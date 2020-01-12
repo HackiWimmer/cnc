@@ -3,6 +3,8 @@
   <!-- Handler Generation is ON -->
   <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
   <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
+  <object class="wxBitmap" name="16-cog">bitmaps\16-cog.png</object>
+  <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>
@@ -10,5 +12,10 @@
   <object class="wxBitmap" name="appointment-new">bitmaps\appointment-new.png</object>
   <object class="wxBitmap" name="appointment-new-5">bitmaps\appointment-new-5.png</object>
   <object class="wxBitmap" name="appointment-soon">bitmaps\appointment-soon.png</object>
+  <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
+  <object class="wxBitmap" name="bricks">bitmaps\bricks.png</object>
+  <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
+  <object class="wxBitmap" name="insert-chart-bar">bitmaps\insert-chart-bar.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
+  <object class="wxBitmap" name="weather-clouds-2 (2)">bitmaps\weather-clouds-2 (2).png</object>
 </resource>

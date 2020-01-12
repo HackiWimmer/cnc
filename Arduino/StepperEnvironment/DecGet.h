@@ -37,14 +37,13 @@ class ArduinoCmdDecoderGetter : public ArduinoCmdDecoderBase {
 
     // ----------------------------------------------------------------------
     byte decodeGetter() {
+      typedef ArduinoMainLoop AML;
+      
       result.reset();
 
-      // Wait a protion of time. This is very importent 
-      // to give the serial a chance to take a breath
-      AE::delayMicroseconds(1000);
-
-      if ( Serial.available() > 0 )
-        result.pid = Serial.read();
+      byte b[1];
+      if ( AML::readSerialBytesWithTimeout(b, 1) == 1 )
+        result.pid = b[0];
         
       // process . . .
       return process(result);

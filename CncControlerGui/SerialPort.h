@@ -366,6 +366,8 @@ class Serial : public SerialOSD {
 		static const char* decodeContollerResult(int ret);
 		// returns the class name
 		virtual const char* getClassName() { return "SerialPort"; } 
+		// can process the PID_SPEED_FEED_MODE setter
+		virtual bool knowsSpeedMode() const { return false; }
 		// returns the emulator type
 		virtual bool isEmulator() const { return false; }
 		// return the port type
@@ -458,7 +460,6 @@ class Serial : public SerialOSD {
 		
 		double getMeasuredFeedSpeed_MM_MIN() 		{ return measuredFeedSpeed_MM_SEC * 60; }
 		double getMeasuredFeedSpeed_MM_SEC() 		{ return measuredFeedSpeed_MM_SEC; }
-		virtual void traceSpeedInformation() 		{}
 
 		virtual void notifySetupSuccesfullyFinsihed() {}
 

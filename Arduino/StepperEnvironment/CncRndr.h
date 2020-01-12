@@ -1,6 +1,8 @@
 #ifndef CNC_POSITION_RENDERER_H
 #define CNC_POSITION_RENDERER_H
 
+#include "ArdoVal.h"
+
 class ArduinoPositionRenderer {
 
   public: 
@@ -8,14 +10,12 @@ class ArduinoPositionRenderer {
     //-------------------------------------------------------------------------
     struct RS {
       
-      static const int      POINT_LENGTH     = 3;
-      static const int      IDX_X            = 0;
-      static const int      IDX_Y            = 1;
-      static const int      IDX_Z            = 2;
+      static const uint8_t  POINT_LENGTH     = 3;
       
       static int32_t        A[POINT_LENGTH];
       static int32_t        B[POINT_LENGTH];
     
+      static uint16_t       impulseCount;
       static uint16_t       xStepCount;
       static uint16_t       yStepCount;
       static uint16_t       zStepCount;
@@ -27,10 +27,11 @@ class ArduinoPositionRenderer {
       static void reset() {
         memset(A, 0, sizeof(A));
         memset(B, 0, sizeof(B));
-    
-        xStepCount = 0;
-        yStepCount = 0;
-        zStepCount = 0;
+
+        impulseCount  = 0;
+        xStepCount    = 0;
+        yStepCount    = 0;
+        zStepCount    = 0;
       }
     
       //------------------------------------------------------------------------
@@ -58,19 +59,45 @@ class ArduinoPositionRenderer {
     virtual ~ArduinoPositionRenderer();
 
     // controller interface
+    byte                    directMove(int8_t dx, int8_t dy, int8_t dz);
     byte                    renderMove(int32_t dx, int32_t dy, int32_t dz);
     
-    virtual void            notifyPositionChange()          = 0;
-    virtual byte            checkRuntimeEnv()               = 0;
+    virtual byte            checkRuntimeEnv()                                 = 0;
+    virtual void            notifyMovePart(int8_t dx, int8_t dy, int8_t dz)   = 0;
+    virtual byte            setDirection(AxisId aid, int32_t steps)           = 0;
+    virtual byte            performStep (AxisId aid)                          = 0;
+    virtual byte            initiateStep(AxisId aid)                          = 0;
+    virtual byte            finalizeStep(AxisId aid)                          = 0;
+};
+
+class ArduinoImpulseCalculator : public ArduinoPositionRenderer {
+
+  private:
+    ArduinoImpulseCalculator(const ArduinoImpulseCalculator&);
+
+  protected:
+
+    virtual byte            checkRuntimeEnv()                        { return RET_OK; }
+    virtual byte            setDirection(AxisId, int32_t )           { return RET_OK; }
+    virtual byte            performStep (AxisId)                     { return RET_OK; }
+    virtual byte            initiateStep(AxisId)                     { return RET_OK; }
+    virtual byte            finalizeStep(AxisId)                     { return RET_OK; }
+    virtual void            notifyMovePart(int8_t, int8_t, int8_t)   {}
+
+  public:
+    ArduinoImpulseCalculator() 
+    : ArduinoPositionRenderer() 
+    {}
     
-    virtual byte            setDirectionX(int32_t steps)    = 0;
-    virtual byte            setDirectionY(int32_t steps)    = 0;
-    virtual byte            setDirectionZ(int32_t steps)    = 0;
-   
-    virtual byte            performNextStepX()              = 0;
-    virtual byte            performNextStepY()              = 0;
-    virtual byte            performNextStepZ()              = 0;
- 
+    virtual ~ArduinoImpulseCalculator()
+    {}
+
+    int32_t calculate(int32_t dx, int32_t dy, int32_t dz) {
+      if ( renderMove(dx, dy, dz) != RET_OK )
+        return -1;
+
+      return RS::impulseCount;          
+    }
 };
 
 #endif

@@ -246,7 +246,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer434->Add(m_mainViewSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_mainViewBook = new wxSimplebook(m_winMainView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMainView, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_mainViewBook = new wxSimplebook(m_winMainView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMainView, wxSize(-1,-1)), 0);
     m_mainViewBook->SetName(wxT("m_mainViewBook"));
     m_mainViewBook->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -460,7 +460,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1294->Add(editorToolBoxSizer, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_editorToolBox = new wxSimplebook(m_panelTplEdit, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_editorToolBox = new wxSimplebook(m_panelTplEdit, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), 0);
     m_editorToolBox->SetName(wxT("m_editorToolBox"));
     m_editorToolBox->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -601,7 +601,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer6102->AddGrowableRow(0);
     m_panelTplSourceExt->SetSizer(flexGridSizer6102);
     
-    m_simpleBookSourceExt = new wxSimplebook(m_panelTplSourceExt, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplSourceExt, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_simpleBookSourceExt = new wxSimplebook(m_panelTplSourceExt, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplSourceExt, wxSize(-1,-1)), 0);
     m_simpleBookSourceExt->SetName(wxT("m_simpleBookSourceExt"));
     wxImageList* m_simpleBookSourceExt_il = new wxImageList(16, 16);
     m_simpleBookSourceExt->AssignImageList(m_simpleBookSourceExt_il);
@@ -2737,7 +2737,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4348->Add(m_monitorViewSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_monitorViewBook = new wxSimplebook(m_winMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMonitorView, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_monitorViewBook = new wxSimplebook(m_winMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMonitorView, wxSize(-1,-1)), 0);
     m_monitorViewBook->SetName(wxT("m_monitorViewBook"));
     m_monitorViewBook->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -3733,7 +3733,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer6118->Add(flexGridSizer6204, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_simpleBookOutBoundEditor = new wxSimplebook(m_panel7697, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7697, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_simpleBookOutBoundEditor = new wxSimplebook(m_panel7697, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7697, wxSize(-1,-1)), 0);
     m_simpleBookOutBoundEditor->SetName(wxT("m_simpleBookOutBoundEditor"));
     m_simpleBookOutBoundEditor->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -5098,7 +5098,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer3833->Add(m_serialSpyPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_sypDetailsBook = new wxSimplebook(m_serialSpyView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_serialSpyView, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_sypDetailsBook = new wxSimplebook(m_serialSpyView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_serialSpyView, wxSize(-1,-1)), 0);
     m_sypDetailsBook->SetName(wxT("m_sypDetailsBook"));
     m_sypDetailsBook->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -6020,7 +6020,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_menuRequestor->AppendSeparator();
     
-    m_miRqtTimestamp = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Sketch Timestamp"), wxT(""), wxITEM_NORMAL);
+    m_miRqtTimestamp = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Sketch Timestamp"), _("fdf"), wxITEM_NORMAL);
     m_miRqtTimestamp->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("time")));
     m_menuRequestor->Append(m_miRqtTimestamp);
     
@@ -6039,20 +6039,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_miRqtPins = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Pin Report"), wxT(""), wxITEM_NORMAL);
     m_miRqtPins->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
     m_menuRequestor->Append(m_miRqtPins);
-    
-    m_menuRequestor->AppendSeparator();
-    
-    m_menuItemInfoMessage = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Test - Info Message"), wxT(""), wxITEM_NORMAL);
-    m_menuItemInfoMessage->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-information (2)")));
-    m_menuRequestor->Append(m_menuItemInfoMessage);
-    
-    m_menuItemWarningMessage = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Test - Warning Message"), wxT(""), wxITEM_NORMAL);
-    m_menuItemWarningMessage->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-warning-3 (2)")));
-    m_menuRequestor->Append(m_menuItemWarningMessage);
-    
-    m_menuItemErrorMessage = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Test - Error Message"), wxT(""), wxITEM_NORMAL);
-    m_menuItemErrorMessage->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-error-5 (2)")));
-    m_menuRequestor->Append(m_menuItemErrorMessage);
     
     m_menuRequestor->AppendSeparator();
     
@@ -6610,9 +6596,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miRqtHeartbeat->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestHeartbeat), NULL, this);
     this->Connect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
     this->Connect(m_miRqtPins->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestPins), NULL, this);
-    this->Connect(m_menuItemInfoMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestInfoMessage), NULL, this);
-    this->Connect(m_menuItemWarningMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestWarningMessage), NULL, this);
-    this->Connect(m_menuItemErrorMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorMessage), NULL, this);
     this->Connect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Connect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Connect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
@@ -6912,9 +6895,6 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miRqtHeartbeat->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestHeartbeat), NULL, this);
     this->Disconnect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
     this->Disconnect(m_miRqtPins->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestPins), NULL, this);
-    this->Disconnect(m_menuItemInfoMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestInfoMessage), NULL, this);
-    this->Disconnect(m_menuItemWarningMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestWarningMessage), NULL, this);
-    this->Disconnect(m_menuItemErrorMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorMessage), NULL, this);
     this->Disconnect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Disconnect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Disconnect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);

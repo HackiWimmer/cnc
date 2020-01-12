@@ -20,7 +20,6 @@
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
 #include "CncSerialSpyListCtrl.h"
-#include "CfgAccelerationGraph.h"
 #include "CncGamepadControllerState.h"
 #include "CncMotionMonitorVertexTrace.h"
 #include "CncParsingSynopsisTrace.h"
@@ -135,6 +134,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void openSpeedPlayground(wxCommandEvent& event);
 		
 		virtual void onChangePreviewMode(wxCommandEvent& event);
 		virtual void connectSec(wxCommandEvent& event);
@@ -174,11 +174,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void updateRenderResolution(wxCommandEvent& event);
 		virtual void toggleIdleRequests(wxCommandEvent& event);
 		virtual void cncMainViewChanged(wxNotebookEvent& event);
-		virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event);
 		virtual void clickSpeedControl(wxCommandEvent& event);
 		virtual void rcSecureDlg(wxCommandEvent& event);
-		virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
-		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
 		virtual void leaveSerialSpy(wxMouseEvent& event);
 		virtual void changeConfigToolbook(wxToolbookEvent& event);
 		virtual void warmStartController(wxCommandEvent& event);
@@ -206,9 +203,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void goPosSypNextId(wxCommandEvent& event);
 		virtual void goPosSypPrevId(wxCommandEvent& event);
 		virtual void selectSerialSpyMode(wxCommandEvent& event);
-		virtual void requestErrorMessage(wxCommandEvent& event);
-		virtual void requestWarningMessage(wxCommandEvent& event);
-		virtual void requestInfoMessage(wxCommandEvent& event);
 		virtual void clearSetterList(wxCommandEvent& event);
 		virtual void loopRepeatTest(wxCommandEvent& event);
 		virtual void selectPositionSpyContent(wxCommandEvent& event);
@@ -564,9 +558,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void decorateIdleState(bool state);
 		
-		void initSpeedConfigPlayground();
-		void updateSpeedConfigPlayground();
-		
 		void enableSourceEditorMenuItems(bool enable);
 		
 		void startAnimationControl();
@@ -637,7 +628,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncGCodeSequenceListCtrl*		gCodeSequenceList;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
 		CncSerialSpyListCtrl* 			serialSpyListCtrl;
-		CfgAccelerationGraph* 			accelGraphPanel; 
 		CncGameportController*			cncGameportDlg;
 		CncSvgViewer*					outboundEditorSvgView;
 		CncNavigatorPanel*				navigatorPanel;

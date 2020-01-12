@@ -190,11 +190,10 @@ void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
 	if ( micros <= 0 )
 		return;
 	
-	CncNanoTimestamp tsStart = getNanoTimestamp();
-	CncNanoTimestamp tsEnd   = 0LL;
-	do {
-		tsEnd  = getNanoTimestamp();
-	} while ( (tsEnd - tsStart)/1000 < micros );
+	const CncNanoTimestamp tsStart = getNanoTimestamp();
+	while ( (getNanoTimestamp() - tsStart) <= micros * 1000 )
+		;
+	
 #endif
 
 #ifdef __WXGTK__

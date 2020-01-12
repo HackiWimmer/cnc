@@ -119,26 +119,12 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetEditor( wxT("ComboBox") );
 			CncConfig::registerProperty(CncWork_Ctl_REPLY_THRESHOLD_METRIC, prop);
 			
-			prop = ctl->AppendChild( new wxStringProperty(" --> Position - Reply Threshold X [steps]", NEXT_PROP_ID, ""));
+			prop = ctl->AppendChild( new wxStringProperty(" --> Position - Reply Threshold [impulse]", NEXT_PROP_ID, ""));
 			prop->Enable(false);
 			prop->SetHelpString("");
 			prop->SetEditor( wxT("TextCtrl") );
 			prop->SetValue("");
-			registerProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_X, prop);
-			
-			prop = ctl->AppendChild( new wxStringProperty(" --> Position - Reply Threshold Y [steps]", NEXT_PROP_ID, ""));
-			prop->Enable(false);
-			prop->SetHelpString("");
-			prop->SetEditor( wxT("TextCtrl") );
-			prop->SetValue("");
-			registerProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y, prop);
-			
-			prop = ctl->AppendChild( new wxStringProperty(" --> Position - Reply Threshold Z [steps]", NEXT_PROP_ID, ""));
-			prop->Enable(false);
-			prop->SetHelpString("");
-			prop->SetEditor( wxT("TextCtrl") );
-			prop->SetValue("");
-			registerProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z, prop);
+			registerProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS, prop);
 			
 			//...............
 			prop = ctl->AppendChild( new wxBoolProperty("Avoid sending of duplicate Setter values", NEXT_PROP_ID, true));

@@ -26,17 +26,15 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 	     || name == CncConfig_DEF_RAPID_SPEED_PERCENT
 	     || name == CncConfig_DEF_WORK_SPEED_PERCENT
 
-	     || name == CncConfig_PULS_WIDTH_LOW_X
-	     || name == CncConfig_PULS_WIDTH_LOW_Y
-	     || name == CncConfig_PULS_WIDTH_LOW_Z 
-		 
 	     || name == CncConfig_PULS_WIDTH_HIGH_X
 	     || name == CncConfig_PULS_WIDTH_HIGH_Y
 	     || name == CncConfig_PULS_WIDTH_HIGH_Z 
 	   ) 
 	{
 		THE_CONFIG->calculateSpeedValues();
-		APP_PROXY::initSpeedConfigPlayground();
+		
+		#warning reactivate if nesseccary
+		//APP_PROXY::initSpeedConfigPlayground();
 	}
 }
 ////////////////////////////////////////////////////////////////////////
@@ -73,31 +71,38 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 		{
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Max speed X axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop = speed->AppendChild( new wxFloatProperty("Max speed X axis [mm/min]", NEXT_PROP_ID, 100.0));
 			prop->Enable(false);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_MAX_SPEED_X_MM_MIN, prop);
 
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Max speed Y axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop = speed->AppendChild( new wxFloatProperty("Max speed Y axis [mm/min]", NEXT_PROP_ID, 100.0));
 			prop->Enable(false);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_MAX_SPEED_Y_MM_MIN, prop);
 
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Max speed Z axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop = speed->AppendChild( new wxFloatProperty("Max speed Z axis [mm/min]", NEXT_PROP_ID, 100.0));
 			prop->Enable(false);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_MAX_SPEED_Z_MM_MIN, prop);
 
 			//...................
-			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Consolidated Max speed X, Y and Z axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			validator.SetPrecision(1); validator.SetRange(0.0, 8000.0);
+			prop = speed->AppendChild( new wxFloatProperty("Max speed X, Y and Z axis [mm/min]", NEXT_PROP_ID, 100.0));
 			prop->Enable(false);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN, prop);
+			
+			//...................
+			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
+			prop = speed->AppendChild( new wxFloatProperty("Max speed X and Y axis [mm/min]", NEXT_PROP_ID, 100.0));
+			prop->Enable(false);
+			prop->SetValidator(validator);
+			registerProperty(CncConfig_MAX_SPEED_XY_MM_MIN, prop);
 			
 			//...............
 			pgParameterMgrArr.Clear();
@@ -119,7 +124,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Default rapid speed X, Y and Z axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop = speed->AppendChild( new wxFloatProperty("Default rapid speed X, Y and Z axis [mm/min]", NEXT_PROP_ID, 100.0));
 			prop->Enable(false);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN, prop);
@@ -133,70 +138,70 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Default work speed X, Y and Z axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop = speed->AppendChild( new wxFloatProperty("Default work speed X, Y and Z axis [mm/min]", NEXT_PROP_ID, 100.0));
 			prop->Enable(false);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_DEF_WORK_SPEED_MM_MIN, prop);
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Acceleration start speed X axis [mm/minute]", NEXT_PROP_ID, 300.0));
+			prop = speed->AppendChild( new wxFloatProperty("Acceleration start speed X axis [mm/min]", NEXT_PROP_ID, 300.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_ACCEL_START_SPEED_X_MM_MIN, prop);
 
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Acceleration stop speed X axis [mm/minute]", NEXT_PROP_ID, 300.0));
+			prop = speed->AppendChild( new wxFloatProperty("Acceleration stop speed X axis [mm/min]", NEXT_PROP_ID, 300.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_ACCEL_STOP_SPEED_X_MM_MIN, prop);
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Acceleration start speed Y axis [mm/minute]", NEXT_PROP_ID, 300.0));
+			prop = speed->AppendChild( new wxFloatProperty("Acceleration start speed Y axis [mm/min]", NEXT_PROP_ID, 300.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_ACCEL_START_SPEED_Y_MM_MIN, prop);
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Acceleration stop speed Y axis [mm/minute]", NEXT_PROP_ID, 300.0));
+			prop = speed->AppendChild( new wxFloatProperty("Acceleration stop speed Y axis [mm/min]", NEXT_PROP_ID, 300.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_ACCEL_STOP_SPEED_Y_MM_MIN, prop);
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Acceleration start speed Y axis [mm/minute]", NEXT_PROP_ID, 300.0));
+			prop = speed->AppendChild( new wxFloatProperty("Acceleration start speed Y axis [mm/min]", NEXT_PROP_ID, 300.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_ACCEL_START_SPEED_Z_MM_MIN, prop);
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Acceleration stop speed Z axis [mm/minute]", NEXT_PROP_ID, 300.0));
+			prop = speed->AppendChild( new wxFloatProperty("Acceleration stop speed Z axis [mm/min]", NEXT_PROP_ID, 300.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_ACCEL_STOP_SPEED_Z_MM_MIN, prop);
 
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Max work speed X axis [mm/minute]", NEXT_PROP_ID, 1500.0));
+			prop = speed->AppendChild( new wxFloatProperty("Max work speed X axis [mm/min]", NEXT_PROP_ID, 1500.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_MAX_WORK_SPEED_X_MM_MIN, prop);
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Max work speed X axis [mm/minute]", NEXT_PROP_ID, 1500.0));
+			prop = speed->AppendChild( new wxFloatProperty("Max work speed X axis [mm/min]", NEXT_PROP_ID, 1500.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_MAX_WORK_SPEED_Y_MM_MIN, prop);
 			
 			//...................
 			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
-			prop = speed->AppendChild( new wxFloatProperty("Max work speed X axis [mm/minute]", NEXT_PROP_ID, 1500.0));
+			prop = speed->AppendChild( new wxFloatProperty("Max work speed X axis [mm/min]", NEXT_PROP_ID, 1500.0));
 			prop->Enable(true);
 			prop->SetValidator(validator);
 			registerProperty(CncConfig_MAX_WORK_SPEED_Z_MM_MIN, prop);
@@ -269,15 +274,6 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			registerProperty(CncConfig_STEPS_Z, prop);
 			
 			//...............
-			validator.SetPrecision(0); validator.SetRange(1, 10000);
-			prop = axis->AppendChild( new wxIntProperty("Steps XYZ AVG [/360]", NEXT_PROP_ID, 200));
-			prop->Enable(false);
-			prop->SetHelpString(_T(""));
-			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_STEPS_XYZ, prop);
-		
-			//...............
 			validator.SetPrecision(3); validator.SetRange(0.1, 50.0);
 			prop = axis->AppendChild( new wxFloatProperty("Pitch X Axis [mm/360]", NEXT_PROP_ID, 1.0));
 			prop->Enable(true);
@@ -303,15 +299,6 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
 			registerProperty(CncConfig_PITCH_Z, prop);
-		
-			//...............
-			validator.SetPrecision(0); validator.SetRange(0, 1000);
-			prop = axis->AppendChild( new wxIntProperty("Low Puls Width X Axis [us]", NEXT_PROP_ID, 100));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_LOW_X, prop);
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(0, 1000);
@@ -324,30 +311,12 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(0, 1000);
-			prop = axis->AppendChild( new wxIntProperty("Low Puls Width Y Axis [us]", NEXT_PROP_ID, 100));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_LOW_Y, prop);
-			
-			//...............
-			validator.SetPrecision(0); validator.SetRange(0, 1000);
 			prop = axis->AppendChild( new wxIntProperty("High Puls Width Y Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
 			registerProperty(CncConfig_PULS_WIDTH_HIGH_Y, prop);
-			
-			//...............
-			validator.SetPrecision(0); validator.SetRange(0, 1000);
-			prop = axis->AppendChild( new wxIntProperty("Low Puls Width Z Axis [us]", NEXT_PROP_ID, 100));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_LOW_Z, prop);
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(0, 1000);

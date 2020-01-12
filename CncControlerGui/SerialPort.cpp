@@ -612,9 +612,9 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 	unsigned int cnt = 0;
 	
 	while ( remainingBytes > 0 ) {
-		#warning
-		// this causes a dead look in case of using ther serial thread
+		#warning this causes a dead look in case of using the serial thread
 		//bytesRead = readData(oneReadBuf, std::min(remainingBytes, maxBytes));
+		
 		bytesRead = readData(oneReadBuf, 1);
 		if ( bytesRead > 0 ) {
 			
@@ -802,7 +802,7 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "Serial::processSetter: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		std::clog << " Running Command: '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
-		if ( pid < PID_DOUBLE_RANG_START )	{
+		if ( pid < PID_FLOAT_RANG_START )	{
 			std::clog << " This Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 	<< "]"
 												 <<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 	<< "]"
 												 <<   "["; 
@@ -812,7 +812,7 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 			std::clog << " This Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 	<< "]"
 			                                     <<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 	<< "]"
 												 <<   "[";
-												 cnc::traceSetterValueList(std::clog, values, DBL_FACT);
+												 cnc::traceSetterValueList(std::clog, values, FLT_FACT);
 			std::clog                            << "]\n";
 		}
 		return true;
@@ -820,7 +820,7 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 	
 	if ( traceSpyInfo && spyWrite ) {
 		std::stringstream ss;
-		if ( pid < PID_DOUBLE_RANG_START )	{
+		if ( pid < PID_FLOAT_RANG_START )	{
 			ss << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0])						<< "]"
 										<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 						<< "]"
 										<<   "[";
@@ -831,7 +831,7 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 			ss << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 						<< "]"
 										<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 						<< "]"
 										<<   "[";
-										cnc::traceSetterValueList(ss, values, DBL_FACT);
+										cnc::traceSetterValueList(ss, values, FLT_FACT);
 			ss 							<<   "]";
 		}
 		
@@ -1543,19 +1543,9 @@ bool Serial::decodeGetter(SerialFetchInfo& sfi) {
 	int count = sfi.Gc.count;
 	for ( int i=0; i<count; i++ ) {
 		
-		#warning
-		if ( false ) {
-			for ( unsigned int j=0; j<LONG_BUF_SIZE; j++ ) {
-				unsigned char b[1];
-				readData(b, 1);
-				sfi.Gc.result[j] = b[0];
-			}
-		} else {
-		
-			if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, LONG_BUF_SIZE, sfi.Gc.timeout) ) != LONG_BUF_SIZE ) {
-				std::cerr << "Serial::decodeGetter: Read failed. Size error! Received size: " << sfi.Gc.bytes << "; PID: " << ArduinoPIDs::getPIDLabel(pid) << std::endl;
-				return false;
-			}
+		if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, LONG_BUF_SIZE, sfi.Gc.timeout) ) != LONG_BUF_SIZE ) {
+			std::cerr << "Serial::decodeGetter: Read failed. Size error! Received size: " << sfi.Gc.bytes << "; PID: " << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+			return false;
 		}
 		
 		memcpy(&sfi.Gc.value, sfi.Gc.result, LONG_BUF_SIZE);
@@ -1593,10 +1583,10 @@ bool Serial::decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi) {
 		
 		if ( pid == PID_XYZ_POS || pid == PID_XYZ_POS_MAJOR || pid == PID_XYZ_POS_DETAIL ) {
 			switch (i) {
-				case  0:	ci.xCtrlPos  = sfi.Mc.value; break;
-				case  4:	ci.yCtrlPos  = sfi.Mc.value; break;
-				case  8:	ci.zCtrlPos  = sfi.Mc.value; break;
-				case 12:	ci.feedSpeed = sfi.Mc.value/DBL_FACT; break;
+				case  0:	ci.xCtrlPos  = sfi.Mc.value; 			break;
+				case  4:	ci.yCtrlPos  = sfi.Mc.value; 			break;
+				case  8:	ci.zCtrlPos  = sfi.Mc.value; 			break;
+				case 12:	ci.feedSpeed = sfi.Mc.value/FLT_FACT; 	break;
 			}
 		} else {
 			switch ( pid ) {
@@ -1834,13 +1824,13 @@ bool Serial::test() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = false;
 	
-	if ( false ) {
+	if ( true ) {
 		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
 		
 		bool fOneB  = true;
 		bool fInt8  = true;
-		bool fInt16 = true;
-		bool fInt32 = true;
+		bool fInt16 = false;
+		bool fInt32 = false;
 		
 		for ( int i = 0; i <50; i++ ) {
 			// one byte values

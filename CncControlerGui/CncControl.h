@@ -70,15 +70,15 @@ class CncControl {
 		CncLongPosition curCtlPos;
 		// speed values
 		// actual rte (measured) speed value
-		double realtimeFeedSpeed_MM_MIN;
+		float realtimeFeedSpeed_MM_MIN;
 		
 		// default values for work and rapid
-		double defaultFeedSpeedRapid_MM_MIN;
-		double defaultFeedSpeedWork_MM_MIN;
+		float defaultFeedSpeedRapid_MM_MIN;
+		float defaultFeedSpeedWork_MM_MIN;
 
 		// actual configured speed type and value
 		CncSpeedMode configuredSpeedMode;
-		double configuredFeedSpeed_MM_MIN;
+		float configuredFeedSpeed_MM_MIN;
 
 		// Duration counter
 		unsigned int durationCounter;
@@ -124,7 +124,7 @@ class CncControl {
 		void reconfigureSimpleMove(bool correctPositions);
 		
 		// secial convesion to transfer a double as long
-		long convertDoubleToCtrlLong(unsigned char 	id, double d);
+		long convertDoubleToCtrlLong(unsigned char 	id, float d);
 		
 		// display the given pos in the open gl view
 		void monitorPosition(const CncLongPosition& pos);
@@ -162,18 +162,18 @@ class CncControl {
 		
 		// Get the current speed parameter
 		CncSpeedMode getConfiguredSpeedMode() 		{ return configuredSpeedMode; }
-		double getRealtimeFeedSpeed_MM_SEC()		{ return realtimeFeedSpeed_MM_MIN / 60.0; }
-		double getRealtimeFeedSpeed_MM_MIN()		{ return realtimeFeedSpeed_MM_MIN; }
-		double getConfiguredFeedSpeed_MM_SEC() 		{ return configuredFeedSpeed_MM_MIN / 60.0; }
-		double getConfiguredFeedSpeed_MM_MIN() 		{ return configuredFeedSpeed_MM_MIN; }
+		float getRealtimeFeedSpeed_MM_SEC()			{ return realtimeFeedSpeed_MM_MIN / 60.0; }
+		float getRealtimeFeedSpeed_MM_MIN()			{ return realtimeFeedSpeed_MM_MIN; }
+		float getConfiguredFeedSpeed_MM_SEC() 		{ return configuredFeedSpeed_MM_MIN / 60.0; }
+		float getConfiguredFeedSpeed_MM_MIN() 		{ return configuredFeedSpeed_MM_MIN; }
 		
 		// Change the current speed parameter
 		bool changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s);
-		void setDefaultRapidSpeed_MM_MIN(double s);
-		void setDefaultWorkSpeed_MM_MIN(double s);
+		void setDefaultRapidSpeed_MM_MIN(float s);
+		void setDefaultWorkSpeed_MM_MIN(float s);
 		
-		bool changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
-		bool changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
+		bool changeCurrentFeedSpeedXYZ_MM_SEC(float value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
+		bool changeCurrentFeedSpeedXYZ_MM_MIN(float value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
 		
 		// signal wrapper
 		bool sendInterrupt() 		{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
@@ -385,7 +385,6 @@ class CncControl {
 		bool canProcessIdle() 											{ return getSerial()->canProcessIdle(); }
 		bool isIdleActive()    											{ return getSerial()->isIdleActive(); }
 		
-		void traceSpeedInformation() 									{ getSerial()->traceSpeedInformation(); }
 		void setSpyMode(Serial::SypMode sm)								{ getSerial()->setSpyMode(sm); }
 		void processTrigger(const Serial::Trigger::BeginRun& tr)		{ getSerial()->processTrigger(tr); }
 		void processTrigger(const Serial::Trigger::EndRun& tr)			{ getSerial()->processTrigger(tr); }

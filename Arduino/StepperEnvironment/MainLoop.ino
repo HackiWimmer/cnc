@@ -6,7 +6,6 @@
 #include "CncCtrl.h"
 #include "MainLoop.h"
 
-static const char*    testMessageText     = "Test text";
 ByteBuffer            SWB;
 
 #ifndef SKETCH_COMPILE 
@@ -170,62 +169,55 @@ void ArduinoMainLoop::sleepMicroseconds(unsigned long usec) {
   AE::delayMicroseconds(micro);
 }
 //////////////////////////////////////////////////////////////
-bool ArduinoMainLoop::dblCompare(double a, double b) {
+bool ArduinoMainLoop::fltCompare(float a, float b) {
 //////////////////////////////////////////////////////////////
-  const double epsilon = ((double)0.000999);
+  static const float epsilon = ((float)0.000999);
   return (abs(a - b) < epsilon);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool ArduinoMainLoop::dblCompareNull(double a) {
+bool ArduinoMainLoop::fltCompareNull(float a) {
 /////////////////////////////////////////////////////////////////////////////////////
-   return dblCompare(a, 0.0);
+   return fltCompare(a, 0.0);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool ArduinoMainLoop::isDoubleValue(const unsigned char pid) {
+bool ArduinoMainLoop::isFloatValue(const unsigned char pid) {
 /////////////////////////////////////////////////////////////////////////////////////
-  return  pid >= PID_DOUBLE_RANG_START; 
+  return  pid >= PID_FLOAT_RANG_START; 
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool ArduinoMainLoop::convertLongToDouble(const int32_t val, double& ret) {
+bool ArduinoMainLoop::convertLongToFloat(const int32_t val, float& ret) {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( val == MIN_LONG || val == MAX_LONG ) {
     ret = 0.0;
     return false;
   }
   
-  ret = ((double)val)/DBL_FACT; 
+  ret = ((float)val)/FLT_FACT; 
   return true;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-void ArduinoMainLoop::sendHeartbeat() {
-/////////////////////////////////////////////////////////////////////////////////////
-  const unsigned char byteCount = sizeof(int32_t);
-  SWB.init();
-  SWB.put(RET_SOH);
-  SWB.put(PID_HEARTBEAT);
-  SWB.put(byteCount);
-  SWB.put((int32_t)(AE::millis() % MAX_LONG));
-  SWB.write();
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void ArduinoMainLoop::sendHeartbeat(unsigned char limitState, unsigned char supportState) {
 /////////////////////////////////////////////////////////////////////////////////////
-  const unsigned char byteCount = 2 * sizeof(int32_t);
+  const uint8_t bCnt = limitState != '\0' && supportState != '\0' ? 2 : 1;
+  const unsigned char byteCount = bCnt * sizeof(int32_t);
   SWB.init();
   SWB.put(RET_SOH);
   SWB.put(PID_HEARTBEAT);
   SWB.put(byteCount);
   SWB.put((int32_t)(AE::millis() % MAX_LONG));
 
-  for (unsigned int i=0; i<I2C_BYTE_COUNT; i++) {
-    switch ( i ) {
-      case I2C_BYTE_LIMIT_STATE:    SWB.put(limitState);   break;
-      case I2C_BYTE_SUPPORT_STATE:  SWB.put(supportState); break;
+  if ( bCnt > 1 ) {
+    for (unsigned int i=0; i<I2C_BYTE_COUNT; i++) {
+      switch ( i ) {
+        case I2C_BYTE_LIMIT_STATE:    SWB.put(limitState);   break;
+        case I2C_BYTE_SUPPORT_STATE:  SWB.put(supportState); break;
+      }
     }
+  
+    SWB.put((unsigned char)255); // reserved
+    SWB.put((unsigned char)255); // reserved
   }
-
-  SWB.put((unsigned char)255); // reserved
-  SWB.put((unsigned char)255); // reserved
+  
   SWB.write();
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -242,24 +234,24 @@ bool ArduinoMainLoop::peakSerial(unsigned char& c) {
 /////////////////////////////////////////////////////////////////////////////////////
 bool ArduinoMainLoop::checkSerialForPauseCommands(bool currentPauseState) {
 /////////////////////////////////////////////////////////////////////////////////////
-    bool ret = currentPauseState;
+  bool ret = currentPauseState;
+  
+  if ( Serial.available() > 0 ) {
     
-    if ( Serial.available() > 0 ) {
-      
-      switch ( Serial.peek() ) {
-        case 'p': ret = PAUSE_INACTIVE; 
-                  // remove the cmd for serial
-                  Serial.read(); 
-                  break;
-                  
-        case 'P': ret = PAUSE_ACTIVE;
-                  // remove the cmd for serial
-                  Serial.read();  
-                  break;
-      }
+    switch ( Serial.peek() ) {
+      case 'p': ret = PAUSE_INACTIVE; 
+                // remove the cmd for serial
+                Serial.read(); 
+                break;
+                
+      case 'P': ret = PAUSE_ACTIVE;
+                // remove the cmd for serial
+                Serial.read();  
+                break;
     }
+  }
 
-    return ret;
+  return ret;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -269,7 +261,7 @@ byte ArduinoMainLoop::readSerialByteWithTimeout(uint32_t timeoutMicros) {
   return readSerialBytesWithTimeout(b, 1, timeoutMicros) == 1 ? b[0] : 0;
 }
 ///////////////////////////////////////////////////////////////
-int ArduinoMainLoop::readSerialBytesWithTimeout(byte* buffer, int length, uint32_t timeoutMicros) {
+int8_t ArduinoMainLoop::readSerialBytesWithTimeout(byte* buffer, int8_t length, uint32_t timeoutMicros) {
 ////////////////////////////////////////////////////////////////
   byte* internalPointer   = buffer;
   int bytesAvailable      = 0;
@@ -483,38 +475,16 @@ void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, Writ
 #endif
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void ArduinoMainLoop::pushTextMessage(const char type, const char* msg) {
-/////////////////////////////////////////////////////////////////////////////////////  
-  LastErrorCodes::clear();
-  LastErrorCodes::messageText = msg;
-  
-  pushMessage(type, E_NO_ERROR, LastErrorCodes::writeToSerial);
-}
-/////////////////////////////////////////////////////////////////////////////////////  
-void ArduinoMainLoop::pushInfoMessage    (const unsigned char eid)    { pushMessage(MT_INFO,         eid); }
-void ArduinoMainLoop::pushWarningMessage (const unsigned char eid)    { pushMessage(MT_WARNING,      eid); }
-void ArduinoMainLoop::pushErrorMessage   (const unsigned char eid)    { pushMessage(MT_ERROR,        eid); }
-void ArduinoMainLoop::pushDebugMessage   (const unsigned char eid)    { pushMessage(MT_DEBUG,        eid); }
-void ArduinoMainLoop::pushInfoMessage    (const char* msg)            { pushTextMessage(MT_INFO,     msg); }
-void ArduinoMainLoop::pushWarningMessage (const char* msg)            { pushTextMessage(MT_WARNING,  msg); }
-void ArduinoMainLoop::pushErrorMessage   (const char* msg)            { pushTextMessage(MT_ERROR,    msg); }
-void ArduinoMainLoop::pushDebugMessage   (const char* msg)            { pushTextMessage(MT_DEBUG,    msg); }
-/////////////////////////////////////////////////////////////////////////////////////  
-
-/////////////////////////////////////////////////////////////////////////////////////
 byte ArduinoMainLoop::reset() {
 /////////////////////////////////////////////////////////////////////////////////////
   CNC_MAIN_LOOP_LOG_FUNCTION();
   
-  #warning reactivation
-/*
   // Turn off ...
-  controller.switchToolState(TOOL_STATE_OFF, FORCE);
-  controller.switchStepperState(ENABLE_STATE_OFF);
+  controller->turnOff();
 
   // Hide the Interrupt LED
   switchOutputPinState(PIN_INTERRUPT_LED, OFF);
-*/
+
   // broadcast reset
   controller->reset();
   clearSerial();
@@ -613,8 +583,8 @@ int ArduinoMainLoop::waitForSerialData(uint32_t timeoutMicros) {
     return Serial.available();
 
   const uint32_t timeout = ArdoObj::maximum(timeoutMicros, minSerialReadTimeoutMicros);
-
-  uint32_t ts = AE::micros();  
+  const uint32_t ts      = AE::micros();  
+  
   while ( Serial.available() == 0 ) {
 
     // The return value of micros() will overflow (go back to zero), 
@@ -629,38 +599,6 @@ int ArduinoMainLoop::waitForSerialData(uint32_t timeoutMicros) {
 
   return Serial.available();
  
-}
-///////////////////////////////////////////////////////
-void ArduinoMainLoop::testLastError() {
-///////////////////////////////////////////////////////
-  LastErrorCodes::clear();
-  LastErrorCodes::register1Byte_A = 'A';
-  LastErrorCodes::register1Byte_B = 'B';
-  LastErrorCodes::register1Byte_C = 'C';
-  LastErrorCodes::register1Byte_D = 'D';
-  LastErrorCodes::register1Byte_E = 'E';
-  LastErrorCodes::register1Byte_F = 'F';
-  LastErrorCodes::register1Byte_G = 'G';
-  LastErrorCodes::register1Byte_H = 'H';
-
-  LastErrorCodes::register4Byte_A =   1;
-  LastErrorCodes::register4Byte_B =   2;
-  LastErrorCodes::register4Byte_C =   3;
-  LastErrorCodes::register4Byte_D =   4;
-  LastErrorCodes::register4Byte_E =   5;
-  LastErrorCodes::register4Byte_F =   6;
-  LastErrorCodes::register4Byte_G =   7;
-  LastErrorCodes::register4Byte_H =   8;
-  
-  pushErrorMessage(E_TEST_ERROR_CODE);
-}
-///////////////////////////////////////////////////////
-byte ArduinoMainLoop::testLab() {
-///////////////////////////////////////////////////////
-  CNC_MAIN_LOOP_LOG_FUNCTION();
-  // to test anything - only
-  
-  return RET_OK;
 }
 //////////////////////////////////////////////////////////////
 bool ArduinoMainLoop::readI2CSlave(ArdoObj::I2CData& data) {
@@ -762,62 +700,39 @@ void ArduinoMainLoop::loop() {
           break;
 
     // SB command - Idle handling
-    case CMD_IDLE:
-          controller->processIdle();
-          r = RET_OK;
-          break;
-
     // SB command - Heartbeat handling
+    case CMD_IDLE:
     case CMD_HEARTBEAT:
-          controller->processHeartbeat();
+          controller->processHeartbeat(c);
           r = RET_OK;
           break;
           
     // MB command - Parameter getter
     case CMD_GETTER:
-          r = controller->processGetter();
+          r = controller->acceptGetter();
           break;
           
     // SB command - Parameter setter
     case CMD_SETTER:
-          r = controller->processSetter();
+          r = controller->acceptSetter();
           break;
           
     // MB command - Movement
     case CMD_MOVE: // obsolete command
     case CMD_RENDER_AND_MOVE:
     case CMD_MOVE_UNIT_SIGNAL:
-          r = controller->processMove(c);
+          r = controller->acceptMove(c);
+          break;
+          
+    case CMD_MOVE_SEQUENCE:
+    case CMD_RENDER_AND_MOVE_SEQUENCE:
+          r = controller->acceptMoveSequence(c);
           break;
 
     // --------------------------------------------------------------------------
     // Commands - multi byte return
     // --------------------------------------------------------------------------
-    
-    case CMD_TEST_LAB:
-          r = ArduinoMainLoop::testLab();
-          break;
-    
-    case CMD_TEST_LAST_ERROR:
-          ArduinoMainLoop::testLastError();
-          r = RET_OK;
-          break;
-    
-    case CMD_TEST_INFO_MESSAGE:
-          ArduinoMainLoop::pushInfoMessage(testMessageText);
-          r = RET_OK;
-          break;
 
-    case CMD_TEST_WARN_MESSAGE:
-          ArduinoMainLoop::pushWarningMessage(testMessageText);
-          r = RET_OK;
-          break;
-
-    case CMD_TEST_ERROR_MESSAGE:
-          ArduinoMainLoop::pushErrorMessage(testMessageText);
-          r = RET_OK;
-          break;
-              
      // MB command - Print configuration
     case CMD_PRINT_CONFIG:
           printConfig();
@@ -842,14 +757,9 @@ void ArduinoMainLoop::loop() {
           break;
    
     default: 
-          #warning reactivate
-          // temp only
-          //ArduinoMainLoop::clearSerial();
-          //r = RET_OK;
-
           LastErrorCodes::clear();
           LastErrorCodes::register1Byte_A = c;
-          ArduinoMainLoop::pushErrorMessage(E_UNKNOW_COMMAND);
+          ArduinoMainLoop::pushMessage(MT_ERROR, E_UNKNOW_COMMAND);
 
   } // switch ( c )
 

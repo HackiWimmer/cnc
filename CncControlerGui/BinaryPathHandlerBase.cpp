@@ -161,7 +161,7 @@ bool BinaryPathHandlerHumanReadableView::displayMoveSequence(const unsigned char
 	CncCommandDecoder::MoveSequenceInfo seqInfo;
 	seqInfo.In.parseAllPortions = true;
 	
-	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f)
+	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz)
 	if ( CncCommandDecoder::decodeMoveSequence(buffer, nbBytes, seqInfo, this) == false )
 		return false;
 		
@@ -232,7 +232,7 @@ bool BinaryPathHandlerHumanReadableView::processCommand(const unsigned char* buf
 	return ret;
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHumanReadableView::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
+void BinaryPathHandlerHumanReadableView::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
 /////////////////////////////////////////////////////////////
 	const double factX = THE_CONFIG->getDisplayFactX();
 	const double factY = THE_CONFIG->getDisplayFactY();

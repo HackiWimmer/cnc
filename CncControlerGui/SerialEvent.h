@@ -14,7 +14,7 @@ class SerialEvent : public wxThreadEvent {
 		// --------------------------------------------------------------------
 		struct Message {
 			
-			enum Type {	MT_INFO='I', MT_WARNING='W', MT_DEBUG='D', MT_ERROR='E' };
+			enum Type {	MT_INFO='I', MT_WARNING='W', MT_DEBUG='D', MT_ERROR='E', MT_SEPERATOR='S' };
 			Type 		type 	= MT_INFO;
 
 			wxString 	message;
@@ -22,9 +22,10 @@ class SerialEvent : public wxThreadEvent {
 			
 			void setType(const char t) {
 				switch ( t ) {
-					case 'W':	type = MT_WARNING;	break;
-					case 'D':	type = MT_DEBUG;	break;
-					case 'E':	type = MT_ERROR;	break;
+					case 'W':	type = MT_WARNING;		break;
+					case 'D':	type = MT_DEBUG;		break;
+					case 'E':	type = MT_ERROR;		break;
+					case 'S': 	type = MT_SEPERATOR; 	break;
 					default:	type = MT_INFO;
 				}
 			}

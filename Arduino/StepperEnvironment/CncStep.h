@@ -35,41 +35,27 @@ class CncArduinoStepper {
 
   protected:
     CncArduinoController*           controller;
-    ArdoObj::PwmProfile             pwmProfile;
     byte                            stpPin;
     byte                            dirPin;
     byte                            lmtPin;
     
     bool                            INCREMENT_DIRECTION_VALUE;
     bool                            interrupted;
-    bool                            calculateDuration;
     bool                            minReached;
     bool                            maxReached;
+    bool                            stepPhase;
     
-    uint32_t                        tsPrevStep;
-    uint32_t                        tsCurrStep;
+    uint32_t                        tsStartStep;
 
-    double                          pitch;
+    float                           feedrate;
     
-    uint16_t                        dirPulseWidth;
-    uint16_t                        lowPulsWidth;
     uint16_t                        highPulsWidth;
-    uint16_t                        minPulsWidth;
 
     StepDirection                   stepDirection;
 
-    uint32_t                        steps;
-    uint32_t                        avgStepDuartion;
-
-    int32_t                         stepCounter;
-    int32_t                         stepCounterOverflow;
-    
     int32_t                         curPos;
-    int32_t                         posReplyThresholdCount;
     
-    inline void                     incStepCounter();
     inline bool                     checkLimit(int dir);
-    inline void                     calcStepLoopDuration(int32_t lastDuration);
     
     explicit CncArduinoStepper(const StepperSetup& ss);
     
@@ -78,8 +64,6 @@ class CncArduinoStepper {
 
     virtual char                    getAxisId()                         = 0;
     virtual unsigned char           getIncrementDirectionValuePid()     = 0;
-
-    ArdoObj::PwmProfile&            getPwnProfile()                      { return pwmProfile; }
 
     void                            printConfig();
     void                            reset();
@@ -90,32 +74,20 @@ class CncArduinoStepper {
     byte                            getDirectionPin()             const  { return dirPin; }
     byte                            getStepPin()                  const  { return stpPin; }
     byte                            getLimitPin()                 const  { return lmtPin; }
-    
+
+    bool                            isStepPhase()                 const  { return stepPhase;  }
     bool                            isMinReached()                const  { return minReached; }
     bool                            isMaxReached()                const  { return maxReached; }
     
-    uint16_t                        getLowPulseWidth()            const  { return lowPulsWidth;  }
     uint16_t                        getHighPulseWidth()           const  { return highPulsWidth; }
-    void                            setLowPulseWidth(int lpw)            { lowPulsWidth  = lpw;  minPulsWidth = highPulsWidth + lowPulsWidth; }
-    void                            setHighPulseWidth(int hpw)           { highPulsWidth = hpw;  minPulsWidth = highPulsWidth + lowPulsWidth; }
+    void                            setHighPulseWidth(int hpw)           { highPulsWidth = hpw; }
     
-    uint32_t                        getSteps()                     const { return steps; }
-    void                            setSteps(uint32_t s)                 { steps = s;    }
-    
-    double                          getPitch()                     const { return pitch; }
-    void                            setPitch(double p)                   { pitch = p;    }
+    float                           getFeedrate()                  const { return feedrate; }
+    void                            setFeedrate(float f)                 { feedrate = f;    }
     
     void                            resetPosition()                      { setPosition(0); }
     void                            setPosition(int32_t val)             { curPos = val;   }
     int32_t                         getPosition()                  const { return curPos;  }
-
-    void                            resetStepCounter()                   { stepCounter = MIN_LONG; stepCounterOverflow = 0L; }
-    int32_t                         getStepCounter()               const { return stepCounter; }
-    int32_t                         getStepCounterOverflow()       const { return stepCounterOverflow; }
-
-    int32_t                         getPosReplyThresholdCouter()   const { return posReplyThresholdCount; }
-    inline void                     incPosReplyThresholdCouter()         { posReplyThresholdCount++;      }
-    void                            resetPosReplyThresholdCouter()       { posReplyThresholdCount = 0;    }
 
     int32_t                         getLimitState();
     int32_t                         readLimitState()                     { return readLimitState(stepDirection); }
@@ -123,14 +95,15 @@ class CncArduinoStepper {
 
     void                            setLimitStateManually(int32_t value);
 
-    uint32_t                        getAvgStepDuration()           const  { return avgStepDuartion; }
-
     StepDirection                   getStepDirection()             const  { return stepDirection; }
     bool                            setDirection(int32_t steps);
     bool                            setDirection(const StepDirection stepDirection);
-    byte                            performNextStep();
+
+    byte                            performStep();
+    byte                            initiateStep(); 
+    byte                            finalizeStep();
     
-    int32_t                         isReadyToRun();    
+    bool                            isReadyToRun();    
 
 
     // The following functionality is to overrule the stepper cabling

@@ -8,6 +8,9 @@
 #include "wxCrafterImages.h"
 #include "CncConfig.h"
 
+#include "../Arduino/StepperEnvironment/ArdoObj.h"
+
+
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,7 +75,7 @@ CncConfig::CncConfig(MainFrame* app)
 , dispFactX(1.0), dispFactY(1.0), dispFactZ(1.0)
 , calcFactX(1.0), calcFactY(1.0), calcFactZ(1.0)
 , dispFactX3D(1.0), dispFactY3D(1.0), dispFactZ3D(1.0)
-, replyThresholdX(1), replyThresholdY(1), replyThresholdZ(1)
+, replyThreshold(1)
 , currentToolId(-1)
 , currentZDepth(0.0)
 , maxZDistance(50.0)
@@ -217,33 +220,26 @@ double CncConfig::connvert_STP_SEC_TO_MM_MIN(int32_t speed, unsigned int steps, 
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
-	CncSpeedController csc;
-	csc.setup('X', getStepsX(), getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthX() + getHighPulsWidthX());
-	csc.setup('Y', getStepsY(), getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthY() + getHighPulsWidthY());
-	csc.setup('Z', getStepsZ(), getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthZ() + getHighPulsWidthZ());
-	
-	const int stepsXYZ     = ( getStepsX() +  getStepsY() +  getStepsZ() ) / 3;
-	const double maxSpeedX = csc.X.maxDistPerMinute;
-	const double maxSpeedY = csc.Y.maxDistPerMinute;
-	const double maxSpeedZ = csc.Z.maxDistPerMinute;
+	CtrlSpeedValues::setupTact    (getHighPulsWidthX(), getHighPulsWidthY(), getHighPulsWidthZ());
+	CtrlSpeedValues::setupMaxSpeed(getFeedrateX(),      getFeedrateY(),      getFeedrateZ());
 	
 	wxPGProperty* prop = NULL;
-	{ prop = getProperty(CncConfig_STEPS_XYZ); 					if (prop != NULL) prop->SetValue(stepsXYZ); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedX); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedY); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedZ); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		if (prop != NULL) prop->SetValue(csc.getMaxFeedSpeed_MM_MIN()); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_1DX_MMSec());   }
+	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_1DY_MMSec());   }
+	{ prop = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_1DZ_MMSec());   }
+	{ prop = getProperty(CncConfig_MAX_SPEED_XY_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_2DXY_MMSec());  }
+	{ prop = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_3DXYZ_MMSec()); }
 	
 	{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_PERCENT);
 		if (prop != NULL) {
-			const double val = csc.getMaxFeedSpeed_MM_MIN() * prop->GetValue().GetDouble();
+			const double val = 60 * CtrlSpeedValues::getMaxF_2DXY_MMSec() * prop->GetValue().GetDouble();
 			{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
 		}
 	}
 	
 	{ prop = getProperty(CncConfig_DEF_WORK_SPEED_PERCENT);
 		if (prop != NULL) {
-			const double val = csc.getMaxFeedSpeed_MM_MIN() * prop->GetValue().GetDouble();
+			const double val = 60 * CtrlSpeedValues::getMaxF_2DXY_MMSec() * prop->GetValue().GetDouble();
 			{ prop = getProperty(CncConfig_DEF_WORK_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
 		}
 	}
@@ -519,7 +515,8 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 		osdConfigList.get(groupName, entryName, val);
 	} 
 	
-	prop->SetValueFromString(val);
+	//prop->SetValueFromString(val);
+	prop->SetValue(val);
 	
 	/*
 	if ( propType == wxPG_VARIANT_TYPE_LONG ) {
@@ -864,13 +861,8 @@ unsigned int CncConfig::calculateThreshold(double pitch, unsigned int steps) {
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::calculateThresholds() {
 ////////////////////////////////////////////////////////////////////////
-	replyThresholdX = calculateThreshold(getPitchX(), getStepsX());
-	replyThresholdY = calculateThreshold(getPitchY(), getStepsY());
-	replyThresholdZ = calculateThreshold(getPitchZ(), getStepsZ());
-	
-	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_X)->SetValue((int)replyThresholdX);
-	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y)->SetValue((int)replyThresholdY);
-	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z)->SetValue((int)replyThresholdZ);
+	replyThreshold = calculateThreshold(getPitchX(), getStepsX());
+	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS)->SetValue((int)replyThreshold);
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setRenderResolution(double res) {
@@ -979,10 +971,6 @@ const bool CncConfig::getPreProcessorCntMoveSequneces()				{ PROPERTY(CncWork_Ct
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsZ() 							{ PROPERTY(CncConfig_STEPS_Z) 							return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getStepsXYZ()							{ PROPERTY(CncConfig_STEPS_XYZ) 					 	return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getLowPulsWidthX() 					{ PROPERTY(CncConfig_PULS_WIDTH_LOW_X) 			 		return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getLowPulsWidthY() 					{ PROPERTY(CncConfig_PULS_WIDTH_LOW_Y) 			 		return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getLowPulsWidthZ() 					{ PROPERTY(CncConfig_PULS_WIDTH_LOW_Z) 			 		return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getHighPulsWidthX() 					{ PROPERTY(CncConfig_PULS_WIDTH_HIGH_X) 			 	return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getHighPulsWidthY() 					{ PROPERTY(CncConfig_PULS_WIDTH_HIGH_Y) 			 	return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getHighPulsWidthZ() 					{ PROPERTY(CncConfig_PULS_WIDTH_HIGH_Z) 				return p->GetValue().GetInteger(); }
@@ -1003,8 +991,11 @@ const double CncConfig::getDefaultWorkSpeed_MM_MIN()				{ PROPERTY(CncConfig_DEF
 const double CncConfig::getMaxSpeedX_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_X_MM_MIN) 				return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxSpeedY_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_Y_MM_MIN) 				return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxSpeedZ_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_Z_MM_MIN) 				return p->GetValue().GetDouble(); }
+const double CncConfig::getMaxSpeedXY_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_XY_MM_MIN) 				return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxSpeedXYZ_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_XYZ_MM_MIN) 				return p->GetValue().GetDouble(); }
 
+
+#warning replace this with A;B;C
 const double CncConfig::getAccelStartSpeedX_MM_MIN()				{ PROPERTY(CncConfig_ACCEL_START_SPEED_X_MM_MIN) 		return p->GetValue().GetDouble(); }
 const double CncConfig::getAccelStopSpeedX_MM_MIN()					{ PROPERTY(CncConfig_ACCEL_STOP_SPEED_X_MM_MIN) 		return p->GetValue().GetDouble(); }
 const double CncConfig::getAccelStartSpeedY_MM_MIN()				{ PROPERTY(CncConfig_ACCEL_START_SPEED_Y_MM_MIN) 		return p->GetValue().GetDouble(); }
@@ -1020,19 +1011,19 @@ const CncUnit CncConfig::getDisplayUnit() 							{ return currentUnit; }
 const CncUnit CncConfig::getDefaultDisplayUnit()					{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? CncMetric : CncSteps ); }
 const char*  CncConfig::getDefaultDisplayUnitAsStr()				{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? "mm" : "steps" ); }
 
-const wxString& CncConfig::getFileBrowser(wxString& ret)			{ PROPERTY(CncApplication_Tool_FILE_BROWSER) 			ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getSVGFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_SVG_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getBINFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_BIN_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getGCodeFileViewer(wxString& ret)		{ PROPERTY(CncApplication_Tool_GCODE_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getXMLFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_XML_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getBrowser(wxString& ret)				{ PROPERTY(CncApplication_Tool_BROWSER) 				ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getEditorTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_EXTERNAL_EDITOR) 		ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getPyCamTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_PY_CAM); 				ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getDefaultSpeedModeXYZ(wxString& ret)	{ PROPERTY(CncConfig_DEF_SPEED_MODE_XYZ) 				ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getDefaultPort(wxString& ret)			{ PROPERTY(CncApplication_Com_DEFALT_PORT) 				ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getDefaultTplDir(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_DIRECTORY) 		ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getDefaultTplFile(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_FILE) 				ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getRunConfirmationMode(wxString& ret)	{ PROPERTY(CncApplication_CONFIRMATION_MODE) 			ret.assign(p->GetValueAsString()); return ret; }
+const wxString& CncConfig::getFileBrowser(wxString& ret)			{ PROPERTY(CncApplication_Tool_FILE_BROWSER) 			ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getSVGFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_SVG_FILE_VIEWER) 		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getBINFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_BIN_FILE_VIEWER) 		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getGCodeFileViewer(wxString& ret)		{ PROPERTY(CncApplication_Tool_GCODE_FILE_VIEWER) 		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getXMLFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_XML_FILE_VIEWER) 		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getBrowser(wxString& ret)				{ PROPERTY(CncApplication_Tool_BROWSER) 				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getEditorTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_EXTERNAL_EDITOR) 		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getPyCamTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_PY_CAM); 				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultSpeedModeXYZ(wxString& ret)	{ PROPERTY(CncConfig_DEF_SPEED_MODE_XYZ) 				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultPort(wxString& ret)			{ PROPERTY(CncApplication_Com_DEFALT_PORT) 				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultTplDir(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_DIRECTORY) 		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultTplFile(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_FILE) 				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getRunConfirmationMode(wxString& ret)	{ PROPERTY(CncApplication_CONFIRMATION_MODE) 			ret.assign(p->GetValue().GetString()); return ret; }
 
 ////////////////////////////////////////////////////////////////////////
 // config setters

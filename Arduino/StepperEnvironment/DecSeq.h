@@ -16,6 +16,7 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
 
       ArdoObj::ValueInfo vi        = ArdoObj::ValueInfo(0);
 
+      byte cmd                     = CMD_INVALID;
       byte pid                     = PID_UNKNOWN;
       byte ret                     = RET_OK;
       byte portionSize             = 0;
@@ -32,12 +33,19 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
       int32_t dx                   = 0;
       int32_t dy                   = 0;
       int32_t dz                   = 0;
-      int32_t f                    = 0;
 
       void reset() {
         *this = Result();
       }
-
+      
+      void resetDynValues() {
+        pid                  = PID_UNKNOWN;
+        ret                  = RET_OK;
+        portionSize          = 0;
+        dx                   = 0;
+        dy                   = 0;
+        dz                   = 0;
+      }
     };
     
     ArduinoCmdDecoderMoveSequence()
@@ -49,43 +57,47 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
     {}
 
   protected:
-    virtual byte process(const ArduinoCmdDecoderMoveSequence::Result& seq) = 0;
+    
+    virtual byte initialize(const ArduinoCmdDecoderMoveSequence::Result& seq) = 0;
+    virtual byte process   (const ArduinoCmdDecoderMoveSequence::Result& seq) = 0;
+    virtual byte finalize  (const ArduinoCmdDecoderMoveSequence::Result& seq) = 0;
 
   private:
+    typedef ArduinoMainLoop AML;
     Result result;  
 
     // ----------------------------------------------------------------------
-    void debugValues(unsigned short idx) {
-  
+    void debugValues(byte idx) {
         LastErrorCodes::clear();
-        LastErrorCodes::register1Byte_A = idx;
-        LastErrorCodes::register1Byte_B = result.pid;
-        LastErrorCodes::register1Byte_C = result.portionSize;
-        LastErrorCodes::register1Byte_D = result.portionCounter;
-  
-        LastErrorCodes::register1Byte_H = (unsigned char)Serial.available();
-  
-        LastErrorCodes::register4Byte_A = result.totalIndex;
-        LastErrorCodes::register4Byte_B = result.totalLength;
-        LastErrorCodes::register4Byte_C = result.totalRemaining;
+
+        ARDO_DEBUG_MESSAGE('S',"Debug MoveSequence Values")
         
-        LastErrorCodes::register4Byte_E = result.dx;
-        LastErrorCodes::register4Byte_F = result.dy;
-        LastErrorCodes::register4Byte_G = result.dz;
-        LastErrorCodes::register4Byte_H = result.f;
+        ARDO_DEBUG_VALUE(" MVSQ.more available",      (int16_t)Serial.available())
+        
+        ARDO_DEBUG_VALUE(" MVSQ.idx",                 (int16_t)idx)
+        ARDO_DEBUG_VALUE(" MVSQ.pid",                 (int16_t)result.pid)
+        ARDO_DEBUG_VALUE(" MVSQ.portionSize",         (int16_t)result.portionSize)
+        ARDO_DEBUG_VALUE(" MVSQ.portionCounter",      (int16_t)result.portionCounter)
+        
+        ARDO_DEBUG_VALUE(" MVSQ.TotalIndex",          result.totalIndex)
+        ARDO_DEBUG_VALUE(" MVSQ.TotalLength",         result.totalLength)
+        ARDO_DEBUG_VALUE(" MVSQ.TotalRemaining",      result.totalRemaining)
+  
+        ARDO_DEBUG_VALUE(" MVSQ.dx",                  result.dx)
+        ARDO_DEBUG_VALUE(" MVSQ.dy",                  result.dy)
+        ARDO_DEBUG_VALUE(" MVSQ.dz",                  result.dz)
     }
   
     // ----------------------------------------------------------------------
-    void logInfo(unsigned char idx, unsigned char eid) {
+    void logInfo(byte idx, byte eid) {
         debugValues(idx);
-        ArduinoMainLoop::pushMessage(MT_DEBUG, eid, LastErrorCodes::writeToSerial);
     }
   
     // ----------------------------------------------------------------------
-    byte logError(unsigned char idx, unsigned char eid) {
+    byte logError(byte idx, byte eid) {
+        AML::pushMessage(MT_ERROR, eid, LastErrorCodes::writeToSerial);
+        AML::clearSerial();
         debugValues(idx);
-        ArduinoMainLoop::pushMessage(MT_ERROR, eid, LastErrorCodes::writeToSerial);
-        ArduinoMainLoop::clearSerial();
         
         return RET_ERROR;
     }
@@ -114,7 +126,7 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
     int parseValues() {
       
       // determine pid and paring rules
-      result.pid = ArduinoMainLoop::readSerialByteWithTimeout();
+      result.pid = AML::readSerialByteWithTimeout();
       result.vi.set(result.pid);
       
       if ( result.vi.isValid() == false ) {
@@ -126,9 +138,9 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
       unsigned int valCount  = result.vi.getValueCount();
       int totalSize          = 1 + ( byteCount != 0 ? valCount * byteCount : 1 );
       int readIndex          = totalSize - 1;
-  
+
       int32_t v[ArdoObj::ValueInfo::MaxValueCount]; 
-      v[0] = v[1] = v[2] = 0; v[3] = 0;
+      v[0] = v[1] = v[2] = 0;
       
       byte b;
       unsigned short count = 0;
@@ -142,31 +154,30 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
           //                  zzyyxx
           //                  -+-+-+ 
           //                          bit  +               bit  -     0
-          case 0:   b = ArduinoMainLoop::readSerialByteWithTimeout();
-                    v[0] = bitRead(b, 6) ? +1 : bitRead(b, 7) ? -1 :  0;
-                    v[1] = bitRead(b, 0) ? +1 : bitRead(b, 1) ? -1 :  0;
-                    v[2] = bitRead(b, 2) ? +1 : bitRead(b, 3) ? -1 :  0;
-                    v[3] = bitRead(b, 4) ? +1 : bitRead(b, 5) ? -1 :  0;
+          case 0:   b = AML::readSerialByteWithTimeout();
+                    v[0] = bitRead(b, 0) ? +1 : bitRead(b, 1) ? -1 :  0;
+                    v[1] = bitRead(b, 2) ? +1 : bitRead(b, 3) ? -1 :  0;
+                    v[2] = bitRead(b, 4) ? +1 : bitRead(b, 5) ? -1 :  0;
                     
                     readIndex -= 1;
                     count     += ArdoObj::ValueInfo::MaxValueCount; // to break the while loop
                     break;
                     
-          case 1:   if ( ArduinoMainLoop::readInt8(v[count]) == false ) {
+          case 1:   if ( AML::readInt8(v[count]) == false ) {
                       logError(42, E_INVALID_MOVE_SEQUENCE);
                       return -1;
                     }
                     readIndex -= 1;
                     break;
     
-          case 2:   if ( ArduinoMainLoop::readInt16(v[count]) == false ) {
+          case 2:   if ( AML::readInt16(v[count]) == false ) {
                       logError(43, E_INVALID_MOVE_SEQUENCE);
                       return -1;
                     }
                     readIndex -= 2;
                     break;
     
-          case 4:   if ( ArduinoMainLoop::readInt32(v[count]) == false ) {
+          case 4:   if ( AML::readInt32(v[count]) == false ) {
                       logError(44, E_INVALID_MOVE_SEQUENCE);
                       return -1;
                     }
@@ -181,15 +192,11 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
       }
   
       // assign x, y, z and f depending on given type
-      const unsigned short p = result.vi.hasF() ? 1 : 0;
-      if ( result.vi.hasF() )  result.f = v[0];
-      else                     result.f = 0;
-        
-      if      ( result.vi.hasXYZ() ) { result.dx = v[p+0]; result.dy = v[p+1]; result.dz = v[p+2]; }
-      else if ( result.vi.hasXY()  ) { result.dx = v[p+0]; result.dy = v[p+1]; result.dz = 0;      }
-      else if ( result.vi.hasX()   ) { result.dx = v[p+0]; result.dy = 0;      result.dz = 0;      }
-      else if ( result.vi.hasY()   ) { result.dx = 0;      result.dy = v[p+0]; result.dz = 0;      }
-      else if ( result.vi.hasZ()   ) { result.dx = 0;      result.dy = 0;      result.dz = v[p+0]; }
+      if      ( result.vi.hasXYZ() ) { result.dx = v[0]; result.dy = v[1]; result.dz = v[2]; }
+      else if ( result.vi.hasXY()  ) { result.dx = v[0]; result.dy = v[1]; result.dz = 0;      }
+      else if ( result.vi.hasX()   ) { result.dx = v[0]; result.dy = 0;    result.dz = 0;      }
+      else if ( result.vi.hasY()   ) { result.dx = 0;    result.dy = v[0]; result.dz = 0;      }
+      else if ( result.vi.hasZ()   ) { result.dx = 0;    result.dy = 0;    result.dz = v[0]; }
       else                           { logError(46, E_INVALID_MOVE_SEQUENCE); return -1;  }
   
       if ( readIndex != 0 ) {
@@ -209,14 +216,25 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
   public:
 
     // ----------------------------------------------------------------------
-    byte decodeMoveSequence() {
+    byte decodeMoveSequence(byte cmd) {
       result.reset();
+      result.cmd = cmd;
 
       // first read header values
-      if ( ArduinoMainLoop::readInt32(result.totalLength) == false )  return logError(10, E_INVALID_MOVE_SEQUENCE);
-      if ( ArduinoMainLoop::readInt32(result.lengthX)     == false )  return logError(11, E_INVALID_MOVE_SEQUENCE);
-      if ( ArduinoMainLoop::readInt32(result.lengthY)     == false )  return logError(12, E_INVALID_MOVE_SEQUENCE);
-      if ( ArduinoMainLoop::readInt32(result.lengthZ)     == false )  return logError(13, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.totalLength) == false )  return logError(10, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.lengthX)     == false )  return logError(11, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.lengthY)     == false )  return logError(12, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.lengthZ)     == false )  return logError(13, E_INVALID_MOVE_SEQUENCE);
+
+      if ( initialize(result) != RET_OK )
+        logError(14, E_INVALID_MOVE_SEQUENCE);
+        
+      if ( false ) {
+        ARDO_DEBUG_VALUE("result.totalLength", result.totalLength)
+        ARDO_DEBUG_VALUE("result.lengthX", result.lengthX)
+        ARDO_DEBUG_VALUE("result.lengthY", result.lengthY)
+        ARDO_DEBUG_VALUE("result.lengthZ", result.lengthZ)
+      }
 
       result.totalRemaining = result.totalLength;
       result.totalIndex     = result.totalLength;
@@ -226,9 +244,10 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
       while ( result.totalRemaining > 0 ) {
         
         // wait max an extra frame of one second for the next portion
-        ArduinoMainLoop::waitForSerialData(1000L * 1000L);
-        
-        result.portionSize = ArduinoMainLoop::readSerialByteWithTimeout();
+        AML::waitForSerialData(1000L * 1000L);
+
+        result.resetDynValues();
+        result.portionSize = AML::readSerialByteWithTimeout();
         
         if ( result.portionSize == 0 )
           return logError(20, E_INVALID_MOVE_SEQUENCE);
@@ -245,6 +264,7 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
         }
       }
 
+      result.ret = finalize(result);
       return result.ret;
     }
 };

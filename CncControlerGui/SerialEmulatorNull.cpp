@@ -14,67 +14,72 @@ int pointA[POINT_LENGTH], pointB[POINT_LENGTH];
 
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
-: SerialSpyPort(cnc)
-, CncCommandDecoder::CallbackInterface()
-, posReplyThresholdX(1)
-, posReplyThresholdY(1)
-, posReplyThresholdZ(1)
-, limitStates()
-, speedSimulator(NULL)
-, positionCounter(MIN_LONG)
-, stepCounterX(MIN_LONG)
-, stepCounterY(MIN_LONG)
-, stepCounterZ(MIN_LONG)
-, positionOverflowCounter(0)
-, stepOverflowCounterX(0)
-, stepOverflowCounterY(0)
-, stepOverflowCounterZ(0)
-, setterMap()
-, targetMajorPos(0L, 0L, 0L)
-, curEmulatorPos(0L, 0L, 0L)
-, lastCommand()
-, lastSignal(CMD_INVALID)
-, maxDimStepsX(THE_CONFIG->getMaxDimensionStepsX())
-, maxDimStepsY(THE_CONFIG->getMaxDimensionStepsY())
-, maxDimStepsZ(THE_CONFIG->getMaxDimensionStepsZ())
+: SerialSpyPort							(cnc)
+, ArduinoPositionRenderer				()
+, ArduinoAccelManager					()
+, CncCommandDecoder::CallbackInterface	()
+, posReplyThreshold						(1)
+, limitStates							()
+, tsMoveStart							(0LL)
+, usToSleep								(0LL)
+, positionCounter						(MIN_LONG)
+, stepCounterX							(MIN_LONG)
+, stepCounterY							(MIN_LONG)
+, stepCounterZ							(MIN_LONG)
+, positionOverflowCounter				(0)
+, stepOverflowCounterX					(0)
+, stepOverflowCounterY					(0)
+, stepOverflowCounterZ					(0)
+, setterMap								()
+, targetMajorPos						(0L, 0L, 0L)
+, curEmulatorPos						(0L, 0L, 0L)
+, cfgFeedSpeed_MMMin					(0.0)
+, rtmFeedSpeed_MMMin					(0.0)
+, lastCommand							()
+, lastSignal							(CMD_INVALID)
+, maxDimStepsX							(THE_CONFIG->getMaxDimensionStepsX())
+, maxDimStepsY							(THE_CONFIG->getMaxDimensionStepsY())
+, maxDimStepsZ							(THE_CONFIG->getMaxDimensionStepsZ())
 
 ///////////////////////////////////////////////////////////////////
 {
-	speedSimulator = new CncSpeedSimulator();
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
-: SerialSpyPort(portName) 
-, posReplyThresholdX(1)
-, posReplyThresholdY(1)
-, posReplyThresholdZ(1)
-, limitStates()
-, speedSimulator(NULL)
-, positionCounter(MIN_LONG)
-, stepCounterX(MIN_LONG)
-, stepCounterY(MIN_LONG)
-, stepCounterZ(MIN_LONG)
-, positionOverflowCounter(0)
-, stepOverflowCounterX(0)
-, stepOverflowCounterY(0)
-, stepOverflowCounterZ(0)
-, setterMap()
-, targetMajorPos(0L, 0L, 0L)
-, curEmulatorPos(0L, 0L, 0L)
-, lastCommand()
-, lastSignal(CMD_INVALID)
+: SerialSpyPort							(portName) 
+, ArduinoPositionRenderer				()
+, ArduinoAccelManager					()
+, CncCommandDecoder::CallbackInterface	()
+, posReplyThreshold						(1)
+, limitStates							()
+, tsMoveStart							(0LL)
+, usToSleep								(0LL)
+, positionCounter						(MIN_LONG)
+, stepCounterX							(MIN_LONG)
+, stepCounterY							(MIN_LONG)
+, stepCounterZ							(MIN_LONG)
+, positionOverflowCounter				(0)
+, stepOverflowCounterX					(0)
+, stepOverflowCounterY					(0)
+, stepOverflowCounterZ					(0)
+, setterMap								()
+, targetMajorPos						(0L, 0L, 0L)
+, curEmulatorPos						(0L, 0L, 0L)
+, cfgFeedSpeed_MMMin					(0.0)
+, rtmFeedSpeed_MMMin					(0.0)
+, lastCommand							()
+, lastSignal							(CMD_INVALID)
+, maxDimStepsX							(THE_CONFIG->getMaxDimensionStepsX())
+, maxDimStepsY							(THE_CONFIG->getMaxDimensionStepsY())
+, maxDimStepsZ							(THE_CONFIG->getMaxDimensionStepsZ())
 ///////////////////////////////////////////////////////////////////
 {
-	speedSimulator = new CncSpeedSimulator();
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::~SerialEmulatorNULL() {
 ///////////////////////////////////////////////////////////////////
-	if ( speedSimulator != NULL )
-		delete speedSimulator;
-		
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
@@ -114,10 +119,7 @@ void SerialEmulatorNULL::reset() {
 	
 	lastCommand.MoveSequence.reset();
 	
-	posReplyThresholdX = 1;
-	posReplyThresholdY = 1;
-	posReplyThresholdZ = 1;
-	
+	posReplyThreshold = 1;
 	curEmulatorPos.setXYZ(0L, 0L, 0L);
 	
 	setterMap.clear();
@@ -134,9 +136,9 @@ void SerialEmulatorNULL::resetStepCounter() {
 	stepCounterX			= MIN_LONG;
 	stepCounterY			= MIN_LONG;
 	stepCounterZ			= MIN_LONG;
-	stepOverflowCounterX	= 0;;
-	stepOverflowCounterY	= 0;;
-	stepOverflowCounterZ	= 0;;
+	stepOverflowCounterX	= 0;
+	stepOverflowCounterY	= 0;
+	stepOverflowCounterZ	= 0;
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::resetCounter() {
@@ -227,6 +229,16 @@ bool SerialEmulatorNULL::evaluateLimitStateZ() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::isReadyToRun() {
+///////////////////////////////////////////////////////////////////
+	if ( isAccelInitialized() == false ) {
+		std::cerr << CNC_LOG_FUNCT << " ArduinoAccelManager isn't initialized!" << std::endl;
+		return false;
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	int ret = 0;
@@ -268,15 +280,6 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 													break;
 			
 			case CMD_PRINT_PIN_REPORT: 				ret = performText((unsigned char*)(buffer), nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel::addPinReportRow(...) for more details
-													break;
-			
-			case CMD_TEST_INFO_MESSAGE:				ret = performMsg((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'I', "This is a test message from type: INFO"));
-													break;
-			
-			case CMD_TEST_WARN_MESSAGE:				ret = performMsg((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'W', "This is a test message from type: WARNING"));
-													break;
-			
-			case CMD_TEST_ERROR_MESSAGE:			ret = performMsg((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'E', "This is a test message from type: ERROR"));
 													break;
 			
 			default:								// for all unsupported commands provide
@@ -388,26 +391,6 @@ int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int n
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::performMsg(unsigned char *buffer, unsigned int nbByte, const char* response) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT( lastCommand.index == 0 );
-		
-	if ( response == NULL )
-		return -1;
-		
-	if ( buffer == NULL )
-		return -1;
-		
-	lastCommand.Serial.write(RET_SOH);
-	lastCommand.Serial.write(PID_MSG);
-	lastCommand.Serial.write(response);
-	lastCommand.Serial.write(MBYTE_CLOSE);
-	lastCommand.Serial.write(RET_OK);
-	
-	// support the first byte
-	return performSerialBytes(buffer, nbByte);
-}
-///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::performText(unsigned char *buffer, unsigned int nbByte, const char* response) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( lastCommand.index == 0 );
@@ -441,12 +424,12 @@ int SerialEmulatorNULL::performConfiguration(unsigned char *buffer, unsigned int
 	SetterMap::iterator it;
 	for ( it=setterMap.begin(); it!=setterMap.end(); ++it ) {
 		wxString valueList(wxString::Format(" %d:", it->first));
-		SetterValueList values = it->second;
+		cnc::SetterValueList values = it->second;
 		unsigned int counter = 0;
 		for ( auto itvl = values.begin(); itvl != values.end(); itvl++ ) {
 			
-			if ( it->first >= PID_DOUBLE_RANG_START )	valueList.append(wxString::Format("%.2lf", (double)(*itvl/DBL_FACT)));
-			else										valueList.append(wxString::Format("%d",    *itvl));
+			if ( it->first >= PID_FLOAT_RANG_START )	valueList.append(wxString::Format("%.2f", (float)(*itvl/FLT_FACT)));
+			else										valueList.append(wxString::Format("%d",   *itvl));
 			
 			if ( ++counter != values.size() )
 				valueList.append(", ");
@@ -477,7 +460,6 @@ int SerialEmulatorNULL::performSequenceMove(unsigned char *buffer, unsigned int 
 int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( lastCommand.index == 0 );
-	wxASSERT( speedSimulator != NULL );
 	
 	if ( buffer == NULL )
 		return -1;
@@ -490,7 +472,7 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 	}
 	
 	// secondary write the major position . . .
-	const int32_t speed = (int32_t)(speedSimulator->getRealtimeFeedSpeed_MM_MIN() * DBL_FACT);
+	const int32_t speed = round(getRealtimeFeedSpeed_MMMin() * FLT_FACT);
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_XYZ_POS_MAJOR);
 	lastCommand.Serial.write(targetMajorPos.getX(), targetMajorPos.getY(), targetMajorPos.getZ(), speed);
@@ -612,7 +594,7 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 	
 	switch ( pid ) {
 		
-		case PID_QUERY_READY_TO_RUN:	    writerGetterValues(pid, (int32_t)1); break;
+		case PID_QUERY_READY_TO_RUN:	    writerGetterValues(pid, (int32_t)isReadyToRun()); break;
 		
 		case PID_X_POS:   					writerGetterValues(pid, curEmulatorPos.getX()); break;
 		case PID_Y_POS:   					writerGetterValues(pid, curEmulatorPos.getY()); break;
@@ -633,7 +615,7 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 		default:							auto it = setterMap.find((int)pid);
 											if ( it != setterMap.end() ) {
 												
-												SetterValueList values = (*it).second;
+												cnc::SetterValueList values = (*it).second;
 												lastCommand.Serial.write(pid);
 												lastCommand.Serial.write((unsigned char)values.size());
 												
@@ -674,7 +656,7 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 		unsigned char valBuf[LONG_BUF_SIZE];
 		
 		// update setter map
-		SetterValueList values;
+		cnc::SetterValueList values;
 		for ( unsigned int i=0; i<valueCount; i++ ) {
 			
 			valBuf[0] = buffer[index + 0];
@@ -689,12 +671,19 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 		
 		setterMap[pid] = values;
 
+		// -------------------------------------------------------------
+		auto setupACM = [&](float AA, float AB, float AC, float DA, float DB, float DC) {
+			Function fA, fD;
+
+			fA.A = AA; fA.B = AB; fA.C = AC;
+			fD.A = DA; fD.B = DB; fD.C = DC;
+
+			setupAccelManager(fA, fD);
+		};
+
 		// special handling for later use
 		switch ( pid ) {
-			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = ( values.size() > 0 ? values.front() : 0 ); break;
-			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = ( values.size() > 0 ? values.front() : 0 ); break;
-			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = ( values.size() > 0 ? values.front() : 0 ); break;
-			
+			case PID_POS_REPLY_THRESHOLD:   posReplyThreshold = ( values.size() > 0 ? values.front() : 0 ); break;
 			case PID_RESERT_POS_COUNTER:  	resetPositionCounter(); break;
 			case PID_RESERT_STEP_COUNTER: 	resetStepCounter(); 	break;
 			
@@ -702,36 +691,20 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			case PID_Y_POS:   				curEmulatorPos.setY(( values.size() > 0 ? values.front() : 0 )); break;
 			case PID_Z_POS:  				curEmulatorPos.setZ(( values.size() > 0 ? values.front() : 0 )); break;
 			
-			case PID_PITCH_X:
-			case PID_PITCH_Y:
-			case PID_PITCH_Z:
-			case PID_STEPS_X:
-			case PID_STEPS_Y:
-			case PID_STEPS_Z:
-			case PID_PULSE_WIDTH_LOW_X:
-			case PID_PULSE_WIDTH_LOW_Y:
-			case PID_PULSE_WIDTH_LOW_Z:
+			case PID_FEEDRATE_X:
+			case PID_FEEDRATE_Y:
+			case PID_FEEDRATE_Z:
 			case PID_PULSE_WIDTH_HIGH_X:
 			case PID_PULSE_WIDTH_HIGH_Y:
 			case PID_PULSE_WIDTH_HIGH_Z:
 			case PID_ACCEL_PROFILE:
 			{
 				#warning consider PID_ACCEL_PROFILE values
-				
-				if ( true ) {
-					speedSimulator->setup('X', THE_CONFIG->getStepsX(), THE_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthX() + THE_CONFIG->getHighPulsWidthX(), 5.0, 5.0);
-					speedSimulator->setup('Y', THE_CONFIG->getStepsY(), THE_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthY() + THE_CONFIG->getHighPulsWidthY(), 5.0, 5.0);
-					speedSimulator->setup('Z', THE_CONFIG->getStepsZ(), THE_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthZ() + THE_CONFIG->getHighPulsWidthZ(), 5.0, 5.0);
-				}
-				else {
-					speedSimulator->X.setup(THE_CONFIG->getStepsX(), THE_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthX() + THE_CONFIG->getHighPulsWidthX());
-					speedSimulator->Y.setup(THE_CONFIG->getStepsY(), THE_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthY() + THE_CONFIG->getHighPulsWidthY());
-					speedSimulator->Z.setup(THE_CONFIG->getStepsZ(), THE_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthZ() + THE_CONFIG->getHighPulsWidthZ());
-				}
+				setupACM(0.009, 0.09, 5.5, 0.009, 0.09, 5.5);
 				break;
 			}
 			
-			case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed_MM_MIN((double)(values.front()/DBL_FACT));
+			case PID_SPEED_MM_MIN: 			setFeedSpeed_MMMin((double)(values.front()/FLT_FACT));
 											break;
 		}
 		
@@ -774,18 +747,14 @@ void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequ
 	lastSignal = CMD_INVALID;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
+void SerialEmulatorNULL::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
-	// a value f != 0 isn't currently provided
-	if ( f != 0 )
-		;//std::clog << "Feed speed change detected: value = " << f << std::endl;
-	
 	renderAndMove(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveSeqIntern(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f)
+	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz)
 	if ( CncCommandDecoder::decodeMoveSequence(buffer, nbByte, lastCommand.MoveSequence.sequence, this) == false )
 		return false;
 
@@ -849,14 +818,14 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz) {
 	// this is already done by the application
 	
 	// speed setup
-	const double START_SPEED = speedSimulator->getStartSpeed_MM_MIN() * 0.5;
+	const double START_SPEED = getStartSpeed_MMSec() * 60 * 0.5;
 	const double MAX_SPEED   = THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
 	const double DIFF_SPEED  = MAX_SPEED - START_SPEED;
 	
 	if ( DIFF_SPEED < 0.0 )
 		return false;
 	
-	speedSimulator->setFeedSpeed_MM_MIN(START_SPEED);
+	setFeedSpeed_MMMin(START_SPEED);
 	
 	bool ret = false;
 	CncMilliTimestamp tsStart = CncTimeFunctions::getMilliTimestamp();
@@ -868,10 +837,10 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz) {
 			
 		unsigned int diff = CncTimeFunctions::getMilliTimestamp() - tsStart;
 		if ( diff > moveUntilAccelPeriod ) {
-			speedSimulator->setFeedSpeed_MM_MIN(MAX_SPEED);
+			setFeedSpeed_MMMin(MAX_SPEED);
 			
 		} else {
-			speedSimulator->setFeedSpeed_MM_MIN(START_SPEED + DIFF_SPEED / moveUntilAccelPeriod * diff);
+			setFeedSpeed_MMMin(START_SPEED + DIFF_SPEED / moveUntilAccelPeriod * diff);
 			
 		}
 	}
@@ -885,182 +854,54 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz) {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::initializeFeedProfile(int32_t dx , int32_t dy , int32_t dz) {
+bool SerialEmulatorNULL::initializeFeedProfile(int32_t dx , int32_t dy , int32_t dz) {
 ///////////////////////////////////////////////////////////////////
-	// update speed simulator values
-	if ( THE_CONTEXT->isProbeMode() == false ) {
-		wxASSERT( speedSimulator != NULL );
-		speedSimulator->initMove(dx, dy, dz);
-	}
+	static ArduinoImpulseCalculator impulseCalculator;
+	const int32_t impulses  = impulseCalculator.calculate(dx, dy, dz);
+	const double speed		= getFeedSpeed_MMSec();
+	
+	const bool ret = speed ? initMove(impulses, speed) : true;
+	
+	usToSleep = 0LL;
+	
+	if ( ret == false )
+		std::cerr << CNC_LOG_FUNCT << wxString::Format(": initMove(%ld, %lf) failed!", impulses, speed) << std::endl;
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::completeFeedProfile() {
+bool SerialEmulatorNULL::completeFeedProfile() {
 ///////////////////////////////////////////////////////////////////
-	// perform any rest offset
-	if ( THE_CONTEXT->isProbeMode() == false ) {
-		wxASSERT( speedSimulator != NULL );
-		speedSimulator->performCurrentOffset(true);
-		speedSimulator->completeMove();
-	}
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::updateRealtimeSpeed() {
-///////////////////////////////////////////////////////////////////
-	// to have some different from the measuered value
-	// the fakeFactor is used.
-	const double fakteFactor = 1.1;
-	speedSimulator->setRealtimeFeedSpeed_MM_MIN(getMeasuredFeedSpeed_MM_MIN() * fakteFactor);
+	// nothing more to do
+	if ( usToSleep >= 0LL )
+		CncTimeFunctions::sleepMircoseconds(usToSleep);
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::initRenderAndMove(int32_t dx , int32_t dy , int32_t dz) {
 ///////////////////////////////////////////////////////////////////
-	initializeFeedProfile(dx, dy, dz);
-
-	bool ret = renderAndMove(dx, dy, dz);
-	if ( ret == true )
-		completeFeedProfile();
-
-	return ret;
+	if ( initializeFeedProfile(dx, dy, dz) == false )
+		return false;
+	
+	if ( renderAndMove(dx, dy, dz) == false )
+		return false;
+		
+	return completeFeedProfile();;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::renderAndMove(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
-	//------------------------------------------------------------
-	auto moving = [&](int32_t dx , int32_t dy , int32_t dz, bool force=false) {
-		// always copy point A into point B
-		memcpy(pointB, pointA, sizeof(pointA));
-
-		// statistic counting
-		incPosistionCounter();
-
-		// stepping
-		lastCommand.ret = RET_OK;
-
-		#define INC_AXIS(axis, delta) \
-				{ \
-					int32_t d = delta; \
-					const int32_t newPos = curEmulatorPos.get##axis() + d; \
-					\
-					if ( newPos >= +maxDimSteps##axis ) { \
-						d = +maxDimSteps##axis - curEmulatorPos.get##axis(); \
-						limitStates.setLimit##axis(LimitSwitch::LIMIT_MAX); \
-						lastCommand.ret = RET_LIMIT; \
-					\
-					} else if ( newPos <= -maxDimSteps##axis ) { \
-						d = -maxDimSteps##axis - curEmulatorPos.get##axis(); \
-						limitStates.setLimit##axis(LimitSwitch::LIMIT_MIN); \
-						lastCommand.ret = RET_LIMIT; \
-					\
-					} else { \
-						limitStates.setLimit##axis(LimitSwitch::LIMIT_UNSET); \
-					} \
-					\
-					unsigned char retSig = RET_OK; \
-					if ( (retSig = signalHandling() ) != RET_OK )  { \
-						lastCommand.ret = retSig; \
-						return translateStepAxisRetValue(retSig); \
-					} \
-					\
-					curEmulatorPos.inc##axis(d); \
-					incStepCounter##axis(d); \
-					if ( ArdoObj::absolute(d) ) \
-						simulateOneStepTime##axis(); \
-					\
-					if ( lastCommand.ret != RET_OK ) \
-						return translateStepAxisRetValue(lastCommand.ret); \
-				}
-
-		// do
-		INC_AXIS(X, dx)
-		INC_AXIS(Y, dy)
-		INC_AXIS(Z, dz)
-
-		// simulate a direct controller callback.
-		replyPosition(force);
-		
-		// do something with this coordinates
-		return writeMoveRenderedCallback(dx, dy, dz);
-	};
-
 	// presetup the move return value, 
 	// it will be overriden by movingXYZ on demand
 	lastCommand.ret = RET_OK;
 	
-	// initialize
-	int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
-	memset(pointA, 0, sizeof(pointA));
-	memset(pointB, 0, sizeof(pointB));
-	
-	x_inc = (dx < 0) ? -1 : 1;
-	l = abs(dx);
-	
-	y_inc = (dy < 0) ? -1 : 1;
-	m = abs(dy);
-	
-	z_inc = (dz < 0) ? -1 : 1;
-	n = abs(dz);
-	
-	dx2 = l << 1;
-	dy2 = m << 1;
-	dz2 = n << 1;
-
-	// -------------------------------------------------------------
-	if ((l >= m) && (l >= n)) {
-		err_1 = dy2 - l;
-		err_2 = dz2 - l;
-		for (i = 0; i < l; i++) {
-			
-			if ( moving(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2]) == false )
-				return false;
-			
-			if (err_1 > 0) { pointA[1] += y_inc; err_1 -= dx2; }
-			if (err_2 > 0) { pointA[2] += z_inc; err_2 -= dx2; }
-			
-			err_1     += dy2;
-			err_2     += dz2;
-			pointA[0] += x_inc;
-		}
-	
-	// -------------------------------------------------------------
-	} else if ((m >= l) && (m >= n)) {
-		err_1 = dx2 - m;
-		err_2 = dz2 - m;
-		for (i = 0; i < m; i++) {
-			
-			if ( moving(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2]) == false )
-				return false;
-			
-			if (err_1 > 0) { pointA[0] += x_inc; err_1 -= dy2; }
-			if (err_2 > 0) { pointA[2] += z_inc; err_2 -= dy2; }
-			
-			err_1     += dx2;
-			err_2     += dz2;
-			pointA[1] += y_inc;
-		}
-		
-	// -------------------------------------------------------------
-	} else {
-		err_1 = dy2 - n;
-		err_2 = dx2 - n;
-		for (i = 0; i < n; i++) {
-			
-			if ( moving(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2]) == false )
-				return false;
-			
-			if (err_1 > 0) { pointA[1] += y_inc; err_1 -= dz2; }
-			if (err_2 > 0) { pointA[0] += x_inc; err_2 -= dz2; }
-			
-			err_1     += dy2;
-			err_2     += dx2;
-			pointA[2] += z_inc;
-		}
-	}
-	
-	// -------------------------------------------------------------
-	if ( moving(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], true) == false )
+	tsMoveStart = CncTimeFunctions::getNanoTimestamp();
+	if ( renderMove(dx, dy, dz) != RET_OK )
 		return false;
 	
-	return true;
+	// do something with this coordinates
+	return writeMoveRenderedCallback(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::translateStepAxisRetValue(unsigned char ret) {
@@ -1083,13 +924,9 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 	// simulate a direct controller callback.
 	static int64_t lastReplyDistance = 0L;
 	const  int64_t stepCounter       = stepCounterX + stepCounterY + stepCounterZ;
-	const  int64_t posReplyThreshold = ( posReplyThresholdX + posReplyThresholdY + posReplyThresholdZ ) / 3;
 	const  int64_t diff              = stepCounter - lastReplyDistance;
 	
-	if ( diff >= posReplyThreshold || force == true )
-	{
-		updateRealtimeSpeed();
-		
+	if ( diff >= posReplyThreshold || force == true ) {
 		// due to the fact, that the emulators runs in the 
 		// same thread as the main loop it makes not sense 
 		// to write here someting to the serial. This is 
@@ -1101,8 +938,6 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 		// complete serial data will be fetched in one block 
 		// at the end if this writeMove(...) call was finalized.
 		
-		wxASSERT( speedSimulator != NULL );
-		
 		ContollerInfo ci;
 		ci.infoType  			= CITPosition;
 		ci.posType   			= curEmulatorPos != targetMajorPos ? PID_XYZ_POS_DETAIL : PID_XYZ_POS_MAJOR;
@@ -1112,7 +947,7 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 		ci.yCtrlPos  			= curEmulatorPos.getY();
 		ci.zCtrlPos  			= curEmulatorPos.getZ();
 		
-		ci.feedSpeed 			= speedSimulator->getRealtimeFeedSpeed_MM_MIN();
+		ci.feedSpeed 			= getRealtimeFeedSpeed_MMMin();
 		
 		sendSerialControllerCallback(ci);
 		
@@ -1143,36 +978,6 @@ unsigned char SerialEmulatorNULL::signalHandling() {
 	}
 	
 	return RET_OK;
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::simulateOneStepTimeX() {
-///////////////////////////////////////////////////////////////////
-	// simulate speed
-	if ( THE_CONTEXT->isProbeMode() == false ) {
-		wxASSERT( speedSimulator != NULL );
-		speedSimulator->simulateOneStepX();
-		speedSimulator->performCurrentOffset(false);
-	}
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::simulateOneStepTimeY() {
-///////////////////////////////////////////////////////////////////
-	// simulate speed
-	if ( THE_CONTEXT->isProbeMode() == false ) {
-		wxASSERT( speedSimulator != NULL );
-		speedSimulator->simulateOneStepY();
-		speedSimulator->performCurrentOffset(false);
-	}
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::simulateOneStepTimeZ() {
-///////////////////////////////////////////////////////////////////
-	// simulate speed
-	if ( THE_CONTEXT->isProbeMode() == false ) {
-		wxASSERT( speedSimulator != NULL );
-		speedSimulator->simulateOneStepZ();
-		speedSimulator->performCurrentOffset(false);
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::resetEmuPositionCounter() {
@@ -1243,11 +1048,118 @@ void SerialEmulatorNULL::incStepCounterZ(int32_t dz) {
 
     stepCounterZ += ArdoObj::absolute(dz);
 }
+
+
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::traceSpeedInformation() {
+void SerialEmulatorNULL::notifyACMStateChange(State s) {
 ///////////////////////////////////////////////////////////////////
-	if ( speedSimulator == NULL )
-		return;
 	
-	// currently nothing to do
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::notifyACMInitMove() {
+///////////////////////////////////////////////////////////////////
+	
+}
+///////////////////////////////////////////////////////////////////
+byte SerialEmulatorNULL::checkRuntimeEnv() {
+///////////////////////////////////////////////////////////////////
+	const unsigned char retSig = signalHandling();
+	
+	if ( retSig != RET_OK )  {
+		lastCommand.ret = retSig; 
+		return translateStepAxisRetValue(retSig); 
+	} 
+	
+	return RET_OK;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
+///////////////////////////////////////////////////////////////////
+	// ------------------------------------------------------------
+	#define INC_AXIS(axis, delta) \
+	{ \
+		int32_t d = delta; \
+		const int32_t newPos = curEmulatorPos.get##axis() + d; \
+		\
+		if ( newPos >= +maxDimSteps##axis ) { \
+			d = +maxDimSteps##axis - curEmulatorPos.get##axis(); \
+			limitStates.setLimit##axis(LimitSwitch::LIMIT_MAX); \
+			lastCommand.ret = RET_LIMIT; \
+		\
+		} else if ( newPos <= -maxDimSteps##axis ) { \
+			d = -maxDimSteps##axis - curEmulatorPos.get##axis(); \
+			limitStates.setLimit##axis(LimitSwitch::LIMIT_MIN); \
+			lastCommand.ret = RET_LIMIT; \
+		\
+		} else { \
+			limitStates.setLimit##axis(LimitSwitch::LIMIT_UNSET); \
+		} \
+		\
+		curEmulatorPos.inc##axis(d); \
+		incStepCounter##axis(d); \
+		\
+	}
+	
+	if ( dx != 0 ) INC_AXIS(X, dx);
+	if ( dy != 0 ) INC_AXIS(Y, dy);
+	if ( dz != 0 ) INC_AXIS(Z, dz);
+	
+	#undef INC_AXIS
+	
+	// speed management
+	#warning no speed
+	/*
+	if ( getFeedSpeed_MMSec() > 0.0 ) {
+		
+		// determine the distance for each axis, 
+		// due to the later pow() abs isn't necessary here 
+		const float distX     = RS::xStepCount * THE_CONFIG->getDisplayFactX();
+		const float distY     = RS::yStepCount * THE_CONFIG->getDisplayFactY();
+		const float distZ     = RS::zStepCount * THE_CONFIG->getDisplayFactZ();
+		const float dist_MM   = sqrt(pow(distX, 2) + pow(distY, 2) + pow(distZ, 2));
+
+		// determine the time deviation between ehe measured and configured sight
+		const int32_t timeElapsed_US    = (CncTimeFunctions::getNanoTimestamp() - tsMoveStart) / 1000;
+		const int32_t timeDistance_US   = round(( 1000.0 * 1000.0 / getNextTargetSpeed_MMSec() ) * dist_MM);
+		const int32_t timeDifference_US = timeDistance_US - timeElapsed_US;
+
+		if ( timeDifference_US > 0 )
+			usToSleep += timeDifference_US;
+			
+		if ( usToSleep >= 500 * 1000LL ) {
+			CncTimeFunctions::sleepMilliseconds(usToSleep / 1000 );
+			usToSleep = 0LL;
+			
+			// measure the current speed again
+			const double rtmF_MMSec = ( 1000.0 * 1000.0 / (CncTimeFunctions::getNanoTimestamp() - tsMoveStart) ) * dist_MM;
+			setRealtimeFeedSpeed_MM_MIN(rtmF_MMSec * 1000 * 60);
+		}
+	}
+	 */
+	
+	// position mnagement
+	replyPosition(false);
+	incPosistionCounter();
+}
+///////////////////////////////////////////////////////////////////
+byte SerialEmulatorNULL::initiateStep(AxisId aid) {
+///////////////////////////////////////////////////////////////////
+	switch ( aid ) {
+		case IDX_X: return RET_OK;
+		case IDX_Y: return RET_OK;
+		case IDX_Z: return RET_OK;
+	}
+	
+	return RET_ERROR;
+}
+///////////////////////////////////////////////////////////////////
+byte SerialEmulatorNULL::finalizeStep(AxisId aid) {
+///////////////////////////////////////////////////////////////////
+	switch ( aid ) {
+		case IDX_X: return RET_OK;
+		case IDX_Y: return RET_OK;
+		case IDX_Z: return RET_OK;
+	}
+	
+	return RET_ERROR;
 }

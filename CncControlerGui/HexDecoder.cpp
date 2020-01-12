@@ -110,8 +110,8 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 	if ( readNextHexBytes(restToken, 1, value) == false ) return;
 	const int portionSize = decodeHexValueAsInteger(value);
 	ret.more.append(wxString::Format("Portion size = %d | | ", portionSize));
-	ret.more.append(wxString::Format(" [TYP][%s]            X           Y           Z           F  | ", ArdoObj::ValueInfo::getBitDeclaration()));
-	ret.more.append(                 " ---------------------------------------------------------------------- | ");
+	ret.more.append(wxString::Format(" [TYP][%s]            X           Y           Z             | ", ArdoObj::ValueInfo::getBitDeclaration()));
+	ret.more.append(                 " ---------------------------------------------------------- | ");
 	
 	// ---------------------------------------------------
 	auto determineDataStructure = [](unsigned char type, unsigned int& byteCount, unsigned int& valCount) {
@@ -136,9 +136,8 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 			const int x = ( v &   1 ?  +1 : v &   2 ? -1 : 0 );
 			const int y = ( v &   4 ?  +1 : v &   8 ? -1 : 0 );
 			const int z = ( v &  16 ?  +1 : v &  32 ? -1 : 0 );
-			const int f = ( v &  64 ?  +1 : v & 128 ? -1 : 0 );
 			
-			ret.more.append(wxString::Format(" [---][11110001] = % 10d, % 10d, % 10d, % 10d | ", x, y, z, f));
+			ret.more.append(wxString::Format(" [---][11110001] = % 10d, % 10d, % 10d | ", x, y, z));
 		}
 	};
 	
@@ -182,15 +181,11 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 					
 					ArdoObj::ValueInfo vi(valueType);
 					
-					const unsigned short p = vi.hasF() ? 1 : 0;
-					if ( vi.hasF() )
-						f = values[0];
-					
-					if 		( vi.hasXYZ() )	{ dx = values[p+0]; dy = values[p+1]; dz = values[p+2]; }
-					else if ( vi.hasXY()  ) { dx = values[p+0]; dy = values[p+1]; dz = 0;           }
-					else if ( vi.hasX()   ) { dx = values[p+0]; dy = values[p+1]; dz = 0;           }
-					else if ( vi.hasY()   ) { dx = 0;           dy = values[p+0]; dz = 0;           }
-					else if ( vi.hasZ()   ) { dx = 0;           dy = 0;           dz = values[p+0]; }
+					if 		( vi.hasXYZ() )	{ dx = values[0]; dy = values[1]; dz = values[2]; }
+					else if ( vi.hasXY()  ) { dx = values[0]; dy = values[1]; dz = 0;           }
+					else if ( vi.hasX()   ) { dx = values[0]; dy = values[1]; dz = 0;           }
+					else if ( vi.hasY()   ) { dx = 0;         dy = values[0]; dz = 0;           }
+					else if ( vi.hasZ()   ) { dx = 0;         dy = 0;         dz = values[0]; }
 					else					{ return;                                               }
 				}
 				else {
@@ -201,7 +196,6 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 					dx = ( v &  1 ?  +1 : v &   2 ? -1 : 0 );
 					dy = ( v &  4 ?  +1 : v &   8 ? -1 : 0 );
 					dz = ( v & 16 ?  +1 : v &  32 ? -1 : 0 );
-					f  = ( v & 64 ?  +1 : v & 128 ? -1 : 0 );
 					
 					remaining--;
 				}

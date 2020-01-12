@@ -77,7 +77,7 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		virtual ~SerialEmulatorTextStreamer();
 		
 		void notifySetter(const CncCommandDecoder::SetterInfo& si) final;
-		void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) final;
+		void notifyMove(int32_t dx, int32_t dy, int32_t dz) final;
 		void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) final;
 		void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence) final;
 		void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence) final;
@@ -95,7 +95,7 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		
 		// trigger
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr);
-		virtual void processTrigger(const Serial::Trigger::EndRun& tr);
+		virtual void processTrigger(const Serial::Trigger::EndRun&   tr);
 		virtual void processTrigger(const Serial::Trigger::NextPath& tr);
 };
 

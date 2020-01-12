@@ -222,7 +222,7 @@ void CncArduinoEnvironment::appendMessage(char type, const wxString& msg, const 
 void CncArduinoEnvironment::notifyStarted() {
 ///////////////////////////////////////////////////////////////////
 	appendSep();
-	appendInfo("Controller main loop running . . .", CNC_LOG_FUNCT);
+	appendInfo("Controller main loop is running . . .", CNC_LOG_FUNCT);
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::notifyConnecting() {
@@ -238,7 +238,7 @@ void CncArduinoEnvironment::notifyConnecting() {
 		appendInfo("Releasing the Emergency Button . . .", CNC_LOG_FUNCT);
 	}
 	
-	appendInfo("Controller connecting . . .", CNC_LOG_FUNCT);
+	appendInfo("Controller is connecting . . .", CNC_LOG_FUNCT);
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::notifyConnected() {
@@ -246,14 +246,14 @@ void CncArduinoEnvironment::notifyConnected() {
 	initValues();
 	enableControls(true, true);
 	
-	appendInfo("Controller connected . . .", CNC_LOG_FUNCT);
+	appendInfo("Controller is connected . . .", CNC_LOG_FUNCT);
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::notifyDisconnected() {
 ///////////////////////////////////////////////////////////////////
 	enableControls(false, true);
 	
-	appendInfo("Controller disconnected . . .", CNC_LOG_FUNCT);
+	appendInfo("Controller is disconnected . . .", CNC_LOG_FUNCT);
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::notifyPaused() {

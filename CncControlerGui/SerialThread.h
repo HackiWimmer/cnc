@@ -5,7 +5,6 @@
 #include <wx/event.h>
 #include "SerialEvent.h"
 #include "OSD/CncTimeFunctions.h"
-#include "ArduinoEnvWrapper.h"
 
 typedef void (wxEvtHandler::*SerialEventFunction)(SerialEvent&);
 #define SerialEventHandler(func) wxEVENT_HANDLER_CAST(SerialEventFunction, func)
@@ -93,7 +92,7 @@ class SerialThread : public wxThread {
 		// additional interface
 		static bool 				isInterruped();
 		static void 				ardoDebugMessage(const char type, const char* msg, const char* context) {
-										SerialThread::publishMessage('D', msg ? msg : "", context ? context : "");
+										SerialThread::publishMessage(type, msg ? msg : "", context ? context : "");
 		}
 		
 		template<typename T>

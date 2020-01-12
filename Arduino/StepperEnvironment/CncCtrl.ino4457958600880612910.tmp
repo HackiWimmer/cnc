@@ -294,19 +294,12 @@ void CncArduinoController::setupAccelProfile(const ArduinoCmdDecoderSetter::Resu
 
   if ( st.valueCount != 6 )
   {
-    // Function fA, fD was initilaizes with default values
     ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_PARAM_STREAM_LEN);       
     
   } else {  
     fA.A = st.values[0].f;
     fA.B = st.values[1].f;
     fA.C = st.values[2].f;
-
-#warning
-  ARDO_DEBUG_VALUE("fA.A", fA.A)
-  ARDO_DEBUG_VALUE("fA.B", fA.B)
-  ARDO_DEBUG_VALUE("fA.C", fA.C)
-
     
     fD.A = st.values[3].f;
     fD.B = st.values[4].f;

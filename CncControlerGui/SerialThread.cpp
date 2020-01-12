@@ -43,18 +43,18 @@ bool 			SerialThread::isInterruped() 	{ return SERIAL_THREAD ? SERIAL_THREAD->in
 ///////////////////////////////////////////////////////////////////
 SerialThread::SerialThread(MainFrame *handler)
 : wxThread(wxTHREAD_DETACHED)
-, pHandler			(handler)
-, exit				(false)
-, processAdmChl		(true)
-, interruped		(false)
-, connected			(false)
-, serialPriority	(SerialPriority::DISCONNECTED)
+, pHandler			( handler )
+, exit				( false )
+, processAdmChl		( true )
+, interruped		( false )
+, connected			( false )
+, serialPriority	( SerialPriority::DISCONNECTED )
 , arduinoMainLoop	()
-, tsStartup			( CncTimeFunctions::getNanoTimestamp())
-, tsHbRef			( CncTimeFunctions::getNanoTimestamp())
-, tsDtRef			( CncTimeFunctions::getNanoTimestamp())
-, tsHbInterval		( 1000 * 1000 * 1000) 	// 1s
-, tsDtInterval		( 2000 * 1000 * 1000) 	// 2s
+, tsStartup			( CncTimeFunctions::getNanoTimestamp() )
+, tsHbRef			( CncTimeFunctions::getNanoTimestamp() )
+, tsDtRef			( CncTimeFunctions::getNanoTimestamp() )
+, tsHbInterval		( 1000 * 1000 * 1000 ) 	// 1s
+, tsDtInterval		( 2000 * 1000 * 1000 ) 	// 2s
 , arduinoDataStore	( new AE::ArduinoData() )
 , adminChannel		( new SerialAdminChannel())
 , adminSender		( new SerialAdminChannelSender(adminChannel))
@@ -73,7 +73,7 @@ SerialThread::SerialThread(MainFrame *handler)
 	// Info:
 	// app end point: reads(ctl2app) && writes(app2ctl)
 	// ctl end point: reads(app2ctl) && writes(ctl2app)
-
+	
 	// Provide a global pointer interface for the arduino environment
 	SERIAL_THREAD					= this;
 	SERIAL_END_PTR_FOR_ARDUINO_ENV 	= ctl;
@@ -140,11 +140,11 @@ wxThread::ExitCode SerialThread::Entry() {
 	tsHbRef = CncTimeFunctions::getNanoTimestamp();
 	tsDtRef = CncTimeFunctions::getNanoTimestamp();
 	
-	arduinoMainLoop.setup();
-	
-	while ( !TestDestroy() ) {
-		try {
-			
+	try {
+		
+		arduinoMainLoop.setup();
+		
+		while ( !TestDestroy() ) {
 			// recheck this here after the sleep
 			if ( TestDestroy() ) break;
 			if ( exit == true  ) break;
@@ -171,17 +171,24 @@ wxThread::ExitCode SerialThread::Entry() {
 			// immediately after publishData()
 			if ( CncTimeFunctions::getTimeSpanToNow(tsHbRef) > tsHbInterval )
 				publishHeartbeat();
-			
-		} catch (const SerialInterruptException& e) {
-			publishMessage('E', wxString::Format("Caught an interrupt: %s", e.what()), CNC_LOG_FUNCT);
-			
-			connected  		= false;
-			interruped 		= true;
-			serialPriority 	= SerialPriority::DISCONNECTED;
-		}
-
-	} // while
+				
+		} // while
 		
+	} catch (const SerialInterruptException& e) {
+		publishMessage('E', wxString::Format("Caught an interrupt: %s", e.what()), CNC_LOG_FUNCT);
+		
+		connected  		= false;
+		interruped 		= true;
+		serialPriority 	= SerialPriority::DISCONNECTED;
+		
+	} catch (...) {
+		publishMessage('E', wxString::Format("Caught an unknown exception:"), CNC_LOG_FUNCT);
+		
+		connected  		= false;
+		interruped 		= true;
+		serialPriority 	= SerialPriority::DISCONNECTED;
+	}
+	
 	// post complete event
 	wxQueueEvent(THE_FRAME, new SerialEvent(wxEVT_SERIAL_THREAD, MainFrame::EventId::COMPLETED));
 	
@@ -433,7 +440,8 @@ void SerialThread::pinMode(AE::PinName pin, AE::PinMode pm) {
 	if ( theSerialThread() && theSerialThread()->adminChannel->size() > 0 )
 		theSerialThread()->dispatchAdminChannel();
 
-	ARDUINO_DATA_STORE->pinMode(pin, pm);
+	if ( ARDUINO_DATA_STORE != NULL )
+		ARDUINO_DATA_STORE->pinMode(pin, pm);
 }
 ////////////////////////////////////////////////////////////////////
 void SerialThread::digitalWrite(AE::PinName pin, AE::PinLevel pl) {
@@ -441,7 +449,8 @@ void SerialThread::digitalWrite(AE::PinName pin, AE::PinLevel pl) {
 	if ( SerialThread::isInterruped() == true )
 		return;
 		
-	ARDUINO_DATA_STORE->digitalWrite(pin, pl);
+	if ( ARDUINO_DATA_STORE != NULL )
+		ARDUINO_DATA_STORE->digitalWrite(pin, pl);
 }
 ////////////////////////////////////////////////////////////////////
 AE::PinLevel SerialThread::digitalRead(AE::PinName pin) {
@@ -453,7 +462,7 @@ AE::PinLevel SerialThread::digitalRead(AE::PinName pin) {
 	if ( theSerialThread() && theSerialThread()->adminChannel->size() > 0 )
 		theSerialThread()->dispatchAdminChannel();
 		
-	return ARDUINO_DATA_STORE->digitalRead(pin);
+	return ARDUINO_DATA_STORE ? ARDUINO_DATA_STORE->digitalRead(pin) : PL_UNDEFINED;
 }
 ////////////////////////////////////////////////////////////////////
 void SerialThread::analogWrite(AE::PinName pin, int value) {
@@ -461,7 +470,8 @@ void SerialThread::analogWrite(AE::PinName pin, int value) {
 	if ( SerialThread::isInterruped() == true )
 		return;
 	
-	ARDUINO_DATA_STORE->analogWrite(pin, value);
+	if ( ARDUINO_DATA_STORE != NULL )
+		ARDUINO_DATA_STORE->analogWrite(pin, value);
 }
 ////////////////////////////////////////////////////////////////////
 int16_t SerialThread::analogRead(AE::PinName pin) {
@@ -473,7 +483,7 @@ int16_t SerialThread::analogRead(AE::PinName pin) {
 	if ( theSerialThread() && theSerialThread()->adminChannel->size() > 0 )
 		theSerialThread()->dispatchAdminChannel();
 		
-	return ARDUINO_DATA_STORE->analogRead(pin);
+	return ARDUINO_DATA_STORE ? ARDUINO_DATA_STORE->analogRead(pin) : 0;
 }
 ////////////////////////////////////////////////////////////////////
 uint32_t SerialThread::millis() {
@@ -535,16 +545,19 @@ uint8_t SerialThread::getDigitalPinToPort(uint8_t pin) {
 ////////////////////////////////////////////////////////////////////
 bool SerialThread::ardoConfigGetTraceGetters() {
 ////////////////////////////////////////////////////////////////////
-	return ARDUINO_DATA_STORE->exterConfig.traceGetters;
+	return ARDUINO_DATA_STORE ? ARDUINO_DATA_STORE->exterConfig.traceGetters : false;
 }
 ////////////////////////////////////////////////////////////////////
 bool SerialThread::ardoConfigGetTraceSetters() {
 ////////////////////////////////////////////////////////////////////
-	return ARDUINO_DATA_STORE->exterConfig.traceSetters;
+	return ARDUINO_DATA_STORE ? ARDUINO_DATA_STORE->exterConfig.traceSetters : false;
 }
 ////////////////////////////////////////////////////////////////////
 void SerialThread::ardoTraceStepperDir(char sid, int32_t dir) {
 ////////////////////////////////////////////////////////////////////
+	if ( ARDUINO_DATA_STORE == NULL )
+		return; 
+		
 	switch ( sid ) {
 		case 'X': ARDUINO_DATA_STORE->traceInfo.stepperDirX = dir; break;
 		case 'Y': ARDUINO_DATA_STORE->traceInfo.stepperDirY = dir; break;
@@ -554,6 +567,9 @@ void SerialThread::ardoTraceStepperDir(char sid, int32_t dir) {
 ////////////////////////////////////////////////////////////////////
 void SerialThread::ardoTraceStepperPos(char sid, int32_t pos) {
 ////////////////////////////////////////////////////////////////////
+	if ( ARDUINO_DATA_STORE == NULL )
+		return; 
+
 	switch ( sid ) {
 		case 'X': ARDUINO_DATA_STORE->traceInfo.stepperPosX = pos; break;
 		case 'Y': ARDUINO_DATA_STORE->traceInfo.stepperPosY = pos; break;

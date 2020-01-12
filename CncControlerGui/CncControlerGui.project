@@ -221,6 +221,12 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncFloatingPointValidator.cpp"/>
+      <File Name="CncFloatingPointValidator.h"/>
+      <File Name="CncSpeedAccelerationDiagram.cpp"/>
+      <File Name="CncSpeedAccelerationDiagram.h"/>
+      <File Name="CncSpeedPlayground.h"/>
+      <File Name="CncSpeedPlayground.cpp"/>
       <File Name="CncArduinoEnvironment.h"/>
       <File Name="CncArduinoEnvironment.cpp"/>
       <File Name="CncFileDialog.cpp"/>
@@ -300,7 +306,6 @@
         <File Name="OSD/CncAsyncKeyboardState.h"/>
         <File Name="OSD/CncAsyncKeyboardState.cpp"/>
       </VirtualDirectory>
-      <File Name="CncSpeedSimulator.cpp"/>
       <File Name="CncNumberFormatter.cpp"/>
       <File Name="CncArduino.cpp"/>
       <File Name="CncControl.cpp"/>
@@ -324,7 +329,6 @@
       <File Name="CncFilePreviewWnd.cpp"/>
       <File Name="CncFilePreviewWnd.h"/>
       <File Name="CncNumberFormatter.h"/>
-      <File Name="CncSpeedSimulator.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
@@ -480,8 +484,6 @@
       </VirtualDirectory>
       <File Name="CncConfigExt.h"/>
       <VirtualDirectory Name="Tabs">
-        <File Name="CfgAccelerationGraph.cpp"/>
-        <File Name="CfgAccelerationGraph.h"/>
         <File Name="CncToolMagazine.cpp"/>
         <File Name="CncToolMagazine.h"/>
       </VirtualDirectory>
@@ -556,8 +558,6 @@
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
   <Dependencies Name="release2"/>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -793,4 +793,7 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Gprof"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

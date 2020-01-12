@@ -3,6 +3,20 @@
 
 #include "ArdoVal.h"
 
+///////////////////////////////////////////////////////////////////////////////////
+namespace CtrlSpeedValues {
+
+  float getMaxF_1DX_MMSec();
+  float getMaxF_1DY_MMSec();
+  float getMaxF_1DZ_MMSec();
+  float getMaxF_2DXY_MMSec();
+  float getMaxF_3DXYZ_MMSec();
+ 
+  void setupTact(int16_t pwX, int16_t pwY, int16_t pwZ);
+  void setupMaxSpeed(float frX, float frY, float frZ);
+};
+
+///////////////////////////////////////////////////////////////////////////////////
 namespace ArdoObj {
 
   // --------------------------------------------------------------
@@ -115,36 +129,26 @@ namespace ArdoObj {
   };
 
   // --------------------------------------------------------------
-  // 
-  struct PwmProfile {
-    
-    unsigned int speedDelay         = 1;
-    unsigned int accelDelay         = 1;
-  
-    unsigned int startSpeed_MM_SEC  = 1;
-    unsigned int stopSpeed_MM_SEC   = 1;  
-  };  
-  
-  // --------------------------------------------------------------
   // Stores value information, 
   // Used within the MoveSequence processing
   struct ValueInfo {
-  
+    public:  
+      enum Byte { L0=1, L1=2, L2=3, L4=4, Q=5, X=6, Y=7, Z=8 };
+      
     private:
-      enum Byte { L0=1, L1=2, L2=3, L4=4, F=5, X=6, Y=7, Z=8 };
       unsigned char type;
   
       //-------------------------------------------------------------
       bool getBit(unsigned char idx) const {
         switch (idx) {
-          case 8:     return type & 128;
-          case 7:     return type &  64;
-          case 6:     return type &  32;
-          case 5:     return type &  16;
-          case 4:     return type &   8;
-          case 3:     return type &   4;
-          case 2:     return type &   2;
-          case 1:     return type &   1;
+          case Byte::Z:     return type & 128;
+          case Byte::Y:     return type &  64;
+          case Byte::X:     return type &  32;
+          case Byte::Q:     return type &  16;
+          case Byte::L4:    return type &   8;
+          case Byte::L2:    return type &   4;
+          case Byte::L1:    return type &   2;
+          case Byte::L0:    return type &   1;
         }
   
         return false;
@@ -154,26 +158,26 @@ namespace ArdoObj {
       void setBit(unsigned char idx, bool value) {
         if ( value == true ) {
           switch ( idx ) {
-            case 8:     type |= (1 << 7); break;
-            case 7:     type |= (1 << 6); break;
-            case 6:     type |= (1 << 5); break;
-            case 5:     type |= (1 << 4); break;
-            case 4:     type |= (1 << 3); break;
-            case 3:     type |= (1 << 2); break;
-            case 2:     type |= (1 << 1); break;
-            case 1:     type |= (1 << 0); break;
+            case Byte::Z:     type |= (1 << 7); break;
+            case Byte::Y:     type |= (1 << 6); break;
+            case Byte::X:     type |= (1 << 5); break;
+            case Byte::Q:     type |= (1 << 4); break;
+            case Byte::L4:    type |= (1 << 3); break;
+            case Byte::L2:    type |= (1 << 2); break;
+            case Byte::L1:    type |= (1 << 1); break;
+            case Byte::L0:    type |= (1 << 0); break;
           }
         } 
         else {
            switch (idx) {
-            case 8:     type &= ~(1 << 7); break;
-            case 7:     type &= ~(1 << 6); break;
-            case 6:     type &= ~(1 << 5); break;
-            case 5:     type &= ~(1 << 4); break;
-            case 4:     type &= ~(1 << 3); break;
-            case 3:     type &= ~(1 << 2); break;
-            case 2:     type &= ~(1 << 1); break;
-            case 1:     type &= ~(1 << 0); break;
+            case Byte::Z:     type &= ~(1 << 7); break;
+            case Byte::Y:     type &= ~(1 << 6); break;
+            case Byte::X:     type &= ~(1 << 5); break;
+            case Byte::Q:     type &= ~(1 << 4); break;
+            case Byte::L4:    type &= ~(1 << 3); break;
+            case Byte::L2:    type &= ~(1 << 2); break;
+            case Byte::L1:    type &= ~(1 << 1); break;
+            case Byte::L0:    type &= ~(1 << 0); break;
           }       
         }
       }
@@ -181,13 +185,13 @@ namespace ArdoObj {
     public:  
       enum Size { One = 0, Int8 = 1, Int16 = 2, Int32 = 4, IntXX = -1};
   
-      static const unsigned short MaxValueCount = 4;
+      static const unsigned short MaxValueCount = 3;
       
       explicit ValueInfo(unsigned char t)
       : type(t)
       {}
   
-      ValueInfo(Size s, int32_t x, int32_t y, int32_t z, int32_t f)
+      ValueInfo(Size s, int32_t x, int32_t y, int32_t z)
       : type(0)
       {
         setBit(Byte::L0, s == Size::One);
@@ -195,8 +199,6 @@ namespace ArdoObj {
         setBit(Byte::L2, s == Size::Int16);
         setBit(Byte::L4, s == Size::Int32);
   
-        setBit(Byte::F,  f != 0L);
-        
         setBit(Byte::X,  x != 0L);
         setBit(Byte::Y,  y != 0L);
         setBit(Byte::Z,  z != 0L);
@@ -211,13 +213,9 @@ namespace ArdoObj {
       bool hasY()   const { return getBit(Byte::Y); }
       bool hasZ()   const { return getBit(Byte::Z); }
   
-      bool hasF()   const { return getBit(Byte::F); }
-  
       bool notX()   const { return !hasX(); }
       bool notY()   const { return !hasY(); }
       bool notZ()   const { return !hasZ(); }
-  
-      bool notF()   const { return !hasF(); }
   
       unsigned char getType() const { return type; }
       
@@ -246,7 +244,7 @@ namespace ArdoObj {
       }
   
       short getValueCount() const {
-        return (short)getBit(Byte::X) + (short)getBit(Byte::Y) + (short)getBit(Byte::Z) + (short)getBit(Byte::F);
+        return (short)getBit(Byte::X) + (short)getBit(Byte::Y) + (short)getBit(Byte::Z);
       }
   
       short getNecessarySize() const {
@@ -263,7 +261,7 @@ namespace ArdoObj {
       
      #ifndef SKETCH_COMPILE
   
-      static const char* getBitDeclaration() { return "XYZF4210"; }
+      static const char* getBitDeclaration() { return "ZYX?4210"; }
      
       friend std::ostream &operator<< (std::ostream& ostr, const ValueInfo& vi) {
         for ( unsigned char i=8; i>=1; i-- ) {

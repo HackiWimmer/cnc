@@ -765,10 +765,6 @@ protected:
     wxMenuItem* m_miRqtHeartbeat;
     wxMenuItem* m_miRqtConfig;
     wxMenuItem* m_miRqtPins;
-    wxMenuItem* m_menuItem46971;
-    wxMenuItem* m_menuItemInfoMessage;
-    wxMenuItem* m_menuItemWarningMessage;
-    wxMenuItem* m_menuItemErrorMessage;
     wxMenuItem* m_menuItem1187;
     wxMenuItem* m_miMotorEnableState;
     wxMenuItem* m_menuItem881;
@@ -1039,9 +1035,6 @@ protected:
     virtual void requestHeartbeat(wxCommandEvent& event) { event.Skip(); }
     virtual void requestConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void requestPins(wxCommandEvent& event) { event.Skip(); }
-    virtual void requestInfoMessage(wxCommandEvent& event) { event.Skip(); }
-    virtual void requestWarningMessage(wxCommandEvent& event) { event.Skip(); }
-    virtual void requestErrorMessage(wxCommandEvent& event) { event.Skip(); }
     virtual void requestEnableStepperMotors(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentPos(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitState(wxCommandEvent& event) { event.Skip(); }

@@ -2,11 +2,18 @@
 #define SERIAL_EMULATOR_CLASS
 
 #include <ostream>
+#include "OSD/CncTimeFunctions.h"
 #include "SerialSpyPort.h"
 #include "CncLimitStates.h"
 #include "CncArduino.h"
 #include "CncCommandDecoder.h"
-#include "CncSpeedSimulator.h"
+
+#include "../Arduino/StepperEnvironment/ArdoEnv.h"
+#include "../Arduino/StepperEnvironment/ArdoObj.h"
+#include "../Arduino/StepperEnvironment/ArdoVal.h"
+#include "../Arduino/StepperEnvironment/CncRndr.h"
+#include "../Arduino/StepperEnvironment/CncAcmr.h"
+
 
 struct LastCommand {
 	unsigned char cmd 		= CMD_INVALID;
@@ -178,19 +185,19 @@ struct LastCommand {
 	} Serial;
 };
 
-class SerialEmulatorNULL : public SerialSpyPort,
-                           public CncCommandDecoder::CallbackInterface
+class SerialEmulatorNULL  : public SerialSpyPort,
+							public ArduinoPositionRenderer,
+							public ArduinoAccelManager,
+							public CncCommandDecoder::CallbackInterface
 {
 	private:
 		
-		int32_t posReplyThresholdX;
-		int32_t posReplyThresholdY;
-		int32_t posReplyThresholdZ;
+		int32_t posReplyThreshold;
 		
-		CncLimitStates limitStates;
+		CncLimitStates 		limitStates;
+		CncNanoTimestamp 	tsMoveStart;
+		uint64_t			usToSleep;
 		
-		CncSpeedSimulator* speedSimulator;
-
 		int32_t positionCounter;
 		int32_t stepCounterX;
 		int32_t stepCounterY;
@@ -205,6 +212,9 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		CncLongPosition targetMajorPos;
 		CncLongPosition curEmulatorPos;
 		
+		double cfgFeedSpeed_MMMin;
+		double rtmFeedSpeed_MMMin;
+		
 		inline bool writeMoveCmdIntern(unsigned char *buffer, unsigned int nbByte);
 		inline bool writeMoveSeqIntern(unsigned char *buffer, unsigned int nbByte);
 		
@@ -218,10 +228,6 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		
 		inline void reset();
 		inline void resetCounter();
-		inline void simulateOneStepTimeX();
-		inline void simulateOneStepTimeY();
-		inline void simulateOneStepTimeZ();
-		
 		inline unsigned char signalHandling();
 		
 		inline bool translateStepAxisRetValue(unsigned char ret);
@@ -235,6 +241,8 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		
 		inline void replyPosition(bool force);
 		
+		bool isReadyToRun();
+		
 	protected:
 		LastCommand 	lastCommand;
 		unsigned char 	lastSignal;
@@ -244,6 +252,21 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		
 		const CncLongPosition& getCurrentEmulatorPosition() 									{ return curEmulatorPos; }
 		
+		// -----------------------------------------------------------------------------------
+		// ArduinoAccelManager interface
+		virtual void notifyACMStateChange(State s);
+		virtual void notifyACMInitMove();
+		
+		// -----------------------------------------------------------------------------------
+		// ArduinoPositionRenderer interface
+		virtual byte checkRuntimeEnv();
+		virtual byte setDirection   (AxisId aid, int32_t steps)	{ return RET_OK; }
+		virtual byte performNextStep(AxisId aid)				{ return RET_OK; }
+		virtual byte performStep    (AxisId aid)				{ return RET_OK; }
+		virtual byte initiateStep   (AxisId aid);
+		virtual byte finalizeStep   (AxisId aid);
+		virtual void notifyMovePart (int8_t dx, int8_t dy, int8_t dz);
+
 		virtual bool writeMoveSequenceRawCallback( unsigned char* buffer, unsigned int nbByte) { return true; }
 		
 		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) 		{ return true; }
@@ -259,7 +282,6 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		virtual int performConfiguration(unsigned char *buffer, unsigned int nbByte);
 		
 		virtual int performText(unsigned char *buffer, unsigned int nbByte, const char* response);
-		virtual int performMsg(unsigned char *buffer, unsigned int nbByte, const char* response);
 		virtual int performMajorMove(unsigned char *buffer, unsigned int nbByte);
 		virtual int performSequenceMove(unsigned char *buffer, unsigned int nbByte);
 		
@@ -299,10 +321,16 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		int32_t getEmuStepOverflowCounterY() { return stepOverflowCounterY; }
 		int32_t getEmuStepOverflowCounterZ() { return stepOverflowCounterZ; }
 
-		void initializeFeedProfile(int32_t dx , int32_t dy , int32_t dz);
-		void completeFeedProfile();
+		void setFeedSpeed_MMMin(double value)			{ cfgFeedSpeed_MMMin = value;     }
+		double getFeedSpeed_MMMin()						{ return cfgFeedSpeed_MMMin;      }
+		double getFeedSpeed_MMSec()						{ return cfgFeedSpeed_MMMin / 60; }
 		
-		void updateRealtimeSpeed();
+		void setRealtimeFeedSpeed_MM_MIN(double value)	{ rtmFeedSpeed_MMMin = value;     }
+		double getRealtimeFeedSpeed_MMMin()				{ return rtmFeedSpeed_MMMin;      }
+		double getRealtimeFeedSpeed_MMSec()				{ return rtmFeedSpeed_MMMin / 60; }
+		
+		bool initializeFeedProfile(int32_t dx , int32_t dy , int32_t dz);
+		bool completeFeedProfile();
 		
 	public:
 		
@@ -313,13 +341,15 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		virtual ~SerialEmulatorNULL();
 		
 		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
-		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f);
+		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz);
 		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence);
 
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulator(dev/null)"; }
+		// can process the PID_SPEED_FEED_MODE setter
+		virtual bool knowsSpeedMode() const { return true; }
 		// returns the emulator type
 		virtual bool isEmulator() const { return true; }
 		// return the port type
@@ -328,8 +358,6 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		virtual bool connect(const char* portName) { setConnected(true); return true; }
 		// close the connection
 		virtual void disconnect(void) { setConnected(false); }
-		
-		virtual void traceSpeedInformation();
 };
 
 #endif

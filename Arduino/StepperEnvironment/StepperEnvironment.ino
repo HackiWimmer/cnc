@@ -1,9 +1,5 @@
 #define SKETCH_COMPILE = TRUE
 
-#warning
-#if __has_include("myinclude.h") && __has_include(<stdint.h>)
-# include "myinclude.h"
-#endif
 
 //#define SKETCH_TEST
 #ifndef SKETCH_TEST

@@ -90,8 +90,11 @@ void CncStatisticsPane::logStatistics(bool force) {
 		speed_MM_SEC 	= cnc->getTotalDistanceMetric() / elapsedTimeSEC;
 		speed_MM_MIN 	= speed_MM_SEC * 60;
 		
+		
+		const int stepsXYZ = ( THE_CONFIG->getStepsX() + THE_CONFIG->getStepsY() + THE_CONFIG->getStepsZ() ) / 3;
+		
 		speed_SP_SEC    = cnc->getStepCounter() / elapsedTimeSEC;
-		speed_RPM		= (speed_SP_SEC / THE_CONFIG->getStepsXYZ() ) * 60;
+		speed_RPM		= (speed_SP_SEC / stepsXYZ ) * 60;
 	}
 
 	static wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel), speedSPSEC(_maxSpeedLabel), speedRPM(_maxSpeedLabel);

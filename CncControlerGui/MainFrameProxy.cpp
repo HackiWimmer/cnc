@@ -130,12 +130,6 @@
 	void APP_PROXY::prepareMotionMonitorViewType()
 	{ THE_APP->prepareMotionMonitorViewType(); }
 
-	void APP_PROXY::initSpeedConfigPlayground()
-	{ THE_APP->initSpeedConfigPlayground(); }
-
-	void APP_PROXY::updateSpeedConfigPlayground()
-	{ THE_APP->updateSpeedConfigPlayground(); }
-
 	void APP_PROXY::openMainPreview(const wxString& fn)
 	{ THE_APP->openMainPreview(fn); }
 

@@ -6,7 +6,7 @@
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Debug"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Debug"/>
@@ -15,7 +15,7 @@
       <Project Name="NavigatorPanel" ConfigName="Debug"/>
       <Project Name="wxWidgetsTest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Gprof" Selected="no">
+    <WorkspaceConfiguration Name="Gprof" Selected="yes">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Release"/>
     </WorkspaceConfiguration>

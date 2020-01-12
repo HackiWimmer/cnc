@@ -439,7 +439,7 @@ Resolution:</label>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <object class="wxSimplebook" name="m_mainViewBook">
-                <style>wxBK_DEFAULT</style>
+                <style/>
                 <effect>wxSHOW_EFFECT_NONE</effect>
                 <object class="simplebookpage">
                   <label>Page</label>
@@ -767,7 +767,7 @@ Resolution:</label>
                                       <flag>wxALL|wxEXPAND</flag>
                                       <border>1</border>
                                       <object class="wxSimplebook" name="m_editorToolBox">
-                                        <style>wxBK_DEFAULT</style>
+                                        <style/>
                                         <effect>wxSHOW_EFFECT_NONE</effect>
                                         <object class="simplebookpage">
                                           <label>Page</label>
@@ -962,7 +962,7 @@ Resolution:</label>
                                 <object class="sizeritem">
                                   <flag>wxALL|wxEXPAND</flag>
                                   <object class="wxSimplebook" name="m_simpleBookSourceExt">
-                                    <style>wxBK_DEFAULT</style>
+                                    <style/>
                                     <effect>wxSHOW_EFFECT_NONE</effect>
                                     <object class="simplebookpage">
                                       <label>Info</label>
@@ -4788,7 +4788,7 @@ Size</value>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <object class="wxSimplebook" name="m_monitorViewBook">
-                <style>wxBK_DEFAULT</style>
+                <style/>
                 <effect>wxSHOW_EFFECT_NONE</effect>
                 <object class="simplebookpage">
                   <label>Page</label>
@@ -6412,7 +6412,7 @@ Source</label>
                                               <object class="sizeritem">
                                                 <flag>wxALL|wxEXPAND</flag>
                                                 <object class="wxSimplebook" name="m_simpleBookOutBoundEditor">
-                                                  <style>wxBK_DEFAULT</style>
+                                                  <style/>
                                                   <effect>wxSHOW_EFFECT_NONE</effect>
                                                   <object class="simplebookpage">
                                                     <label>Page</label>
@@ -9017,7 +9017,7 @@ State</label>
                     <object class="sizeritem">
                       <flag>wxALL|wxEXPAND</flag>
                       <object class="wxSimplebook" name="m_sypDetailsBook">
-                        <style>wxBK_DEFAULT</style>
+                        <style/>
                         <effect>wxSHOW_EFFECT_NONE</effect>
                         <object class="simplebookpage">
                           <label>Page</label>
@@ -10644,28 +10644,6 @@ State</label>
         <object class="wxMenuItem" name="m_miRqtPins">
           <label>Pin Report</label>
           <bitmap>bitmaps/messagebox_info.png</bitmap>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-        </object>
-        <object class="separator"/>
-        <object class="wxMenuItem" name="m_menuItemInfoMessage">
-          <label>Test - Info Message</label>
-          <bitmap>bitmaps/dialog-information (2).png</bitmap>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-        </object>
-        <object class="wxMenuItem" name="m_menuItemWarningMessage">
-          <label>Test - Warning Message</label>
-          <bitmap>bitmaps/dialog-warning-3 (2).png</bitmap>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-        </object>
-        <object class="wxMenuItem" name="m_menuItemErrorMessage">
-          <label>Test - Error Message</label>
-          <bitmap>bitmaps/dialog-error-5 (2).png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>

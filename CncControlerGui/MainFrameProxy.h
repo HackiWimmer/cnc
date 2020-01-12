@@ -59,8 +59,6 @@ class MainFrameProxy {
 		static void releaseControllerSetupFromConfig();
 		static void changeCrossingThickness();
 		static void prepareMotionMonitorViewType();
-		static void initSpeedConfigPlayground();
-		static void updateSpeedConfigPlayground();
 		static void openMainPreview(const wxString& fn);
 		static void openMonitorPreview(const wxString& fn);
 		static void openFileFromFileManager(const wxString& fn);

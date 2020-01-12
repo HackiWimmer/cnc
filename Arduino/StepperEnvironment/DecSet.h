@@ -20,9 +20,9 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
   public:
    
     struct Values {
-      bool     isDouble = false;
+      bool     isFloat  = false;
       int32_t  l        =   0;
-      double   d        = 0.0;   
+      float    f        = 0.0;   
 
       void reset() {
         *this = Values();
@@ -32,6 +32,7 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
     struct Result {
       byte      pid         = PID_UNKNOWN;
       byte      valueCount  = 0;
+      
       Values    values[MAX_SETTER_VALUES];
 
       void reset() {
@@ -67,62 +68,35 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
 
     // ----------------------------------------------------------------------
     byte decodeSetter() {
+      typedef ArduinoMainLoop AML;
+      
       result.reset();
 
-      // Wait a protion of time. This is very importent 
-      // to give the serial a chance to take a breath
-      DEC_SETTER_DELAY_MICROS(1000);
-      
-      // error handling: pid + count
-      if ( Serial.available() < 2) {
-        ArduinoMainLoop::pushErrorMessage(E_INVALID_PARAM_ID);
-        return RET_ERROR;
-      }
-  
-      result.pid          = Serial.read();
-      result.valueCount   = Serial.read();
-      byteCount           = Serial.available();
-      tryCount            = 0;
-      
-      while ( byteCount < result.valueCount * sizeof(int32_t) ) {
-        // take the next breath to have something available 
-        DEC_SETTER_DELAY_MICROS(1000);
-        byteCount = Serial.available();
-        
-        // error handling
-        if ( ++tryCount >= 5 ) {
-          ArduinoMainLoop::pushErrorMessage(E_INVALID_PARAM_STREAM);
-          return RET_ERROR;      
-        }
-      }
-
-      // error handling
-      if ( byteCount%sizeof(int32_t) != 0 || byteCount/sizeof(int32_t) > MAX_SETTER_VALUES ) {
-        LastErrorCodes::clear();
-        LastErrorCodes::register4Byte_A = byteCount;
-        ArduinoMainLoop::pushErrorMessage(E_INVALID_PARAM_STREAM_LEN);
+      if ( AML::readSerialBytesWithTimeout(b, 2) != 2 ) {
+        ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_PARAM_ID);
         return RET_ERROR;
       }
 
+      result.pid          = b[0];
+      result.valueCount   = b[1];
+      
       // over all given values
-      for (unsigned short i=0; i<byteCount/sizeof(int32_t); i++) {
-        
+      for (unsigned short i=0; i<result.valueCount; i++) {
         // read a 4 byte
-        unsigned int size = Serial.readBytes(b, sizeof(int32_t));
-        if ( size != sizeof(int32_t) ) {
-          ArduinoMainLoop::pushErrorMessage(E_INVALID_PARAM_STREAM);
+        if ( AML::readSerialBytesWithTimeout(b, sizeof(int32_t)) != sizeof(int32_t) ) {
+          ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_PARAM_STREAM);
           return RET_ERROR;
         }
-
+        
         // order the received bytes the an int32_t value
         if ( convertBytesToInt32(b, result.values[i].l) == false ) {
-          ArduinoMainLoop::pushErrorMessage(E_INVALID_PARAM_STREAM);
+          ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_PARAM_STREAM);
           return RET_ERROR;
         }
         
-        const bool mode = ArduinoMainLoop::isDoubleValue(result.pid);
-        if ( mode )  ArduinoMainLoop::convertLongToDouble(result.values[i].l, result.values[i].d);
-        else         result.values[i].d = 0.0;      
+        const bool mode = ArduinoMainLoop::isFloatValue(result.pid);
+        if ( mode )  ArduinoMainLoop::convertLongToFloat(result.values[i].l, result.values[i].f);
+        else         result.values[i].f = 0.0;      
       }
 
       // process . . .

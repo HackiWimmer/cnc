@@ -62,7 +62,7 @@ CncOSDConfigList::OSDEntry::OSDEntry(const wxString& group,
 		delimiter = value[0];
 		
 		if ( delimiter == OSDEntry::groupKeySeparator ) {
-			std::cerr << "CncOSDConfigList::OSDEntry::OSDEntry(): " << OSDEntry::groupKeySeparator << " isn't allowed eas delimiter!"<< std::endl;
+			std::cerr << "CncOSDConfigList::OSDEntry::OSDEntry(): " << OSDEntry::groupKeySeparator << " isn't allowed as delimiter!"<< std::endl;
 			values.push_back("");
 			
 		} else {

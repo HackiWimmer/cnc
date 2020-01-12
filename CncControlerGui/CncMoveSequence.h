@@ -14,7 +14,6 @@ class CncMoveSequence {
 			int32_t x;
 			int32_t y;
 			int32_t z;
-			int32_t f;
 			long 	clientID;
 
 			struct Parameter {
@@ -22,31 +21,26 @@ class CncMoveSequence {
 				unsigned int 	necessarySize	= 0;
 			} param;
 
-			explicit SequencePoint(long clientID)                     				 : x(0), y(0), z(0), f(0), clientID(clientID), param() {}
-			SequencePoint(long clientID, int32_t z)   								 : x(0), y(0), z(z), f(0), clientID(clientID), param() {}
-			SequencePoint(long clientID, int32_t x, int32_t y)						 : x(x), y(y), z(0), f(0), clientID(clientID), param() {}
-			SequencePoint(long clientID, int32_t x, int32_t y, int32_t z)			 : x(x), y(y), z(z), f(0), clientID(clientID), param() {}
-			SequencePoint(long clientID, int32_t x, int32_t y, int32_t z, int32_t f) : x(x), y(y), z(z), f(f), clientID(clientID), param() {}
+			explicit SequencePoint(long clientID)                     				 : x(0), y(0), z(0), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t z)   								 : x(0), y(0), z(z), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t x, int32_t y)						 : x(x), y(y), z(0), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t x, int32_t y, int32_t z)			 : x(x), y(y), z(z), clientID(clientID), param() {}
 
-			//                                       pid             + 4                                 * value
+			//                                       pid             + 3                                 * value
 			static const unsigned int MaxPointSize = sizeof(int32_t) + ArdoObj::ValueInfo::MaxValueCount * sizeof(int32_t);
 
-			bool isOneByte() const { return ( cnc::between(x, -2, +2)               && cnc::between(y, -2, +2)               && cnc::between(z, -2, +2)               && cnc::between(f, -2, +2) ); } 
-			bool isInt8()    const { return ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   && cnc::between(z, INT8_MIN, INT8_MAX)   && cnc::between(f, INT8_MIN, INT8_MAX) ); }
-			bool isInt16()   const { return ( cnc::between(x, INT16_MIN, INT16_MAX) && cnc::between(y, INT16_MIN, INT16_MAX) && cnc::between(z, INT16_MIN, INT16_MAX) && cnc::between(f, INT16_MIN, INT16_MAX) ); } 
-			bool isInt32()   const { return ( cnc::between(x, INT32_MIN, INT32_MAX) && cnc::between(y, INT32_MIN, INT32_MAX) && cnc::between(z, INT32_MIN, INT32_MAX) && cnc::between(f, INT32_MIN, INT32_MAX) ); } 
+			bool isOneByte() const { return ( cnc::between(x, -2, +2)               && cnc::between(y, -2, +2)               && cnc::between(z, -2, +2)                ); } 
+			bool isInt8()    const { return ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   && cnc::between(z, INT8_MIN, INT8_MAX)    ); }
+			bool isInt16()   const { return ( cnc::between(x, INT16_MIN, INT16_MAX) && cnc::between(y, INT16_MIN, INT16_MAX) && cnc::between(z, INT16_MIN, INT16_MAX)  ); } 
+			bool isInt32()   const { return ( cnc::between(x, INT32_MIN, INT32_MAX) && cnc::between(y, INT32_MIN, INT32_MAX) && cnc::between(z, INT32_MIN, INT32_MAX)  ); } 
 
 			bool hasX() const { return x != 0; }
 			bool hasY() const { return y != 0; }
 			bool hasZ() const { return z != 0; }
 			
-			bool hasF() const { return f != 0; }
-			
 			bool notX() const { return x == 0; }
 			bool notY() const { return y == 0; }
 			bool notZ() const { return z == 0; }
-			
-			bool notF() const { return f == 0; }
 			
 			void determineOneByte() {
 				param.type 				= 0;
@@ -65,22 +59,22 @@ class CncMoveSequence {
 				
 				// cnc::between(x, -2, +2) means values [-1, 0, +1]
 				if      ( isOneByte() ) {
-					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::One, x, y, z, f);
+					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::One, x, y, z);
 					param.type 				= vi.getType();
 					param.necessarySize		= vi.getNecessarySize();
 				}
 				else if ( isInt8() ) {
-					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int8, x, y, z, f);
+					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int8, x, y, z);
 					param.type 				= vi.getType();
 					param.necessarySize		= vi.getNecessarySize();
 				}
 				else if ( isInt16() ) {
-					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int16, x, y, z, f);
+					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int16, x, y, z);
 					param.type 				= vi.getType();
 					param.necessarySize		= vi.getNecessarySize();
 				}
 				else if ( isInt32() ) {
-					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int32, x, y, z, f);
+					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int32, x, y, z);
 					param.type 				= vi.getType();
 					param.necessarySize		= vi.getNecessarySize();
 				}
@@ -148,9 +142,6 @@ class CncMoveSequence {
 		void setType(unsigned char t) {  moveCmd = t; }
 		friend class CncCommandDecoder;
 		
-		void 					addMetricPosXYZF(double dx, double dy, double dz, double f);
-		void 					addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f);
-		
 	public:
 	
 		struct SpeedInfo {
@@ -198,11 +189,11 @@ class CncMoveSequence {
 
 		void 					addMetricPosXYZ(double dx, double dy, double dz);
 		
-		void 					addStepPosXYZ (int32_t dx, int32_t dy, int32_t dz)	{ addStepPosXYZF(dx, dy, dz, 0); }
-		void 					addStepPosXY  (int32_t dx, int32_t dy)				{ addStepPosXYZF(dx, dy,  0, 0); }
-		void 					addStepPosX   (int32_t dx)							{ addStepPosXYZF(dx,  0,  0, 0); }
-		void 					addStepPosY   (int32_t dy)							{ addStepPosXYZF( 0, dy,  0, 0); }
-		void 					addStepPosZ   (int32_t dz)							{ addStepPosXYZF( 0,  0, dz, 0); }
+		void 					addStepPosXYZ (int32_t dx, int32_t dy, int32_t dz);
+		void 					addStepPosXY  (int32_t dx, int32_t dy)				{ addStepPosXYZ(dx, dy,  0); }
+		void 					addStepPosX   (int32_t dx)							{ addStepPosXYZ(dx,  0,  0); }
+		void 					addStepPosY   (int32_t dy)							{ addStepPosXYZ( 0, dy,  0); }
+		void 					addStepPosZ   (int32_t dz)							{ addStepPosXYZ( 0,  0, dz); }
 
 		bool 					hasMore() const 					{ return getCount() > 0; }
 		unsigned int 			getCount() const;

@@ -179,29 +179,17 @@ void CncMoveSequence::addMetricPosXYZ(double dx, double dy, double dz) {
 					(int32_t)round(sz));
 }
 ///////////////////////////////////////////////////////////////////
-void CncMoveSequence::addMetricPosXYZF(double dx, double dy, double dz, double f) {
-///////////////////////////////////////////////////////////////////
-	const double sx = dx * THE_CONFIG->getCalculationFactX();
-	const double sy = dy * THE_CONFIG->getCalculationFactY();
-	const double sz = dz * THE_CONFIG->getCalculationFactZ();
-	
-	addStepPosXYZF( (int32_t)round(sx), 
-					(int32_t)round(sy),
-					(int32_t)round(sz),
-					0); // Currently not used therefore always 0
-}
-///////////////////////////////////////////////////////////////////
-void CncMoveSequence::addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f)  {
+void CncMoveSequence::addStepPosXYZ(int32_t dx, int32_t dy, int32_t dz)  {
 ///////////////////////////////////////////////////////////////////
 	if ( isValid() == false )
 		return;
 
-	if ( dx == 0 && dy == 0 && dz == 0 && f == 0 )
+	if ( dx == 0 && dy == 0 && dz == 0 )
 		return;
 
 	//std::cout << "CncMoveSequence::addStepPosXYZF: " << getLastClientId() << std::endl;
 
-	sequence.push_back(SequencePoint(getLastClientId(), dx, dy, dz, f));
+	sequence.push_back(SequencePoint(getLastClientId(), dx, dy, dz));
 	data.add(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
@@ -289,9 +277,10 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 		flushInt32(data.lengthY);
 		flushInt32(data.lengthZ);
 		
-		#warning do something with speedInfo
+		#warning do something with speedInfo --> nothing
 		
-		if ( false ) {
+		#warning
+		if ( true ) {
 			std::cout 	<< "data.length X,Y,Z: " 
 						<< data.lengthX << ", " << data.lengthY << ", " << data.lengthZ
 						<< std::endl;
@@ -389,7 +378,8 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	moveSequenceFlushedSize = byteCount;
 
 	// debug
-	if ( false ) {
+	#warning
+	if ( true ) {
 		std::cout << "byteOffset              : " << byteOffset					<< std::endl;
 		std::cout << "byteCount               : " << byteCount					<< std::endl;
 		std::cout << "flushedCount            : " << flushed					<< std::endl;
@@ -415,20 +405,22 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 	if ( sequenceBuffer == NULL )
 		return 0;
 
+	typedef ArdoObj::ValueInfo::Byte Byte;
+	
 	unsigned char* pointer	= sequenceBuffer;
 	unsigned int byteCount	= 0;
 
 	// -------------------------------------------------------------
 	auto setBit = [&](unsigned char& value, int idx) {
 		switch ( idx ) {
-			case 8:     value |= (1 << 7); break;
-			case 7:     value |= (1 << 6); break;
-			case 6:     value |= (1 << 5); break;
-			case 5:     value |= (1 << 4); break;
-			case 4:     value |= (1 << 3); break;
-			case 3:     value |= (1 << 2); break;
-			case 2:     value |= (1 << 1); break;
-			case 1:     value |= (1 << 0); break;
+			case Byte::Z:      value |= (1 << 7); break;
+			case Byte::Y:      value |= (1 << 6); break;
+			case Byte::X:      value |= (1 << 5); break;
+			case Byte::Q:      value |= (1 << 4); break;
+			case Byte::L4:     value |= (1 << 3); break;
+			case Byte::L2:     value |= (1 << 2); break;
+			case Byte::L1:     value |= (1 << 1); break;
+			case Byte::L0:     value |= (1 << 0); break;
 		}
 	};
 
@@ -440,7 +432,7 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 	};
 
 	// -------------------------------------------------------------
-	auto putOneByte = [&](int8_t x, int8_t y, int8_t z, int8_t f) {
+	auto putOneByte = [&](int8_t x, int8_t y, int8_t z) {
 		unsigned char xyz = 0;
 
 		if 		( x > 0 ) 	setBit(xyz, 1);
@@ -451,9 +443,6 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 
 		if 		( z > 0 ) 	setBit(xyz, 5);
 		else if ( z < 0 )	setBit(xyz, 6);
-
-		if 		( f > 0 ) 	setBit(xyz, 7);
-		else if ( f < 0 )	setBit(xyz, 8);
 
 		copy(pointer, &xyz, sizeof(unsigned char));
 	};
@@ -481,11 +470,9 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 		ArdoObj::ValueInfo vi(valueType);
 		if ( vi.getByteCount() == 0 ) {
 			
-			putOneByte(sp.x, sp.y, sp.z, sp.f);
+			putOneByte(sp.x, sp.y, sp.z);
 		}
 		else if ( vi.getByteCount() == 1 ) {
-			if ( vi.hasF() )
-				putInt8(sp.f); 
 			
 			if 		( vi.hasXYZ() ) { putInt8(sp.x); putInt8(sp.y); putInt8(sp.z); }
 			else if ( vi.hasXY()  ) { putInt8(sp.x); putInt8(sp.y); }
@@ -494,8 +481,6 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 			else if ( vi.hasZ()   ) { putInt8(sp.z); }
 		}
 		else if ( vi.getByteCount() == 2 ) {
-			if ( vi.hasF() )
-				putInt16(sp.f); 
 
 			if 		( vi.hasXYZ() ) { putInt16(sp.x); putInt16(sp.y); putInt16(sp.z); }
 			else if ( vi.hasXY()  ) { putInt16(sp.x); putInt16(sp.y); }
@@ -504,8 +489,6 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 			else if ( vi.hasZ()   ) { putInt16(sp.z); }
 		}
 		else if ( vi.getByteCount() == 4 ) {
-			if ( vi.hasF() )
-				putInt32(sp.f); 
 			
 			if 		( vi.hasXYZ() ) { putInt32(sp.x); putInt32(sp.y); putInt32(sp.z); }
 			else if ( vi.hasXY()  ) { putInt32(sp.x); putInt32(sp.y); }
@@ -521,7 +504,7 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 	// -------------------------------------------------------------
 	auto flushPoint_MOVE_SEQUENCE = [&]() {
 		wxASSERT( sp.isOneByte() );
-		putOneByte(sp.x, sp.y, sp.z, sp.f);
+		putOneByte(sp.x, sp.y, sp.z);
 	};
 
 	// -------------------------------------------------------------

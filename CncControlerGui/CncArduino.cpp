@@ -47,10 +47,6 @@ void ArduinoCMDs::init() {
 	cmds[CMD_PRINT_VERSION]                    = "Pull Version";
 	cmds[CMD_PRINT_PIN_REPORT]                 = "Pull PIN Report";
 	
-	cmds[CMD_TEST_INFO_MESSAGE]                = "Pull Test Info Message";
-	cmds[CMD_TEST_WARN_MESSAGE]                = "Pull Test Warning Message";
-	cmds[CMD_TEST_ERROR_MESSAGE]               = "Pull Test Error Message";
-	
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoCMDs::getCMDLabel(unsigned int id) {
@@ -131,14 +127,10 @@ void ArduinoPIDs::init() {
 	pids[PID_STEPPER_INITIALIZED]             .setup("Stepper Initialize State", "bool");
 	pids[PID_QUERY_READY_TO_RUN]              .setup("Ready to run", "bool");
 	
-	pids[PID_STEPS_X]                         .setup("Steps X Axis", "steps");
-	pids[PID_STEPS_Y]                         .setup("Steps Y Axis", "steps");
-	pids[PID_STEPS_Z]                         .setup("Steps Z Axis", "steps");
-	
-	pids[PID_PITCH]                           .setup("Pitch", "mm");
-	pids[PID_PITCH_X]                         .setup("Pitch X Axis", "mm");
-	pids[PID_PITCH_Y]                         .setup("Pitch Y Axis", "mm");
-	pids[PID_PITCH_Z]                         .setup("Pitch Z Axis", "mm");
+	pids[PID_FEEDRATE]                        .setup("Feedrate", "mm/step");
+	pids[PID_FEEDRATE_X]                      .setup("Feedrate X Axis", "mm/step");
+	pids[PID_FEEDRATE_Y]                      .setup("Feedrate Y Axis", "mm/step");
+	pids[PID_FEEDRATE_Z]                      .setup("Feedrate Z Axis", "mm/step");
 	
 	pids[PID_MIN_SWITCH]                      .setup("Min Switch", "bool");  
 	pids[PID_MAX_SWITCH]                      .setup("Max Switch", "bool");
@@ -154,9 +146,7 @@ void ArduinoPIDs::init() {
 	
 	pids[PID_CONTROLLER]                      .setup("Cnc Controller", "");
 	pids[PID_TOOL_SWITCH]                     .setup("Tool Enabled State", "bool");
-	pids[PID_POS_REPLY_THRESHOLD_X]           .setup("Position Reply Threshold X Axis", "steps");
-	pids[PID_POS_REPLY_THRESHOLD_Y]           .setup("Position Reply Threshold Y Axis", "steps");
-	pids[PID_POS_REPLY_THRESHOLD_Z]           .setup("Position Reply Threshold Z Axis", "steps");
+	pids[PID_POS_REPLY_THRESHOLD]             .setup("Position Reply Threshold", "impulses");
 	pids[PID_PROBE_MODE]                      .setup("Probe Mode State", "bool");
 
 	pids[PID_XYZ_POS_MAJOR]                   .setup("XYZ Pos - Type Major", "steps");
@@ -175,14 +165,8 @@ void ArduinoPIDs::init() {
 	pids[PID_STEP_PIN]                        .setup("Step Pin", "");
 	pids[PID_DIR_PIN]                         .setup("Direction Pin", "");
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");
-	pids[PID_AVG_STEP_DURATION]               .setup("AVG Step Loop Duration", "us");
 
-	pids[PID_PULSE_WIDTH_OFFSET_DIR]          .setup("Direction Pulse Width", "us");
-	pids[PID_PULSE_WIDTH_OFFSET_LOW]          .setup("Step Pulse Width Low", "us");
-	pids[PID_PULSE_WIDTH_OFFSET_HIGH]         .setup("Step Pulse Width High", "us");
-	pids[PID_PULSE_WIDTH_LOW_X]               .setup("Step Pulse Width Low X", "us");
-	pids[PID_PULSE_WIDTH_LOW_Y]               .setup("Step Pulse Width Low Y", "us");
-	pids[PID_PULSE_WIDTH_LOW_Z]               .setup("Step Pulse Width Low Z", "us");
+	pids[PID_PULSE_WIDTH_HIGH]                .setup("Step Pulse Width High", "us");
 	pids[PID_PULSE_WIDTH_HIGH_X]              .setup("Step Pulse Width High X", "us");
 	pids[PID_PULSE_WIDTH_HIGH_Y]              .setup("Step Pulse Width High Y", "us");
 	pids[PID_PULSE_WIDTH_HIGH_Z]              .setup("Step Pulse Width High Z", "us");
@@ -312,15 +296,12 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_STEPPER_PULS_WIDTH_TO_LARGE]        = "Arduino::recalcDriverConfig(): Value to large";
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";
 	
-	errorCodes[E_TEST_ERROR_CODE]                    = "Test Error Code";
-
 	errorCodes[E_INTERRUPT]                          = "Interrupt received";
 	errorCodes[E_TOTAL_COUNT]                        = "Total error count";
 	
 	errorCodes[E_PURE_TEXT_VALUE_ERROR]              = "Pure text message";
 	errorCodes[E_SPEED_MGMT_NOT_INITIALIZED]         = "Speed Manager isn't initialized";
 	errorCodes[E_STEPPER_NOT_READY_TO_RUN]           = "Stepper not ready to run";
-	
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoErrorCodes::getECLabel(unsigned int id) {

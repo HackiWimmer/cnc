@@ -18,7 +18,6 @@ SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(CncControl* cnc)
 : SerialEmulatorNULL(cnc)
 , fileName("")
 , startPos(0.0, 0.0, 0.0)
-, currentSpeedMode(CncSpeedUserDefined)
 , currentSpeedValue(0.0)
 , metricBoundbox()
 ///////////////////////////////////////////////////////////////////
@@ -29,7 +28,6 @@ SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(CncControl* cnc)
 SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(const char* fileName) 
 : SerialEmulatorNULL(fileName)
 , fileName("")
-, currentSpeedMode(CncSpeedUserDefined)
 , currentSpeedValue(0.0)
 , metricBoundbox()
 ///////////////////////////////////////////////////////////////////
@@ -147,13 +145,13 @@ void SerialEmulatorTextStreamer::notifySetter(const CncCommandDecoder::SetterInf
 		};
 		
 		if ( checkValue() == true ) 
-			currentSpeedValue = (double)si.values.front() / DBL_FACT;
+			currentSpeedValue = (double)si.values.front() / FLT_FACT;
 	}
 	
 	writeEncodedSetterCallback(si);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
+void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
 	MoveInfo mi;
 	mi.speedMode 	= currentSpeedMode;
@@ -167,7 +165,7 @@ void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, 
 	mi.mdz 			= THE_CONFIG->convertStepsToMetricZ(mi.sdz);
 	
 	if ( writeEncodedMoveSequenceCallback(mi) == true )
-		SerialEmulatorNULL::notifyMove(dx, dy, dz, f);
+		SerialEmulatorNULL::notifyMove(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) {
@@ -256,7 +254,7 @@ bool SerialEmulatorTextStreamer::writeEncodedSetterCallback(const SetterInfo& si
 	bodyStream << "Values=\"";
 	wxString values;
 	for ( auto it = si.values.begin(); it != si.values.end(); ++it) {
-		if ( si.pid >= PID_DOUBLE_RANG_START && si.pid <= PID_DOUBLE_RANG_END )		values.append(wxString::Format("%.3lf ", (double)(*it) / DBL_FACT));
+		if ( si.pid >= PID_FLOAT_RANG_START && si.pid <= PID_FLOAT_RANG_END )		values.append(wxString::Format("%.3lf ", (float)(*it) / FLT_FACT));
 		else																		values.append(wxString::Format("%ld ",   (long)(*it) ));
 	}
 		

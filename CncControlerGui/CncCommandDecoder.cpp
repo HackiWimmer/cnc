@@ -20,10 +20,10 @@ CncCommandDecoder::MoveSequenceRecreator::MoveSequenceRecreator(CncMoveSequence*
 	wxASSERT( moveSequence != NULL );
 }
 ///////////////////////////////////////////////////////////////////
-void CncCommandDecoder::MoveSequenceRecreator::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
+void CncCommandDecoder::MoveSequenceRecreator::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( moveSequence != NULL );
-	moveSequence->addStepPosXYZF(dx, dy, dz, f);
+	moveSequence->addStepPosXYZ(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
 void CncCommandDecoder::MoveSequenceRecreator::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& seqInfo) {
@@ -79,7 +79,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		
 		if ( vi.isValid() == false )
 			return false;
-		
+			
 		byteCount = (unsigned int)(vi.getByteCount()); 
 		valCount  = (unsigned int)(vi.getValueCount());
 		
@@ -87,28 +87,24 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	};
 
 	// ------------------------------------------------------------------------
-	auto readOneByteToPos = [&] (CncLongPosition& pos, int32_t& f) {
+	auto readOneByteToPos = [&] (CncLongPosition& pos) {
 		unsigned char buf[1];
 		buf[0] = buffer[idx++];
 
 		pos.setX( buf[0] &   1 ?  +1 : buf[0] &   2 ? -1 : 0 );
 		pos.setY( buf[0] &   4 ?  +1 : buf[0] &   8 ? -1 : 0 );
 		pos.setZ( buf[0] &  16 ?  +1 : buf[0] &  32 ? -1 : 0 );
-		
-		f      =  buf[0] &  64 ?  +1 : buf[0] & 128 ? -1 : 0;
-
 		return 1;
  	};
 
 	// ------------------------------------------------------------------------
-	auto readOneByte = [&] (int32_t& x, int32_t& y, int32_t& z, int32_t& f) {
+	auto readOneByte = [&] (int32_t& x, int32_t& y, int32_t& z) {
 		unsigned char buf[1];
 		buf[0] = buffer[idx++];
 
 		x = buf[0] &   1 ?  +1 : buf[0] &   2 ? -1 : 0 ;
 		y = buf[0] &   4 ?  +1 : buf[0] &   8 ? -1 : 0 ;
 		z = buf[0] &  16 ?  +1 : buf[0] &  32 ? -1 : 0 ;
-		f = buf[0] &  64 ?  +1 : buf[0] & 128 ? -1 : 0 ;
 		return 1;
 	};
 
@@ -147,7 +143,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	};
 
 	// ------------------------------------------------------------------------
-	auto readPosition = [&] (CncLongPosition& pos, int32_t& f) {
+	auto readPosition = [&] (CncLongPosition& pos) {
 
 		const unsigned char valueType 	= buffer[idx++];
 		unsigned int byteCount 			= 0;
@@ -165,7 +161,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		
 		while ( valCounter < valCount ) {
 			switch ( byteCount ) {
-				case 0:		readOneByte(values[0], values[1], values[2], values[3]);
+				case 0:		readOneByte(values[0], values[1], values[2]);
 							valCounter  += 3; 	// to break the while loop
 							byteCounter += 1;
 							break;
@@ -192,15 +188,11 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		// assign x, y, z depending on given pid
 		ArdoObj::ValueInfo vi(valueType);
 		
-		const unsigned short p = vi.hasF() ? 1 : 0;
-		if ( vi.hasF() )
-			f = values[0];
-			
-		if 		( vi.hasXYZ() )	{ pos.setX(values[p+0]); pos.setY(values[p+1]); pos.setZ(values[p+2]); }
-		else if ( vi.hasXY()  ) { pos.setX(values[p+0]); pos.setY(values[p+1]); pos.setZ(0);           }
-		else if ( vi.hasX()   ) { pos.setX(values[p+0]); pos.setY(0);           pos.setZ(0);           }
-		else if ( vi.hasY()   ) { pos.setX(0);           pos.setY(values[p+0]); pos.setZ(0);           }
-		else if ( vi.hasZ()   ) { pos.setX(0);           pos.setY(0);           pos.setZ(values[p+0]); }
+		if 		( vi.hasXYZ() )	{ pos.setX(values[0]); pos.setY(values[1]); pos.setZ(values[2]); }
+		else if ( vi.hasXY()  ) { pos.setX(values[0]); pos.setY(values[1]); pos.setZ(0);         }
+		else if ( vi.hasX()   ) { pos.setX(values[0]); pos.setY(0);         pos.setZ(0);         }
+		else if ( vi.hasY()   ) { pos.setX(0);         pos.setY(values[0]); pos.setZ(0);         }
+		else if ( vi.hasZ()   ) { pos.setX(0);         pos.setY(0);         pos.setZ(values[0]); }
 		
 		if ( trace )
 			std::cout << "byteCounter: " << byteCounter << ", pos: " << pos << std::endl;
@@ -300,14 +292,13 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		while ( byteCounter < portionSize - 1) {
 
 			CncLongPosition pos;
-			int32_t f = 0;
 			if ( sequence.Out.cmd == CMD_RENDER_AND_MOVE_SEQUENCE ) {
 				
-				byteCounter += readPosition(pos, f);
+				byteCounter += readPosition(pos);
 			}
 			else if ( sequence.Out.cmd == CMD_MOVE_SEQUENCE ) {
 				
-				byteCounter += readOneByteToPos(pos, f);
+				byteCounter += readOneByteToPos(pos);
 			}
 			else {
 				
@@ -318,7 +309,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 
 			// notify
 			if ( caller != NULL )
-				caller->notifyMove(pos.getX(), pos.getY(), pos.getZ(), f);
+				caller->notifyMove(pos.getX(), pos.getY(), pos.getZ());
 
 			// debug
 			if ( false ) {
@@ -373,7 +364,7 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 	bool ret = CncCommandDecoder::decodeMove(buffer, nbByte, x , y , z);
 
 	if ( caller != NULL )
-		caller->notifyMove(x, y, z, 0);
+		caller->notifyMove(x, y, z);
 
 	return ret;
 }

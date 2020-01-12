@@ -47,6 +47,7 @@
 #include "CncStartPositionResolver.h"
 #include "CncFileNameService.h"
 #include "CncFilePreviewWnd.h"
+#include "CncSpeedPlayground.h"
 #include "SVGPathHandlerCnc.h"
 #include "ManuallyParser.h"
 #include "SVGFileParser.h"
@@ -270,7 +271,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , gCodeSequenceList(NULL)
 , cncSummaryListCtrl(NULL)
 , serialSpyListCtrl(NULL)
-, accelGraphPanel(NULL)
 , cncGameportDlg(new CncGameportController(this))
 , outboundEditorSvgView(NULL)
 , navigatorPanel(NULL)
@@ -303,6 +303,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 {
 ///////////////////////////////////////////////////////////////////
 	APPEND_THREAD_IDTO_STACK_TRACE_FILE;
+
 
 	// initialize update manager thread
 	initializeUpdateManagerThread();
@@ -441,7 +442,6 @@ MainFrame::~MainFrame() {
 	cncDELETE( parsingSynopisis );
 	cncDELETE( cncSummaryListCtrl );
 	cncDELETE( serialSpyListCtrl );
-	cncDELETE( accelGraphPanel );
 	cncDELETE( outboundEditorSvgView );
 	cncDELETE( gCodeSequenceList );
 	cncDELETE( navigatorPanel );
@@ -782,10 +782,6 @@ void MainFrame::installCustControls() {
 	serialSpyListCtrl = new CncSerialSpyListCtrl(this, wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_serialSpyPlaceholder, serialSpyListCtrl);
 	
-	// acceleration graph
-	accelGraphPanel = new CfgAccelerationGraph(this); 
-	GblFunc::replaceControl(m_accelGraphPanel, accelGraphPanel);
-	
 	// Outbound editor svg viewer
 	outboundEditorSvgView = new CncSvgViewer(this); 
 	GblFunc::replaceControl(m_outboundEditorSvgViewPlaceholder, outboundEditorSvgView);
@@ -965,56 +961,7 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-
-	class XXX {
-
-		public:
-			int i;
-			std::string s;
-
-			XXX(int c, const char* x)
-			: i(c)
-			, s(x)
-			{}
-
-			XXX(const XXX& x)
-			: i(x.i)
-			, s(x.s)
-			{}
-
-			XXX(const XXX&& x)
-			: i(x.i)
-			, s(x.s)
-			{}
-
-			virtual ~XXX()
-			{}
-
-			// copy assignment operator
-			auto operator=(const XXX& rhs) & -> XXX&;
-
-			// move assignment operator
-			auto operator=(XXX&& rhs) & noexcept -> XXX&;
-
-
-
-	};
-	
-	
-	XXX a(42, "Stefan");
-	XXX b(84, "Sonja");
-
-	XXX c = a;
-	
-	std::cout << c.i << std::endl;
-	std::cout << c.s.c_str() << std::endl;
-	
-	XXX d(a);
-	std::cout << d.i << std::endl;
-	std::cout << a.i << std::endl;
-
-	
-	
+	cnc->getSerialExtern()->test();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -1578,7 +1525,7 @@ void MainFrame::onSerialThreadHeartbeat(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onSerialThreadMessage(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	char type = (char)event.message.type;
+	const char type = (char)event.message.type;
 	cncArduinoEnvironment->appendMessage(type, event.message.getMessage(), event.message.getContext());
 }
 ///////////////////////////////////////////////////////////////////
@@ -2070,7 +2017,6 @@ void MainFrame::initialize(void) {
 	decorateSecureDlgChoice(true);
 	registerGuiControls();
 	changeManuallySpeedValue();
-	initSpeedConfigPlayground();
 	decorateOutboundSaveControls(false);
 
 	// init config pages
@@ -2102,9 +2048,6 @@ void MainFrame::initialize(void) {
 	
 	val.SetRange(0, 50000);
 	val.SetPrecision(0);
-	m_speedConfigStepsX->SetValidator(val);
-	m_speedConfigStepsY->SetValidator(val);
-	m_speedConfigStepsZ->SetValidator(val);
 	
 	wxTextValidator tVal(wxFILTER_NUMERIC);
 	tVal.SetCharIncludes(", ");
@@ -2129,6 +2072,11 @@ void MainFrame::initialize(void) {
 	
 	// curve lib resulotion
 	THE_CONFIG->setupSelectorRenderResolution();
+	
+	
+	#warning
+	wxCommandEvent event;
+	openSpeedPlayground(event);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeCncControl() {
@@ -4237,8 +4185,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		else {
 			std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
 		}
-		
-		cnc->traceSpeedInformation();
 		
 		Serial::Trigger::EndRun endRun;
 		endRun.succcess = ret;
@@ -7200,36 +7146,6 @@ void MainFrame::clearSetterList(wxCommandEvent& event) {
 	m_setterListCount->SetValue("# 0");
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::requestInfoMessage(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( cnc == NULL )
-		return;
-		
-	cnc->processCommand(CMD_TEST_INFO_MESSAGE, std::clog);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
-	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::CNC_MSG_HIST_PANEL);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::requestWarningMessage(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( cnc == NULL )
-		return;
-		
-	cnc->processCommand(CMD_TEST_WARN_MESSAGE, std::clog);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
-	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::CNC_MSG_HIST_PANEL);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::requestErrorMessage(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( cnc == NULL )
-		return;
-		
-	cnc->processCommand(CMD_TEST_ERROR_MESSAGE, std::clog);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
-	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::CNC_MSG_HIST_PANEL);
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::goPosSypFirstId(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( positionSpy->GetItemCount() == 0 )
@@ -7544,88 +7460,6 @@ void MainFrame::leaveSerialSpy(wxMouseEvent& event) {
 	wxASSERT(serialSpyListCtrl);
 	// currently nothing more to do
 	//serialSpyListCtrl->clearDetails();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::initSpeedConfigPlayground() {
-/////////////////////////////////////////////////////////////////////
-	if ( m_speedConfigSlider ) {
-		m_speedConfigSlider->SetRange(0, THE_CONFIG->getMaxSpeedXYZ_MM_MIN());
-		m_speedConfigSlider->SetValue(THE_CONFIG->getMaxSpeedXYZ_MM_MIN() * 0.7);
-	}
-	
-	updateSpeedConfigPlayground();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::updateSpeedConfigPlayground() {
-/////////////////////////////////////////////////////////////////////
-	if ( m_speedConfigSlider ) {
-		
-		CncSpeedController csc;
-		csc.setup('X', THE_CONFIG->getStepsX(), THE_CONFIG->getPitchX(), 
-		          SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
-				  THE_CONFIG->getLowPulsWidthX() + THE_CONFIG->getHighPulsWidthX(),
-				  THE_CONFIG->getAccelStartSpeedX_MM_MIN()/60, THE_CONFIG->getAccelStopSpeedX_MM_MIN()/60
-				 );
-		csc.setup('Y', THE_CONFIG->getStepsY(), THE_CONFIG->getPitchY(), 
-		          SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
-				  THE_CONFIG->getLowPulsWidthY() + THE_CONFIG->getHighPulsWidthY(),
-				  THE_CONFIG->getAccelStartSpeedY_MM_MIN()/60, THE_CONFIG->getAccelStopSpeedY_MM_MIN()/60
-				 );
-		csc.setup('Z', THE_CONFIG->getStepsZ(), THE_CONFIG->getPitchZ(), 
-		          SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
-				  THE_CONFIG->getLowPulsWidthZ() + THE_CONFIG->getHighPulsWidthZ(),
-				  THE_CONFIG->getAccelStartSpeedZ_MM_MIN()/60, THE_CONFIG->getAccelStopSpeedZ_MM_MIN()/60
-				  );
-		
-		csc.setFeedSpeed_MM_MIN(m_speedConfigSlider->GetValue());
-		
-		long x; m_speedConfigStepsX->GetValue().ToLong(&x);
-		long y; m_speedConfigStepsY->GetValue().ToLong(&y);
-		long z; m_speedConfigStepsZ->GetValue().ToLong(&z);
-		csc.initMove(x, y, z);
-		
-		std::stringstream ssX, ssY, ssZ, ssAX, ssAY, ssAZ, ssC;
-		ssC << csc;  		m_speedConfigTrace->ChangeValue(ssC.str());
-		
-		ssX << csc.X;  		m_speedConfigTraceX->ChangeValue(ssX.str());
-		ssY << csc.Y;  		m_speedConfigTraceY->ChangeValue(ssY.str());
-		ssZ << csc.Z;  		m_speedConfigTraceZ->ChangeValue(ssZ.str());
-		
-		ssAX << csc.X.AP;  	m_accelConfigTraceX->ChangeValue(ssAX.str());
-		ssAY << csc.Y.AP;  	m_accelConfigTraceY->ChangeValue(ssAY.str());
-		ssAZ << csc.Z.AP;  	m_accelConfigTraceZ->ChangeValue(ssAZ.str());
-		
-		wxASSERT(accelGraphPanel);
-		char axis   = m_speedConfigAccelAxis->GetStringSelection()[0];
-		int32_t stm = 0;
-		switch ( axis ) {
-			case 'X': stm = x; break;
-			case 'Y': stm = y; break;
-			case 'Z': stm = z; break;
-			default : axis = '\0';
-		}
-		
-		if ( axis != '\0' ) {
-			accelGraphPanel->init(&csc);
-			accelGraphPanel->calculate(axis, stm);
-			accelGraphPanel->display();
-		}
-	}
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::changeSpeedConfigSlider(wxScrollEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	updateSpeedConfigPlayground();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::updatedSpeedConfigSteps(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	updateSpeedConfigPlayground();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::updatedSpeedConfigAccelAxis(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	updateSpeedConfigPlayground();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::decorateGamepadState(bool state) {
@@ -8190,6 +8024,15 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 			cncArduinoEnvironment->Show(state);
 	};
 	
+	//---------------------------------------------------------------
+	auto checkSerialThread = [&]() {
+		if ( serialThread == NULL ) {
+			return false;
+		}
+		
+		return true;
+	};
+	
 	switch ( ice->GetId() ) {
 		//-----------------------------------------------------------
 		case EMF_ID::DispatchAll:
@@ -8231,6 +8074,10 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 		case ESS_ID::NotifyConneting:
 		{
 			showArduinoEnv(true);
+			
+			if ( checkSerialThread() == false )
+				return; 
+				
 			serialThread->notifyConnecting();
 			cncArduinoEnvironment->notifyConnecting();
 			break;
@@ -8239,6 +8086,10 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 		case ESS_ID::NotifyConneted:
 		{
 			showArduinoEnv(true);
+			
+			if ( checkSerialThread() == false )
+				return; 
+				
 			serialThread->notifyConnected();
 			cncArduinoEnvironment->notifyConnected();
 			break;
@@ -8247,6 +8098,10 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 		case ESS_ID::NotifyDisconnected:
 		{
 			showArduinoEnv(false);
+			
+			if ( checkSerialThread() == false )
+				return; 
+				
 			serialThread->notifyDisconnected();
 			cncArduinoEnvironment->notifyDisconnected();
 			break;
@@ -8281,6 +8136,13 @@ SerialThread* MainFrame::getSerialThread(SerialThreadStub* sts) {
 	
 	return NULL;
 }
-
-
-
+/////////////////////////////////////////////////////////////////////
+void MainFrame::openSpeedPlayground(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	static CncSpeedPlayground* csp = NULL;
+	
+	if ( csp == NULL )
+		csp = new CncSpeedPlayground(this);
+		
+	csp->Show(csp->IsShownOnScreen() == false);
+}

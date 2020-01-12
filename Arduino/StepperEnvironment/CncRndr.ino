@@ -1,3 +1,4 @@
+#include "ArdoEnv.h"
 #include "ArdoObj.h"
 #include "CncRndr.h"
 
@@ -17,6 +18,7 @@ typedef ArduinoPositionRenderer::RS RS;
 
 int32_t       RS::A[RS::POINT_LENGTH]    = {0,0,0};
 int32_t       RS::B[RS::POINT_LENGTH]    = {0,0,0};
+uint16_t      RS::impulseCount           = 0;
 uint16_t      RS::xStepCount             = 0;
 uint16_t      RS::yStepCount             = 0;
 uint16_t      RS::zStepCount             = 0;
@@ -24,18 +26,19 @@ uint16_t      RS::zStepCount             = 0;
 /////////////////////////////////////////////////////////////////////////////////////
 ArduinoPositionRenderer::ArduinoPositionRenderer() {
 ///////////////////////////////////////////////////////////////////////////////////// 
-  CNC_RENDERER_LOG_FUNCTION()
+  //CNC_RENDERER_LOG_FUNCTION()
 }
 /////////////////////////////////////////////////////////////////////////////////////
 ArduinoPositionRenderer::~ArduinoPositionRenderer() {
 /////////////////////////////////////////////////////////////////////////////////////  
-  CNC_RENDERER_LOG_FUNCTION()
+  //CNC_RENDERER_LOG_FUNCTION()
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte ArduinoPositionRenderer::stepping() {  
 /////////////////////////////////////////////////////////////////////////////////////
-  // if stepAxisXYZ() is called from renderAndStepAxisXYZ - normal processing -
-  // RS conatins dx, dy and dz with in range [-1, 0, +1] only
+  // if stepping() is called from renderAndStepAxisXYZ - normal processing -
+  //  - RS conatins dx, dy and dz with a range of [-1, 0, +1] only
+  //  - In this connection 0, 1, 2 or 3 axes can be included
    
   // avoid empty processing
   if ( RS::empty() )
@@ -44,32 +47,44 @@ byte ArduinoPositionRenderer::stepping() {
   byte retValue = checkRuntimeEnv();
   if ( retValue != RET_OK )
     return retValue;
-  
-  if ( RS::dx() != 0) {
-    if ( (retValue = performNextStepX()) != RET_OK ) 
+
+  RS::impulseCount++;
+
+  if ( RS::dx() != 0 ) {
+    if ( (retValue = initiateStep(IDX_X)) != RET_OK ) 
       return retValue;
 
     RS::xStepCount++;
   }
   
   if ( RS::dy() != 0 ) {
-     if ( (retValue = performNextStepY()) != RET_OK )
+     if ( (retValue = initiateStep(IDX_Y)) != RET_OK )
       return retValue;
       
     RS::yStepCount++;
   }
     
   if ( RS::dz() != 0 ) {
-     if ( (retValue = performNextStepZ()) != RET_OK )
+     if ( (retValue = initiateStep(IDX_Z)) != RET_OK )
       return retValue;
       
     RS::zStepCount++;
   }
 
-  notifyPositionChange();
+  finalizeStep(IDX_X);
+  finalizeStep(IDX_Y);
+  finalizeStep(IDX_Z);
+
+  // position and speed management
+  notifyMovePart((int8_t)RS::dx(), (int8_t)RS::dy(), (int8_t)RS::dz());
+  
   RS::swap();
-      
   return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+byte ArduinoPositionRenderer::directMove(int8_t dx, int8_t dy, int8_t dz) {
+/////////////////////////////////////////////////////////////////////////////////////
+  return renderMove(dx, dy, dz);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
@@ -99,13 +114,13 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
   // first setup the directions - this can be done once
   // because the directions didn't switch during a call of
   // renderAndStepAxisXYZ()
-  if ( setDirectionX(dx) == false )
+  if ( setDirection(IDX_X, dx) == false )
     return RET_ERROR;
 
-  if ( setDirectionY(dy) == false )
+  if ( setDirection(IDX_Y, dy) == false )
     return RET_ERROR;
 
-  if ( setDirectionZ(dz) == false )
+  if ( setDirection(IDX_Z, dz) == false )
     return RET_ERROR;
 
   RS::reset();
@@ -119,12 +134,12 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
 
       ret = stepping();
       if ( ret != RET_OK ) { return ret; }
-      if (err_1 > 0)       { RS::A[RS::IDX_Y] += y_inc; err_1 -= dx2; }
-      if (err_2 > 0)       { RS::A[RS::IDX_Z] += z_inc; err_2 -= dx2; }
+      if (err_1 > 0)       { RS::A[IDX_Y] += y_inc; err_1 -= dx2; }
+      if (err_2 > 0)       { RS::A[IDX_Z] += z_inc; err_2 -= dx2; }
       
       err_1            += dy2;
       err_2            += dz2;
-      RS::A[RS::IDX_X] += x_inc;
+      RS::A[IDX_X] += x_inc;
     }
 
   //------------------------------------------------------  
@@ -136,12 +151,12 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
 
       ret = stepping();
       if ( ret != RET_OK ) { return ret; }
-      if (err_1 > 0)       { RS::A[RS::IDX_X] += x_inc; err_1 -= dy2; }
-      if (err_2 > 0)       { RS::A[RS::IDX_Z] += z_inc; err_2 -= dy2; }
+      if (err_1 > 0)       { RS::A[IDX_X] += x_inc; err_1 -= dy2; }
+      if (err_2 > 0)       { RS::A[IDX_Z] += z_inc; err_2 -= dy2; }
       
       err_1            += dx2;
       err_2            += dz2;
-      RS::A[RS::IDX_Y] += y_inc;
+      RS::A[IDX_Y] += y_inc;
     }
 
   //------------------------------------------------------  
@@ -153,12 +168,12 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
 
       ret = stepping();
       if ( ret != RET_OK ) { return ret; }
-      if (err_1 > 0)       { RS::A[RS::IDX_Y] += y_inc; err_1 -= dz2; }
-      if (err_2 > 0)       { RS::A[RS::IDX_X] += x_inc; err_2 -= dz2; }
+      if (err_1 > 0)       { RS::A[IDX_Y] += y_inc; err_1 -= dz2; }
+      if (err_2 > 0)       { RS::A[IDX_X] += x_inc; err_2 -= dz2; }
       
       err_1            += dy2;
       err_2            += dx2;
-      RS::A[RS::IDX_Z] += z_inc;
+      RS::A[IDX_Z] += z_inc;
     }
   }
   

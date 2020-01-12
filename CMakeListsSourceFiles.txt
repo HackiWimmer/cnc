@@ -44,7 +44,6 @@ set(SOURCE_FILES
 	CncControlerGui/CncPathListManager.cpp
 	CncControlerGui/CncPosSpyListCtrl.cpp
 	CncControlerGui/CncSetterListCtrl.cpp
-	CncControlerGui/CncSpeedSimulator.cpp
 	CncControlerGui/CncSerialSpyListCtrl.cpp
 	CncControlerGui/CncStatisticSummaryListCtrl.cpp
 	CncControlerGui/CncFileViewLists.cpp
@@ -94,9 +93,11 @@ set(SOURCE_FILES
 	CncControlerGui/CncMonitorSplitterWindow.cpp
 	CncControlerGui/CncReferencePosition.cpp
 	CncControlerGui/CncConnectProgress.cpp
-	CncControlerGui/CfgAccelerationGraph.cpp
 	CncControlerGui/CncBinaryTemplateStreamer.cpp
 	CncControlerGui/SVGPathHandlerBase.cpp
+	
+	CncControlerGui/CncSpeedPlayground.cpp
+	CncControlerGui/CncSpeedAccelerationDiagram.cpp
 	
 	CncControlerGui/CncGamepadControllerState.cpp
 	CncControlerGui/GamepadEvent.cpp
@@ -159,6 +160,8 @@ set(SOURCE_FILES
 	CncControlerGui/ArduinoData.cpp
 	CncControlerGui/ArduinoEnvWrapper.cpp
 	CncControlerGui/CncArduinoPinsListCtrl.cpp
+	
+	CncControlerGui/CCncFloatingPointValidator.cpp
 	
 	CncControlerGui/wxCrafterContextObserver.cpp
 	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp

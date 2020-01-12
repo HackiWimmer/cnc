@@ -100,9 +100,7 @@ class CncConfig {
 		double calcFactX, calcFactY, calcFactZ;
 		float dispFactX3D, dispFactY3D, dispFactZ3D;
 		
-		unsigned int replyThresholdX;
-		unsigned int replyThresholdY;
-		unsigned int replyThresholdZ;
+		unsigned int replyThreshold;
 		
 		int currentToolId;
 		
@@ -279,9 +277,7 @@ class CncConfig {
 		const double getToolOffset(int toolId=-1);
 		const wxString& getToolType(wxString& ret, int toolId=-1);
 		
-		const unsigned int getReplyThresholdStepsX() { return replyThresholdX; }
-		const unsigned int getReplyThresholdStepsY() { return replyThresholdY; }
-		const unsigned int getReplyThresholdStepsZ() { return replyThresholdZ; }
+		const unsigned int getReplyThresholdSteps() { return replyThreshold; }
 		
 		// configuration getters
 		const CncUnit getDisplayUnit(void);
@@ -320,6 +316,7 @@ class CncConfig {
 		const double getMaxSpeedX_MM_MIN();
 		const double getMaxSpeedY_MM_MIN();
 		const double getMaxSpeedZ_MM_MIN();
+		const double getMaxSpeedXY_MM_MIN();
 		const double getMaxSpeedXYZ_MM_MIN();
 		
 		const double getAccelStartSpeedX_MM_MIN();
@@ -337,9 +334,6 @@ class CncConfig {
 		const unsigned int getStepsY();
 		const unsigned int getStepsZ();
 		const unsigned int getStepsXYZ();
-		const unsigned int getLowPulsWidthX();
-		const unsigned int getLowPulsWidthY();
-		const unsigned int getLowPulsWidthZ();
 		const unsigned int getHighPulsWidthX();
 		const unsigned int getHighPulsWidthY();
 		const unsigned int getHighPulsWidthZ();
@@ -370,6 +364,11 @@ class CncConfig {
 		const double getCalculationFactX(CncUnit cu=CncMetric) 	{ return ( cu == CncMetric ? calcFactX : 1.0 ); }
 		const double getCalculationFactY(CncUnit cu=CncMetric) 	{ return ( cu == CncMetric ? calcFactY : 1.0 ); }
 		const double getCalculationFactZ(CncUnit cu=CncMetric) 	{ return ( cu == CncMetric ? calcFactZ : 1.0 ); }
+		const double getFeedrateX()							 	{ return getDisplayFactX(); }
+		const double getFeedrateY()								{ return getDisplayFactY(); }
+		const double getFeedrateZ()								{ return getDisplayFactZ(); }
+		
+		
 		const double getDispFactX3D() 							{ return dispFactX3D; }
 		const double getDispFactY3D() 							{ return dispFactY3D; }
 		const double getDispFactZ3D()							{ return dispFactZ3D; }

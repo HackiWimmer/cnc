@@ -39,7 +39,7 @@ CncControl::CncControl(CncPortType pt)
 , zeroAppPos(0,0,0)
 , startAppPos(0,0,0)
 , curAppPos(0,0,0)
-, realtimeFeedSpeed_MM_MIN(MAX_FEED_SPEED_VALUE)
+, realtimeFeedSpeed_MM_MIN(0.0)
 , defaultFeedSpeedRapid_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , defaultFeedSpeedWork_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , configuredSpeedMode(CncSpeedRapid)
@@ -173,13 +173,13 @@ bool CncControl::execute(const unsigned char* buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processSetter(unsigned char pid, int32_t value) {
 ///////////////////////////////////////////////////////////////////
-	SetterValueList values;
+	cnc::SetterValueList values;
 	values.push_back(value);
 	
 	return processSetter(pid, values);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::processSetter(unsigned char pid, const SetterValueList& values) {
+bool CncControl::processSetter(unsigned char pid, const cnc::SetterValueList& values) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
 		return false;
@@ -193,7 +193,7 @@ bool CncControl::processSetter(unsigned char pid, const SetterValueList& values)
 			auto it = setterMap.find((int)pid);
 			if ( it != setterMap.end() ) {
 				// any value(s) are changed?
-				SetterValueList smvl = it->second;
+				cnc::SetterValueList smvl = it->second;
 				if ( smvl.size() == values.size() ) {
 					bool somethingChanged = false;
 					auto itvv=values.begin();
@@ -213,7 +213,7 @@ bool CncControl::processSetter(unsigned char pid, const SetterValueList& values)
 			std::cerr << std::endl << "CncControl::processSetter: Setter failed." << std::endl;
 			std::cerr << " Id:    " << ArduinoPIDs::getPIDLabel((int)pid) << std::endl;
 			std::cerr << " Value(s): ";
-			cnc::traceSetterValueList(std::cerr, values, pid < PID_DOUBLE_RANG_START ? 1 : DBL_FACT);
+			cnc::traceSetterValueList(std::cerr, values, pid < PID_FLOAT_RANG_START ? 1 : FLT_FACT);
 			std::cerr << std::endl;
 			return false;
 		}
@@ -233,7 +233,7 @@ bool CncControl::processSetter(unsigned char pid, const SetterValueList& values)
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::appendToSetterMap(unsigned char pid, const SetterValueList& values) {
+void CncControl::appendToSetterMap(unsigned char pid, const cnc::SetterValueList& values) {
 ///////////////////////////////////////////////////////////////////
 	// add all pids which are shouldn't stored 
 	switch ( pid ) {
@@ -249,7 +249,7 @@ void CncControl::appendToSetterMap(unsigned char pid, const SetterValueList& val
 bool CncControl::processSetterList(const Setters& setup) {
 ///////////////////////////////////////////////////////////////////
 	for ( auto itl = setup.begin(); itl != setup.end(); ++itl) {
-		SetterValueList svl = (*itl).values;
+		cnc::SetterValueList svl = (*itl).values;
 		unsigned char pid   = (*itl).pid;
 		
 		if ( processSetter(pid, svl) == false )
@@ -310,35 +310,32 @@ bool CncControl::setup(bool doReset) {
 		return false;
 	}
 	
+	if ( THE_CONFIG->getStepsX() <= 0 ) { std::cerr << CNC_LOG_FUNCT << ": Invalid Steps configuration, X axis! Steps: " << THE_CONFIG->getStepsX() << std::endl; return false; }
+	if ( THE_CONFIG->getStepsY() <= 0 ) { std::cerr << CNC_LOG_FUNCT << ": Invalid Steps configuration, Y axis! Steps: " << THE_CONFIG->getStepsX() << std::endl; return false; }
+	if ( THE_CONFIG->getStepsZ() <= 0 ) { std::cerr << CNC_LOG_FUNCT << ": Invalid Steps configuration, Z axis! Steps: " << THE_CONFIG->getStepsX() << std::endl; return false; }
+	
 	// process initial setters
 	Setters setup;
-	setup.push_back(SetterTuple(PID_STEPS_X, THE_CONFIG->getStepsX()));
-	setup.push_back(SetterTuple(PID_STEPS_Y, THE_CONFIG->getStepsY()));
-	setup.push_back(SetterTuple(PID_STEPS_Z, THE_CONFIG->getStepsZ()));
-	
-	setup.push_back(SetterTuple(PID_PITCH_X, convertDoubleToCtrlLong(PID_PITCH_X, THE_CONFIG->getPitchX())));
-	setup.push_back(SetterTuple(PID_PITCH_Y, convertDoubleToCtrlLong(PID_PITCH_Y, THE_CONFIG->getPitchY())));
-	setup.push_back(SetterTuple(PID_PITCH_Z, convertDoubleToCtrlLong(PID_PITCH_Z, THE_CONFIG->getPitchZ())));
-	
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_X,  THE_CONFIG->getLowPulsWidthX()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_Y,  THE_CONFIG->getLowPulsWidthY()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_Z,  THE_CONFIG->getLowPulsWidthZ()));
+	setup.push_back(SetterTuple(PID_FEEDRATE_X, convertDoubleToCtrlLong(PID_FEEDRATE_X, THE_CONFIG->getPitchX() / THE_CONFIG->getStepsX())));
+	setup.push_back(SetterTuple(PID_FEEDRATE_Y, convertDoubleToCtrlLong(PID_FEEDRATE_X, THE_CONFIG->getPitchY() / THE_CONFIG->getStepsY())));
+	setup.push_back(SetterTuple(PID_FEEDRATE_Z, convertDoubleToCtrlLong(PID_FEEDRATE_X, THE_CONFIG->getPitchZ() / THE_CONFIG->getStepsZ())));
+
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_X, THE_CONFIG->getHighPulsWidthX()));
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Y, THE_CONFIG->getHighPulsWidthY()));
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Z, THE_CONFIG->getHighPulsWidthZ()));
 	
-	SetterValueList accelList;
-	accelList.push_back(THE_CONFIG->getAccelStartSpeedX_MM_MIN()/60);
-	accelList.push_back(THE_CONFIG->getAccelStopSpeedX_MM_MIN()/60);
-	accelList.push_back(THE_CONFIG->getAccelStartSpeedY_MM_MIN()/60);
-	accelList.push_back(THE_CONFIG->getAccelStopSpeedY_MM_MIN()/60);
-	accelList.push_back(THE_CONFIG->getAccelStartSpeedZ_MM_MIN()/60);
-	accelList.push_back(THE_CONFIG->getAccelStopSpeedZ_MM_MIN()/60);
+	
+	#warning use config values
+	cnc::SetterValueList accelList;
+	accelList.push_back(0.0 * FLT_FACT);
+	accelList.push_back(0.5 * FLT_FACT);
+	accelList.push_back(333/60 * FLT_FACT);
+	accelList.push_back(0.0 * FLT_FACT);
+	accelList.push_back(0.5 * FLT_FACT);
+	accelList.push_back(444/60 * FLT_FACT);
 	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
-	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, THE_CONFIG->getReplyThresholdStepsX()));
-	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, THE_CONFIG->getReplyThresholdStepsY()));
-	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Z, THE_CONFIG->getReplyThresholdStepsZ()));
+	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, THE_CONFIG->getReplyThresholdSteps()));
 	
 	int32_t dirValueX = THE_CONFIG->getInverseCtrlDirectionXFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
 	int32_t dirValueY = THE_CONFIG->getInverseCtrlDirectionYFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
@@ -365,19 +362,19 @@ bool CncControl::setup(bool doReset) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-long CncControl::convertDoubleToCtrlLong(unsigned char id, double d) { 
+long CncControl::convertDoubleToCtrlLong(unsigned char id, float f) { 
 ///////////////////////////////////////////////////////////////////
-	if ( d <= MIN_LONG / DBL_FACT ) {
-		std::cerr << "CncControl::convertDoubleToCtrlLong(): Invalid double value: '" << d << "' for PID: " << ArduinoPIDs::getPIDLabel(id) << std::endl;
+	if ( f <= MIN_LONG / FLT_FACT ) {
+		std::cerr << "CncControl::convertDoubleToCtrlLong(): Invalid double value: '" << f << "' for PID: " << ArduinoPIDs::getPIDLabel(id) << std::endl;
 		return MIN_LONG; 
 	}
 		
-	if ( d >= MAX_LONG / DBL_FACT ) {
-		std::cerr << "CncControl::convertDoubleToCtrlLong(): Invalid double value: '" << d << "' for PID: " << ArduinoPIDs::getPIDLabel(id) << std::endl;
+	if ( f >= MAX_LONG / FLT_FACT ) {
+		std::cerr << "CncControl::convertDoubleToCtrlLong(): Invalid double value: '" << f << "' for PID: " << ArduinoPIDs::getPIDLabel(id) << std::endl;
 		return MAX_LONG; 
 	}
 		
-	return d * DBL_FACT; 
+	return f * FLT_FACT; 
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::disconnect() {
@@ -724,12 +721,12 @@ bool CncControl::moveZToTop() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value, CncSpeedMode s) {
+bool CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(float value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
 	return changeCurrentFeedSpeedXYZ_MM_MIN(value * 60, s);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) {
+bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
 	// always reset the realtime speed value, but don't
 	// use MAX_FEED_SPEED_VALUE here because it is declared as MIN_LONG
@@ -747,10 +744,12 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) 
 		
 		displaySpeedMode(configuredSpeedMode);
 		
-		if ( THE_APP->GetBtSpeedControl()->GetValue() == true ) {
-			if ( processSetter(PID_SPEED_FEED_MODE, (int32_t)(configuredSpeedMode)) == false ) {
-				std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_FEED_MODE) failed" << std::endl;
-				return false;
+		if ( getSerial()->knowsSpeedMode() == true ) {
+			if ( THE_APP->GetBtSpeedControl()->GetValue() == true ) {
+				if ( processSetter(PID_SPEED_FEED_MODE, (int32_t)(configuredSpeedMode)) == false ) {
+					std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_FEED_MODE) failed" << std::endl;
+					return false;
+				}
 			}
 		}
 	}
@@ -763,8 +762,8 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) 
 			configuredFeedSpeed_MM_MIN = 0.0;
 		
 		displaySpeedValue(value);
-			
-		if ( processSetter(PID_SPEED_MM_MIN, (int32_t)(configuredFeedSpeed_MM_MIN * DBL_FACT)) == false ) {
+		
+		if ( processSetter(PID_SPEED_MM_MIN, (int32_t)(configuredFeedSpeed_MM_MIN * FLT_FACT)) == false ) {
 			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_MM_MIN) failed" << std::endl;
 			return false;
 		}
@@ -787,7 +786,7 @@ bool CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s) {
 	return changeCurrentFeedSpeedXYZ_MM_MIN(value, s);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::setDefaultRapidSpeed_MM_MIN(double s) { 
+void CncControl::setDefaultRapidSpeed_MM_MIN(float s) { 
 ///////////////////////////////////////////////////////////////////
 	if ( s <= 0.0)
 		return;
@@ -798,7 +797,7 @@ void CncControl::setDefaultRapidSpeed_MM_MIN(double s) {
 	defaultFeedSpeedRapid_MM_MIN = s; 
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::setDefaultWorkSpeed_MM_MIN(double s)  { 
+void CncControl::setDefaultWorkSpeed_MM_MIN(float s)  { 
 ///////////////////////////////////////////////////////////////////
 	if ( s <= 0.0)
 		return;
@@ -1056,7 +1055,7 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 				case PID_SPEED_MM_MIN:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
 												return false;
 												
-											displaySpeedValue(cei.setterValueList.front() / DBL_FACT);
+											displaySpeedValue(cei.setterValueList.front() / FLT_FACT);
 											break;
 											
 				case PID_ENABLE_STEPPERS:	// nothing to do here

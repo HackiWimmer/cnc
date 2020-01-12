@@ -82,7 +82,7 @@ class BinaryPathHandlerHumanReadableView : public BinaryPathHandlerBase
 		explicit BinaryPathHandlerHumanReadableView(FormatType ft);
 		virtual ~BinaryPathHandlerHumanReadableView() {}
 		
-		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f);
+		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz);
 
 		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence);

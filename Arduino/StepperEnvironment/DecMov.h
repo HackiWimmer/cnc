@@ -44,8 +44,8 @@ class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
     Result          result;  
     byte            b[MAX_MOVE_VALUES + 1];
     int32_t         v[MAX_MOVE_VALUES];
-    unsigned short  size;
-    unsigned short  count;
+    uint8_t         size;
+    uint8_t         count;
 
     // ----------------------------------------------------------------------
     void reset() {
@@ -58,25 +58,58 @@ class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
 
     // ----------------------------------------------------------------------
     byte decodeMove(byte cmd) {
+      typedef ArduinoMainLoop AML;
+
       reset();
       result.cmd = cmd;  
 
+
+#warning decode valueCount as the second byte after the PID
+
+/*
+
+      //fetch 1 to max 3 long values
+      while ( true ) {
+        
+        size = AML::readSerialBytesWithTimeout(b, sizeof(int32_t)) != sizeof(int32_t);
+        if ( size != sizeof(int32_t) ) {
+
+          if ( size != 0 ) {
+            ARDO_DEBUG_VALUE("size",  (int)size )
+            ARDO_DEBUG_VALUE("count", (int)count )
+            AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
+            return RET_ERROR;
+          }
+        }
+
+        // order the received bytes the an int32_t value
+        if ( convertBytesToInt32(b, v[count]) == false ) {
+          AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
+          return RET_ERROR;
+        }
+        
+        if ( ++count == MAX_MOVE_VALUES )
+          break;
+      }
+*/
+
       // Wait a protion of time. This is very importent 
       // to give the serial a chance to take a breath
-      AE::delayMicroseconds(1000);
+      //AE::delayMicroseconds(1000);
+      AML::waitForSerialData();
 
       //fetch 1 to max 3 long values
       while ( (size = Serial.available()) > 0 ) {
         size = Serial.readBytes(b, sizeof(int32_t));
         
         if ( size != sizeof(int32_t) ) {
-          ArduinoMainLoop::pushErrorMessage(E_INVALID_MOVE_CMD);
+          ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
           return RET_ERROR;
         }
 
         // order the received bytes the an int32_t value
         if ( convertBytesToInt32(b, v[count]) == false ) {
-          ArduinoMainLoop::pushErrorMessage(E_INVALID_MOVE_CMD);
+          ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
           return RET_ERROR;
         }
         
@@ -91,7 +124,7 @@ class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
         case 2:   result.dx = v[0]; result.dy = v[1]; result.dz = 0;    break;
         case 3:   result.dx = v[0]; result.dy = v[1]; result.dz= v[2];  break;
         
-        default:  ArduinoMainLoop::pushErrorMessage(E_INVALID_MOVE_CMD);
+        default:  AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
                   return RET_ERROR;
       }
 
