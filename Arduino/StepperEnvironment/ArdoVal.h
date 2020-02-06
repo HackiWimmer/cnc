@@ -157,9 +157,9 @@
   const unsigned char PID_SEPARATOR                       =  26;
   const unsigned char PID_QUERY_READY_TO_RUN              =  27;
   
-  const unsigned char PID_STEPS_X                         =  30;
-  const unsigned char PID_STEPS_Y                         =  31;
-  const unsigned char PID_STEPS_Z                         =  32;
+  const unsigned char PID_COMMON                          =  30;
+  const unsigned char PID_CONTROLLER                      =  31;
+  const unsigned char PID_AXIS                            =  32;
   const unsigned char PID_LAST_STEP_DIR                   =  33;
   const unsigned char PID_ACCEL_START_SPEED               =  34;
   const unsigned char PID_ACCEL_STOP_SPEED                =  35;
@@ -174,12 +174,11 @@
   const unsigned char PID_I2C_LIMIT_VALUE                 =  47;
   const unsigned char PID_I2C_SUPPORT_VALUE               =  48;
  
-  const unsigned char PID_CONTROLLER                      =  50;
-  const unsigned char PID_TOOL_SWITCH                     =  51;
-  const unsigned char PID_POS_REPLY_THRESHOLD             =  52;
-  const unsigned char PID_MAX_DIMENSION_X                 =  53;
-  const unsigned char PID_MAX_DIMENSION_Y                 =  54;
-  const unsigned char PID_MAX_DIMENSION_Z                 =  55;
+  const unsigned char PID_TOOL_SWITCH                     =  50;
+  const unsigned char PID_POS_REPLY_THRESHOLD             =  51;
+  const unsigned char PID_MAX_DIMENSION_X                 =  52;
+  const unsigned char PID_MAX_DIMENSION_Y                 =  53;
+  const unsigned char PID_MAX_DIMENSION_Z                 =  54;
 
   const unsigned char PID_XYZ_POS                         =  60;
   const unsigned char PID_XYZ_POS_MAJOR                   =  61;
@@ -188,33 +187,18 @@
   const unsigned char PID_X_POS                           =  64;
   const unsigned char PID_Y_POS                           =  65;
   const unsigned char PID_Z_POS                           =  66;
-  const unsigned char PID_PROBE_MODE                      =  67;
 
-  const unsigned char PID_AXIS                            =  70;
-  const unsigned char PID_COMMON                          =  71;
-  const unsigned char PID_STEPS                           =  72;
-  const unsigned char PID_STEP_PIN                        =  73;
-  const unsigned char PID_DIR_PIN                         =  74;
-  const unsigned char PID_ENABLE_STEPPERS                 =  75;
+  const unsigned char PID_STEP_PIN                        =  70;
+  const unsigned char PID_DIR_PIN                         =  71;
+  const unsigned char PID_ENABLE_STEPPERS                 =  72;
 
-  const unsigned char PID_TEST_INTERRUPT                  =  80;
-  const unsigned char PID_INC_DIRECTION_VALUE_X           =  81;
-  const unsigned char PID_INC_DIRECTION_VALUE_Y           =  82;
-  const unsigned char PID_INC_DIRECTION_VALUE_Z           =  83;
+  const unsigned char PID_INC_DIRECTION_VALUE_X           =  80;
+  const unsigned char PID_INC_DIRECTION_VALUE_Y           =  81;
+  const unsigned char PID_INC_DIRECTION_VALUE_Z           =  82;
 
-  const unsigned char PID_SPEED_CONTROLLER                =  90;
-  const unsigned char PID_SPEED_FEED_MODE                 =  91;
-  const unsigned char PID_SPEED_CTRL_INITIALIZED          =  92;
-  const unsigned char PID_SPEED_CTRL_TOTAL_OFFSET         =  93;
-  const unsigned char PID_SPEED_CTRL_RPM                  =  94;
-  const unsigned char PID_SPEED_CTRL_SYNTH_SPEED_DELAY    =  95;
-  const unsigned char PID_SPEED_CTRL_MAX_SPEED            =  96;
-  const unsigned char PID_SPEED_CTRL_CFG_SPEED            =  97;
-  
-  const unsigned char PID_PULSE_WIDTH_HIGH                = 100;
-  const unsigned char PID_PULSE_WIDTH_HIGH_X              = 101;
-  const unsigned char PID_PULSE_WIDTH_HIGH_Y              = 102;
-  const unsigned char PID_PULSE_WIDTH_HIGH_Z              = 103;
+  const unsigned char PID_SPEED_FEED_MODE                 = 100;
+  const unsigned char PID_PULSE_WIDTH_HIGH                = 101;
+  const unsigned char PID_PROBE_MODE                      = 102;
   
   const unsigned char PID_RESERT_POS_COUNTER              = 110;
   const unsigned char PID_GET_POS_COUNTER                 = 111;
@@ -239,9 +223,6 @@
 // .....................................................................
 
   const unsigned char PID_FEEDRATE                        = 200;
-  const unsigned char PID_FEEDRATE_X                      = 201;
-  const unsigned char PID_FEEDRATE_Y                      = 202;
-  const unsigned char PID_FEEDRATE_Z                      = 203;
   const unsigned char PID_SPEED_MM_MIN                    = 204;
   const unsigned char PID_ACCEL_PROFILE                   = 205;
 
@@ -343,39 +324,33 @@
   const char      TEXT_SEPARATOR                         = ':';
 
   const uint32_t minSerialReadTimeoutMicros              = 10L * 1000L;
-  
-  const unsigned short moveUntilAccelPeriod              = 2500; // ms
-  const int16_t cncHeartbeatInterval                     = 2000; // milli seconds
+  const int16_t moveUntilAccelPeriod                     = 2500; // ms
+  //const int16_t cncHeartbeatInterval                     = 2000; // milli seconds
 
-  const int32_t NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;
-  const int32_t INVERSED_INCREMENT_DIRECTION_VALUE       = 0;
-
-  const int16_t SPEED_MANAGER_CONST_STATIC_OFFSET_US     = 0; // [us]
-  const int16_t SPEED_MANAGER_CONST_LOOP_OFFSET_US       = 0; // [us]
+  const int8_t  NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;
+  const int8_t  INVERSED_INCREMENT_DIRECTION_VALUE       = 0;
 
   // MAX_SERIAL_BUFFER_SIZE:
   // - 64 byte is the standard UNO buffer sizes
   // - Max 255
-  // - Attention: If the value is > than 64 possible data loss occures,
-  //              always the reader is slower the the writer
-  const int16_t MAX_SERIAL_BUFFER_SIZE                   = 64; 
+  // - Attention: If the value is > than 64 possibly a data loss occures, because the reader is always slower the the writer
+  const int8_t  MAX_SERIAL_BUFFER_SIZE                   = 64; 
   const int32_t BAUD_RATE                                = 115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
     
-  const int16_t DIRECTION_UNKNOWN                        =  0;
-  const int16_t DIRECTION_INC                            = +1;
-  const int16_t DIRECTION_DEC                            = -1;
-
+  const int8_t  DIRECTION_UNKNOWN                        =  0;
+  const int8_t  DIRECTION_INC                            = +1;
+  const int8_t  DIRECTION_DEC                            = -1;
   
-  const int16_t MAX_SETTER_VALUES                        = 16;
-  const int16_t MAX_MOVE_CMD_SIZE                        = 16;
+  const int8_t  MAX_SETTER_VALUES                        = 16;
+  const int8_t  MAX_MOVE_CMD_SIZE                        = 16;
     
-  const int32_t FLT_FACT                                 = 1000;
+  const int16_t FLT_FACT                                 = 1000;
   const int32_t MIN_LONG                                 = -2147483648L;
   const int32_t MAX_LONG                                 = +2147483647L;
   
-  const int16_t MIN_INT                                  = -32767;
-  const int16_t MAX_INT                                  = +32767;
+  //const int16_t MIN_INT                                  = -32767;
+  //const int16_t MAX_INT                                  = +32767;
   
-  const uint16_t MAX_UINT                                = +65535;
+  //const uint16_t MAX_UINT                                = +65535;
 
 #endif

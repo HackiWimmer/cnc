@@ -3,6 +3,7 @@
 
 #include <SoftwareSerial.h>
 #include "ArdoVal.h"
+#include "ArdoObj.h"
 #include "DecBase.h"
 #include "MainLoop.h"
 
@@ -10,7 +11,7 @@
 class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
 
   public:
-    static const short MAX_MOVE_VALUES = 3;
+    static const uint8_t MAX_MOVE_VALUES = 3;
     
     struct Result {
       byte        cmd = CMD_INVALID;
@@ -27,10 +28,6 @@ class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
     ArduinoCmdDecoderMove()
     : ArduinoCmdDecoderBase()
     , result  ()
-    , b       {0, 0, 0, 0}
-    , v       {0, 0, 0}
-    , size    (0)
-    , count   (0)
     {}
     
     virtual ~ArduinoCmdDecoderMove() 
@@ -42,16 +39,10 @@ class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
   private:
   
     Result          result;  
-    byte            b[MAX_MOVE_VALUES + 1];
-    int32_t         v[MAX_MOVE_VALUES];
-    uint8_t         size;
-    uint8_t         count;
 
     // ----------------------------------------------------------------------
     void reset() {
       result.reset();
-      size    = 0;
-      count   = 0;
     }
 
   public:
@@ -62,70 +53,56 @@ class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
 
       reset();
       result.cmd = cmd;  
+      
+      AML::waitForSerialData();
 
+      const uint8_t valueCount = (uint8_t)AML::readSerialByteWithTimeout();
+      if ( valueCount < 1 || valueCount > MAX_MOVE_VALUES ) {
+        AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
+        return RET_ERROR;        
+      }
 
-#warning decode valueCount as the second byte after the PID
-
-/*
-
-      //fetch 1 to max 3 long values
-      while ( true ) {
+      byte b[sizeof(int32_t)];
+      for (uint8_t i=0; i<ArdoObj::minimum(valueCount, MAX_MOVE_VALUES); i++) {
         
-        size = AML::readSerialBytesWithTimeout(b, sizeof(int32_t)) != sizeof(int32_t);
+        const uint8_t size = AML::readSerialBytesWithTimeout(b, sizeof(int32_t));
         if ( size != sizeof(int32_t) ) {
-
-          if ( size != 0 ) {
-            ARDO_DEBUG_VALUE("size",  (int)size )
-            ARDO_DEBUG_VALUE("count", (int)count )
-            AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
-            return RET_ERROR;
-          }
-        }
-
-        // order the received bytes the an int32_t value
-        if ( convertBytesToInt32(b, v[count]) == false ) {
           AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
           return RET_ERROR;
         }
-        
-        if ( ++count == MAX_MOVE_VALUES )
-          break;
-      }
-*/
-
-      // Wait a protion of time. This is very importent 
-      // to give the serial a chance to take a breath
-      //AE::delayMicroseconds(1000);
-      AML::waitForSerialData();
-
-      //fetch 1 to max 3 long values
-      while ( (size = Serial.available()) > 0 ) {
-        size = Serial.readBytes(b, sizeof(int32_t));
-        
-        if ( size != sizeof(int32_t) ) {
-          ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
-          return RET_ERROR;
-        }
 
         // order the received bytes the an int32_t value
-        if ( convertBytesToInt32(b, v[count]) == false ) {
-          ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
+        int32_t value = 0L;
+        if ( convertBytesToInt32(b, value) == false ) {
+          AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
           return RET_ERROR;
         }
-        
-        if ( ++count == MAX_MOVE_VALUES )
-          break;
-          
-      } // while
 
-      // delegate values
-      switch ( count ) {
-        case 1:   result.dx = 0;    result.dy = 0;    result.dz = v[0]; break;
-        case 2:   result.dx = v[0]; result.dy = v[1]; result.dz = 0;    break;
-        case 3:   result.dx = v[0]; result.dy = v[1]; result.dz= v[2];  break;
-        
-        default:  AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
-                  return RET_ERROR;
+        // delegate values
+        switch ( valueCount ) {
+          // axis Z Only
+          case 1: {
+            result.dz = value; 
+            break;
+          }
+          // axis X and Y
+          case 2: {   
+            switch ( i ) {
+              case 0: result.dx = value; break;
+              case 1: result.dy = value; break;
+            }
+            break;
+          }
+          // axis X, Y and Z
+          case 3: {   
+            switch ( i ) {
+              case 0: result.dx = value; break;
+              case 1: result.dy = value; break;
+              case 2: result.dz = value; break;
+            }
+            break;
+          }
+        }
       }
 
       // process . . .

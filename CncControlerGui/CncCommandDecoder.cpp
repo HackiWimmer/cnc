@@ -393,26 +393,35 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 		default:						std::cerr << "CncCommandDecoder::decodeMove() Invalid command = " << buffer[0] << std::endl;
 										return false;
 	}
+
+	if ( nbByte < 1 ) {
+		std::cerr << "CncCommandDecoder::decodeMove() Empty value count" << std::endl;
+		return false;
+	}
 	
-	unsigned int idx = 1;
+	const unsigned int valueCount = (unsigned int)buffer[1];
+
+	unsigned int idx = 2;
+
 	// idx will be increased by each call of convertBytesToInt32
 	// by the sizeof(int32_t)
-	switch ( nbByte ) {
-		case  5:	convertBytesToInt32(buffer, idx, z); 
-					break;
+	switch ( valueCount ) {
+		case 1:	convertBytesToInt32(buffer, idx, z);
+				break;
 					
-		case  9:	convertBytesToInt32(buffer, idx, x);
-					convertBytesToInt32(buffer, idx, y); 
-					break;
+		case 2:	convertBytesToInt32(buffer, idx, x);
+				convertBytesToInt32(buffer, idx, y);
+				break;
 					
-		case 13:	convertBytesToInt32(buffer, idx, x);
-					convertBytesToInt32(buffer, idx, y); 
-					convertBytesToInt32(buffer, idx, z); 
-					break;
+		case 3:	convertBytesToInt32(buffer, idx, x);
+				convertBytesToInt32(buffer, idx, y);
+				convertBytesToInt32(buffer, idx, z);
+				break;
+
 		default:
-					std::cerr << "CncCommandDecoder::decodeMove() error." << std::endl;
-					std::cerr << " Invalid byte count: " << nbByte << std::endl;
-					return false;
+				std::cerr << "CncCommandDecoder::decodeMove() error." << std::endl;
+				std::cerr << " Invalid byte count: " << nbByte << std::endl;
+				return false;
 	}
 	
 	return true;

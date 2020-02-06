@@ -66,7 +66,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     bool                disableStepperPin()                        { return enableStepperPin(false); }
 
     bool                isAnyLimitActive();
-    bool                evaluateLimitStates(int32_t& xLimit, int32_t& yLimit, int32_t& zLimit);
+    bool                evaluateLimitStates(int8_t& xLimit, int8_t& yLimit, int8_t& zLimit);
 
     void                sendCurrentPositions(unsigned char pid, bool force);
 

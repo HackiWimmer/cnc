@@ -89,9 +89,9 @@ class CncArduinoStepper {
     void                            setPosition(int32_t val)             { curPos = val;   }
     int32_t                         getPosition()                  const { return curPos;  }
 
-    int32_t                         getLimitState();
-    int32_t                         readLimitState()                     { return readLimitState(stepDirection); }
-    int32_t                         readLimitState(int dir);
+    int8_t                          getLimitState();
+    int8_t                          readLimitState()                     { return readLimitState(stepDirection); }
+    int8_t                          readLimitState(int dir);
 
     void                            setLimitStateManually(int32_t value);
 

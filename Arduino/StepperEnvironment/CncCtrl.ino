@@ -21,7 +21,7 @@ namespace CtrlParameter {
   
   template <class T>
   void print(unsigned char pid, T value, int8_t indent=1) {
-    for (auto i=0; i<indent; i++) Serial.print(BLANK); \
+    for (auto i=0; i<indent; i++) Serial.print(BLANK1); \
     Serial.print(pid);   Serial.print(TEXT_SEPARATOR); \
     Serial.print(value); Serial.write(TEXT_CLOSE);
   }
@@ -246,9 +246,9 @@ bool CncArduinoController::sendCurrentLimitStates(bool force) {
 /////////////////////////////////////////////////////////////////////////////////////
 // This method evaluate the limit states by the current stepper states
 
-  const int32_t x = X->getLimitState();
-  const int32_t y = Y->getLimitState();
-  const int32_t z = Z->getLimitState();
+  const int8_t x = X->getLimitState();
+  const int8_t y = Y->getLimitState();
+  const int8_t z = Z->getLimitState();
 
   // the states will be only sent if one of them is activ or they should be forced
   if ( x != LimitSwitch::LIMIT_UNSET || y != LimitSwitch::LIMIT_UNSET || z != LimitSwitch::LIMIT_UNSET || force == true )
@@ -268,9 +268,9 @@ bool CncArduinoController::processHeartbeat(byte /* pid */) {
       supportState = lastI2CData.supportState;
     }
   } else {
-    int32_t x = X->readLimitState(DIRECTION_UNKNOWN);
-    int32_t y = Y->readLimitState(DIRECTION_UNKNOWN);
-    int32_t z = Z->readLimitState(DIRECTION_UNKNOWN);
+    int8_t x = X->readLimitState(DIRECTION_UNKNOWN);
+    int8_t y = Y->readLimitState(DIRECTION_UNKNOWN);
+    int8_t z = Z->readLimitState(DIRECTION_UNKNOWN);
     CncInterface::ILS::States ls(x, y, z);   
     limitState = ls.getValue();
   }
@@ -292,37 +292,63 @@ void CncArduinoController::setupAccelProfile(const ArduinoCmdDecoderSetter::Resu
   typedef ArduinoAccelManager::Function Function;
   Function fA, fD;
 
-  if ( st.valueCount != 6 )
+  // FEEDRATE_X,Y,Z         = 3
+  // PULSE_WIDTH_HIGH_X,Y,Z = 3
+  // FA                     = 3
+  // FD                     = 3
+  if ( st.valueCount != 3 + 3 + 3 + 3 )
   {
+    // Function the members Feedrate as well as HighPulseWidth leave unchanged
     // Function fA, fD was initilaizes with default values
     ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_PARAM_STREAM_LEN);       
     
   } else {  
-    fA.A = st.values[0].f;
-    fA.B = st.values[1].f;
-    fA.C = st.values[2].f;
 
-#warning
-  ARDO_DEBUG_VALUE("fA.A", fA.A)
-  ARDO_DEBUG_VALUE("fA.B", fA.B)
-  ARDO_DEBUG_VALUE("fA.C", fA.C)
+    X->setFeedrate(st.values[0].asFloat());
+    Y->setFeedrate(st.values[1].asFloat());
+    Z->setFeedrate(st.values[2].asFloat());
 
+    X->setHighPulseWidth(round(st.values[3].asFloat()));
+    Y->setHighPulseWidth(round(st.values[4].asFloat()));
+    Z->setHighPulseWidth(round(st.values[5].asFloat()));
+
+    fA.A = st.values[ 6].asFloat();
+    fA.B = st.values[ 7].asFloat();
+    fA.C = st.values[ 8].asFloat();
+
+    fD.A = st.values[ 9].asFloat();
+    fD.B = st.values[10].asFloat();
+    fD.C = st.values[11].asFloat();
+  }
+
+  // Pepare some speed  values  
+  CtrlSpeedValues::setupTact    (X->getHighPulseWidth(), Y->getHighPulseWidth(), Z->getHighPulseWidth());
+  CtrlSpeedValues::setupMaxSpeed(X->getFeedrate(),       Y->getFeedrate(),       Z->getFeedrate());
+
+  if ( true ) {
+    ARDO_DEBUG_VALUE("AccelProfile::FeedrateX", X->getFeedrate())
+    ARDO_DEBUG_VALUE("AccelProfile::FeedrateY", Y->getFeedrate())
+    ARDO_DEBUG_VALUE("AccelProfile::FeedrateZ", Z->getFeedrate())
     
-    fD.A = st.values[3].f;
-    fD.B = st.values[4].f;
-    fD.C = st.values[5].f;
+    ARDO_DEBUG_VALUE("AccelProfile::HighPulseWidthX", X->getHighPulseWidth())
+    ARDO_DEBUG_VALUE("AccelProfile::HighPulseWidthY", Y->getHighPulseWidth())
+    ARDO_DEBUG_VALUE("AccelProfile::HighPulseWidthZ", Z->getHighPulseWidth())
+
+    ARDO_DEBUG_VALUE("AccelProfile::fA.A", fA.A)
+    ARDO_DEBUG_VALUE("AccelProfile::fA.B", fA.B)
+    ARDO_DEBUG_VALUE("AccelProfile::fA.C", fA.C)
+    ARDO_DEBUG_VALUE("AccelProfile::fD.A", fD.A)
+    ARDO_DEBUG_VALUE("AccelProfile::fD.B", fD.B)
+    ARDO_DEBUG_VALUE("AccelProfile::fD.C", fD.C)
+    
+    ARDO_DEBUG_VALUE("CtrlSpeedValues::tact       [hz]",     CtrlSpeedValues::tact ? 1000.0 *1000.0 / CtrlSpeedValues::tact : 1)
+    ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_1DX   [mm/min]", 60.0 * CtrlSpeedValues::maxF_1DX_MMSec)
+    ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_1DY   [mm/min]", 60.0 * CtrlSpeedValues::maxF_1DY_MMSec)
+    ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_1DZ   [mm/min]", 60.0 * CtrlSpeedValues::maxF_1DZ_MMSec)
+    ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_2DXY  [mm/min]", 60.0 * CtrlSpeedValues::maxF_2DXY_MMSec)
+    ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_3DXYZ [mm/min]", 60.0 * CtrlSpeedValues::maxF_3DXYZ_MMSec)
   }
   
-  CtrlSpeedValues::setupTact    (X->getHighPulseWidth(),Y->getHighPulseWidth(), Z->getHighPulseWidth());
-  CtrlSpeedValues::setupMaxSpeed(X->getFeedrate(),      Y->getFeedrate(),       Z->getFeedrate());
-
-  ARDO_DEBUG_VALUE("CtrlSpeedValues::tact       [hz]",     CtrlSpeedValues::tact ? 1000.0 *1000.0 / CtrlSpeedValues::tact : 1)
-  ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_1DX   [mm/min]", 60.0 * CtrlSpeedValues::maxF_1DX_MMSec)
-  ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_1DY   [mm/min]", 60.0 * CtrlSpeedValues::maxF_1DY_MMSec)
-  ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_1DZ   [mm/min]", 60.0 * CtrlSpeedValues::maxF_1DZ_MMSec)
-  ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_2DXY  [mm/min]", 60.0 * CtrlSpeedValues::maxF_2DXY_MMSec)
-  ARDO_DEBUG_VALUE("CtrlSpeedValues::maxF_3DXYZ [mm/min]", 60.0 * CtrlSpeedValues::maxF_3DXYZ_MMSec)
-
   setupAccelManager(fA, fD);  
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -358,11 +384,11 @@ bool CncArduinoController::enableStepperPin(bool state){
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncArduinoController::isAnyLimitActive() {
 /////////////////////////////////////////////////////////////////////////////////////
-  static int32_t xLimit, yLimit, zLimit;
+  static int8_t xLimit, yLimit, zLimit;
   return evaluateLimitStates(xLimit, yLimit, zLimit);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::evaluateLimitStates(int32_t& xLimit, int32_t& yLimit, int32_t& zLimit) {
+bool CncArduinoController::evaluateLimitStates(int8_t& xLimit, int8_t& yLimit, int8_t& zLimit) {
 /////////////////////////////////////////////////////////////////////////////////////
   // call the steppers to read their individual pins
   xLimit = X->readLimitState(DIRECTION_UNKNOWN);
@@ -418,7 +444,7 @@ bool CncArduinoController::observeToolState() {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( isProbeMode() == OFF ) {
 
-    #warning impl. missing
+    #warning impl. missing observeToolState()
     /*
     if ( digitalRead(PIN_TOOL_FEEDBACK) == TOOL_STATE_OFF ) {
       errorInfo->setNextErrorInfo(E_TOOL_NOT_ENALED);
@@ -752,9 +778,9 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
   auto writeGetterValue3 = [&](unsigned char pid, int32_t val1, int32_t val2, int32_t val3 )  { DBG_GETTER3(pid, val1, val2, val3); AML::writeGetterValues(pid, val1, val2, val3);  };
   
   auto writeLimitGetter = [&]() {
-    int32_t x = LimitSwitch::LIMIT_UNKNOWN;
-    int32_t y = LimitSwitch::LIMIT_UNKNOWN;
-    int32_t z = LimitSwitch::LIMIT_UNKNOWN;
+    int8_t x = LimitSwitch::LIMIT_UNKNOWN;
+    int8_t y = LimitSwitch::LIMIT_UNKNOWN;
+    int8_t z = LimitSwitch::LIMIT_UNKNOWN;
 
     evaluateLimitStates(x, y, z);
     writeGetterValue3(PID_LIMIT, x, y, z);
@@ -798,7 +824,7 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
 
     wxString values;
     for( int i=0; i<st.valueCount; i++ ) {
-      if ( st.values[i].isFloat )  { values.append(wxString::Format("[%d]=%f",  i, st.values[i].f)); } 
+      if ( st.values[i].isFloat )  { values.append(wxString::Format("[%d]=%f",  i, st.values[i].asFloat())); } 
       else                         { values.append(wxString::Format("[%d]=%ld", i, st.values[i].l)); }
 
       if ( i != st.valueCount - 1 )
@@ -819,14 +845,6 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     case PID_X_LIMIT:                 X->setLimitStateManually(st.values[0].l); break;
     case PID_Y_LIMIT:                 Y->setLimitStateManually(st.values[0].l); break;
     case PID_Z_LIMIT:                 Z->setLimitStateManually(st.values[0].l); break;
-   
-    case PID_FEEDRATE_X:              X->setFeedrate(st.values[0].f); break;
-    case PID_FEEDRATE_Y:              Y->setFeedrate(st.values[0].f); break;
-    case PID_FEEDRATE_Z:              Z->setFeedrate(st.values[0].f); break;
-
-    case PID_PULSE_WIDTH_HIGH_X:      X->setHighPulseWidth(st.values[0].l); break;
-    case PID_PULSE_WIDTH_HIGH_Y:      Y->setHighPulseWidth(st.values[0].l); break;
-    case PID_PULSE_WIDTH_HIGH_Z:      Z->setHighPulseWidth(st.values[0].l); break;
 
     case PID_RESERT_STEP_COUNTER:     CtrlStatistics::resetStepCounter(IDX_X); CtrlStatistics::resetStepCounter(IDX_Y); CtrlStatistics::resetStepCounter(IDX_Z); break;
   
@@ -836,7 +854,7 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     
     case PID_POS_REPLY_THRESHOLD:     setPosReplyThreshold(st.values[0].l); break;
     
-    case PID_SPEED_MM_MIN:            setSpeedValue_MMMin(st.values[0].f); break;
+    case PID_SPEED_MM_MIN:            setSpeedValue_MMMin(st.values[0].asFloat()); break;
 
     case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].l != 0); break;
     case PID_RESERT_POS_COUNTER:      CtrlStatistics::resetPositionCounter(); break;
@@ -878,12 +896,12 @@ byte CncArduinoController::initialize(const ArduinoCmdDecoderMoveSequence::Resul
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::finalize(const ArduinoCmdDecoderMoveSequence::Result& seq) {
+byte CncArduinoController::finalize(const ArduinoCmdDecoderMoveSequence::Result&) {
 /////////////////////////////////////////////////////////////////////////////////////  
   sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
   ARDO_DEBUG_MESSAGE('S', "MoveSequence finished")
 
-   return RET_OK;
+  return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::process(const ArduinoCmdDecoderMove::Result& mv) {
@@ -914,8 +932,7 @@ byte CncArduinoController::movePosition(int32_t dx, int32_t dy, int32_t dz) {
 byte CncArduinoController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
   // speed setup
-  #warning
-  const float MAX_SPEED   = 2700;//speedController.getMaxFeedSpeed_MM_MIN();
+  const float MAX_SPEED   = CtrlSpeedValues::maxF_1DZ_MMSec * 60;
   const float START_SPEED = getStartSpeed_MMSec() * 60 * 0.5;
   const float DIFF_SPEED  = MAX_SPEED - START_SPEED;
 

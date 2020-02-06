@@ -15,10 +15,9 @@
     const char HASH                             =     '#';
     const char COMMA                            =     ',';
     
-    #define EMPTY_TEXT_VAL                             ""
-    #define BLANK                                     " "
+    #define EMPTY_TEXT_VAL                            ""
     
-    #define BLANK1                                 BLANK
+    #define BLANK1                                   " "
     #define BLANK2                                  "  "
     #define BLANK3                                 "   "
 

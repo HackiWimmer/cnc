@@ -1114,8 +1114,10 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	moveCommand[idx++] = cmdType;
 	p++;
 	
+	moveCommand[idx++] = (unsigned char)size;
+	p++;
+
 	for (unsigned int i=0; i<size; i++) {
-		//int32_t v  = htonl(values[i]);
 		int32_t v  = values[i];
 		memcpy(p, &v, LONG_BUF_SIZE);
 		idx += LONG_BUF_SIZE; 

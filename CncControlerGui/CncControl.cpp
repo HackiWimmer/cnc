@@ -316,23 +316,22 @@ bool CncControl::setup(bool doReset) {
 	
 	// process initial setters
 	Setters setup;
-	setup.push_back(SetterTuple(PID_FEEDRATE_X, convertDoubleToCtrlLong(PID_FEEDRATE_X, THE_CONFIG->getPitchX() / THE_CONFIG->getStepsX())));
-	setup.push_back(SetterTuple(PID_FEEDRATE_Y, convertDoubleToCtrlLong(PID_FEEDRATE_X, THE_CONFIG->getPitchY() / THE_CONFIG->getStepsY())));
-	setup.push_back(SetterTuple(PID_FEEDRATE_Z, convertDoubleToCtrlLong(PID_FEEDRATE_X, THE_CONFIG->getPitchZ() / THE_CONFIG->getStepsZ())));
-
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_X, THE_CONFIG->getHighPulsWidthX()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Y, THE_CONFIG->getHighPulsWidthY()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Z, THE_CONFIG->getHighPulsWidthZ()));
 	
+	cnc::SetterValueList accelList;
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getPitchX() / THE_CONFIG->getStepsX()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getPitchY() / THE_CONFIG->getStepsY()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getPitchZ() / THE_CONFIG->getStepsZ()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthX()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthY()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthZ()));
 	
 	#warning use config values
-	cnc::SetterValueList accelList;
-	accelList.push_back(0.0 * FLT_FACT);
-	accelList.push_back(0.5 * FLT_FACT);
-	accelList.push_back(333/60 * FLT_FACT);
-	accelList.push_back(0.0 * FLT_FACT);
-	accelList.push_back(0.5 * FLT_FACT);
-	accelList.push_back(444/60 * FLT_FACT);
+	accelList.push_back(FLT_FACT * 0.0);
+	accelList.push_back(FLT_FACT * 0.5);
+	accelList.push_back(FLT_FACT * 333.0/60);
+	accelList.push_back(FLT_FACT * 0.0);
+	accelList.push_back(FLT_FACT * 0.5);
+	accelList.push_back(FLT_FACT * 444.0/60);
 	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, THE_CONFIG->getReplyThresholdSteps()));

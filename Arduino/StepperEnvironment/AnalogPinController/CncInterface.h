@@ -6,10 +6,10 @@ namespace LimitSwitch {
   const bool LIMIT_SWITCH_ON                             = false;  // LOW;
   const bool LIMIT_SWITCH_OFF                            =  true;  // HIGH;
       
-  const long LIMIT_MIN                                   =   -1L;
-  const long LIMIT_MAX                                   =   +1L;
-  const long LIMIT_UNKNOWN                               = +256L;
-  const long LIMIT_UNSET                                 =    0L;
+  const int8_t LIMIT_MIN                                 =   -1;
+  const int8_t LIMIT_MAX                                 =   +1;
+  const int8_t LIMIT_UNKNOWN                             = +127;
+  const int8_t LIMIT_UNSET                               =    0;
 
   const unsigned char BIT_LS_X_MIN                       =     8;
   const unsigned char BIT_LS_X_MAX                       =     7;
@@ -179,7 +179,7 @@ namespace CncInterface {
         explicit States(const States& s)
         : StatesBase(s.getValue()) {}
 
-        States(const int32_t x, const int32_t y, const int32_t z) 
+        States(const int8_t x, const int8_t y, const int8_t z) 
         : StatesBase()
         {
           switch ( x ) {

@@ -15,7 +15,7 @@ namespace AccelMngParameter {
   
   template <class T>
   void print(unsigned char pid, T value, int8_t indent=1) {
-    for (auto i=0; i<indent; i++) Serial.print(BLANK); \
+    for (auto i=0; i<indent; i++) Serial.print(BLANK1); \
     Serial.print(pid);   Serial.print(TEXT_SEPARATOR); \
     Serial.print(value); Serial.write(TEXT_CLOSE);
   }

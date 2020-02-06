@@ -28,7 +28,7 @@ namespace StepperParameter {
   
   template <class T>
   void print(unsigned char pid, T value, int8_t indent=2) {
-    for (auto i=0; i<indent; i++) Serial.print(BLANK); \
+    for (auto i=0; i<indent; i++) Serial.print(BLANK1); \
     Serial.print(pid);   Serial.print(TEXT_SEPARATOR); \
     Serial.print(value); Serial.write(TEXT_CLOSE);
   }
@@ -124,7 +124,7 @@ void CncArduinoStepper::resetDirectionPin() {
   ARDO_TRACE_STEPPER_DIR(getAxisId(), stepDirection)
 }
 //////////////////////////////////////////////////////////////////////////////
-int32_t CncArduinoStepper::getLimitState() {
+int8_t CncArduinoStepper::getLimitState() {
 //////////////////////////////////////////////////////////////////////////////  
   if ( minReached == true ) return LimitSwitch::LIMIT_MIN;
   if ( maxReached == true ) return LimitSwitch::LIMIT_MAX;
@@ -132,7 +132,7 @@ int32_t CncArduinoStepper::getLimitState() {
   return LimitSwitch::LIMIT_UNSET;
 }
 //////////////////////////////////////////////////////////////////////////////
-int32_t CncArduinoStepper::readLimitState(int dir) {
+int8_t CncArduinoStepper::readLimitState(int dir) {
 //////////////////////////////////////////////////////////////////////////////
   if ( AE::digitalRead(lmtPin) == LimitSwitch::LIMIT_SWITCH_OFF )
     return LimitSwitch::LIMIT_UNSET;

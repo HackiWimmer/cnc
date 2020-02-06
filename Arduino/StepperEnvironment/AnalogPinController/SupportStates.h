@@ -107,13 +107,13 @@ namespace SupportPin {
       //-------------------------------------------------------------
       virtual void trace() {
         Serial.print("SP Report:");
-        Serial.print(BLANK);
+        Serial.print(BLANK1);
         Serial.print(getValue());
         Serial.print(BLANK3);
         Serial.print("'");
         Serial.print(getValueAsString());
         Serial.print("'");
-        Serial.print(BLANK);
+        Serial.print(BLANK1);
         
         Serial.print("PIN Values: ");
         Serial.print(PIN_SS_SUPPORT_BUTTON_1_PRESSED);  Serial.print(EQUAL); Serial.print(readPin(PIN_SS_SUPPORT_BUTTON_1_PRESSED));  Serial.print(COMMA);

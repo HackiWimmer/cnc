@@ -106,13 +106,13 @@ namespace LimitSwitch {
       //-------------------------------------------------------------
       virtual void trace() {
         Serial.print("LS Report:");
-        Serial.print(BLANK);
+        Serial.print(BLANK1);
         Serial.print(getValue());
         Serial.print(BLANK3);
         Serial.print("'");
         Serial.print(getValueAsString());
         Serial.print("'");
-        Serial.print(BLANK);
+        Serial.print(BLANK1);
       
         Serial.print("PIN Values: ");
         Serial.print(PIN_LS_X_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MIN)); Serial.print(COMMA);

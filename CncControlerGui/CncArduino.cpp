@@ -128,9 +128,6 @@ void ArduinoPIDs::init() {
 	pids[PID_QUERY_READY_TO_RUN]              .setup("Ready to run", "bool");
 	
 	pids[PID_FEEDRATE]                        .setup("Feedrate", "mm/step");
-	pids[PID_FEEDRATE_X]                      .setup("Feedrate X Axis", "mm/step");
-	pids[PID_FEEDRATE_Y]                      .setup("Feedrate Y Axis", "mm/step");
-	pids[PID_FEEDRATE_Z]                      .setup("Feedrate Z Axis", "mm/step");
 	
 	pids[PID_MIN_SWITCH]                      .setup("Min Switch", "bool");  
 	pids[PID_MAX_SWITCH]                      .setup("Max Switch", "bool");
@@ -161,16 +158,11 @@ void ArduinoPIDs::init() {
 	pids[PID_COMMON]                          .setup("Common", "");
 	pids[PID_SPEED_MM_MIN]                    .setup("Speed", "mm/min");
 	pids[PID_SPEED_FEED_MODE]                 .setup("Speed Mode", "-");
-	pids[PID_STEPS]                           .setup("Steps", "steps");
 	pids[PID_STEP_PIN]                        .setup("Step Pin", "");
 	pids[PID_DIR_PIN]                         .setup("Direction Pin", "");
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");
 
 	pids[PID_PULSE_WIDTH_HIGH]                .setup("Step Pulse Width High", "us");
-	pids[PID_PULSE_WIDTH_HIGH_X]              .setup("Step Pulse Width High X", "us");
-	pids[PID_PULSE_WIDTH_HIGH_Y]              .setup("Step Pulse Width High Y", "us");
-	pids[PID_PULSE_WIDTH_HIGH_Z]              .setup("Step Pulse Width High Z", "us");
-	
 	pids[PID_ACCEL_PROFILE]                   .setup("Accel Profile X,Y,Z(startSpeed, stopSpeed)", "mm/min");
 	pids[PID_ACCEL_START_SPEED]               .setup("Accel start speed", "mm/min");
 	pids[PID_ACCEL_STOP_SPEED]                .setup("Accel stop speed", "mm/min");
@@ -184,15 +176,7 @@ void ArduinoPIDs::init() {
 	pids[PID_GET_STEP_COUNTER_X]              .setup("Get Step Counter X", "#");
 	pids[PID_GET_STEP_COUNTER_Y]              .setup("Get Step Counter Y", "#");
 	pids[PID_GET_STEP_COUNTER_Z]              .setup("Get Step Counter Z", "#");
-	
-	pids[PID_SPEED_CONTROLLER]                .setup("Feed Speed Controller", "");
-	pids[PID_SPEED_CTRL_INITIALIZED]          .setup("Initialized State", "bool");
-	pids[PID_SPEED_CTRL_RPM]                  .setup("Rounds Per Minute", "rpm");
-	pids[PID_SPEED_CTRL_TOTAL_OFFSET]         .setup("Total Speed Offset", "us");
-	pids[PID_SPEED_CTRL_SYNTH_SPEED_DELAY]    .setup("Synthetically Speed Delay", "us");
-	pids[PID_SPEED_CTRL_MAX_SPEED]            .setup("Max Speed", "mm/min");
-	pids[PID_SPEED_CTRL_CFG_SPEED]            .setup("Configured Speed", "mm/min");
-	
+
 	pids[PID_MAX_DIMENSION_X]                 .setup("Max Dimension X", "steps");
 	pids[PID_MAX_DIMENSION_Y]                 .setup("Max Dimension Y", "steps");
 	pids[PID_MAX_DIMENSION_Z]                 .setup("Max Dimension Z", "steps");

@@ -52,8 +52,8 @@ void ArduinoMainLoop::printConfig() {
 /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOH);
     Serial.write(PID_TEXT);
-    Serial.print(PID_COMMON);        Serial.print(TEXT_SEPARATOR);     Serial.print(BLANK);                                             Serial.print(TEXT_CLOSE);
-    Serial.print(BLANK);             Serial.print(PID_VERSION);        Serial.print(TEXT_SEPARATOR); Serial.print(FIRMWARE_VERSION);    Serial.print(TEXT_CLOSE);
+    Serial.print(PID_COMMON);        Serial.print(TEXT_SEPARATOR);     Serial.print(BLANK1);                                            Serial.print(TEXT_CLOSE);
+    Serial.print(BLANK1);            Serial.print(PID_VERSION);        Serial.print(TEXT_SEPARATOR); Serial.print(FIRMWARE_VERSION);    Serial.print(TEXT_CLOSE);
 
     controller->printConfig();
 
@@ -131,8 +131,8 @@ AE::PinType ArduinoMainLoop::getPinType(uint8_t pin) {
 //////////////////////////////////////////////////////////////
 uint8_t ArduinoMainLoop::getPinMode(uint8_t pin) {
 //////////////////////////////////////////////////////////////
-  #warning impl. missing
-  /*
+#ifdef SKETCH_COMPILE
+
   uint8_t bit  = digitalPinToBitMask(pin);
   uint8_t port = digitalPinToPort(pin);
 
@@ -154,8 +154,15 @@ uint8_t ArduinoMainLoop::getPinMode(uint8_t pin) {
   if      (*reg & bit)  return OUTPUT;
   else if (*out & bit)  return INPUT_PULLUP;
   else                  return INPUT;
-  */
+
   return NOT_A_PIN;
+  
+#else
+
+  #warning impl. missing getPinMode()
+  return NOT_A_PIN;
+  
+#endif
 }
 //////////////////////////////////////////////////////////////
 void ArduinoMainLoop::sleepMicroseconds(unsigned long usec) {

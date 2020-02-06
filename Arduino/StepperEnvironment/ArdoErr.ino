@@ -25,7 +25,7 @@ void LastErrorCodes::writeToSerial() {
   }
 
   if ( has1TextInfo() == true ) {
-    Serial.print(BLANK);
+    Serial.print(BLANK1);
     Serial.print(messageText);
   }
 }

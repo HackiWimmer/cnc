@@ -67,7 +67,11 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
     Result result;  
 
     // ----------------------------------------------------------------------
+#ifdef SKETCH_COMPILE
+    void debugValues(byte) {
+#else
     void debugValues(byte idx) {
+#endif  
         LastErrorCodes::clear();
 
         ARDO_DEBUG_MESSAGE('S',"Debug MoveSequence Values")
@@ -86,11 +90,6 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
         ARDO_DEBUG_VALUE(" MVSQ.dx",                  result.dx)
         ARDO_DEBUG_VALUE(" MVSQ.dy",                  result.dy)
         ARDO_DEBUG_VALUE(" MVSQ.dz",                  result.dz)
-    }
-  
-    // ----------------------------------------------------------------------
-    void logInfo(byte idx, byte eid) {
-        debugValues(idx);
     }
   
     // ----------------------------------------------------------------------

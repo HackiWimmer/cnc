@@ -22,11 +22,9 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
     struct Values {
       bool     isFloat  = false;
       int32_t  l        =   0;
-      float    f        = 0.0;   
 
-      void reset() {
-        *this = Values();
-      }
+      float asFloat() const { return (float)(l) / FLT_FACT; }
+      void reset()          { *this = Values();  }
     };
 
     struct Result {
@@ -48,8 +46,6 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
     : ArduinoCmdDecoderBase()
     , result      ()
     , b           {0,0,0,0}
-    , byteCount   (0)
-    , tryCount    (0)
     {}
     
     virtual ~ArduinoCmdDecoderSetter() 
@@ -61,8 +57,6 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
   private:
     Result          result;  
     byte            b[4];
-    unsigned short  byteCount;
-    unsigned short  tryCount;
 
   public:
 
@@ -81,8 +75,9 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
       result.valueCount   = b[1];
       
       // over all given values
-      for (unsigned short i=0; i<result.valueCount; i++) {
-        // read a 4 byte
+      for (byte i=0; i<result.valueCount; i++) {
+        
+        // read 4 bytes
         if ( AML::readSerialBytesWithTimeout(b, sizeof(int32_t)) != sizeof(int32_t) ) {
           ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_PARAM_STREAM);
           return RET_ERROR;
@@ -93,19 +88,10 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
           ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_PARAM_STREAM);
           return RET_ERROR;
         }
-        
-        const bool mode = ArduinoMainLoop::isFloatValue(result.pid);
-        if ( mode )  ArduinoMainLoop::convertLongToFloat(result.values[i].l, result.values[i].f);
-        else         result.values[i].f = 0.0;      
       }
 
       // process . . .
-      byte ret = process(result);
-      
-      // And finally wait a protion of time 
-      // to give the reader a period to do something
-      DEC_SETTER_DELAY_MICROS(1000);
-      return ret;
+      return process(result);
     }
 };
 

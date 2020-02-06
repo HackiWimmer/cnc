@@ -691,16 +691,24 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			case PID_Y_POS:   				curEmulatorPos.setY(( values.size() > 0 ? values.front() : 0 )); break;
 			case PID_Z_POS:  				curEmulatorPos.setZ(( values.size() > 0 ? values.front() : 0 )); break;
 			
-			case PID_FEEDRATE_X:
-			case PID_FEEDRATE_Y:
-			case PID_FEEDRATE_Z:
-			case PID_PULSE_WIDTH_HIGH_X:
-			case PID_PULSE_WIDTH_HIGH_Y:
-			case PID_PULSE_WIDTH_HIGH_Z:
 			case PID_ACCEL_PROFILE:
 			{
-				#warning consider PID_ACCEL_PROFILE values
-				setupACM(0.009, 0.09, 5.5, 0.009, 0.09, 5.5);
+				/*
+			    values[ 0] / FLT_FACT // Feedrate X
+			    values[ 1] / FLT_FACT // Feedrate Y
+			    values[ 2] / FLT_FACT // Feedrate Z
+
+			    values[3] / FLT_FACT // HighPulsWidth X
+			    values[4] / FLT_FACT // HighPulsWidth Y
+			    values[5] / FLT_FACT // HighPulsWidth Z
+				*/
+
+				setupACM((float)values[ 6] / FLT_FACT,
+						 (float)values[ 7] / FLT_FACT,
+						 (float)values[ 8] / FLT_FACT,
+						 (float)values[ 9] / FLT_FACT,
+						 (float)values[10] / FLT_FACT,
+						 (float)values[11] / FLT_FACT);
 				break;
 			}
 			
