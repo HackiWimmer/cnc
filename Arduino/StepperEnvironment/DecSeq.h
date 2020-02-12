@@ -228,11 +228,11 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
       if ( initialize(result) != RET_OK )
         logError(14, E_INVALID_MOVE_SEQUENCE);
         
-      if ( false ) {
-        ARDO_DEBUG_VALUE("result.totalLength", result.totalLength)
-        ARDO_DEBUG_VALUE("result.lengthX", result.lengthX)
-        ARDO_DEBUG_VALUE("result.lengthY", result.lengthY)
-        ARDO_DEBUG_VALUE("result.lengthZ", result.lengthZ)
+      if ( true ) {
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.totalLength", result.totalLength)
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthX    ", result.lengthX)
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthY    ", result.lengthY)
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthZ    ", result.lengthZ)
       }
 
       result.totalRemaining = result.totalLength;

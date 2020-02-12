@@ -18,14 +18,16 @@ typedef ArduinoPositionRenderer::RS RS;
 
 int32_t       RS::A[RS::POINT_LENGTH]    = {0,0,0};
 int32_t       RS::B[RS::POINT_LENGTH]    = {0,0,0};
-uint16_t      RS::impulseCount           = 0;
-uint16_t      RS::xStepCount             = 0;
-uint16_t      RS::yStepCount             = 0;
-uint16_t      RS::zStepCount             = 0;
+uint32_t      RS::impulseCount           = 0;
+uint32_t      RS::xStepCount             = 0;
+uint32_t      RS::yStepCount             = 0;
+uint32_t      RS::zStepCount             = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////
-ArduinoPositionRenderer::ArduinoPositionRenderer() {
+ArduinoPositionRenderer::ArduinoPositionRenderer()
+: countOnlyMode(false)
 ///////////////////////////////////////////////////////////////////////////////////// 
+{
   //CNC_RENDERER_LOG_FUNCTION()
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -44,12 +46,14 @@ byte ArduinoPositionRenderer::stepping() {
   if ( RS::empty() )
     return RET_OK;
 
+  RS::impulseCount++;
+  if ( countOnlyMode == true )
+    return RET_OK;
+
   byte retValue = checkRuntimeEnv();
   if ( retValue != RET_OK )
     return retValue;
-
-  RS::impulseCount++;
-
+    
   if ( RS::dx() != 0 ) {
     if ( (retValue = initiateStep(IDX_X)) != RET_OK ) 
       return retValue;
@@ -139,7 +143,7 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
       
       err_1            += dy2;
       err_2            += dz2;
-      RS::A[IDX_X] += x_inc;
+      RS::A[IDX_X]     += x_inc;
     }
 
   //------------------------------------------------------  
@@ -156,7 +160,7 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
       
       err_1            += dx2;
       err_2            += dz2;
-      RS::A[IDX_Y] += y_inc;
+      RS::A[IDX_Y]     += y_inc;
     }
 
   //------------------------------------------------------  
@@ -173,7 +177,7 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
       
       err_1            += dy2;
       err_2            += dx2;
-      RS::A[IDX_Z] += z_inc;
+      RS::A[IDX_Z]     += z_inc;
     }
   }
   

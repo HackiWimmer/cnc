@@ -61,8 +61,10 @@ void ArduinoAccelManager::setupAccelManager(const Function& fA, const Function& 
 /////////////////////////////////////////////////////////////////////////////////////  
 void ArduinoAccelManager::changeState(const State s) {
 /////////////////////////////////////////////////////////////////////////////////////  
-  curState = s;
-  notifyACMStateChange(s); 
+  if ( curState != s ) {
+    curState = s;
+    notifyACMStateChange(s); 
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////  
 bool ArduinoAccelManager::initMove(uint32_t mD_IMPL, float mF_MMSec) {
@@ -102,12 +104,16 @@ bool ArduinoAccelManager::initMove(uint32_t mD_IMPL, float mF_MMSec) {
       }
     }
 
-    //if ( aRampWidth_IMPL >=
-
     if ( aRampWidth_IMPL >= minImpulseCount / 2 && dRampWidth_IMPL >= minImpulseCount / 2 ) {
       state       = P_ACCEL;
       cF_MMSec    = mF_MMSec;
     }
+  }
+
+  if ( true ) {
+    ARDO_DEBUG_VALUE("ArduinoAccelManager: Total impulse count", cD_IMPL)
+    ARDO_DEBUG_VALUE("ArduinoAccelManager: Accel ramp         ", aRampWidth_IMPL)
+    ARDO_DEBUG_VALUE("ArduinoAccelManager: Deaccel ramp       ", dRampWidth_IMPL)
   }
 
   changeState(state);
@@ -165,8 +171,11 @@ float ArduinoAccelManager::getNextTargetSpeed_MMSec() {
       iD_IMPL++;
 
       // state machine handling
-      if ( iD_IMPL > cD_IMPL )
+      if ( iD_IMPL > cD_IMPL ) {
+        #warning
+        ARDO_DEBUG_VALUE("ArduinoAccelManager: Current impulse index", iD_IMPL)  
         changeState(P_UNDEF);
+      }
 
       break;
     }

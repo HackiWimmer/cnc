@@ -1826,6 +1826,53 @@ bool Serial::test() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = false;
 	
+	if ( false ) {
+		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+		cms.addMetricPosXYZ( +200,  +0,   0);
+
+		return processMoveSequence(cms);
+	}
+
+	if ( true ) {
+		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+		
+		float q = 1.0;
+		for ( auto i=0; i<5; i++) {
+			for ( auto j=0; j<10; j++) 
+				cms.addMetricPosXYZ( q * +10, q *  +10,   0);
+			
+			for ( auto j=0; j<10; j++) 
+				cms.addMetricPosXYZ( q * +10, q *  -10,   0);
+				
+			for ( auto j=0; j<10; j++) 
+				cms.addMetricPosXYZ( q * -10, q *  -10,   0);
+				
+			for ( auto j=0; j<10; j++) 
+				cms.addMetricPosXYZ( q * -10, q * +10,   0);
+				
+			q -= 0.1;
+		}
+
+		return processMoveSequence(cms);
+	}
+
+	if ( true ) {
+		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+		cms.addMetricPosXYZ(+0,   +0, +10);
+		cms.addMetricPosXYZ(+10, +20,  +0);
+		cms.addMetricPosXYZ(+0,   +0, -10);
+
+
+		cms.addMetricPosXYZ( +50,  +20,   0);
+		cms.addMetricPosXYZ( +20,  +10,   0);
+		cms.addMetricPosXYZ( +20,   -5,   0);
+		cms.addMetricPosXYZ( +15,   -3,   0);
+		cms.addMetricPosXYZ( +10,   -2,   0);
+		cms.addMetricPosXYZ( +20,  +10,   0);
+
+		return processMoveSequence(cms);
+	}
+	
 	if ( true ) {
 		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
 		

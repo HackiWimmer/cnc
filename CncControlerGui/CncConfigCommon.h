@@ -43,9 +43,9 @@
 	#define CncConfig_MULTIPLIER_X 							"Cnc.Config/MULTIPLIER_X"
 	#define CncConfig_MULTIPLIER_Y 							"Cnc.Config/MULTIPLIER_Y"
 	#define CncConfig_MULTIPLIER_Z 							"Cnc.Config/MULTIPLIER_Z"
-	#define CncConfig_PULS_WIDTH_HIGH_X 					"Cnc.Config/PULS_WIDTH_HIGH_X"
-	#define CncConfig_PULS_WIDTH_HIGH_Y 					"Cnc.Config/PULS_WIDTH_HIGH_Y"
-	#define CncConfig_PULS_WIDTH_HIGH_Z						"Cnc.Config/PULS_WIDTH_HIGH_Z"
+	#define CncConfig_PULSE_WIDTH_HIGH_X					"Cnc.Config/PULSE_WIDTH_HIGH_X"
+	#define CncConfig_PULSE_WIDTH_HIGH_Y					"Cnc.Config/PULSE_WIDTH_HIGH_Y"
+	#define CncConfig_PULSE_WIDTH_HIGH_Z					"Cnc.Config/PULSE_WIDTH_HIGH_Z"
 
 	#define CncRuntime_DISPLAY_FACT_X 						"#/CncRuntime/DISPLAY_FACT_X"
 	#define CncRuntime_DISPLAY_FACT_Y 						"#/CncRuntime/DISPLAY_FACT_Y"

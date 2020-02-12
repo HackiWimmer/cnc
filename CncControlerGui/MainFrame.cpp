@@ -955,14 +955,26 @@ void MainFrame::displayReport(int id) {
 	cnc->displayGetterList(pidList);
 }
 
-#include "SerialCircularBuffer.h"
-#include "SerialEndPoint.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	
+	if ( speedMonitor )
+		speedMonitor->activate(true);
+
+	m_btSpeedControl->Enable(true);
+	decorateSpeedControlBtn(true);
+	
+	selectMonitorBookCncPanel();
+	cnc->changeCurrentFeedSpeedXYZ_MM_MIN(1800);
 	cnc->getSerialExtern()->test();
 }
+
+#warning
+#include "SerialCircularBuffer.h"
+#include "SerialEndPoint.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
@@ -991,8 +1003,8 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
 	
-	for ( auto i = 0; i<64; i++)
-		std::cout << wxString::Format("%03d", i) << wxString('*', 48)  << std::endl;
+	if ( speedMonitor )
+		speedMonitor->activate(true);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
@@ -7290,11 +7302,11 @@ void MainFrame::clickProbeMode(wxCommandEvent& event) {
 	
 	cnc->enableProbeMode(probeMode);
 
-	m_btSpeedControl->Enable(probeMode);
-	decorateSpeedControlBtn(true);
+	//m_btSpeedControl->Enable(probeMode);
+	//decorateSpeedControlBtn(true);
 
-	if ( speedMonitor )
-		speedMonitor->activate(!probeMode);
+//	if ( speedMonitor )
+//		speedMonitor->activate(!probeMode);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clickSpeedControl(wxCommandEvent& event) {

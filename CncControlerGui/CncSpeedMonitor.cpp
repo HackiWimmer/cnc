@@ -338,7 +338,8 @@ void CncSpeedMonitor::onPaintRightAxis(wxPaintEvent& event) {
 	};
 	
 	if ( m_refreshTimer->IsRunning() && m_btToggleConnection->GetValue() == true )
-		drawCurrentValue(axisMeasuredSpeed, currentMeasuredFeedSpeed_MM_MIN);
+		//drawCurrentValue(axisMeasuredSpeed, currentMeasuredFeedSpeed_MM_MIN);
+		drawCurrentValue(axisReceivedSpeed, currentReceivedFeedSpeed_MM_MIN);
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::onMouseMotion(wxMouseEvent& event) {

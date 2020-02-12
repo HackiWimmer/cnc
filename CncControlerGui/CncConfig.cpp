@@ -515,8 +515,8 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 		osdConfigList.get(groupName, entryName, val);
 	} 
 	
-	//prop->SetValueFromString(val);
-	prop->SetValue(val);
+	prop->SetValueFromString(val);
+	//prop->SetValue(val);
 	
 	/*
 	if ( propType == wxPG_VARIANT_TYPE_LONG ) {
@@ -971,9 +971,9 @@ const bool CncConfig::getPreProcessorCntMoveSequneces()				{ PROPERTY(CncWork_Ct
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsZ() 							{ PROPERTY(CncConfig_STEPS_Z) 							return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthX() 					{ PROPERTY(CncConfig_PULS_WIDTH_HIGH_X) 			 	return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthY() 					{ PROPERTY(CncConfig_PULS_WIDTH_HIGH_Y) 			 	return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthZ() 					{ PROPERTY(CncConfig_PULS_WIDTH_HIGH_Z) 				return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthX() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_X) 			 	return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthY() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Y) 			 	return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthZ() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Z) 				return p->GetValue().GetInteger(); }
 
 const double CncConfig::getMaxDimension() 							{ return std::max(std::max(getMaxDimensionX(), getMaxDimensionY()), getMaxDimensionZ()); }
 const double CncConfig::getMaxDimensionX() 							{ PROPERTY(CncConfig_MAX_DIMENSION_X)					return p->GetValue().GetDouble(); } 

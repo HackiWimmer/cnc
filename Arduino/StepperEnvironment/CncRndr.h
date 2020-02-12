@@ -15,10 +15,10 @@ class ArduinoPositionRenderer {
       static int32_t        A[POINT_LENGTH];
       static int32_t        B[POINT_LENGTH];
     
-      static uint16_t       impulseCount;
-      static uint16_t       xStepCount;
-      static uint16_t       yStepCount;
-      static uint16_t       zStepCount;
+      static uint32_t       impulseCount;
+      static uint32_t       xStepCount;
+      static uint32_t       yStepCount;
+      static uint32_t       zStepCount;
     
       //------------------------------------------------------------------------
       static void swap() { memcpy(B, A, sizeof(B)); }
@@ -58,6 +58,8 @@ class ArduinoPositionRenderer {
     ArduinoPositionRenderer();
     virtual ~ArduinoPositionRenderer();
 
+    bool                    countOnlyMode;
+
     // controller interface
     byte                    directMove(int8_t dx, int8_t dy, int8_t dz);
     byte                    renderMove(int32_t dx, int32_t dy, int32_t dz);
@@ -93,6 +95,10 @@ class ArduinoImpulseCalculator : public ArduinoPositionRenderer {
     {}
 
     int32_t calculate(int32_t dx, int32_t dy, int32_t dz) {
+      
+      countOnlyMode    = true;
+      RS::impulseCount = 0;
+       
       if ( renderMove(dx, dy, dz) != RET_OK )
         return -1;
 

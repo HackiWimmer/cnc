@@ -42,6 +42,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     uint16_t            posReplyThreshold;
 
     uint32_t            tsMoveStart;
+    uint32_t            tsMoveLast;
  
     CncArduinoController(const CncArduinoController&);
 

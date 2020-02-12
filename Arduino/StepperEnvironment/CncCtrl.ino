@@ -57,7 +57,8 @@ namespace CtrlSpeedValues {
   float     maxF_3DXYZ_MMSec = 0.0;
 
   float     cfgF_MMSec       = 0.0;
-  float     msdF_MMSec       = 0.0;
+  float     cmsF_MMSec       = 0.0;
+  float     tmsF_MMSec       = 0.0;
 
   float getMaxF_1DX_MMSec()   { return maxF_1DX_MMSec;   }
   float getMaxF_1DY_MMSec()   { return maxF_1DY_MMSec;   }
@@ -101,6 +102,7 @@ CncArduinoController::CncArduinoController()
 , posReplyCounter               (0)
 , posReplyThreshold             (100)
 , tsMoveStart                   (0L)
+, tsMoveLast                    (0L)
 {  
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -628,13 +630,17 @@ void CncArduinoController::sendCurrentPositions(unsigned char pid, bool force) {
                                       X->getPosition(),
                                       Y->getPosition(),
                                       Z->getPosition(),
-                                      CtrlSpeedValues::msdF_MMSec * 60 * FLT_FACT);
+                                      CtrlSpeedValues::cmsF_MMSec * 60 * FLT_FACT);
                       break;
 
       default:        ; // do nothing
 
     }
 
+    if ( false ) {
+      ARDO_DEBUG_VALUE("F'", CtrlSpeedValues::cmsF_MMSec)
+    }
+    
     //Serial.flush();
   }
 }
@@ -659,28 +665,44 @@ byte CncArduinoController::checkRuntimeEnv() {
   return RET_OK;   
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void CncArduinoController::notifyMovePart(int8_t, int8_t, int8_t) {
+void CncArduinoController::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
   // speed management
   if ( CtrlSpeedValues::cfgF_MMSec > 0 ) {
     
-    // determine the distance for each axis, 
+    // determine the current distance for each axis, 
     // due to the later pow() abs isn't necessary here 
-    const float dx        = RS::xStepCount * X->getFeedrate();
-    const float dy        = RS::yStepCount * Y->getFeedrate();
-    const float dz        = RS::zStepCount * Z->getFeedrate();
-    const float dist_MM   = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
+    const float curDistX_MM = dx             * X->getFeedrate();
+    const float curDistY_MM = dy             * Y->getFeedrate();
+    const float curDistZ_MM = dz             * Z->getFeedrate();
+    const float curDistV_MM = sqrt(pow(curDistX_MM, 2) + pow(curDistY_MM, 2) + pow(curDistZ_MM, 2));
 
-    // determine the time deviation between ehe measured and configured sight
-    const int32_t timeElapsed_US    = AE::micros() - tsMoveStart;
-    const int32_t timeDistance_US   = round(( 1000.0 * 1000.0 / getNextTargetSpeed_MMSec() ) * dist_MM);
-    const int32_t timeDifference_US = timeDistance_US - timeElapsed_US;
+    // determine the time deviation between the measured and configured sight
+    const int32_t curTimeElapsed_US    = AE::micros() - tsMoveLast;
+    const int32_t curTimeDistance_US   = round(( 1000.0 * 1000.0 / getNextTargetSpeed_MMSec() ) * curDistV_MM);
+    const int32_t curTimeDifference_US = curTimeDistance_US - curTimeElapsed_US;
 
-    if ( timeDifference_US > 0 )
-      AE::delayMicroseconds(timeDifference_US);
+    if ( curTimeDifference_US > 0 )
+      AE::delayMicroseconds(curTimeDifference_US);
 
     // measure the current speed again
-    CtrlSpeedValues::msdF_MMSec = ( 1000.0 * 1000.0 / (AE::micros() - tsMoveStart) ) * dist_MM;
+    CtrlSpeedValues::cmsF_MMSec = ( 1000.0 * 1000.0 / (AE::micros() - tsMoveLast) ) * curDistV_MM;
+    tsMoveLast = AE::micros();
+
+    if ( false ) {
+      // determine the total distance for each axis, 
+      // due to the later pow() abs isn't necessary here 
+      const float totDistX_MM = RS::xStepCount * X->getFeedrate();
+      const float totDistY_MM = RS::yStepCount * Y->getFeedrate();
+      const float totDistZ_MM = RS::zStepCount * Z->getFeedrate();
+      const float totDistV_MM = sqrt(pow(totDistX_MM, 2) + pow(totDistY_MM, 2) + pow(totDistZ_MM, 2));
+  
+      const int32_t totTimeElapsed_US    = AE::micros() - tsMoveStart;
+      const int32_t totTimeDistance_US   = CtrlSpeedValues::cfgF_MMSec ? round(( 1000.0 * 1000.0 / CtrlSpeedValues::cfgF_MMSec ) * totDistV_MM) : 0;
+      const int32_t totTimeDifference_US = totTimeDistance_US - totTimeElapsed_US;
+
+      CtrlSpeedValues::tmsF_MMSec = ( 1000.0 * 1000.0 / totTimeDifference_US ) * totDistV_MM;
+    }
   }  
   
   // position management
@@ -689,8 +711,17 @@ void CncArduinoController::notifyMovePart(int8_t, int8_t, int8_t) {
   sendCurrentPositions(PID_XYZ_POS_DETAIL, false);  
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void CncArduinoController::notifyACMStateChange(State) {
+void CncArduinoController::notifyACMStateChange(State state) {
 /////////////////////////////////////////////////////////////////////////////////////
+  if ( true ) {
+    switch ( state ) {
+      case P_UNDEF:   ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_UNDEF'");   break;
+      case P_CONST:   ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_CONST'");   break;
+      case P_ACCEL:   ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_ACCEL'");   break;
+      case P_TARGET:  ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_TARGET'");  break;
+      case P_DEACCEL: ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_DEACCEL'"); break;
+    }
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::notifyACMInitMove() {
@@ -889,8 +920,13 @@ byte CncArduinoController::initialize(const ArduinoCmdDecoderMoveSequence::Resul
   ARDO_DEBUG_MESSAGE('S', "MoveSequence started")
   
   tsMoveStart = AE::micros();
-  
-  if ( CtrlSpeedValues::cfgF_MMSec && initMove(impulseCalculator.calculate(seq.lengthX, seq.lengthY, seq.lengthZ), CtrlSpeedValues::cfgF_MMSec) == false )
+  tsMoveLast  = tsMoveStart;
+
+  const int32_t ic = impulseCalculator.calculate(seq.lengthX, seq.lengthY, seq.lengthZ);
+  if ( ic < 0 )
+    return RET_ERROR;
+   
+  if ( CtrlSpeedValues::cfgF_MMSec && initMove(ic, CtrlSpeedValues::cfgF_MMSec) == false )
     return RET_ERROR;
  
   return RET_OK;
@@ -921,9 +957,14 @@ byte CncArduinoController::movePosition(int32_t dx, int32_t dy, int32_t dz) {
   if ( dx == 0 && dy == 0 && dz == 0 ) 
     return RET_OK;
 
+  const int32_t ic = impulseCalculator.calculate(dx, dy, dz);
+  if ( ic < 0 )
+    return RET_ERROR;
+
   tsMoveStart = AE::micros();
+  tsMoveLast  = tsMoveStart;
   
-  if ( CtrlSpeedValues::cfgF_MMSec && initMove(impulseCalculator.calculate(dx, dy, dz), CtrlSpeedValues::cfgF_MMSec) == false )
+  if ( CtrlSpeedValues::cfgF_MMSec && initMove(ic, CtrlSpeedValues::cfgF_MMSec) == false )
     return RET_ERROR;
   
   return renderMove(dx, dy, dz);

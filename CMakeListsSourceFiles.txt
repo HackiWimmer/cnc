@@ -161,7 +161,7 @@ set(SOURCE_FILES
 	CncControlerGui/ArduinoEnvWrapper.cpp
 	CncControlerGui/CncArduinoPinsListCtrl.cpp
 	
-	CncControlerGui/CCncFloatingPointValidator.cpp
+	CncControlerGui/CncFloatingPointValidator.cpp
 	
 	CncControlerGui/wxCrafterContextObserver.cpp
 	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp

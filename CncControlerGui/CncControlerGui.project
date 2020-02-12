@@ -288,7 +288,6 @@
       <File Name="CncUsbConnectionDetected.cpp"/>
       <File Name="CncGamepadControllerState.h"/>
       <File Name="CncGamepadControllerState.cpp"/>
-      <File Name="CncSpeedController.h"/>
       <File Name="CncReferencePosition.h"/>
       <File Name="CncReferencePosition.cpp"/>
       <File Name="CncConnectProgress.h"/>

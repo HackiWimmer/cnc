@@ -26,9 +26,9 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 	     || name == CncConfig_DEF_RAPID_SPEED_PERCENT
 	     || name == CncConfig_DEF_WORK_SPEED_PERCENT
 
-	     || name == CncConfig_PULS_WIDTH_HIGH_X
-	     || name == CncConfig_PULS_WIDTH_HIGH_Y
-	     || name == CncConfig_PULS_WIDTH_HIGH_Z 
+	     || name == CncConfig_PULSE_WIDTH_HIGH_X
+	     || name == CncConfig_PULSE_WIDTH_HIGH_Y
+	     || name == CncConfig_PULSE_WIDTH_HIGH_Z 
 	   ) 
 	{
 		THE_CONFIG->calculateSpeedValues();
@@ -302,30 +302,30 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(0, 1000);
-			prop = axis->AppendChild( new wxIntProperty("High Puls Width X Axis [us]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("High Pulse Width X Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_HIGH_X, prop);
+			registerProperty(CncConfig_PULSE_WIDTH_HIGH_X, prop);
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(0, 1000);
-			prop = axis->AppendChild( new wxIntProperty("High Puls Width Y Axis [us]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("High Pulse Width Y Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_HIGH_Y, prop);
+			registerProperty(CncConfig_PULSE_WIDTH_HIGH_Y, prop);
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(0, 1000);
-			prop = axis->AppendChild( new wxIntProperty("High Puls Width Z Axis [us]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("High Pulse Width Z Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_HIGH_Z, prop);
+			registerProperty(CncConfig_PULSE_WIDTH_HIGH_Z, prop);
 			
 		}
 	}

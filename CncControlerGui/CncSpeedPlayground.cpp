@@ -6,10 +6,11 @@
 #include <wx/textctrl.h>
 #include <wx/slider.h>
 
+#include "StdStreamRedirector.h"
 #include "GlobalFunctions.h"
 #include "CncConfig.h"
 #include "CncLoggerProxy.h"
-#include "StdStreamRedirector.h"
+#include "CncFloatingPointValidator.h"
 #include "CncSpeedPlayground.h"
 
 #define SLIDER_FACT  10
@@ -76,7 +77,7 @@ CncSpeedPlayground::CncSpeedPlayground(wxWindow* parent)
 	// init controls
 	double f = 725, x = 6.0, y = 3.0, z = 1.0; 
 	
-	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	CncFloatingPointValidator val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	
 	val.SetPrecision(1);
 	val.       SetRange(minF, maxF); m_valF->SetValidator(val);	m_valF->SetValue(wxString::Format("%4.1lf", f ));
@@ -113,12 +114,12 @@ CncSpeedPlayground::CncSpeedPlayground(wxWindow* parent)
 	val.SetPrecision(1); val.SetRange( 0, +1000); m_valAC->SetValidator(val);
 	val.SetPrecision(1); val.SetRange( 0, +1000); m_valDC->SetValidator(val);
 	
-	m_valAA->ChangeValue("0.009");
-	m_valDA->ChangeValue("0.009");
-	m_valAB->ChangeValue("0.09");
-	m_valDB->ChangeValue("0.09");
+	m_valAA->ChangeValue("0.000");
+	m_valDA->ChangeValue("0.000");
+	m_valAB->ChangeValue("0.05");
+	m_valDB->ChangeValue("0.05");
 	m_valAC->ChangeValue("333.0");
-	m_valDC->ChangeValue("444.0");
+	m_valDC->ChangeValue("333.0");
 }
 ////////////////////////////////////////////////////////////////////
 CncSpeedPlayground::~CncSpeedPlayground() {
@@ -147,19 +148,16 @@ void CncSpeedPlayground::onActivate(wxActivateEvent& event) {
 ////////////////////////////////////////////////////////////////////
 void CncSpeedPlayground::onValKeyDown(wxKeyEvent& event) {
 ////////////////////////////////////////////////////////////////////
-//	event.Skip();
-//	return;
-	
 	wxTextCtrl* c = static_cast<wxTextCtrl*>(event.GetEventObject());
 	if ( c == NULL )
 		return;
 		
-	wxFloatingPointValidator<float>* v = static_cast<wxFloatingPointValidator<float>*>(c->GetValidator());
+	CncFloatingPointValidator* v = static_cast<CncFloatingPointValidator*>(c->GetValidator());
 	if ( v == NULL )
 		return;
 
-	const float minVal = v->GetMin();
-	const float maxVal = v->GetMax();
+	const float minVal = v->getMin();
+	const float maxVal = v->getMax();
 
 	bool inFocus	= false;
 	double toAdd 	= 0.1;

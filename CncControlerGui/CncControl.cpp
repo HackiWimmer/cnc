@@ -327,11 +327,11 @@ bool CncControl::setup(bool doReset) {
 	
 	#warning use config values
 	accelList.push_back(FLT_FACT * 0.0);
-	accelList.push_back(FLT_FACT * 0.5);
+	accelList.push_back(FLT_FACT * 0.05);
 	accelList.push_back(FLT_FACT * 333.0/60);
 	accelList.push_back(FLT_FACT * 0.0);
-	accelList.push_back(FLT_FACT * 0.5);
-	accelList.push_back(FLT_FACT * 444.0/60);
+	accelList.push_back(FLT_FACT * 0.05);
+	accelList.push_back(FLT_FACT * 333.0/60);
 	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, THE_CONFIG->getReplyThresholdSteps()));
