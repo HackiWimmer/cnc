@@ -63,7 +63,7 @@ int CncStartPositionResolver::resolve() {
 			else					 { ret = false; }
 			
 			if ( ret == false ) {
-				std::cerr << "CncStartPositionResolver::onOk(): Error while resolve '" << token << "'" << std::endl;
+				std::cerr << "CncStartPositionResolver::resolve(): Error while resolve '" << token << "'" << std::endl;
 				return wxID_ABORT;
 			}
 		}

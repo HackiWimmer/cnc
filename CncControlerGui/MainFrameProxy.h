@@ -64,7 +64,8 @@ class MainFrameProxy {
 		static void openFileFromFileManager(const wxString& fn);
 		static void selectMainBookSourcePanel(int sourcePageToSelect);
 		static void decorateProbeMode(bool probeMode);
-		static int showReferencePositionDlg(wxString msg);
+		static void decorateSpeedControl(bool probeMode);
+		static int  showReferencePositionDlg(wxString msg);
 		static void newTemplate();
 		static void openTemplate();
 		static bool filePreviewListLeave();

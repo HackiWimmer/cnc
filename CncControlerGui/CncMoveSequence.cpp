@@ -273,15 +273,14 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 		flushInt32(0);
 
 		// HEADER - PATH LENGTHES
+		flushInt32(data.impulseCount);
 		flushInt32(data.lengthX);
 		flushInt32(data.lengthY);
 		flushInt32(data.lengthZ);
 		
-		#warning do something with speedInfo --> nothing
-		
-		#warning
-		if ( true ) {
-			std::cout 	<< "data.length X,Y,Z: " 
+		if ( false ) {
+			std::cout 	<< "data.length I,X,Y,Z: " 
+						<< data.impulseCount << ", "
 						<< data.lengthX << ", " << data.lengthY << ", " << data.lengthZ
 						<< std::endl;
 		}
@@ -378,8 +377,7 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	moveSequenceFlushedSize = byteCount;
 
 	// debug
-	#warning
-	if ( true ) {
+	if ( false ) {
 		std::cout << "byteOffset              : " << byteOffset					<< std::endl;
 		std::cout << "byteCount               : " << byteCount					<< std::endl;
 		std::cout << "flushedCount            : " << flushed					<< std::endl;

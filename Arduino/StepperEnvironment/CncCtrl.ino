@@ -195,8 +195,8 @@ void CncArduinoController::reset() {
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::turnOff() {
 /////////////////////////////////////////////////////////////////////////////////////
-  switchToolState(TOOL_STATE_OFF, FORCE);
-  switchStepperState(ENABLE_STATE_OFF);
+  switchToolState (TOOL_STATE_OFF, FORCE);
+  enableStepperPin(false);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncArduinoController::isReadyToRun() {
@@ -231,8 +231,8 @@ bool CncArduinoController::isReadyToRun() {
 void CncArduinoController::broadcastInterrupt() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
-  switchToolState     (TOOL_STATE_OFF, FORCE);
-  switchStepperState  (ENABLE_STATE_OFF);
+  switchToolState (TOOL_STATE_OFF, FORCE);
+  enableStepperPin(false);
 
   // Show Interrupt LED
   ArduinoMainLoop::switchOutputPinState(PIN_INTERRUPT_LED, ON);
@@ -354,15 +354,10 @@ void CncArduinoController::setupAccelProfile(const ArduinoCmdDecoderSetter::Resu
   setupAccelManager(fA, fD);  
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void CncArduinoController::switchStepperState(bool state) {
-/////////////////////////////////////////////////////////////////////////////////////
-  AE::digitalWrite(PIN_STEPPER_ENABLE,  state);
-}
-/////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::switchToolState(bool state, bool force) {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( force == false ) {
-    if ( isProbeMode() == true ) {
+    if ( isProbeMode() == ON ) {
       AE::digitalWrite(PIN_TOOL_ENABLE, TOOL_STATE_OFF);
       return;
     }
@@ -377,8 +372,8 @@ void CncArduinoController::switchToolState(bool state, bool force) {
 //////////////////////////////////////////////////////////////////////////////
 bool CncArduinoController::enableStepperPin(bool state){
 //////////////////////////////////////////////////////////////////////////////
-  if ( probeMode == false )   AE::digitalWrite(PIN_STEPPER_ENABLE, state == true ? ENABLE_STATE_ON : ENABLE_STATE_OFF);
-  else                        AE::digitalWrite(PIN_STEPPER_ENABLE, ENABLE_STATE_OFF);
+  if ( isProbeMode() == OFF )   AE::digitalWrite(PIN_STEPPER_ENABLE, state == true ? ENABLE_STATE_ON : ENABLE_STATE_OFF);
+  else                          AE::digitalWrite(PIN_STEPPER_ENABLE, ENABLE_STATE_OFF);
 
   AE::delayMicroseconds(10);
   return state;
@@ -434,7 +429,7 @@ bool CncArduinoController::observeEnablePin() {
   if ( isProbeMode() == OFF ) {
     
     if ( AE::digitalRead(PIN_STEPPER_ENABLE) == ENABLE_STATE_OFF ) {
-       ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_ENALED); 
+       ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_ENABLED); 
        return false;
     }
   }
@@ -689,6 +684,7 @@ void CncArduinoController::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
     CtrlSpeedValues::cmsF_MMSec = ( 1000.0 * 1000.0 / (AE::micros() - tsMoveLast) ) * curDistV_MM;
     tsMoveLast = AE::micros();
 
+  #warning
     if ( false ) {
       // determine the total distance for each axis, 
       // due to the later pow() abs isn't necessary here 
@@ -865,7 +861,7 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     ARDO_DEBUG_VALUE(" Values", wxString::Format("{%s}", values));
   }
 #endif
-  
+
   typedef ArduinoMainLoop AML;
   //---------------------------------------------------------------------------------
   switch ( st.pid ) {
@@ -879,19 +875,19 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
 
     case PID_RESERT_STEP_COUNTER:     CtrlStatistics::resetStepCounter(IDX_X); CtrlStatistics::resetStepCounter(IDX_Y); CtrlStatistics::resetStepCounter(IDX_Z); break;
   
-    case PID_INC_DIRECTION_VALUE_X:   X->setIncrementDirectionValue(st.values[0].l); break;
-    case PID_INC_DIRECTION_VALUE_Y:   Y->setIncrementDirectionValue(st.values[0].l); break;
-    case PID_INC_DIRECTION_VALUE_Z:   Z->setIncrementDirectionValue(st.values[0].l); break;
+    case PID_INC_DIRECTION_VALUE_X:   X->setIncrementDirectionValue(st.values[0].l);  break;
+    case PID_INC_DIRECTION_VALUE_Y:   Y->setIncrementDirectionValue(st.values[0].l);  break;
+    case PID_INC_DIRECTION_VALUE_Z:   Z->setIncrementDirectionValue(st.values[0].l);  break;
     
-    case PID_POS_REPLY_THRESHOLD:     setPosReplyThreshold(st.values[0].l); break;
+    case PID_POS_REPLY_THRESHOLD:     setPosReplyThreshold(st.values[0].l);           break;
     
-    case PID_SPEED_MM_MIN:            setSpeedValue_MMMin(st.values[0].asFloat()); break;
+    case PID_SPEED_MM_MIN:            setSpeedValue_MMMin(st.values[0].asFloat());    break;
 
-    case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].l != 0); break;
-    case PID_RESERT_POS_COUNTER:      CtrlStatistics::resetPositionCounter(); break;
+    case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].asBool());        break;
+    case PID_RESERT_POS_COUNTER:      CtrlStatistics::resetPositionCounter();         break;
 
-    case PID_PROBE_MODE:              setProbeMode(st.values[0].l != 0); break;
-    case PID_TOOL_SWITCH:             switchToolState(st.values[0].l == 0 ? TOOL_STATE_OFF: TOOL_STATE_ON); break;
+    case PID_PROBE_MODE:              setProbeMode(st.values[0].asBool());            break;
+    case PID_TOOL_SWITCH:             switchToolState(st.values[0].asBool());         break;
     
     case PID_ACCEL_PROFILE:           setupAccelProfile(st); 
                                       break;
@@ -922,7 +918,7 @@ byte CncArduinoController::initialize(const ArduinoCmdDecoderMoveSequence::Resul
   tsMoveStart = AE::micros();
   tsMoveLast  = tsMoveStart;
 
-  const int32_t ic = impulseCalculator.calculate(seq.lengthX, seq.lengthY, seq.lengthZ);
+  const int32_t ic = seq.impulseCount;// impulseCalculator.calculate(seq.lengthX, seq.lengthY, seq.lengthZ);
   if ( ic < 0 )
     return RET_ERROR;
    

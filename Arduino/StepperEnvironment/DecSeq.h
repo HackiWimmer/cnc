@@ -21,11 +21,12 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
       byte ret                     = RET_OK;
       byte portionSize             = 0;
       byte portionCounter          = 0;
-  
+
       int32_t totalLength          = 0; 
       int32_t totalIndex           = 0;
       int32_t totalRemaining       = 0;
 
+      int32_t impulseCount         = 0; 
       int32_t lengthX              = 0; 
       int32_t lengthY              = 0; 
       int32_t lengthZ              = 0; 
@@ -220,10 +221,11 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
       result.cmd = cmd;
 
       // first read header values
-      if ( AML::readInt32(result.totalLength) == false )  return logError(10, E_INVALID_MOVE_SEQUENCE);
-      if ( AML::readInt32(result.lengthX)     == false )  return logError(11, E_INVALID_MOVE_SEQUENCE);
-      if ( AML::readInt32(result.lengthY)     == false )  return logError(12, E_INVALID_MOVE_SEQUENCE);
-      if ( AML::readInt32(result.lengthZ)     == false )  return logError(13, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.totalLength)  == false )  return logError(10, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.impulseCount) == false )  return logError(11, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.lengthX)      == false )  return logError(11, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.lengthY)      == false )  return logError(12, E_INVALID_MOVE_SEQUENCE);
+      if ( AML::readInt32(result.lengthZ)      == false )  return logError(13, E_INVALID_MOVE_SEQUENCE);
 
       if ( initialize(result) != RET_OK )
         logError(14, E_INVALID_MOVE_SEQUENCE);

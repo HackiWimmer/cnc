@@ -2,6 +2,7 @@
 #define CNCCONTROLERGUI_CNC_MOVE_SEQUENCE_H
 
 #include <vector>
+#include "../Arduino/StepperEnvironment/CncRndr.h"
 #include "OSD/CncTimeFunctions.h"
 #include "CncCommon.h"
 
@@ -86,13 +87,15 @@ class CncMoveSequence {
 
 		// -------------------------------------------------------------------------------
 		struct SequenceData {
-			int32_t lengthX	= 0;
-			int32_t lengthY	= 0;
-			int32_t lengthZ	= 0;
+			int32_t impulseCount 	= 0;
 
-			int32_t targetX	= 0;
-			int32_t targetY	= 0;
-			int32_t targetZ	= 0;
+			int32_t lengthX			= 0;
+			int32_t lengthY			= 0;
+			int32_t lengthZ			= 0;
+
+			int32_t targetX			= 0;
+			int32_t targetY			= 0;
+			int32_t targetZ			= 0;
 
 			void reset() {
 				lengthX	= lengthY = lengthZ	= 0;
@@ -100,13 +103,21 @@ class CncMoveSequence {
 			}
 
 			void add(int32_t dx, int32_t dy, int32_t dz) {
+				const int32_t DX = ArdoObj::absolute(dx);
+				const int32_t DY = ArdoObj::absolute(dy);
+				const int32_t DZ = ArdoObj::absolute(dz);
+				const int32_t ic = ArduinoImpulseCalculator().calculate(DX, DY, DZ);
+				
+				if ( ic < 0 ) 	std::cerr << "Error while: SequenceData::add(): Invalid impulse count!" << std::endl;
+				else			impulseCount += ic;
+				
 				targetX += dx;
-				targetY += dy;
-				targetZ += dz;
-
-				lengthX	+= ArdoObj::absolute(dx);
-				lengthY	+= ArdoObj::absolute(dy);
-				lengthZ	+= ArdoObj::absolute(dz);
+				targetY	+= dy;
+				targetZ	+= dz;
+				
+				lengthX	+= DX;
+				lengthY	+= DY;
+				lengthZ	+= DZ;
 			}
 		};
 

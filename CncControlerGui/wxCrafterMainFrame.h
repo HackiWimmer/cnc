@@ -686,6 +686,7 @@ protected:
     wxSplitterWindow* m_secureSplitterMainV;
     wxPanel* m_splitterPageLeft;
     wxPanel* m_fileViewsPlaceholder;
+    wxPanel* m_lcdPositionPlaceholder;
     wxPanel* m_splitterPageRight;
     wxSplitterWindow* m_secureSplitterMainH;
     wxPanel* m_splitterPageMonitor;
@@ -783,6 +784,8 @@ protected:
     wxMenuItem* m_miPyCam;
     wxMenuItem* m_menuItem7460;
     wxMenuItem* m_miGameportController;
+    wxMenuItem* m_menuItem74601;
+    wxMenuItem* m_miSpeedPlayground;
     wxMenu* m_menuTest;
     wxMenuItem* m_miUnitTestFramework;
     wxMenuItem* m_menuItem3361;
@@ -1046,6 +1049,7 @@ protected:
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void openPyCam(wxCommandEvent& event) { event.Skip(); }
     virtual void openGameportController(wxCommandEvent& event) { event.Skip(); }
+    virtual void openSpeedPlayground(wxCommandEvent& event) { event.Skip(); }
     virtual void unitTestFramework(wxCommandEvent& event) { event.Skip(); }
     virtual void loopRepeatTest(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction1(wxCommandEvent& event) { event.Skip(); }
@@ -1670,6 +1674,7 @@ public:
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
     wxPanel* GetSecToolbar() { return m_secToolbar; }
     wxPanel* GetFileViewsPlaceholder() { return m_fileViewsPlaceholder; }
+    wxPanel* GetLcdPositionPlaceholder() { return m_lcdPositionPlaceholder; }
     wxPanel* GetSplitterPageLeft() { return m_splitterPageLeft; }
     wxPanel* GetSecMonitorPlaceholder() { return m_secMonitorPlaceholder; }
     wxPanel* GetSecZViewPlaceholder() { return m_secZViewPlaceholder; }

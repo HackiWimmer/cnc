@@ -64,6 +64,7 @@ class CncOpenGLContextObserver;
 class CncOSEnvironmentDialog;
 class CncExternalViewBox;
 class CncArduinoEnvironment;
+class CncLCDPositionPanel;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -134,7 +135,10 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void openSpeedPlayground(wxCommandEvent& event);
+		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
+		virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event);
+		virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
+		virtual void openSpeedPlayground(wxCommandEvent& event);
 		
 		virtual void onChangePreviewMode(wxCommandEvent& event);
 		virtual void connectSec(wxCommandEvent& event);
@@ -642,6 +646,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncOSEnvironmentDialog* 		cncOsEnvDialog;
 		CncExternalViewBox* 			cncExtMainPreview;
 		CncArduinoEnvironment*			cncArduinoEnvironment;
+		CncLCDPositionPanel*			cncLCDPositionPanel;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;
@@ -739,7 +744,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void decorateSearchButton();
 		void decorateOutboundSaveControls(bool state);
 		void decoratePosSpyConnectButton(bool state);
-		void decorateSpeedControlBtn(bool useSpeedCfg);
+		void decorateSpeedControl(bool useSpeedCfg);
 		
 		void registerGuiControls();
 		bool initializeCncControl();

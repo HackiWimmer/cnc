@@ -51,7 +51,6 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     void                disableProbeMode()                                  { setProbeMode(false); }
 
     void                switchToolState(bool state, bool force = false);
-    void                switchStepperState(bool state);
 
     void                setupAccelProfile(const ArduinoCmdDecoderSetter::Result& st);
     

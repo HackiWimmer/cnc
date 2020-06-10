@@ -270,7 +270,7 @@
   const unsigned char E_INVALID_MOVE_SEQUENCE             =   9;
   const unsigned char E_INVALID_PARAM_SIZE                =  10;
 
-  const unsigned char E_STEPPER_NOT_ENALED                =  20;
+  const unsigned char E_STEPPER_NOT_ENABLED               =  20;
   const unsigned char E_STEPPER_NOT_INITIALIZED           =  21;
   const unsigned char E_TOOL_NOT_ENALED                   =  22;
   

@@ -238,13 +238,14 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 			return returnAndNotify(false);
 		}
 
-		// read total length
-		sequence.Out.totSeqSize = readInt32();
-
+		// read total length and impulse count
+		sequence.Out.totSeqSize   = readInt32();
+		sequence.Out.impulseCount = readInt32();
+		
 		// read total path length
-		sequence.Out.totLengthX = readInt32();
-		sequence.Out.totLengthY = readInt32();
-		sequence.Out.totLengthZ = readInt32();
+		sequence.Out.totLengthX   = readInt32();
+		sequence.Out.totLengthY   = readInt32();
+		sequence.Out.totLengthZ   = readInt32();
 
 		if ( false ) {
 			std::cout << "totSeqSize: " << sequence.Out.totSeqSize << std::endl;

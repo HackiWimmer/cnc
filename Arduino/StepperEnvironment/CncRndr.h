@@ -65,11 +65,11 @@ class ArduinoPositionRenderer {
     byte                    renderMove(int32_t dx, int32_t dy, int32_t dz);
     
     virtual byte            checkRuntimeEnv()                                 = 0;
-    virtual void            notifyMovePart(int8_t dx, int8_t dy, int8_t dz)   = 0;
     virtual byte            setDirection(AxisId aid, int32_t steps)           = 0;
     virtual byte            performStep (AxisId aid)                          = 0;
     virtual byte            initiateStep(AxisId aid)                          = 0;
     virtual byte            finalizeStep(AxisId aid)                          = 0;
+    virtual void            notifyMovePart(int8_t dx, int8_t dy, int8_t dz)   = 0;
 };
 
 class ArduinoImpulseCalculator : public ArduinoPositionRenderer {

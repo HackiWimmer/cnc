@@ -148,9 +148,12 @@
 	void APP_PROXY::openTemplate()
 	{ wxCommandEvent dummy; THE_APP->openTemplate(dummy); }
 
-	void APP_PROXY::decorateProbeMode(bool probeMode)
-	{ THE_APP->decorateProbeMode(probeMode); }
+	void APP_PROXY::decorateProbeMode(bool state)
+	{ THE_APP->decorateProbeMode(state); }
 
+	void APP_PROXY::decorateSpeedControl(bool state)
+	{ THE_APP->decorateSpeedControl(state); }
+	
 	wxFileConfig* APP_PROXY::getLruStore()
 	{ return THE_APP->lruStore; }
 	

@@ -26,13 +26,14 @@ struct CncCommandDecoder {
 		} In;
 		
 		struct OUT {
-			unsigned char cmd	= 0;
-			int32_t totSeqSize	= 0;
-			int32_t remainSize	= 0;
+			unsigned char cmd		= 0;
+			int32_t totSeqSize		= 0;
+			int32_t remainSize		= 0;
 			
-			int32_t	totLengthX	= 0;
-			int32_t	totLengthY	= 0;
-			int32_t	totLengthZ	= 0;
+			int32_t	impulseCount	= 0;
+			int32_t	totLengthX		= 0;
+			int32_t	totLengthY		= 0;
+			int32_t	totLengthZ		= 0;
 			
 			void reset() {
 				cmd			=  0;

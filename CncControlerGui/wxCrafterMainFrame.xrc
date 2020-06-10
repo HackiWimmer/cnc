@@ -10016,7 +10016,7 @@ State</label>
                   <style>wxTAB_TRAVERSAL</style>
                   <object class="wxFlexGridSizer">
                     <cols>1</cols>
-                    <rows>1</rows>
+                    <rows>2</rows>
                     <vgap>0</vgap>
                     <hgap>0</hgap>
                     <growablecols>0</growablecols>
@@ -10025,6 +10025,14 @@ State</label>
                       <flag>wxALL|wxEXPAND</flag>
                       <border>1</border>
                       <object class="wxPanel" name="m_fileViewsPlaceholder">
+                        <style>wxTAB_TRAVERSAL</style>
+                        <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>1</border>
+                      <object class="wxPanel" name="m_lcdPositionPlaceholder">
                         <style>wxTAB_TRAVERSAL</style>
                         <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
                       </object>
@@ -10731,6 +10739,14 @@ State</label>
         <object class="wxMenuItem" name="m_miGameportController">
           <label>Gameport Controller</label>
           <bitmap>bitmaps/gamepad-active.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="separator"/>
+        <object class="wxMenuItem" name="m_miSpeedPlayground">
+          <label>Speed Playground</label>
+          <bitmap>bitmaps/car.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>

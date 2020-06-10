@@ -30,6 +30,7 @@
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/webviewOSD.h"
+#include "wxCode/lcdwindow.h"
 #include "GamepadEvent.h"
 #include "SerialThread.h"
 #include "CncExceptions.h"
@@ -79,8 +80,10 @@
 #include "CncLastProcessingTimestampSummary.h"
 #include "CncFileDialog.h"
 #include "CncArduinoEnvironment.h"
+#include "CncLCDPositionPanel.h"
 #include "CncUserEvents.h"
 #include "GlobalStrings.h"
+#include "wxCrafterLCDPanel.h"
 #include "wxCrafterImages.h"
 #include "MainFrame.h"
 
@@ -285,6 +288,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , cncOsEnvDialog(new CncOSEnvironmentDialog(this))
 , cncExtMainPreview(NULL)
 , cncArduinoEnvironment(new CncArduinoEnvironment(this))
+, cncLCDPositionPanel(NULL)
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -799,6 +803,9 @@ void MainFrame::installCustControls() {
 	cfg.initToolTipMapAsCoordSytem();
 	navigatorPanel = new CncNavigatorPanel(this, cfg); 
 	GblFunc::replaceControl(m_navigationPanelPlaceholder, navigatorPanel);
+	
+	cncLCDPositionPanel = new CncLCDPositionPanel(this);
+	GblFunc::replaceControl(m_lcdPositionPlaceholder, cncLCDPositionPanel);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -960,51 +967,47 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	
 	if ( speedMonitor )
 		speedMonitor->activate(true);
 
 	m_btSpeedControl->Enable(true);
-	decorateSpeedControlBtn(true);
+	decorateSpeedControl(true);
 	
 	selectMonitorBookCncPanel();
+	//cnc->enableProbeMode(probeMode);
 	cnc->changeCurrentFeedSpeedXYZ_MM_MIN(1800);
 	cnc->getSerialExtern()->test();
 }
-
-#warning
-#include "SerialCircularBuffer.h"
-#include "SerialEndPoint.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 	
-	auto runTest = [&](int id) {
-		wxDateTime ts(wxDateTime::UNow());
-		std::clog << wxString::Format("%s.%03d: %s: Start", ts.FormatISOTime(), ts.GetMillisecond(),  __PRETTY_FUNCTION__) << std::endl;
-			SerialCircularBuffer::test(id);
-		std::clog << wxString::Format("%s.%03d: %s: End  ", ts.FormatISOTime(), ts.GetMillisecond(),  __PRETTY_FUNCTION__) << std::endl;
-	};
+	static const char* xxxx[] = {"F", "Z"};
+	std::cout << xxxx[0][0] << std::endl;
+	std::cout << xxxx[1][0] << std::endl;
 	
-	//runTest(1);
-	runTest(2);
+	std::cout << (int)xxxx[0][0] << std::endl;
+	std::cout << (int)xxxx[1][0] << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	
-	std::cout << wxString('*', 800)  << std::endl;
-	std::cout << "Ready"  << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
 	
-	if ( speedMonitor )
-		speedMonitor->activate(true);
+	static wxLCDWindow* mClock = new wxLCDWindow( this, wxPoint( 50, 50 ), wxSize( 200, 100 ) );
+	mClock->SetNumberDigits( 8 );
+	
+	mClock->Show();
+	
+	wxString now = ::wxNow();
+	mClock->SetValue( now.Mid( 11, 8 ) );
+	mClock->SetValue( "123.45" );
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
@@ -2022,7 +2025,7 @@ void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
 	createAnimationControl();
 	decorateSearchButton();
-	decorateSpeedControlBtn(true);
+	decorateSpeedControl(true);
 	switchMonitorButton(true);
 	determineRunMode();
 	decoratePosSpyConnectButton(false);
@@ -2086,9 +2089,9 @@ void MainFrame::initialize(void) {
 	THE_CONFIG->setupSelectorRenderResolution();
 	
 	
-	#warning
-	wxCommandEvent event;
-	openSpeedPlayground(event);
+	//#warning
+	//wxCommandEvent event;
+	//openSpeedPlayground(event);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeCncControl() {
@@ -2529,18 +2532,14 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	// config setup
 	serialFileName.assign(setup.serialFileName);
 	THE_CONTEXT->setProbeMode(setup.probeMode);
+	THE_CONTEXT->setSpeedCtrlMode(setup.speedControl);
+	
 	decorateSecureDlgChoice(setup.secureDlg);
-	decorateSpeedControlBtn(setup.speedControl);
 	
 	if ( cncPreprocessor != NULL ) {
 		cncPreprocessor->enablePathListEntries(setup.pathListEntries);
 		cncPreprocessor->enableMoveSequences(setup.moveSequences);
 	}
-	
-	// add on
-	const bool probeMode = THE_CONTEXT->isProbeMode();
-	if ( speedMonitor )
-		speedMonitor->activate(!probeMode);
 	
 	return serialFileName;
 }
@@ -4151,10 +4150,16 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		// as a result the processing slows down significantly.
 		CncConfig::NotificationDeactivator cfgNotDeactivation;
 		
+		THE_CONTEXT->setAllowEventHandling(true);
+		cnc->resetSetterMap();
+		cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
+		cnc->enableProbeMode(THE_CONTEXT->isProbeMode());
+		cnc->enableStepperMotors(true);
+
 		wxString fn (getCurrentTemplatePathFileName());
 		if ( fn.IsEmpty() == true )
 			return false;
-
+		
 		// do this before the clearing opertions below, 
 		// because then the ref pos correction will be also removed
 		// as well as the previous drawing
@@ -4263,10 +4268,13 @@ bool MainFrame::processTemplateIntern() {
 	resetMinMaxPositions();
 	updateCncConfigTrace();
 	
+	/*
 	THE_CONTEXT->setAllowEventHandling(true);
 	cnc->resetSetterMap();
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
+	cnc->enableProbeMode(THE_CONTEXT->isProbeMode());
 	cnc->enableStepperMotors(true);
+	*/
 	
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
@@ -7263,29 +7271,36 @@ void MainFrame::displayIntervalKeyDown(wxKeyEvent& event) {
 	THE_CONTEXT->setUpdateInterval(m_displayInterval->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::clickProbeMode(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	// this forces decorateProbeMode(...) also
+	THE_CONTEXT->setProbeMode(m_btProbeMode->GetValue());
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::decorateProbeMode(bool probeMode) {
 /////////////////////////////////////////////////////////////////////
 	if ( probeMode == true ) {
+		const wxString tt("Probe mode is ON\nThis disables the stepper motors and the speed controller");
 		m_btProbeMode->SetBitmap(ImageLibProbe().Bitmap("BMP_PROBE"));
-		m_btProbeMode->SetToolTip("Probe mode on");
+		m_btProbeMode->SetToolTip(tt);
 		
 		m_probeModeState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_YELLOW"));
-		m_probeModeState->SetToolTip("Probe mode is ON");
+		m_probeModeState->SetToolTip(tt);
 		m_probeModeStateLabel->SetLabel(" ON");
 		
 	} else {
+		const wxString tt("Probe mode is OFF\nThis enables the stepper motors and the speed controller");
 		m_btProbeMode->SetBitmap(ImageLibProbe().Bitmap("BMP_RELEASE"));
-		m_btProbeMode->SetToolTip("Probe mode off");
+		m_btProbeMode->SetToolTip(tt);
 		
 		m_probeModeState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_DEFAULT"));
-		m_probeModeState->SetToolTip("Probe mode is OFF");
+		m_probeModeState->SetToolTip(tt);
 		m_probeModeStateLabel->SetLabel("OFF");
 		
 	}
 	
 	m_btProbeMode->SetValue(probeMode);
 	m_btProbeMode->Refresh();
-	m_btProbeMode->Update();
 	
 	if ( motionMonitor != NULL ) {
 		motionMonitor->decorateProbeMode(THE_CONTEXT->isProbeMode());
@@ -7293,46 +7308,45 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::clickProbeMode(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	THE_CONTEXT->setProbeMode(m_btProbeMode->GetValue());
-	
-	// update depending controls
-	const bool probeMode = THE_CONTEXT->isProbeMode();
-	
-	cnc->enableProbeMode(probeMode);
-
-	//m_btSpeedControl->Enable(probeMode);
-	//decorateSpeedControlBtn(true);
-
-//	if ( speedMonitor )
-//		speedMonitor->activate(!probeMode);
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::clickSpeedControl(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	decorateSpeedControlBtn(m_btSpeedControl->GetValue());
+	// this forces decorateSpeedControl(...) also
+	THE_CONTEXT->setSpeedCtrlMode(m_btSpeedControl->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::decorateSpeedControlBtn(bool useSpeedCfg) {
+void MainFrame::decorateSpeedControl(bool useSpeedCfg) {
 /////////////////////////////////////////////////////////////////////
 	if ( useSpeedCfg == true )	{
+		const wxString tt("Speed Controller is ON\nThis forces the controller to work with the configured speed");
 		m_btSpeedControl->SetBitmap((ImageLibSpeed().Bitmap("BMP_SPEED_CTRL_ON")));
-		m_btSpeedControl->SetToolTip("Speed Contoller is active");
+		m_btSpeedControl->SetToolTip(tt);
 		
 		m_speedCtrlState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_YELLOW"));
-		m_speedCtrlState->SetToolTip("Speed Controller is ON");
+		m_speedCtrlState->SetToolTip(tt);
 		m_speedCtrlStateLabel->SetLabel(" ON");
 		
+		m_btProbeMode->SetValue(true);
+		THE_CONTEXT->setProbeMode(m_btProbeMode->GetValue());
+		m_btProbeMode->Enable(true);
+		
 	} else {
+		const wxString tt("Speed Controller is OFF\nThis forces the controller to work as fast as possible\nTherefore ProbeMode=ON is mandatory");
 		m_btSpeedControl->SetBitmap((ImageLibSpeed().Bitmap("BMP_SPEED_CTRL_OFF")));
-		m_btSpeedControl->SetToolTip("Speed Contoller is inactive");
+		m_btSpeedControl->SetToolTip(tt);
 		
 		m_speedCtrlState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_DEFAULT"));
-		m_speedCtrlState->SetToolTip("Speed Controller is OFF");
+		m_speedCtrlState->SetToolTip(tt);
 		m_speedCtrlStateLabel->SetLabel(" OFF");
+		
+		m_btProbeMode->SetValue(false);
+		THE_CONTEXT->setProbeMode(m_btProbeMode->GetValue());
+		m_btProbeMode->Enable(false);
+		
 	}
 	
+	if ( speedMonitor )
+		speedMonitor->activate(m_btSpeedControl->GetValue());
+
 	m_btSpeedControl->SetValue(useSpeedCfg);
 	m_btSpeedControl->Refresh();
 	
@@ -8157,4 +8171,13 @@ void MainFrame::openSpeedPlayground(wxCommandEvent& event) {
 		csp = new CncSpeedPlayground(this);
 		
 	csp->Show(csp->IsShownOnScreen() == false);
+}
+void MainFrame::changeSpeedConfigSlider(wxScrollEvent& event)
+{
+}
+void MainFrame::updatedSpeedConfigAccelAxis(wxCommandEvent& event)
+{
+}
+void MainFrame::updatedSpeedConfigSteps(wxCommandEvent& event)
+{
 }
