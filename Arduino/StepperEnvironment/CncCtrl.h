@@ -43,7 +43,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 
     uint32_t            tsMoveStart;
     uint32_t            tsMoveLast;
- 
+
     CncArduinoController(const CncArduinoController&);
 
     void                setProbeMode(bool state = true)                     { probeMode = state; }
@@ -64,6 +64,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 
     bool                enableStepperPin(bool state = true);
     bool                disableStepperPin()                        { return enableStepperPin(false); }
+    bool                enableStepperPinState();
 
     bool                isAnyLimitActive();
     bool                evaluateLimitStates(int8_t& xLimit, int8_t& yLimit, int8_t& zLimit);
@@ -106,8 +107,6 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     bool                sendCurrentLimitStates(bool force);
 
     inline bool         observeSerialFrontByte(byte& retValue);
-    inline bool         observeEnablePin();
-    inline bool         observeToolState();
 
     bool                processSignal(byte sig, byte& retValue);
     void                broadcastInterrupt();
@@ -137,6 +136,10 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     byte                acceptSetter();
     byte                acceptMove(byte cmd);
     byte                acceptMoveSequence(byte cmd);
+
+    // test interface
+    byte                performTest();
+    
 };
 
 #endif

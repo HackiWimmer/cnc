@@ -176,6 +176,9 @@ void ArduinoPIDs::init() {
 	pids[PID_GET_STEP_COUNTER_X]              .setup("Get Step Counter X", "#");
 	pids[PID_GET_STEP_COUNTER_Y]              .setup("Get Step Counter Y", "#");
 	pids[PID_GET_STEP_COUNTER_Z]              .setup("Get Step Counter Z", "#");
+	pids[PID_GET_US_PER_IMPL_MEASUREMENT1]    .setup("Get Measured Duration per Impulse [1 step]", "us");
+	pids[PID_GET_US_PER_IMPL_MEASUREMENT2]    .setup("Get Measured Duration per Impulse [2 step]", "us");
+	pids[PID_GET_US_PER_IMPL_MEASUREMENT3]    .setup("Get Measured Duration per Impulse [3 step]", "us");
 
 	pids[PID_MAX_DIMENSION_X]                 .setup("Max Dimension X", "steps");
 	pids[PID_MAX_DIMENSION_Y]                 .setup("Max Dimension Y", "steps");
@@ -281,6 +284,7 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";
 	
 	errorCodes[E_INTERRUPT]                          = "Interrupt received";
+	errorCodes[E_EXTERNEL_INTERRUPT]                 = "External Interrupt received";
 	errorCodes[E_TOTAL_COUNT]                        = "Total error count";
 	
 	errorCodes[E_PURE_TEXT_VALUE_ERROR]              = "Pure text message";
@@ -343,7 +347,7 @@ void ArduinoDigitalPins::init() {
 	pins[PIN_Z_LIMIT]            = "LIMIT PIN Z";
 	
 	pins[PIN_TOOL_ENABLE]        = "TOOL ENABLE PIN";
-	pins[PIN_TOOL_FEEDBACK]      = "TOOL FEEDBACK PIN";
+	pins[PIN_EXTERNAL_INTERRUPT] = "External Interrupt PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoDigitalPins::getPinLabel(unsigned int id) {

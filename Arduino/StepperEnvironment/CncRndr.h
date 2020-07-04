@@ -58,8 +58,6 @@ class ArduinoPositionRenderer {
     ArduinoPositionRenderer();
     virtual ~ArduinoPositionRenderer();
 
-    bool                    countOnlyMode;
-
     // controller interface
     byte                    directMove(int8_t dx, int8_t dy, int8_t dz);
     byte                    renderMove(int32_t dx, int32_t dy, int32_t dz);
@@ -72,37 +70,24 @@ class ArduinoPositionRenderer {
     virtual void            notifyMovePart(int8_t dx, int8_t dy, int8_t dz)   = 0;
 };
 
-class ArduinoImpulseCalculator : public ArduinoPositionRenderer {
+class ArduinoImpulseCalculator {
 
   private:
     ArduinoImpulseCalculator(const ArduinoImpulseCalculator&);
 
-  protected:
-
-    virtual byte            checkRuntimeEnv()                        { return RET_OK; }
-    virtual byte            setDirection(AxisId, int32_t )           { return RET_OK; }
-    virtual byte            performStep (AxisId)                     { return RET_OK; }
-    virtual byte            initiateStep(AxisId)                     { return RET_OK; }
-    virtual byte            finalizeStep(AxisId)                     { return RET_OK; }
-    virtual void            notifyMovePart(int8_t, int8_t, int8_t)   {}
-
   public:
     ArduinoImpulseCalculator() 
-    : ArduinoPositionRenderer() 
     {}
     
     virtual ~ArduinoImpulseCalculator()
     {}
 
     int32_t calculate(int32_t dx, int32_t dy, int32_t dz) {
+      const int32_t DX = ArdoObj::absolute<int32_t>(dx);
+      const int32_t DY = ArdoObj::absolute<int32_t>(dy);
+      const int32_t DZ = ArdoObj::absolute<int32_t>(dz);
       
-      countOnlyMode    = true;
-      RS::impulseCount = 0;
-       
-      if ( renderMove(dx, dy, dz) != RET_OK )
-        return -1;
-
-      return RS::impulseCount;          
+      return ArdoObj::maximum(ArdoObj::maximum(DX, DY), DZ);
     }
 };
 

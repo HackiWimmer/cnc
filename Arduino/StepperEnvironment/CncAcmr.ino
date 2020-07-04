@@ -10,6 +10,19 @@
   #define CNC_ACM_LOG_FUNCTION()
 #endif
 
+#define CNC_ACM_DEBUG
+#ifndef CNC_ACM_DEBUG 
+  //////////////////////////////////////////////////////////////
+  void ArduinoAccelManager::debugACM() {}
+  //////////////////////////////////////////////////////////////
+#else
+  //////////////////////////////////////////////////////////////
+  void ArduinoAccelManager::debugACM() {
+  //////////////////////////////////////////////////////////////
+    //PRINT_DEBUG_VALUE("IMPULSE COUNT", iD_IMPL)
+  }
+#endif  
+
 /////////////////////////////////////////////////////////////////////////////////////
 namespace AccelMngParameter {
   
@@ -108,12 +121,25 @@ bool ArduinoAccelManager::initMove(uint32_t mD_IMPL, float mF_MMSec) {
       state       = P_ACCEL;
       cF_MMSec    = mF_MMSec;
     }
+    
+  } else if ( mF_MMSec < fA.C ) {
+    state    = P_CONST;
+    cF_MMSec = mF_MMSec;
+    
   }
 
   if ( true ) {
     ARDO_DEBUG_VALUE("ArduinoAccelManager: Total impulse count", cD_IMPL)
+    ARDO_DEBUG_VALUE("ArduinoAccelManager: cF_MMSec           ", cF_MMSec)
+    ARDO_DEBUG_VALUE("ArduinoAccelManager: mF_MMSec           ", mF_MMSec)
     ARDO_DEBUG_VALUE("ArduinoAccelManager: Accel ramp         ", aRampWidth_IMPL)
     ARDO_DEBUG_VALUE("ArduinoAccelManager: Deaccel ramp       ", dRampWidth_IMPL)
+
+    if ( false ) {
+      PRINT_DEBUG_VALUE("ArduinoAccelManager: Total impulse count", cD_IMPL)
+      PRINT_DEBUG_VALUE("ArduinoAccelManager: cF_MMSec           ", cF_MMSec)
+      PRINT_DEBUG_VALUE("ArduinoAccelManager: mF_MMSec           ", mF_MMSec)
+    }
   }
 
   changeState(state);
@@ -172,8 +198,6 @@ float ArduinoAccelManager::getNextTargetSpeed_MMSec() {
 
       // state machine handling
       if ( iD_IMPL > cD_IMPL ) {
-        #warning
-        ARDO_DEBUG_VALUE("ArduinoAccelManager: Current impulse index", iD_IMPL)  
         changeState(P_UNDEF);
       }
 
@@ -194,7 +218,7 @@ float ArduinoAccelManager::getNextTargetSpeed_MMSec() {
 
   // check bounderies
   ret = ret > cF_MMSec ? cF_MMSec : ret;
-  ret = ret < fA.C     ? fA.C     : ret;
+  ret = ret < 0        ? fA.C     : ret;
 
   return ret;
 }

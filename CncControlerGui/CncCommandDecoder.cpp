@@ -215,6 +215,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	if ( sequence.Out.isBegin() ) {
 		const unsigned int totHeaderLength = sizeof(unsigned char)		// pid
 				                           + 1 * sizeof(int32_t)		// totSeqSize
+										   + 1 * sizeof(int32_t)		// impulseCount
 										   + 3 * sizeof(int32_t);		// totLengthX,Y,Z
 
 		// read header

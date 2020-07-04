@@ -151,9 +151,6 @@
 	void APP_PROXY::decorateProbeMode(bool state)
 	{ THE_APP->decorateProbeMode(state); }
 
-	void APP_PROXY::decorateSpeedControl(bool state)
-	{ THE_APP->decorateSpeedControl(state); }
-	
 	wxFileConfig* APP_PROXY::getLruStore()
 	{ return THE_APP->lruStore; }
 	

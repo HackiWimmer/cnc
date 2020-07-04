@@ -327,10 +327,10 @@ bool CncControl::setup(bool doReset) {
 	
 	#warning use config values
 	accelList.push_back(FLT_FACT * 0.0);
-	accelList.push_back(FLT_FACT * 0.05);
+	accelList.push_back(FLT_FACT * 0.1);
 	accelList.push_back(FLT_FACT * 333.0/60);
 	accelList.push_back(FLT_FACT * 0.0);
-	accelList.push_back(FLT_FACT * 0.05);
+	accelList.push_back(FLT_FACT * 0.1);
 	accelList.push_back(FLT_FACT * 333.0/60);
 	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
@@ -348,6 +348,9 @@ bool CncControl::setup(bool doReset) {
 		std::cerr << " CncControl::setup: Calling processSetterList() failed!\n";
 		return false;
 	}
+	
+	// enable stepper motors, do this here because to initiate a defined state
+	enableStepperMotors(true);
 	
 	// speed setup
 	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
@@ -744,11 +747,9 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 		displaySpeedMode(configuredSpeedMode);
 		
 		if ( getSerial()->knowsSpeedMode() == true ) {
-			if ( THE_APP->GetBtSpeedControl()->GetValue() == true ) {
-				if ( processSetter(PID_SPEED_FEED_MODE, (int32_t)(configuredSpeedMode)) == false ) {
-					std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_FEED_MODE) failed" << std::endl;
-					return false;
-				}
+			if ( processSetter(PID_SPEED_FEED_MODE, (int32_t)(configuredSpeedMode)) == false ) {
+				std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_FEED_MODE) failed" << std::endl;
+				return false;
 			}
 		}
 	}
@@ -756,9 +757,6 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	// avoid the setter below if nothing will change
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false ) {
 		configuredFeedSpeed_MM_MIN = value;
-		
-		if ( THE_APP->GetBtSpeedControl()->GetValue() == false)
-			configuredFeedSpeed_MM_MIN = 0.0;
 		
 		displaySpeedValue(value);
 		
@@ -1509,12 +1507,24 @@ bool CncControl::enableStepperMotors(bool s) {
 	
 	bool ret = processSetter(PID_ENABLE_STEPPERS, (int32_t)s);
 	if ( ret == false ) {
+		
 		std::cerr << "CncControl::enableStepperMotors" << std::endl;
 		std::cerr << " Error while enabling stepper motors. State=" << s << std::endl;
+		THE_APP->GetMiMotorEnableState()->Check(false);
 		return false;
 	}
 	
-	THE_APP->GetMiMotorEnableState()->Check(s);
+	std::vector<int32_t> list;
+	getSerial()->processGetter(PID_ENABLE_STEPPERS, list);
+		
+	if ( list.size() != 1 ) {
+		std::cerr << "CncControl::enableStepperMotors" << std::endl;
+		std::cerr << " Get Enanble State: Unable to read the serial port:" << std::endl;
+		THE_APP->GetMiMotorEnableState()->Check(false);
+		return false;
+	}
+		
+	THE_APP->GetMiMotorEnableState()->Check( list.at(0) == 1L );
 		
 	return true;
 }

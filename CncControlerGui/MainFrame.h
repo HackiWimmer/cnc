@@ -65,6 +65,7 @@ class CncOSEnvironmentDialog;
 class CncExternalViewBox;
 class CncArduinoEnvironment;
 class CncLCDPositionPanel;
+class CncManuallyMoveCoordinates;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -178,7 +179,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void updateRenderResolution(wxCommandEvent& event);
 		virtual void toggleIdleRequests(wxCommandEvent& event);
 		virtual void cncMainViewChanged(wxNotebookEvent& event);
-		virtual void clickSpeedControl(wxCommandEvent& event);
 		virtual void rcSecureDlg(wxCommandEvent& event);
 		virtual void leaveSerialSpy(wxMouseEvent& event);
 		virtual void changeConfigToolbook(wxToolbookEvent& event);
@@ -186,7 +186,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void setReferencePosition(wxCommandEvent& event);
 		virtual void testCaseBookChanged(wxListbookEvent& event);
 		virtual void requestInterrupt(wxCommandEvent& event);
-		virtual void changeManuallySpeedSlider(wxScrollEvent& event);
 		virtual void requestHeartbeat(wxCommandEvent& event);
 		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
 		virtual void renameTemplateFromButton(wxCommandEvent& event);
@@ -277,13 +276,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void testCountXSpinCtl(wxSpinEvent& event);
 		virtual void testCountXUpdated(wxCommandEvent& event);
 		virtual void selectTestIntervalMode(wxCommandEvent& event);
-		virtual void changeManuallySliderZ(wxScrollEvent& event);
-		virtual void maxManuallyZSlider(wxCommandEvent& event);
-		virtual void minManuallyZSlider(wxCommandEvent& event);
-		virtual void moveManuallySliderZ(wxScrollEvent& event);
-		virtual void signManuallyZSlider(wxCommandEvent& event);
-		virtual void updateMetricZ(wxCommandEvent& event);
-		virtual void zeroManuallyZSlider(wxCommandEvent& event);
 		virtual void requestCurrentLimitStateIcon(wxMouseEvent& event);
 		virtual void rcDebugConfig(wxCommandEvent& event);
 		virtual void rcFinish(wxCommandEvent& event);
@@ -363,20 +355,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void activateMainWindow(wxActivateEvent& event);
 		virtual void outboundBookChanged(wxNotebookEvent& event);
 		virtual void outboundBookChanging(wxNotebookEvent& event);
-		virtual void moveManuallySliderX(wxScrollEvent& event);
-		virtual void moveManuallySliderY(wxScrollEvent& event);
-		virtual void changeManuallySliderX(wxScrollEvent& event);
-		virtual void changeManuallySliderY(wxScrollEvent& event);
-		virtual void zeroManuallyXSlider(wxCommandEvent& event);
-		virtual void zeroManuallyYSlider(wxCommandEvent& event);
-		virtual void signManuallyXSlider(wxCommandEvent& event);
-		virtual void signManuallyYSlider(wxCommandEvent& event);
-		virtual void minManuallyXSlider(wxCommandEvent& event);
-		virtual void maxManuallyXSlider(wxCommandEvent& event);
-		virtual void minManuallyYSlider(wxCommandEvent& event);
-		virtual void maxManuallyYSlider(wxCommandEvent& event);
-		virtual void updateMetricX(wxCommandEvent& event);
-		virtual void updateMetricY(wxCommandEvent& event);
 		virtual void viewMainView(wxCommandEvent& event);
 		virtual void viewTemplateManager(wxCommandEvent& event);
 		virtual void viewLogger(wxCommandEvent& event);
@@ -485,7 +463,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
 		void installCustControls();
-		void changeManuallySpeedValue();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// svg edit popup callbacks
@@ -647,6 +624,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncExternalViewBox* 			cncExtMainPreview;
 		CncArduinoEnvironment*			cncArduinoEnvironment;
 		CncLCDPositionPanel*			cncLCDPositionPanel;
+		CncManuallyMoveCoordinates*		cncManuallyMoveCoordPanel;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;
@@ -744,7 +722,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void decorateSearchButton();
 		void decorateOutboundSaveControls(bool state);
 		void decoratePosSpyConnectButton(bool state);
-		void decorateSpeedControl(bool useSpeedCfg);
 		
 		void registerGuiControls();
 		bool initializeCncControl();

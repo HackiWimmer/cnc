@@ -32,6 +32,12 @@ namespace StepperParameter {
     Serial.print(pid);   Serial.print(TEXT_SEPARATOR); \
     Serial.print(value); Serial.write(TEXT_CLOSE);
   }
+  
+  void print(unsigned char pid, float value, int8_t indent=2) {
+    for (auto i=0; i<indent; i++) Serial.print(BLANK1); \
+    Serial.print(pid);      Serial.print(TEXT_SEPARATOR); \
+    Serial.print(value, 3); Serial.write(TEXT_CLOSE);
+  }
 };
 
 /////////////////////////////////////////////////////////////////////////////////////

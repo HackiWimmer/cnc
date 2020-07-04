@@ -33,6 +33,9 @@ namespace CtrlStatistics {
   // CncArduinoStepper classe to this global namespace to save sketch space and move it 
   // to the global variable memory
 
+  enum MessuedImpulseId                { IDMI_1 = 0, IDMI_2 = 1, IDMI_3 = 2};
+  int32_t measuredUsPerImpulse[3]    = { 0L, 0L, 0L};
+  
   int32_t positionCounter            = 0L;
   uint8_t positionCounterOverflow    = 0L; 
 
@@ -44,27 +47,41 @@ namespace CtrlStatistics {
   
   void incPositionCounter()         { if ( positionCounter  == MAX_LONG ) { positionCounter  = 0L; positionCounterOverflow++;  } positionCounter++;  }    
   void incStepCounter(AxisId aid)   { if ( stepCounter[aid] == MAX_LONG ) { stepCounter[aid] = 0L; stepCounterOverflow[aid]++; } stepCounter[aid]++; }
+
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
 namespace CtrlSpeedValues {
 
-  int16_t   tact           = 0;
-  float     maxF_1DX_MMSec   = 0.0;
-  float     maxF_1DY_MMSec   = 0.0; 
-  float     maxF_1DZ_MMSec   = 0.0;
-  float     maxF_2DXY_MMSec  = 0.0;
-  float     maxF_3DXYZ_MMSec = 0.0;
+  int16_t   tact             = 0;
 
   float     cfgF_MMSec       = 0.0;
   float     cmsF_MMSec       = 0.0;
   float     tmsF_MMSec       = 0.0;
 
-  float getMaxF_1DX_MMSec()   { return maxF_1DX_MMSec;   }
-  float getMaxF_1DY_MMSec()   { return maxF_1DY_MMSec;   }
-  float getMaxF_1DZ_MMSec()   { return maxF_1DZ_MMSec;   }
-  float getMaxF_2DXY_MMSec()  { return maxF_2DXY_MMSec;  }
-  float getMaxF_3DXYZ_MMSec() { return maxF_3DXYZ_MMSec; }
+  float     distXYZ          = 0.0;
+  float     distXY           = 0.0;
+  float     distYZ           = 0.0;
+  float     distXZ           = 0.0;
+  float     distX            = 0.0;
+  float     distY            = 0.0;
+  float     distZ            = 0.0;
+
+  #ifndef SKETCH_COMPILE
+
+    float     maxF_1DX_MMSec   = 0.0;
+    float     maxF_1DY_MMSec   = 0.0; 
+    float     maxF_1DZ_MMSec   = 0.0;
+    float     maxF_2DXY_MMSec  = 0.0;
+    float     maxF_3DXYZ_MMSec = 0.0;
+
+    float getMaxF_1DX_MMSec()   { return maxF_1DX_MMSec;   }
+    float getMaxF_1DY_MMSec()   { return maxF_1DY_MMSec;   }
+    float getMaxF_1DZ_MMSec()   { return maxF_1DZ_MMSec;   }
+    float getMaxF_2DXY_MMSec()  { return maxF_2DXY_MMSec;  }
+    float getMaxF_3DXYZ_MMSec() { return maxF_3DXYZ_MMSec; }
+    
+  #endif
 
   void setupTact(int16_t pwX, int16_t pwY, int16_t pwZ) {
     tact  = ArdoObj::maximum(pwZ, ArdoObj::maximum(pwX, pwY));
@@ -72,13 +89,29 @@ namespace CtrlSpeedValues {
   }
 
   void setupMaxSpeed(float frX, float frY, float frZ) {
-    maxF_1DX_MMSec   = tact ? frX * 1000.0 * 1000.0 / tact                                             : 0;
-    maxF_1DY_MMSec   = tact ? frY * 1000.0 * 1000.0 / tact                                             : 0;
-    maxF_1DZ_MMSec   = tact ? frZ * 1000.0 * 1000.0 / tact                                             : 0;
-    maxF_2DXY_MMSec  = tact ? sqrt( pow(frX, 2) + pow(frY ,2) ) * 1000.0 * 1000.0 / tact               : 0;
-    maxF_3DXYZ_MMSec = tact ? sqrt( pow(frX, 2) + pow(frY ,2) + pow(frZ, 2) ) * 1000.0 * 1000.0 / tact : 0;
+    
+    #ifndef SKETCH_COMPILE
+    
+      maxF_1DX_MMSec   = tact ? frX * 1000.0 * 1000.0 / tact                                             : 0;
+      maxF_1DY_MMSec   = tact ? frY * 1000.0 * 1000.0 / tact                                             : 0;
+      maxF_1DZ_MMSec   = tact ? frZ * 1000.0 * 1000.0 / tact                                             : 0;
+      maxF_2DXY_MMSec  = tact ? sqrt( pow(frX, 2) + pow(frY ,2) ) * 1000.0 * 1000.0 / tact               : 0;
+      maxF_3DXYZ_MMSec = tact ? sqrt( pow(frX, 2) + pow(frY ,2) + pow(frZ, 2) ) * 1000.0 * 1000.0 / tact : 0;
+      
+    #endif
+      
+    const float cdx  = pow(frX, 2);
+    const float cdy  = pow(frY, 2);
+    const float cdz  = pow(frZ, 2);
+    
+    distXYZ          = sqrt(cdx + cdy + cdz);
+    distXY           = sqrt(cdx + cdy      );
+    distYZ           = sqrt(      cdy + cdz);
+    distXZ           = sqrt(cdx +       cdz);
+    distX            = sqrt(cdx            );
+    distY            = sqrt(      cdy      );
+    distZ            = sqrt(            cdz);
   }
-
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -125,7 +158,6 @@ void CncArduinoController::printConfig() {
 
   Serial.print(PID_CONTROLLER); Serial.print(TEXT_SEPARATOR); Serial.write(TEXT_CLOSE);
 
-
     CtrlParameter::print(PID_POS_REPLY_THRESHOLD,              getPosReplyThreshold());
     CtrlParameter::print(PID_PROBE_MODE,                       isProbeMode());
     CtrlParameter::print(PID_ENABLE_STEPPERS,                  AE::digitalRead(PIN_STEPPER_ENABLE) == ENABLE_STATE_ON);
@@ -135,6 +167,9 @@ void CncArduinoController::printConfig() {
     CtrlParameter::print(PID_GET_STEP_COUNTER_X,               CtrlStatistics::stepCounter[IDX_X]);
     CtrlParameter::print(PID_GET_STEP_COUNTER_Y,               CtrlStatistics::stepCounter[IDX_Y]);
     CtrlParameter::print(PID_GET_STEP_COUNTER_Z,               CtrlStatistics::stepCounter[IDX_Z]);
+    CtrlParameter::print(PID_GET_US_PER_IMPL_MEASUREMENT1,     CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_1]);
+    CtrlParameter::print(PID_GET_US_PER_IMPL_MEASUREMENT2,     CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_2]);
+    CtrlParameter::print(PID_GET_US_PER_IMPL_MEASUREMENT3,     CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_3]);
     CtrlParameter::print(PID_I2C_LIMIT_VALUE,                  limitState);
     CtrlParameter::print(PID_I2C_SUPPORT_VALUE,                supportState);
 
@@ -191,6 +226,10 @@ void CncArduinoController::reset() {
     CtrlStatistics::resetStepCounter(IDX_X);
     CtrlStatistics::resetStepCounter(IDX_Y);
     CtrlStatistics::resetStepCounter(IDX_Z);
+
+    CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_1] = 0L;
+    CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_2] = 0L;
+    CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_3] = 0L;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::turnOff() {
@@ -203,6 +242,13 @@ bool CncArduinoController::isReadyToRun() {
 /////////////////////////////////////////////////////////////////////////////////////
   CNC_CONTROLLER_LOG_FUNCTION();
   bool ret = true;
+
+  if ( AE::digitalRead(PIN_EXTERNAL_INTERRUPT) == EXTERNAL_INTERRRUPT_ON ) {
+    LastErrorCodes::clear(); 
+    LastErrorCodes::messageText = "I"; 
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_EXTERNEL_INTERRUPT); 
+    ret = false; 
+  }
 
   if ( X->isReadyToRun() == false ) { 
     LastErrorCodes::clear(); 
@@ -285,7 +331,7 @@ void CncArduinoController::setSpeedValue_MMMin(double f, bool activateAccelerati
 /////////////////////////////////////////////////////////////////////////////////////
   CtrlSpeedValues::cfgF_MMSec = f / 60; 
   activateAccel(activateAcceleration);
-  
+
   ARDO_DEBUG_VALUE("F [mm/sec]", CtrlSpeedValues::cfgF_MMSec)
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -324,7 +370,7 @@ void CncArduinoController::setupAccelProfile(const ArduinoCmdDecoderSetter::Resu
   }
 
   // Pepare some speed  values  
-  CtrlSpeedValues::setupTact    (X->getHighPulseWidth(), Y->getHighPulseWidth(), Z->getHighPulseWidth());
+  CtrlSpeedValues::setupTact    (MIN_DURATION_PER_STEP_US, MIN_DURATION_PER_STEP_US, MIN_DURATION_PER_STEP_US);
   CtrlSpeedValues::setupMaxSpeed(X->getFeedrate(),       Y->getFeedrate(),       Z->getFeedrate());
 
   if ( true ) {
@@ -378,6 +424,11 @@ bool CncArduinoController::enableStepperPin(bool state){
   AE::delayMicroseconds(10);
   return state;
 }
+//////////////////////////////////////////////////////////////////////////////
+bool CncArduinoController::enableStepperPinState(){
+//////////////////////////////////////////////////////////////////////////////
+  return AE::digitalRead(PIN_STEPPER_ENABLE) == ENABLE_STATE_ON;
+}
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncArduinoController::isAnyLimitActive() {
 /////////////////////////////////////////////////////////////////////////////////////
@@ -422,35 +473,6 @@ bool CncArduinoController::evaluateLimitStates(int8_t& xLimit, int8_t& yLimit, i
   }
 
   return ( xLimit != LimitSwitch::LIMIT_UNSET && yLimit != LimitSwitch::LIMIT_UNSET && zLimit != LimitSwitch::LIMIT_UNSET );
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::observeEnablePin() {
-/////////////////////////////////////////////////////////////////////////////////////
-  if ( isProbeMode() == OFF ) {
-    
-    if ( AE::digitalRead(PIN_STEPPER_ENABLE) == ENABLE_STATE_OFF ) {
-       ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_ENABLED); 
-       return false;
-    }
-  }
-  
-  return true;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::observeToolState() {
-/////////////////////////////////////////////////////////////////////////////////////
-  if ( isProbeMode() == OFF ) {
-
-    #warning impl. missing observeToolState()
-    /*
-    if ( digitalRead(PIN_TOOL_FEEDBACK) == TOOL_STATE_OFF ) {
-      errorInfo->setNextErrorInfo(E_TOOL_NOT_ENALED);
-      return false;
-    }
-    */
-  }
-  
-  return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncArduinoController::observeSerialFrontByte(byte& retValue) {
@@ -642,18 +664,46 @@ void CncArduinoController::sendCurrentPositions(unsigned char pid, bool force) {
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::checkRuntimeEnv() {
 /////////////////////////////////////////////////////////////////////////////////////
+  
+  //--------------------------------------------------------------------------------
+  auto observeEnablePin = [&]() {
+    if ( isProbeMode() == OFF ) {
+
+      if ( AE::digitalRead(PIN_STEPPER_ENABLE) == ENABLE_STATE_OFF ) {
+         ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_ENABLED); 
+         return false;
+      }
+    }
+    
+    return true;
+  };
+
+  //--------------------------------------------------------------------------------
+  auto observeExternalInterruptPin = [&]() {
+
+    if ( isProbeMode() == OFF ) {
+  
+      if ( AE::digitalRead(PIN_EXTERNAL_INTERRUPT) == EXTERNAL_INTERRRUPT_ON ) {
+         ArduinoMainLoop::pushMessage(MT_ERROR, E_EXTERNEL_INTERRUPT); 
+         return false;
+      }
+    }
+    
+    return true;
+  };
+  
   // TODO: speed up the performance and observate in intervalls
   // blind flying: e.g. 16 * 0,015 (12 mm / 800 steps) = 0,24 mm
-  if ( CtrlStatistics::positionCounter%1 == 0 ) {
+  if ( CtrlStatistics::positionCounter%16 == 0 ) {
     
     byte retValue = RET_ERROR;
     if ( observeSerialFrontByte(retValue) == false )
       return retValue;
 
-    if ( observeEnablePin() == false )
+    if ( observeExternalInterruptPin() == false )
       return RET_ERROR;
-  
-    if ( observeToolState() == false )
+      
+    if ( observeEnablePin() == false )
       return RET_ERROR;
   }
 
@@ -662,62 +712,76 @@ byte CncArduinoController::checkRuntimeEnv() {
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
-  // speed management
-  if ( CtrlSpeedValues::cfgF_MMSec > 0 ) {
-    
-    // determine the current distance for each axis, 
-    // due to the later pow() abs isn't necessary here 
-    const float curDistX_MM = dx             * X->getFeedrate();
-    const float curDistY_MM = dy             * Y->getFeedrate();
-    const float curDistZ_MM = dz             * Z->getFeedrate();
-    const float curDistV_MM = sqrt(pow(curDistX_MM, 2) + pow(curDistY_MM, 2) + pow(curDistZ_MM, 2));
-
-    // determine the time deviation between the measured and configured sight
-    const int32_t curTimeElapsed_US    = AE::micros() - tsMoveLast;
-    const int32_t curTimeDistance_US   = round(( 1000.0 * 1000.0 / getNextTargetSpeed_MMSec() ) * curDistV_MM);
-    const int32_t curTimeDifference_US = curTimeDistance_US - curTimeElapsed_US;
-
-    if ( curTimeDifference_US > 0 )
-      AE::delayMicroseconds(curTimeDifference_US);
-
-    // measure the current speed again
-    CtrlSpeedValues::cmsF_MMSec = ( 1000.0 * 1000.0 / (AE::micros() - tsMoveLast) ) * curDistV_MM;
-    tsMoveLast = AE::micros();
-
-  #warning
-    if ( false ) {
-      // determine the total distance for each axis, 
-      // due to the later pow() abs isn't necessary here 
-      const float totDistX_MM = RS::xStepCount * X->getFeedrate();
-      const float totDistY_MM = RS::yStepCount * Y->getFeedrate();
-      const float totDistZ_MM = RS::zStepCount * Z->getFeedrate();
-      const float totDistV_MM = sqrt(pow(totDistX_MM, 2) + pow(totDistY_MM, 2) + pow(totDistZ_MM, 2));
-  
-      const int32_t totTimeElapsed_US    = AE::micros() - tsMoveStart;
-      const int32_t totTimeDistance_US   = CtrlSpeedValues::cfgF_MMSec ? round(( 1000.0 * 1000.0 / CtrlSpeedValues::cfgF_MMSec ) * totDistV_MM) : 0;
-      const int32_t totTimeDifference_US = totTimeDistance_US - totTimeElapsed_US;
-
-      CtrlSpeedValues::tmsF_MMSec = ( 1000.0 * 1000.0 / totTimeDifference_US ) * totDistV_MM;
-    }
-  }  
-  
   // position management
   posReplyCounter++;
   CtrlStatistics::incPositionCounter();
   sendCurrentPositions(PID_XYZ_POS_DETAIL, false);  
+
+  // speed management
+  if ( CtrlSpeedValues::cfgF_MMSec > 0 ) {
+    
+    // determine the current distance for each axis, 
+    float curDistV_MM                         = 0.0;
+    CtrlStatistics::MessuedImpulseId idx  = CtrlStatistics::MessuedImpulseId::IDMI_1;
+   
+    if      ( dx != 0 && dy != 0 && dz != 0 )   { idx = CtrlStatistics::MessuedImpulseId::IDMI_3; curDistV_MM = CtrlSpeedValues::distXYZ; }
+    else if ( dx != 0 && dy != 0 )              { idx = CtrlStatistics::MessuedImpulseId::IDMI_2; curDistV_MM = CtrlSpeedValues::distXY;  }
+    else if ( dx != 0 && dz != 0 )              { idx = CtrlStatistics::MessuedImpulseId::IDMI_2; curDistV_MM = CtrlSpeedValues::distXZ;  }
+    else if ( dy != 0 && dz != 0 )              { idx = CtrlStatistics::MessuedImpulseId::IDMI_2; curDistV_MM = CtrlSpeedValues::distYZ;  }
+    else if ( dx != 0 )                         { idx = CtrlStatistics::MessuedImpulseId::IDMI_1; curDistV_MM = CtrlSpeedValues::distX;   }
+    else if ( dy != 0 )                         { idx = CtrlStatistics::MessuedImpulseId::IDMI_1; curDistV_MM = CtrlSpeedValues::distY;   }
+    else if ( dz != 0 )                         { idx = CtrlStatistics::MessuedImpulseId::IDMI_1; curDistV_MM = CtrlSpeedValues::distZ;   }
+
+    // determine the time deviation between the measured and configured sight
+    const float   nextTragetSpeed_MMSec = getNextTargetSpeed_MMSec();
+    const int32_t curTimeDistance_US    = round(( 1000.0 * 1000.0 / nextTragetSpeed_MMSec ) * curDistV_MM);
+    const int32_t curTimeDifference_US  = curTimeDistance_US - (AE::micros() - tsMoveLast);
+
+    // don't put anything beween the lines of the section below
+    {
+      if ( true && curTimeDifference_US > 0 )
+        AE::delayMicroseconds(curTimeDifference_US);
+  
+      // measure the current speed again
+      CtrlSpeedValues::cmsF_MMSec = ( 1000.0 * 1000.0 / (AE::micros() - tsMoveLast) ) * curDistV_MM;
+    }
+
+    if ( true && curTimeDifference_US > 0 ) {
+      const int32_t duration = curTimeDistance_US - curTimeDifference_US;
+      CtrlStatistics::measuredUsPerImpulse[idx] = CtrlStatistics::measuredUsPerImpulse[idx] ? (CtrlStatistics::measuredUsPerImpulse[idx] + duration ) / 2 : duration;
+    }
+
+    // this has to be the last action within this function
+    tsMoveLast = AE::micros();
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::notifyACMStateChange(State state) {
 /////////////////////////////////////////////////////////////////////////////////////
+
+#ifndef SKETCH_COMPILE   
   if ( true ) {
+    const int32_t cic = getCurrentImpulseCount();
     switch ( state ) {
-      case P_UNDEF:   ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_UNDEF'");   break;
-      case P_CONST:   ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_CONST'");   break;
-      case P_ACCEL:   ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_ACCEL'");   break;
-      case P_TARGET:  ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_TARGET'");  break;
-      case P_DEACCEL: ARDO_DEBUG_MESSAGE('D', "CncArduinoController::notifyACMStateChange: to 'P_DEACCEL'"); break;
+      case P_UNDEF:   ARDO_DEBUG_MESSAGE('D', wxString::Format("CncArduinoController::notifyACMStateChange: to 'P_UNDEF';   Current impulse count: %ld", cic)); break;
+      case P_CONST:   ARDO_DEBUG_MESSAGE('D', wxString::Format("CncArduinoController::notifyACMStateChange: to 'P_CONST';   Current impulse count: %ld", cic)); break;
+      case P_ACCEL:   ARDO_DEBUG_MESSAGE('D', wxString::Format("CncArduinoController::notifyACMStateChange: to 'P_ACCEL';   Current impulse count: %ld", cic)); break;
+      case P_TARGET:  ARDO_DEBUG_MESSAGE('D', wxString::Format("CncArduinoController::notifyACMStateChange: to 'P_TARGET';  Current impulse count: %ld", cic)); break;
+      case P_DEACCEL: ARDO_DEBUG_MESSAGE('D', wxString::Format("CncArduinoController::notifyACMStateChange: to 'P_DEACCEL'; Current impulse count: %ld", cic)); break;
     }
   }
+#else
+
+    switch ( state ) {
+      case P_UNDEF:
+      case P_CONST:
+      case P_ACCEL:
+      case P_TARGET:
+      case P_DEACCEL: ;
+    }
+    
+  //debugACM();
+#endif  
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::notifyACMInitMove() {
@@ -725,6 +789,7 @@ void CncArduinoController::notifyACMInitMove() {
 }  
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::setDirection(AxisId aid, int32_t steps) { 
+/////////////////////////////////////////////////////////////////////////////////////
   switch ( aid ) {
     case IDX_X: return X->setDirection(steps);
     case IDX_Y: return Y->setDirection(steps);
@@ -816,28 +881,30 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
   //---------------------------------------------------------------------------------
   switch ( gt.pid ) {
     
-    case PID_QUERY_READY_TO_RUN:      writeGetterValue1(PID_QUERY_READY_TO_RUN,    (int32_t)isReadyToRun()); break;
+    case PID_QUERY_READY_TO_RUN:          writeGetterValue1(PID_QUERY_READY_TO_RUN,           (int32_t)isReadyToRun()); break;
+    case PID_ENABLE_STEPPERS:             writeGetterValue1(PID_ENABLE_STEPPERS,              (int32_t)enableStepperPinState()); break;
     
-    case PID_X_POS:                   writeGetterValue1(PID_X_POS,                 X->getPosition()); break;
-    case PID_Y_POS:                   writeGetterValue1(PID_Y_POS,                 Y->getPosition()); break;
-    case PID_Z_POS:                   writeGetterValue1(PID_Z_POS,                 Z->getPosition()); break;
-
-    case PID_XY_POS:                  writeGetterValue2(PID_XY_POS,                X->getPosition(), Y->getPosition()); break;
-    case PID_XYZ_POS:                 writeGetterValue3(PID_XYZ_POS,               X->getPosition(), Y->getPosition(), Z->getPosition()); break;
-
-    case PID_GET_POS_COUNTER:         writeGetterValue2(PID_GET_POS_COUNTER,       CtrlStatistics::positionCounter,    (int32_t)CtrlStatistics::positionCounterOverflow); break;
-    case PID_GET_STEP_COUNTER_X:      writeGetterValue2(PID_GET_STEP_COUNTER_X,    CtrlStatistics::stepCounter[IDX_X], (int32_t)CtrlStatistics::stepCounterOverflow[IDX_X]); break;
-    case PID_GET_STEP_COUNTER_Y:      writeGetterValue2(PID_GET_STEP_COUNTER_Y,    CtrlStatistics::stepCounter[IDX_Y], (int32_t)CtrlStatistics::stepCounterOverflow[IDX_Y]); break;
-    case PID_GET_STEP_COUNTER_Z:      writeGetterValue2(PID_GET_STEP_COUNTER_Z,    CtrlStatistics::stepCounter[IDX_Z], (int32_t)CtrlStatistics::stepCounterOverflow[IDX_Z]); break; 
-
-    case PID_LIMIT:                   writeLimitGetter(); break;
     
-    default:                          writeGetterValue1(PID_UNKNOWN, 0);
+    case PID_X_POS:                       writeGetterValue1(PID_X_POS,                        X->getPosition()); break;
+    case PID_Y_POS:                       writeGetterValue1(PID_Y_POS,                        Y->getPosition()); break;
+    case PID_Z_POS:                       writeGetterValue1(PID_Z_POS,                        Z->getPosition()); break;
+
+    case PID_XY_POS:                      writeGetterValue2(PID_XY_POS,                       X->getPosition(), Y->getPosition()); break;
+    case PID_XYZ_POS:                     writeGetterValue3(PID_XYZ_POS,                      X->getPosition(), Y->getPosition(), Z->getPosition()); break;
+
+    case PID_GET_POS_COUNTER:             writeGetterValue2(PID_GET_POS_COUNTER,              CtrlStatistics::positionCounter,    (int32_t)CtrlStatistics::positionCounterOverflow); break;
+    case PID_GET_STEP_COUNTER_X:          writeGetterValue2(PID_GET_STEP_COUNTER_X,           CtrlStatistics::stepCounter[IDX_X], (int32_t)CtrlStatistics::stepCounterOverflow[IDX_X]); break;
+    case PID_GET_STEP_COUNTER_Y:          writeGetterValue2(PID_GET_STEP_COUNTER_Y,           CtrlStatistics::stepCounter[IDX_Y], (int32_t)CtrlStatistics::stepCounterOverflow[IDX_Y]); break;
+    case PID_GET_STEP_COUNTER_Z:          writeGetterValue2(PID_GET_STEP_COUNTER_Z,           CtrlStatistics::stepCounter[IDX_Z], (int32_t)CtrlStatistics::stepCounterOverflow[IDX_Z]); break; 
+
+    case PID_LIMIT:                       writeLimitGetter(); break;
+    
+    default:                              writeGetterValue1(PID_UNKNOWN, 0);
                                       
-                                      LastErrorCodes::clear();
-                                      LastErrorCodes::register1Byte_A = gt.pid;
-                                      AML::pushMessage(MT_ERROR, E_INVALID_GETTER_ID);
-                                      return RET_ERROR;
+                                          LastErrorCodes::clear();
+                                          LastErrorCodes::register1Byte_A = gt.pid;
+                                          AML::pushMessage(MT_ERROR, E_INVALID_GETTER_ID);
+                                          return RET_ERROR;
   }
 
   return RET_OK;
@@ -954,6 +1021,7 @@ byte CncArduinoController::movePosition(int32_t dx, int32_t dy, int32_t dz) {
     return RET_OK;
 
   const int32_t ic = impulseCalculator.calculate(dx, dy, dz);
+
   if ( ic < 0 )
     return RET_ERROR;
 
@@ -962,14 +1030,22 @@ byte CncArduinoController::movePosition(int32_t dx, int32_t dy, int32_t dz) {
   
   if ( CtrlSpeedValues::cfgF_MMSec && initMove(ic, CtrlSpeedValues::cfgF_MMSec) == false )
     return RET_ERROR;
+
+  const byte ret = renderMove(dx, dy, dz);
+
+  #if ( 0)
+    PRINT_DEBUG_VALUE("usPerImpl0", CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_1])
+    PRINT_DEBUG_VALUE("usPerImpl1", CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_2])
+    PRINT_DEBUG_VALUE("usPerImpl2", CtrlStatistics::measuredUsPerImpulse[CtrlStatistics::MessuedImpulseId::IDMI_3])
+  #endif
   
-  return renderMove(dx, dy, dz);
+  return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
   // speed setup
-  const float MAX_SPEED   = CtrlSpeedValues::maxF_1DZ_MMSec * 60;
+  const float MAX_SPEED   = CtrlSpeedValues::tact ? Z->getFeedrate() * 1000.0 * 1000.0 / CtrlSpeedValues::tact * 60 : 3000;
   const float START_SPEED = getStartSpeed_MMSec() * 60 * 0.5;
   const float DIFF_SPEED  = MAX_SPEED - START_SPEED;
 
@@ -1003,4 +1079,141 @@ byte CncArduinoController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz) {
 
   activateAccel(true);
   return ret;
+}
+
+
+///////////////////////////////////////////////////////
+byte CncArduinoController::performTest() {
+///////////////////////////////////////////////////////
+#if (0)
+
+  const int   steps       = 800;  // #
+  const float resolution  = 12.0; // mmm/360
+  const float feedRate    = resolution / steps;
+
+  // --------------------------------------------------
+  auto summerizeSpeed = [&](float totalMM, uint32_t ts) {
+    const uint32_t totalSteps = round(totalMM / feedRate);
+    const uint32_t timeDiff   = AE::micros() - ts;
+    const float    mmMin      = (float)((totalMM * 60 * 1000 * 1000) / timeDiff);
+
+    Serial.print("D=");   Serial.print((float)timeDiff / 1000 / 1000 ); Serial.print("[s]\n");
+    Serial.print("R=");   Serial.print((float)timeDiff / totalSteps  ); Serial.print("[us/step]\n");
+    Serial.print("F=");   Serial.print(mmMin);                          Serial.print("[mm/min]\n");
+    Serial.print("RPM="); Serial.print(mmMin / resolution);             Serial.print("[rpm]\n");
+  };
+
+  // --------------------------------------------------
+  auto stepDist = [&](uint32_t dist, bool x, bool y, bool z) {
+
+      const uint32_t tsBeg = AE::micros();
+      for ( uint32_t i=0; i<dist; i++) {
+
+          if ( x ) X->initiateStep();
+          if ( y ) Y->initiateStep();
+          if ( z ) Z->initiateStep();
+          
+          if ( x ) X->finalizeStep();
+          if ( y ) Y->finalizeStep();
+          if ( z ) Z->finalizeStep();
+      }
+
+      if      ( x && y && z )    summerizeSpeed( 3 * sqrt(pow(dist * feedRate, 2)), tsBeg);
+      else if ( x && y )         summerizeSpeed( 2 * sqrt(pow(dist * feedRate, 2)), tsBeg);
+      else if ( x && z )         summerizeSpeed( 2 * sqrt(pow(dist * feedRate, 2)), tsBeg);
+      else if ( y && z )         summerizeSpeed( 2 * sqrt(pow(dist * feedRate, 2)), tsBeg);
+      else if ( x )              summerizeSpeed( 1 * sqrt(pow(dist * feedRate, 2)), tsBeg);
+      else if ( y )              summerizeSpeed( 1 * sqrt(pow(dist * feedRate, 2)), tsBeg);
+      else if ( z )              summerizeSpeed( 1 * sqrt(pow(dist * feedRate, 2)), tsBeg);
+  };
+
+  // --------------------------------------------------
+  bool error = false;
+
+  byte b[1];
+  if ( !ArduinoMainLoop::readSerialBytesWithTimeout(b, 1) )
+    b[0] = 0;
+
+  Serial.write("\ntc"); Serial.write(b[0]); Serial.write('\n');
+  
+  switch ( b[0] ) {
+
+    case '1':   
+    { 
+              ArduinoCmdDecoderSetter::Result acc;
+              acc.pid          = PID_ACCEL_PROFILE;
+              acc.valueCount   = 12;
+                  
+              acc.values[ 0].l = FLT_FACT * feedRate;    // steps x
+              acc.values[ 1].l = FLT_FACT * feedRate;    // steps y
+              acc.values[ 2].l = FLT_FACT * feedRate;    // steps z
+              acc.values[ 3].l = FLT_FACT * 5L;          // pulse width x
+              acc.values[ 4].l = FLT_FACT * 5L;          // pulse width y
+              acc.values[ 5].l = FLT_FACT * 5L;          // pulse width z
+              
+              acc.values[ 6].l = FLT_FACT * 0.0;         // acc profile 
+              acc.values[ 7].l = FLT_FACT * 0.1;         // acc profile 
+              acc.values[ 8].l = FLT_FACT * 333.0 / 60;  // acc profile 
+              acc.values[ 9].l = FLT_FACT * 0.0;         // acc profile 
+              acc.values[10].l = FLT_FACT * 0.1;         // acc profile 
+              acc.values[11].l = FLT_FACT * 333.0 / 60;  // acc profile 
+              setupAccelProfile(acc);
+              
+              enableStepperPin(true);
+              setProbeMode(false);
+              setSpeedValue_MMMin(4500.0, true);
+              setPosReplyThreshold(333);
+              
+              const uint32_t dist = 700 / feedRate;
+              
+              ArduinoCmdDecoderMove::Result mv;
+              mv.cmd = CMD_RENDER_AND_MOVE;
+              mv.dx  = dist;
+              mv.dy  = dist;
+              mv.dz  = dist;
+
+              const uint32_t tsBeg = AE::micros();
+              if ( process(mv) != RET_OK )
+                error = true;
+
+              summerizeSpeed(sqrt(pow(mv.dx * feedRate, 2) + pow(mv.dy * feedRate, 2) + pow(mv.dz * feedRate, 2)), tsBeg);
+              break; 
+    }
+    case '2':   
+    { 
+              enableStepperPin(true);
+              setProbeMode(false);
+              setPosReplyThreshold(33);
+
+              X->setHighPulseWidth(5);
+              X->setDirection(1);
+              Y->setHighPulseWidth(5);
+              Y->setDirection(1);
+              Z->setHighPulseWidth(5);
+              Z->setDirection(1);
+              
+              const uint32_t dist  = 3500 / feedRate;
+        
+              stepDist (dist, true, true,  true );
+              stepDist (dist, true, true,  false);
+              stepDist (dist, true, false, false);
+              
+              break; 
+    }
+
+    case '0':
+    default:  
+    {
+              enableStepperPin(false);
+              Serial.println("> IR");
+              processSignal(SIG_INTERRUPPT);
+    }
+  }
+
+  Serial.write("finished ");
+  if ( error )  Serial.write("failed\n");
+  else          Serial.write("succesfull\n");
+#endif
+
+  return RET_OK;
 }

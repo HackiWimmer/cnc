@@ -45,8 +45,8 @@
 #include <wx/listbook.h>
 #include <wx/scrolwin.h>
 #include <wx/radiobox.h>
-#include <wx/checkbox.h>
 #include <wx/spinctrl.h>
+#include <wx/checkbox.h>
 #include <wx/listctrl.h>
 #include "CncZView.h"
 #include <wx/timer.h>
@@ -65,6 +65,18 @@
 #else
 #define WXC_FROM_DIP(x) x
 #endif
+
+
+class MainFrameDummyBase : public wxFrame
+{
+protected:
+
+protected:
+
+public:
+    MainFrameDummyBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("MainFrameDummy"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_FRAME_STYLE);
+    virtual ~MainFrameDummyBase();
+};
 
 
 class MainFrameBClass : public wxFrame
@@ -98,7 +110,6 @@ protected:
     wxComboBox* m_cbRenderResolution;
     wxBitmapButton* m_rcReset;
     wxBitmapToggleButton* m_btProbeMode;
-    wxBitmapToggleButton* m_btSpeedControl;
     wxBitmapButton* m_rcDebugConfig;
     wxBitmapButton* m_rcDebug;
     wxBitmapButton* m_rcNextBreakpoint;
@@ -264,46 +275,7 @@ protected:
     wxStaticBitmap* m_staticBitmap5907;
     wxStaticText* m_staticText5909;
     wxPanel* m_mainBookManual;
-    wxStaticText* m_staticText1160;
-    wxStaticLine* m_staticLine1162;
-    wxRadioBox* m_mmRadioCoordinates;
-    wxStaticText* m_staticText5101;
-    wxComboBox* m_manuallyToolId;
-    wxCheckBox* m_checkBoxToolEnabled;
-    wxStaticText* m_staticText5105;
-    wxSlider* m_manuallySpeedSlider;
-    wxTextCtrl* m_manuallySpeedValue;
-    wxStaticText* m_staticText5113;
-    wxStaticLine* m_staticLine5729;
-    wxCheckBox* m_manuallyCorrectLimitPos;
-    wxStaticLine* m_staticLine5109;
-    wxStaticText* m_staticText793;
-    wxButton* m_minManuallyXSlider;
-    wxTextCtrl* m_metricX;
-    wxButton* m_maxManuallyXSlider;
-    wxButton* m_zeroManuallyXSlider;
-    wxButton* m_signManuallyXSlider;
-    wxStaticText* m_mmUnitX;
-    wxSlider* m_xManuallySlider;
-    wxStaticLine* m_staticLine5129;
-    wxStaticText* m_staticText797;
-    wxButton* m_minManuallyYSlider;
-    wxTextCtrl* m_metricY;
-    wxButton* m_maxManuallyYSlider;
-    wxButton* m_zeroManuallyYSlider;
-    wxButton* m_signManuallyYSlider;
-    wxStaticText* m_mmUnitY;
-    wxSlider* m_yManuallySlider;
-    wxStaticLine* m_staticLine5133;
-    wxStaticText* m_staticText7973;
-    wxButton* m_minManuallyZSlider;
-    wxTextCtrl* m_metricZ;
-    wxButton* m_maxManuallyZSlider;
-    wxButton* m_zeroManuallyZSlider;
-    wxButton* m_signManuallyZSlider;
-    wxStaticText* m_mmUnitZ;
-    wxSlider* m_zManuallySlider;
-    wxStaticLine* m_staticLine5135;
+    wxPanel* m_manuallyMoveCoordPlaceholder;
     wxPanel* m_mainBookTest;
     wxListbook* m_testCaseBook;
     wxPanel* m_testIntervalPage;
@@ -559,10 +531,6 @@ protected:
     wxStaticText* m_staticText5656;
     wxStaticBitmap* m_probeModeState;
     wxStaticText* m_probeModeStateLabel;
-    wxStaticLine* m_staticLine60234112;
-    wxStaticText* m_staticText56563;
-    wxStaticBitmap* m_speedCtrlState;
-    wxStaticText* m_speedCtrlStateLabel;
     wxStaticLine* m_staticLine680;
     wxStaticText* LableF;
     wxTextCtrl* m_configuredFeedSpeed;
@@ -837,7 +805,6 @@ protected:
     virtual void updateRenderResolution(wxCommandEvent& event) { event.Skip(); }
     virtual void rcReset(wxCommandEvent& event) { event.Skip(); }
     virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void clickSpeedControl(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebugConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebug(wxCommandEvent& event) { event.Skip(); }
     virtual void rcNextBreakpoint(wxCommandEvent& event) { event.Skip(); }
@@ -892,28 +859,6 @@ protected:
     virtual void moveZToMin(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToTop(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToBottom(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeManuallySpeedSlider(wxScrollEvent& event) { event.Skip(); }
-    virtual void minManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateMetricX(wxCommandEvent& event) { event.Skip(); }
-    virtual void maxManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void zeroManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void signManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void moveManuallySliderX(wxScrollEvent& event) { event.Skip(); }
-    virtual void changeManuallySliderX(wxScrollEvent& event) { event.Skip(); }
-    virtual void minManuallyYSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateMetricY(wxCommandEvent& event) { event.Skip(); }
-    virtual void maxManuallyYSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void zeroManuallyYSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void signManuallyYSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void moveManuallySliderY(wxScrollEvent& event) { event.Skip(); }
-    virtual void changeManuallySliderY(wxScrollEvent& event) { event.Skip(); }
-    virtual void minManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateMetricZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void maxManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void zeroManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void signManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
-    virtual void moveManuallySliderZ(wxScrollEvent& event) { event.Skip(); }
-    virtual void changeManuallySliderZ(wxScrollEvent& event) { event.Skip(); }
     virtual void testCaseBookChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void selectTestIntervalMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCountXSpinCtl(wxSpinEvent& event) { event.Skip(); }
@@ -1086,7 +1031,6 @@ public:
     wxComboBox* GetCbRenderResolution() { return m_cbRenderResolution; }
     wxBitmapButton* GetRcReset() { return m_rcReset; }
     wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
-    wxBitmapToggleButton* GetBtSpeedControl() { return m_btSpeedControl; }
     wxBitmapButton* GetRcDebugConfig() { return m_rcDebugConfig; }
     wxBitmapButton* GetRcDebug() { return m_rcDebug; }
     wxBitmapButton* GetRcNextBreakpoint() { return m_rcNextBreakpoint; }
@@ -1252,46 +1196,7 @@ public:
     wxPanel* GetNavigator() { return m_navigator; }
     wxListbook* GetListbook7170() { return m_listbook7170; }
     wxPanel* GetMainBookReference() { return m_mainBookReference; }
-    wxStaticText* GetStaticText1160() { return m_staticText1160; }
-    wxStaticLine* GetStaticLine1162() { return m_staticLine1162; }
-    wxRadioBox* GetMmRadioCoordinates() { return m_mmRadioCoordinates; }
-    wxStaticText* GetStaticText5101() { return m_staticText5101; }
-    wxComboBox* GetManuallyToolId() { return m_manuallyToolId; }
-    wxCheckBox* GetCheckBoxToolEnabled() { return m_checkBoxToolEnabled; }
-    wxStaticText* GetStaticText5105() { return m_staticText5105; }
-    wxSlider* GetManuallySpeedSlider() { return m_manuallySpeedSlider; }
-    wxTextCtrl* GetManuallySpeedValue() { return m_manuallySpeedValue; }
-    wxStaticText* GetStaticText5113() { return m_staticText5113; }
-    wxStaticLine* GetStaticLine5729() { return m_staticLine5729; }
-    wxCheckBox* GetManuallyCorrectLimitPos() { return m_manuallyCorrectLimitPos; }
-    wxStaticLine* GetStaticLine5109() { return m_staticLine5109; }
-    wxStaticText* GetStaticText793() { return m_staticText793; }
-    wxButton* GetMinManuallyXSlider() { return m_minManuallyXSlider; }
-    wxTextCtrl* GetMetricX() { return m_metricX; }
-    wxButton* GetMaxManuallyXSlider() { return m_maxManuallyXSlider; }
-    wxButton* GetZeroManuallyXSlider() { return m_zeroManuallyXSlider; }
-    wxButton* GetSignManuallyXSlider() { return m_signManuallyXSlider; }
-    wxStaticText* GetMmUnitX() { return m_mmUnitX; }
-    wxSlider* GetXManuallySlider() { return m_xManuallySlider; }
-    wxStaticLine* GetStaticLine5129() { return m_staticLine5129; }
-    wxStaticText* GetStaticText797() { return m_staticText797; }
-    wxButton* GetMinManuallyYSlider() { return m_minManuallyYSlider; }
-    wxTextCtrl* GetMetricY() { return m_metricY; }
-    wxButton* GetMaxManuallyYSlider() { return m_maxManuallyYSlider; }
-    wxButton* GetZeroManuallyYSlider() { return m_zeroManuallyYSlider; }
-    wxButton* GetSignManuallyYSlider() { return m_signManuallyYSlider; }
-    wxStaticText* GetMmUnitY() { return m_mmUnitY; }
-    wxSlider* GetYManuallySlider() { return m_yManuallySlider; }
-    wxStaticLine* GetStaticLine5133() { return m_staticLine5133; }
-    wxStaticText* GetStaticText7973() { return m_staticText7973; }
-    wxButton* GetMinManuallyZSlider() { return m_minManuallyZSlider; }
-    wxTextCtrl* GetMetricZ() { return m_metricZ; }
-    wxButton* GetMaxManuallyZSlider() { return m_maxManuallyZSlider; }
-    wxButton* GetZeroManuallyZSlider() { return m_zeroManuallyZSlider; }
-    wxButton* GetSignManuallyZSlider() { return m_signManuallyZSlider; }
-    wxStaticText* GetMmUnitZ() { return m_mmUnitZ; }
-    wxSlider* GetZManuallySlider() { return m_zManuallySlider; }
-    wxStaticLine* GetStaticLine5135() { return m_staticLine5135; }
+    wxPanel* GetManuallyMoveCoordPlaceholder() { return m_manuallyMoveCoordPlaceholder; }
     wxPanel* GetMainBookManual() { return m_mainBookManual; }
     wxStaticText* GetStaticText2117() { return m_staticText2117; }
     wxStaticLine* GetStaticLine2253() { return m_staticLine2253; }
@@ -1549,10 +1454,6 @@ public:
     wxStaticText* GetStaticText5656() { return m_staticText5656; }
     wxStaticBitmap* GetProbeModeState() { return m_probeModeState; }
     wxStaticText* GetProbeModeStateLabel() { return m_probeModeStateLabel; }
-    wxStaticLine* GetStaticLine60234112() { return m_staticLine60234112; }
-    wxStaticText* GetStaticText56563() { return m_staticText56563; }
-    wxStaticBitmap* GetSpeedCtrlState() { return m_speedCtrlState; }
-    wxStaticText* GetSpeedCtrlStateLabel() { return m_speedCtrlStateLabel; }
     wxStaticLine* GetStaticLine680() { return m_staticLine680; }
     wxStaticText* GetLableF() { return LableF; }
     wxTextCtrl* GetConfiguredFeedSpeed() { return m_configuredFeedSpeed; }
@@ -1707,15 +1608,169 @@ public:
 };
 
 
-class MainFrameDummyBase : public wxFrame
+class CncManuallyMoveCoordinatesBase : public wxPanel
 {
 protected:
+    wxStaticText* m_staticText1160;
+    wxStaticLine* m_staticLine1162;
+    wxStaticText* m_staticText8386;
+    wxRadioBox* m_mmRadioCoordinates;
+    wxStaticLine* m_staticLine8390;
+    wxStaticText* m_staticText8388;
+    wxCheckBox* m_manuallyCorrectLimitPos;
+    wxStaticLine* m_staticLine839012;
+    wxStaticText* m_staticText8396;
+    wxComboBox* m_manuallyToolId;
+    wxCheckBox* m_checkBoxToolEnabled;
+    wxStaticLine* m_staticLine83901;
+    wxStaticText* m_staticText83998;
+    wxStaticText* m_staticText8399;
+    wxStaticText* m_staticText5105;
+    wxSlider* m_manuallySpeedSlider;
+    wxTextCtrl* m_manuallySpeedValue;
+    wxStaticText* m_staticText85409;
+    wxStaticText* m_staticText8540;
+    wxStaticText* m_staticText8542;
+    wxStaticText* m_staticText8544;
+    wxStaticText* m_staticText8546;
+    wxStaticText* m_staticText8548;
+    wxStaticText* m_staticText8563;
+    wxTextCtrl* m_fxMax;
+    wxTextCtrl* m_fyMax;
+    wxTextCtrl* m_fzMax;
+    wxTextCtrl* m_fxyMax;
+    wxTextCtrl* m_fxyzMax;
+    wxStaticLine* m_staticLine5109;
+    wxStaticText* m_staticText8578;
+    wxTextCtrl* m_metricCommon;
+    wxStaticText* m_mmUnitCommon;
+    wxButton* m_btSetXYZ;
+    wxButton* m_btSetXY;
+    wxButton* m_btSetXZ;
+    wxButton* m_btSetYZ;
+    wxStaticLine* m_staticLine8570;
+    wxStaticText* m_staticText793;
+    wxButton* m_minManuallyXSlider;
+    wxTextCtrl* m_metricX;
+    wxButton* m_maxManuallyXSlider;
+    wxButton* m_zeroManuallyXSlider;
+    wxButton* m_signManuallyXSlider;
+    wxStaticText* m_mmUnitX;
+    wxSlider* m_xManuallySlider;
+    wxStaticLine* m_staticLine5129;
+    wxStaticText* m_staticText797;
+    wxButton* m_minManuallyYSlider;
+    wxTextCtrl* m_metricY;
+    wxButton* m_maxManuallyYSlider;
+    wxButton* m_zeroManuallyYSlider;
+    wxButton* m_signManuallyYSlider;
+    wxStaticText* m_mmUnitY;
+    wxSlider* m_yManuallySlider;
+    wxStaticLine* m_staticLine5133;
+    wxStaticText* m_staticText7973;
+    wxButton* m_minManuallyZSlider;
+    wxTextCtrl* m_metricZ;
+    wxButton* m_maxManuallyZSlider;
+    wxButton* m_zeroManuallyZSlider;
+    wxButton* m_signManuallyZSlider;
+    wxStaticText* m_mmUnitZ;
+    wxSlider* m_zManuallySlider;
+    wxStaticLine* m_staticLine5135;
 
 protected:
+    virtual void changeManuallySpeedSlider(wxScrollEvent& event) { event.Skip(); }
+    virtual void onLBDownMax(wxMouseEvent& event) { event.Skip(); }
+    virtual void onSetCommonValue(wxCommandEvent& event) { event.Skip(); }
+    virtual void minManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateMetricX(wxCommandEvent& event) { event.Skip(); }
+    virtual void maxManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void zeroManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void signManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void moveManuallySliderX(wxScrollEvent& event) { event.Skip(); }
+    virtual void changeManuallySliderX(wxScrollEvent& event) { event.Skip(); }
+    virtual void minManuallyYSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateMetricY(wxCommandEvent& event) { event.Skip(); }
+    virtual void maxManuallyYSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void zeroManuallyYSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void signManuallyYSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void moveManuallySliderY(wxScrollEvent& event) { event.Skip(); }
+    virtual void changeManuallySliderY(wxScrollEvent& event) { event.Skip(); }
+    virtual void minManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateMetricZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void maxManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void zeroManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void signManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
+    virtual void moveManuallySliderZ(wxScrollEvent& event) { event.Skip(); }
+    virtual void changeManuallySliderZ(wxScrollEvent& event) { event.Skip(); }
 
 public:
-    MainFrameDummyBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("MainFrameDummy"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_FRAME_STYLE);
-    virtual ~MainFrameDummyBase();
+    wxStaticText* GetStaticText1160() { return m_staticText1160; }
+    wxStaticLine* GetStaticLine1162() { return m_staticLine1162; }
+    wxStaticText* GetStaticText8386() { return m_staticText8386; }
+    wxRadioBox* GetMmRadioCoordinates() { return m_mmRadioCoordinates; }
+    wxStaticLine* GetStaticLine8390() { return m_staticLine8390; }
+    wxStaticText* GetStaticText8388() { return m_staticText8388; }
+    wxCheckBox* GetManuallyCorrectLimitPos() { return m_manuallyCorrectLimitPos; }
+    wxStaticLine* GetStaticLine839012() { return m_staticLine839012; }
+    wxStaticText* GetStaticText8396() { return m_staticText8396; }
+    wxComboBox* GetManuallyToolId() { return m_manuallyToolId; }
+    wxCheckBox* GetCheckBoxToolEnabled() { return m_checkBoxToolEnabled; }
+    wxStaticLine* GetStaticLine83901() { return m_staticLine83901; }
+    wxStaticText* GetStaticText83998() { return m_staticText83998; }
+    wxStaticText* GetStaticText8399() { return m_staticText8399; }
+    wxStaticText* GetStaticText5105() { return m_staticText5105; }
+    wxSlider* GetManuallySpeedSlider() { return m_manuallySpeedSlider; }
+    wxTextCtrl* GetManuallySpeedValue() { return m_manuallySpeedValue; }
+    wxStaticText* GetStaticText85409() { return m_staticText85409; }
+    wxStaticText* GetStaticText8540() { return m_staticText8540; }
+    wxStaticText* GetStaticText8542() { return m_staticText8542; }
+    wxStaticText* GetStaticText8544() { return m_staticText8544; }
+    wxStaticText* GetStaticText8546() { return m_staticText8546; }
+    wxStaticText* GetStaticText8548() { return m_staticText8548; }
+    wxStaticText* GetStaticText8563() { return m_staticText8563; }
+    wxTextCtrl* GetFxMax() { return m_fxMax; }
+    wxTextCtrl* GetFyMax() { return m_fyMax; }
+    wxTextCtrl* GetFzMax() { return m_fzMax; }
+    wxTextCtrl* GetFxyMax() { return m_fxyMax; }
+    wxTextCtrl* GetFxyzMax() { return m_fxyzMax; }
+    wxStaticLine* GetStaticLine5109() { return m_staticLine5109; }
+    wxStaticText* GetStaticText8578() { return m_staticText8578; }
+    wxTextCtrl* GetMetricCommon() { return m_metricCommon; }
+    wxStaticText* GetMmUnitCommon() { return m_mmUnitCommon; }
+    wxButton* GetBtSetXYZ() { return m_btSetXYZ; }
+    wxButton* GetBtSetXY() { return m_btSetXY; }
+    wxButton* GetBtSetXZ() { return m_btSetXZ; }
+    wxButton* GetBtSetYZ() { return m_btSetYZ; }
+    wxStaticLine* GetStaticLine8570() { return m_staticLine8570; }
+    wxStaticText* GetStaticText793() { return m_staticText793; }
+    wxButton* GetMinManuallyXSlider() { return m_minManuallyXSlider; }
+    wxTextCtrl* GetMetricX() { return m_metricX; }
+    wxButton* GetMaxManuallyXSlider() { return m_maxManuallyXSlider; }
+    wxButton* GetZeroManuallyXSlider() { return m_zeroManuallyXSlider; }
+    wxButton* GetSignManuallyXSlider() { return m_signManuallyXSlider; }
+    wxStaticText* GetMmUnitX() { return m_mmUnitX; }
+    wxSlider* GetXManuallySlider() { return m_xManuallySlider; }
+    wxStaticLine* GetStaticLine5129() { return m_staticLine5129; }
+    wxStaticText* GetStaticText797() { return m_staticText797; }
+    wxButton* GetMinManuallyYSlider() { return m_minManuallyYSlider; }
+    wxTextCtrl* GetMetricY() { return m_metricY; }
+    wxButton* GetMaxManuallyYSlider() { return m_maxManuallyYSlider; }
+    wxButton* GetZeroManuallyYSlider() { return m_zeroManuallyYSlider; }
+    wxButton* GetSignManuallyYSlider() { return m_signManuallyYSlider; }
+    wxStaticText* GetMmUnitY() { return m_mmUnitY; }
+    wxSlider* GetYManuallySlider() { return m_yManuallySlider; }
+    wxStaticLine* GetStaticLine5133() { return m_staticLine5133; }
+    wxStaticText* GetStaticText7973() { return m_staticText7973; }
+    wxButton* GetMinManuallyZSlider() { return m_minManuallyZSlider; }
+    wxTextCtrl* GetMetricZ() { return m_metricZ; }
+    wxButton* GetMaxManuallyZSlider() { return m_maxManuallyZSlider; }
+    wxButton* GetZeroManuallyZSlider() { return m_zeroManuallyZSlider; }
+    wxButton* GetSignManuallyZSlider() { return m_signManuallyZSlider; }
+    wxStaticText* GetMmUnitZ() { return m_mmUnitZ; }
+    wxSlider* GetZManuallySlider() { return m_zManuallySlider; }
+    wxStaticLine* GetStaticLine5135() { return m_staticLine5135; }
+    CncManuallyMoveCoordinatesBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxTAB_TRAVERSAL);
+    virtual ~CncManuallyMoveCoordinatesBase();
 };
 
 #endif

@@ -220,7 +220,7 @@ double CncConfig::connvert_STP_SEC_TO_MM_MIN(int32_t speed, unsigned int steps, 
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
-	CtrlSpeedValues::setupTact    (getHighPulsWidthX(), getHighPulsWidthY(), getHighPulsWidthZ());
+	CtrlSpeedValues::setupTact    (MIN_DURATION_PER_STEP_US, MIN_DURATION_PER_STEP_US, MIN_DURATION_PER_STEP_US);
 	CtrlSpeedValues::setupMaxSpeed(getFeedrateX(),      getFeedrateY(),      getFeedrateZ());
 	
 	wxPGProperty* prop = NULL;

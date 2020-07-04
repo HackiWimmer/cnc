@@ -30,7 +30,6 @@
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/webviewOSD.h"
-#include "wxCode/lcdwindow.h"
 #include "GamepadEvent.h"
 #include "SerialThread.h"
 #include "CncExceptions.h"
@@ -77,6 +76,7 @@
 #include "CncOpenGLContextObserver.h"
 #include "CncOSEnvironmentDialog.h"
 #include "CncContext.h"
+#include "CncManuallyMoveCoordinates.h"
 #include "CncLastProcessingTimestampSummary.h"
 #include "CncFileDialog.h"
 #include "CncArduinoEnvironment.h"
@@ -289,6 +289,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , cncExtMainPreview(NULL)
 , cncArduinoEnvironment(new CncArduinoEnvironment(this))
 , cncLCDPositionPanel(NULL)
+, cncManuallyMoveCoordPanel(NULL)
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -683,9 +684,6 @@ void MainFrame::enableGuiControls(bool state) {
 			*it = wi;
 		}
 	}
-	
-	if ( state == true )
-		m_btSpeedControl->Enable(THE_CONTEXT->isProbeMode());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::installCustControls() {
@@ -806,6 +804,9 @@ void MainFrame::installCustControls() {
 	
 	cncLCDPositionPanel = new CncLCDPositionPanel(this);
 	GblFunc::replaceControl(m_lcdPositionPlaceholder, cncLCDPositionPanel);
+	
+	cncManuallyMoveCoordPanel = new CncManuallyMoveCoordinates(this);
+	GblFunc::replaceControl(m_manuallyMoveCoordPlaceholder, cncManuallyMoveCoordPanel);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -826,10 +827,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btnPosMarker);
 	registerGuiControl(m_btnFlyPath);
 	registerGuiControl(m_btToggleOutboundEditorWordWrap);
-	registerGuiControl(m_checkBoxToolEnabled);
-	registerGuiControl(m_manuallyCorrectLimitPos);
 	registerGuiControl(m_rcSecureDlg);
-	registerGuiControl(m_btSpeedControl);
 	registerGuiControl(m_btProbeMode);
 	registerGuiControl(m_btSelectReferences);
 	registerGuiControl(m_btSelectManuallyMove);
@@ -895,29 +893,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_testModeX);
 	registerGuiControl(m_testModeY);
 	registerGuiControl(m_testModeZ);
-	registerGuiControl(m_xManuallySlider);
-	registerGuiControl(m_yManuallySlider);
-	registerGuiControl(m_zManuallySlider);
-	registerGuiControl(m_minManuallyXSlider);
-	registerGuiControl(m_minManuallyYSlider);
-	registerGuiControl(m_minManuallyZSlider);
-	registerGuiControl(m_metricX);
-	registerGuiControl(m_metricY);
-	registerGuiControl(m_metricZ);
-	registerGuiControl(m_maxManuallyXSlider);
-	registerGuiControl(m_maxManuallyYSlider);
-	registerGuiControl(m_maxManuallyZSlider);
-	registerGuiControl(m_zeroManuallyXSlider);
-	registerGuiControl(m_zeroManuallyYSlider);
-	registerGuiControl(m_zeroManuallyZSlider);
-	registerGuiControl(m_signManuallyXSlider);
-	registerGuiControl(m_signManuallyYSlider);
-	registerGuiControl(m_signManuallyZSlider);
-	registerGuiControl(m_manuallyToolId);
-	registerGuiControl(m_manuallySpeedSlider);
-	registerGuiControl(m_manuallySpeedValue);
-	registerGuiControl(m_mmRadioCoordinates);
-	
+
 	//...
 	
 	// already managed by sourceEditor
@@ -966,17 +942,6 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	if ( speedMonitor )
-		speedMonitor->activate(true);
-
-	m_btSpeedControl->Enable(true);
-	decorateSpeedControl(true);
-	
-	selectMonitorBookCncPanel();
-	//cnc->enableProbeMode(probeMode);
-	cnc->changeCurrentFeedSpeedXYZ_MM_MIN(1800);
-	cnc->getSerialExtern()->test();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -999,15 +964,9 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
+
 	
-	static wxLCDWindow* mClock = new wxLCDWindow( this, wxPoint( 50, 50 ), wxSize( 200, 100 ) );
-	mClock->SetNumberDigits( 8 );
-	
-	mClock->Show();
-	
-	wxString now = ::wxNow();
-	mClock->SetValue( now.Mid( 11, 8 ) );
-	mClock->SetValue( "123.45" );
+
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
@@ -2025,13 +1984,11 @@ void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
 	createAnimationControl();
 	decorateSearchButton();
-	decorateSpeedControl(true);
 	switchMonitorButton(true);
 	determineRunMode();
 	decoratePosSpyConnectButton(false);
 	decorateSecureDlgChoice(true);
 	registerGuiControls();
-	changeManuallySpeedValue();
 	decorateOutboundSaveControls(false);
 
 	// init config pages
@@ -2056,10 +2013,6 @@ void MainFrame::initialize(void) {
 	m_testDistanceX->SetValidator(val);
 	m_testDistanceY->SetValidator(val);
 	m_testDistanceZ->SetValidator(val);
-	
-	val.SetRange(0, 50000.0);
-	val.SetPrecision(1);
-	m_manuallySpeedValue->SetValidator(val);
 	
 	val.SetRange(0, 50000);
 	val.SetPrecision(0);
@@ -2169,18 +2122,9 @@ bool MainFrame::openInitialTemplateFile() {
 void MainFrame::updateUnit() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
-	wxString unit = m_unit->GetValue();
-
-	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	wxASSERT(cncManuallyMoveCoordPanel);
 	
-	double xLimit = +cncConfig->getMaxDimensionX()/2; // [mm]
-	double yLimit = +cncConfig->getMaxDimensionY()/2; // [mm]
-	double zLimit = +cncConfig->getMaxDimensionZ()/2; // [mm]
-	
-	double valueX = m_xManuallySlider->GetValue();
-	double valueY = m_yManuallySlider->GetValue();
-	double valueZ = m_zManuallySlider->GetValue();
+	const wxString unit = m_unit->GetValue();
 	
 	wxString xAppPos(m_xAxis->GetValue());
 	wxString yAppPos(m_yAxis->GetValue());
@@ -2189,99 +2133,30 @@ void MainFrame::updateUnit() {
 	wxString yCtlPos(m_yAxisCtl->GetValue());
 	wxString zCtlPos(m_zAxisCtl->GetValue());
 	
-	int precision = 0;
-
 	if ( unit == "mm" ) { 
-		cncConfig->setDisplayUnit(CncMetric); 
-		precision = 3;
-		
-		valueX *= THE_CONFIG->getDisplayFactX();
-		valueY *= THE_CONFIG->getDisplayFactY();
-		valueZ *= THE_CONFIG->getDisplayFactZ();
-		
-		m_metricX->SetValue(wxString::Format("%4.3lf", valueX));
-		m_metricY->SetValue(wxString::Format("%4.3lf", valueY));
-		m_metricZ->SetValue(wxString::Format("%4.3lf", valueZ));
+		THE_CONFIG->setDisplayUnit(CncMetric); 
 		
 		long v; 
-		xAppPos.ToLong(&v);
-		m_xAxis->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactX())));
-		
-		yAppPos.ToLong(&v);
-		m_yAxis->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactY())));
-		
-		zAppPos.ToLong(&v);
-		m_zAxis->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactZ())));
-		
-		xCtlPos.ToLong(&v);
-		m_xAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactX())));
-		
-		yCtlPos.ToLong(&v);
-		m_yAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactY())));
-		
-		zCtlPos.ToLong(&v);
-		m_zAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactZ())));
+		xAppPos.ToLong(&v); m_xAxis->ChangeValue   (wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactX())));
+		yAppPos.ToLong(&v); m_yAxis->ChangeValue   (wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactY())));
+		zAppPos.ToLong(&v); m_zAxis->ChangeValue   (wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactZ())));
+		xCtlPos.ToLong(&v); m_xAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactX())));
+		yCtlPos.ToLong(&v); m_yAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactY())));
+		zCtlPos.ToLong(&v); m_zAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * THE_CONFIG->getDisplayFactZ())));
 		
 	} else {
-		xLimit *= THE_CONFIG->getCalculationFactX();
-		yLimit *= THE_CONFIG->getCalculationFactY();
-		zLimit *= THE_CONFIG->getCalculationFactZ();
-		
-		cncConfig->setDisplayUnit(CncSteps);
-		
-		valueX *= THE_CONFIG->getCalculationFactX();
-		valueY *= THE_CONFIG->getCalculationFactY();
-		valueZ *= THE_CONFIG->getCalculationFactZ();
-		
-		m_metricX->SetValue(wxString::Format("%ld", (long)valueX));
-		m_metricY->SetValue(wxString::Format("%ld", (long)valueY));
-		m_metricZ->SetValue(wxString::Format("%ld", (long)valueZ));
+		THE_CONFIG->setDisplayUnit(CncSteps);
 		
 		double v; 
-		xAppPos.ToDouble(&v);
-		m_xAxis->ChangeValue(wxString::Format("%ld",    (long)(v * THE_CONFIG->getCalculationFactX())));
-		
-		yAppPos.ToDouble(&v);
-		m_yAxis->ChangeValue(wxString::Format("%ld",    (long)(v * THE_CONFIG->getCalculationFactY())));
-		
-		zAppPos.ToDouble(&v);
-		m_zAxis->ChangeValue(wxString::Format("%ld",    (long)(v * THE_CONFIG->getCalculationFactZ())));
-		
-		xCtlPos.ToDouble(&v);
-		m_xAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactX())));
-		
-		yCtlPos.ToDouble(&v);
-		m_yAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactY())));
-		
-		zCtlPos.ToDouble(&v);
-		m_zAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactZ())));
-		
-		precision = 0;
+		xAppPos.ToDouble(&v); m_xAxis->ChangeValue   (wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactX())));
+		yAppPos.ToDouble(&v); m_yAxis->ChangeValue   (wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactY())));
+		zAppPos.ToDouble(&v); m_zAxis->ChangeValue   (wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactZ())));
+		xCtlPos.ToDouble(&v); m_xAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactX())));
+		yCtlPos.ToDouble(&v); m_yAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactY())));
+		zCtlPos.ToDouble(&v); m_zAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * THE_CONFIG->getCalculationFactZ())));
 	}
 	
-	m_xManuallySlider->SetMin(-xLimit);
-	m_xManuallySlider->SetMax(+xLimit);
-	m_yManuallySlider->SetMin(-yLimit);
-	m_yManuallySlider->SetMax(+yLimit);
-	m_zManuallySlider->SetMin(-zLimit);
-	m_zManuallySlider->SetMax(+zLimit);
-	
-	m_xManuallySlider->SetValue(valueX);
-	m_yManuallySlider->SetValue(valueY);
-	m_zManuallySlider->SetValue(valueZ);
-	
-	val.SetPrecision(precision);
-	val.SetRange(-xLimit, +xLimit);
-	
-	m_metricX->SetValidator(val);
-	m_metricY->SetValidator(val);
-	m_metricZ->SetValidator(val);
-	
-	// manual control
-	m_mmUnitX->SetLabel(unit);
-	m_mmUnitY->SetLabel(unit);
-	m_mmUnitZ->SetLabel(unit);
-
+	cncManuallyMoveCoordPanel->updateUnit();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::OnExit(wxCommandEvent& event) {
@@ -2340,6 +2215,7 @@ bool MainFrame::connectSerialPortDialog() {
 bool MainFrame::connectSerialPort() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
+	wxASSERT( cncManuallyMoveCoordPanel );
 	
 	const wxBitmap bmpC = ImageLib16().Bitmap("BMP_CONNECTED");
 	const wxBitmap bmpD = ImageLib16().Bitmap("BMP_DISCONNECTED");
@@ -2402,6 +2278,7 @@ bool MainFrame::connectSerialPort() {
 		}
 	}
 	
+	cncManuallyMoveCoordPanel->reset();
 	updateSetterList();
 	decoratePortSelector();
 	m_connect->Refresh();
@@ -2428,7 +2305,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		wxString serialFileName		= "";
 		bool probeMode				= false;
 		bool secureDlg				= false;
-		bool speedControl			= false;
 		bool pathListEntries		= false;
 		bool moveSequences			= false;
 		bool vertexTrace			= false;
@@ -2441,7 +2317,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.serialFileName.assign("dev/null");
 		setup.probeMode			= true;
 		setup.secureDlg			= false;
-		setup.speedControl		= false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2452,7 +2327,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundTxtFileName());
 		setup.probeMode			= true;
 		setup.secureDlg			= false;
-		setup.speedControl		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2463,7 +2337,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundSvgFileName());
 		setup.probeMode			= true;
 		setup.secureDlg			= false;
-		setup.speedControl		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2474,7 +2347,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundGCodeFileName());
 		setup.probeMode			= true;
 		setup.secureDlg			= false;
-		setup.speedControl		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2485,7 +2357,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
 		setup.probeMode			= true;
 		setup.secureDlg			= false;
-		setup.speedControl		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2496,7 +2367,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.serialFileName.assign("::Arduino");
 		setup.probeMode			= true;
 		setup.secureDlg			= false;
-		setup.speedControl		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2506,8 +2376,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		
 		setup.serialFileName.assign(wxString::Format("\\\\.\\%s", sel));
 		setup.probeMode			= false;
-		setup.secureDlg			= true;
-		setup.speedControl		= true;
+		setup.secureDlg			= false;
 		setup.pathListEntries	= false;
 		setup.moveSequences		= false;
 		setup.vertexTrace		= false;
@@ -2520,7 +2389,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 //		bool pathListEntries		= THE_CONFIG->getPreProcessorCntPathListEntries();
 //		bool moveSequences			= THE_CONFIG->getPreProcessorCntMoveSequneces();
 
-		setup.speedControl		= false;
 		setup.pathListEntries	= false;
 		setup.moveSequences		= false;
 		setup.vertexTrace		= false;
@@ -2532,7 +2400,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	// config setup
 	serialFileName.assign(setup.serialFileName);
 	THE_CONTEXT->setProbeMode(setup.probeMode);
-	THE_CONTEXT->setSpeedCtrlMode(setup.speedControl);
 	
 	decorateSecureDlgChoice(setup.secureDlg);
 	
@@ -3474,20 +3341,10 @@ bool MainFrame::processGCodeTemplate() {
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::changeManuallySpeedSlider(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	changeManuallySpeedValue();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::changeManuallySpeedValue() {
-///////////////////////////////////////////////////////////////////
-	double fact = m_manuallySpeedSlider->GetValue()/100.0;
-	m_manuallySpeedValue->ChangeValue(wxString::Format("%5.1lf", fact * THE_CONFIG->getMaxSpeedXYZ_MM_MIN()));
-}
-///////////////////////////////////////////////////////////////////
 bool MainFrame::processManualTemplate() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc != NULL );
+	wxASSERT( cnc );
+	wxASSERT( cncManuallyMoveCoordPanel );
 	
 	if ( inboundFileParser != NULL )
 		delete inboundFileParser;
@@ -3497,14 +3354,14 @@ bool MainFrame::processManualTemplate() {
 
 	ManuallyPathHandlerCnc::MoveDefinition move;
 	move.speedMode 		= CncSpeedUserDefined;
-	move.absoluteMove	= ( m_mmRadioCoordinates->GetSelection() == 0 );
-	move.toolState		= m_checkBoxToolEnabled->GetValue();
-	move.correctLimit   = m_manuallyCorrectLimitPos->GetValue();
+	move.absoluteMove	= cncManuallyMoveCoordPanel->isAbsoluteMove();
+	move.toolState		= cncManuallyMoveCoordPanel->switchToolOn();
+	move.correctLimit   = cncManuallyMoveCoordPanel->correctLimitStates();
 	
-	m_manuallySpeedValue->GetValue().ToDouble(&move.f);
-	m_metricX->GetValue().ToDouble(&move.x);
-	m_metricY->GetValue().ToDouble(&move.y);
-	m_metricZ->GetValue().ToDouble(&move.z);
+	move.f = cncManuallyMoveCoordPanel->getSpeedValueMM_MIN();
+	move.x = cncManuallyMoveCoordPanel->getValueX();
+	move.y = cncManuallyMoveCoordPanel->getValueY();
+	move.z = cncManuallyMoveCoordPanel->getValueZ();
 	
 	if ( m_unit->GetValue() == "steps" ) {
 		move.x *= THE_CONFIG->getDisplayFactX();
@@ -3870,6 +3727,7 @@ bool MainFrame::checkReferencePositionState() {
 
 	if ( isZeroReferenceValid == false ) {
 		const TemplateFormat tf = getCurrentTemplateFormat();
+		
 		if ( tf != TplManual && tf != TplTest ) {
 			wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n");
 			
@@ -3881,36 +3739,36 @@ bool MainFrame::checkReferencePositionState() {
 				// stopp the current startet run. 
 				return false;
 			}
-		}
-	}
 	
-	// check current position
-	if ( zero ) {
-		wxASSERT( cnc != NULL );
+			// check current position
+			if ( zero ) {
+				wxASSERT( cnc != NULL );
 
-		bool openDlg = false;
-		switch ( THE_CONFIG->getRunConfirmationModeAsChar() ) {
-			// Always
-			case 'A':	openDlg = true; break;
-			// Serial Port only
-			case 'S': 	openDlg = !cnc->isEmulator(); break;
-			// Never
-			default:	openDlg = false;
+				bool openDlg = false;
+				switch ( THE_CONFIG->getRunConfirmationModeAsChar() ) {
+					// Always
+					case 'A':	openDlg = true; break;
+					// Serial Port only
+					case 'S': 	openDlg = !cnc->isEmulator(); break;
+					// Never
+					default:	openDlg = false;
+				}
+
+				CncStartPositionResolver dlg(this);
+				int ret = wxID_OK;
+
+				if ( openDlg == true ) 	ret = dlg.ShowModal();
+				else 					ret = dlg.resolve();
+
+				if ( ret == wxID_OK )
+					cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
+				
+				// Safety: Always return false in this case because this will
+				// stopp the current startet run. 
+				if ( openDlg == true )
+					return false;
+			}
 		}
-
-		CncStartPositionResolver dlg(this);
-		int ret = wxID_OK;
-
-		if ( openDlg == true ) 	ret = dlg.ShowModal();
-		else 					ret = dlg.resolve();
-
-		if ( ret == wxID_OK )
-			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
-		
-		// Safety: Always return false in this case because this will
-		// stopp the current startet run. 
-		if ( openDlg == true )
-			return false;
 	}
 	
 	return true;
@@ -4166,7 +4024,16 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		if ( checkReferencePositionState() == false )
 			return false;
 		
-		clearMotionMonitor();
+		wxASSERT( cncManuallyMoveCoordPanel );
+		const TemplateFormat tf = getCurrentTemplateFormat();
+		bool clearMM = true;
+		
+		if ( tf == TplManual )  clearMM = cncManuallyMoveCoordPanel->shouldClearMontionMonitor();
+		else  					cncManuallyMoveCoordPanel->resetClearViewState();
+		
+		if ( clearMM )  
+			clearMotionMonitor();
+			
 		decorateOutboundSaveControls(false);
 		cncPreprocessor->clearAll();
 		
@@ -4918,39 +4785,6 @@ void MainFrame::openCalculator(wxCommandEvent& event) {
 	openFileExtern(cmd, _(""));
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::moveManuallySliderX(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_xManuallySlider->GetValue()));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
-	}
-	m_metricX->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::moveManuallySliderY(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_yManuallySlider->GetValue()));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
-	}
-	m_metricY->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::moveManuallySliderZ(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_zManuallySlider->GetValue()));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
-	}
-	m_metricZ->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::enableTestControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 	// handle interval mode
@@ -4960,237 +4794,6 @@ void MainFrame::enableTestControls(bool state) {
 
 		m_testCountY->Enable(mode == 'A');
 		m_testCountZ->Enable(mode == 'A');
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::changeManuallySliderX(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	moveManuallySliderX(event);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::changeManuallySliderY(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	moveManuallySliderY(event);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::changeManuallySliderZ(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	moveManuallySliderZ(event);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::minManuallyXSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_xManuallySlider->SetValue(m_xManuallySlider->GetMin());
-	
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_xManuallySlider->GetValue()));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
-	}
-	m_metricX->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::maxManuallyXSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_xManuallySlider->SetValue(m_xManuallySlider->GetMax());
-	
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_xManuallySlider->GetValue()));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
-	}
-	m_metricX->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::minManuallyYSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_yManuallySlider->SetValue(m_yManuallySlider->GetMin());
-	
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_yManuallySlider->GetValue()));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
-	}
-	m_metricY->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::maxManuallyYSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_yManuallySlider->SetValue(m_yManuallySlider->GetMax());
-	
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_yManuallySlider->GetValue()));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
-	}
-	m_metricY->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::minManuallyZSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_zManuallySlider->SetValue(m_zManuallySlider->GetMin());
-	
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_zManuallySlider->GetValue() ));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
-	}
-	m_metricZ->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::maxManuallyZSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_zManuallySlider->SetValue(m_zManuallySlider->GetMax());
-	
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"),    (int)(m_zManuallySlider->GetValue()));
-	} else {
-		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
-	}
-	m_metricZ->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::zeroManuallyXSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_xManuallySlider->SetValue(0);
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), 0);
-	} else {
-		val = wxString::Format(wxT("%4.3f"), 0.0);
-	}
-	m_metricX->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::zeroManuallyYSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_yManuallySlider->SetValue(0);
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), 0);
-	} else {
-		val = wxString::Format(wxT("%4.3f"), 0.0);
-	}
-	m_metricY->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::zeroManuallyZSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_zManuallySlider->SetValue(0);
-	wxString val;
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), 0);
-	} else {
-		val = wxString::Format(wxT("%4.3f"), 0.0);
-	}
-	m_metricZ->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::signManuallyXSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val = m_metricX->GetValue();
-	double v;
-	val.ToDouble(&v);
-	if ( v != 0.0 )
-		v *= -1;
-	
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%6.0f"), v);
-		m_xManuallySlider->SetValue(v);
-	} else {
-		val = wxString::Format(wxT("%4.3f"), v);
-		m_xManuallySlider->SetValue(v);
-	}
-	
-	m_metricX->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::signManuallyYSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val = m_metricY->GetValue();
-	double v;
-	val.ToDouble(&v);
-	if ( v != 0.0 )
-		v *= -1;
-	
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%6.0f"), v);
-		m_yManuallySlider->SetValue(v);
-	} else {
-		val = wxString::Format(wxT("%4.3f"), v);
-		m_yManuallySlider->SetValue(v);
-	}
-	
-	m_metricY->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::signManuallyZSlider(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val = m_metricZ->GetValue();
-	double v;
-	val.ToDouble(&v);
-	if ( v != 0.0 )
-		v *= -1;
-	
-	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%6.0f"), v);
-		m_zManuallySlider->SetValue(v);
-	} else {
-		val = wxString::Format(wxT("%4.3f"), v);
-		m_zManuallySlider->SetValue(v);
-	}
-	
-	m_metricZ->SetValue(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateMetricX(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val = m_metricX->GetValue();
-
-	if ( m_unit->GetValue() == "steps" ) {
-		long v;
-		val.ToLong(&v);
-		m_xManuallySlider->SetValue(v);
-	} else {
-		double v;
-		val.ToDouble(&v);
-		m_xManuallySlider->SetValue(v);
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateMetricY(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val = m_metricY->GetValue();
-	
-	if ( m_unit->GetValue() == "steps" ) {
-		long v;
-		val.ToLong(&v);
-		m_yManuallySlider->SetValue(v);
-	} else {
-		double v;
-		val.ToDouble(&v);
-		m_yManuallySlider->SetValue(v);
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateMetricZ(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString val = m_metricZ->GetValue();
-	
-	if ( m_unit->GetValue() == "steps" ) {
-		long v;
-		val.ToLong(&v);
-		m_zManuallySlider->SetValue(v);
-	} else {
-		double v;
-		val.ToDouble(&v);
-		m_zManuallySlider->SetValue(v);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -7308,52 +6911,6 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::clickSpeedControl(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	// this forces decorateSpeedControl(...) also
-	THE_CONTEXT->setSpeedCtrlMode(m_btSpeedControl->GetValue());
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::decorateSpeedControl(bool useSpeedCfg) {
-/////////////////////////////////////////////////////////////////////
-	if ( useSpeedCfg == true )	{
-		const wxString tt("Speed Controller is ON\nThis forces the controller to work with the configured speed");
-		m_btSpeedControl->SetBitmap((ImageLibSpeed().Bitmap("BMP_SPEED_CTRL_ON")));
-		m_btSpeedControl->SetToolTip(tt);
-		
-		m_speedCtrlState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_YELLOW"));
-		m_speedCtrlState->SetToolTip(tt);
-		m_speedCtrlStateLabel->SetLabel(" ON");
-		
-		m_btProbeMode->SetValue(true);
-		THE_CONTEXT->setProbeMode(m_btProbeMode->GetValue());
-		m_btProbeMode->Enable(true);
-		
-	} else {
-		const wxString tt("Speed Controller is OFF\nThis forces the controller to work as fast as possible\nTherefore ProbeMode=ON is mandatory");
-		m_btSpeedControl->SetBitmap((ImageLibSpeed().Bitmap("BMP_SPEED_CTRL_OFF")));
-		m_btSpeedControl->SetToolTip(tt);
-		
-		m_speedCtrlState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_DEFAULT"));
-		m_speedCtrlState->SetToolTip(tt);
-		m_speedCtrlStateLabel->SetLabel(" OFF");
-		
-		m_btProbeMode->SetValue(false);
-		THE_CONTEXT->setProbeMode(m_btProbeMode->GetValue());
-		m_btProbeMode->Enable(false);
-		
-	}
-	
-	if ( speedMonitor )
-		speedMonitor->activate(m_btSpeedControl->GetValue());
-
-	m_btSpeedControl->SetValue(useSpeedCfg);
-	m_btSpeedControl->Refresh();
-	
-	m_speedCtrlState->Refresh();
-	m_speedCtrlStateLabel->Refresh();
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( updateManagerThread != NULL ) {
@@ -7525,7 +7082,7 @@ void MainFrame::cncMainViewChanged(wxNotebookEvent& event) {
 	if ( event.GetOldSelection() == MainBookSelection::VAL::PREVIEW_PANEL ) {
 		wxASSERT( lruFileView != NULL );
 		lruFileView->selectFirstItem();
-	}
+	} 
 	
 	activateGamepadNotificationsOnDemand(true);
 }

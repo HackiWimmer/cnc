@@ -69,7 +69,7 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
 
     // ----------------------------------------------------------------------
 #ifdef SKETCH_COMPILE
-    void debugValues(byte) {
+    void debugValues(byte /*idx*/) {
 #else
     void debugValues(byte idx) {
 #endif  
@@ -231,10 +231,11 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
         logError(14, E_INVALID_MOVE_SEQUENCE);
         
       if ( true ) {
-        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.totalLength", result.totalLength)
-        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthX    ", result.lengthX)
-        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthY    ", result.lengthY)
-        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthZ    ", result.lengthZ)
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.totalLength  [bytes} ", result.totalLength)
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.impulseCount     [#] ", result.impulseCount)
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthX      [steps] ", result.lengthX)
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthY      [steps] ", result.lengthY)
+        ARDO_DEBUG_VALUE("ArduinoCmdDecoderMoveSequence: result.lengthZ      [steps] ", result.lengthZ)
       }
 
       result.totalRemaining = result.totalLength;

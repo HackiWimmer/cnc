@@ -6,11 +6,15 @@
 ///////////////////////////////////////////////////////////////////////////////////
 namespace CtrlSpeedValues {
 
-  float getMaxF_1DX_MMSec();
-  float getMaxF_1DY_MMSec();
-  float getMaxF_1DZ_MMSec();
-  float getMaxF_2DXY_MMSec();
-  float getMaxF_3DXYZ_MMSec();
+  #ifndef SKETCH_COMPILE
+  
+    float getMaxF_1DX_MMSec();
+    float getMaxF_1DY_MMSec();
+    float getMaxF_1DZ_MMSec();
+    float getMaxF_2DXY_MMSec();
+    float getMaxF_3DXYZ_MMSec();
+    
+  #endif
  
   void setupTact(int16_t pwX, int16_t pwY, int16_t pwZ);
   void setupMaxSpeed(float frX, float frY, float frZ);

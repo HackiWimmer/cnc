@@ -28,7 +28,7 @@
   const unsigned char PIN_Z_LIMIT                         =  11;
 
   const unsigned char PIN_TOOL_ENABLE                     =  12;
-  const unsigned char PIN_TOOL_FEEDBACK                   =  13;
+  const unsigned char PIN_EXTERNAL_INTERRUPT              =  13;
 
   // A0 CNC Shield: Reset/Abort
   // A1 CNC Shield: Feed Hold
@@ -92,6 +92,8 @@
   const unsigned char CMD_PRINT_VERSION                   =  'V'; //  86 0x56
   const unsigned char CMD_PRINT_PIN_REPORT                =  'Q'; //  81 0x51
     
+  const unsigned char CMD_PERFORM_TEST                    =  't'; // 116 0x74
+  
   // Ranges reserved via above definitions:
   //   48 -  57 --> '0'..'9'
   //   65 -  90 --> 'A'..'Z'
@@ -206,6 +208,9 @@
   const unsigned char PID_GET_STEP_COUNTER_X              = 113;
   const unsigned char PID_GET_STEP_COUNTER_Y              = 114;
   const unsigned char PID_GET_STEP_COUNTER_Z              = 115;
+  const unsigned char PID_GET_US_PER_IMPL_MEASUREMENT1    = 116;
+  const unsigned char PID_GET_US_PER_IMPL_MEASUREMENT2    = 117;
+  const unsigned char PID_GET_US_PER_IMPL_MEASUREMENT3    = 118;
 
 // .....................................................................
 // end long pid range [PID_FLOAT_RANG_END] 
@@ -282,8 +287,9 @@
 
   const unsigned char E_LIMIT_SWITCH_ACTIVE               =  51;
 
-  const unsigned char E_PURE_TEXT_VALUE_ERROR             = 252;
-  const unsigned char E_INTERRUPT                         = 253;
+  const unsigned char E_PURE_TEXT_VALUE_ERROR             = 253;
+  const unsigned char E_INTERRUPT                         = 252;
+  const unsigned char E_EXTERNEL_INTERRUPT                = 253;
   const unsigned char E_TOTAL_COUNT                       = 254;
 
 // .........................................................
@@ -314,6 +320,9 @@
   #define ENABLE_STATE_OFF                               PL_HIGH
   #define ENABLE_STATE_ON                                PL_LOW 
 
+  #define EXTERNAL_INTERRRUPT_OFF                        PL_HIGH
+  #define EXTERNAL_INTERRRUPT_ON                         PL_LOW
+
   #define PAUSE_ACTIVE                                   true
   #define PAUSE_INACTIVE                                 false
 
@@ -324,11 +333,13 @@
   const char      TEXT_SEPARATOR                         = ':';
 
   const uint32_t minSerialReadTimeoutMicros              = 10L * 1000L;
-  const int16_t moveUntilAccelPeriod                     = 2500; // ms
+  const int16_t  moveUntilAccelPeriod                    = 2500; // ms
   //const int16_t cncHeartbeatInterval                     = 2000; // milli seconds
 
   const int8_t  NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;
   const int8_t  INVERSED_INCREMENT_DIRECTION_VALUE       = 0;
+
+  const int16_t  MIN_DURATION_PER_STEP_US                = 240;
 
   // MAX_SERIAL_BUFFER_SIZE:
   // - 64 byte is the standard UNO buffer sizes

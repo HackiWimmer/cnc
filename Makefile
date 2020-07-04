@@ -1,8 +1,8 @@
 .PHONY: clean All
 
 All:
-	@echo "----------Building project:[ CncConrollerGui - Release ]----------"
-	@cd "CncControlerGui" && "$(MAKE)" -f  "CncConrollerGui.mk" PreBuild && "$(MAKE)" -f  "CncConrollerGui.mk"
+	@echo "----------Building project:[ CncControllerGui - Release ]----------"
+	@cd "CncControlerGui" && "$(MAKE)" -f  "CncControllerGui.mk" PreBuild && "$(MAKE)" -f  "CncControllerGui.mk"
 clean:
-	@echo "----------Cleaning project:[ CncConrollerGui - Release ]----------"
-	@cd "CncControlerGui" && "$(MAKE)" -f  "CncConrollerGui.mk" clean
+	@echo "----------Cleaning project:[ CncControllerGui - Release ]----------"
+	@cd "CncControlerGui" && "$(MAKE)" -f  "CncControllerGui.mk" clean

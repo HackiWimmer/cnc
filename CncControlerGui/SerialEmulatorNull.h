@@ -198,22 +198,24 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		CncNanoTimestamp 	tsMoveStart;
 		uint64_t			usToSleep;
 		
-		int32_t positionCounter;
-		int32_t stepCounterX;
-		int32_t stepCounterY;
-		int32_t stepCounterZ;
-
-		int32_t positionOverflowCounter;
-		int32_t stepOverflowCounterX;
-		int32_t stepOverflowCounterY;
-		int32_t stepOverflowCounterZ;
-
-		SetterMap setterMap;
-		CncLongPosition targetMajorPos;
-		CncLongPosition curEmulatorPos;
+		bool				stepperEnableState;
 		
-		double cfgFeedSpeed_MMMin;
-		double rtmFeedSpeed_MMMin;
+		int32_t 			positionCounter;
+		int32_t 			stepCounterX;
+		int32_t 			stepCounterY;
+		int32_t				stepCounterZ;
+
+		int32_t 			positionOverflowCounter;
+		int32_t 			stepOverflowCounterX;
+		int32_t 			stepOverflowCounterY;
+		int32_t 			stepOverflowCounterZ;
+
+		SetterMap 			setterMap;
+		CncLongPosition 	targetMajorPos;
+		CncLongPosition 	curEmulatorPos;
+		
+		double 				cfgFeedSpeed_MMMin;
+		double 				rtmFeedSpeed_MMMin;
 		
 		inline bool writeMoveCmdIntern(unsigned char *buffer, unsigned int nbByte);
 		inline bool writeMoveSeqIntern(unsigned char *buffer, unsigned int nbByte);

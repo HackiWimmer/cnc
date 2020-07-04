@@ -20,6 +20,7 @@ class ArduinoMainLoop {
     void            printSketchVersion();
     void            printSketchTimestamp();
     byte            reset();
+    byte            performTest();
     void            printConfig();
     
   public:

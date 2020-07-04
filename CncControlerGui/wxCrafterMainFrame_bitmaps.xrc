@@ -166,7 +166,6 @@
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>
-  <object class="wxBitmap" name="time-add">bitmaps\time-add.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>

@@ -81,8 +81,8 @@ void CncMonitorVSplitterWindow::showRightWindow(bool show) {
 	//const int splitterWidth	= IsShown() ? GetSize().GetWidth() : 2000;
 	const int splitterWidth	= 2000;
 	
-	CNC_PRINT_LOCATION
-	std::cout << "show = " << show <<  "; splitterWidth = " << splitterWidth << std::endl;
+	//CNC_PRINT_LOCATION
+	//std::cout << "show = " << show <<  "; splitterWidth = " << splitterWidth << std::endl;
 
 	if ( show == false ) {
 		// Use a min pane size > 0, otherwise the pane may be disappears for ever

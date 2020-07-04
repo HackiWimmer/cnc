@@ -102,7 +102,7 @@ void ArduinoMainLoop::printPinReport() {
     printDigitalPin(PIN_Z_LIMIT,              I);
 
     printDigitalPin(PIN_TOOL_ENABLE,          I);
-    printDigitalPin(PIN_TOOL_FEEDBACK,        I);
+    printDigitalPin(PIN_EXTERNAL_INTERRUPT,   I);
                    
     printAnalogPin(PIN_INTERRUPT_LED_ID,      I);
 
@@ -658,12 +658,12 @@ void ArduinoMainLoop::setup() {
   Serial.flush();
 
   // digital pins
-  AE::pinMode(PIN_X_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_X_DIR,       PL_LOW);
-  AE::pinMode(PIN_Y_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,       PL_LOW);
-  AE::pinMode(PIN_Z_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,       PL_LOW);
   AE::pinMode(PIN_X_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,       PL_LOW);
   AE::pinMode(PIN_Y_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,       PL_LOW);
   AE::pinMode(PIN_Z_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,       PL_LOW);
+  AE::pinMode(PIN_X_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_X_DIR,       PL_LOW);
+  AE::pinMode(PIN_Y_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,       PL_LOW);
+  AE::pinMode(PIN_Z_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,       PL_LOW);
 
   AE::pinMode(PIN_X_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_LIMIT,     LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Y_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_LIMIT,     LimitSwitch::LIMIT_SWITCH_OFF);
@@ -676,7 +676,20 @@ void ArduinoMainLoop::setup() {
 
   reset();
   controller->evaluateI2CAvailable();
+
+ #if (0)
+  #ifdef SKETCH_COMPILE 
+    #warning  ilegal use of pin 2  - temp for testing only!
+    pinMode(PIN_X_STP, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(PIN_X_STP), externalInterrupt, CHANGE);
+  #endif
+ #endif
 }
+
+void externalInterrupt() {
+  PRINT_DEBUG_VALUE("Interrupt", "hallo")
+}
+
 ///////////////////////////////////////////////////////
 void ArduinoMainLoop::loop() {
 ///////////////////////////////////////////////////////
@@ -763,6 +776,14 @@ void ArduinoMainLoop::loop() {
           r = RET_OK;
           break;
    
+    // --------------------------------------------------------------------------
+    // Commands - for tests only
+    // MB command - Pin report
+    case CMD_PERFORM_TEST:
+          r =  controller->performTest();
+          break;
+    
+    // --------------------------------------------------------------------------
     default: 
           LastErrorCodes::clear();
           LastErrorCodes::register1Byte_A = c;

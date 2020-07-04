@@ -73,6 +73,8 @@ class ArduinoAccelManager {
 
     virtual void notifyACMStateChange(State s) = 0;
     virtual void notifyACMInitMove()           = 0;
+
+    void         debugACM();
     
   public:
     ArduinoAccelManager();
@@ -84,12 +86,14 @@ class ArduinoAccelManager {
     float         getDRampWidth()               const { return dRampWidth_IMPL; }
     float         getStartSpeed_MMSec()         const { return fA.C; }
     float         getStopSpeed_MMSec()          const { return fD.C; }
+    int32_t       getCurrentImpulseCount()      const { return iD_IMPL; }
 
     void          activateAccel(bool s)               { active = s; }
     
     void          setupAccelManager(const Function& fA, const Function& fD);
     bool          initMove(uint32_t mD_IMPL, float mF_MMSec);
     float         getNextTargetSpeed_MMSec();
+
 
     #ifndef SKETCH_COMPILE 
     void          traceACM(std::ostream& o, int indent);

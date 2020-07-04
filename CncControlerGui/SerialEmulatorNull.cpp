@@ -22,6 +22,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , limitStates							()
 , tsMoveStart							(0LL)
 , usToSleep								(0LL)
+, stepperEnableState					(false)
 , positionCounter						(MIN_LONG)
 , stepCounterX							(MIN_LONG)
 , stepCounterY							(MIN_LONG)
@@ -595,6 +596,7 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 	switch ( pid ) {
 		
 		case PID_QUERY_READY_TO_RUN:	    writerGetterValues(pid, (int32_t)isReadyToRun()); break;
+		case PID_ENABLE_STEPPERS:	    	writerGetterValues(pid, (int32_t)stepperEnableState); break;
 		
 		case PID_X_POS:   					writerGetterValues(pid, curEmulatorPos.getX()); break;
 		case PID_Y_POS:   					writerGetterValues(pid, curEmulatorPos.getY()); break;
@@ -683,7 +685,9 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 
 		// special handling for later use
 		switch ( pid ) {
-			case PID_POS_REPLY_THRESHOLD:   posReplyThreshold = ( values.size() > 0 ? values.front() : 0 ); break;
+			case PID_ENABLE_STEPPERS:		stepperEnableState = (bool)( values.size() > 0 ? values.front() : 0 ); break;
+			case PID_POS_REPLY_THRESHOLD:	posReplyThreshold  = ( values.size() > 0 ? values.front() : 0 ); break;
+			
 			case PID_RESERT_POS_COUNTER:  	resetPositionCounter(); break;
 			case PID_RESERT_STEP_COUNTER: 	resetStepCounter(); 	break;
 			

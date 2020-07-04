@@ -22,7 +22,6 @@ struct CncContext {
 	private:
 		OSType os						= OSType::UNDEF;
 		bool probeMode					= true;
-		bool speedCtrlMode				= true;
 		bool onlineUpdateCoordinates	= true;
 		bool onlineUpdateDrawPane		= true;
 		bool allowEventHandling			= true;
@@ -145,9 +144,6 @@ struct CncContext {
 		void setProbeMode(bool state); 
 		bool isProbeMode() { return  probeMode; }
 		
-		void setSpeedCtrlMode(bool state); 
-		bool isSpeedCtrlMode() { return speedCtrlMode; }
-
 		bool isOnlineUpdateCoordinates() 						{ return onlineUpdateCoordinates; }
 		bool isOnlineUpdateDrawPane() 							{ return onlineUpdateDrawPane; }
 		bool isAllowEventHandling() 							{ return allowEventHandling; }

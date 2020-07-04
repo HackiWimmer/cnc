@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="CncConrollerGui" InternalType="GUI" Version="11000">
+<CodeLite_Project Name="CncControllerGui" InternalType="GUI" Version="11000">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
@@ -225,6 +225,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncManuallyMoveCoordinates.h"/>
+      <File Name="CncManuallyMoveCoordinates.cpp"/>
       <File Name="CncLCDPositionPanel.h"/>
       <File Name="CncLCDPositionPanel.cpp"/>
       <File Name="CncFloatingPointValidator.cpp"/>

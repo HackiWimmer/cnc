@@ -1,6 +1,8 @@
 #ifndef ARDUINO_ENVIRONMENT_H
 #define ARDUINO_ENVIRONMENT_H
 
+  #include "ArdoVal.h"
+
   #define ARDO_LOG_FUNCT __PRETTY_FUNCTION__
 
   #ifndef SKETCH_COMPILE
@@ -78,6 +80,7 @@
 
     #define NOT_A_PIN               AE::PN_NOT_A_PIN
 
+    #define PRINT_DEBUG_VALUE(vName, vValue)          AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
     #define ARDO_DEBUG_MESSAGE(type, msg)             AE::ardoDebugMessage(type, msg, ARDO_LOG_FUNCT);
     #define ARDO_DEBUG_VALUE(vName, vValue)           AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
     #define ARDO_TRACE_STEPPER_DIR(sid, value)        AE::ardoTraceStepperDir(sid, value);
@@ -100,7 +103,22 @@
     enum PinMode   { PM_INPUT = INPUT, PM_OUTPUT = OUTPUT, PM_INPUT_PULLUP = INPUT_PULLUP };
     enum PinType   { PT_UNKNOWN = 0, PT_ANALOG = 1, PT_DIGITAL = 2 };
 
+    template<typename T>
+    void printDebugValue(const char* vName, T vValue) {
+      Serial.write(RET_SOH);
+      Serial.write(PID_MSG);
+      Serial.write(MT_DEBUG);
+  
+      Serial.print(vName); 
+      Serial.print('='); 
+      Serial.print(vValue);
+    
+      Serial.write(MBYTE_CLOSE);
+      Serial.flush();
+    }
+
     // addition helper functions
+    #define PRINT_DEBUG_VALUE(vName, vValue)    printDebugValue(vName, vValue);
     #define ARDO_DEBUG_MESSAGE(a,b)             // to eliminate this within the arduino context
     #define ARDO_DEBUG_VALUE(a,b)               // to eliminate this within the arduino context
     #define ARDO_TRACE_STEPPER_DIR(a, b)        // to eliminate this within the arduino context
