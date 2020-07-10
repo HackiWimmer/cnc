@@ -59,6 +59,8 @@ class CncMotionMonitor : public CncGlCanvas
 		CncMotionMonitor(wxWindow *parent, int *attribList = NULL);
 		virtual ~CncMotionMonitor();
 		
+		virtual void update(bool force=false);
+
 		// is used from global key down hook, that's the reason why it is public
 		void onKeyDown(wxKeyEvent& event);
 		void onKeyDown(int keyCode);
@@ -165,9 +167,11 @@ class CncMotionMonitor : public CncGlCanvas
 		void onEraseBackground(wxEraseEvent& event);
 		void onCameraRotationTimer(wxTimerEvent& event);
 		
-		void performMouseToolTip();
+		void performMouseCoordAndToolTip();
 		
 	private:
+		
+		bool processMode;
 		
 		inline void appendVertex(long id, CncSpeedMode sm, float x, float y, float z);
 		inline void onPaint();

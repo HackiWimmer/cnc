@@ -22,7 +22,6 @@ class SerialEmulatorSvgStreamer : public SerialEmulatorTextStreamer
 	public:
 	
 		explicit SerialEmulatorSvgStreamer(CncControl* cnc);
-		explicit SerialEmulatorSvgStreamer(const char *fileName);
 		virtual ~SerialEmulatorSvgStreamer();
 		
 

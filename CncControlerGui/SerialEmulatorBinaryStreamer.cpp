@@ -10,16 +10,6 @@ SerialEmulatorBinaryStreamer::SerialEmulatorBinaryStreamer(CncControl* cnc)
 {
 }
 ///////////////////////////////////////////////////////////////////
-//Initialize Serial communication with the given COM port
-SerialEmulatorBinaryStreamer::SerialEmulatorBinaryStreamer(const char* fileName) 
-: SerialEmulatorNULL(fileName)
-, CncBinaryTemplateStreamer()
-, fileName("")
-, inboundFormat(TplUnknown)
-///////////////////////////////////////////////////////////////////
-{
-}
-///////////////////////////////////////////////////////////////////
 SerialEmulatorBinaryStreamer::~SerialEmulatorBinaryStreamer() {
 ///////////////////////////////////////////////////////////////////
 }
@@ -71,7 +61,7 @@ bool SerialEmulatorBinaryStreamer::writeMoveSequenceRawCallback(unsigned char* b
 void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	if ( isReadyToStream() )
-		finalize();
+		CncBinaryTemplateStreamer::finalize();
 	
 	CncBinaryTemplateStreamer::ParameterSet ps = tr.parameter;
 	ps.fullFileName = fileName;
@@ -86,7 +76,7 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::BeginRu
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
-	if ( finalize() == false ) {
+	if ( CncBinaryTemplateStreamer::finalize() == false ) {
 		std::cerr << "SerialEmulatorStreamer::processTrigger(TrEndRun): finalize() failed" << std::endl;
 	}
 }

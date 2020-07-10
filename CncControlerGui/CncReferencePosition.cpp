@@ -154,11 +154,11 @@ void CncReferencePosition::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 		}
 		
 		if ( move == true )
-			APP_PROXY::manualContinuousMoveStart(x, y, z);
+			APP_PROXY::updateInteractiveMove(x, y, z);
 	};
 	
 	auto moveStop = [&]() {
-		APP_PROXY::manualContinuousMoveStop();
+		APP_PROXY::stopInteractiveMove();
 	};
 	
 	/*

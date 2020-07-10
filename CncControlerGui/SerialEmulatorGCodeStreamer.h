@@ -22,7 +22,6 @@ class SerialEmulatorGCodeStreamer : public SerialEmulatorTextStreamer
 	public:
 	
 		explicit SerialEmulatorGCodeStreamer(CncControl* cnc);
-		explicit SerialEmulatorGCodeStreamer(const char *fileName);
 		virtual ~SerialEmulatorGCodeStreamer();
 		
 		virtual bool isOutputAsTemplateAvailable();

@@ -240,3 +240,425 @@ CncGameportControllerBase::~CncGameportControllerBase()
     m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGameportControllerBase::onClose), NULL, this);
     
 }
+
+CncGamepadControllerSpyBase::CncGamepadControllerSpyBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC81CCInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active"));
+        wxIcon icn;
+        icn.CopyFromBitmap(iconBmp);
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+
+    
+    wxFlexGridSizer* flexGridSizer61 = new wxFlexGridSizer(6, 1, 0, 0);
+    flexGridSizer61->SetFlexibleDirection( wxBOTH );
+    flexGridSizer61->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    this->SetSizer(flexGridSizer61);
+    
+    wxFlexGridSizer* flexGridSizer63 = new wxFlexGridSizer(1, 20, 0, 0);
+    flexGridSizer63->SetFlexibleDirection( wxBOTH );
+    flexGridSizer63->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer61->Add(flexGridSizer63, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText65 = new wxStaticText(this, wxID_ANY, _("  State:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText65Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
+    m_staticText65->SetFont(m_staticText65Font);
+    
+    flexGridSizer63->Add(m_staticText65, 0, wxALL, WXC_FROM_DIP(1));
+    
+    flexGridSizer63->Add(32, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticBitmap1681 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lStrick16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(17,17)), 0 );
+    
+    flexGridSizer63->Add(m_staticBitmap1681, 0, wxALL, WXC_FROM_DIP(0));
+    m_staticBitmap1681->SetMinSize(wxSize(16,16));
+    
+    m_staticBitmap168 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(17,17)), 0 );
+    
+    flexGridSizer63->Add(m_staticBitmap168, 0, wxALL, WXC_FROM_DIP(0));
+    m_staticBitmap168->SetMinSize(wxSize(16,16));
+    
+    m_staticText651 = new wxStaticText(this, wxID_ANY, _("Position Mode:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText651Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
+    m_staticText651->SetFont(m_staticText651Font);
+    
+    flexGridSizer63->Add(m_staticText651, 0, wxALL, WXC_FROM_DIP(1));
+    
+    flexGridSizer63->Add(24, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticBitmap122 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-cross-dark-icon16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer63->Add(m_staticBitmap122, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticText58 = new wxStaticText(this, wxID_ANY, _("Step Sensiitivity:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    flexGridSizer63->Add(m_staticText58, 0, wxALL, WXC_FROM_DIP(1));
+    
+    flexGridSizer63->Add(38, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText131 = new wxStaticText(this, wxID_ANY, _("X/Y"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText131Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText131->SetFont(m_staticText131Font);
+    
+    flexGridSizer63->Add(m_staticText131, 0, wxALL, WXC_FROM_DIP(1));
+    
+    flexGridSizer63->Add(38, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText133 = new wxStaticText(this, wxID_ANY, _("Z"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText133Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText133->SetFont(m_staticText133Font);
+    
+    flexGridSizer63->Add(m_staticText133, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticLine73 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer61->Add(m_staticLine73, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer27 = new wxFlexGridSizer(1, 20, 0, 0);
+    flexGridSizer27->SetFlexibleDirection( wxBOTH );
+    flexGridSizer27->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer61->Add(flexGridSizer27, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticLine163 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer27->Add(m_staticLine163, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_gamepadState = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer27->Add(m_gamepadState, 0, wxALL, WXC_FROM_DIP(8));
+    
+    m_staticLine60 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer27->Add(m_staticLine60, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_gpBmp1 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_all-small")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer27->Add(m_gpBmp1, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_gpBmp2 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_updown-small")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer27->Add(m_gpBmp2, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_gpBmp3 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lstick_all-small")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer27->Add(m_gpBmp3, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_gpBmp4 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer27->Add(m_gpBmp4, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticLine71 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer27->Add(m_staticLine71, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxArrayString m_chStepsSensitivityArr;
+    m_chStepsSensitivityArr.Add(wxT("Finest"));
+    m_chStepsSensitivityArr.Add(wxT("Fine"));
+    m_chStepsSensitivityArr.Add(wxT("Medium"));
+    m_chStepsSensitivityArr.Add(wxT("Rought"));
+    m_chStepsSensitivityArr.Add(wxT("Roughest"));
+    m_chStepsSensitivity = new wxChoice(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(100,26)), m_chStepsSensitivityArr, 0);
+    m_chStepsSensitivity->SetSelection(1);
+    
+    flexGridSizer27->Add(m_chStepsSensitivity, 0, wxALL, WXC_FROM_DIP(5));
+    m_chStepsSensitivity->SetMinSize(wxSize(100,26));
+    
+    m_staticLine716 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer27->Add(m_staticLine716, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    flexGridSizer27->Add(12, 0, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_bmpCompassXY = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("compass_000")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(37,37)), 0 );
+    
+    flexGridSizer27->Add(m_bmpCompassXY, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(1));
+    m_bmpCompassXY->SetMinSize(wxSize(37,37));
+    
+    flexGridSizer27->Add(16, 0, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_bmpCompassZ = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("compass_090")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(37,37)), 0 );
+    
+    flexGridSizer27->Add(m_bmpCompassZ, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(1));
+    m_bmpCompassZ->SetMinSize(wxSize(37,37));
+    
+    flexGridSizer27->Add(12, 0, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticLine161 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer27->Add(m_staticLine161, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticLine733 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer61->Add(m_staticLine733, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    wxFlexGridSizer* flexGridSizer95 = new wxFlexGridSizer(1, 9, 0, 0);
+    flexGridSizer95->SetFlexibleDirection( wxBOTH );
+    flexGridSizer95->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer61->Add(flexGridSizer95, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticBitmap56 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-square-dark-icon16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer95->Add(m_staticBitmap56, 0, wxALL, WXC_FROM_DIP(1));
+    
+    flexGridSizer95->Add(5, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText97 = new wxStaticText(this, wxID_ANY, _("Open Reference Position Dialog"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    flexGridSizer95->Add(m_staticText97, 0, wxALL, WXC_FROM_DIP(1));
+    
+    flexGridSizer95->Add(5, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticLine171 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer95->Add(m_staticLine171, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    flexGridSizer95->Add(5, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticBitmap562 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(17,17)), 0 );
+    
+    flexGridSizer95->Add(m_staticBitmap562, 0, wxALL, WXC_FROM_DIP(1));
+    m_staticBitmap562->SetMinSize(wxSize(16,16));
+    
+    flexGridSizer95->Add(5, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText174 = new wxStaticText(this, wxID_ANY, _("Open Navigator"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    flexGridSizer95->Add(m_staticText174, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_continuesTimer = new wxTimer;
+    m_continuesTimer->Start(1000, false);
+    
+    SetName(wxT("CncGamepadControllerSpyBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    m_gpBmp1->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickNaviXY), NULL, this);
+    m_gpBmp2->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickNaviZ), NULL, this);
+    m_gpBmp3->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickLeftStick), NULL, this);
+    m_gpBmp4->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickRightStick), NULL, this);
+    m_chStepsSensitivity->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(CncGamepadControllerSpyBase::selectSensitivity), NULL, this);
+    m_continuesTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncGamepadControllerSpyBase::onContinuesTimer), NULL, this);
+    
+}
+
+CncGamepadControllerSpyBase::~CncGamepadControllerSpyBase()
+{
+    m_gpBmp1->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickNaviXY), NULL, this);
+    m_gpBmp2->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickNaviZ), NULL, this);
+    m_gpBmp3->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickLeftStick), NULL, this);
+    m_gpBmp4->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickRightStick), NULL, this);
+    m_chStepsSensitivity->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(CncGamepadControllerSpyBase::selectSensitivity), NULL, this);
+    m_continuesTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncGamepadControllerSpyBase::onContinuesTimer), NULL, this);
+    
+    m_continuesTimer->Stop();
+    wxDELETE( m_continuesTimer );
+
+}
+
+ImageLibGamepadSpy::ImageLibGamepadSpy()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC81CCInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_000"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_000"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_045"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_045"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_090"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_090"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_135"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_135"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_180"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_180"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_225"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_225"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_270"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_270"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_315"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_315"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_COMPASS_NULL"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_COMPASS_NULL"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_XY"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_XY"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_Z"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_Z"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STICK_LEFT"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_STICK_LEFT"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STICK_RIGHT"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_STICK_RIGHT"), bmp));
+        }
+    }
+    
+}
+
+ImageLibGamepadSpy::~ImageLibGamepadSpy()
+{
+}

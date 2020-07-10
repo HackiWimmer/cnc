@@ -20,8 +20,6 @@ class SerialThreadStub : public SerialSpyPort {
 		
 		//Initialize Serial communication without an acitiv connection 
 		SerialThreadStub(CncControl* cnc);
-		//Initialize Serial communication with the given COM port
-		SerialThreadStub(const char *portName);
 		virtual ~SerialThreadStub();
 		
 		// returns the class name

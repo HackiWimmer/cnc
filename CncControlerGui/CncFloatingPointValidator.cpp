@@ -1,5 +1,5 @@
+#include <iostream>
 #include "CncFloatingPointValidator.h"
-
 
 ////////////////////////////////////////////////////////////////////
 CncFloatingPointValidator::CncFloatingPointValidator(int precision, float *value, int style)

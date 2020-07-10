@@ -26,6 +26,7 @@ class CncToolStateControl {
 		: currentState(neutral)
 		, control(NULL)
 		{}
+		
 		~CncToolStateControl() {}
 		
 		//////////////////////////////////////////////////////////////////

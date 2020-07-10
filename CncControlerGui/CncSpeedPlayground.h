@@ -2,6 +2,7 @@
 #define CNCSPEEDPLAYGROUND_H
 
 #include "CncSpeedAccelerationDiagram.h"
+#include "CncFloatingPointValidator.h"
 #include "wxCrafterSpeedMonitor.h"
 
 #include "../Arduino/StepperEnvironment/ArdoEnv.h"
@@ -22,7 +23,19 @@ class CncSpeedPlayground 	: public CncSpeedPlaygroundBase
 		CncSpeedPlayground(wxWindow* parent);
 		virtual ~CncSpeedPlayground();
 		
+		void appendArdoMessage(char type, const wxString& msg, const wxString& context=wxEmptyString);
+		
 	protected:
+		virtual void enableSpecialSpeedDisplayHeight(wxCommandEvent& event);
+		virtual void updateSpecialSpeedDisplayHeightValue(wxCommandEvent& event);
+		virtual void updateTriggerF1(wxCommandEvent& event);
+		virtual void updateTriggerF2(wxCommandEvent& event);
+		virtual void updateTriggerF3(wxCommandEvent& event);
+		virtual void updateTriggerI1(wxCommandEvent& event);
+		virtual void updateTriggerI2(wxCommandEvent& event);
+		virtual void updateTriggerI3(wxCommandEvent& event);
+		virtual void enableSpecialAccelDisplayWidth(wxCommandEvent& event);
+		virtual void updateSpecialAccelDisplayWidthValue(wxCommandEvent& event);
 		virtual void onRun(wxCommandEvent& event);
 		virtual void onClearLogger(wxCommandEvent& event);
 		virtual void onChangeDisplayType(wxCommandEvent& event);
@@ -78,6 +91,11 @@ class CncSpeedPlayground 	: public CncSpeedPlaygroundBase
 		
 		DisplayTypeH					displayTypeH;
 		DisplayTypeV					displayTypeV;
+		
+		CncFloatingPointValidator		valF;
+		CncFloatingPointValidator		valX;
+		CncFloatingPointValidator		valY;
+		CncFloatingPointValidator		valZ;
 		
 		uint32_t						minDA;
 		uint32_t						maxDA;

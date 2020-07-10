@@ -17,12 +17,13 @@
       AE::delayMicroseconds(us); \
     } \
   }
-  
+
 #define CNC_STEPPER_WRITE_STP_PIN(value) \
   if ( controller->isProbeMode() == OFF ) { \
-    AE::digitalWrite(stpPin, value); \
+      writeStpPin(value); \
   } \
   stepPhase = (value == PL_HIGH);
+    
 
 namespace StepperParameter {
   
@@ -46,10 +47,9 @@ CncArduinoStepper::CncArduinoStepper(const StepperSetup& ss)
 : controller              (ss.controller)
 , stpPin                  (ss.stpPin)
 , dirPin                  (ss.dirPin)
-, lmtPin                  (ss.lmtPin)
+, llmPin                  (ss.llmPin)
+, hlmPin                  (ss.hlmPin)
 , interrupted             (false)
-, minReached              (false)
-, maxReached              (false)
 , stepPhase               (false)
 , tsStartStep             (0L)
 , feedrate                (1.0)
@@ -57,7 +57,6 @@ CncArduinoStepper::CncArduinoStepper(const StepperSetup& ss)
 , stepDirection           (SD_UNKNOWN)
 , curPos                  (0L)
 {
-  CNC_STEPPER_WRITE_STP_PIN(PL_LOW);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 CncArduinoStepper::~CncArduinoStepper() {
@@ -74,10 +73,9 @@ void  CncArduinoStepper::printConfig() {
     StepperParameter::print(PID_STEP_PIN,                         getStepPin());
     StepperParameter::print(PID_DIR_PIN,                          getDirectionPin());
     StepperParameter::print(pidIncrementDirectionValue,           getIncrementDirectionValue());
-    StepperParameter::print(PID_MIN_SWITCH,                       minReached);
-    StepperParameter::print(PID_MAX_SWITCH,                       maxReached);
+    StepperParameter::print(PID_MIN_SWITCH,                       readMinLmtPin());
+    StepperParameter::print(PID_MAX_SWITCH,                       readMaxLmtPin());
     StepperParameter::print(PID_LIMIT,                            readLimitState());
-    StepperParameter::print(PID_LAST_STEP_DIR,                    getStepDirection());
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncArduinoStepper::isReadyToRun() {
@@ -107,8 +105,6 @@ void CncArduinoStepper::reset() {
   stepDirection         = SD_UNKNOWN;
 
   interrupted           = false;
-  minReached            = false;
-  maxReached            = false;
 
   tsStartStep           = 0L;
 
@@ -116,116 +112,76 @@ void CncArduinoStepper::reset() {
   ARDO_TRACE_STEPPER_POS(getAxisId(), curPos)
 }
 //////////////////////////////////////////////////////////////////////////////
-void CncArduinoStepper::setLimitStateManually(int32_t value) {
+bool CncArduinoStepper::resolveLimit() {
 //////////////////////////////////////////////////////////////////////////////  
-  if ( value > 0 )  { maxReached = true; stepDirection = SD_INC; }
-  else              { minReached = true; stepDirection = SD_DEC; }
-}    
+    const int8_t  ls   = readLimitState();
+    const int32_t step = ( ls == LimitSwitch::LIMIT_MIN ? +1 : ( ls == LimitSwitch::LIMIT_MAX ? -1 : 0 ) );
+
+    if ( step != 0 ) {
+      
+      short cnt  = 0;
+      setDirection(step);
+      
+      while ( readLimitPins() == LimitSwitch::LIMIT_SWITCH_ON ) {
+        performStep();
+
+        if ( ( ++cnt * feedrate ) > 12.0 ) // max mm - a typical sensor diameter
+          break;
+
+        // artificially speed delay to be smooth
+        AE::delayMicroseconds(5000);  
+      }        
+    }
+
+   return readLimitState() == LimitSwitch::LIMIT_SWITCH_OFF;
+}   
 //////////////////////////////////////////////////////////////////////////////
-void CncArduinoStepper::resetDirectionPin() {
+int8_t CncArduinoStepper::readLimitState() {
 //////////////////////////////////////////////////////////////////////////////
-  if ( getIncrementDirectionValue() == false )  setDirection(DIRECTION_INC);
-  else                                          setDirection(DIRECTION_DEC);            
+  const bool lmtMin = readMinLmtPin() == LimitSwitch::LIMIT_SWITCH_ON; 
+  const bool lmtMax = readMaxLmtPin() == LimitSwitch::LIMIT_SWITCH_ON; 
   
-  ARDO_TRACE_STEPPER_DIR(getAxisId(), stepDirection)
-}
-//////////////////////////////////////////////////////////////////////////////
-int8_t CncArduinoStepper::getLimitState() {
-//////////////////////////////////////////////////////////////////////////////  
-  if ( minReached == true ) return LimitSwitch::LIMIT_MIN;
-  if ( maxReached == true ) return LimitSwitch::LIMIT_MAX;
-  
+  if ( lmtMin && lmtMax )  return LimitSwitch::LIMIT_UNKNOWN;
+  if ( lmtMin )            return LimitSwitch::LIMIT_MIN;
+  if ( lmtMax )            return LimitSwitch::LIMIT_MAX;
+
   return LimitSwitch::LIMIT_UNSET;
 }
 //////////////////////////////////////////////////////////////////////////////
-int8_t CncArduinoStepper::readLimitState(int dir) {
+bool CncArduinoStepper::readLimitPins() {
 //////////////////////////////////////////////////////////////////////////////
-  if ( AE::digitalRead(lmtPin) == LimitSwitch::LIMIT_SWITCH_OFF )
-    return LimitSwitch::LIMIT_UNSET;
-
-  // determine which one . . .
-  switch ( dir ) {
-    case DIRECTION_INC:   return LimitSwitch::LIMIT_MAX;
-    case DIRECTION_DEC:   return LimitSwitch::LIMIT_MIN;
-  }
-
-  // in this case no valid limit information available
-  return LimitSwitch::LIMIT_UNKNOWN;
+  const bool isLimit = (    readMinLmtPin() == LimitSwitch::LIMIT_SWITCH_ON 
+                         || readMaxLmtPin() == LimitSwitch::LIMIT_SWITCH_ON 
+                       );
+  
+  return isLimit ? LimitSwitch::LIMIT_SWITCH_ON : LimitSwitch::LIMIT_SWITCH_OFF;
 }
 //////////////////////////////////////////////////////////////////////////////
-bool CncArduinoStepper::checkLimit(int dir) {
-//////////////////////////////////////////////////////////////////////////////
-  static short minLimitCnt = 0;
-  static short maxLimitCnt = 0;
-
-  // ------------------------------------------------------------------------
-  auto setMinReached = [&](bool state) {
-    // avoid hysteresis
-    if ( maxReached == true ) {
-      minLimitCnt++;
-      
-      if ( minLimitCnt == 3 ) {
-        minLimitCnt = 0;
-        minReached = state;
-      }
-     
-    } else {
-      minReached = state;
-    }
-  
-    controller->sendCurrentLimitStates(FORCE);
-  };
-
-  // ------------------------------------------------------------------------
-  auto setMaxReached = [&](bool state) {
-    // avoid hysteresis
-    if ( minReached == true ) {
-      maxLimitCnt++;
-      
-      if ( maxLimitCnt == 3 ) {
-        maxLimitCnt = 0;
-        maxReached = state;
-      }
-      
-    } else {
-      maxReached = state;
-    }
-    
-    controller->sendCurrentLimitStates(FORCE);
-  };
-  
-  // ------------------------------------------------------------------------
-  const int val = AE::digitalRead(lmtPin);
+bool CncArduinoStepper::isLimitPinRelevant() {
+/////////////////////////////////////////////////////////////////////////////
+  const bool val = readLimitPins();
   if ( val == LimitSwitch::LIMIT_SWITCH_ON ) {
 
-    // unclear sitiuation avoid movement!
-    if ( stepDirection == SD_UNKNOWN ) {
-      controller->sendCurrentLimitStates(FORCE);
-      controller->broadcastInterrupt();
-      return true;
-    }
+    switch ( stepDirection ) {
 
-    // enable the move in the opposite direction
-    if ( minReached && dir > 0 )
-      return false;
-      
-    // enable the move in the opposite direction
-    if ( maxReached && dir < 0 )
-      return false;
-      
-    switch ( dir ) {
-      
-      case DIRECTION_INC:   setMaxReached(true);
-                            return true;
-      
-      case DIRECTION_DEC:   setMinReached(true);
-                            return true;
-    }
-  } else {
-    // reset limit state
-    if ( minReached == true || maxReached == true ) {
-      setMinReached(false);
-      setMaxReached(false);
+      case SD_UNKNOWN:  // unclear sitiuation avoid movement!
+                        controller->sendCurrentLimitStates(FORCE);
+                        controller->broadcastInterrupt();
+                        return true;
+                        
+      case SD_INC:      // enable the move in the opposite direction
+                        if ( readMinLmtPin() == LimitSwitch::LIMIT_SWITCH_ON )
+                          return false;
+                          
+                        controller->sendCurrentLimitStates(FORCE);
+                        return true;
+
+      case SD_DEC:      // enable the move in the opposite direction
+                        if ( readMaxLmtPin() == LimitSwitch::LIMIT_SWITCH_ON )
+                          return false;
+
+                        controller->sendCurrentLimitStates(FORCE);
+                        return true;
     }
   }
 
@@ -253,7 +209,7 @@ bool CncArduinoStepper::setDirection(const StepDirection sd) {
     // and the physical min and max position staying unchanged
     const bool dir = (stepDirection == SD_INC ? getIncrementDirectionValue() : getDecrementDirectionValue());
     
-    AE::digitalWrite(dirPin, dir);
+    writeDirPin(dir);
     CNC_STEPPER_DELAY_MICROS(10);
   }
 
@@ -282,7 +238,7 @@ byte CncArduinoStepper::initiateStep() {
     return RET_INTERRUPT;
   }
 
-  if ( checkLimit(stepDirection) == true )
+  if ( isLimitPinRelevant() == true )
     return RET_LIMIT;
 
   if ( stepPhase == true )
@@ -291,7 +247,7 @@ byte CncArduinoStepper::initiateStep() {
   // generate the step impuls ....
   CNC_STEPPER_WRITE_STP_PIN(PL_HIGH);
 
-  tsStartStep = AE::micros() % UINT32_MAX;
+  tsStartStep = ArdoTs::now();
   return RET_OK;
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -309,9 +265,8 @@ byte CncArduinoStepper::finalizeStep() {
   if ( stepPhase == false )
     return RET_OK;
 
-  const uint32_t tsNow  = AE::micros();
-  const int32_t  tpPuls = highPulsWidth - (tsNow - tsStartStep);
-
+  const int32_t  tpPuls = highPulsWidth - ArdoTs::timespan(tsStartStep);
+  
   // guarantee the min. pulse width
   if ( tpPuls > 0 ) CNC_STEPPER_DELAY_MICROS(tpPuls);
 

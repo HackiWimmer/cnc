@@ -2,27 +2,39 @@
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include "wxCrafterImages.h"
+#include "GlobalFunctions.h"
+#include "CncCommon.h"
+#include "CncContext.h"
 #include "CncFileNameService.h"
+#include "CncSpeedSlider.h"
 #include "CncSpeedMonitor.h"
 
 ////////////////////////////////////////////////////////////////
 CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 : CncSpeedMonitorBase(parent)
-, drawingArea(lMargin, tMargin, 0, 0)
-, valueFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"))
-, labelFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"))
-, mouseLabel(-1, -1)
-, axisMeasurePoints()
-, axisMeasuredSpeed()
-, axisReceivedSpeed()
-, axisConfiguredSpeed()
-, lastRefresh(CncTimeFunctions::getMilliTimestamp())
-, timeIndex(0)
-, currentMeasuredFeedSpeed_MM_MIN(0.0)
-, currentReceivedFeedSpeed_MM_MIN(0.0)
-, currentConfiguredFeedSpeed_MM_MIN(0.0)
+, drawingArea							(lMargin, tMargin, 0, 0)
+, valueFont								(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"))
+, labelFont								(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"))
+, mouseLabel							(-1, -1)
+, axisMeasurePoints						()
+, axisMeasuredSpeed						()
+, axisReceivedSpeed						()
+, axisConfiguredSpeed					()
+, speedSlider							(NULL)
+, lastRefresh							(CncTimeFunctions::getMilliTimestamp())
+, timeIndex								(0)
+, currentMeasuredFeedSpeed_MM_MIN		(0.0)
+, currentReceivedFeedSpeed_MM_MIN		(0.0)
+, currentConfiguredFeedSpeed_MM_MIN		(0.0)
 ////////////////////////////////////////////////////////////////
 {
+	// Speed Slider
+	speedSlider = new CncSpeedSlider(this);
+	speedSlider->showUnit(true);
+	speedSlider->showValue(true);
+	speedSlider->autoConfigure();
+	GblFunc::replaceControl(m_speedSliderPlaceholder, speedSlider);
+	
 	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
 	m_btToggleConnection->SetBitmapDisabled(bmpOff.ConvertToDisabled());
 	
@@ -67,6 +79,16 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 CncSpeedMonitor::~CncSpeedMonitor() {
 ////////////////////////////////////////////////////////////////
 	m_refreshTimer->Stop();
+	
+	wxDELETE(speedSlider);
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::enableSpeedSlider(bool state) {
+////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->canSpeedMonitoring() == false )
+		return;
+		
+	speedSlider->enable(state);
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::activate(bool enable) {
@@ -84,6 +106,10 @@ void CncSpeedMonitor::activate(bool enable) {
 	m_btSave->Enable(enable);
 	
 	m_intervalSlider->Enable(enable);
+	
+	speedSlider->enable(enable);
+	if ( enable == false )
+		speedSlider->setValue(0);
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::setupSizes() {
@@ -157,11 +183,13 @@ void CncSpeedMonitor::stop() {
 		m_refreshTimer->Stop();
 }
 ////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::setCurrentFeedSpeedValue(const SpeedData& sd) {
+void CncSpeedMonitor::setCurrentFeedSpeedValues(const SpeedData& sd) {
 ////////////////////////////////////////////////////////////////
 	currentMeasuredFeedSpeed_MM_MIN		= std::max(0.0, sd.measured_MM_MIN);
 	currentReceivedFeedSpeed_MM_MIN		= std::max(0.0, sd.received_MM_MIN);
 	currentConfiguredFeedSpeed_MM_MIN	= std::max(0.0, sd.configured_MM_MIN);
+	
+	speedSlider->setValue((int)currentConfiguredFeedSpeed_MM_MIN);
 	
 	// log that min one measure point exists
 	axisMeasurePoints.values[timeIndex] = axisMeasurePoints.maxValue;
@@ -404,7 +432,7 @@ void CncSpeedMonitor::decorateConnectBtn() {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::enableConnection(bool state) {
 ////////////////////////////////////////////////////////////////
-	m_btToggleConnection->SetValue(state);
+	////////////////////////////////////////////////////////////////
 	decorateConnectBtn();
 }
 ////////////////////////////////////////////////////////////////

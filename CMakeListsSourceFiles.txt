@@ -82,7 +82,6 @@ set(SOURCE_FILES
 	CncControlerGui/SVGPathHandlerCnc.cpp
 	CncControlerGui/SvgUnitCalculator.cpp
 	CncControlerGui/UnitTestFrame.cpp
-	CncControlerGui/UpdateManagerThread.cpp
 	CncControlerGui/CncCurveLib.cpp
 	CncControlerGui/CncBaseEditor.cpp
 	CncControlerGui/CncSourceEditor.cpp

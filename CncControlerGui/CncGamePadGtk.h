@@ -41,6 +41,8 @@ class CncGamepadGtk
 		virtual bool checkConnection()				{ return false; }
 		virtual bool refresh()						{ return false; }
 				
+		virtual int  getStickResolutionFactor() 	{ return 16; }
+
 		virtual float getLeftStickX()				{ return 0.0; }
 		virtual float getLeftStickY()				{ return 0.0; }
 		virtual float getRightStickX()				{ return 0.0; }

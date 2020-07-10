@@ -21,28 +21,29 @@ namespace LimitSwitch {
       
       //-------------------------------------------------------------
       virtual void init() {
-        initInputPin(PIN_LS_X_MIN, LIMIT_SWITCH_OFF);
-        initInputPin(PIN_LS_X_MAX, LIMIT_SWITCH_OFF);
-        initInputPin(PIN_LS_Y_MIN, LIMIT_SWITCH_OFF);
-        initInputPin(PIN_LS_Y_MAX, LIMIT_SWITCH_OFF);
-        initInputPin(PIN_LS_Z_MIN, LIMIT_SWITCH_OFF);
-        initInputPin(PIN_LS_Z_MAX, LIMIT_SWITCH_OFF);
+        initInputPin(PIN_LS_X_MIN,          LIMIT_SWITCH_OFF);
+        initInputPin(PIN_LS_X_MAX,          LIMIT_SWITCH_OFF);
+        initInputPin(PIN_LS_Y_MIN,          LIMIT_SWITCH_OFF);
+        initInputPin(PIN_LS_Y_MAX,          LIMIT_SWITCH_OFF);
+        initInputPin(PIN_LS_Z_MIN,          LIMIT_SWITCH_OFF);
+        initInputPin(PIN_LS_Z_MAX,          LIMIT_SWITCH_OFF);
+        initInputPin(PIN_EMERGENCY_SWITCH,  EMERGENCY_SWITCH_OFF);
       }
 
       //-------------------------------------------------------------
       virtual bool evaluate() {
         const unsigned int oldPinValue = pinValue;
         
-        setBit(BIT_LS_X_MIN, readPin(PIN_LS_X_MIN) == LIMIT_SWITCH_ON);
-        setBit(BIT_LS_X_MAX, readPin(PIN_LS_X_MAX) == LIMIT_SWITCH_ON);
+        setBit(BIT_LS_X_MIN,          readPin(PIN_LS_X_MIN)         == LIMIT_SWITCH_ON);
+        setBit(BIT_LS_X_MAX,          readPin(PIN_LS_X_MAX)         == LIMIT_SWITCH_ON);
       
-        setBit(BIT_LS_Y_MIN, readPin(PIN_LS_Y_MIN) == LIMIT_SWITCH_ON);
-        setBit(BIT_LS_Y_MAX, readPin(PIN_LS_Y_MAX) == LIMIT_SWITCH_ON);
+        setBit(BIT_LS_Y_MIN,          readPin(PIN_LS_Y_MIN)         == LIMIT_SWITCH_ON);
+        setBit(BIT_LS_Y_MAX,          readPin(PIN_LS_Y_MAX)         == LIMIT_SWITCH_ON);
         
-        setBit(BIT_LS_Z_MIN, readPin(PIN_LS_Z_MIN) == LIMIT_SWITCH_ON);
-        setBit(BIT_LS_Z_MAX, readPin(PIN_LS_Z_MAX) == LIMIT_SWITCH_ON);
+        setBit(BIT_LS_Z_MIN,          readPin(PIN_LS_Z_MIN)         == LIMIT_SWITCH_ON);
+        setBit(BIT_LS_Z_MAX,          readPin(PIN_LS_Z_MAX)         == LIMIT_SWITCH_ON);
 
-        setBit(BIT_2,        false);
+        setBit(BIT_EMERGENCY_SWITCH,  readPin(PIN_EMERGENCY_SWITCH) == EMERGENCY_SWITCH_ON);
         setBit(BIT_1,        false);
 
         return ( oldPinValue != pinValue );
@@ -66,7 +67,9 @@ namespace LimitSwitch {
                      "%c %s=%d\n"
                      "%c %s=%d\n"
                      "%c %s=%d\n"
+                     "%c %s=%d\n"
                      "%c %s=%d\n", 
+                     'E', low,  getBit(PIN_EMERGENCY_SWITCH),
                      'X', low,  getBit(BIT_LS_X_MIN),
                      'X', high, getBit(BIT_LS_X_MAX),
                      'Y', low,  getBit(BIT_LS_Y_MIN),
@@ -95,12 +98,13 @@ namespace LimitSwitch {
       
         Serial.print("PIN Values: ");
         Serial.print(CR);
-        Serial.print(PIN_LS_X_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MIN)); Serial.print(CR);
-        Serial.print(PIN_LS_X_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MAX)); Serial.print(CR);
-        Serial.print(PIN_LS_Y_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MIN)); Serial.print(CR);
-        Serial.print(PIN_LS_Y_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MAX)); Serial.print(CR);
-        Serial.print(PIN_LS_Z_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MIN)); Serial.print(CR);
-        Serial.print(PIN_LS_Z_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MAX)); Serial.print(CR);
+        Serial.print(PIN_EMERGENCY_SWITCH); Serial.print(EQUAL); Serial.print(readPin(PIN_EMERGENCY_SWITCH)); Serial.print(CR);
+        Serial.print(PIN_LS_X_MIN);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MIN));         Serial.print(CR);
+        Serial.print(PIN_LS_X_MAX);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MAX));         Serial.print(CR);
+        Serial.print(PIN_LS_Y_MIN);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MIN));         Serial.print(CR);
+        Serial.print(PIN_LS_Y_MAX);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MAX));         Serial.print(CR);
+        Serial.print(PIN_LS_Z_MIN);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MIN));         Serial.print(CR);
+        Serial.print(PIN_LS_Z_MAX);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MAX));         Serial.print(CR);
       }
 
       //-------------------------------------------------------------
@@ -115,12 +119,13 @@ namespace LimitSwitch {
         Serial.print(BLANK1);
       
         Serial.print("PIN Values: ");
-        Serial.print(PIN_LS_X_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MIN)); Serial.print(COMMA);
-        Serial.print(PIN_LS_X_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MAX)); Serial.print(COMMA);
-        Serial.print(PIN_LS_Y_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MIN)); Serial.print(COMMA);
-        Serial.print(PIN_LS_Y_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MAX)); Serial.print(COMMA);
-        Serial.print(PIN_LS_Z_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MIN)); Serial.print(COMMA);
-        Serial.print(PIN_LS_Z_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MAX)); Serial.print(COMMA);  
+        Serial.print(PIN_EMERGENCY_SWITCH); Serial.print(EQUAL); Serial.print(readPin(PIN_EMERGENCY_SWITCH)); Serial.print(COMMA);
+        Serial.print(PIN_LS_X_MIN);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MIN));         Serial.print(COMMA);
+        Serial.print(PIN_LS_X_MAX);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MAX));         Serial.print(COMMA);
+        Serial.print(PIN_LS_Y_MIN);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MIN));         Serial.print(COMMA);
+        Serial.print(PIN_LS_Y_MAX);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MAX));         Serial.print(COMMA);
+        Serial.print(PIN_LS_Z_MIN);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MIN));         Serial.print(COMMA);
+        Serial.print(PIN_LS_Z_MAX);         Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MAX));         Serial.print(COMMA);  
         Serial.print(CR);       
       }
   };

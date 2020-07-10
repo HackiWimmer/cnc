@@ -27,6 +27,11 @@ bool CncGlCanvas::Show(bool show) {
 	return wxGLCanvas::Show(show);
 }
 //////////////////////////////////////////////////
+void CncGlCanvas::update(bool force) {
+//////////////////////////////////////////////////
+	Refresh();
+}
+//////////////////////////////////////////////////
 bool CncGlCanvas::activateContext(GLContextBase* context, bool verbose) {
 //////////////////////////////////////////////////
 	return activateContext(context, *this, verbose);
@@ -66,7 +71,7 @@ void CncGlCanvas::view(GLContextBase::ViewMode fm) {
 	
 	const wxSize cs = GetClientSize();
 	context->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
-	Refresh();
+	update();
 }
 //////////////////////////////////////////////////
 void CncGlCanvas::incScale() {
@@ -99,7 +104,7 @@ void CncGlCanvas::reshapeRelative(int dx, int dy) {
 	const int ny 	= cs.GetHeight() - lastReshape.y - dy;
 	
 	context->reshape(cs.GetWidth(), cs.GetHeight(), nx, ny);
-	Refresh();
+	update();
 }
 //////////////////////////////////////////////////
 void CncGlCanvas::onMouse(wxMouseEvent& event) {
@@ -118,7 +123,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	if ( rot != 0 ) {
 		if (rot < 0 ) 	decScale();
 		else 			incScale();
-		Refresh();
+		update();
 	}
 	
 	// move origin
@@ -157,7 +162,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 			const int y = cs.GetHeight() - event.GetY();
 			
 			context->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
-			Refresh();
+			update();
 		}
 	}
 }

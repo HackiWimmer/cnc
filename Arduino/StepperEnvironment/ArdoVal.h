@@ -12,46 +12,8 @@
 // .....................................................................
 // Pin setup
 // .....................................................................
+#include "ArdoPin.h"
 
-  const unsigned char MAX_PINS                            =  32;
-  const unsigned char PIN_X_STP                           =   2;
-  const unsigned char PIN_Y_STP                           =   3;
-  const unsigned char PIN_Z_STP                           =   4;
-  const unsigned char PIN_X_DIR                           =   5;
-  const unsigned char PIN_Y_DIR                           =   6;
-  const unsigned char PIN_Z_DIR                           =   7;
-
-  const unsigned char PIN_STEPPER_ENABLE                  =   8;
-
-  const unsigned char PIN_X_LIMIT                         =   9;
-  const unsigned char PIN_Y_LIMIT                         =  10;
-  const unsigned char PIN_Z_LIMIT                         =  11;
-
-  const unsigned char PIN_TOOL_ENABLE                     =  12;
-  const unsigned char PIN_EXTERNAL_INTERRUPT              =  13;
-
-  // A0 CNC Shield: Reset/Abort
-  // A1 CNC Shield: Feed Hold
-  // A2 CNC Shield: Cycle Start / Resume
-  // A3 CNC Shield: Collant Enabled
-  // A4 CNC Shield: free
-  // A5 CNC Shield: free
-  
-  #ifndef SKETCH_COMPILE   
-    #define PIN_INTERRUPT                              AE::PN_A0   
-  #else
-    #define PIN_INTERRUPT                                     A0
-  #endif  
-  const unsigned char PIN_INTERRUPT_ID                     =   0;
-  
-
-  #ifndef SKETCH_COMPILE   
-    #define PIN_INTERRUPT_LED                          AE::PN_A3   
-  #else
-    #define PIN_INTERRUPT_LED                                 A3   
-  #endif  
-  const unsigned char PIN_INTERRUPT_LED_ID                 =   3;
-  
 // .....................................................................
 // Signals
 // .....................................................................
@@ -61,8 +23,9 @@
   const unsigned char SIG_PAUSE                           =  'P';
   const unsigned char SIG_RESUME                          =  'p';
   const unsigned char SIG_QUIT_MOVE                       =  'q';
+  const unsigned char SIG_UPDATE                          =  'U';
 
-  const unsigned char SIG_SOFTWARE_RESET                  =  '#';
+  const unsigned char SIG_SOFTWARE_RESET                  =  '\\';
 
 // .....................................................................
 // Commands
@@ -70,7 +33,9 @@
 
   const unsigned char MAX_CMDS                            =  255;
   const unsigned char CMD_INVALID                         = '\0'; 
-  
+  const unsigned char CMD_POP_SERIAL                      = '~'; 
+  const unsigned char CMD_POP_SERIAL_WAIT                 = '#'; 
+
   const unsigned char CMD_IDLE                            =  'i'; // 105 0x69
   const unsigned char CMD_HEARTBEAT                       =  'h'; // 104 0x68
   
@@ -85,7 +50,9 @@
   const unsigned char CMD_MOVE_SEQUENCE                   =  '.'; //  46 0x2E
   const unsigned char CMD_RENDER_AND_MOVE_SEQUENCE        =  ':'; //  58 0x3A
 
-  const unsigned char CMD_MOVE_UNIT_SIGNAL                =  '>'; //  62 0x3E
+  const unsigned char CMD_MOVE_UNIT_LIMIT_IS_FREE         =  '>'; //  62 0x3E
+
+  const unsigned char CMD_MOVE_INTERACTIVE                =  '%'; //  37 0x25
   
   const unsigned char CMD_PRINT_CONFIG                    =  'c'; //  99 0x63
   const unsigned char CMD_PRINT_TIMESTAMP                 =  'T'; //  84 0x54
@@ -161,8 +128,8 @@
   
   const unsigned char PID_COMMON                          =  30;
   const unsigned char PID_CONTROLLER                      =  31;
-  const unsigned char PID_AXIS                            =  32;
-  const unsigned char PID_LAST_STEP_DIR                   =  33;
+  const unsigned char PID_SETUP_ID                        =  32;
+  const unsigned char PID_AXIS                            =  33;
   const unsigned char PID_ACCEL_START_SPEED               =  34;
   const unsigned char PID_ACCEL_STOP_SPEED                =  35;
      
@@ -182,13 +149,14 @@
   const unsigned char PID_MAX_DIMENSION_Y                 =  53;
   const unsigned char PID_MAX_DIMENSION_Z                 =  54;
 
-  const unsigned char PID_XYZ_POS                         =  60;
-  const unsigned char PID_XYZ_POS_MAJOR                   =  61;
-  const unsigned char PID_XYZ_POS_DETAIL                  =  62;
-  const unsigned char PID_XY_POS                          =  63;
-  const unsigned char PID_X_POS                           =  64;
-  const unsigned char PID_Y_POS                           =  65;
-  const unsigned char PID_Z_POS                           =  66;
+  const unsigned char PID_XYZ_INTERACTIVE_POS             =  60;
+  const unsigned char PID_XYZ_POS                         =  61;
+  const unsigned char PID_XYZ_POS_MAJOR                   =  62;
+  const unsigned char PID_XYZ_POS_DETAIL                  =  63;
+  const unsigned char PID_XY_POS                          =  64;
+  const unsigned char PID_X_POS                           =  65;
+  const unsigned char PID_Y_POS                           =  66;
+  const unsigned char PID_Z_POS                           =  67;
 
   const unsigned char PID_STEP_PIN                        =  70;
   const unsigned char PID_DIR_PIN                         =  71;
@@ -198,9 +166,8 @@
   const unsigned char PID_INC_DIRECTION_VALUE_Y           =  81;
   const unsigned char PID_INC_DIRECTION_VALUE_Z           =  82;
 
-  const unsigned char PID_SPEED_FEED_MODE                 = 100;
-  const unsigned char PID_PULSE_WIDTH_HIGH                = 101;
-  const unsigned char PID_PROBE_MODE                      = 102;
+  const unsigned char PID_PULSE_WIDTH_HIGH                = 100;
+  const unsigned char PID_PROBE_MODE                      = 101;
   
   const unsigned char PID_RESERT_POS_COUNTER              = 110;
   const unsigned char PID_GET_POS_COUNTER                 = 111;
@@ -208,9 +175,6 @@
   const unsigned char PID_GET_STEP_COUNTER_X              = 113;
   const unsigned char PID_GET_STEP_COUNTER_Y              = 114;
   const unsigned char PID_GET_STEP_COUNTER_Z              = 115;
-  const unsigned char PID_GET_US_PER_IMPL_MEASUREMENT1    = 116;
-  const unsigned char PID_GET_US_PER_IMPL_MEASUREMENT2    = 117;
-  const unsigned char PID_GET_US_PER_IMPL_MEASUREMENT3    = 118;
 
 // .....................................................................
 // end long pid range [PID_FLOAT_RANG_END] 
@@ -272,8 +236,9 @@
   const unsigned char E_INVALID_GETTER_ID                 =   6;
   const unsigned char E_INVALID_GETTER_LIST_COUNT         =   7;
   const unsigned char E_INVALID_MOVE_CMD                  =   8;
-  const unsigned char E_INVALID_MOVE_SEQUENCE             =   9;
-  const unsigned char E_INVALID_PARAM_SIZE                =  10;
+  const unsigned char E_OTHER_MOVE_CMD_ACTIVE             =   9;
+  const unsigned char E_INVALID_MOVE_SEQUENCE             =  10;
+  const unsigned char E_INVALID_PARAM_SIZE                =  11;
 
   const unsigned char E_STEPPER_NOT_ENABLED               =  20;
   const unsigned char E_STEPPER_NOT_INITIALIZED           =  21;
@@ -287,7 +252,7 @@
 
   const unsigned char E_LIMIT_SWITCH_ACTIVE               =  51;
 
-  const unsigned char E_PURE_TEXT_VALUE_ERROR             = 253;
+  const unsigned char E_PURE_TEXT_VALUE_ERROR             = 251;
   const unsigned char E_INTERRUPT                         = 252;
   const unsigned char E_EXTERNEL_INTERRUPT                = 253;
   const unsigned char E_TOTAL_COUNT                       = 254;
@@ -314,14 +279,8 @@
   #define ON                                             true
   #define OFF                                            false
   
-  #define TOOL_STATE_OFF                                 PL_LOW
-  #define TOOL_STATE_ON                                  PL_HIGH 
-
-  #define ENABLE_STATE_OFF                               PL_HIGH
-  #define ENABLE_STATE_ON                                PL_LOW 
-
-  #define EXTERNAL_INTERRRUPT_OFF                        PL_HIGH
-  #define EXTERNAL_INTERRRUPT_ON                         PL_LOW
+  #define EXTERNAL_INTERRRUPT_OFF                        LimitSwitch::EXTERNAL_INTERRUPT_OFF
+  #define EXTERNAL_INTERRRUPT_ON                         LimitSwitch::EXTERNAL_INTERRUPT_ON
 
   #define PAUSE_ACTIVE                                   true
   #define PAUSE_INACTIVE                                 false
@@ -339,7 +298,7 @@
   const int8_t  NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;
   const int8_t  INVERSED_INCREMENT_DIRECTION_VALUE       = 0;
 
-  const int16_t  MIN_DURATION_PER_STEP_US                = 240;
+  const int16_t  MIN_DURATION_PER_STEP_US                = 225;
 
   // MAX_SERIAL_BUFFER_SIZE:
   // - 64 byte is the standard UNO buffer sizes

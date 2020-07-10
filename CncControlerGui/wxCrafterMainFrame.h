@@ -194,39 +194,10 @@ protected:
     wxPropertyGridManager* m_pgMgrSetup;
     wxPanel* m_setupToolMagazine;
     wxPanel* m_toolMagazinePlaceholder;
-    wxPanel* m_setupSpeedWizard;
-    wxStaticText* m_staticText5677;
-    wxSlider* m_speedConfigSlider;
-    wxStaticText* m_staticText5709;
-    wxStaticText* m_staticText5717;
-    wxTextCtrl* m_speedConfigStepsX;
-    wxStaticText* m_staticText5719;
-    wxTextCtrl* m_speedConfigStepsY;
-    wxStaticText* m_staticText5721;
-    wxTextCtrl* m_speedConfigStepsZ;
-    wxStaticLine* m_staticLine5781;
-    wxStaticText* m_staticText5777;
-    wxComboBox* m_speedConfigAccelAxis;
-    wxNotebook* m_notebook5687;
-    wxPanel* m_panel5699;
-    wxSplitterWindow* m_splitter5759;
-    wxPanel* m_accelGraphPanelMain;
-    wxPanel* m_accelGraphPanel;
-    wxPanel* m_splitterPage5767;
-    wxTextCtrl* m_speedConfigTrace;
-    wxPanel* m_panelSpeedPgAxisX;
-    wxTextCtrl* m_accelConfigTraceX;
-    wxTextCtrl* m_speedConfigTraceX;
-    wxPanel* m_panelSpeedPgAxisY;
-    wxTextCtrl* m_accelConfigTraceY;
-    wxTextCtrl* m_speedConfigTraceY;
-    wxPanel* m_panelSpeedPgAxisZ;
-    wxTextCtrl* m_accelConfigTraceZ;
-    wxTextCtrl* m_speedConfigTraceZ;
     wxPanel* m_mainBookReference;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
-    wxListbook* m_listbook7170;
+    wxListbook* m_listbookManallyMotionControl;
     wxPanel* m_predefinedPositions;
     wxScrolledWindow* m_scrollWin7112;
     wxStaticText* m_staticText1171;
@@ -266,11 +237,10 @@ protected:
     wxButton* m_zToBottom;
     wxPanel* m_panel7172;
     wxPanel* m_navigator;
-    wxPanel* m_navigationPanelPlaceholder;
-    wxStaticLine* m_staticLine5550;
     wxStaticBitmap* m_staticBitmap5901;
     wxStaticText* m_cbStepSensitivityText;
     wxRadioBox* m_rbStepSensitivity;
+    wxPanel* m_navigationPanelPlaceholder;
     wxStaticLine* m_staticLine5552;
     wxStaticBitmap* m_staticBitmap5907;
     wxStaticText* m_staticText5909;
@@ -355,7 +325,9 @@ protected:
     wxPanel* m_testToolPage;
     wxStaticText* m_staticText211726;
     wxStaticLine* m_staticLine225337;
-    wxToggleButton* m_testToggleTool;
+    wxPanel* m_panel8592;
+    wxStaticText* m_testToolPowerState;
+    wxButton* m_testToolPowerBtn;
     wxPanel* m_mainBookPreviewPanel;
     wxPanel* m_filePreviewPlaceholder;
     wxPanel* m_panel4398;
@@ -507,13 +479,6 @@ protected:
     wxBitmapToggleButton* m_showLoggerOnDemand;
     wxStaticLine* m_staticLine7605;
     wxBitmapToggleButton* m_freezeLogger;
-    wxStaticText* m_staticText58651;
-    wxStaticBitmap* m_gamepadState;
-    wxStaticText* m_staticText5865;
-    wxStaticBitmap* m_gpBmp1;
-    wxStaticBitmap* m_gpBmp2;
-    wxStaticBitmap* m_gpBmp3;
-    wxStaticBitmap* m_gpBmp4;
     wxStaticBitmap* m_staticBitmap5890;
     wxTextCtrl* m_tmpTraceInfoPlaceholder;
     wxPanel* m_statusBar;
@@ -521,6 +486,8 @@ protected:
     wxStaticLine* m_staticLine6801;
     wxTextCtrl* m_inputFileName;
     wxStaticLine* m_staticLine602;
+    wxStaticBitmap* m_gamepadState;
+    wxStaticLine* m_staticLine6021333;
     wxStaticBitmap* m_heartbeatState;
     wxStaticLine* m_staticLine60214444;
     wxStaticBitmap* m_staticBitmap7262;
@@ -570,8 +537,8 @@ protected:
     wxPanel* m_cableConnectedState;
     wxPanel* m_toolPowerObserverState;
     wxStaticLine* m_staticLine6023412;
+    wxStaticBitmap* m_gamepadThreadHeartbeat;
     wxStaticBitmap* m_serialThreadHeartbeat;
-    wxStaticBitmap* m_updateManagerUpdate;
     wxPanel* m_svgUnitCalulator;
     wxStaticText* m_staticText3261;
     wxComboBox* m_cbUCUnitFrom;
@@ -752,7 +719,6 @@ protected:
     wxMenuItem* m_miPyCam;
     wxMenuItem* m_menuItem7460;
     wxMenuItem* m_miGameportController;
-    wxMenuItem* m_menuItem74601;
     wxMenuItem* m_miSpeedPlayground;
     wxMenu* m_menuTest;
     wxMenuItem* m_miUnitTestFramework;
@@ -841,9 +807,6 @@ protected:
     virtual void setupGridChanging(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridSelected(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridCommandButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeSpeedConfigSlider(wxScrollEvent& event) { event.Skip(); }
-    virtual void updatedSpeedConfigSteps(wxCommandEvent& event) { event.Skip(); }
-    virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void moveHome(wxCommandEvent& event) { event.Skip(); }
     virtual void moveToZeroXY(wxCommandEvent& event) { event.Skip(); }
     virtual void moveToZeroXYZ(wxCommandEvent& event) { event.Skip(); }
@@ -1006,9 +969,9 @@ protected:
     virtual void showStacktraceStore(wxCommandEvent& event) { event.Skip(); }
     virtual void showOSEnvironment(wxCommandEvent& event) { event.Skip(); }
     virtual void OnAbout(wxCommandEvent& event) { event.Skip(); }
-    virtual void startupTimer(wxTimerEvent& event) { event.Skip(); }
-    virtual void serialTimer(wxTimerEvent& event) { event.Skip(); }
-    virtual void traceTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onSerialTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onTraceTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
     wxBitmapButton* GetBmpButton4490() { return m_bmpButton4490; }
@@ -1114,35 +1077,6 @@ public:
     wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
     wxPanel* GetToolMagazinePlaceholder() { return m_toolMagazinePlaceholder; }
     wxPanel* GetSetupToolMagazine() { return m_setupToolMagazine; }
-    wxStaticText* GetStaticText5677() { return m_staticText5677; }
-    wxSlider* GetSpeedConfigSlider() { return m_speedConfigSlider; }
-    wxStaticText* GetStaticText5709() { return m_staticText5709; }
-    wxStaticText* GetStaticText5717() { return m_staticText5717; }
-    wxTextCtrl* GetSpeedConfigStepsX() { return m_speedConfigStepsX; }
-    wxStaticText* GetStaticText5719() { return m_staticText5719; }
-    wxTextCtrl* GetSpeedConfigStepsY() { return m_speedConfigStepsY; }
-    wxStaticText* GetStaticText5721() { return m_staticText5721; }
-    wxTextCtrl* GetSpeedConfigStepsZ() { return m_speedConfigStepsZ; }
-    wxStaticLine* GetStaticLine5781() { return m_staticLine5781; }
-    wxStaticText* GetStaticText5777() { return m_staticText5777; }
-    wxComboBox* GetSpeedConfigAccelAxis() { return m_speedConfigAccelAxis; }
-    wxPanel* GetAccelGraphPanel() { return m_accelGraphPanel; }
-    wxPanel* GetAccelGraphPanelMain() { return m_accelGraphPanelMain; }
-    wxTextCtrl* GetSpeedConfigTrace() { return m_speedConfigTrace; }
-    wxPanel* GetSplitterPage5767() { return m_splitterPage5767; }
-    wxSplitterWindow* GetSplitter5759() { return m_splitter5759; }
-    wxPanel* GetPanel5699() { return m_panel5699; }
-    wxTextCtrl* GetAccelConfigTraceX() { return m_accelConfigTraceX; }
-    wxTextCtrl* GetSpeedConfigTraceX() { return m_speedConfigTraceX; }
-    wxPanel* GetPanelSpeedPgAxisX() { return m_panelSpeedPgAxisX; }
-    wxTextCtrl* GetAccelConfigTraceY() { return m_accelConfigTraceY; }
-    wxTextCtrl* GetSpeedConfigTraceY() { return m_speedConfigTraceY; }
-    wxPanel* GetPanelSpeedPgAxisY() { return m_panelSpeedPgAxisY; }
-    wxTextCtrl* GetAccelConfigTraceZ() { return m_accelConfigTraceZ; }
-    wxTextCtrl* GetSpeedConfigTraceZ() { return m_speedConfigTraceZ; }
-    wxPanel* GetPanelSpeedPgAxisZ() { return m_panelSpeedPgAxisZ; }
-    wxNotebook* GetNotebook5687() { return m_notebook5687; }
-    wxPanel* GetSetupSpeedWizard() { return m_setupSpeedWizard; }
     wxNotebook* GetNotebook4561() { return m_notebook4561; }
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
     wxStaticText* GetStaticText779() { return m_staticText779; }
@@ -1185,16 +1119,15 @@ public:
     wxScrolledWindow* GetScrollWin7112() { return m_scrollWin7112; }
     wxPanel* GetPanel7172() { return m_panel7172; }
     wxPanel* GetPredefinedPositions() { return m_predefinedPositions; }
-    wxPanel* GetNavigationPanelPlaceholder() { return m_navigationPanelPlaceholder; }
-    wxStaticLine* GetStaticLine5550() { return m_staticLine5550; }
     wxStaticBitmap* GetStaticBitmap5901() { return m_staticBitmap5901; }
     wxStaticText* GetCbStepSensitivityText() { return m_cbStepSensitivityText; }
     wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
+    wxPanel* GetNavigationPanelPlaceholder() { return m_navigationPanelPlaceholder; }
     wxStaticLine* GetStaticLine5552() { return m_staticLine5552; }
     wxStaticBitmap* GetStaticBitmap5907() { return m_staticBitmap5907; }
     wxStaticText* GetStaticText5909() { return m_staticText5909; }
     wxPanel* GetNavigator() { return m_navigator; }
-    wxListbook* GetListbook7170() { return m_listbook7170; }
+    wxListbook* GetListbookManallyMotionControl() { return m_listbookManallyMotionControl; }
     wxPanel* GetMainBookReference() { return m_mainBookReference; }
     wxPanel* GetManuallyMoveCoordPlaceholder() { return m_manuallyMoveCoordPlaceholder; }
     wxPanel* GetMainBookManual() { return m_mainBookManual; }
@@ -1274,7 +1207,9 @@ public:
     wxPanel* GetTestLimitPage() { return m_testLimitPage; }
     wxStaticText* GetStaticText211726() { return m_staticText211726; }
     wxStaticLine* GetStaticLine225337() { return m_staticLine225337; }
-    wxToggleButton* GetTestToggleTool() { return m_testToggleTool; }
+    wxStaticText* GetTestToolPowerState() { return m_testToolPowerState; }
+    wxPanel* GetPanel8592() { return m_panel8592; }
+    wxButton* GetTestToolPowerBtn() { return m_testToolPowerBtn; }
     wxPanel* GetTestToolPage() { return m_testToolPage; }
     wxListbook* GetTestCaseBook() { return m_testCaseBook; }
     wxPanel* GetMainBookTest() { return m_mainBookTest; }
@@ -1430,13 +1365,6 @@ public:
     wxBitmapToggleButton* GetFreezeLogger() { return m_freezeLogger; }
     wxPanel* GetPanel5878() { return m_panel5878; }
     wxNotebook* GetLoggerNotebook() { return m_loggerNotebook; }
-    wxStaticText* GetStaticText58651() { return m_staticText58651; }
-    wxStaticBitmap* GetGamepadState() { return m_gamepadState; }
-    wxStaticText* GetStaticText5865() { return m_staticText5865; }
-    wxStaticBitmap* GetGpBmp1() { return m_gpBmp1; }
-    wxStaticBitmap* GetGpBmp2() { return m_gpBmp2; }
-    wxStaticBitmap* GetGpBmp3() { return m_gpBmp3; }
-    wxStaticBitmap* GetGpBmp4() { return m_gpBmp4; }
     wxStaticBitmap* GetStaticBitmap5890() { return m_staticBitmap5890; }
     wxTextCtrl* GetTmpTraceInfoPlaceholder() { return m_tmpTraceInfoPlaceholder; }
     wxPanel* GetWinLoggerView() { return m_winLoggerView; }
@@ -1444,6 +1372,8 @@ public:
     wxStaticLine* GetStaticLine6801() { return m_staticLine6801; }
     wxTextCtrl* GetInputFileName() { return m_inputFileName; }
     wxStaticLine* GetStaticLine602() { return m_staticLine602; }
+    wxStaticBitmap* GetGamepadState() { return m_gamepadState; }
+    wxStaticLine* GetStaticLine6021333() { return m_staticLine6021333; }
     wxStaticBitmap* GetHeartbeatState() { return m_heartbeatState; }
     wxStaticLine* GetStaticLine60214444() { return m_staticLine60214444; }
     wxStaticBitmap* GetStaticBitmap7262() { return m_staticBitmap7262; }
@@ -1493,8 +1423,8 @@ public:
     wxPanel* GetCableConnectedState() { return m_cableConnectedState; }
     wxPanel* GetToolPowerObserverState() { return m_toolPowerObserverState; }
     wxStaticLine* GetStaticLine6023412() { return m_staticLine6023412; }
+    wxStaticBitmap* GetGamepadThreadHeartbeat() { return m_gamepadThreadHeartbeat; }
     wxStaticBitmap* GetSerialThreadHeartbeat() { return m_serialThreadHeartbeat; }
-    wxStaticBitmap* GetUpdateManagerUpdate() { return m_updateManagerUpdate; }
     wxPanel* GetStatusBar() { return m_statusBar; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }
     wxComboBox* GetCbUCUnitFrom() { return m_cbUCUnitFrom; }
@@ -1625,9 +1555,6 @@ protected:
     wxStaticLine* m_staticLine83901;
     wxStaticText* m_staticText83998;
     wxStaticText* m_staticText8399;
-    wxStaticText* m_staticText5105;
-    wxSlider* m_manuallySpeedSlider;
-    wxTextCtrl* m_manuallySpeedValue;
     wxStaticText* m_staticText85409;
     wxStaticText* m_staticText8540;
     wxStaticText* m_staticText8542;
@@ -1678,7 +1605,6 @@ protected:
     wxStaticLine* m_staticLine5135;
 
 protected:
-    virtual void changeManuallySpeedSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void onLBDownMax(wxMouseEvent& event) { event.Skip(); }
     virtual void onSetCommonValue(wxCommandEvent& event) { event.Skip(); }
     virtual void minManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
@@ -1718,9 +1644,6 @@ public:
     wxStaticLine* GetStaticLine83901() { return m_staticLine83901; }
     wxStaticText* GetStaticText83998() { return m_staticText83998; }
     wxStaticText* GetStaticText8399() { return m_staticText8399; }
-    wxStaticText* GetStaticText5105() { return m_staticText5105; }
-    wxSlider* GetManuallySpeedSlider() { return m_manuallySpeedSlider; }
-    wxTextCtrl* GetManuallySpeedValue() { return m_manuallySpeedValue; }
     wxStaticText* GetStaticText85409() { return m_staticText85409; }
     wxStaticText* GetStaticText8540() { return m_staticText8540; }
     wxStaticText* GetStaticText8542() { return m_staticText8542; }

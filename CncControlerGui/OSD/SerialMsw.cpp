@@ -168,7 +168,7 @@ void SerialMsw::purge(void) {
 	APP_PROXY::waitActive(500);
 }
 ///////////////////////////////////////////////////////////////////
-int SerialMsw::readData(void *buffer, unsigned int nbChar) {
+int SerialMsw::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	//Number of bytes we'll have read
 	DWORD bytesRead 	= 0;
@@ -186,7 +186,7 @@ int SerialMsw::readData(void *buffer, unsigned int nbChar) {
 		//Check if there is enough data to read the required number
 		//of characters, if not we'll read only the available characters to prevent
 		//locking of the application.
-		if( status.cbInQue > nbChar ) 	toRead = nbChar;
+		if( status.cbInQue > nbByte ) 	toRead = nbByte;
 		else							toRead = status.cbInQue;
 	}
 	

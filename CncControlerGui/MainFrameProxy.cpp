@@ -21,13 +21,22 @@
 
 	void APP_PROXY::tryToSelectClientIds(long firstClientId, long lastClientId, ClientIdSelSource::ID tss)
 	{ THE_APP->tryToSelectClientIds(firstClientId, lastClientId, tss); }
-
-	void APP_PROXY::manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z)
-	{ THE_APP->manualContinuousMoveStart(x, y, z); }
-
-	void APP_PROXY::manualContinuousMoveStop()
-	{ THE_APP->manualContinuousMoveStop(); }
-
+	
+	void APP_PROXY::updateSpeedSlider(float value)
+	{ THE_APP->updateSpeedSlider(value); }
+	
+	void APP_PROXY::updateCncSpeed(float value, CncSpeedMode mode)
+	{ THE_APP->updateCncSpeed(value, mode); }
+	
+	bool APP_PROXY::startInteractiveMove()
+	{ return THE_APP->startInteractiveMove(); }
+	
+	bool APP_PROXY::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z)
+	{ return THE_APP->updateInteractiveMove(x, y, z); }
+	
+	bool APP_PROXY::stopInteractiveMove()
+	{ return THE_APP->stopInteractiveMove(); }
+	
 	void APP_PROXY::dispatchAll()
 	{ THE_APP->dispatchAll(); }
 
@@ -54,18 +63,6 @@
 
 	CncReferencePosition* APP_PROXY::getRefPositionDlg()
 	{ return THE_APP->refPositionDlg; }
-
-	wxStaticBitmap* APP_PROXY::GetGpBmp1()
-	{ return THE_APP->GetGpBmp1(); }
-
-	wxStaticBitmap* APP_PROXY::GetGpBmp2()
-	{ return THE_APP->GetGpBmp2(); }
-
-	wxStaticBitmap* APP_PROXY::GetGpBmp3()
-	{ return THE_APP->GetGpBmp3(); }
-
-	wxStaticBitmap* APP_PROXY::GetGpBmp4()
-	{ return THE_APP->GetGpBmp4(); }
 
 	wxBitmapButton* APP_PROXY::GetBtSelectReferences()
 	{ return THE_APP->GetBtSelectReferences(); }

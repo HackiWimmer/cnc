@@ -3,6 +3,7 @@
 
 #include <vector> 
 #include <map>
+#include <queue> 
 #include <wx/string.h>
 #include "OSD/CncTimeFunctions.h"
 #include "OSD/SerialOSD.h"
@@ -43,6 +44,7 @@ class SerialCommandLocker {
 		}
 		
 		bool lock(CncControl* cnc);
+		unsigned char getCommand() const { return command; }
 		
 		static unsigned char getLockedCommand() { return lockedCommand; }
 		static bool isCommandActive()			{ return lockedCommand != CMD_INVALID; }
@@ -81,8 +83,8 @@ struct SerialFetchInfo {
 	unsigned char command				= CMD_INVALID;
 	unsigned char multiByteResult[2048];
 
-	unsigned int singleFetchTimeout 	= 2000;
-	bool autoCallErrorInfo 				= false;
+	unsigned int fetchTimeout 	= 2000;
+	bool fetchTimeoutErrorInfo 	= true;
 	
 	explicit SerialFetchInfo(unsigned char cmd) 
 	: command(cmd)
@@ -153,10 +155,12 @@ struct SerialFetchInfo {
 };
 
 //------------------------------------------------------------
-enum ControllerInfoType { CITUnknown, CITHeartbeat, CITPosition, CITLimit };
+enum ControllerInfoType { CITDefault, CITHandshake, CITHeartbeat, CITPosition, CITLimit };
 struct ContollerInfo {
-	ControllerInfoType infoType			= CITUnknown;
+	ControllerInfoType infoType			= CITDefault;
 	unsigned char command				= '\0';
+	
+	unsigned char handshake				= '\0';
 	
 	int32_t heartbeatValue				= 0;
 	bool limitState						= false;
@@ -221,6 +225,11 @@ class Serial : public SerialOSD {
 			struct NextPath {
 				
 			};
+			
+			struct SpeedChange {
+				CncSpeedMode 		currentSpeedMode  = CncSpeedUserDefined;
+				double				currentSpeedValue = 0.0;
+			};
 		};
 		
 		// SerialSyPort parameter
@@ -230,6 +239,8 @@ class Serial : public SerialOSD {
 		static const unsigned int LONG_BUF_SIZE = sizeof(int32_t);
 		
 	private:
+		typedef std::queue<unsigned char> ReadBuffer;
+		ReadBuffer readBuffer; 
 		
 		// total distance
 		size_t totalDistanceSteps[4];
@@ -242,6 +253,8 @@ class Serial : public SerialOSD {
 		CncNanoTimestamp tsMeasurementStart;
 		CncNanoTimestamp tsMeasurementRef;
 		CncNanoTimestamp tsMeasurementLast;
+		
+		void clearReadBuffer();
 		
 	protected:
 		
@@ -301,7 +314,7 @@ class Serial : public SerialOSD {
 		// return true if the given cmd is a move command
 		bool isMoveCommand(unsigned char cmd);
 		// fetches the controler hand shake after sendData
-		inline unsigned char fetchControllerResult(unsigned int maxDelay=1000);
+		inline unsigned char fetchControllerResult(SerialFetchInfo& sfi);
 		// reads data from controller until nbBytes are ceived or maxDelay was reached
 		inline int readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByte, unsigned int maxDelay = 1000, bool withErrorMsg = true);
 		// reads data from controller until a MBYTE_CLOSE wa received or maxDelay was reached
@@ -333,17 +346,18 @@ class Serial : public SerialOSD {
 		void resetTotalDistance(); 
 		void logMeasurementRefTs(const CncLongPosition& pos);
 		void logMeasurementLastTs();
-				
+		
 		bool sendSerialControllerCallback(ContollerInfo& ci);
 		bool sendSerialControllerCallback(ContollerExecuteInfo& cei);
 		
 		inline bool processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char command);
-
+		
 		virtual void startMeasurementIntern() {}
 		virtual void stopMeasurementIntern() {}
 		
 		// physically serialize interface
-		virtual int readData(void *buffer, unsigned int nbByte);
+		virtual int  peekData(void *buffer, unsigned int nbByte);
+		virtual int  readData(void *buffer, unsigned int nbByte);
 		virtual bool writeData(unsigned char cmd);
 		virtual bool writeData(void *buffer, unsigned int nbByte);
 		
@@ -358,16 +372,12 @@ class Serial : public SerialOSD {
 	
 		//Initialize Serial communication without an acitiv connection 
 		Serial(CncControl* cnc);
-		//Initialize Serial communication with the given COM port
-		Serial(const char *portName);
 		//Close the connection
 		virtual ~Serial();
 		// gets a string represntation of ret
 		static const char* decodeContollerResult(int ret);
 		// returns the class name
 		virtual const char* getClassName() { return "SerialPort"; } 
-		// can process the PID_SPEED_FEED_MODE setter
-		virtual bool knowsSpeedMode() const { return false; }
 		// returns the emulator type
 		virtual bool isEmulator() const { return false; }
 		// return the port type
@@ -381,7 +391,7 @@ class Serial : public SerialOSD {
 		// read all remaining bytes from serial to /dev/null
 		virtual bool clearRemainingBytes(bool trace=false);
 		
-
+		virtual bool dataAvailable();
 		virtual const char* getPortName() 						{ return portName.c_str(); }
 		virtual void onPeriodicallyAppEvent(bool interrupted) 	{}
 		virtual bool canProcessIdle() 							{ return true; }
@@ -392,11 +402,15 @@ class Serial : public SerialOSD {
 		bool isSpyOutputOn() 									{ return traceSpyInfo; }
 		Serial::SypMode getSpyMode() 							{ return spyMode; };
 		
+		const LastSerialResult& getLastFetchResult() { return lastFetchResult; }
+		
 		// return the current command flag
-		bool isCommandActive() { return SerialCommandLocker::isCommandActive(); }
-		bool isIdleActive()    { return SerialCommandLocker::getLockedCommand() == CMD_IDLE; }
+		bool isCommandActive() 		{ return SerialCommandLocker::isCommandActive(); }
+		bool isPopSerialActive()	{ return SerialCommandLocker::getLockedCommand() == CMD_POP_SERIAL; }
+		bool isIdleActive()			{ return SerialCommandLocker::getLockedCommand() == CMD_IDLE; }
 		
 		// port writting
+		bool popSerial(bool returnImmediately=true);
 		bool processIdle();
 		
 		bool processGetter(unsigned char pid, GetterValues& ret);
@@ -406,8 +420,12 @@ class Serial : public SerialOSD {
 		
 		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream);
 		
-		bool processMoveUntilSignal(unsigned int size, const int32_t (&values)[3]);
+		bool processStartInteractiveMove();
+		bool processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		
 		bool processMoveSequence(CncMoveSequence& moveSequence);
+		
+		bool resolveLimits(unsigned int size, const int32_t (&values)[3]);
 		
 		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered);
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
@@ -430,6 +448,7 @@ class Serial : public SerialOSD {
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr)	{}
 		virtual void processTrigger(const Serial::Trigger::EndRun& tr)		{}
 		virtual void processTrigger(const Serial::Trigger::NextPath& tr)	{}
+		virtual void processTrigger(const Serial::Trigger::SpeedChange& tr)	{}
 		
 		// position movement counting
 		virtual void resetPositionCounter();

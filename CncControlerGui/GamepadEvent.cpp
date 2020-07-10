@@ -4,21 +4,21 @@
 ///////////////////////////////////////////////////////////////////
 std::ostream& GamepadEvent::Data::trace(std::ostream &ostr, const GamepadEvent::Data &data) {
 ///////////////////////////////////////////////////////////////////
-	ostr << "Button state(A;B;X;Y)          : " 
+	ostr << "Button      state(A;B;X;Y)     : " 
 		<< data.buttonA 				<< "; " 
 		<< data.buttonB 				<< "; " 
 		<< data.buttonX 				<< "; " 
 		<< data.buttonY 
 		<< std::endl;
 		
-	ostr << "Button state(L;R;U;D)          : " 
+	ostr << "Button      state(L;R;U;D)     : " 
 		<< data.buttonLeft				<< "; " 
 		<< data.buttonRight 			<< "; " 
 		<< data.buttonUp 				<< "; " 
 		<< data.buttonDown
 		<< std::endl; 
 		
-	ostr << "Button (Start;Back)            : " 
+	ostr << "Button      (Start;Back)       : " 
 		<< data.buttonStart	<< "; " 
 		<< data.buttonBack 
 		<< std::endl; 
@@ -48,5 +48,21 @@ std::ostream& GamepadEvent::Data::trace(std::ostream &ostr, const GamepadEvent::
 		<< wxString::Format("%+1.1lf",   data.rightStickY)
 		<< std::endl; 
 			
+	ostr << std::endl; 
+
+	ostr << "Evaluated Position Management\n"
+		<< "  (Sticks, NaviXY, NaviZ)      : "; 
+			switch ( data.posCtrlMode ) {
+				case PCM_STICKS:	ostr << "Sticks";	break;
+				case PCM_NAV_XY:	ostr << "Navi XZ";	break;
+				case PCM_NAV_Z:		ostr << "Navi  Z";	break;
+			}
+	ostr << std::endl; 
+
+	ostr << "Evaluated Movement(X;Y;Z)      : " 
+		<< wxString::Format("%d; ", data.dx)
+		<< wxString::Format("%d; ", data.dy)
+		<< wxString::Format("%d",   data.dz)
+		<< std::endl; 
 	return ostr;
 }

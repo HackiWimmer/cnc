@@ -345,6 +345,7 @@ class CncConfig {
 		const double getMaxDimensionY();
 		const double getMaxDimensionZ();
 		
+		const int32_t getMaxDimensionSteps()					{ return getMaxDimension()  * getCalculationFactX(); }
 		const int32_t getMaxDimensionStepsX()					{ return getMaxDimensionX() * getCalculationFactX(); }
 		const int32_t getMaxDimensionStepsY()					{ return getMaxDimensionY() * getCalculationFactY(); }
 		const int32_t getMaxDimensionStepsZ()					{ return getMaxDimensionZ() * getCalculationFactZ(); }

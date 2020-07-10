@@ -6,7 +6,6 @@
 #include <wx/notifmsg.h>
 #include <wx/generic/notifmsg.h>
 #include <wx/event.h>
-#include "UpdateManagerThread.h"
 #include "GamepadEvent.h"
 #include "SerialEvent.h"
 #include "NotebookInfo.h"
@@ -38,6 +37,8 @@ class wxFileConfig;
 class GL3DOptionPane;
 class GL3DDrawPane;
 
+class CncTransactionLock;
+
 class GamepadThread;
 
 class SerialThread;
@@ -66,6 +67,8 @@ class CncExternalViewBox;
 class CncArduinoEnvironment;
 class CncLCDPositionPanel;
 class CncManuallyMoveCoordinates;
+class CncSpeedPlayground;
+class CncGamepadControllerSpy;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -92,6 +95,24 @@ namespace CncApp {
 	};
 	
 	typedef std::map<wxMenuItem*, MenuInfo> MenuItems;
+	
+	
+	class LocalContext {
+		bool* locked;
+		
+		public:
+			LocalContext(bool* value)
+			: locked(value)
+			{ 
+				*locked = true; 
+			}
+			
+			~LocalContext()
+			{ 
+				*locked = false; 
+			}
+	};
+	
 };
 
 
@@ -136,11 +157,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
-		virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event);
-		virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
+		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
 		virtual void openSpeedPlayground(wxCommandEvent& event);
-		
 		virtual void onChangePreviewMode(wxCommandEvent& event);
 		virtual void connectSec(wxCommandEvent& event);
 		virtual void selectPortSec(wxCommandEvent& event);
@@ -187,7 +205,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void testCaseBookChanged(wxListbookEvent& event);
 		virtual void requestInterrupt(wxCommandEvent& event);
 		virtual void requestHeartbeat(wxCommandEvent& event);
-		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
 		virtual void renameTemplateFromButton(wxCommandEvent& event);
 		virtual void removeTemplateFromButton(wxCommandEvent& event);
 		virtual void onSelectCncMonitor(wxCommandEvent& event);
@@ -232,7 +249,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void viewStatusbar(wxCommandEvent& event);
 		virtual void searchAvailiablePorts(wxCommandEvent& event);
 		virtual void unitTestFramework(wxCommandEvent& event);
-		virtual void traceTimer(wxTimerEvent& event);
 		virtual void selectUCChangeFrom(wxCommandEvent& event);
 		virtual void selectUCUnitFrom(wxCommandEvent& event);
 		virtual void selectUCUnitTo(wxCommandEvent& event);
@@ -305,8 +321,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void stepDelayChanged(wxScrollEvent& event);
 		virtual void displayUserAgent(wxCommandEvent& event);
 		virtual void updateToolControls(wxCommandEvent& event);
-		virtual void serialTimer(wxTimerEvent& event);
-		virtual void startupTimer(wxTimerEvent& event);
+		virtual void onSerialTimer(wxTimerEvent& event);
+		virtual void onStartupTimer(wxTimerEvent& event);
+		virtual void onTraceTimer(wxTimerEvent& event);
 		virtual void moveHome(wxCommandEvent& event);
 		virtual void moveToZeroXY(wxCommandEvent& event);
 		virtual void moveToZeroXYZ(wxCommandEvent& event);
@@ -377,18 +394,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void setupGridCommandButton(wxCommandEvent& event);
 		virtual void setupGridSelected(wxPropertyGridEvent& event);
 		
-		void onThreadAppPosUpdate(UpdateManagerEvent& event);
-		void onThreadCtlPosUpdate(UpdateManagerEvent& event);
-		void onThreadHeartbeat(UpdateManagerEvent& event);
-		void onThreadCompletion(UpdateManagerEvent& event);
-		void onThreadDispatchAll(wxThreadEvent& event);
-		void onThreadPostInfo(wxThreadEvent& event);
-		void onThreadPostWarning(wxThreadEvent& event);
-		void onThreadPostError(wxThreadEvent& event);
 		void onGamepadThreadInitialized(GamepadEvent& event);
 		void onGamepadThreadCompletion(GamepadEvent& event);
 		void onGamepadThreadUpadte(GamepadEvent& event);
 		void onGamepadThreadHeartbeat(GamepadEvent& event);
+		void onGamepadThreadMessage(GamepadEvent& event);
 		void onSerialThreadInitialized(SerialEvent& event);
 		void onSerialThreadCompletion(SerialEvent& event);
 		void onSerialThreadHeartbeat(SerialEvent& event);
@@ -414,15 +424,14 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 	public:
 		enum EventId { 	INITIALIZED 				=  1,
 						COMPLETED 					=  2,
-						HEARTBEAT 					=  3, 
-						APP_POS_UPDATE 				=  4, 
-						CTL_POS_UPDATE 				=  5, 
-						DISPATCH_ALL 				=  6, 
-						POST_INFO 					=  7, 
-						POST_WARNING 				=  8, 
-						POST_ERROR 					=  9,
-						GAMEPAD_STATE				= 10,
-						GAMEPAD_HEARTBEAT			= 11,
+						HEARTBEAT 					=  3,
+						DISPATCH_ALL 				=  5, 
+						POST_INFO 					=  6, 
+						POST_WARNING 				=  7, 
+						POST_ERROR 					=  8,
+						GAMEPAD_STATE				=  9,
+						GAMEPAD_HEARTBEAT			= 10,
+						GAMEPAD_MESSAGE				= 11,
 						SERIAL_HEARTBEAT			= 12,
 						SERIAL_MESSAGE				= 13,
 						SERIAL_DATA					= 14,
@@ -446,16 +455,12 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		wxMenuItem* GetMiMotorEnableState()		{ return m_miMotorEnableState; }
 		
 		//////////////////////////////////////////////////////////////////////////////////
-		// this call is alread locked by the ConcurrentQueue class
-		void umPostEvent(const UpdateManagerThread::Event& evt);
-		
-		//////////////////////////////////////////////////////////////////////////////////
 		void selectMainBookSourcePanel(int sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL);
 		void selectMainBookPreviewPanel();
 		void selectMainBookSetupPanel();
 		void selectMainBookReferencePanel();
 		void selectMainBookManuelPanel();
-		void selectMainBookTestPanel();
+		void selectMainBookTestPanel();	
 		
 		void selectMonitorBookCncPanel();
 		void selectMonitorBookTemplatePanel();
@@ -477,11 +482,13 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		/////////////////////////////////////////////////////////////////////////////////
 		// configuration callbacks
 		void releaseControllerSetupFromConfig();
-		void updateCncConfigTrace();
+		void notifyConfigUpdate();
 		void changeWorkpieceThickness();
 		void changeCrossingThickness();
 		
 		void updateSpyDetailWindow();
+		
+		void decorateSwitchToolOnOff(bool state);
 		
 		//////////////////////////////////////////////////////////////////////////////////
 #		ifdef __WXMSW__
@@ -493,11 +500,22 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		//////////////////////////////////////////////////////////////////////////////////
 		void waitActive(unsigned int milliseconds, bool once = true);
 		void dispatchNext();
+		void dispatchTimerEvents();
 		void dispatchAll();
 		
 		const char* getCurrentPortName(wxString& ret);
 		
+		void addSetter(unsigned char pid, const cnc::SetterValueList& v);
+		void addAppPosition(unsigned char pid, long id, char speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& pos);
+		void addCtlPosition(unsigned char pid, long id, char speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& pos);
+		
 		bool isDisplayParserDetails() { return m_menuItemDisplayParserDetails->IsChecked(); }
+		void updateAppPositionControls();
+		void updateCtlPositionControls();
+		void updateSpeedControls();
+		
+		void updateSpeedSlider(float value);
+		void updateCncSpeed(float value, CncSpeedMode mode);
 		
 	protected:
 	
@@ -510,7 +528,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void globalKeyDownHook(wxKeyEvent& event);
  
 		// Interrupt thread handling
-		UpdateManagerThread* updateManagerThread;
+		//UpdateManagerThread* updateManagerThread;
 		wxCriticalSection pUpdateManagerThreadCS;
 		
 		GamepadThread* gamepadThread;
@@ -519,6 +537,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		SerialThread* serialThread;
 		wxCriticalSection pSerialThreadCS;
 
+		CncSpeedPlayground*	cncSpeedPlayground;
+		
 		CncControl* getCncControl() 						{ return cnc; }
 		CncPreprocessor* getCncPreProcessor()				{ return cncPreprocessor; }
 		
@@ -526,8 +546,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
 		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ return parsingSynopisis; }
 		
-		void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
-		void manualContinuousMoveStop();
+		bool startInteractiveMove();
+		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		bool stopInteractiveMove();
 		
 		bool connectSerialPort();
 		
@@ -576,20 +597,24 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 	private:
 		// Member variables
-		bool isDebugMode;
-		bool isZeroReferenceValid;
-		bool canClose;
-		bool evaluatePositions;
-		bool ignoreDirControlEvents;
+		bool 							isDebugMode;
+		bool 							isZeroReferenceValid;
+		bool 							canClose;
+		bool 							evaluatePositions;
+		bool 							ignoreDirControlEvents;
 		
-		RunConfirmationInfo  runConfirmationInfo;
+		RunConfirmationInfo  			runConfirmationInfo;
+		CncTransactionLock*				interactiveTransactionLock;
 		
-		int traceTimerCounter;
+		int 							startTimerTimeout;
+		int 							serialTimerTimeout;
+		int 							traceTimerTimeout;
+		int 							traceTimerCounter;
 		
-		wxString lastPortName;
-		wxString defaultPortName;
+		wxString 						lastPortName;
+		wxString 						defaultPortName;
 	
-		CncControl* cnc;
+		CncControl* 					cnc;
 		
 		CncLruFileViewListCtrl*			lruFileView;
 		CncSourceEditor* 				sourceEditor;
@@ -625,6 +650,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncArduinoEnvironment*			cncArduinoEnvironment;
 		CncLCDPositionPanel*			cncLCDPositionPanel;
 		CncManuallyMoveCoordinates*		cncManuallyMoveCoordPanel;
+		CncGamepadControllerSpy* 		gamepadControllerSpy;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;
@@ -725,7 +751,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void registerGuiControls();
 		bool initializeCncControl();
-		void initializeUpdateManagerThread();
 		void initializeGamepadThread();
 		void initializeSerialThread();
 		bool initializeLruMenu();
@@ -733,8 +758,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void createAnimationControl();
 		int showReferencePositionDlg(wxString msg);
-		
-		void decorateSwitchToolOnOff(bool state);
 		
 		///////////////////////////////////////////////////////////////
 		// search handling
@@ -888,6 +911,7 @@ class CncTransactionLock {
 			parent->m_miRqtIdleMessages->Check(false);
 			parent->m_miRqtIdleMessages->Enable(false);
 			
+			
 			CncControl* cnc = parent->getCncControl();
 			if ( cnc != NULL && cnc->isCommandActive() ) {
 				
@@ -902,7 +926,7 @@ class CncTransactionLock {
 					}
 				}
 			}
-			
+						
 			parent->decorateIdleState(false);
 		}
 		
@@ -912,12 +936,14 @@ class CncTransactionLock {
 			
 			parent->m_miRqtIdleMessages->Enable(prevEnableState);
 			
+			wxASSERT( referenceCounter != 0 );
 			referenceCounter--;
 		}
 		
-		void setErrorMode() {
-			errorMode = true;
-		}
+		void 					setErrorMode() 			{ errorMode = true;	}
+		
+		static bool 			isLocked() 				{ return referenceCounter != 0; }
+		static unsigned int 	getReferenceCount()		{ return referenceCounter; }
 };
 
 ////////////////////////////////////////////////////////////////////

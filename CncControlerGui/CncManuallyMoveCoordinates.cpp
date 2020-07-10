@@ -37,8 +37,6 @@ void CncManuallyMoveCoordinates::enableControls(bool state) {
 	m_signManuallyYSlider->Enable(state);
 	m_signManuallyZSlider->Enable(state);
 	m_manuallyToolId->Enable(state);
-	m_manuallySpeedSlider->Enable(state);
-	m_manuallySpeedValue->Enable(state);
 	m_mmRadioCoordinates->Enable(state);
 	m_metricCommon->Enable(state);
 	m_btSetXYZ->Enable(state);
@@ -52,7 +50,6 @@ void CncManuallyMoveCoordinates::initialize() {
 ///////////////////////////////////////////////////////////////////
 	enableControls(true);
 	updateValidators();
-	updateSpeedSliderValue();
 	
 	m_fxMax  ->ChangeValue(wxString::Format("%5.1lf", THE_CONFIG->getMaxSpeedX_MM_MIN()  ));
 	m_fyMax  ->ChangeValue(wxString::Format("%5.1lf", THE_CONFIG->getMaxSpeedY_MM_MIN()  ));
@@ -73,20 +70,15 @@ void CncManuallyMoveCoordinates::updateValidators() {
 	m_metricZ->SetValidator(val);
 	
 	m_metricCommon->SetValidator(val);
-	
-	val.SetRange(0, 50000.0);
-	val.SetPrecision(1);
-	m_manuallySpeedValue->SetValidator(val);
 }
-
 ///////////////////////////////////////////////////////////////////
 void CncManuallyMoveCoordinates::updateUnit() {
 ///////////////////////////////////////////////////////////////////
 	const wxString unit(THE_APP->GetUnit()->GetValue());
 	
-	double xLimit = +THE_CONFIG->getMaxDimensionX()/2; // [mm]
-	double yLimit = +THE_CONFIG->getMaxDimensionY()/2; // [mm]
-	double zLimit = +THE_CONFIG->getMaxDimensionZ()/2; // [mm]
+	double xLimit = +THE_CONFIG->getMaxDimensionX() * 0.8; // [mm]
+	double yLimit = +THE_CONFIG->getMaxDimensionY() * 0.8; // [mm]
+	double zLimit = +THE_CONFIG->getMaxDimensionZ() * 0.8; // [mm]
 	
 	auto setCommon = [&](double fact) {
 		double value; m_metricCommon->GetValue().ToDouble(&value);
@@ -203,21 +195,6 @@ double CncManuallyMoveCoordinates::getValueZ() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-double CncManuallyMoveCoordinates::getSpeedValueMM_MIN() {
-///////////////////////////////////////////////////////////////////
-	double ret;
-	m_manuallySpeedValue->GetValue().ToDouble(&ret);
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-void CncManuallyMoveCoordinates::updateSpeedSliderValue() {
-///////////////////////////////////////////////////////////////////
-	const double    fact = m_manuallySpeedSlider->GetValue() / 100.0;
-	const wxString value = wxString::Format("%5.1lf", fact * THE_CONFIG->getMaxSpeedXYZ_MM_MIN());
-	
-	m_manuallySpeedValue->ChangeValue(value);
-}
-///////////////////////////////////////////////////////////////////
 void CncManuallyMoveCoordinates::update(wxTextCtrl* ctrl, double value) {
 ///////////////////////////////////////////////////////////////////
 	const wxString unit(THE_APP->GetUnit()->GetValue());
@@ -248,11 +225,6 @@ void CncManuallyMoveCoordinates::update(wxSlider* ctrl, const wxString& value) {
 		value.ToDouble(&v);
 		ctrl->SetValue(v);
 	}
-}
-///////////////////////////////////////////////////////////////////
-void CncManuallyMoveCoordinates::changeManuallySpeedSlider(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateSpeedSliderValue();
 }
 ///////////////////////////////////////////////////////////////////
 void CncManuallyMoveCoordinates::changeManuallySliderX(wxScrollEvent& event) {
@@ -399,8 +371,7 @@ void CncManuallyMoveCoordinates::onLBDownMax(wxMouseEvent& event) {
 	
 	if ( ctrl != NULL ) {
 		double v; ctrl->GetValue().ToDouble(&v);
-		m_manuallySpeedSlider->SetValue(v / THE_CONFIG->getMaxSpeedXYZ_MM_MIN() * 100);
-		updateSpeedSliderValue();
+		THE_APP->updateSpeedSlider(v);
 	}
 	
 	event.Skip();

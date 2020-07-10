@@ -5,6 +5,7 @@
 #include "3D/GLContextTestCube.h"
 #include "CncMotionVertexTrace.h"
 #include "GL3DDrawPane.h"
+#include "CncContext.h"
 #include "CncConfig.h"
 #include "CncCommon.h"
 #include "MainFrame.h"
@@ -40,7 +41,7 @@ class GlutLibInitManager {
 // ----------------------------------------------------------------------------
 // CncMotionMonitor Event Table
 // ----------------------------------------------------------------------------
-wxDEFINE_EVENT(wxEVT_MONTION_MONITOR_TIMER, wxTimerEvent);
+wxDEFINE_EVENT(wxEVT_MONITOR_CAMERA_TIMER,  wxTimerEvent);
 
 wxBEGIN_EVENT_TABLE(CncMotionMonitor, wxGLCanvas)
 	EVT_PAINT(								CncMotionMonitor::onPaint)
@@ -49,18 +50,19 @@ wxBEGIN_EVENT_TABLE(CncMotionMonitor, wxGLCanvas)
 	EVT_MOUSE_EVENTS(						CncMotionMonitor::onMouse)
 	EVT_KEY_DOWN(							CncMotionMonitor::onKeyDown)
 	EVT_LEAVE_WINDOW(						CncMotionMonitor::onLeave)
-	EVT_TIMER(wxEVT_MONTION_MONITOR_TIMER, CncMotionMonitor::onCameraRotationTimer)
+	EVT_TIMER(wxEVT_MONITOR_CAMERA_TIMER,	CncMotionMonitor::onCameraRotationTimer)
 wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////
 CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList) 
 : CncGlCanvas(parent, attribList)
 , monitor(new GLContextCncPath(this, "GLMotionMonitor"))
-, cameraRotationTimer(this, wxEVT_MONTION_MONITOR_TIMER)
+, cameraRotationTimer(this, wxEVT_MONITOR_CAMERA_TIMER)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
 , zoom(2.0f)
 , currentClientID(-1L)
+, processMode(false)
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
@@ -262,6 +264,12 @@ void CncMotionMonitor::onPaint() {
 	SwapBuffers();
 }
 //////////////////////////////////////////////////
+void CncMotionMonitor::update(bool force) { 
+//////////////////////////////////////////////////
+	if ( force == true || processMode == false)
+		onPaint(); 
+}
+//////////////////////////////////////////////////
 void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 	// This is required even though dc is not used otherwise.
@@ -287,7 +295,7 @@ void CncMotionMonitor::onLeave(wxMouseEvent& event) {
 	mouseMoveMode = false;
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::performMouseToolTip() {
+void CncMotionMonitor::performMouseCoordAndToolTip() {
 //////////////////////////////////////////////////
 	typedef GLContextBase::ViewMode VT;
 	
@@ -336,23 +344,32 @@ void CncMotionMonitor::performMouseToolTip() {
 //////////////////////////////////////////////////
 void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
-	// mouse crosshair
-	SetToolTip("");
-	THE_APP->GetMouseCoordX()->ChangeValue("");
-	THE_APP->GetMouseCoordY()->ChangeValue("");
-	THE_APP->GetMouseCoordZ()->ChangeValue("");
+	static bool displayCoords = false;
+
+	auto clearCoords = [&]() {
+		if ( displayCoords == true ) {
+			SetToolTip("");
+			THE_APP->GetMouseCoordX()->ChangeValue("");
+			THE_APP->GetMouseCoordY()->ChangeValue("");
+			THE_APP->GetMouseCoordZ()->ChangeValue("");
+		}
+	};
+	
+	clearCoords();
 	
 	if ( event.ControlDown() == true ) {
 		if ( context->logWinCoordsToVertex(event.GetX(), event.GetY()) )  {
+			// the refresh() (not update()) is necessary here to get the coordinates well
 			Refresh();
-			
-			performMouseToolTip();
+			performMouseCoordAndToolTip();
+			displayCoords = true;
 		}
 	
 	} else {
 		context->delWinCoordsToVertex();
-		Refresh();
-		
+		update();
+		clearCoords();
+		displayCoords = false;
 	}
 	
 	// default handling
@@ -465,6 +482,7 @@ void CncMotionMonitor::normalizeMonitor() {
 //////////////////////////////////////////////////
 	monitor->normalizeRotation();
 	monitor->normalizeCamera();
+	
 	Refresh();
 }
 //////////////////////////////////////////////////
@@ -474,11 +492,13 @@ void CncMotionMonitor::pushProcessMode() {
 	normalizeMonitor();
 	resetCurrentClientId();
 	
+	processMode = true;
 	monitor->deactivateNotifications();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::popProcessMode() {
 //////////////////////////////////////////////////
+	processMode = false;
 	monitor->activateNotifications();
 }
 

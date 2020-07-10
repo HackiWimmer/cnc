@@ -104,8 +104,6 @@
   <object class="wxBitmap" name="BMP_MINUS@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_MONITORING_MINIMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-low (2).png</object>
   <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-full.png</object>
-  <object class="wxBitmap" name="BMP_NAVI_XY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_all-small.png</object>
-  <object class="wxBitmap" name="BMP_NAVI_Z">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_updown-small.png</object>
   <object class="wxBitmap" name="BMP_NO_CHG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bug-link.png</object>
   <object class="wxBitmap" name="BMP_NO_WPT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="BMP_OK16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok.png</object>
@@ -152,8 +150,6 @@
   <object class="wxBitmap" name="BMP_SPEED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\sports-shuttlecock.png</object>
   <object class="wxBitmap" name="BMP_SPEED_CTRL_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\time-delete.png</object>
   <object class="wxBitmap" name="BMP_SPEED_CTRL_ON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\time-add.png</object>
-  <object class="wxBitmap" name="BMP_STICK_LEFT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\lstick_all-small.png</object>
-  <object class="wxBitmap" name="BMP_STICK_RIGHT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\rstick_updown-small.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>

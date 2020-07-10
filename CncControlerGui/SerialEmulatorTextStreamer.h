@@ -73,7 +73,6 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 	public:
 	
 		explicit SerialEmulatorTextStreamer(CncControl* cnc);
-		explicit SerialEmulatorTextStreamer(const char *fileName);
 		virtual ~SerialEmulatorTextStreamer();
 		
 		void notifySetter(const CncCommandDecoder::SetterInfo& si) final;
@@ -97,6 +96,7 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr);
 		virtual void processTrigger(const Serial::Trigger::EndRun&   tr);
 		virtual void processTrigger(const Serial::Trigger::NextPath& tr);
+		virtual void processTrigger(const Serial::Trigger::SpeedChange& tr);
 };
 
 #endif

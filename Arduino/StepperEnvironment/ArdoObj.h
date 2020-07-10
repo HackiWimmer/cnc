@@ -21,8 +21,19 @@ namespace CtrlSpeedValues {
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
-namespace ArdoObj {
+namespace ArdoTs {
 
+  const uint32_t MAX_VALUE = UINT32_MAX;
+
+  inline uint32_t now();
+  inline uint32_t timespan(uint32_t from, uint32_t to);
+  inline uint32_t timespan(uint32_t from);
+  
+};
+
+///////////////////////////////////////////////////////////////////////////////////
+namespace ArdoObj {
+  
   // --------------------------------------------------------------
   template <class T>
   T minimum(T v1, T v2) {
@@ -102,6 +113,7 @@ namespace ArdoObj {
       case SIG_PAUSE:
       case SIG_HALT:
       case SIG_QUIT_MOVE: 
+      case SIG_UPDATE: 
       
         return true;
     }

@@ -22,6 +22,12 @@ class ArduinoMainLoop {
     byte            reset();
     byte            performTest();
     void            printConfig();
+
+    static void     functorIR1();
+    static void     functorIR2();
+    
+    static void     startMessage       (const char type, const unsigned char eid);
+    static void     finalizeMessage    ();
     
   public:
     ArduinoMainLoop();
@@ -48,7 +54,7 @@ class ArduinoMainLoop {
     static void     waitActiveMicroseconds(uint32_t micro);
     static int      waitForSerialData(uint32_t timeoutMicros=minSerialReadTimeoutMicros);
 
-    static void     sendHeartbeat(unsigned char limitState='\0', unsigned char supportState='\0');
+    static void     sendHeartbeat(unsigned char limitState, unsigned char supportState);
 
     static void     sleepMicroseconds(unsigned long usec);
     
@@ -81,7 +87,10 @@ class ArduinoMainLoop {
     static void     writeGetterValues(unsigned char pid, int32_t val1, int32_t val2);
     static void     writeGetterValues(unsigned char pid, int32_t val1, int32_t val2, int32_t val3);
 
-    static void     pushMessage        (const char type, const unsigned char eid, WriteFunctionType func=LastErrorCodes::writeToSerial);
+    static void     pushMessage        (const char type, const unsigned char eid);
+    static void     pushMessage        (const char type, const unsigned char eid, const unsigned char  exText);
+    static void     pushMessage        (const char type, const unsigned char eid, const char* exText);
+    static void     pushMessage        (const char type, const unsigned char eid, WriteFunctionType func/*=LastErrorCodes::writeToSerial*/);
    
 };
 

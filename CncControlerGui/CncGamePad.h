@@ -21,6 +21,8 @@ class CncGamepad : public CncGamePadOSD
 		
 		virtual bool isServiceRuning()				{ return CncGamePadOSD::isServiceRuning(); }
 		 
+		virtual int  getStickResolutionFactor() 	{ return CncGamePadOSD::getStickResolutionFactor(); }
+		 
 		virtual float getLeftStickX()				{ return CncGamePadOSD::getLeftStickX(); }
 		virtual float getLeftStickY()				{ return CncGamePadOSD::getLeftStickY(); }
 		virtual float getRightStickX()				{ return CncGamePadOSD::getRightStickX(); }

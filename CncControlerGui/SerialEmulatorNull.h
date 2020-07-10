@@ -220,8 +220,6 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		inline bool writeMoveCmdIntern(unsigned char *buffer, unsigned int nbByte);
 		inline bool writeMoveSeqIntern(unsigned char *buffer, unsigned int nbByte);
 		
-		// specialization wrapper --> call initRenderAndMove
-		inline bool moveUntilSignal(int32_t dx, int32_t dy, int32_t dz);
 		// init feed speed and calling renderAndMove
 		inline bool initRenderAndMove(int32_t dx, int32_t dy, int32_t dz);
 		// render and step axis
@@ -287,7 +285,7 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		virtual int performMajorMove(unsigned char *buffer, unsigned int nbByte);
 		virtual int performSequenceMove(unsigned char *buffer, unsigned int nbByte);
 		
-		int readData(void *buffer, unsigned int nbByte) final;
+		int  readData(void *buffer, unsigned int nbByte)  final;
 		bool writeData(void *buffer, unsigned int nbByte) final;
 
 		void addErrorInfo(unsigned char eid, const wxString& text);
@@ -338,8 +336,6 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		
 		//Initialize Serial communication without an acitiv connection 
 		SerialEmulatorNULL(CncControl* cnc);
-		//Initialize Serial communication with the given COM port
-		SerialEmulatorNULL(const char *portName);
 		virtual ~SerialEmulatorNULL();
 		
 		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
@@ -350,8 +346,6 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulator(dev/null)"; }
-		// can process the PID_SPEED_FEED_MODE setter
-		virtual bool knowsSpeedMode() const { return true; }
 		// returns the emulator type
 		virtual bool isEmulator() const { return true; }
 		// return the port type
@@ -360,6 +354,8 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		virtual bool connect(const char* portName) { setConnected(true); return true; }
 		// close the connection
 		virtual void disconnect(void) { setConnected(false); }
+		// purge the connection
+		virtual void purge(void) {}
 };
 
 #endif

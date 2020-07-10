@@ -22,6 +22,10 @@ CncSpeedPlayground::CncSpeedPlayground(wxWindow* parent)
 , ArduinoPositionRenderer	()
 , displayTypeH				(DTH_IMPULSE)
 , displayTypeV				(DTV_MM_MIN)
+, valF						(1, NULL, wxNUM_VAL_DEFAULT)
+, valX						(3, NULL, wxNUM_VAL_DEFAULT)
+, valY						(3, NULL, wxNUM_VAL_DEFAULT)
+, valZ						(3, NULL, wxNUM_VAL_DEFAULT)
 , minDA						(0L)
 , maxDA						(0L)
 , minFA						(0L)
@@ -59,7 +63,7 @@ CncSpeedPlayground::CncSpeedPlayground(wxWindow* parent)
 	
 	determineDisplayType();
 	
-	const int minF 	=   10;
+	const int minF 	=    1;
 	const int maxF 	= THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
 	const int minX	=    0;
 	const int maxX	=  100;
@@ -77,21 +81,17 @@ CncSpeedPlayground::CncSpeedPlayground(wxWindow* parent)
 	// init controls
 	double f = 725, x = 6.0, y = 3.0, z = 1.0; 
 	
-	CncFloatingPointValidator val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	valF.      SetRange(minF, maxF); m_valF->SetValidator(valF);	m_valF->SetValue(wxString::Format("%4.1lf", f ));
+	m_sliderF->SetRange(minF, maxF);								m_sliderF->SetValue(round(f));
 	
-	val.SetPrecision(1);
-	val.       SetRange(minF, maxF); m_valF->SetValidator(val);	m_valF->SetValue(wxString::Format("%4.1lf", f ));
-	m_sliderF->SetRange(minF, maxF);							m_sliderF->SetValue(round(f));
+	valX.      SetRange(minX, maxX); m_valX->SetValidator(valX);	m_valX->SetValue(wxString::Format("%4.3lf", x ));
+	m_sliderX->SetRange(minX, maxX * SLIDER_FACT);					m_sliderX->SetValue(round(x * SLIDER_FACT));
 	
-	val.SetPrecision(3);
-	val.       SetRange(minX, maxX); m_valX->SetValidator(val);	m_valX->SetValue(wxString::Format("%4.3lf", x ));
-	m_sliderX->SetRange(minX, maxX * SLIDER_FACT);				m_sliderX->SetValue(round(x * SLIDER_FACT));
+	valY.      SetRange(minY, maxY); m_valY->SetValidator(valY);	m_valY->SetValue(wxString::Format("%4.3lf", y ));
+	m_sliderY->SetRange(minY, maxY * SLIDER_FACT);					m_sliderY->SetValue(round(y * SLIDER_FACT));
 	
-	val.       SetRange(minY, maxY); m_valY->SetValidator(val);	m_valY->SetValue(wxString::Format("%4.3lf", y ));
-	m_sliderY->SetRange(minY, maxY * SLIDER_FACT);				m_sliderY->SetValue(round(y * SLIDER_FACT));
-	
-	val.       SetRange(minZ, maxZ); m_valZ->SetValidator(val);	m_valZ->SetValue(wxString::Format("%4.3lf", z ));
-	m_sliderZ->SetRange(minZ, maxZ * SLIDER_FACT);				m_sliderZ->SetValue(round(z * SLIDER_FACT));
+	valZ.      SetRange(minZ, maxZ); m_valZ->SetValidator(valZ);	m_valZ->SetValue(wxString::Format("%4.3lf", z ));
+	m_sliderZ->SetRange(minZ, maxZ * SLIDER_FACT);					m_sliderZ->SetValue(round(z * SLIDER_FACT));
 	
 	m_staticMinF->SetLabel(wxString::Format("%d", minF));
 	m_staticMaxF->SetLabel(wxString::Format("%d", maxF));
@@ -104,6 +104,8 @@ CncSpeedPlayground::CncSpeedPlayground(wxWindow* parent)
 	
 	m_staticMinZ->SetLabel(wxString::Format("%d", minZ));
 	m_staticMaxZ->SetLabel(wxString::Format("%d", maxZ));
+	
+	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	
 	val.SetPrecision(3); val.SetRange(-5,    +5); m_valAA->SetValidator(val);
 	val.SetPrecision(3); val.SetRange(-5,    +5); m_valDA->SetValidator(val);
@@ -120,6 +122,26 @@ CncSpeedPlayground::CncSpeedPlayground(wxWindow* parent)
 	m_valDB->ChangeValue("0.05");
 	m_valAC->ChangeValue("333.0");
 	m_valDC->ChangeValue("333.0");
+	
+	val.SetPrecision(0); val.SetRange(1, 10000); 
+	valF.SetRange(0.0, 10000.0);
+	
+	m_cbSpecialAccelDisplayWidth		->SetValue(false);
+	m_ebSpecialAccelDisplayWidthValue	->Enable(false);
+	m_ebSpecialAccelDisplayWidthValue	->SetValidator(val);
+	
+	m_cbSpecialSpeedDisplayHeight		->SetValue(false);
+	m_ebSpecialSpeedDisplayHeightValue	->Enable(false);
+	m_ebSpecialSpeedDisplayHeightValue	->SetValidator(valF);
+	
+	val.SetPrecision(0); val.SetRange(0, 10000); 
+	m_ebSpecialTriggerImpluse1->SetValidator(val);
+	m_ebSpecialTriggerImpluse2->SetValidator(val);
+	m_ebSpecialTriggerImpluse3->SetValidator(val);
+	
+	m_ebSpecialTriggerSpeed1->SetValidator(valF);
+	m_ebSpecialTriggerSpeed2->SetValidator(valF);
+	m_ebSpecialTriggerSpeed3->SetValidator(valF);
 }
 ////////////////////////////////////////////////////////////////////
 CncSpeedPlayground::~CncSpeedPlayground() {
@@ -149,16 +171,16 @@ void CncSpeedPlayground::onActivate(wxActivateEvent& event) {
 void CncSpeedPlayground::onValKeyDown(wxKeyEvent& event) {
 ////////////////////////////////////////////////////////////////////
 	wxTextCtrl* c = static_cast<wxTextCtrl*>(event.GetEventObject());
-	if ( c == NULL )
-		return;
-		
-	CncFloatingPointValidator* v = static_cast<CncFloatingPointValidator*>(c->GetValidator());
-	if ( v == NULL )
-		return;
-
-	const float minVal = v->getMin();
-	const float maxVal = v->getMax();
-
+	
+	float minVal = 0.0;
+	float maxVal = 0.0;
+	
+	if      ( c == m_valF ) { minVal = valF.getMin(); maxVal = valF.getMax(); } 
+	else if ( c == m_valX ) { minVal = valX.getMin(); maxVal = valX.getMax(); } 
+	else if ( c == m_valY ) { minVal = valY.getMin(); maxVal = valY.getMax(); } 
+	else if ( c == m_valZ ) { minVal = valZ.getMin(); maxVal = valZ.getMax(); } 
+	else					{ event.Skip(); return; }
+	
 	bool inFocus	= false;
 	double toAdd 	= 0.1;
 	double dVal  	= 0.0;
@@ -275,6 +297,84 @@ void CncSpeedPlayground::updateValueZ(wxCommandEvent& event) {
 	runFromGui();
 }
 ////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::enableSpecialAccelDisplayWidth(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	m_ebSpecialAccelDisplayWidthValue->Enable(m_cbSpecialAccelDisplayWidth->GetValue());
+	
+	runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::updateSpecialAccelDisplayWidthValue(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::enableSpecialSpeedDisplayHeight(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	m_ebSpecialSpeedDisplayHeightValue->Enable(m_cbSpecialSpeedDisplayHeight->GetValue());
+	
+	runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::updateSpecialSpeedDisplayHeightValue(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::updateTriggerF1(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	long v1; m_ebSpecialTriggerImpluse1->GetValue().ToLong(&v1);
+	long v2; m_ebSpecialTriggerSpeed1  ->GetValue().ToLong(&v2);
+	
+	//if ( v1 != 0 && v2 != 0 )
+		runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::updateTriggerF2(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	long v1; m_ebSpecialTriggerImpluse2->GetValue().ToLong(&v1);
+	long v2; m_ebSpecialTriggerSpeed2  ->GetValue().ToLong(&v2);
+	
+	//if ( v1 != 0 && v2 != 0 )
+		runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::updateTriggerF3(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	long v1; m_ebSpecialTriggerImpluse3->GetValue().ToLong(&v1);
+	long v2; m_ebSpecialTriggerSpeed3  ->GetValue().ToLong(&v2);
+	
+	//if ( v1 != 0 && v2 != 0 )
+		runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::updateTriggerI1(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	long v1; m_ebSpecialTriggerImpluse1->GetValue().ToLong(&v1);
+	long v2; m_ebSpecialTriggerSpeed2  ->GetValue().ToLong(&v2);
+	
+	//if ( v1 != 0 && v2 != 0 )
+		runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::updateTriggerI2(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	long v1; m_ebSpecialTriggerImpluse2->GetValue().ToLong(&v1);
+	long v2; m_ebSpecialTriggerSpeed2  ->GetValue().ToLong(&v2);
+	
+	//if ( v1 != 0 && v2 != 0 )
+		runFromGui();
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::updateTriggerI3(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////
+	long v1; m_ebSpecialTriggerImpluse3->GetValue().ToLong(&v1);
+	long v2; m_ebSpecialTriggerSpeed3  ->GetValue().ToLong(&v2);
+	
+	//if ( v1 != 0 && v2 != 0 )
+		runFromGui();
+}
+////////////////////////////////////////////////////////////////////
 void CncSpeedPlayground::updateListControl(wxListCtrl* ctrl, int columns, const char* values) {
 ////////////////////////////////////////////////////////////////////
 	if ( ctrl == NULL )
@@ -356,8 +456,8 @@ void CncSpeedPlayground::onClearLogger(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////
 void CncSpeedPlayground::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
 ////////////////////////////////////////////////////////////////////
-	const double F = displayTypeV == DTV_MM_MIN ? getNextTargetSpeed_MMSec() * 60 
-												: getNextTargetSpeed_MMSec();
+	const double F = displayTypeV == DTV_MM_MIN ? initNextTargetSpeed_MMSec() * 60 
+												: initNextTargetSpeed_MMSec();
 	
 	// acceleration
 	if ( testData.totalImpulseCounter >= minDA && testData.totalImpulseCounter <= maxDA ) {
@@ -411,10 +511,41 @@ void CncSpeedPlayground::onTimer(wxTimerEvent& event) {
 	//run();
 }
 ////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::appendArdoMessage(char type, const wxString& msg, const wxString& context) {
+////////////////////////////////////////////////////////////////////
+	if ( m_cbEnhancedTracing->GetValue() == false )
+		return;
+		
+	//-------------------------------------------------------------
+	auto log2Std = [&](std::ostream & o) {
+		o << "ArdoMsg: " << type 
+						 << " " 
+						 << msg 
+						 /*
+						 << std::setw(80) 
+						 << " [[ " 
+						 << context 
+						 << " ]]"
+						 */ 
+						 << std::endl;
+	};
+	
+	switch ( type ) {
+		case 'E':	log2Std(std::cerr); break;
+		case 'D':
+		case 'W':	log2Std(std::clog); break;
+		case 'S':	log2Std(cnc::cex1); break;
+		default:	log2Std(std::cout);
+	}
+}
+////////////////////////////////////////////////////////////////////
 void CncSpeedPlayground::run() {
 ////////////////////////////////////////////////////////////////////
 	if ( IsShown() == false )
 		return;
+
+	if ( logger->IsFrozen() == false )
+		logger->Freeze();
 
 	typedef ArduinoAccelManager::Function Function;
 
@@ -436,7 +567,7 @@ void CncSpeedPlayground::run() {
 		fA.A = AA; fA.B = AB; fA.C = AC;
 		fD.A = DA; fD.B = DB; fD.C = DC;
 
-		setupAccelManager(fA, fD);
+		ArduinoAccelManager::setup(fA, fD);
 	};
 	
 	testData.reset();
@@ -450,12 +581,15 @@ void CncSpeedPlayground::run() {
 	setupACM(dValAA, dValAB, dValAC / 60.0, dValDA, dValDB, dValDC / 60.0);
 	
 	determineDisplayType();
-	activateAccel(m_cbWithAcceleration->GetValue());
+	ArduinoAccelManager::activate(m_cbWithAcceleration->GetValue());
 	
 	const int32_t maxD 	= ArduinoImpulseCalculator().calculate(x, y, z);
 	const float speed 	= F / 60.0;
 	if ( initMove(maxD, speed) == false ) {
 		std::cerr << wxString::Format("initMove(%u, %.1lf) failed!", maxD, speed) << std::endl;
+		
+		if ( logger->IsFrozen() == true )
+			logger->Thaw();
 		return;
 	}
 	
@@ -466,8 +600,16 @@ void CncSpeedPlayground::run() {
 	const float extendFactH  = aRampWidth + aRampWidth * 0.15 + dRampWidth + dRampWidth * 0.15 >= maxD ? 0 : 0.15;
 	const float extendFactV  = 0.15;
 	
-	maxDA  = aRampWidth;
-	maxDA += aRampWidth * extendFactH;
+	long aWidth = aRampWidth;
+	if ( m_cbSpecialAccelDisplayWidth->GetValue() == false ) {
+		m_ebSpecialAccelDisplayWidthValue->ChangeValue(wxString::Format("%ld", maxD));
+	}
+	else {
+		m_ebSpecialAccelDisplayWidthValue->GetValue().ToLong(&aWidth);
+	}
+	
+	maxDA  = aWidth;
+	maxDA += aWidth * extendFactH;
 	minDA  = 0;
 	
 	maxDD  = maxD - 1;
@@ -475,11 +617,23 @@ void CncSpeedPlayground::run() {
 	minDD -= dRampWidth * extendFactH;
 	minDD  = minDD < 0 ? 0 : minDD;
 	
+	maxDD  = minDD < maxDA ? maxDA + aWidth : maxDD;
+	minDD  = minDD < maxDA ? maxDA  : maxDA;
+	
 	maxFA  = m_cbSpeedRelative->GetValue() == true ? F : THE_CONFIG->getMaxSpeedXYZ_MM_MIN(); 
 	maxFA  = displayTypeV == DTV_MM_SEC ? maxFA / 60 : maxFA ; 
 	maxFA  = maxFA < dValAC ? dValAC : maxFA;
 	maxFA += maxFA * extendFactV; 
 	minFA  = 0;
+	
+	if ( m_ebSpecialSpeedDisplayHeightValue->IsEnabled() == false ) {
+		m_ebSpecialSpeedDisplayHeightValue->ChangeValue(wxString::Format("%ld", maxFA));
+	}
+	else {
+		long val;
+		m_ebSpecialSpeedDisplayHeightValue->GetValue().ToLong(&val);
+		maxFA = val > 0 ? (uint32_t)val : maxFA;
+	}
 	
 	maxFD  = maxFA;
 	minFD  = minFA;
@@ -509,6 +663,25 @@ void CncSpeedPlayground::run() {
 	ss << "Steps Z Axis                    =" << round(z) 			<< "[steps]"	<< std::endl;
 	ss << "Total Impulse Count             =" << maxD 				<< "[#]"		<< std::endl;
 	ss << "Impulse Period                  =" << implPeriod			<< "[us]"		<< std::endl;
+	
+	long stI1, stI2, stI3;
+	m_ebSpecialTriggerImpluse1->GetValue().ToLong(&stI1);
+	m_ebSpecialTriggerImpluse2->GetValue().ToLong(&stI2);
+	m_ebSpecialTriggerImpluse3->GetValue().ToLong(&stI3);
+	
+	double stF1, stF2, stF3;
+	m_ebSpecialTriggerSpeed1->GetValue().ToDouble(&stF1);
+	m_ebSpecialTriggerSpeed2->GetValue().ToDouble(&stF2);
+	m_ebSpecialTriggerSpeed3->GetValue().ToDouble(&stF3);
+	
+	if ( stI1 > 0 && stF1 > 0.0 ) 	setSpecialSpeedTrigger1(stI1, (float)stF1 / 60);
+	else							setSpecialSpeedTrigger1(   0, (float)0.0);
+	
+	if ( stI2 > 0 && stF2 > 0.0 )	setSpecialSpeedTrigger2(stI2, (float)stF2 / 60);
+	else							setSpecialSpeedTrigger2(   0, (float)0.0);
+	
+	if ( stI3 > 0 && stF3 > 0.0 )	setSpecialSpeedTrigger3(stI3, (float)stF3 / 60);
+	else							setSpecialSpeedTrigger3(   0, (float)0.0);
 	
 	// simulated the stepping
 	if ( renderMove(x, y, z) == RET_OK ) {
@@ -558,5 +731,8 @@ void CncSpeedPlayground::run() {
 	
 	accelerationDiagram  ->display();
 	deaccelerationDiagram->display();
-}
+	
+	if ( logger->IsFrozen() == true )
+		logger->Thaw();
 
+}

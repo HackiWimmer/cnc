@@ -7,6 +7,7 @@
 #include "DecSeq.h"
 #include "CncAcmr.h"
 #include "CncRndr.h"
+#include "CncTest.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
 class CncAxisX;
@@ -24,10 +25,10 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 
    typedef ArduinoImpulseCalculator ImpulseCalculator;
 
-
     CncAxisX*           X;
     CncAxisY*           Y;
     CncAxisZ*           Z;
+    ArduinoTestManager* testManager;
 
     ImpulseCalculator   impulseCalculator;
     
@@ -37,12 +38,18 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     bool                probeMode;
     bool                pause;
     bool                I2CAvailable;
+    bool                interactiveMode;
+    bool                interactiveMoveActive;
 
     uint16_t            posReplyCounter;
     uint16_t            posReplyThreshold;
 
     uint32_t            tsMoveStart;
     uint32_t            tsMoveLast;
+
+    int8_t              interactiveValueX;
+    int8_t              interactiveValueY;
+    int8_t              interactiveValueZ;
 
     CncArduinoController(const CncArduinoController&);
 
@@ -62,20 +69,21 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     void                setPosReplyThreshold(uint16_t t)           { posReplyThreshold = t; }
     uint16_t            getPosReplyThreshold()              const  { return posReplyThreshold; }
 
-    bool                enableStepperPin(bool state = true);
-    bool                disableStepperPin()                        { return enableStepperPin(false); }
-    bool                enableStepperPinState();
+    bool                enableStepperPin(bool state = ENABLE_STATE_ON);
+    bool                disableStepperPin()                        { return enableStepperPin(ENABLE_STATE_OFF); }
+    bool                getEnableStepperPinState();
 
     bool                isAnyLimitActive();
     bool                evaluateLimitStates(int8_t& xLimit, int8_t& yLimit, int8_t& zLimit);
 
     void                sendCurrentPositions(unsigned char pid, bool force);
 
-    byte                movePosition   (int32_t dx, int32_t dy, int32_t dz);
-    byte                moveUntilSignal(int32_t dx, int32_t dy, int32_t dz);
+    byte                movePosition        (int32_t dx, int32_t dy, int32_t dz);
+    byte                moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz);
 
   protected:
 
+    friend class        ArduinoTestManager;
     friend class        CncArduinoStepper;
     friend class        CncAxisX;
     friend class        CncAxisY;
@@ -93,11 +101,12 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     // render interface
     virtual byte        checkRuntimeEnv();
 
-    virtual void        notifyMovePart(int8_t dx, int8_t dy, int8_t dz);
-    virtual byte        setDirection  (AxisId aid, int32_t steps);
-    virtual byte        performStep   (AxisId aid);
-    virtual byte        initiateStep  (AxisId aid);
-    virtual byte        finalizeStep  (AxisId aid);
+    virtual void        notifyMovePart    (int8_t dx, int8_t dy, int8_t dz);
+    virtual byte        setHighPulseWidth (AxisId aid, int32_t width);
+    virtual byte        setDirection      (AxisId aid, int32_t steps);
+    virtual byte        performStep       (AxisId aid);
+    virtual byte        initiateStep      (AxisId aid);
+    virtual byte        finalizeStep      (AxisId aid);
 
     // accelartor interface
     virtual void        notifyACMStateChange(State s);
@@ -109,7 +118,10 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     inline bool         observeSerialFrontByte(byte& retValue);
 
     bool                processSignal(byte sig, byte& retValue);
+    bool                processSignalUpdate(byte& retValue);
     void                broadcastInterrupt();
+
+    void                updateInteractiveMoveValues(int8_t dx, int8_t dy, int8_t dz);
 
   public:
     
@@ -130,12 +142,15 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     bool                evaluateI2CAvailable();
 
     bool                processSignal(byte sig);
-    bool                processHeartbeat(byte pid);
+    bool                processHeartbeat();
     
     byte                acceptGetter();
     byte                acceptSetter();
     byte                acceptMove(byte cmd);
     byte                acceptMoveSequence(byte cmd);
+    
+    byte                acceptInteractiveMove(byte cmd);
+    byte                cancelInteractiveMove(byte cmd);
 
     // test interface
     byte                performTest();

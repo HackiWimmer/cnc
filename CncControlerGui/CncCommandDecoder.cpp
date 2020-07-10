@@ -390,10 +390,10 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 	switch ( buffer[0] ) {
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE:
-		case CMD_MOVE_UNIT_SIGNAL: 		break;
+		case CMD_MOVE_UNIT_LIMIT_IS_FREE:	break;
 		
-		default:						std::cerr << "CncCommandDecoder::decodeMove() Invalid command = " << buffer[0] << std::endl;
-										return false;
+		default:							std::cerr << "CncCommandDecoder::decodeMove() Invalid command = " << buffer[0] << std::endl;
+											return false;
 	}
 
 	if ( nbByte < 1 ) {

@@ -24,16 +24,6 @@ SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(CncControl* cnc)
 {
 }
 ///////////////////////////////////////////////////////////////////
-//Initialize Serial communication with the given COM port
-SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(const char* fileName) 
-: SerialEmulatorNULL(fileName)
-, fileName("")
-, currentSpeedValue(0.0)
-, metricBoundbox()
-///////////////////////////////////////////////////////////////////
-{
-}
-///////////////////////////////////////////////////////////////////
 SerialEmulatorTextStreamer::~SerialEmulatorTextStreamer() {
 ///////////////////////////////////////////////////////////////////
 }
@@ -107,32 +97,8 @@ void SerialEmulatorTextStreamer::notifySetter(const CncCommandDecoder::SetterInf
 ///////////////////////////////////////////////////////////////////
 	SetterInfo si;
 	si.pid 		= csi.pid;
-	si.values	= csi.values;
 	
-	if ( si.pid == PID_SPEED_FEED_MODE ) {
-		si.values	= csi.values;
-		
-		auto checkValue = [&]() {
-			if ( si.values.size() <= 0 ) {
-				std::cerr << "SerialEmulatorTextStreamer::writeSetterRawCallback(): Empty setter values!" << std::endl;
-				return false;
-			}
-			
-			int32_t value = si.values.front();
-			if ( value < CncSpeedWork || value > CncSpeedUserDefined ) {
-				std::cerr << "SerialEmulatorTextStreamer::writeSetterRawCallback(): Invalid setter value: '" 
-				          << value
-				          << "'" << std::endl;
-				return false;
-			}
-			
-			return true;
-		};
-		
-		if ( checkValue() == true )
-			currentSpeedMode = (CncSpeedMode)si.values.front();
-			
-	} else if ( si.pid == PID_SPEED_MM_MIN ) {
+	if ( si.pid == PID_SPEED_MM_MIN ) {
 		si.values	= csi.values;
 		
 		auto checkValue = [&]() {
@@ -329,6 +295,11 @@ void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::EndRun& t
 void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
 	initializePath(tr);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::SpeedChange& tr) {
+///////////////////////////////////////////////////////////////////
+	currentSpeedMode = tr.currentSpeedMode;
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::initializeFile(const Serial::Trigger::BeginRun& tr) {

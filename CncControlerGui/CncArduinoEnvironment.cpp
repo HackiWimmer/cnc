@@ -18,12 +18,12 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 , logger  (NULL)
 , lsOn    (NULL)
 , lsOff   (NULL)
-, lsiMinX (m_btMinX,   'D', PIN_X_LIMIT, -1)
-, lsiMaxX (m_btMaxX,   'D', PIN_X_LIMIT, -1)
-, lsiMinY (m_btMinY,   'D', PIN_Y_LIMIT, -1)
-, lsiMaxY (m_btMaxY,   'D', PIN_Y_LIMIT, -1)
-, lsiMinZ (m_btMinZ,   'D', PIN_Z_LIMIT, -1)
-, lsiMaxZ (m_btMaxZ,   'D', PIN_Z_LIMIT, -1)
+, lsiMinX (m_btMinX,   'D', PIN_X_MIN_LIMIT, -1)
+, lsiMaxX (m_btMaxX,   'D', PIN_X_MAX_LIMIT, -1)
+, lsiMinY (m_btMinY,   'D', PIN_Y_MIN_LIMIT, -1)
+, lsiMaxY (m_btMaxY,   'D', PIN_Y_MAX_LIMIT, -1)
+, lsiMinZ (m_btMinZ,   'D', PIN_Z_MIN_LIMIT, -1)
+, lsiMaxZ (m_btMaxZ,   'D', PIN_Z_MAX_LIMIT, -1)
 , ssiBit8 (m_btSSBit8, 'B', -1)
 , ssiBit7 (m_btSSBit7, 'B', -1)
 , ssiBit6 (m_btSSBit6, 'B', -1)
@@ -659,17 +659,18 @@ void CncArduinoEnvironment::updateStateCtrl(wxTextCtrl* ctrl, const unsigned cha
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::updateLimitStates() {
 ///////////////////////////////////////////////////////////////////
-	setBit(limitStates, LimitSwitch::BIT_LS_X_MIN, 	lsiMinX.getBoolValue());
-	setBit(limitStates, LimitSwitch::BIT_LS_X_MAX, 	lsiMaxX.getBoolValue());
+	setBit(limitStates, LimitSwitch::BIT_LS_X_MIN, 			lsiMinX.getBoolValue());
+	setBit(limitStates, LimitSwitch::BIT_LS_X_MAX, 			lsiMaxX.getBoolValue());
 	
-	setBit(limitStates, LimitSwitch::BIT_LS_Y_MIN, 	lsiMinY.getBoolValue());
-	setBit(limitStates, LimitSwitch::BIT_LS_Y_MAX, 	lsiMaxY.getBoolValue());
+	setBit(limitStates, LimitSwitch::BIT_LS_Y_MIN, 			lsiMinY.getBoolValue());
+	setBit(limitStates, LimitSwitch::BIT_LS_Y_MAX, 			lsiMaxY.getBoolValue());
 	
-	setBit(limitStates, LimitSwitch::BIT_LS_Z_MIN, 	lsiMinZ.getBoolValue());
-	setBit(limitStates, LimitSwitch::BIT_LS_Z_MAX, 	lsiMaxZ.getBoolValue());
+	setBit(limitStates, LimitSwitch::BIT_LS_Z_MIN, 			lsiMinZ.getBoolValue());
+	setBit(limitStates, LimitSwitch::BIT_LS_Z_MAX, 			lsiMaxZ.getBoolValue());
 	
-	setBit(limitStates, LimitSwitch::BIT_2, 		false);
-	setBit(limitStates, LimitSwitch::BIT_1, 		false);
+	#warning use BIT_EMERGENCY_SWITCH
+	setBit(limitStates, LimitSwitch::BIT_EMERGENCY_SWITCH, 	false);
+	setBit(limitStates, LimitSwitch::BIT_1, 				false);
 
 	updateStateCtrl(m_curLimitStates, limitStates);
 }

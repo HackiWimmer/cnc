@@ -14,6 +14,7 @@ class CncGlCanvas : public wxGLCanvas {
 		virtual ~CncGlCanvas();
 		
 		virtual bool Show(bool show=true);
+		virtual void update(bool force=false);
 
 		void viewTop() 		{ view(GLContextBase::ViewMode::V2D_TOP); }
 		void viewBottom() 	{ view(GLContextBase::ViewMode::V2D_BOTTOM); }

@@ -19,7 +19,6 @@ class SerialEmulatorBinaryStreamer : public SerialEmulatorNULL
 	public:
 	
 		explicit SerialEmulatorBinaryStreamer(CncControl* cnc);
-		explicit SerialEmulatorBinaryStreamer(const char *fileName);
 		virtual ~SerialEmulatorBinaryStreamer();
 		
 		// returns the class name

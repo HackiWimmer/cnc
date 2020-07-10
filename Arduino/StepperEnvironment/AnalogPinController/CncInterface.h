@@ -3,6 +3,12 @@
 
 namespace LimitSwitch {
   
+  const bool EXTERNAL_INTERRUPT_ON                       = false;
+  const bool EXTERNAL_INTERRUPT_OFF                      =  true;
+
+  const bool EMERGENCY_SWITCH_ON                         = false;
+  const bool EMERGENCY_SWITCH_OFF                        =  true;
+
   const bool LIMIT_SWITCH_ON                             = false;  // LOW;
   const bool LIMIT_SWITCH_OFF                            =  true;  // HIGH;
       
@@ -11,13 +17,14 @@ namespace LimitSwitch {
   const int8_t LIMIT_UNKNOWN                             = +127;
   const int8_t LIMIT_UNSET                               =    0;
 
+
   const unsigned char BIT_LS_X_MIN                       =     8;
   const unsigned char BIT_LS_X_MAX                       =     7;
   const unsigned char BIT_LS_Y_MIN                       =     6;
   const unsigned char BIT_LS_Y_MAX                       =     5;
   const unsigned char BIT_LS_Z_MIN                       =     4;
   const unsigned char BIT_LS_Z_MAX                       =     3;
-  const unsigned char BIT_2                              =     2;
+  const unsigned char BIT_EMERGENCY_SWITCH               =     2;
   const unsigned char BIT_1                              =     1;
 
 }; // namespace LimitSwitch
@@ -179,6 +186,14 @@ namespace CncInterface {
         explicit States(const States& s)
         : StatesBase(s.getValue()) {}
 
+        States(bool xMin, bool xMax, bool yMin, bool yMax, bool zMin, bool zMax) 
+        : StatesBase()
+        {
+          setBit(LimitSwitch::BIT_LS_X_MAX, xMax); setBit(LimitSwitch::BIT_LS_X_MIN, xMin);
+          setBit(LimitSwitch::BIT_LS_Y_MAX, yMax); setBit(LimitSwitch::BIT_LS_Y_MIN, yMin);
+          setBit(LimitSwitch::BIT_LS_Z_MAX, zMax); setBit(LimitSwitch::BIT_LS_Z_MIN, zMin);
+        }
+
         States(const int8_t x, const int8_t y, const int8_t z) 
         : StatesBase()
         {
@@ -205,6 +220,9 @@ namespace CncInterface {
         }
         
         //-------------------------------------------------------------
+        bool emergency() const  { return getBit(LimitSwitch::BIT_EMERGENCY_SWITCH); }
+        
+        //-------------------------------------------------------------
         bool xMin() const       { return getBit(LimitSwitch::BIT_LS_X_MIN); }
         bool xMax() const       { return getBit(LimitSwitch::BIT_LS_X_MAX); }
         bool yMin() const       { return getBit(LimitSwitch::BIT_LS_Y_MIN); }
@@ -216,11 +234,18 @@ namespace CncInterface {
         long yLimit() const     { return evaluateLimit(yMin(), yMax()); }
         long zLimit() const     { return evaluateLimit(zMin(), zMax()); }
         
-        bool hasError() const   { 
-          if ( xMin() && xMax() ) return true;
-          if ( yMin() && yMax() ) return true;
-          if ( zMin() && zMax() ) return true;
+        bool hasLimits() const   {
+          if ( xMin() || xMax() ) return true;
+          if ( yMin() || yMax() ) return true;
+          if ( zMin() || zMax() ) return true;
+          
+          return false;
+        }
   
+        bool hasErrors() const   {
+          if ( emergency()      ) return true;
+          if ( hasLimits()       ) return true;
+          
           return false;
         }
         

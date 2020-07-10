@@ -28,10 +28,7 @@
     const SHORT CMD_RESET                       =     'r';
 
     // Additional Output Pins
-    const SHORT PIN_SUPPORT_SWITCH1_STATE       =      8;
-    const SHORT PIN_SUPPORT_SWITCH2_STATE       =      9;
-    const SHORT PIN_SUPPORT_TOOL_POWERED        =     10;
-    const SHORT PIN_SUPPORT_CABLE_CONNECTED     =     11;
+    const SHORT PIN_BROADCAST_INTERRUPT         =     11;
 
     // Limit Input Pins
     const SHORT PIN_LS_Z_MIN                    =      2;
@@ -40,6 +37,7 @@
     const SHORT PIN_LS_Y_MAX                    =      5;
     const SHORT PIN_LS_X_MIN                    =      6;
     const SHORT PIN_LS_X_MAX                    =      7;
+    const SHORT PIN_EMERGENCY_SWITCH            =      8;
 
     // Support Input Pins
     const SHORT PIN_SS_SUPPORT_BUTTON_1_PRESSED =     A6;

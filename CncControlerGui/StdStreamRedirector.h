@@ -3,6 +3,11 @@
 
 #include <iostream>
 #include "CncStreamBuffers.h"
+//#include "CncCommon.h"
+
+namespace cnc {
+	extern CncBasicLogStream  cex1;
+}
 
 //////////////////////////////////////////////////////////
 class CncTextCtrl;
@@ -20,6 +25,9 @@ class StdStreamRedirector {
 		// to redirect std::cerr
 		CncCerrBuf* psbufCerr; 
 		CncCerrBuf* sbOldCerr;
+		
+		CncCex1Buf* psbufCex1;
+		CncCex1Buf* sbOldCex1;
 		
 	public:
 		//////////////////////////////////////////////////
@@ -39,6 +47,11 @@ class StdStreamRedirector {
 				psbufCerr = new CncCerrBuf(ctl);
 				sbOldCerr = (CncCerrBuf*)std::cerr.rdbuf();
 				std::cerr.rdbuf(psbufCerr);
+				
+				//redirect cnc::cex1
+				psbufCex1 = new CncCex1Buf(ctl);
+				sbOldCex1 = (CncCex1Buf*)cnc::cex1.rdbuf();
+				((std::iostream*)&cnc::cex1)->rdbuf(psbufCex1);
 			}
 		}
 		//////////////////////////////////////////////////
@@ -57,6 +70,11 @@ class StdStreamRedirector {
 			if ( psbufCerr ) {
 				std::cerr.rdbuf(sbOldCerr);
 				delete psbufCerr;
+			}
+			
+			if ( psbufCex1 ) {
+				((std::iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
+				delete psbufCex1;
 			}
 		}
 };

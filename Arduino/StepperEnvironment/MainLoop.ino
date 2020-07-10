@@ -6,7 +6,7 @@
 #include "CncCtrl.h"
 #include "MainLoop.h"
 
-ByteBuffer            SWB;
+ByteBuffer SWB;
 
 #ifndef SKETCH_COMPILE 
   #define CNC_MAIN_LOOP_LOG_FUNCTION()  \
@@ -18,18 +18,22 @@ ByteBuffer            SWB;
   #define CNC_MAIN_LOOP_LOG_FUNCTION()
 #endif
 
+CncArduinoController* THE_CONTROLLER = NULL;
 
 /////////////////////////////////////////////////////////////////////////////////////
 ArduinoMainLoop::ArduinoMainLoop() 
 /////////////////////////////////////////////////////////////////////////////////////
 : controller( new CncArduinoController() )
 {
+  THE_CONTROLLER = controller;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 ArduinoMainLoop::~ArduinoMainLoop() {
 /////////////////////////////////////////////////////////////////////////////////////
   delete controller; 
-  controller = NULL;
+  
+  controller     = NULL;
+  THE_CONTROLLER = controller;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void ArduinoMainLoop::printSketchVersion() {
@@ -44,6 +48,8 @@ void ArduinoMainLoop::printSketchTimestamp() {
 /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOH);
     Serial.write(PID_TEXT);
+    Serial.print(SETUP_ID);
+    Serial.write('-');
     Serial.write(__TIMESTAMP__);
   Serial.write(MBYTE_CLOSE);
 }
@@ -95,13 +101,16 @@ void ArduinoMainLoop::printPinReport() {
     printDigitalPin(PIN_Y_DIR,                O);
     printDigitalPin(PIN_Z_DIR,                O);
   
-    printDigitalPin(PIN_STEPPER_ENABLE ,      O);
+    printDigitalPin(PIN_ENABLE_STEPPER,       O);
+    printDigitalPin(PIN_ENABLE_TOOL,          O);
     
-    printDigitalPin(PIN_X_LIMIT,              I);
-    printDigitalPin(PIN_Y_LIMIT,              I);
-    printDigitalPin(PIN_Z_LIMIT,              I);
+    printDigitalPin(PIN_X_MIN_LIMIT,          I);
+    printDigitalPin(PIN_X_MAX_LIMIT,          I);
+    printDigitalPin(PIN_Y_MIN_LIMIT,          I);
+    printDigitalPin(PIN_Y_MAX_LIMIT,          I);
+    printDigitalPin(PIN_Z_MIN_LIMIT,          I);
+    printDigitalPin(PIN_Z_MAX_LIMIT,          I);
 
-    printDigitalPin(PIN_TOOL_ENABLE,          I);
     printDigitalPin(PIN_EXTERNAL_INTERRUPT,   I);
                    
     printAnalogPin(PIN_INTERRUPT_LED_ID,      I);
@@ -205,25 +214,16 @@ bool ArduinoMainLoop::convertLongToFloat(const int32_t val, float& ret) {
 /////////////////////////////////////////////////////////////////////////////////////
 void ArduinoMainLoop::sendHeartbeat(unsigned char limitState, unsigned char supportState) {
 /////////////////////////////////////////////////////////////////////////////////////
-  const uint8_t bCnt = limitState != '\0' && supportState != '\0' ? 2 : 1;
-  const unsigned char byteCount = bCnt * sizeof(int32_t);
+  
   SWB.init();
   SWB.put(RET_SOH);
   SWB.put(PID_HEARTBEAT);
-  SWB.put(byteCount);
   SWB.put((int32_t)(AE::millis() % MAX_LONG));
-
-  if ( bCnt > 1 ) {
-    for (unsigned int i=0; i<I2C_BYTE_COUNT; i++) {
-      switch ( i ) {
-        case I2C_BYTE_LIMIT_STATE:    SWB.put(limitState);   break;
-        case I2C_BYTE_SUPPORT_STATE:  SWB.put(supportState); break;
-      }
-    }
   
-    SWB.put((unsigned char)255); // reserved
-    SWB.put((unsigned char)255); // reserved
-  }
+  SWB.put(limitState);
+  SWB.put(supportState);
+  SWB.put((unsigned char)255); // reserved
+  SWB.put((unsigned char)255); // reserved
   
   SWB.write();
 }
@@ -451,7 +451,7 @@ void ArduinoMainLoop::writeGetterValues(unsigned char pid, int32_t val1, int32_t
   SWB.write();
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, WriteFunctionType function) {
+void ArduinoMainLoop::startMessage(const char type, const unsigned char eid) {
 /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOH);
   
@@ -467,19 +467,40 @@ void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, Writ
       Serial.write(MT_MID_FLAG);
       Serial.write(eid);
     }
-
-    if ( function ) 
-      function();
-
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void ArduinoMainLoop::finalizeMessage() {
+/////////////////////////////////////////////////////////////////////////////////////  
   Serial.write(MBYTE_CLOSE);
   Serial.flush();
-
-#ifndef SKETCH_COMPILE 
-
-  const wxString errText(wxString::Format("%s %s", AE::ardoGetErrLabel(eid), LastErrorCodes::messageText));
-  ARDO_DEBUG_MESSAGE(type, errText);    
-
-#endif
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid) {
+/////////////////////////////////////////////////////////////////////////////////////
+  startMessage(type, eid);
+  finalizeMessage();
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, const unsigned char exText) {
+/////////////////////////////////////////////////////////////////////////////////////
+  startMessage(type, eid);
+    Serial.write(exText);
+  finalizeMessage();
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, const char* exText) {
+/////////////////////////////////////////////////////////////////////////////////////
+  startMessage(type, eid);
+    Serial.write(exText);
+  finalizeMessage();
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, WriteFunctionType function) {
+/////////////////////////////////////////////////////////////////////////////////////
+  startMessage(type, eid);
+    if ( function ) 
+      function();
+  finalizeMessage();
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte ArduinoMainLoop::reset() {
@@ -487,7 +508,7 @@ byte ArduinoMainLoop::reset() {
   CNC_MAIN_LOOP_LOG_FUNCTION();
   
   // Turn off ...
-  controller->turnOff();
+  //controller->turnOff();
 
   // Hide the Interrupt LED
   switchOutputPinState(PIN_INTERRUPT_LED, OFF);
@@ -564,7 +585,7 @@ void ArduinoMainLoop::waitActiveMicroseconds(uint32_t microseconds) {
     waitActiveMilliseconds(milliseconds);
 
   uint32_t us = microseconds % threshold;
-  uint32_t ts = AE::micros();  
+  uint32_t ts = ArdoTs::now();
 
   if ( us <= 10 )
     return;
@@ -574,12 +595,12 @@ void ArduinoMainLoop::waitActiveMicroseconds(uint32_t microseconds) {
     // The return value of millis() will overflow (go back to zero), 
     // after approximately 50 days
     // In this case restart 
-    if ( AE::micros() < ts ) {
+    if ( ArdoTs::now() < ts ) {
       waitActiveMicroseconds(us);
       break;
     }
 
-    if ( AE::micros() - ts > us )
+    if ( ArdoTs::now() - ts > us )
       break;
   }
 }
@@ -590,17 +611,17 @@ int ArduinoMainLoop::waitForSerialData(uint32_t timeoutMicros) {
     return Serial.available();
 
   const uint32_t timeout = ArdoObj::maximum(timeoutMicros, minSerialReadTimeoutMicros);
-  const uint32_t ts      = AE::micros();  
+  const uint32_t ts      = ArdoTs::now();
   
   while ( Serial.available() == 0 ) {
 
     // The return value of micros() will overflow (go back to zero), 
     // after approximately 70 minutes.
     // In this case restart 
-    if ( AE::micros() < ts )
+    if ( ArdoTs::now() < ts )
       return waitForSerialData(timeoutMicros);
 
-    if ( AE::micros() - ts > timeout )
+    if ( ArdoTs::now() - ts > timeout )
       return 0;
   }
 
@@ -657,39 +678,59 @@ void ArduinoMainLoop::setup() {
   Serial.setTimeout(1000);
   Serial.flush();
 
-  // digital pins
-  AE::pinMode(PIN_X_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,       PL_LOW);
-  AE::pinMode(PIN_Y_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,       PL_LOW);
-  AE::pinMode(PIN_Z_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,       PL_LOW);
-  AE::pinMode(PIN_X_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_X_DIR,       PL_LOW);
-  AE::pinMode(PIN_Y_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,       PL_LOW);
-  AE::pinMode(PIN_Z_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,       PL_LOW);
+  LastErrorCodes::clear(); 
 
-  AE::pinMode(PIN_X_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_LIMIT,     LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Y_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_LIMIT,     LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Z_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_LIMIT,     LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_STEPPER_ENABLE,   PM_OUTPUT);  // state will be managed the reset below 
-  AE::pinMode(PIN_TOOL_ENABLE,      PM_OUTPUT);  // state will be managed the reset below 
+  // digital pins
+  AE::pinMode(PIN_X_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,          PL_LOW);
+  AE::pinMode(PIN_Y_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,          PL_LOW);
+  AE::pinMode(PIN_Z_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,          PL_LOW);
+  AE::pinMode(PIN_X_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_X_DIR,          PL_LOW);
+  AE::pinMode(PIN_Y_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,          PL_LOW);
+  AE::pinMode(PIN_Z_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,          PL_LOW);
+
+  AE::pinMode(PIN_X_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MIN_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_X_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Y_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MIN_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Y_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Z_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MIN_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(READ_EXT_INNTERRUPT_PIN,  PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+
+  AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER, ENABLE_STATE_OFF);
+  AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,    TOOL_STATE_ON);
 
   // analog pins
-  AE::pinMode(PIN_INTERRUPT_LED,    PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,      ANALOG_LOW);
+  AE::pinMode(PIN_INTERRUPT_LED,        PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,   ANALOG_LOW);
 
   reset();
   controller->evaluateI2CAvailable();
 
- #if (0)
   #ifdef SKETCH_COMPILE 
-    #warning  ilegal use of pin 2  - temp for testing only!
-    pinMode(PIN_X_STP, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(PIN_X_STP), externalInterrupt, CHANGE);
+
+    if ( PIN_IR_1 != 0 ) {
+      pinMode(PIN_IR_1, INPUT_PULLUP);
+      attachInterrupt(digitalPinToInterrupt(PIN_IR_1), functorIR1, CHANGE);
+    }
+    
+    if ( PIN_IR_2 != 0 ) {
+      pinMode(PIN_IR_2, INPUT_PULLUP);
+      attachInterrupt(digitalPinToInterrupt(PIN_IR_2), functorIR2, CHANGE);
+    }
+    
   #endif
- #endif
 }
-
-void externalInterrupt() {
-  PRINT_DEBUG_VALUE("Interrupt", "hallo")
+///////////////////////////////////////////////////////
+void ArduinoMainLoop::functorIR1() {
+///////////////////////////////////////////////////////
+  PRINT_DEBUG_VALUE("Interrupt", "functorIR1\n")
+  //THE_CONTROLLER->broadcastInterrupt();
 }
-
+///////////////////////////////////////////////////////
+void ArduinoMainLoop::functorIR2() {
+///////////////////////////////////////////////////////
+  PRINT_DEBUG_VALUE("Interrupt", "functorIR2\n")
+  //THE_CONTROLLER->broadcastInterrupt();
+}
 ///////////////////////////////////////////////////////
 void ArduinoMainLoop::loop() {
 ///////////////////////////////////////////////////////
@@ -714,16 +755,23 @@ void ArduinoMainLoop::loop() {
   // --------------------------------------------------------------------------
   switch ( c ) {
 
+    // SB command -  Peek Serial
+    case CMD_POP_SERIAL:
+    case CMD_POP_SERIAL_WAIT:
+          // Do nothing this here
+          // is a controller only command
+          r = RET_NULL;
+          break;
+    
     // SB command -  Reset
     case CMD_RESET_CONTROLLER:
           r = reset();
           break;
 
-    // SB command - Idle handling
     // SB command - Heartbeat handling
     case CMD_IDLE:
     case CMD_HEARTBEAT:
-          controller->processHeartbeat(c);
+          controller->processHeartbeat();
           r = RET_OK;
           break;
           
@@ -736,11 +784,16 @@ void ArduinoMainLoop::loop() {
     case CMD_SETTER:
           r = controller->acceptSetter();
           break;
+
+    // MB command - Interactive Movement
+    case CMD_MOVE_INTERACTIVE:
+          r = controller->acceptInteractiveMove(c);
+          break;
           
     // MB command - Movement
     case CMD_MOVE: // obsolete command
     case CMD_RENDER_AND_MOVE:
-    case CMD_MOVE_UNIT_SIGNAL:
+    case CMD_MOVE_UNIT_LIMIT_IS_FREE:
           r = controller->acceptMove(c);
           break;
           
@@ -785,9 +838,7 @@ void ArduinoMainLoop::loop() {
     
     // --------------------------------------------------------------------------
     default: 
-          LastErrorCodes::clear();
-          LastErrorCodes::register1Byte_A = c;
-          ArduinoMainLoop::pushMessage(MT_ERROR, E_UNKNOW_COMMAND);
+          ArduinoMainLoop::pushMessage(MT_ERROR, E_UNKNOW_COMMAND, c);
 
   } // switch ( c )
 

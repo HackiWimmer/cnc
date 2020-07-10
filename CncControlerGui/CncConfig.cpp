@@ -695,7 +695,7 @@ void CncConfig::setupGridChanged(wxPropertyGridEvent& event) {
 		(*(it->second.propertyChanged))(event);
 		
 	wxASSERT( theApp != NULL );
-	theApp->updateCncConfigTrace();
+	theApp->notifyConfigUpdate();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setupGridChanging(wxPropertyGridEvent& event) {

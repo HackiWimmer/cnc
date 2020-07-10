@@ -70,6 +70,8 @@ class CncGamepadMsw
 		virtual bool checkConnection();
 		virtual bool refresh();
 				
+		virtual int  getStickResolutionFactor() 	{ return 16; }
+
 		virtual float getLeftStickX()				{ return leftStickX; }
 		virtual float getLeftStickY()				{ return leftStickY; }
 		virtual float getRightStickX()				{ return rightStickX; }

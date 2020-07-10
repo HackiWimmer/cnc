@@ -47,38 +47,6 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
-SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
-: SerialSpyPort							(portName) 
-, ArduinoPositionRenderer				()
-, ArduinoAccelManager					()
-, CncCommandDecoder::CallbackInterface	()
-, posReplyThreshold						(1)
-, limitStates							()
-, tsMoveStart							(0LL)
-, usToSleep								(0LL)
-, positionCounter						(MIN_LONG)
-, stepCounterX							(MIN_LONG)
-, stepCounterY							(MIN_LONG)
-, stepCounterZ							(MIN_LONG)
-, positionOverflowCounter				(0)
-, stepOverflowCounterX					(0)
-, stepOverflowCounterY					(0)
-, stepOverflowCounterZ					(0)
-, setterMap								()
-, targetMajorPos						(0L, 0L, 0L)
-, curEmulatorPos						(0L, 0L, 0L)
-, cfgFeedSpeed_MMMin					(0.0)
-, rtmFeedSpeed_MMMin					(0.0)
-, lastCommand							()
-, lastSignal							(CMD_INVALID)
-, maxDimStepsX							(THE_CONFIG->getMaxDimensionStepsX())
-, maxDimStepsY							(THE_CONFIG->getMaxDimensionStepsY())
-, maxDimStepsZ							(THE_CONFIG->getMaxDimensionStepsZ())
-///////////////////////////////////////////////////////////////////
-{
-	reset();
-}
-///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::~SerialEmulatorNULL() {
 ///////////////////////////////////////////////////////////////////
 	reset();
@@ -264,7 +232,7 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 			
 			case CMD_MOVE:
 			case CMD_RENDER_AND_MOVE:
-			case CMD_MOVE_UNIT_SIGNAL:				ret = performMajorMove((unsigned char*)(buffer), nbByte);
+			case CMD_MOVE_UNIT_LIMIT_IS_FREE:		ret = performMajorMove((unsigned char*)(buffer), nbByte);
 													break;
 			
 			case CMD_MOVE_SEQUENCE:					
@@ -529,7 +497,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		
 		case CMD_MOVE:
 		case CMD_RENDER_AND_MOVE:
-		case CMD_MOVE_UNIT_SIGNAL:			lastCommand.cmd = cmd;
+		case CMD_MOVE_UNIT_LIMIT_IS_FREE:	lastCommand.cmd = cmd;
 											return writeMoveCmdIntern(buffer, nbByte);
 		
 		case CMD_MOVE_SEQUENCE:
@@ -550,12 +518,14 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 bool SerialEmulatorNULL::writeHeartbeat(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	static int32_t counter = 0;
-	unsigned char byteCount = sizeof(int32_t);
 	
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_HEARTBEAT);
-	lastCommand.Serial.write(byteCount);
 	lastCommand.Serial.write(counter++ % INT32_MAX);
+	lastCommand.Serial.write((unsigned char)'\0');
+	lastCommand.Serial.write((unsigned char)'\0');
+	lastCommand.Serial.write((unsigned char)255);
+	lastCommand.Serial.write((unsigned char)255);
 	lastCommand.Serial.write(RET_OK);
 	
 	return true;
@@ -680,7 +650,7 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			fA.A = AA; fA.B = AB; fA.C = AC;
 			fD.A = DA; fD.B = DB; fD.C = DC;
 
-			setupAccelManager(fA, fD);
+			ArduinoAccelManager::setup(fA, fD);
 		};
 
 		// special handling for later use
@@ -794,75 +764,32 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 	int32_t x = 0L, y = 0L, z = 0L;
 	if ( CncCommandDecoder::decodeMove(buffer, nbByte, x, y, z) == false ) 
 		return false;
-	
-	bool ret = false;
-	if ( lastCommand.cmd == CMD_MOVE_UNIT_SIGNAL ) {
-		ret = moveUntilSignal(x, y, z);
-	
-	} else {
-		// determine the target major position, this is the current pos + the given move
-		targetMajorPos.set(curEmulatorPos);
-		targetMajorPos.inc(x, y, z);
 		
-		// the emulator function readData and writeData runs in the same thread.
-		// so, it isn't possible to repeat a move command with serval position callbacks
-		// as a real mirco controller can do.
-		// Instead the the move is supported with its total distance - see readMove. 
-		// however, for a preview this is good enougth!
-		//
-		// the following linear rendering is only to support a more detailed writeMoveCmd(...)
-		ret = initRenderAndMove(x, y, z);
+	if ( lastCommand.cmd == CMD_MOVE_UNIT_LIMIT_IS_FREE ) {
+		if ( x != 0 ) limitStates.setLimitX(LimitSwitch::LIMIT_UNSET);
+		if ( y != 0 ) limitStates.setLimitY(LimitSwitch::LIMIT_UNSET);
+		if ( z != 0 ) limitStates.setLimitZ(LimitSwitch::LIMIT_UNSET);
+		
+		x = y = z = 0;
 	}
+	
+	// determine the target major position, this is the current pos + the given move
+	targetMajorPos.set(curEmulatorPos);
+	targetMajorPos.inc(x, y, z);
+	
+	// the emulator function readData and writeData runs in the same thread.
+	// so, it isn't possible to repeat a move command with serval position callbacks
+	// as a real mirco controller can do.
+	// Instead the the move is supported with its total distance - see readMove. 
+	// however, for a preview this is good enougth!
+	//
+	// the following linear rendering is only to support a more detailed writeMoveCmd(...)
+	const bool ret = initRenderAndMove(x, y, z);
 	
 	replyPosition(true);
 	
 	// reset last signal
 	lastSignal = CMD_INVALID;
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz) {
-///////////////////////////////////////////////////////////////////
-	// determine the target major position, this is the current pos + ...
-	targetMajorPos.set(cncControl->getCurAppPos());
-	
-	// Always disable probe mode here, otherwise very long move distances appear
-	// this is already done by the application
-	
-	// speed setup
-	const double START_SPEED = getStartSpeed_MMSec() * 60 * 0.5;
-	const double MAX_SPEED   = THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
-	const double DIFF_SPEED  = MAX_SPEED - START_SPEED;
-	
-	if ( DIFF_SPEED < 0.0 )
-		return false;
-	
-	setFeedSpeed_MMMin(START_SPEED);
-	
-	bool ret = false;
-	CncMilliTimestamp tsStart = CncTimeFunctions::getMilliTimestamp();
-	while ( (ret = initRenderAndMove(dx, dy, dz) ) == true ) {
-		
-		// Important: Because in case of SIG_QUIT_MOVE initRenderAndMove returns true
-		if ( lastCommand.ret != RET_OK )
-			break;
-			
-		unsigned int diff = CncTimeFunctions::getMilliTimestamp() - tsStart;
-		if ( diff > moveUntilAccelPeriod ) {
-			setFeedSpeed_MMMin(MAX_SPEED);
-			
-		} else {
-			setFeedSpeed_MMMin(START_SPEED + DIFF_SPEED / moveUntilAccelPeriod * diff);
-			
-		}
-	}
-	
-	// adjust last callback position
-	targetMajorPos = curEmulatorPos;
-	
-	// reactivate configured probe mode state
-	// this is already done by the application
-	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -872,12 +799,12 @@ bool SerialEmulatorNULL::initializeFeedProfile(int32_t dx , int32_t dy , int32_t
 	const int32_t impulses  = impulseCalculator.calculate(dx, dy, dz);
 	const double speed		= getFeedSpeed_MMSec();
 	
-	const bool ret = speed ? initMove(impulses, speed) : true;
+	const bool ret = speed && impulses ? initMove(impulses, speed) : true;
 	
 	usToSleep = 0LL;
 	
 	if ( ret == false )
-		std::cerr << CNC_LOG_FUNCT << wxString::Format(": initMove(%ld, %lf) failed!", impulses, speed) << std::endl;
+		std::cerr << CNC_LOG_FUNCT << wxString::Format(": initMove(impulses=%ld, speed=%lf, dx=%ld, dy=%ld, dz=%ld) failed!", impulses, speed, dx, dy, dz) << std::endl;
 	
 	return ret;
 }

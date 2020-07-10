@@ -40,7 +40,7 @@ UpdateManagerThread::~UpdateManagerThread() {
 ///////////////////////////////////////////////////////////////////
 	wxCriticalSectionLocker enter(pHandler->pUpdateManagerThreadCS);
 	// the thread is being destroyed; make sure not to leave dangling pointers around
-	pHandler->updateManagerThread = NULL;
+	//pHandler->updateManagerThread = NULL;
 	
 	posSpyQueue.reset();
 	posSpyStringQueue.reset();
@@ -58,7 +58,7 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 	APPEND_THREAD_IDTO_STACK_TRACE_FILE;
 	
 	const unsigned int milliseconds = 1;
-	MainFrame::EventId posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
+	//MainFrame::EventId posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
 	
 	// initialize 
 	unit 		 = THE_CONFIG->getDisplayUnit();
@@ -83,13 +83,14 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 		// --------------------------------------------------------------------
 		// process data update
 		if ( (wxDateTime::UNow() - tsLastData).GetMilliseconds() >= 100 ) {
-			const UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, posEvtId);
+			//const UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, posEvtId);
+			//const UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, MainFrame::EventId::TOT_POS_UPDATE);
 			
-			if ( posEvtId == MainFrame::EventId::APP_POS_UPDATE) 	posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
-			else													posEvtId = MainFrame::EventId::APP_POS_UPDATE;
+			//if ( posEvtId == MainFrame::EventId::APP_POS_UPDATE) 	posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
+			//else													posEvtId = MainFrame::EventId::APP_POS_UPDATE;
 			
-			wxPostEvent(pHandler, evt);
-			tsLastData = wxDateTime::UNow();
+			//wxPostEvent(pHandler, evt);
+			//tsLastData = wxDateTime::UNow();
 		}
 		
 		// --------------------------------------------------------------------

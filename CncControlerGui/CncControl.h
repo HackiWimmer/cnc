@@ -21,18 +21,15 @@
 #include "CncLimitStates.h"
 #include "CncPosition.h"
 
-const double endSwitchStepBackMertic = 2.5;
-
 ///////////////////////////////////////////////////////////////////
 class CncControl {
 	public:
 		enum DimensionMode   { DM_2D, DM_3D };
-		enum StepSensitivity { FINEST = 1, FINE = 10 , MEDIUM = 50, ROUGH = 100, ROUGHEST = 200 };
 		const short STEP_SENSITIVITY_FACTOR = 100;
 
 	private:
 		long currentClientId;
-		bool runContinuousMove;
+		bool runInteractiveMove;
 		
 		///////////////////////////////////////////////////////////////////
 		struct SetterTuple {
@@ -56,6 +53,8 @@ class CncControl {
 		SetterMap setterMap;
 		
 		void appendToSetterMap(unsigned char pid, const cnc::SetterValueList& values);
+		
+		bool dispatchEventQueue();
 		
 	protected:
 		// internal port object
@@ -87,7 +86,7 @@ class CncControl {
 		// position flf
 		bool positionOutOfRangeFlag;
 		// power state
-		bool powerOn;
+		bool toolPowerState;
 		// Artificially Step Delay
 		unsigned int stepDelay;
 		// heartbeat value
@@ -101,8 +100,6 @@ class CncControl {
 		//struct timeb endTime, startTime;
 		// Flag to indicatate if a positions check aplies
 		bool positionCheck;
-		// margin of the draw pane
-		unsigned int drawPaneMargin;
 		//sets a value into the given text control
 		void setValue(wxTextCtrl *ctl, int32_t val);
 		void setValue(wxTextCtrl *ctl, double val);
@@ -129,10 +126,8 @@ class CncControl {
 		// display the given pos in the open gl view
 		void monitorPosition(const CncLongPosition& pos);
 		
-		inline void postAppPosition(unsigned char pid);
+		inline void postAppPosition(unsigned char pid, bool force = false);
 		inline void postCtlPosition(unsigned char pid);
-		
-		bool manualContinuousMoveStart_CtrlBased(const double x, const double y, const double z, bool correctLimit=true);
 		
 	public:
 		
@@ -187,10 +182,7 @@ class CncControl {
 		
 		// getter list wrapper
 		bool displayGetterList(const PidList& pidlist);
-		
 		void displayToolState(const bool state);
-		void displaySpeedValue(const double value);
-		void displaySpeedMode(const CncSpeedMode mode);
 		
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
@@ -216,6 +208,7 @@ class CncControl {
 		bool moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
 		
 		bool correctLimitPositions();
+		bool resolveLimits(bool x, bool y, bool z);
 		
 		void waitActive(unsigned int millis);
 		
@@ -236,9 +229,6 @@ class CncControl {
 		// Setup the cnc control
 		void resetSetterMap();
 		bool setup(bool reset = true);
-		//handle draw control
-		unsigned int getDrawPaneMargin() { return drawPaneMargin; }
-		void updateDrawControl();
 		// Duration management
 		unsigned int getDurationCount();
 		unsigned int getDurationCounter();
@@ -254,9 +244,9 @@ class CncControl {
 		// Tool management
 		void switchToolOn();
 		void switchToolOff(bool force = false);
-		bool getToolState() { return powerOn; }
+		bool getToolState() { return toolPowerState; }
 		// Updates the config trace control
-		void updateCncConfigTrace();
+		void notifyConfigUpdate();
 		
 		// returns the correponding pc postions
 		CncLongPosition& getCurAppPosAsReference()					{ return curAppPos; }
@@ -292,6 +282,8 @@ class CncControl {
 		bool validateAppAgainstCtlPosition();
 		// execute
 		bool execute(const unsigned char* buffer, unsigned int nbByte);
+		//
+		bool popSerial();
 		// processing the given setter values
 		bool processSetter(unsigned char pid, int32_t value);
 		bool processSetter(unsigned char pid, const cnc::SetterValueList& values);
@@ -316,10 +308,10 @@ class CncControl {
 		bool moveYToMid();
 		bool moveZToMid();
 		
-		bool manualMoveFinest(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit=true);
-		bool manualContinuousMoveStart(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit=true);
-		void manualContinuousMoveStop();
-		bool isContinuousMoveActive() { return runContinuousMove; }
+		bool startInteractiveMove(StepSensitivity s);
+		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		bool stopInteractiveMove();
+		bool isInteractiveMoveActive() { return runInteractiveMove; }
 		
 		bool manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);
 		bool manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);
@@ -384,14 +376,16 @@ class CncControl {
 		bool isEmulator() 												{ return getSerial()->isEmulator(); }
 		bool canProcessIdle() 											{ return getSerial()->canProcessIdle(); }
 		bool isIdleActive()    											{ return getSerial()->isIdleActive(); }
+		bool serialDataAvailable()										{ return getSerial()->dataAvailable(); }
 		
 		void setSpyMode(Serial::SypMode sm)								{ getSerial()->setSpyMode(sm); }
 		void processTrigger(const Serial::Trigger::BeginRun& tr)		{ getSerial()->processTrigger(tr); }
 		void processTrigger(const Serial::Trigger::EndRun& tr)			{ getSerial()->processTrigger(tr); }
 		void processTrigger(const Serial::Trigger::NextPath& tr)		{ getSerial()->processTrigger(tr); }
+		void processTrigger(const Serial::Trigger::SpeedChange& tr)		{ getSerial()->processTrigger(tr); }
 
 		// 3D control
-		void updatePreview3D(bool force=false);
+		void updatePreview3D();
 		
 		// idle handling
 		void sendIdleMessage();

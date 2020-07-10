@@ -14,11 +14,16 @@ typedef void (wxEvtHandler::*GamepadEventFunction)(GamepadEvent&);
 class GamepadThread : public wxThread {
 	
 	protected:
-		MainFrame* pHandler;
-		bool exit;
+		MainFrame* 					pHandler;
+		bool 						exit;
+		bool 						prevButtonLeftStick;
+		bool 						prevButtonRightStick;
+		GamepadEvent::PosCtrlMode 	prevPosCtrlMode;
 		
 		virtual ExitCode Entry();
 		void evaluateNotifications(CncGamepad& gamepad, GamepadEvent& state);
+		
+		void sendMessage(const wxString& msg);
 		
 	public:
 		GamepadThread(MainFrame *handler);

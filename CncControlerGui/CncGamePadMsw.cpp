@@ -97,16 +97,19 @@ bool CncGamepadMsw::refresh() {
 		}
 	 
 		if ( stickMode == STICK_MODE1 ) {
-			leftStickX  = (float)(state.Gamepad.sThumbLX / 32767);
-			leftStickY  = (float)(state.Gamepad.sThumbLY / 32767);
 			
-			rightStickX = (float)(state.Gamepad.sThumbRX / 32767);
-			rightStickY = (float)(state.Gamepad.sThumbRY / 32767);
+			const int resolutionFactor = getStickResolutionFactor();
+			leftStickX  = (float)(state.Gamepad.sThumbLX / (32767 / resolutionFactor));
+			leftStickY  = (float)(state.Gamepad.sThumbLY / (32767 / resolutionFactor));
+			
+			rightStickX = (float)(state.Gamepad.sThumbRX / (32767 / resolutionFactor));
+			rightStickY = (float)(state.Gamepad.sThumbRY / (32767 / resolutionFactor));
 			
 		} else {
+			
 			float normLX = fmaxf(-1, (float) state.Gamepad.sThumbLX / 32767);
 			float normLY = fmaxf(-1, (float) state.Gamepad.sThumbLY / 32767);
-			 
+			
 			leftStickX = (abs(normLX) < deadzoneX ? 0 : (abs(normLX) - deadzoneX) * (normLX / abs(normLX)));
 			leftStickY = (abs(normLY) < deadzoneY ? 0 : (abs(normLY) - deadzoneY) * (normLY / abs(normLY)));
 			 

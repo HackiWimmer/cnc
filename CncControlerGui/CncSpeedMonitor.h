@@ -2,7 +2,11 @@
 #define CNCSPEEDMONITOR_H
 
 #include "OSD/CncTimeFunctions.h"
+#include "CncConfig.h"
+#include "CncContext.h"
 #include "wxCrafterSpeedMonitor.h"
+
+class CncSpeedSlider;
 
 class CncSpeedMonitor : public CncSpeedMonitorBase {
 
@@ -31,7 +35,10 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		void enableConnection(bool state=true);
 		void disableConnection() { enableConnection(false); }
 			
-		void setCurrentFeedSpeedValue(const SpeedData& sd);
+		void setCurrentFeedSpeedValues(const SpeedData& sd);
+		
+		void enableSpeedSlider(bool state);
+		CncSpeedSlider* getSpeedSlider() { return speedSlider; }
 		
 	protected:
 		virtual void onClear(wxCommandEvent& event);
@@ -112,22 +119,25 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 			}
 		};
 		
-		wxRect drawingArea;
-		wxFont valueFont;
-		wxFont labelFont;
-		wxPoint mouseLabel;
+		wxRect 				drawingArea;
+		wxFont 				valueFont;
+		wxFont 				labelFont;
+		wxPoint 			mouseLabel;
 		
-		Axis axisMeasurePoints;
-		Axis axisMeasuredSpeed;
-		Axis axisReceivedSpeed;
-		Axis axisConfiguredSpeed;
+		Axis 				axisMeasurePoints;
+		Axis 				axisMeasuredSpeed;
+		Axis 				axisReceivedSpeed;
+		Axis 				axisConfiguredSpeed;
 		
-		CncMilliTimestamp lastRefresh;
-		CncMilliTimestamp lastDataSet;
-		unsigned int timeIndex;
-		double currentMeasuredFeedSpeed_MM_MIN;
-		double currentReceivedFeedSpeed_MM_MIN;
-		double currentConfiguredFeedSpeed_MM_MIN;
+		CncSpeedSlider* 	speedSlider;
+		
+		CncMilliTimestamp 	lastRefresh;
+		CncMilliTimestamp 	lastDataSet;
+		
+		unsigned int 		timeIndex;
+		double 				currentMeasuredFeedSpeed_MM_MIN;
+		double 				currentReceivedFeedSpeed_MM_MIN;
+		double 				currentConfiguredFeedSpeed_MM_MIN;
 		
 		void reset();
 		void setupSizes();
@@ -145,7 +155,7 @@ class CncSpeedMonitorRunner {
 		CncSpeedMonitorRunner(CncSpeedMonitor* sm, double feedSpeed)
 		: monitor(sm)
 		{
-			if ( monitor )
+			if ( monitor && THE_CONTEXT->canSpeedMonitoring() )
 				monitor->start(feedSpeed);
 		}
 

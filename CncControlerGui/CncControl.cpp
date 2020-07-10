@@ -33,7 +33,7 @@ static CommandTemplates CMDTPL;
 ///////////////////////////////////////////////////////////////////
 CncControl::CncControl(CncPortType pt) 
 : currentClientId(-1)
-, runContinuousMove(false)
+, runInteractiveMove(false)
 , setterMap()
 , serialPort(NULL)
 , zeroAppPos(0,0,0)
@@ -47,12 +47,11 @@ CncControl::CncControl(CncPortType pt)
 , durationCounter(0)
 , interruptState(false)
 , positionOutOfRangeFlag(false)
-, powerOn(false)
+, toolPowerState(TOOL_STATE_OFF)
 , stepDelay(0)
 , lastCncHeartbeatValue(0)
 , toolState()
 , positionCheck(true)
-, drawPaneMargin(30)
 {
 //////////////////////////////////////////////////////////////////
 	// Serial factory
@@ -63,7 +62,7 @@ CncControl::CncControl(CncPortType pt)
 	else if ( pt == CncEMU_GCODE )			serialPort = new SerialEmulatorGCodeStreamer(this);
 	else if ( pt == CncEMU_BIN )			serialPort = new SerialEmulatorBinaryStreamer(this);
 	else if ( pt == CncPORT_EMU_ARDUINO )	serialPort = new SerialThreadStub(this);
-	else 									serialPort = new SerialSpyPort(this);
+	else 									serialPort = new SerialEmulatorNULL(this);
 	
 	toolState.setControl(THE_APP->GetToolState());
 	setToolState(true);
@@ -75,7 +74,7 @@ CncControl::~CncControl() {
 ///////////////////////////////////////////////////////////////////
 	assert(serialPort);
 	
-	if ( getToolState() == true )
+	if ( getToolState() == TOOL_STATE_ON )
 		switchToolOff();
 	
 	// safty
@@ -223,10 +222,8 @@ bool CncControl::processSetter(unsigned char pid, const cnc::SetterValueList& va
 	}
 	
 	// publish setter event
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	THE_APP->umPostEvent(evt.SetterEvent(pid, values));
-		
+	THE_APP->addSetter(pid, values);
+	
 	wxCommandEvent comevt(wxEVT_COMMAND_BUTTON_CLICKED);
 	wxPostEvent(THE_APP->GetBtRefreshSetterList(), comevt);
 	
@@ -272,11 +269,11 @@ bool CncControl::setup(bool doReset) {
 	// always reset the map here to definitly reinitianlize the controller
 	resetSetterMap();
 	
-	// init setup
-	processSetter(PID_SEPARATOR, SEPARARTOR_SETUP);
-	
 	if ( serialPort->isConnected() == false ) 
 		return false;
+		
+	// init setup
+	processSetter(PID_SEPARATOR, SEPARARTOR_SETUP);
 	
 	// reste controller on demand
 	if ( doReset == true ) {
@@ -327,10 +324,10 @@ bool CncControl::setup(bool doReset) {
 	
 	#warning use config values
 	accelList.push_back(FLT_FACT * 0.0);
-	accelList.push_back(FLT_FACT * 0.1);
+	accelList.push_back(FLT_FACT * 0.5);
 	accelList.push_back(FLT_FACT * 333.0/60);
 	accelList.push_back(FLT_FACT * 0.0);
-	accelList.push_back(FLT_FACT * 0.1);
+	accelList.push_back(FLT_FACT * 0.5);
 	accelList.push_back(FLT_FACT * 333.0/60);
 	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
@@ -349,8 +346,7 @@ bool CncControl::setup(bool doReset) {
 		return false;
 	}
 	
-	// enable stepper motors, do this here because to initiate a defined state
-	enableStepperMotors(true);
+	enableStepperMotors(ENABLE_STATE_ON);
 	
 	// speed setup
 	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
@@ -382,6 +378,8 @@ long CncControl::convertDoubleToCtrlLong(unsigned char id, float f) {
 bool CncControl::disconnect() {
 ///////////////////////////////////////////////////////////////////
 	if ( serialPort->isConnected() ) {
+		enableStepperMotors(ENABLE_STATE_OFF);
+		
 		CncTextCtrl* logger = THE_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
 		
 		std::cout << " Disconnecting serial port . . .\n";
@@ -435,7 +433,25 @@ bool CncControl::isConnected() {
 void CncControl::onPeriodicallyAppEvent() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
+	
+	if ( isInterrupted() == false ) {
+		
+		if ( isInteractiveMoveActive() ) {
+			if ( serialPort->isCommandActive() == false )
+				if ( popSerial() == false )
+					std::cerr << "CncControl::onPeriodicallyAppEvent(): popSerial failed!" << std::endl;
+		}
+	}
+	
 	serialPort->onPeriodicallyAppEvent(isInterrupted());
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::popSerial() {
+///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() == true )
+		return false;
+		
+	return serialPort->popSerial();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processCommand(const unsigned char c, std::ostream& txtCtl) {
@@ -463,11 +479,6 @@ bool CncControl::processMoveSequence(CncMoveSequence& moveSequence) {
 
 	wxASSERT(serialPort);
 	return serialPort->processMoveSequence(moveSequence);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::updateDrawControl() {
-///////////////////////////////////////////////////////////////////
-	updatePreview3D(true); 
 }
 ///////////////////////////////////////////////////////////////////
 inline void CncControl::setValue(wxTextCtrl *ctl, int32_t val) {
@@ -620,6 +631,7 @@ bool CncControl::resetWatermarks() {
 bool CncControl::reset() {
 ///////////////////////////////////////////////////////////////////
 	getSerial()->purge();
+	
 	resetInterrupt();
 	resetPositionOutOfRangeFlag();
 	
@@ -744,21 +756,15 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	if ( configuredSpeedMode != s ) {
 		configuredSpeedMode = s;
 		
-		displaySpeedMode(configuredSpeedMode);
-		
-		if ( getSerial()->knowsSpeedMode() == true ) {
-			if ( processSetter(PID_SPEED_FEED_MODE, (int32_t)(configuredSpeedMode)) == false ) {
-				std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_FEED_MODE) failed" << std::endl;
-				return false;
-			}
-		}
+		Serial::Trigger::SpeedChange tr;
+		tr.currentSpeedMode  = configuredSpeedMode;
+		tr.currentSpeedValue = configuredFeedSpeed_MM_MIN;
+		processTrigger(tr);
 	}
 	
 	// avoid the setter below if nothing will change
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false ) {
 		configuredFeedSpeed_MM_MIN = value;
-		
-		displaySpeedValue(value);
 		
 		if ( processSetter(PID_SPEED_MM_MIN, (int32_t)(configuredFeedSpeed_MM_MIN * FLT_FACT)) == false ) {
 			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_MM_MIN) failed" << std::endl;
@@ -849,74 +855,110 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 	
 	if ( pos != prevPos ) {
 		
-		if ( THE_APP->getMotionMonitor() ) {
+		if ( THE_APP->getMotionMonitor() )
 			THE_APP->getMotionMonitor()->appendVertex(getClientId(), getConfiguredSpeedMode(), pos);
-			updatePreview3D(false);
-		}
 		
 		prevPos.set(pos);
 		
 		if ( THE_CONFIG->getInterruptByPosOutOfRangeFlag() == true ) {
-			if ( isPositionOutOfRange(pos, true) == true )
+			if ( isPositionOutOfRange(pos, true) == true ) {
 				interrupt("Position Out Of Range");
+				updatePreview3D();
+			}
 		} 
 		else {
-			if ( isPositionOutOfRange(pos, false) == true )
+			if ( isPositionOutOfRange(pos, false) == true ) {
 				positionOutOfRangeFlag = true;
+				updatePreview3D();
+			}
 		}
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
+void CncControl::waitActive(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
-	wxDateTime now = wxDateTime::UNow();
-	wxString msg(cmi.message.str().c_str());
-	char type = (char)msg[0];
-	msg = msg.SubString(1, msg.length());
+	THE_APP->waitActive(millis, true);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::dispatchEventQueue() {
+///////////////////////////////////////////////////////////////////
+	// Event handling, enables the interrupt functionallity
+	static const CncMilliTimespan  thresholdEvent   = 100;
+	static       CncMilliTimestamp tsLastDispatch   = 0;
+	static       CncMilliTimestamp tsLastUpdate     = 0;
 	
-	if ( type != 'D' )
-		THE_APP->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
-	
-	switch ( type ) {
-		
-		case 'W':	
-					cnc::msg.logWarning(now.Format("Warning Message received: %H:%M:%S.%l\n"));
-					cnc::msg.logWarning(msg);
-					cnc::cex1 << "Received the following CNC Controller Warning:\n" << msg;
-					break;
-					
-		case 'E':	cnc::msg.logError(now.Format("Error Message received: %H:%M:%S.%l\n"));
-					cnc::msg.logError(msg);
-					std::cerr << "Received the following CNC Controller Error:\n" << msg;
-					break;
-					
-		case 'D':	cnc::msg.logDebug(now.Format("Debug Message received: %H:%M:%S.%l\n"));
-					cnc::msg.logDebug(msg);
-					cnc::cex1 << "Serial Remote Debug: " << msg;
-					break;
-
-		default:	cnc::msg.logInfo(now.Format("Info Message received: %H:%M:%S.%l\n"));
-					cnc::msg.logInfo(msg);
-					std::cout << "Received the following CNC Controller Information:\n" << msg;
+	if ( isInterrupted() ) {
+		std::cerr << "SerialCallback: Interrupt detected"<< std::endl;
+		return false;
 	}
 	
-	cnc::msg.setTextColour(wxColour(128, 128, 0));
-	cnc::msg << "-------------------------------------------------------------------------------------------\n";
-	cnc::msg.resetTextAttr();
-
-	return true;
+	if ( THE_CONTEXT->isAllowEventHandling() ) {
+		const CncMilliTimespan timespanMonitor = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getMilliTimestamp(), tsLastUpdate);
+		const CncMilliTimespan timespanEvent   = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getMilliTimestamp(), tsLastDispatch);
+		
+		if ( timespanMonitor >= THE_CONTEXT->getUpdateInterval() ) {
+			updatePreview3D();
+			tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
+		}
+		
+		if ( timespanEvent >= thresholdEvent ) {
+			THE_APP->dispatchAll();
+			tsLastDispatch = CncTimeFunctions::getMilliTimestamp();
+		}
+		
+	}
+	
+	if ( CncAsyncKeyboardState::isEscapePressed() != 0 ) {
+		if ( THE_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true ) {
+			std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
+			interrupt("ESCAPE detected");
+		}
+	}
+	
+	if ( isInterrupted() ) {
+		std::cerr << "SerialCallback: Interrupt detected"<< std::endl;
+		return false;
+	}
+	
+	return !isInterrupted();
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::SerialCallback() {
+///////////////////////////////////////////////////////////////////
+	static const ContollerInfo ci;
+	return SerialControllerCallback(ci);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
 	// Event handling, enables the interrrpt functionality
-	if ( THE_CONTEXT->isAllowEventHandling() )
-		THE_APP->dispatchAll();
-		
-	if ( isInterrupted() )
+	if ( dispatchEventQueue() == false )
 		return false;
 	
 	switch ( ci.infoType ) {
+		// --------------------------------------------------------
+		case CITDefault:
+		{
+			break;
+		}
+		// --------------------------------------------------------
+		case CITHandshake:
+		{
+			if ( false )
+				std::cout << "handshake: " << ArduinoCMDs::getCMDLabel(ci.command) << " = " << ArduinoPIDs::getPIDLabel(ci.handshake) << std::endl;
+				
+			if ( ci.handshake == RET_QUIT ) {
+				// adjust the pc position
+				curAppPos = curCtlPos;
+				postCtlPosition(PID_XYZ_POS_MAJOR);
+				postAppPosition(PID_XYZ_POS_MAJOR, true);
+				
+				//THE_APP->updateAppPositionControls();
+				//THE_APP->updateCtlPositionControls();
+			}
+			
+			break;
+		}
 		// --------------------------------------------------------
 		case CITHeartbeat:
 		{
@@ -965,20 +1007,22 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		// --------------------------------------------------------
 		case CITPosition:
 		{
+			bool postAppPosToo = ci.synchronizeAppPos == true;
+			
 			// update controller position
 			switch ( ci.posType ) {
 				case PID_X_POS: 		curCtlPos.setX(ci.xCtrlPos); 
-										if ( ci.synchronizeAppPos == true ) 
+										if ( postAppPosToo ) 
 											curAppPos.setX(ci.xCtrlPos);
 										break;
 										
 				case PID_Y_POS: 		curCtlPos.setY(ci.yCtrlPos); 
-										if ( ci.synchronizeAppPos == true ) 
+										if (postAppPosToo ) 
 											curAppPos.setY(ci.yCtrlPos);
 										break;
 				
 				case PID_Z_POS: 		curCtlPos.setZ(ci.zCtrlPos); 
-										if ( ci.synchronizeAppPos == true ) 
+										if ( postAppPosToo ) 
 											curAppPos.setZ(ci.zCtrlPos);
 										break;
 				
@@ -988,16 +1032,19 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 										realtimeFeedSpeed_MM_MIN = ci.feedSpeed;
 										
+										if ( postAppPosToo ) 
+											curAppPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
+										
 										if ( false )
 											std::cout << "CITPosition: speed: " << realtimeFeedSpeed_MM_MIN << std::endl;
-
-										if ( ci.synchronizeAppPos == true )
-											curAppPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 			}
 			
 			// display controller coordinates
 			postCtlPosition(ci.posType);
 			
+			if ( postAppPosToo ) 
+				postAppPosition(ci.posType);
+				
 			// motion monitor
 			monitorPosition(curCtlPos);
 			
@@ -1013,9 +1060,52 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
+bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
+///////////////////////////////////////////////////////////////////
+	// Event handling, enables the interrrpt functionality
+	if ( dispatchEventQueue() == false )
+		return false;
+	
+	wxString msg(cmi.message.str().c_str());
+	const wxDateTime now = wxDateTime::UNow();
+	const char type = (char)msg[0];
+	msg.assign(msg.SubString(1, msg.length() - 1));
+	
+	if ( type != 'D' )
+		THE_APP->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
+	
+	switch ( type ) {
+		
+		case 'W':	
+					cnc::msg.logWarning(now.Format("Warning Message received: %H:%M:%S.%l\n"));
+					cnc::msg.logWarning(msg);
+					cnc::cex1 << "Received the following CNC Controller Warning: '" << msg << "'\n";
+					break;
+					
+		case 'E':	cnc::msg.logError(now.Format("Error Message received: %H:%M:%S.%l\n"));
+					cnc::msg.logError(msg);
+					std::cerr << "Received the following CNC Controller Error: '" << msg << "'\n";
+					break;
+					
+		case 'D':	cnc::msg.logDebug(now.Format("Debug Message received: %H:%M:%S.%l \n"));
+					cnc::msg.logDebug(msg);
+					cnc::cex1 << "Serial Remote Debug: " << msg;
+					break;
+
+		default:	cnc::msg.logInfo(now.Format("Info Message received: %H:%M:%S.%l\n"));
+					cnc::msg.logInfo(msg);
+					std::cout << "Received the following CNC Controller Information: '" << msg << "'\n";
+	}
+	
+	cnc::msg.setTextColour(wxColour(128, 128, 0));
+	cnc::msg << "-------------------------------------------------------------------------------------------\n";
+	cnc::msg.resetTextAttr();
+
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei) {
 ///////////////////////////////////////////////////////////////////
-	
 	auto checkSetterCount = [](unsigned char pid, size_t count, size_t ref) {
 		bool ret = (count == ref);
 		
@@ -1028,6 +1118,10 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 		return ret;
 	};
 	
+	// Event handling, enables the interrrpt functionality
+	if ( dispatchEventQueue() == false )
+		return false;
+	
 	switch ( cei.infoType ) {
 		// --------------------------------------------------------
 		case CEITSetter:
@@ -1038,21 +1132,14 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 				case PID_TOOL_SWITCH:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
 												return false;
 												
-											powerOn = (bool)cei.setterValueList.front();
-											displayToolState(powerOn);
-											break;
-											
-				case PID_SPEED_FEED_MODE:	if ( checkSetterCount(cei.setterPid, size, 1) == false )
-												return false;
-											
-											configuredSpeedMode = (CncSpeedMode)(cei.setterValueList.front());
-											displaySpeedMode(configuredSpeedMode);
+											toolPowerState = (bool)cei.setterValueList.front();
+											displayToolState(toolPowerState);
 											break;
 											
 				case PID_SPEED_MM_MIN:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
 												return false;
 												
-											displaySpeedValue(cei.setterValueList.front() / FLT_FACT);
+											configuredFeedSpeed_MM_MIN = cei.setterValueList.front() / FLT_FACT;
 											break;
 											
 				case PID_ENABLE_STEPPERS:	// nothing to do here
@@ -1074,65 +1161,23 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::waitActive(unsigned int millis) {
-///////////////////////////////////////////////////////////////////
-	THE_APP->waitActive(millis, true);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::SerialCallback() {
-///////////////////////////////////////////////////////////////////
-	if ( isInterrupted() ) {
-		std::cerr << "SerialCallback: Interrupt detected"<< std::endl;
-		return false;
-	}
-
-	// Event handling, enables the interrupt functionallity
-	static CncNanoTimestamp tsLastDispatch = 0;
-	static const CncNanoTimespan threshold = std::nano::den / 4; // 250 ms
-	if ( THE_CONTEXT->isAllowEventHandling() ) {
-		const CncNanoTimespan span = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getNanoTimestamp(), tsLastDispatch);
-
-		if ( span > threshold ) {
-			THE_APP->dispatchAll();
-			tsLastDispatch = CncTimeFunctions::getNanoTimestamp();
-		}
-	}
-	
-	// display application coordinates
-	postAppPosition(PID_XYZ_POS_MAJOR);
-	
-	if ( CncAsyncKeyboardState::isEscapePressed() != 0 ) {
-		if ( THE_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true ) {
-			std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
-			interrupt("ESCAPE detected");
-		}
-	}
-	
-	return !isInterrupted();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::postAppPosition(unsigned char pid) {
+void CncControl::postAppPosition(unsigned char pid, bool force) {
 ///////////////////////////////////////////////////////////////////
 	static CncLongPosition lastAppPos;
 	
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) {
-		// application position
-		typedef UpdateManagerThread::Event Event;
-		static Event evt;
-		
 		// app positions are always from type major
 		// so || pid == PID_XYZ_POS_MAJOR isn't necessary
 		// the compairison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
-		if ( lastAppPos != curAppPos ) {
-			THE_APP->umPostEvent(evt.AppPosEvent(pid, 
-												 getClientId(), 
-												 configuredSpeedMode, 
-												 getConfiguredFeedSpeed_MM_MIN(), 
-												 getRealtimeFeedSpeed_MM_MIN(), 
-												 curAppPos
-												)
-											   );
+		if ( lastAppPos != curAppPos || force == true) {
+			THE_APP->addCtlPosition(	pid, 
+										getClientId(), 
+										configuredSpeedMode, 
+										getConfiguredFeedSpeed_MM_MIN(), 
+										getRealtimeFeedSpeed_MM_MIN(), 
+										curAppPos
+									);
 		}
 	}
 	
@@ -1142,20 +1187,15 @@ void CncControl::postAppPosition(unsigned char pid) {
 void CncControl::postCtlPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) {
-		// application position
-		typedef UpdateManagerThread::Event Event;
-		static Event evt;
-		
 		// a position compairsion isn't necessay here because the serialControllerCallback(...)
 		// call this method only on position changes
-		THE_APP->umPostEvent(evt.CtlPosEvent(pid, 
-											 getClientId(), 
-											 configuredSpeedMode, 
-											 getConfiguredFeedSpeed_MM_MIN(), 
-											 getRealtimeFeedSpeed_MM_MIN(), 
-											 curCtlPos
-											)
-										   );
+		THE_APP->addCtlPosition(	pid, 
+									getClientId(), 
+									configuredSpeedMode, 
+									getConfiguredFeedSpeed_MM_MIN(), 
+									getRealtimeFeedSpeed_MM_MIN(), 
+									curCtlPos
+								);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1357,8 +1397,8 @@ void CncControl::setToolState(bool defaultStyle) {
 	if ( defaultStyle == true ) {
 		toolState.setState(CncToolStateControl::red);
 	} else {
-		if ( powerOn == true ) 	toolState.setState(CncToolStateControl::green);
-		else 					toolState.setState(CncToolStateControl::red);
+		if ( toolPowerState == TOOL_STATE_ON ) 	toolState.setState(CncToolStateControl::green);
+		else 									toolState.setState(CncToolStateControl::red);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1367,10 +1407,10 @@ void CncControl::switchToolOn() {
 	if ( isInterrupted() )
 		return;
 
-	if ( powerOn == false ) { 
-		if ( processSetter(PID_TOOL_SWITCH, 1) ) {
-			powerOn = true;
-			displayToolState(powerOn);
+	if ( toolPowerState == TOOL_STATE_OFF ) { 
+		if ( processSetter(PID_TOOL_SWITCH, TOOL_STATE_ON) ) {
+			toolPowerState = TOOL_STATE_ON;
+			displayToolState(toolPowerState);
 		}
 	}
 }
@@ -1380,28 +1420,18 @@ void CncControl::switchToolOff(bool force) {
 	if ( isInterrupted() )
 		return;
 
-	if ( powerOn == true || force == true ) {
-		if ( processSetter(PID_TOOL_SWITCH, 0) ) {
-			powerOn = false;
-			displayToolState(powerOn);
+	if ( toolPowerState == TOOL_STATE_ON || force == true ) {
+		if ( processSetter(PID_TOOL_SWITCH, TOOL_STATE_OFF) ) {
+			toolPowerState = TOOL_STATE_OFF;
+			displayToolState(toolPowerState);
 		}
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::displayToolState(const bool state) {
 ///////////////////////////////////////////////////////////////////
-	THE_APP->GetTestToggleTool()->SetValue(state);
+	THE_APP->decorateSwitchToolOnOff(state);
 	setToolState();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::displaySpeedValue(const double value) {
-///////////////////////////////////////////////////////////////////
-	THE_APP->GetConfiguredFeedSpeed()->ChangeValue(wxString::Format("%3.1lf", value));
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::displaySpeedMode(const CncSpeedMode mode) {
-///////////////////////////////////////////////////////////////////
-	THE_APP->GetConfiguredFeedSpeedMode()->ChangeValue(wxString::Format("%c", cnc::getCncSpeedTypeAsCharacter(mode)));
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::displayGetterList(const PidList& pidList) {
@@ -1423,7 +1453,7 @@ bool CncControl::displayGetterList(const PidList& pidList) {
 		GetterValues& list = itl->second;
 		for (GetterValues::iterator itp = list.begin() ; itp != list.end(); ++itp) {
 
-			if ( itp != list.begin() )	
+			if ( itp != list.begin() )
 				std::cout << ',';
 
 			std::cout << *itp;
@@ -1463,7 +1493,7 @@ const CncLongPosition CncControl::requestControllerPos() {
 ///////////////////////////////////////////////////////////////////
 const CncLongPosition CncControl::requestControllerLimitState() {
 ///////////////////////////////////////////////////////////////////
-	static CncLongPosition limitStates;
+	static CncLongPosition localStaticLimitStates;
 	GetterValues list;
 	
 	if ( isInterrupted() == false )
@@ -1475,12 +1505,12 @@ const CncLongPosition CncControl::requestControllerLimitState() {
 			std::cerr << " Received value count: " << list.size() << ", expected: 3" << std::endl;
 		}
 	} else {
-		limitStates.setXYZ(list.at(0), list.at(1), list.at(2));
-		return limitStates;
+		localStaticLimitStates.setXYZ(list.at(0), list.at(1), list.at(2));
+		return localStaticLimitStates;
 	}
 	
-	limitStates.setXYZ(0, 0, 0);
-	return limitStates;
+	localStaticLimitStates.setXYZ(0, 0, 0);
+	return localStaticLimitStates;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::validateAppAgainstCtlPosition() {
@@ -1489,12 +1519,9 @@ bool CncControl::validateAppAgainstCtlPosition() {
 	return ( curAppPos == ctlPos );
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::updateCncConfigTrace() {
+void CncControl::notifyConfigUpdate() {
 ///////////////////////////////////////////////////////////////////
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	THE_APP->umPostEvent(evt.ConfigUpdateEvent());
+	// currently nothing to do
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::enableStepperMotors(bool s) {
@@ -1524,7 +1551,7 @@ bool CncControl::enableStepperMotors(bool s) {
 		return false;
 	}
 		
-	THE_APP->GetMiMotorEnableState()->Check( list.at(0) == 1L );
+	THE_APP->GetMiMotorEnableState()->Check( list.at(0) == (int32_t)ENABLE_STATE_ON );
 		
 	return true;
 }
@@ -1686,13 +1713,13 @@ bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox*
 			if ( max ) max->SetValue(true);
 			
 			switch ( axis ) {
-				case 'X': 	ret = moveRelLinearMetricXY(-endSwitchStepBackMertic, 0.0, true);
+				case 'X': 	ret =resolveLimits(true, false, false);
 							break;
 							
-				case 'Y': 	ret = moveRelLinearMetricXY(0.0, -endSwitchStepBackMertic, true);
+				case 'Y': 	ret = resolveLimits(false, true, false);
 							break;
 							
-				case 'Z': 	ret = moveRelMetricZ(-endSwitchStepBackMertic);
+				case 'Z': 	ret = resolveLimits(false, false, true);
 							break;
 			}
 		}
@@ -1728,7 +1755,7 @@ bool CncControl::moveXToMinLimit() {
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(distance, 0.0, true);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(+endSwitchStepBackMertic, 0.0, true);
+			ret = resolveLimits(true, false, false);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1745,7 +1772,7 @@ bool CncControl::moveXToMaxLimit() {
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(distance, 0.0, true);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(-endSwitchStepBackMertic, 0.0, true);
+			ret = resolveLimits(true, false, false);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1762,7 +1789,7 @@ bool CncControl::moveYToMinLimit() {
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(0.0, distance, true);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(0.0, +endSwitchStepBackMertic, true);
+			ret = resolveLimits(false, true, false);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1779,7 +1806,7 @@ bool CncControl::moveYToMaxLimit() {
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(0.0, distance, true);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(0.0, -endSwitchStepBackMertic, true);
+			ret = resolveLimits(false, true, false);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1796,7 +1823,7 @@ bool CncControl::moveZToMinLimit() {
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(distance);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelMetricZ(+endSwitchStepBackMertic);
+			ret = resolveLimits(false, false, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1813,7 +1840,7 @@ bool CncControl::moveZToMaxLimit() {
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(distance);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelMetricZ(-endSwitchStepBackMertic);
+			ret = resolveLimits(false, false, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1861,111 +1888,80 @@ bool CncControl::moveZToMid() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualMoveFinest(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit) {
+bool CncControl::startInteractiveMove(StepSensitivity s) {
 ///////////////////////////////////////////////////////////////////
-	bool ret = false;
-	
-	const double xDim = 0.1 * x; // ~ 0.1 mm
-	const double yDim = 0.1 * y; // ~ 0.1 mm
-	const double zDim = 0.1 * z; // ~ 0.1 mm
-	
-	//TODO fix 10.0
-	if ( changeCurrentFeedSpeedXYZ_MM_SEC(10.0) == false )
-		return false;
-	
-	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXYZ(xDim, yDim, zDim, false);
-		//WAIT
-		if ( ret == false && limitStates.hasLimit() && correctLimit )
-			ret = correctLimitPositions();
-	}
-	
-	reconfigureSimpleMove(ret);
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::manualContinuousMoveStop() {
-///////////////////////////////////////////////////////////////////
-	if ( runContinuousMove == true ) {
-		if ( getSerial()->sendSignal(SIG_QUIT_MOVE) == false ) {
-			std::cerr << "CncControl::manualContinuousMoveStop(): sendSignal(SIG_QUIT_MOVE) failed" << std::endl;
-		}
-	}
-	
-	runContinuousMove = false;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit) {
-///////////////////////////////////////////////////////////////////
-	const double SSF = (double)STEP_SENSITIVITY_FACTOR;
-	
-	// redirect on demand
-	if ( s == FINEST ) 
-		return manualMoveFinest(s, x, y, z, correctLimit);
-	
-	// Setup
-	const double xDim = s/SSF * x;
-	const double yDim = s/SSF * y;
-	const double zDim = s/SSF * z;
-	
-	bool ret = manualContinuousMoveStart_CtrlBased(xDim, yDim, zDim, correctLimit);
-	
-	// adjust the pc position
-	if ( ret == true )
-		curAppPos = curCtlPos;
-		
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const double yDim, const double zDim, bool correctLimit) {
-///////////////////////////////////////////////////////////////////
+	if ( runInteractiveMove == true )
+		return true;
+
 	if ( getSerial()->isCommandActive() == true )
 		return false;
-		
-	// Always disable probe mode here, otherwise very long move distances appear
-	const bool probeModeBefore = THE_CONTEXT->isProbeMode();
-	if ( enableProbeMode(false) == false ) {
-		std::cerr << " Can't disable probe mode. Manual continous move aborted" << std::endl;
+	
+	const double maxSpeed = THE_CONFIG->getMaxSpeedX_MM_MIN();
+	
+	switch ( s ) {
+		case FINEST:	changeCurrentFeedSpeedXYZ_MM_MIN(100.0, CncSpeedRapid);
+						break;
+						
+		case FINE:		changeCurrentFeedSpeedXYZ_MM_MIN(maxSpeed * 0.2, CncSpeedRapid);
+						break;
+						
+		case MEDIUM:	changeCurrentFeedSpeedXYZ_MM_MIN(maxSpeed * 0.5, CncSpeedRapid);
+						break;
+						
+		case ROUGH:		changeCurrentFeedSpeedXYZ_MM_MIN(maxSpeed * 0.8, CncSpeedRapid);
+						break;
+						
+		case ROUGHEST:	changeCurrentFeedSpeedXYZ_MM_MIN(maxSpeed * 1.0, CncSpeedRapid);
+						break;
+	}
+	
+	runInteractiveMove = serialPort->processStartInteractiveMove();
+	return runInteractiveMove;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
+///////////////////////////////////////////////////////////////////
+	if ( runInteractiveMove == false ) 
 		return false;
-	}
-	THE_CONTEXT->setProbeMode(false);
-	
-	// Move preparation
-	initNextDuration();
-	THE_CONTEXT->setAllowEventHandling(true);
-	activatePositionCheck(false);
-	enableStepperMotors(true);
-	
-	double sX = xDim * THE_CONFIG->getCalculationFactX();
-	double sY = yDim * THE_CONFIG->getCalculationFactY();
-	double sZ = zDim * THE_CONFIG->getCalculationFactZ();
-	
-	int32_t values[3];
-	values[0] = (int32_t)round(sX);
-	values[1] = (int32_t)round(sY);
-	values[2] = (int32_t)round(sZ);
-	
-	// move loop
-	runContinuousMove = true;
-	bool ret = getSerial()->processMoveUntilSignal(sizeof(values)/sizeof(int32_t), values);
-	if ( ret == false ) {
 		
-		if ( limitStates.hasLimit() && correctLimit)
-			ret = correctLimitPositions();
+	const bool ret = serialPort->processUpdateInteractiveMove(x, y, z);
+	if ( ret == false ) {
+		std::cerr << "CncControl::updateInteractiveMove(): processUpdateInteractiveMove failed" << std::endl;
+		
+		stopInteractiveMove();
 	}
 	
-	// Move touch up
-	enableStepperMotors(false);
-	activatePositionCheck(true);
-	resetDurationCounter();
-	
-	// reactivate configured probe mode state
-	if ( (ret = enableProbeMode(probeModeBefore)) == false ) {
-		std::cerr << " Can't reactivate probe mode." << std::endl;
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::stopInteractiveMove() {
+///////////////////////////////////////////////////////////////////
+	if ( runInteractiveMove == true ) {
+		
+		if ( getSerial()->sendSignal(SIG_QUIT_MOVE) == false ) {
+			std::cerr << "CncControl::stopInteractiveMove(): sendSignal(SIG_QUIT_MOVE) failed" << std::endl;
+			return false;
+		}
+		
+		// read somthing left information on demand
+		if ( getSerial()->isCommandActive() == false )
+			getSerial()->popSerial();
+			
+		runInteractiveMove = false;
 	}
-	THE_CONTEXT->setProbeMode(probeModeBefore);
 	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::resolveLimits(bool x, bool y, bool z) {
+///////////////////////////////////////////////////////////////////
+	const unsigned int size = 3;
+	static int32_t values[size];
+	values[0] = (int32_t)x;
+	values[1] = (int32_t)y;
+	values[2] = (int32_t)z;
+	
+	return serialPort->resolveLimits(size, values);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::correctLimitPositions() {
@@ -1973,22 +1969,11 @@ bool CncControl::correctLimitPositions() {
 	bool ret = true;
 	
 	if ( limitStates.hasLimit() ) {
+		const bool x = limitStates.getXMinLimit() || limitStates.getXMaxLimit();
+		const bool y = limitStates.getYMinLimit() || limitStates.getYMaxLimit();
+		const bool z = limitStates.getZMinLimit() || limitStates.getZMaxLimit();
 		
-		double xsbm = 0.0, ysbm = 0.0, zsbm  = 0.0;
-		if (  limitStates.getXMinLimit() && !limitStates.getXMaxLimit() )	xsbm = +endSwitchStepBackMertic;
-		if ( !limitStates.getXMinLimit() &&  limitStates.getXMaxLimit() )	xsbm = -endSwitchStepBackMertic;
-		
-		if (  limitStates.getYMinLimit() && !limitStates.getYMaxLimit() )	ysbm = +endSwitchStepBackMertic;
-		if ( !limitStates.getYMinLimit() &&  limitStates.getYMaxLimit() )	ysbm = -endSwitchStepBackMertic;
-		
-		if (  limitStates.getZMinLimit() && !limitStates.getZMaxLimit() )	zsbm = +endSwitchStepBackMertic;
-		if ( !limitStates.getZMinLimit() &&  limitStates.getZMaxLimit() )	zsbm = -endSwitchStepBackMertic;
-		
-		// limit correction
-		if ( moveRelLinearMetricXYZ(xsbm, ysbm, zsbm, true) == false ) {
-			std::cerr << "CncControl::correctLimitPositions(): Error while corrrecting limit positions!" << std::endl;
-			ret = false;
-		}
+		ret = resolveLimits(x, y, z);
 		
 		// adjust position on demand
 		if ( validateAppAgainstCtlPosition() == false )
@@ -2028,18 +2013,18 @@ bool CncControl::manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alr
 				
 				if ( x != 0 ) {
 					if ( limitStates.isXLimitStateValid() && limitStates.getXMinLimit() )
-						ret = moveRelLinearMetricXY(+endSwitchStepBackMertic, 0.0, false);
+						ret = resolveLimits(true, false, false);
 						
 					if ( limitStates.isXLimitStateValid() && limitStates.getXMaxLimit() )
-						ret = moveRelLinearMetricXY(-endSwitchStepBackMertic, 0.0, false);
+						ret = resolveLimits(true, false, false);
 				}
 				
 				if ( y != 0 ) {
 					if ( limitStates.isYLimitStateValid() && limitStates.getYMinLimit() )
-						ret = moveRelLinearMetricXY(0.0, +endSwitchStepBackMertic, false);
+						ret = resolveLimits(false, true, false);
 						
 					if ( limitStates.isYLimitStateValid() && limitStates.getYMaxLimit() )
-						ret = moveRelLinearMetricXY(0.0, -endSwitchStepBackMertic, false);
+						ret = resolveLimits(false, true, false);
 				}
 			}
 				
@@ -2054,10 +2039,10 @@ bool CncControl::manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alr
 			if ( ret && limitStates.hasLimit() ) {
 				
 				if ( limitStates.isZLimitStateValid() && limitStates.getZMinLimit() )
-					ret = moveRelMetricZ(+endSwitchStepBackMertic);
+					ret = resolveLimits(false, false, true);
 					
 				if ( limitStates.isZLimitStateValid() && limitStates.getZMaxLimit() )
-					ret = moveRelMetricZ(-endSwitchStepBackMertic);
+					ret = resolveLimits(false, false, true);
 			}
 				
 			reconfigureSimpleMove(ret);
@@ -2080,26 +2065,26 @@ bool CncControl::manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool a
 				
 				if ( x != 0 ) {
 					if ( limitStates.isXLimitStateValid() && limitStates.getXMinLimit() )
-						ret = moveRelLinearMetricXYZ(+endSwitchStepBackMertic, 0.0, 0.0, false);
+						ret = resolveLimits(true, false, false);
 						
 					if ( limitStates.isXLimitStateValid() && limitStates.getXMaxLimit() )
-						ret = moveRelLinearMetricXYZ(-endSwitchStepBackMertic, 0.0, 0.0, false);
+						ret = resolveLimits(true, false, false);
 				}
 				
 				if ( y != 0 ) {
 					if ( limitStates.isYLimitStateValid() && limitStates.getYMinLimit() )
-						ret = moveRelLinearMetricXYZ(0.0, +endSwitchStepBackMertic, 0.0,false);
+						ret = resolveLimits(false, true, false);
 						
 					if ( limitStates.isYLimitStateValid() && limitStates.getYMaxLimit() )
-						ret = moveRelLinearMetricXYZ(0.0, -endSwitchStepBackMertic, 0.0, false);
+						ret = resolveLimits(false, true, false);
 				}
 				
 				if ( z != 0 ) {
 					if ( limitStates.isZLimitStateValid() && limitStates.getZMinLimit() )
-						ret = moveRelLinearMetricXYZ(0.0, 0.0, +endSwitchStepBackMertic, false);
+						ret = resolveLimits(false, false, true);
 						
 					if ( limitStates.isZLimitStateValid() && limitStates.getZMaxLimit() )
-						ret = moveRelLinearMetricXYZ(0.0, 0.0, -endSwitchStepBackMertic, false);
+						ret = resolveLimits(false, false, true);
 				}
 			}
 			
@@ -2115,7 +2100,6 @@ bool CncControl::prepareSimpleMove(bool enaleEventHandling) {
 	initNextDuration();
 	THE_CONTEXT->setAllowEventHandling(enaleEventHandling);
 	activatePositionCheck(false);
-	enableStepperMotors(true);
 	
 	// currently no checks implemented, if checks necessary do it here
 	return true;
@@ -2123,7 +2107,6 @@ bool CncControl::prepareSimpleMove(bool enaleEventHandling) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::reconfigureSimpleMove(bool correctPositions) {
 ///////////////////////////////////////////////////////////////////
-	enableStepperMotors(false);
 	activatePositionCheck(true);
 	resetDurationCounter();
 	
@@ -2168,25 +2151,14 @@ void CncControl::appendNumKeyValueToControllerPinInfo(const char* desc, int pin,
 	THE_APP->GetDvListCtrlControllerPins()->Thaw();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::updatePreview3D(bool force) {
+void CncControl::updatePreview3D() {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_APP->getMotionMonitor() == NULL )
 		return;
 		
-	if ( force == true ) {
-		THE_APP->getMotionMonitor()->Refresh();
-		return;
-	}
-	
-	// Online drawing coordinates
-	if ( THE_CONTEXT->isOnlineUpdateDrawPane() ) {
-		static CncMilliTimestamp tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
-		
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsLastUpdate) >= THE_CONTEXT->getUpdateInterval() ) {
-			THE_APP->getMotionMonitor()->Refresh();
-			tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
-		}
-	}
+	if ( THE_CONTEXT->isOnlineUpdateDrawPane() ) 
+		//THE_APP->getMotionMonitor()->Refresh();
+		THE_APP->getMotionMonitor()->update(true);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::sendIdleMessage() {

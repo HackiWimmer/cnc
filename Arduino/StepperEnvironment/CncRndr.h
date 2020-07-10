@@ -7,6 +7,8 @@ class ArduinoPositionRenderer {
 
   public: 
     
+    enum Mode { DirectMove, RenderMove};
+
     //-------------------------------------------------------------------------
     struct RS {
       
@@ -50,17 +52,45 @@ class ArduinoPositionRenderer {
     };
   
   private:
+
+    //-------------------------------------------------------------------------
+    struct RenderData {
+      int32_t idx       = 0; 
+      int32_t l         = 0;
+      int32_t m         = 0;
+      int32_t n         = 0;
+      int32_t x_inc     = 0;
+      int32_t y_inc     = 0;
+      int32_t z_inc     = 0;
+      int32_t err_1     = 0;
+      int32_t err_2     = 0;
+      int32_t dx2       = 0;
+      int32_t dy2       = 0; 
+      int32_t dz2       = 0;
+
+      void reset() {*this = RenderData(); }
+    };
+
+    Mode                    mode;  
+    RenderData              RD;
+    
     ArduinoPositionRenderer(const ArduinoPositionRenderer&);
 
     inline byte             stepping();
+    //inline byte             renderNextDrivenByX(const RenderData& RD);
+    //inline byte             renderNextDrivenByY(const RenderData& RD);
+    //inline byte             renderNextDrivenByZ(const RenderData& RD);
     
   protected:
+    
     ArduinoPositionRenderer();
     virtual ~ArduinoPositionRenderer();
-
+    
     // controller interface
-    byte                    directMove(int8_t dx, int8_t dy, int8_t dz);
+    byte                    directMove(int8_t  dx, int8_t  dy, int8_t  dz);
     byte                    renderMove(int32_t dx, int32_t dy, int32_t dz);
+    
+    Mode                    getMode() const { return mode; }
     
     virtual byte            checkRuntimeEnv()                                 = 0;
     virtual byte            setDirection(AxisId aid, int32_t steps)           = 0;

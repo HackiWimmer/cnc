@@ -5,18 +5,48 @@
 #include "GamepadThread.h"
 
 class CncGamepadControllerState : public CncGamepadControllerStateBase {
+	typedef CncLinearDirection CLD;
 	
 	private:
-		enum PosCtrlMode { PCM_STICKS = 0, PCM_NAV_XY = 1, PCM_NAV_Z = 2 };
+		struct MoveState {
+			bool 	moving 	= false;
+			CLD 	dx 		= CLD::CncNoneDir;
+			CLD 	dy 		= CLD::CncNoneDir;
+			CLD 	dz 		= CLD::CncNoneDir;
+			
+			MoveState()
+			: moving(false)
+			, dx(CLD::CncNoneDir)
+			, dy(CLD::CncNoneDir)
+			, dz(CLD::CncNoneDir)
+			{}
+			
+			bool hasX() 	{ return dx != CLD::CncNoneDir;		}
+			bool hasY() 	{ return dy != CLD::CncNoneDir;		}
+			bool hasZ() 	{ return dz != CLD::CncNoneDir;		}
+			bool hasXAndY()	{ return hasX() && hasY();			}
+			bool hasXOrY() 	{ return hasX() || hasY();			}
+			
+			bool isEqual(CLD dx, CLD dy, CLD dz)  { 
+				return dx == this->dx && dy == this->dy && dz == this->dz; 
+			}
+			
+			void reset() { 
+				moving = false;  
+				dx = dy = dz = CLD::CncNoneDir;	
+			}
+			
+			void set(CLD dx, CLD dy, CLD dz)  { 
+				this->dx = dx;
+				this->dy = dy;
+				this->dz = dz; 
+			}
+		};
 		
-		PosCtrlMode posCtrlMode;
-		bool running;
-		
-		bool xyNavigationActive;
-		bool zNavigationActive;
-		
-		wxString serviceShortName;
-		wxString serviceLongName;
+		bool 			running;
+		MoveState 		currentMoveState;
+		wxString 		serviceShortName;
+		wxString 		serviceLongName;
 		
 		inline bool isRefPosDlgMode();
 		
@@ -25,10 +55,6 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 		inline void processPositionControlMode(const GamepadEvent& state);
 		inline void processRefPositionDlg(const GamepadEvent& state);
 		inline void processPosition(const GamepadEvent& state);
-		
-		inline void managePositionViaStick(const GamepadEvent& state);
-		inline void managePositionViaNavi(const GamepadEvent& state);
-		inline void mangageMainView(const GamepadEvent& state);
 		
 	public:
 		CncGamepadControllerState(wxWindow* parent);

@@ -25,8 +25,6 @@ class CncManuallyMoveCoordinates : public CncManuallyMoveCoordinatesBase {
 		double getValueY();
 		double getValueZ();
 		
-		double getSpeedValueMM_MIN();
-		
 		bool isAbsoluteMove() 		{ return m_mmRadioCoordinates->GetSelection() == 0; }
 		bool switchToolOn() 		{ return m_checkBoxToolEnabled->GetValue(); }
 		bool correctLimitStates() 	{ return m_manuallyCorrectLimitPos->GetValue(); }
@@ -40,7 +38,6 @@ class CncManuallyMoveCoordinates : public CncManuallyMoveCoordinatesBase {
 		virtual void changeManuallySliderX(wxScrollEvent& event);
 		virtual void changeManuallySliderY(wxScrollEvent& event);
 		virtual void changeManuallySliderZ(wxScrollEvent& event);
-		virtual void changeManuallySpeedSlider(wxScrollEvent& event);
 		virtual void maxManuallyXSlider(wxCommandEvent& event);
 		virtual void maxManuallyYSlider(wxCommandEvent& event);
 		virtual void maxManuallyZSlider(wxCommandEvent& event);
@@ -68,7 +65,6 @@ class CncManuallyMoveCoordinates : public CncManuallyMoveCoordinatesBase {
 		void update(wxSlider*   ctrl, double value);
 		void update(wxSlider*   ctrl, const wxString& value);
 		
-		void updateSpeedSliderValue();
 		void updateValidators();
 		
 };

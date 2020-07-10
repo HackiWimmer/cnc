@@ -51,7 +51,6 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		virtual ~CncPathListEntryListCtrl();
 		
 		void addPathListEntry(const CncPathListEntry& cpe);
-		
 		void clearAll();
 
 		bool searchReference(const wxString& what);

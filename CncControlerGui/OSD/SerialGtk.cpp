@@ -38,5 +38,4 @@ bool SerialGtk::writeData(void *buffer, unsigned int nbByte) {
 	return false;
 }
 
-
 #endif

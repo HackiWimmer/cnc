@@ -40,7 +40,7 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		int32_t getLimit(bool min, bool max) {
+		int32_t getLimit(bool min, bool max) const {
 			
 			if ( min == true && max == true )
 				return LimitSwitch::LIMIT_UNKNOWN;
@@ -58,7 +58,7 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		wxString& getLimitString(wxString& ret, int32_t limit) {
+		wxString& getLimitString(wxString& ret, int32_t limit) const {
 			ret.clear();
 			switch ( limit ) {
 				case LimitSwitch::LIMIT_UNSET:
@@ -116,17 +116,17 @@ class CncLimitStates {
 		{}
 		
 		///////////////////////////////////////////////////////////////////
-		const bool getXMinLimit() { return xMinLimit; }
-		const bool getXMaxLimit() { return xMaxLimit; }
-		const bool getYMinLimit() { return yMinLimit; }
-		const bool getYMaxLimit() { return yMaxLimit; }
-		const bool getZMinLimit() { return zMinLimit; }
-		const bool getZMaxLimit() { return zMaxLimit; }
+		const bool getXMinLimit() const { return xMinLimit; }
+		const bool getXMaxLimit() const { return xMaxLimit; }
+		const bool getYMinLimit() const { return yMinLimit; }
+		const bool getYMaxLimit() const { return yMaxLimit; }
+		const bool getZMinLimit() const { return zMinLimit; }
+		const bool getZMaxLimit() const { return zMaxLimit; }
 		
 		///////////////////////////////////////////////////////////////////
-		const int32_t getXLimit() { return getLimit(xMinLimit, xMaxLimit); }
-		const int32_t getYLimit() { return getLimit(yMinLimit, yMaxLimit); }
-		const int32_t getZLimit() { return getLimit(zMinLimit, zMaxLimit); }
+		const int32_t getXLimit() const { return getLimit(xMinLimit, xMaxLimit); }
+		const int32_t getYLimit() const { return getLimit(yMinLimit, yMaxLimit); }
+		const int32_t getZLimit() const { return getLimit(zMinLimit, zMaxLimit); }
 		
 		///////////////////////////////////////////////////////////////////
 		void reset() {
@@ -141,32 +141,17 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		const bool hasPreviousLimit() {
-			return previousHasLimit;
-		}
+		const bool hasPreviousLimit() const { return previousHasLimit; }
 		
 		///////////////////////////////////////////////////////////////////
-		const bool hasLimit() {
+		const bool hasLimit() const {
 			return (xMinLimit || xMaxLimit || yMinLimit || yMaxLimit || zMinLimit || zMaxLimit);
 		}
 		///////////////////////////////////////////////////////////////////
-		const bool isXLimitStateValid() { 
-			if ( xMinLimit == true && xMaxLimit == true ) 
-				return false;
-			return true;
-		}
-		///////////////////////////////////////////////////////////////////
-		const bool isYLimitStateValid() { 
-			if ( yMinLimit == true && yMaxLimit == true ) 
-				return false;
-			return true;
-		}
-		///////////////////////////////////////////////////////////////////
-		const bool isZLimitStateValid() { 
-			if ( zMinLimit == true && zMaxLimit == true ) 
-				return false;
-			return true;
-		}
+		const bool isXLimitStateValid() const { return !( xMinLimit == true && xMaxLimit == true ); }
+		const bool isYLimitStateValid() const { return !( yMinLimit == true && yMaxLimit == true ); }
+		const bool isZLimitStateValid() const { return !( zMinLimit == true && zMaxLimit == true ); }
+		
 		///////////////////////////////////////////////////////////////////
 		void setXMinLimit(bool l) { xMinLimit = l; }
 		void setXMaxLimit(bool l) { xMaxLimit = l; }
@@ -192,7 +177,7 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		wxString& getLimitInfoString(wxString& ret) {
+		wxString& getLimitInfoString(wxString& ret) const {
 			wxString ls;
 			
 			ret.clear();

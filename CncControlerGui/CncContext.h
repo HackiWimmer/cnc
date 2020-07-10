@@ -20,8 +20,11 @@ struct CncContext {
 		enum OSType {UNDEF, WXMSW, WXGTK};
 
 	private:
+		
 		OSType os						= OSType::UNDEF;
 		bool probeMode					= true;
+		bool gamePortMode				= false;
+		bool speedMonitor				= false;
 		bool onlineUpdateCoordinates	= true;
 		bool onlineUpdateDrawPane		= true;
 		bool allowEventHandling			= true;
@@ -142,7 +145,13 @@ struct CncContext {
 		const wxString& traceCommandLineParameter(wxString& s) const;
 
 		void setProbeMode(bool state); 
-		bool isProbeMode() { return  probeMode; }
+		bool isProbeMode() 					{ return probeMode; }
+		
+		void setGamePortMode(bool state) 	{ gamePortMode = state; }
+		bool canGamePort()					{ return gamePortMode;  }
+		
+		void setSpeedMonitoring(bool state) { speedMonitor = state; } 
+		bool canSpeedMonitoring() 			{ return speedMonitor; }
 		
 		bool isOnlineUpdateCoordinates() 						{ return onlineUpdateCoordinates; }
 		bool isOnlineUpdateDrawPane() 							{ return onlineUpdateDrawPane; }

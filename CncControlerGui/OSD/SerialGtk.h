@@ -12,7 +12,7 @@
 				
 				void setConnected(bool state) { connected = state; }
 				
-				virtual int readData(void *buffer, unsigned int nbByte);
+				virtual int  readData(void *buffer, unsigned int nbByte);
 				virtual bool writeData(void *buffer, unsigned int nbByte);
 				
 			public:

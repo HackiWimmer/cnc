@@ -29,8 +29,12 @@ void ArduinoCMDs::init() {
 	cmds[SIG_PAUSE]                            = "Push Signal Pause";
 	cmds[SIG_RESUME]                           = "Push Signal Resume";
 	cmds[SIG_QUIT_MOVE]                        = "Push Signal Quit Move";
+	cmds[SIG_UPDATE]                           = "Push Signal Update";
 	
+	cmds[CMD_HEARTBEAT]                        = "Pull Heartbeat Callback";
 	cmds[CMD_IDLE]                             = "Pull Idle Callback";
+	cmds[CMD_POP_SERIAL]                       = "Pop Serial without Timeout";
+	cmds[CMD_POP_SERIAL_WAIT]                  = "Pop Serial with Timeout";
 	cmds[CMD_RESET_CONTROLLER]                 = "Push Reset Controller";
 	
 	cmds[CMD_SETTER]                           = "Push Setter";
@@ -38,8 +42,10 @@ void ArduinoCMDs::init() {
 	
 	cmds[CMD_MOVE]                             = "Push Move";
 	cmds[CMD_RENDER_AND_MOVE]                  = "Push Render and Move";
-	cmds[CMD_MOVE_UNIT_SIGNAL]                 = "Push Render and Move until Signal";
+	cmds[CMD_MOVE_UNIT_LIMIT_IS_FREE]          = "Push Move until limit switches are free";
 	
+	cmds[CMD_MOVE_INTERACTIVE]                 = "Push Move Interactive";
+
 	cmds[CMD_MOVE_SEQUENCE]                    = "Push Move Sequence";
 	cmds[CMD_RENDER_AND_MOVE_SEQUENCE]         = "Push Render and Move Sequence";
 	
@@ -132,16 +138,16 @@ void ArduinoPIDs::init() {
 	pids[PID_MIN_SWITCH]                      .setup("Min Switch", "bool");  
 	pids[PID_MAX_SWITCH]                      .setup("Max Switch", "bool");
 	pids[PID_LIMIT]                           .setup("Limit State", "bool");
-	pids[PID_LAST_STEP_DIR]                   .setup("Last Step Direction", "");
 	pids[PID_X_LIMIT]                         .setup("X limit State", "bool");
 	pids[PID_Y_LIMIT]                         .setup("Y limit State", "bool");
 	pids[PID_Z_LIMIT]                         .setup("Z limit State", "bool");
 
 	pids[PID_I2C_AVAILABEL  ]                 .setup("I2C Availabel", "bool");
-	pids[PID_I2C_LIMIT_VALUE]                 .setup("I2C Limit Value", "-");
-	pids[PID_I2C_SUPPORT_VALUE]               .setup("I2C Support Value", "-");
+	pids[PID_I2C_LIMIT_VALUE]                 .setup("I2C Limit Value", "BIN");
+	pids[PID_I2C_SUPPORT_VALUE]               .setup("I2C Support Value", "BIN");
 	
 	pids[PID_CONTROLLER]                      .setup("Cnc Controller", "");
+	pids[PID_SETUP_ID]                        .setup("Cnc Controller Setup ID", "");
 	pids[PID_TOOL_SWITCH]                     .setup("Tool Enabled State", "bool");
 	pids[PID_POS_REPLY_THRESHOLD]             .setup("Position Reply Threshold", "impulses");
 	pids[PID_PROBE_MODE]                      .setup("Probe Mode State", "bool");
@@ -157,7 +163,6 @@ void ArduinoPIDs::init() {
 	pids[PID_AXIS]                            .setup("Stepper Axis", "");
 	pids[PID_COMMON]                          .setup("Common", "");
 	pids[PID_SPEED_MM_MIN]                    .setup("Speed", "mm/min");
-	pids[PID_SPEED_FEED_MODE]                 .setup("Speed Mode", "-");
 	pids[PID_STEP_PIN]                        .setup("Step Pin", "");
 	pids[PID_DIR_PIN]                         .setup("Direction Pin", "");
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");
@@ -176,9 +181,6 @@ void ArduinoPIDs::init() {
 	pids[PID_GET_STEP_COUNTER_X]              .setup("Get Step Counter X", "#");
 	pids[PID_GET_STEP_COUNTER_Y]              .setup("Get Step Counter Y", "#");
 	pids[PID_GET_STEP_COUNTER_Z]              .setup("Get Step Counter Z", "#");
-	pids[PID_GET_US_PER_IMPL_MEASUREMENT1]    .setup("Get Measured Duration per Impulse [1 step]", "us");
-	pids[PID_GET_US_PER_IMPL_MEASUREMENT2]    .setup("Get Measured Duration per Impulse [2 step]", "us");
-	pids[PID_GET_US_PER_IMPL_MEASUREMENT3]    .setup("Get Measured Duration per Impulse [3 step]", "us");
 
 	pids[PID_MAX_DIMENSION_X]                 .setup("Max Dimension X", "steps");
 	pids[PID_MAX_DIMENSION_Y]                 .setup("Max Dimension Y", "steps");
@@ -261,7 +263,7 @@ class ArduinoErrorCodesInitializer {
 void ArduinoErrorCodes::init() {
 /////////////////////////////////////////////////////////////////////////
 	for (int i=0; i<MAX_ERROR_CODES -1;i++){
-		errorCodes[i]  = "Unknow error code: ";
+		errorCodes[i]  = "Unknown error code: ";
 	}
 
 	errorCodes[E_NO_ERROR]                           = "Current Error Count";
@@ -273,6 +275,7 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_INVALID_GETTER_ID]                  = "Arduino::getValue(): Getter id not known"; 
 	errorCodes[E_INVALID_GETTER_LIST_COUNT]          = "Arduino::getValues(): Getter list count not available";
 	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Can't read a int32_t value from Serial: invalid size: ";
+	errorCodes[E_OTHER_MOVE_CMD_ACTIVE]              = "Arduino::decodeMove(): Move rejected because a other move statement is currently active";
 	errorCodes[E_INVALID_MOVE_SEQUENCE]              = "Arduino::decodeMoveSequence(): Invalid byte chain";
 	errorCodes[E_INVALID_PARAM_SIZE]                 = "Arduino::decodeMoveSequence(): Can't read size (int32_t) from Serial: invalid size: ";
 	
@@ -282,6 +285,8 @@ void ArduinoErrorCodes::init() {
 	
 	errorCodes[E_STEPPER_PULS_WIDTH_TO_LARGE]        = "Arduino::recalcDriverConfig(): Value to large";
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";
+	
+	errorCodes[E_LIMIT_SWITCH_ACTIVE]                = "Limit switch active";
 	
 	errorCodes[E_INTERRUPT]                          = "Interrupt received";
 	errorCodes[E_EXTERNEL_INTERRUPT]                 = "External Interrupt received";
@@ -340,13 +345,16 @@ void ArduinoDigitalPins::init() {
 	pins[PIN_Y_DIR]              = "DIR PIN Y";
 	pins[PIN_Z_DIR]              = "DIR PIN Z";
 	
-	pins[PIN_STEPPER_ENABLE]     = "STEPPER ENABLE PIN";
+	pins[PIN_ENABLE_STEPPER]     = "STEPPER ENABLE PIN";
 	
-	pins[PIN_X_LIMIT]            = "LIMIT PIN X";
-	pins[PIN_Y_LIMIT]            = "LIMIT PIN Y";
-	pins[PIN_Z_LIMIT]            = "LIMIT PIN Z";
+	pins[PIN_X_MIN_LIMIT]        = "LIMIT PIN X Min";
+	pins[PIN_X_MAX_LIMIT]        = "LIMIT PIN X Max";
+	pins[PIN_Y_MIN_LIMIT]        = "LIMIT PIN Y Min";
+	pins[PIN_Y_MAX_LIMIT]        = "LIMIT PIN Y Max";
+	pins[PIN_Z_MIN_LIMIT]        = "LIMIT PIN Z Min";
+	pins[PIN_Z_MAX_LIMIT]        = "LIMIT PIN Z Max";
 	
-	pins[PIN_TOOL_ENABLE]        = "TOOL ENABLE PIN";
+	pins[PIN_ENABLE_TOOL]        = "TOOL ENABLE PIN";
 	pins[PIN_EXTERNAL_INTERRUPT] = "External Interrupt PIN";
 }
 /////////////////////////////////////////////////////////////////////////

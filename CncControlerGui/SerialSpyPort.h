@@ -15,7 +15,6 @@ class SerialSpyPort : public Serial {
 		
 	public:
 		SerialSpyPort(CncControl* cnc);
-		SerialSpyPort(const char *portName);
 		virtual ~SerialSpyPort();
 		
 		// returns the class name

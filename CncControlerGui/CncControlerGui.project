@@ -33,8 +33,6 @@
       <File Name="GamepadThread.h"/>
       <File Name="SerialThread.cpp"/>
       <File Name="SerialThread.h"/>
-      <File Name="UpdateManagerThread.cpp"/>
-      <File Name="UpdateManagerThread.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Editor">
       <File Name="CncBaseEditor.cpp"/>
@@ -225,6 +223,10 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncSpeedSlider.h"/>
+      <File Name="CncSpeedSlider.cpp"/>
+      <File Name="CncGamepadControllerSpy.h"/>
+      <File Name="CncGamepadControllerSpy.cpp"/>
       <File Name="CncManuallyMoveCoordinates.h"/>
       <File Name="CncManuallyMoveCoordinates.cpp"/>
       <File Name="CncLCDPositionPanel.h"/>
@@ -569,6 +571,9 @@
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
   <Dependencies Name="release2"/>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Gprof"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -577,8 +582,8 @@
       <Linker Options=""/>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-pg;-g;-O0;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
+    <Configuration Name="Debug" CompilerType="gcc.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-pg;-g;-O0;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:/@Development/boost_1_71_0"/>
         <IncludePath Value="C:/msys64/mingw64/include"/>
@@ -627,6 +632,7 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
+        <Command Enabled="yes">g++</Command>
         <Command Enabled="yes">g++ -v</Command>
         <Command Enabled="yes">echo %WXWIN%</Command>
         <Command Enabled="yes">where g++</Command>
@@ -779,6 +785,9 @@
         <Command Enabled="yes">g++ -v</Command>
         <Command Enabled="yes">echo %WXWIN%</Command>
         <Command Enabled="yes">where g++</Command>
+        <Command Enabled="yes">g++ -v</Command>
+        <Command Enabled="yes">echo %WXWIN%</Command>
+        <Command Enabled="yes">where g++</Command>
         <Command Enabled="yes"/>
       </PreBuild>
       <PostBuild/>
@@ -804,7 +813,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Gprof"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>

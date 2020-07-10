@@ -785,3 +785,24 @@ CncStartPositionResolverBase::~CncStartPositionResolverBase()
     m_button7830->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncStartPositionResolverBase::onCancel), NULL, this);
     
 }
+
+CncPredefinedPositionsBase::CncPredefinedPositionsBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC127EInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    SetName(wxT("CncPredefinedPositionsBase"));
+    SetSize(500,300);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+}
+
+CncPredefinedPositionsBase::~CncPredefinedPositionsBase()
+{
+}

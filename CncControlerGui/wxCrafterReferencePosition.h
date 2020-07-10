@@ -212,4 +212,16 @@ public:
     virtual ~CncStartPositionResolverBase();
 };
 
+
+class CncPredefinedPositionsBase : public wxPanel
+{
+protected:
+
+protected:
+
+public:
+    CncPredefinedPositionsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    virtual ~CncPredefinedPositionsBase();
+};
+
 #endif

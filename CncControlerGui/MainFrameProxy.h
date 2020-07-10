@@ -53,8 +53,9 @@ class MainFrameProxy {
 		static void parsingSynopsisTraceAddWarning(const wxString& entry);
 		static void parsingSynopsisTraceAddError(const wxString& entry);
 
-		static void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
-		static void manualContinuousMoveStop();
+		static bool startInteractiveMove();
+		static bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		static bool stopInteractiveMove();
 		
 		static void releaseControllerSetupFromConfig();
 		static void changeCrossingThickness();
@@ -69,17 +70,14 @@ class MainFrameProxy {
 		static void newTemplate();
 		static void openTemplate();
 		static bool filePreviewListLeave();
+		static void updateSpeedSlider(float value);
+		static void updateCncSpeed(float value, CncSpeedMode mode);
 		
 		static SerialThread* getSerialThread(SerialThreadStub* sts);
 		
 		static wxFileConfig*			getLruStore();
 		
 		static wxPoint 					GetScreenPosition();
-
-		static wxStaticBitmap* 			GetGpBmp1();
-		static wxStaticBitmap* 			GetGpBmp2();
-		static wxStaticBitmap* 			GetGpBmp3();
-		static wxStaticBitmap* 			GetGpBmp4();
 
 		static wxStaticText* 			GetOutboundEditMode();
 		static wxStaticText* 			GetOutboundPosition();

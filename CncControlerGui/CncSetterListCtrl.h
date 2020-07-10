@@ -1,19 +1,47 @@
 #ifndef CNC_SETTER_LIST_CTRL_H
 #define CNC_SETTER_LIST_CTRL_H
 
+#include <vector>
+#include "CncArduino.h"
+#include "CncCommon.h"
 #include "CncLargeScaleListCtrl.h"
 
 class CncSetterListCtrl : public CncLargeScaledListCtrl {
 	
 	private:
-		wxString separatorPid;
+	
+		struct SetterEntry {
+			unsigned char 			pid	= PID_UNKNOWN;
+			cnc::SetterValueList	values;
+			wxDateTime 				time;
+			
+			SetterEntry(unsigned char p, const cnc::SetterValueList& v) 
+			: pid(p)
+			, values(v)
+			, time(wxDateTime::UNow())
+			{}
+		};
+		
+		typedef std::vector<SetterEntry> SetterEntries;
+		SetterEntries setterEntries;
+		
 		wxListItemAttr defaultItemAttr;
 		wxListItemAttr separatorRunItemAttr;
 		wxListItemAttr separatorResetItemAttr;
 		wxListItemAttr separatorSetupItemAttr;
+		wxTimer 			displayTimer;
+		int					displayTimerInterval;
 		
+		long translateItem(long item) const;
+		virtual bool isItemValid(long item) const;
+		
+		virtual wxString OnGetItemText(long item, long column) const;
 		virtual int OnGetItemColumnImage(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
+		
+		void onPaint(wxPaintEvent& event);
+		void onSize(wxSizeEvent& event);
+		void onDisplayTimer(wxTimerEvent& event);
 		
 	public:
 		static const int COL_TYPE 		= 0;
@@ -28,10 +56,11 @@ class CncSetterListCtrl : public CncLargeScaledListCtrl {
 		CncSetterListCtrl(wxWindow *parent, long style);
 		virtual ~CncSetterListCtrl();
 		
+		void addSetter(unsigned char pid, const cnc::SetterValueList& v);
+		void clearAll();
+		
 		void updateColumnWidth();
-		
-		void onSize(wxSizeEvent& event);
-		
+			
 		wxDECLARE_NO_COPY_CLASS(CncSetterListCtrl);
 		wxDECLARE_EVENT_TABLE();
 };

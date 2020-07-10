@@ -211,7 +211,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		: CncBasicLogStream()
 		, infoColour(*wxWHITE)
 		, warningColour(255, 201, 14)
-		, errorColour(*wxRED)
+		, errorColour(wxColour(255, 128, 128))
 		, debugColour(128, 0, 255)
 		{}
 
@@ -220,7 +220,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		: CncBasicLogStream()
 		, infoColour(*wxWHITE)
 		, warningColour(255, 201, 14)
-		, errorColour(*wxRED)
+		, errorColour(wxColour(255, 128, 128))
 		, debugColour(128, 0, 255)
 		{}
 
