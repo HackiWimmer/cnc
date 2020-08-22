@@ -17,6 +17,8 @@
   <object class="wxBitmap" name="16-debugger_restart@2x">bitmaps\16-debugger_restart@2x.png</object>
   <object class="wxBitmap" name="16-debugger_stop">bitmaps\16-debugger_stop.png</object>
   <object class="wxBitmap" name="16-debugger_stop@2x">bitmaps\16-debugger_stop@2x.png</object>
+  <object class="wxBitmap" name="16-dll">bitmaps\16-dll.png</object>
+  <object class="wxBitmap" name="16-dll@2x">bitmaps\16-dll@2x.png</object>
   <object class="wxBitmap" name="16-enumerator">bitmaps\16-enumerator.png</object>
   <object class="wxBitmap" name="16-enumerator@2x">bitmaps\16-enumerator@2x.png</object>
   <object class="wxBitmap" name="16-execute_stop">bitmaps\16-execute_stop.png</object>
@@ -59,6 +61,8 @@
   <object class="wxBitmap" name="24-redo@2x">bitmaps\24-redo@2x.png</object>
   <object class="wxBitmap" name="24-undo">bitmaps\24-undo.png</object>
   <object class="wxBitmap" name="24-undo@2x">bitmaps\24-undo@2x.png</object>
+  <object class="wxBitmap" name="CubeHardwareDimensions">bitmaps\CubeHardwareDimensions.png</object>
+  <object class="wxBitmap" name="CubeHardwareReference">bitmaps\CubeHardwareReference.png</object>
   <object class="wxBitmap" name="ViewButtom">bitmaps\ViewButtom.png</object>
   <object class="wxBitmap" name="ViewDown">bitmaps\ViewDown.png</object>
   <object class="wxBitmap" name="ViewFront">bitmaps\ViewFront.png</object>
@@ -69,6 +73,7 @@
   <object class="wxBitmap" name="ViewLeft">bitmaps\ViewLeft.png</object>
   <object class="wxBitmap" name="ViewRight">bitmaps\ViewRight.png</object>
   <object class="wxBitmap" name="ViewUp">bitmaps\ViewUp.png</object>
+  <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
   <object class="wxBitmap" name="actionrun">bitmaps\actionrun.png</object>
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
@@ -149,6 +154,7 @@
   <object class="wxBitmap" name="script-gear">bitmaps\script-gear.png</object>
   <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="settings">bitmaps\settings.png</object>
+  <object class="wxBitmap" name="shape-group">bitmaps\shape-group.png</object>
   <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
   <object class="wxBitmap" name="snap-orto">bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="software-update-available-3 (2)">bitmaps\software-update-available-3 (2).png</object>

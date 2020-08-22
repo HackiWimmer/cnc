@@ -22,6 +22,8 @@
 #include <wx/tglbtn.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
 #include <wx/timer.h>
 #include <wx/listbox.h>
 #if wxVERSION_NUMBER >= 2900
@@ -75,6 +77,10 @@ protected:
     wxTextCtrl* m_measurePlateThickness;
     wxStaticText* m_staticText5499;
     wxStaticLine* m_staticLine5350;
+    wxStaticText* m_staticText113;
+    wxComboBox* m_comboBox117;
+    wxButton* m_button115;
+    wxStaticLine* m_staticLine74511;
     wxStaticBitmap* m_infoBitmap;
     wxStaticLine* m_staticLine74384;
     wxStaticText* m_staticText7442;
@@ -139,6 +145,10 @@ public:
     wxTextCtrl* GetMeasurePlateThickness() { return m_measurePlateThickness; }
     wxStaticText* GetStaticText5499() { return m_staticText5499; }
     wxStaticLine* GetStaticLine5350() { return m_staticLine5350; }
+    wxStaticText* GetStaticText113() { return m_staticText113; }
+    wxComboBox* GetComboBox117() { return m_comboBox117; }
+    wxButton* GetButton115() { return m_button115; }
+    wxStaticLine* GetStaticLine74511() { return m_staticLine74511; }
     wxStaticBitmap* GetInfoBitmap() { return m_infoBitmap; }
     wxStaticLine* GetStaticLine74384() { return m_staticLine74384; }
     wxStaticText* GetStaticText7442() { return m_staticText7442; }
@@ -210,18 +220,6 @@ public:
     wxButton* GetButton7830() { return m_button7830; }
     CncStartPositionResolverBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Start Position Resolver"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncStartPositionResolverBase();
-};
-
-
-class CncPredefinedPositionsBase : public wxPanel
-{
-protected:
-
-protected:
-
-public:
-    CncPredefinedPositionsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
-    virtual ~CncPredefinedPositionsBase();
 };
 
 #endif

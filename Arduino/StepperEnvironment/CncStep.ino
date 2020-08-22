@@ -133,7 +133,7 @@ bool CncArduinoStepper::resolveLimit() {
       }        
     }
 
-   return readLimitState() == LimitSwitch::LIMIT_SWITCH_OFF;
+   return readLimitPins() == LimitSwitch::LIMIT_SWITCH_OFF;
 }   
 //////////////////////////////////////////////////////////////////////////////
 int8_t CncArduinoStepper::readLimitState() {

@@ -26,6 +26,7 @@ struct GLContextOptions {
 	bool showPosMarker					= true;
 	bool showFlyPath					= true;
 	bool showBoundBox					= true;
+	bool showHardwareBox				= true;
 	bool showRuler						= true;
 	bool showHelpLines					= true;
 	
@@ -36,6 +37,7 @@ struct GLContextOptions {
 	unsigned int rulerOriginOffsetAbs	= 10;
 	unsigned int rapidAlpha				= 64;
 		
+	wxColour hardwareBoxColour			= wxColour(255,   0,  0);
 	wxColour boundBoxColour				= wxColour(185, 127, 87);
 	wxColour rapidColour				= *wxYELLOW;
 	wxColour workColour					= *wxWHITE;

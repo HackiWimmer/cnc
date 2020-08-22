@@ -8,6 +8,7 @@ CncContext::CncContext()
 : timestamps()
 , secureModeInfo()
 , versionInfoMap()
+, hardwareOriginOffset()
 ////////////////////////////////////////////////////////////////////////
 {
 	#ifdef __WXMSW__

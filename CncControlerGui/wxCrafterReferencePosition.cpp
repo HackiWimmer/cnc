@@ -33,7 +33,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     SetIcons( app_icons );
 
     
-    wxFlexGridSizer* flexGridSizer7428 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer7428 = new wxFlexGridSizer(5, 1, 0, 0);
     flexGridSizer7428->SetFlexibleDirection( wxBOTH );
     flexGridSizer7428->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     this->SetSizer(flexGridSizer7428);
@@ -315,11 +315,12 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer5324->Add(flexGridSizer5484, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticText5486 = new wxStaticText(this, wxID_ANY, _("Workpiece\nThickness"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText5486 = new wxStaticText(this, wxID_ANY, _("Workpiece\nThickness"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(60,-1)), 0);
     wxFont m_staticText5486Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText5486->SetFont(m_staticText5486Font);
     
     flexGridSizer5484->Add(m_staticText5486, 0, wxALL, WXC_FROM_DIP(3));
+    m_staticText5486->SetMinSize(wxSize(60,-1));
     
     m_workpiceThickness = new wxTextCtrl(this, wxID_ANY, wxT("0,00"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RIGHT);
     #if wxVERSION_NUMBER >= 3000
@@ -359,6 +360,40 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     m_staticLine5350 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer5324->Add(m_staticLine5350, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer110 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer110->SetFlexibleDirection( wxBOTH );
+    flexGridSizer110->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer110->AddGrowableCol(1);
+    flexGridSizer110->AddGrowableRow(0);
+    
+    flexGridSizer7428->Add(flexGridSizer110, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticText113 = new wxStaticText(this, wxID_ANY, _("Log\nPosition:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(60,-1)), 0);
+    
+    flexGridSizer110->Add(m_staticText113, 0, wxALL, WXC_FROM_DIP(3));
+    m_staticText113->SetMinSize(wxSize(60,-1));
+    
+    wxArrayString m_comboBox117Arr;
+    m_comboBox117Arr.Add(wxT("Reference Position 01"));
+    m_comboBox117Arr.Add(wxT("Reference Position 02"));
+    m_comboBox117Arr.Add(wxT("Reference Position 03"));
+    m_comboBox117 = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(300,-1)), m_comboBox117Arr, 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_comboBox117->SetHint(wxT(""));
+    #endif
+    m_comboBox117->SetSelection(0);
+    
+    flexGridSizer110->Add(m_comboBox117, 0, wxALL, WXC_FROM_DIP(5));
+    m_comboBox117->SetMinSize(wxSize(300,-1));
+    
+    m_button115 = new wxButton(this, wxID_ANY, _("Log"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    flexGridSizer110->Add(m_button115, 0, wxALL, WXC_FROM_DIP(4));
+    
+    m_staticLine74511 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer7428->Add(m_staticLine74511, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     wxFlexGridSizer* flexGridSizer7419 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer7419->SetFlexibleDirection( wxBOTH );
@@ -784,25 +819,4 @@ CncStartPositionResolverBase::~CncStartPositionResolverBase()
     m_button7828->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncStartPositionResolverBase::onOk), NULL, this);
     m_button7830->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncStartPositionResolverBase::onCancel), NULL, this);
     
-}
-
-CncPredefinedPositionsBase::CncPredefinedPositionsBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-    : wxPanel(parent, id, pos, size, style)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC127EInitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    
-    SetName(wxT("CncPredefinedPositionsBase"));
-    SetSize(500,300);
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
-    }
-}
-
-CncPredefinedPositionsBase::~CncPredefinedPositionsBase()
-{
 }

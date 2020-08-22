@@ -29,7 +29,7 @@ void GamepadThread::stop() {
 ///////////////////////////////////////////////////////////////////
 wxThread::ExitCode GamepadThread::Entry() {
 ///////////////////////////////////////////////////////////////////
-	APPEND_THREAD_IDTO_STACK_TRACE_FILE;
+	APPEND_THREAD_ID_TO_STACK_TRACE_FILE;
 	
 	// post complete event
 	GamepadEvent initEvt(wxEVT_GAMEPAD_THREAD, MainFrame::EventId::INITIALIZED);

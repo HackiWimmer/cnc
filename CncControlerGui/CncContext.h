@@ -28,13 +28,31 @@ struct CncContext {
 		bool onlineUpdateCoordinates	= true;
 		bool onlineUpdateDrawPane		= true;
 		bool allowEventHandling			= true;
+		bool hardwareFlag				= false;
 		
 		int updateInterval				= 100;
 
 	public:
 		
 		wxFont outboundListBookFont		= wxFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-
+		
+		struct HardwareOriginOffset {
+			bool valid = false;
+			
+			// stores the signed ofset origin to Xmin, Ymin and Zmax
+			int32_t dx = 0;
+			int32_t dy = 0;
+			int32_t dz = 0;
+			
+			HardwareOriginOffset() 
+			: dx(0), dy(0), dz(0)
+			{}
+			
+			void reset() {
+				*this = HardwareOriginOffset();
+			}
+		};
+		
 		struct SecureModeInfo {
 			bool useIt						= false;
 			bool isActive					= false;
@@ -134,6 +152,8 @@ struct CncContext {
 		TsTplProcessing 			timestamps;
 		SecureModeInfo				secureModeInfo;
 		VersionInfoMap				versionInfoMap;
+		HardwareOriginOffset		hardwareOriginOffset;
+
 		
 		bool isWinOS() { return os == WXMSW; }
 		bool isGtkOS() { return os == WXGTK; }
@@ -150,8 +170,11 @@ struct CncContext {
 		void setGamePortMode(bool state) 	{ gamePortMode = state; }
 		bool canGamePort()					{ return gamePortMode;  }
 		
-		void setSpeedMonitoring(bool state) { speedMonitor = state; } 
+		void setSpeedMonitoring(bool state)	{ speedMonitor = state; } 
 		bool canSpeedMonitoring() 			{ return speedMonitor; }
+		
+		void setHardwareFlag(bool state)	{ hardwareFlag = state; } 
+		bool hasHardware()		 			{ return hardwareFlag; }
 		
 		bool isOnlineUpdateCoordinates() 						{ return onlineUpdateCoordinates; }
 		bool isOnlineUpdateDrawPane() 							{ return onlineUpdateDrawPane; }

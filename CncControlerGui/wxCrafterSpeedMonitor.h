@@ -52,6 +52,7 @@ class CncSpeedMonitorBase : public wxPanel
 {
 protected:
     wxStaticText* m_staticText382;
+    wxStaticText* m_staticText47112;
     wxStaticLine* m_staticLine386;
     wxPanel* m_speedSliderPlaceholder;
     wxStaticLine* m_staticLine3845;
@@ -95,6 +96,7 @@ protected:
 
 public:
     wxStaticText* GetStaticText382() { return m_staticText382; }
+    wxStaticText* GetStaticText47112() { return m_staticText47112; }
     wxStaticLine* GetStaticLine386() { return m_staticLine386; }
     wxPanel* GetSpeedSliderPlaceholder() { return m_speedSliderPlaceholder; }
     wxStaticLine* GetStaticLine3845() { return m_staticLine3845; }

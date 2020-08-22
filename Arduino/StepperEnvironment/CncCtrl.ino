@@ -1118,6 +1118,10 @@ byte CncArduinoController::moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t 
   if ( dy != 0 ) { retY = Y->resolveLimit(); }
   if ( dz != 0 ) { retZ = Z->resolveLimit(); }
 
+  //PRINT_DEBUG_VALUE("retX", retX);
+  //PRINT_DEBUG_VALUE("retY", retY);
+  //PRINT_DEBUG_VALUE("retZ", retZ);
+  
   return (retX == true && retY == true && retZ == true) ? RET_OK : RET_LIMIT;
 }
 /////////////////////////////////////////////////////////////////////////////////////

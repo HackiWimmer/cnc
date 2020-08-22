@@ -69,6 +69,7 @@ class CncLCDPositionPanel;
 class CncManuallyMoveCoordinates;
 class CncSpeedPlayground;
 class CncGamepadControllerSpy;
+class CncGamepadControllerState;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -157,7 +158,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
+		virtual void onEvaluateHardwareXYPlane(wxCommandEvent& event);
+		virtual void onEvaluateHardwareZAxis(wxCommandEvent& event);
+		virtual void onTakeoverHardwareDimensions(wxCommandEvent& event);
+		virtual void onResetHardwareReference(wxCommandEvent& event);
+		virtual void onEvaluateHardwareReference(wxCommandEvent& event);
 		virtual void openSpeedPlayground(wxCommandEvent& event);
 		virtual void onChangePreviewMode(wxCommandEvent& event);
 		virtual void connectSec(wxCommandEvent& event);
@@ -274,10 +279,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void moveXToMid(wxCommandEvent& event);
 		virtual void moveYToMid(wxCommandEvent& event);
 		virtual void moveZToMid(wxCommandEvent& event);
-   		virtual void testDimTakeOverAll(wxCommandEvent& event);
-		virtual void testDimTakeOverX(wxCommandEvent& event);
-		virtual void testDimTakeOverY(wxCommandEvent& event);
-		virtual void testDimTakeOverZ(wxCommandEvent& event);
 		virtual void refreshMotionMonitor(wxCommandEvent& event);
 		virtual void clearMotionMonitor(wxCommandEvent& event);
 		virtual void show3D(wxCommandEvent& event);
@@ -287,7 +288,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void showFromRear3D(wxCommandEvent& event);
 		virtual void showFromRight3D(wxCommandEvent& event);
 		virtual void showFromTop3D(wxCommandEvent& event);
-		virtual void testEndSwitchEvaluation(wxCommandEvent& event);
 		virtual void testSwitchToolOnOff(wxCommandEvent& event);
 		virtual void testCountXSpinCtl(wxSpinEvent& event);
 		virtual void testCountXUpdated(wxCommandEvent& event);
@@ -651,6 +651,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncLCDPositionPanel*			cncLCDPositionPanel;
 		CncManuallyMoveCoordinates*		cncManuallyMoveCoordPanel;
 		CncGamepadControllerSpy* 		gamepadControllerSpy;
+		CncGamepadControllerState*		gamepadStatusCtl; 
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;
@@ -722,6 +723,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		const wxString& getCurrentTemplateFileName();
 		const wxString& getCurrentTemplatePathFileName();
 		
+		void updateHardwareReference();
+		void updateHardwareDimensions();
 		
 		bool saveTemplateOnDemand();
 
@@ -750,7 +753,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void decoratePosSpyConnectButton(bool state);
 		
 		void registerGuiControls();
-		bool initializeCncControl();
+		void initializeConnectionSelector();
 		void initializeGamepadThread();
 		void initializeSerialThread();
 		bool initializeLruMenu();
@@ -783,7 +786,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool processManualTemplate();
 		bool processTestTemplate();
 		bool processTestInterval();
-		bool processTestDimensions();
 		
 		void logTimeConsumed();
 		

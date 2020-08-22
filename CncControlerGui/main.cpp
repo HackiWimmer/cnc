@@ -19,7 +19,6 @@
 #include "CncCommon.h"
 #include "GlobalStrings.h"
 #include "GlobalFunctions.h"
-#include "MainFrameDummy.h"
 #include "MainFrame.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -393,13 +392,6 @@ class MainApp : public wxApp {
 		virtual bool OnInit() {
 		///////////////////////////////////////////////////////////
 			APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Entry . . .");
-			
-			if ( false ) {
-				MainFrameDummy* mainFrameDummy = new MainFrameDummy(NULL);
-				mainFrameDummy->SetTitle(CncFileNameService::getStackTraceFileName());
-				SetTopWindow(mainFrameDummy);
-				return GetTopWindow()->Show();
-			}
 			
 			//setlocale(LC_NUMERIC, "");
 			wxLocale(LC_NUMERIC);

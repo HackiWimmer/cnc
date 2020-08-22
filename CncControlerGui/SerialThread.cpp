@@ -132,7 +132,7 @@ bool SerialThread::notifyDisconnected() {
 ///////////////////////////////////////////////////////////////////
 wxThread::ExitCode SerialThread::Entry() {
 ///////////////////////////////////////////////////////////////////
-	APPEND_THREAD_IDTO_STACK_TRACE_FILE;
+	APPEND_THREAD_ID_TO_STACK_TRACE_FILE;
 	
 	// post complete event
 	wxQueueEvent(THE_FRAME, new SerialEvent(wxEVT_SERIAL_THREAD, MainFrame::EventId::INITIALIZED));

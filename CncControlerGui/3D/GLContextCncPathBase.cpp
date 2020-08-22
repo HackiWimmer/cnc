@@ -2,6 +2,7 @@
 #include "3D/GLContextCncPathBase.h"
 #include "3D/GLLabelCluster.h"
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "3D/GLInclude.h"
 #include "3D/CncGLCanvas.h"
 #include <wx/bitmap.h>
@@ -261,7 +262,6 @@ void GLContextCncPathBase::determineModel() {
 /////////////////////////////////////////////////////////////////
 	if ( isEnabled() == false ) {
 		
-		
 		//std::cout  << " GLContextCncPathBase::determineModel(); false"<< std::endl;
 		
 		//drawTeapot();
@@ -287,6 +287,93 @@ void GLContextCncPathBase::determineModel() {
 	}
 	
 	drawBoundBox();
+	drawHardwareBox();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawHardwareBox() {
+/////////////////////////////////////////////////////////////////
+	if ( options.showHardwareBox == false )
+		return; 
+
+	if ( THE_CONTEXT->hardwareOriginOffset.valid == false )
+		return;
+		
+	// evaluate hardware origin as vertex
+	float originX = THE_CONTEXT->hardwareOriginOffset.dx / THE_CONFIG->getDispFactX3D();
+	float originY = THE_CONTEXT->hardwareOriginOffset.dy / THE_CONFIG->getDispFactY3D();
+	float originZ = THE_CONTEXT->hardwareOriginOffset.dz / THE_CONFIG->getDispFactZ3D();
+		
+	// evaluate hardware dimensions as vertex
+	float maxX    = THE_CONFIG->getMaxDimensionStepsX()  / THE_CONFIG->getDispFactX3D();
+	float maxY    = THE_CONFIG->getMaxDimensionStepsY()  / THE_CONFIG->getDispFactY3D();
+	float maxZ    = THE_CONFIG->getMaxDimensionStepsZ()  / THE_CONFIG->getDispFactZ3D();
+
+	// ensure the right model
+	glMatrixMode(GL_MODELVIEW);
+	glLineStipple(4, 0xAAAA);
+	glEnable(GL_LINE_STIPPLE);
+	
+	glColor4ub(options.hardwareBoxColour.Red(), options.hardwareBoxColour.Green(), options.hardwareBoxColour.Blue(), 255);
+	
+	//-------------------------------------------------------------
+	struct Point { 
+		float x = 0.0; 
+		float y = 0.0; 
+		float z = 0.0; 
+		
+		void set(float a, float b, float c)
+		{ x = a; y =b; z = c; }
+		
+	} p1, p2;
+	
+	//-------------------------------------------------------------
+	auto drawLine = [&](const Point& p1, const Point& p2) {
+		glBegin(GL_LINES);
+			glVertex3f(p1.x, p1.y, p1.z);
+			glVertex3f(p2.x, p2.y, p2.z);
+		glEnd();
+	};
+	
+	// top rect
+	p1.set(originX, originY, originZ); p2.set(originX, originY + maxY, originZ);
+	drawLine(p1, p2);
+	
+	p1 = p2; p2.set(originX + maxX, originY + maxY, originZ);
+	drawLine(p1, p2);
+	
+	p1 = p2; p2.set(originX + maxX, originY, originZ);
+	drawLine(p1, p2);
+	
+	p1 = p2; p2.set(originX, originY, originZ);
+	drawLine(p1, p2);
+	
+	// bottom rect
+	p1.set(originX, originY, originZ + maxZ); p2.set(originX, originY + maxY, originZ + maxZ);
+	drawLine(p1, p2);
+	
+	p1 = p2; p2.set(originX + maxX, originY + maxY, originZ + maxZ);
+	drawLine(p1, p2);
+	
+	p1 = p2; p2.set(originX + maxX, originY, originZ + maxZ);
+	drawLine(p1, p2);
+	
+	p1 = p2; p2.set(originX, originY, originZ + maxZ);
+	drawLine(p1, p2);
+	
+	// connection lines (top to bottom)
+	p1.set(originX, originY, originZ); p2.set(originX, originY, originZ + maxZ);
+	drawLine(p1, p2);
+	
+	p1.set(originX, originY + maxY, originZ); p2.set(originX, originY + maxY, originZ + maxZ);
+	drawLine(p1, p2);
+	
+	p1.set(originX + maxX, originY + maxY, originZ); p2.set(originX + maxX, originY + maxY, originZ + maxZ);
+	drawLine(p1, p2);
+	
+	p1.set(originX + maxX, originY, originZ); p2.set(originX + maxX, originY, originZ + maxZ);
+	drawLine(p1, p2);
+	
+	glDisable(GL_LINE_STIPPLE);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawBoundBox() {

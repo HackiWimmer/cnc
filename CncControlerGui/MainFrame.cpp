@@ -28,6 +28,7 @@
 #include <wx/textdlg.h>
 #include <wx/clipbrd.h>
 #include <wx/version.h> 
+#include <wx/richmsgdlg.h>
 #include <boost/version.hpp>
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
@@ -298,6 +299,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , cncLCDPositionPanel					(NULL)
 , cncManuallyMoveCoordPanel				(NULL)
 , gamepadControllerSpy					(new CncGamepadControllerSpy(this))
+, gamepadStatusCtl						(NULL)
 , perspectiveHandler					(globalConfig, m_menuPerspective)
 , config								(globalConfig)
 , lruStore								(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -315,7 +317,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , refPositionDlg						(new CncReferencePosition(this))
 {
 ///////////////////////////////////////////////////////////////////
-	APPEND_THREAD_IDTO_STACK_TRACE_FILE;
+	APPEND_THREAD_ID_TO_STACK_TRACE_FILE;
 	
 	// initialize gamepad thread
 	initializeGamepadThread();
@@ -358,6 +360,9 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	m_listbookMonitor->GetListView()->SetFont(font);
 	m_listbookPostProcessor->GetListView()->SetFont(font);
 	m_listbookManallyMotionControl->GetListView()->SetFont(font);
+	m_listbookSetupConfig->GetListView()->SetFont(font);
+	m_listbookReferences->GetListView()->SetFont(font);
+	m_testCaseBook->GetListView()->SetFont(font);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -760,7 +765,11 @@ void MainFrame::installCustControls() {
 	// GCode Sequence control
 	gCodeSequenceList = new CncGCodeSequenceListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_gCodeSequenceListPlaceholder, gCodeSequenceList);
-
+	
+	// Gamepad status control
+	gamepadStatusCtl = new CncGamepadControllerState(this); 
+	GblFunc::replaceControl(m_gamepadStatusPlaceholder, gamepadStatusCtl);
+	
 	// navigator panel
 	CncNavigatorPanel::Config cfg;
 	cfg.innerCircle = true;
@@ -816,13 +825,11 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_portSelectorSec);
 	registerGuiControl(m_connect);
 	registerGuiControl(m_connectSec);
-	registerGuiControl(m_testDimModeX);
-	registerGuiControl(m_testDimModeY);
-	registerGuiControl(m_testDimModeZ);
-	registerGuiControl(m_testDimTakeX);
-	registerGuiControl(m_testDimTakeY);
-	registerGuiControl(m_testDimTakeZ);
-	registerGuiControl(m_testDimTakeAll);
+	registerGuiControl(m_btResetHardwareReference);
+	registerGuiControl(m_btEvaluateHardwareReference);
+	registerGuiControl(m_btTakeOverDimensions);
+	registerGuiControl(m_btEvaluateDimensionXYPlane);
+	registerGuiControl(m_btEvaluateDimensionZAxis);
 	registerGuiControl(m_refPosition);
 	registerGuiControl(m_zToTop);
 	registerGuiControl(m_zToBottom);
@@ -911,32 +918,21 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	wxASSERT(cnc);
-	CncLimitStates ls = cnc->getLimitState();
-	
-	if ( ls.hasLimit() ) {
-		
-		while ( ls.getYMaxLimit() ) {
-			cnc->moveRelLinearStepsXY(0, -2, true);
-			cnc->evaluateLimitState();
-			ls = cnc->getLimitState();
-		}
-	}
-	
+	cnc->correctLimitPositions();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 	
-	cnc->correctLimitPositions();
+	CncDoublePosition pos; 
+	bool ret = cnc->convertPositionToHardwareCoordinate(cnc->getCurCtlPosMetric(), pos);
+	std::cout << ret << ": " << pos << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	
-	cnc->resolveLimits(false, true, false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -1994,6 +1990,7 @@ void MainFrame::initialize(void) {
 	decorateSecureDlgChoice(true);
 	registerGuiControls();
 	decorateOutboundSaveControls(false);
+	updateHardwareDimensions();
 
 	// init config pages
 	GetConfigurationToolbook()->SetSelection(0);
@@ -2036,8 +2033,12 @@ void MainFrame::initialize(void) {
 	
 	resetMinMaxPositions();
 	initializeLruMenu();
-	initializeCncControl();
+	initializeConnectionSelector();
 	
+	// initilaize debug state
+	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->enableSpyOutput(true);
+	else				   						cnc->enableSpyOutput(false); 
+
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
@@ -2045,45 +2046,27 @@ void MainFrame::initialize(void) {
 	// curve lib resulotion
 	THE_CONFIG->setupSelectorRenderResolution();
 	
-	
-	//#warning
-	//wxCommandEvent event;
-	//openSpeedPlayground(event);
+	notifyConfigUpdate();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::initializeCncControl() {
+void MainFrame::initializeConnectionSelector() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	
-	if ( THE_CONFIG != NULL ) {
-		wxString value;
+	if ( THE_CONFIG == NULL )
+		return;
 		
-		// initialize display unit
-		m_unit->SetStringSelection(THE_CONFIG->getDefaultDisplayUnitAsStr());
-		updateUnit();
-		
-		// initialize com port
-		THE_CONFIG->getDefaultPort(value);
-		m_portSelector   ->SetStringSelection(value);
-		m_portSelectorSec->SetStringSelection(value); //???
-		defaultPortName.assign(value);
-		
-		// initialize update interval
-		THE_CONTEXT->setUpdateInterval(m_displayInterval->GetValue());
-	}
-	 
-	// initialize the postion controls
-	setControllerZero(true, true, true);
-	notifyConfigUpdate();
+	// initialize display unit
+	m_unit->SetStringSelection(THE_CONFIG->getDefaultDisplayUnitAsStr());
+	updateUnit();
 	
-	// z slider
-	m_zView->updateView(cnc->requestControllerPos().getZ() * THE_CONFIG->getDisplayFactZ(THE_CONFIG->getDisplayUnit()));
+	// initialize com port
+	wxString value;
+	THE_CONFIG->getDefaultPort(value);
+	m_portSelector   ->SetStringSelection(value);
+	m_portSelectorSec->SetStringSelection(value); //???
+	defaultPortName.assign(value);
 	
-	//initilaize debug state
-	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->enableSpyOutput(true);
-	else				    					cnc->enableSpyOutput(false); 
-	
-	return true;
+	// initialize update interval
+	THE_CONTEXT->setUpdateInterval(m_displayInterval->GetValue());
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeLruMenu() {
@@ -2229,6 +2212,9 @@ bool MainFrame::connectSerialPort() {
 	startAnimationControl();
 	m_serialTimer->Stop();
 	
+	THE_CONTEXT->hardwareOriginOffset.reset();
+	updateHardwareReference();
+	
 	if ( m_clearSerialSpyOnConnect->GetValue() )
 		clearSerialSpy();
 		
@@ -2247,10 +2233,12 @@ bool MainFrame::connectSerialPort() {
 	createCncControl(sel, serialFileName);
 	if ( cnc == NULL )
 		return false;
-		
+	
+	// initialize the postion controls
+	setControllerZero(true, true, true);
+	
 	statisticsPane->setCncControl(cnc);
 	
-	initializeCncControl();
 	selectSerialSpyMode();
 	clearPositionSpy();
 	
@@ -2258,17 +2246,18 @@ bool MainFrame::connectSerialPort() {
 	
 	bool ret = false;
 	if ( (ret = cnc->connect(serialFileName)) == true )  {
-
+		
 		lastPortName.assign(sel);
 		clearMotionMonitor();
 		clearPositionSpy();
-
+		
 		if ( (ret = cnc->setup()) == true ) {
 			
 			cnc->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 			notifyConfigUpdate();
 			decorateSwitchToolOnOff(cnc->getToolState());
 			selectSerialSpyMode();
+			
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
 			
@@ -2276,8 +2265,6 @@ bool MainFrame::connectSerialPort() {
 				m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
 				m_miRqtIdleMessages->Enable(true);
 			}
-			
-			setControllerZero(true, true, true);
 		}
 	}
 	
@@ -2289,7 +2276,7 @@ bool MainFrame::connectSerialPort() {
 	
 	stopAnimationControl();
 	enableControls();
-
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -2313,6 +2300,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		bool moveSequences			= false;
 		bool vertexTrace			= false;
 		bool speedMonitor			= false;
+		bool hasHardware			= false;
 
 	} setup;
 	
@@ -2324,6 +2312,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.gamePortMode		= false;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
+		setup.hasHardware		= false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2336,6 +2325,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.gamePortMode		= false;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
+		setup.hasHardware		= false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2348,6 +2338,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.gamePortMode		= false;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
+		setup.hasHardware		= false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2360,6 +2351,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.gamePortMode		= false;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
+		setup.hasHardware		= false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2372,6 +2364,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.gamePortMode		= false;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
+		setup.hasHardware		= false;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2384,6 +2377,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.gamePortMode		= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= true;
+		setup.hasHardware		= true;
 		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2396,6 +2390,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.gamePortMode		= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= true;
+		setup.hasHardware		= true;
 		setup.pathListEntries	= false;
 		setup.moveSequences		= false;
 		setup.vertexTrace		= false;
@@ -2421,6 +2416,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	THE_CONTEXT->setProbeMode(setup.probeMode);
 	THE_CONTEXT->setGamePortMode(setup.gamePortMode);
 	THE_CONTEXT->setSpeedMonitoring(setup.speedMonitor);
+	THE_CONTEXT->setHardwareFlag(setup.hasHardware);
 	
 	speedMonitor->clear();
 	speedMonitor->activate(THE_CONTEXT->canSpeedMonitoring());
@@ -2586,9 +2582,22 @@ void MainFrame::clearLogger(wxCommandEvent& event) {
 void MainFrame::setControllerZero(bool x, bool y, bool z) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
+	
+	CncLongPosition prevPos = cnc->getCurCtlPos();
+	
 	cnc->resetClientId();
 	cnc->setZeroPos(x, y, z);
 	setRefPostionState(true);
+	
+	// align the hardware offset
+	if ( THE_CONTEXT->hardwareOriginOffset.valid == true ) {
+		
+		THE_CONTEXT->hardwareOriginOffset.dx -= prevPos.getX();
+		THE_CONTEXT->hardwareOriginOffset.dy -= prevPos.getY();
+		THE_CONTEXT->hardwareOriginOffset.dz -= prevPos.getZ();
+		
+		cnc::trc.logInfoMessage("The hardware offset was realigned to the new origin . . .");
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectUnit(wxCommandEvent& event) {
@@ -2621,6 +2630,7 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 						  refPositionDlg->shouldZeroZ()
 						 );
 						 
+		motionMonitor->Refresh();
 	} 
 	else {
 		cnc::cex1 << " Set reference position aborted . . . " << std::endl;
@@ -3410,7 +3420,6 @@ bool MainFrame::processTestTemplate() {
 	wxWindow* page = m_testCaseBook->GetCurrentPage();
 	if ( page != NULL ) {
 		if 		( page == m_testIntervalPage )	return processTestInterval();
-		else if ( page == m_testDimensions )	return processTestDimensions();
 		//...
 		
 		wxString msg;
@@ -3525,105 +3534,6 @@ bool MainFrame::processTestInterval() {
 	}
 	
 	return true;
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::processTestDimensions() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	
-	if ( cnc->isConnected() == false ) {
-		std::cerr << "Not connetced, nothing will be processed." << std::endl;
-		return false;
-	}
-	
-	cnc->activatePositionCheck(false);
-	
-	double result = -DBL_MAX;
-	bool ret = true;
-	
-	// meassure X Axis
-	if ( m_testDimModeX->GetValue() == true  && ret == true ) {
-		m_testDimResultX->SetValue(wxString::Format("%4.3f", 0.0));
-		ret = cnc->meassureXDimension(m_testDimMinX, m_testDimMaxX, result);
-		if ( ret ) {
-			m_testDimMinX->SetValue(false);
-			m_testDimMaxX->SetValue(false);
-			m_testDimResultStateX->SetValue(true);
-			m_testDimResultX->SetValue(wxString::Format("%4.3f", result));
-			
-			ret = cnc->moveXToMid();
-		}
-	}
-	// meassure z Axis
-	if ( m_testDimModeY->GetValue() == true && ret == true ) {
-		m_testDimResultY->SetValue(wxString::Format("%4.3f", 0.0));
-		ret = cnc->meassureYDimension(m_testDimMinY, m_testDimMaxY, result);
-		if ( ret ) {
-			m_testDimMinY->SetValue(false);
-			m_testDimMaxY->SetValue(false);
-			m_testDimResultStateY->SetValue(true);
-			m_testDimResultY->SetValue(wxString::Format("%4.3f", result));
-			
-			ret = cnc->moveYToMid();
-		}
-	}
-	// meassure z Axis
-	if ( m_testDimModeZ->GetValue() == true  && ret == true ) {
-		m_testDimResultZ->SetValue(wxString::Format("%4.3f", 0.0));
-		ret = cnc->meassureZDimension(m_testDimMinZ, m_testDimMaxZ, result);
-		if ( ret ) {
-			m_testDimMinZ->SetValue(false);
-			m_testDimMaxZ->SetValue(false);
-			m_testDimResultStateZ->SetValue(true);
-			m_testDimResultZ->SetValue(wxString::Format("%4.3f", result));
-			
-			ret = cnc->moveZToMid();
-		}
-	}
-	
-	if ( ret == false ) {
-		std::cerr << "MainFrame::processTestDimensions(): Invalid Test!" << std::endl;
-	}
-	
-	cnc->activatePositionCheck(true);
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::testDimTakeOverAll(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	testDimTakeOverX(event);
-	testDimTakeOverY(event);
-	testDimTakeOverZ(event);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::testDimTakeOverX(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	double v;
-	wxString val = m_testDimResultX->GetValue();
-	val.ToDouble(&v);
-	
-	if ( v > 0.0 )
-		CncConfig::getGlobalCncConfig()->setMaxDimensionX(v);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::testDimTakeOverY(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	double v;
-	wxString val = m_testDimResultY->GetValue();
-	val.ToDouble(&v);
-	
-	if ( v > 0.0 )
-		CncConfig::getGlobalCncConfig()->setMaxDimensionY(v);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::testDimTakeOverZ(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	double v;
-	wxString val = m_testDimResultZ->GetValue();
-	val.ToDouble(&v);
-
-	if ( v > 0.0 )
-		CncConfig::getGlobalCncConfig()->setMaxDimensionZ(v);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::processTestMove(wxStaticText* axis, wxStaticText* counter, int c, double xd, double yd, double zd) {
@@ -6019,47 +5929,6 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 	updateSetterList();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::testEndSwitchEvaluation(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	
-	if ( cnc->isConnected() == false ) {
-		std::cerr << "Not connetced, nothing will be processed." << std::endl;
-		return;
-	}
-	
-	if ( m_testToggleEndSwitch->GetValue() == true ) {
-		m_testToggleEndSwitch->SetLabel("Stop End Switch Evaluation");
-		m_testToggleEndSwitch->SetBackgroundColour(*wxRED);
-		m_testToggleEndSwitch->SetForegroundColour(*wxWHITE);
-		
-		disableControls();
-		m_testToggleEndSwitch->Enable(true);
-		
-		startAnimationControl();
-		while ( m_testToggleEndSwitch->GetValue() == true ) {
-			dispatchAll();
-			
-			if ( cnc->isInterrupted() ) {
-				m_testToggleEndSwitch->SetValue(false);
-				break;
-			}
-			
-			cnc->evaluateLimitState();
-		}
-		
-		enableControls();
-		stopAnimationControl();
-		
-	} 
-	
-	if ( m_testToggleEndSwitch->GetValue() == false ) {
-		m_testToggleEndSwitch->SetLabel("Start End Switch Evaluation");
-		m_testToggleEndSwitch->SetBackgroundColour(*wxGREEN);
-		m_testToggleEndSwitch->SetForegroundColour(*wxBLACK);
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
 ///////////////////////////////////////////////////////////////////
 	static wxColour active(171, 171, 171);
@@ -7740,9 +7609,152 @@ void MainFrame::openSpeedPlayground(wxCommandEvent& event) {
 		
 	cncSpeedPlayground->Show(cncSpeedPlayground->IsShownOnScreen() == false);
 }
-
-
-
-void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event)
-{
+/////////////////////////////////////////////////////////////////////
+void MainFrame::updateHardwareReference() {
+/////////////////////////////////////////////////////////////////////
+	double dx = 0.0;
+	double dy = 0.0;
+	double dz = 0.0;
+	
+	if ( THE_CONTEXT->hardwareOriginOffset.valid == true ) {
+		dx = THE_CONFIG->convertStepsToMetricX(THE_CONTEXT->hardwareOriginOffset.dx);
+		dy = THE_CONFIG->convertStepsToMetricY(THE_CONTEXT->hardwareOriginOffset.dy);
+		dz = THE_CONFIG->convertStepsToMetricZ(THE_CONTEXT->hardwareOriginOffset.dz);
+	}
+	
+	m_hardwareOffsetX->ChangeValue(wxString::Format("%.3lf", dx));
+	m_hardwareOffsetY->ChangeValue(wxString::Format("%.3lf", dy));
+	m_hardwareOffsetZ->ChangeValue(wxString::Format("%.3lf", dz));
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxString msg("Do you really want to evaluate the hardware reference position?\n");
+	msg.append("Execution Plan:\n\n");
+	msg.append(" 1. Moves Z axis to maximum position\n");
+	msg.append(" 2. Moves X axis to minimum position\n");
+	msg.append(" 3. Moves Y axis to minimum position\n");
+	msg.append(" 4. Move X and Y axis to previous position\n");
+	msg.append(" 5. Moves Z axis to previous position\n");
+	
+	wxRichMessageDialog dlg(this, msg, _T("Evaluate Hardware Reference . . . "), 
+						wxYES_NO|wxICON_QUESTION|wxCENTRE);
+	
+	if ( dlg.ShowModal() == wxID_YES ) {
+		
+		selectMonitorBookCncPanel();
+		disableControls();
+		CncTransactionLock ctl(this);
+		
+		cnc->evaluateHardwareReference();
+		updateHardwareReference();
+		
+		enableControls();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onResetHardwareReference(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_CONTEXT->hardwareOriginOffset.reset();
+	updateHardwareReference();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::updateHardwareDimensions() {
+/////////////////////////////////////////////////////////////////////
+	m_hardwareDimensionX->ChangeValue(wxString::Format("%.3lf", THE_CONFIG->getMaxDimensionX()));
+	m_hardwareDimensionY->ChangeValue(wxString::Format("%.3lf", THE_CONFIG->getMaxDimensionY()));
+	m_hardwareDimensionZ->ChangeValue(wxString::Format("%.3lf", THE_CONFIG->getMaxDimensionZ()));
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxString msg("Do you really want to evaluate the dimensions of the XY plane?\n");
+	msg.append("Execution Plan:\n\n");
+	msg.append(" 1. Moves Z axis to maximum position\n");
+	msg.append(" 2. Moves X axis to minimum position\n");
+	msg.append(" 3. Moves Y axis to minimum position\n");
+	msg.append(" 4. Moves Y axis to maximum position\n");
+	msg.append(" 5. Moves X axis to maximum position\n");
+	msg.append(" 6. Moves Y axis to minimum position\n");
+	msg.append(" 7. Moves X axis to minimum position\n");
+	msg.append(" 8. Move X and Y axis to previous position\n");
+	msg.append(" 9. Moves Z axis to previous position\n");
+	
+	wxRichMessageDialog dlg(this, msg, _T("Evaluate Hardware Dimension . . . "), 
+						wxYES_NO|wxICON_QUESTION|wxCENTRE);
+	
+	if ( dlg.ShowModal() == wxID_YES ) {
+		
+		selectMonitorBookCncPanel();
+		disableControls();
+		CncTransactionLock ctl(this);
+		
+		CncControl::DimensionXYPlane result;
+		if ( cnc->evaluateHardwareDimensionsXYPlane(result) ) {
+			m_cbHardwareDimensionEvaluatedX->SetValue(true);
+			m_hardwareDimensionX->ChangeValue(wxString::Format("%.3lf", result.dimensionX));
+			
+			m_cbHardwareDimensionEvaluatedY->SetValue(true);
+			m_hardwareDimensionY->ChangeValue(wxString::Format("%.3lf", result.dimensionY));
+		}
+		
+		enableControls();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onEvaluateHardwareZAxis(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxString msg("Do you really want to evaluate the dimensions of the Z axis?\n");
+	msg.append("Execution Plan:\n\n");
+	msg.append(" 1. Moves Z axis to maximum position\n");
+	msg.append(" 2. Moves Z axis to minimum position\n");
+	msg.append(" 5. Moves Z axis to previous position\n");
+	
+	wxRichMessageDialog dlg(this, msg, _T("Evaluate Hardware Dimension . . . "), 
+						wxYES_NO|wxICON_QUESTION|wxCENTRE);
+	
+	if ( dlg.ShowModal() == wxID_YES ) {
+		
+		selectMonitorBookCncPanel();
+		disableControls();
+		CncTransactionLock ctl(this);
+		
+		CncControl::DimensionZAxis result;
+		if ( cnc->evaluateHardwareDimensionsZAxis(result) ) {
+			m_cbHardwareDimensionEvaluatedZ->SetValue(true);
+			m_hardwareDimensionZ->ChangeValue(wxString::Format("%.3lf", result.dimensionZ));
+		}
+		
+		enableControls();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onTakeoverHardwareDimensions(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	// No extra question required here because saveConfiguration()
+	// below will generate someone . . .
+	
+	bool somethingChanged = false;
+	{
+		if ( m_cbHardwareDimensionEvaluatedX->GetValue() == true ) {
+			double v; m_hardwareDimensionX->GetValue().ToDouble(&v);
+			THE_CONFIG->setMaxDimensionX(v);
+			somethingChanged = true;
+		}
+		
+		if ( m_cbHardwareDimensionEvaluatedY->GetValue() == true ) {
+			double v; m_hardwareDimensionY->GetValue().ToDouble(&v);
+			THE_CONFIG->setMaxDimensionY(v);
+			somethingChanged = true;
+		}
+		
+		if ( m_cbHardwareDimensionEvaluatedZ->GetValue() == true ) {
+			double v; m_hardwareDimensionZ->GetValue().ToDouble(&v);
+			THE_CONFIG->setMaxDimensionZ(v);
+			somethingChanged = true;
+		}
+	}
+	
+	if ( somethingChanged == true )
+		THE_CONFIG->saveConfiguration(*config);
 }

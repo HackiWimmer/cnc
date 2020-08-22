@@ -808,12 +808,11 @@ bool Serial::popSerial(bool returnImmediately) {
 		ret = evaluateResultWrapper(sfi, std::cout);
 		if ( ret == false ) {
 			std::cerr << "Error while processing popSerial: " << std::endl;
+			return false;
 		}
 	}
 	
-	cncControl->SerialCallback();
-	
-	return ret;
+	return cncControl->SerialCallback();
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::processIdle() {
@@ -989,7 +988,7 @@ bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 	} else {
 		std::cerr << "Serial::processGetter: Unable to write data" << std::endl;
 		cncControl->SerialCallback();
-		ret =  false;
+		ret = false;
 	}
 	
 	return ret;
@@ -1117,7 +1116,8 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 	}
 
 	// Always log the start position
-	cncControl->SerialCallback();
+	if ( cncControl->SerialCallback() == false )
+		return false;
 	
 	bool ret = false;
 
@@ -1208,10 +1208,14 @@ bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncL
 	lastFetchResult.init(cmd[0]);
 	
 	// Always log the start postion
-	cncControl->SerialCallback();
+	if ( cncControl->SerialCallback() == false )
+		return false;
 	
 	const bool ret = writeData(cmd, LEN);
-	cncControl->SerialCallback();
+	
+	// Always log the start postion
+	if ( cncControl->SerialCallback() == false )
+		return false;
 	
 	return ret;
 }
@@ -1249,7 +1253,8 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	}
 
 	// Always log the start postion
-	cncControl->SerialCallback();
+	if ( cncControl->SerialCallback() == false )
+		return false;
 	
 	unsigned char* p = moveCommand;
 	unsigned int idx = 0;

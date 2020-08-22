@@ -40,12 +40,32 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer370->Add(0, 0, 1, wxALL, WXC_FROM_DIP(0));
     
-    m_staticText382 = new wxStaticText(this, wxID_ANY, _("CNC\nSpeed"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFlexGridSizer* flexGridSizer394 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer394->SetFlexibleDirection( wxBOTH );
+    flexGridSizer394->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer370->Add(flexGridSizer394, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticText382 = new wxStaticText(this, wxID_ANY, _("F"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     m_staticText382->SetForegroundColour(wxColour(wxT("rgb(79,79,79)")));
-    wxFont m_staticText382Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    wxFont m_staticText382Font(13, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText382->SetFont(m_staticText382Font);
     
-    flexGridSizer370->Add(m_staticText382, 0, wxALL, WXC_FROM_DIP(1));
+    flexGridSizer394->Add(m_staticText382, 0, wxALL, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer397 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer397->SetFlexibleDirection( wxBOTH );
+    flexGridSizer397->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer394->Add(flexGridSizer397, 0, wxALL, WXC_FROM_DIP(0));
+    
+    flexGridSizer397->Add(0, 10, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText47112 = new wxStaticText(this, wxID_ANY, _(" [mm/min]"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText47112Font(6, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText47112->SetFont(m_staticText47112Font);
+    
+    flexGridSizer397->Add(m_staticText47112, 0, wxALL, WXC_FROM_DIP(0));
     
     m_staticLine386 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     

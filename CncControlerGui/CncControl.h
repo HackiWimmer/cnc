@@ -50,10 +50,9 @@ class CncControl {
 		};
 		typedef std::vector<SetterTuple> Setters;
 		
-		SetterMap setterMap;
+		SetterMap 				setterMap;
 		
 		void appendToSetterMap(unsigned char pid, const cnc::SetterValueList& values);
-		
 		bool dispatchEventQueue();
 		
 	protected:
@@ -130,6 +129,28 @@ class CncControl {
 		inline void postCtlPosition(unsigned char pid);
 		
 	public:
+		
+		struct DimensionXYPlane {
+			double dimensionX;
+			double dimensionY;
+			
+			struct {
+				CncLongPosition p1;
+				CncLongPosition p2;
+				CncLongPosition p3;
+				CncLongPosition p4;
+				CncLongPosition p5;
+			} Details;
+		};
+		
+		struct DimensionZAxis {
+			double dimensionZ;
+			
+			struct {
+				CncLongPosition pMin;
+				CncLongPosition pMax;
+			} Details;
+		};
 		
 		CncControl(CncPortType pt);
 		virtual ~CncControl();
@@ -209,6 +230,9 @@ class CncControl {
 		
 		bool correctLimitPositions();
 		bool resolveLimits(bool x, bool y, bool z);
+		bool evaluateHardwareReference();
+		bool evaluateHardwareDimensionsXYPlane(DimensionXYPlane& result);
+		bool evaluateHardwareDimensionsZAxis(DimensionZAxis& result);
 		
 		void waitActive(unsigned int millis);
 		
@@ -248,12 +272,11 @@ class CncControl {
 		// Updates the config trace control
 		void notifyConfigUpdate();
 		
-		// returns the correponding pc postions
-		CncLongPosition& getCurAppPosAsReference()					{ return curAppPos; }
-		const CncLongPosition 				getCurAppPos()			{ return curAppPos; }
-		const CncLongPosition 				getCurCtlPos() 			{ return curCtlPos; }
-		const CncLongPosition 				getAppStartPos() 		{ return startAppPos; }
-		const CncLongPosition 				getAppZeroPos() 		{ return zeroAppPos; }
+		CncLongPosition& 					getCurAppPosAsReference()	{ return curAppPos;   }
+		const CncLongPosition 				getCurAppPos()				{ return curAppPos;   }
+		const CncLongPosition 				getCurCtlPos() 				{ return curCtlPos;   }
+		const CncLongPosition 				getAppStartPos() 			{ return startAppPos; }
+		const CncLongPosition 				getAppZeroPos() 			{ return zeroAppPos;  }
 		
 		const CncDoublePosition 			getStartPosMetric();
 		const CncDoublePosition 			getCurAppPosMetric();
@@ -272,6 +295,8 @@ class CncControl {
 		const double 						getCurCtlPosMetricY() { return curCtlPos.getY() * THE_CONFIG->getDisplayFactY(); }
 		const double 						getCurCtlPosMetricZ() { return curCtlPos.getZ() * THE_CONFIG->getDisplayFactZ(); }
 		
+		bool								convertPositionToHardwareCoordinate(const CncLongPosition&   pos, CncLongPosition&   ret);
+		bool								convertPositionToHardwareCoordinate(const CncDoublePosition& pos, CncDoublePosition& ret);
 		
 		// query the current controller position
 		const CncLongPosition requestControllerPos();
@@ -341,12 +366,6 @@ class CncControl {
 		
 		void setStepDelay(unsigned int d) { stepDelay = d; }
 		unsigned int getStepDelay() { return stepDelay; }
-		
-		//meassurments
-		bool meassureDimension(const char axis, wxCheckBox* min, wxCheckBox* max, double& result);
-		bool meassureXDimension(wxCheckBox* min, wxCheckBox* max, double& result) { return meassureDimension('X', min, max, result); }
-		bool meassureYDimension(wxCheckBox* min, wxCheckBox* max, double& result) { return meassureDimension('Y', min, max, result); }
-		bool meassureZDimension(wxCheckBox* min, wxCheckBox* max, double& result) { return meassureDimension('Z', min, max, result); }
 		
 		void startSerialMeasurement() 									{ getSerial()->startMeasurement(); }
 		void stopSerialMeasurement()  									{ getSerial()->stopMeasurement(); }

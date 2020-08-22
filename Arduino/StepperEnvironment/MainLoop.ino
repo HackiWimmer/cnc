@@ -508,7 +508,7 @@ byte ArduinoMainLoop::reset() {
   CNC_MAIN_LOOP_LOG_FUNCTION();
   
   // Turn off ...
-  //controller->turnOff();
+  controller->turnOff();
 
   // Hide the Interrupt LED
   switchOutputPinState(PIN_INTERRUPT_LED, OFF);

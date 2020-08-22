@@ -32,26 +32,26 @@ static CommandTemplates CMDTPL;
 
 ///////////////////////////////////////////////////////////////////
 CncControl::CncControl(CncPortType pt) 
-: currentClientId(-1)
-, runInteractiveMove(false)
-, setterMap()
-, serialPort(NULL)
-, zeroAppPos(0,0,0)
-, startAppPos(0,0,0)
-, curAppPos(0,0,0)
-, realtimeFeedSpeed_MM_MIN(0.0)
-, defaultFeedSpeedRapid_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
-, defaultFeedSpeedWork_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
-, configuredSpeedMode(CncSpeedRapid)
-, configuredFeedSpeed_MM_MIN(0.0)
-, durationCounter(0)
-, interruptState(false)
-, positionOutOfRangeFlag(false)
-, toolPowerState(TOOL_STATE_OFF)
-, stepDelay(0)
-, lastCncHeartbeatValue(0)
-, toolState()
-, positionCheck(true)
+: currentClientId				(-1)
+, runInteractiveMove			(false)
+, setterMap						()
+, serialPort					(NULL)
+, zeroAppPos					(0,0,0)
+, startAppPos					(0,0,0)
+, curAppPos						(0,0,0)
+, realtimeFeedSpeed_MM_MIN		(0.0)
+, defaultFeedSpeedRapid_MM_MIN	(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
+, defaultFeedSpeedWork_MM_MIN	(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
+, configuredSpeedMode			(CncSpeedRapid)
+, configuredFeedSpeed_MM_MIN	(0.0)
+, durationCounter				(0)
+, interruptState				(false)
+, positionOutOfRangeFlag		(false)
+, toolPowerState				(TOOL_STATE_OFF)
+, stepDelay						(0)
+, lastCncHeartbeatValue			(0)
+, toolState						()
+, positionCheck					(true)
 {
 //////////////////////////////////////////////////////////////////
 	// Serial factory
@@ -1654,96 +1654,6 @@ void CncControl::displayUnknownSupportStates() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox* max, double& result) {
-///////////////////////////////////////////////////////////////////
-	double maxSteps 	= (axis != 'Z' ? -450.0 : -100.0); // mm
-	bool ret 			= false;
-	long minPos 		= 0l;
-	long maxPos 		= 0l;
-	result 				= -DBL_MAX; // invalid Values
-	
-	if ( min ) min->SetValue(false);
-	if ( max ) max->SetValue(false);
-	
-	if ( prepareSimpleMove() == true ) {
-		
-		// move to min position
-		switch ( axis ) {
-			case 'X': 	ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
-						if ( ret ) 
-							minPos = curCtlPos.getX();
-						break;
-						
-			case 'Y': 	ret = moveRelLinearMetricXY(0.0, maxSteps, true);
-						if ( ret ) 
-							minPos = curCtlPos.getY();
-						break;
-						
-			case 'Z': 	ret = moveRelMetricZ(maxSteps);
-						if ( ret ) 
-							minPos = curCtlPos.getZ();
-						break;
-		}
-		
-		// move to max position
-		if ( ret ) {
-			if ( min ) min->SetValue(true);
-			maxSteps *= -1;
-			
-			switch ( axis ) {
-				case 'X': 	ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
-							if ( ret ) 
-								maxPos = curCtlPos.getX();
-							break;
-							
-				case 'Y': 	ret = moveRelLinearMetricXY(0.0, maxSteps, true);
-							if ( ret ) 
-								maxPos = curCtlPos.getY();
-							break;
-							
-				case 'Z': 	ret = moveRelMetricZ(maxSteps);
-							if ( ret ) 
-								maxPos = curCtlPos.getZ();
-							break;
-			}
-		}
-		
-		// free end position
-		if ( ret ) {
-			if ( max ) max->SetValue(true);
-			
-			switch ( axis ) {
-				case 'X': 	ret =resolveLimits(true, false, false);
-							break;
-							
-				case 'Y': 	ret = resolveLimits(false, true, false);
-							break;
-							
-				case 'Z': 	ret = resolveLimits(false, false, true);
-							break;
-			}
-		}
-		
-		// calculate result
-		if ( ret ) {
-
-			switch ( axis ) {
-				case 'X': 	result = (maxPos - minPos) * THE_CONFIG->getDisplayFactX();
-							break;
-							
-				case 'Y': 	result = (maxPos - minPos) * THE_CONFIG->getDisplayFactY();
-							break;
-							
-				case 'Z': 	result = (maxPos - minPos) * THE_CONFIG->getDisplayFactZ();
-							break;
-			}
-		}
-	}
-	
-	reconfigureSimpleMove(ret);
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMinLimit() {
 // This function move the max distiance and will be latest stopped by the end switch
 // However, the PC and controller postions are not equal at the end!
@@ -1983,6 +1893,205 @@ bool CncControl::correctLimitPositions() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+bool CncControl::convertPositionToHardwareCoordinate(const CncLongPosition& pos, CncLongPosition& ret) {
+///////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->hardwareOriginOffset.valid == false ) {
+		ret = pos;
+		return false;
+	}
+	
+	ret.setX(abs(THE_CONTEXT->hardwareOriginOffset.dx) + pos.getX());
+	ret.setY(abs(THE_CONTEXT->hardwareOriginOffset.dy) + pos.getY());
+	ret.setZ(abs(THE_CONTEXT->hardwareOriginOffset.dz) + pos.getZ());
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::convertPositionToHardwareCoordinate(const CncDoublePosition& pos, CncDoublePosition& ret) {
+///////////////////////////////////////////////////////////////////
+	CncLongPosition sPos = THE_CONFIG->convertMetricToSteps(sPos, pos);
+	CncLongPosition sRet;
+	
+	const bool b = convertPositionToHardwareCoordinate(sPos, sRet);
+	
+	ret = THE_CONFIG->convertStepsToMetric(ret, sRet);
+	
+	return b;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::evaluateHardwareReference() {
+///////////////////////////////////////////////////////////////////
+	float 			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
+	CncLongPosition	prevCtlPos	= curCtlPos;
+	
+	// ------------------------------------------------------------
+	auto returnFalse = [&](const wxString& msg) {
+		std::cerr << CNC_LOG_FUNCT << ": " << msg << std::endl;
+		return false;
+	};
+	
+	// ------------------------------------------------------------
+	bool ret = true;
+	
+	ret = changeCurrentFeedSpeedXYZ_MM_MIN(5000, CncSpeedUserDefined);
+	if ( ret == false ) { return returnFalse("Error while changeCurrentFeedSpeedXYZ_MM_MIN()"); }
+
+	// move to Zmax, Xmin and Ymin
+	{
+		ret = moveZToMaxLimit();
+		if ( ret == false ) { return returnFalse("Error while moveZToMaxLimit()"); }
+		
+		ret = moveXToMinLimit();
+		if ( ret == false ) { return returnFalse("Error while moveXToMinLimit()"); }
+		
+		ret = moveYToMinLimit();
+		if ( ret == false ) { return returnFalse("Error while moveYToMinLimit()"); }
+	}
+	
+	// determine the current distance to Xmin, Ymin and Zmax
+	const int32_t dx = prevCtlPos.getX() + curCtlPos.getX();
+	const int32_t dy = prevCtlPos.getY() + curCtlPos.getY();
+	const int32_t dz = prevCtlPos.getZ() + curCtlPos.getZ();
+	
+	// normalize the current distance to the origin (0, 0, 0)
+	THE_CONTEXT->hardwareOriginOffset.dx    = dx - prevCtlPos.getX();
+	THE_CONTEXT->hardwareOriginOffset.dy    = dy - prevCtlPos.getY();
+	THE_CONTEXT->hardwareOriginOffset.dz    = dz - prevCtlPos.getZ();
+	THE_CONTEXT->hardwareOriginOffset.valid = true; 
+	
+	// move to previous positions
+	moveRelLinearStepsXY(abs(prevCtlPos.getX() - curCtlPos.getX()), abs(prevCtlPos.getY() - curCtlPos.getY()), false);
+	moveRelStepsZ(abs(prevCtlPos.getZ() - curCtlPos.getZ()));
+
+	changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, CncSpeedUserDefined);
+	if ( ret == false ) { return returnFalse("Error while resetting feed speed"); }
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::evaluateHardwareDimensionsZAxis(DimensionZAxis& result) {
+///////////////////////////////////////////////////////////////////
+	float 			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
+	CncLongPosition	prevCtlPos	= curCtlPos;
+	
+	// ------------------------------------------------------------
+	auto returnFalse = [&](const wxString& msg) {
+		std::cerr << CNC_LOG_FUNCT << ": " << msg << std::endl;
+		
+		result.dimensionZ = 0.0;
+		result.Details.pMin = prevCtlPos;
+		result.Details.pMax = prevCtlPos;
+		return false;
+	};
+	
+	// ------------------------------------------------------------
+	bool ret = true;
+	result.Details.pMin = curCtlPos;
+	result.Details.pMax = curCtlPos;
+	
+	ret = changeCurrentFeedSpeedXYZ_MM_MIN(5000, CncSpeedUserDefined);
+	if ( ret == false ) { return returnFalse("Error while changeCurrentFeedSpeedXYZ_MM_MIN()"); }
+	
+	ret = correctLimitPositions();
+	if ( ret == false ) { return returnFalse("Error while correctLimitPositions()"); }
+	
+	ret = moveZToMaxLimit(); 
+	if ( ret == false ) { return returnFalse("Error while moveZToMaxLimit()"); }
+	
+	result.Details.pMax = curCtlPos;
+	
+	ret = moveZToMinLimit(); 
+	if ( ret == false ) { return returnFalse("Error while moveZToMaxLimit()"); }
+	
+	result.Details.pMin = curCtlPos;
+	
+	result.dimensionZ = THE_CONFIG->convertStepsToMetricZ(result.Details.pMax.getZ() - result.Details.pMin.getZ());
+	
+	changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, CncSpeedUserDefined);
+	if ( ret == false ) { return returnFalse("Error while resetting feed speed"); }
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::evaluateHardwareDimensionsXYPlane(DimensionXYPlane& result) {
+///////////////////////////////////////////////////////////////////
+	float 			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
+	CncLongPosition	prevCtlPos	= curCtlPos;
+	
+	// ------------------------------------------------------------
+	auto returnFalse = [&](const wxString& msg) {
+		std::cerr << CNC_LOG_FUNCT << ": " << msg << std::endl;
+		
+		result.dimensionX = 0.0;
+		result.dimensionY = 0.0;
+		result.Details.p1 = prevCtlPos;
+		result.Details.p2 = prevCtlPos;
+		result.Details.p3 = prevCtlPos;
+		result.Details.p4 = prevCtlPos;
+		result.Details.p5 = prevCtlPos;
+		return false;
+	};
+	
+	// ------------------------------------------------------------
+	bool ret = true;
+	result.Details.p1 = curCtlPos;
+	result.Details.p2 = curCtlPos;
+	result.Details.p3 = curCtlPos;
+	result.Details.p4 = curCtlPos;
+	result.Details.p5 = curCtlPos;
+	
+	ret = changeCurrentFeedSpeedXYZ_MM_MIN(5000, CncSpeedUserDefined);
+	if ( ret == false ) { return returnFalse("Error while changeCurrentFeedSpeedXYZ_MM_MIN()"); }
+	
+	ret = correctLimitPositions();
+	if ( ret == false ) { return returnFalse("Error while correctLimitPositions()"); }
+	
+	ret = moveZToMaxLimit(); 
+	if ( ret == false ) { return returnFalse("Error while moveZToMaxLimit()"); }
+	
+	ret = moveXToMinLimit();
+	if ( ret == false ) { return returnFalse("Error while moveXToMinLimit()"); }
+	
+	ret = moveYToMinLimit();
+	if ( ret == false ) { return returnFalse("Error while moveYToMinLimit()"); }
+	
+	result.Details.p1 = curCtlPos;
+	
+	ret = moveYToMaxLimit();
+	if ( ret == false ) { return returnFalse("Error while moveYToMinLimit()"); }
+	
+	result.Details.p2 = curCtlPos;
+	
+	ret = moveXToMaxLimit();
+	if ( ret == false ) { return returnFalse("Error while moveYToMinLimit()"); }
+	
+	result.Details.p3 = curCtlPos;
+	
+	ret = moveYToMinLimit();
+	if ( ret == false ) { return returnFalse("Error while moveYToMinLimit()"); }
+	
+	result.Details.p4 = curCtlPos;
+	
+	ret = moveXToMinLimit();
+	if ( ret == false ) { return returnFalse("Error while moveXToMinLimit()"); }
+	
+	result.Details.p5 = curCtlPos;
+	
+	int32_t y1 = result.Details.p2.getY() - result.Details.p1.getY();
+	int32_t y2 = result.Details.p3.getY() - result.Details.p4.getY();
+	
+	int32_t x1 = result.Details.p3.getX() - result.Details.p2.getX();
+	int32_t x2 = result.Details.p4.getX() - result.Details.p5.getX();
+	
+	result.dimensionX = THE_CONFIG->convertStepsToMetricX(std::min(x1, x2));
+	result.dimensionY = THE_CONFIG->convertStepsToMetricY(std::min(y1, y2));
+	
+	changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, CncSpeedUserDefined);
+	if ( ret == false ) { return returnFalse("Error while resetting feed speed"); }
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool CncControl::manualSimpleMoveMetric(double x, double y, double z, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	double sX = x * THE_CONFIG->getCalculationFactX();
@@ -2171,3 +2280,4 @@ void CncControl::sendIdleMessage() {
 	
 	getSerial()->processIdle();
 }
+
