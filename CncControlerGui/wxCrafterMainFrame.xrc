@@ -3638,90 +3638,6 @@ Interval</label>
                             </object>
                           </object>
                           <object class="listbookpage">
-                            <label>Evaluate
-Limit Switches</label>
-                            <bitmap>bitmaps/16-typedef.png</bitmap>
-                            <selected>0</selected>
-                            <object class="wxPanel" name="m_testLimitPage">
-                              <style>wxTAB_TRAVERSAL</style>
-                              <object class="wxFlexGridSizer">
-                                <cols>1</cols>
-                                <rows>2</rows>
-                                <vgap>0</vgap>
-                                <hgap>0</hgap>
-                                <growablecols>0</growablecols>
-                                <growablerows>1</growablerows>
-                                <object class="sizeritem" name="flexGridSizer21571">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <border>5</border>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>1</cols>
-                                    <rows>0</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols>0</growablecols>
-                                    <growablerows>0</growablerows>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxEXPAND</flag>
-                                      <border>2</border>
-                                      <object class="wxStaticText" name="m_staticText21172">
-                                        <label>Test::Evaluate End Switch States:</label>
-                                        <style/>
-                                        <font>
-                                          <size>12</size>
-                                          <style>normal</style>
-                                          <weight>bold</weight>
-                                          <family>swiss</family>
-                                          <underlined>0</underlined>
-                                          <face>Segoe UI</face>
-                                        </font>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxEXPAND</flag>
-                                      <border>2</border>
-                                      <object class="wxStaticLine" name="m_staticLine22533">
-                                        <style>wxLI_HORIZONTAL</style>
-                                      </object>
-                                    </object>
-                                  </object>
-                                </object>
-                                <object class="sizeritem" name="flexGridSizer2269">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <border>5</border>
-                                  <option>1</option>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>1</cols>
-                                    <rows>1</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols>0</growablecols>
-                                    <growablerows>0</growablerows>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxEXPAND</flag>
-                                      <border>5</border>
-                                      <object class="wxToggleButton" name="m_testToggleEndSwitch">
-                                        <style/>
-                                        <label>Start End Switch Evaluation</label>
-                                        <bg>#008000</bg>
-                                        <fg>#FFFFFF</fg>
-                                        <font>
-                                          <size>18</size>
-                                          <style>normal</style>
-                                          <weight>bold</weight>
-                                          <family>swiss</family>
-                                          <underlined>0</underlined>
-                                          <face>Segoe UI</face>
-                                        </font>
-                                        <checked>0</checked>
-                                      </object>
-                                    </object>
-                                  </object>
-                                </object>
-                              </object>
-                            </object>
-                          </object>
-                          <object class="listbookpage">
                             <label>Switch
 Tool Power</label>
                             <bitmap>bitmaps/16-typedef.png</bitmap>
@@ -9697,14 +9613,14 @@ State</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtTimestamp">
-          <label>Sketch Timestamp</label>
+          <label>Firmware Timestamp</label>
           <bitmap>bitmaps/time.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miRqtVersion">
-          <label>Sketch Version</label>
+          <label>Firmware Version</label>
           <bitmap>bitmaps/enumerator.png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -9735,6 +9651,20 @@ State</label>
         <object class="wxMenuItem" name="m_miMotorEnableState">
           <checkable>1</checkable>
           <label>Enable stepper motors</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_miPerformToolTest">
+          <label>Perform a Tool Test</label>
+          <bitmap>bitmaps/ToolPin.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_miResolveLimitState">
+          <label>Resolve Limit States</label>
+          <bitmap>bitmaps/16-warning.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -9811,13 +9741,6 @@ State</label>
           </accel>
         </object>
         <object class="separator"/>
-        <object class="wxMenuItem" name="m_miGameportController">
-          <label>Gameport Controller</label>
-          <bitmap>bitmaps/gamepad-active.png</bitmap>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-        </object>
         <object class="wxMenuItem" name="m_miSpeedPlayground">
           <label>Speed Playground</label>
           <bitmap>bitmaps/car.png</bitmap>

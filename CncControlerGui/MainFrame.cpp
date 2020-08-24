@@ -39,7 +39,6 @@
 #include "CncLoggerProxy.h"
 #include "CncSourceEditor.h"
 #include "CncOutboundEditor.h"
-#include "CncGameportController.h"
 #include "CncNumberFormatter.h"
 #include "CncSpeedSlider.h"
 #include "GlobalFunctions.h"
@@ -263,6 +262,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , traceTimerCounter						(0)
 , lastPortName							(wxT(""))
 , defaultPortName						(wxT(""))
+, mainInfoBar							(new wxInfoBar(this))
 , cnc									(new CncControl(CncEMU_NULL))
 , lruFileView							(NULL)
 , sourceEditor							(NULL)
@@ -282,7 +282,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , gCodeSequenceList						(NULL)
 , cncSummaryListCtrl					(NULL)
 , serialSpyListCtrl						(NULL)
-, cncGameportDlg						(new CncGameportController(this))
 , outboundEditorSvgView					(NULL)
 , navigatorPanel						(NULL)
 , optionPane3D							(NULL)
@@ -407,7 +406,7 @@ MainFrame::~MainFrame() {
 	// and this crashes definitly if the MainFame dtor is already passed
 	// the delete below avoid this behaviour
 	cncDELETE ( motionMonitor );
-	cncDELETE ( cncGameportDlg );
+	cncDELETE ( gamepadStatusCtl );
 
 	wxASSERT(lruStore);
 	wxASSERT(lruFileView);
@@ -820,7 +819,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_3D_Clear);
 	registerGuiControl(m_cbContentPosSpy);
 	registerGuiControl(m_testToolPowerBtn);
-	registerGuiControl(m_testToggleEndSwitch);
 	registerGuiControl(m_portSelector);
 	registerGuiControl(m_portSelectorSec);
 	registerGuiControl(m_connect);
@@ -918,7 +916,24 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	cnc->correctLimitPositions();
+    mainInfoBar->AddButton(wxID_EXIT);
+    mainInfoBar->RemoveButton(wxID_EXIT);
+
+    // ... changing the colours and/or fonts
+    mainInfoBar->SetOwnBackgroundColour(0xc8ffff);
+    mainInfoBar->SetForegroundColour(0x123312);
+    mainInfoBar->SetFont(GetFont().Bold().Larger());
+
+    // ... and changing the effect (only does anything under MSW currently)
+    mainInfoBar->SetShowHideEffects(wxSHOW_EFFECT_EXPAND, wxSHOW_EFFECT_EXPAND);
+    mainInfoBar->SetEffectDuration(1500);
+
+	mainInfoBar->ShowMessage("Sorry, it didn't work out.", wxICON_WARNING);
+	
+    // to use the info bars we need to use sizer for the window layout
+    wxBoxSizer * const sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(mainInfoBar, wxSizerFlags().Expand());
+    SetSizer(sizer);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -1164,23 +1179,23 @@ void MainFrame::onTraceTimer(wxTimerEvent& event) {
 		case 0: {
 					callCounter = 1;
 					updateAppPositionControls();
-					break;
+					//break;
 		}
 		case 1: {
 					callCounter = 2;
 					updateCtlPositionControls();
-					break;
+					//break;
 		}
 		case 2: {
 					callCounter = 3;
 					updateSpeedControls();
-					break;
+					//break;
 		}
 		case 3: {
 					callCounter = 4;
 					if ( isProcessing() )
 						statisticsPane->logStatistics(false);
-					break;
+					//break;
 		}
 		case 4: {
 					callCounter = 0;
@@ -1190,7 +1205,7 @@ void MainFrame::onTraceTimer(wxTimerEvent& event) {
 					if ( ctrl && ctrl->GetValue().IsEmpty() )	traceTimerCounter = 0;
 					else 										traceTimerCounter += event.GetInterval();
 					
-					if ( traceTimerCounter > 16 * 1000 ) {
+					if ( traceTimerCounter > 4 * 1000 ) {
 						traceTimerCounter = 0;
 						ctrl->Clear();
 					}
@@ -1245,32 +1260,33 @@ void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
 	static wxColour col(0, 128, 255);
 	static wxBrush  brush(col);
 	static wxPen    barPen(col, 1, wxSOLID);
-	static wxPen    wpPen(*wxRED, 1, wxSOLID);
+	static wxPen    wmpPen(*wxRED, 1, wxSOLID);
 	
-	const wxSize size   = m_speedPanel->GetSize();
-	unsigned int pos    = size.GetWidth();
-	unsigned int height = size.GetHeight();
+	const wxSize size   		= m_speedPanel->GetSize();
+	const unsigned int height 	= size.GetHeight();
 	
-	pos *= (cnc->getRealtimeFeedSpeed_MM_MIN() / THE_CONFIG->getMaxSpeedXYZ_MM_MIN());
+	const unsigned int pos		= size.GetWidth() 
+								* cnc->getRealtimeFeedSpeed_MM_MIN() 
+								/ THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
+	
+	const unsigned int wmp		= size.GetWidth() 
+								* cnc->getConfiguredFeedSpeed_MM_MIN() 
+								/ THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
 	
 	// bar
-	wxPaintDC dc(m_speedPanel);
-	dc.SetPen(barPen);
-	dc.SetBrush(brush);
-	
-	const wxRect rect(0, 0, pos, height);
-	dc.DrawRectangle(rect);
+		wxPaintDC dc(m_speedPanel);
+		dc.SetPen(barPen);
+		dc.SetBrush(brush);
+
+		const wxRect rect(0, 0, pos, height);
+		dc.DrawRectangle(rect);
 	
 	// watermark for current config
-	unsigned int wp = size.GetWidth() 
-	                * cnc->getConfiguredFeedSpeed_MM_MIN() 
-					/ THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
-					
-	dc.SetPen(wpPen);
-	
-	// move wp 2 pixel to the left so see valu = max also.
-	dc.DrawLine(wp - 2, 0, wp - 2, height);
-	dc.DrawLine(wp - 1, 0, wp - 1, height);
+		dc.SetPen(wmpPen);
+		
+		// move wp 2 pixel to the left so see valu = max also.
+		dc.DrawLine(wmp - 2, 0, wmp - 2, height);
+		dc.DrawLine(wmp - 1, 0, wmp - 1, height);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::addSetter(unsigned char pid, const cnc::SetterValueList& v) {
@@ -1291,14 +1307,14 @@ void MainFrame::addAppPosition(unsigned char pid, long id, char speedMode, doubl
 									);
 	}
 	
-	if ( THE_CONTEXT->canSpeedMonitoring() ) {
-		static CncSpeedMonitor::SpeedData sd;
-		sd.configured_MM_MIN = cfgSpeedValue;
-		sd.received_MM_MIN	 = curSpeedValue;
-		sd.measured_MM_MIN	 = cnc != NULL ? cnc->getMeasuredFeedSpeed_MM_MIN() : 0.0; 
-		
-		speedMonitor->setCurrentFeedSpeedValues(sd);
-	}
+	const double measured_MM_MIN = ( THE_CONTEXT->canSpeedMonitoring() && cnc != NULL ? cnc->getMeasuredFeedSpeed_MM_MIN() : 0.0 ); 
+	
+	static CncSpeedMonitor::SpeedData sd;
+	sd.configured_MM_MIN = cfgSpeedValue;
+	sd.received_MM_MIN	 = curSpeedValue;
+	sd.measured_MM_MIN	 = measured_MM_MIN; 
+	
+	speedMonitor->setCurrentFeedSpeedValues(sd);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::addCtlPosition(unsigned char pid, long id, char speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& pos) {
@@ -1313,14 +1329,14 @@ void MainFrame::addCtlPosition(unsigned char pid, long id, char speedMode, doubl
 									);
 	}
 	
-	if ( THE_CONTEXT->canSpeedMonitoring() ) {
-		static CncSpeedMonitor::SpeedData sd;
-		sd.configured_MM_MIN = cfgSpeedValue;
-		sd.received_MM_MIN	 = curSpeedValue;
-		sd.measured_MM_MIN	 = cnc != NULL ? cnc->getMeasuredFeedSpeed_MM_MIN() : 0.0; 
-		
-		speedMonitor->setCurrentFeedSpeedValues(sd);
-	}
+	const double measured_MM_MIN = ( THE_CONTEXT->canSpeedMonitoring() && cnc != NULL ? cnc->getMeasuredFeedSpeed_MM_MIN() : 0.0 ); 
+	
+	static CncSpeedMonitor::SpeedData sd;
+	sd.configured_MM_MIN = cfgSpeedValue;
+	sd.received_MM_MIN	 = curSpeedValue;
+	sd.measured_MM_MIN	 = measured_MM_MIN; 
+	
+	speedMonitor->setCurrentFeedSpeedValues(sd);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateAppPositionControls() {
@@ -1377,32 +1393,35 @@ void MainFrame::updateSpeedControls() {
 	if ( cnc == NULL )
 		return;
 		
-	m_configuredFeedSpeed->ChangeValue(wxString::Format("%3.1lf", cnc->getConfiguredFeedSpeed_MM_MIN()));
-	m_configuredFeedSpeedMode->ChangeValue(wxString::Format("%c", cnc::getCncSpeedTypeAsCharacter(cnc->getConfiguredSpeedMode())));
+	// Configured speed values
+	if ( speedMonitor->getSpeedSlider()->IsEnabled() == false )
+		updateSpeedSlider(cnc->getConfiguredFeedSpeed_MM_MIN());
+
+	m_configuredFeedSpeed    ->ChangeValue(wxString::Format("%3.1lf", cnc->getConfiguredFeedSpeed_MM_MIN()));
+	m_configuredFeedSpeedMode->ChangeValue(wxString::Format("%c",     cnc::getCncSpeedTypeAsCharacter(cnc->getConfiguredSpeedMode())));
 	
+	// Realtime speed values
 	if ( THE_CONTEXT->isProbeMode() == false && THE_CONTEXT->canSpeedMonitoring() ) {
-		// feed speed control + feed speed panel
+		
 		if ( m_speedPanel->IsShownOnScreen() )
 			m_speedPanel->Refresh();
 		
-		if ( CncTransactionLock::isLocked() == true )
-			updateSpeedSlider(cnc->getConfiguredFeedSpeed_MM_MIN());
-		
 		const double dValue = cnc->getRealtimeFeedSpeed_MM_MIN();
-		if ( dValue  >= 0.0 ) 	m_realtimeFeedSpeed->ChangeValue(wxString::Format("%.1lf", dValue));
-		else					m_realtimeFeedSpeed->ChangeValue(_maxSpeedLabel);
+		m_realtimeFeedSpeed->ChangeValue(dValue >= 0.0 ? wxString::Format("%.1lf", dValue) : _maxSpeedLabel);
 	} 
 	else {
 		m_realtimeFeedSpeed->ChangeValue(_maxSpeedLabel);
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::updateAndSetSpeedSlider(float value) {
+///////////////////////////////////////////////////////////////////
+	speedMonitor->getSpeedSlider()->setValue(value);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::updateSpeedSlider(float value) {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->canSpeedMonitoring() == false )
-		return;
-		
-	speedMonitor->getSpeedSlider()->setValue(value);
+	speedMonitor->getSpeedSlider()->showValue(value);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateCncSpeed(float value, CncSpeedMode mode) {
@@ -1464,9 +1483,9 @@ void MainFrame::onGamepadThreadUpadte(GamepadEvent& event) {
 		cnc::trc.logInfo("The gamepad isn't available for this connetion port . . . ");
 		return;
 	}
-		
-	if ( cncGameportDlg )
-		cncGameportDlg->update(event);
+	
+	if ( gamepadStatusCtl )
+		gamepadStatusCtl->update(event);
 	
 	if ( gamepadControllerSpy )
 		gamepadControllerSpy->update(event);
@@ -2233,6 +2252,8 @@ bool MainFrame::connectSerialPort() {
 	createCncControl(sel, serialFileName);
 	if ( cnc == NULL )
 		return false;
+		
+	speedMonitor->getSpeedSlider()->autoConfigure();
 	
 	// initialize the postion controls
 	setControllerZero(true, true, true);
@@ -3296,12 +3317,6 @@ bool MainFrame::isGamepadNotificationActive() {
 		return false;
 		
 	return gamepadThread->IsRunning();
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::isGamepadDialogShown() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cncGameportDlg);
-	return cncGameportDlg->IsShown();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::activateGamepadNotificationsOnDemand(bool state) {
@@ -4489,7 +4504,7 @@ void MainFrame::moveXToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
 	CncTransactionLock ctl(this);
-	
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -6049,9 +6064,7 @@ void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 	unsigned int sel = event.GetSelection();
 	
 	switch ( sel ) {
-		case TestBookSelection::VAL::INTERVAL:
-		case TestBookSelection::VAL::DIMENSION:
-		case TestBookSelection::VAL::LIMIT:		break;
+		case TestBookSelection::VAL::INTERVAL:	break;
 		
 		case TestBookSelection::VAL::TOOL:		if ( cnc != NULL )
 													decorateSwitchToolOnOff(cnc->getToolState());
@@ -6801,12 +6814,10 @@ bool MainFrame::startInteractiveMove() {
 	}
 	
 	if ( interactiveTransactionLock != NULL ) {
-		
 		wxDELETE(interactiveTransactionLock);
-		std::cerr << "interactiveTransactionLock != NULL" << std::endl;
+		//std::cerr << "interactiveTransactionLock != NULL" << std::endl;
 		
-		//stopInteractiveMove();
-		return false;
+		stopInteractiveMove();
 	}
 	
 	interactiveTransactionLock = new CncTransactionLock(this);
@@ -6937,9 +6948,15 @@ void MainFrame::decorateGamepadState(bool state) {
 	if ( state == true )	m_gamepadState->SetBitmap((ImageLibGamepad().Bitmap("BMP_ACTIVATED")));
 	else 					m_gamepadState->SetBitmap((ImageLibGamepad().Bitmap("BMP_DEACTIVATED")));
 	
-	if ( state == false ) {
-		if ( cncGameportDlg )
-			cncGameportDlg->trace("Gamepad state not available");
+	if ( gamepadStatusCtl != NULL ) {
+		if ( THE_CONTEXT->canGamePort() == false ) {
+			gamepadStatusCtl->trace("The gamepad isn't available for the current connetion port . . . ");
+		}
+		else {
+			if ( state == false ) {
+				gamepadStatusCtl->trace("Gamepad state not available");
+			}
+		}
 	}
 	
 	m_gamepadState->Refresh();
@@ -7333,26 +7350,6 @@ void MainFrame::showOSEnvironment(wxCommandEvent& event) {
 		cncOsEnvDialog->Show();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::openGameportController(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	showGameportController(true);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::showGameportController(bool show) {
-/////////////////////////////////////////////////////////////////////
-	if ( cncGameportDlg == NULL )
-		cncGameportDlg = new CncGameportController(this);
-	
-	if ( show == true ) {
-		if ( cncGameportDlg->IsShown() == false )
-			cncGameportDlg->Show(true);
-	}
-	else {
-		if ( cncGameportDlg->IsShown() == true )
-			cncGameportDlg->Show(false);
-	}
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::dclickHeartbeatState(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( m_miRqtIdleMessages->IsEnabled() == false )
@@ -7629,7 +7626,7 @@ void MainFrame::updateHardwareReference() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxString msg("Do you really want to evaluate the hardware reference position?\n");
+	wxString msg("Do you really want to evaluate the hardware reference position?\n\n");
 	msg.append("Execution Plan:\n\n");
 	msg.append(" 1. Moves Z axis to maximum position\n");
 	msg.append(" 2. Moves X axis to minimum position\n");
@@ -7638,18 +7635,27 @@ void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 	msg.append(" 5. Moves Z axis to previous position\n");
 	
 	wxRichMessageDialog dlg(this, msg, _T("Evaluate Hardware Reference . . . "), 
-						wxYES_NO|wxICON_QUESTION|wxCENTRE);
+							wxYES_NO|wxICON_INFORMATION|wxCENTRE);
+	
+	dlg.SetFooterText("Make sure this path is free . . . ");
+	dlg.SetFooterIcon(wxICON_WARNING);
 	
 	if ( dlg.ShowModal() == wxID_YES ) {
 		
 		selectMonitorBookCncPanel();
 		disableControls();
 		CncTransactionLock ctl(this);
-		
+
 		cnc->evaluateHardwareReference();
 		updateHardwareReference();
 		
 		enableControls();
+		
+#warning
+updateAppPositionControls();
+updateCtlPositionControls();
+updateSpeedControls();
+
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -7679,16 +7685,20 @@ void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {
 	msg.append(" 7. Moves X axis to minimum position\n");
 	msg.append(" 8. Move X and Y axis to previous position\n");
 	msg.append(" 9. Moves Z axis to previous position\n");
+	msg.append("\n Make sure this path is free . . . ");
 	
 	wxRichMessageDialog dlg(this, msg, _T("Evaluate Hardware Dimension . . . "), 
-						wxYES_NO|wxICON_QUESTION|wxCENTRE);
+							wxYES_NO|wxICON_INFORMATION|wxCENTRE);
+	
+	dlg.SetFooterText("Make sure this path is free . . . ");
+	dlg.SetFooterIcon(wxICON_WARNING);
 	
 	if ( dlg.ShowModal() == wxID_YES ) {
 		
 		selectMonitorBookCncPanel();
 		disableControls();
 		CncTransactionLock ctl(this);
-		
+
 		CncControl::DimensionXYPlane result;
 		if ( cnc->evaluateHardwareDimensionsXYPlane(result) ) {
 			m_cbHardwareDimensionEvaluatedX->SetValue(true);
@@ -7711,8 +7721,11 @@ void MainFrame::onEvaluateHardwareZAxis(wxCommandEvent& event) {
 	msg.append(" 5. Moves Z axis to previous position\n");
 	
 	wxRichMessageDialog dlg(this, msg, _T("Evaluate Hardware Dimension . . . "), 
-						wxYES_NO|wxICON_QUESTION|wxCENTRE);
+							wxYES_NO|wxICON_INFORMATION|wxCENTRE);
 	
+	dlg.SetFooterText("Make sure this path is free . . . ");
+	dlg.SetFooterIcon(wxICON_WARNING);
+
 	if ( dlg.ShowModal() == wxID_YES ) {
 		
 		selectMonitorBookCncPanel();
@@ -7757,4 +7770,63 @@ void MainFrame::onTakeoverHardwareDimensions(wxCommandEvent& event) {
 	
 	if ( somethingChanged == true )
 		THE_CONFIG->saveConfiguration(*config);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::requestResolveLimitStates(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc == NULL )
+		return;
+		
+	if ( cnc->getLimitState().hasLimit() == false ) {
+		cnc::trc.logInfo("No limit situation present . . . ");
+		return;
+	}
+	
+	wxString msg("Do you really want to resolve the current limit situation?\n");
+	wxRichMessageDialog dlg(this, msg, _T("Resolve limit situation . . . "), 
+							wxYES_NO|wxICON_INFORMATION|wxCENTRE);
+	
+	msg.append("Execution Plan:\n\n");
+	msg.append(" The controller tries to move each relevant axis one step before the limit switch\n");
+	
+	dlg.SetFooterText("Make sure this path is free . . . ");
+	dlg.SetFooterIcon(wxICON_WARNING);
+
+	if ( dlg.ShowModal() == wxID_YES ) {
+		if ( cnc->correctLimitPositions() == false )
+			std::cerr << "MainFrame::requestResolveLimitStates: The function correctLimitPositions() is failed" << std::endl;
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::requestToolTest(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_mainViewSelector->SetSelection(MainBookSelection::VAL::TEST_PANEL);
+	m_testCaseBook->SetSelection(TestBookSelection::VAL::TOOL);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::cncTransactionLockCallback() {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc != NULL && cnc->isCommandActive() ) {
+		
+		unsigned counter = 0;
+		while ( cnc->isIdleActive() ) {
+			waitActive(10);
+			
+			if ( counter++ > 15 ) {
+				//  this should not appear
+				std::cerr << "MainFrame::cncTransactionLockCallback(): Idle still active!" << std::endl;
+				break;
+			}
+		}
+	}
+	
+	// Try to set the configurated speed value if not already done.
+	// If it was already done the duplicate setter values will be filtered
+	if ( THE_CONTEXT->canSpeedMonitoring() == true )
+		speedMonitor->getSpeedSlider()->synchronize();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::cncTransactionReleaseCallback() {
+/////////////////////////////////////////////////////////////////////
+	
 }

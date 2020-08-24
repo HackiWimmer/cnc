@@ -266,8 +266,6 @@
       <File Name="CncMoveSequence.cpp"/>
       <File Name="CncSpeedMonitor.h"/>
       <File Name="CncSpeedMonitor.cpp"/>
-      <File Name="CncGameportController.h"/>
-      <File Name="CncGameportController.cpp"/>
       <File Name="CncOSEnvironmentDialog.h"/>
       <File Name="CncOSEnvironmentDialog.cpp"/>
       <File Name="CncSvgControl.h"/>

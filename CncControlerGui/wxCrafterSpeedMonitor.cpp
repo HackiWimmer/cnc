@@ -1585,6 +1585,7 @@ CncSpeedSliderBase::CncSpeedSliderBase(wxWindow* parent, wxWindowID id, const wx
     m_slider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedSliderBase::onThumbtrackSlider), NULL, this);
     m_slider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedSliderBase::onChangeSlider), NULL, this);
     m_slider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedSliderBase::onChangedSlider), NULL, this);
+    m_slider->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncSpeedSliderBase::onLeaveWindow), NULL, this);
     
 }
 
@@ -1594,5 +1595,6 @@ CncSpeedSliderBase::~CncSpeedSliderBase()
     m_slider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedSliderBase::onThumbtrackSlider), NULL, this);
     m_slider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedSliderBase::onChangeSlider), NULL, this);
     m_slider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedSliderBase::onChangedSlider), NULL, this);
+    m_slider->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncSpeedSliderBase::onLeaveWindow), NULL, this);
     
 }

@@ -108,8 +108,6 @@ void CncSpeedMonitor::activate(bool enable) {
 	m_intervalSlider->Enable(enable);
 	
 	speedSlider->enable(enable);
-	if ( enable == false )
-		speedSlider->setValue(0);
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::setupSizes() {
@@ -189,7 +187,7 @@ void CncSpeedMonitor::setCurrentFeedSpeedValues(const SpeedData& sd) {
 	currentReceivedFeedSpeed_MM_MIN		= std::max(0.0, sd.received_MM_MIN);
 	currentConfiguredFeedSpeed_MM_MIN	= std::max(0.0, sd.configured_MM_MIN);
 	
-	speedSlider->setValue((int)currentConfiguredFeedSpeed_MM_MIN);
+	speedSlider->showValue((int)currentConfiguredFeedSpeed_MM_MIN);
 	
 	// log that min one measure point exists
 	axisMeasurePoints.values[timeIndex] = axisMeasurePoints.maxValue;

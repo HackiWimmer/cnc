@@ -745,7 +745,7 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	// always reset the realtime speed value, but don't
 	// use MAX_FEED_SPEED_VALUE here because it is declared as MIN_LONG
 	// realtimeFeedSpeed_MM_MIN = MAX_FEED_SPEED_VALUE;
-	realtimeFeedSpeed_MM_MIN = THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
+	realtimeFeedSpeed_MM_MIN = 0.0;
 	
 	// safety checks 
 	const double maxValue = THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
@@ -1610,7 +1610,7 @@ void CncControl::displayLimitStates(const CncInterface::ILS::States& ls) {
 	displayLimitState(THE_APP->GetZMinLimit(), limitStates.getZMinLimit());
 	displayLimitState(THE_APP->GetZMaxLimit(), limitStates.getZMaxLimit());
 	
-	limitStates.displayLimitState();
+	limitStates.traceLimitInfo();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::displayLimitState(wxWindow* ctl, bool value) {

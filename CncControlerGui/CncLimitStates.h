@@ -79,27 +79,6 @@ class CncLimitStates {
 			return ret;
 		}
 		
-		///////////////////////////////////////////////////////////////////
-		void displayLimit(const char axis, int32_t limit, bool wrongOnly = true) {
-			switch ( limit ) {
-				case LimitSwitch::LIMIT_UNSET:
-							if ( wrongOnly == false )
-								std::clog << axis << ": No limit active." << std::endl;
-							break; 
-				case LimitSwitch::LIMIT_MIN:
-							//std::cerr << axis << ": Min switch is active." << std::endl;
-							break;
-				case LimitSwitch::LIMIT_MAX:
-							//std::cerr << axis << ": Max switch is active." << std::endl;
-							break;
-				case LimitSwitch::LIMIT_UNKNOWN:
-							std::cerr << axis << ": Limit active, but the position is unclear." << std::endl;
-							break;
-				default:	if ( wrongOnly == false )
-								std::cerr << axis << ": Unknown limit state!" << std::endl;
-			}
-		}
-
 	public:
 		///////////////////////////////////////////////////////////////////
 		CncLimitStates() 
@@ -197,7 +176,8 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void displayLimitState() {
+		void traceLimitInfo() {
+			
 			if ( hasLimit() == false ) {
 				wxString m(cnc::trc.getCurrentMessage());
 				if ( m.StartsWith("Limit state for") )
@@ -205,24 +185,26 @@ class CncLimitStates {
 					
 				return;
 			}
+			
+			// -------------------------------------------------------------
+			auto append = [](wxString& ret, const wxString& append) {
+				if ( ret.IsEmpty() ) 	ret.append(append);
+				else					ret.append(wxString::Format(", %s", append));
+			};
+			
+			wxString invalid("");
+			wxString unknown("");
+			
+			if ( isXLimitStateValid() == false )				append(invalid, "X");
+			if ( isYLimitStateValid() == false )				append(invalid, "Y");
+			if ( isZLimitStateValid() == false )				append(invalid, "Z");
 				
-			if ( isXLimitStateValid() == false ) {
-				cnc::trc.logErrorMessage("Limit state for X axis isn't valid!");
-			} else {
-				displayLimit('X', getXLimit());
-			}
-				
-			if ( isYLimitStateValid() == false ) {
-				cnc::trc.logErrorMessage("Limit state for Y axis isn't valid!");
-			} else {
-				displayLimit('Y', getYLimit());
-			}
-				
-			if ( isZLimitStateValid() == false ) {
-				cnc::trc.logErrorMessage("Limit state for Z axis isn't valid!");
-			} else {
-				displayLimit('Z', getZLimit());
-			}
+			if ( getXLimit() == LimitSwitch::LIMIT_UNKNOWN )	append(unknown, "X");
+			if ( getYLimit() == LimitSwitch::LIMIT_UNKNOWN )	append(unknown, "Y");
+			if ( getZLimit() == LimitSwitch::LIMIT_UNKNOWN )	append(unknown, "Z");
+			
+			if ( invalid.IsEmpty() == false || unknown.IsEmpty() == false )
+				cnc::trc.logErrorMessage(wxString::Format("Limit state summary: Unknown=[%s] axis; Invalid=[%s] axis", unknown, invalid));
 		}
 };
 

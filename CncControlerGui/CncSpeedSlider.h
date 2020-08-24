@@ -30,6 +30,10 @@ class CncSpeedSlider : public CncSpeedSliderBase {
 		void setValue(int value);
 		void setValue(float value);
 		
+		void showValue(int value);
+		void showValue(float value);
+		void synchronize();
+		
 		void autoConfigure();
 		
 		int getValueMM_MIN();

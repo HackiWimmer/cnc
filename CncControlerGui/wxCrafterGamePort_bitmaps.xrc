@@ -20,7 +20,6 @@
   <object class="wxBitmap" name="color-swatch">bitmaps\color-swatch.png</object>
   <object class="wxBitmap" name="compass_000">bitmaps\compass_000.png</object>
   <object class="wxBitmap" name="compass_090">bitmaps\compass_090.png</object>
-  <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
   <object class="wxBitmap" name="dialog-question-2 (2)">bitmaps\dialog-question-2 (2).png</object>
   <object class="wxBitmap" name="dpad_all-small">bitmaps\gamepad\navi\dpad_all-small.png</object>
   <object class="wxBitmap" name="dpad_updown-small">bitmaps\gamepad\navi\dpad_updown-small.png</object>

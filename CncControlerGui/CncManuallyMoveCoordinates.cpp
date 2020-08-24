@@ -371,7 +371,7 @@ void CncManuallyMoveCoordinates::onLBDownMax(wxMouseEvent& event) {
 	
 	if ( ctrl != NULL ) {
 		double v; ctrl->GetValue().ToDouble(&v);
-		THE_APP->updateSpeedSlider(v);
+		THE_APP->updateAndSetSpeedSlider(v);
 	}
 	
 	event.Skip();

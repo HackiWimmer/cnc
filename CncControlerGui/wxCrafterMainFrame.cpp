@@ -2132,53 +2132,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer20911117->Add(m_testDurationCounterZ, 0, wxALL, WXC_FROM_DIP(5));
     m_testDurationCounterZ->SetMinSize(wxSize(40,-1));
     
-    m_testLimitPage = new wxPanel(m_testCaseBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_testCaseBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_testLimitPageImgIndex;
-    m_testLimitPageImgIndex = m_testCaseBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-typedef")));
-    m_testCaseBook->AddPage(m_testLimitPage, _("Evaluate\nLimit Switches"), false, m_testLimitPageImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer2249 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer2249->SetFlexibleDirection( wxBOTH );
-    flexGridSizer2249->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer2249->AddGrowableCol(0);
-    flexGridSizer2249->AddGrowableRow(1);
-    m_testLimitPage->SetSizer(flexGridSizer2249);
-    
-    wxFlexGridSizer* flexGridSizer21571 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer21571->SetFlexibleDirection( wxBOTH );
-    flexGridSizer21571->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer21571->AddGrowableCol(0);
-    flexGridSizer21571->AddGrowableRow(0);
-    
-    flexGridSizer2249->Add(flexGridSizer21571, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_staticText21172 = new wxStaticText(m_testLimitPage, wxID_ANY, _("Test::Evaluate End Switch States:"), wxDefaultPosition, wxDLG_UNIT(m_testLimitPage, wxSize(-1,-1)), 0);
-    wxFont m_staticText21172Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText21172->SetFont(m_staticText21172Font);
-    
-    flexGridSizer21571->Add(m_staticText21172, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_staticLine22533 = new wxStaticLine(m_testLimitPage, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_testLimitPage, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer21571->Add(m_staticLine22533, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    wxFlexGridSizer* flexGridSizer2269 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer2269->SetFlexibleDirection( wxBOTH );
-    flexGridSizer2269->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer2269->AddGrowableCol(0);
-    flexGridSizer2269->AddGrowableRow(0);
-    
-    flexGridSizer2249->Add(flexGridSizer2269, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_testToggleEndSwitch = new wxToggleButton(m_testLimitPage, wxID_ANY, _("Start End Switch Evaluation"), wxDefaultPosition, wxDLG_UNIT(m_testLimitPage, wxSize(-1,-1)), 0);
-    m_testToggleEndSwitch->SetBackgroundColour(wxColour(wxT("rgb(0,128,0)")));
-    m_testToggleEndSwitch->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
-    wxFont m_testToggleEndSwitchFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_testToggleEndSwitch->SetFont(m_testToggleEndSwitchFont);
-    m_testToggleEndSwitch->SetValue(false);
-    
-    flexGridSizer2269->Add(m_testToggleEndSwitch, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
     m_testToolPage = new wxPanel(m_testCaseBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_testCaseBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_testToolPageImgIndex;
     m_testToolPageImgIndex = m_testCaseBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-typedef")));
@@ -5552,11 +5505,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_menuRequestor->AppendSeparator();
     
-    m_miRqtTimestamp = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Sketch Timestamp"), _("fdf"), wxITEM_NORMAL);
+    m_miRqtTimestamp = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Firmware Timestamp"), _("fdf"), wxITEM_NORMAL);
     m_miRqtTimestamp->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("time")));
     m_menuRequestor->Append(m_miRqtTimestamp);
     
-    m_miRqtVersion = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Sketch Version"), wxT(""), wxITEM_NORMAL);
+    m_miRqtVersion = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Firmware Version"), wxT(""), wxITEM_NORMAL);
     m_miRqtVersion->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("enumerator")));
     m_menuRequestor->Append(m_miRqtVersion);
     
@@ -5576,6 +5529,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_miMotorEnableState = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Enable stepper motors"), wxT(""), wxITEM_CHECK);
     m_menuRequestor->Append(m_miMotorEnableState);
+    
+    m_miPerformToolTest = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Perform a Tool Test"), wxT(""), wxITEM_NORMAL);
+    m_miPerformToolTest->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ToolPin")));
+    m_menuRequestor->Append(m_miPerformToolTest);
+    
+    m_miResolveLimitState = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Resolve Limit States"), wxT(""), wxITEM_NORMAL);
+    m_miResolveLimitState->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-warning")));
+    m_menuRequestor->Append(m_miResolveLimitState);
     
     m_menuRequestor->AppendSeparator();
     
@@ -5625,10 +5586,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuTools->Append(m_miPyCam);
     
     m_menuTools->AppendSeparator();
-    
-    m_miGameportController = new wxMenuItem(m_menuTools, wxID_ANY, _("Gameport Controller"), wxT(""), wxITEM_NORMAL);
-    m_miGameportController->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")));
-    m_menuTools->Append(m_miGameportController);
     
     m_miSpeedPlayground = new wxMenuItem(m_menuTools, wxID_ANY, _("Speed Playground"), wxT(""), wxITEM_NORMAL);
     m_miSpeedPlayground->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("car")));
@@ -5955,7 +5912,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_testIntervalMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectTestIntervalMode), NULL, this);
     m_testCountX->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
     m_testCountX->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::testCountXUpdated), NULL, this);
-    m_testToggleEndSwitch->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testEndSwitchEvaluation), NULL, this);
     m_testToolPowerBtn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
     m_monitorViewSelector->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::monitorViewSelectorSelected), NULL, this);
     m_outboundNotebook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::outboundBookChanged), NULL, this);
@@ -6099,6 +6055,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
     this->Connect(m_miRqtPins->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestPins), NULL, this);
     this->Connect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
+    this->Connect(m_miPerformToolTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestToolTest), NULL, this);
+    this->Connect(m_miResolveLimitState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResolveLimitStates), NULL, this);
     this->Connect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Connect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Connect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
@@ -6108,7 +6066,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);
     this->Connect(m_miCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openCalculator), NULL, this);
     this->Connect(m_miPyCam->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openPyCam), NULL, this);
-    this->Connect(m_miGameportController->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openGameportController), NULL, this);
     this->Connect(m_miSpeedPlayground->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSpeedPlayground), NULL, this);
     this->Connect(m_miUnitTestFramework->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::unitTestFramework), NULL, this);
     this->Connect(m_miLoopRepeatTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loopRepeatTest), NULL, this);
@@ -6221,7 +6178,6 @@ MainFrameBClass::~MainFrameBClass()
     m_testIntervalMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectTestIntervalMode), NULL, this);
     m_testCountX->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
     m_testCountX->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::testCountXUpdated), NULL, this);
-    m_testToggleEndSwitch->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testEndSwitchEvaluation), NULL, this);
     m_testToolPowerBtn->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
     m_monitorViewSelector->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::monitorViewSelectorSelected), NULL, this);
     m_outboundNotebook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::outboundBookChanged), NULL, this);
@@ -6365,6 +6321,8 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
     this->Disconnect(m_miRqtPins->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestPins), NULL, this);
     this->Disconnect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
+    this->Disconnect(m_miPerformToolTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestToolTest), NULL, this);
+    this->Disconnect(m_miResolveLimitState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResolveLimitStates), NULL, this);
     this->Disconnect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Disconnect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Disconnect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
@@ -6374,7 +6332,6 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);
     this->Disconnect(m_miCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openCalculator), NULL, this);
     this->Disconnect(m_miPyCam->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openPyCam), NULL, this);
-    this->Disconnect(m_miGameportController->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openGameportController), NULL, this);
     this->Disconnect(m_miSpeedPlayground->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSpeedPlayground), NULL, this);
     this->Disconnect(m_miUnitTestFramework->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::unitTestFramework), NULL, this);
     this->Disconnect(m_miLoopRepeatTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loopRepeatTest), NULL, this);

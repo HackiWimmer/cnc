@@ -397,6 +397,7 @@ protected:
     virtual void onThumbtrackSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void onChangeSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void onChangedSlider(wxScrollEvent& event) { event.Skip(); }
+    virtual void onLeaveWindow(wxMouseEvent& event) { event.Skip(); }
 
 public:
     wxSlider* GetSlider() { return m_slider; }

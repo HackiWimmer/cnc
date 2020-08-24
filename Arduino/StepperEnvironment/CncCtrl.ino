@@ -818,7 +818,7 @@ void CncArduinoController::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
   sendCurrentPositions(PID_XYZ_POS_DETAIL, false);  
 
   // speed management
-  if ( CtrlSpeedValues::cfgF_MMSec > 0 ) {
+  if ( CtrlSpeedValues::cfgF_MMSec > 0.0 ) {
     
     // determine the current distance for each axis, 
     int32_t curDistV_NM = 0;
@@ -832,8 +832,8 @@ void CncArduinoController::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
     else if ( dz != 0 )                         { curDistV_NM = CtrlSpeedValues::distZ_NM;   }
 
     // determine the time deviation between the measured and configured sight
-    const int32_t currentTragetSpeed_MMSec = getCurrentTargetSpeed_MMSec();
-    const int32_t currentTimeDistance_US   = curDistV_NM / currentTragetSpeed_MMSec; // [nm/mm/s] -> [10^9/10^3 s] --> [us] 
+    const int32_t currentTargetSpeed_MMSec = ArdoObj::maximum((int32_t)1, (int32_t)getCurrentTargetSpeed_MMSec());
+    const int32_t currentTimeDistance_US   = curDistV_NM / currentTargetSpeed_MMSec; // [nm/mm/s] -> [10^9/10^3 s] --> [us] 
 
     // don't put anything between the lines of the section below
     {
@@ -857,7 +857,7 @@ void CncArduinoController::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
           AE::delayMicroseconds(rest_US);
 
           // here we are in time it can be asumed the speed is as configured
-          CtrlSpeedValues::cmsF_MMSec = currentTragetSpeed_MMSec;
+          CtrlSpeedValues::cmsF_MMSec = currentTargetSpeed_MMSec;
         }
         else {
           // measure the current speed again

@@ -306,10 +306,6 @@ protected:
     wxStaticText* m_staticText215124;
     wxCheckBox* m_testModeZ;
     wxStaticText* m_testDurationCounterZ;
-    wxPanel* m_testLimitPage;
-    wxStaticText* m_staticText21172;
-    wxStaticLine* m_staticLine22533;
-    wxToggleButton* m_testToggleEndSwitch;
     wxPanel* m_testToolPage;
     wxStaticText* m_staticText211726;
     wxStaticLine* m_staticLine225337;
@@ -691,6 +687,8 @@ protected:
     wxMenuItem* m_miRqtPins;
     wxMenuItem* m_menuItem1187;
     wxMenuItem* m_miMotorEnableState;
+    wxMenuItem* m_miPerformToolTest;
+    wxMenuItem* m_miResolveLimitState;
     wxMenuItem* m_menuItem881;
     wxMenuItem* m_miRqtCurPos;
     wxMenuItem* m_miRqtLimit;
@@ -706,7 +704,6 @@ protected:
     wxMenuItem* m_miCalculator;
     wxMenuItem* m_miPyCam;
     wxMenuItem* m_menuItem7460;
-    wxMenuItem* m_miGameportController;
     wxMenuItem* m_miSpeedPlayground;
     wxMenu* m_menuTest;
     wxMenuItem* m_miUnitTestFramework;
@@ -819,7 +816,6 @@ protected:
     virtual void selectTestIntervalMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCountXSpinCtl(wxSpinEvent& event) { event.Skip(); }
     virtual void testCountXUpdated(wxCommandEvent& event) { event.Skip(); }
-    virtual void testEndSwitchEvaluation(wxCommandEvent& event) { event.Skip(); }
     virtual void testSwitchToolOnOff(wxCommandEvent& event) { event.Skip(); }
     virtual void monitorViewSelectorSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
@@ -935,6 +931,8 @@ protected:
     virtual void requestConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void requestPins(wxCommandEvent& event) { event.Skip(); }
     virtual void requestEnableStepperMotors(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestToolTest(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentPos(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitState(wxCommandEvent& event) { event.Skip(); }
     virtual void requestReset(wxCommandEvent& event) { event.Skip(); }
@@ -944,7 +942,6 @@ protected:
     virtual void openExternalEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void openPyCam(wxCommandEvent& event) { event.Skip(); }
-    virtual void openGameportController(wxCommandEvent& event) { event.Skip(); }
     virtual void openSpeedPlayground(wxCommandEvent& event) { event.Skip(); }
     virtual void unitTestFramework(wxCommandEvent& event) { event.Skip(); }
     virtual void loopRepeatTest(wxCommandEvent& event) { event.Skip(); }
@@ -1189,10 +1186,6 @@ public:
     wxCheckBox* GetTestModeZ() { return m_testModeZ; }
     wxStaticText* GetTestDurationCounterZ() { return m_testDurationCounterZ; }
     wxPanel* GetTestIntervalPage() { return m_testIntervalPage; }
-    wxStaticText* GetStaticText21172() { return m_staticText21172; }
-    wxStaticLine* GetStaticLine22533() { return m_staticLine22533; }
-    wxToggleButton* GetTestToggleEndSwitch() { return m_testToggleEndSwitch; }
-    wxPanel* GetTestLimitPage() { return m_testLimitPage; }
     wxStaticText* GetStaticText211726() { return m_staticText211726; }
     wxStaticLine* GetStaticLine225337() { return m_staticLine225337; }
     wxStaticText* GetTestToolPowerState() { return m_testToolPowerState; }

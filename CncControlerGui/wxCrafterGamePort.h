@@ -81,25 +81,6 @@ public:
 };
 
 
-class CncGameportControllerBase : public wxDialog
-{
-protected:
-    wxPanel* m_gamepadState;
-    wxStaticLine* m_staticLine7492;
-    wxButton* m_btClose;
-
-protected:
-    virtual void onClose(wxCommandEvent& event) { event.Skip(); }
-
-public:
-    wxPanel* GetGamepadState() { return m_gamepadState; }
-    wxStaticLine* GetStaticLine7492() { return m_staticLine7492; }
-    wxButton* GetBtClose() { return m_btClose; }
-    CncGameportControllerBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Gameport Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP|wxRESIZE_BORDER);
-    virtual ~CncGameportControllerBase();
-};
-
-
 class CncGamepadControllerSpyBase : public wxDialog
 {
 protected:
