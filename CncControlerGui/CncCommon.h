@@ -245,8 +245,8 @@ class LoggerSelection {
 class PosSpySelection {
 	public:
 		enum VAL {
-			POSITION_SPY				= 0,
-			SPEED_SPY					= 1
+			SPEED_SPY					= 0,
+			POSITION_SPY				= 1,
 		};
 };
 

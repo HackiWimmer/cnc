@@ -1321,19 +1321,55 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     flexGridSizer48671->Add(m_staticText4875, 0, wxALL, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer4973 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer213 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer213->SetFlexibleDirection( wxBOTH );
+    flexGridSizer213->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer213->AddGrowableCol(0);
+    flexGridSizer213->AddGrowableRow(0);
+    
+    flexGridSizer2360->Add(flexGridSizer213, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_drawPanePanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer213->Add(m_drawPanePanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer4973 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer4973->SetFlexibleDirection( wxBOTH );
     flexGridSizer4973->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4973->AddGrowableCol(0);
     flexGridSizer4973->AddGrowableRow(0);
+    m_drawPanePanel->SetSizer(flexGridSizer4973);
     
-    flexGridSizer2360->Add(flexGridSizer4973, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_drawPane3DPlaceHolder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_drawPane3DPlaceHolder = new wxPanel(m_drawPanePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_drawPanePanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_drawPane3DPlaceHolder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_drawPane3DPlaceHolder->SetToolTip(_("OpenGl Control placeholder"));
     
     flexGridSizer4973->Add(m_drawPane3DPlaceHolder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_DrawPaneZView = new wxPanel(m_drawPanePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_drawPanePanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer4973->Add(m_DrawPaneZView, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer208 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer208->SetFlexibleDirection( wxBOTH );
+    flexGridSizer208->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer208->AddGrowableCol(0);
+    flexGridSizer208->AddGrowableRow(0);
+    m_DrawPaneZView->SetSizer(flexGridSizer208);
+    
+    m_zView = new CncZView(m_DrawPaneZView, wxID_ANY);
+    flexGridSizer208->Add(m_zView, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_infoToolDiameter = new wxStaticText(m_DrawPaneZView, wxID_ANY, _("0.000"), wxDefaultPosition, wxDLG_UNIT(m_DrawPaneZView, wxSize(-1,-1)), wxALIGN_RIGHT);
+    m_infoToolDiameter->SetBackgroundColour(wxColour(wxT("rgb(255,156,108)")));
+    wxFont m_infoToolDiameterFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
+    m_infoToolDiameter->SetFont(m_infoToolDiameterFont);
+    m_infoToolDiameter->SetToolTip(_("Tool Diameter [mm]"));
+    
+    flexGridSizer208->Add(m_infoToolDiameter, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    flexGridSizer208->Add(0, 1, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_DrawPaneZView->SetMinSize(wxSize(32,-1));
     
     wxFlexGridSizer* flexGridSizer4867 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer4867->SetFlexibleDirection( wxBOTH );

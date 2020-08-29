@@ -58,6 +58,7 @@ class CncStatisticsPane;
 class CncSvgViewer;
 class CncGameportController;
 class CncSpeedMonitor;
+class CncDefaultSpeedSlider;
 class CncPreprocessor;
 class CncGCodeSequenceListCtrl;
 class CncLruFileViewListCtrl;
@@ -159,6 +160,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onDeactivateSecureRunMode(wxCommandEvent& event);
 		virtual void requestResolveLimitStates(wxCommandEvent& event);
 		virtual void requestToolTest(wxCommandEvent& event);
 		virtual void onEvaluateHardwareXYPlane(wxCommandEvent& event);
@@ -237,7 +239,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void togglePositionSpy(wxCommandEvent& event);
 		virtual void activateAuiPane(wxAuiManagerEvent& event);
 		virtual void buttonAuiPane(wxAuiManagerEvent& event);
-		virtual void viewZAxis(wxCommandEvent& event);
 		virtual void loadPerspective(wxCommandEvent& event);
 		virtual void savePerspective(wxCommandEvent& event);
 		virtual void addUserPerspective(wxCommandEvent& event);
@@ -633,6 +634,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncPosSpyListCtrl* 				positionSpy;
 		CncSetterListCtrl* 				setterList;
 		CncSpeedMonitor*				speedMonitor;
+		CncDefaultSpeedSlider*			defaultSpeedSlider;
 		CncMotionVertexTrace* 			motionVertexCtrl;
 		CncPreprocessor*				cncPreprocessor;
 		CncParsingSynopsisTrace*		parsingSynopisis;

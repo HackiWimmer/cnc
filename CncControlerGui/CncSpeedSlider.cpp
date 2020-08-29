@@ -6,42 +6,44 @@
 #include "CncSpeedSlider.h"
 
 ///////////////////////////////////////////////////////////////////
-CncSpeedSlider::CncSpeedSlider(wxWindow* parent)
-: CncSpeedSliderBase(parent)
-, bShowvalue		(true)
-, toolTipWindow		(NULL)
+CncSpeedSliderInterface::CncSpeedSliderInterface(wxSlider* s, wxTextCtrl* l, wxStaticText* u) 
+: slider				(s)
+, sliderValue			(l)
+, sliderUnit			(u)
+, toolTipWindow			(NULL)
+, bShowvalue			(true)
 ///////////////////////////////////////////////////////////////////
 {
-	setRange(0, 10000);
-	setValue((float)(m_slider->GetMax() * 0.2));
+	wxASSERT(slider			!= NULL);
+	wxASSERT(sliderValue	!= NULL);
+}
+///////////////////////////////////////////////////////////////////
+CncSpeedSliderInterface::~CncSpeedSliderInterface() {
+///////////////////////////////////////////////////////////////////
 	
-	showUnit(true);
-	showValue(true);
 }
 ///////////////////////////////////////////////////////////////////
-CncSpeedSlider::~CncSpeedSlider() {
+void CncSpeedSliderInterface::enable(bool state) {
 ///////////////////////////////////////////////////////////////////
+	slider->Enable(state);
+	sliderValue->Enable(state);
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::enable(bool state) {
+void CncSpeedSliderInterface::showUnit(bool state) {
 ///////////////////////////////////////////////////////////////////
-	m_slider->Enable(state);
-	m_lbSliderValue->Enable(state);
+	if ( sliderUnit != NULL ) {
+		sliderUnit->SetLabel( state ? "[mm/min]" : "");
+		updateControls();
+	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::showUnit(bool state) {
-///////////////////////////////////////////////////////////////////
-	m_lbSliderUinit->SetLabel( state ? "[mm/min]" : "");
-	Refresh();
-}
-///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::showValue(bool state) {
+void CncSpeedSliderInterface::showValue(bool state) {
 ///////////////////////////////////////////////////////////////////
 	bShowvalue = state;
-	Refresh();
+	updateControls();
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::updateToolTip() {
+void CncSpeedSliderInterface::updateToolTip() {
 ///////////////////////////////////////////////////////////////////
 	if ( toolTipWindow == NULL )
 		return;
@@ -50,10 +52,10 @@ void CncSpeedSlider::updateToolTip() {
 	
 	wxString tt("");
 	
-	tt.append(wxString::Format("%s [mm/min]\n",	CncNumberFormatter::toString((double)(m_slider->GetValue())),				1));
-	tt.append(wxString::Format("%s [mm/sec]\n",	CncNumberFormatter::toString((double)(m_slider->GetValue()) / 60.0),		1));
-	tt.append(wxString::Format("%s [rpm]\n",	CncNumberFormatter::toString((double)(m_slider->GetValue()) / pitch),		1));
-	tt.append(wxString::Format("%s [rps]\n",	CncNumberFormatter::toString((double)(m_slider->GetValue()) / pitch / 60),	1));
+	tt.append(wxString::Format("%s [mm/min]\n",	CncNumberFormatter::toString((double)(slider->GetValue())),				1));
+	tt.append(wxString::Format("%s [mm/sec]\n",	CncNumberFormatter::toString((double)(slider->GetValue()) / 60.0),		1));
+	tt.append(wxString::Format("%s [rpm]\n",	CncNumberFormatter::toString((double)(slider->GetValue()) / pitch),		1));
+	tt.append(wxString::Format("%s [rps]\n",	CncNumberFormatter::toString((double)(slider->GetValue()) / pitch / 60),	1));
 	
 	wxRichToolTip tip("Configured Speed:", tt);
 	tip.SetIcon(wxICON_INFORMATION);
@@ -61,7 +63,7 @@ void CncSpeedSlider::updateToolTip() {
 	tip.ShowFor(toolTipWindow);
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::setRange(int min, int max) {
+void CncSpeedSliderInterface::setRange(int min, int max) {
 ///////////////////////////////////////////////////////////////////
 	if ( min < 0 )
 		min = 0;
@@ -69,74 +71,129 @@ void CncSpeedSlider::setRange(int min, int max) {
 	if ( max < min )
 		max = min;
 	
-	m_slider->SetRange(min, max);
-	Refresh();
+	slider->SetRange(min, max);
+	updateControls();
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::setValue(int value) {
+void CncSpeedSliderInterface::setValue(int value) {
 ///////////////////////////////////////////////////////////////////
-	showValue(value);
+	previewValue(value);
 	synchronize();
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::setValue(float value) {
+void CncSpeedSliderInterface::setValue(float value) {
 ///////////////////////////////////////////////////////////////////
 	setValue((int)value);
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::showValue(int value) {
+void CncSpeedSliderInterface::setValue(double value) {
 ///////////////////////////////////////////////////////////////////
-	m_slider->SetValue(value);
-	Refresh();
+	setValue((int)value);
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::showValue(float value) {
+void CncSpeedSliderInterface::previewValue(int value) {
 ///////////////////////////////////////////////////////////////////
-	showValue((int)value);
+	slider->SetValue(value);
+	updateControls();
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::synchronize() {
+void CncSpeedSliderInterface::previewValue(float value) {
+///////////////////////////////////////////////////////////////////
+	previewValue((int)value);
+}
+///////////////////////////////////////////////////////////////////
+void CncSpeedSliderInterface::previewValue(double value) {
+///////////////////////////////////////////////////////////////////
+	previewValue((int)value);
+}
+///////////////////////////////////////////////////////////////////
+void CncSpeedSliderInterface::synchronize() {
 ///////////////////////////////////////////////////////////////////
 	// reads the slider value and puts it to the cnc control
-	APP_PROXY::updateCncSpeed((float)(m_slider->GetValue()), CncSpeedUserDefined);
+	APP_PROXY::updateCncSpeed((float)(slider->GetValue()), CncSpeedUserDefined);
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::autoConfigure() {
+void CncSpeedSliderInterface::autoConfigure() {
 ///////////////////////////////////////////////////////////////////
 	setRange(0, (int) THE_CONFIG->getMaxSpeedXYZ_MM_MIN());
-	setValue((float)(m_slider->GetMax() * 0.2));
-	Refresh();
+	setValue((float)(slider->GetMax() * 0.2));
+	updateControls();
 }
 ///////////////////////////////////////////////////////////////////
-int CncSpeedSlider::getValueMM_MIN() {
+int CncSpeedSliderInterface::getValueMM_MIN() {
 ///////////////////////////////////////////////////////////////////
-	return m_slider->GetValue();
+	return slider->GetValue();
 }
 ///////////////////////////////////////////////////////////////////
-int CncSpeedSlider::getValueMM_SEC() {
+int CncSpeedSliderInterface::getValueMM_SEC() {
 ///////////////////////////////////////////////////////////////////
 	return round(((float)getValueMM_MIN()) / 60.0);
 }
+
+
+
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::onChangeSlider(wxScrollEvent& event) {
+CncDefaultSpeedSlider::CncDefaultSpeedSlider(wxSlider* slider, wxTextCtrl* label, wxStaticText* unit)
+: wxEvtHandler 				()
+, CncSpeedSliderInterface	(slider, label, unit)
+, loggedSliderValue			(-1)
 ///////////////////////////////////////////////////////////////////
-	Refresh();
+{
+	setRange(0, 10000);
+	setValue((float)(slider->GetMax() * 0.2));
+	
+	showUnit (unit != NULL);
+	showValue(true);
+
+	slider->Bind(wxEVT_SCROLL_CHANGED,			&CncDefaultSpeedSlider::onChangedSlider, 		this);
+	slider->Bind(wxEVT_SCROLL_THUMBTRACK,		&CncDefaultSpeedSlider::onThumbtrackSlider, 	this);
+	slider->Bind(wxEVT_SCROLL_THUMBRELEASE,		&CncDefaultSpeedSlider::onThumbreleasekSlider, 	this);
+}
+///////////////////////////////////////////////////////////////////
+CncDefaultSpeedSlider::~CncDefaultSpeedSlider() {
+///////////////////////////////////////////////////////////////////
+	slider->Unbind(wxEVT_SCROLL_CHANGED,		&CncDefaultSpeedSlider::onChangedSlider, 		this);
+	slider->Unbind(wxEVT_SCROLL_THUMBTRACK,		&CncDefaultSpeedSlider::onThumbtrackSlider, 	this);
+	slider->Unbind(wxEVT_SCROLL_THUMBRELEASE,	&CncDefaultSpeedSlider::onThumbreleasekSlider, 	this);
+}
+///////////////////////////////////////////////////////////////////
+void CncDefaultSpeedSlider::logValue() {
+///////////////////////////////////////////////////////////////////
+	loggedSliderValue = slider->GetValue();
+}
+///////////////////////////////////////////////////////////////////
+void CncDefaultSpeedSlider::unlogValue() {
+///////////////////////////////////////////////////////////////////
+	loggedSliderValue = -1;
+}
+///////////////////////////////////////////////////////////////////
+void CncDefaultSpeedSlider::restoreValue() {
+///////////////////////////////////////////////////////////////////
+	if ( loggedSliderValue >= 0 ) {
+		slider->SetValue(loggedSliderValue);
+		updateControls();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncDefaultSpeedSlider::updateControls() {
+///////////////////////////////////////////////////////////////////
+	sliderValue->ChangeValue(CncNumberFormatter::toString(getValueMM_MIN()));
+}
+///////////////////////////////////////////////////////////////////
+void CncDefaultSpeedSlider::onChangedSlider(wxScrollEvent& event) {
+///////////////////////////////////////////////////////////////////
+	updateControls();
 	
 	synchronize();
 	updateToolTip();
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::onChangedSlider(wxScrollEvent& event) {
+void CncDefaultSpeedSlider::onThumbtrackSlider(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	Refresh();
+	updateControls();
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::onThumbtrackSlider(wxScrollEvent& event) {
+void CncDefaultSpeedSlider::onThumbreleasekSlider(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	Refresh();
-}
-///////////////////////////////////////////////////////////////////
-void CncSpeedSlider::onPaint(wxPaintEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_lbSliderValue->ChangeValue(CncNumberFormatter::toString(getValueMM_MIN()));
+	updateControls();
 }

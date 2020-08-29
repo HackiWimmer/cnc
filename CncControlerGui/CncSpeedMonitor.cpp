@@ -1,8 +1,6 @@
-#include <wx/dcbuffer.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include "wxCrafterImages.h"
-#include "GlobalFunctions.h"
 #include "CncCommon.h"
 #include "CncContext.h"
 #include "CncFileNameService.h"
@@ -11,84 +9,36 @@
 
 ////////////////////////////////////////////////////////////////
 CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
-: CncSpeedMonitorBase(parent)
-, drawingArea							(lMargin, tMargin, 0, 0)
-, valueFont								(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"))
-, labelFont								(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"))
-, mouseLabel							(-1, -1)
-, axisMeasurePoints						()
-, axisMeasuredSpeed						()
-, axisReceivedSpeed						()
-, axisConfiguredSpeed					()
-, speedSlider							(NULL)
-, lastRefresh							(CncTimeFunctions::getMilliTimestamp())
-, timeIndex								(0)
-, currentMeasuredFeedSpeed_MM_MIN		(0.0)
-, currentReceivedFeedSpeed_MM_MIN		(0.0)
-, currentConfiguredFeedSpeed_MM_MIN		(0.0)
+: CncSpeedMonitorBase		(parent)
+, diagram					()
 ////////////////////////////////////////////////////////////////
 {
-	// Speed Slider
-	speedSlider = new CncSpeedSlider(this);
-	speedSlider->showUnit(true);
-	speedSlider->showValue(true);
-	speedSlider->autoConfigure();
-	GblFunc::replaceControl(m_speedSliderPlaceholder, speedSlider);
-	
 	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
 	m_btToggleConnection->SetBitmapDisabled(bmpOff.ConvertToDisabled());
 	
-	m_refreshTimer->Stop();
-	
 	// This has to be done to use wxAutoBufferedPaintDC 
 	// on EVT_PAINT events correctly
-	m_darwingArea->SetBackgroundStyle(wxBG_STYLE_PAINT);
-	m_leftAxis->SetBackgroundStyle(wxBG_STYLE_PAINT);
-	m_rightAxis->SetBackgroundStyle(wxBG_STYLE_PAINT);
+	m_leftAxisH		->SetBackgroundStyle(wxBG_STYLE_PAINT);
+	m_darwingAreaH	->SetBackgroundStyle(wxBG_STYLE_PAINT);
+	m_rightAxisH	->SetBackgroundStyle(wxBG_STYLE_PAINT);
 	
-	m_darwingArea->SetBackgroundColour(*wxBLACK);
-	m_leftAxis->SetBackgroundColour(*wxBLACK);
-	m_rightAxis->SetBackgroundColour(*wxBLACK);
+	m_topAxisV		->SetBackgroundStyle(wxBG_STYLE_PAINT);
+	m_darwingAreaV	->SetBackgroundStyle(wxBG_STYLE_PAINT);
+	m_bottomAxisV	->SetBackgroundStyle(wxBG_STYLE_PAINT);
+
+	m_leftAxisH		->SetBackgroundColour(*wxBLACK);
+	m_darwingAreaH	->SetBackgroundColour(*wxBLACK);
+	m_rightAxisH	->SetBackgroundColour(*wxBLACK);
 	
-	// setup axises
-	axisMeasurePoints.pen 		= wxPen(wxColour(0, 190, 0), 		1, wxSOLID);
-	axisMeasurePoints.pos 		= wxBOTTOM;
-	axisMeasurePoints.fill 		= true;
-	axisMeasurePoints.minValue	= 0.0;
-	axisMeasurePoints.maxValue	= 3.0;
-	axisMeasurePoints.yOffset 	= 5;
+	m_topAxisV		->SetBackgroundColour(*wxBLACK);
+	m_darwingAreaV	->SetBackgroundColour(*wxBLACK);
+	m_bottomAxisV	->SetBackgroundColour(*wxBLACK);
 	
-	axisMeasuredSpeed.pen 		= wxPen(wxColour(255, 80, 80), 		2, wxSOLID);
-	axisMeasuredSpeed.pos 		= wxRIGHT;
-	axisMeasuredSpeed.fill 		= false;
-	axisMeasuredSpeed.yOffset 	= 0;
-	
-	axisReceivedSpeed.pen 		= wxPen(wxColour(239, 228, 176),	1, wxSOLID);
-	axisReceivedSpeed.pos 		= wxRIGHT;
-	axisReceivedSpeed.fill 		= false;
-	axisReceivedSpeed.yOffset 	= 0;
-	
-	axisConfiguredSpeed.pen		= wxPen(wxColour(64, 64, 64),		1, wxSOLID);
-	axisConfiguredSpeed.pos		= wxLEFT;
-	axisConfiguredSpeed.fill 	= true;
-	axisMeasuredSpeed.yOffset 	= 0;
-	
-	setupSizes();
+	init();
 }
 ////////////////////////////////////////////////////////////////
 CncSpeedMonitor::~CncSpeedMonitor() {
 ////////////////////////////////////////////////////////////////
-	m_refreshTimer->Stop();
-	
-	wxDELETE(speedSlider);
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::enableSpeedSlider(bool state) {
-////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->canSpeedMonitoring() == false )
-		return;
-		
-	speedSlider->enable(state);
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::activate(bool enable) {
@@ -99,7 +49,6 @@ void CncSpeedMonitor::activate(bool enable) {
 	
 	m_btToggleConfiguredAxis->Enable(enable);
 	m_btToggleMeasurePointsAxis->Enable(enable);
-	m_btToggleMeasuredSpeedAxis->Enable(enable);
 	m_btToggleReceivedSpeedAxis->Enable(enable);
 	
 	m_btClear->Enable(enable);
@@ -107,350 +56,35 @@ void CncSpeedMonitor::activate(bool enable) {
 	
 	m_intervalSlider->Enable(enable);
 	
-	speedSlider->enable(enable);
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::setupSizes() {
-////////////////////////////////////////////////////////////////
-	wxSize size;
-	size.SetWidth(MAX_VALUES);
-	size.SetHeight(m_scrollWindow->GetClientSize().GetHeight());
-	
-	m_scrollWindow->SetVirtualSize(size);
-	m_darwingArea->SetSize(size);
-	m_darwingArea->SetMinSize(size);
-	
-	m_scrollWindow->Scroll(m_scrollWindow->GetScrollRange(wxHORIZONTAL), 0);
-	
-	drawingArea.height 			= size.GetHeight() - tMargin - bMargin;
-	drawingArea.width  			= size.GetWidth()  - lMargin - rMargin;
-	drawingArea.width 			= std::min((int)MAX_VALUES, drawingArea.width);
-	
-	axisMeasuredSpeed.height 	= drawingArea.height;
-	axisReceivedSpeed.height 	= drawingArea.height;
-	axisConfiguredSpeed.height 	= drawingArea.height;
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onScrolledSize(wxSizeEvent& event) {
-////////////////////////////////////////////////////////////////
-	event.StopPropagation();
-	setupSizes();
-	
-	m_darwingArea->Refresh();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onSize(wxSizeEvent& event) {
-////////////////////////////////////////////////////////////////
+	m_scrollBarH->Enable(enable);
+	m_scrollBarV->Enable(enable);
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::reset() {
 ////////////////////////////////////////////////////////////////
-	timeIndex = 0;
-	m_scrollWindow->Scroll(m_scrollWindow->GetScrollRange(wxHORIZONTAL), 0);
+	clear();
+	
+	const wxRect rect = GetClientRect();
+	m_scrollBarH->SetScrollbar(diagram.points.getSize(), rect.GetWidth(),  diagram.points.getSize(), rect.GetWidth(),  true);
+	m_scrollBarV->SetScrollbar(diagram.points.getSize(), rect.GetHeight(), diagram.points.getSize(), rect.GetHeight(), true);
+	
+	determineTimeOffset();
 }
 ////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::init(double maxSpeedValue_MM_MIN) {
+void CncSpeedMonitor::start() {
 ////////////////////////////////////////////////////////////////
-	const double overSize =  maxSpeedValue_MM_MIN * 0.2;
-	
-	axisMeasuredSpeed.maxValue 		= maxSpeedValue_MM_MIN + overSize;
-	axisReceivedSpeed.maxValue		= maxSpeedValue_MM_MIN + overSize;
-	axisConfiguredSpeed.maxValue	= maxSpeedValue_MM_MIN + overSize;
-	
-	wxASSERT(axisMeasuredSpeed.maxValue   > axisMeasuredSpeed.minValue);
-	wxASSERT(axisReceivedSpeed.maxValue   > axisMeasuredSpeed.minValue);
-	wxASSERT(axisConfiguredSpeed.maxValue > axisConfiguredSpeed.minValue);
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::start(double maxSpeedValue_MM_MIN) {
-////////////////////////////////////////////////////////////////
-	m_refreshTimer->Stop();
 	reset();
-		
-	init(maxSpeedValue_MM_MIN);
-	
-	lastRefresh = CncTimeFunctions::getMilliTimestamp();
-	lastDataSet = CncTimeFunctions::getMilliTimestamp();
-	
-	m_refreshTimer->Start(m_intervalSlider->GetValue());
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::stop() {
 ////////////////////////////////////////////////////////////////
-	if ( m_refreshTimer->IsRunning() == true )
-		m_refreshTimer->Stop();
 }
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::setCurrentFeedSpeedValues(const SpeedData& sd) {
-////////////////////////////////////////////////////////////////
-	currentMeasuredFeedSpeed_MM_MIN		= std::max(0.0, sd.measured_MM_MIN);
-	currentReceivedFeedSpeed_MM_MIN		= std::max(0.0, sd.received_MM_MIN);
-	currentConfiguredFeedSpeed_MM_MIN	= std::max(0.0, sd.configured_MM_MIN);
-	
-	speedSlider->showValue((int)currentConfiguredFeedSpeed_MM_MIN);
-	
-	// log that min one measure point exists
-	axisMeasurePoints.values[timeIndex] = axisMeasurePoints.maxValue;
-	
-	lastDataSet = CncTimeFunctions::getMilliTimestamp();
-	
-	if ( m_refreshTimer->IsRunning() == false )
-		m_refreshTimer->Start(m_intervalSlider->GetValue());
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onRefreshTimer(wxTimerEvent& event) {
-////////////////////////////////////////////////////////////////
-	// switch this timer off if connection switched off
-	if ( m_btToggleConnection->GetValue() == false ) {
-		stop();
-		return;
-	}
-	
-	// create next data snapshot 
-	const unsigned int maxNoDataTimespan = 3000; // ms
-	if ( CncTimeFunctions::getMilliTimestamp() - lastDataSet < maxNoDataTimespan ) {
-	
-		if ( (int)timeIndex > drawingArea.width )
-			timeIndex = 0;
-			
-		axisMeasuredSpeed.values[timeIndex] 	= axisMeasuredSpeed.convert(currentMeasuredFeedSpeed_MM_MIN);
-		axisReceivedSpeed.values[timeIndex] 	= axisMeasuredSpeed.convert(currentReceivedFeedSpeed_MM_MIN);
-		axisConfiguredSpeed.values[timeIndex] 	= axisConfiguredSpeed.convert(currentConfiguredFeedSpeed_MM_MIN);
-		
-		timeIndex++;
-	}
-	else {
-		// switch this timer off if longer no data received
-		stop();
-	}
-		
-	//  update the view
-	if ( CncTimeFunctions::getMilliTimestamp() - lastRefresh > refreshInterval ) {
-		lastRefresh = CncTimeFunctions::getMilliTimestamp();
-		Refresh();
-	}
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onPaint(wxPaintEvent& event) {
-////////////////////////////////////////////////////////////////
-	if ( IsShown() == false )
-		return;
-		
-	wxAutoBufferedPaintDC dc(m_darwingArea);
-	dc.Clear();
-	dc.SetBrush(*wxTRANSPARENT_BRUSH);
-	
-	// --------------------------------------------------------
-	auto drawBoundbox = [&]() {
-		dc.SetPen(wxPen(*wxWHITE, 1, wxDOT));
-		dc.DrawRectangle(drawingArea);
-		
-		const unsigned int dy = drawingArea.GetHeight() / 3; 
-		dc.DrawLine(lMargin, tMargin + dy * 1, lMargin + drawingArea.GetWidth(), tMargin + dy * 1);
-		dc.DrawLine(lMargin, tMargin + dy * 2, lMargin + drawingArea.GetWidth(), tMargin + dy * 2);
-		dc.DrawLine(lMargin, tMargin + dy * 3, lMargin + drawingArea.GetWidth(), tMargin + dy * 3);
-	};
-	
-	// --------------------------------------------------------
-	auto drawMouseLabel = [&]() {
-		if      ( mouseLabel.x < 0 )									return;
-		else if ( mouseLabel.x < (int)lMargin ) 						return;
-		else if ( mouseLabel.y < (int)tMargin ) 						return;
-		else if ( mouseLabel.x > (int)lMargin + drawingArea.width) 		return;
-		else if ( mouseLabel.y > (int)tMargin + drawingArea.height) 	return;
-		
-		dc.SetTextForeground(*wxRED);
-		dc.SetFont(labelFont);
-		
-		const double value = axisMeasuredSpeed.convertToValue(tMargin + drawingArea.height - mouseLabel.y);
-		dc.DrawLabel(wxString::Format("%4.0lf", value), wxRect(mouseLabel.x, mouseLabel.y - 10, 10, 10), wxALIGN_NOT);
-	};
-	
-	// --------------------------------------------------------
-	auto drawValues = [&]() {
-		
-		auto draw = [&](Axis& axis, unsigned int x, unsigned int i) {
-			dc.SetPen(axis.pen);
-			if ( axis.fill == false ) {
-				dc.DrawLine(lMargin + x - 1, axis.yOffset + tMargin + drawingArea.height - axis.values[i - 1],
-							lMargin + x,     axis.yOffset + tMargin + drawingArea.height - axis.values[i    ]);
-			}
-			else {
-				dc.DrawRectangle(lMargin + x, axis.yOffset + tMargin + drawingArea.height, 1, -axis.values[i]);
-			}
-		};
-		
-		const unsigned int  pos = timeIndex;
-		unsigned int 		x = 0;
-		
-		// section A
-		for ( unsigned int i = pos; i <= (unsigned int)drawingArea.width; i++, x++ ) {
-			if ( i == 0 || x == 0 )
-				continue;
 
-			if ( m_btToggleConfiguredAxis->GetValue() )		draw(axisConfiguredSpeed, 	x ,i);
-			if ( m_btToggleMeasurePointsAxis->GetValue() ) 	draw(axisMeasurePoints,		x ,i);
-			if ( m_btToggleReceivedSpeedAxis->GetValue() )	draw(axisReceivedSpeed, 	x ,i);
-			if ( m_btToggleMeasuredSpeedAxis->GetValue() )	draw(axisMeasuredSpeed, 	x ,i);
-		}
-		
-		// section B
-		for ( unsigned int i = 0; i < pos; i++, x++ ) {
-			if ( i == 0 || x == 0 )
-				continue;
-				
-			if ( m_btToggleConfiguredAxis->GetValue() )		draw(axisConfiguredSpeed, 	x ,i);
-			if ( m_btToggleMeasurePointsAxis->GetValue() ) 	draw(axisMeasurePoints,		x ,i);
-			if ( m_btToggleReceivedSpeedAxis->GetValue() )	draw(axisReceivedSpeed, 	x ,i);
-			if ( m_btToggleMeasuredSpeedAxis->GetValue() )	draw(axisMeasuredSpeed, 	x ,i);
-		}
-	};
-	
-	// --------------------------------------------------------
-	// drawing
-	drawBoundbox();
-	drawValues();
-	drawMouseLabel();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onPaintLeftAxis(wxPaintEvent& event) {
-////////////////////////////////////////////////////////////////
-	if ( IsShown() == false )
-		return;
-	
-	wxAutoBufferedPaintDC dc(m_leftAxis);
-	dc.Clear();
-	dc.SetBrush(*wxTRANSPARENT_BRUSH);
-	
-	// --------------------------------------------------------
-	auto drawCurrentValue = [&](Axis& axis, double value) {
-		if ( axis.pos != wxLEFT )
-			return;
-			
-		dc.SetTextForeground(axis.pen.GetColour());
-		dc.SetFont(valueFont);
-		
-		const int x = 1;
-		const int y = drawingArea.height - axis.convert(value);
-		
-		dc.DrawLabel(wxString::Format("%4.0lf", value), wxRect(x, y, 100, 100), wxALIGN_LEFT);
-	};
 
-	if ( m_refreshTimer->IsRunning() && m_btToggleConnection->GetValue() == true )
-		drawCurrentValue(axisConfiguredSpeed, currentConfiguredFeedSpeed_MM_MIN); 
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onPaintRightAxis(wxPaintEvent& event) {
-////////////////////////////////////////////////////////////////
-	if ( IsShown() == false )
-		return;
-	
-	wxAutoBufferedPaintDC dc(m_rightAxis);
-	dc.Clear();
-	dc.SetBrush(*wxTRANSPARENT_BRUSH);
 
-	// --------------------------------------------------------
-	auto drawCurrentValue = [&](Axis& axis, double value) {
-		if ( axis.pos != wxRIGHT )
-			return;
-			
-		dc.SetTextForeground(axis.pen.GetColour());
-		dc.SetFont(valueFont);
-		
-		const int x = 1;
-		const int y = drawingArea.height - axis.convert(value);
-		
-		dc.DrawLabel(wxString::Format("%4.0lf", value), wxRect(x, y, 100, 100), wxALIGN_LEFT);
-	};
-	
-	if ( m_refreshTimer->IsRunning() && m_btToggleConnection->GetValue() == true )
-		//drawCurrentValue(axisMeasuredSpeed, currentMeasuredFeedSpeed_MM_MIN);
-		drawCurrentValue(axisReceivedSpeed, currentReceivedFeedSpeed_MM_MIN);
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onMouseMotion(wxMouseEvent& event) {
-////////////////////////////////////////////////////////////////
-	if ( mouseLabel.x < 0 )
-		return;
-		
-	mouseLabel = {event.GetX(), event.GetY()};
-	
-	if ( m_refreshTimer->IsRunning() == false )
-		m_darwingArea->Refresh();
-	
-	event.Skip();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onLeftDown(wxMouseEvent& event) {
-////////////////////////////////////////////////////////////////
-	mouseLabel = {event.GetX(), event.GetY()};
-	m_darwingArea->Refresh();
-	
-	event.Skip();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onLeftUp(wxMouseEvent& event) {
-////////////////////////////////////////////////////////////////
-	mouseLabel = {-1, -1};
-	m_darwingArea->Refresh();
-	
-	event.Skip();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::toggleConfiguredAxis(wxCommandEvent& event) {
-////////////////////////////////////////////////////////////////
-	m_darwingArea->Refresh();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::toggleMeasurePointsAxis(wxCommandEvent& event) {
-////////////////////////////////////////////////////////////////
-	m_darwingArea->Refresh();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::toggleMeasuredSpeedAxis(wxCommandEvent& event) {
-////////////////////////////////////////////////////////////////
-	m_darwingArea->Refresh();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::toggleReceivedSpeedAxis(wxCommandEvent& event) {
-////////////////////////////////////////////////////////////////
-	m_darwingArea->Refresh();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::decorateConnectBtn() {
-////////////////////////////////////////////////////////////////
-	wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
-	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
-	
-	m_btToggleConnection->GetValue() == true ? m_btToggleConnection->SetBitmap(bmpOn) 
-	                                         : m_btToggleConnection->SetBitmap(bmpOff);
-	m_btToggleConnection->Refresh();
-	m_btToggleConnection->Update();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::enableConnection(bool state) {
-////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////
-	decorateConnectBtn();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::toggleConnection() {
-////////////////////////////////////////////////////////////////
-	enableConnection(!m_btToggleConnection->GetValue());
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::toggleConnection(wxCommandEvent& event) {
-////////////////////////////////////////////////////////////////
-	decorateConnectBtn();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::changeIntervalSlider(wxScrollEvent& event) {
-////////////////////////////////////////////////////////////////
-	const int value = m_intervalSlider->GetValue();
-	
-	m_intervalSlider->SetToolTip(wxString::Format("%d ms", value));
-	m_refreshTimer->Start(value);
-}
+
+
+
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::onSave(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
@@ -459,10 +93,10 @@ void CncSpeedMonitor::onSave(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::save() {
 ////////////////////////////////////////////////////////////////
-	const unsigned int w = m_darwingArea->GetClientSize().GetWidth();
-	const unsigned int h = m_darwingArea->GetClientSize().GetHeight();
+	const unsigned int w = m_darwingAreaH->GetClientSize().GetWidth();
+	const unsigned int h = m_darwingAreaH->GetClientSize().GetHeight();
 
-	wxClientDC cltDC(m_darwingArea);
+	wxClientDC cltDC(m_darwingAreaH);
 	wxMemoryDC memDC;
 	wxBitmap bitmap(w, h);
 	
@@ -498,6 +132,225 @@ void CncSpeedMonitor::save() {
 	
 	bitmap.SaveFile(saveFileDialog.GetPath(), wxBITMAP_TYPE_BMP);
 }
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onMouseMotion(wxMouseEvent& event) {
+////////////////////////////////////////////////////////////////
+	if ( diagram.mouseLabel.x < 0 )
+		return;
+	
+	diagram.mouseLabel = {event.GetX(), event.GetY()};
+	
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	da->Refresh();
+	
+	event.Skip();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onLeftDown(wxMouseEvent& event) {
+////////////////////////////////////////////////////////////////
+	diagram.mouseLabel = {event.GetX(), event.GetY()};
+	
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	da->Refresh();
+	
+	event.Skip();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onLeftUp(wxMouseEvent& event) {
+////////////////////////////////////////////////////////////////
+	diagram.mouseLabel = {-1, -1};
+	
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	da->Refresh();
+	
+	event.Skip();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onPaint(wxPaintEvent& event) {
+////////////////////////////////////////////////////////////////
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	if ( da->IsShownOnScreen() == false )
+		return;
+	
+	wxAutoBufferedPaintDC dc(da);
+	dc.Clear();
+	diagram.plotMain(dc, da->GetRect());
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onPaintLeftAxis(wxPaintEvent& event) {
+////////////////////////////////////////////////////////////////
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_leftAxisH : m_topAxisV );
+	if ( da->IsShownOnScreen() == false )
+		return;
+	
+	wxAutoBufferedPaintDC dc(da);
+	dc.Clear();
+	diagram.plotBtLf(dc, da->GetRect());
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onPaintRightAxis(wxPaintEvent& event) {
+////////////////////////////////////////////////////////////////
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_rightAxisH : m_bottomAxisV );
+	if ( da->IsShownOnScreen() == false )
+		return;
+	
+	wxAutoBufferedPaintDC dc(da);
+	dc.Clear();
+	diagram.plotToRt(dc, da->GetRect());
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onSize(wxSizeEvent& event) {
+////////////////////////////////////////////////////////////////
+	event.Skip();
+	const wxRect rect = GetClientRect();
+	
+	// select orientation
+	if ( rect.GetWidth() >= rect.GetHeight() )	diagram.orientation = Diagram::DOHorizontal;
+	else										diagram.orientation	= Diagram::DOVertical;
+	m_drawingAreaBook->SetSelection(diagram.orientation);
+	
+	// scrollbar handling
+	m_scrollBarH->SetScrollbar(diagram.points.getSize(), rect.GetWidth(),  diagram.points.getSize(), rect.GetWidth(),  true);
+	m_scrollBarV->SetScrollbar(diagram.points.getSize(), rect.GetHeight(), diagram.points.getSize(), rect.GetHeight(), true);
+	
+	// main plot range
+	const wxWindow* da  = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	const wxRect daRect = da->GetRect();
+	diagram.plotTRange  = ( diagram.orientation == Diagram::DOHorizontal ? daRect.GetWidth()  : daRect.GetHeight() );
+	diagram.plotFRange  = ( diagram.orientation == Diagram::DOHorizontal ? daRect.GetHeight() : daRect.GetWidth()  );
+	
+	restoreTimeOffset();
+	update();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onToggleMeasurePointsAxis(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	diagram.showTimePoint = m_btToggleMeasurePointsAxis->GetValue();
+	
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	da->Refresh();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onToggleConfiguredAxis(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	diagram.showCfgSpeed = m_btToggleConfiguredAxis->GetValue();
+	
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	da->Refresh();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onToggleReceivedSpeedAxis(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	diagram.showRltSpeed = m_btToggleReceivedSpeedAxis->GetValue();
+	
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	da->Refresh();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::decorateConnectBtn() {
+////////////////////////////////////////////////////////////////
+	wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
+	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
+	
+	m_btToggleConnection->GetValue() == true ? m_btToggleConnection->SetBitmap(bmpOn) 
+	                                         : m_btToggleConnection->SetBitmap(bmpOff);
+	m_btToggleConnection->Refresh();
+	m_btToggleConnection->Update();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::enableConnection(bool state) {
+////////////////////////////////////////////////////////////////
+	decorateConnectBtn();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::toggleConnection() {
+////////////////////////////////////////////////////////////////
+	enableConnection(!m_btToggleConnection->GetValue());
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onToggleConnection(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	decorateConnectBtn();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::init() {
+////////////////////////////////////////////////////////////////
+	typedef Diagram::Resolution DRes;
+	switch ( diagram.resolution ) {
+		case DRes::DS_Sec:				m_intervalSlider->SetValue(1);	break;
+		case DRes::DS_TenthSec:			m_intervalSlider->SetValue(2);	break;
+		case DRes::DS_HundredthSec:		m_intervalSlider->SetValue(3);	break;
+		case DRes::DS_ThousandthSec:	m_intervalSlider->SetValue(4);	break;
+	}
+	m_intervalSlider->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
+	
+	m_cbTimeCompression->SetStringSelection(wxString::Format("%ld", diagram.timeCompression));
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onChangeTimeCompression(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	m_cbTimeCompression->GetStringSelection().ToLong(&(diagram.timeCompression));
+	update();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onChangeIntervalSlider(wxScrollEvent& event) {
+////////////////////////////////////////////////////////////////
+	typedef Diagram::Resolution DRes;
+	
+	const int value = m_intervalSlider->GetValue();
+	switch ( value ) {
+		case 1:	diagram.resolution = DRes::DS_Sec;				break;
+		case 2:	diagram.resolution = DRes::DS_TenthSec; 		break;
+		case 3:	diagram.resolution = DRes::DS_HundredthSec;		break;
+		case 4:	diagram.resolution = DRes::DS_ThousandthSec;	break;
+	}
+	
+	m_intervalSlider->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
+	clear();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::restoreTimeOffset() {
+////////////////////////////////////////////////////////////////
+	const wxRect rect = GetClientRect();
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	
+	if ( horztl )	m_scrollBarH->SetThumbPosition(m_scrollBarH->GetRange() + rect.GetWidth()  - diagram.timeOffset);
+	else			m_scrollBarV->SetThumbPosition(m_scrollBarV->GetRange() + rect.GetHeight() - diagram.timeOffset);
+	
+	update();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::determineTimeOffset() {
+////////////////////////////////////////////////////////////////
+	const wxRect rect = GetClientRect();
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	
+	if ( horztl )	diagram.timeOffset = m_scrollBarH->GetRange() - (m_scrollBarH->GetThumbPosition() + rect.GetWidth());
+	else			diagram.timeOffset = m_scrollBarV->GetRange() - (m_scrollBarV->GetThumbPosition() + rect.GetHeight());
+	
+	diagram.timeOffset /= diagram.timeCompression;
+	
+	update();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onChangeScrollBarH(wxScrollEvent& event) {
+////////////////////////////////////////////////////////////////
+	determineTimeOffset();
+	m_scrollBarH->SetToolTip(wxString::Format("-%ld ms", diagram.timeOffset));
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onChangeScrollBarV(wxScrollEvent& event) {
+////////////////////////////////////////////////////////////////
+	determineTimeOffset();
+	m_scrollBarV->SetToolTip(wxString::Format("-%ld ms", diagram.timeOffset));
+}
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::onClear(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
@@ -506,18 +359,314 @@ void CncSpeedMonitor::onClear(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::clear() {
 ////////////////////////////////////////////////////////////////
-	bool timerState = m_refreshTimer->IsRunning();
-	if ( timerState == true )
-		m_refreshTimer->Stop();
-		
-	axisMeasurePoints.clear();
-	axisMeasuredSpeed.clear();
-	axisConfiguredSpeed.clear();
+	diagram.clear();
 	
-	reset();
-		
-	if ( timerState == true )
-		m_refreshTimer->Start(m_intervalSlider->GetValue());
+	setCurrentFeedSpeedValues(0.0, 0.0);
+	update();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::setCurrentFeedSpeedValues(double cfgF_MM_MIN, double rltF_MM_MIN) {
+////////////////////////////////////////////////////////////////
+	
+	if ( rltF_MM_MIN < 0.0 )
+		std::cout << "rltF_MM_MIN = " << rltF_MM_MIN << std::endl;
 
-	m_darwingArea->Refresh();
+	if ( cnc::dblCompare(rltF_MM_MIN, 0.0) )
+		std::cout << "rltF_MM_MIN = " << rltF_MM_MIN << std::endl;
+	
+	
+	
+	
+	diagram.append(rltF_MM_MIN, cfgF_MM_MIN);
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::update() {
+////////////////////////////////////////////////////////////////
+	if ( m_btToggleConnection->GetValue() == false )
+		return;
+	
+	//diagram.appendAgain(10);
+	
+	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
+	wxWindow* dl = ( diagram.orientation == Diagram::DOHorizontal ? m_leftAxisH    : m_topAxisV     );
+	wxWindow* dr = ( diagram.orientation == Diagram::DOHorizontal ? m_rightAxisH   : m_bottomAxisV  );
+	
+	da->Refresh();
+	dl->Refresh();
+	dr->Refresh();
+}
+////////////////////////////////////////////////////////////////
+int CncSpeedMonitor::Diagram::getFAsPx(double value) {
+////////////////////////////////////////////////////////////////
+	const bool horztl = (orientation == DOHorizontal);
+	
+	if ( horztl )
+		return plotFRange - offsetAxisF - ( value / getVirtualMaxF() * plotFRange);
+	
+	return offsetAxisF + value / getVirtualMaxF() * plotFRange;
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::Diagram::plotBtLf(wxAutoBufferedPaintDC& dc, const wxRect& rect) {
+////////////////////////////////////////////////////////////////
+	if ( showCfgSpeed == false ) 
+		return;
+		
+	if ( points.getCount() == 0 )
+		return;
+		
+	dc.SetPen			(cfgPen);
+	dc.SetBrush			(cfgBrush);
+	dc.SetTextForeground(cfgPen.GetColour());
+	dc.SetFont			(valFont1);
+	
+	auto last = points.rbegin(); 
+	last      = last + timeOffset;
+	
+	const double v		= last->cfgF_MM_MIN.getAvg();
+	const int 	 px		= getFAsPx(v) - ( orientation == DOVertical ? offsetAxisF : 0 );
+	
+	if ( orientation == DOHorizontal ) {
+		dc.DrawRectangle(1, px, rect.GetWidth() - 2 , rect.GetHeight() - px - 1);
+		dc.DrawLabel(wxString::Format("%.0lf", v), wxRect(1, px - 12, rect.GetWidth(), 40), wxALIGN_RIGHT | wxALIGN_TOP);
+	}
+	else {
+		dc.DrawRectangle(1, 1, px, rect.GetHeight() - 1);
+		dc.DrawLabel(wxString::Format("%.0lf", v), wxRect(px + 2, 4, 40, rect.GetHeight()), wxALIGN_LEFT | wxALIGN_TOP);
+	}
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::Diagram::plotToRt(wxAutoBufferedPaintDC& dc, const wxRect& rect) {
+////////////////////////////////////////////////////////////////
+	if ( showRltSpeed == false ) 
+		return;
+		
+	if ( points.getCount() == 0 )
+		return;
+		
+	dc.SetPen			(rltPen);
+	dc.SetBrush			(rltBrush);
+	dc.SetTextForeground(rltPen.GetColour());
+	dc.SetFont			(valFont1);
+	
+	auto last = points.rbegin(); 
+	last      = last + timeOffset;
+	
+	const double v		= last->rltF_MM_MIN.getAvg();
+	const int 	 px		= getFAsPx(v) - ( orientation == DOVertical ? offsetAxisF : 0 );
+	
+	if ( orientation == DOHorizontal ) {
+		dc.DrawRectangle(1, px, rect.GetWidth() - 2 , rect.GetHeight() - px - 1);
+		dc.DrawLabel(wxString::Format("%.0lf", v), wxRect(1, px - 12, rect.GetWidth(), 40), wxALIGN_RIGHT | wxALIGN_TOP);
+	}
+	else {
+		dc.DrawRectangle(1, 1, px , rect.GetHeight() - 1);
+		dc.DrawLabel(wxString::Format("%.0lf", v), wxRect(px + 2, 4, 40, rect.GetHeight()), wxALIGN_LEFT | wxALIGN_TOP);
+	}
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::Diagram::plotMain(wxAutoBufferedPaintDC& dc, const wxRect& rect) {
+////////////////////////////////////////////////////////////////
+	dc.SetBrush(*wxTRANSPARENT_BRUSH);
+	
+	// plot grid
+	dc.SetPen				(grtPen);
+	dc.SetTextForeground	(grtCol2);
+	dc.SetFont				(valFont1);
+	
+	if ( orientation == DOHorizontal ) {
+		// horizontal lines
+		{
+			const int dfMinor = plotFRange/10;
+			const int dfStart = plotFRange - offsetAxisF;
+			
+			grtPen.SetColour(grtCol1);
+			dc.SetPen(grtPen);
+			
+			for (int f = dfStart; f > 0; f -= dfMinor )
+				dc.DrawLine(0, f, plotTRange, f);
+		}
+		// vertical lines --> moving dimension
+		{
+			const int	dtMinor	= 10;
+			const int	dtMajor	= dtMinor * 10;
+			const int	dtStart = (plotTRange - 1) + (timeOffset % (dtMajor));
+			int			vlCnter	= (timeOffset / dtMajor) * dtMajor;
+			
+			for (int t = dtStart; t > 0; t -= dtMinor ) {
+				
+				if ( vlCnter % (dtMajor) == 0 ) {
+					// time scale lable
+					grtPen.SetColour(grtCol2);
+					const int vlCounterValue = vlCnter * timeCompression;
+					dc.DrawLabel(wxString::Format("%c%d [ms]", (vlCounterValue ? '-' : ' '), vlCounterValue), wxRect(t - 50, 0, 50, 10), wxALIGN_RIGHT);
+				}
+				else {
+					grtPen.SetColour(grtCol1);
+				}
+				
+				dc.SetPen(grtPen);
+				dc.DrawLine(t, 10, t, plotFRange - offsetAxisF);
+				
+				vlCnter += dtMinor;
+			}
+		}
+	}
+	else {
+		// vertical lines
+		{
+			const int	dfMinor = plotFRange/10;
+			const int	dfStart = offsetAxisF;
+			
+			grtPen.SetColour(grtCol1);
+			dc.SetPen(grtPen);
+			
+			for (int f = dfStart; f < plotTRange; f += dfMinor )
+				dc.DrawLine(f, 0, f, plotTRange);
+		}
+		// horizontal lines --> moving dimension
+		{
+			const int	dtMinor = 10;
+			const int	dtMajor	= dtMinor * 10;
+			const int	dtStart = (plotTRange - 1) + (timeOffset % (dtMajor));
+			int			vlCnter	= (timeOffset / dtMajor) * dtMajor;
+			
+			for (int t = dtStart; t > 0; t -= dtMinor ) {
+				
+				if ( vlCnter % (dtMajor) == 0 ) {
+					// time scale lable
+					grtPen.SetColour(grtCol2);
+					const int vlCounterValue = vlCnter * timeCompression;
+					dc.DrawLabel(wxString::Format("%c%d [ms]", (vlCounterValue ? '-' : ' '), vlCounterValue), wxRect(plotFRange - 50 , t, 50, 10), wxALIGN_RIGHT);
+				}
+				else {
+					grtPen.SetColour(grtCol1);
+				}
+				
+				dc.SetPen(grtPen);
+				dc.DrawLine(17, t, plotFRange, t);
+				
+				vlCnter += dtMinor;
+			}
+		}
+	}
+	
+	// plot graphs - minimu 2 points required
+	if ( points.getCount() > 1 ) {
+		
+		//----------------------------------------------------------------
+		auto getTsAsPx = [&](CncMilliTimestamp tsFirst, auto it) {
+			return plotTRange - abs((long)(it->ts - tsFirst)) / timeCompression;
+		};
+		
+		//----------------------------------------------------------------
+		auto plotPointHorizontal = [&](CncMilliTimestamp tsFirst, auto itPrev, auto itCurr) {
+			
+			const int ts1 = getTsAsPx(tsFirst, itPrev);
+			const int ts2 = getTsAsPx(tsFirst, itCurr);
+			
+			if ( showCfgSpeed == true ) {
+				const int y1 = getFAsPx(itPrev->cfgF_MM_MIN.getAvg());
+				const int y2 = getFAsPx(itCurr->cfgF_MM_MIN.getAvg());
+					
+				dc.SetPen(cfgPen);
+				if ( y1 == y2 ) { dc.DrawLine(ts1, y1, ts2, y2); }
+				else			{ dc.DrawLine(ts1, y1, ts2, y1); dc.DrawLine(ts2, y1, ts2, y2); }
+			}
+			
+			if ( showRltSpeed == true ) {
+				const int y1 =  getFAsPx(itPrev->rltF_MM_MIN.getAvg());
+				const int y2 =  getFAsPx(itCurr->rltF_MM_MIN.getAvg());
+				
+				dc.SetPen(rltPen);
+				dc.DrawLine(ts1, y1, ts2, y2);
+			}
+			
+			if ( showTimePoint == true ) {
+				dc.SetPen(pntPen);
+				dc.DrawLine(ts2, plotFRange - offsetAxisF, ts2, plotFRange);
+			}
+		};
+		
+		//----------------------------------------------------------------
+		auto plotPointVertical = [&](CncMilliTimestamp tsFirst, auto itPrev, auto itCurr) {
+			
+			const int ts1 = getTsAsPx(tsFirst, itPrev);
+			const int ts2 = getTsAsPx(tsFirst, itCurr);
+			
+			if ( showCfgSpeed == true ) {
+				const int x1 = getFAsPx(itPrev->cfgF_MM_MIN.getAvg());
+				const int x2 = getFAsPx(itCurr->cfgF_MM_MIN.getAvg());
+				
+				dc.SetPen(cfgPen);
+				if ( x1 == x2 )	{ dc.DrawLine(x1, ts1, x2, ts2); } 
+				else 			{ dc.DrawLine(x1, ts1, x1, ts2); dc.DrawLine(x1, ts2, x2, ts2); }
+			}
+			
+			if ( showRltSpeed == true ) {
+				const int x1 = getFAsPx(itPrev->rltF_MM_MIN.getAvg());
+				const int x2 = getFAsPx(itCurr->rltF_MM_MIN.getAvg());
+				
+				dc.SetPen(rltPen);
+				dc.DrawLine(x1, ts1, x2, ts2);
+			}
+			
+			if ( showTimePoint == true ) {
+				dc.SetPen(pntPen);
+				dc.DrawLine(0, ts2, offsetAxisF, ts2);
+			}
+		};
+		
+		// over all relevant points
+		auto rend = points.rend();
+		auto prev = points.rbegin(); 
+		prev = prev + timeOffset;
+		
+		CncMilliTimestamp tsFirst = prev->ts;
+		
+		for ( auto it = prev + 1; it.hasMore(rend); ++it ) {
+			
+			if ( orientation == DOHorizontal )	plotPointHorizontal(tsFirst, prev, it);
+			else								plotPointVertical  (tsFirst, prev, it);
+			
+			// if the last ts was negative (out of the ploting area) stop the ploting
+			// a check after the plot has 1 negative step but a closed grah
+			const int tsPx = getTsAsPx(tsFirst, it);
+			if ( tsPx < 0 )
+				break;
+				
+			prev = it;
+		}
+	}
+	
+	// mouse lable
+	if ( mouseLabel.x < 0 )
+		return;
+	
+	dc.SetTextForeground	(grtCol2);
+	dc.SetFont				(valFont1);
+	
+	if ( orientation == DOHorizontal ) {
+		const int t = (timeOffset + (plotTRange - mouseLabel.x)) * timeCompression;  
+		const int f = ( (plotFRange - offsetAxisF - mouseLabel.y) * getVirtualMaxF() ) / ( plotFRange - offsetAxisF);
+		
+		if ( f > 0 ) {
+			const bool		b = ( plotTRange - mouseLabel.x ) > 100;
+			const int 		a = ( b ? wxALIGN_LEFT | wxALIGN_TOP                            : wxALIGN_RIGHT | wxALIGN_TOP );
+			const wxRect	r = ( b ? wxRect(mouseLabel.x + 5, mouseLabel.y - 10, 100, 100) : wxRect(mouseLabel.x - 100, mouseLabel.y - 10, 100, 100) );
+			
+			dc.DrawLabel(wxString::Format("%d ms, ~%d mm/min", t, f), r, a);
+		}
+	}
+	else {
+		const int t = (timeOffset + (plotTRange - mouseLabel.y)) * timeCompression;  
+		const int f = ( ( mouseLabel.x - offsetAxisF ) * getVirtualMaxF() ) / ( plotFRange - offsetAxisF);
+		
+		if ( f > 0 ) {
+			const bool		b = ( plotFRange - mouseLabel.x ) > 100;
+			const int 		a = ( b ? wxALIGN_LEFT | wxALIGN_TOP                            : wxALIGN_RIGHT | wxALIGN_TOP );
+			const wxRect	r = ( b ? wxRect(mouseLabel.x + 5, mouseLabel.y - 10, 100, 100) : wxRect(mouseLabel.x - 100, mouseLabel.y - 10, 100, 100) );
+			
+			dc.DrawLabel(wxString::Format("%d ms, ~%d mm/min", t, f), r, a);
+		}
+	}
 }

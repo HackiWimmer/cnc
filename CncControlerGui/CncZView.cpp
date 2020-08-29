@@ -7,10 +7,10 @@
 #include "CncZView.h"
 
 wxBEGIN_EVENT_TABLE(CncZView, wxPanel)
-    EVT_PAINT(CncZView::OnPaint)
-	EVT_MOUSE_EVENTS(CncZView::OnMouse)
-	EVT_KILL_FOCUS(CncZView::OnKillFocus)
-	EVT_LEAVE_WINDOW(CncZView::OnLeaveWindow)
+    EVT_PAINT			(CncZView::OnPaint)
+	EVT_MOUSE_EVENTS	(CncZView::OnMouse)
+	EVT_KILL_FOCUS		(CncZView::OnKillFocus)
+	EVT_LEAVE_WINDOW	(CncZView::OnLeaveWindow)
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////////////
@@ -89,6 +89,7 @@ void CncZView::setScale(double val, double errorValue) {
 }
 /////////////////////////////////////////////////////////////////////
 void CncZView::refresh(RefreshType rt) {
+/////////////////////////////////////////////////////////////////////
 	const wxSize cs = GetClientSize();
 	
 	switch ( rt ) {

@@ -1030,7 +1030,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				case PID_XYZ_POS_MAJOR:
 				case PID_XYZ_POS_DETAIL:
 				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
-										realtimeFeedSpeed_MM_MIN = ci.feedSpeed;
+										if ( ci.hasSpeedInformation() )
+											realtimeFeedSpeed_MM_MIN = ci.feedSpeed;
 										
 										if ( postAppPosToo ) 
 											curAppPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
@@ -1171,7 +1172,7 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 		// the compairison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos || force == true) {
-			THE_APP->addCtlPosition(	pid, 
+			THE_APP->addAppPosition(	pid, 
 										getClientId(), 
 										configuredSpeedMode, 
 										getConfiguredFeedSpeed_MM_MIN(), 
@@ -1870,6 +1871,8 @@ bool CncControl::resolveLimits(bool x, bool y, bool z) {
 	values[0] = (int32_t)x;
 	values[1] = (int32_t)y;
 	values[2] = (int32_t)z;
+	
+	CNC_PRINT_LOCATION
 	
 	return serialPort->resolveLimits(size, values);
 }

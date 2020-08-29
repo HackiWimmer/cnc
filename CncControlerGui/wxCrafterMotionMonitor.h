@@ -33,6 +33,7 @@
 #include <wx/propgrid/advprops.h>
 #include <wx/scrolwin.h>
 #include <wx/slider.h>
+#include "CncZView.h"
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -365,7 +366,11 @@ protected:
     wxStaticText* m_staticText48755;
     wxPanel* m_rotatePaneX3D;
     wxStaticText* m_staticText4875;
+    wxPanel* m_drawPanePanel;
     wxPanel* m_drawPane3DPlaceHolder;
+    wxPanel* m_DrawPaneZView;
+    CncZView* m_zView;
+    wxStaticText* m_infoToolDiameter;
     wxPanel* m_scalePane3D;
 
 protected:
@@ -378,6 +383,10 @@ public:
     wxPanel* GetRotatePaneX3D() { return m_rotatePaneX3D; }
     wxStaticText* GetStaticText4875() { return m_staticText4875; }
     wxPanel* GetDrawPane3DPlaceHolder() { return m_drawPane3DPlaceHolder; }
+    CncZView* GetZView() { return m_zView; }
+    wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
+    wxPanel* GetDrawPaneZView() { return m_DrawPaneZView; }
+    wxPanel* GetDrawPanePanel() { return m_drawPanePanel; }
     wxPanel* GetScalePane3D() { return m_scalePane3D; }
     GL3DDrawPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(200,-1), long style = wxTAB_TRAVERSAL);
     virtual ~GL3DDrawPaneBase();

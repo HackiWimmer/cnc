@@ -276,6 +276,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , positionSpy							(NULL)
 , setterList							(NULL)
 , speedMonitor							(NULL)
+, defaultSpeedSlider					(new CncDefaultSpeedSlider(m_defaultSpeedSlider, m_configuredFeedSpeed))
 , motionVertexCtrl						(NULL)
 , cncPreprocessor						(NULL)
 , parsingSynopisis						(NULL)
@@ -362,6 +363,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	m_listbookSetupConfig->GetListView()->SetFont(font);
 	m_listbookReferences->GetListView()->SetFont(font);
 	m_testCaseBook->GetListView()->SetFont(font);
+	
+	defaultSpeedSlider->setToolTipWindow(m_configuredFeedSpeed);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -438,6 +441,7 @@ MainFrame::~MainFrame() {
 	cncDELETE( setterList );
 	cncDELETE( motionVertexCtrl );
 	cncDELETE( speedMonitor );
+	cncDELETE( defaultSpeedSlider );
 	cncDELETE( cncPreprocessor );
 	cncDELETE( parsingSynopisis );
 	cncDELETE( cncSummaryListCtrl );
@@ -738,7 +742,6 @@ void MainFrame::installCustControls() {
 	
 	// speed monitor control
 	speedMonitor = new CncSpeedMonitor(this); 
-	speedMonitor->getSpeedSlider()->setToolTipWindow(m_configuredFeedSpeed);
 	GblFunc::replaceControl(m_speedMonitorPlaceholder, speedMonitor);
 	
 	// preprocessor control
@@ -795,7 +798,8 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(outboundEditor);
 	registerGuiControl(fileView);
 	registerGuiControl(lruFileView);
-
+	
+	registerGuiControl(m_defaultSpeedSlider);
 	registerGuiControl(m_searchConnections);
 	registerGuiControl(m_btnOrigin);
 	registerGuiControl(m_btnRuler);
@@ -955,6 +959,12 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 	cnc::trc.logInfoMessage("Test function 4");
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_CONTEXT->secureModeInfo.isActivatedByStartup = false;
+	m_btDearctivateSecureRunMode->Enable(false);
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) {
@@ -975,6 +985,7 @@ void MainFrame::activateSecureMode(bool state) {
 	const bool useIt   = THE_CONTEXT->secureModeInfo.useIt;
 	m_loadTemplateSec->Enable(!useIt);
 	getLogger()->setShowOnDemandState(!useIt);
+	m_btDearctivateSecureRunMode->Enable(THE_CONTEXT->secureModeInfo.isActivatedByStartup);
 	
 	// switch the state
 	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
@@ -987,12 +998,10 @@ void MainFrame::activateSecureMode(bool state) {
 		showAuiPane("SecureRunPanel", 	false);
 		showAuiPane("StatusBar", 		false);
 		
-		GblFunc::swapControls(m_secMonitorPlaceholder, 	motionMonitor);
-		GblFunc::swapControls(m_secLoggerPlaceholder, 	getLogger());
-		GblFunc::swapControls(m_secZViewPlaceholder, 	m_zView);
-		
-		GblFunc::swapControls(m_fileViewsPlaceholder, 	m_fileViews);
-		
+		GblFunc::swapControls(m_secMonitorPlaceholder,				drawPane3D->GetDrawPanePanel());
+		GblFunc::swapControls(m_secLoggerPlaceholder, 				getLogger());
+		GblFunc::swapControls(m_secSpeedMonitorPlaceholder,			speedMonitor->GetDrawingAreaBook());
+		GblFunc::swapControls(m_fileViewsPlaceholder,				m_fileViews);
 		
 		getLogger()->setShowOnDemandState(false);
 		
@@ -1003,11 +1012,10 @@ void MainFrame::activateSecureMode(bool state) {
 		
 		perspectiveHandler.restoreLoggedPerspective();
 		
-		GblFunc::swapControls(motionMonitor, 		m_secMonitorPlaceholder);
-		GblFunc::swapControls(getLogger(), 			m_secLoggerPlaceholder);
-		GblFunc::swapControls(m_zView, 				m_secZViewPlaceholder);
-		
-		GblFunc::swapControls(m_fileViews,			m_fileViewsPlaceholder);
+		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),		m_secMonitorPlaceholder);
+		GblFunc::swapControls(getLogger(),							m_secLoggerPlaceholder);
+		GblFunc::swapControls(speedMonitor->GetDrawingAreaBook(),	m_secSpeedMonitorPlaceholder);
+		GblFunc::swapControls(m_fileViews,							m_fileViewsPlaceholder);
 		
 		getLogger()->setShowOnDemandState(m_showLoggerOnDemand->GetValue());
 	}
@@ -1179,23 +1187,23 @@ void MainFrame::onTraceTimer(wxTimerEvent& event) {
 		case 0: {
 					callCounter = 1;
 					updateAppPositionControls();
-					//break;
+					break;
 		}
 		case 1: {
 					callCounter = 2;
 					updateCtlPositionControls();
-					//break;
+					break;
 		}
 		case 2: {
 					callCounter = 3;
 					updateSpeedControls();
-					//break;
+					break;
 		}
 		case 3: {
 					callCounter = 4;
 					if ( isProcessing() )
 						statisticsPane->logStatistics(false);
-					//break;
+					break;
 		}
 		case 4: {
 					callCounter = 0;
@@ -1307,14 +1315,7 @@ void MainFrame::addAppPosition(unsigned char pid, long id, char speedMode, doubl
 									);
 	}
 	
-	const double measured_MM_MIN = ( THE_CONTEXT->canSpeedMonitoring() && cnc != NULL ? cnc->getMeasuredFeedSpeed_MM_MIN() : 0.0 ); 
-	
-	static CncSpeedMonitor::SpeedData sd;
-	sd.configured_MM_MIN = cfgSpeedValue;
-	sd.received_MM_MIN	 = curSpeedValue;
-	sd.measured_MM_MIN	 = measured_MM_MIN; 
-	
-	speedMonitor->setCurrentFeedSpeedValues(sd);
+	speedMonitor->setCurrentFeedSpeedValues(cfgSpeedValue, curSpeedValue);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::addCtlPosition(unsigned char pid, long id, char speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& pos) {
@@ -1329,14 +1330,7 @@ void MainFrame::addCtlPosition(unsigned char pid, long id, char speedMode, doubl
 									);
 	}
 	
-	const double measured_MM_MIN = ( THE_CONTEXT->canSpeedMonitoring() && cnc != NULL ? cnc->getMeasuredFeedSpeed_MM_MIN() : 0.0 ); 
-	
-	static CncSpeedMonitor::SpeedData sd;
-	sd.configured_MM_MIN = cfgSpeedValue;
-	sd.received_MM_MIN	 = curSpeedValue;
-	sd.measured_MM_MIN	 = measured_MM_MIN; 
-	
-	speedMonitor->setCurrentFeedSpeedValues(sd);
+	speedMonitor->setCurrentFeedSpeedValues(cfgSpeedValue, curSpeedValue);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateAppPositionControls() {
@@ -1385,7 +1379,8 @@ void MainFrame::updateCtlPositionControls() {
 	}
 	
 	// update z view
-	m_zView->updateView(cnc->getCurCtlPos().getZ() * THE_CONFIG->getDisplayFactZ(unit));
+	if ( drawPane3D && drawPane3D->GetZView() )
+		drawPane3D->GetZView()->updateView(cnc->getCurCtlPos().getZ() * THE_CONFIG->getDisplayFactZ(unit));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateSpeedControls() {
@@ -1394,11 +1389,10 @@ void MainFrame::updateSpeedControls() {
 		return;
 		
 	// Configured speed values
-	if ( speedMonitor->getSpeedSlider()->IsEnabled() == false )
-		updateSpeedSlider(cnc->getConfiguredFeedSpeed_MM_MIN());
-
 	m_configuredFeedSpeed    ->ChangeValue(wxString::Format("%3.1lf", cnc->getConfiguredFeedSpeed_MM_MIN()));
 	m_configuredFeedSpeedMode->ChangeValue(wxString::Format("%c",     cnc::getCncSpeedTypeAsCharacter(cnc->getConfiguredSpeedMode())));
+	
+	speedMonitor->update();
 	
 	// Realtime speed values
 	if ( THE_CONTEXT->isProbeMode() == false && THE_CONTEXT->canSpeedMonitoring() ) {
@@ -1416,12 +1410,12 @@ void MainFrame::updateSpeedControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateAndSetSpeedSlider(float value) {
 ///////////////////////////////////////////////////////////////////
-	speedMonitor->getSpeedSlider()->setValue(value);
+	defaultSpeedSlider->setValue(value);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateSpeedSlider(float value) {
 ///////////////////////////////////////////////////////////////////
-	speedMonitor->getSpeedSlider()->showValue(value);
+	defaultSpeedSlider->previewValue(value);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateCncSpeed(float value, CncSpeedMode mode) {
@@ -1429,7 +1423,7 @@ void MainFrame::updateCncSpeed(float value, CncSpeedMode mode) {
 	if ( cnc == NULL )
 		return;
 		
-	if ( cnc->isConnected() )
+	if ( cnc->isConnected() ) 
 		cnc->changeCurrentFeedSpeedXYZ_MM_MIN(value, mode);
 }
 ///////////////////////////////////////////////////////////////////
@@ -2015,7 +2009,7 @@ void MainFrame::initialize(void) {
 	GetConfigurationToolbook()->SetSelection(0);
 	m_pgMgrSetup->SelectPage(GetConfigurationToolbook()->GetSelection());
 
-	speedMonitor->init(THE_CONFIG->getMaxSpeedXYZ_MM_MIN());
+	speedMonitor->init();
 	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
 	
 	m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
@@ -2253,8 +2247,6 @@ bool MainFrame::connectSerialPort() {
 	if ( cnc == NULL )
 		return false;
 		
-	speedMonitor->getSpeedSlider()->autoConfigure();
-	
 	// initialize the postion controls
 	setControllerZero(true, true, true);
 	
@@ -2278,6 +2270,7 @@ bool MainFrame::connectSerialPort() {
 			notifyConfigUpdate();
 			decorateSwitchToolOnOff(cnc->getToolState());
 			selectSerialSpyMode();
+			setRefPostionState(true);
 			
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
@@ -2292,9 +2285,12 @@ bool MainFrame::connectSerialPort() {
 	cncManuallyMoveCoordPanel->reset();
 	updateSetterList();
 	decoratePortSelector();
+	
+	defaultSpeedSlider->autoConfigure();
+	
 	m_connect->Refresh();
 	m_connect->Update();
-	
+
 	stopAnimationControl();
 	enableControls();
 	
@@ -2565,6 +2561,7 @@ void MainFrame::enableControls(bool state) {
 	
 	m_secureSplitterMainV->SetSashInvisible(!state);
 	m_secureSplitterMainH->SetSashInvisible(!state);
+	m_secureSplitterDrawingH->SetSashInvisible(!state);
 	
 	// enable menu bar
 	enableMenuItems(state);
@@ -2577,8 +2574,6 @@ void MainFrame::enableControls(bool state) {
 	
 	// run control
 	enableRunControls(state);
-	
-	speedMonitor->enableSpeedSlider(state);
 	
 	// at least update motion monitor
 	if ( state == true )
@@ -2666,8 +2661,11 @@ void MainFrame::notifyConfigUpdate() {
 	wxASSERT(cnc);
 	cnc->notifyConfigUpdate();
 	
-	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", THE_CONFIG->getToolDiameter(THE_CONFIG->getCurrentToolId())));
-	m_zView->updateView(cnc->requestControllerPos().getZ() * THE_CONFIG->getDisplayFactZ(THE_CONFIG->getDisplayUnit()));
+	if ( drawPane3D && drawPane3D->GetZView() && drawPane3D->GetInfoToolDiameter() ) {
+		drawPane3D->GetInfoToolDiameter()->SetLabel(wxString::Format("%.3lf", THE_CONFIG->getToolDiameter(THE_CONFIG->getCurrentToolId())));
+		drawPane3D->GetZView()->updateView(cnc->requestControllerPos().getZ() * THE_CONFIG->getDisplayFactZ(THE_CONFIG->getDisplayUnit()));
+	}
+	
 	collectSummary();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3409,7 +3407,7 @@ bool MainFrame::processManualTemplate() {
 	move.toolState		= cncManuallyMoveCoordPanel->switchToolOn();
 	move.correctLimit   = cncManuallyMoveCoordPanel->correctLimitStates();
 	
-	move.f = (double)(speedMonitor->getSpeedSlider()->getValueMM_MIN());
+	move.f = (double)(defaultSpeedSlider->getValueMM_MIN());
 	move.x = cncManuallyMoveCoordPanel->getValueX();
 	move.y = cncManuallyMoveCoordPanel->getValueY();
 	move.z = cncManuallyMoveCoordPanel->getValueZ();
@@ -3976,7 +3974,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			
 		if ( ret == true ) {
 			// This instance starts and stops the speed monitor
-			CncSpeedMonitorRunner smr(speedMonitor, THE_CONFIG->getMaxSpeedXYZ_MM_MIN());
+			CncSpeedMonitorRunner smr(speedMonitor);
 			ret = processTemplateIntern();
 			
 			// refresh some periphery
@@ -5032,7 +5030,6 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	else if ( name == "UnitCalculator")		return m_svgUnitCalulator;
 	else if ( name == "Debugger")			return m_debuggerView;
 	else if ( name == "PositionMonitor")	return m_positionMonitorView;
-	else if ( name == "ZView")				return m_panelZView;
 	else if ( name == "SecureRunPanel")		return m_secureRunPanel;
 	
 	return NULL;
@@ -5050,7 +5047,6 @@ wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 	else if ( name == "UnitCalculator")		return m_miViewUnitCalculator;
 	else if ( name == "Debugger")			return m_miViewDebugger;
 	else if ( name == "PositionMonitor")	return m_miViewPosMonitor;
-	else if ( name == "ZView")				return m_miViewZAxis;
 	
 	return NULL;
 }
@@ -5141,11 +5137,6 @@ void MainFrame::viewLogger(wxCommandEvent& event) {
 void MainFrame::viewMonitor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	toggleAuiPane("Outbound");
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::viewZAxis(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	toggleAuiPane("ZView");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewSpy(wxCommandEvent& event) {
@@ -7650,12 +7641,6 @@ void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 		updateHardwareReference();
 		
 		enableControls();
-		
-#warning
-updateAppPositionControls();
-updateCtlPositionControls();
-updateSpeedControls();
-
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -7820,13 +7805,18 @@ void MainFrame::cncTransactionLockCallback() {
 		}
 	}
 	
+	speedMonitor->deactivate();
+	defaultSpeedSlider->logValue();
+	
 	// Try to set the configurated speed value if not already done.
 	// If it was already done the duplicate setter values will be filtered
-	if ( THE_CONTEXT->canSpeedMonitoring() == true )
-		speedMonitor->getSpeedSlider()->synchronize();
-}
+	if ( THE_CONTEXT->canSpeedMonitoring() == true ) {
+		defaultSpeedSlider->synchronize();
+	}
+} 
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cncTransactionReleaseCallback() {
 /////////////////////////////////////////////////////////////////////
-	
+	defaultSpeedSlider->restoreValue();
+	speedMonitor->activate(THE_CONTEXT->canSpeedMonitoring());
 }

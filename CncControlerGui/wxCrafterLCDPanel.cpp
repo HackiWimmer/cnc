@@ -44,12 +44,12 @@ CncLCDPositionPanelBase::CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer47->Add(m_staticLine5110, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticText49 = new wxStaticText(this, wxID_ANY, _("Cnc Position/Speed Monitor:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText49 = new wxStaticText(this, wxID_ANY, _("Cnc Monitor:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     m_staticText49->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
     wxFont m_staticText49Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText49->SetFont(m_staticText49Font);
     
-    flexGridSizer47->Add(m_staticText49, 0, wxALL, WXC_FROM_DIP(0));
+    flexGridSizer47->Add(m_staticText49, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticLine51 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     

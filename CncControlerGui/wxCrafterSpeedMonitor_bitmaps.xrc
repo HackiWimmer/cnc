@@ -10,7 +10,6 @@
   <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>
   <object class="wxBitmap" name="16-file_save@2x">bitmaps\16-file_save@2x.png</object>
   <object class="wxBitmap" name="appointment-new">bitmaps\appointment-new.png</object>
-  <object class="wxBitmap" name="appointment-new-5">bitmaps\appointment-new-5.png</object>
   <object class="wxBitmap" name="appointment-soon">bitmaps\appointment-soon.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bricks">bitmaps\bricks.png</object>

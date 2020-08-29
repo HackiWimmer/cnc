@@ -23,71 +23,12 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer368 = new wxFlexGridSizer(1, 3, 0, 0);
-    flexGridSizer368->SetFlexibleDirection( wxBOTH );
-    flexGridSizer368->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer368->AddGrowableCol(2);
-    flexGridSizer368->AddGrowableRow(0);
-    this->SetSizer(flexGridSizer368);
-    
-    wxFlexGridSizer* flexGridSizer370 = new wxFlexGridSizer(4, 1, 0, 0);
-    flexGridSizer370->SetFlexibleDirection( wxBOTH );
-    flexGridSizer370->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer370->AddGrowableCol(0);
-    flexGridSizer370->AddGrowableRow(3);
-    
-    flexGridSizer368->Add(flexGridSizer370, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    flexGridSizer370->Add(0, 0, 1, wxALL, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer394 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer394->SetFlexibleDirection( wxBOTH );
-    flexGridSizer394->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer370->Add(flexGridSizer394, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_staticText382 = new wxStaticText(this, wxID_ANY, _("F"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_staticText382->SetForegroundColour(wxColour(wxT("rgb(79,79,79)")));
-    wxFont m_staticText382Font(13, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText382->SetFont(m_staticText382Font);
-    
-    flexGridSizer394->Add(m_staticText382, 0, wxALL, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer397 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer397->SetFlexibleDirection( wxBOTH );
-    flexGridSizer397->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer394->Add(flexGridSizer397, 0, wxALL, WXC_FROM_DIP(0));
-    
-    flexGridSizer397->Add(0, 10, 1, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText47112 = new wxStaticText(this, wxID_ANY, _(" [mm/min]"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText47112Font(6, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText47112->SetFont(m_staticText47112Font);
-    
-    flexGridSizer397->Add(m_staticText47112, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticLine386 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer370->Add(m_staticLine386, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_speedSliderPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(50,-1)), wxTAB_TRAVERSAL);
-    m_speedSliderPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer370->Add(m_speedSliderPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_speedSliderPlaceholder->SetMinSize(wxSize(50,-1));
-    
-    m_staticLine3845 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
-    
-    flexGridSizer368->Add(m_staticLine3845, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
     wxFlexGridSizer* flexGridSizer7514 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer7514->SetFlexibleDirection( wxBOTH );
     flexGridSizer7514->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer7514->AddGrowableCol(0);
     flexGridSizer7514->AddGrowableRow(1);
-    
-    flexGridSizer368->Add(flexGridSizer7514, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    this->SetSizer(flexGridSizer7514);
     
     wxFlexGridSizer* flexGridSizer7523 = new wxFlexGridSizer(1, 11, 0, 0);
     flexGridSizer7523->SetFlexibleDirection( wxBOTH );
@@ -121,25 +62,12 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer7523->Add(m_btToggleConfiguredAxis, 0, wxALL, WXC_FROM_DIP(1));
     m_btToggleConfiguredAxis->SetMinSize(wxSize(26,26));
     
-    m_btToggleMeasuredSpeedAxis = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("appointment-new-5")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
-    m_btToggleMeasuredSpeedAxis->SetToolTip(_("Show Measured Speed"));
-    m_btToggleMeasuredSpeedAxis->SetValue(false);
-    
-    flexGridSizer7523->Add(m_btToggleMeasuredSpeedAxis, 0, wxALL, WXC_FROM_DIP(1));
-    m_btToggleMeasuredSpeedAxis->SetMinSize(wxSize(26,26));
-    
     m_btToggleReceivedSpeedAxis = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("appointment-soon")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     m_btToggleReceivedSpeedAxis->SetToolTip(_("Show Received Speed"));
     m_btToggleReceivedSpeedAxis->SetValue(true);
     
     flexGridSizer7523->Add(m_btToggleReceivedSpeedAxis, 0, wxALL, WXC_FROM_DIP(1));
     m_btToggleReceivedSpeedAxis->SetMinSize(wxSize(26,26));
-    
-    m_staticText7610 = new wxStaticText(this, wxID_ANY, _("[mm/min]"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText7610Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText7610->SetFont(m_staticText7610Font);
-    
-    flexGridSizer7523->Add(m_staticText7610, 0, wxALL, WXC_FROM_DIP(5));
     
     m_staticLine7557 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -157,6 +85,19 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer7523->Add(m_btSave, 0, wxALL, WXC_FROM_DIP(1));
     m_btSave->SetMinSize(wxSize(26,26));
     
+    wxArrayString m_cbTimeCompressionArr;
+    m_cbTimeCompressionArr.Add(wxT("1"));
+    m_cbTimeCompressionArr.Add(wxT("2"));
+    m_cbTimeCompressionArr.Add(wxT("5"));
+    m_cbTimeCompressionArr.Add(wxT("10"));
+    m_cbTimeCompressionArr.Add(wxT("20"));
+    m_cbTimeCompressionArr.Add(wxT("50"));
+    m_cbTimeCompressionArr.Add(wxT("100"));
+    m_cbTimeCompression = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_cbTimeCompressionArr, wxCB_READONLY);
+    m_cbTimeCompression->SetSelection(1);
+    
+    flexGridSizer7523->Add(m_cbTimeCompression, 0, wxALL, WXC_FROM_DIP(2));
+    
     wxFlexGridSizer* flexGridSizer7532 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer7532->SetFlexibleDirection( wxBOTH );
     flexGridSizer7532->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -171,7 +112,7 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7532->Add(m_staticText7534, 0, wxALL, WXC_FROM_DIP(0));
     
-    m_intervalSlider = new wxSlider(this, wxID_ANY, 50, 5, 250, wxDefaultPosition, wxDLG_UNIT(this, wxSize(90,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
+    m_intervalSlider = new wxSlider(this, wxID_ANY, 3, 1, 4, wxDefaultPosition, wxDLG_UNIT(this, wxSize(90,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
     
     flexGridSizer7532->Add(m_intervalSlider, 0, wxALL, WXC_FROM_DIP(1));
     m_intervalSlider->SetMinSize(wxSize(90,-1));
@@ -182,13 +123,46 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7532->Add(m_staticText7614, 0, wxALL, WXC_FROM_DIP(3));
     
+    m_drawingAreaBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_drawingAreaBook->SetName(wxT("m_drawingAreaBook"));
+    m_drawingAreaBook->SetEffect(wxSHOW_EFFECT_NONE);
+    
+    flexGridSizer7514->Add(m_drawingAreaBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_horizontalPanel = new wxPanel(m_drawingAreaBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_drawingAreaBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_drawingAreaBook->AddPage(m_horizontalPanel, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer409 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer409->SetFlexibleDirection( wxBOTH );
+    flexGridSizer409->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer409->AddGrowableCol(0);
+    flexGridSizer409->AddGrowableRow(0);
+    m_horizontalPanel->SetSizer(flexGridSizer409);
+    
+    m_panel401 = new wxPanel(m_horizontalPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_horizontalPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel401->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer409->Add(m_panel401, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer424 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer424->SetFlexibleDirection( wxBOTH );
+    flexGridSizer424->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer424->AddGrowableCol(0);
+    flexGridSizer424->AddGrowableRow(0);
+    m_panel401->SetSizer(flexGridSizer424);
+    
     wxFlexGridSizer* flexGridSizer7547 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer7547->SetFlexibleDirection( wxBOTH );
     flexGridSizer7547->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer7547->AddGrowableCol(1);
+    flexGridSizer7547->AddGrowableCol(0);
     flexGridSizer7547->AddGrowableRow(0);
     
-    flexGridSizer7514->Add(flexGridSizer7547, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer424->Add(flexGridSizer7547, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_darwingAreaH = new wxPanel(m_panel401, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel401, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_darwingAreaH->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer7547->Add(m_darwingAreaH, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer7548 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer7548->SetFlexibleDirection( wxBOTH );
@@ -198,29 +172,13 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7547->Add(flexGridSizer7548, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_leftAxis = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(28,-1)), wxTAB_TRAVERSAL);
-    m_leftAxis->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    m_leftAxisH = new wxPanel(m_panel401, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel401, wxSize(28,-1)), wxTAB_TRAVERSAL);
+    m_leftAxisH->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer7548->Add(m_leftAxis, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_leftAxis->SetMinSize(wxSize(28,-1));
+    flexGridSizer7548->Add(m_leftAxisH, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_leftAxisH->SetMinSize(wxSize(28,-1));
     
     flexGridSizer7548->Add(0, 17, 1, wxALL, WXC_FROM_DIP(0));
-    
-    m_scrollWindow = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHSCROLL);
-    m_scrollWindow->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_scrollWindow->SetScrollRate(5, 5);
-    
-    flexGridSizer7547->Add(m_scrollWindow, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer7540 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer7540->SetFlexibleDirection( wxBOTH );
-    flexGridSizer7540->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    m_scrollWindow->SetSizer(flexGridSizer7540);
-    
-    m_darwingArea = new wxPanel(m_scrollWindow, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWindow, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_darwingArea->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    
-    flexGridSizer7540->Add(m_darwingArea, 0, wxALL, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer7551 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer7551->SetFlexibleDirection( wxBOTH );
@@ -230,69 +188,172 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7547->Add(flexGridSizer7551, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_rightAxis = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(28,-1)), wxTAB_TRAVERSAL);
-    m_rightAxis->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    m_rightAxisH = new wxPanel(m_panel401, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel401, wxSize(28,-1)), wxTAB_TRAVERSAL);
+    m_rightAxisH->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
-    flexGridSizer7551->Add(m_rightAxis, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_rightAxis->SetMinSize(wxSize(28,-1));
+    flexGridSizer7551->Add(m_rightAxisH, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_rightAxisH->SetMinSize(wxSize(28,-1));
     
     flexGridSizer7551->Add(0, 17, 1, wxALL, WXC_FROM_DIP(0));
     
-    m_refreshTimer = new wxTimer;
+    m_scrollBarH = new wxScrollBar(m_panel401, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel401, wxSize(-1,-1)), wxSB_HORIZONTAL);
+    m_scrollBarH->SetScrollbar(10, 1, 10, 1);
+    
+    flexGridSizer424->Add(m_scrollBarH, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_verticalPanel = new wxPanel(m_drawingAreaBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_drawingAreaBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_drawingAreaBook->AddPage(m_verticalPanel, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer411 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer411->SetFlexibleDirection( wxBOTH );
+    flexGridSizer411->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer411->AddGrowableCol(0);
+    flexGridSizer411->AddGrowableRow(0);
+    m_verticalPanel->SetSizer(flexGridSizer411);
+    
+    m_panel4011 = new wxPanel(m_verticalPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_verticalPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel4011->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer411->Add(m_panel4011, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer425 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer425->SetFlexibleDirection( wxBOTH );
+    flexGridSizer425->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer425->AddGrowableCol(0);
+    flexGridSizer425->AddGrowableRow(0);
+    m_panel4011->SetSizer(flexGridSizer425);
+    
+    wxFlexGridSizer* flexGridSizer75472 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer75472->SetFlexibleDirection( wxBOTH );
+    flexGridSizer75472->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer75472->AddGrowableCol(0);
+    flexGridSizer75472->AddGrowableRow(0);
+    
+    flexGridSizer425->Add(flexGridSizer75472, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_darwingAreaV = new wxPanel(m_panel4011, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel4011, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_darwingAreaV->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer75472->Add(m_darwingAreaV, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer75483 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer75483->SetFlexibleDirection( wxBOTH );
+    flexGridSizer75483->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer75483->AddGrowableCol(1);
+    flexGridSizer75483->AddGrowableRow(0);
+    
+    flexGridSizer75472->Add(flexGridSizer75483, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    flexGridSizer75483->Add(17, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_topAxisV = new wxPanel(m_panel4011, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel4011, wxSize(-1,28)), wxTAB_TRAVERSAL);
+    m_topAxisV->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer75483->Add(m_topAxisV, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_topAxisV->SetMinSize(wxSize(-1,28));
+    
+    wxFlexGridSizer* flexGridSizer75517 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer75517->SetFlexibleDirection( wxBOTH );
+    flexGridSizer75517->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer75517->AddGrowableCol(1);
+    flexGridSizer75517->AddGrowableRow(0);
+    
+    flexGridSizer75472->Add(flexGridSizer75517, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    flexGridSizer75517->Add(17, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_bottomAxisV = new wxPanel(m_panel4011, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel4011, wxSize(-1,28)), wxTAB_TRAVERSAL);
+    m_bottomAxisV->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer75517->Add(m_bottomAxisV, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_bottomAxisV->SetMinSize(wxSize(-1,28));
+    
+    m_scrollBarV = new wxScrollBar(m_panel4011, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel4011, wxSize(-1,-1)), wxSB_VERTICAL);
+    m_scrollBarV->SetScrollbar(10, 1, 10, 1);
+    
+    flexGridSizer425->Add(m_scrollBarV, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_drawingAreaBook->SetMinSize(wxSize(320,-1));
     
     SetName(wxT("CncSpeedMonitorBase"));
-    SetSize(500,300);
+    SetSize(600,300);
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
     // Connect events
-    m_btToggleConnection->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleConnection), NULL, this);
-    m_btToggleMeasurePointsAxis->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleMeasurePointsAxis), NULL, this);
-    m_btToggleConfiguredAxis->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleConfiguredAxis), NULL, this);
-    m_btToggleMeasuredSpeedAxis->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleMeasuredSpeedAxis), NULL, this);
-    m_btToggleReceivedSpeedAxis->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleReceivedSpeedAxis), NULL, this);
+    m_btToggleConnection->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleConnection), NULL, this);
+    m_btToggleMeasurePointsAxis->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleMeasurePointsAxis), NULL, this);
+    m_btToggleConfiguredAxis->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleConfiguredAxis), NULL, this);
+    m_btToggleReceivedSpeedAxis->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleReceivedSpeedAxis), NULL, this);
     m_btClear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onClear), NULL, this);
     m_btSave->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onSave), NULL, this);
-    m_intervalSlider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::changeIntervalSlider), NULL, this);
-    m_intervalSlider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedMonitorBase::changeIntervalSlider), NULL, this);
-    m_intervalSlider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedMonitorBase::changeIntervalSlider), NULL, this);
-    m_leftAxis->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintLeftAxis), NULL, this);
-    m_scrollWindow->Connect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onScrolledSize), NULL, this);
-    m_darwingArea->Connect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onSize), NULL, this);
-    m_darwingArea->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaint), NULL, this);
-    m_darwingArea->Connect(wxEVT_MOTION, wxMouseEventHandler(CncSpeedMonitorBase::onMouseMotion), NULL, this);
-    m_darwingArea->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncSpeedMonitorBase::onLeftDown), NULL, this);
-    m_darwingArea->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncSpeedMonitorBase::onLeftUp), NULL, this);
-    m_rightAxis->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintRightAxis), NULL, this);
-    m_refreshTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncSpeedMonitorBase::onRefreshTimer), NULL, this);
+    m_cbTimeCompression->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncSpeedMonitorBase::onChangeTimeCompression), NULL, this);
+    m_intervalSlider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::onChangeIntervalSlider), NULL, this);
+    m_intervalSlider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedMonitorBase::onChangeIntervalSlider), NULL, this);
+    m_intervalSlider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedMonitorBase::onChangeIntervalSlider), NULL, this);
+    m_darwingAreaH->Connect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onSize), NULL, this);
+    m_darwingAreaH->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaint), NULL, this);
+    m_darwingAreaH->Connect(wxEVT_MOTION, wxMouseEventHandler(CncSpeedMonitorBase::onMouseMotion), NULL, this);
+    m_darwingAreaH->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncSpeedMonitorBase::onLeftDown), NULL, this);
+    m_darwingAreaH->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncSpeedMonitorBase::onLeftUp), NULL, this);
+    m_leftAxisH->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintLeftAxis), NULL, this);
+    m_rightAxisH->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintRightAxis), NULL, this);
+    m_scrollBarH->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Connect(wxEVT_SCROLL_PAGEUP, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Connect(wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Connect(wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Connect(wxEVT_SCROLL_LINEUP, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_darwingAreaV->Connect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onSize), NULL, this);
+    m_darwingAreaV->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaint), NULL, this);
+    m_darwingAreaV->Connect(wxEVT_MOTION, wxMouseEventHandler(CncSpeedMonitorBase::onMouseMotion), NULL, this);
+    m_darwingAreaV->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncSpeedMonitorBase::onLeftDown), NULL, this);
+    m_darwingAreaV->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncSpeedMonitorBase::onLeftUp), NULL, this);
+    m_topAxisV->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintLeftAxis), NULL, this);
+    m_bottomAxisV->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintRightAxis), NULL, this);
+    m_scrollBarV->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarV), NULL, this);
+    m_scrollBarV->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarV), NULL, this);
+    m_scrollBarV->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarV), NULL, this);
     
 }
 
 CncSpeedMonitorBase::~CncSpeedMonitorBase()
 {
-    m_btToggleConnection->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleConnection), NULL, this);
-    m_btToggleMeasurePointsAxis->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleMeasurePointsAxis), NULL, this);
-    m_btToggleConfiguredAxis->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleConfiguredAxis), NULL, this);
-    m_btToggleMeasuredSpeedAxis->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleMeasuredSpeedAxis), NULL, this);
-    m_btToggleReceivedSpeedAxis->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::toggleReceivedSpeedAxis), NULL, this);
+    m_btToggleConnection->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleConnection), NULL, this);
+    m_btToggleMeasurePointsAxis->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleMeasurePointsAxis), NULL, this);
+    m_btToggleConfiguredAxis->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleConfiguredAxis), NULL, this);
+    m_btToggleReceivedSpeedAxis->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleReceivedSpeedAxis), NULL, this);
     m_btClear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onClear), NULL, this);
     m_btSave->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onSave), NULL, this);
-    m_intervalSlider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::changeIntervalSlider), NULL, this);
-    m_intervalSlider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedMonitorBase::changeIntervalSlider), NULL, this);
-    m_intervalSlider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedMonitorBase::changeIntervalSlider), NULL, this);
-    m_leftAxis->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintLeftAxis), NULL, this);
-    m_scrollWindow->Disconnect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onScrolledSize), NULL, this);
-    m_darwingArea->Disconnect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onSize), NULL, this);
-    m_darwingArea->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaint), NULL, this);
-    m_darwingArea->Disconnect(wxEVT_MOTION, wxMouseEventHandler(CncSpeedMonitorBase::onMouseMotion), NULL, this);
-    m_darwingArea->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncSpeedMonitorBase::onLeftDown), NULL, this);
-    m_darwingArea->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncSpeedMonitorBase::onLeftUp), NULL, this);
-    m_rightAxis->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintRightAxis), NULL, this);
-    m_refreshTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncSpeedMonitorBase::onRefreshTimer), NULL, this);
+    m_cbTimeCompression->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncSpeedMonitorBase::onChangeTimeCompression), NULL, this);
+    m_intervalSlider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::onChangeIntervalSlider), NULL, this);
+    m_intervalSlider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedMonitorBase::onChangeIntervalSlider), NULL, this);
+    m_intervalSlider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedMonitorBase::onChangeIntervalSlider), NULL, this);
+    m_darwingAreaH->Disconnect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onSize), NULL, this);
+    m_darwingAreaH->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaint), NULL, this);
+    m_darwingAreaH->Disconnect(wxEVT_MOTION, wxMouseEventHandler(CncSpeedMonitorBase::onMouseMotion), NULL, this);
+    m_darwingAreaH->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncSpeedMonitorBase::onLeftDown), NULL, this);
+    m_darwingAreaH->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncSpeedMonitorBase::onLeftUp), NULL, this);
+    m_leftAxisH->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintLeftAxis), NULL, this);
+    m_rightAxisH->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintRightAxis), NULL, this);
+    m_scrollBarH->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Disconnect(wxEVT_SCROLL_PAGEUP, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Disconnect(wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Disconnect(wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_scrollBarH->Disconnect(wxEVT_SCROLL_LINEUP, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarH), NULL, this);
+    m_darwingAreaV->Disconnect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onSize), NULL, this);
+    m_darwingAreaV->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaint), NULL, this);
+    m_darwingAreaV->Disconnect(wxEVT_MOTION, wxMouseEventHandler(CncSpeedMonitorBase::onMouseMotion), NULL, this);
+    m_darwingAreaV->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncSpeedMonitorBase::onLeftDown), NULL, this);
+    m_darwingAreaV->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncSpeedMonitorBase::onLeftUp), NULL, this);
+    m_topAxisV->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintLeftAxis), NULL, this);
+    m_bottomAxisV->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedMonitorBase::onPaintRightAxis), NULL, this);
+    m_scrollBarV->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarV), NULL, this);
+    m_scrollBarV->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarV), NULL, this);
+    m_scrollBarV->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedMonitorBase::onChangeScrollBarV), NULL, this);
     
-    m_refreshTimer->Stop();
-    wxDELETE( m_refreshTimer );
-
 }
 
 CncSpeedPlaygroundBase::CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
@@ -1534,67 +1595,4 @@ CncSpeedPlaygroundBase::~CncSpeedPlaygroundBase()
     m_continuousTimer->Stop();
     wxDELETE( m_continuousTimer );
 
-}
-
-CncSpeedSliderBase::CncSpeedSliderBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-    : wxPanel(parent, id, pos, size, style)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC1664InitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    
-    wxFlexGridSizer* flexGridSizer348 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer348->SetFlexibleDirection( wxBOTH );
-    flexGridSizer348->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer348->AddGrowableCol(0);
-    flexGridSizer348->AddGrowableRow(0);
-    this->SetSizer(flexGridSizer348);
-    
-    m_slider = new wxSlider(this, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxSL_INVERSE|wxSL_VERTICAL);
-    wxFont m_sliderFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_slider->SetFont(m_sliderFont);
-    
-    flexGridSizer348->Add(m_slider, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_lbSliderValue = new wxTextCtrl(this, wxID_ANY, wxT("99.999"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    wxFont m_lbSliderValueFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_lbSliderValue->SetFont(m_lbSliderValueFont);
-    #if wxVERSION_NUMBER >= 3000
-    m_lbSliderValue->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer348->Add(m_lbSliderValue, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    m_lbSliderValue->SetMinSize(wxSize(42,-1));
-    
-    m_lbSliderUinit = new wxStaticText(this, wxID_ANY, _("[mm/min]"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_lbSliderUinitFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_lbSliderUinit->SetFont(m_lbSliderUinitFont);
-    
-    flexGridSizer348->Add(m_lbSliderUinit, 0, wxALL, WXC_FROM_DIP(1));
-    
-    SetName(wxT("CncSpeedSliderBase"));
-    SetSize(-1,-1);
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
-    }
-    // Connect events
-    this->Connect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedSliderBase::onPaint), NULL, this);
-    m_slider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedSliderBase::onThumbtrackSlider), NULL, this);
-    m_slider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedSliderBase::onChangeSlider), NULL, this);
-    m_slider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedSliderBase::onChangedSlider), NULL, this);
-    m_slider->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncSpeedSliderBase::onLeaveWindow), NULL, this);
-    
-}
-
-CncSpeedSliderBase::~CncSpeedSliderBase()
-{
-    this->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncSpeedSliderBase::onPaint), NULL, this);
-    m_slider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedSliderBase::onThumbtrackSlider), NULL, this);
-    m_slider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSpeedSliderBase::onChangeSlider), NULL, this);
-    m_slider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSpeedSliderBase::onChangedSlider), NULL, this);
-    m_slider->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncSpeedSliderBase::onLeaveWindow), NULL, this);
-    
 }

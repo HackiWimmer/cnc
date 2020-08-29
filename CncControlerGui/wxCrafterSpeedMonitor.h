@@ -13,24 +13,25 @@
 #include <wx/panel.h>
 #include <wx/artprov.h>
 #include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/statline.h>
 #include <wx/tglbtn.h>
 #include <wx/button.h>
+#include <wx/statline.h>
 #include <wx/bmpbuttn.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
+#include <wx/stattext.h>
 #include <wx/slider.h>
-#include <wx/scrolwin.h>
-#include <wx/timer.h>
+#include <wx/simplebook.h>
+#include <wx/imaglist.h>
+#include <wx/scrolbar.h>
 #include <wx/frame.h>
 #include <wx/iconbndl.h>
 #include <wx/splitter.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
-#include <wx/combobox.h>
-#include <wx/arrstr.h>
 #include <wx/toolbook.h>
-#include <wx/imaglist.h>
 #include <wx/listctrl.h>
+#include <wx/timer.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -51,74 +52,78 @@
 class CncSpeedMonitorBase : public wxPanel
 {
 protected:
-    wxStaticText* m_staticText382;
-    wxStaticText* m_staticText47112;
-    wxStaticLine* m_staticLine386;
-    wxPanel* m_speedSliderPlaceholder;
-    wxStaticLine* m_staticLine3845;
     wxBitmapToggleButton* m_btToggleConnection;
     wxStaticLine* m_staticLine75573;
     wxBitmapToggleButton* m_btToggleMeasurePointsAxis;
     wxBitmapToggleButton* m_btToggleConfiguredAxis;
-    wxBitmapToggleButton* m_btToggleMeasuredSpeedAxis;
     wxBitmapToggleButton* m_btToggleReceivedSpeedAxis;
-    wxStaticText* m_staticText7610;
     wxStaticLine* m_staticLine7557;
     wxBitmapButton* m_btClear;
     wxBitmapButton* m_btSave;
+    wxComboBox* m_cbTimeCompression;
     wxStaticText* m_staticText7534;
     wxSlider* m_intervalSlider;
     wxStaticText* m_staticText7614;
-    wxPanel* m_leftAxis;
-    wxScrolledWindow* m_scrollWindow;
-    wxPanel* m_darwingArea;
-    wxPanel* m_rightAxis;
-    wxTimer* m_refreshTimer;
+    wxSimplebook* m_drawingAreaBook;
+    wxPanel* m_horizontalPanel;
+    wxPanel* m_panel401;
+    wxPanel* m_darwingAreaH;
+    wxPanel* m_leftAxisH;
+    wxPanel* m_rightAxisH;
+    wxScrollBar* m_scrollBarH;
+    wxPanel* m_verticalPanel;
+    wxPanel* m_panel4011;
+    wxPanel* m_darwingAreaV;
+    wxPanel* m_topAxisV;
+    wxPanel* m_bottomAxisV;
+    wxScrollBar* m_scrollBarV;
 
 protected:
-    virtual void toggleConnection(wxCommandEvent& event) { event.Skip(); }
-    virtual void toggleMeasurePointsAxis(wxCommandEvent& event) { event.Skip(); }
-    virtual void toggleConfiguredAxis(wxCommandEvent& event) { event.Skip(); }
-    virtual void toggleMeasuredSpeedAxis(wxCommandEvent& event) { event.Skip(); }
-    virtual void toggleReceivedSpeedAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleConnection(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleMeasurePointsAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleConfiguredAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleReceivedSpeedAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void onClear(wxCommandEvent& event) { event.Skip(); }
     virtual void onSave(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeIntervalSlider(wxScrollEvent& event) { event.Skip(); }
-    virtual void onPaintLeftAxis(wxPaintEvent& event) { event.Skip(); }
-    virtual void onScrolledSize(wxSizeEvent& event) { event.Skip(); }
+    virtual void onChangeTimeCompression(wxCommandEvent& event) { event.Skip(); }
+    virtual void onChangeIntervalSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void onSize(wxSizeEvent& event) { event.Skip(); }
     virtual void onPaint(wxPaintEvent& event) { event.Skip(); }
     virtual void onMouseMotion(wxMouseEvent& event) { event.Skip(); }
     virtual void onLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void onLeftUp(wxMouseEvent& event) { event.Skip(); }
+    virtual void onPaintLeftAxis(wxPaintEvent& event) { event.Skip(); }
     virtual void onPaintRightAxis(wxPaintEvent& event) { event.Skip(); }
-    virtual void onRefreshTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onChangeScrollBarH(wxScrollEvent& event) { event.Skip(); }
+    virtual void onChangeScrollBarV(wxScrollEvent& event) { event.Skip(); }
 
 public:
-    wxStaticText* GetStaticText382() { return m_staticText382; }
-    wxStaticText* GetStaticText47112() { return m_staticText47112; }
-    wxStaticLine* GetStaticLine386() { return m_staticLine386; }
-    wxPanel* GetSpeedSliderPlaceholder() { return m_speedSliderPlaceholder; }
-    wxStaticLine* GetStaticLine3845() { return m_staticLine3845; }
     wxBitmapToggleButton* GetBtToggleConnection() { return m_btToggleConnection; }
     wxStaticLine* GetStaticLine75573() { return m_staticLine75573; }
     wxBitmapToggleButton* GetBtToggleMeasurePointsAxis() { return m_btToggleMeasurePointsAxis; }
     wxBitmapToggleButton* GetBtToggleConfiguredAxis() { return m_btToggleConfiguredAxis; }
-    wxBitmapToggleButton* GetBtToggleMeasuredSpeedAxis() { return m_btToggleMeasuredSpeedAxis; }
     wxBitmapToggleButton* GetBtToggleReceivedSpeedAxis() { return m_btToggleReceivedSpeedAxis; }
-    wxStaticText* GetStaticText7610() { return m_staticText7610; }
     wxStaticLine* GetStaticLine7557() { return m_staticLine7557; }
     wxBitmapButton* GetBtClear() { return m_btClear; }
     wxBitmapButton* GetBtSave() { return m_btSave; }
+    wxComboBox* GetCbTimeCompression() { return m_cbTimeCompression; }
     wxStaticText* GetStaticText7534() { return m_staticText7534; }
     wxSlider* GetIntervalSlider() { return m_intervalSlider; }
     wxStaticText* GetStaticText7614() { return m_staticText7614; }
-    wxPanel* GetLeftAxis() { return m_leftAxis; }
-    wxPanel* GetDarwingArea() { return m_darwingArea; }
-    wxScrolledWindow* GetScrollWindow() { return m_scrollWindow; }
-    wxPanel* GetRightAxis() { return m_rightAxis; }
-    wxTimer* GetRefreshTimer() { return m_refreshTimer; }
-    CncSpeedMonitorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    wxPanel* GetDarwingAreaH() { return m_darwingAreaH; }
+    wxPanel* GetLeftAxisH() { return m_leftAxisH; }
+    wxPanel* GetRightAxisH() { return m_rightAxisH; }
+    wxScrollBar* GetScrollBarH() { return m_scrollBarH; }
+    wxPanel* GetPanel401() { return m_panel401; }
+    wxPanel* GetHorizontalPanel() { return m_horizontalPanel; }
+    wxPanel* GetDarwingAreaV() { return m_darwingAreaV; }
+    wxPanel* GetTopAxisV() { return m_topAxisV; }
+    wxPanel* GetBottomAxisV() { return m_bottomAxisV; }
+    wxScrollBar* GetScrollBarV() { return m_scrollBarV; }
+    wxPanel* GetPanel4011() { return m_panel4011; }
+    wxPanel* GetVerticalPanel() { return m_verticalPanel; }
+    wxSimplebook* GetDrawingAreaBook() { return m_drawingAreaBook; }
+    CncSpeedMonitorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncSpeedMonitorBase();
 };
 
@@ -382,29 +387,6 @@ public:
     wxTimer* GetContinuousTimer() { return m_continuousTimer; }
     CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Speed & Acceleration Playground"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1000,1200), long style = wxDEFAULT_FRAME_STYLE);
     virtual ~CncSpeedPlaygroundBase();
-};
-
-
-class CncSpeedSliderBase : public wxPanel
-{
-protected:
-    wxSlider* m_slider;
-    wxTextCtrl* m_lbSliderValue;
-    wxStaticText* m_lbSliderUinit;
-
-protected:
-    virtual void onPaint(wxPaintEvent& event) { event.Skip(); }
-    virtual void onThumbtrackSlider(wxScrollEvent& event) { event.Skip(); }
-    virtual void onChangeSlider(wxScrollEvent& event) { event.Skip(); }
-    virtual void onChangedSlider(wxScrollEvent& event) { event.Skip(); }
-    virtual void onLeaveWindow(wxMouseEvent& event) { event.Skip(); }
-
-public:
-    wxSlider* GetSlider() { return m_slider; }
-    wxTextCtrl* GetLbSliderValue() { return m_lbSliderValue; }
-    wxStaticText* GetLbSliderUinit() { return m_lbSliderUinit; }
-    CncSpeedSliderBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
-    virtual ~CncSpeedSliderBase();
 };
 
 #endif

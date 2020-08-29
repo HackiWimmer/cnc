@@ -155,6 +155,7 @@
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="script-delete">bitmaps\script-delete.png</object>
   <object class="wxBitmap" name="script-gear">bitmaps\script-gear.png</object>
+  <object class="wxBitmap" name="security-low-2">bitmaps\security-low-2.png</object>
   <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="settings">bitmaps\settings.png</object>
   <object class="wxBitmap" name="shape-group">bitmaps\shape-group.png</object>

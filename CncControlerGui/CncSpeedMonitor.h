@@ -1,31 +1,26 @@
 #ifndef CNCSPEEDMONITOR_H
 #define CNCSPEEDMONITOR_H
 
+#include <wx/dcbuffer.h>
 #include "OSD/CncTimeFunctions.h"
+#include "CncAverage.h"
+#include "CncCircularBuffer.h"
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "wxCrafterSpeedMonitor.h"
-
-class CncSpeedSlider;
 
 class CncSpeedMonitor : public CncSpeedMonitorBase {
 
 	public:
 	
-		struct SpeedData {
-			double configured_MM_MIN	= 0.0;
-			double measured_MM_MIN		= 0.0;
-			double received_MM_MIN		= 0.0; 
-		};
-		
 		CncSpeedMonitor(wxWindow* parent);
 		virtual ~CncSpeedMonitor();
 		
 		void save();
 		void clear();
 		
-		void init(double maxSpeedValue_MM_MIN);
-		void start(double maxSpeedValue_MM_MIN);
+		void init();
+		void start();
 		void stop();
 		
 		void activate(bool state=true);
@@ -34,23 +29,17 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		void toggleConnection();
 		void enableConnection(bool state=true);
 		void disableConnection() { enableConnection(false); }
-			
-		void setCurrentFeedSpeedValues(const SpeedData& sd);
 		
-		void enableSpeedSlider(bool state);
-		CncSpeedSlider* getSpeedSlider() { return speedSlider; }
+		void setCurrentFeedSpeedValues(double cfgF_MM_MIN, double rltF_MM_MIN);
+		void update();
 		
 	protected:
+		virtual void onChangeTimeCompression(wxCommandEvent& event);
+		virtual void onChangeScrollBarH(wxScrollEvent& event);
+		virtual void onChangeScrollBarV(wxScrollEvent& event);
+		virtual void onChangeIntervalSlider(wxScrollEvent& event);
 		virtual void onClear(wxCommandEvent& event);
 		virtual void onSave(wxCommandEvent& event);
-		virtual void onRefreshTimer(wxTimerEvent& event);
-		virtual void onScrolledSize(wxSizeEvent& event);
-		virtual void changeIntervalSlider(wxScrollEvent& event);
-		virtual void toggleConfiguredAxis(wxCommandEvent& event);
-		virtual void toggleConnection(wxCommandEvent& event);
-		virtual void toggleMeasurePointsAxis(wxCommandEvent& event);
-		virtual void toggleMeasuredSpeedAxis(wxCommandEvent& event);
-		virtual void toggleReceivedSpeedAxis(wxCommandEvent& event);
 		virtual void onLeftDown(wxMouseEvent& event);
 		virtual void onLeftUp(wxMouseEvent& event);
 		virtual void onMouseMotion(wxMouseEvent& event);
@@ -58,92 +47,165 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		virtual void onPaintRightAxis(wxPaintEvent& event);
 		virtual void onPaint(wxPaintEvent& event);
 		virtual void onSize(wxSizeEvent& event);
+
+		virtual void onToggleConfiguredAxis(wxCommandEvent& event);
+		virtual void onToggleConnection(wxCommandEvent& event);
+		virtual void onToggleMeasurePointsAxis(wxCommandEvent& event);
+		virtual void onToggleReceivedSpeedAxis(wxCommandEvent& event);
 		
 	private:
 		
-		static const unsigned int refreshInterval	=  100;
-		
-		static const unsigned int lMargin 			=    8;
-		static const unsigned int rMargin 			=    8;
-		static const unsigned int tMargin 			=    8;
-		static const unsigned int bMargin 			=    8;
-		
-		static const unsigned int MAX_VALUES 		= 4 * 1024;
-		
-		struct Axis {
-			bool fill	= false;
-			wxPen pen 	= wxPen(*wxWHITE, 1, wxSOLID);
-			int pos 	= wxRIGHT;
-			int yOffset	= 0;
+		//--------------------------------------------------------
+		struct Diagram {
 			
-			unsigned int height = 0;
-						
-			double minValue 	= 0.0;
-			double maxValue 	= 0.0;
+			enum Presentation	{ DRRelative, DRAbsolute };
+			enum Orientation	{ DOHorizontal = 0, DOVertical = 1 };
+			enum Resolution		{ DS_Sec=1000, DS_TenthSec=100, DS_HundredthSec=10, DS_ThousandthSec=1 };
 			
-			unsigned int values[MAX_VALUES];
+			struct Point {
+				CncMilliTimestamp	ts = 0.0;
+				CncAverage<double> 	rltF_MM_MIN;
+				CncAverage<double> 	cfgF_MM_MIN;
+				
+				Point() 
+				: ts(0)
+				, rltF_MM_MIN()
+				, cfgF_MM_MIN()
+				{}
+				
+				explicit Point(CncMilliTimestamp t) 
+				: ts(t)
+				, rltF_MM_MIN()
+				, cfgF_MM_MIN()
+				{
+				}
+				
+				Point(CncMilliTimestamp t, double r, double c) 
+				: ts(t)
+				, rltF_MM_MIN()
+				, cfgF_MM_MIN()
+				{
+					rltF_MM_MIN.add(r);
+					cfgF_MM_MIN.add(c);
+				}
+			};
 			
-			// --------------------------------------------------
-			Axis() {
-				clear();
+			typedef CncCircularBuffer<10 * 1024, Point> Points;
+			
+			static const int	offsetAxisF 	= 17;
+			
+			Points 				points;
+			Presentation		presentation	= DRAbsolute;
+			Orientation			orientation		= DOHorizontal;
+			Resolution			resolution		= DS_HundredthSec;
+			double 				maxF_MM_MIN		= 0.0;
+			long				timeOffset		= 0;
+			long				timeCompression	= 2;
+			bool				showTimePoint	= true;
+			bool				showCfgSpeed	= true;
+			bool				showRltSpeed	= true;
+			
+			int					plotTRange		= 0;
+			int					plotFRange		= 0;
+			
+			wxPoint 			mouseLabel		= wxPoint(-1, -1);
+			
+			wxColor 			grtCol1			= wxColour(255, 255, 255).ChangeLightness( 24);
+			wxColor 			grtCol2			= wxColour(255, 255, 255).ChangeLightness(100);
+			
+			wxFont 				valFont1		= wxFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+			
+			wxPen 				grtPen			= wxPen(grtCol1, 										1, wxSOLID);
+			wxPen 				cfgPen			= wxPen(wxColor(153, 217, 234).ChangeLightness(100),	1, wxSOLID);
+			wxPen				rltPen			= wxPen(wxColor(  0, 255,   0).ChangeLightness(100),	1, wxSOLID);
+			wxPen				pntPen			= wxPen(wxColor(255, 128,   0).ChangeLightness(100),	1, wxSOLID);
+			
+			wxBrush				cfgBrush		= wxBrush(cfgPen.GetColour().ChangeLightness(20));
+			wxBrush				rltBrush		= wxBrush(rltPen.GetColour().ChangeLightness(20));
+			
+			CncAverage<double>	defaultValue;
+			
+			//----------------------------------------------------
+			size_t count() const { return points.getSize(); }
+			
+			//----------------------------------------------------
+			double getVirtualMaxF() const {
+				return ( presentation == DRAbsolute ? THE_CONFIG->getMaxSpeedXYZ_MM_MIN() 
+													: maxF_MM_MIN);
 			}
 			
-			// --------------------------------------------------
+			//----------------------------------------------------
 			void clear() {
-				for ( unsigned int i = 0; i < MAX_VALUES; i++ )
-					values[i] = 0;
+				maxF_MM_MIN = 0.0;
+				points.clear();
 			}
 			
-			// --------------------------------------------------
-			unsigned int convert(double value) {
-				if ( maxValue <= 0.0 )
-					return 0;
-				
-				value -= minValue;
-				
-				if ( value <= minValue )
-					return 0;
+			//----------------------------------------------------
+			const CncAverage<double>& getLastCfgF() {
+				if ( count() == 0 )
+					return defaultValue;
 					
-				if ( value >= maxValue )
-					return height;
-				
-				return value * height / maxValue;
+				return points.rbegin()->cfgF_MM_MIN;
 			}
 			
-			// --------------------------------------------------
-			double convertToValue(unsigned int value) {
-				if ( height == 0 )
-					return 0;
+			//----------------------------------------------------
+			const CncAverage<double>& getLastRltF() {
+				if ( count() == 0 )
+					return defaultValue;
 					
-				return value * maxValue / height;
+				return points.rbegin()->rltF_MM_MIN;
 			}
-		};
+			
+			//----------------------------------------------------
+			void append(double r, double c) { 
+				const CncMilliTimestamp ts	= ( (long)(CncTimeFunctions::getMilliTimestamp() / resolution) * resolution );
+				maxF_MM_MIN 				= std::max(maxF_MM_MIN, std::max(r, c));
+				
+				// the first entry
+				if ( count() == 0 ) {
+					points.add(std::move(Point(ts, r, c)));
+					return;
+				}
+				
+				// or a next new entry
+				auto last = points.rbegin();
+				if ( abs((long)(ts - last->ts)) > 0 ) {
+					points.add(std::move(Point(ts, r, c)));
+					return;
+				}
+				
+				// or accumulate
+				last->cfgF_MM_MIN.add(c);
+				last->rltF_MM_MIN.add(r);
+			}
+			
+			//----------------------------------------------------
+			void appendAgain(unsigned int millisFeedForward = 0 ) { 
+				if ( count() == 0 )
+					return;
+					
+				auto last = points.rbegin();
+				
+				if ( millisFeedForward == 0 )
+					append(last->rltF_MM_MIN.getAvg(), last->cfgF_MM_MIN.getAvg());
+				else
+					points.add(std::move(Point(last->ts + millisFeedForward, last->rltF_MM_MIN.getAvg(), last->cfgF_MM_MIN.getAvg())));
+			}
+			
+			//----------------------------------------------------
+			inline void plotBtLf(wxAutoBufferedPaintDC& dc, const wxRect& rect);
+			inline void plotToRt(wxAutoBufferedPaintDC& dc, const wxRect& rect);
+			inline void plotMain(wxAutoBufferedPaintDC& dc, const wxRect& rect);
+			
+			inline int  getFAsPx(double value);
+		}; //struct Diagram 
 		
-		wxRect 				drawingArea;
-		wxFont 				valueFont;
-		wxFont 				labelFont;
-		wxPoint 			mouseLabel;
+		Diagram 			diagram;
 		
-		Axis 				axisMeasurePoints;
-		Axis 				axisMeasuredSpeed;
-		Axis 				axisReceivedSpeed;
-		Axis 				axisConfiguredSpeed;
-		
-		CncSpeedSlider* 	speedSlider;
-		
-		CncMilliTimestamp 	lastRefresh;
-		CncMilliTimestamp 	lastDataSet;
-		
-		unsigned int 		timeIndex;
-		double 				currentMeasuredFeedSpeed_MM_MIN;
-		double 				currentReceivedFeedSpeed_MM_MIN;
-		double 				currentConfiguredFeedSpeed_MM_MIN;
-		
+		void restoreTimeOffset();
+		void determineTimeOffset();
 		void reset();
-		void setupSizes();
-		
 		void decorateConnectBtn();
-	
 };
 
 class CncSpeedMonitorRunner {
@@ -152,11 +214,11 @@ class CncSpeedMonitorRunner {
 		CncSpeedMonitor* monitor;
 
 	public:
-		CncSpeedMonitorRunner(CncSpeedMonitor* sm, double feedSpeed)
+		CncSpeedMonitorRunner(CncSpeedMonitor* sm)
 		: monitor(sm)
 		{
 			if ( monitor && THE_CONTEXT->canSpeedMonitoring() )
-				monitor->start(feedSpeed);
+				monitor->start();
 		}
 
 		~CncSpeedMonitorRunner() {
@@ -166,3 +228,4 @@ class CncSpeedMonitorRunner {
 };
 
 #endif // CNCSPEEDMONITOR_H
+

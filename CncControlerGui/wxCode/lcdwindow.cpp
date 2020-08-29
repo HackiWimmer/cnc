@@ -71,7 +71,8 @@ void wxLCDWindow::DoDrawing( wxDC *dc )
 	int ac = buflen - 1;
 
 	const wxColour lightColour = mLightColour;
-	mLightColour = mLightColour.ChangeLightness(54);
+	mLightColour = wxColour(255, 128, 128); 
+	mLightColour = mLightColour.ChangeLightness(75);
 	
 	for( int c = 0; c < mNumberDigits; c++ )
 	{

@@ -180,7 +180,7 @@ struct ContollerInfo {
 	int32_t yLimit						= 0L;
 	int32_t zLimit						= 0L;
 	
-	bool hasSpeedInformation() { return feedSpeed > 0.0; }
+	bool hasSpeedInformation() const { return feedSpeed > 0.0; }
 };
 
 //------------------------------------------------------------

@@ -3,23 +3,22 @@
 
 #include "wxCrafterSpeedMonitor.h"
 
-class CncSpeedSlider : public CncSpeedSliderBase {
+// -------------------------------------------------------------
+class CncSpeedSliderInterface {
 	
-	private:
-		bool 		bShowvalue;
-		wxWindow*	toolTipWindow;
-		
-		void updateToolTip();
-		
 	protected:
-		virtual void onChangedSlider(wxScrollEvent& event);
-		virtual void onThumbtrackSlider(wxScrollEvent& event);
-		virtual void onChangeSlider(wxScrollEvent& event);
-		virtual void onPaint(wxPaintEvent& event);
+		wxSlider*		slider;
+		wxTextCtrl*		sliderValue;
+		wxStaticText*	sliderUnit;
+		wxWindow*		toolTipWindow;
+		bool 			bShowvalue;
+		
+		virtual void updateToolTip();
+		virtual void updateControls() = 0;
 		
 	public:
-		CncSpeedSlider(wxWindow* parent);
-		virtual ~CncSpeedSlider();
+		CncSpeedSliderInterface(wxSlider* slider, wxTextCtrl* label, wxStaticText* unit);
+		virtual ~CncSpeedSliderInterface();
 		
 		void enable(bool state);
 		
@@ -29,9 +28,11 @@ class CncSpeedSlider : public CncSpeedSliderBase {
 		void setRange(int min, int max);
 		void setValue(int value);
 		void setValue(float value);
+		void setValue(double value);
 		
-		void showValue(int value);
-		void showValue(float value);
+		void previewValue(int value);
+		void previewValue(float value);
+		void previewValue(double value);
 		void synchronize();
 		
 		void autoConfigure();
@@ -40,7 +41,28 @@ class CncSpeedSlider : public CncSpeedSliderBase {
 		int getValueMM_SEC();
 		
 		void setToolTipWindow(wxWindow* wnd) { toolTipWindow = wnd; }
+};
+
+// -------------------------------------------------------------
+class CncDefaultSpeedSlider : public wxEvtHandler, public CncSpeedSliderInterface
+{
+	private: 
+		int 	loggedSliderValue;
 		
+	protected:
+		virtual void onChangedSlider(wxScrollEvent& event);
+		virtual void onThumbtrackSlider(wxScrollEvent& event);
+		virtual void onThumbreleasekSlider(wxScrollEvent& event);
+		
+		virtual void updateControls();
+		
+	public:
+		CncDefaultSpeedSlider(wxSlider* slider, wxTextCtrl* label, wxStaticText* unit = NULL);
+		virtual ~CncDefaultSpeedSlider();
+		
+		void logValue();
+		void unlogValue();
+		void restoreValue();
 };
 
 #endif // CNCSPEEDSLIDER_H

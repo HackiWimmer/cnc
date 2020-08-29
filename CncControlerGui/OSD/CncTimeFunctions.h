@@ -5,21 +5,24 @@
 #include <sys/time.h>
 
 ///////////////////////////////////////////////////////////////////////
-// max size of long long 			9223372036854775807 
-// max seconds of a day:			              86400
-// max milli seconds of a day:		           86400000
-// max mirco seconds of a day:		        86400000000
-// max nano seconds of a day:		     86400000000000
+// max size of    double                         1.79769e+308
+// max size of long long            9.223.372.036.854.775.807 
+// max size of      long                        2.147.483.647
+// max seconds       of a day:                         86.400
+// max milli seconds of a day:                     86.400.000
+// max mirco seconds of a day:                 86.400.000.000
+// max nano  seconds of a day:             86.400.000.000.000
 
-typedef long long   CncNanoTimestamp;
-typedef long double CncMicroTimestamp;
-typedef double      CncMilliTimestamp;
-typedef double      CncSecondTimestamp;
+typedef long long                            CncNanoTimestamp;
+typedef long double                         CncMicroTimestamp;
+typedef double                              CncMilliTimestamp;
+typedef double                             CncSecondTimestamp;
 
-typedef long long   CncNanoTimespan;
-typedef long long   CncMicroTimespan;
-typedef long        CncMilliTimespan;
-typedef long        CncSecondTimespan;
+typedef long long                             CncNanoTimespan;
+typedef long long                            CncMicroTimespan;
+typedef long                                 CncMilliTimespan;
+typedef long                                CncSecondTimespan;
+///////////////////////////////////////////////////////////////////////
 
 struct CncTimeval : public timeval {
 	
