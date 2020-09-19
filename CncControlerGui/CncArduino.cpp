@@ -163,6 +163,7 @@ void ArduinoPIDs::init() {
 	pids[PID_AXIS]                            .setup("Stepper Axis", "");
 	pids[PID_COMMON]                          .setup("Common", "");
 	pids[PID_SPEED_MM_MIN]                    .setup("Speed", "mm/min");
+	pids[PID_SPEED_MM_SEC]                    .setup("Speed", "mm/sec");
 	pids[PID_STEP_PIN]                        .setup("Step Pin", "");
 	pids[PID_DIR_PIN]                         .setup("Direction Pin", "");
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");

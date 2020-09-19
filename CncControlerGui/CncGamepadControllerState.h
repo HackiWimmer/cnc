@@ -4,19 +4,22 @@
 #include "wxCrafterGamePort.h"
 #include "GamepadThread.h"
 
+class CncGamepadCommadHistoryListCtrl;
+
 class CncGamepadControllerState : public CncGamepadControllerStateBase {
 	typedef CncLinearDirection CLD;
 	
 	private:
-		struct MoveState {
-			bool 	moving 	= false;
+		
+		enum MovementState { MS_STOPPED, MS_RUNNING, MS_ERROR };
+	
+		struct MoveInfo {
 			CLD 	dx 		= CLD::CncNoneDir;
 			CLD 	dy 		= CLD::CncNoneDir;
 			CLD 	dz 		= CLD::CncNoneDir;
 			
-			MoveState()
-			: moving(false)
-			, dx(CLD::CncNoneDir)
+			MoveInfo()
+			: dx(CLD::CncNoneDir)
 			, dy(CLD::CncNoneDir)
 			, dz(CLD::CncNoneDir)
 			{}
@@ -27,12 +30,20 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 			bool hasXAndY()	{ return hasX() && hasY();			}
 			bool hasXOrY() 	{ return hasX() || hasY();			}
 			
-			bool isEqual(CLD dx, CLD dy, CLD dz)  { 
+			bool isEqual(CLD dx, CLD dy, CLD dz) const { 
 				return dx == this->dx && dy == this->dy && dz == this->dz; 
 			}
 			
+			bool update(CLD dx, CLD dy, CLD dz) { 
+				if ( isEqual(dx, dy, dz) == false ) {
+					set(dx, dy, dz);
+					return true;
+				}
+				
+				return false; 
+			}
+			
 			void reset() { 
-				moving = false;  
 				dx = dy = dz = CLD::CncNoneDir;	
 			}
 			
@@ -43,34 +54,40 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 			}
 		};
 		
-		bool 			running;
-		MoveState 		currentMoveState;
+		CncGamepadCommadHistoryListCtrl* cmdHistCtrl;
+		MovementState	currentMovementState;
+		MoveInfo 		currentMoveInfo;
 		wxString 		serviceShortName;
 		wxString 		serviceLongName;
 		
 		inline bool isRefPosDlgMode();
 		
 		inline void processTrace(const GamepadEvent& state);
-		inline void processReferencePage(const GamepadEvent& state);
+		inline void processOpenNavigator(const GamepadEvent& state);
 		inline void processPositionControlMode(const GamepadEvent& state);
 		inline void processRefPositionDlg(const GamepadEvent& state);
-		inline void processPosition(const GamepadEvent& state);
+		inline void processMovement(const GamepadEvent& state);
 		
-	public:
-		CncGamepadControllerState(wxWindow* parent);
-		virtual ~CncGamepadControllerState();
+		inline const char* getMovementStateAsString(MovementState s);
 		
-		bool isRunning() { return running; }
-		void update(const GamepadEvent& state);
-		void trace(const wxString& msg);
+		void decoarteConnectButton();
 		
 	protected:
+		virtual void onClearHistory(wxCommandEvent& event);
+		virtual void onConnectGamepad(wxCommandEvent& event);
 		virtual void clearGamepadServiceTrace(wxCommandEvent& event);
 		void executeCommand(const wxString& cmd);
+		void traceCommand(const wxString& cmd);
 		
 		virtual void queryGamepadService(wxCommandEvent& event);
 		virtual void startGamepadService(wxCommandEvent& event);
 		virtual void stopGamepadService(wxCommandEvent& event);
 		
+	public:
+		CncGamepadControllerState(wxWindow* parent);
+		virtual ~CncGamepadControllerState();
+		
+		void update(const GamepadEvent& state);
+		void trace(const wxString& msg);
 };
 #endif // CNCGAMEPADCONTROLLERSTATE_H

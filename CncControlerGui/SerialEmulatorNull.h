@@ -259,13 +259,15 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		
 		// -----------------------------------------------------------------------------------
 		// ArduinoPositionRenderer interface
-		virtual byte checkRuntimeEnv();
-		virtual byte setDirection   (AxisId aid, int32_t steps)	{ return RET_OK; }
-		virtual byte performNextStep(AxisId aid)				{ return RET_OK; }
-		virtual byte performStep    (AxisId aid)				{ return RET_OK; }
-		virtual byte initiateStep   (AxisId aid);
-		virtual byte finalizeStep   (AxisId aid);
-		virtual void notifyMovePart (int8_t dx, int8_t dy, int8_t dz);
+		virtual byte checkRuntimeEnv		();
+		virtual byte setDirection			(AxisId aid, int32_t steps)	{ return RET_OK; }
+		virtual byte performNextStep		(AxisId aid)				{ return RET_OK; }
+		virtual byte performStep			(AxisId aid)				{ return RET_OK; }
+		virtual byte initiateStep			(AxisId aid);
+		virtual byte finalizeStep			(AxisId aid);
+		virtual void notifyMovePartInit		() {}
+		virtual void notifyMovePartBefore	() {}
+		virtual void notifyMovePartAfter	();
 
 		virtual bool writeMoveSequenceRawCallback( unsigned char* buffer, unsigned int nbByte) { return true; }
 		

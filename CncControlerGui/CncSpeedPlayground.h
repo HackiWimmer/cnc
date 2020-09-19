@@ -61,7 +61,9 @@ class CncSpeedPlayground 	: public CncSpeedPlaygroundBase
 		virtual byte setDirection(AxisId aid, int32_t steps)	{ return RET_OK; }
 		virtual byte checkRuntimeEnv()  						{ return RET_OK; }
 
-		virtual void notifyMovePart (int8_t dx, int8_t dy, int8_t dz);
+		virtual void notifyMovePartInit  () {}
+		virtual void notifyMovePartBefore();
+		virtual void notifyMovePartAfter ();
 		virtual byte performNextStep(AxisId aid);
 		virtual byte performStep    (AxisId aid);
 		virtual byte initiateStep   (AxisId aid);

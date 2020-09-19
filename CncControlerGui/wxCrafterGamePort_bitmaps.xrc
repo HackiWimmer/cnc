@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
+  <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
+  <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
+  <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-x-close">bitmaps\16-x-close.png</object>
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="BMP_COMPASS_000">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\compass_000.png</object>
@@ -14,8 +18,12 @@
   <object class="wxBitmap" name="BMP_COMPASS_NULL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\compass_NULL.png</object>
   <object class="wxBitmap" name="BMP_NAVI_XY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_all-small.png</object>
   <object class="wxBitmap" name="BMP_NAVI_Z">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_updown-small.png</object>
+  <object class="wxBitmap" name="BMP_START">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\run-build-2.png</object>
   <object class="wxBitmap" name="BMP_STICK_LEFT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="BMP_STICK_RIGHT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\rstick_updown-small.png</object>
+  <object class="wxBitmap" name="BMP_STOP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\run-build-clean.png</object>
+  <object class="wxBitmap" name="BMP_UPDATE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-inactive (2).png</object>
+  <object class="wxBitmap" name="BMP_UPDATE_WITH_CONTENT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-available-2 (2).png</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
   <object class="wxBitmap" name="color-swatch">bitmaps\color-swatch.png</object>
   <object class="wxBitmap" name="compass_000">bitmaps\compass_000.png</object>

@@ -9,6 +9,41 @@ namespace cnc {
 	const char* USER_DEFIND_SPEED_CHAR_DESC		= "Userdefined speed";
 };
 
+
+//////////////////////////////////////////////////////////////
+StepSensitivity cnc::getStepSensitivityOfIndex(unsigned int index) {
+//////////////////////////////////////////////////////////////
+	StepSensitivity stepSensitivity = StepSensitivity::FINEST;
+	
+	switch ( index ) {
+		case 0: 	stepSensitivity = StepSensitivity::FINEST;		break;
+		case 1: 	stepSensitivity = StepSensitivity::FINE; 		break;
+		case 2: 	stepSensitivity = StepSensitivity::MEDIUM; 		break;
+		case 3: 	stepSensitivity = StepSensitivity::ROUGH; 		break;
+		case 4: 	stepSensitivity = StepSensitivity::ROUGHEST; 	break;
+		
+		default:	stepSensitivity = StepSensitivity::FINEST;
+	}
+	
+	return stepSensitivity;
+}
+//////////////////////////////////////////////////////////////
+float cnc::getSpeedValue(StepSensitivity s) {
+//////////////////////////////////////////////////////////////
+	// any default value . . .
+	double			newSpeed =    1.0;
+	const double	maxSpeed = 9000.0;
+	
+	switch ( s ) {
+		case FINEST:	newSpeed = 60.0;				break;
+		case FINE:		newSpeed = maxSpeed * 0.2;		break;
+		case MEDIUM:	newSpeed = maxSpeed * 0.5;		break;
+		case ROUGH:		newSpeed = maxSpeed * 0.8;		break;
+		case ROUGHEST:	newSpeed = maxSpeed * 1.0;		break;
+	}
+	
+	return newSpeed;
+}
 //////////////////////////////////////////////////////////////
 const wxString& cnc::lformat(wxString& str, unsigned int len, char c) {
 //////////////////////////////////////////////////////////////

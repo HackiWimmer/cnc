@@ -7,7 +7,8 @@
 // ----------------------------------------------------------------------------
 // CncNavigatorPanel Event Table
 // ----------------------------------------------------------------------------
-wxDEFINE_EVENT(wxEVT_CNC_NAVIGATOR_PANEL, CncNavigatorPanelEvent);
+wxDEFINE_EVENT(wxEVT_CNC_NAVIGATOR_PANEL,		CncNavigatorPanelEvent);
+wxDEFINE_EVENT(wxEVT_CNC_NAVIGATOR_PANEL_TIMER,	wxTimerEvent);
 
 wxBEGIN_EVENT_TABLE(CncNavigatorPanel, wxPanel)
 	EVT_PAINT					(CncNavigatorPanel::onPaint)
@@ -19,20 +20,25 @@ wxBEGIN_EVENT_TABLE(CncNavigatorPanel, wxPanel)
 	EVT_SET_FOCUS				(CncNavigatorPanel::onSetFocus)
 	EVT_KILL_FOCUS				(CncNavigatorPanel::onKillFocus)
 	EVT_ERASE_BACKGROUND		(CncNavigatorPanel::onEraseBackground)
+	EVT_TIMER					(wxEVT_CNC_NAVIGATOR_PANEL_TIMER, CncNavigatorPanel::onContinuousTimer)
 wxEND_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////
 CncNavigatorPanel::CncNavigatorPanel(wxWindow *parent, const Config& cfg)
-: wxPanel(parent)
-, navEvent(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
-, navRectangle()
-, innerRadius(0)
-, outerRadius(0)
-, outerRegions()
-, config(cfg)
-, current()
+: wxPanel			(parent)
+, navEvent			(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
+, continuousEvent	(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
+, continuousTimer	(this, wxEVT_CNC_NAVIGATOR_PANEL_TIMER)
+, navRectangle		()
+, innerRadius		(0)
+, outerRadius		(0)
+, outerRegions		()
+, config			(cfg)
+, current			()
 ///////////////////////////////////////////////////////////////////
 {
+	continuousTimer.Stop();
+	
 	// This has to be done to use wxAutoBufferedPaintDC 
 	// on EVT_PAINT events correctly
 	SetBackgroundStyle(wxBG_STYLE_PAINT);
@@ -92,8 +98,10 @@ CncNavigatorPanel::CncNavigatorPanel(wxWindow *parent, const Config& cfg)
 ///////////////////////////////////////////////////////////////////
 CncNavigatorPanel::~CncNavigatorPanel() {
 ///////////////////////////////////////////////////////////////////
-	if ( navEvent != NULL )
-		delete navEvent;
+	continuousTimer.Stop();
+	
+	wxDELETE ( navEvent );
+	wxDELETE ( continuousEvent );
 }
 ///////////////////////////////////////////////////////////////////
 const char* CncNavigatorPanel::getDirectionAsString(const Direction d) {
@@ -117,7 +125,7 @@ const char* CncNavigatorPanel::getDirectionAsString(const Direction d) {
 	return "???";
 }
 //////////////////////////////////////////////////
-CncNavigatorPanelEvent& CncNavigatorPanel::getEvent(int id) { 
+CncNavigatorPanelEvent& CncNavigatorPanel::prepareEvent(int id) { 
 //////////////////////////////////////////////////
 	wxASSERT(navEvent); 
 	navEvent->reset();
@@ -151,7 +159,7 @@ void CncNavigatorPanel::onKeyDown(wxKeyEvent& event) {
 void CncNavigatorPanel::onEnter(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	typedef CncNavigatorPanelEvent::Id EID;
-	enterPanel(getEvent(EID::CNP_ENTER_PANEL));
+	enterPanel(prepareEvent(EID::CNP_ENTER_PANEL));
 	
 	event.Skip();
 }
@@ -159,7 +167,7 @@ void CncNavigatorPanel::onEnter(wxMouseEvent& event) {
 void CncNavigatorPanel::onLeave(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	typedef CncNavigatorPanelEvent::Id EID;
-	leavePanel(getEvent(EID::CNP_LEAVE_PANEL));
+	leavePanel(prepareEvent(EID::CNP_LEAVE_PANEL));
 	
 	event.Skip();
 }
@@ -167,7 +175,7 @@ void CncNavigatorPanel::onLeave(wxMouseEvent& event) {
 void CncNavigatorPanel::onSetFocus(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	typedef CncNavigatorPanelEvent::Id EID;
-	setFocus(getEvent(EID::CNP_SET_FOCUS));
+	setFocus(prepareEvent(EID::CNP_SET_FOCUS));
 	
 	event.Skip();
 }
@@ -175,7 +183,7 @@ void CncNavigatorPanel::onSetFocus(wxFocusEvent& event) {
 void CncNavigatorPanel::onKillFocus(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	typedef CncNavigatorPanelEvent::Id EID;
-	killFocus(getEvent(EID::CNP_KILL_FOCUS));
+	killFocus(prepareEvent(EID::CNP_KILL_FOCUS));
 	
 	event.Skip();
 }
@@ -589,7 +597,7 @@ void CncNavigatorPanel::onMouse(const MouseInfo& mi) {
 	
 	typedef CncNavigatorPanelEvent::Id EID;
 	
-	CncNavigatorPanelEvent& evt = getEvent();
+	CncNavigatorPanelEvent& evt = prepareEvent();
 	evt.radius 	= radius;
 	evt.angle	= angle;
 	evt.mouseX 	= mi.normalizedX;
@@ -685,4 +693,42 @@ void CncNavigatorPanel::onMouse(const MouseInfo& mi) {
 	}
 	
 	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::leftDownRegion(const CncNavigatorPanelEvent& event) {
+///////////////////////////////////////////////////////////////////
+	postEvent(event); 
+	
+	typedef CncNavigatorPanelEvent::Id EID;
+	startContinuousEvent(EID::CNP_LEFT_DOWN_FOLLOWUP); 
+}
+///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::leftUpRegion(const CncNavigatorPanelEvent& event) {
+///////////////////////////////////////////////////////////////////
+	postEvent(event); 
+	stopContinuousEvent();  
+}
+///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::onContinuousTimer(wxTimerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( continuousEvent );
+	CncNavigatorPanelEvent& evt = *continuousEvent;
+	postEvent(evt);
+}
+///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::startContinuousEvent(int id) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( continuousEvent );
+	
+	continuousEvent->reset();
+	continuousEvent->SetEventObject(this); 
+	continuousEvent->SetId(id); 
+	
+	continuousTimer.Start(100);
+}
+///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::stopContinuousEvent() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( continuousEvent );
+	continuousTimer.Stop();
 }

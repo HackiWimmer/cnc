@@ -16,12 +16,15 @@
 // static initialization . . .
 typedef ArduinoPositionRenderer::RS RS;
 
-int32_t       RS::A[RS::POINT_LENGTH]    = {0,0,0};
-int32_t       RS::B[RS::POINT_LENGTH]    = {0,0,0};
-uint32_t      RS::impulseCount           = 0;
-uint32_t      RS::xStepCount             = 0;
-uint32_t      RS::yStepCount             = 0;
-uint32_t      RS::zStepCount             = 0;
+int32_t             RS::A[RS::POINT_LENGTH]    = {0,0,0};
+int32_t             RS::B[RS::POINT_LENGTH]    = {0,0,0};
+
+uint8_t             RS::stepSignature          = 0;
+AxisSignatureIndex  RS::stepSignatureIndex     = ASGI_MASTER;
+uint32_t            RS::impulseCount           = 0;
+uint32_t            RS::xStepCount             = 0;
+uint32_t            RS::yStepCount             = 0;
+uint32_t            RS::zStepCount             = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////
 ArduinoPositionRenderer::ArduinoPositionRenderer()
@@ -42,51 +45,57 @@ byte ArduinoPositionRenderer::stepping() {
   // if stepping() is called from renderMove - normal processing -
   //  - RS conatins dx, dy and dz with a range of [-1, 0, +1] only
   //  - In this connection 0, 1, 2 or 3 axes can be included
-   
-  byte retValue = checkRuntimeEnv();
-  if ( retValue != RET_OK )
-    return retValue;
 
-  // avoid empty processing
-  if ( RS::empty() )
+  // Attention: checkRuntimeEnv() has to be processed always 
+  // to have a correct signal handling, also if the RS::empty() == true
+    byte retValue = checkRuntimeEnv();
+    if ( retValue != RET_OK )
+      return retValue;
+    
+  // .......................................................  
+    // avoid empty processing
+    if ( RS::empty() )
+      return RET_OK;
+
+    notifyMovePartInit();  
+      
+    RS::impulseCount++;
+    RS::stepSignature = 0;
+      
+    if ( RS::dx() != 0 ) {
+      if ( (retValue = initiateStep(IDX_X)) != RET_OK ) 
+        return retValue;
+  
+      RS::stepSignature |= ASG_X;
+      RS::xStepCount++;
+    }
+    
+    if ( RS::dy() != 0 ) {
+       if ( (retValue = initiateStep(IDX_Y)) != RET_OK )
+        return retValue;
+        
+      RS::stepSignature |= ASG_Y;
+      RS::yStepCount++;
+    }
+      
+    if ( RS::dz() != 0 ) {
+       if ( (retValue = initiateStep(IDX_Z)) != RET_OK )
+        return retValue;
+        
+      RS::stepSignature |= ASG_Z;
+      RS::zStepCount++;
+    }
+    
+    notifyMovePartBefore();
+  
+    if ( finalizeStep(IDX_X) == false ) { PRINT_DEBUG_VALUE1("finalizeStep(IDX_X)","false") }
+    if ( finalizeStep(IDX_Y) == false ) { PRINT_DEBUG_VALUE1("finalizeStep(IDX_Y)","false") }
+    if ( finalizeStep(IDX_Z) == false ) { PRINT_DEBUG_VALUE1("finalizeStep(IDX_Z)","false") }
+  
+    notifyMovePartAfter();
+    
+    RS::swap();
     return RET_OK;
-    
-  RS::impulseCount++;
-
-  // before
-  
-    
-  if ( RS::dx() != 0 ) {
-    if ( (retValue = initiateStep(IDX_X)) != RET_OK ) 
-      return retValue;
-
-    RS::xStepCount++;
-  }
-  
-  if ( RS::dy() != 0 ) {
-     if ( (retValue = initiateStep(IDX_Y)) != RET_OK )
-      return retValue;
-      
-    RS::yStepCount++;
-  }
-    
-  if ( RS::dz() != 0 ) {
-     if ( (retValue = initiateStep(IDX_Z)) != RET_OK )
-      return retValue;
-      
-    RS::zStepCount++;
-  }
-
-  if ( finalizeStep(IDX_X) == false ) { PRINT_DEBUG_VALUE("finalizeStep(IDX_X)","false") }
-  if ( finalizeStep(IDX_Y) == false ) { PRINT_DEBUG_VALUE("finalizeStep(IDX_Y)","false") }
-  if ( finalizeStep(IDX_Z) == false ) { PRINT_DEBUG_VALUE("finalizeStep(IDX_Z)","false") }
-
-  // after
-  // position and speed management
-  notifyMovePart((int8_t)RS::dx(), (int8_t)RS::dy(), (int8_t)RS::dz());
-  
-  RS::swap();
-  return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte ArduinoPositionRenderer::directMove(int8_t dx, int8_t dy, int8_t dz) {
@@ -114,12 +123,6 @@ byte ArduinoPositionRenderer::directMove(int8_t dx, int8_t dy, int8_t dz) {
   RS::A[IDX_Y] = dy == 0 ? 0 : dy > 1 ? 0 : -1;
   RS::A[IDX_Z] = dz == 0 ? 0 : dz > 1 ? 0 : -1;
  
-  /*if ( RS::dx() != 0 ||RS::dy() != 0 || RS::dz() != 0 ) {
-      PRINT_DEBUG_VALUE("processSignalUpdate X", RS::dx())
-      PRINT_DEBUG_VALUE("processSignalUpdate Y", RS::dy())
-      PRINT_DEBUG_VALUE("processSignalUpdate Z", RS::dz())
-  }*/
-
   return stepping();
 }
 /////////////////////////////////////////////////////////////////////////////////////

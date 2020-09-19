@@ -501,30 +501,32 @@ void CncPerspective::logCurrentPerspective() {
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void CncPerspective::restoreLoggedPerspective() {
+bool CncPerspective::restoreLoggedPerspective() {
 /////////////////////////////////////////////////////////////////////
-	if ( currentPerspectiveBuffer.layoutInfo.IsEmpty() == false ) {
-		THE_APP->m_auimgrMain->LoadPerspective(currentPerspectiveBuffer.layoutInfo);
+	if ( currentPerspectiveBuffer.layoutInfo.IsEmpty() == true ) 
+		return false;
 		
-		wxAuiPaneInfoArray panes = THE_APP->GetAuimgrMain()->GetAllPanes();
-		for (unsigned int i = 0; i < panes.GetCount(); ++i) {
-			
-			const wxString name = panes.Item(i).name;
-			auto it             = currentPerspectiveBuffer.paneList.find(name);
-			const bool show     = it != currentPerspectiveBuffer.paneList.end() ? it->second : false;
-						
-			if ( show == true )	THE_APP->showAuiPane(name, false);
-			else				THE_APP->hideAuiPane(name, false);
-		}
+	THE_APP->m_auimgrMain->LoadPerspective(currentPerspectiveBuffer.layoutInfo);
+	
+	wxAuiPaneInfoArray panes = THE_APP->GetAuimgrMain()->GetAllPanes();
+	for (unsigned int i = 0; i < panes.GetCount(); ++i) {
 		
-		THE_APP->decorateViewMenu();
-		THE_APP->GetAuimgrMain()->Update();
+		const wxString name = panes.Item(i).name;
+		auto it             = currentPerspectiveBuffer.paneList.find(name);
+		const bool show     = it != currentPerspectiveBuffer.paneList.end() ? it->second : false;
+					
+		if ( show == true )	THE_APP->showAuiPane(name, false);
+		else				THE_APP->hideAuiPane(name, false);
 	}
+	
+	THE_APP->decorateViewMenu();
+	THE_APP->GetAuimgrMain()->Update();
+	
+	return true;
 }
 /////////////////////////////////////////////////////////////////////
 const char* CncPerspective::formatWxPerspectiveInfo(wxString& info) {
 /////////////////////////////////////////////////////////////////////
 	info.Replace("|", "\n ", true);
-	
 	return info;
 }

@@ -12,6 +12,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////
 namespace AccelMngParameter {
+#ifdef SKETCH_COMPILE 
   
   template <class T>
   void print(unsigned char pid, T value, int8_t indent=1) {
@@ -19,34 +20,78 @@ namespace AccelMngParameter {
     Serial.print(pid);   Serial.print(TEXT_SEPARATOR); \
     Serial.print(value); Serial.write(TEXT_CLOSE);
   }
+  
+#else
+
+  template <class T>
+  void print(unsigned char pid, T value, int8_t indent=1) {
+    ARDO_DEBUG_VALUE(wxString::Format("PID=%u", pid), value); \
+  }
+  
+#endif  
 };
-/////////////////////////////////////////////////////////////////////////////////////
-ArduinoAccelManager::ArduinoAccelManager()
-: initialized           (false)
-, active                (false)
-, curState              (P_UNDEF)
-, fA                    ()
-, fD                    ()
-, aRampWidth_IMPL       (-1.0)
-, dRampWidth_IMPL       (-1.0)
-, cD_IMPL               (0)
-, iD_IMPL               (0)
-, cF_MMSec              (0.0)
-, currentTargetF_MMSec  (0.0)
-
-#ifndef SKETCH_COMPILE 
-  , cFT1_IMPL             (0)
-  , cFT2_IMPL             (0)
-  , cFT3_IMPL             (0)
-  , cFT1_MMSec            (0.0)
-  , cFT2_MMSec            (0.0)
-  , cFT3_MMSec            (0.0)
-#endif
 
 /////////////////////////////////////////////////////////////////////////////////////
+uint32_t ArduinoAccelManager::Setup::feedRate_FT[]        = {C_2_08, C_2_08, C_2_08, C_2_08, C_2_08, C_2_08, C_2_08, C_2_08};
+uint32_t ArduinoAccelManager::Setup::feedRate_UM[]        = {0,      0,      0,      0,      0,      0,      0,      0};
+uint32_t ArduinoAccelManager::Setup::feedRate_Master1000  = 0;
+/////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////  
+void ArduinoAccelManager::Function::initMinSpeedDelay() { 
+/////////////////////////////////////////////////////////////////////////////////////  
+  minSpeedDelay_US  = ( C_1000 > 0 ? 1000L * 1000 * Setup::feedRate_Master1000 / C_1000 : 0 );
+  stdRampWidth_IMPL = 0;
+  relRampWidth_IMPL = 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+void ArduinoAccelManager::Function::initTrgSpeedDelay(const uint32_t trgF1000_MMSEC) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  stdRampWidth_IMPL = ( minSpeedDelay_US == 0 ? 0 : rampWidth(trgF1000_MMSEC) );
+  relRampWidth_IMPL = 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+uint32_t ArduinoAccelManager::Function::rampWidth(uint32_t trgF1000_MMSEC) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  if ( A_1000 == 0 ) {
+    // linear function: F(impulse) = B * impulse + C
+    return B_1000 ? ( trgF1000_MMSEC - C_1000 ) / B_1000 + 1 : C_1000;
+  }
+  else {
+    // quadratic functions
+    if ( B_1000 == 0 ) {
+      // simple quadratic: F(impulse) = A * (impulse)^2 + C
+      return sqrt( ( trgF1000_MMSEC - C_1000) / A_1000 ) + 1;
+    }
+    else {
+      // quadratic
+      const uint32_t p = B_1000 / A_1000 * 0.5;
+      const uint32_t q = ( C_1000 - trgF1000_MMSEC ) / A_1000;
+      const uint32_t s = sqrt( p * p - q );
+      
+      return ( s >= p ? -p + s : -p - s );
+    }
+  }
+  
+  return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////  
+ArduinoAccelManager::ArduinoAccelManager() 
+/////////////////////////////////////////////////////////////////////////////////////  
+: initialized             (false)
+, active                  (false)
+, curState                (P_UNDEF)
+, curType                 (T_MODEL_DRIVEN)
+, curSpeedDelay           (0)
+, curImplIdx              (0)
+, curImplCnt              (0)
+, cfgSpeedDelay           (0)
+, fA                      (0.0, 0.0, 0.0)
+, fD                      (0.0, 0.0, 0.0)
 {
 }
-/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////  
 ArduinoAccelManager::~ArduinoAccelManager() {
 /////////////////////////////////////////////////////////////////////////////////////  
 }
@@ -54,19 +99,23 @@ ArduinoAccelManager::~ArduinoAccelManager() {
 void ArduinoAccelManager::printAccelConfig() const {
 /////////////////////////////////////////////////////////////////////////////////////  
   const int8_t indent = 2;  
-  AccelMngParameter::print(PID_ACCEL_START_SPEED,    fA.C, indent);
-  AccelMngParameter::print(PID_ACCEL_STOP_SPEED,     fD.C, indent);
+  AccelMngParameter::print(PID_ACCEL_START_SPEED,    (float)fA.getC_1000() / 1000, indent);
+  AccelMngParameter::print(PID_ACCEL_STOP_SPEED,     (float)fD.getC_1000() / 1000, indent);
   // Todo: add PIDS for fA, fD
 }
 /////////////////////////////////////////////////////////////////////////////////////  
-void ArduinoAccelManager::setup(const Function& fA, const Function& fD) {
+void ArduinoAccelManager::initialize(const Function& fA, const Function& fD) {
 /////////////////////////////////////////////////////////////////////////////////////  
-  this->fA         = fA;
-  this->fD         = fD;
-
+  this->fA    = fA;
+  this->fD    = fD;
+  
+  this->fA.initMinSpeedDelay();
+  this->fD.initMinSpeedDelay();
+  
   // the start speed must be greater then 0.0 because it's used as default value
-  initialized = ( fA.C > 0.0 );
-  active      = initialized;
+  // and a valid feedRate has to exist
+  initialized = ( fA.C_1000 > 0.0 && Setup::feedRate_Master1000 > 0);
+  active    = initialized;
   
   changeState(P_UNDEF);
 }
@@ -75,303 +124,188 @@ void ArduinoAccelManager::changeState(const State s) {
 /////////////////////////////////////////////////////////////////////////////////////  
   if ( curState != s ) {
     curState = s;
+
     notifyACMStateChange(s); 
 
-    if ( true ) {
-      switch ( s ) {
-        case P_UNDEF:   ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_UNDEF';   Current impulse count: %ld", getCurrentImpulseCount())); break;
-        case P_CONST:   ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_CONST';   Current impulse count: %ld", getCurrentImpulseCount())); break;
-        case P_ACCEL:   ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_ACCEL';   Current impulse count: %ld", getCurrentImpulseCount())); break;
-        case P_TARGET:  ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_TARGET';  Current impulse count: %ld", getCurrentImpulseCount())); break;
-        case P_DEACCEL: ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_DEACCEL'; Current impulse count: %ld", getCurrentImpulseCount())); break;
-      }
-    }
-  }
-}
-/////////////////////////////////////////////////////////////////////////////////////  
-bool ArduinoAccelManager::initMove(uint32_t mD_IMPL, float mF_MMSec) {
-/////////////////////////////////////////////////////////////////////////////////////  
-  const uint8_t minImpulseCount = 32;
-
-  if ( initialized != true )  return false;
-  if ( mD_IMPL     == 0    )  return false;
-  if ( mF_MMSec    == 0    )  return false;
-
-  if ( false ) {
-    ARDO_DEBUG_MESSAGE('S', "ArduinoAccelManager::initMove previous parameters:")
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: curState           ", getStateAsString(curState))
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Total impulse count", cD_IMPL)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: iD_IMPL            ", iD_IMPL)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: cF_MMSec           ", cF_MMSec)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: mF_MMSec           ", mF_MMSec)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Accel   c()        ", fA.c())
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Deaccel c()        ", fD.c())
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Accel   ramp       ", aRampWidth_IMPL)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Deaccel ramp       ", dRampWidth_IMPL)
-  }
-
-  State newState  = P_UNDEF;
-  iD_IMPL         = 1;
-  cD_IMPL         = mD_IMPL;
-  cF_MMSec        = fA.defValue();
-  aRampWidth_IMPL = mD_IMPL / 2;
-  dRampWidth_IMPL = mD_IMPL / 2;
-
-
-  fA.refValue = mF_MMSec;
-  fA.cSlider  = curState == P_UNDEF ? 0.0 : currentTargetF_MMSec - fA.C;
-  fD.refValue = fD.C;
-  fD.cSlider  = 0.0;
-
-
-  auto constSetup = [&]() {
-    newState = curState == P_UNDEF ? P_CONST : P_ACCEL;
-    cF_MMSec = mF_MMSec;
-  };
-
-
-  if ( curState == P_UNDEF && mF_MMSec <= fA.c() ) {
-    ARDO_DEBUG_MESSAGE('D', "1")
-    constSetup();
-  }
-  else {
-    
-    // if there is a minimum amount of steps 
-    if ( cD_IMPL > minImpulseCount ) { 
-  
-      aRampWidth_IMPL = fA.rampWidth(mF_MMSec);
-      dRampWidth_IMPL = fD.rampWidth(mF_MMSec);
-  
-      // reduce the accelertion and deaccelartion ramp width until 
-      // they are fit into the total impulse distance - on demand
-      if ( aRampWidth_IMPL > 0.0 && dRampWidth_IMPL > 0.0 ) {
-        
-        while ( (uint32_t)(aRampWidth_IMPL + dRampWidth_IMPL) > cD_IMPL ) {
-  
-          const float ratio = dRampWidth_IMPL ? aRampWidth_IMPL/dRampWidth_IMPL : 1;
-  
-          for ( int i=0; i<ratio;   i++) aRampWidth_IMPL--;
-          for ( int i=0; i<1/ratio; i++) dRampWidth_IMPL--;
-      
-          if ( aRampWidth_IMPL <= minImpulseCount / 2 || dRampWidth_IMPL <= minImpulseCount / 2 )
-            break;
+    #ifndef SKETCH_COMPILE 
+      if ( true ) {
+        switch ( s ) {
+          case P_UNDEF:   ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_UNDEF';   Current impulse count: %ld", getCurrentImpulseCount())); break;
+          case P_CONST:   ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_CONST';   Current impulse count: %ld", getCurrentImpulseCount())); break;
+          case P_ACCEL:   ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_ACCEL';   Current impulse count: %ld", getCurrentImpulseCount())); break;
+          case P_TARGET:  ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_TARGET';  Current impulse count: %ld", getCurrentImpulseCount())); break;
+          case P_DEACCEL: ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::changeState: to 'P_DEACCEL'; Current impulse count: %ld", getCurrentImpulseCount())); break;
         }
       }
-      
-      if ( aRampWidth_IMPL >= minImpulseCount / 2 && dRampWidth_IMPL >= minImpulseCount / 2 ) {
-        newState    = P_ACCEL;
-        cF_MMSec    = mF_MMSec;
-        
-      } else {
-        ARDO_DEBUG_MESSAGE('D', "2")
-        constSetup();
-      }
-    } 
-    else {
-      ARDO_DEBUG_MESSAGE('D', "1")
-      constSetup();
-    }
+    #endif  
+  }
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+void ArduinoAccelManager::finalize() { 
+/////////////////////////////////////////////////////////////////////////////////////  
+  changeState(P_UNDEF);
+  curType               = T_MODEL_DRIVEN; 
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+void ArduinoAccelManager::reset() {
+/////////////////////////////////////////////////////////////////////////////////////  
+  curState              = P_UNDEF;
+  curType               = T_MODEL_DRIVEN; 
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+bool ArduinoAccelManager::initSpeed(uint32_t mF1000_MMSec) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  fA.initTrgSpeedDelay(mF1000_MMSec);
+  fD.initTrgSpeedDelay(mF1000_MMSec);
+  
+  cfgSpeedDelay = cnvSpeedToDelay(mF1000_MMSec);
+  return true;
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+bool ArduinoAccelManager::initMove(uint32_t mD_IMPL) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  
+  // --------------------------------------------------------------------------------
+  // Init model driven movement
+  if ( mD_IMPL > 0 ) {
+    const uint32_t MIN_IMPL_COUNT = 3;
+    const bool b = fA.stdRampWidth_IMPL > 0  && fD.stdRampWidth_IMPL > 0;
+  
+    curType     = T_MODEL_DRIVEN;
+    curImplIdx  = 0;
+    curImplCnt  = mD_IMPL;
     
-  }
-  
-  if ( true ) {
-    ARDO_DEBUG_MESSAGE('S', "ArduinoAccelManager::initMove resolved parameters:")
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: newState           ", getStateAsString(newState))
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Total impulse count", cD_IMPL)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: iD_IMPL            ", iD_IMPL)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: cF_MMSec           ", cF_MMSec)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: mF_MMSec           ", mF_MMSec)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Accel   c()        ", fA.c())
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Deaccel c()        ", fD.c())
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Accel   ramp       ", aRampWidth_IMPL)
-    ARDO_DEBUG_VALUE("ArduinoAccelManager: Deaccel ramp       ", dRampWidth_IMPL)
-  }
-
-  changeState(newState);
-  notifyACMInitMove();
-  
-  return true;
-}
-/////////////////////////////////////////////////////////////////////////////////////  
-bool ArduinoAccelManager::updateSpeedConfig(float mF_MMSec) {
-/////////////////////////////////////////////////////////////////////////////////////  
-  if ( initialized != true )  return false;
-  if ( mF_MMSec    == 0    )  return false;
-
-  ARDO_DEBUG_MESSAGE('S', "ArduinoAccelManager::updateSpeedConfig:")
-
-  switch ( curState ) {
-    // ------------------------------------------------------------------------------
-    case P_CONST:
-    case P_ACCEL: 
-    case P_TARGET: 
-    {   
-      // no change, nothing to do leave unchanged
-      if ( ArduinoMainLoop::fltCompare(currentTargetF_MMSec, mF_MMSec) == true )
-        break;
-
-      // 
-      if ( cD_IMPL - iD_IMPL <= 0 )
-        break;
-     
-      initMove(cD_IMPL - iD_IMPL + 1, mF_MMSec);
-      break;
-    }
-    // ------------------------------------------------------------------------------
-    case P_DEACCEL:
-    {
-      // to late, nothing to do leave unchanged
-      break;
-    }
-    // ------------------------------------------------------------------------------
-    case P_UNDEF:
-    default:
-    {
-      // generally nothing to do leave unchanged
-    }
-  }
+    if ( b && curImplCnt >= MIN_IMPL_COUNT ) {
       
+      if ( fA.stdRampWidth_IMPL + fD.stdRampWidth_IMPL < curImplCnt ) {
+        fA.relRampWidth_IMPL = fA.stdRampWidth_IMPL;
+        fD.relRampWidth_IMPL = fD.stdRampWidth_IMPL;
+        changeState(P_ACCEL);
+      }
+      else {
+        fA.relRampWidth_IMPL = curImplCnt / 2;
+        fD.relRampWidth_IMPL = curImplCnt - fA.relRampWidth_IMPL;
+        changeState(P_ACCEL);
+      }
+    }
+    else {
+      fA.relRampWidth_IMPL = 0;
+      fD.relRampWidth_IMPL = 0;
+      changeState(P_CONST);
+    }
+  }
+  // --------------------------------------------------------------------------------
+  // Init interactive movement
+  else {
+    curType     = T_INTERACTIVE;
+    curImplIdx  = 0;
+    curImplCnt  = 0;
+    
+    if ( fA.stdRampWidth_IMPL > 0 ) {
+        changeState(P_ACCEL);
+    }
+    else {
+      fA.relRampWidth_IMPL = 0;
+      fD.relRampWidth_IMPL = 0;
+      changeState(P_CONST);
+    }
+  }
+  // --------------------------------------------------------------------------------
+
+  notifyACMInitMove();
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////  
-float ArduinoAccelManager::initNextTargetSpeed_MMSec() {
+bool ArduinoAccelManager::initMove(uint32_t mD_IMPL, uint32_t mF1000_MMSec) {
 /////////////////////////////////////////////////////////////////////////////////////  
-  if ( initialized   != true    )  changeState(P_UNDEF);
-  if ( iD_IMPL        > cD_IMPL )  changeState(P_UNDEF);
+  if ( initSpeed(mF1000_MMSec) == false )
+    return false;
+  
+  return initMove(mD_IMPL);
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+uint32_t ArduinoAccelManager::initNextImpulse(AxisSignatureIndex axisSignatureIdx) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  if ( initialized != true ) 
+    changeState(P_UNDEF);
+
+  // interactive moves didn't have a curImplCnt value > 0  
+  if ( curType == T_MODEL_DRIVEN && curImplIdx > curImplCnt )  
+    changeState(P_UNDEF);
 
   if ( active == false ) 
-    return cF_MMSec;
+    return cfgSpeedDelay;
 
-  float ret = 0.0;
+  uint32_t ret = 0;
   switch ( curState ) {
+    
     // ------------------------------------------------------------------------------
     case P_ACCEL: 
     {
-      ret = fA.fctValue(iD_IMPL);
-      iD_IMPL++;
+      ret = cnvSpeedToDelay( fA.fctValue1000(curImplIdx) );
+      curImplIdx++;
       
       // state machine handling
-      if ( iD_IMPL >= aRampWidth_IMPL ) {
+      if ( curImplIdx >= fA.relRampWidth_IMPL ) {
         // if the rest amount of steps is smaller then the deacceleration ramp witdh
         // switch directly to P_DEACCEL
         // -1 to avoid problems raised by rounding
-        if ( iD_IMPL + dRampWidth_IMPL >= cD_IMPL - 1 ) changeState(P_DEACCEL);
-        else                                            changeState(P_TARGET);
-      }
+        // Further, interactive moves didn't have a curImplCnt value > 0  
+        const bool b = curImplIdx + fD.relRampWidth_IMPL >= curImplCnt - 1;
         
+        // interactive moves don't reach the mode P_DEACCEL
+        changeState( b && curType == T_MODEL_DRIVEN ? P_DEACCEL : P_TARGET );
+      }
+      
       break;
     }
     // ------------------------------------------------------------------------------
     case P_TARGET: 
     {   
-      ret = cF_MMSec;
-      iD_IMPL++;
+      ret = cfgSpeedDelay;
+      curImplIdx++;
       
       // state machine handling
-      if ( iD_IMPL > cD_IMPL - dRampWidth_IMPL )
-        changeState(P_DEACCEL);
-        
+      // interactive moves stay in mode P_TARGET until they stops
+      if ( curType == T_MODEL_DRIVEN ) {
+        if ( curImplIdx > curImplCnt - fD.relRampWidth_IMPL )
+          changeState(P_DEACCEL);
+      }
+      
       break;
     }
     // ------------------------------------------------------------------------------
     case P_DEACCEL:
     {
+      curImplIdx++;
       // Note: Due to the unsigned characteristic of idxS_ST and curS_ST they have to be 
       // casted to a signed value to avoid overflows
       // ArdoObj::absolute: this with respect to get a falling curve here
-      ret = fD.fctValue(ArdoObj::absolute((int32_t)iD_IMPL - (int32_t)cD_IMPL));
-      iD_IMPL++;
-
+      ret = cnvSpeedToDelay(fD.fctValue1000( ArdoObj::absolute((int32_t)curImplIdx - (int32_t)curImplCnt)) );
+      
       // state machine handling
-      if ( iD_IMPL > cD_IMPL ) {
-        changeState(P_UNDEF);
-      }
-
+      if ( curImplIdx > curImplCnt )
+        finalize();
+      
       break;
     }
     // ------------------------------------------------------------------------------
     case P_CONST:
     {
-      ret = cF_MMSec;
+      ret = cfgSpeedDelay;
       break;
     }
     // ------------------------------------------------------------------------------
     case P_UNDEF:
     default:
     {
-      ret = fA.defValue();
+      ret = getDefalutDelay();
     }
   }
 
-  // check bounderies
-  ret = ret < 0        ? fA.C     : ret;
-
-  currentTargetF_MMSec = ret;
-
-  // *********************************************************************************
-  // for testing only
-  #ifndef SKETCH_COMPILE 
-    if  ( cFT1_IMPL > 0 && cFT1_MMSec > 0 && cFT1_IMPL == iD_IMPL) { 
-      if ( cFT2_IMPL > 0 )
-        cFT2_IMPL -= cFT1_IMPL;
-        
-      if ( cFT3_IMPL > 0 )
-        cFT3_IMPL -= cFT1_IMPL;
-        
-      updateSpeedConfig(cFT1_MMSec); 
-      cFT1_IMPL  = 0; 
-      cFT1_MMSec = 0.0; 
-    }
-    
-    if ( cFT2_IMPL > 0 && cFT2_MMSec > 0 && cFT2_IMPL == iD_IMPL) { 
-      if ( cFT3_IMPL > 0 )
-        cFT3_IMPL -= cFT2_IMPL;
-      
-      updateSpeedConfig(cFT2_MMSec); 
-      cFT2_IMPL = 0; 
-      cFT2_MMSec = 0.0; 
-    }
-    
-    if ( cFT3_IMPL > 0 && cFT3_MMSec > 0 && cFT3_IMPL == iD_IMPL) { 
-      updateSpeedConfig(cFT3_MMSec); 
-      cFT3_IMPL = 0; 
-      cFT3_MMSec = 0.0; 
-    }
-  #endif
-  // *********************************************************************************
+  // shift the master feed rate to the concrete movement situation
+  // Setup::feedRate_FT[axisSignatureIdx] stored with factore C_2_08
+  curSpeedDelay = ( ret * Setup::feedRate_FT[axisSignatureIdx] ) >> 8;
   
-  return ret;
+  return curSpeedDelay;
 }
-
-#ifndef SKETCH_COMPILE 
-/////////////////////////////////////////////////////////////////////////////////////  
-const char* ArduinoAccelManager::getStateAsString(State s) {
-/////////////////////////////////////////////////////////////////////////////////////  
-  switch ( s ) {
-    case P_UNDEF:   return "P_UNDEF";
-    case P_CONST:   return "P_CONST";
-    case P_ACCEL:   return "P_ACCEL";
-    case P_TARGET:  return "P_TARGET";
-    case P_DEACCEL: return "P_DEACCEL";
-  }
-
-  return "Unkonwn ArduinoAccelManager State";
-}
-/////////////////////////////////////////////////////////////////////////////////////  
-void ArduinoAccelManager::traceACM(std::ostream& o, int indent) {
-/////////////////////////////////////////////////////////////////////////////////////  
-  std::string prefix(indent, ' ');
-  o << prefix << "ACM.aF.A                = " << fA.A             << " [fact]"      << std::endl;
-  o << prefix << "ACM.aF.B                = " << fA.B             << " [fact]"      << std::endl;
-  o << prefix << "ACM.aF.C                = " << fA.C             << " [mm/sec]"    << std::endl;
-  o << prefix << "ACM.dF.A                = " << fD.A             << " [fact]"      << std::endl;
-  o << prefix << "ACM.dF.B                = " << fD.B             << " [fact]"      << std::endl;
-  o << prefix << "ACM.dF.C                = " << fD.C             << " [mm/sec]"    << std::endl;
-
-  o << prefix << "ACM.aRampWidth          = " << aRampWidth_IMPL  << " [impulses]"  << std::endl;
-  o << prefix << "ACM.dRampWidth          = " << dRampWidth_IMPL  << " [impulses]"  << std::endl;
-  o << prefix << "ACM.cD_IMPL             = " << cD_IMPL          << " [impulses]"  << std::endl;
-
-  o << prefix << "ACM.cF_MMSec            = " << cF_MMSec         << " [mm/sec]"    << std::endl;
-}
-#endif

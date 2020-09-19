@@ -6,26 +6,14 @@ CncControlerGui/Gprof/**
 CncControlerGui/Resources/**
 CncControlerGui/Doxyfile/**
 
-FreeGlutWorkspace/Release/**
-FreeGlutWorkspace/Debug/**
-
-Experiments/Release/**
-Experiments/Debug/**
-
-RenderAndMove/Release/**
-RenderAndMove/Debug/**
+CncControllerTest/Release/**
+CncControllerTest/Debug/**
+CncControllerTest/Gprof/**
+CncControllerTest/Resources/**
+CncControllerTest/Doxyfile/**
 
 UnitTests/Release/**
 UnitTests/Debug/**
-
-GameController/Release/**
-GameController/Debug/**
-
-NavigatorPanel/Release/**
-NavigatorPanel/Debug/**
-
-wxWidgetsTest/Release/**
-wxWidgetsTest/Debug/**
 
 #*.exe
 #*.txt

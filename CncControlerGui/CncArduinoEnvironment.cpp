@@ -668,7 +668,7 @@ void CncArduinoEnvironment::updateLimitStates() {
 	setBit(limitStates, LimitSwitch::BIT_LS_Z_MIN, 			lsiMinZ.getBoolValue());
 	setBit(limitStates, LimitSwitch::BIT_LS_Z_MAX, 			lsiMaxZ.getBoolValue());
 	
-	#warning use BIT_EMERGENCY_SWITCH
+	#warning use BIT_EMERGENCY_SWITCH value instead of false
 	setBit(limitStates, LimitSwitch::BIT_EMERGENCY_SWITCH, 	false);
 	setBit(limitStates, LimitSwitch::BIT_1, 				false);
 

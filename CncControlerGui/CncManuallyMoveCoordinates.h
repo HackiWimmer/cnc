@@ -32,6 +32,8 @@ class CncManuallyMoveCoordinates : public CncManuallyMoveCoordinatesBase {
 		bool shouldClearMontionMonitor();
 		
 	protected:
+    virtual void onZeroXYZ(wxCommandEvent& event);
+    virtual void onReverseXYZ(wxCommandEvent& event);
 	
 		virtual void onSetCommonValue(wxCommandEvent& event);
 		virtual void onLBDownMax(wxMouseEvent& event);

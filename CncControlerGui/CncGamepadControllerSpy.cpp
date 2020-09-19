@@ -23,6 +23,9 @@ void CncGamepadControllerSpy::onContinuesTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////////////////////
 void CncGamepadControllerSpy::update(const GamepadEvent& state) {
 //////////////////////////////////////////////////////////////////
+	if ( state.isSomethingChanged == false )
+		return;
+		
 	if ( IsShownOnScreen() == false )
 		Show(true);
 	

@@ -69,18 +69,28 @@ void CncLCDPositionPanel::onSize(wxSizeEvent& event) {
 	lcdZ->Refresh();
 }
 ///////////////////////////////////////////////////////////////////
-void CncLCDPositionPanel::onUpdateTimer(wxTimerEvent& event) {
+void CncLCDPositionPanel::updateUnit() {
+///////////////////////////////////////////////////////////////////
+	const wxString unit(THE_APP->GetUnit()->GetValue());
+	
+	if ( m_unitX->GetLabel() != unit) {
+		m_unitX->SetLabel(unit);
+		m_unitY->SetLabel(unit);
+		m_unitZ->SetLabel(unit);
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncLCDPositionPanel::updateValues() {
 ///////////////////////////////////////////////////////////////////
 	lcdW->SetValue(THE_APP->GetConfiguredFeedSpeed()->GetValue());
 	
 	lcdX->SetValue(THE_APP->GetXAxisCtl()->GetValue());
 	lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());
 	lcdZ->SetValue(THE_APP->GetZAxisCtl()->GetValue());
-	
-	const wxString unit(THE_APP->GetUnit()->GetValue());
-	if ( m_unitX->GetLabel() != unit) {
-		m_unitX->SetLabel(unit);
-		m_unitY->SetLabel(unit);
-		m_unitZ->SetLabel(unit);
-	}
+}
+///////////////////////////////////////////////////////////////////
+void CncLCDPositionPanel::onUpdateTimer(wxTimerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	#warning remove timer
+	//updateValues();
 }

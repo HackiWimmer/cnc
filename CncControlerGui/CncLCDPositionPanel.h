@@ -16,6 +16,9 @@ class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 		CncLCDPositionPanel(wxWindow* parent);
 		virtual ~CncLCDPositionPanel();
 		
+		void updateUnit();
+		void updateValues();
+		
 	protected:
 		virtual void onPaint(wxPaintEvent& event);
 		virtual void onSize(wxSizeEvent& event);

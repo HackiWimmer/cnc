@@ -645,12 +645,8 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 
 		// -------------------------------------------------------------
 		auto setupACM = [&](float AA, float AB, float AC, float DA, float DB, float DC) {
-			Function fA, fD;
-
-			fA.A = AA; fA.B = AB; fA.C = AC;
-			fD.A = DA; fD.B = DB; fD.C = DC;
-
-			ArduinoAccelManager::setup(fA, fD);
+			Function fA(AA, AB, AC), fD(DA, DB, DC);
+			ArduinoAccelManager::initialize(fA, fD);
 		};
 
 		// special handling for later use
@@ -686,7 +682,7 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 				break;
 			}
 			
-			case PID_SPEED_MM_MIN: 			setFeedSpeed_MMMin((double)(values.front()/FLT_FACT));
+			case PID_SPEED_MM_SEC: 			setFeedSpeed_MMMin((double)(60.0 * values.front()/FLT_FACT));
 											break;
 		}
 		
@@ -1012,7 +1008,7 @@ byte SerialEmulatorNULL::checkRuntimeEnv() {
 	return RET_OK;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
+void SerialEmulatorNULL::notifyMovePartAfter() {
 ///////////////////////////////////////////////////////////////////
 	// ------------------------------------------------------------
 	#define INC_AXIS(axis, delta) \
@@ -1039,9 +1035,9 @@ void SerialEmulatorNULL::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
 		\
 	}
 	
-	if ( dx != 0 ) INC_AXIS(X, dx);
-	if ( dy != 0 ) INC_AXIS(Y, dy);
-	if ( dz != 0 ) INC_AXIS(Z, dz);
+	if ( RS::stepSignature & ASG_X ) INC_AXIS(X, RS::dx());
+	if ( RS::stepSignature & ASG_Y ) INC_AXIS(Y, RS::dy());
+	if ( RS::stepSignature & ASG_Z ) INC_AXIS(Z, RS::dz());
 	
 	#undef INC_AXIS
 	

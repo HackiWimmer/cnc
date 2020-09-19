@@ -57,6 +57,7 @@ struct CncContext {
 			bool useIt						= false;
 			bool isActive					= false;
 			bool isActivatedByStartup		= false;
+			bool isDeactivatedByUser		= false;
 		};
 		
 		struct TsTplProcessing {

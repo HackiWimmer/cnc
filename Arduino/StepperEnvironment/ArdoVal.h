@@ -193,7 +193,8 @@
 
   const unsigned char PID_FEEDRATE                        = 200;
   const unsigned char PID_SPEED_MM_MIN                    = 204;
-  const unsigned char PID_ACCEL_PROFILE                   = 205;
+  const unsigned char PID_SPEED_MM_SEC                    = 205;
+  const unsigned char PID_ACCEL_PROFILE                   = 206;
 
 
 // .....................................................................
@@ -285,42 +286,86 @@
   #define PAUSE_ACTIVE                                   true
   #define PAUSE_INACTIVE                                 false
 
-  enum AxisId     { IDX_X = 0, IDX_Y = 1, IDX_Z = 2 };
+  // ------------------------------------------------------------------------------
+  // Don't modify the values above because it has to coresponde with RS::A and RS::B
+  enum AxisId
+  { 
+      IDX_X = 0,
+      IDX_Y = 1,
+      IDX_Z = 2 
+  };
 
+  // ------------------------------------------------------------------------------
+  // Don't modify the values above because it has to coresponde with AxisSignatureIndex
+  enum AxisSignature  
+  {  
+      ASG_X    = 0x02,                    //  2
+      ASG_Y    = 0x04,                    //  4
+      ASG_XY   = ASG_X | ASG_Y,           //  6
+      ASG_Z    = 0x08,                    //  8
+      ASG_XZ   = ASG_X | ASG_Z,           // 10
+      ASG_YZ   = ASG_Y | ASG_Z,           // 12
+      ASG_XYZ  = ASG_X | ASG_Y | ASG_Z    // 14
+  };
+
+  #define IS_AxisSignature(s) ( s >= ASG_X && s <= ASG_XYZ && s%2 == 0 )
+  
+  enum AxisSignatureIndex
+  {
+      ASGI_MASTER = 0,
+      ASGI_X      = 1,
+      ASGI_Y      = 2,
+      ASGI_XY     = 3,
+      ASGI_Z      = 4,
+      ASGI_XZ     = 5,
+      ASGI_YZ     = 6,
+      ASGI_XYZ    = 7
+  };
+  
+  // calculates an zero-based index of the signature
+  #define GET_AxisSignatureIndex(s)  ( IS_AxisSignature(s) ? (AxisSignatureIndex)((s / 2) - 1) : ASGI_MASTER )
+  #define AXIS_SIGNATURE_COUNT       ( ASGI_XYZ + 1 )
+
+  // ------------------------------------------------------------------------------
+  
   const char      MBYTE_CLOSE                            = RET_MBYTE_CLOSE;
   const char      TEXT_CLOSE                             = '\n';
   const char      TEXT_SEPARATOR                         = ':';
 
-  const uint32_t minSerialReadTimeoutMicros              = 10L * 1000L;
-  const int16_t  moveUntilAccelPeriod                    = 2500; // ms
-  //const int16_t cncHeartbeatInterval                     = 2000; // milli seconds
+  const uint32_t  minSerialReadTimeoutMicros             = 10L * 1000L;
+  const int16_t   moveUntilAccelPeriod                   = 2500; // ms
 
-  const int8_t  NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;
-  const int8_t  INVERSED_INCREMENT_DIRECTION_VALUE       = 0;
+  const int8_t    NORMALIZED_INCREMENT_DIRECTION_VALUE   = 1;
+  const int8_t    INVERSED_INCREMENT_DIRECTION_VALUE     = 0;
 
-  const int16_t  MIN_DURATION_PER_STEP_US                = 225;
+  const int16_t   MIN_DURATION_PER_STEP_US               = 225;
 
   // MAX_SERIAL_BUFFER_SIZE:
   // - 64 byte is the standard UNO buffer sizes
   // - Max 255
   // - Attention: If the value is > than 64 possibly a data loss occures, because the reader is always slower the the writer
-  const int8_t  MAX_SERIAL_BUFFER_SIZE                   = 64; 
-  const int32_t BAUD_RATE                                = 115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
+  const int8_t    MAX_SERIAL_BUFFER_SIZE                 = 64; 
+  const int32_t   BAUD_RATE                              = 115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
     
-  const int8_t  DIRECTION_UNKNOWN                        =  0;
-  const int8_t  DIRECTION_INC                            = +1;
-  const int8_t  DIRECTION_DEC                            = -1;
+  const int8_t    DIRECTION_UNKNOWN                      =  0;
+  const int8_t    DIRECTION_INC                          = +1;
+  const int8_t    DIRECTION_DEC                          = -1;
   
-  const int8_t  MAX_SETTER_VALUES                        = 16;
-  const int8_t  MAX_MOVE_CMD_SIZE                        = 16;
+  const int8_t    MAX_SETTER_VALUES                      = 16;
+  const int8_t    MAX_MOVE_CMD_SIZE                      = 16;
     
-  const int16_t FLT_FACT                                 = 1000;
-  const int32_t MIN_LONG                                 = -2147483648L;
-  const int32_t MAX_LONG                                 = +2147483647L;
-  
-  //const int16_t MIN_INT                                  = -32767;
-  //const int16_t MAX_INT                                  = +32767;
-  
-  //const uint16_t MAX_UINT                                = +65535;
+  const int16_t   FLT_FACT                               = 1000;
+  const int32_t   MIN_LONG                               = -2147483648L;
+  const int32_t   MAX_LONG                               = +2147483647L;
+
+  const int32_t   C_2_08                                 =     256;
+  const int32_t   C_2_09                                 =     512;
+  const int32_t   C_2_10                                 =    1024;
+  const int32_t   C_2_11                                 =    2048;
+  const int32_t   C_2_12                                 =    4096;
+  const int32_t   C_2_13                                 =    8192;
+  const int32_t   C_2_14                                 =   16384;
+  const int32_t   C_2_15                                 =   32768;
+  const int32_t   C_2_16                                 =   65536;
 
 #endif

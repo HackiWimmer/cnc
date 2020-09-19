@@ -72,6 +72,7 @@ class CncManuallyMoveCoordinates;
 class CncSpeedPlayground;
 class CncGamepadControllerSpy;
 class CncGamepadControllerState;
+class CncGamepadEventFilter;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -160,6 +161,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void clickAdditionalParameters(wxCommandEvent& event);
     virtual void onDeactivateSecureRunMode(wxCommandEvent& event);
 		virtual void requestResolveLimitStates(wxCommandEvent& event);
 		virtual void requestToolTest(wxCommandEvent& event);
@@ -265,10 +267,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
 		virtual void paintDrawPaneWindow(wxPaintEvent& event);
-		virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event);
-		virtual void cfgStepDelayArduino(wxCommandEvent& event);
-		virtual void cfgStepDelayMax(wxCommandEvent& event);
-		virtual void cfgStepDelayMin(wxCommandEvent& event);
 		virtual void enableSerialSpy(wxCommandEvent& event);
 		virtual void clearSerialSpy(wxCommandEvent& event);
 		virtual void nootebookConfigChanged(wxListbookEvent& event);
@@ -320,7 +318,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void svgEditFind(wxCommandEvent& event);
 		virtual void svgEditFindPrev(wxCommandEvent& event);
 		virtual void dclickDurationCount(wxMouseEvent& event);
-		virtual void stepDelayThumbtrack(wxScrollEvent& event);
 		virtual void stepDelayChanged(wxScrollEvent& event);
 		virtual void displayUserAgent(wxCommandEvent& event);
 		virtual void updateToolControls(wxCommandEvent& event);
@@ -431,12 +428,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 						POST_WARNING 				=  7, 
 						POST_ERROR 					=  8,
 						GAMEPAD_STATE				=  9,
-						GAMEPAD_HEARTBEAT			= 10,
-						GAMEPAD_MESSAGE				= 11,
-						SERIAL_HEARTBEAT			= 12,
-						SERIAL_MESSAGE				= 13,
-						SERIAL_DATA					= 14,
-						SERIAL_PIN_NOTIFICATION		= 15
+						GAMEPAD_MESSAGE				= 10,
+						SERIAL_HEARTBEAT			= 11,
+						SERIAL_MESSAGE				= 12,
+						SERIAL_DATA					= 13,
+						SERIAL_PIN_NOTIFICATION		= 14
 					  };
 					  
 		enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
@@ -527,7 +523,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void selectSourceControlLineNumbers(long firstLine, long lastLine);
 
 		// will be bind to this frame
-		void globalKeyDownHook(wxKeyEvent& event);
+		void onGlobalKeyDownHook(wxKeyEvent& event);
+		void onIdle(wxIdleEvent& event);
  
 		// Interrupt thread handling
 		//UpdateManagerThread* updateManagerThread;
@@ -548,7 +545,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
 		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ return parsingSynopisis; }
 		
-		bool startInteractiveMove();
+		bool startInteractiveMove(CncInteractiveMoveDriver imd);
+		bool updateInteractiveMove();
 		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		bool stopInteractiveMove();
 		
@@ -588,6 +586,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 		friend class UpdateManagerThread;
 		friend class GamepadThread;
+		friend class CncGamepadEventFilter;
 		friend class SerialThread;
 		friend class SerialThreadStub;
 
@@ -717,6 +716,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void openMainPreview(const wxString& fn);
 		void openMonitorPreview(const wxString& fn);
 		void openFileFromFileManager(const wxString& fn);
+		void openNavigatorFromGamepad();
 		
 		bool openFileExtern(const wxString& tool, const char* file);
 		bool openFileExtern(const wxString& tool, wxString& file);

@@ -32,8 +32,7 @@ wxThread::ExitCode GamepadThread::Entry() {
 	APPEND_THREAD_ID_TO_STACK_TRACE_FILE;
 	
 	// post complete event
-	GamepadEvent initEvt(wxEVT_GAMEPAD_THREAD, MainFrame::EventId::INITIALIZED);
-	wxPostEvent(pHandler, initEvt);
+	wxQueueEvent(pHandler, new GamepadEvent(wxEVT_GAMEPAD_THREAD, MainFrame::EventId::INITIALIZED));
 	
 	CncGamepad gamepad(0.9f, 0.9f);
 	GamepadEvent refState(wxEVT_GAMEPAD_THREAD, MainFrame::EventId::GAMEPAD_STATE);
@@ -69,17 +68,10 @@ wxThread::ExitCode GamepadThread::Entry() {
 		curState.data.connected 	= gamepad.wasConnected();
 		curState.data.gpId			= gamepad.getPort();
 		
+		curState.isSomethingChanged	= ( memcmp(&(refState.data), &(curState.data), sizeof(GamepadEvent::Data)) != 0 );
+		
 		// send a notification message - on demand only
-		if ( curState.isSomethingChanged(refState) == true ) {
-			// post notification event
-			wxPostEvent(pHandler, curState);
-		} 
-		else {
-			// create and send a heartbeat
-			GamepadEvent heartbeat(wxEVT_GAMEPAD_THREAD, MainFrame::EventId::GAMEPAD_HEARTBEAT);
-			heartbeat.data = curState.data;
-			wxPostEvent(pHandler, heartbeat);
-		}
+		wxQueueEvent(pHandler, new GamepadEvent(curState));
 		
 		// swap buffers
 		refState.data = curState.data;
@@ -101,7 +93,7 @@ void GamepadThread::sendMessage(const wxString& msg) {
 	wxQueueEvent(pHandler, message);
 }
 ///////////////////////////////////////////////////////////////////
-void GamepadThread::evaluateNotifications(CncGamepad& gamepad, GamepadEvent& state) {
+void GamepadThread::evaluateNotifications(const CncGamepad& gamepad, GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 	state.data.buttonA					= gamepad.stateButtonA();
 	state.data.buttonB 					= gamepad.stateButtonB();
@@ -157,7 +149,7 @@ void GamepadThread::evaluateNotifications(CncGamepad& gamepad, GamepadEvent& sta
 
 	typedef CncLinearDirection CLD;
 	
-	auto isValueInRange = [&](float value) { 
+	auto isValueInRange = [&](float value) {
 		const float threshold = (float)state.data.stickResolutionFactor / 4;
 		return (abs(value) >= abs(threshold)); 
 	};
@@ -200,5 +192,11 @@ void GamepadThread::evaluateNotifications(CncGamepad& gamepad, GamepadEvent& sta
 			break;
 		}
 	}
+	
+	state.data.hasEmptyMovement		= gamepad.hasEmptyMovement();
+	state.data.isAnyStickActive		= gamepad.isAnyStickActive();
+	state.data.isLeftStickActive	= gamepad.isLeftStickActive();
+	state.data.isRightStickActive	= gamepad.isRightStickActive();
+	state.data.isNaviButtonActive	= gamepad.isNaviButtonActive();
 }
 

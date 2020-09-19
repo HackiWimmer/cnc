@@ -15,12 +15,14 @@
 #include <wx/sizer.h>
 #include <wx/listbook.h>
 #include <wx/imaglist.h>
+#include <wx/splitter.h>
 #include <wx/textctrl.h>
+#include <wx/tglbtn.h>
 #include <wx/button.h>
+#include <wx/stattext.h>
 #include <wx/statline.h>
 #include <wx/dialog.h>
 #include <wx/iconbndl.h>
-#include <wx/stattext.h>
 #include <wx/statbmp.h>
 #include <wx/choice.h>
 #include <wx/arrstr.h>
@@ -50,16 +52,26 @@ class CncGamepadControllerStateBase : public wxPanel
 protected:
     wxListbook* m_listbook7478;
     wxPanel* m_panel7480;
+    wxSplitterWindow* m_splitter190;
+    wxPanel* m_spTrace;
     wxTextCtrl* m_gamepadTrace;
+    wxBitmapToggleButton* m_btConnect;
+    wxPanel* m_spHistory;
+    wxStaticText* m_staticText204;
+    wxPanel* m_gamepadCmdHistoryPlaceholder;
+    wxButton* m_btClearHistory;
     wxPanel* m_panel7482;
     wxTextCtrl* m_gamepadServiceTrace;
     wxButton* m_btQueryGamepadService;
-    wxStaticLine* m_staticLine6051;
+    wxStaticLine* m_staticLine60512;
     wxButton* m_btStartGamepadService;
     wxButton* m_btStopGamepadService;
+    wxStaticLine* m_staticLine6051;
     wxButton* m_btClearGamepadServiceTrace;
 
 protected:
+    virtual void onConnectGamepad(wxCommandEvent& event) { event.Skip(); }
+    virtual void onClearHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void queryGamepadService(wxCommandEvent& event) { event.Skip(); }
     virtual void startGamepadService(wxCommandEvent& event) { event.Skip(); }
     virtual void stopGamepadService(wxCommandEvent& event) { event.Skip(); }
@@ -67,12 +79,20 @@ protected:
 
 public:
     wxTextCtrl* GetGamepadTrace() { return m_gamepadTrace; }
+    wxBitmapToggleButton* GetBtConnect() { return m_btConnect; }
+    wxPanel* GetSpTrace() { return m_spTrace; }
+    wxStaticText* GetStaticText204() { return m_staticText204; }
+    wxPanel* GetGamepadCmdHistoryPlaceholder() { return m_gamepadCmdHistoryPlaceholder; }
+    wxButton* GetBtClearHistory() { return m_btClearHistory; }
+    wxPanel* GetSpHistory() { return m_spHistory; }
+    wxSplitterWindow* GetSplitter190() { return m_splitter190; }
     wxPanel* GetPanel7480() { return m_panel7480; }
     wxTextCtrl* GetGamepadServiceTrace() { return m_gamepadServiceTrace; }
     wxButton* GetBtQueryGamepadService() { return m_btQueryGamepadService; }
-    wxStaticLine* GetStaticLine6051() { return m_staticLine6051; }
+    wxStaticLine* GetStaticLine60512() { return m_staticLine60512; }
     wxButton* GetBtStartGamepadService() { return m_btStartGamepadService; }
     wxButton* GetBtStopGamepadService() { return m_btStopGamepadService; }
+    wxStaticLine* GetStaticLine6051() { return m_staticLine6051; }
     wxButton* GetBtClearGamepadServiceTrace() { return m_btClearGamepadServiceTrace; }
     wxPanel* GetPanel7482() { return m_panel7482; }
     wxListbook* GetListbook7478() { return m_listbook7478; }
@@ -183,6 +203,35 @@ public:
     }
 
     virtual ~ImageLibGamepadSpy();
+};
+
+
+class ImageLibGamepadCommand : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibGamepadCommand();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibGamepadCommand();
 };
 
 #endif

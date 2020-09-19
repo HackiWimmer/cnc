@@ -30,10 +30,46 @@ void 			AE::ardoDebugMessage(const char type, const char* msg, const char* ctx)
 #endif
 
 // .................................................................
-template<typename T>
-void 			AE::ardoDebugValue(	const char* name, T value, const char* ctx)
+template<typename T1>
+void 			AE::ardoDebugValue(	const char* name, T1 v1, const char* ctx)
 #ifdef JOIN_SERIAL_THREAD
-				{ SerialThread::ardoDebugValue(name, value, ctx); }
+				{ SerialThread::ardoDebugValue(name, v1, ctx); }
+#else
+				{}
+#endif
+
+// .................................................................
+template<typename T1, typename T2>
+void 			AE::ardoDebugValue(	const char* name, T1 v1, T2 v2, const char* ctx)
+#ifdef JOIN_SERIAL_THREAD
+				{ SerialThread::ardoDebugValue(name, v1, v2, ctx); }
+#else
+				{}
+#endif
+
+// .................................................................
+template<typename T1, typename T2, typename T3>
+void 			AE::ardoDebugValue(	const char* name, T1 v1, T2 v2, T3 v3, const char* ctx)
+#ifdef JOIN_SERIAL_THREAD
+				{ SerialThread::ardoDebugValue(name, v1, v2, v3, ctx); }
+#else
+				{}
+#endif
+
+// .................................................................
+template<typename T1, typename T2, typename T3, typename T4>
+void 			AE::ardoDebugValue(	const char* name, T1 v1, T2 v2, T3 v3, T4 v4, const char* ctx)
+#ifdef JOIN_SERIAL_THREAD
+				{ SerialThread::ardoDebugValue(name, v1, v2, v3, v4, ctx); }
+#else
+				{}
+#endif
+
+// .................................................................
+template<typename T1, typename T2, typename T3, typename T4, typename T5>
+void 			AE::ardoDebugValue(	const char* name, T1 v1, T2 v2, T3 v3, T4 v4, T5 v5, const char* ctx)
+#ifdef JOIN_SERIAL_THREAD
+				{ SerialThread::ardoDebugValue(name, v1, v2, v3, v4, v5, ctx); }
 #else
 				{}
 #endif

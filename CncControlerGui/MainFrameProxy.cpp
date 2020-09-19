@@ -22,14 +22,20 @@
 	void APP_PROXY::tryToSelectClientIds(long firstClientId, long lastClientId, ClientIdSelSource::ID tss)
 	{ THE_APP->tryToSelectClientIds(firstClientId, lastClientId, tss); }
 	
-	void APP_PROXY::updateSpeedSlider(float value)
-	{ THE_APP->updateSpeedSlider(value); }
-	
 	void APP_PROXY::updateCncSpeed(float value, CncSpeedMode mode)
 	{ THE_APP->updateCncSpeed(value, mode); }
 	
-	bool APP_PROXY::startInteractiveMove()
-	{ return THE_APP->startInteractiveMove(); }
+	void APP_PROXY::updateSpeedSlider(float value)
+	{ THE_APP->updateSpeedSlider(value); }
+	
+	void APP_PROXY::updateAndSetSpeedSlider(float value)
+	{ THE_APP->updateAndSetSpeedSlider(value); }
+	
+	bool APP_PROXY::startInteractiveMove(CncInteractiveMoveDriver imd)
+	{ return THE_APP->startInteractiveMove(imd); }
+	
+	bool APP_PROXY::updateInteractiveMove()
+	{ return THE_APP->updateInteractiveMove(); }
 	
 	bool APP_PROXY::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z)
 	{ return THE_APP->updateInteractiveMove(x, y, z); }
@@ -135,7 +141,10 @@
 
 	void APP_PROXY::openFileFromFileManager(const wxString& fn)
 	{ THE_APP->openFileFromFileManager(fn); }
-
+	
+	void APP_PROXY::openNavigatorFromGamepad()
+	{ THE_APP->openNavigatorFromGamepad(); }
+	
 	void APP_PROXY::selectMainBookSourcePanel(int sourcePageToSelect)
 	{ THE_APP->selectMainBookSourcePanel(sourcePageToSelect); }
 

@@ -122,8 +122,8 @@ protected:
     wxTextCtrl* m_pathListRowCount;
     wxStaticLine* m_staticLine7903;
     wxBitmapToggleButton* m_btConnectPathListEntries;
-    wxStaticLine* m_staticLine78021113;
     wxBitmapButton* m_btClearPathListEntries;
+    wxStaticLine* m_staticLine219;
     wxListCtrl* m_pathListEntriesPlaceholder;
     wxPanel* m_panel7630;
     wxStaticText* m_staticText613814;
@@ -154,8 +154,8 @@ public:
     wxTextCtrl* GetPathListRowCount() { return m_pathListRowCount; }
     wxStaticLine* GetStaticLine7903() { return m_staticLine7903; }
     wxBitmapToggleButton* GetBtConnectPathListEntries() { return m_btConnectPathListEntries; }
-    wxStaticLine* GetStaticLine78021113() { return m_staticLine78021113; }
     wxBitmapButton* GetBtClearPathListEntries() { return m_btClearPathListEntries; }
+    wxStaticLine* GetStaticLine219() { return m_staticLine219; }
     wxListCtrl* GetPathListEntriesPlaceholder() { return m_pathListEntriesPlaceholder; }
     wxPanel* GetPanel7622() { return m_panel7622; }
     wxStaticText* GetStaticText613814() { return m_staticText613814; }

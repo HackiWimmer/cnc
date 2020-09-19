@@ -21,7 +21,7 @@ class GamepadThread : public wxThread {
 		GamepadEvent::PosCtrlMode 	prevPosCtrlMode;
 		
 		virtual ExitCode Entry();
-		void evaluateNotifications(CncGamepad& gamepad, GamepadEvent& state);
+		void evaluateNotifications(const CncGamepad& gamepad, GamepadEvent& state);
 		
 		void sendMessage(const wxString& msg);
 		

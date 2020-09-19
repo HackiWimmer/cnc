@@ -14,7 +14,8 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 ////////////////////////////////////////////////////////////////
 {
 	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
-	m_btToggleConnection->SetBitmapDisabled(bmpOff.ConvertToDisabled());
+	m_btToggleConnectionH->SetBitmapDisabled(bmpOff.ConvertToDisabled());
+	m_btToggleConnectionV->SetBitmapDisabled(bmpOff.ConvertToDisabled());
 	
 	// This has to be done to use wxAutoBufferedPaintDC 
 	// on EVT_PAINT events correctly
@@ -45,16 +46,23 @@ void CncSpeedMonitor::activate(bool enable) {
 ////////////////////////////////////////////////////////////////
 	enableConnection(enable);
 	
-	m_btToggleConnection->Enable(enable);
+	m_btToggleConnectionV->Enable(enable);
+	m_btToggleConnectionH->Enable(enable);
 	
-	m_btToggleConfiguredAxis->Enable(enable);
-	m_btToggleMeasurePointsAxis->Enable(enable);
-	m_btToggleReceivedSpeedAxis->Enable(enable);
+	m_btToggleConfiguredAxisH->Enable(enable);
+	m_btToggleConfiguredAxisV->Enable(enable);
+	m_btToggleMeasurePointsAxisH->Enable(enable);
+	m_btToggleMeasurePointsAxisV->Enable(enable);
+	m_btToggleReceivedSpeedAxisH->Enable(enable);
+	m_btToggleReceivedSpeedAxisV->Enable(enable);
 	
-	m_btClear->Enable(enable);
-	m_btSave->Enable(enable);
+	m_btClearH->Enable(enable);
+	m_btClearV->Enable(enable);
+	m_btSaveH->Enable(enable);
+	m_btSaveV->Enable(enable);
 	
-	m_intervalSlider->Enable(enable);
+	m_sliderRecordResolutionH->Enable(enable);
+	m_sliderRecordResolutionV->Enable(enable);
 	
 	m_scrollBarH->Enable(enable);
 	m_scrollBarV->Enable(enable);
@@ -209,7 +217,7 @@ void CncSpeedMonitor::onPaintRightAxis(wxPaintEvent& event) {
 void CncSpeedMonitor::onSize(wxSizeEvent& event) {
 ////////////////////////////////////////////////////////////////
 	event.Skip();
-	const wxRect rect = GetClientRect();
+	const wxRect rect = m_darwingAreaH->IsShownOnScreen() ? m_darwingAreaH->GetRect() : m_darwingAreaV->GetRect();
 	
 	// select orientation
 	if ( rect.GetWidth() >= rect.GetHeight() )	diagram.orientation = Diagram::DOHorizontal;
@@ -232,7 +240,11 @@ void CncSpeedMonitor::onSize(wxSizeEvent& event) {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::onToggleMeasurePointsAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
-	diagram.showTimePoint = m_btToggleMeasurePointsAxis->GetValue();
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	wxBitmapToggleButton* masterButton = horztl ? m_btToggleMeasurePointsAxisH : m_btToggleMeasurePointsAxisV;
+	wxBitmapToggleButton* slaveButton  = horztl ? m_btToggleMeasurePointsAxisV : m_btToggleMeasurePointsAxisH;
+	slaveButton->SetValue(masterButton->GetValue());
+	diagram.showTimePoint = masterButton->GetValue();
 	
 	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
 	da->Refresh();
@@ -240,7 +252,11 @@ void CncSpeedMonitor::onToggleMeasurePointsAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::onToggleConfiguredAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
-	diagram.showCfgSpeed = m_btToggleConfiguredAxis->GetValue();
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	wxBitmapToggleButton* masterButton = horztl ? m_btToggleConfiguredAxisH : m_btToggleConfiguredAxisV;
+	wxBitmapToggleButton* slaveButton  = horztl ? m_btToggleConfiguredAxisV : m_btToggleConfiguredAxisH;
+	slaveButton->SetValue(masterButton->GetValue());
+	diagram.showCfgSpeed = masterButton->GetValue();
 	
 	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
 	da->Refresh();
@@ -248,7 +264,11 @@ void CncSpeedMonitor::onToggleConfiguredAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::onToggleReceivedSpeedAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
-	diagram.showRltSpeed = m_btToggleReceivedSpeedAxis->GetValue();
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	wxBitmapToggleButton* masterButton = horztl ? m_btToggleReceivedSpeedAxisH : m_btToggleReceivedSpeedAxisV;
+	wxBitmapToggleButton* slaveButton  = horztl ? m_btToggleReceivedSpeedAxisV : m_btToggleReceivedSpeedAxisH;
+	slaveButton->SetValue(masterButton->GetValue());
+	diagram.showRltSpeed = masterButton->GetValue();
 	
 	wxWindow* da = ( diagram.orientation == Diagram::DOHorizontal ? m_darwingAreaH : m_darwingAreaV );
 	da->Refresh();
@@ -256,13 +276,18 @@ void CncSpeedMonitor::onToggleReceivedSpeedAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::decorateConnectBtn() {
 ////////////////////////////////////////////////////////////////
-	wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
-	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
+	const wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
+	const wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
 	
-	m_btToggleConnection->GetValue() == true ? m_btToggleConnection->SetBitmap(bmpOn) 
-	                                         : m_btToggleConnection->SetBitmap(bmpOff);
-	m_btToggleConnection->Refresh();
-	m_btToggleConnection->Update();
+	auto updateCntBtn = [&](wxBitmapToggleButton* b) {
+		b->GetValue() == true ? b->SetBitmap(bmpOn) 
+	                          : b->SetBitmap(bmpOff);
+		b->Refresh();
+		b->Update();
+	};
+	
+	updateCntBtn(m_btToggleConnectionH);
+	updateCntBtn(m_btToggleConnectionV);
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::enableConnection(bool state) {
@@ -272,7 +297,12 @@ void CncSpeedMonitor::enableConnection(bool state) {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::toggleConnection() {
 ////////////////////////////////////////////////////////////////
-	enableConnection(!m_btToggleConnection->GetValue());
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	wxBitmapToggleButton* masterButton = horztl ? m_btToggleConnectionH : m_btToggleConnectionV;
+	wxBitmapToggleButton* slaveButton  = horztl ? m_btToggleConnectionV : m_btToggleConnectionH;
+	slaveButton->SetValue(masterButton->GetValue());
+	
+	enableConnection(!masterButton->GetValue());
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::onToggleConnection(wxCommandEvent& event) {
@@ -282,38 +312,76 @@ void CncSpeedMonitor::onToggleConnection(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::init() {
 ////////////////////////////////////////////////////////////////
-	typedef Diagram::Resolution DRes;
+	typedef Diagram::Resolution  DRes;
+	typedef Diagram::Compression DCom;
+	
 	switch ( diagram.resolution ) {
-		case DRes::DS_Sec:				m_intervalSlider->SetValue(1);	break;
-		case DRes::DS_TenthSec:			m_intervalSlider->SetValue(2);	break;
-		case DRes::DS_HundredthSec:		m_intervalSlider->SetValue(3);	break;
-		case DRes::DS_ThousandthSec:	m_intervalSlider->SetValue(4);	break;
+		case DRes::DS_Sec:				m_sliderRecordResolutionH->SetValue(1);	m_sliderRecordResolutionV->SetValue(1); break;
+		case DRes::DS_TenthSec:			m_sliderRecordResolutionH->SetValue(2);	m_sliderRecordResolutionV->SetValue(2); break;
+		case DRes::DS_HundredthSec:		m_sliderRecordResolutionH->SetValue(3);	m_sliderRecordResolutionV->SetValue(3); break;
+		case DRes::DS_ThousandthSec:	m_sliderRecordResolutionH->SetValue(4);	m_sliderRecordResolutionV->SetValue(4); break;
 	}
-	m_intervalSlider->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
+	m_sliderRecordResolutionH->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
+	m_sliderRecordResolutionV->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
 	
-	m_cbTimeCompression->SetStringSelection(wxString::Format("%ld", diagram.timeCompression));
+	switch ( diagram.timeCompression ) {
+		case DCom::CPV_1:				m_sliderTimeCompressionH->SetValue(1); m_sliderTimeCompressionH->SetValue(1); break;
+		case DCom::CPV_2:				m_sliderTimeCompressionH->SetValue(2); m_sliderTimeCompressionH->SetValue(2); break;
+		case DCom::CPV_5:				m_sliderTimeCompressionH->SetValue(3); m_sliderTimeCompressionH->SetValue(3); break;
+		case DCom::CPV_10:				m_sliderTimeCompressionH->SetValue(4); m_sliderTimeCompressionH->SetValue(4); break;
+		case DCom::CPV_20:				m_sliderTimeCompressionH->SetValue(5); m_sliderTimeCompressionH->SetValue(5); break;
+		case DCom::CPV_50:				m_sliderTimeCompressionH->SetValue(6); m_sliderTimeCompressionH->SetValue(6); break;
+		case DCom::CPV_100:				m_sliderTimeCompressionH->SetValue(7); m_sliderTimeCompressionH->SetValue(7); break;
+	}
+	m_sliderTimeCompressionH->SetToolTip(wxString::Format("Factor %ld", diagram.timeCompression));
+	m_sliderTimeCompressionV->SetToolTip(wxString::Format("Factor %ld", diagram.timeCompression));
 }
 ////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onChangeTimeCompression(wxCommandEvent& event) {
-////////////////////////////////////////////////////////////////
-	m_cbTimeCompression->GetStringSelection().ToLong(&(diagram.timeCompression));
-	update();
-}
-////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::onChangeIntervalSlider(wxScrollEvent& event) {
+void CncSpeedMonitor::onChangeRecordResolution(wxScrollEvent& event) {
 ////////////////////////////////////////////////////////////////
 	typedef Diagram::Resolution DRes;
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
 	
-	const int value = m_intervalSlider->GetValue();
+	wxSlider* masterSlider = horztl ? m_sliderRecordResolutionH : m_sliderRecordResolutionV;
+	wxSlider* slaveSlider  = horztl ? m_sliderRecordResolutionV : m_sliderRecordResolutionH;
+	const int value = masterSlider->GetValue();
 	switch ( value ) {
 		case 1:	diagram.resolution = DRes::DS_Sec;				break;
 		case 2:	diagram.resolution = DRes::DS_TenthSec; 		break;
 		case 3:	diagram.resolution = DRes::DS_HundredthSec;		break;
 		case 4:	diagram.resolution = DRes::DS_ThousandthSec;	break;
 	}
+	slaveSlider->SetValue(value);
 	
-	m_intervalSlider->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
+	m_sliderRecordResolutionH->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
+	m_sliderRecordResolutionV->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
 	clear();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onChangeDisplayCompression(wxScrollEvent& event) {
+////////////////////////////////////////////////////////////////
+	typedef Diagram::Compression DCom;
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	
+	wxSlider* masterSlider = horztl ? m_sliderTimeCompressionH : m_sliderTimeCompressionV;
+	wxSlider* slaveSlider  = horztl ? m_sliderTimeCompressionV : m_sliderTimeCompressionH;
+	
+	const int value = masterSlider->GetValue();
+	switch ( value ) {
+		case 1:	diagram.timeCompression = DCom::CPV_1;		break;
+		case 2:	diagram.timeCompression = DCom::CPV_2; 		break;
+		case 3:	diagram.timeCompression = DCom::CPV_5;		break;
+		case 4:	diagram.timeCompression = DCom::CPV_10;		break;
+		case 5:	diagram.timeCompression = DCom::CPV_20;		break;
+		case 6:	diagram.timeCompression = DCom::CPV_50;		break;
+		case 7:	diagram.timeCompression = DCom::CPV_100;	break;
+	}
+	slaveSlider->SetValue(value);
+	
+	m_sliderTimeCompressionH->SetToolTip(wxString::Format("Factor %ld", diagram.timeCompression));
+	m_sliderTimeCompressionV->SetToolTip(wxString::Format("Factor %ld", diagram.timeCompression));
+	
+	update();
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::restoreTimeOffset() {
@@ -372,7 +440,7 @@ void CncSpeedMonitor::setCurrentFeedSpeedValues(double cfgF_MM_MIN, double rltF_
 		std::cout << "rltF_MM_MIN = " << rltF_MM_MIN << std::endl;
 
 	if ( cnc::dblCompare(rltF_MM_MIN, 0.0) )
-		std::cout << "rltF_MM_MIN = " << rltF_MM_MIN << std::endl;
+		;//std::cout << "rltF_MM_MIN = " << rltF_MM_MIN << std::endl;
 	
 	
 	
@@ -382,7 +450,10 @@ void CncSpeedMonitor::setCurrentFeedSpeedValues(double cfgF_MM_MIN, double rltF_
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::update() {
 ////////////////////////////////////////////////////////////////
-	if ( m_btToggleConnection->GetValue() == false )
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	wxBitmapToggleButton* masterButton = horztl ? m_btToggleConnectionH : m_btToggleConnectionV;
+
+	if ( masterButton->GetValue() == false )
 		return;
 	
 	//diagram.appendAgain(10);
@@ -670,3 +741,4 @@ void CncSpeedMonitor::Diagram::plotMain(wxAutoBufferedPaintDC& dc, const wxRect&
 		}
 	}
 }
+

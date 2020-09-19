@@ -6,7 +6,7 @@
 #include <Windows.h>
 
 ///////////////////////////////////////////////////////////////////
-bool CncGamepadMsw::isServiceRuning() {
+bool CncGamepadMsw::isServiceRuning() const {
 ///////////////////////////////////////////////////////////////////
 	const char* name = "Ds3Service";
 	
@@ -126,7 +126,7 @@ bool CncGamepadMsw::refresh() {
 			if ( deadzoneY > 0 ) rightStickY *= 1 / (1 - deadzoneY);
 		}
 		 
-		leftTrigger = (float) state.Gamepad.bLeftTrigger / 255;
+		leftTrigger  = (float) state.Gamepad.bLeftTrigger  / 255;
 		rightTrigger = (float) state.Gamepad.bRightTrigger / 255;
 		
 		return true;
@@ -135,7 +135,7 @@ bool CncGamepadMsw::refresh() {
 	return false;
 }
 /////////////////////////////////////////////////////////////////// 
-bool CncGamepadMsw::isPressed(WORD button) {
+bool CncGamepadMsw::isPressed(WORD button) const {
 ///////////////////////////////////////////////////////////////////
 	return (state.Gamepad.wButtons & button) != 0;
 }

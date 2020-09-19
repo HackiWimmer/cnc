@@ -40,13 +40,14 @@ static struct ClientIds {
 } CLIENT_ID;
 
 enum CncUnit 					{ CncSteps, CncMetric };
+enum CncInteractiveMoveDriver	{ IMD_NONE, IMD_GAMEPAD, IMD_NAVIGATOR };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
 enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};
 enum CncSpeedMode				{ CncSpeedWork = 0, CncSpeedRapid = 1, CncSpeedMax = 2, CncSpeedUserDefined = 3 }; // dont change the values
 enum CncPortType 				{ CncPORT, CncPORT_EMU_ARDUINO, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
 enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
 enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
-enum StepSensitivity 			{ FINEST = 1, FINE = 10 , MEDIUM = 50, ROUGH = 100, ROUGHEST = 200 };
+enum StepSensitivity 			{ FINEST = 1, FINE = 20 , MEDIUM = 50, ROUGH = 80, ROUGHEST = 100 };
 enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4 };
 enum TemplateFormat 			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
 enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
@@ -110,7 +111,9 @@ namespace cnc {
 	
 	void traceSetterValueList(std::ostream& s, const SetterValueList& values, int32_t factor = 1);
 	void traceLineNumberTranslater(std::ostream& s, const LineNumberTranslater& lnt);
-
+	
+	StepSensitivity getStepSensitivityOfIndex(unsigned int index);
+	float getSpeedValue(StepSensitivity s);
 };
 
 namespace ClientIdSelSource {
@@ -218,8 +221,9 @@ class OutboundCfgSelection{
 	public:
 		enum VAL {
 			SUMMARY_PANEL				= 0,
-			CNC_CONFIG_PANEL			= 1,
-			CNC_PIN_PANEL				= 2
+			ADDITIONAL_PARAMETERS		= 1,
+			CNC_CONFIG_PANEL			= 2,
+			CNC_PIN_PANEL				= 3
 		};
 };
 

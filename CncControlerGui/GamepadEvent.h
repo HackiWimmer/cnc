@@ -16,11 +16,13 @@ class GamepadEvent : public wxThreadEvent {
 		
 		GamepadEvent(wxEventType eventType = wxEVT_GAMEPAD_THREAD, int id = 0)
 		: wxThreadEvent(eventType, id)
+		, isSomethingChanged(false)
 		, data()
 		{}
 		
 		explicit GamepadEvent(const GamepadEvent& event)
 		: wxThreadEvent(event)
+		, isSomethingChanged(event.isSomethingChanged)
 		, data(event.data)
 		{}
 
@@ -49,6 +51,12 @@ class GamepadEvent : public wxThreadEvent {
 			bool 	buttonLeftShoulder		= false;
 			bool 	buttonRightShoulder		= false;
 			
+			bool 	hasEmptyMovement		= false;
+			bool 	isAnyStickActive		= false;
+			bool 	isLeftStickActive		= false;
+			bool 	isRightStickActive		= false;
+			bool 	isNaviButtonActive		= false;
+			
 			float 	leftTrigger				= 0.0f;
 			float 	rightTrigger			= 0.0f;
 			
@@ -66,11 +74,19 @@ class GamepadEvent : public wxThreadEvent {
 			
 			friend std::ostream &operator<< (std::ostream &ostr, const Data &data) { return trace(ostr, data); }
 			static std::ostream& trace(std::ostream &ostr, const GamepadEvent::Data &data);
-		} data;
+		};
+		
+		bool isSomethingChanged;
+		Data data;
 		
 		/////////////////////////////////////////////////////////////////////////////
-		bool isSomethingChanged(const GamepadEvent& event) {
-			return memcmp(&(this->data), &(event.data), sizeof(GamepadEvent::Data)) != 0;
+		bool hasEmptyMovementInformation() const {
+			return ( data.dx == CLD::CncNoneDir && data.dy == CLD::CncNoneDir && data.dz == CLD::CncNoneDir );
+		}
+		
+		/////////////////////////////////////////////////////////////////////////////
+		bool hasMovementInformation() const {
+			return !hasEmptyMovementInformation();
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////

@@ -53,7 +53,8 @@ class MainFrameProxy {
 		static void parsingSynopsisTraceAddWarning(const wxString& entry);
 		static void parsingSynopsisTraceAddError(const wxString& entry);
 
-		static bool startInteractiveMove();
+		static bool startInteractiveMove(CncInteractiveMoveDriver imd);
+		static bool updateInteractiveMove();
 		static bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		static bool stopInteractiveMove();
 		
@@ -69,9 +70,11 @@ class MainFrameProxy {
 		static int  showReferencePositionDlg(wxString msg);
 		static void newTemplate();
 		static void openTemplate();
+		static void openNavigatorFromGamepad();
 		static bool filePreviewListLeave();
-		static void updateSpeedSlider(float value);
 		static void updateCncSpeed(float value, CncSpeedMode mode);
+		static void updateSpeedSlider(float value);
+		static void updateAndSetSpeedSlider(float value);
 		
 		static SerialThread* getSerialThread(SerialThreadStub* sts);
 		

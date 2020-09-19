@@ -22,6 +22,7 @@
 #include "CncExceptions.h"
 #include "CncCommon.h"
 #include "CncContext.h"
+#include "CncGamePad.h"
 #include "CncFileNameService.h"
 #include "CncLoggerProxy.h"
 #include "wxCrafterImages.h"
@@ -33,7 +34,7 @@ static CommandTemplates CMDTPL;
 ///////////////////////////////////////////////////////////////////
 CncControl::CncControl(CncPortType pt) 
 : currentClientId				(-1)
-, runInteractiveMove			(false)
+, currentInteractiveMoveDriver	(IMD_NONE)
 , setterMap						()
 , serialPort					(NULL)
 , zeroAppPos					(0,0,0)
@@ -434,15 +435,6 @@ void CncControl::onPeriodicallyAppEvent() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
 	
-	if ( isInterrupted() == false ) {
-		
-		if ( isInteractiveMoveActive() ) {
-			if ( serialPort->isCommandActive() == false )
-				if ( popSerial() == false )
-					std::cerr << "CncControl::onPeriodicallyAppEvent(): popSerial failed!" << std::endl;
-		}
-	}
-	
 	serialPort->onPeriodicallyAppEvent(isInterrupted());
 }
 ///////////////////////////////////////////////////////////////////
@@ -592,6 +584,11 @@ bool CncControl::isReadyToRun() {
 	
 	if ( isInterrupted() == true ) {
 		std::cerr << "CncControl::isReadyToRun: The controller is interrupted. A reset is required!" << std::endl;
+		return false;
+	}
+	
+	if ( isCommandActive() == true ) {
+		std::cerr << "CncControl::isReadyToRun: The controller is bussy!" << std::endl;
 		return false;
 	}
 	
@@ -766,8 +763,8 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false ) {
 		configuredFeedSpeed_MM_MIN = value;
 		
-		if ( processSetter(PID_SPEED_MM_MIN, (int32_t)(configuredFeedSpeed_MM_MIN * FLT_FACT)) == false ) {
-			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_MM_MIN) failed" << std::endl;
+		if ( processSetter(PID_SPEED_MM_SEC, (int32_t)(configuredFeedSpeed_MM_MIN * FLT_FACT / 60)) == false ) {
+			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_MM_SEC) failed" << std::endl;
 			return false;
 		}
 	}
@@ -890,6 +887,18 @@ bool CncControl::dispatchEventQueue() {
 	if ( isInterrupted() ) {
 		std::cerr << "SerialCallback: Interrupt detected"<< std::endl;
 		return false;
+	}
+	
+	if ( currentInteractiveMoveDriver == IMD_GAMEPAD ) {
+		// Check the gamepad datatus also here to stop immediately
+		// Or in other words as fast as possible
+		static CncGamepad gamepad;
+		gamepad.refresh();
+			
+		// stop immediately . . .
+		if ( gamepad.hasEmptyMovement() )
+			if ( stopInteractiveMove() == false )
+				std::cerr << "CncControl::dispatchEventQueue(): stopInteractiveMove() failed" << std::endl;
 	}
 	
 	if ( THE_CONTEXT->isAllowEventHandling() ) {
@@ -1137,10 +1146,10 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 											displayToolState(toolPowerState);
 											break;
 											
-				case PID_SPEED_MM_MIN:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
+				case PID_SPEED_MM_SEC:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
 												return false;
 												
-											configuredFeedSpeed_MM_MIN = cei.setterValueList.front() / FLT_FACT;
+											configuredFeedSpeed_MM_MIN = 60.0 * cei.setterValueList.front() / FLT_FACT;
 											break;
 											
 				case PID_ENABLE_STEPPERS:	// nothing to do here
@@ -1799,40 +1808,23 @@ bool CncControl::moveZToMid() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::startInteractiveMove(StepSensitivity s) {
+bool CncControl::startInteractiveMove(StepSensitivity s, CncInteractiveMoveDriver imd ) {
 ///////////////////////////////////////////////////////////////////
-	if ( runInteractiveMove == true )
+	if ( isInteractiveMoveActive() )
 		return true;
-
-	if ( getSerial()->isCommandActive() == true )
-		return false;
+		
+	const double newSpeed = cnc::getSpeedValue( s);
+	changeCurrentFeedSpeedXYZ_MM_MIN(newSpeed, CncSpeedRapid);
 	
-	const double maxSpeed = THE_CONFIG->getMaxSpeedX_MM_MIN();
+	const bool b = serialPort->processStartInteractiveMove();
+	currentInteractiveMoveDriver = (b ? imd : IMD_NONE);
 	
-	switch ( s ) {
-		case FINEST:	changeCurrentFeedSpeedXYZ_MM_MIN(100.0, CncSpeedRapid);
-						break;
-						
-		case FINE:		changeCurrentFeedSpeedXYZ_MM_MIN(maxSpeed * 0.2, CncSpeedRapid);
-						break;
-						
-		case MEDIUM:	changeCurrentFeedSpeedXYZ_MM_MIN(maxSpeed * 0.5, CncSpeedRapid);
-						break;
-						
-		case ROUGH:		changeCurrentFeedSpeedXYZ_MM_MIN(maxSpeed * 0.8, CncSpeedRapid);
-						break;
-						
-		case ROUGHEST:	changeCurrentFeedSpeedXYZ_MM_MIN(maxSpeed * 1.0, CncSpeedRapid);
-						break;
-	}
-	
-	runInteractiveMove = serialPort->processStartInteractiveMove();
-	return runInteractiveMove;
+	return isInteractiveMoveActive();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
 ///////////////////////////////////////////////////////////////////
-	if ( runInteractiveMove == false ) 
+	if ( isInteractiveMoveActive() == false )
 		return false;
 		
 	const bool ret = serialPort->processUpdateInteractiveMove(x, y, z);
@@ -1847,10 +1839,10 @@ bool CncControl::updateInteractiveMove(const CncLinearDirection x, const CncLine
 ///////////////////////////////////////////////////////////////////
 bool CncControl::stopInteractiveMove() {
 ///////////////////////////////////////////////////////////////////
-	if ( runInteractiveMove == true ) {
+	if ( isInteractiveMoveActive() ) {
 		
-		if ( getSerial()->sendSignal(SIG_QUIT_MOVE) == false ) {
-			std::cerr << "CncControl::stopInteractiveMove(): sendSignal(SIG_QUIT_MOVE) failed" << std::endl;
+		if ( getSerial()->sendQuitMove() == false ) {
+			std::cerr << "CncControl::stopInteractiveMove(): sendQuitMove() failed" << std::endl;
 			return false;
 		}
 		
@@ -1858,7 +1850,7 @@ bool CncControl::stopInteractiveMove() {
 		if ( getSerial()->isCommandActive() == false )
 			getSerial()->popSerial();
 			
-		runInteractiveMove = false;
+		currentInteractiveMoveDriver = IMD_NONE;
 	}
 	
 	return true;

@@ -33,7 +33,6 @@ class CncSpeedSliderInterface {
 		void previewValue(int value);
 		void previewValue(float value);
 		void previewValue(double value);
-		void synchronize();
 		
 		void autoConfigure();
 		
@@ -46,9 +45,6 @@ class CncSpeedSliderInterface {
 // -------------------------------------------------------------
 class CncDefaultSpeedSlider : public wxEvtHandler, public CncSpeedSliderInterface
 {
-	private: 
-		int 	loggedSliderValue;
-		
 	protected:
 		virtual void onChangedSlider(wxScrollEvent& event);
 		virtual void onThumbtrackSlider(wxScrollEvent& event);
@@ -59,10 +55,6 @@ class CncDefaultSpeedSlider : public wxEvtHandler, public CncSpeedSliderInterfac
 	public:
 		CncDefaultSpeedSlider(wxSlider* slider, wxTextCtrl* label, wxStaticText* unit = NULL);
 		virtual ~CncDefaultSpeedSlider();
-		
-		void logValue();
-		void unlogValue();
-		void restoreValue();
 };
 
 #endif // CNCSPEEDSLIDER_H

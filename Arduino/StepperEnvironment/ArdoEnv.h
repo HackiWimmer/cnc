@@ -28,9 +28,21 @@
       // addition helper functions
       extern inline void              ardoDebugMessage(const char type, const char* msg, const char* context);
   
-      template<typename T>
-      extern void                     ardoDebugValue(const char* name, T value, const char* context);
+      template<typename T1>
+      extern void                     ardoDebugValue(const char* name, T1 v1, const char* context);
+      
+      template<typename T1, typename T2>
+      extern void                     ardoDebugValue(const char* name, T1 v1, T2 v2, const char* context);
+      
+      template<typename T1, typename T2, typename T3>
+      extern void                     ardoDebugValue(const char* name, T1 v1, T2 v2, T3 v3, const char* context);
 
+      template<typename T1, typename T2, typename T3, typename T4>
+      extern void                     ardoDebugValue(const char* name, T1 v1, T2 v2, T3 v3, T4 v4, const char* context);
+      
+      template<typename T1, typename T2, typename T3, typename T4, typename T5>
+      extern void                     ardoDebugValue(const char* name, T1 v1, T2 v2, T3 v3, T4 v4, T5 v5, const char* context);
+      
       extern bool                     ardoConfigGetTraceGetters();
       extern bool                     ardoConfigGetTraceSetters();
 
@@ -80,11 +92,16 @@
 
     #define NOT_A_PIN               AE::PN_NOT_A_PIN
 
-    #define PRINT_DEBUG_VALUE(vName, vValue)          AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
-    #define ARDO_DEBUG_MESSAGE(type, msg)             AE::ardoDebugMessage(type, msg, ARDO_LOG_FUNCT);
-    #define ARDO_DEBUG_VALUE(vName, vValue)           AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
-    #define ARDO_TRACE_STEPPER_DIR(sid, value)        AE::ardoTraceStepperDir(sid, value);
-    #define ARDO_TRACE_STEPPER_POS(sid, value)        AE::ardoTraceStepperPos(sid, value);
+    #define PRINT_DEBUG_VALUE1(vName, vV1)                      AE::ardoDebugValue(vName, vV1, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE2(vName, vV1, vV2)                 AE::ardoDebugValue(vName, vV1, vV2, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE3(vName, vV1, vV2, vV3)            AE::ardoDebugValue(vName, vV1, vV2, vV3, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE4(vName, vV1, vV2, vV3, vV4)       AE::ardoDebugValue(vName, vV1, vV2, vV3, vV4, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE5(vName, vV1, vV2, vV3, vV4, vV5)  AE::ardoDebugValue(vName, vV1, vV2, vV3, vV4, vV5, ARDO_LOG_FUNCT);
+
+    #define ARDO_DEBUG_MESSAGE(type, msg)                       AE::ardoDebugMessage(type, msg, ARDO_LOG_FUNCT);
+    #define ARDO_DEBUG_VALUE(vName, vValue)                     AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
+    #define ARDO_TRACE_STEPPER_DIR(sid, value)                  AE::ardoTraceStepperDir(sid, value);
+    #define ARDO_TRACE_STEPPER_POS(sid, value)                  AE::ardoTraceStepperPos(sid, value);
     
     #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 
@@ -103,26 +120,52 @@
     enum PinMode   { PM_INPUT = INPUT, PM_OUTPUT = OUTPUT, PM_INPUT_PULLUP = INPUT_PULLUP };
     enum PinType   { PT_UNKNOWN = 0, PT_ANALOG = 1, PT_DIGITAL = 2 };
 
-    template<typename T>
-    void printDebugValue(const char* vName, T vValue) {
-      Serial.write(RET_SOH);
-      Serial.write(PID_MSG);
-      Serial.write(MT_DEBUG);
-  
-      Serial.print(vName); 
-      Serial.print('='); 
-      Serial.print(vValue);
-    
-      Serial.write(MBYTE_CLOSE);
-      Serial.flush();
+    template<typename T1>
+    void printDebugValue(const char* vName, T1 vV1) {
+      Serial.write(RET_SOH); Serial.write(PID_MSG); Serial.write(MT_DEBUG);
+        Serial.print(vName); Serial.print('='); Serial.print(vV1);
+      Serial.write(MBYTE_CLOSE); Serial.flush();
     }
 
+    template<typename T1, typename T2>
+    void printDebugValue(const char* vName, T1 vV1, T2 vV2) {
+      Serial.write(RET_SOH); Serial.write(PID_MSG); Serial.write(MT_DEBUG);
+        Serial.print(vName); Serial.print('='); Serial.print(vV1); Serial.print(','); Serial.print(vV2);
+      Serial.write(MBYTE_CLOSE); Serial.flush();
+    }
+    
+    template<typename T1, typename T2, typename T3>
+    void printDebugValue(const char* vName, T1 vV1, T2 vV2, T3 vV3) {
+      Serial.write(RET_SOH); Serial.write(PID_MSG); Serial.write(MT_DEBUG);
+        Serial.print(vName); Serial.print('='); Serial.print(vV1); Serial.print(','); Serial.print(vV2); Serial.print(','); Serial.print(vV3);
+      Serial.write(MBYTE_CLOSE); Serial.flush();
+    }
+    
+    template<typename T1, typename T2, typename T3, typename T4>
+    void printDebugValue(const char* vName, T1 vV1, T2 vV2, T3 vV3, T4 vV4) {
+      Serial.write(RET_SOH); Serial.write(PID_MSG); Serial.write(MT_DEBUG);
+        Serial.print(vName); Serial.print('='); Serial.print(vV1); Serial.print(','); Serial.print(vV2); Serial.print(','); Serial.print(vV3); Serial.print(','); Serial.print(vV4);
+      Serial.write(MBYTE_CLOSE); Serial.flush();
+    }
+    
+    template<typename T1, typename T2, typename T3, typename T4, typename T5>
+    void printDebugValue(const char* vName, T1 vV1, T2 vV2, T3 vV3, T4 vV4, T5 vV5) {
+      Serial.write(RET_SOH); Serial.write(PID_MSG); Serial.write(MT_DEBUG);
+        Serial.print(vName); Serial.print('='); Serial.print(vV1); Serial.print(','); Serial.print(vV2); Serial.print(','); Serial.print(vV3); Serial.print(','); Serial.print(vV4); Serial.print(','); Serial.print(vV5);
+      Serial.write(MBYTE_CLOSE); Serial.flush();
+    }
+    
     // addition helper functions
-    #define PRINT_DEBUG_VALUE(vName, vValue)    printDebugValue(vName, vValue);
-    #define ARDO_DEBUG_MESSAGE(a,b)             // to eliminate this within the arduino context
-    #define ARDO_DEBUG_VALUE(a,b)               // to eliminate this within the arduino context
-    #define ARDO_TRACE_STEPPER_DIR(a, b)        // to eliminate this within the arduino context
-    #define ARDO_TRACE_STEPPER_POS(a, b)        // to eliminate this within the arduino context
+    #define PRINT_DEBUG_VALUE1(vName, vV1)                      printDebugValue(vName, vV1);
+    #define PRINT_DEBUG_VALUE2(vName, vV1, vV2)                 printDebugValue(vName, vV1, vV2);
+    #define PRINT_DEBUG_VALUE3(vName, vV1, vV2, vV3)            printDebugValue(vName, vV1, vV2, vV3);
+    #define PRINT_DEBUG_VALUE4(vName, vV1, vV2, vV3, vV4)       printDebugValue(vName, vV1, vV2, vV3, vV4);
+    #define PRINT_DEBUG_VALUE5(vName, vV1, vV2, vV3, vV4, vV5)  printDebugValue(vName, vV1, vV2, vV3, vV4, vV5);
+
+    #define ARDO_DEBUG_MESSAGE(a,b)                             // to eliminate this within the arduino context
+    #define ARDO_DEBUG_VALUE(a,b)                               // to eliminate this within the arduino context
+    #define ARDO_TRACE_STEPPER_DIR(a, b)                        // to eliminate this within the arduino context
+    #define ARDO_TRACE_STEPPER_POS(a, b)                        // to eliminate this within the arduino context
 
   #endif // #ifndef SKETCH_COMPILE
 

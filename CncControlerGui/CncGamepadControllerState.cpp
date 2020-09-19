@@ -2,37 +2,91 @@
 #include "wxCrafterImages.h"
 #include "MainFrame.h"
 #include "MainFrameProxy.h"
+#include "GlobalFunctions.h"
 #include "CncReferencePosition.h"
+#include "CncGamepadCommandHistory.h"
 #include "CncGamepadControllerState.h"
 
 ///////////////////////////////////////////////////////////////////
 CncGamepadControllerState::CncGamepadControllerState(wxWindow* parent)
 : CncGamepadControllerStateBase(parent)
-, running(false)
-, currentMoveState()
-, serviceShortName("Ds3Service")
-, serviceLongName("SCP DSx Service")
+, cmdHistCtrl			(NULL)
+, currentMovementState	(MS_STOPPED)
+, currentMoveInfo		()
+, serviceShortName		("Ds3Service")
+, serviceLongName		("SCP DSx Service")
 ///////////////////////////////////////////////////////////////////
 {
+	cmdHistCtrl = new CncGamepadCommadHistoryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_gamepadCmdHistoryPlaceholder, cmdHistCtrl);
 }
 ///////////////////////////////////////////////////////////////////
 CncGamepadControllerState::~CncGamepadControllerState() {
 ///////////////////////////////////////////////////////////////////
+	wxDELETE( cmdHistCtrl );
+}
+///////////////////////////////////////////////////////////////////
+const char* CncGamepadControllerState::getMovementStateAsString(MovementState s) {
+///////////////////////////////////////////////////////////////////
+	switch ( currentMovementState ) {
+		case MS_STOPPED:	return "Stopped";
+		case MS_RUNNING:	return "Running";
+		case MS_ERROR:		return "Error";
+	}
+	
+	return "Unknown";
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::clearGamepadServiceTrace(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_gamepadServiceTrace->Clear();
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::onClearHistory(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( cmdHistCtrl );
+	
+	cmdHistCtrl->clearAll();
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::onConnectGamepad(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	decoarteConnectButton();
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::decoarteConnectButton() {
+///////////////////////////////////////////////////////////////////
+	const bool b   = m_btConnect->GetValue();
+	const char* t1 = "For Debug purpose only!\nDisconnect Gamepad from CNC Controller";
+	const char* t2 = "For Debug purpose only!\nConnect Gamepad To CNC Controller";
+	
+	m_btConnect->SetBitmap(ImageLib16().Bitmap(b ? "BMP_CONNECTED" : "BMP_DISCONNECTED")); 
+	m_btConnect->SetToolTip(b ? t1 : t2);
+	m_btConnect->Refresh();
+	m_btConnect->Update();
+	
+	// to clear
+	if ( b )
+		cnc::trc.logInfo("");
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::update(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	running = true;
-		processTrace(state);
-		processReferencePage(state);
-		processRefPositionDlg(state);
-		processPosition(state);
-	running = false;
-}
-///////////////////////////////////////////////////////////////////
-void CncGamepadControllerState::trace(const wxString& msg) {
-//////////////////////////////////////////////////////////////////
-	m_gamepadTrace->ChangeValue(msg);
+	if ( m_btConnect->GetValue() == true )
+		processMovement(state);
+
+	if ( state.isSomethingChanged == false )
+		return;
+		
+	processTrace(state);
+	
+	if ( m_btConnect->GetValue() == false ) {
+		cnc::trc.logWarning("Gamepad currently decoupled from the CNC Controller!");
+		return;
+	}
+	
+	processOpenNavigator(state);
+	processRefPositionDlg(state);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncGamepadControllerState::isRefPosDlgMode() {
@@ -43,19 +97,25 @@ bool CncGamepadControllerState::isRefPosDlgMode() {
 	return APP_PROXY::getRefPositionDlg()->IsShown();
 }
 ///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::trace(const wxString& msg) {
+//////////////////////////////////////////////////////////////////
+	m_gamepadTrace->ChangeValue(msg);
+}
+///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::processTrace(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << state;
+	ss << "\nCurrent Movement State         : ";
+	ss << getMovementStateAsString(currentMovementState);
+	
 	m_gamepadTrace->ChangeValue(ss.str());
 }
 ///////////////////////////////////////////////////////////////////
-void CncGamepadControllerState::processReferencePage(const GamepadEvent& state) {
+void CncGamepadControllerState::processOpenNavigator(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	if ( state.data.buttonStart ) {
-		wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-		wxPostEvent(APP_PROXY::GetBtSelectReferences(), evt);
-	}
+	if ( state.data.buttonStart ) 
+		APP_PROXY::openNavigatorFromGamepad();
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state) {
@@ -73,11 +133,14 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 		
 		// select step sensitivity - main frame
 		if ( state.data.buttonA ) { 
-			unsigned int sel = APP_PROXY::GetRbStepSensitivity()->GetSelection();
-			unsigned int cnt = APP_PROXY::GetRbStepSensitivity()->GetCount();
-		
-			if ( sel + 1 >= cnt ) 	APP_PROXY::GetRbStepSensitivity()->SetSelection(0);
-			else					APP_PROXY::GetRbStepSensitivity()->SetSelection(sel +1);
+			const unsigned int sel  = APP_PROXY::GetRbStepSensitivity()->GetSelection();
+			const unsigned int max  = APP_PROXY::GetRbStepSensitivity()->GetCount();
+			const unsigned int next = (sel + 1) % max;
+			const StepSensitivity s = cnc::getStepSensitivityOfIndex(next);
+			const double newSpeed   = cnc::getSpeedValue(s);
+			
+			APP_PROXY::GetRbStepSensitivity()->SetSelection(next);
+			APP_PROXY::updateSpeedSlider(newSpeed);
 		}
 		
 		// always return here
@@ -89,17 +152,19 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 	// sensitivity
 	if ( state.data.buttonA == true ) {
 		wxRadioBox* rbs  = APP_PROXY::getRefPositionDlg()->GetRbStepSensitivity();
-		unsigned int sel = rbs->GetSelection();
-		unsigned int cnt = rbs->GetCount();
 		
-		// select it at the ref pos dlg
-		if ( sel + 1 >= cnt ) 	rbs->SetSelection(0);
-		else					rbs->SetSelection(sel +1);
+		const unsigned int sel  = rbs->GetSelection();
+		const unsigned int max  = rbs->GetCount();
+		const unsigned int next = (sel + 1) % max;
+		const StepSensitivity s = cnc::getStepSensitivityOfIndex(next);
+		const double newSpeed   = cnc::getSpeedValue(s);
+
+		rbs->SetSelection(next);
 		
-		// select it at the main frame
 		rbs  = APP_PROXY::GetRbStepSensitivity();
-		if ( sel + 1 >= cnt ) 	rbs->SetSelection(0);
-		else					rbs->SetSelection(sel +1);
+		rbs->SetSelection(next);
+		
+		APP_PROXY::updateSpeedSlider(newSpeed);
 	}
 	
 	// ref pos mode
@@ -120,47 +185,65 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncGamepadControllerState::processPosition(const GamepadEvent& state) {
+void CncGamepadControllerState::processMovement(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 	typedef CncLinearDirection CLD;
-	
-	//---------------------------------------------------------
-	auto stopMove = [&](){
-		currentMoveState.reset();
-		APP_PROXY::stopInteractiveMove();
-	};
-	
 	const CLD dx = state.data.dx;
 	const CLD dy = state.data.dy;
 	const CLD dz = state.data.dz;
-	
-	//
-	if ( dx == CLD::CncNoneDir && dy == CLD::CncNoneDir && dz == CLD::CncNoneDir ) {
-		stopMove();
-	}
-	else { 
-		
-		if ( dx != CLD::CncNoneDir || dy != CLD::CncNoneDir || dz != CLD::CncNoneDir ) {
-			
-			if ( currentMoveState.isEqual(dx, dy, dz) == false ) {
-				
-				if ( false ) {
-					std::cout   << " x or y changed: " << dx << ", " << dy << ", " << dz 
-					            << "-----------" << currentMoveState.dx << ", " << currentMoveState.dy << ", " << currentMoveState.dz
-								<< " -- Stick: "
-								<< state.data.leftStickX
-								<< ","
-								<< state.data.leftStickY
-								<< std::endl;
-				}
-				
-				currentMoveState.set(dx, dy, dz);
-				APP_PROXY::updateInteractiveMove(dx, dy, dz);
+
+	switch ( currentMovementState ) {
+		// -------------------------------------------------------
+		case MS_STOPPED:
+		{
+			if ( state.hasMovementInformation() ) {
+				const bool b = APP_PROXY::startInteractiveMove(CncInteractiveMoveDriver::IMD_GAMEPAD);
+				currentMovementState = b ? MS_RUNNING : MS_ERROR;
+				currentMoveInfo.reset();
+				cmdHistCtrl->addStartCommand(b);
 			}
+			
+			m_btConnect->Enable(true);
+			break;
+		}
+		// -------------------------------------------------------
+		case MS_RUNNING:
+		{
+			if ( state.hasEmptyMovementInformation() ) {
+				const bool b = APP_PROXY::stopInteractiveMove();
+				currentMovementState = b ? MS_STOPPED : MS_ERROR;
+				currentMoveInfo.reset();
+				cmdHistCtrl->addStopCommand(b);
+			}
+			else {
+				if ( currentMoveInfo.update(dx, dy, dz) == true ) {
+					const bool b = APP_PROXY::updateInteractiveMove(dx, dy, dz);
+					currentMovementState = b ? MS_RUNNING : MS_ERROR;
+					currentMoveInfo.reset();
+					cmdHistCtrl->addUpdateCommand(b, wxString::Format("%+d, %+d, %+d", (int)dx, (int)dy, (int)dz));
+				}
+				else {
+					const bool b = APP_PROXY::updateInteractiveMove();
+					currentMovementState = b ? MS_RUNNING : MS_ERROR;
+					currentMoveInfo.reset();
+					cmdHistCtrl->addUpdateCommand(b, "");
+				}
+			}
+			
+			m_btConnect->Enable(false);
+			break;
+		}
+		// -------------------------------------------------------
+		case MS_ERROR:
+		{
+			const bool b = APP_PROXY::stopInteractiveMove();
+			currentMovementState = b ? MS_STOPPED : MS_ERROR;
+			currentMoveInfo.reset();
+			
+			m_btConnect->Enable(false);
+			break;
 		}
 	}
-	
-	currentMoveState.set(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::executeCommand(const wxString& cmd) {
@@ -223,9 +306,4 @@ void CncGamepadControllerState::queryGamepadService(wxCommandEvent& event) {
 	#else
 		m_gamepadServiceTrace->AppendText("Query Gamepad Service isn't supported");
 	#endif
-}
-///////////////////////////////////////////////////////////////////
-void CncGamepadControllerState::clearGamepadServiceTrace(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_gamepadServiceTrace->Clear();
 }

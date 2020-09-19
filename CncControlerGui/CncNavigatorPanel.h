@@ -4,6 +4,7 @@
 #include <map>
 #include <wx/panel.h>
 #include <wx/event.h>
+#include <wx/timer.h>
 
 // ----------------------------------------------------------------------------
 class CncNavigatorPanelEvent;
@@ -78,19 +79,6 @@ class CncNavigatorPanel : public wxPanel {
 		
 		static const char* getDirectionAsString(const Direction d);
 		
-	protected:
-		
-		virtual void enterPanel(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
-		virtual void leavePanel(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
-		virtual void setFocus(const CncNavigatorPanelEvent& event)			{ postEvent(event); }
-		virtual void killFocus(const CncNavigatorPanelEvent& event)			{ postEvent(event); }
-		virtual void enterRegion(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
-		virtual void leaveRegion(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
-		virtual void leftDownRegion(const CncNavigatorPanelEvent& event)	{ postEvent(event); }
-		virtual void leftUpRegion(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
-		virtual void activateRegion(const CncNavigatorPanelEvent& event)	{ postEvent(event); }
-		virtual void deactivateRegion(const CncNavigatorPanelEvent& event)	{ postEvent(event); }
-		
 	private:
 		
 		struct Current {
@@ -115,6 +103,8 @@ class CncNavigatorPanel : public wxPanel {
 		typedef std::vector<OuterCircleRegion> OuterRegions;
 		
 		CncNavigatorPanelEvent*	navEvent;
+		CncNavigatorPanelEvent*	continuousEvent;
+		wxTimer					continuousTimer;
 		wxRect 					navRectangle;
 		int 					innerRadius;
 		int 					outerRadius;
@@ -122,11 +112,15 @@ class CncNavigatorPanel : public wxPanel {
 		Config 					config;
 		Current					current;
 		
-		CncNavigatorPanelEvent& getEvent(int id = 0); 
+		CncNavigatorPanelEvent& prepareEvent(int id = 0); 
+		
 		double adjustAngle(double angle, double dx, double dy);
 		void onMouse(const MouseInfo& mi);
 		void postEvent(const CncNavigatorPanelEvent& event);
 		void drawToolTip(const Direction direction);
+		
+		void startContinuousEvent(int id);
+		void stopContinuousEvent();
 		
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
@@ -137,9 +131,24 @@ class CncNavigatorPanel : public wxPanel {
 		void onSetFocus(wxFocusEvent& event);
 		void onKillFocus(wxFocusEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
-		
+		void onContinuousTimer(wxTimerEvent& event);
+				
 		wxDECLARE_NO_COPY_CLASS(CncNavigatorPanel);
 		wxDECLARE_EVENT_TABLE();
+		
+	protected:
+		
+		virtual void enterPanel(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
+		virtual void leavePanel(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
+		virtual void setFocus(const CncNavigatorPanelEvent& event)			{ postEvent(event); }
+		virtual void killFocus(const CncNavigatorPanelEvent& event)			{ postEvent(event); }
+		virtual void enterRegion(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
+		virtual void leaveRegion(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
+		virtual void activateRegion(const CncNavigatorPanelEvent& event)	{ postEvent(event); }
+		virtual void deactivateRegion(const CncNavigatorPanelEvent& event)	{ postEvent(event); }
+		virtual void leftDownRegion(const CncNavigatorPanelEvent& event);
+		virtual void leftUpRegion(const CncNavigatorPanelEvent& event);
+		
 };
 
 // ----------------------------------------------------------------------------
@@ -158,7 +167,9 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 			CNP_LEFT_DOWN_REGION	= 400,
 			CNP_LEFT_UP_REGION		= 401,
 			CNP_ACTIVATE_REGION		= 500,
-			CNP_DEACTIVATE_REGION	= 501
+			CNP_DEACTIVATE_REGION	= 501,
+			CNP_LEFT_DOWN_FOLLOWUP	= 900
+
 		};
 		
 		static const char* getEventIdAsString(Id id) {
@@ -174,6 +185,7 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 				case CNP_LEFT_UP_REGION:			return "CNP_LEFT_UP_REGION";
 				case CNP_ACTIVATE_REGION:			return "CNP_ACTIVATE_REGION";
 				case CNP_DEACTIVATE_REGION:			return "CNP_DEACTIVATE_REGION";
+				case CNP_LEFT_DOWN_FOLLOWUP:		return "CNP_LEFT_DOWN_FOLLOWUP";
 			}
 			
 			return "CNP_???";

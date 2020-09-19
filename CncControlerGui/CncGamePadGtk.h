@@ -32,38 +32,38 @@ class CncGamepadGtk
 		virtual ~CncGamepadGtk()
 		{}
 		
-		virtual bool isServiceRuning()				{ return false; }
 		
 		virtual void setConnected()					{ connected = false; }
 		virtual void setDisconnected()				{ connected = false; }
-		virtual bool wasConnected()					{ return connected; }
 		virtual int  getPort()						{ return -1; }
 		virtual bool checkConnection()				{ return false; }
 		virtual bool refresh()						{ return false; }
-				
-		virtual int  getStickResolutionFactor() 	{ return 16; }
 
-		virtual float getLeftStickX()				{ return 0.0; }
-		virtual float getLeftStickY()				{ return 0.0; }
-		virtual float getRightStickX()				{ return 0.0; }
-		virtual float getRightStickY()				{ return 0.0; }
-		virtual float getLeftTrigger()				{ return 0.0; }
-		virtual float getRightTrigger()				{ return 0.0; }
+		virtual bool isServiceRuning()				const { return false; }
+		virtual bool wasConnected()					const { return connected; }
+		virtual int  getStickResolutionFactor() 	const { return 16; }
+
+		virtual float getLeftStickX()				const { return 0.0; }
+		virtual float getLeftStickY()				const { return 0.0; }
+		virtual float getRightStickX()				const { return 0.0; }
+		virtual float getRightStickY()				const { return 0.0; }
+		virtual float getLeftTrigger()				const { return 0.0; }
+		virtual float getRightTrigger()				const { return 0.0; }
 		
-		virtual bool stateButtonA()					{ return false; }
-		virtual bool stateButtonB()					{ return false; }
-		virtual bool stateButtonX()					{ return false; }
-		virtual bool stateButtonY()					{ return false; }
-		virtual bool stateButtonLeft()				{ return false; }
-		virtual bool stateButtonRight()				{ return false; }
-		virtual bool stateButtonUp()				{ return false; }
-		virtual bool stateButtonDown()				{ return false; }
-		virtual bool stateButtonStart()				{ return false; }
-		virtual bool stateButtonBack()				{ return false; }
-		virtual bool stateButtonLeftStick()			{ return false; }
-		virtual bool stateButtonRightStick()		{ return false; }
-		virtual bool stateButtonLeftShoulder()		{ return false; }
-		virtual bool stateButtonRightShoulder()		{ return false; }
+		virtual bool stateButtonA()					const { return false; }
+		virtual bool stateButtonB()					const { return false; }
+		virtual bool stateButtonX()					const { return false; }
+		virtual bool stateButtonY()					const { return false; }
+		virtual bool stateButtonLeft()				const { return false; }
+		virtual bool stateButtonRight()				const { return false; }
+		virtual bool stateButtonUp()				const { return false; }
+		virtual bool stateButtonDown()				const { return false; }
+		virtual bool stateButtonStart()				const { return false; }
+		virtual bool stateButtonBack()				const { return false; }
+		virtual bool stateButtonLeftStick()			const { return false; }
+		virtual bool stateButtonRightStick()		const { return false; }
+		virtual bool stateButtonLeftShoulder()		const { return false; }
+		virtual bool stateButtonRightShoulder()		const { return false; }
 };
 
 

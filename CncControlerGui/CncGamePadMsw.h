@@ -27,7 +27,7 @@ class CncGamepadMsw
 		float rightTrigger;
 		
 		XINPUT_GAMEPAD *getState();
-		bool isPressed(WORD button);
+		bool isPressed(WORD button) const;
 		
 	public:
 		CncGamepadMsw() 
@@ -61,38 +61,38 @@ class CncGamepadMsw
 		virtual ~CncGamepadMsw()
 		{}
 		
-		virtual bool isServiceRuning();
 		
 		virtual void setConnected()					{ connected = true; }
 		virtual void setDisconnected()				{ connected = false; }
-		virtual bool wasConnected()					{ return connected; }
+		virtual bool wasConnected()					const { return connected; }
 		virtual int  getPort();
 		virtual bool checkConnection();
 		virtual bool refresh();
 				
-		virtual int  getStickResolutionFactor() 	{ return 16; }
+		virtual bool isServiceRuning()				const;
+		virtual int  getStickResolutionFactor() 	const { return 16; }
 
-		virtual float getLeftStickX()				{ return leftStickX; }
-		virtual float getLeftStickY()				{ return leftStickY; }
-		virtual float getRightStickX()				{ return rightStickX; }
-		virtual float getRightStickY()				{ return rightStickY; }
-		virtual float getLeftTrigger()				{ return leftTrigger; }
-		virtual float getRightTrigger()				{ return rightTrigger; }
+		virtual float getLeftStickX()				const { return leftStickX; }
+		virtual float getLeftStickY()				const { return leftStickY; }
+		virtual float getRightStickX()				const { return rightStickX; }
+		virtual float getRightStickY()				const { return rightStickY; }
+		virtual float getLeftTrigger()				const { return leftTrigger; }
+		virtual float getRightTrigger()				const { return rightTrigger; }
 		
-		virtual bool stateButtonA()					{ return isPressed(XINPUT_GAMEPAD_A); }
-		virtual bool stateButtonB()					{ return isPressed(XINPUT_GAMEPAD_B); }
-		virtual bool stateButtonX()					{ return isPressed(XINPUT_GAMEPAD_X); }
-		virtual bool stateButtonY()					{ return isPressed(XINPUT_GAMEPAD_Y); }
-		virtual bool stateButtonLeft()				{ return isPressed(XINPUT_GAMEPAD_DPAD_LEFT); }
-		virtual bool stateButtonRight()				{ return isPressed(XINPUT_GAMEPAD_DPAD_RIGHT); }
-		virtual bool stateButtonUp()				{ return isPressed(XINPUT_GAMEPAD_DPAD_UP); }
-		virtual bool stateButtonDown()				{ return isPressed(XINPUT_GAMEPAD_DPAD_DOWN); }
-		virtual bool stateButtonStart()				{ return isPressed(XINPUT_GAMEPAD_START); }
-		virtual bool stateButtonBack()				{ return isPressed(XINPUT_GAMEPAD_BACK); }
-		virtual bool stateButtonLeftStick()			{ return isPressed(XINPUT_GAMEPAD_LEFT_THUMB); }
-		virtual bool stateButtonRightStick()		{ return isPressed(XINPUT_GAMEPAD_RIGHT_THUMB); }
-		virtual bool stateButtonLeftShoulder()		{ return isPressed(XINPUT_GAMEPAD_LEFT_SHOULDER); }
-		virtual bool stateButtonRightShoulder()		{ return isPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER); }
+		virtual bool stateButtonA()					const { return isPressed(XINPUT_GAMEPAD_A); }
+		virtual bool stateButtonB()					const { return isPressed(XINPUT_GAMEPAD_B); }
+		virtual bool stateButtonX()					const { return isPressed(XINPUT_GAMEPAD_X); }
+		virtual bool stateButtonY()					const { return isPressed(XINPUT_GAMEPAD_Y); }
+		virtual bool stateButtonLeft()				const { return isPressed(XINPUT_GAMEPAD_DPAD_LEFT); }
+		virtual bool stateButtonRight()				const { return isPressed(XINPUT_GAMEPAD_DPAD_RIGHT); }
+		virtual bool stateButtonUp()				const { return isPressed(XINPUT_GAMEPAD_DPAD_UP); }
+		virtual bool stateButtonDown()				const { return isPressed(XINPUT_GAMEPAD_DPAD_DOWN); }
+		virtual bool stateButtonStart()				const { return isPressed(XINPUT_GAMEPAD_START); }
+		virtual bool stateButtonBack()				const { return isPressed(XINPUT_GAMEPAD_BACK); }
+		virtual bool stateButtonLeftStick()			const { return isPressed(XINPUT_GAMEPAD_LEFT_THUMB); }
+		virtual bool stateButtonRightStick()		const { return isPressed(XINPUT_GAMEPAD_RIGHT_THUMB); }
+		virtual bool stateButtonLeftShoulder()		const { return isPressed(XINPUT_GAMEPAD_LEFT_SHOULDER); }
+		virtual bool stateButtonRightShoulder()		const { return isPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER); }
 };
 
 #endif

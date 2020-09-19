@@ -153,37 +153,32 @@ void CncReferencePosition::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 			default:								move = false;
 		}
 		
-		if ( move == true )
-			APP_PROXY::updateInteractiveMove(x, y, z);
+		if ( move == true ) {
+			if ( APP_PROXY::startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR) )
+				APP_PROXY::updateInteractiveMove(x, y, z);
+		}
+	};
+	
+	auto moveUpdate = [&]() {
+		APP_PROXY::updateInteractiveMove();
 	};
 	
 	auto moveStop = [&]() {
 		APP_PROXY::stopInteractiveMove();
 	};
 	
-	/*
-		CNP_COORDINATES 		= 100,
-		CNP_ENTER_PANEL			= 200, 
-		CNP_LEAVE_PANEL			= 201,
-		CNP_SET_FOCUS			= 202, 
-		CNP_KILL_FOCUS			= 203,
-		CNP_ENTER_REGION		= 300, 
-		CNP_LEAVE_REGION		= 301,
-		CNP_LEFT_DOWN_REGION	= 400,
-		CNP_LEFT_UP_REGION		= 401,
-		CNP_ACTIVATE_REGION		= 500,
-		CNP_DEACTIVATE_REGION	= 501
-	*/
 	switch ( eventId ) {
-		case Id::CNP_ACTIVATE_REGION:	moveStart();
-										break;
+		case Id::CNP_ACTIVATE_REGION:		moveStart();
+											break;
+										
+		case Id::CNP_LEFT_DOWN_FOLLOWUP:	moveUpdate();
+											break;
 										
 		case Id::CNP_DEACTIVATE_REGION:
 		case Id::CNP_LEAVE_PANEL:
 		case Id::CNP_KILL_FOCUS:
-		case Id::CNP_LEAVE_REGION:
-										moveStop();
-										break;
+		case Id::CNP_LEAVE_REGION:			moveStop();
+											break;
 		default: ;
 	}
 }

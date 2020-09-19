@@ -36,6 +36,8 @@ class CncPerspective {
 		bool removeUserPerspective();
 		bool renameUserPerspective();
 		
+		bool loadDefaultPerspective() { return loadPerspective("Default"); }
+
 		bool loadPerspective(const wxString& name);
 		void savePerspective(const wxString& name, bool withQuestion=true);
 		
@@ -44,7 +46,8 @@ class CncPerspective {
 		void ensureAllPanesFromPerspectiveAreShown(const wxString& name);
 		
 		void logCurrentPerspective();
-		void restoreLoggedPerspective();
+		bool isAPerspectiveLogged() 	{ return currentPerspectiveBuffer.layoutInfo.IsEmpty() == false; }
+		bool restoreLoggedPerspective();
 	
 	private:
 		
@@ -52,6 +55,13 @@ class CncPerspective {
 		struct PerspectiveBuffer {
 			wxString 			layoutInfo;
 			ActiveAuiPaneList	paneList;
+			
+			///////////////////////////////////////////////////////////
+			PerspectiveBuffer ()
+			: layoutInfo()
+			, paneList()
+			{
+			}
 			
 			///////////////////////////////////////////////////////////
 			void clear() {

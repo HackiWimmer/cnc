@@ -12,15 +12,18 @@ class ArduinoPositionRenderer {
     //-------------------------------------------------------------------------
     struct RS {
       
-      static const uint8_t  POINT_LENGTH     = 3;
+      static const uint8_t      POINT_LENGTH     = 3;
       
-      static int32_t        A[POINT_LENGTH];
-      static int32_t        B[POINT_LENGTH];
-    
-      static uint32_t       impulseCount;
-      static uint32_t       xStepCount;
-      static uint32_t       yStepCount;
-      static uint32_t       zStepCount;
+      static int32_t            A[POINT_LENGTH];
+      static int32_t            B[POINT_LENGTH];
+
+      static uint8_t            stepSignature;
+      static AxisSignatureIndex stepSignatureIndex;
+      
+      static uint32_t           impulseCount;
+      static uint32_t           xStepCount;
+      static uint32_t           yStepCount;
+      static uint32_t           zStepCount;
     
       //------------------------------------------------------------------------
       static void swap() { memcpy(B, A, sizeof(B)); }
@@ -30,6 +33,7 @@ class ArduinoPositionRenderer {
         memset(A, 0, sizeof(A));
         memset(B, 0, sizeof(B));
 
+        stepSignature = 0;
         impulseCount  = 0;
         xStepCount    = 0;
         yStepCount    = 0;
@@ -92,12 +96,14 @@ class ArduinoPositionRenderer {
     
     Mode                    getMode() const { return mode; }
     
-    virtual byte            checkRuntimeEnv()                                 = 0;
-    virtual byte            setDirection(AxisId aid, int32_t steps)           = 0;
-    virtual byte            performStep (AxisId aid)                          = 0;
-    virtual byte            initiateStep(AxisId aid)                          = 0;
-    virtual byte            finalizeStep(AxisId aid)                          = 0;
-    virtual void            notifyMovePart(int8_t dx, int8_t dy, int8_t dz)   = 0;
+    virtual byte            checkRuntimeEnv()                             = 0;
+    virtual byte            setDirection(AxisId aid, int32_t steps)       = 0;
+    virtual byte            performStep (AxisId aid)                      = 0;
+    virtual byte            initiateStep(AxisId aid)                      = 0;
+    virtual byte            finalizeStep(AxisId aid)                      = 0;
+    virtual void            notifyMovePartInit()                          = 0;
+    virtual void            notifyMovePartBefore()                        = 0;
+    virtual void            notifyMovePartAfter()                         = 0;
 };
 
 class ArduinoImpulseCalculator {

@@ -26,16 +26,16 @@
 #include <wx/bmpcbox.h>
 #include <wx/statbmp.h>
 #include <wx/slider.h>
-#include <wx/combobox.h>
-#include <wx/arrstr.h>
 #include <wx/tglbtn.h>
 #include <wx/button.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
+#include <wx/arrstr.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/statline.h>
 #include <wx/notebook.h>
+#include <wx/combobox.h>
 #include <wx/stc/stc.h>
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
@@ -71,7 +71,6 @@ class MainFrameBClass : public wxFrame
 protected:
     wxAuiManager* m_auimgrMain;
     wxAuiToolBar* m_auibarMain;
-    std::map<int, wxMenu*> m_dropdownMenus;
     wxBitmapButton* m_bmpButton4490;
     wxStaticText* m_staticText1842;
     wxBitmapButton* m_searchConnections;
@@ -90,16 +89,8 @@ protected:
     wxStaticText* m_staticText9216;
     wxStaticText* m_defaultSpeedLabelText;
     wxSlider* m_defaultSpeedSlider;
-    wxMenu* m_configStepDelayMenu;
-    wxMenuItem* m_miCfgStepDelayMin;
-    wxMenuItem* m_miCfgStepDelayMax;
-    wxMenuItem* m_miCfgSimulateArduino;
-    wxMenuItem* m_miCfgCustom;
-    wxSlider* m_stepDelay;
-    wxStaticText* m_stepDelayValue;
-    wxStaticText* m_staticText16032;
-    wxComboBox* m_cbRenderResolution;
     wxBitmapButton* m_rcReset;
+    wxBitmapToggleButton* m_btAdditionalParameters;
     wxBitmapToggleButton* m_btProbeMode;
     wxBitmapButton* m_rcDebugConfig;
     wxBitmapButton* m_rcDebug;
@@ -334,6 +325,19 @@ protected:
     wxListCtrl* m_cncSummaryListCtrl;
     wxButton* m_btCancelRun;
     wxButton* m_btConfirmRun;
+    wxPanel* m_additionalParameters;
+    wxStaticBitmap* m_staticBitmap92606;
+    wxStaticText* m_staticText1603237;
+    wxStaticText* m_staticText9268;
+    wxStaticLine* m_staticLine9270;
+    wxStaticLine* m_staticLine9272;
+    wxStaticLine* m_staticLine9274;
+    wxStaticBitmap* m_staticBitmap9260;
+    wxStaticText* m_staticText160323;
+    wxComboBox* m_cbRenderResolution;
+    wxStaticBitmap* m_staticBitmap9262;
+    wxStaticText* m_staticText9255;
+    wxSlider* m_stepDelay;
     wxPanel* m_controllerConfiguration;
     wxStaticText* m_staticText12831;
     wxButton* m_btRequestCtlConfig;
@@ -751,14 +755,8 @@ protected:
     virtual void onSelectInboundPreview(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectCncMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectTemplatePreview(wxCommandEvent& event) { event.Skip(); }
-    virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event) { event.Skip(); }
-    virtual void cfgStepDelayMin(wxCommandEvent& event) { event.Skip(); }
-    virtual void cfgStepDelayMax(wxCommandEvent& event) { event.Skip(); }
-    virtual void cfgStepDelayArduino(wxCommandEvent& event) { event.Skip(); }
-    virtual void stepDelayChanged(wxScrollEvent& event) { event.Skip(); }
-    virtual void stepDelayThumbtrack(wxScrollEvent& event) { event.Skip(); }
-    virtual void updateRenderResolution(wxCommandEvent& event) { event.Skip(); }
     virtual void rcReset(wxCommandEvent& event) { event.Skip(); }
+    virtual void clickAdditionalParameters(wxCommandEvent& event) { event.Skip(); }
     virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebugConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebug(wxCommandEvent& event) { event.Skip(); }
@@ -827,6 +825,8 @@ protected:
     virtual void nootebookConfigChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
     virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateRenderResolution(wxCommandEvent& event) { event.Skip(); }
+    virtual void stepDelayChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void changeMonitorListBook(wxListbookEvent& event) { event.Skip(); }
@@ -981,11 +981,8 @@ public:
     wxStaticText* GetStaticText9216() { return m_staticText9216; }
     wxStaticText* GetDefaultSpeedLabelText() { return m_defaultSpeedLabelText; }
     wxSlider* GetDefaultSpeedSlider() { return m_defaultSpeedSlider; }
-    wxSlider* GetStepDelay() { return m_stepDelay; }
-    wxStaticText* GetStepDelayValue() { return m_stepDelayValue; }
-    wxStaticText* GetStaticText16032() { return m_staticText16032; }
-    wxComboBox* GetCbRenderResolution() { return m_cbRenderResolution; }
     wxBitmapButton* GetRcReset() { return m_rcReset; }
+    wxBitmapToggleButton* GetBtAdditionalParameters() { return m_btAdditionalParameters; }
     wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
     wxBitmapButton* GetRcDebugConfig() { return m_rcDebugConfig; }
     wxBitmapButton* GetRcDebug() { return m_rcDebug; }
@@ -997,8 +994,6 @@ public:
     wxBitmapButton* GetRcPause() { return m_rcPause; }
     wxBitmapButton* GetRcStop() { return m_rcStop; }
     wxButton* GetBtnEmergenyStop() { return m_btnEmergenyStop; }
-
-    virtual void ShowAuiToolMenu(wxAuiToolBarEvent& event);
     wxAuiToolBar* GetAuibarMain() { return m_auibarMain; }
     wxChoice* GetMainViewSelector() { return m_mainViewSelector; }
     wxButton* GetOpenSourceExtern() { return m_openSourceExtern; }
@@ -1217,6 +1212,19 @@ public:
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
     wxPanel* GetCncSummary() { return m_cncSummary; }
+    wxStaticBitmap* GetStaticBitmap92606() { return m_staticBitmap92606; }
+    wxStaticText* GetStaticText1603237() { return m_staticText1603237; }
+    wxStaticText* GetStaticText9268() { return m_staticText9268; }
+    wxStaticLine* GetStaticLine9270() { return m_staticLine9270; }
+    wxStaticLine* GetStaticLine9272() { return m_staticLine9272; }
+    wxStaticLine* GetStaticLine9274() { return m_staticLine9274; }
+    wxStaticBitmap* GetStaticBitmap9260() { return m_staticBitmap9260; }
+    wxStaticText* GetStaticText160323() { return m_staticText160323; }
+    wxComboBox* GetCbRenderResolution() { return m_cbRenderResolution; }
+    wxStaticBitmap* GetStaticBitmap9262() { return m_staticBitmap9262; }
+    wxStaticText* GetStaticText9255() { return m_staticText9255; }
+    wxSlider* GetStepDelay() { return m_stepDelay; }
+    wxPanel* GetAdditionalParameters() { return m_additionalParameters; }
     wxStaticText* GetStaticText12831() { return m_staticText12831; }
     wxButton* GetBtRequestCtlConfig() { return m_btRequestCtlConfig; }
     wxDataViewListCtrl* GetDvListCtrlControllerConfig() { return m_dvListCtrlControllerConfig; }
@@ -1564,6 +1572,9 @@ protected:
     wxButton* m_btSetXY;
     wxButton* m_btSetXZ;
     wxButton* m_btSetYZ;
+    wxStaticLine* m_staticLine9280;
+    wxButton* m_btZeroXYZ;
+    wxButton* m_btReverseXYZ;
     wxStaticLine* m_staticLine8570;
     wxStaticText* m_staticText793;
     wxButton* m_minManuallyXSlider;
@@ -1596,6 +1607,8 @@ protected:
 protected:
     virtual void onLBDownMax(wxMouseEvent& event) { event.Skip(); }
     virtual void onSetCommonValue(wxCommandEvent& event) { event.Skip(); }
+    virtual void onZeroXYZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void onReverseXYZ(wxCommandEvent& event) { event.Skip(); }
     virtual void minManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
     virtual void updateMetricX(wxCommandEvent& event) { event.Skip(); }
     virtual void maxManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
@@ -1651,6 +1664,9 @@ public:
     wxButton* GetBtSetXY() { return m_btSetXY; }
     wxButton* GetBtSetXZ() { return m_btSetXZ; }
     wxButton* GetBtSetYZ() { return m_btSetYZ; }
+    wxStaticLine* GetStaticLine9280() { return m_staticLine9280; }
+    wxButton* GetBtZeroXYZ() { return m_btZeroXYZ; }
+    wxButton* GetBtReverseXYZ() { return m_btReverseXYZ; }
     wxStaticLine* GetStaticLine8570() { return m_staticLine8570; }
     wxStaticText* GetStaticText793() { return m_staticText793; }
     wxButton* GetMinManuallyXSlider() { return m_minManuallyXSlider; }

@@ -95,10 +95,44 @@ class SerialThread : public wxThread {
 										SerialThread::publishMessage(type, msg ? msg : "", context ? context : "");
 		}
 		
-		template<typename T>
-		static void 				ardoDebugValue(const char* name, T value, const char* context) {
-										wxString strValue; strValue << value;
-										SerialThread::publishMessage('D', wxString::Format("%s = %s", name ? name : "Unknown", strValue), context ? context : "");
+		template<typename T1>
+		static void 				ardoDebugValue(const char* name, T1 v1, const char* context) {
+										wxString strValue1; strValue1 << v1;
+										SerialThread::publishMessage('D', wxString::Format("%s = %s", name ? name : "Unknown", strValue1), context ? context : "");
+		}
+		
+		template<typename T1, typename T2>
+		static void 				ardoDebugValue(const char* name, T1 v1, T2 v2, const char* context) {
+										wxString strValue1; strValue1 << v1;
+										wxString strValue2; strValue2 << v2;
+										SerialThread::publishMessage('D', wxString::Format("%s = %s, %s", name ? name : "Unknown", strValue1, strValue2), context ? context : "");
+		}
+		
+		template<typename T1, typename T2, typename T3>
+		static void 				ardoDebugValue(const char* name, T1 v1, T2 v2, T3 v3, const char* context) {
+										wxString strValue1; strValue1 << v1;
+										wxString strValue2; strValue2 << v2;
+										wxString strValue3; strValue3 << v3;
+										SerialThread::publishMessage('D', wxString::Format("%s = %s, %s, %s", name ? name : "Unknown", strValue1, strValue2, strValue3), context ? context : "");
+		}
+		
+		template<typename T1, typename T2, typename T3, typename T4>
+		static void 				ardoDebugValue(const char* name, T1 v1, T2 v2, T3 v3, T4 v4, const char* context) {
+										wxString strValue1; strValue1 << v1;
+										wxString strValue2; strValue2 << v2;
+										wxString strValue3; strValue3 << v3;
+										wxString strValue4; strValue4 << v4;
+										SerialThread::publishMessage('D', wxString::Format("%s = %s, %s, %s, %s", name ? name : "Unknown", strValue1, strValue2, strValue3, strValue4), context ? context : "");
+		}
+		
+		template<typename T1, typename T2, typename T3, typename T4, typename T5>
+		static void 				ardoDebugValue(const char* name, T1 v1, T2 v2, T3 v3, T4 v4, T5 v5, const char* context) {
+										wxString strValue1; strValue1 << v1;
+										wxString strValue2; strValue2 << v2;
+										wxString strValue3; strValue3 << v3;
+										wxString strValue4; strValue4 << v4;
+										wxString strValue5; strValue4 << v5;
+										SerialThread::publishMessage('D', wxString::Format("%s = %s, %s, %s, %s, %s", name ? name : "Unknown", strValue1, strValue2, strValue3, strValue4, strValue5), context ? context : "");
 		}
 		
 		static bool 				ardoConfigGetTraceGetters();

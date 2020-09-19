@@ -722,13 +722,13 @@ void ArduinoMainLoop::setup() {
 ///////////////////////////////////////////////////////
 void ArduinoMainLoop::functorIR1() {
 ///////////////////////////////////////////////////////
-  PRINT_DEBUG_VALUE("Interrupt", "functorIR1\n")
+  PRINT_DEBUG_VALUE1("Interrupt", "functorIR1\n")
   //THE_CONTROLLER->broadcastInterrupt();
 }
 ///////////////////////////////////////////////////////
 void ArduinoMainLoop::functorIR2() {
 ///////////////////////////////////////////////////////
-  PRINT_DEBUG_VALUE("Interrupt", "functorIR2\n")
+  PRINT_DEBUG_VALUE1("Interrupt", "functorIR2\n")
   //THE_CONTROLLER->broadcastInterrupt();
 }
 ///////////////////////////////////////////////////////

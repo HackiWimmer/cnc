@@ -17,15 +17,21 @@ struct wxDigitData
 
 class wxLCDWindow : public wxWindow
 {
-protected:
-	int mSegmentLen;
-	int mSegmentWidth;
-	int mSpace;
+	protected:
+		int mSegmentLen;
+		int mSegmentWidth;
+		int mSpace;
 
-	int mNumberDigits;
-	wxString mValue;
-	wxColour mLightColour;
-	wxColour mGrayColour;
+		int mNumberDigits;
+		
+		wxString mValue;
+		
+		wxColour mLightColour;
+		wxColour mLightColourBeforeDecimal;
+		wxColour mLightColourDecimalPlaces;
+		wxColour mGrayColour;
+		
+		wxDigitData digitData;
 
 protected:
 // Internal functions used by the control.
@@ -65,7 +71,7 @@ public:
    - The characters :,.-EroC and space
    - The character ^ is displayed as an o, but displayed at the top. ( The symbol of degrees )
 */
-	void SetValue( wxString value );
+	void SetValue(const wxString& value);
 
 // Gets the value currently displayed.
 	wxString GetValue( void );

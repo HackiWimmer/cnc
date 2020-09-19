@@ -38,8 +38,10 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     bool                probeMode;
     bool                pause;
     bool                I2CAvailable;
-    bool                interactiveMode;
     bool                interactiveMoveActive;
+
+    uint32_t            cfgF1000_MMSEC   = 0;
+    uint32_t            cmsF1000_MMMin   = 0;
 
     uint16_t            posReplyCounter;
     uint16_t            posReplyThreshold;
@@ -60,11 +62,11 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     void                switchToolState(bool state, bool force = false);
 
     void                setupAccelProfile(const ArduinoCmdDecoderSetter::Result& st);
-    
-    void                setSpeedValue_MMMin(double f, bool activateAcceleration=true);
+    void                setSpeedValue_MMSec1000(int32_t f, bool activateAcceleration=true);
 
     void                setPosReplyState(bool s)                   { posReplyState = s; }
     bool                getPosReplyState()                  const  { return posReplyState; }
+    bool                isReplyDue()                        const  { return posReplyCounter >= posReplyThreshold; }
 
     void                setPosReplyThreshold(uint16_t t)           { posReplyThreshold = t; }
     uint16_t            getPosReplyThreshold()              const  { return posReplyThreshold; }
@@ -72,7 +74,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     bool                enableStepperPin(bool state = ENABLE_STATE_ON);
     bool                disableStepperPin()                        { return enableStepperPin(ENABLE_STATE_OFF); }
     bool                getEnableStepperPinState();
-
+    
     bool                isAnyLimitActive();
     bool                evaluateLimitStates(int8_t& xLimit, int8_t& yLimit, int8_t& zLimit);
 
@@ -101,12 +103,14 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     // render interface
     virtual byte        checkRuntimeEnv();
 
-    virtual void        notifyMovePart    (int8_t dx, int8_t dy, int8_t dz);
-    virtual byte        setHighPulseWidth (AxisId aid, int32_t width);
-    virtual byte        setDirection      (AxisId aid, int32_t steps);
-    virtual byte        performStep       (AxisId aid);
-    virtual byte        initiateStep      (AxisId aid);
-    virtual byte        finalizeStep      (AxisId aid);
+    virtual void        notifyMovePartInit    (){}
+    virtual void        notifyMovePartBefore  ();
+    virtual void        notifyMovePartAfter   ();
+    virtual byte        setHighPulseWidth     (AxisId aid, int32_t width);
+    virtual byte        setDirection          (AxisId aid, int32_t steps);
+    virtual byte        performStep           (AxisId aid);
+    virtual byte        initiateStep          (AxisId aid);
+    virtual byte        finalizeStep          (AxisId aid);
 
     // accelartor interface
     virtual void        notifyACMStateChange(State s);

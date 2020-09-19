@@ -13,22 +13,22 @@
 #include <wx/panel.h>
 #include <wx/artprov.h>
 #include <wx/sizer.h>
+#include <wx/simplebook.h>
+#include <wx/imaglist.h>
 #include <wx/tglbtn.h>
 #include <wx/button.h>
 #include <wx/statline.h>
 #include <wx/bmpbuttn.h>
-#include <wx/combobox.h>
-#include <wx/arrstr.h>
 #include <wx/stattext.h>
 #include <wx/slider.h>
-#include <wx/simplebook.h>
-#include <wx/imaglist.h>
 #include <wx/scrolbar.h>
 #include <wx/frame.h>
 #include <wx/iconbndl.h>
 #include <wx/splitter.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
 #include <wx/toolbook.h>
 #include <wx/listctrl.h>
 #include <wx/timer.h>
@@ -52,31 +52,45 @@
 class CncSpeedMonitorBase : public wxPanel
 {
 protected:
-    wxBitmapToggleButton* m_btToggleConnection;
-    wxStaticLine* m_staticLine75573;
-    wxBitmapToggleButton* m_btToggleMeasurePointsAxis;
-    wxBitmapToggleButton* m_btToggleConfiguredAxis;
-    wxBitmapToggleButton* m_btToggleReceivedSpeedAxis;
-    wxStaticLine* m_staticLine7557;
-    wxBitmapButton* m_btClear;
-    wxBitmapButton* m_btSave;
-    wxComboBox* m_cbTimeCompression;
-    wxStaticText* m_staticText7534;
-    wxSlider* m_intervalSlider;
-    wxStaticText* m_staticText7614;
     wxSimplebook* m_drawingAreaBook;
     wxPanel* m_horizontalPanel;
+    wxBitmapToggleButton* m_btToggleConnectionH;
+    wxStaticLine* m_staticLine75573;
+    wxBitmapToggleButton* m_btToggleMeasurePointsAxisH;
+    wxBitmapToggleButton* m_btToggleConfiguredAxisH;
+    wxBitmapToggleButton* m_btToggleReceivedSpeedAxisH;
+    wxStaticLine* m_staticLine7557;
+    wxBitmapButton* m_btClearH;
+    wxBitmapButton* m_btSaveH;
+    wxStaticLine* m_staticLine755732;
+    wxStaticText* m_staticText753431;
+    wxSlider* m_sliderTimeCompressionH;
+    wxStaticText* m_staticText7534;
+    wxSlider* m_sliderRecordResolutionH;
     wxPanel* m_panel401;
     wxPanel* m_darwingAreaH;
     wxPanel* m_leftAxisH;
     wxPanel* m_rightAxisH;
     wxScrollBar* m_scrollBarH;
     wxPanel* m_verticalPanel;
+    wxBitmapToggleButton* m_btToggleConnectionV;
+    wxStaticLine* m_staticLine75573317;
+    wxBitmapToggleButton* m_btToggleMeasurePointsAxisV;
+    wxBitmapToggleButton* m_btToggleConfiguredAxisV;
+    wxBitmapToggleButton* m_btToggleReceivedSpeedAxisV;
+    wxStaticLine* m_staticLine7557721;
+    wxBitmapButton* m_btClearV;
+    wxBitmapButton* m_btSaveV;
     wxPanel* m_panel4011;
     wxPanel* m_darwingAreaV;
     wxPanel* m_topAxisV;
     wxPanel* m_bottomAxisV;
     wxScrollBar* m_scrollBarV;
+    wxStaticText* m_staticText75341230;
+    wxSlider* m_sliderTimeCompressionV;
+    wxStaticLine* m_staticLine755733;
+    wxStaticText* m_staticText753412;
+    wxSlider* m_sliderRecordResolutionV;
 
 protected:
     virtual void onToggleConnection(wxCommandEvent& event) { event.Skip(); }
@@ -85,8 +99,8 @@ protected:
     virtual void onToggleReceivedSpeedAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void onClear(wxCommandEvent& event) { event.Skip(); }
     virtual void onSave(wxCommandEvent& event) { event.Skip(); }
-    virtual void onChangeTimeCompression(wxCommandEvent& event) { event.Skip(); }
-    virtual void onChangeIntervalSlider(wxScrollEvent& event) { event.Skip(); }
+    virtual void onChangeDisplayCompression(wxScrollEvent& event) { event.Skip(); }
+    virtual void onChangeRecordResolution(wxScrollEvent& event) { event.Skip(); }
     virtual void onSize(wxSizeEvent& event) { event.Skip(); }
     virtual void onPaint(wxPaintEvent& event) { event.Skip(); }
     virtual void onMouseMotion(wxMouseEvent& event) { event.Skip(); }
@@ -98,29 +112,43 @@ protected:
     virtual void onChangeScrollBarV(wxScrollEvent& event) { event.Skip(); }
 
 public:
-    wxBitmapToggleButton* GetBtToggleConnection() { return m_btToggleConnection; }
+    wxBitmapToggleButton* GetBtToggleConnectionH() { return m_btToggleConnectionH; }
     wxStaticLine* GetStaticLine75573() { return m_staticLine75573; }
-    wxBitmapToggleButton* GetBtToggleMeasurePointsAxis() { return m_btToggleMeasurePointsAxis; }
-    wxBitmapToggleButton* GetBtToggleConfiguredAxis() { return m_btToggleConfiguredAxis; }
-    wxBitmapToggleButton* GetBtToggleReceivedSpeedAxis() { return m_btToggleReceivedSpeedAxis; }
+    wxBitmapToggleButton* GetBtToggleMeasurePointsAxisH() { return m_btToggleMeasurePointsAxisH; }
+    wxBitmapToggleButton* GetBtToggleConfiguredAxisH() { return m_btToggleConfiguredAxisH; }
+    wxBitmapToggleButton* GetBtToggleReceivedSpeedAxisH() { return m_btToggleReceivedSpeedAxisH; }
     wxStaticLine* GetStaticLine7557() { return m_staticLine7557; }
-    wxBitmapButton* GetBtClear() { return m_btClear; }
-    wxBitmapButton* GetBtSave() { return m_btSave; }
-    wxComboBox* GetCbTimeCompression() { return m_cbTimeCompression; }
+    wxBitmapButton* GetBtClearH() { return m_btClearH; }
+    wxBitmapButton* GetBtSaveH() { return m_btSaveH; }
+    wxStaticLine* GetStaticLine755732() { return m_staticLine755732; }
+    wxStaticText* GetStaticText753431() { return m_staticText753431; }
+    wxSlider* GetSliderTimeCompressionH() { return m_sliderTimeCompressionH; }
     wxStaticText* GetStaticText7534() { return m_staticText7534; }
-    wxSlider* GetIntervalSlider() { return m_intervalSlider; }
-    wxStaticText* GetStaticText7614() { return m_staticText7614; }
+    wxSlider* GetSliderRecordResolutionH() { return m_sliderRecordResolutionH; }
     wxPanel* GetDarwingAreaH() { return m_darwingAreaH; }
     wxPanel* GetLeftAxisH() { return m_leftAxisH; }
     wxPanel* GetRightAxisH() { return m_rightAxisH; }
     wxScrollBar* GetScrollBarH() { return m_scrollBarH; }
     wxPanel* GetPanel401() { return m_panel401; }
     wxPanel* GetHorizontalPanel() { return m_horizontalPanel; }
+    wxBitmapToggleButton* GetBtToggleConnectionV() { return m_btToggleConnectionV; }
+    wxStaticLine* GetStaticLine75573317() { return m_staticLine75573317; }
+    wxBitmapToggleButton* GetBtToggleMeasurePointsAxisV() { return m_btToggleMeasurePointsAxisV; }
+    wxBitmapToggleButton* GetBtToggleConfiguredAxisV() { return m_btToggleConfiguredAxisV; }
+    wxBitmapToggleButton* GetBtToggleReceivedSpeedAxisV() { return m_btToggleReceivedSpeedAxisV; }
+    wxStaticLine* GetStaticLine7557721() { return m_staticLine7557721; }
+    wxBitmapButton* GetBtClearV() { return m_btClearV; }
+    wxBitmapButton* GetBtSaveV() { return m_btSaveV; }
     wxPanel* GetDarwingAreaV() { return m_darwingAreaV; }
     wxPanel* GetTopAxisV() { return m_topAxisV; }
     wxPanel* GetBottomAxisV() { return m_bottomAxisV; }
     wxScrollBar* GetScrollBarV() { return m_scrollBarV; }
     wxPanel* GetPanel4011() { return m_panel4011; }
+    wxStaticText* GetStaticText75341230() { return m_staticText75341230; }
+    wxSlider* GetSliderTimeCompressionV() { return m_sliderTimeCompressionV; }
+    wxStaticLine* GetStaticLine755733() { return m_staticLine755733; }
+    wxStaticText* GetStaticText753412() { return m_staticText753412; }
+    wxSlider* GetSliderRecordResolutionV() { return m_sliderRecordResolutionV; }
     wxPanel* GetVerticalPanel() { return m_verticalPanel; }
     wxSimplebook* GetDrawingAreaBook() { return m_drawingAreaBook; }
     CncSpeedMonitorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,300), long style = wxTAB_TRAVERSAL);

@@ -94,7 +94,7 @@ byte ArduinoTestManager::performTestCase1() {
   
   controller->setProbeMode(OFF);
   controller->enableStepperPin(ENABLE_STATE_ON);
-  controller->setSpeedValue_MMMin(4500.0, true);
+  controller->setSpeedValue_MMSec1000(1000L * 4500 / 60, true);
   controller->setPosReplyThreshold(333);
   
   const uint32_t dist = 700 / feedRate;

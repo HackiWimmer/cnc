@@ -25,6 +25,8 @@
   <object class="wxBitmap" name="16-execute_stop@2x">bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="16-file_close">bitmaps\16-file_close.png</object>
   <object class="wxBitmap" name="16-file_close@2x">bitmaps\16-file_close@2x.png</object>
+  <object class="wxBitmap" name="16-file_open">bitmaps\CodeLite\16-file_open.png</object>
+  <object class="wxBitmap" name="16-file_open@2x">bitmaps\CodeLite\16-file_open@2x.png</object>
   <object class="wxBitmap" name="16-file_reload">bitmaps\16-file_reload.png</object>
   <object class="wxBitmap" name="16-file_reload@2x">bitmaps\16-file_reload@2x.png</object>
   <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>
@@ -47,6 +49,8 @@
   <object class="wxBitmap" name="16-record@2x">bitmaps\16-record@2x.png</object>
   <object class="wxBitmap" name="16-regular-expression">bitmaps\16-regular-expression.png</object>
   <object class="wxBitmap" name="16-regular-expression@2x">bitmaps\16-regular-expression@2x.png</object>
+  <object class="wxBitmap" name="16-sort">bitmaps\16-sort.png</object>
+  <object class="wxBitmap" name="16-sort@2x">bitmaps\16-sort@2x.png</object>
   <object class="wxBitmap" name="16-struct">bitmaps\16-struct.png</object>
   <object class="wxBitmap" name="16-struct@2x">bitmaps\16-struct@2x.png</object>
   <object class="wxBitmap" name="16-typedef">bitmaps\16-typedef.png</object>
@@ -81,6 +85,7 @@
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
+  <object class="wxBitmap" name="application-tile-horizontal">bitmaps\application-tile-horizontal.png</object>
   <object class="wxBitmap" name="application-view-gallery">bitmaps\application-view-gallery.png</object>
   <object class="wxBitmap" name="arrow-out">bitmaps\arrow-out.png</object>
   <object class="wxBitmap" name="arrow-right-3">bitmaps\arrow-right-3.png</object>
@@ -95,6 +100,7 @@
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
   <object class="wxBitmap" name="car">bitmaps\car.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
+  <object class="wxBitmap" name="clear">bitmaps\clear.png</object>
   <object class="wxBitmap" name="close">bitmaps\close.png</object>
   <object class="wxBitmap" name="cube_green">bitmaps\cube_green.png</object>
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
@@ -151,6 +157,7 @@
   <object class="wxBitmap" name="playstation-cross-dark-icon16">bitmaps\gamepad\playstation-cross-dark-icon16.png</object>
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
   <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
+  <object class="wxBitmap" name="ruby">bitmaps\ruby.png</object>
   <object class="wxBitmap" name="ruler2">bitmaps\ruler2.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="script-delete">bitmaps\script-delete.png</object>
@@ -171,6 +178,7 @@
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
+  <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>

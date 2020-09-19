@@ -105,6 +105,33 @@ namespace ArdoObj {
   }
 
   // --------------------------------------------------------------
+  inline uint32_t sqrt(uint32_t x) {
+    register uint32_t xr;   // result register
+    register uint32_t q2;   // scan-bit register
+    register unsigned char f; // flag (one bit)
+
+    xr = 0;             // clear result
+    q2 = 0x40000000L;       // higest possible result bit
+    do {
+      if ( (xr + q2) <= x ) {
+        x -= xr + q2;
+        f = 1;          // set flag
+      }
+      else {
+        f = 0;          // clear flag
+      }
+      xr >>= 1;
+      
+      if ( f ) 
+        xr += q2;         // test flag
+      
+    } while ( q2 >>= 2 );     // shift twice
+    
+    // xr + 1: add for rounding
+    return xr < x ? xr + 1 : xr;
+  }
+
+  // --------------------------------------------------------------
   inline bool isSignal(byte cmd) {
     switch ( cmd ) {
       case SIG_SOFTWARE_RESET:

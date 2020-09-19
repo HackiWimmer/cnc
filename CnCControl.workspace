@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="CnCControl" Database="" Version="10.0.0">
   <Project Name="CncControllerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
+  <Project Name="CncControllerTest" Path="CncControllerTest/CncControllerTest.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="CncControllerGui" ConfigName="Release"/>
+      <Project Name="CncControllerTest" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
       <Project Name="CncControllerGui" ConfigName="Debug"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Debug"/>
@@ -14,10 +16,12 @@
       <Project Name="GameController" ConfigName="Debug"/>
       <Project Name="NavigatorPanel" ConfigName="Debug"/>
       <Project Name="wxWidgetsTest" ConfigName="Debug"/>
+      <Project Name="CncControllerTest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Gprof" Selected="yes">
       <Environment/>
       <Project Name="CncControllerGui" ConfigName="Release"/>
+      <Project Name="CncControllerTest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

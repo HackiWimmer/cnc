@@ -1206,18 +1206,7 @@ bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncL
 	cmd[5] = (unsigned char)z;
 	
 	lastFetchResult.init(cmd[0]);
-	
-	// Always log the start postion
-	if ( cncControl->SerialCallback() == false )
-		return false;
-	
-	const bool ret = writeData(cmd, LEN);
-	
-	// Always log the start postion
-	if ( cncControl->SerialCallback() == false )
-		return false;
-	
-	return ret;
+	return writeData(cmd, LEN);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::resolveLimits(unsigned int size, const int32_t (&values)[3]) {

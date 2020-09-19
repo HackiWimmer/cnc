@@ -9,7 +9,7 @@
 #include "CncConfig.h"
 
 #include "../Arduino/StepperEnvironment/ArdoObj.h"
-
+#include "../Arduino/StepperEnvironment/CncAcmr.h"
 
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 
@@ -220,26 +220,26 @@ double CncConfig::connvert_STP_SEC_TO_MM_MIN(int32_t speed, unsigned int steps, 
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
-	CtrlSpeedValues::setupTact    (MIN_DURATION_PER_STEP_US, MIN_DURATION_PER_STEP_US, MIN_DURATION_PER_STEP_US);
-	CtrlSpeedValues::setupMaxSpeed(getFeedrateX(),      getFeedrateY(),      getFeedrateZ());
+	ArduinoAccelManager::Setup(getFeedrateX(), getFeedrateY(), getFeedrateZ());
 	
+	const float MAX_MM_MIN = 20000.0;
 	wxPGProperty* prop = NULL;
-	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_1DX_MMSec());   }
-	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_1DY_MMSec());   }
-	{ prop = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_1DZ_MMSec());   }
-	{ prop = getProperty(CncConfig_MAX_SPEED_XY_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_2DXY_MMSec());  }
-	{ prop = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		if (prop != NULL) prop->SetValue(60 * CtrlSpeedValues::getMaxF_3DXYZ_MMSec()); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_XY_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
 	
 	{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_PERCENT);
 		if (prop != NULL) {
-			const double val = 60 * CtrlSpeedValues::getMaxF_2DXY_MMSec() * prop->GetValue().GetDouble();
+			const double val = MAX_MM_MIN * prop->GetValue().GetDouble();
 			{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
 		}
 	}
 	
 	{ prop = getProperty(CncConfig_DEF_WORK_SPEED_PERCENT);
 		if (prop != NULL) {
-			const double val = 60 * CtrlSpeedValues::getMaxF_2DXY_MMSec() * prop->GetValue().GetDouble();
+			const double val = MAX_MM_MIN* prop->GetValue().GetDouble();
 			{ prop = getProperty(CncConfig_DEF_WORK_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
 		}
 	}

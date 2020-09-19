@@ -501,6 +501,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncGamepadCommandHistory.cpp"/>
+      <File Name="CncGamepadCommandHistory.h"/>
       <File Name="CncArduinoPinsListCtrl.cpp"/>
       <File Name="CncArduinoPinsListCtrl.h"/>
       <File Name="CncMessageListCtrl.cpp"/>

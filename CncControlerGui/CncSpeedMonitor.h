@@ -34,10 +34,10 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		void update();
 		
 	protected:
-		virtual void onChangeTimeCompression(wxCommandEvent& event);
+		virtual void onChangeDisplayCompression(wxScrollEvent& event);
 		virtual void onChangeScrollBarH(wxScrollEvent& event);
 		virtual void onChangeScrollBarV(wxScrollEvent& event);
-		virtual void onChangeIntervalSlider(wxScrollEvent& event);
+		virtual void onChangeRecordResolution(wxScrollEvent& event);
 		virtual void onClear(wxCommandEvent& event);
 		virtual void onSave(wxCommandEvent& event);
 		virtual void onLeftDown(wxMouseEvent& event);
@@ -61,6 +61,7 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 			enum Presentation	{ DRRelative, DRAbsolute };
 			enum Orientation	{ DOHorizontal = 0, DOVertical = 1 };
 			enum Resolution		{ DS_Sec=1000, DS_TenthSec=100, DS_HundredthSec=10, DS_ThousandthSec=1 };
+			enum Compression	{ CPV_1 = 1, CPV_2 = 2, CPV_5 = 5, CPV_10 = 10, CPV_20 = 20, CPV_50 = 50, CPV_100 = 100 };
 			
 			struct Point {
 				CncMilliTimestamp	ts = 0.0;
@@ -98,9 +99,10 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 			Presentation		presentation	= DRAbsolute;
 			Orientation			orientation		= DOHorizontal;
 			Resolution			resolution		= DS_HundredthSec;
+			
 			double 				maxF_MM_MIN		= 0.0;
 			long				timeOffset		= 0;
-			long				timeCompression	= 2;
+			long				timeCompression	= CPV_2;
 			bool				showTimePoint	= true;
 			bool				showCfgSpeed	= true;
 			bool				showRltSpeed	= true;

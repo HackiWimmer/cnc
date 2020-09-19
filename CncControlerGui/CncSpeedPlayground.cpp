@@ -452,45 +452,50 @@ void CncSpeedPlayground::onClearLogger(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////
 	logger->Clear();
 }
-
 ////////////////////////////////////////////////////////////////////
-void CncSpeedPlayground::notifyMovePart(int8_t dx, int8_t dy, int8_t dz) {
+void CncSpeedPlayground::notifyMovePartBefore() {
 ////////////////////////////////////////////////////////////////////
-	const double F = displayTypeV == DTV_MM_MIN ? initNextTargetSpeed_MMSec() * 60 
-												: initNextTargetSpeed_MMSec();
+	#warning using stepSignature
+	initNextImpulse(ASGI_MASTER);
+}
+////////////////////////////////////////////////////////////////////
+void CncSpeedPlayground::notifyMovePartAfter() {
+////////////////////////////////////////////////////////////////////
+	const double F = displayTypeV == DTV_MM_MIN ? getCurrentTargetSpeed1000_MMSec() * 60 / 1000 
+												: getCurrentTargetSpeed1000_MMSec()      / 1000;
 	
 	// acceleration
 	if ( testData.totalImpulseCounter >= minDA && testData.totalImpulseCounter <= maxDA ) {
 		
 		CncSpeedAccelerationDiagram::Impulse impulse;
-		impulse.x = dx;
-		impulse.y = dy;
-		impulse.z = dz;
+		impulse.x = RS::dx();
+		impulse.y = RS::dy();
+		impulse.z = RS::dz();
 		
 		wxRealPoint p(testData.totalImpulseCounter, F);
 		accelerationDiagram->appendPointToGraph(0, p, impulse);
 		
 		testData.A.impulses++;
-		if ( dx != 0 ) testData.A.xSteps++;
-		if ( dy != 0 ) testData.A.ySteps++;
-		if ( dz != 0 ) testData.A.zSteps++;
+		if ( RS::stepSignature & ASG_X ) testData.A.xSteps++;
+		if ( RS::stepSignature & ASG_Y ) testData.A.ySteps++;
+		if ( RS::stepSignature & ASG_Z ) testData.A.zSteps++;
 	}
 	
 	// deacceleration
 	if ( testData.totalImpulseCounter >= minDD && testData.totalImpulseCounter <= maxDD ) {
 		
 		CncSpeedAccelerationDiagram::Impulse impulse;
-		impulse.x = dx;
-		impulse.y = dy;
-		impulse.z = dz;
+		impulse.x = RS::dx();
+		impulse.y = RS::dy();
+		impulse.z = RS::dz();
 		
 		wxRealPoint p(testData.totalImpulseCounter, F);
 		deaccelerationDiagram->appendPointToGraph(0, p, impulse);
 		
 		testData.D.impulses++;
-		if ( dx != 0 ) testData.D.xSteps++;
-		if ( dy != 0 ) testData.D.ySteps++;
-		if ( dz != 0 ) testData.D.zSteps++;
+		if ( RS::stepSignature & ASG_X ) testData.D.xSteps++;
+		if ( RS::stepSignature & ASG_Y ) testData.D.ySteps++;
+		if ( RS::stepSignature & ASG_Z ) testData.D.zSteps++;
 	}
 	
 	testData.totalImpulseCounter++;
@@ -562,12 +567,8 @@ void CncSpeedPlayground::run() {
 	
 	// -------------------------------------------------------------
 	auto setupACM = [&](float AA, float AB, float AC, float DA, float DB, float DC) {
-		Function fA, fD;
-
-		fA.A = AA; fA.B = AB; fA.C = AC;
-		fD.A = DA; fD.B = DB; fD.C = DC;
-
-		ArduinoAccelManager::setup(fA, fD);
+		Function fA(AA, AB, AC), fD(DA, DB, DC);
+		ArduinoAccelManager::initialize(fA, fD);
 	};
 	
 	testData.reset();
@@ -583,8 +584,8 @@ void CncSpeedPlayground::run() {
 	determineDisplayType();
 	ArduinoAccelManager::activate(m_cbWithAcceleration->GetValue());
 	
-	const int32_t maxD 	= ArduinoImpulseCalculator().calculate(x, y, z);
-	const float speed 	= F / 60.0;
+	const int32_t  maxD 	= ArduinoImpulseCalculator().calculate(x, y, z);
+	const uint32_t speed 	= 1000 * F / 60 ;
 	if ( initMove(maxD, speed) == false ) {
 		std::cerr << wxString::Format("initMove(%u, %.1lf) failed!", maxD, speed) << std::endl;
 		
@@ -674,6 +675,7 @@ void CncSpeedPlayground::run() {
 	m_ebSpecialTriggerSpeed2->GetValue().ToDouble(&stF2);
 	m_ebSpecialTriggerSpeed3->GetValue().ToDouble(&stF3);
 	
+	/*
 	if ( stI1 > 0 && stF1 > 0.0 ) 	setSpecialSpeedTrigger1(stI1, (float)stF1 / 60);
 	else							setSpecialSpeedTrigger1(   0, (float)0.0);
 	
@@ -682,7 +684,7 @@ void CncSpeedPlayground::run() {
 	
 	if ( stI3 > 0 && stF3 > 0.0 )	setSpecialSpeedTrigger3(stI3, (float)stF3 / 60);
 	else							setSpecialSpeedTrigger3(   0, (float)0.0);
-	
+	*/
 	// simulated the stepping
 	if ( renderMove(x, y, z) == RET_OK ) {
 		// the graphs are refilled by virtual void notifyMovePart()
@@ -726,7 +728,8 @@ void CncSpeedPlayground::run() {
 		std::cerr << "Evaluation: The call of renderMove() is failed!" << std::endl;
 	}
 	
-	traceACM(ss, 2);
+	#
+	//traceACM(ss, 2);
 	updateTestListControl(m_listCtrlTestData, wxString(ss.str()));
 	
 	accelerationDiagram  ->display();

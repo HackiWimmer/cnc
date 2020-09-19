@@ -98,7 +98,7 @@ void SerialEmulatorTextStreamer::notifySetter(const CncCommandDecoder::SetterInf
 	SetterInfo si;
 	si.pid 		= csi.pid;
 	
-	if ( si.pid == PID_SPEED_MM_MIN ) {
+	if ( si.pid == PID_SPEED_MM_SEC ) {
 		si.values	= csi.values;
 		
 		auto checkValue = [&]() {
@@ -111,7 +111,7 @@ void SerialEmulatorTextStreamer::notifySetter(const CncCommandDecoder::SetterInf
 		};
 		
 		if ( checkValue() == true ) 
-			currentSpeedValue = (double)si.values.front() / FLT_FACT;
+			currentSpeedValue = 60.0 * (double)si.values.front() / FLT_FACT;
 	}
 	
 	writeEncodedSetterCallback(si);

@@ -43,6 +43,8 @@ void CncManuallyMoveCoordinates::enableControls(bool state) {
 	m_btSetXY->Enable(state);
 	m_btSetXZ->Enable(state);
 	m_btSetYZ->Enable(state);
+	m_btZeroXYZ->Enable(state);
+	m_btReverseXYZ->Enable(state);
 	
 }
 ///////////////////////////////////////////////////////////////////
@@ -76,9 +78,9 @@ void CncManuallyMoveCoordinates::updateUnit() {
 ///////////////////////////////////////////////////////////////////
 	const wxString unit(THE_APP->GetUnit()->GetValue());
 	
-	double xLimit = +THE_CONFIG->getMaxDimensionX() * 0.8; // [mm]
-	double yLimit = +THE_CONFIG->getMaxDimensionY() * 0.8; // [mm]
-	double zLimit = +THE_CONFIG->getMaxDimensionZ() * 0.8; // [mm]
+	double xLimit = +THE_CONFIG->getMaxDimensionX() * 0.95; // [mm]
+	double yLimit = +THE_CONFIG->getMaxDimensionY() * 0.95; // [mm]
+	double zLimit = +THE_CONFIG->getMaxDimensionZ() * 0.95; // [mm]
 	
 	auto setCommon = [&](double fact) {
 		double value; m_metricCommon->GetValue().ToDouble(&value);
@@ -386,4 +388,18 @@ void CncManuallyMoveCoordinates::onSetCommonValue(wxCommandEvent& event) {
 	else if ( btn == m_btSetXY )   { setValueX(value); setValueY(value); setValueZ(0.0);   } 
 	else if ( btn == m_btSetXZ )   { setValueX(value); setValueY(0.0);   setValueZ(value); } 
 	else if ( btn == m_btSetYZ )   { setValueX(0.0);   setValueY(value); setValueZ(value); } 
+}
+///////////////////////////////////////////////////////////////////
+void CncManuallyMoveCoordinates::onReverseXYZ(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	signManuallyXSlider(event);
+	signManuallyYSlider(event);
+	signManuallyZSlider(event);
+}
+///////////////////////////////////////////////////////////////////
+void CncManuallyMoveCoordinates::onZeroXYZ(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	zeroManuallyXSlider(event);
+	zeroManuallyYSlider(event);
+	zeroManuallyZSlider(event);
 }
