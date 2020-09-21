@@ -1220,10 +1220,17 @@ void MainFrame::onStartupTimer(wxTimerEvent& event) {
 
 	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == false ) {
 		
-		openInitialTemplateFile();
+		// Auto open last ?
+		if ( THE_CONFIG->getAutoOpenLastFlag() )
+			openInitialTemplateFile();
 		
 		// Auto process ?
 		if ( THE_CONFIG->getAutoProcessFlag() ) {
+			
+			// some template available?
+			if ( getCurrentTemplateFormat() == TplUnknown )
+				openInitialTemplateFile();
+				
 			defineMinMonitoring();
 			processTemplateWrapper();
 			defineNormalMonitoring();
@@ -2735,6 +2742,7 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 		
 		motionMonitor->clear();
 		
+		CncTransactionLock ctl(this);
 		setControllerZero(refPositionDlg->shouldZeroX(), 
 		                  refPositionDlg->shouldZeroY(), 
 						  refPositionDlg->shouldZeroZ()
@@ -2916,12 +2924,12 @@ const char* MainFrame::getCurrentTemplateFormatName() {
 	return "";
 }
 ///////////////////////////////////////////////////////////////////
-TemplateFormat MainFrame::getTemplateFormat(const wxString& fn) {
+CncTemplateFormat MainFrame::getTemplateFormat(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 	return cnc::getTemplateFormatFromFileName(fn);
 }
 ///////////////////////////////////////////////////////////////////
-TemplateFormat MainFrame::getCurrentTemplateFormat() {
+CncTemplateFormat MainFrame::getCurrentTemplateFormat() {
 ///////////////////////////////////////////////////////////////////
 	wxString fn;
 	fn.assign(getCurrentTemplatePathFileName());
@@ -2948,7 +2956,7 @@ const wxString& MainFrame::getCurrentTemplatePathFileName() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::decorateExtTemplatePages(TemplateFormat tf) {
+void MainFrame::decorateExtTemplatePages(CncTemplateFormat tf) {
 ///////////////////////////////////////////////////////////////////
 	switch ( tf ) {
 		case TplSvg:		m_simpleBookSourceExt->SetSelection(SourceExtBookSelection::VAL::USER_AGENT_PANEL);
@@ -3103,7 +3111,7 @@ void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::prepareNewTemplateFile() {
 ///////////////////////////////////////////////////////////////////
-	const TemplateFormat tf = getCurrentTemplateFormat();
+	const CncTemplateFormat tf = getCurrentTemplateFormat();
 
 	sourceEditor->SetReadOnly(false);
 	sourceEditor->clearContent();
@@ -3761,7 +3769,7 @@ bool MainFrame::checkReferencePositionState() {
 	const bool zero = ( cnc->getCurAppPosMetric() != refPos );
 
 	if ( isZeroReferenceValid == false ) {
-		const TemplateFormat tf = getCurrentTemplateFormat();
+		const CncTemplateFormat tf = getCurrentTemplateFormat();
 		
 		if ( tf != TplManual && tf != TplTest ) {
 			wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n");
@@ -4038,7 +4046,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			return false;
 		
 		wxASSERT( cncManuallyMoveCoordPanel );
-		const TemplateFormat tf = getCurrentTemplateFormat();
+		const CncTemplateFormat tf = getCurrentTemplateFormat();
 		bool clearMM = true;
 		
 		if ( tf == TplManual )  clearMM = cncManuallyMoveCoordPanel->shouldClearMontionMonitor();
@@ -4296,7 +4304,7 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 	// write a temp file instead to have anytime a new one
 	wxString tfn(CncFileNameService::getTempFileName(getCurrentTemplateFormat()));
 	
-	TemplateFormat tf = getCurrentTemplateFormat();
+	CncTemplateFormat tf = getCurrentTemplateFormat();
 	switch ( tf ) {
 		case TplSvg:		tfn.append(".svg");
 							break;
@@ -4873,7 +4881,7 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 		else if ( ctrl == monitorFilePreview)	cncExtMainPreview->setStatusTextRight(m_inputFileName->GetValue());
 	}
 	
-	TemplateFormat tf = getTemplateFormat(fn);
+	CncTemplateFormat tf = getTemplateFormat(fn);
 	switch ( tf ) {
 		case TplSvg:		ctrl->selectPreview(fn);
 							break;
@@ -6864,7 +6872,7 @@ bool MainFrame::startInteractiveMove(CncInteractiveMoveDriver imd) {
 	wxASSERT(cnc);
 	
 	const unsigned int sel = m_rbStepSensitivity->GetSelection();
-	StepSensitivity stepSensitivity = cnc::getStepSensitivityOfIndex(sel);
+	CncStepSensitivity stepSensitivity = cnc::getStepSensitivityOfIndex(sel);
 	
 	// cnc->isReadyToRun() isn't sufficient here, because this disables
 	// the possibility to resolve a limit situation
@@ -6927,10 +6935,12 @@ void MainFrame::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 	typedef CncNavigatorPanelEvent::Id Id;
 	const Id eventId = (Id)event.GetId();
 	
-	auto moveStart = [&]() {
-		CncLinearDirection x = CncLinearDirection::CncNoneDir;
-		CncLinearDirection y = CncLinearDirection::CncNoneDir;
-		CncLinearDirection z = CncLinearDirection::CncNoneDir;
+	CncLinearDirection x = CncLinearDirection::CncNoneDir;
+	CncLinearDirection y = CncLinearDirection::CncNoneDir;
+	CncLinearDirection z = CncLinearDirection::CncNoneDir;
+	
+	// -------------------------------------------------------------
+	auto evaluateMovement = [&]() {
 		
 		bool move = true;
 		switch ( event.direction ) {
@@ -6962,34 +6972,67 @@ void MainFrame::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 			default:								move = false;
 		}
 		
-		if ( move == true ) {
+		return move;
+	};
+	
+	// -------------------------------------------------------------
+	auto interactiveMoveStart = [&]() {
+		
+		if ( evaluateMovement() == true ) {
 			if ( startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR) )
 				updateInteractiveMove(x, y, z);
 		}
 	};
 	
-	auto moveUpdate = [&]() {
+	// -------------------------------------------------------------
+	auto interactiveMoveUpdate = [&]() {
 		updateInteractiveMove();
 	};
 	
-	auto moveStop = [&]() {
+	// -------------------------------------------------------------
+	auto interactiveMoveStop = [&]() {
 		stopInteractiveMove();
 	};
-		
-	switch ( eventId ) {
-		case Id::CNP_ACTIVATE_REGION:		moveStart();
-											break;
-										
-		case Id::CNP_LEFT_DOWN_FOLLOWUP:	moveUpdate();
-											break;
-										
-		case Id::CNP_DEACTIVATE_REGION:
-		case Id::CNP_LEAVE_PANEL:
-		case Id::CNP_KILL_FOCUS:
-		case Id::CNP_LEAVE_REGION:			moveStop();
-											break;
-		default: ;
+	
+	// -------------------------------------------------------------
+	if ( GetRbStepMode()->GetSelection() == SM_INTERACTIVE ) {
+		switch ( eventId ) {
+			case Id::CNP_ACTIVATE_REGION:		interactiveMoveStart();
+												break;
+											
+			case Id::CNP_LEFT_DOWN_FOLLOWUP:	interactiveMoveUpdate();
+												break;
+											
+			case Id::CNP_DEACTIVATE_REGION:
+			case Id::CNP_LEAVE_PANEL:
+			case Id::CNP_KILL_FOCUS:
+			case Id::CNP_LEAVE_REGION:			interactiveMoveStop();
+												break;
+			default: ;
+		}
 	}
+	else {
+		if ( eventId != Id::CNP_ACTIVATE_REGION )
+			return;
+			
+		if ( evaluateMovement() == false ) 
+			return;
+			
+		startStepwiseMovement(x, y, z);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+bool MainFrame::startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc == NULL ) 
+		return false;
+		
+	const double dx = x * THE_CONFIG->getFeedrateX();
+	const double dy = y * THE_CONFIG->getFeedrateY();
+	const double dz = z * THE_CONFIG->getFeedrateZ();
+	
+	selectMonitorBookCncPanel();
+	return cnc->manualSimpleMoveMetric3D(dx, dy, dz, false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setReferencePosition(wxCommandEvent& event) {
@@ -7904,6 +7947,27 @@ void MainFrame::clickAdditionalParameters(wxCommandEvent& event) {
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::ADDITIONAL_PARAMETERS);
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onSelectStepSensitivity(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( navigatorPanel == NULL)
+		return;
+		
+	// currently nothing to do
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onSelectStepMode(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( navigatorPanel == NULL)
+		return;
+		
+	const CncStepMode sm = m_rbStepMode->GetSelection() == 0 ? SM_INTERACTIVE : SM_STEPWISE;
+	navigatorPanel->setStepMode(sm);
+}
+
+
+
+
 
 
 

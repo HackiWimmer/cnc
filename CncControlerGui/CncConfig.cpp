@@ -950,6 +950,7 @@ const char CncConfig::getRunConfirmationModeAsChar() {
 
 const bool CncConfig::getSplashScreenFlag()							{ PROPERTY(CncApplication_SHOW_SPLASH_SCREEN) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getAutoConnectFlag()							{ PROPERTY(CncApplication_AUTO_CONNECT) 					return p->GetValue().GetBool(); }
+const bool CncConfig::getAutoOpenLastFlag()							{ PROPERTY(CncApplication_AUTO_OPEN_LAST) 					return p->GetValue().GetBool(); }
 const bool CncConfig::getAutoProcessFlag()							{ PROPERTY(CncApplication_AUTO_PROCESS) 					return p->GetValue().GetBool(); }
 const bool CncConfig::getAutoOpenOglObserverFlag()					{ PROPERTY(CncApplication_AUTO_OPEN_OGL_OBSERVER) 			return p->GetValue().GetBool(); }
 const bool CncConfig::getUseMainPreviewFlag()						{ PROPERTY(CncApplication_USE_MAIN_PREVIEW) 				return p->GetValue().GetBool(); }

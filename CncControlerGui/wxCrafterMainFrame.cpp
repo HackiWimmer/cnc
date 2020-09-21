@@ -661,9 +661,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1490->Add(m_dvListCtrlSvgUAInboundPathList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_dvListCtrlSvgUAInboundPathList->AppendTextColumn(_("Ln"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlSvgUAInboundPathList->AppendToggleColumn(_("Considered"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_CENTER);
-    m_dvListCtrlSvgUAInboundPathList->AppendTextColumn(_("Node"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_dvListCtrlSvgUAInboundPathList->AppendTextColumn(_("Ln"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlSvgUAInboundPathList->AppendToggleColumn(_("Considered"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_CENTER, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlSvgUAInboundPathList->AppendTextColumn(_("Node"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_staticText14983 = new wxStaticText(m_panelTplUserAgent, wxID_ANY, _("Use Directives:"), wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), 0);
     wxFont m_staticText14983Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText14983Font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -676,8 +676,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1490->Add(m_dvListCtrlSvgUAUseDirective, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_dvListCtrlSvgUAUseDirective->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlSvgUAUseDirective->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_dvListCtrlSvgUAUseDirective->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlSvgUAUseDirective->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     wxFlexGridSizer* flexGridSizer1492 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer1492->SetFlexibleDirection( wxBOTH );
     flexGridSizer1492->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -698,8 +698,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1492->Add(m_dvListCtrlSvgUADetailInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_dvListCtrlSvgUADetailInfo->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlSvgUADetailInfo->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_dvListCtrlSvgUADetailInfo->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlSvgUADetailInfo->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_selectedUAInfo = new wxTextCtrl(m_panelTplUserAgent, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxTE_READONLY);
     m_selectedUAInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     #if wxVERSION_NUMBER >= 3000
@@ -1745,13 +1745,19 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5204->Add(flexGridSizer8616, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer5206 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer9282 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer9282->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9282->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer8616->Add(flexGridSizer9282, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5206 = new wxFlexGridSizer(5, 1, 0, 0);
     flexGridSizer5206->SetFlexibleDirection( wxBOTH );
     flexGridSizer5206->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5206->AddGrowableCol(0);
     flexGridSizer5206->AddGrowableRow(1);
     
-    flexGridSizer8616->Add(flexGridSizer5206, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9282->Add(flexGridSizer5206, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer5899 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer5899->SetFlexibleDirection( wxBOTH );
@@ -1760,6 +1766,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5206->Add(flexGridSizer5899, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
     m_staticBitmap5901 = new wxStaticBitmap(m_scrollWin8687, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-cross-dark-icon16")), wxDefaultPosition, wxDLG_UNIT(m_scrollWin8687, wxSize(-1,-1)), 0 );
+    m_staticBitmap5901->SetToolTip(_("Corresponding Gamepad Button"));
     
     flexGridSizer5899->Add(m_staticBitmap5901, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -1790,6 +1797,45 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5834->Add(m_rbStepSensitivity, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
+    m_staticLine9290 = new wxStaticLine(m_scrollWin8687, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWin8687, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5206->Add(m_staticLine9290, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer58991 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer58991->SetFlexibleDirection( wxBOTH );
+    flexGridSizer58991->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5206->Add(flexGridSizer58991, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
+    
+    m_staticBitmap59012 = new wxStaticBitmap(m_scrollWin8687, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxDefaultPosition, wxDLG_UNIT(m_scrollWin8687, wxSize(-1,-1)), 0 );
+    m_staticBitmap59012->SetToolTip(_("Gamepad 'Option' Button"));
+    
+    flexGridSizer58991->Add(m_staticBitmap59012, 0, wxALL, WXC_FROM_DIP(1));
+    
+    flexGridSizer58991->Add(4, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_cbStepModeText = new wxStaticText(m_scrollWin8687, wxID_ANY, _("Step Mode:"), wxDefaultPosition, wxDLG_UNIT(m_scrollWin8687, wxSize(-1,-1)), 0);
+    wxFont m_cbStepModeTextFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_cbStepModeText->SetFont(m_cbStepModeTextFont);
+    
+    flexGridSizer58991->Add(m_cbStepModeText, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer58345 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer58345->SetFlexibleDirection( wxBOTH );
+    flexGridSizer58345->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5206->Add(flexGridSizer58345, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_rbStepModeArr;
+    m_rbStepModeArr.Add(_("Interactive:"));
+    m_rbStepModeArr.Add(_("Stepwise:"));
+    m_rbStepMode = new wxRadioBox(m_scrollWin8687, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_scrollWin8687, wxSize(-1,-1)), m_rbStepModeArr, 1, wxRA_SPECIFY_COLS);
+    wxFont m_rbStepModeFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_rbStepMode->SetFont(m_rbStepModeFont);
+    m_rbStepMode->SetSelection(0);
+    
+    flexGridSizer58345->Add(m_rbStepMode, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
     wxFlexGridSizer* flexGridSizer6841 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer6841->SetFlexibleDirection( wxBOTH );
     flexGridSizer6841->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -1814,6 +1860,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5204->Add(flexGridSizer5905, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_staticBitmap5907 = new wxStaticBitmap(m_scrollWin8687, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-square-dark-icon16")), wxDefaultPosition, wxDLG_UNIT(m_scrollWin8687, wxSize(-1,-1)), 0 );
+    m_staticBitmap5907->SetToolTip(_("Corresponding Gamepad Button"));
     
     flexGridSizer5905->Add(m_staticBitmap5907, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -2470,10 +2517,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1306->Add(m_dvListCtrlControllerConfig, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_dvListCtrlControllerConfig->AppendTextColumn(_("PID"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT);
-    m_dvListCtrlControllerConfig->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlControllerConfig->AppendTextColumn(_("Unit"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlControllerConfig->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_dvListCtrlControllerConfig->AppendTextColumn(_("PID"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlControllerConfig->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlControllerConfig->AppendTextColumn(_("Unit"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlControllerConfig->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_controllerPinReport = new wxPanel(m_notebookConfig, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookConfig, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     wxFont m_controllerPinReportFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("wxT(\"Segoe UI\")"));
     m_controllerPinReport->SetFont(m_controllerPinReportFont);
@@ -2515,11 +2562,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer13061->Add(m_dvListCtrlControllerPins, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_dvListCtrlControllerPins->AppendTextColumn(_("PIN"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT);
-    m_dvListCtrlControllerPins->AppendTextColumn(_("Description"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlControllerPins->AppendTextColumn(_("Type"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlControllerPins->AppendTextColumn(_("Mode"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlControllerPins->AppendTextColumn(_("Value3"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_dvListCtrlControllerPins->AppendTextColumn(_("PIN"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlControllerPins->AppendTextColumn(_("Description"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlControllerPins->AppendTextColumn(_("Type"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlControllerPins->AppendTextColumn(_("Mode"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_dvListCtrlControllerPins->AppendTextColumn(_("Value3"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_cncPrePorcessor = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_cncPrePorcessorImgIndex;
     m_cncPrePorcessorImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("script-gear")));
@@ -4653,7 +4700,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer7559->Add(m_spyUnknownDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_spyUnknownDetails->AppendTextColumn(_("Info"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_spyUnknownDetails->AppendTextColumn(_("Info"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_spyUnknownDetails->SetMinSize(wxSize(-1,60));
     
     m_btOpenSpyDetailWindow = new wxButton(m_unknownPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_unknownPanel, wxSize(26, 60)), 0);
@@ -4718,11 +4765,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer7565->Add(m_spyInboundDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_spyInboundDetails->AppendTextColumn(_("Context"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_spyInboundDetails->AppendTextColumn(_("Command [CMD]"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_spyInboundDetails->AppendTextColumn(_("Process ID [PID]"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_spyInboundDetails->AppendTextColumn(_("Index"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_spyInboundDetails->AppendTextColumn(_("Data"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_spyInboundDetails->AppendTextColumn(_("Context"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_spyInboundDetails->AppendTextColumn(_("Command [CMD]"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_spyInboundDetails->AppendTextColumn(_("Process ID [PID]"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_spyInboundDetails->AppendTextColumn(_("Index"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_spyInboundDetails->AppendTextColumn(_("Data"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_spyInboundDetails->SetMinSize(wxSize(-1,55));
     
     m_button75612 = new wxButton(m_inboundPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_inboundPanel, wxSize(26, 60)), 0);
@@ -4787,10 +4834,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer7562->Add(m_spyOutboundDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_spyOutboundDetails->AppendTextColumn(_("Context"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_spyOutboundDetails->AppendTextColumn(_("Command [CMD]"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_spyOutboundDetails->AppendTextColumn(_("Portion"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_spyOutboundDetails->AppendTextColumn(_("Data"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_spyOutboundDetails->AppendTextColumn(_("Context"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_spyOutboundDetails->AppendTextColumn(_("Command [CMD]"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_spyOutboundDetails->AppendTextColumn(_("Portion"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+    m_spyOutboundDetails->AppendTextColumn(_("Data"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_spyOutboundDetails->SetMinSize(wxSize(-1,55));
     
     m_button75611 = new wxButton(m_outbundPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_outbundPanel, wxSize(26, 60)), 0);
@@ -5854,7 +5901,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     SetName(wxT("MainFrameBClass"));
-    SetSize(1600,1000);
+    SetSize(wxDLG_UNIT(this, wxSize(1600,1000)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -5952,6 +5999,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zToMin->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToMin), NULL, this);
     m_zToTop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToTop), NULL, this);
     m_zToBottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToBottom), NULL, this);
+    m_rbStepSensitivity->Connect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::onSelectStepSensitivity), NULL, this);
     m_testCaseBook->Connect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::testCaseBookChanged), NULL, this);
     m_testIntervalMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectTestIntervalMode), NULL, this);
     m_testCountX->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
@@ -6215,6 +6263,7 @@ MainFrameBClass::~MainFrameBClass()
     m_zToMin->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToMin), NULL, this);
     m_zToTop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToTop), NULL, this);
     m_zToBottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToBottom), NULL, this);
+    m_rbStepSensitivity->Disconnect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::onSelectStepSensitivity), NULL, this);
     m_testCaseBook->Disconnect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::testCaseBookChanged), NULL, this);
     m_testIntervalMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectTestIntervalMode), NULL, this);
     m_testCountX->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
@@ -6988,7 +7037,7 @@ CncManuallyMoveCoordinatesBase::CncManuallyMoveCoordinatesBase(wxWindow* parent,
     flexGridSizer15911->Add(m_staticLine5135, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     SetName(wxT("CncManuallyMoveCoordinatesBase"));
-    SetSize(800,600);
+    SetSize(wxDLG_UNIT(this, wxSize(800,600)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

@@ -131,56 +131,8 @@ void CncReferencePosition::setMode(short mode) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	typedef CncNavigatorPanelEvent::Id Id;
-	const Id eventId = (Id)event.GetId();
-	
-	auto moveStart = [&]() {
-		CncLinearDirection x = CncLinearDirection::CncNoneDir;
-		CncLinearDirection y = CncLinearDirection::CncNoneDir;
-		CncLinearDirection z = CncLinearDirection::CncNoneDir;
-		
-		bool move = true;
-		switch ( event.direction ) {
-			case CncNavigatorPanel::Direction::EE: 	x = CncLinearDirection::CncPosDir; break;
-			case CncNavigatorPanel::Direction::WW: 	x = CncLinearDirection::CncNegDir; break;
-			
-			case CncNavigatorPanel::Direction::NN: 	y = CncLinearDirection::CncPosDir; break;
-			case CncNavigatorPanel::Direction::SS: 	y = CncLinearDirection::CncNegDir; break;
-			
-			case CncNavigatorPanel::Direction::CP: 	z = CncLinearDirection::CncPosDir; break;
-			case CncNavigatorPanel::Direction::CN: 	z = CncLinearDirection::CncNegDir; break;
-			
-			default:								move = false;
-		}
-		
-		if ( move == true ) {
-			if ( APP_PROXY::startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR) )
-				APP_PROXY::updateInteractiveMove(x, y, z);
-		}
-	};
-	
-	auto moveUpdate = [&]() {
-		APP_PROXY::updateInteractiveMove();
-	};
-	
-	auto moveStop = [&]() {
-		APP_PROXY::stopInteractiveMove();
-	};
-	
-	switch ( eventId ) {
-		case Id::CNP_ACTIVATE_REGION:		moveStart();
-											break;
-										
-		case Id::CNP_LEFT_DOWN_FOLLOWUP:	moveUpdate();
-											break;
-										
-		case Id::CNP_DEACTIVATE_REGION:
-		case Id::CNP_LEAVE_PANEL:
-		case Id::CNP_KILL_FOCUS:
-		case Id::CNP_LEAVE_REGION:			moveStop();
-											break;
-		default: ;
-	}
+	// redirect to main frame . . .
+	APP_PROXY::postEvent(new CncNavigatorPanelEvent(event));
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::mode1(wxCommandEvent& event) {
@@ -238,6 +190,7 @@ void CncReferencePosition::init(wxInitDialogEvent& event) {
 void CncReferencePosition::show(wxShowEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_rbStepSensitivity->SetSelection(APP_PROXY::GetRbStepSensitivity()->GetSelection());
+	m_rbStepMode->SetSelection(APP_PROXY::GetRbStepMode()->GetSelection());
 	
 	if ( event.IsShown() ) 
 		m_infoTimer->Start(200);
@@ -268,6 +221,15 @@ void CncReferencePosition::selectStepSensitivity(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( APP_PROXY::isAppPointerAvailable() == true )
 		APP_PROXY::GetRbStepSensitivity()->SetSelection(m_rbStepSensitivity->GetSelection());
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::selectStepMode(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( APP_PROXY::isAppPointerAvailable() == true )
+		APP_PROXY::GetRbStepMode()->SetSelection(m_rbStepMode->GetSelection());
+		
+	const CncStepMode sm = m_rbStepMode->GetSelection() == 0 ? SM_INTERACTIVE : SM_STEPWISE;
+	navigationPanel->setStepMode(sm);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::showInformation() {

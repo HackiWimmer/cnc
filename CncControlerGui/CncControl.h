@@ -27,8 +27,23 @@ class CncControl {
 		enum DimensionMode			{ DM_2D, DM_3D };
 
 	private:
+		
+		struct InteractiveMoveInfo {
+			
+			CncInteractiveMoveDriver	driver;
+			CncStepSensitivity			stepSensitivity;
+			
+			InteractiveMoveInfo()
+			: driver			(IMD_NONE)
+			, stepSensitivity	(FINEST)
+			{}
+			
+			bool active() 		{ return driver != IMD_NONE; }
+			void reset() 		{ *this = InteractiveMoveInfo(); }
+		};
+		
 		long	 					currentClientId;
-		CncInteractiveMoveDriver	currentInteractiveMoveDriver;
+		InteractiveMoveInfo			currentInteractiveMoveInfo;
 		
 		///////////////////////////////////////////////////////////////////
 		struct SetterTuple {
@@ -332,10 +347,10 @@ class CncControl {
 		bool moveYToMid();
 		bool moveZToMid();
 		
-		bool startInteractiveMove(StepSensitivity s, CncInteractiveMoveDriver imd);
+		bool startInteractiveMove(CncStepSensitivity s, CncInteractiveMoveDriver imd);
 		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		bool stopInteractiveMove();
-		bool isInteractiveMoveActive() { return currentInteractiveMoveDriver != IMD_NONE; }
+		bool isInteractiveMoveActive() { return currentInteractiveMoveInfo.active(); }
 		
 		bool manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);
 		bool manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);

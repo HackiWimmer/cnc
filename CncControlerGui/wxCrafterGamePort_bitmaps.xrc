@@ -16,9 +16,13 @@
   <object class="wxBitmap" name="BMP_COMPASS_270">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\compass_270.png</object>
   <object class="wxBitmap" name="BMP_COMPASS_315">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\compass_315.png</object>
   <object class="wxBitmap" name="BMP_COMPASS_NULL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\compass_NULL.png</object>
+  <object class="wxBitmap" name="BMP_INTERACTIVE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\collapse.png</object>
+  <object class="wxBitmap" name="BMP_INTERACTIVE@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\collapse@2x.png</object>
+  <object class="wxBitmap" name="BMP_INTERACTIVE@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\collapse@2x.png</object>
   <object class="wxBitmap" name="BMP_NAVI_XY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_all-small.png</object>
   <object class="wxBitmap" name="BMP_NAVI_Z">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_updown-small.png</object>
   <object class="wxBitmap" name="BMP_START">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\run-build-2.png</object>
+  <object class="wxBitmap" name="BMP_STEPWISE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\start-here.png</object>
   <object class="wxBitmap" name="BMP_STICK_LEFT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="BMP_STICK_RIGHT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\rstick_updown-small.png</object>
   <object class="wxBitmap" name="BMP_STOP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\run-build-clean.png</object>
@@ -39,5 +43,6 @@
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
   <object class="wxBitmap" name="rstick16">bitmaps\gamepad\rstick16.png</object>
   <object class="wxBitmap" name="rstick_updown-small">bitmaps\gamepad\navi\rstick_updown-small.png</object>
+  <object class="wxBitmap" name="start-here">bitmaps\start-here.png</object>
   <object class="wxBitmap" name="system-run-3">bitmaps\system-run-3.png</object>
 </resource>

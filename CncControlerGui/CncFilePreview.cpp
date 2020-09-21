@@ -114,7 +114,7 @@ bool CncFilePreview::loadFile() {
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectPreview(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
-	TemplateFormat tf = cnc::getTemplateFormatFromFileName(fileName);
+	CncTemplateFormat tf = cnc::getTemplateFormatFromFileName(fileName);
 	
 	switch ( tf ) {
 		case TplSvg:		selectSVGPreview();

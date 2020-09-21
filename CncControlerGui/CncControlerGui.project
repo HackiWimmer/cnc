@@ -5,6 +5,15 @@
       <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
     </Plugin>
   </Plugins>
+  <Reconciliation>
+    <Regexes/>
+    <Excludepaths/>
+    <Ignorefiles/>
+    <Extensions>
+      <![CDATA[*.cpp;*.c;*.h;*.hpp;*.xrc;*.wxcp;*.fbp]]>
+    </Extensions>
+    <Topleveldir>/@Development/@Projekte/c++/CNCGuiController/CncControlerGui</Topleveldir>
+  </Reconciliation>
   <VirtualDirectory Name="cmake">
     <File Name="../CMakeListsSourceFiles.txt"/>
     <File Name="../CMakeListsMain.txt"/>

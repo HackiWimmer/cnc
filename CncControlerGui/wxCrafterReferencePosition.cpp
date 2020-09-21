@@ -74,7 +74,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer6839->Add(flexGridSizer5314, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    wxFlexGridSizer* flexGridSizer5336 = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer5336 = new wxFlexGridSizer(5, 1, 0, 0);
     flexGridSizer5336->SetFlexibleDirection( wxBOTH );
     flexGridSizer5336->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -84,22 +84,23 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer5336->Add(m_staticLine5357, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticText5355 = new wxStaticText(this, wxID_ANY, _("Step Sensitivity:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_staticText5355->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
-    wxFont m_staticText5355Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5355->SetFont(m_staticText5355Font);
+    m_staticText53555 = new wxStaticText(this, wxID_ANY, _("Step Sensitivity:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText53555->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
+    wxFont m_staticText53555Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText53555->SetFont(m_staticText53555Font);
     
-    flexGridSizer5336->Add(m_staticText5355, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer5336->Add(m_staticText53555, 0, wxALL, WXC_FROM_DIP(5));
     
-    wxFlexGridSizer* flexGridSizer5353 = new wxFlexGridSizer(0, 3, 0, 0);
-    flexGridSizer5353->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5353->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    wxFlexGridSizer* flexGridSizer53531 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer53531->SetFlexibleDirection( wxBOTH );
+    flexGridSizer53531->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer5336->Add(flexGridSizer5353, 0, wxALL, WXC_FROM_DIP(2));
+    flexGridSizer5336->Add(flexGridSizer53531, 0, wxALL, WXC_FROM_DIP(2));
     
-    m_staticBitmap5844 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-cross-dark-icon24")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    m_staticBitmap58442 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-cross-dark-icon16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    m_staticBitmap58442->SetToolTip(_("Corresponding Gamepad Button"));
     
-    flexGridSizer5353->Add(m_staticBitmap5844, 0, wxALL, WXC_FROM_DIP(2));
+    flexGridSizer53531->Add(m_staticBitmap58442, 0, wxALL, WXC_FROM_DIP(2));
     
     wxArrayString m_rbStepSensitivityArr;
     m_rbStepSensitivityArr.Add(_("Finest:"));
@@ -112,11 +113,39 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     m_rbStepSensitivity->SetFont(m_rbStepSensitivityFont);
     m_rbStepSensitivity->SetSelection(1);
     
-    flexGridSizer5353->Add(m_rbStepSensitivity, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer53531->Add(m_rbStepSensitivity, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    flexGridSizer53531->Add(10, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5355 = new wxStaticText(this, wxID_ANY, _("Step Mode:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText5355->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
+    wxFont m_staticText5355Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5355->SetFont(m_staticText5355Font);
+    
+    flexGridSizer5336->Add(m_staticText5355, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5353 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer5353->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5353->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5336->Add(flexGridSizer5353, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_staticBitmap5844 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    m_staticBitmap5844->SetToolTip(_("Gamepad 'Option' Button"));
+    
+    flexGridSizer5353->Add(m_staticBitmap5844, 0, wxALL, WXC_FROM_DIP(2));
+    
+    wxArrayString m_rbStepModeArr;
+    m_rbStepModeArr.Add(_("Interactive:"));
+    m_rbStepModeArr.Add(_("Stepwise:"));
+    m_rbStepMode = new wxRadioBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_rbStepModeArr, 1, wxRA_SPECIFY_COLS);
+    wxFont m_rbStepModeFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_rbStepMode->SetFont(m_rbStepModeFont);
+    m_rbStepMode->SetSelection(0);
+    
+    flexGridSizer5353->Add(m_rbStepMode, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     flexGridSizer5353->Add(10, 0, 1, wxALL, WXC_FROM_DIP(0));
-    
-    flexGridSizer5336->Add(0, 46, 1, wxALL, WXC_FROM_DIP(2));
     
     wxFlexGridSizer* flexGridSizer6836 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer6836->SetFlexibleDirection( wxBOTH );
@@ -151,7 +180,8 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer7412->Add(14, 0, 1, wxALL, WXC_FROM_DIP(0));
     
-    m_staticBitmap5847 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-circle-dark-icon24")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    m_staticBitmap5847 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-circle-dark-icon16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    m_staticBitmap5847->SetToolTip(_("Corresponding Gamepad Button"));
     
     flexGridSizer7412->Add(m_staticBitmap5847, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -476,7 +506,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     m_infoTimer = new wxTimer;
     
     SetName(wxT("CncReferencePositionBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -489,6 +519,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncReferencePositionBase::init), NULL, this);
     this->Connect(wxEVT_SHOW, wxShowEventHandler(CncReferencePositionBase::show), NULL, this);
     m_rbStepSensitivity->Connect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncReferencePositionBase::selectStepSensitivity), NULL, this);
+    m_rbStepMode->Connect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncReferencePositionBase::selectStepMode), NULL, this);
     m_btMode1->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode1), NULL, this);
     m_btMode2->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode2), NULL, this);
     m_btMode3->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode3), NULL, this);
@@ -510,6 +541,7 @@ CncReferencePositionBase::~CncReferencePositionBase()
     this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncReferencePositionBase::init), NULL, this);
     this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncReferencePositionBase::show), NULL, this);
     m_rbStepSensitivity->Disconnect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncReferencePositionBase::selectStepSensitivity), NULL, this);
+    m_rbStepMode->Disconnect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncReferencePositionBase::selectStepMode), NULL, this);
     m_btMode1->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode1), NULL, this);
     m_btMode2->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode2), NULL, this);
     m_btMode3->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode3), NULL, this);
@@ -765,7 +797,7 @@ CncStartPositionResolverBase::CncStartPositionResolverBase(wxWindow* parent, wxW
     flexGridSizer7822->Add(m_button7830, 0, wxALL, WXC_FROM_DIP(5));
     
     SetName(wxT("CncStartPositionResolverBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

@@ -28,6 +28,7 @@ CncNavigatorPanel::CncNavigatorPanel(wxWindow *parent, const Config& cfg)
 : wxPanel			(parent)
 , navEvent			(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
 , continuousEvent	(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
+, stepMode			(SM_INTERACTIVE)
 , continuousTimer	(this, wxEVT_CNC_NAVIGATOR_PANEL_TIMER)
 , navRectangle		()
 , innerRadius		(0)
@@ -718,6 +719,9 @@ void CncNavigatorPanel::onContinuousTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::startContinuousEvent(int id) {
 ///////////////////////////////////////////////////////////////////
+	if ( stepMode == SM_STEPWISE )
+		return;
+		
 	wxASSERT( continuousEvent );
 	
 	continuousEvent->reset();

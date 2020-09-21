@@ -717,7 +717,7 @@ void CncBaseEditor::clearContent() {
 	Enable(hasEditMode());
 }
 ///////////////////////////////////////////////////////////////////
-void CncBaseEditor::prepareNewTemplateFile(TemplateFormat tf) {
+void CncBaseEditor::prepareNewTemplateFile(CncTemplateFormat tf) {
 ///////////////////////////////////////////////////////////////////
 	ClearAll();
 	
@@ -753,7 +753,7 @@ void CncBaseEditor::prepareNewTemplateFile(TemplateFormat tf) {
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::setupModelType() {
 ///////////////////////////////////////////////////////////////////
-	TemplateFormat tf = fileInfo.format;
+	CncTemplateFormat tf = fileInfo.format;
 	if ( tf == TplBinary )
 		tf = fileInfo.binaryOrigFomat;
 	

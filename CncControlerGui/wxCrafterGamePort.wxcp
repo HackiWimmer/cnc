@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 216,
+  "m_objCounter": 225,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC81CCInitBitmapResources",
   "m_bitmapsFile": "wxCrafterGamePort_bitmaps.cpp",
@@ -691,7 +691,7 @@
                       }, {
                        "type": "string",
                        "m_label": "# Columns:",
-                       "m_value": "2"
+                       "m_value": "1"
                       }, {
                        "type": "string",
                        "m_label": "# Rows:",
@@ -1122,7 +1122,7 @@
                         }, {
                          "type": "string",
                          "m_label": "# Columns:",
-                         "m_value": "2"
+                         "m_value": "1"
                         }, {
                          "type": "string",
                          "m_label": "# Rows:",
@@ -1489,7 +1489,7 @@
                 }, {
                  "type": "string",
                  "m_label": "# Rows:",
-                 "m_value": ""
+                 "m_value": "0"
                 }, {
                  "type": "string",
                  "m_label": "Growable columns:",
@@ -2700,7 +2700,7 @@
           }, {
            "type": "multi-string",
            "m_label": "Label:",
-           "m_value": "Step Sensiitivity:"
+           "m_value": "Step Mode/Sensiitivity:"
           }, {
            "type": "string",
            "m_label": "Wrap:",
@@ -2723,7 +2723,7 @@
           }, {
            "type": "string",
            "m_label": "Size:",
-           "m_value": "38,0"
+           "m_value": "32,0"
           }],
          "m_events": [],
          "m_children": []
@@ -3595,6 +3595,143 @@
          "m_events": [],
          "m_children": []
         }, {
+         "m_type": 4403,
+         "proportion": 0,
+         "border": 0,
+         "gbSpan": "1,1",
+         "gbPosition": "0,0",
+         "m_styles": [],
+         "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+         "m_properties": [{
+           "type": "string",
+           "m_label": "Minimum Size:",
+           "m_value": "-1,-1"
+          }, {
+           "type": "string",
+           "m_label": "Name:",
+           "m_value": "flexGridSizer219"
+          }, {
+           "type": "string",
+           "m_label": "Style:",
+           "m_value": ""
+          }, {
+           "type": "string",
+           "m_label": "# Columns:",
+           "m_value": "1"
+          }, {
+           "type": "string",
+           "m_label": "# Rows:",
+           "m_value": "2"
+          }, {
+           "type": "string",
+           "m_label": "Growable columns:",
+           "m_value": ""
+          }, {
+           "type": "string",
+           "m_label": "Growable rows:",
+           "m_value": ""
+          }, {
+           "type": "string",
+           "m_label": "Horizontal gap:",
+           "m_value": "0"
+          }, {
+           "type": "string",
+           "m_label": "Vertical gap:",
+           "m_value": "0"
+          }],
+         "m_events": [],
+         "m_children": [{
+           "m_type": 4454,
+           "proportion": 1,
+           "border": 0,
+           "gbSpan": "1,1",
+           "gbPosition": "0,0",
+           "m_styles": [],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+           "m_properties": [{
+             "type": "string",
+             "m_label": "Name:",
+             "m_value": "Spacer221"
+            }, {
+             "type": "string",
+             "m_label": "Size:",
+             "m_value": "0,3"
+            }],
+           "m_events": [],
+           "m_children": []
+          }, {
+           "m_type": 4409,
+           "proportion": 0,
+           "border": 5,
+           "gbSpan": "1,1",
+           "gbPosition": "0,0",
+           "m_styles": [],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+           "m_properties": [{
+             "type": "winid",
+             "m_label": "ID:",
+             "m_winid": "wxID_ANY"
+            }, {
+             "type": "string",
+             "m_label": "Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
+             "m_label": "Name:",
+             "m_value": "m_gpBmpStepMode"
+            }, {
+             "type": "multi-string",
+             "m_label": "Tooltip:",
+             "m_value": ""
+            }, {
+             "type": "colour",
+             "m_label": "Bg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "colour",
+             "m_label": "Fg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "font",
+             "m_label": "Font:",
+             "m_value": ""
+            }, {
+             "type": "bool",
+             "m_label": "Hidden",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Disabled",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Focused",
+             "m_value": false
+            }, {
+             "type": "string",
+             "m_label": "Class Name:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Include File:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Style:",
+             "m_value": ""
+            }, {
+             "type": "bitmapPicker",
+             "m_label": "Bitmap File:",
+             "m_path": "bitmaps/start-here.png"
+            }],
+           "m_events": [],
+           "m_children": []
+          }]
+        }, {
          "m_type": 4411,
          "proportion": 0,
          "border": 5,
@@ -4150,7 +4287,7 @@
           }, {
            "type": "multi-string",
            "m_label": "Tooltip:",
-           "m_value": ""
+           "m_value": "Corresponding Gamepad Button"
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
@@ -4420,7 +4557,7 @@
           }, {
            "type": "multi-string",
            "m_label": "Tooltip:",
-           "m_value": ""
+           "m_value": "Gamepad 'Share' Button"
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
@@ -4550,7 +4687,7 @@
           }, {
            "type": "multi-string",
            "m_label": "Label:",
-           "m_value": "Open Navigator"
+           "m_value": "Open/Select Navigator"
           }, {
            "type": "string",
            "m_label": "Wrap:",
@@ -4984,6 +5121,79 @@
        "type": "filePicker",
        "m_label": "Bitmap File:",
        "m_path": "bitmaps/software-update-available-2 (2).png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }]
+  }, {
+   "m_type": 4481,
+   "proportion": 0,
+   "border": 5,
+   "gbSpan": "1,1",
+   "gbPosition": "0,0",
+   "m_styles": [],
+   "m_sizerFlags": [],
+   "m_properties": [{
+     "type": "string",
+     "m_label": "Name:",
+     "m_value": "ImageLibGamepadStepMode"
+    }, {
+     "type": "string",
+     "m_label": "File:",
+     "m_value": ""
+    }, {
+     "type": "virtualFolderPicker",
+     "m_label": "Virtual Folder:",
+     "m_path": ""
+    }, {
+     "type": "string",
+     "m_label": "Class Decorator",
+     "m_value": ""
+    }, {
+     "type": "integer",
+     "m_label": "Bitmap Size:",
+     "m_value": 16
+    }, {
+     "type": "bool",
+     "m_label": "Bitmap Mask",
+     "m_value": true
+    }],
+   "m_events": [],
+   "m_children": [{
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_INTERACTIVE"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/collapse.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }, {
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_STEPWISE"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/start-here.png"
       }],
      "m_events": [],
      "m_children": []

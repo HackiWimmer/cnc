@@ -46,9 +46,12 @@ class CncReferencePositionBase : public wxDialog
 protected:
     wxStaticText* m_staticText5505;
     wxStaticLine* m_staticLine5357;
+    wxStaticText* m_staticText53555;
+    wxStaticBitmap* m_staticBitmap58442;
+    wxRadioBox* m_rbStepSensitivity;
     wxStaticText* m_staticText5355;
     wxStaticBitmap* m_staticBitmap5844;
-    wxRadioBox* m_rbStepSensitivity;
+    wxRadioBox* m_rbStepMode;
     wxPanel* m_navigationPanelPlaceholder;
     wxStaticLine* m_staticLine535015;
     wxStaticBitmap* m_staticBitmap5847;
@@ -93,6 +96,7 @@ protected:
     virtual void init(wxInitDialogEvent& event) { event.Skip(); }
     virtual void show(wxShowEvent& event) { event.Skip(); }
     virtual void selectStepSensitivity(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectStepMode(wxCommandEvent& event) { event.Skip(); }
     virtual void mode1(wxCommandEvent& event) { event.Skip(); }
     virtual void mode2(wxCommandEvent& event) { event.Skip(); }
     virtual void mode3(wxCommandEvent& event) { event.Skip(); }
@@ -110,9 +114,12 @@ protected:
 public:
     wxStaticText* GetStaticText5505() { return m_staticText5505; }
     wxStaticLine* GetStaticLine5357() { return m_staticLine5357; }
+    wxStaticText* GetStaticText53555() { return m_staticText53555; }
+    wxStaticBitmap* GetStaticBitmap58442() { return m_staticBitmap58442; }
+    wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
     wxStaticText* GetStaticText5355() { return m_staticText5355; }
     wxStaticBitmap* GetStaticBitmap5844() { return m_staticBitmap5844; }
-    wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
+    wxRadioBox* GetRbStepMode() { return m_rbStepMode; }
     wxPanel* GetNavigationPanelPlaceholder() { return m_navigationPanelPlaceholder; }
     wxStaticLine* GetStaticLine535015() { return m_staticLine535015; }
     wxStaticBitmap* GetStaticBitmap5847() { return m_staticBitmap5847; }

@@ -72,9 +72,13 @@ void CncGamepadControllerState::decoarteConnectButton() {
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::update(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	if ( m_btConnect->GetValue() == true )
-		processMovement(state);
-
+	if ( m_btConnect->GetValue() == true ) {
+		const bool b = APP_PROXY::GetRbStepMode()->GetSelection() == SM_INTERACTIVE; 
+		
+		if ( b )	processInteractiveMovement(state);
+		else 		processStepwiseMovement(state);
+	}
+	
 	if ( state.isSomethingChanged == false )
 		return;
 		
@@ -114,7 +118,7 @@ void CncGamepadControllerState::processTrace(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::processOpenNavigator(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	if ( state.data.buttonStart ) 
+	if ( state.data.buttonBack ) 
 		APP_PROXY::openNavigatorFromGamepad();
 }
 ///////////////////////////////////////////////////////////////////
@@ -133,31 +137,38 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 		
 		// select step sensitivity - main frame
 		if ( state.data.buttonA ) { 
-			const unsigned int sel  = APP_PROXY::GetRbStepSensitivity()->GetSelection();
-			const unsigned int max  = APP_PROXY::GetRbStepSensitivity()->GetCount();
-			const unsigned int next = (sel + 1) % max;
-			const StepSensitivity s = cnc::getStepSensitivityOfIndex(next);
-			const double newSpeed   = cnc::getSpeedValue(s);
+			const unsigned int sel		= APP_PROXY::GetRbStepSensitivity()->GetSelection();
+			const unsigned int max		= APP_PROXY::GetRbStepSensitivity()->GetCount();
+			const unsigned int next		= (sel + 1) % max;
+			const CncStepSensitivity s	= cnc::getStepSensitivityOfIndex(next);
+			const double newSpeed   	= cnc::getSpeedValue(s);
 			
 			APP_PROXY::GetRbStepSensitivity()->SetSelection(next);
 			APP_PROXY::updateSpeedSlider(newSpeed);
+		}
+		
+		// select step sensitivity - main frame
+		if ( state.data.buttonStart ) { 
+			const unsigned int sel		= APP_PROXY::GetRbStepMode()->GetSelection();
+			const unsigned int max		= APP_PROXY::GetRbStepMode()->GetCount();
+			const unsigned int next		= (sel + 1) % max;
+			
+			APP_PROXY::GetRbStepMode()->SetSelection(next);
 		}
 		
 		// always return here
 		return;
 	}
 	
-	// manage ref pos dlg
-	
-	// sensitivity
+	// step sensitivity - main frame + reference dlg
 	if ( state.data.buttonA == true ) {
 		wxRadioBox* rbs  = APP_PROXY::getRefPositionDlg()->GetRbStepSensitivity();
 		
-		const unsigned int sel  = rbs->GetSelection();
-		const unsigned int max  = rbs->GetCount();
-		const unsigned int next = (sel + 1) % max;
-		const StepSensitivity s = cnc::getStepSensitivityOfIndex(next);
-		const double newSpeed   = cnc::getSpeedValue(s);
+		const unsigned int sel		= rbs->GetSelection();
+		const unsigned int max		= rbs->GetCount();
+		const unsigned int next		= (sel + 1) % max;
+		const CncStepSensitivity s	= cnc::getStepSensitivityOfIndex(next);
+		const double newSpeed		= cnc::getSpeedValue(s);
 
 		rbs->SetSelection(next);
 		
@@ -165,6 +176,20 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 		rbs->SetSelection(next);
 		
 		APP_PROXY::updateSpeedSlider(newSpeed);
+	}
+	
+	 // step mode - main frame + reference dlg
+	if ( state.data.buttonStart ) { 
+		wxRadioBox* rbs  = APP_PROXY::getRefPositionDlg()->GetRbStepMode();
+		
+		const unsigned int sel		= rbs->GetSelection();
+		const unsigned int max		= rbs->GetCount();
+		const unsigned int next		= (sel + 1) % max;
+		
+		rbs->SetSelection(next);
+		
+		rbs  = APP_PROXY::GetRbStepMode();
+		rbs->SetSelection(next);
 	}
 	
 	// ref pos mode
@@ -185,7 +210,19 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncGamepadControllerState::processMovement(const GamepadEvent& state) {
+void CncGamepadControllerState::processStepwiseMovement(const GamepadEvent& state) {
+///////////////////////////////////////////////////////////////////
+	if ( state.hasMovementInformation() == false )
+		return;
+		
+	const CLD dx = state.data.dx;
+	const CLD dy = state.data.dy;
+	const CLD dz = state.data.dz;
+		
+	APP_PROXY::startStepwiseMovement(dx, dy, dz);
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::processInteractiveMovement(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 	typedef CncLinearDirection CLD;
 	const CLD dx = state.data.dx;

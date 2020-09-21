@@ -63,6 +63,13 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		registerProperty(CncApplication_AUTO_CONNECT, prop);
 		
 		//...............
+		prop = root->AppendChild( new wxBoolProperty("Auto open last template on startup", NEXT_PROP_ID, false));
+		prop->Enable(true);
+		prop->SetHelpString(_T("Restart required"));
+		prop->SetEditor( wxT("CheckBox") );
+		registerProperty(CncApplication_AUTO_OPEN_LAST, prop);
+		
+		//...............
 		prop = root->AppendChild( new wxBoolProperty("Auto process template on startup", NEXT_PROP_ID, false));
 		prop->Enable(true);
 		prop->SetHelpString(_T("Restart required"));
@@ -77,14 +84,14 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		registerProperty(CncApplication_AUTO_OPEN_OGL_OBSERVER, prop);
 
 		//...............
-		prop = root->AppendChild( new wxBoolProperty("Show test menu", NEXT_PROP_ID, true));
+		prop = root->AppendChild( new wxBoolProperty("Show Test menu", NEXT_PROP_ID, true));
 		prop->Enable(true);
 		prop->SetHelpString(_T("Restart required"));
 		prop->SetEditor( wxT("CheckBox") );
 		registerProperty(CncApplication_SHOW_TEST_MENU, prop);
 		
 		//...............
-		prop = root->AppendChild( new wxBoolProperty("Use main preview", NEXT_PROP_ID, true));
+		prop = root->AppendChild( new wxBoolProperty("Use Main preview", NEXT_PROP_ID, true));
 		prop->Enable(true);
 		prop->SetHelpString(_T("Restart required"));
 		prop->SetEditor( wxT("CheckBox") );

@@ -256,6 +256,10 @@ protected:
     wxStaticBitmap* m_staticBitmap5901;
     wxStaticText* m_cbStepSensitivityText;
     wxRadioBox* m_rbStepSensitivity;
+    wxStaticLine* m_staticLine9290;
+    wxStaticBitmap* m_staticBitmap59012;
+    wxStaticText* m_cbStepModeText;
+    wxRadioBox* m_rbStepMode;
     wxPanel* m_navigationPanelPlaceholder;
     wxStaticLine* m_staticLine5552;
     wxStaticBitmap* m_staticBitmap5907;
@@ -814,6 +818,7 @@ protected:
     virtual void moveZToMin(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToTop(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToBottom(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectStepSensitivity(wxCommandEvent& event) { event.Skip(); }
     virtual void testCaseBookChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void selectTestIntervalMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCountXSpinCtl(wxSpinEvent& event) { event.Skip(); }
@@ -1143,6 +1148,10 @@ public:
     wxStaticBitmap* GetStaticBitmap5901() { return m_staticBitmap5901; }
     wxStaticText* GetCbStepSensitivityText() { return m_cbStepSensitivityText; }
     wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
+    wxStaticLine* GetStaticLine9290() { return m_staticLine9290; }
+    wxStaticBitmap* GetStaticBitmap59012() { return m_staticBitmap59012; }
+    wxStaticText* GetCbStepModeText() { return m_cbStepModeText; }
+    wxRadioBox* GetRbStepMode() { return m_rbStepMode; }
     wxPanel* GetNavigationPanelPlaceholder() { return m_navigationPanelPlaceholder; }
     wxStaticLine* GetStaticLine5552() { return m_staticLine5552; }
     wxStaticBitmap* GetStaticBitmap5907() { return m_staticBitmap5907; }

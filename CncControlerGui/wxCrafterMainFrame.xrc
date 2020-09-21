@@ -2904,88 +2904,186 @@ Panel</label>
                                               <hgap>0</hgap>
                                               <growablecols>1</growablecols>
                                               <growablerows>0</growablerows>
-                                              <object class="sizeritem" name="flexGridSizer5206">
+                                              <object class="sizeritem" name="flexGridSizer9282">
                                                 <flag>wxALL|wxEXPAND</flag>
                                                 <option>1</option>
                                                 <object class="wxFlexGridSizer">
-                                                  <cols>1</cols>
-                                                  <rows>2</rows>
+                                                  <cols>2</cols>
+                                                  <rows>0</rows>
                                                   <vgap>0</vgap>
                                                   <hgap>0</hgap>
-                                                  <growablecols>0</growablecols>
-                                                  <growablerows>1</growablerows>
-                                                  <object class="sizeritem" name="flexGridSizer5899">
+                                                  <growablecols/>
+                                                  <growablerows/>
+                                                  <object class="sizeritem" name="flexGridSizer5206">
                                                     <flag>wxALL|wxEXPAND</flag>
-                                                    <border>3</border>
+                                                    <option>1</option>
                                                     <object class="wxFlexGridSizer">
-                                                      <cols>3</cols>
-                                                      <rows>1</rows>
+                                                      <cols>1</cols>
+                                                      <rows>5</rows>
                                                       <vgap>0</vgap>
                                                       <hgap>0</hgap>
-                                                      <growablecols/>
-                                                      <growablerows/>
-                                                      <object class="sizeritem">
-                                                        <flag>wxALL</flag>
-                                                        <border>1</border>
-                                                        <object class="wxStaticBitmap" name="m_staticBitmap5901">
-                                                          <bitmap>bitmaps/gamepad/playstation-cross-dark-icon16.png</bitmap>
+                                                      <growablecols>0</growablecols>
+                                                      <growablerows>1</growablerows>
+                                                      <object class="sizeritem" name="flexGridSizer5899">
+                                                        <flag>wxALL|wxEXPAND</flag>
+                                                        <border>3</border>
+                                                        <object class="wxFlexGridSizer">
+                                                          <cols>3</cols>
+                                                          <rows>1</rows>
+                                                          <vgap>0</vgap>
+                                                          <hgap>0</hgap>
+                                                          <growablecols/>
+                                                          <growablerows/>
+                                                          <object class="sizeritem">
+                                                            <flag>wxALL</flag>
+                                                            <border>1</border>
+                                                            <object class="wxStaticBitmap" name="m_staticBitmap5901">
+                                                              <bitmap>bitmaps/gamepad/playstation-cross-dark-icon16.png</bitmap>
+                                                              <tooltip>
+                                                                <![CDATA[Corresponding Gamepad Button]]>
+                                                              </tooltip>
+                                                            </object>
+                                                          </object>
+                                                          <object class="spacer" name="Spacer5903">
+                                                            <size>4,0</size>
+                                                            <flag>wxALL</flag>
+                                                            <option>1</option>
+                                                          </object>
+                                                          <object class="sizeritem">
+                                                            <flag>wxALL|wxEXPAND</flag>
+                                                            <object class="wxStaticText" name="m_cbStepSensitivityText">
+                                                              <label>Step Sensitivity:</label>
+                                                              <style/>
+                                                              <font>
+                                                                <size>9</size>
+                                                                <style>normal</style>
+                                                                <weight>bold</weight>
+                                                                <family>swiss</family>
+                                                                <underlined>0</underlined>
+                                                                <face>Segoe UI</face>
+                                                              </font>
+                                                            </object>
+                                                          </object>
                                                         </object>
                                                       </object>
-                                                      <object class="spacer" name="Spacer5903">
-                                                        <size>4,0</size>
+                                                      <object class="sizeritem" name="flexGridSizer5834">
                                                         <flag>wxALL</flag>
-                                                        <option>1</option>
+                                                        <border>5</border>
+                                                        <object class="wxFlexGridSizer">
+                                                          <cols>2</cols>
+                                                          <rows>0</rows>
+                                                          <vgap>0</vgap>
+                                                          <hgap>0</hgap>
+                                                          <growablecols/>
+                                                          <growablerows/>
+                                                          <object class="sizeritem">
+                                                            <flag>wxALL|wxEXPAND</flag>
+                                                            <border>1</border>
+                                                            <object class="wxRadioBox" name="m_rbStepSensitivity">
+                                                              <label/>
+                                                              <style>wxRA_SPECIFY_COLS</style>
+                                                              <font>
+                                                                <size>8</size>
+                                                                <style>normal</style>
+                                                                <weight>bold</weight>
+                                                                <family>swiss</family>
+                                                                <underlined>0</underlined>
+                                                                <face>Segoe UI</face>
+                                                              </font>
+                                                              <dimension>1</dimension>
+                                                              <selection>1</selection>
+                                                              <content>
+                                                                <item>Finest:</item>
+                                                                <item>Fine:</item>
+                                                                <item>Medium:</item>
+                                                                <item>Rough:</item>
+                                                                <item>Roughest:</item>
+                                                              </content>
+                                                            </object>
+                                                          </object>
+                                                        </object>
                                                       </object>
                                                       <object class="sizeritem">
                                                         <flag>wxALL|wxEXPAND</flag>
-                                                        <object class="wxStaticText" name="m_cbStepSensitivityText">
-                                                          <label>Step Sensitivity:</label>
-                                                          <style/>
-                                                          <font>
-                                                            <size>9</size>
-                                                            <style>normal</style>
-                                                            <weight>bold</weight>
-                                                            <family>swiss</family>
-                                                            <underlined>0</underlined>
-                                                            <face>Segoe UI</face>
-                                                          </font>
+                                                        <border>5</border>
+                                                        <object class="wxStaticLine" name="m_staticLine9290">
+                                                          <style>wxLI_HORIZONTAL</style>
                                                         </object>
                                                       </object>
-                                                    </object>
-                                                  </object>
-                                                  <object class="sizeritem" name="flexGridSizer5834">
-                                                    <flag>wxALL</flag>
-                                                    <border>5</border>
-                                                    <object class="wxFlexGridSizer">
-                                                      <cols>2</cols>
-                                                      <rows>0</rows>
-                                                      <vgap>0</vgap>
-                                                      <hgap>0</hgap>
-                                                      <growablecols/>
-                                                      <growablerows/>
-                                                      <object class="sizeritem">
+                                                      <object class="sizeritem" name="flexGridSizer58991">
                                                         <flag>wxALL|wxEXPAND</flag>
-                                                        <border>1</border>
-                                                        <object class="wxRadioBox" name="m_rbStepSensitivity">
-                                                          <label/>
-                                                          <style>wxRA_SPECIFY_COLS</style>
-                                                          <font>
-                                                            <size>8</size>
-                                                            <style>normal</style>
-                                                            <weight>bold</weight>
-                                                            <family>swiss</family>
-                                                            <underlined>0</underlined>
-                                                            <face>Segoe UI</face>
-                                                          </font>
-                                                          <dimension>1</dimension>
-                                                          <selection>1</selection>
-                                                          <content>
-                                                            <item>Finest:</item>
-                                                            <item>Fine:</item>
-                                                            <item>Medium:</item>
-                                                            <item>Rough:</item>
-                                                            <item>Roughest:</item>
-                                                          </content>
+                                                        <border>3</border>
+                                                        <object class="wxFlexGridSizer">
+                                                          <cols>3</cols>
+                                                          <rows>1</rows>
+                                                          <vgap>0</vgap>
+                                                          <hgap>0</hgap>
+                                                          <growablecols/>
+                                                          <growablerows/>
+                                                          <object class="sizeritem">
+                                                            <flag>wxALL</flag>
+                                                            <border>1</border>
+                                                            <object class="wxStaticBitmap" name="m_staticBitmap59012">
+                                                              <bitmap>bitmaps/gamepad/options16.png</bitmap>
+                                                              <tooltip>
+                                                                <![CDATA[Gamepad 'Option' Button]]>
+                                                              </tooltip>
+                                                            </object>
+                                                          </object>
+                                                          <object class="spacer" name="Spacer59033">
+                                                            <size>4,0</size>
+                                                            <flag>wxALL</flag>
+                                                            <option>1</option>
+                                                          </object>
+                                                          <object class="sizeritem">
+                                                            <flag>wxALL|wxEXPAND</flag>
+                                                            <object class="wxStaticText" name="m_cbStepModeText">
+                                                              <label>Step Mode:</label>
+                                                              <style/>
+                                                              <font>
+                                                                <size>9</size>
+                                                                <style>normal</style>
+                                                                <weight>bold</weight>
+                                                                <family>swiss</family>
+                                                                <underlined>0</underlined>
+                                                                <face>Segoe UI</face>
+                                                              </font>
+                                                            </object>
+                                                          </object>
+                                                        </object>
+                                                      </object>
+                                                      <object class="sizeritem" name="flexGridSizer58345">
+                                                        <flag>wxALL</flag>
+                                                        <border>5</border>
+                                                        <object class="wxFlexGridSizer">
+                                                          <cols>2</cols>
+                                                          <rows>0</rows>
+                                                          <vgap>0</vgap>
+                                                          <hgap>0</hgap>
+                                                          <growablecols/>
+                                                          <growablerows/>
+                                                          <object class="sizeritem">
+                                                            <flag>wxALL|wxEXPAND</flag>
+                                                            <border>1</border>
+                                                            <object class="wxRadioBox" name="m_rbStepMode">
+                                                              <label/>
+                                                              <style>wxRA_SPECIFY_COLS</style>
+                                                              <font>
+                                                                <size>8</size>
+                                                                <style>normal</style>
+                                                                <weight>bold</weight>
+                                                                <family>swiss</family>
+                                                                <underlined>0</underlined>
+                                                                <face>Segoe UI</face>
+                                                              </font>
+                                                              <dimension>1</dimension>
+                                                              <selection>0</selection>
+                                                              <content>
+                                                                <item>Interactive:</item>
+                                                                <item>Stepwise:</item>
+                                                              </content>
+                                                            </object>
+                                                          </object>
                                                         </object>
                                                       </object>
                                                     </object>
@@ -3037,6 +3135,9 @@ Panel</label>
                                                 <border>1</border>
                                                 <object class="wxStaticBitmap" name="m_staticBitmap5907">
                                                   <bitmap>bitmaps/gamepad/playstation-square-dark-icon16.png</bitmap>
+                                                  <tooltip>
+                                                    <![CDATA[Corresponding Gamepad Button]]>
+                                                  </tooltip>
                                                 </object>
                                               </object>
                                               <object class="spacer" name="Spacer5911">
@@ -9362,6 +9463,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miOpenTemplate">
           <label>Open Template</label>
@@ -9369,6 +9473,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miReloadTemplate">
           <label>Reload Template</label>
@@ -9376,6 +9483,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miSaveTemplate">
           <label>Save Template</label>
@@ -9383,6 +9493,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miSaveTemplateAs">
           <label>Save Template as</label>
@@ -9390,6 +9503,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miSaveEmuOutput">
           <label>Save current outbound as new Template</label>
@@ -9397,6 +9513,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miExit">
@@ -9405,6 +9524,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
       </object>
       <object class="wxMenu" name="m_menuView">
@@ -9416,6 +9538,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewStatusbar">
           <checkable>1</checkable>
@@ -9423,6 +9548,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewTemplateManager">
           <checkable>1</checkable>
@@ -9430,6 +9558,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewMainView">
           <checkable>1</checkable>
@@ -9437,6 +9568,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewMonitor">
           <checkable>1</checkable>
@@ -9444,6 +9578,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewPosMonitor">
           <checkable>1</checkable>
@@ -9451,6 +9588,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewDebugger">
           <checkable>1</checkable>
@@ -9458,6 +9598,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewSpy">
           <checkable>1</checkable>
@@ -9465,6 +9608,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewLogger">
           <checkable>1</checkable>
@@ -9472,6 +9618,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miViewUnitCalculator">
           <checkable>1</checkable>
@@ -9479,6 +9628,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miOpenGLContextObserver">
@@ -9487,6 +9639,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miViewAll">
@@ -9495,6 +9650,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miHideAll">
           <label>Hide all Panes</label>
@@ -9502,6 +9660,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
       </object>
       <object class="wxMenu" name="m_menuPerspective">
@@ -9513,6 +9674,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miPerspectiveRun">
           <label>Perspective - 'Run'</label>
@@ -9520,6 +9684,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miPerspectiveDebug">
           <label>Perspective - 'Debug'</label>
@@ -9527,6 +9694,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miPerspectiveSource">
           <label>Perspective - 'Source'</label>
@@ -9534,6 +9704,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuSavePerspectiveDefault">
@@ -9542,6 +9715,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuSavePerspectiveRun">
           <label>Save Perspective as 'Run'</label>
@@ -9549,6 +9725,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuSavePerspectiveDebug">
           <label>Save Perspective as 'Debug'</label>
@@ -9556,6 +9735,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuSavePerspectiveSource">
           <label>Save Perspective as 'Source'</label>
@@ -9563,6 +9745,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuAddUserPerspective">
@@ -9571,6 +9756,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuRenameUserPerspective">
           <label>Rename User Perspective</label>
@@ -9578,6 +9766,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuRemoveUserPerspective">
           <label>Remove User Perspective</label>
@@ -9585,6 +9776,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
       </object>
       <object class="wxMenu" name="m_menuMonitoring">
@@ -9597,6 +9791,9 @@ State</label>
             <![CDATA[]]>
           </accel>
           <checked>1</checked>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuItemUpdDraw">
           <checkable>1</checkable>
@@ -9605,6 +9802,9 @@ State</label>
             <![CDATA[]]>
           </accel>
           <checked>1</checked>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuItemAllowEvents">
           <checkable>1</checkable>
@@ -9613,6 +9813,9 @@ State</label>
             <![CDATA[]]>
           </accel>
           <checked>1</checked>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuItemDisplayParserDetails">
           <checkable>1</checkable>
@@ -9621,6 +9824,9 @@ State</label>
             <![CDATA[]]>
           </accel>
           <checked>1</checked>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuItemDebugSerial">
@@ -9629,6 +9835,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuItemFreezeLogger">
           <checkable>1</checkable>
@@ -9637,6 +9846,9 @@ State</label>
             <![CDATA[]]>
           </accel>
           <checked>1</checked>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuItemMinMonitoring">
@@ -9645,6 +9857,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_menuItemNormalMonitoring">
           <label>Setup Standard Monitoring</label>
@@ -9652,6 +9867,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
       </object>
       <object class="wxMenu" name="m_menuRequestor">
@@ -9664,6 +9882,9 @@ State</label>
             <![CDATA[]]>
           </accel>
           <checked>1</checked>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtTimestamp">
@@ -9672,6 +9893,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[fdf]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miRqtVersion">
           <label>Firmware Version</label>
@@ -9679,6 +9903,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miRqtHeartbeat">
           <label>Heartbeat</label>
@@ -9686,6 +9913,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miRqtConfig">
           <label>Current Config</label>
@@ -9693,6 +9923,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miRqtPins">
           <label>Pin Report</label>
@@ -9700,6 +9933,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miMotorEnableState">
@@ -9708,6 +9944,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miPerformToolTest">
           <label>Perform a Tool Test</label>
@@ -9715,6 +9954,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miResolveLimitState">
           <label>Resolve Limit States</label>
@@ -9722,6 +9964,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtCurPos">
@@ -9730,6 +9975,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miRqtLimit">
           <label>Current Limit State</label>
@@ -9737,6 +9985,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtReset">
@@ -9745,6 +9996,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtSendInterrupt">
@@ -9753,6 +10007,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[wewe]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtWarmstart">
@@ -9761,6 +10018,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
       </object>
       <object class="wxMenu" name="m_menuTools">
@@ -9772,6 +10032,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miExternalEditor">
           <label>External Editor</label>
@@ -9779,6 +10042,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miCalculator">
           <label>Calculator</label>
@@ -9786,6 +10052,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miPyCam">
           <label>PyCAM</label>
@@ -9793,6 +10062,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miSpeedPlayground">
@@ -9801,6 +10073,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
       </object>
       <object class="wxMenu" name="m_menuTest">
@@ -9812,6 +10087,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miLoopRepeatTest">
@@ -9820,6 +10098,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miTest1">
@@ -9828,6 +10109,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miTest2">
           <label>Test Function 2</label>
@@ -9835,6 +10119,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miTest3">
           <label>Test Function 3</label>
@@ -9842,6 +10129,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miTest4">
           <label>Test Function 4</label>
@@ -9849,6 +10139,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
       </object>
       <object class="wxMenu" name="m_menuAbout">
@@ -9860,6 +10153,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miOpenSessionDlg">
           <label>Open Session Directory</label>
@@ -9867,6 +10163,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="wxMenuItem" name="m_miShowStacktraceFile">
           <label>Show Stacktrace Store</label>
@@ -9874,6 +10173,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miShowAppEnv">
@@ -9882,6 +10184,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miAbout">
@@ -9890,6 +10195,9 @@ State</label>
           <accel>
             <![CDATA[]]>
           </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
         </object>
       </object>
     </object>

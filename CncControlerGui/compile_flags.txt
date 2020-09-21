@@ -17,5 +17,6 @@
 -DBOOST_STACKTRACE_USE_BACKTRACE
 -DHAVE_W32API_H
 -D_UNICODE
+-std=c++14
 -target
 x86_64-pc-windows-gnu

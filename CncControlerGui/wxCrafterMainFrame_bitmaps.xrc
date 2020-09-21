@@ -151,6 +151,7 @@
   <object class="wxBitmap" name="network-wireless-low (2)">bitmaps\network-wireless-low (2).png</object>
   <object class="wxBitmap" name="office-chart-polar">bitmaps\office-chart-polar.png</object>
   <object class="wxBitmap" name="office-chart-ring">bitmaps\office-chart-ring.png</object>
+  <object class="wxBitmap" name="options16">bitmaps\gamepad\options16.png</object>
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
   <object class="wxBitmap" name="pencil-add">bitmaps\pencil-add.png</object>

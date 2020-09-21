@@ -223,7 +223,7 @@ void CncFileNameService::deleteFile(wxString fn) {
 		wxRemoveFile(fn);
 }
 ///////////////////////////////////////////////////////////////////
-const char* CncFileNameService::getTempFileName(TemplateFormat f) {
+const char* CncFileNameService::getTempFileName(CncTemplateFormat f) {
 ///////////////////////////////////////////////////////////////////
 	
 	switch ( f ) {
@@ -240,7 +240,7 @@ const char* CncFileNameService::getTempFileName(TemplateFormat f) {
 	return _ret;
 }
 ///////////////////////////////////////////////////////////////////
-const char* CncFileNameService::getCncTemplatePreviewFileName(TemplateFormat f) { 
+const char* CncFileNameService::getCncTemplatePreviewFileName(CncTemplateFormat f) { 
 ///////////////////////////////////////////////////////////////////
 	return "";
 }

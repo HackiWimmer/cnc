@@ -14,15 +14,18 @@ class CncGamepadControllerSpy : public CncGamepadControllerSpyBase {
 		void update(const GamepadEvent& state);
 		
 	protected:
-    virtual void dclickLeftStick(wxMouseEvent& event);
-    virtual void dclickNaviXY(wxMouseEvent& event);
-    virtual void dclickNaviZ(wxMouseEvent& event);
-    virtual void dclickRightStick(wxMouseEvent& event);
-    virtual void selectSensitivity(wxCommandEvent& event);
+		virtual void dclickLeftStick(wxMouseEvent& event);
+		virtual void dclickNaviXY(wxMouseEvent& event);
+		virtual void dclickNaviZ(wxMouseEvent& event);
+		virtual void dclickRightStick(wxMouseEvent& event);
+		virtual void selectSensitivity(wxCommandEvent& event);
 		virtual void onContinuesTimer(wxTimerEvent& event);
 		
 	private:
-		CncMilliTimestamp tsLastUpdate;
+		CncMilliTimestamp	tsLastUpdate;
+		CncStepMode			lastStepMode;
+		
+		void decorateStepMode();
 };
 
 #endif // CNCGAMEPADCONTROLLERSPY_H

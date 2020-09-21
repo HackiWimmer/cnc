@@ -161,8 +161,10 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void clickAdditionalParameters(wxCommandEvent& event);
-    virtual void onDeactivateSecureRunMode(wxCommandEvent& event);
+		virtual void onSelectStepSensitivity(wxCommandEvent& event);
+		virtual void onSelectStepMode(wxCommandEvent& event);
+		virtual void clickAdditionalParameters(wxCommandEvent& event);
+		virtual void onDeactivateSecureRunMode(wxCommandEvent& event);
 		virtual void requestResolveLimitStates(wxCommandEvent& event);
 		virtual void requestToolTest(wxCommandEvent& event);
 		virtual void onEvaluateHardwareXYPlane(wxCommandEvent& event);
@@ -545,6 +547,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
 		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ return parsingSynopisis; }
 		
+		bool startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z);
 		bool startInteractiveMove(CncInteractiveMoveDriver imd);
 		bool updateInteractiveMove();
 		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
@@ -721,10 +724,10 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool openFileExtern(const wxString& tool, const char* file);
 		bool openFileExtern(const wxString& tool, wxString& file);
 		
-		TemplateFormat getTemplateFormat(const wxString& fn);
+		CncTemplateFormat getTemplateFormat(const wxString& fn);
 		const char* getTemplateFormatName(const wxString& fn);
 
-		TemplateFormat getCurrentTemplateFormat();
+		CncTemplateFormat getCurrentTemplateFormat();
 		const char* getCurrentTemplateFormatName();
 		const wxString& getCurrentTemplateFileName();
 		const wxString& getCurrentTemplatePathFileName();
@@ -851,7 +854,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void selectEditorToolBox(bool fileLoaded);
 		void fillFileDetails(bool fileLoaded, const char* extFileName = NULL);
 		void prepareNewTemplateFile();
-		void decorateExtTemplatePages(TemplateFormat tf);
+		void decorateExtTemplatePages(CncTemplateFormat tf);
 		void prepareAndShowMonitorTemplatePreview(bool force=false);
 		
 		void registerMenuItem(wxMenuItem* item);

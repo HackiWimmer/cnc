@@ -68,6 +68,7 @@
 	#define CncApplication_SHOW_SPLASH_SCREEN 				"CncApplication/SHOW_SPLASH_SCREEN"
 	#define CncApplication_DEF_DISPLAY_UNIT 				"CncApplication/DEF_DISPLAY_UNIT"
 	#define CncApplication_AUTO_CONNECT 					"CncApplication/AUTO_CONNECT"
+	#define CncApplication_AUTO_OPEN_LAST 					"CncApplication/AUTO_OPEN_LAST"
 	#define CncApplication_AUTO_PROCESS 					"CncApplication/AUTO_PROCESS"
 	#define CncApplication_AUTO_OPEN_OGL_OBSERVER			"CncApplication/AUTO_OPEN_OGL_OBSERVER"
 	#define CncApplication_SHOW_TEST_MENU 					"CncApplication/SHOW_TEST_MENU"

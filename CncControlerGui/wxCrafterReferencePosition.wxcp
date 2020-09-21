@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 117,
+  "m_objCounter": 122,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC127EInitBitmapResources",
   "m_bitmapsFile": "wxCrafterReferencePosition_bitmaps.cpp",
@@ -470,7 +470,7 @@
                 }, {
                  "type": "string",
                  "m_label": "# Rows:",
-                 "m_value": "4"
+                 "m_value": "5"
                 }, {
                  "type": "string",
                  "m_label": "Growable columns:",
@@ -579,7 +579,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Name:",
-                   "m_value": "m_staticText5355"
+                   "m_value": "m_staticText53555"
                   }, {
                    "type": "multi-string",
                    "m_label": "Tooltip:",
@@ -646,7 +646,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Name:",
-                   "m_value": "flexGridSizer5353"
+                   "m_value": "flexGridSizer53531"
                   }, {
                    "type": "string",
                    "m_label": "Style:",
@@ -700,11 +700,11 @@
                     }, {
                      "type": "string",
                      "m_label": "Name:",
-                     "m_value": "m_staticBitmap5844"
+                     "m_value": "m_staticBitmap58442"
                     }, {
                      "type": "multi-string",
                      "m_label": "Tooltip:",
-                     "m_value": ""
+                     "m_value": "Corresponding Gamepad Button"
                     }, {
                      "type": "colour",
                      "m_label": "Bg Colour:",
@@ -744,7 +744,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "bitmaps/gamepad/playstation-cross-dark-icon24.png"
+                     "m_path": "bitmaps/gamepad/playstation-cross-dark-icon16.png"
                     }],
                    "m_events": [],
                    "m_children": []
@@ -849,7 +849,7 @@
                    "m_properties": [{
                      "type": "string",
                      "m_label": "Name:",
-                     "m_value": "Spacer5842"
+                     "m_value": "Spacer58424"
                     }, {
                      "type": "string",
                      "m_label": "Size:",
@@ -859,8 +859,83 @@
                    "m_children": []
                   }]
                 }, {
-                 "m_type": 4454,
-                 "proportion": 1,
+                 "m_type": 4405,
+                 "proportion": 0,
+                 "border": 5,
+                 "gbSpan": "1,1",
+                 "gbPosition": "0,0",
+                 "m_styles": [],
+                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                 "m_properties": [{
+                   "type": "winid",
+                   "m_label": "ID:",
+                   "m_winid": "wxID_ANY"
+                  }, {
+                   "type": "string",
+                   "m_label": "Size:",
+                   "m_value": "-1,-1"
+                  }, {
+                   "type": "string",
+                   "m_label": "Minimum Size:",
+                   "m_value": "-1,-1"
+                  }, {
+                   "type": "string",
+                   "m_label": "Name:",
+                   "m_value": "m_staticText5355"
+                  }, {
+                   "type": "multi-string",
+                   "m_label": "Tooltip:",
+                   "m_value": ""
+                  }, {
+                   "type": "colour",
+                   "m_label": "Bg Colour:",
+                   "colour": "<Default>"
+                  }, {
+                   "type": "colour",
+                   "m_label": "Fg Colour:",
+                   "colour": "(0,0,128)"
+                  }, {
+                   "type": "font",
+                   "m_label": "Font:",
+                   "m_value": "8,normal, bold, swiss, 0, Segoe UI"
+                  }, {
+                   "type": "bool",
+                   "m_label": "Hidden",
+                   "m_value": false
+                  }, {
+                   "type": "bool",
+                   "m_label": "Disabled",
+                   "m_value": false
+                  }, {
+                   "type": "bool",
+                   "m_label": "Focused",
+                   "m_value": false
+                  }, {
+                   "type": "string",
+                   "m_label": "Class Name:",
+                   "m_value": ""
+                  }, {
+                   "type": "string",
+                   "m_label": "Include File:",
+                   "m_value": ""
+                  }, {
+                   "type": "string",
+                   "m_label": "Style:",
+                   "m_value": ""
+                  }, {
+                   "type": "multi-string",
+                   "m_label": "Label:",
+                   "m_value": "Step Mode:"
+                  }, {
+                   "type": "string",
+                   "m_label": "Wrap:",
+                   "m_value": "-1"
+                  }],
+                 "m_events": [],
+                 "m_children": []
+                }, {
+                 "m_type": 4403,
+                 "proportion": 0,
                  "border": 2,
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
@@ -868,15 +943,223 @@
                  "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
                  "m_properties": [{
                    "type": "string",
-                   "m_label": "Name:",
-                   "m_value": "Spacer5359"
+                   "m_label": "Minimum Size:",
+                   "m_value": "-1,-1"
                   }, {
                    "type": "string",
-                   "m_label": "Size:",
-                   "m_value": "0,46"
+                   "m_label": "Name:",
+                   "m_value": "flexGridSizer5353"
+                  }, {
+                   "type": "string",
+                   "m_label": "Style:",
+                   "m_value": ""
+                  }, {
+                   "type": "string",
+                   "m_label": "# Columns:",
+                   "m_value": "3"
+                  }, {
+                   "type": "string",
+                   "m_label": "# Rows:",
+                   "m_value": "0"
+                  }, {
+                   "type": "string",
+                   "m_label": "Growable columns:",
+                   "m_value": ""
+                  }, {
+                   "type": "string",
+                   "m_label": "Growable rows:",
+                   "m_value": ""
+                  }, {
+                   "type": "string",
+                   "m_label": "Horizontal gap:",
+                   "m_value": "0"
+                  }, {
+                   "type": "string",
+                   "m_label": "Vertical gap:",
+                   "m_value": "0"
                   }],
                  "m_events": [],
-                 "m_children": []
+                 "m_children": [{
+                   "m_type": 4409,
+                   "proportion": 0,
+                   "border": 2,
+                   "gbSpan": "1,1",
+                   "gbPosition": "0,0",
+                   "m_styles": [],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                   "m_properties": [{
+                     "type": "winid",
+                     "m_label": "ID:",
+                     "m_winid": "wxID_ANY"
+                    }, {
+                     "type": "string",
+                     "m_label": "Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Minimum Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Name:",
+                     "m_value": "m_staticBitmap5844"
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Tooltip:",
+                     "m_value": "Gamepad Option Button"
+                    }, {
+                     "type": "colour",
+                     "m_label": "Bg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "colour",
+                     "m_label": "Fg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "font",
+                     "m_label": "Font:",
+                     "m_value": ""
+                    }, {
+                     "type": "bool",
+                     "m_label": "Hidden",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Disabled",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Focused",
+                     "m_value": false
+                    }, {
+                     "type": "string",
+                     "m_label": "Class Name:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Include File:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Style:",
+                     "m_value": ""
+                    }, {
+                     "type": "bitmapPicker",
+                     "m_label": "Bitmap File:",
+                     "m_path": "bitmaps/gamepad/options16.png"
+                    }],
+                   "m_events": [],
+                   "m_children": []
+                  }, {
+                   "m_type": 4416,
+                   "proportion": 0,
+                   "border": 1,
+                   "gbSpan": "1,1",
+                   "gbPosition": "0,0",
+                   "m_styles": ["wxRA_SPECIFY_COLS"],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+                   "m_properties": [{
+                     "type": "winid",
+                     "m_label": "ID:",
+                     "m_winid": "wxID_ANY"
+                    }, {
+                     "type": "string",
+                     "m_label": "Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Minimum Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Name:",
+                     "m_value": "m_rbStepMode"
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Tooltip:",
+                     "m_value": ""
+                    }, {
+                     "type": "colour",
+                     "m_label": "Bg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "colour",
+                     "m_label": "Fg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "font",
+                     "m_label": "Font:",
+                     "m_value": "8,normal, bold, swiss, 0, Segoe UI"
+                    }, {
+                     "type": "bool",
+                     "m_label": "Hidden",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Disabled",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Focused",
+                     "m_value": false
+                    }, {
+                     "type": "string",
+                     "m_label": "Class Name:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Include File:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Style:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Label:",
+                     "m_value": ""
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Choices:",
+                     "m_value": "Interactive:;Stepwise:"
+                    }, {
+                     "type": "string",
+                     "m_label": "Selection:",
+                     "m_value": "0"
+                    }, {
+                     "type": "string",
+                     "m_label": "Major Dimension:",
+                     "m_value": "1"
+                    }],
+                   "m_events": [{
+                     "m_eventName": "wxEVT_COMMAND_RADIOBOX_SELECTED",
+                     "m_eventClass": "wxCommandEvent",
+                     "m_eventHandler": "wxCommandEventHandler",
+                     "m_functionNameAndSignature": "selectStepMode(wxCommandEvent& event)",
+                     "m_description": "Process a wxEVT_COMMAND_RADIOBOX_SELECTED event, when a radiobutton is clicked.",
+                     "m_noBody": false
+                    }],
+                   "m_children": []
+                  }, {
+                   "m_type": 4454,
+                   "proportion": 1,
+                   "border": 0,
+                   "gbSpan": "1,1",
+                   "gbPosition": "0,0",
+                   "m_styles": [],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                   "m_properties": [{
+                     "type": "string",
+                     "m_label": "Name:",
+                     "m_value": "Spacer5842"
+                    }, {
+                     "type": "string",
+                     "m_label": "Size:",
+                     "m_value": "10,0"
+                    }],
+                   "m_events": [],
+                   "m_children": []
+                  }]
                 }]
               }]
             }]
@@ -1200,7 +1483,7 @@
               }, {
                "type": "multi-string",
                "m_label": "Tooltip:",
-               "m_value": ""
+               "m_value": "Corresponding Gamepad Button"
               }, {
                "type": "colour",
                "m_label": "Bg Colour:",
@@ -1240,7 +1523,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/gamepad/playstation-circle-dark-icon24.png"
+               "m_path": "bitmaps/gamepad/playstation-circle-dark-icon16.png"
               }],
              "m_events": [],
              "m_children": []

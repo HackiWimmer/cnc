@@ -23,6 +23,7 @@ class CncReferencePosition : public CncReferencePositionBase
 		bool shouldZeroZ() 	{ return m_btZeroZ->GetValue(); }
 	
 	protected:
+    virtual void selectStepMode(wxCommandEvent& event);
 		virtual void onInfoTimer(wxTimerEvent& event);
 		virtual void selectInformation(wxMouseEvent& event);
 		virtual void selectStepSensitivity(wxCommandEvent& event);

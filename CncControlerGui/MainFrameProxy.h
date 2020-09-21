@@ -39,6 +39,8 @@ class MainFrameProxy {
 		static void tryToSelectClientId(long clientId, ClientIdSelSource::ID tss);
 		static void tryToSelectClientIds(long firstClientId, long lastClientId, ClientIdSelSource::ID tss);
 
+		static void postEvent(wxEvent* evt);
+		
 		static void dispatchAll();
 		static void dispatchNext();
 		static void waitActive(unsigned int millis);
@@ -53,6 +55,7 @@ class MainFrameProxy {
 		static void parsingSynopsisTraceAddWarning(const wxString& entry);
 		static void parsingSynopsisTraceAddError(const wxString& entry);
 
+		static bool startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z);
 		static bool startInteractiveMove(CncInteractiveMoveDriver imd);
 		static bool updateInteractiveMove();
 		static bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
@@ -95,6 +98,7 @@ class MainFrameProxy {
 		static wxDataViewListCtrl* 		GetDvListCtrlSvgUAUseDirective();
 
 		static wxRadioBox* 				GetRbStepSensitivity();
+		static wxRadioBox* 				GetRbStepMode();
 		
 		static wxSimplebook* 			GetMainViewBook();
 		static wxCheckBox* 				GetKeepFileManagerPreview();

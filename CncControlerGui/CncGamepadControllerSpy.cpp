@@ -7,8 +7,10 @@
 CncGamepadControllerSpy::CncGamepadControllerSpy(wxWindow* parent)
 : CncGamepadControllerSpyBase(parent)
 , tsLastUpdate(0)
+, lastStepMode(SM_INTERACTIVE)
 ///////////////////////////////////////////////////////////////////
 {
+	decorateStepMode();
 }
 ///////////////////////////////////////////////////////////////////
 CncGamepadControllerSpy::~CncGamepadControllerSpy() {
@@ -19,6 +21,15 @@ void CncGamepadControllerSpy::onContinuesTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( CncTimeFunctions::getMilliTimestamp() - tsLastUpdate > 6000 )
 		Show(false);
+}
+//////////////////////////////////////////////////////////////////
+void CncGamepadControllerSpy::decorateStepMode() {
+//////////////////////////////////////////////////////////////////
+	static wxBitmap dBmp[] = {	ImageLibGamepadStepMode().Bitmap("BMP_INTERACTIVE"), 
+								ImageLibGamepadStepMode().Bitmap("BMP_STEPWISE")
+	};
+	
+	m_gpBmpStepMode->SetBitmap(dBmp[lastStepMode]);
 }
 //////////////////////////////////////////////////////////////////
 void CncGamepadControllerSpy::update(const GamepadEvent& state) {
@@ -32,14 +43,14 @@ void CncGamepadControllerSpy::update(const GamepadEvent& state) {
 	tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
 
 	// Position mode state
-	static wxBitmap aBmpNaviXY     = ImageLibGamepadSpy().Bitmap("BMP_NAVI_XY");
-	static wxBitmap aBmpNaviZ      = ImageLibGamepadSpy().Bitmap("BMP_NAVI_Z");
-	static wxBitmap aBmpStickLeft  = ImageLibGamepadSpy().Bitmap("BMP_STICK_LEFT");
-	static wxBitmap aBmpStickRight = ImageLibGamepadSpy().Bitmap("BMP_STICK_RIGHT");
-	static wxBitmap dBmpNaviXY     = ImageLibGamepadSpy().Bitmap("BMP_NAVI_XY").ConvertToDisabled();
-	static wxBitmap dBmpNaviZ      = ImageLibGamepadSpy().Bitmap("BMP_NAVI_Z").ConvertToDisabled();
-	static wxBitmap dBmpStickLeft  = ImageLibGamepadSpy().Bitmap("BMP_STICK_LEFT").ConvertToDisabled();
-	static wxBitmap dBmpStickRight = ImageLibGamepadSpy().Bitmap("BMP_STICK_RIGHT").ConvertToDisabled();
+	static wxBitmap aBmpNaviXY      = ImageLibGamepadSpy().Bitmap("BMP_NAVI_XY");
+	static wxBitmap aBmpNaviZ       = ImageLibGamepadSpy().Bitmap("BMP_NAVI_Z");
+	static wxBitmap aBmpStickLeft   = ImageLibGamepadSpy().Bitmap("BMP_STICK_LEFT");
+	static wxBitmap aBmpStickRight  = ImageLibGamepadSpy().Bitmap("BMP_STICK_RIGHT");
+	static wxBitmap dBmpNaviXY      = ImageLibGamepadSpy().Bitmap("BMP_NAVI_XY").ConvertToDisabled();
+	static wxBitmap dBmpNaviZ       = ImageLibGamepadSpy().Bitmap("BMP_NAVI_Z").ConvertToDisabled();
+	static wxBitmap dBmpStickLeft   = ImageLibGamepadSpy().Bitmap("BMP_STICK_LEFT").ConvertToDisabled();
+	static wxBitmap dBmpStickRight  = ImageLibGamepadSpy().Bitmap("BMP_STICK_RIGHT").ConvertToDisabled();
 	
 	switch ( state.data.posCtrlMode ) {
 		case GamepadEvent::PCM_STICKS:
@@ -70,15 +81,22 @@ void CncGamepadControllerSpy::update(const GamepadEvent& state) {
 			GetGpBmp4()->SetBitmap(dBmpStickRight);
 	}
 	
-	// Sensitivity
+	// Step Sensitivity
 	if ( state.data.buttonA == true ) {
 		
 		unsigned int sel = m_chStepsSensitivity->GetSelection();
 		unsigned int cnt = m_chStepsSensitivity->GetCount();
 		
-		// select it at the ref pos dlg
 		if ( sel + 1 >= cnt ) 	m_chStepsSensitivity->SetSelection(0);
 		else					m_chStepsSensitivity->SetSelection(sel +1);
+	}
+	
+	// Step Mode
+	if ( state.data.buttonStart == true ) {
+		if ( lastStepMode == SM_STEPWISE )	lastStepMode = SM_INTERACTIVE;
+		else								lastStepMode = SM_STEPWISE;
+		
+		decorateStepMode();
 	}
 	
 	// Position Management
@@ -112,8 +130,6 @@ void CncGamepadControllerSpy::update(const GamepadEvent& state) {
 //////////////////////////////////////////////////////////////////
 void CncGamepadControllerSpy::selectSensitivity(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
-	if ( APP_PROXY::isAppPointerAvailable() == true )
-		APP_PROXY::GetRbStepSensitivity()->SetSelection(m_chStepsSensitivity->GetSelection());
 }
 //////////////////////////////////////////////////////////////////
 void CncGamepadControllerSpy::dclickLeftStick(wxMouseEvent& event) {

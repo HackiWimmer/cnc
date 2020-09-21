@@ -47,9 +47,10 @@ enum CncSpeedMode				{ CncSpeedWork = 0, CncSpeedRapid = 1, CncSpeedMax = 2, Cnc
 enum CncPortType 				{ CncPORT, CncPORT_EMU_ARDUINO, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
 enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
 enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
-enum StepSensitivity 			{ FINEST = 1, FINE = 20 , MEDIUM = 50, ROUGH = 80, ROUGHEST = 100 };
+enum CncStepSensitivity 		{ FINEST = 1, FINE = 20 , MEDIUM = 50, ROUGH = 80, ROUGHEST = 100 };
+enum CncStepMode		 		{ SM_INTERACTIVE = 0, SM_STEPWISE = 1 };
 enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4 };
-enum TemplateFormat 			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
+enum CncTemplateFormat 			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
 enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
 enum CncRefPositionMode 		{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6 };
 
@@ -104,16 +105,16 @@ namespace cnc {
 	const wxString& dblFormat2(const double d1, const double d2, const wxString& delimiter = _T(","));
 	const wxString& dblFormat3(const double d1, const double d2, const double d3, const wxString& delimiter = _T(","));
 	
-	const TemplateFormat getTemplateFormatFromFileName(const char* fileName);
-	const TemplateFormat getTemplateFormatFromExtention(const char* extention);
-	const char* getTemplateFormatAsString(const TemplateFormat tf);
-	const char* getExtention(const TemplateFormat tf);
+	const CncTemplateFormat getTemplateFormatFromFileName(const char* fileName);
+	const CncTemplateFormat getTemplateFormatFromExtention(const char* extention);
+	const char* getTemplateFormatAsString(const CncTemplateFormat tf);
+	const char* getExtention(const CncTemplateFormat tf);
 	
 	void traceSetterValueList(std::ostream& s, const SetterValueList& values, int32_t factor = 1);
 	void traceLineNumberTranslater(std::ostream& s, const LineNumberTranslater& lnt);
 	
-	StepSensitivity getStepSensitivityOfIndex(unsigned int index);
-	float getSpeedValue(StepSensitivity s);
+	CncStepSensitivity getStepSensitivityOfIndex(unsigned int index);
+	float getSpeedValue(CncStepSensitivity s);
 };
 
 namespace ClientIdSelSource {

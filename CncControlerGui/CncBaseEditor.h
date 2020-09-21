@@ -31,7 +31,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		struct FileInfo {
 			
 			// common variables
-			TemplateFormat				format;
+			CncTemplateFormat				format;
 			wxFileName					fileName;
 			GLContextBase::ModelType 	modelType;
 			cnc::LineNumberTranslater	lineNumberTranslater;
@@ -39,7 +39,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 			
 			// binary format specials
 			BinaryFileParser::ViewType 	binaryViewType;
-			TemplateFormat				binaryOrigFomat;
+			CncTemplateFormat				binaryOrigFomat;
 			
 			FileInfo() { reset(); }
 			
@@ -70,7 +70,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		bool selectLineNumber(unsigned long ln, const char* searchKey = NULL);
 		bool selectLineNumbers(unsigned long firstLine, unsigned long lastLine);
 		
-		void prepareNewTemplateFile(TemplateFormat tf);
+		void prepareNewTemplateFile(CncTemplateFormat tf);
 		bool openFile(const wxString& fileName);
 		bool saveFile();
 		bool saveFileAs(const wxString& fileName);

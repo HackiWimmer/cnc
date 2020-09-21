@@ -288,6 +288,7 @@ class CncConfig {
 
 		const bool getSplashScreenFlag();
 		const bool getAutoConnectFlag();
+		const bool getAutoOpenLastFlag();
 		const bool getAutoProcessFlag();
 		const bool getAutoOpenOglObserverFlag();
 		const bool getUseMainPreviewFlag();

@@ -34,7 +34,7 @@ static CommandTemplates CMDTPL;
 ///////////////////////////////////////////////////////////////////
 CncControl::CncControl(CncPortType pt) 
 : currentClientId				(-1)
-, currentInteractiveMoveDriver	(IMD_NONE)
+, currentInteractiveMoveInfo	()
 , setterMap						()
 , serialPort					(NULL)
 , zeroAppPos					(0,0,0)
@@ -889,7 +889,7 @@ bool CncControl::dispatchEventQueue() {
 		return false;
 	}
 	
-	if ( currentInteractiveMoveDriver == IMD_GAMEPAD ) {
+	if ( currentInteractiveMoveInfo.driver == IMD_GAMEPAD ) {
 		// Check the gamepad datatus also here to stop immediately
 		// Or in other words as fast as possible
 		static CncGamepad gamepad;
@@ -1808,16 +1808,18 @@ bool CncControl::moveZToMid() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::startInteractiveMove(StepSensitivity s, CncInteractiveMoveDriver imd ) {
+bool CncControl::startInteractiveMove(CncStepSensitivity s, CncInteractiveMoveDriver imd ) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInteractiveMoveActive() )
 		return true;
 		
-	const double newSpeed = cnc::getSpeedValue( s);
+	const double newSpeed = cnc::getSpeedValue(s);
 	changeCurrentFeedSpeedXYZ_MM_MIN(newSpeed, CncSpeedRapid);
 	
+	currentInteractiveMoveInfo.stepSensitivity = s;
+	
 	const bool b = serialPort->processStartInteractiveMove();
-	currentInteractiveMoveDriver = (b ? imd : IMD_NONE);
+	currentInteractiveMoveInfo.driver = (b ? imd : IMD_NONE);
 	
 	return isInteractiveMoveActive();
 }
@@ -1850,7 +1852,7 @@ bool CncControl::stopInteractiveMove() {
 		if ( getSerial()->isCommandActive() == false )
 			getSerial()->popSerial();
 			
-		currentInteractiveMoveDriver = IMD_NONE;
+		currentInteractiveMoveInfo.reset();
 	}
 	
 	return true;

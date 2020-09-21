@@ -3,6 +3,13 @@
 
 	bool APP_PROXY::isAppPointerAvailable()
 	{ return THE_APP != NULL; }
+	
+	void APP_PROXY::postEvent(wxEvent* evt) {
+		if ( evt == NULL )
+			return;
+			
+		wxQueueEvent(THE_APP, evt);
+	}
 
 	void APP_PROXY::enableBtnEmergenyStop(bool state)
 	{ THE_APP->GetBtnEmergenyStop()->Enable(state); }
@@ -33,6 +40,9 @@
 	
 	bool APP_PROXY::startInteractiveMove(CncInteractiveMoveDriver imd)
 	{ return THE_APP->startInteractiveMove(imd); }
+	
+	bool APP_PROXY::startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z)
+	{ return THE_APP->startStepwiseMovement(x, y, z); }
 	
 	bool APP_PROXY::updateInteractiveMove()
 	{ return THE_APP->updateInteractiveMove(); }
@@ -75,6 +85,9 @@
 
 	wxRadioBox* APP_PROXY::GetRbStepSensitivity()
 	{ return THE_APP->GetRbStepSensitivity(); }
+
+	wxRadioBox* APP_PROXY::GetRbStepMode()
+	{ return THE_APP->GetRbStepMode(); }
 
 	wxTextCtrl* APP_PROXY::GetSvgRootNode()
 	{ return THE_APP->GetSvgRootNode(); }

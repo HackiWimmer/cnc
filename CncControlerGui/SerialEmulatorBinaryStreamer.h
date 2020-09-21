@@ -10,7 +10,7 @@ class SerialEmulatorBinaryStreamer : public SerialEmulatorNULL
 	protected:
 	
 		wxString fileName;
-		TemplateFormat inboundFormat;
+		CncTemplateFormat inboundFormat;
 		
 		virtual bool writeMoveSequenceRawCallback(unsigned char* buffer, unsigned int nbByte);
 		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte);

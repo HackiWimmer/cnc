@@ -47,8 +47,8 @@ class CncFileNameService {
 		
 		static const char* getSession()							{ return _session; }
 		
-		static const char* getTempFileName(TemplateFormat f);
-		static const char* getCncTemplatePreviewFileName(TemplateFormat f);
+		static const char* getTempFileName(CncTemplateFormat f);
+		static const char* getCncTemplatePreviewFileName(CncTemplateFormat f);
 		
 		static const char* getStackTraceFileName()	 			{ _ret = _tempDirectorySession + "CncStackTrace.txt"; 		return _ret; }
 		

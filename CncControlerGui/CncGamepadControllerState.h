@@ -66,7 +66,8 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 		inline void processOpenNavigator(const GamepadEvent& state);
 		inline void processPositionControlMode(const GamepadEvent& state);
 		inline void processRefPositionDlg(const GamepadEvent& state);
-		inline void processMovement(const GamepadEvent& state);
+		inline void processStepwiseMovement(const GamepadEvent& state);
+		inline void processInteractiveMovement(const GamepadEvent& state);
 		
 		inline const char* getMovementStateAsString(MovementState s);
 		

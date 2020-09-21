@@ -80,7 +80,7 @@ CncGamepadControllerStateBase::CncGamepadControllerStateBase(wxWindow* parent, w
     
     flexGridSizer200->Add(m_gamepadTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer206 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer206 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer206->SetFlexibleDirection( wxBOTH );
     flexGridSizer206->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -122,7 +122,7 @@ CncGamepadControllerStateBase::CncGamepadControllerStateBase(wxWindow* parent, w
     
     flexGridSizer207->Add(m_gamepadCmdHistoryPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer209 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer209 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer209->SetFlexibleDirection( wxBOTH );
     flexGridSizer209->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -213,7 +213,7 @@ CncGamepadControllerStateBase::CncGamepadControllerStateBase(wxWindow* parent, w
     m_btClearGamepadServiceTrace->SetMinSize(wxSize(26,26));
     
     SetName(wxT("CncGamepadControllerStateBase"));
-    SetSize(500,300);
+    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -299,11 +299,11 @@ CncGamepadControllerSpyBase::CncGamepadControllerSpyBase(wxWindow* parent, wxWin
     
     flexGridSizer63->Add(m_staticBitmap122, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_staticText58 = new wxStaticText(this, wxID_ANY, _("Step Sensiitivity:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText58 = new wxStaticText(this, wxID_ANY, _("Step Mode/Sensiitivity:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     
     flexGridSizer63->Add(m_staticText58, 0, wxALL, WXC_FROM_DIP(1));
     
-    flexGridSizer63->Add(38, 0, 1, wxALL, WXC_FROM_DIP(0));
+    flexGridSizer63->Add(32, 0, 1, wxALL, WXC_FROM_DIP(0));
     
     m_staticText131 = new wxStaticText(this, wxID_ANY, _("X/Y"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText131Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
@@ -361,6 +361,18 @@ CncGamepadControllerSpyBase::CncGamepadControllerSpyBase(wxWindow* parent, wxWin
     
     flexGridSizer27->Add(m_staticLine71, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
+    wxFlexGridSizer* flexGridSizer219 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer219->SetFlexibleDirection( wxBOTH );
+    flexGridSizer219->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer27->Add(flexGridSizer219, 0, wxALL, WXC_FROM_DIP(0));
+    
+    flexGridSizer219->Add(0, 3, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_gpBmpStepMode = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("start-here")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer219->Add(m_gpBmpStepMode, 0, wxALL, WXC_FROM_DIP(5));
+    
     wxArrayString m_chStepsSensitivityArr;
     m_chStepsSensitivityArr.Add(wxT("Finest"));
     m_chStepsSensitivityArr.Add(wxT("Fine"));
@@ -408,6 +420,7 @@ CncGamepadControllerSpyBase::CncGamepadControllerSpyBase(wxWindow* parent, wxWin
     flexGridSizer61->Add(flexGridSizer95, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_staticBitmap56 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-square-dark-icon16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    m_staticBitmap56->SetToolTip(_("Corresponding Gamepad Button"));
     
     flexGridSizer95->Add(m_staticBitmap56, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -426,13 +439,14 @@ CncGamepadControllerSpyBase::CncGamepadControllerSpyBase(wxWindow* parent, wxWin
     flexGridSizer95->Add(5, 0, 1, wxALL, WXC_FROM_DIP(0));
     
     m_staticBitmap562 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("options16")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(17,17)), 0 );
+    m_staticBitmap562->SetToolTip(_("Gamepad 'Share' Button"));
     
     flexGridSizer95->Add(m_staticBitmap562, 0, wxALL, WXC_FROM_DIP(1));
     m_staticBitmap562->SetMinSize(wxSize(16,16));
     
     flexGridSizer95->Add(5, 0, 1, wxALL, WXC_FROM_DIP(0));
     
-    m_staticText174 = new wxStaticText(this, wxID_ANY, _("Open Navigator"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText174 = new wxStaticText(this, wxID_ANY, _("Open/Select Navigator"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     
     flexGridSizer95->Add(m_staticText174, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -440,7 +454,7 @@ CncGamepadControllerSpyBase::CncGamepadControllerSpyBase(wxWindow* parent, wxWin
     m_continuesTimer->Start(1000, false);
     
     SetName(wxT("CncGamepadControllerSpyBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -727,5 +741,61 @@ ImageLibGamepadCommand::ImageLibGamepadCommand()
 }
 
 ImageLibGamepadCommand::~ImageLibGamepadCommand()
+{
+}
+
+ImageLibGamepadStepMode::ImageLibGamepadStepMode()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC81CCInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_INTERACTIVE"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_INTERACTIVE"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_INTERACTIVE@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_INTERACTIVE@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STEPWISE"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_STEPWISE"), bmp));
+        }
+    }
+    
+}
+
+ImageLibGamepadStepMode::~ImageLibGamepadStepMode()
 {
 }

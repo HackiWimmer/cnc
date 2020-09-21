@@ -11,24 +11,24 @@ namespace cnc {
 
 
 //////////////////////////////////////////////////////////////
-StepSensitivity cnc::getStepSensitivityOfIndex(unsigned int index) {
+CncStepSensitivity cnc::getStepSensitivityOfIndex(unsigned int index) {
 //////////////////////////////////////////////////////////////
-	StepSensitivity stepSensitivity = StepSensitivity::FINEST;
+	CncStepSensitivity stepSensitivity = CncStepSensitivity::FINEST;
 	
 	switch ( index ) {
-		case 0: 	stepSensitivity = StepSensitivity::FINEST;		break;
-		case 1: 	stepSensitivity = StepSensitivity::FINE; 		break;
-		case 2: 	stepSensitivity = StepSensitivity::MEDIUM; 		break;
-		case 3: 	stepSensitivity = StepSensitivity::ROUGH; 		break;
-		case 4: 	stepSensitivity = StepSensitivity::ROUGHEST; 	break;
+		case 0: 	stepSensitivity = CncStepSensitivity::FINEST;		break;
+		case 1: 	stepSensitivity = CncStepSensitivity::FINE; 		break;
+		case 2: 	stepSensitivity = CncStepSensitivity::MEDIUM; 		break;
+		case 3: 	stepSensitivity = CncStepSensitivity::ROUGH; 		break;
+		case 4: 	stepSensitivity = CncStepSensitivity::ROUGHEST; 	break;
 		
-		default:	stepSensitivity = StepSensitivity::FINEST;
+		default:	stepSensitivity = CncStepSensitivity::FINEST;
 	}
 	
 	return stepSensitivity;
 }
 //////////////////////////////////////////////////////////////
-float cnc::getSpeedValue(StepSensitivity s) {
+float cnc::getSpeedValue(CncStepSensitivity s) {
 //////////////////////////////////////////////////////////////
 	// any default value . . .
 	double			newSpeed =    1.0;
@@ -159,7 +159,7 @@ const char* cnc::getCncSpeedTypeAsString(CncSpeedMode s) {
 
 }
 //////////////////////////////////////////////////////////////
-const char* cnc::getTemplateFormatAsString(const TemplateFormat tf) {
+const char* cnc::getTemplateFormatAsString(const CncTemplateFormat tf) {
 //////////////////////////////////////////////////////////////
 	switch ( tf ) {
 		case TplUnknown:	return "UNKNOWN";
@@ -174,7 +174,7 @@ const char* cnc::getTemplateFormatAsString(const TemplateFormat tf) {
 	return "????";
 }
 //////////////////////////////////////////////////////////////
-const char* cnc::getExtention(const TemplateFormat tf) {
+const char* cnc::getExtention(const CncTemplateFormat tf) {
 //////////////////////////////////////////////////////////////
 	switch ( tf ) {
 		case TplUnknown:	return "unknown";
@@ -189,7 +189,7 @@ const char* cnc::getExtention(const TemplateFormat tf) {
 	return "unknown";
 }
 //////////////////////////////////////////////////////////////
-const TemplateFormat cnc::getTemplateFormatFromExtention(const char* extention) {
+const CncTemplateFormat cnc::getTemplateFormatFromExtention(const char* extention) {
 //////////////////////////////////////////////////////////////
 	if ( extention == NULL )
 		return TplUnknown;
@@ -206,7 +206,7 @@ const TemplateFormat cnc::getTemplateFormatFromExtention(const char* extention) 
 	return TplUnknown;
 }
 //////////////////////////////////////////////////////////////
-const TemplateFormat cnc::getTemplateFormatFromFileName(const char* fileName) {
+const CncTemplateFormat cnc::getTemplateFormatFromFileName(const char* fileName) {
 //////////////////////////////////////////////////////////////
 	if ( fileName == NULL )
 		return TplUnknown;
