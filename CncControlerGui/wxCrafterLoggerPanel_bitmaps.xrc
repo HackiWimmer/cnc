@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
+  <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
+  <object class="wxBitmap" name="16-file_save">bitmaps\CodeLite\16-file_save.png</object>
+  <object class="wxBitmap" name="16-file_save@2x">bitmaps\CodeLite\16-file_save@2x.png</object>
+  <object class="wxBitmap" name="16-file_save_all">bitmaps\CodeLite\16-file_save_all.png</object>
+  <object class="wxBitmap" name="16-file_save_all@2x">bitmaps\CodeLite\16-file_save_all@2x.png</object>
+  <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
+  <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
+  <object class="wxBitmap" name="edit-copy-7">bitmaps\edit-copy-7.png</object>
+  <object class="wxBitmap" name="go-jump-today">bitmaps\go-jump-today.png</object>
+  <object class="wxBitmap" name="lightbulb-off">bitmaps\lightbulb-off.png</object>
+  <object class="wxBitmap" name="pencil-add">bitmaps\pencil-add.png</object>
+  <object class="wxBitmap" name="view-calendar-month">bitmaps\view-calendar-month.png</object>
+  <object class="wxBitmap" name="view-calendar-week">bitmaps\view-calendar-week.png</object>
+</resource>

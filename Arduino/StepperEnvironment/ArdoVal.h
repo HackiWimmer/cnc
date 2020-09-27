@@ -169,13 +169,6 @@
   const unsigned char PID_PULSE_WIDTH_HIGH                = 100;
   const unsigned char PID_PROBE_MODE                      = 101;
   
-  const unsigned char PID_RESERT_POS_COUNTER              = 110;
-  const unsigned char PID_GET_POS_COUNTER                 = 111;
-  const unsigned char PID_RESERT_STEP_COUNTER             = 112;
-  const unsigned char PID_GET_STEP_COUNTER_X              = 113;
-  const unsigned char PID_GET_STEP_COUNTER_Y              = 114;
-  const unsigned char PID_GET_STEP_COUNTER_Z              = 115;
-
 // .....................................................................
 // end long pid range [PID_FLOAT_RANG_END] 
 // .....................................................................
@@ -252,6 +245,7 @@
   const unsigned char E_STEPPER_NOT_READY_TO_RUN          =  41;
 
   const unsigned char E_LIMIT_SWITCH_ACTIVE               =  51;
+  const unsigned char E_RMDR_INVALID_STP_POINTER          =  52;
 
   const unsigned char E_PURE_TEXT_VALUE_ERROR             = 251;
   const unsigned char E_INTERRUPT                         = 252;

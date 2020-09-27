@@ -83,6 +83,9 @@ class CncNavigatorPanel : public wxPanel {
 		
 	private:
 		
+		const unsigned int defaultTimeout  =  100;
+		const unsigned int stepwiseTimeout = 1000;
+		
 		struct Current {
 			Direction 	direction	= UD;
 			bool		acitvated	= false;

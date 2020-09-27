@@ -346,35 +346,11 @@
           <style>wxTAB_TRAVERSAL</style>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
-            <rows>2</rows>
+            <rows>1</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
-            <growablerows>1</growablerows>
-            <object class="sizeritem">
-              <flag>wxALL|wxEXPAND</flag>
-              <object class="wxChoice" name="m_mainViewSelector">
-                <font>
-                  <size>7</size>
-                  <style>normal</style>
-                  <weight>bold</weight>
-                  <family>swiss</family>
-                  <underlined>0</underlined>
-                  <face>Segoe UI</face>
-                </font>
-                <hidden>1</hidden>
-                <style>wxBORDER_NONE</style>
-                <content>
-                  <item>Source View</item>
-                  <item>Setup</item>
-                  <item>References</item>
-                  <item>Manuel Controller</item>
-                  <item>Test</item>
-                  <item>File Manager Preview</item>
-                </content>
-                <selection>0</selection>
-              </object>
-            </object>
+            <growablerows>0</growablerows>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <object class="wxSimplebook" name="m_mainViewBook">
@@ -3939,31 +3915,11 @@ Size</value>
           <bg>wxSYS_COLOUR_BTNFACE</bg>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
-            <rows>2</rows>
+            <rows>1</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
-            <growablerows>1</growablerows>
-            <object class="sizeritem">
-              <flag>wxALL|wxEXPAND</flag>
-              <object class="wxChoice" name="m_monitorViewSelector">
-                <font>
-                  <size>7</size>
-                  <style>normal</style>
-                  <weight>bold</weight>
-                  <family>swiss</family>
-                  <underlined>0</underlined>
-                  <face>Segoe UI</face>
-                </font>
-                <hidden>1</hidden>
-                <style>wxBORDER_NONE</style>
-                <content>
-                  <item>CNC Monitor</item>
-                  <item>Template Preview</item>
-                </content>
-                <selection>0</selection>
-              </object>
-            </object>
+            <growablerows>0</growablerows>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <object class="wxSimplebook" name="m_monitorViewBook">
@@ -5534,7 +5490,7 @@ Messages</label>
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>1</border>
                                             <object class="wxFlexGridSizer">
-                                              <cols>2</cols>
+                                              <cols>3</cols>
                                               <rows>1</rows>
                                               <vgap>0</vgap>
                                               <hgap>0</hgap>
@@ -5554,6 +5510,20 @@ Messages</label>
                                                     <underlined>0</underlined>
                                                     <face>Segoe UI</face>
                                                   </font>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxALIGN_RIGHT</flag>
+                                                <border>1</border>
+                                                <object class="wxButton" name="m_btViewMsgHistory">
+                                                  <label>View List</label>
+                                                  <style/>
+                                                  <tooltip>
+                                                    <![CDATA[View Message Histroy]]>
+                                                  </tooltip>
+                                                  <bitmap>bitmaps/view-calendar-month.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
                                                 </object>
                                               </object>
                                               <object class="sizeritem">
@@ -6220,225 +6190,11 @@ Preview</label>
                 <hgap>0</hgap>
                 <growablecols>0</growablecols>
                 <growablerows>0</growablerows>
-                <object class="sizeritem" name="flexGridSizer2520">
-                  <flag>wxALL|wxEXPAND</flag>
-                  <object class="wxFlexGridSizer">
-                    <cols>1</cols>
-                    <rows>1</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>0</growablecols>
-                    <growablerows>0</growablerows>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <object class="wxNotebook" name="m_loggerNotebook">
-                        <style>wxNB_NOPAGETHEME|wxBK_LEFT|wxBORDER_NONE</style>
-                        <font>
-                          <size>7</size>
-                          <style>normal</style>
-                          <weight>bold</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI Semibold</face>
-                        </font>
-                        <object class="notebookpage">
-                          <label>S</label>
-                          <bitmap>bitmaps/go-jump-today.png</bitmap>
-                          <selected>0</selected>
-                          <object class="wxPanel" name="m_panelStartupTrace">
-                            <style>wxTAB_TRAVERSAL</style>
-                            <font>
-                              <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                              <style>normal</style>
-                              <weight>normal</weight>
-                              <underlined>0</underlined>
-                            </font>
-                            <object class="wxFlexGridSizer">
-                              <cols>1</cols>
-                              <rows>1</rows>
-                              <vgap>0</vgap>
-                              <hgap>0</hgap>
-                              <growablecols>0</growablecols>
-                              <growablerows>0</growablerows>
-                              <object class="sizeritem">
-                                <flag>wxALL|wxEXPAND</flag>
-                                <object class="wxTextCtrl" name="m_startupTracePlaceholder">
-                                  <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE</style>
-                                  <bg>#000000</bg>
-                                  <font>
-                                    <size>10</size>
-                                    <style>normal</style>
-                                    <weight>normal</weight>
-                                    <family>modern</family>
-                                    <underlined>0</underlined>
-                                    <face>Consolas</face>
-                                  </font>
-                                </object>
-                              </object>
-                            </object>
-                          </object>
-                        </object>
-                        <object class="notebookpage">
-                          <label>L</label>
-                          <bitmap>bitmaps/pencil-add.png</bitmap>
-                          <selected>1</selected>
-                          <object class="wxPanel" name="m_panel5878">
-                            <style>wxTAB_TRAVERSAL</style>
-                            <tooltip>
-                              <![CDATA[Cnc Logger]]>
-                            </tooltip>
-                            <object class="wxFlexGridSizer">
-                              <cols>2</cols>
-                              <rows>1</rows>
-                              <vgap>0</vgap>
-                              <hgap>0</hgap>
-                              <growablecols>0</growablecols>
-                              <growablerows>0</growablerows>
-                              <object class="sizeritem">
-                                <flag>wxALL|wxEXPAND</flag>
-                                <object class="wxTextCtrl" name="m_loggerPlaceholder">
-                                  <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxVSCROLL</style>
-                                  <bg>#000000</bg>
-                                  <font>
-                                    <size>10</size>
-                                    <style>normal</style>
-                                    <weight>normal</weight>
-                                    <family>modern</family>
-                                    <underlined>0</underlined>
-                                    <face>Consolas</face>
-                                  </font>
-                                  <tooltip>
-                                    <![CDATA[Logger Output]]>
-                                  </tooltip>
-                                </object>
-                              </object>
-                              <object class="sizeritem" name="flexGridSizer1863">
-                                <flag>wxALL|wxEXPAND</flag>
-                                <object class="wxFlexGridSizer">
-                                  <cols>1</cols>
-                                  <rows>8</rows>
-                                  <vgap>0</vgap>
-                                  <hgap>0</hgap>
-                                  <growablecols/>
-                                  <growablerows/>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>1</border>
-                                    <minsize>26,26</minsize>
-                                    <object class="wxBitmapButton" name="m_clearLogger">
-                                      <bitmap>bitmaps/16-clean.png</bitmap>
-                                      <size>26,26</size>
-                                      <style>wxBU_AUTODRAW</style>
-                                      <tooltip>
-                                        <![CDATA[Clear Logger Panel]]>
-                                      </tooltip>
-                                      <default>0</default>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>1</border>
-                                    <minsize>26,26</minsize>
-                                    <object class="wxBitmapButton" name="m_copyLogger">
-                                      <bitmap>bitmaps/edit-copy-7.png</bitmap>
-                                      <size>26,26</size>
-                                      <style>wxBU_AUTODRAW</style>
-                                      <tooltip>
-                                        <![CDATA[Copy Logger Panel]]>
-                                      </tooltip>
-                                      <default>0</default>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL|wxEXPAND</flag>
-                                    <border>1</border>
-                                    <object class="wxStaticLine" name="m_staticLine76051">
-                                      <style>wxLI_HORIZONTAL</style>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>1</border>
-                                    <minsize>26,26</minsize>
-                                    <object class="wxBitmapToggleButton" name="m_showLoggerOnDemand">
-                                      <style/>
-                                      <size>26,26</size>
-                                      <bitmap>bitmaps/lightbulb-off.png</bitmap>
-                                      <tooltip>
-                                        <![CDATA[Show Logger on demand]]>
-                                      </tooltip>
-                                      <checked>1</checked>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL|wxEXPAND</flag>
-                                    <border>1</border>
-                                    <object class="wxStaticLine" name="m_staticLine7605">
-                                      <style>wxLI_HORIZONTAL</style>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>1</border>
-                                    <minsize>26,26</minsize>
-                                    <object class="wxBitmapToggleButton" name="m_freezeLogger">
-                                      <style/>
-                                      <size>26,26</size>
-                                      <bitmap>bitmaps/lock-edit.png</bitmap>
-                                      <tooltip>
-                                        <![CDATA[Freeze Logger]]>
-                                      </tooltip>
-                                      <checked>1</checked>
-                                    </object>
-                                  </object>
-                                </object>
-                              </object>
-                            </object>
-                          </object>
-                        </object>
-                      </object>
-                    </object>
-                  </object>
-                </object>
-              </object>
-            </object>
-            <object class="sizeritem" name="flexGridSizer5888">
-              <flag>wxALL|wxEXPAND</flag>
-              <border>1</border>
-              <object class="wxFlexGridSizer">
-                <cols>2</cols>
-                <rows>1</rows>
-                <vgap>0</vgap>
-                <hgap>0</hgap>
-                <growablecols>1</growablecols>
-                <growablerows>0</growablerows>
-                <object class="sizeritem">
-                  <flag>wxALL</flag>
-                  <border>2</border>
-                  <object class="wxStaticBitmap" name="m_staticBitmap5890">
-                    <bitmap>bitmaps/dialog-information (2).png</bitmap>
-                  </object>
-                </object>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND</flag>
-                  <border>1</border>
-                  <minsize>-1,24</minsize>
-                  <object class="wxTextCtrl" name="m_tmpTraceInfoPlaceholder">
-                    <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP</style>
-                    <size>-1,24</size>
-                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
-                    <font>
-                      <size>10</size>
-                      <style>normal</style>
-                      <weight>normal</weight>
-                      <family>modern</family>
-                      <underlined>0</underlined>
-                      <face>Consolas</face>
-                    </font>
-                    <tooltip>
-                      <![CDATA[Trace Information]]>
-                    </tooltip>
+                  <object class="wxPanel" name="m_loggerViewPlaceholder">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
                   </object>
                 </object>
               </object>

@@ -11,9 +11,13 @@ class CncGamepadControllerSpy : public CncGamepadControllerSpyBase {
 		CncGamepadControllerSpy(wxWindow* parent);
 		virtual ~CncGamepadControllerSpy();
 		
+		void selectStepSensitivity(int index);
+		void selectStepMode(int index);
+		
 		void update(const GamepadEvent& state);
 		
 	protected:
+		virtual void show(wxShowEvent& event);
 		virtual void dclickLeftStick(wxMouseEvent& event);
 		virtual void dclickNaviXY(wxMouseEvent& event);
 		virtual void dclickNaviZ(wxMouseEvent& event);

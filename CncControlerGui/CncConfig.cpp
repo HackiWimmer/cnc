@@ -222,7 +222,7 @@ void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
 	ArduinoAccelManager::Setup(getFeedrateX(), getFeedrateY(), getFeedrateZ());
 	
-	const float MAX_MM_MIN = 20000.0;
+	const float MAX_MM_MIN = 24000.0;
 	wxPGProperty* prop = NULL;
 	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
 	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
@@ -848,7 +848,7 @@ const wxString& CncConfig::getToolType(wxString& ret, int toolId) {
 ////////////////////////////////////////////////////////////////////////
 unsigned int CncConfig::calculateThreshold(double pitch, unsigned int steps) {
 ////////////////////////////////////////////////////////////////////////
-	double metric		= getReplyThresholdMetric();
+	double metric = getReplyThresholdMetric();
 	if ( metric < 0.0 )
 		return 1;
 	

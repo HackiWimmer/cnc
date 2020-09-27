@@ -25,17 +25,17 @@ wxEND_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////
 CncNavigatorPanel::CncNavigatorPanel(wxWindow *parent, const Config& cfg)
-: wxPanel			(parent)
-, navEvent			(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
-, continuousEvent	(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
-, stepMode			(SM_INTERACTIVE)
-, continuousTimer	(this, wxEVT_CNC_NAVIGATOR_PANEL_TIMER)
-, navRectangle		()
-, innerRadius		(0)
-, outerRadius		(0)
-, outerRegions		()
-, config			(cfg)
-, current			()
+: wxPanel					(parent)
+, navEvent					(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
+, continuousEvent			(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
+, stepMode					(SM_INTERACTIVE)
+, continuousTimer			(this, wxEVT_CNC_NAVIGATOR_PANEL_TIMER)
+, navRectangle				()
+, innerRadius				(0)
+, outerRadius				(0)
+, outerRegions				()
+, config					(cfg)
+, current					()
 ///////////////////////////////////////////////////////////////////
 {
 	continuousTimer.Stop();
@@ -715,20 +715,28 @@ void CncNavigatorPanel::onContinuousTimer(wxTimerEvent& event) {
 	wxASSERT( continuousEvent );
 	CncNavigatorPanelEvent& evt = *continuousEvent;
 	postEvent(evt);
+	
+	if ( continuousTimer.GetInterval() > (int)defaultTimeout ) {
+		
+		const int diff = stepwiseTimeout - continuousTimer.GetInterval();
+		const int fact = ( diff / defaultTimeout ) + 1;
+		const int next = continuousTimer.GetInterval() - fact * defaultTimeout;
+		
+		continuousTimer.Start( next > (int)defaultTimeout ? next : (int)defaultTimeout );
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::startContinuousEvent(int id) {
 ///////////////////////////////////////////////////////////////////
-	if ( stepMode == SM_STEPWISE )
-		return;
-		
 	wxASSERT( continuousEvent );
+	
+	const unsigned int timeout = stepMode == SM_STEPWISE ? stepwiseTimeout : defaultTimeout;
 	
 	continuousEvent->reset();
 	continuousEvent->SetEventObject(this); 
 	continuousEvent->SetId(id); 
 	
-	continuousTimer.Start(100);
+	continuousTimer.Start(timeout);
 }
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::stopContinuousEvent() {

@@ -394,11 +394,6 @@ class CncControl {
 		size_t getTotalDistanceSteps() 									{ return getSerial()->getTotalDistanceSteps();  }
 		double getMeasuredFeedSpeed_MM_MIN() 							{ return getSerial()->getMeasuredFeedSpeed_MM_MIN(); }
 		double getMeasuredFeedSpeed_MM_SEC() 							{ return getSerial()->getMeasuredFeedSpeed_MM_SEC(); }
-		size_t getStepCounter()											{ return getSerial()->getStepCounter(); }
-		size_t getStepCounterX()										{ return getSerial()->getStepCounterX(); }
-		size_t getStepCounterY()										{ return getSerial()->getStepCounterY(); }
-		size_t getStepCounterZ()										{ return getSerial()->getStepCounterZ(); }
-		size_t getPositionCounter()										{ return getSerial()->getPositionCounter(); }
 		
 		void enableSpyOutput(bool show=true) 							{ getSerial()->enableSpyOutput(show); }
 		const char* getPortName() 										{ return getSerial()->getPortName(); }

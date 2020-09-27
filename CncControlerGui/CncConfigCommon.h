@@ -91,8 +91,8 @@
 	
 	#define CncWork_Wpt_MAX_THICKNESS_CROSS					"CncWork.Workpiece/MAX_THICKNESS_PER_CROSSING"
 
-	#define CncWork_Ctl_REPLY_THRESHOLD_METRIC				"CncWork.Controller/REPLAY_THRESHOLD_METRIC"
-	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS				"CncWork.Controller/REPLAY_THRESHOLD_STEPS"
+	#define CncWork_Ctl_REPLY_THRESHOLD_METRIC				"CncWork.Controller/REPLY_THRESHOLD_METRIC"
+	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS				"CncWork.Controller/REPLY_THRESHOLD_STEPS"
 	#define CncWork_Ctl_AVOID_DUP_SETTER_VALUES				"CncWork.Controller/AVOID_DUP_SETTER_VALUES"
 	#define CncWork_Ctl_REQUEST_IDLE_REQUESTS				"CncWork.Controller/REQUEST_IDLE_REQUESTS"
 	#define CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE			"CncWork.Controller/INTERRUPT_BY_POS_OUTOFRANGE"

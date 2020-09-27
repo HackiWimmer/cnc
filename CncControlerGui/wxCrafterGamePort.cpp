@@ -464,6 +464,7 @@ CncGamepadControllerSpyBase::CncGamepadControllerSpyBase(wxWindow* parent, wxWin
         CentreOnScreen(wxBOTH);
     }
     // Connect events
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncGamepadControllerSpyBase::show), NULL, this);
     m_gpBmp1->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickNaviXY), NULL, this);
     m_gpBmp2->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickNaviZ), NULL, this);
     m_gpBmp3->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickLeftStick), NULL, this);
@@ -475,6 +476,7 @@ CncGamepadControllerSpyBase::CncGamepadControllerSpyBase(wxWindow* parent, wxWin
 
 CncGamepadControllerSpyBase::~CncGamepadControllerSpyBase()
 {
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncGamepadControllerSpyBase::show), NULL, this);
     m_gpBmp1->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickNaviXY), NULL, this);
     m_gpBmp2->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickNaviZ), NULL, this);
     m_gpBmp3->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncGamepadControllerSpyBase::dclickLeftStick), NULL, this);

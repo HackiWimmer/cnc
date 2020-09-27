@@ -325,13 +325,13 @@ void CncSpeedMonitor::init() {
 	m_sliderRecordResolutionV->SetToolTip(wxString::Format("%d ms", (int)(diagram.resolution)));
 	
 	switch ( diagram.timeCompression ) {
-		case DCom::CPV_1:				m_sliderTimeCompressionH->SetValue(1); m_sliderTimeCompressionH->SetValue(1); break;
-		case DCom::CPV_2:				m_sliderTimeCompressionH->SetValue(2); m_sliderTimeCompressionH->SetValue(2); break;
-		case DCom::CPV_5:				m_sliderTimeCompressionH->SetValue(3); m_sliderTimeCompressionH->SetValue(3); break;
-		case DCom::CPV_10:				m_sliderTimeCompressionH->SetValue(4); m_sliderTimeCompressionH->SetValue(4); break;
-		case DCom::CPV_20:				m_sliderTimeCompressionH->SetValue(5); m_sliderTimeCompressionH->SetValue(5); break;
-		case DCom::CPV_50:				m_sliderTimeCompressionH->SetValue(6); m_sliderTimeCompressionH->SetValue(6); break;
-		case DCom::CPV_100:				m_sliderTimeCompressionH->SetValue(7); m_sliderTimeCompressionH->SetValue(7); break;
+		case DCom::CPV_1:				m_sliderTimeCompressionH->SetValue(1); m_sliderTimeCompressionV->SetValue(1); break;
+		case DCom::CPV_2:				m_sliderTimeCompressionH->SetValue(2); m_sliderTimeCompressionV->SetValue(2); break;
+		case DCom::CPV_5:				m_sliderTimeCompressionH->SetValue(3); m_sliderTimeCompressionV->SetValue(3); break;
+		case DCom::CPV_10:				m_sliderTimeCompressionH->SetValue(4); m_sliderTimeCompressionV->SetValue(4); break;
+		case DCom::CPV_20:				m_sliderTimeCompressionH->SetValue(5); m_sliderTimeCompressionV->SetValue(5); break;
+		case DCom::CPV_50:				m_sliderTimeCompressionH->SetValue(6); m_sliderTimeCompressionV->SetValue(6); break;
+		case DCom::CPV_100:				m_sliderTimeCompressionH->SetValue(7); m_sliderTimeCompressionV->SetValue(7); break;
 	}
 	m_sliderTimeCompressionH->SetToolTip(wxString::Format("Factor %ld", diagram.timeCompression));
 	m_sliderTimeCompressionV->SetToolTip(wxString::Format("Factor %ld", diagram.timeCompression));
@@ -621,12 +621,13 @@ void CncSpeedMonitor::Diagram::plotMain(wxAutoBufferedPaintDC& dc, const wxRect&
 		}
 	}
 	
-	// plot graphs - minimu 2 points required
+	// plot graphs - minimum 2 points required
 	if ( points.getCount() > 1 ) {
 		
 		//----------------------------------------------------------------
 		auto getTsAsPx = [&](CncMilliTimestamp tsFirst, auto it) {
-			return plotTRange - abs((long)(it->ts - tsFirst)) / timeCompression;
+			#warning
+			return plotTRange - abs((long)(it->ts - tsFirst)) / timeCompression + timeOffset / timeCompression;
 		};
 		
 		//----------------------------------------------------------------
@@ -690,10 +691,8 @@ void CncSpeedMonitor::Diagram::plotMain(wxAutoBufferedPaintDC& dc, const wxRect&
 		// over all relevant points
 		auto rend = points.rend();
 		auto prev = points.rbegin(); 
-		prev = prev + timeOffset;
 		
-		CncMilliTimestamp tsFirst = prev->ts;
-		
+		const CncMilliTimestamp tsFirst = prev->ts;
 		for ( auto it = prev + 1; it.hasMore(rend); ++it ) {
 			
 			if ( orientation == DOHorizontal )	plotPointHorizontal(tsFirst, prev, it);
@@ -705,6 +704,7 @@ void CncSpeedMonitor::Diagram::plotMain(wxAutoBufferedPaintDC& dc, const wxRect&
 			if ( tsPx < 0 )
 				break;
 				
+			// swap
 			prev = it;
 		}
 	}

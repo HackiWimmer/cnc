@@ -3,7 +3,7 @@
 #include <wx/textdlg.h>
 #include <wx/choicdlg.h>
 #include "GlobalFunctions.h"
-#include "CncLoggerProxy.h"
+#include "CncTextCtrl.h"
 #include "Tests/Test_FrameworkCallback.h"
 #include "Tests/Test_SVGNodeParser.h"
 #include "Tests/Test_CncPathListManager.h"

@@ -1,64 +1,67 @@
 #ifndef CNC_LOGGER_PROXY_H
 #define CNC_LOGGER_PROXY_H
 
-#include <wx/timer.h>
-#include <wx/textctrl.h>
-#include "OSD/CncTimeFunctions.h"
+#include "CncTextCtrl.h"
 
-class CncTextCtrl : public wxTextCtrl  {
+// --------------------------------------------------------------
+class CncStartupLoggerProxy : public CncTextCtrl  {
 	
-	private:
-		static const unsigned int MAX_LINE_BUFFER_SIZE 				= 1024;
-		static const unsigned int DEFAULT_OVERFLOW_PERIOD_VALUE 	=  800;
-
-		wxTimer* 			overflowTimer;
-		char				lineBuffer[MAX_LINE_BUFFER_SIZE];
-		unsigned int		index;
-		long 				loggedPos;
-		
-		inline size_t flushLineBuffer();
-		
-	protected:
-		virtual void onOverflowTimer(wxTimerEvent& event);
-		
 	public:
-		CncTextCtrl(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, 
-					const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
-					long style=0, const wxValidator &validator=wxDefaultValidator, const wxString 
-					&name=wxTextCtrlNameStr);
-		virtual ~CncTextCtrl();
+		CncStartupLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
+		virtual ~CncStartupLoggerProxy();
 		
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);
 		
-		void logCurrentPosition();
-		long getLoggedPosition();
-		bool isLoggedPositionEqualCurrent();
-		bool skipBackIfLoggedPositionEqualCurrent();
-		
-		size_t flush();
+		wxDECLARE_NO_COPY_CLASS(CncStartupLoggerProxy);
 };
 
-
-class CncLoggerProxy : public CncTextCtrl  {
+// --------------------------------------------------------------
+class CncStandardLoggerProxy : public CncTextCtrl  {
 	
-	protected:
-		bool showOnDemandState;
-		
-		virtual void onKeyDown(wxKeyEvent& event);
-		virtual void onLeftDClick(wxMouseEvent& event);
-		virtual void onUpdateLogger(wxCommandEvent& event);
-
 	public:
-		CncLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		CncStandardLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
 		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
-		virtual ~CncLoggerProxy();
+		virtual ~CncStandardLoggerProxy();
 		
-		void setShowOnDemandState(bool state) { showOnDemandState = state; }
+		virtual bool SetDefaultStyle(const wxTextAttr& style);
+		virtual void AppendChar(char c);
+		virtual void AppendText(const wxString &text);
 		
-		wxDECLARE_NO_COPY_CLASS(CncLoggerProxy);
-		wxDECLARE_EVENT_TABLE();
+		wxDECLARE_NO_COPY_CLASS(CncStandardLoggerProxy);
+};
+
+// --------------------------------------------------------------
+class CncMsgHistoryLoggerProxy : public CncTextCtrl  {
+	
+	public:
+		CncMsgHistoryLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
+		virtual ~CncMsgHistoryLoggerProxy();
+		
+		virtual bool SetDefaultStyle(const wxTextAttr& style);
+		virtual void AppendChar(char c);
+		virtual void AppendText(const wxString &text);
+		
+		wxDECLARE_NO_COPY_CLASS(CncMsgHistoryLoggerProxy);
+};
+
+// --------------------------------------------------------------
+class CncTraceProxy : public CncTextCtrl  {
+	
+	public:
+		CncTraceProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
+		virtual ~CncTraceProxy();
+		
+		virtual void Clear();
+		virtual bool SetDefaultStyle(const wxTextAttr& style);
+		virtual void AppendChar(char c);
+		virtual void AppendText(const wxString &text);
+		
+		wxDECLARE_NO_COPY_CLASS(CncTraceProxy);
 };
 
 #endif

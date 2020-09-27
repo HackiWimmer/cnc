@@ -32,10 +32,20 @@ void CncGamepadControllerSpy::decorateStepMode() {
 	m_gpBmpStepMode->SetBitmap(dBmp[lastStepMode]);
 }
 //////////////////////////////////////////////////////////////////
+void CncGamepadControllerSpy::show(wxShowEvent& event) {
+//////////////////////////////////////////////////////////////////
+	selectStepSensitivity(APP_PROXY::GetRbStepSensitivity()->GetSelection());
+	selectStepMode(APP_PROXY::GetRbStepMode()->GetSelection());
+}
+//////////////////////////////////////////////////////////////////
 void CncGamepadControllerSpy::update(const GamepadEvent& state) {
 //////////////////////////////////////////////////////////////////
-	if ( state.isSomethingChanged == false )
+	if ( state.isSomethingChanged == false ) {
+		// Trick, this ensures the update of the reference position dialog too
+		selectStepSensitivity(APP_PROXY::GetRbStepSensitivity()->GetSelection());
+		selectStepMode(APP_PROXY::GetRbStepMode()->GetSelection());
 		return;
+	}
 		
 	if ( IsShownOnScreen() == false )
 		Show(true);
@@ -128,6 +138,22 @@ void CncGamepadControllerSpy::update(const GamepadEvent& state) {
 	m_bmpCompassZ->Refresh();
 }
 //////////////////////////////////////////////////////////////////
+void CncGamepadControllerSpy::selectStepSensitivity(int index) {
+//////////////////////////////////////////////////////////////////
+	if ( index >=0 && index < (int)m_chStepsSensitivity->GetCount() )
+		m_chStepsSensitivity->SetSelection(index);
+}
+//////////////////////////////////////////////////////////////////
+void CncGamepadControllerSpy::selectStepMode(int index) {
+//////////////////////////////////////////////////////////////////
+	switch ( index ) {
+		case SM_INTERACTIVE:	lastStepMode = SM_INTERACTIVE;	break;
+		case SM_STEPWISE:		lastStepMode = SM_STEPWISE;		break;
+	}
+	
+	decorateStepMode();
+}
+//////////////////////////////////////////////////////////////////
 void CncGamepadControllerSpy::selectSensitivity(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 }
@@ -146,4 +172,4 @@ void CncGamepadControllerSpy::dclickNaviZ(wxMouseEvent& event) {
 //////////////////////////////////////////////////////////////////
 void CncGamepadControllerSpy::dclickRightStick(wxMouseEvent& event) {
 //////////////////////////////////////////////////////////////////
-}
+} 

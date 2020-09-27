@@ -28,8 +28,11 @@ uint32_t            RS::zStepCount             = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////
 ArduinoPositionRenderer::ArduinoPositionRenderer()
-: mode(RenderMove)
-, RD()
+: mode  (RenderMove)
+, RD    ()
+, pX    (NULL)
+, pY    (NULL)
+, pZ    (NULL)
 ///////////////////////////////////////////////////////////////////////////////////// 
 {
   //CNC_RENDERER_LOG_FUNCTION()
@@ -38,6 +41,26 @@ ArduinoPositionRenderer::ArduinoPositionRenderer()
 ArduinoPositionRenderer::~ArduinoPositionRenderer() {
 /////////////////////////////////////////////////////////////////////////////////////  
   //CNC_RENDERER_LOG_FUNCTION()
+}
+/////////////////////////////////////////////////////////////////////////////////////
+bool ArduinoPositionRenderer::isReadyToRender() {
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( pX == NULL || pY == NULL || pZ == NULL ) {
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_RMDR_INVALID_STP_POINTER); 
+    return false;
+  }
+
+  return true;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void ArduinoPositionRenderer::setupSteppers(CncArduinoStepper* x, CncArduinoStepper* y, CncArduinoStepper* z) {
+/////////////////////////////////////////////////////////////////////////////////////
+  pX  = x;
+  pY  = y;
+  pZ  = z;
+  
+  if ( pX == NULL || pY == NULL || pZ == NULL )
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_RMDR_INVALID_STP_POINTER); 
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte ArduinoPositionRenderer::stepping() {  
@@ -63,7 +86,7 @@ byte ArduinoPositionRenderer::stepping() {
     RS::stepSignature = 0;
       
     if ( RS::dx() != 0 ) {
-      if ( (retValue = initiateStep(IDX_X)) != RET_OK ) 
+      if ( (retValue = pX->initiateStep()) != RET_OK ) 
         return retValue;
   
       RS::stepSignature |= ASG_X;
@@ -71,7 +94,7 @@ byte ArduinoPositionRenderer::stepping() {
     }
     
     if ( RS::dy() != 0 ) {
-       if ( (retValue = initiateStep(IDX_Y)) != RET_OK )
+       if ( (retValue = pY->initiateStep()) != RET_OK )
         return retValue;
         
       RS::stepSignature |= ASG_Y;
@@ -79,7 +102,7 @@ byte ArduinoPositionRenderer::stepping() {
     }
       
     if ( RS::dz() != 0 ) {
-       if ( (retValue = initiateStep(IDX_Z)) != RET_OK )
+       if ( (retValue = pZ->initiateStep()) != RET_OK )
         return retValue;
         
       RS::stepSignature |= ASG_Z;
@@ -88,9 +111,9 @@ byte ArduinoPositionRenderer::stepping() {
     
     notifyMovePartBefore();
   
-    if ( finalizeStep(IDX_X) == false ) { PRINT_DEBUG_VALUE1("finalizeStep(IDX_X)","false") }
-    if ( finalizeStep(IDX_Y) == false ) { PRINT_DEBUG_VALUE1("finalizeStep(IDX_Y)","false") }
-    if ( finalizeStep(IDX_Z) == false ) { PRINT_DEBUG_VALUE1("finalizeStep(IDX_Z)","false") }
+    if ( pX->finalizeStep() == false ) { PRINT_DEBUG_VALUE1("pX->finalizeStep()","false") }
+    if ( pY->finalizeStep() == false ) { PRINT_DEBUG_VALUE1("pY->finalizeStep()","false") }
+    if ( pZ->finalizeStep() == false ) { PRINT_DEBUG_VALUE1("pZ->finalizeStep()","false") }
   
     notifyMovePartAfter();
     
@@ -102,13 +125,13 @@ byte ArduinoPositionRenderer::directMove(int8_t dx, int8_t dy, int8_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
   mode = DirectMove;
 
-  if ( setDirection(IDX_X, dx) == false )
+  if ( pX->setDirection(dx) == false )
     return RET_ERROR;
 
-  if ( setDirection(IDX_Y, dy) == false )
+  if ( pY->setDirection(dy) == false )
     return RET_ERROR;
 
-  if ( setDirection(IDX_Z, dz) == false )
+  if ( pZ->setDirection(dz) == false )
     return RET_ERROR;
   
   // dx() = A[IDX_X] - B[IDX_X] 
@@ -151,13 +174,13 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
   // first setup the directions - this can be done once
   // because the directions didn't switch during a call of
   // renderAndStepAxisXYZ()
-  if ( setDirection(IDX_X, dx) == false )
+  if ( pX->setDirection(dx) == false )
     return RET_ERROR;
 
-  if ( setDirection(IDX_Y, dy) == false )
+  if ( pY->setDirection(dy) == false )
     return RET_ERROR;
 
-  if ( setDirection(IDX_Z, dz) == false )
+  if ( pZ->setDirection(dz) == false )
     return RET_ERROR;
   
   //------------------------------------------------------

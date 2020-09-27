@@ -578,12 +578,6 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 											writerGetterValues(pid, limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
 											break;
 		
-		case PID_GET_POS_COUNTER:			writerGetterValues(pid, getEmuPositionCounter(), getEmuPositionOverflowCounter()); break;
-		
-		case PID_GET_STEP_COUNTER_X:		writerGetterValues(pid, getEmuStepCounterX(), getEmuStepOverflowCounterX()); break;
-		case PID_GET_STEP_COUNTER_Y:		writerGetterValues(pid, getEmuStepCounterY(), getEmuStepOverflowCounterY()); break;
-		case PID_GET_STEP_COUNTER_Z:		writerGetterValues(pid, getEmuStepCounterZ(), getEmuStepOverflowCounterZ()); break;
-		
 		default:							auto it = setterMap.find((int)pid);
 											if ( it != setterMap.end() ) {
 												
@@ -653,9 +647,6 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 		switch ( pid ) {
 			case PID_ENABLE_STEPPERS:		stepperEnableState = (bool)( values.size() > 0 ? values.front() : 0 ); break;
 			case PID_POS_REPLY_THRESHOLD:	posReplyThreshold  = ( values.size() > 0 ? values.front() : 0 ); break;
-			
-			case PID_RESERT_POS_COUNTER:  	resetPositionCounter(); break;
-			case PID_RESERT_STEP_COUNTER: 	resetStepCounter(); 	break;
 			
 			case PID_X_POS:   				curEmulatorPos.setX(( values.size() > 0 ? values.front() : 0 )); break;
 			case PID_Y_POS:   				curEmulatorPos.setY(( values.size() > 0 ? values.front() : 0 )); break;

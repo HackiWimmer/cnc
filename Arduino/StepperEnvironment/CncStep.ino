@@ -4,7 +4,7 @@
 #ifndef SKETCH_COMPILE 
   #define CNC_STEPPER_LOG_FUNCTION()  \
     { \
-        const wxString logStr(wxString::Format("Stepper[%c]::%s", getAxisId(), __FUNCTION__)); \
+        const wxString logStr(wxString::Format("Stepper[%c]::%s", axisLabel, __FUNCTION__)); \
         ARDO_DEBUG_MESSAGE('D', logStr); \
     }
 #else
@@ -13,7 +13,7 @@
 
 #define CNC_STEPPER_DELAY_MICROS(us) \
   { \
-    if ( true ) { \
+    if ( false ) { \
       AE::delayMicroseconds(us); \
     } \
   }
@@ -42,13 +42,29 @@ namespace StepperParameter {
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
-CncArduinoStepper::CncArduinoStepper(const StepperSetup& ss) 
+CncArduinoStepper::CncArduinoStepper(
+  const StepperSetup&   ss,
+  const char            label,
+  readPin_funct         Fp_readLmtPins,
+  readPin_funct         Fp_readMinLmtPinF,
+  readPin_funct         Fp_readMaxLmtPinF,
+  writePin_funct        Fp_writeDirPinF,
+  writePin_funct        Fp_writeStpPinF
+) 
 /////////////////////////////////////////////////////////////////////////////////////
-: controller              (ss.controller)
+: axisLabel               (label)
+, readLmtPins             (Fp_readLmtPins)
+, readMinLmtPin           (Fp_readMinLmtPinF)
+, readMaxLmtPin           (Fp_readMaxLmtPinF)
+, writeDirPin             (Fp_writeDirPinF)
+, writeStpPin             (Fp_writeStpPinF)
+, controller              (ss.controller)
 , stpPin                  (ss.stpPin)
 , dirPin                  (ss.dirPin)
 , llmPin                  (ss.llmPin)
 , hlmPin                  (ss.hlmPin)
+, idvPid                  (ss.idvPid)
+, optimisticMode          (true)
 , interrupted             (false)
 , stepPhase               (false)
 , tsStartStep             (0L)
@@ -59,14 +75,10 @@ CncArduinoStepper::CncArduinoStepper(const StepperSetup& ss)
 {
 }
 /////////////////////////////////////////////////////////////////////////////////////
-CncArduinoStepper::~CncArduinoStepper() {
-/////////////////////////////////////////////////////////////////////////////////////  
-}
-/////////////////////////////////////////////////////////////////////////////////////
 void  CncArduinoStepper::printConfig() {
 /////////////////////////////////////////////////////////////////////////////////////
-  const unsigned char pidIncrementDirectionValue = getIncrementDirectionValuePid();
-  Serial.print(PID_AXIS); Serial.print(TEXT_SEPARATOR); Serial.print(getAxisId()); Serial.write(TEXT_CLOSE);
+  const unsigned char pidIncrementDirectionValue = idvPid;
+  Serial.print(PID_AXIS); Serial.print(TEXT_SEPARATOR); Serial.print(axisLabel); Serial.write(TEXT_CLOSE);
 
     StepperParameter::print(PID_PULSE_WIDTH_HIGH,                 highPulsWidth);
     StepperParameter::print(PID_FEEDRATE,                         getFeedrate());
@@ -108,8 +120,8 @@ void CncArduinoStepper::reset() {
 
   tsStartStep           = 0L;
 
-  ARDO_TRACE_STEPPER_DIR(getAxisId(), stepDirection)
-  ARDO_TRACE_STEPPER_POS(getAxisId(), curPos)
+  ARDO_TRACE_STEPPER_DIR(axisLabel, stepDirection)
+  ARDO_TRACE_STEPPER_POS(axisLabel, curPos)
 }
 //////////////////////////////////////////////////////////////////////////////
 bool CncArduinoStepper::resolveLimit() {
@@ -122,7 +134,7 @@ bool CncArduinoStepper::resolveLimit() {
       short cnt  = 0;
       setDirection(step);
       
-      while ( readLimitPins() == LimitSwitch::LIMIT_SWITCH_ON ) {
+      while ( readLmtPins() == LimitSwitch::LIMIT_SWITCH_ON ) {
         performStep();
 
         if ( ( ++cnt * feedrate ) > 12.0 ) // max mm - a typical sensor diameter
@@ -133,7 +145,7 @@ bool CncArduinoStepper::resolveLimit() {
       }        
     }
 
-   return readLimitPins() == LimitSwitch::LIMIT_SWITCH_OFF;
+   return ( readLmtPins() == LimitSwitch::LIMIT_SWITCH_OFF );
 }   
 //////////////////////////////////////////////////////////////////////////////
 int8_t CncArduinoStepper::readLimitState() {
@@ -148,19 +160,9 @@ int8_t CncArduinoStepper::readLimitState() {
   return LimitSwitch::LIMIT_UNSET;
 }
 //////////////////////////////////////////////////////////////////////////////
-bool CncArduinoStepper::readLimitPins() {
-//////////////////////////////////////////////////////////////////////////////
-  const bool isLimit = (    readMinLmtPin() == LimitSwitch::LIMIT_SWITCH_ON 
-                         || readMaxLmtPin() == LimitSwitch::LIMIT_SWITCH_ON 
-                       );
-  
-  return isLimit ? LimitSwitch::LIMIT_SWITCH_ON : LimitSwitch::LIMIT_SWITCH_OFF;
-}
-//////////////////////////////////////////////////////////////////////////////
 bool CncArduinoStepper::isLimitPinRelevant() {
 /////////////////////////////////////////////////////////////////////////////
-  const bool val = readLimitPins();
-  if ( val == LimitSwitch::LIMIT_SWITCH_ON ) {
+  if ( readLmtPins() == LimitSwitch::LIMIT_SWITCH_ON ) {
 
     switch ( stepDirection ) {
 
@@ -190,10 +192,7 @@ bool CncArduinoStepper::isLimitPinRelevant() {
 //////////////////////////////////////////////////////////////////////////////
 bool CncArduinoStepper::setDirection(int32_t steps) {
 //////////////////////////////////////////////////////////////////////////////
-  if      ( steps <  0 ) return setDirection(SD_DEC);
-  else if ( steps >= 0 ) return setDirection(SD_INC);
-
-  return false;
+  return setDirection(steps < 0 ? SD_DEC : SD_INC);
 }
 //////////////////////////////////////////////////////////////////////////////
 bool CncArduinoStepper::setDirection(const StepDirection sd) {
@@ -213,7 +212,7 @@ bool CncArduinoStepper::setDirection(const StepDirection sd) {
     CNC_STEPPER_DELAY_MICROS(10);
   }
 
-  ARDO_TRACE_STEPPER_DIR(getAxisId(), stepDirection)
+  ARDO_TRACE_STEPPER_DIR(axisLabel, stepDirection)
   
   return true;
 }
@@ -230,14 +229,14 @@ byte CncArduinoStepper::performStep() {
 byte CncArduinoStepper::initiateStep() {
 //////////////////////////////////////////////////////////////////////////////
   // avoid everything in this states
-  if ( isInterrupted() )
-    return RET_INTERRUPT;
-
+  //if ( isInterrupted() )
+    //return 
+    /*
   if ( stepDirection == SD_UNKNOWN ) {
     controller->broadcastInterrupt();
     return RET_INTERRUPT;
   }
-
+ */
   if ( isLimitPinRelevant() == true )
     return RET_LIMIT;
 
@@ -247,35 +246,39 @@ byte CncArduinoStepper::initiateStep() {
   // generate the step impuls ....
   CNC_STEPPER_WRITE_STP_PIN(PL_HIGH);
 
-  tsStartStep = ArdoTs::now();
+  //tsStartStep = ArdoTs::now();
   return RET_OK;
 }
 //////////////////////////////////////////////////////////////////////////////
 byte CncArduinoStepper::finalizeStep() {
 //////////////////////////////////////////////////////////////////////////////
   // avoid everything in this states
-  if ( isInterrupted() )
-    return RET_INTERRUPT;
+  //if ( isInterrupted() )
+    //return RET_INTERRUPT;
 
+/*
   if ( stepDirection == SD_UNKNOWN ) {
     controller->broadcastInterrupt();
     return RET_INTERRUPT;
   }
-
+*/
   if ( stepPhase == false )
     return RET_OK;
-
-  const int32_t  tpPuls = highPulsWidth - ArdoTs::timespan(tsStartStep);
+/*
+  if ( optimisticMode == false ) {
+    const int32_t  tpPuls = highPulsWidth - ArdoTs::timespan(tsStartStep);
   
-  // guarantee the min. pulse width
-  if ( tpPuls > 0 ) CNC_STEPPER_DELAY_MICROS(tpPuls);
-
+    // guarantee the min. pulse width
+    if ( tpPuls > 0 ) CNC_STEPPER_DELAY_MICROS(tpPuls);
+  }
+ */
+  
   // finish the step impuls
   CNC_STEPPER_WRITE_STP_PIN(PL_LOW);
 
   // position handling -/+1
   curPos += stepDirection;
-  ARDO_TRACE_STEPPER_POS(getAxisId(), curPos)
+  ARDO_TRACE_STEPPER_POS(axisLabel, curPos)
   
   return RET_OK;
 }

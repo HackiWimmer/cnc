@@ -99,12 +99,23 @@ void Serial::sleepMilliseconds(unsigned int millis) {
 	CncTimeFunctions::sleepMilliseconds(millis);
 }
 ///////////////////////////////////////////////////////////////////
+void Serial::resetTotalDistance() { 
+///////////////////////////////////////////////////////////////////
+	totalDistanceMetric[0] = 0.0;
+	totalDistanceMetric[1] = 0.0;
+	totalDistanceMetric[2] = 0.0;
+	totalDistanceMetric[3] = 0.0;
+	
+	totalDistanceSteps[0]  = 0L;
+	totalDistanceSteps[1]  = 0L;
+	totalDistanceSteps[2]  = 0L;
+	totalDistanceSteps[3]  = 0L;
+}
+///////////////////////////////////////////////////////////////////
 void Serial::startMeasurement() {
 ///////////////////////////////////////////////////////////////////
 	measurementActive = true;
 	
-	resetPositionCounter();
-	resetStepCounter();
 	resetTotalDistance();
 	
 	tsMeasurementStart  = CncTimeFunctions::getNanoTimestamp();
@@ -317,99 +328,6 @@ bool Serial::isMoveCommand(unsigned char cmd) {
 	   }
 		
 	return false;
-}
-///////////////////////////////////////////////////////////////////
-void Serial::resetPositionCounter() {
-///////////////////////////////////////////////////////////////////
-	processSetter(PID_RESERT_POS_COUNTER, 0);
-}
-///////////////////////////////////////////////////////////////////
-size_t Serial::getPositionCounter() {
-///////////////////////////////////////////////////////////////////
-	if ( cncControl->isInterrupted() )
-		return 0;
-		
-	if ( cncControl->isConnected() == false )
-		return 0;
-		
-	if ( SerialCommandLocker::isCommandActive() )
-		return 0;
-	
-	std::vector<int32_t> list;
-	if ( processGetter(PID_GET_POS_COUNTER, list) && list.size() == 2 ) {
-		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
-		// to get the whole unsigned int32_t range the controller starts counting with MIN_LONG
-		size_t ret  = list.at(0) + abs(MIN_LONG);
-		ret        += list.at(1) * (abs(MIN_LONG) + MAX_LONG);
-		return ret;
-	}
-	
-	return 0;
-}
-///////////////////////////////////////////////////////////////////
-void Serial::resetStepCounter() {
-///////////////////////////////////////////////////////////////////
-	processSetter(PID_RESERT_STEP_COUNTER, 0);
-}
-///////////////////////////////////////////////////////////////////
-void Serial::resetTotalDistance() { 
-///////////////////////////////////////////////////////////////////
-	totalDistanceMetric[0] = 0.0;
-	totalDistanceMetric[1] = 0.0;
-	totalDistanceMetric[2] = 0.0;
-	totalDistanceMetric[3] = 0.0;
-	
-	totalDistanceSteps[0]  = 0L;
-	totalDistanceSteps[1]  = 0L;
-	totalDistanceSteps[2]  = 0L;
-	totalDistanceSteps[3]  = 0L;
-}
-///////////////////////////////////////////////////////////////////
-size_t Serial::requestStepCounter(unsigned char pid) {
-///////////////////////////////////////////////////////////////////
-	if ( cncControl->isInterrupted() )
-		return 0;
-		
-	if ( cncControl->isConnected() == false )
-		return 0;
-	
-	if ( SerialCommandLocker::isCommandActive() )
-		return 0;
-	
-	std::vector<int32_t> list;
-	if ( processGetter(pid, list) && list.size() == 2 ) {
-		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
-		// to get the whole unsigned int32_t range the controller starts counting with MIN_LONG
-		size_t ret =  list.at(0) + abs(MIN_LONG);
-		ret        += list.at(1) * (abs(MIN_LONG) + MAX_LONG);
-		return ret;
-	}
-	
-	return 0;
-}
-///////////////////////////////////////////////////////////////////
-size_t Serial::getStepCounter() {
-///////////////////////////////////////////////////////////////////
-	size_t ret = 0;
-	ret += requestStepCounter(PID_GET_STEP_COUNTER_X);
-	ret += requestStepCounter(PID_GET_STEP_COUNTER_Y);
-	ret += requestStepCounter(PID_GET_STEP_COUNTER_Z);
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-size_t Serial::getStepCounterX() {
-///////////////////////////////////////////////////////////////////
-	return requestStepCounter(PID_GET_STEP_COUNTER_X);
-}
-///////////////////////////////////////////////////////////////////
-size_t Serial::getStepCounterY() {
-///////////////////////////////////////////////////////////////////
-	return requestStepCounter(PID_GET_STEP_COUNTER_Y);
-}
-///////////////////////////////////////////////////////////////////
-size_t Serial::getStepCounterZ() {
-///////////////////////////////////////////////////////////////////
-	return requestStepCounter(PID_GET_STEP_COUNTER_Z);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::dataAvailable() {
@@ -795,7 +713,6 @@ bool Serial::popSerial(bool returnImmediately) {
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%s'", ArduinoCMDs::getCMDLabel(cmd)));
 	
-	//lastFetchResult.init(cmd);
 	SerialFetchInfo sfi(cmd);
 	sfi.fetchTimeout 			= 1000;
 	sfi.fetchTimeoutErrorInfo 	= false;
@@ -807,7 +724,11 @@ bool Serial::popSerial(bool returnImmediately) {
 		
 		ret = evaluateResultWrapper(sfi, std::cout);
 		if ( ret == false ) {
-			std::cerr << "Error while processing popSerial: " << std::endl;
+			std::cerr   << "Error while processing 'Serial::popSerial()': "											<< std::endl
+						<< " Serial CMD = " << ArduinoCMDs::getCMDLabel((const unsigned char)lastFetchResult.cmd)	<< std::endl
+						<< " Serial RET = " << ArduinoPIDs::getPIDLabel((const unsigned char)lastFetchResult.ret)	<< std::endl
+			;
+			
 			return false;
 		}
 	}
@@ -983,7 +904,7 @@ bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 		sfi.fetchTimeout = 1000;
 		sfi.Gc.list = &list;
 
-		ret =  evaluateResultWrapper(sfi, std::cout);
+		ret = evaluateResultWrapper(sfi, std::cout);
 		
 	} else {
 		std::cerr << "Serial::processGetter: Unable to write data" << std::endl;

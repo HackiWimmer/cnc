@@ -11,6 +11,7 @@
 #include <wx/intl.h>
 #include <wx/propgrid/property.h>
 #include "OSD/CncTimeFunctions.h"
+#include "CncTextCtrl.h"
 #include "CncLoggerProxy.h"
 #include "CncConfigProperty.h"
 #include "CncFileNameService.h"
@@ -111,16 +112,7 @@ namespace GlobalStreamRedirection {
 			return;
 			
 		// perform startup trace
-		CncTextCtrl* st = mainFrame->getStartupTrace();
-		st->Clear();
-		
-		wxTextAttr ta(wxColour(192, 192, 192));
-		st->SetDefaultStyle(ta);
-		bool hasLogOrErr = StartupBuffer::trace(st);
-		mainFrame->GetLoggerNotebook()->SetPageText(LoggerSelection::VAL::STARTUP, (hasLogOrErr == true ? ")-:" : "(-;"));
-		
-		st->SetInsertionPoint(st->XYToPosition(0, 0));
-		st->ShowPosition(st->XYToPosition(0, 0));
+		StartupBuffer::trace(mainFrame->getLoggerView());
 		
 		// set the logger control
 		psbufCout->setTextControl(mainFrame->getLogger());

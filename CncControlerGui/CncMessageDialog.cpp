@@ -131,6 +131,7 @@ CncFileContentDialog::~CncFileContentDialog() {
 void CncFileContentDialog::setFileName(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////////
 	wxString msg;
+	
 	if ( wxFileName::Exists(fileName) == true ) {
 		std::ifstream ifs (fileName.c_str().AsChar(), std::ifstream::in);
 		char c = ifs.get();

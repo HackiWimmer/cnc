@@ -28,6 +28,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     CncAxisX*           X;
     CncAxisY*           Y;
     CncAxisZ*           Z;
+    
     ArduinoTestManager* testManager;
 
     ImpulseCalculator   impulseCalculator;

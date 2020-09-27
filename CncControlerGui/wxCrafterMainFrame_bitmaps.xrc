@@ -108,7 +108,6 @@
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="db_update">bitmaps\db_update.png</object>
-  <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
@@ -134,7 +133,6 @@
   <object class="wxBitmap" name="go-down-2">bitmaps\go-down-2.png</object>
   <object class="wxBitmap" name="go-down-7">bitmaps\go-down-7.png</object>
   <object class="wxBitmap" name="go-first-view">bitmaps\go-first-view.png</object>
-  <object class="wxBitmap" name="go-jump-today">bitmaps\go-jump-today.png</object>
   <object class="wxBitmap" name="go-last-view">bitmaps\go-last-view.png</object>
   <object class="wxBitmap" name="go-next-2">bitmaps\go-next-2.png</object>
   <object class="wxBitmap" name="go-next-context">bitmaps\go-next-context.png</object>
@@ -142,9 +140,7 @@
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
-  <object class="wxBitmap" name="lightbulb-off">bitmaps\lightbulb-off.png</object>
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
-  <object class="wxBitmap" name="lock-edit">bitmaps\lock-edit.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
   <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
   <object class="wxBitmap" name="network-wireless-full (2)">bitmaps\network-wireless-full (2).png</object>
@@ -154,7 +150,6 @@
   <object class="wxBitmap" name="options16">bitmaps\gamepad\options16.png</object>
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
-  <object class="wxBitmap" name="pencil-add">bitmaps\pencil-add.png</object>
   <object class="wxBitmap" name="playstation-cross-dark-icon16">bitmaps\gamepad\playstation-cross-dark-icon16.png</object>
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
   <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
@@ -180,6 +175,7 @@
   <object class="wxBitmap" name="time">bitmaps\time.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
+  <object class="wxBitmap" name="view-calendar-month">bitmaps\view-calendar-month.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>

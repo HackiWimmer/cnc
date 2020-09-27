@@ -24,6 +24,7 @@
 #include "CncContext.h"
 #include "CncGamePad.h"
 #include "CncFileNameService.h"
+#include "CncLoggerView.h"
 #include "CncLoggerProxy.h"
 #include "wxCrafterImages.h"
 #include "MainFrame.h"
@@ -298,12 +299,13 @@ bool CncControl::setup(bool doReset) {
 	// evaluate limit states
 	evaluateLimitState();
 	
-	std::cout << " Starting controller initialization . . . \n";
-	CncTextCtrl* logger = THE_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
-	logger->logCurrentPosition();
+	std::cout << " Starting controller initialization . . .";
+	THE_APP->getLoggerView()->logCurrentPosition(LoggerSelection::VAL::CNC);
+	std::cout << std::endl;
 	
 	// setup probe mode
 	if ( enableProbeMode(THE_CONTEXT->isProbeMode()) == false ) {
+		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "Error");
 		std::cerr << " CncControl::setup: Probe mode configuration failed!\n";
 		return false;
 	}
@@ -343,6 +345,7 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Z, dirValueZ));
 	
 	if ( processSetterList(setup) == false) {
+		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "Error");
 		std::cerr << " CncControl::setup: Calling processSetterList() failed!\n";
 		return false;
 	}
@@ -352,11 +355,7 @@ bool CncControl::setup(bool doReset) {
 	// speed setup
 	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
 	
-	// check if some output was logged in between, if not 
-	// remove last '\n' and put 'Ready' at the end of the
-	// same line as the starting the initialization hint
-	logger->skipBackIfLoggedPositionEqualCurrent();
-	std::clog << "Ready - OK\n";
+	THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "OK");
 	serialPort->notifySetupSuccesfullyFinsihed();
 	return true;
 }
@@ -381,15 +380,12 @@ bool CncControl::disconnect() {
 	if ( serialPort->isConnected() ) {
 		enableStepperMotors(ENABLE_STATE_OFF);
 		
-		CncTextCtrl* logger = THE_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
-		
 		std::cout << " Disconnecting serial port . . .\n";
-		logger->logCurrentPosition();
+		THE_APP->getLoggerView()->logCurrentPosition(LoggerSelection::VAL::CNC);
 		
 		serialPort->disconnect();
 		
-		logger->skipBackIfLoggedPositionEqualCurrent();
-		std::clog << " Disconnected\n";
+		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "OK");
 	}
 	
 	return true;
@@ -632,15 +628,8 @@ bool CncControl::reset() {
 	resetInterrupt();
 	resetPositionOutOfRangeFlag();
 	
-	CncLoggerProxy* logger = THE_CONFIG->getTheApp()->getLogger(); 
-	wxASSERT( logger != NULL );
-	
 	std::cout << " Try to reset the controller . . .\n";
-	logger->logCurrentPosition();
-	
 	bool ret = processCommand(CMD_RESET_CONTROLLER, std::cerr);
-	
-	logger->skipBackIfLoggedPositionEqualCurrent();
 	if ( ret == true )  { std::clog << " Controller reseted - OK\n"; } 
 	else 				{ std::cerr << " Controller reset failed\n"; return false; }
 	
@@ -919,13 +908,13 @@ bool CncControl::dispatchEventQueue() {
 	
 	if ( CncAsyncKeyboardState::isEscapePressed() != 0 ) {
 		if ( THE_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true ) {
-			std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
+			std::cerr << "dispatchEventQueue: ESCAPE key detected" << std::endl;
 			interrupt("ESCAPE detected");
 		}
 	}
 	
 	if ( isInterrupted() ) {
-		std::cerr << "SerialCallback: Interrupt detected"<< std::endl;
+		std::cerr << "dispatchEventQueue: Interrupt detected"<< std::endl;
 		return false;
 	}
 	
@@ -1107,7 +1096,7 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 					std::cout << "Received the following CNC Controller Information: '" << msg << "'\n";
 	}
 	
-	cnc::msg.setTextColour(wxColour(128, 128, 0));
+	cnc::msg.setTextColour(wxColour(192, 192, 192));
 	cnc::msg << "-------------------------------------------------------------------------------------------\n";
 	cnc::msg.resetTextAttr();
 

@@ -29,13 +29,12 @@
 #include <wx/tglbtn.h>
 #include <wx/button.h>
 #include <wx/panel.h>
-#include <wx/choice.h>
-#include <wx/arrstr.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/statline.h>
 #include <wx/notebook.h>
 #include <wx/combobox.h>
+#include <wx/arrstr.h>
 #include <wx/stc/stc.h>
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
@@ -103,7 +102,6 @@ protected:
     wxBitmapButton* m_rcStop;
     wxButton* m_btnEmergenyStop;
     wxPanel* m_winMainView;
-    wxChoice* m_mainViewSelector;
     wxSimplebook* m_mainViewBook;
     wxPanel* m_mainBookSourcePanel;
     wxButton* m_openSourceExtern;
@@ -318,7 +316,6 @@ protected:
     wxTextCtrl* m_filePreviewDetails;
     wxTextCtrl* m_currentFileMangerPreviewFileName;
     wxPanel* m_winMonitorView;
-    wxChoice* m_monitorViewSelector;
     wxSimplebook* m_monitorViewBook;
     wxPanel* m_monitorBookCncPanel;
     wxNotebook* m_outboundNotebook;
@@ -420,6 +417,7 @@ protected:
     wxListCtrl* m_setterList;
     wxPanel* m_conrollerMessages;
     wxStaticText* m_staticText1283132;
+    wxButton* m_btViewMsgHistory;
     wxButton* m_btClearMsgHistory;
     wxTextCtrl* m_controllerMsgHistoryPlaceholder;
     wxPanel* m_motionVertexTrace;
@@ -460,19 +458,7 @@ protected:
     wxPanel* m_splitterPage6490;
     wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_winLoggerView;
-    wxNotebook* m_loggerNotebook;
-    wxPanel* m_panelStartupTrace;
-    wxTextCtrl* m_startupTracePlaceholder;
-    wxPanel* m_panel5878;
-    wxTextCtrl* m_loggerPlaceholder;
-    wxBitmapButton* m_clearLogger;
-    wxBitmapButton* m_copyLogger;
-    wxStaticLine* m_staticLine76051;
-    wxBitmapToggleButton* m_showLoggerOnDemand;
-    wxStaticLine* m_staticLine7605;
-    wxBitmapToggleButton* m_freezeLogger;
-    wxStaticBitmap* m_staticBitmap5890;
-    wxTextCtrl* m_tmpTraceInfoPlaceholder;
+    wxPanel* m_loggerViewPlaceholder;
     wxPanel* m_statusBar;
     wxStaticText* m_svgParseMode;
     wxStaticLine* m_staticLine6801;
@@ -772,7 +758,6 @@ protected:
     virtual void rcPause(wxCommandEvent& event) { event.Skip(); }
     virtual void rcStop(wxCommandEvent& event) { event.Skip(); }
     virtual void emergencyStop(wxCommandEvent& event) { event.Skip(); }
-    virtual void mainViewSelectorSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void cncMainViewChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void openTemplateSourceExtern(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateSvgExtern(wxCommandEvent& event) { event.Skip(); }
@@ -819,12 +804,12 @@ protected:
     virtual void moveZToTop(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToBottom(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectStepSensitivity(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectStepMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCaseBookChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void selectTestIntervalMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCountXSpinCtl(wxSpinEvent& event) { event.Skip(); }
     virtual void testCountXUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void testSwitchToolOnOff(wxCommandEvent& event) { event.Skip(); }
-    virtual void monitorViewSelectorSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void outboundBookChanging(wxNotebookEvent& event) { event.Skip(); }
     virtual void nootebookConfigChanged(wxListbookEvent& event) { event.Skip(); }
@@ -861,13 +846,10 @@ protected:
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void refreshSetterList(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
     virtual void onChangePreviewMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
-    virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
-    virtual void onShowLoggerOnDemand(wxCommandEvent& event) { event.Skip(); }
-    virtual void freezeLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickHeartbeatState(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
@@ -1000,7 +982,6 @@ public:
     wxBitmapButton* GetRcStop() { return m_rcStop; }
     wxButton* GetBtnEmergenyStop() { return m_btnEmergenyStop; }
     wxAuiToolBar* GetAuibarMain() { return m_auibarMain; }
-    wxChoice* GetMainViewSelector() { return m_mainViewSelector; }
     wxButton* GetOpenSourceExtern() { return m_openSourceExtern; }
     wxButton* GetOpenSvgExtern() { return m_openSvgExtern; }
     wxStaticLine* GetStaticLine44728() { return m_staticLine44728; }
@@ -1215,7 +1196,6 @@ public:
     wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
     wxSimplebook* GetMainViewBook() { return m_mainViewBook; }
     wxPanel* GetWinMainView() { return m_winMainView; }
-    wxChoice* GetMonitorViewSelector() { return m_monitorViewSelector; }
     wxStaticText* GetStaticText11481() { return m_staticText11481; }
     wxListCtrl* GetCncSummaryListCtrl() { return m_cncSummaryListCtrl; }
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
@@ -1311,6 +1291,7 @@ public:
     wxListCtrl* GetSetterList() { return m_setterList; }
     wxPanel* GetCncSetters() { return m_cncSetters; }
     wxStaticText* GetStaticText1283132() { return m_staticText1283132; }
+    wxButton* GetBtViewMsgHistory() { return m_btViewMsgHistory; }
     wxButton* GetBtClearMsgHistory() { return m_btClearMsgHistory; }
     wxTextCtrl* GetControllerMsgHistoryPlaceholder() { return m_controllerMsgHistoryPlaceholder; }
     wxPanel* GetConrollerMessages() { return m_conrollerMessages; }
@@ -1357,19 +1338,7 @@ public:
     wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
     wxPanel* GetFileViews() { return m_fileViews; }
     wxPanel* GetWinFileView() { return m_winFileView; }
-    wxTextCtrl* GetStartupTracePlaceholder() { return m_startupTracePlaceholder; }
-    wxPanel* GetPanelStartupTrace() { return m_panelStartupTrace; }
-    wxTextCtrl* GetLoggerPlaceholder() { return m_loggerPlaceholder; }
-    wxBitmapButton* GetClearLogger() { return m_clearLogger; }
-    wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
-    wxStaticLine* GetStaticLine76051() { return m_staticLine76051; }
-    wxBitmapToggleButton* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
-    wxStaticLine* GetStaticLine7605() { return m_staticLine7605; }
-    wxBitmapToggleButton* GetFreezeLogger() { return m_freezeLogger; }
-    wxPanel* GetPanel5878() { return m_panel5878; }
-    wxNotebook* GetLoggerNotebook() { return m_loggerNotebook; }
-    wxStaticBitmap* GetStaticBitmap5890() { return m_staticBitmap5890; }
-    wxTextCtrl* GetTmpTraceInfoPlaceholder() { return m_tmpTraceInfoPlaceholder; }
+    wxPanel* GetLoggerViewPlaceholder() { return m_loggerViewPlaceholder; }
     wxPanel* GetWinLoggerView() { return m_winLoggerView; }
     wxStaticText* GetSvgParseMode() { return m_svgParseMode; }
     wxStaticLine* GetStaticLine6801() { return m_staticLine6801; }

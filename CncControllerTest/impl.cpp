@@ -2,6 +2,7 @@
 #include <cmath> 
 #include "impl.h"
 #include <wx/string.h>
+#include <wx/datetime.h>
 
 #define PRINT_DEBUG_VALUE(vName, vValue)    std::cout << std::endl << "*** D1: " << vName << " = " << vValue << std::endl << std::endl;
 #define ARDO_DEBUG_MESSAGE(a,b)             std::cout << std::endl << "*** D2: " << a     << " = " << b      << std::endl << std::endl;
@@ -44,11 +45,100 @@ unsigned long __sqrt(unsigned long x) {
 	// xr + 1: add for rounding
 	return xr < x ? xr + 1 : xr;
 }
+/*
+virtual bool readMinLmtPin()                                  { return READ_LMT_PIN_X_MIN; }  
+    virtual bool readMaxLmtPin()                                  { return READ_LMT_PIN_X_MAX; }  
+    virtual bool readLmtPins()                                    { return READ_LMT_PIN_X;     }  
+    virtual void writeDirPin(bool value)                          { WRITE_DIR_PIN_X            }
+    virtual void writeStpPin(bool value)                          { WRITE_STP_PIN_X            }  
+
+  public:
+    CncAxisX(const StepperSetup& ss) 
+    : CncArduinoStepper(ss)                                       {}
+    virtual ~CncAxisX()                                           {}
+    virtual char              getAxisId()   
+*/
+//template <bool o, typename T> 
+
+class Base {
+	
+	typedef bool 			(*readPin_funct) 	(void);
+	typedef void 			(*writePin_funct) 	(void);
+	
+	protected:
+		
+		char axis;
+		
+		readPin_funct	readLmtPins;
+		readPin_funct	readMinLmtPin;
+		readPin_funct	readMaxLmtPin;
+		writePin_funct	writeDirPin;
+		writePin_funct	writeStpPin;
+		
+	protected:
+		Base(
+			char 			aId, 
+			readPin_funct 	fMinMax,
+			readPin_funct 	fMin,
+			readPin_funct 	fMax
+		)
+		: axis				(aId)
+		, readLmtPins		(fMinMax)
+		, readMinLmtPin		(fMin)
+		, readMaxLmtPin		(fMax)
+		{}
+		
+	public:
+		
+		void test () {
+			std::cout << readLmtPins() << std::endl;
+			std::cout << readMinLmtPin() << std::endl;
+			std::cout << readMaxLmtPin() << std::endl;
+		}
+};
+
+#undef READ_LMT_PIN_X_MIN
+#undef READ_LMT_PIN_X_MAX
+#undef READ_LMT_PIN_X
+
+#define READ_LMT_PIN_X_MIN	true
+#define READ_LMT_PIN_X_MAX	true
+#define READ_LMT_PIN_X		false
+
+class X : public Base {
+
+	public:
+		static bool readLmtPins()       { return READ_LMT_PIN_X;     }  
+		static bool readMinLmtPin()     { return READ_LMT_PIN_X_MIN; }  
+		static bool readMaxLmtPin()     { return READ_LMT_PIN_X_MAX; }  
+		
+		X() 
+		: Base(
+			'X',
+			&X::readLmtPins,
+			&X::readMinLmtPin,
+			&X::readMaxLmtPin
+		)
+		{}
+		
+	
+};
 
 ////////////////////////////////////////////////////
 void Implementation::run() {
 ////////////////////////////////////////////////////
 	std::cout << "Start . . ." << std::endl;
+	
+	
+	std::cout << wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S").c_str() << std::endl;
+	
+	return;
+	
+	X x;
+	x.test();
+	
+	return;
+	
 	
 	class MyArduinoAccelManager : public ArduinoAccelManager {
 		

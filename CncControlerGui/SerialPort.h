@@ -342,8 +342,8 @@ class Serial : public SerialOSD {
 		void incTotalDistance(int32_t dx, int32_t dy, int32_t dz);
 		void incTotalDistance(const CncLongPosition& pos, int32_t cx, int32_t cy, int32_t cz);
 		void incTotalDistance(unsigned int size, const int32_t (&values)[3]);
-		
 		void resetTotalDistance(); 
+		
 		void logMeasurementRefTs(const CncLongPosition& pos);
 		void logMeasurementLastTs();
 		
@@ -449,17 +449,6 @@ class Serial : public SerialOSD {
 		virtual void processTrigger(const Serial::Trigger::EndRun& tr)		{}
 		virtual void processTrigger(const Serial::Trigger::NextPath& tr)	{}
 		virtual void processTrigger(const Serial::Trigger::SpeedChange& tr)	{}
-		
-		// position movement counting
-		virtual void resetPositionCounter();
-		virtual size_t getPositionCounter();
-
-		virtual void resetStepCounter();
-		size_t requestStepCounter(unsigned char pid);
-		virtual size_t getStepCounter();
-		virtual size_t getStepCounterX();
-		virtual size_t getStepCounterY();
-		virtual size_t getStepCounterZ();
 		
 		size_t getTotalDistanceStepsX() { return totalDistanceSteps[0]; }
 		size_t getTotalDistanceStepsY() { return totalDistanceSteps[1]; }

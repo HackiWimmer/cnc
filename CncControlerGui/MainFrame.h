@@ -44,7 +44,12 @@ class GamepadThread;
 
 class SerialThread;
 class SerialThreadStub;
-class CncLoggerProxy;
+class CncStartupLoggerProxy;
+class CncStandardLoggerProxy;
+class CncMsgHistoryLoggerProxy;
+class CncTraceProxy;
+class CncLoggerView;
+class CncLoggerListCtrl;
 
 class CncSourceEditor;
 class CncOutboundEditor;
@@ -137,10 +142,11 @@ class GlobalConfigManager {
 class MainFrameBase : public MainFrameBClass {
 	
 	private:
-		CncLoggerProxy* logger;
-		CncTextCtrl* 	startupTrace;
-		CncTextCtrl* 	tmpTraceInfo;
-		CncTextCtrl* 	controllerMsgHistory;
+		CncStandardLoggerProxy* 	logger;
+		CncStartupLoggerProxy* 		startupTrace;
+		CncLoggerView*				loggerView;
+		CncTraceProxy* 				tmpTraceInfo;
+		CncMsgHistoryLoggerProxy*	controllerMsgHistory;
 		
 		virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
 		
@@ -149,10 +155,11 @@ class MainFrameBase : public MainFrameBClass {
 		virtual ~MainFrameBase();
 		
 		// global trace controls
-		CncLoggerProxy* getLogger() 			{ return logger; }
-		CncTextCtrl* 	getStartupTrace() 		{ return startupTrace; }
-		CncTextCtrl* 	getTrace() 				{ return tmpTraceInfo; }
-		CncTextCtrl* 	getCtrlMessageHistory() { return controllerMsgHistory; }
+		CncStandardLoggerProxy* 	getLogger() 			{ return logger; }
+		CncStartupLoggerProxy* 		getStartupTrace() 		{ return startupTrace; }
+		CncLoggerView*				getLoggerView()			{ return loggerView; }
+		CncTraceProxy* 				getTrace() 				{ return tmpTraceInfo; }
+		CncMsgHistoryLoggerProxy*	getCtrlMessageHistory() { return controllerMsgHistory; }
 		
 };
 
@@ -161,6 +168,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void viewControllerMsgHistory(wxCommandEvent& event);
 		virtual void onSelectStepSensitivity(wxCommandEvent& event);
 		virtual void onSelectStepMode(wxCommandEvent& event);
 		virtual void clickAdditionalParameters(wxCommandEvent& event);
@@ -178,8 +186,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void selectPortSec(wxCommandEvent& event);
 		virtual void onCloseSecureRunAuiPane(wxCommandEvent& event);
 		virtual void onOpenGLContextObserver(wxCommandEvent& event);
-		virtual void onShowLoggerOnDemand(wxCommandEvent& event);
-		virtual void freezeLogger(wxCommandEvent& event);
 		virtual void changeMonitorListBook(wxListbookEvent& event);
 		virtual void showStacktraceStore(wxCommandEvent& event);
 		virtual void onSelectSpyInboundDetails(wxDataViewEvent& event);
@@ -256,8 +262,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void onSelectReferences(wxCommandEvent& event);
 		virtual void onSelectSetup(wxCommandEvent& event);
 		virtual void onSelectTemplate(wxCommandEvent& event);
-		virtual void mainViewSelectorSelected(wxCommandEvent& event);
-		virtual void monitorViewSelectorSelected(wxCommandEvent& event);
 		virtual void viewStatusbar(wxCommandEvent& event);
 		virtual void searchAvailiablePorts(wxCommandEvent& event);
 		virtual void unitTestFramework(wxCommandEvent& event);
@@ -312,7 +316,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void maximizeAuiPane(wxAuiManagerEvent& event);
 		virtual void saveTemplateFromButton(wxCommandEvent& event);
 		virtual void toggleTemplateWordWrapMode(wxCommandEvent& event);
-		virtual void copyLogger(wxCommandEvent& event);
 		virtual void closeAuiPane(wxAuiManagerEvent& evt);
 		virtual void toogleSvgEditSearchFlag(wxCommandEvent& event);
 		virtual void svgEditSelected(wxCommandEvent& event);
@@ -366,7 +369,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void defineAllowEvents(wxCommandEvent& event);
 		virtual void defineOnlineDrawing(wxCommandEvent& event);
 		virtual void selectUnit(wxCommandEvent& event);
-		virtual void clearLogger(wxCommandEvent& event);
 		virtual void connect(wxCommandEvent& event);
 		virtual void selectUAInboundPathList(wxDataViewEvent& event);
 		virtual void selectUAUseDirectiveList(wxDataViewEvent& event);
@@ -542,6 +544,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		CncControl* getCncControl() 						{ return cnc; }
 		CncPreprocessor* getCncPreProcessor()				{ return cncPreprocessor; }
+		CncLoggerListCtrl* getCtrlMsgHistoryList()			{ return controllersMsgHistoryList; }
 		
 		CncGCodeSequenceListCtrl* getGCodeSequenceList() 	{ return gCodeSequenceList; }
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
@@ -577,7 +580,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void cncTransactionReleaseCallback();
 		
 		friend class MainFrameProxy;
-		friend class CncLoggerProxy;
+		friend class CncMsgHistoryLoggerProxy;
+		friend class CncLoggerListCtrl;
 		friend class CncPerspective;
 
 		friend class CncBaseEditor;
@@ -587,9 +591,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncGampadDeactivator;
 		friend class CncTransactionLock;
 
-		friend class UpdateManagerThread;
 		friend class GamepadThread;
-		friend class CncGamepadEventFilter;
 		friend class SerialThread;
 		friend class SerialThreadStub;
 
@@ -660,6 +662,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncManuallyMoveCoordinates*		cncManuallyMoveCoordPanel;
 		CncGamepadControllerSpy* 		gamepadControllerSpy;
 		CncGamepadControllerState*		gamepadStatusCtl; 
+		CncLoggerListCtrl* 				controllersMsgHistoryList;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;

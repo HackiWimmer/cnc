@@ -136,6 +136,7 @@ protected:
     wxTimer* m_continuesTimer;
 
 protected:
+    virtual void show(wxShowEvent& event) { event.Skip(); }
     virtual void dclickNaviXY(wxMouseEvent& event) { event.Skip(); }
     virtual void dclickNaviZ(wxMouseEvent& event) { event.Skip(); }
     virtual void dclickLeftStick(wxMouseEvent& event) { event.Skip(); }

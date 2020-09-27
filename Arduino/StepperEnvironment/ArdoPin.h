@@ -67,13 +67,19 @@
     #ifdef SKETCH_COMPILE
       // Attention: the following read and write macros have to be aligned 
       // with the numeric pind declaration above
-      
+
       #define READ_LMT_PIN_X_MIN                            (PINC & B00000001) // 37
       #define READ_LMT_PIN_X_MAX                            (PINC & B00000010) // 36
+      #define READ_LMT_PIN_X                                ( (PINC & B00000001) && (PINC & B00000010) )
+      
       #define READ_LMT_PIN_Y_MIN                            (PINC & B00000100) // 35      
       #define READ_LMT_PIN_Y_MAX                            (PINC & B00001000) // 34
+      #define READ_LMT_PIN_Y                                ( (PINC & B00000100) && (PINC & B00001000) )
+
       #define READ_LMT_PIN_Z_MIN                            (PINC & B00010000) // 33
       #define READ_LMT_PIN_Z_MAX                            (PINC & B00100000) // 32
+      #define READ_LMT_PIN_Z                                ( (PINC & B00010000) && (PINC & B00100000) )
+
       #define READ_EXT_INNTERRUPT_PIN                       (PINC & B01000000) // 31
       
       #define READ_ENABLE_STEPPER_PIN                       (PINB & B00010000) // 10
@@ -92,10 +98,16 @@
     
       #define READ_LMT_PIN_X_MIN                            AE::digitalRead(PIN_X_MIN_LIMIT)
       #define READ_LMT_PIN_X_MAX                            AE::digitalRead(PIN_X_MAX_LIMIT)
+      #define READ_LMT_PIN_X                                ( AE::digitalRead(PIN_X_MIN_LIMIT) && AE::digitalRead(PIN_X_MAX_LIMIT) )
+
       #define READ_LMT_PIN_Y_MIN                            AE::digitalRead(PIN_Y_MIN_LIMIT)
       #define READ_LMT_PIN_Y_MAX                            AE::digitalRead(PIN_Y_MAX_LIMIT)
+      #define READ_LMT_PIN_Y                                ( AE::digitalRead(PIN_Y_MIN_LIMIT) && AE::digitalRead(PIN_Y_MAX_LIMIT) )
+
       #define READ_LMT_PIN_Z_MIN                            AE::digitalRead(PIN_Z_MIN_LIMIT)
       #define READ_LMT_PIN_Z_MAX                            AE::digitalRead(PIN_Z_MAX_LIMIT)
+      #define READ_LMT_PIN_Z                                ( AE::digitalRead(PIN_Z_MIN_LIMIT) && AE::digitalRead(PIN_Z_MAX_LIMIT) )
+
       #define READ_EXT_INNTERRUPT_PIN                       AE::digitalRead(PIN_EXTERNAL_INTERRUPT)
 
       #define READ_ENABLE_STEPPER_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)

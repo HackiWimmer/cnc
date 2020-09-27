@@ -1,5 +1,8 @@
 #include "CncSerialSpyListCtrl.h"
+#include "CncCommon.h"
+#include "CncTextCtrl.h"
 #include "CncLoggerProxy.h"
+#include "CncLoggerView.h"
 #include "CncStreamBuffers.h"
 
 wxString   		LoggerStreamBuf::startupBuffer 		= wxString("");
@@ -26,13 +29,17 @@ namespace StartupBuffer {
 	}
 	
 	//-------------------------------------------------------------------------
-	bool trace(CncTextCtrl* ctl) {
+	bool trace(CncLoggerView* ctl) {
 		if ( ctl == NULL )
 			return false;
 		
+		// clear
+		ctl->clear(LoggerSelection::VAL::STARTUP);
+		
 		bool containsLogOrErr = false;
 		
-		wxTextAttr ta(ctl->GetDefaultStyle());
+		//wxTextAttr ta(ctl->GetDefaultStyle());
+		wxTextAttr ta;
 		for ( unsigned int i = 0; i < LoggerStreamBuf::startupBuffer.length(); i++ ) {
 			
 			if ( i % 2 == 0 ) {
@@ -52,11 +59,12 @@ namespace StartupBuffer {
 				
 			} else {
 				// over all text chars
-				ctl->SetDefaultStyle(ta);
-				ctl->AppendText(LoggerStreamBuf::startupBuffer[i]);
+				ctl->changeTextAttr(LoggerSelection::VAL::STARTUP, ta);
+				ctl->add(LoggerSelection::VAL::STARTUP, (char)(LoggerStreamBuf::startupBuffer[i]));
 			}
 		}
 		
+		ctl->setErrorFlag(LoggerSelection::VAL::STARTUP, containsLogOrErr);
 		return containsLogOrErr;
 	}
 };
@@ -292,7 +300,6 @@ void CncSerialSpyStream::logTime() {
 	wxDateTime now = wxDateTime::UNow();
 	c->addLine(now.Format("Time: %H:%M:%S.%l: "), CncSerialSpyListCtrl::LineType::LT_Time);
 }
-
 
 
 ///////////////////////////////////////////////////////////

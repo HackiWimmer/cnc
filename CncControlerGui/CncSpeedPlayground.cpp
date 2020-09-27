@@ -9,7 +9,7 @@
 #include "StdStreamRedirector.h"
 #include "GlobalFunctions.h"
 #include "CncConfig.h"
-#include "CncLoggerProxy.h"
+#include "CncTextCtrl.h"
 #include "CncFloatingPointValidator.h"
 #include "CncSpeedPlayground.h"
 

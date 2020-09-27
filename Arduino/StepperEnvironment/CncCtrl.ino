@@ -36,9 +36,9 @@ CncArduinoController::CncArduinoController()
 , ArduinoCmdDecoderMoveSequence ()
 , ArduinoPositionRenderer       ()
 , ArduinoAccelManager           ()
-, X                             ( new CncAxisX(StepperSetup( this, PIN_X_STP, PIN_X_DIR, PIN_X_MIN_LIMIT, PIN_X_MAX_LIMIT )) )
-, Y                             ( new CncAxisY(StepperSetup( this, PIN_Y_STP, PIN_Y_DIR, PIN_Y_MIN_LIMIT, PIN_X_MAX_LIMIT )) )
-, Z                             ( new CncAxisZ(StepperSetup( this, PIN_Z_STP, PIN_Z_DIR, PIN_Z_MIN_LIMIT, PIN_X_MAX_LIMIT )) )
+, X                             ( new CncAxisX(StepperSetup( this, PIN_X_STP, PIN_X_DIR, PIN_X_MIN_LIMIT, PIN_X_MAX_LIMIT, PID_INC_DIRECTION_VALUE_X )) )
+, Y                             ( new CncAxisY(StepperSetup( this, PIN_Y_STP, PIN_Y_DIR, PIN_Y_MIN_LIMIT, PIN_Y_MAX_LIMIT, PID_INC_DIRECTION_VALUE_Y )) )
+, Z                             ( new CncAxisZ(StepperSetup( this, PIN_Z_STP, PIN_Z_DIR, PIN_Z_MIN_LIMIT, PIN_Z_MAX_LIMIT, PID_INC_DIRECTION_VALUE_Z )) )
 , testManager                   (NULL)
 , impulseCalculator             ()
 , lastI2CData                   ()
@@ -57,6 +57,7 @@ CncArduinoController::CncArduinoController()
 , interactiveValueY             (0)
 , interactiveValueZ             (0)
 {  
+  ArduinoPositionRenderer::setupSteppers(X, Y, Z);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 CncArduinoController::~CncArduinoController() {
@@ -173,6 +174,11 @@ bool CncArduinoController::isReadyToRun() {
   if ( Z->isReadyToRun() == false ) { 
     ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_READY_TO_RUN, "Z");
     ret = false; 
+  }
+
+  if ( isReadyToRender() == false) {
+    // message already created by class ArduinoPositionRenderer
+    ret = false;
   }
   
   return ret;
@@ -872,12 +878,6 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
     case PID_XY_POS:                      writeGetterValue2(PID_XY_POS,                       X->getPosition(), Y->getPosition()); break;
     case PID_XYZ_POS:                     writeGetterValue3(PID_XYZ_POS,                      X->getPosition(), Y->getPosition(), Z->getPosition()); break;
 
-    // obsolete
-    case PID_GET_POS_COUNTER:             writeGetterValue2(PID_GET_POS_COUNTER,              0L, 0L); break;
-    case PID_GET_STEP_COUNTER_X:          writeGetterValue2(PID_GET_STEP_COUNTER_X,           0L, 0L); break;
-    case PID_GET_STEP_COUNTER_Y:          writeGetterValue2(PID_GET_STEP_COUNTER_Y,           0L, 0L); break;
-    case PID_GET_STEP_COUNTER_Z:          writeGetterValue2(PID_GET_STEP_COUNTER_Z,           0L, 0L); break;
-
     case PID_LIMIT:                       writeLimitGetter(); break;
     
     default:                              writeGetterValue1(PID_UNKNOWN, 0);
@@ -915,10 +915,6 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     case PID_Y_POS:                   Y->setPosition(st.values[0].l); break;
     case PID_Z_POS:                   Z->setPosition(st.values[0].l); break;
 
-    // obsolete
-    case PID_RESERT_STEP_COUNTER:     break;
-    case PID_RESERT_POS_COUNTER:      break;
-  
     case PID_INC_DIRECTION_VALUE_X:   X->setIncrementDirectionValue(st.values[0].l);  break;
     case PID_INC_DIRECTION_VALUE_Y:   Y->setIncrementDirectionValue(st.values[0].l);  break;
     case PID_INC_DIRECTION_VALUE_Z:   Z->setIncrementDirectionValue(st.values[0].l);  break;

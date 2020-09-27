@@ -6,7 +6,9 @@
 
 ///////////////////////////////////////////////////////////////////
 class CncTextCtrl;
-class CncLoggerProxy;
+class CncLoggerView;
+class CncStartupLoggerProxy;
+class CncStandardLoggerProxy;
 class LoggerStreamBuf : public std::streambuf {
 	
 	private:
@@ -40,7 +42,7 @@ class LoggerStreamBuf : public std::streambuf {
 namespace StartupBuffer {
 	
 	void append(LoggerStreamBuf::Type t, const char* text);
-	bool trace(CncTextCtrl* ctl);
+	bool trace(CncLoggerView* ctl);
 	
 };
 
@@ -176,12 +178,12 @@ class CncBasicLogStream : public std::stringstream {
 		
 		//////////////////////////////////////////////////////////
 		void red() 		{ setTextColour(wxColour(255, 128, 128)); }
-		void black() 	{ setTextColour(*wxBLACK); }
-		void blue() 	{ setTextColour(wxColour(0, 162, 232)); }
-		void green() 	{ setTextColour(wxColour(0, 128, 64)); }
-		void white() 	{ setTextColour(*wxWHITE); }
-		void gray() 	{ setTextColour(*wxLIGHT_GREY); }
-		void yellow()	{ setTextColour(wxColour(255, 242, 0)); }
+		void black() 	{ setTextColour(*wxBLACK);                }
+		void blue() 	{ setTextColour(wxColour(0,   162, 232)); }
+		void green() 	{ setTextColour(wxColour(0,   128,  64)); }
+		void white() 	{ setTextColour(*wxWHITE);                }
+		void gray() 	{ setTextColour(*wxLIGHT_GREY);           }
+		void yellow()	{ setTextColour(wxColour(255, 242,   0)); }
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -209,19 +211,19 @@ class CncTraceLogStream : public CncBasicLogStream {
 		///////////////////////////////////////////////////////////
 		CncTraceLogStream() 
 		: CncBasicLogStream()
-		, infoColour(*wxWHITE)
-		, warningColour(255, 201, 14)
-		, errorColour(wxColour(255, 128, 128))
-		, debugColour(128, 0, 255)
+		, infoColour		(*wxWHITE)
+		, warningColour		(255, 201, 14)
+		, errorColour		(wxColour(255, 128, 128))
+		, debugColour		(128, 128,  0)
 		{}
 
 		///////////////////////////////////////////////////////////
 		CncTraceLogStream(const CncTraceLogStream& ctb) 
 		: CncBasicLogStream()
-		, infoColour(*wxWHITE)
-		, warningColour(255, 201, 14)
-		, errorColour(wxColour(255, 128, 128))
-		, debugColour(128, 0, 255)
+		, infoColour		(*wxWHITE)
+		, warningColour		(255, 201, 14)
+		, errorColour		(wxColour(255, 128, 128))
+		, debugColour		(128, 128,  0)
 		{}
 
 		///////////////////////////////////////////////////////////
@@ -272,18 +274,13 @@ class CncMsgLogStream : public CncTraceLogStream {
 		///////////////////////////////////////////////////////////
 		CncMsgLogStream() 
 		: CncTraceLogStream()
-		{
-			setInfoColour(*wxBLACK);
-			setWarningColour(wxColour(128, 64, 0));
-		}
+		{}
 		
 		///////////////////////////////////////////////////////////
 		CncMsgLogStream(const CncMsgLogStream& cmb) 
 		: CncTraceLogStream()
-		{
-			setInfoColour(*wxBLACK);
-		}
-
+		{}
+		
 		///////////////////////////////////////////////////////////
 		virtual ~CncMsgLogStream() 
 		{}

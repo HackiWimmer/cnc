@@ -81,8 +81,8 @@ void CncStatisticsPane::logStatistics(bool force) {
 	double elapsedTimeSEC	= 0.0;
 	double speed_MM_MIN		= 0.0;
 	double speed_MM_SEC		= 0.0;
-	long speed_SP_SEC		= 0;
-	long speed_RPM			= 0;
+	long   speed_SP_SEC		= 0;
+	long   speed_RPM		= 0;
 	
 	if ( measurementTimeSpan > 0L ) {
 		elapsedTimeMSEC = measurementTimeSpan / (1000.0 * 1000.0);
@@ -90,11 +90,10 @@ void CncStatisticsPane::logStatistics(bool force) {
 		speed_MM_SEC 	= cnc->getTotalDistanceMetric() / elapsedTimeSEC;
 		speed_MM_MIN 	= speed_MM_SEC * 60;
 		
-		
-		const int stepsXYZ = ( THE_CONFIG->getStepsX() + THE_CONFIG->getStepsY() + THE_CONFIG->getStepsZ() ) / 3;
-		
-		speed_SP_SEC    = cnc->getStepCounter() / elapsedTimeSEC;
-		speed_RPM		= (speed_SP_SEC / stepsXYZ ) * 60;
+		#warning
+		//const int stepsXYZ = ( THE_CONFIG->getStepsX() + THE_CONFIG->getStepsY() + THE_CONFIG->getStepsZ() ) / 3;
+		speed_SP_SEC    = 0;//cnc->getStepCounter() / elapsedTimeSEC;
+		speed_RPM		= 0;//(speed_SP_SEC / stepsXYZ ) * 60;
 	}
 
 	static wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel), speedSPSEC(_maxSpeedLabel), speedRPM(_maxSpeedLabel);
@@ -103,18 +102,17 @@ void CncStatisticsPane::logStatistics(bool force) {
 	if ( cnc->isEmulator() == false )
 		setupSpeedValue = true;
 
-	if (  setupSpeedValue ) {
-		speedMMMIN.assign( CncNumberFormatter::toString(speed_MM_MIN, 1));
-		speedMMSEC.assign( CncNumberFormatter::toString(speed_MM_SEC, 1));
-		speedSPSEC.assign( CncNumberFormatter::toString(speed_SP_SEC));
-		speedRPM.assign(   CncNumberFormatter::toString(speed_RPM));
+	if ( setupSpeedValue ) {
+		speedMMMIN.assign(CncNumberFormatter::toString(speed_MM_MIN, 1));
+		speedMMSEC.assign(CncNumberFormatter::toString(speed_MM_SEC, 1));
+		speedSPSEC.assign(CncNumberFormatter::toString(speed_SP_SEC));
+		speedRPM  .assign(CncNumberFormatter::toString(speed_RPM));
 	}
 	
 	// statistic keys
 	static const char* SKEY_MIN_BOUND	= "Boundaries - Min";
 	static const char* SKEY_MAX_BOUND	= "Boundaries - Max";
 	static const char* SKEY_STEP_CNT	= "Step count";
-	static const char* SKEY_POS_CNT		= "Position count";
 	static const char* SKEY_DISTANCE 	= "Distance";
 	static const char* SKEY_TIME 		= "Time consumend";
 	static const char* SKEY_SPEED 		= "Feed speed AVG";
@@ -125,7 +123,6 @@ void CncStatisticsPane::logStatistics(bool force) {
 		statisticSummaryListCtrl->addKey(SKEY_MIN_BOUND, 	"X, Y, Z", 				"mm");
 		statisticSummaryListCtrl->addKey(SKEY_MAX_BOUND, 	"X, Y, Z", 				"mm");
 		statisticSummaryListCtrl->addKey(SKEY_STEP_CNT, 	"Total, X, Y, Z", 		"steps");
-		statisticSummaryListCtrl->addKey(SKEY_POS_CNT, 		"Total", 				"steps");
 		statisticSummaryListCtrl->addKey(SKEY_DISTANCE, 	"Total, X, Y, Z", 		"mm");
 		statisticSummaryListCtrl->addKey(SKEY_TIME, 		"Total, Stepping", 		"ms");
 		statisticSummaryListCtrl->addKey(SKEY_SPEED_EXT, 	"steps/sec, rpm", 		"unit");
@@ -148,11 +145,6 @@ void CncStatisticsPane::logStatistics(bool force) {
 															, CncNumberFormatter::toString(cnc->getTotalDistanceStepsY())
 															, CncNumberFormatter::toString(cnc->getTotalDistanceStepsZ()));
 															
-	statisticSummaryListCtrl->updateValues(SKEY_POS_CNT		, _("")
-															, _("")
-															, _("")
-															, CncNumberFormatter::toString(cnc->getPositionCounter()));
-	
 	statisticSummaryListCtrl->updateValues(SKEY_DISTANCE	, CncNumberFormatter::toString((double)(cnc->getTotalDistanceMetric()),  3)
 															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceMetricX()), 3)
 															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceMetricY()), 3)

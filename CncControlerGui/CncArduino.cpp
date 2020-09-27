@@ -176,13 +176,6 @@ void ArduinoPIDs::init() {
 	pids[PID_VERSION]                         .setup("Firmware Version", "-");
 	pids[PID_SEPARATOR]                       .setup("Separator", "");
 	
-	pids[PID_RESERT_POS_COUNTER]              .setup("Reset Position Counter", "");
-	pids[PID_GET_POS_COUNTER]                 .setup("Get Position Counter", "#");
-	pids[PID_RESERT_STEP_COUNTER]             .setup("Reset Step Counter", "");
-	pids[PID_GET_STEP_COUNTER_X]              .setup("Get Step Counter X", "#");
-	pids[PID_GET_STEP_COUNTER_Y]              .setup("Get Step Counter Y", "#");
-	pids[PID_GET_STEP_COUNTER_Z]              .setup("Get Step Counter Z", "#");
-
 	pids[PID_MAX_DIMENSION_X]                 .setup("Max Dimension X", "steps");
 	pids[PID_MAX_DIMENSION_Y]                 .setup("Max Dimension Y", "steps");
 	pids[PID_MAX_DIMENSION_Z]                 .setup("Max Dimension Z", "steps");
@@ -288,6 +281,7 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";
 	
 	errorCodes[E_LIMIT_SWITCH_ACTIVE]                = "Limit switch active";
+	errorCodes[E_RMDR_INVALID_STP_POINTER]           = "ArduinoPositionRenderer: Invalid stepper pointers";
 	
 	errorCodes[E_INTERRUPT]                          = "Interrupt received";
 	errorCodes[E_EXTERNEL_INTERRUPT]                 = "External Interrupt received";

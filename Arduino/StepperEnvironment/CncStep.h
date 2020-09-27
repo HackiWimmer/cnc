@@ -13,17 +13,24 @@ struct StepperSetup {
   byte                    llmPin      = AE::PN_NOT_A_PIN;
   byte                    hlmPin      = AE::PN_NOT_A_PIN;
 
-  StepperSetup(CncArduinoController* c, byte s, byte d, byte ll, byte hl)
+  // IncrementDirectionValuePid
+  byte                    idvPid      = PID_UNKNOWN;
+
+  StepperSetup(CncArduinoController* c, byte s, byte d, byte ll, byte hl, byte p)
   : controller(c)
   , stpPin(s)
   , dirPin(d)
   , llmPin(ll)
   , hlmPin(hl)
+  , idvPid(p)
   {}
 };
 
 // ----------------------------------------------------------------
 class CncArduinoStepper {
+
+  typedef bool  (*readPin_funct)  (void);
+  typedef void  (*writePin_funct) (bool);
 
   public:
     enum StepDirection { SD_INC     = DIRECTION_INC, 
@@ -36,12 +43,22 @@ class CncArduinoStepper {
     CncArduinoStepper(const CncArduinoStepper&);
 
   protected:
-    CncArduinoController*           controller;
-    byte                            stpPin;
-    byte                            dirPin;
-    byte                            llmPin;
-    byte                            hlmPin;
 
+    const char                      axisLabel;
+    const readPin_funct             readLmtPins;
+    const readPin_funct             readMinLmtPin;
+    const readPin_funct             readMaxLmtPin;
+    const writePin_funct            writeDirPin;
+    const writePin_funct            writeStpPin;
+
+    CncArduinoController*           controller;
+    const byte                      stpPin;
+    const byte                      dirPin;
+    const byte                      llmPin;
+    const byte                      hlmPin;
+    const byte                      idvPid;
+
+    const bool                      optimisticMode;
     bool                            INCREMENT_DIRECTION_VALUE;
     bool                            interrupted;
     bool                            stepPhase;
@@ -58,19 +75,19 @@ class CncArduinoStepper {
     
     inline bool                     isLimitPinRelevant();
     
-    explicit CncArduinoStepper(const StepperSetup& ss);
-
-    // Will be overriden by CncAxisX, CncAxisY and CncAxisZ
-    virtual bool readMinLmtPin()   = 0;
-    virtual bool readMaxLmtPin()   = 0;
-    virtual void writeDirPin(bool) = 0;
-    virtual void writeStpPin(bool) = 0;
+    CncArduinoStepper
+    (
+        const StepperSetup&     ss,
+        const char              label, 
+        readPin_funct           Fp_readLmtPins,
+        readPin_funct           Fp_readMinLmtPin,
+        readPin_funct           Fp_readMaxLmtPin,
+        writePin_funct          Fp_writeDirPin,
+        writePin_funct          Fp_writeStpPin
+    );
+        
     
   public:
-    virtual ~CncArduinoStepper();
-
-    virtual char                    getAxisId()                         = 0;
-    virtual unsigned char           getIncrementDirectionValuePid()     = 0;
 
     void                            printConfig();
     void                            reset();
@@ -96,7 +113,6 @@ class CncArduinoStepper {
 
     bool                            resolveLimit();
     int8_t                          readLimitState();
-    bool                            readLimitPins();
 
     StepDirection                   getStepDirection()             const { return stepDirection; }
     bool                            setDirection(int32_t steps);
@@ -126,17 +142,26 @@ class CncAxisX : public CncArduinoStepper {
     CncAxisX(const CncAxisX&);
 
   protected:
-    virtual bool readMinLmtPin()                                  { return READ_LMT_PIN_X_MIN; }  
-    virtual bool readMaxLmtPin()                                  { return READ_LMT_PIN_X_MAX; }  
-    virtual void writeDirPin(bool value)                          { WRITE_DIR_PIN_X            }
-    virtual void writeStpPin(bool value)                          { WRITE_STP_PIN_X            }  
+  
+    static bool readLmtPins()                                    { return READ_LMT_PIN_X;     }  
+    static bool readMinLmtPin()                                  { return READ_LMT_PIN_X_MIN; }  
+    static bool readMaxLmtPin()                                  { return READ_LMT_PIN_X_MAX; }  
+    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_X            }
+    static void writeStpPin(bool value)                          { WRITE_STP_PIN_X            }  
 
   public:
     CncAxisX(const StepperSetup& ss) 
-    : CncArduinoStepper(ss)                                       {}
-    virtual ~CncAxisX()                                           {}
-    virtual char              getAxisId()                         { return 'X'; }
-    virtual unsigned char     getIncrementDirectionValuePid()     { return PID_INC_DIRECTION_VALUE_X; }
+    : CncArduinoStepper
+    (
+        ss,
+        'X',
+        &CncAxisX::readLmtPins,
+        &CncAxisX::readMinLmtPin,
+        &CncAxisX::readMaxLmtPin,
+        &CncAxisX::writeDirPin,
+        &CncAxisX::writeStpPin
+    )                                   
+    {}
 };
 
 // ----------------------------------------------------------------
@@ -146,17 +171,26 @@ class CncAxisY : public CncArduinoStepper {
     CncAxisY(const CncAxisY&);
 
   protected:
-    virtual bool readMinLmtPin()                                  { return READ_LMT_PIN_Y_MIN; }  
-    virtual bool readMaxLmtPin()                                  { return READ_LMT_PIN_Y_MAX; }  
-    virtual void writeDirPin(bool value)                          { WRITE_DIR_PIN_Y            }    
-    virtual void writeStpPin(bool value)                          { WRITE_STP_PIN_Y            }  
+  
+    static bool readLmtPins()                                    { return READ_LMT_PIN_Y;     }  
+    static bool readMinLmtPin()                                  { return READ_LMT_PIN_Y_MIN; }  
+    static bool readMaxLmtPin()                                  { return READ_LMT_PIN_Y_MAX; }  
+    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_Y            }    
+    static void writeStpPin(bool value)                          { WRITE_STP_PIN_Y            }  
     
   public:
     CncAxisY(const StepperSetup& ss) 
-    : CncArduinoStepper(ss)                                       {}
-    virtual ~CncAxisY()                                           {}
-    virtual char              getAxisId()                         { return 'Y'; }
-    virtual unsigned char     getIncrementDirectionValuePid()     { return PID_INC_DIRECTION_VALUE_Y; }
+    : CncArduinoStepper
+    (
+        ss,
+        'Y', 
+        &CncAxisY::readLmtPins,
+        &CncAxisY::readMinLmtPin,
+        &CncAxisY::readMaxLmtPin,
+        &CncAxisY::writeDirPin,
+        &CncAxisY::writeStpPin
+    )                                       
+    {}
 };
 
 // ----------------------------------------------------------------
@@ -166,17 +200,26 @@ class CncAxisZ : public CncArduinoStepper {
     CncAxisZ(const CncAxisZ&);
 
   protected:
-    virtual bool readMinLmtPin()                                  { return READ_LMT_PIN_Z_MIN; }  
-    virtual bool readMaxLmtPin()                                  { return READ_LMT_PIN_Z_MAX; }  
-    virtual void writeDirPin(bool value)                          { WRITE_DIR_PIN_Z            }      
-    virtual void writeStpPin(bool value)                          { WRITE_STP_PIN_Z            }  
+   
+    static bool readLmtPins()                                    { return READ_LMT_PIN_Z;     }  
+    static bool readMinLmtPin()                                  { return READ_LMT_PIN_Z_MIN; }  
+    static bool readMaxLmtPin()                                  { return READ_LMT_PIN_Z_MAX; }  
+    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_Z            }      
+    static void writeStpPin(bool value)                          { WRITE_STP_PIN_Z            }  
 
   public:
     CncAxisZ(const StepperSetup& ss) 
-    : CncArduinoStepper(ss)                                       {}
-    virtual ~CncAxisZ()                                           {}
-    virtual char              getAxisId()                         { return 'Z'; }
-    virtual unsigned char     getIncrementDirectionValuePid()     { return PID_INC_DIRECTION_VALUE_Z; }
+    : CncArduinoStepper
+    (
+        ss,
+        'Z',
+        &CncAxisZ::readLmtPins,
+        &CncAxisZ::readMinLmtPin,
+        &CncAxisZ::readMaxLmtPin,
+        &CncAxisZ::writeDirPin,
+        &CncAxisZ::writeStpPin
+    )                                       
+    {}
 };
 
 #endif

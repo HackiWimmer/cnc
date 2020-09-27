@@ -232,6 +232,12 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncTraceCtrl.cpp"/>
+      <File Name="CncTraceCtrl.h"/>
+      <File Name="CncTextCtrl.cpp"/>
+      <File Name="CncTextCtrl.h"/>
+      <File Name="CncLoggerView.h"/>
+      <File Name="CncLoggerView.cpp"/>
       <File Name="CncCircularBuffer.cpp"/>
       <File Name="CncCircularBuffer.h"/>
       <File Name="CncAverage.cpp"/>
@@ -359,6 +365,9 @@
       <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterLoggerPanel.cpp"/>
+      <File Name="wxCrafterLoggerPanel.h"/>
+      <File Name="wxCrafterLoggerPanel_bitmaps.cpp"/>
       <File Name="wxCrafterLCDPanel_bitmaps.cpp"/>
       <File Name="wxCrafterLCDPanel.h"/>
       <File Name="wxCrafterLCDPanel.cpp"/>
@@ -510,6 +519,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncLoggerListCtrl.cpp"/>
+      <File Name="CncLoggerListCtrl.h"/>
       <File Name="CncGamepadCommandHistory.cpp"/>
       <File Name="CncGamepadCommandHistory.h"/>
       <File Name="CncArduinoPinsListCtrl.cpp"/>
@@ -547,6 +558,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
+    <File Name="wxCrafterLoggerPanel.wxcp"/>
     <File Name="wxCrafterLCDPanel.wxcp"/>
     <File Name="wxCrafterArduinoEnv.wxcp"/>
     <File Name="wxCrafterMotionMonitor.wxcp"/>

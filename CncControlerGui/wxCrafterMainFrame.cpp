@@ -200,27 +200,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_winMainView, wxAuiPaneInfo().Name(wxT("SourceView")).Caption(_("CNC Template")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(400,400).MinSize(400,400).MaxSize(400,400).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
     
-    wxFlexGridSizer* flexGridSizer434 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer434 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer434->SetFlexibleDirection( wxBOTH );
     flexGridSizer434->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer434->AddGrowableCol(0);
-    flexGridSizer434->AddGrowableRow(1);
+    flexGridSizer434->AddGrowableRow(0);
     m_winMainView->SetSizer(flexGridSizer434);
-    
-    wxArrayString m_mainViewSelectorArr;
-    m_mainViewSelectorArr.Add(wxT("Source View"));
-    m_mainViewSelectorArr.Add(wxT("Setup"));
-    m_mainViewSelectorArr.Add(wxT("References"));
-    m_mainViewSelectorArr.Add(wxT("Manuel Controller"));
-    m_mainViewSelectorArr.Add(wxT("Test"));
-    m_mainViewSelectorArr.Add(wxT("File Manager Preview"));
-    m_mainViewSelector = new wxChoice(m_winMainView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMainView, wxSize(-1,-1)), m_mainViewSelectorArr, wxBORDER_NONE);
-    wxFont m_mainViewSelectorFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_mainViewSelector->SetFont(m_mainViewSelectorFont);
-    m_mainViewSelector->Hide();
-    m_mainViewSelector->SetSelection(0);
-    
-    flexGridSizer434->Add(m_mainViewSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_mainViewBook = new wxSimplebook(m_winMainView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMainView, wxSize(-1,-1)), 0);
     m_mainViewBook->SetName(wxT("m_mainViewBook"));
@@ -2292,23 +2277,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_winMonitorView, wxAuiPaneInfo().Name(wxT("Outbound")).Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(1).Position(0).BestSize(500,500).MinSize(500,500).MaxSize(500,500).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
     
-    wxFlexGridSizer* flexGridSizer4348 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer4348 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer4348->SetFlexibleDirection( wxBOTH );
     flexGridSizer4348->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4348->AddGrowableCol(0);
-    flexGridSizer4348->AddGrowableRow(1);
+    flexGridSizer4348->AddGrowableRow(0);
     m_winMonitorView->SetSizer(flexGridSizer4348);
-    
-    wxArrayString m_monitorViewSelectorArr;
-    m_monitorViewSelectorArr.Add(wxT("CNC Monitor"));
-    m_monitorViewSelectorArr.Add(wxT("Template Preview"));
-    m_monitorViewSelector = new wxChoice(m_winMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMonitorView, wxSize(-1,-1)), m_monitorViewSelectorArr, wxBORDER_NONE);
-    wxFont m_monitorViewSelectorFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_monitorViewSelector->SetFont(m_monitorViewSelectorFont);
-    m_monitorViewSelector->Hide();
-    m_monitorViewSelector->SetSelection(0);
-    
-    flexGridSizer4348->Add(m_monitorViewSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_monitorViewBook = new wxSimplebook(m_winMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMonitorView, wxSize(-1,-1)), 0);
     m_monitorViewBook->SetName(wxT("m_monitorViewBook"));
@@ -3254,7 +3228,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2577->AddGrowableRow(1);
     m_conrollerMessages->SetSizer(flexGridSizer2577);
     
-    wxFlexGridSizer* flexGridSizer2586 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2586 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer2586->SetFlexibleDirection( wxBOTH );
     flexGridSizer2586->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2586->AddGrowableCol(0);
@@ -3266,6 +3240,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText1283132->SetFont(m_staticText1283132Font);
     
     flexGridSizer2586->Add(m_staticText1283132, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_btViewMsgHistory = new wxButton(m_conrollerMessages, wxID_ANY, _("View List"), wxDefaultPosition, wxDLG_UNIT(m_conrollerMessages, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btViewMsgHistory->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-calendar-month")), wxLEFT);
+    m_btViewMsgHistory->SetBitmapMargins(2,2);
+    #endif
+    m_btViewMsgHistory->SetToolTip(_("View Message Histroy"));
+    
+    flexGridSizer2586->Add(m_btViewMsgHistory, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
     m_btClearMsgHistory = new wxButton(m_conrollerMessages, wxID_ANY, _("Clear List"), wxDefaultPosition, wxDLG_UNIT(m_conrollerMessages, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -3685,126 +3668,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer869->Add(flexGridSizer3158, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer2520 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer2520->SetFlexibleDirection( wxBOTH );
-    flexGridSizer2520->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer2520->AddGrowableCol(0);
-    flexGridSizer2520->AddGrowableRow(0);
+    m_loggerViewPlaceholder = new wxPanel(m_winLoggerView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_loggerViewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer3158->Add(flexGridSizer2520, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_loggerNotebook = new wxNotebook(m_winLoggerView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), wxNB_NOPAGETHEME|wxBK_LEFT|wxBORDER_NONE);
-    wxFont m_loggerNotebookFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
-    m_loggerNotebook->SetFont(m_loggerNotebookFont);
-    m_loggerNotebook->SetName(wxT("m_loggerNotebook"));
-    wxImageList* m_loggerNotebook_il = new wxImageList(16, 16);
-    m_loggerNotebook->AssignImageList(m_loggerNotebook_il);
-    
-    flexGridSizer2520->Add(m_loggerNotebook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_panelStartupTrace = new wxPanel(m_loggerNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    wxFont m_panelStartupTraceFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_panelStartupTrace->SetFont(m_panelStartupTraceFont);
-    int m_panelStartupTraceImgIndex;
-    m_panelStartupTraceImgIndex = m_loggerNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("go-jump-today")));
-    m_loggerNotebook->AddPage(m_panelStartupTrace, _("S"), false, m_panelStartupTraceImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer6474 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer6474->SetFlexibleDirection( wxBOTH );
-    flexGridSizer6474->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer6474->AddGrowableCol(0);
-    flexGridSizer6474->AddGrowableRow(0);
-    m_panelStartupTrace->SetSizer(flexGridSizer6474);
-    
-    m_startupTracePlaceholder = new wxTextCtrl(m_panelStartupTrace, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelStartupTrace, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE);
-    m_startupTracePlaceholder->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
-    wxFont m_startupTracePlaceholderFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-    m_startupTracePlaceholder->SetFont(m_startupTracePlaceholderFont);
-    
-    flexGridSizer6474->Add(m_startupTracePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_panel5878 = new wxPanel(m_loggerNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_panel5878->SetToolTip(_("Cnc Logger"));
-    int m_panel5878ImgIndex;
-    m_panel5878ImgIndex = m_loggerNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("pencil-add")));
-    m_loggerNotebook->AddPage(m_panel5878, _("L"), true, m_panel5878ImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer5880 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer5880->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5880->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5880->AddGrowableCol(0);
-    flexGridSizer5880->AddGrowableRow(0);
-    m_panel5878->SetSizer(flexGridSizer5880);
-    
-    m_loggerPlaceholder = new wxTextCtrl(m_panel5878, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxVSCROLL);
-    m_loggerPlaceholder->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
-    wxFont m_loggerPlaceholderFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-    m_loggerPlaceholder->SetFont(m_loggerPlaceholderFont);
-    m_loggerPlaceholder->SetToolTip(_("Logger Output"));
-    
-    flexGridSizer5880->Add(m_loggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer1863 = new wxFlexGridSizer(8, 1, 0, 0);
-    flexGridSizer1863->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1863->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5880->Add(flexGridSizer1863, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_clearLogger = new wxBitmapButton(m_panel5878, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(26,26)), wxBU_AUTODRAW);
-    m_clearLogger->SetToolTip(_("Clear Logger Panel"));
-    
-    flexGridSizer1863->Add(m_clearLogger, 0, wxALL, WXC_FROM_DIP(1));
-    m_clearLogger->SetMinSize(wxSize(26,26));
-    
-    m_copyLogger = new wxBitmapButton(m_panel5878, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("edit-copy-7")), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(26,26)), wxBU_AUTODRAW);
-    m_copyLogger->SetToolTip(_("Copy Logger Panel"));
-    
-    flexGridSizer1863->Add(m_copyLogger, 0, wxALL, WXC_FROM_DIP(1));
-    m_copyLogger->SetMinSize(wxSize(26,26));
-    
-    m_staticLine76051 = new wxStaticLine(m_panel5878, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer1863->Add(m_staticLine76051, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_showLoggerOnDemand = new wxBitmapToggleButton(m_panel5878, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lightbulb-off")), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(26,26)), 0);
-    m_showLoggerOnDemand->SetToolTip(_("Show Logger on demand"));
-    m_showLoggerOnDemand->SetValue(true);
-    
-    flexGridSizer1863->Add(m_showLoggerOnDemand, 0, wxALL, WXC_FROM_DIP(1));
-    m_showLoggerOnDemand->SetMinSize(wxSize(26,26));
-    
-    m_staticLine7605 = new wxStaticLine(m_panel5878, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer1863->Add(m_staticLine7605, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_freezeLogger = new wxBitmapToggleButton(m_panel5878, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lock-edit")), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(26,26)), 0);
-    m_freezeLogger->SetToolTip(_("Freeze Logger"));
-    m_freezeLogger->SetValue(true);
-    
-    flexGridSizer1863->Add(m_freezeLogger, 0, wxALL, WXC_FROM_DIP(1));
-    m_freezeLogger->SetMinSize(wxSize(26,26));
-    
-    wxFlexGridSizer* flexGridSizer5888 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer5888->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5888->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5888->AddGrowableCol(1);
-    flexGridSizer5888->AddGrowableRow(0);
-    
-    flexGridSizer869->Add(flexGridSizer5888, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_staticBitmap5890 = new wxStaticBitmap(m_winLoggerView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dialog-information (2)")), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), 0 );
-    
-    flexGridSizer5888->Add(m_staticBitmap5890, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_tmpTraceInfoPlaceholder = new wxTextCtrl(m_winLoggerView, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,24)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP);
-    m_tmpTraceInfoPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_tmpTraceInfoPlaceholder->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_tmpTraceInfoPlaceholderFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-    m_tmpTraceInfoPlaceholder->SetFont(m_tmpTraceInfoPlaceholderFont);
-    m_tmpTraceInfoPlaceholder->SetToolTip(_("Trace Information"));
-    
-    flexGridSizer5888->Add(m_tmpTraceInfoPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_tmpTraceInfoPlaceholder->SetMinSize(wxSize(-1,24));
+    flexGridSizer3158->Add(m_loggerViewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_statusBar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_statusBar->SetBackgroundColour(wxColour(wxT("rgb(109,109,109)")));
@@ -5877,14 +5744,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     #if wxVERSION_NUMBER >= 2900
-    if(!wxPersistenceManager::Get().Find(m_loggerNotebook)){
-        wxPersistenceManager::Get().RegisterAndRestore(m_loggerNotebook);
-    } else {
-        wxPersistenceManager::Get().Restore(m_loggerNotebook);
-    }
-    #endif
-    
-    #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(m_sypDetailsBook)){
         wxPersistenceManager::Get().RegisterAndRestore(m_sypDetailsBook);
     } else {
@@ -5951,7 +5810,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_rcPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
     m_rcStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
     m_btnEmergenyStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::emergencyStop), NULL, this);
-    m_mainViewSelector->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::mainViewSelectorSelected), NULL, this);
     m_mainViewBook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::cncMainViewChanged), NULL, this);
     m_openSourceExtern->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSourceExtern), NULL, this);
     m_openSvgExtern->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSvgExtern), NULL, this);
@@ -6000,12 +5858,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zToTop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToTop), NULL, this);
     m_zToBottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToBottom), NULL, this);
     m_rbStepSensitivity->Connect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::onSelectStepSensitivity), NULL, this);
+    m_rbStepMode->Connect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::onSelectStepMode), NULL, this);
     m_testCaseBook->Connect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::testCaseBookChanged), NULL, this);
     m_testIntervalMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectTestIntervalMode), NULL, this);
     m_testCountX->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
     m_testCountX->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::testCountXUpdated), NULL, this);
     m_testToolPowerBtn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
-    m_monitorViewSelector->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::monitorViewSelectorSelected), NULL, this);
     m_outboundNotebook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::outboundBookChanged), NULL, this);
     m_outboundNotebook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGING, wxNotebookEventHandler(MainFrameBClass::outboundBookChanging), NULL, this);
     m_notebookConfig->Connect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::nootebookConfigChanged), NULL, this);
@@ -6048,14 +5906,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_3D_Perspective4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
     m_btClearSetterList->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSetterList), NULL, this);
     m_btRefreshSetterList->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshSetterList), NULL, this);
+    m_btViewMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::viewControllerMsgHistory), NULL, this);
     m_btClearMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btSaveOutboundAsTemplate2->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveOutboundAsNewTplFromButton), NULL, this);
     m_btToggleOutboundEditorWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
     m_externFileManagerPreview->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
-    m_clearLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
-    m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
-    m_showLoggerOnDemand->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onShowLoggerOnDemand), NULL, this);
-    m_freezeLogger->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_heartbeatState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
     m_cbUCUnitFrom->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
@@ -6215,7 +6070,6 @@ MainFrameBClass::~MainFrameBClass()
     m_rcPause->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
     m_rcStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
     m_btnEmergenyStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::emergencyStop), NULL, this);
-    m_mainViewSelector->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::mainViewSelectorSelected), NULL, this);
     m_mainViewBook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::cncMainViewChanged), NULL, this);
     m_openSourceExtern->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSourceExtern), NULL, this);
     m_openSvgExtern->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSvgExtern), NULL, this);
@@ -6264,12 +6118,12 @@ MainFrameBClass::~MainFrameBClass()
     m_zToTop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToTop), NULL, this);
     m_zToBottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToBottom), NULL, this);
     m_rbStepSensitivity->Disconnect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::onSelectStepSensitivity), NULL, this);
+    m_rbStepMode->Disconnect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::onSelectStepMode), NULL, this);
     m_testCaseBook->Disconnect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::testCaseBookChanged), NULL, this);
     m_testIntervalMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectTestIntervalMode), NULL, this);
     m_testCountX->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
     m_testCountX->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::testCountXUpdated), NULL, this);
     m_testToolPowerBtn->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
-    m_monitorViewSelector->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::monitorViewSelectorSelected), NULL, this);
     m_outboundNotebook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::outboundBookChanged), NULL, this);
     m_outboundNotebook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGING, wxNotebookEventHandler(MainFrameBClass::outboundBookChanging), NULL, this);
     m_notebookConfig->Disconnect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::nootebookConfigChanged), NULL, this);
@@ -6312,14 +6166,11 @@ MainFrameBClass::~MainFrameBClass()
     m_3D_Perspective4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
     m_btClearSetterList->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSetterList), NULL, this);
     m_btRefreshSetterList->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshSetterList), NULL, this);
+    m_btViewMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::viewControllerMsgHistory), NULL, this);
     m_btClearMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btSaveOutboundAsTemplate2->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveOutboundAsNewTplFromButton), NULL, this);
     m_btToggleOutboundEditorWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
     m_externFileManagerPreview->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
-    m_clearLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
-    m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
-    m_showLoggerOnDemand->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onShowLoggerOnDemand), NULL, this);
-    m_freezeLogger->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_heartbeatState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
     m_cbUCUnitFrom->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
