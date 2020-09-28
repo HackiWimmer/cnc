@@ -124,13 +124,26 @@ class X : public Base {
 	
 };
 
+template<> bool Foo<PESIMISTIC>::f()
+{
+  std::cout << "Foo<false>::f()\n";
+  return PESIMISTIC;
+}
+
+template<> bool Foo<OPTIMISTIC>::f()
+{
+  std::cout << "Foo<true>::f()\n";
+  return OPTIMISTIC;
+}
+
 ////////////////////////////////////////////////////
 void Implementation::run() {
 ////////////////////////////////////////////////////
 	std::cout << "Start . . ." << std::endl;
 	
+	Foo<true> foo;
+	foo.f();
 	
-	std::cout << wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S").c_str() << std::endl;
 	
 	return;
 	

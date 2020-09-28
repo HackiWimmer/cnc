@@ -9,6 +9,19 @@ class Implementation {
 };
 
 
+#define OPTIMISTIC true
+#define PESIMISTIC false
+
+
+template<bool OPTIMIZED>
+class Foo {
+	public:
+		bool f();
+};
+
+
+
+
 
 
 #endif

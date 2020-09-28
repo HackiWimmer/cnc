@@ -30,6 +30,7 @@
 #include <wx/version.h> 
 #include <wx/richmsgdlg.h>
 #include <boost/version.hpp>
+#include "Codelite/cl_aui_dock_art.h"
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/webviewOSD.h"
@@ -349,6 +350,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 {
 ///////////////////////////////////////////////////////////////////
 	APPEND_THREAD_ID_TO_STACK_TRACE_FILE;
+	
+	m_auimgrMain->SetArtProvider(new clAuiDockArt());
 	
 	getLoggerView()->initialize();
 	
@@ -1339,7 +1342,7 @@ void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
 	
 	static wxColour col(0, 128, 255);
 	static wxBrush  brush(col);
-	static wxPen    barPen(col, 1, wxSOLID);
+	static wxPen    barPen(col,    1, wxSOLID);
 	static wxPen    wmpPen(*wxRED, 1, wxSOLID);
 	
 	const wxSize size   		= m_speedPanel->GetSize();
@@ -4032,7 +4035,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		const CncTemplateFormat tf = getCurrentTemplateFormat();
 		const wxString fn (getCurrentTemplatePathFileName());
 		
-		std::cout << tf << std::endl;
 		if ( tf != TplManual && tf != TplTest ) {
 			if ( fn.IsEmpty() == true )
 				return false;

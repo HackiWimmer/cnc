@@ -280,6 +280,9 @@
   #define PAUSE_ACTIVE                                   true
   #define PAUSE_INACTIVE                                 false
 
+  #define OPTIMISTIC                                     true
+  #define PESIMISTIC                                     false
+
   // ------------------------------------------------------------------------------
   // Don't modify the values above because it has to coresponde with RS::A and RS::B
   enum AxisId

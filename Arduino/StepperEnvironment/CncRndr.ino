@@ -8,8 +8,35 @@
         const wxString logStr(wxString::Format("PositionRenderer::%s", __FUNCTION__)); \
         ARDO_DEBUG_MESSAGE('D', logStr); \
     }
+    
+  #define SET_DIRECTION_X(dx)             setDirection(IDX_X, dx)
+  #define SET_DIRECTION_Y(dy)             setDirection(IDX_Y, dy)
+  #define SET_DIRECTION_Z(dz)             setDirection(IDX_Z, dz)
+
+  #define INITIALIZE_SETP_X               initiateStep(IDX_X)
+  #define INITIALIZE_SETP_Y               initiateStep(IDX_Y)
+  #define INITIALIZE_SETP_Z               initiateStep(IDX_Z)
+
+  #define FINALIZE_SETP_X                 finalizeStep(IDX_X)
+  #define FINALIZE_SETP_Y                 finalizeStep(IDX_Y)
+  #define FINALIZE_SETP_Z                 finalizeStep(IDX_Z)
+  
 #else
+
   #define CNC_RENDERER_LOG_FUNCTION()
+
+  #define SET_DIRECTION_X(dx)             pX->setDirection(dx)
+  #define SET_DIRECTION_Y(dy)             pY->setDirection(dy)
+  #define SET_DIRECTION_Z(dz)             pZ->setDirection(dz)
+
+  #define INITIALIZE_SETP_X               pX->initiateStep()
+  #define INITIALIZE_SETP_Y               pY->initiateStep()
+  #define INITIALIZE_SETP_Z               pZ->initiateStep()
+
+  #define FINALIZE_SETP_X                 pX->finalizeStep()
+  #define FINALIZE_SETP_Y                 pY->finalizeStep()
+  #define FINALIZE_SETP_Z                 pZ->finalizeStep()
+  
 #endif
 
 // ----------------------------------------------------------------------------------
@@ -45,7 +72,10 @@ ArduinoPositionRenderer::~ArduinoPositionRenderer() {
 /////////////////////////////////////////////////////////////////////////////////////
 bool ArduinoPositionRenderer::isReadyToRender() {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( pX == NULL || pY == NULL || pZ == NULL ) {
+  if (     ( ArduinoMainLoop::isSketchEnv() )
+        && ( pX == NULL || pY == NULL || pZ == NULL ) 
+     ) 
+  {
     ArduinoMainLoop::pushMessage(MT_ERROR, E_RMDR_INVALID_STP_POINTER); 
     return false;
   }
@@ -53,7 +83,7 @@ bool ArduinoPositionRenderer::isReadyToRender() {
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void ArduinoPositionRenderer::setupSteppers(CncArduinoStepper* x, CncArduinoStepper* y, CncArduinoStepper* z) {
+void ArduinoPositionRenderer::setupSteppers(CncAxisX* x, CncAxisY* y, CncAxisZ* z) {
 /////////////////////////////////////////////////////////////////////////////////////
   pX  = x;
   pY  = y;
@@ -86,7 +116,7 @@ byte ArduinoPositionRenderer::stepping() {
     RS::stepSignature = 0;
       
     if ( RS::dx() != 0 ) {
-      if ( (retValue = pX->initiateStep()) != RET_OK ) 
+      if ( (retValue = INITIALIZE_SETP_X) != RET_OK ) 
         return retValue;
   
       RS::stepSignature |= ASG_X;
@@ -94,7 +124,7 @@ byte ArduinoPositionRenderer::stepping() {
     }
     
     if ( RS::dy() != 0 ) {
-       if ( (retValue = pY->initiateStep()) != RET_OK )
+       if ( (retValue = INITIALIZE_SETP_Y) != RET_OK )
         return retValue;
         
       RS::stepSignature |= ASG_Y;
@@ -102,7 +132,7 @@ byte ArduinoPositionRenderer::stepping() {
     }
       
     if ( RS::dz() != 0 ) {
-       if ( (retValue = pZ->initiateStep()) != RET_OK )
+       if ( (retValue = INITIALIZE_SETP_Z) != RET_OK )
         return retValue;
         
       RS::stepSignature |= ASG_Z;
@@ -111,9 +141,9 @@ byte ArduinoPositionRenderer::stepping() {
     
     notifyMovePartBefore();
   
-    if ( pX->finalizeStep() == false ) { PRINT_DEBUG_VALUE1("pX->finalizeStep()","false") }
-    if ( pY->finalizeStep() == false ) { PRINT_DEBUG_VALUE1("pY->finalizeStep()","false") }
-    if ( pZ->finalizeStep() == false ) { PRINT_DEBUG_VALUE1("pZ->finalizeStep()","false") }
+    if ( FINALIZE_SETP_X == false ) { PRINT_DEBUG_VALUE1("FINALIZE_SETP_X","false") }
+    if ( FINALIZE_SETP_Y == false ) { PRINT_DEBUG_VALUE1("FINALIZE_SETP_Y","false") }
+    if ( FINALIZE_SETP_Z == false ) { PRINT_DEBUG_VALUE1("FINALIZE_SETP_Z","false") }
   
     notifyMovePartAfter();
     
@@ -125,13 +155,13 @@ byte ArduinoPositionRenderer::directMove(int8_t dx, int8_t dy, int8_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
   mode = DirectMove;
 
-  if ( pX->setDirection(dx) == false )
+  if ( SET_DIRECTION_X(dx) == false )
     return RET_ERROR;
 
-  if ( pY->setDirection(dy) == false )
+  if ( SET_DIRECTION_Y(dy) == false )
     return RET_ERROR;
 
-  if ( pZ->setDirection(dz) == false )
+  if ( SET_DIRECTION_Z(dz) == false )
     return RET_ERROR;
   
   // dx() = A[IDX_X] - B[IDX_X] 
@@ -174,13 +204,13 @@ byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
   // first setup the directions - this can be done once
   // because the directions didn't switch during a call of
   // renderAndStepAxisXYZ()
-  if ( pX->setDirection(dx) == false )
+  if ( SET_DIRECTION_X(dx) == false )
     return RET_ERROR;
 
-  if ( pY->setDirection(dy) == false )
+  if ( SET_DIRECTION_Y(dy) == false )
     return RET_ERROR;
 
-  if ( pZ->setDirection(dz) == false )
+  if ( SET_DIRECTION_Z(dz) == false )
     return RET_ERROR;
   
   //------------------------------------------------------

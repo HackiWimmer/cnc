@@ -270,15 +270,16 @@ void CncLoggerListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::updateContent() {
 /////////////////////////////////////////////////////////////
-	#warning
-	/*
-	if ( showOnDemand == true && IsShownOnScreen() == false ) {
+	if (   showOnDemand 		== true  
+		&& IsShownOnScreen()	== false 
+		&& IsShown() 			== true
+	   ) 
+	{
 		if ( CNC_READY ) {
 			THE_APP->showAuiPane("Logger");
 			THE_APP->getLoggerView()->select(LoggerSelection::VAL::CNC);
 		}
 	}
-	*/
 	
 	if ( updateMode != UM_Immediately ) {
 		anyUpdate = true;

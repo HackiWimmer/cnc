@@ -37,6 +37,8 @@ class ArduinoMainLoop {
     void loop();
 
     // common function interface
+    static bool     isSketchEnv();
+
     static uint8_t      getPinMode(uint8_t pin);
     static AE::PinType  getPinType(uint8_t pin);
 

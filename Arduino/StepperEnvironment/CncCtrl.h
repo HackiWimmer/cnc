@@ -86,8 +86,10 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 
   protected:
 
-    friend class        ArduinoTestManager;
+    template<bool IMPL>
     friend class        CncArduinoStepper;
+    
+    friend class        ArduinoTestManager;
     friend class        CncAxisX;
     friend class        CncAxisY;
     friend class        CncAxisZ;

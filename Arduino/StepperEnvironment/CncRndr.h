@@ -3,7 +3,9 @@
 
 #include "ArdoVal.h"
 
-class CncArduinoStepper;
+class CncAxisX;
+class CncAxisY;
+class CncAxisZ;
 class ArduinoPositionRenderer {
 
   public: 
@@ -27,7 +29,7 @@ class ArduinoPositionRenderer {
       static uint32_t           zStepCount;
     
       //------------------------------------------------------------------------
-      static void swap() { *B = *A; /*memcpy(B, A, sizeof(B));*/ }
+      static void swap() { memcpy(B, A, sizeof(B)); }
     
       //------------------------------------------------------------------------
       static void reset() {
@@ -55,9 +57,6 @@ class ArduinoPositionRenderer {
       static int8_t dz() { return A[IDX_Z] - B[IDX_Z]; }
     
     };
-
-    bool                  isReadyToRender();
-    void                  setupSteppers(CncArduinoStepper* x, CncArduinoStepper* y, CncArduinoStepper* z);
   
   private:
 
@@ -81,9 +80,9 @@ class ArduinoPositionRenderer {
 
     Mode                    mode;  
     RenderData              RD;
-    CncArduinoStepper*      pX;
-    CncArduinoStepper*      pY;
-    CncArduinoStepper*      pZ;
+    CncAxisX*               pX;
+    CncAxisY*               pY;
+    CncAxisZ*               pZ;
     
     ArduinoPositionRenderer(const ArduinoPositionRenderer&);
 
@@ -103,7 +102,11 @@ class ArduinoPositionRenderer {
     
     Mode                    getMode() const { return mode; }
     
+    bool                    isReadyToRender();
+    void                    setupSteppers(CncAxisX* x, CncAxisY* y, CncAxisZ* z);
+
     virtual byte            checkRuntimeEnv()                             = 0;
+    virtual byte            setDirection(AxisId aid, int32_t steps)       = 0;
     virtual byte            performStep (AxisId aid)                      = 0;
     virtual byte            initiateStep(AxisId aid)                      = 0;
     virtual byte            finalizeStep(AxisId aid)                      = 0;

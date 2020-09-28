@@ -359,10 +359,8 @@
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
       <File Name="Codelite/wxPNGAnimation.h"/>
-      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
-      <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
-      <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
-      <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
+      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="Debug;release2;Gprof;"/>
+      <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Debug;release2;Gprof;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
       <File Name="wxCrafterLoggerPanel.cpp"/>

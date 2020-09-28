@@ -27,6 +27,7 @@ struct StepperSetup {
 };
 
 // ----------------------------------------------------------------
+template<bool IMPL>
 class CncArduinoStepper {
 
   typedef bool  (*readPin_funct)  (void);
@@ -58,7 +59,6 @@ class CncArduinoStepper {
     const byte                      hlmPin;
     const byte                      idvPid;
 
-    const bool                      optimisticMode;
     bool                            INCREMENT_DIRECTION_VALUE;
     bool                            interrupted;
     bool                            stepPhase;
@@ -135,8 +135,16 @@ class CncArduinoStepper {
 
 };
 
+
 // ----------------------------------------------------------------
-class CncAxisX : public CncArduinoStepper {
+template<> byte CncArduinoStepper<PESIMISTIC>::initiateStep();
+template<> byte CncArduinoStepper<OPTIMISTIC>::initiateStep();
+
+template<> byte CncArduinoStepper<PESIMISTIC>::finalizeStep();
+template<> byte CncArduinoStepper<OPTIMISTIC>::finalizeStep();
+
+// ----------------------------------------------------------------
+class CncAxisX : public CncArduinoStepper<OPTIMISTIC> {
 
   private:
     CncAxisX(const CncAxisX&);
@@ -146,8 +154,8 @@ class CncAxisX : public CncArduinoStepper {
     static bool readLmtPins()                                    { return READ_LMT_PIN_X;     }  
     static bool readMinLmtPin()                                  { return READ_LMT_PIN_X_MIN; }  
     static bool readMaxLmtPin()                                  { return READ_LMT_PIN_X_MAX; }  
-    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_X            }
-    static void writeStpPin(bool value)                          { WRITE_STP_PIN_X            }  
+    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_X(value)     }
+    static void writeStpPin(bool value)                          { WRITE_STP_PIN_X(value)     }  
 
   public:
     CncAxisX(const StepperSetup& ss) 
@@ -165,7 +173,7 @@ class CncAxisX : public CncArduinoStepper {
 };
 
 // ----------------------------------------------------------------
-class CncAxisY : public CncArduinoStepper {
+class CncAxisY : public CncArduinoStepper<OPTIMISTIC> {
 
   private:
     CncAxisY(const CncAxisY&);
@@ -175,8 +183,8 @@ class CncAxisY : public CncArduinoStepper {
     static bool readLmtPins()                                    { return READ_LMT_PIN_Y;     }  
     static bool readMinLmtPin()                                  { return READ_LMT_PIN_Y_MIN; }  
     static bool readMaxLmtPin()                                  { return READ_LMT_PIN_Y_MAX; }  
-    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_Y            }    
-    static void writeStpPin(bool value)                          { WRITE_STP_PIN_Y            }  
+    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_Y(value)     }
+    static void writeStpPin(bool value)                          { WRITE_STP_PIN_Y(value)     }  
     
   public:
     CncAxisY(const StepperSetup& ss) 
@@ -194,7 +202,7 @@ class CncAxisY : public CncArduinoStepper {
 };
 
 // ----------------------------------------------------------------
-class CncAxisZ : public CncArduinoStepper {
+class CncAxisZ : public CncArduinoStepper<OPTIMISTIC> {
 
   private:
     CncAxisZ(const CncAxisZ&);
@@ -204,8 +212,8 @@ class CncAxisZ : public CncArduinoStepper {
     static bool readLmtPins()                                    { return READ_LMT_PIN_Z;     }  
     static bool readMinLmtPin()                                  { return READ_LMT_PIN_Z_MIN; }  
     static bool readMaxLmtPin()                                  { return READ_LMT_PIN_Z_MAX; }  
-    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_Z            }      
-    static void writeStpPin(bool value)                          { WRITE_STP_PIN_Z            }  
+    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_Z(value)     }      
+    static void writeStpPin(bool value)                          { WRITE_STP_PIN_Z(value)     }  
 
   public:
     CncAxisZ(const StepperSetup& ss) 

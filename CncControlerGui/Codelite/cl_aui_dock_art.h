@@ -28,35 +28,43 @@
 
 #include <wx/window.h>
 #include <wx/aui/framemanager.h>
+#include <wx/colour.h>
+#include <wx/dcgraph.h>
 #include <wx/dc.h>
 #include <wx/gdicmn.h>
 #include <wx/aui/dockart.h>
 #include <wx/aui/auibar.h>
 
 class clAuiDockArt : public wxAuiDefaultDockArt {
-    wxBitmap m_dockCloseBmp;
-    wxBitmap m_dockMoreBmp;
-    wxBitmap m_dockExpandeBmp;
-    wxBitmap m_dockMinimizeBmp;
-    
-public:
-    clAuiDockArt();
-    virtual ~clAuiDockArt();
-    
-    virtual void DrawBorder(wxDC& dc, wxWindow* window, const wxRect& rect, wxAuiPaneInfo& pane);
-    virtual void DrawCaption(wxDC& dc, wxWindow *window,
-                             const wxString& text,
-                             const wxRect& rect,
-                             wxAuiPaneInfo& pane);
+	
+	private:
+		
+		wxBitmap m_dockCloseBmp;
+		wxBitmap m_dockMoreBmp;
+		wxBitmap m_dockExpandeBmp;
+		wxBitmap m_dockMinimizeBmp;
+		
+		static wxString wxAuiChopText(wxDC& dc, const wxString& text, int max_size);
+		static bool GetGCDC(wxDC& dc, wxGCDC& gdc);
+	
+	public:
+		clAuiDockArt();
+		virtual ~clAuiDockArt();
+		
+		virtual void DrawBorder(wxDC& dc, wxWindow* window, const wxRect& rect, wxAuiPaneInfo& pane);
+		virtual void DrawCaption(wxDC& dc, wxWindow *window,
+								 const wxString& text,
+								 const wxRect& rect,
+								 wxAuiPaneInfo& pane);
 
-    virtual void DrawPaneButton(wxDC& dc, wxWindow *window,
-                                int button,
-                                int button_state,
-                                const wxRect& _rect,
-                                wxAuiPaneInfo& pane);
-    virtual void DrawBackground(wxDC& dc, wxWindow* window, int orientation, const wxRect& rect);
-    
-    virtual void DrawSash(wxDC& dc, wxWindow* window, int orientation, const wxRect &rect);
+		virtual void DrawPaneButton(wxDC& dc, wxWindow *window,
+									int button,
+									int button_state,
+									const wxRect& _rect,
+									wxAuiPaneInfo& pane);
+		virtual void DrawBackground(wxDC& dc, wxWindow* window, int orientation, const wxRect& rect);
+		
+		virtual void DrawSash(wxDC& dc, wxWindow* window, int orientation, const wxRect &rect);
 };
 
 #endif // CLAUIDOCKART_H
