@@ -232,6 +232,10 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncInfoBar.cpp"/>
+      <File Name="CncInfoBar.h"/>
+      <File Name="CncAutoFreezer.cpp"/>
+      <File Name="CncAutoFreezer.h"/>
       <File Name="CncTraceCtrl.cpp"/>
       <File Name="CncTraceCtrl.h"/>
       <File Name="CncTextCtrl.cpp"/>

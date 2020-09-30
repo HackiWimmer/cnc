@@ -82,7 +82,6 @@ void CncLoggerView::initialize() {
 	if ( loggerLists.size() == 0 ) {
 		
 		CncLoggerListCtrl* startup = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
-		startup->setShowOnDemand(m_btLoggerOnDemand->GetValue());
 		GblFunc::replaceControl(m_startupLoggerPlaceholder, startup);
 		loggerLists.push_back(startup);
 
@@ -131,6 +130,12 @@ void CncLoggerView::trace(const wxString& text) {
 		traceCtrl->AppendText(text);
 }
 /////////////////////////////////////////////////////////////////////
+void CncLoggerView::openTraceHistory() {
+/////////////////////////////////////////////////////////////////////
+	if ( traceCtrl )
+		traceCtrl->openHistroyView();
+}
+/////////////////////////////////////////////////////////////////////
 void CncLoggerView::onSelectStandardLogger(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	select(LoggerSelection::VAL::CNC);
@@ -160,8 +165,7 @@ void CncLoggerView::onClearTraceHistory(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::onViewTraceHistory(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( traceCtrl )
-		traceCtrl->openHistroyView();
+	openTraceHistory();
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::popImmediatelyMode(LoggerSelection::VAL id) {

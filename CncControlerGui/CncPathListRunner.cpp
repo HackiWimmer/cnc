@@ -4,6 +4,7 @@
 #include "CncConfig.h"
 #include "FileParser.h"
 #include "CncControl.h"
+#include "CncAutoFreezer.h"
 #include "CncPreprocessor.h"
 #include "CncMoveSequence.h"
 #include "CncPathListRunner.h"
@@ -330,33 +331,28 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		return false;
 	}
 	
-	// ----------------------------------------------------------
-	auto deFrost = [&](bool ret) {
-		APP_PROXY::getCncPreProcessor()->thaw();
-		return ret;
-	};
-	
-
 	// over all stored pathes
-	wxASSERT( APP_PROXY::getCncPreProcessor() != NULL );
-	APP_PROXY::getCncPreProcessor()->freeze();
+	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+	wxASSERT( cpp != NULL );
+	
+	CncAutoFreezer caf(cpp);
 	
 	for ( auto it = plm.const_begin(); it != plm.const_end(); ++it) {
 		const CncPathListEntry& curr  = *it;
 
 		if ( isCncInterrupted() == true )
-			return deFrost(false);
+			return false;
 
 		// if the corresponding list isn't connected this call does nothing and returns only
 		APP_PROXY::getCncPreProcessor()->addPathListEntry(curr);
 		
 		if ( checkDebugState() == false )
-			return deFrost(false);
+			return false;
 		
 		// client id change
 		if ( curr.isClientIdChange() == true ) {
 			if ( onPhysicallyClientIdChange(curr) == false )
-				return deFrost(false);
+				return false;
 		
 			continue;
 		}
@@ -364,7 +360,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		// speed change
 		if ( curr.isSpeedChange() == true ) {
 			if ( onPhysicallySpeedChange(curr) == false )
-				return deFrost(false);
+				return false;
 			
 			continue;
 		}
@@ -373,12 +369,12 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		if ( curr.isPositionChange() == true ) {
 			if ( setup.optAnalyse == false ) {
 				if ( onPhysicallyMoveRaw(curr) == false ) {
-					return deFrost(false);
+					return false;
 				}
 			}
 			else {
 				if ( onPhysicallyMoveAnalysed(it, plm.const_end()) == false ) {
-					return deFrost(false);
+					return false;
 				}
 			}
 			
@@ -386,5 +382,5 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		}
 	}
 	
-	return deFrost(publishMoveSequence());
+	return publishMoveSequence();
 }

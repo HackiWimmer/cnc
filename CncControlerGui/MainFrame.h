@@ -38,6 +38,7 @@ class wxFileConfig;
 class GL3DOptionPane;
 class GL3DDrawPane;
 
+class CncMainInfoBar;
 class CncTransactionLock;
 
 class GamepadThread;
@@ -166,7 +167,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void onReloadMonitorPreview(wxCommandEvent& event);
+		virtual void onReloadMonitorPreview(wxCommandEvent& event);
 		virtual void viewControllerMsgHistory(wxCommandEvent& event);
 		virtual void onSelectStepSensitivity(wxCommandEvent& event);
 		virtual void onSelectStepMode(wxCommandEvent& event);
@@ -423,6 +424,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		wxDECLARE_EVENT_TABLE();
 		
 	public:
+		
+		// ----------------------------------------------------------
 		enum EventId { 	INITIALIZED 				=  1,
 						COMPLETED 					=  2,
 						HEARTBEAT 					=  3,
@@ -439,6 +442,17 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 					  };
 					  
 		enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
+		
+		// ----------------------------------------------------------
+		struct Notification {
+			
+			enum Location { NL_MainView, NL_MonitorView };
+			
+			Location		location	= NL_MainView;
+			char			type		= 'I'; 
+			wxString		title		= ""; 
+			wxString		message		= ""; 
+		};
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		MainFrame(wxWindow* parent, wxFileConfig* globalConfig);
@@ -474,7 +488,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void openCurrentTemplateInBrowser();
 		
 		//////////////////////////////////////////////////////////////////////////////////
-		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
+		void displayNotification(const Notification& notification);
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		virtual void ShowAuiToolMenu(wxAuiToolBarEvent& event);
@@ -622,7 +636,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		wxString 						lastPortName;
 		wxString 						defaultPortName;
 		
-		wxInfoBar*						mainInfoBar;
 		CncControl* 					cnc;
 		
 		CncLruFileViewListCtrl*			lruFileView;
@@ -662,6 +675,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncGamepadControllerSpy* 		gamepadControllerSpy;
 		CncGamepadControllerState*		gamepadStatusCtl; 
 		CncLoggerListCtrl* 				controllersMsgHistoryList;
+		CncMainInfoBar*					mainViewInfobar;
+		CncMainInfoBar*					monitorViewInfobar;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;

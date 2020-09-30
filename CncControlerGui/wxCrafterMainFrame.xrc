@@ -346,11 +346,16 @@
           <style>wxTAB_TRAVERSAL</style>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
-            <rows>1</rows>
+            <rows>2</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
-            <growablerows>0</growablerows>
+            <growablerows>1</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="unknown" name="m_mainViewInfobar"/>
+            </object>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <object class="wxSimplebook" name="m_mainViewBook">
@@ -3915,11 +3920,16 @@ Size</value>
           <bg>wxSYS_COLOUR_BTNFACE</bg>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
-            <rows>1</rows>
+            <rows>2</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
-            <growablerows>0</growablerows>
+            <growablerows>1</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="unknown" name="m_monitorViewInfobar"/>
+            </object>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <object class="wxSimplebook" name="m_monitorViewBook">

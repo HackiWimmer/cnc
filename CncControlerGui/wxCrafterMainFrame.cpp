@@ -200,12 +200,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_winMainView, wxAuiPaneInfo().Name(wxT("SourceView")).Caption(_("CNC Template")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(400,400).MinSize(400,400).MaxSize(400,400).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
     
-    wxFlexGridSizer* flexGridSizer434 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer434 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer434->SetFlexibleDirection( wxBOTH );
     flexGridSizer434->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer434->AddGrowableCol(0);
-    flexGridSizer434->AddGrowableRow(0);
+    flexGridSizer434->AddGrowableRow(1);
     m_winMainView->SetSizer(flexGridSizer434);
+    
+    m_mainViewInfobar = new wxInfoBar(m_winMainView, wxID_ANY);
+    m_mainViewInfobar->SetSize(wxDLG_UNIT(m_winMainView, wxSize(-1,-1)));
+    
+    flexGridSizer434->Add(m_mainViewInfobar, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_mainViewBook = new wxSimplebook(m_winMainView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMainView, wxSize(-1,-1)), 0);
     m_mainViewBook->SetName(wxT("m_mainViewBook"));
@@ -2277,12 +2282,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_winMonitorView, wxAuiPaneInfo().Name(wxT("Outbound")).Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(1).Position(0).BestSize(500,500).MinSize(500,500).MaxSize(500,500).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
     
-    wxFlexGridSizer* flexGridSizer4348 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer4348 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer4348->SetFlexibleDirection( wxBOTH );
     flexGridSizer4348->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4348->AddGrowableCol(0);
-    flexGridSizer4348->AddGrowableRow(0);
+    flexGridSizer4348->AddGrowableRow(1);
     m_winMonitorView->SetSizer(flexGridSizer4348);
+    
+    m_monitorViewInfobar = new wxInfoBar(m_winMonitorView, wxID_ANY);
+    m_monitorViewInfobar->SetSize(wxDLG_UNIT(m_winMonitorView, wxSize(-1,-1)));
+    
+    flexGridSizer4348->Add(m_monitorViewInfobar, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_monitorViewBook = new wxSimplebook(m_winMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMonitorView, wxSize(-1,-1)), 0);
     m_monitorViewBook->SetName(wxT("m_monitorViewBook"));

@@ -49,7 +49,7 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 , entries					() 
 , updateMode				(UM_Normal)
 , updateModePreviously		(UM_Normal)
-, showOnDemand				(true)
+, showOnDemand				(false)
 , anyUpdate					(false)
 , selectedItem				(wxNOT_FOUND)
 , loggedRowNumber			(wxNOT_FOUND)
@@ -286,9 +286,12 @@ void CncLoggerListCtrl::updateContent() {
 		return;
 	}
 	
-	Refresh();
 	SetItemCount(entries.size());
-	EnsureVisible(GetItemCount() - 1);
+	
+	if ( IsShownOnScreen() == true ) {
+		Refresh();
+		EnsureVisible(GetItemCount() - 1);
+	}
 }
 //////////////////////////////////////////////////
 void CncLoggerListCtrl::onDisplayTimer(wxTimerEvent& event) {
@@ -296,8 +299,10 @@ void CncLoggerListCtrl::onDisplayTimer(wxTimerEvent& event) {
 	if ( anyUpdate == true ) {
 		
 		SetItemCount(entries.size());
-		Refresh();
-		EnsureVisible(GetItemCount() - 1);
+		if ( IsShownOnScreen() == true ) {
+			Refresh();
+			EnsureVisible(GetItemCount() - 1);
+		}
 		anyUpdate = false;
 	}
 }

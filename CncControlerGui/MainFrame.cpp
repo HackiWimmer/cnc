@@ -90,6 +90,7 @@
 #include "CncArduinoEnvironment.h"
 #include "CncLCDPositionPanel.h"
 #include "CncUserEvents.h"
+#include "CncInfoBar.h"
 #include "GlobalStrings.h"
 #include "wxCrafterLCDPanel.h"
 #include "wxCrafterImages.h"
@@ -293,7 +294,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , traceTimerCounter						(0)
 , lastPortName							(wxT(""))
 , defaultPortName						(wxT(""))
-, mainInfoBar							(new wxInfoBar(this))
 , cnc									(new CncControl(CncEMU_NULL))
 , lruFileView							(NULL)
 , sourceEditor							(NULL)
@@ -332,6 +332,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , gamepadControllerSpy					(new CncGamepadControllerSpy(this))
 , gamepadStatusCtl						(NULL)
 , controllersMsgHistoryList				(NULL)
+, mainViewInfobar						(new CncMainInfoBar(this))
+, monitorViewInfobar					(new CncMainInfoBar(this))
 , perspectiveHandler					(globalConfig, m_menuPerspective)
 , config								(globalConfig)
 , lruStore								(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -390,14 +392,16 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadPinNotification, 	this, MainFrame::EventId::SERIAL_PIN_NOTIFICATION);
 	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 			&MainFrame::onNavigatorPanel, 				this);
 	
-	const wxFont font = THE_CONTEXT->outboundListBookFont;
-	m_notebookConfig->GetListView()->SetFont(font);
-	m_listbookMonitor->GetListView()->SetFont(font);
-	m_listbookPostProcessor->GetListView()->SetFont(font);
-	m_listbookManallyMotionControl->GetListView()->SetFont(font);
-	m_listbookSetupConfig->GetListView()->SetFont(font);
-	m_listbookReferences->GetListView()->SetFont(font);
-	m_testCaseBook->GetListView()->SetFont(font);
+	{
+		const wxFont font = THE_CONTEXT->outboundListBookFont;
+		m_notebookConfig->GetListView()->SetFont(font);
+		m_listbookMonitor->GetListView()->SetFont(font);
+		m_listbookPostProcessor->GetListView()->SetFont(font);
+		m_listbookManallyMotionControl->GetListView()->SetFont(font);
+		m_listbookSetupConfig->GetListView()->SetFont(font);
+		m_listbookReferences->GetListView()->SetFont(font);
+		m_testCaseBook->GetListView()->SetFont(font);
+	}
 	
 	defaultSpeedSlider->setToolTipWindow(m_configuredFeedSpeed);
 }
@@ -717,6 +721,10 @@ void MainFrame::installCustControls() {
 	
 	GblFunc::replaceControl(m_3DSplitterPlaceholder, cnc3DHSplitterWindow);
 	
+	// info bars - aready created
+	GblFunc::replaceControl(m_mainViewInfobar,		mainViewInfobar);
+	GblFunc::replaceControl(m_monitorViewInfobar,	monitorViewInfobar);
+	
 	// Montion Monitor
 	motionMonitor = new CncMotionMonitor(this);
 	GblFunc::replaceControl(drawPane3D->GetDrawPane3DPlaceHolder(), motionMonitor);
@@ -915,19 +923,38 @@ void MainFrame::registerGuiControls() {
 	//...
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::displayNotification(const char type, wxString title, wxString message, unsigned int timeout) {
+void MainFrame::displayNotification(const Notification& notification) {
 ///////////////////////////////////////////////////////////////////
+	if ( notification.title.IsEmpty() && notification.message.IsEmpty() )
+		return;
+	
+	// msg: initial formating ...
+	wxString msg(wxString::Format("%s: %s", notification.title, notification.message));
+	msg.Replace("\n", " ");
+	
+	typedef MainFrame::Notification::Location Loc;
+	switch ( notification.location ) {
+		case Loc::NL_MainView:		mainViewInfobar->showMessage(notification.type, msg);
+									break;
+									
+		case Loc::NL_MonitorView:	monitorViewInfobar->showMessage(notification.type, msg);
+									break;
+	}
+	
+	/*
+	// obsolete, just for documentation . . 
 	wxSharedPtr<wxNotificationMessageBase> dlg;
-	dlg = new wxGenericNotificationMessage(title, message, this);
-	switch ( type ) {
+	dlg = new wxGenericNotificationMessage(notification.title, notification.message, this);
+	switch ( notification.type ) {
 		case 'E':	dlg->SetFlags(wxICON_ERROR); break;
 		case 'W':	dlg->SetFlags(wxICON_WARNING); break;
 		default:	dlg->SetFlags(wxICON_INFORMATION); break;
 	}
 	
-	dlg->Show(timeout);
+	dlg->Show(notification.timeout);
 	// important to free the shared Pointer!
 	dlg.reset();
+	*/
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayReport(int id) {
@@ -951,34 +978,14 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-    mainInfoBar->AddButton(wxID_EXIT);
-    mainInfoBar->RemoveButton(wxID_EXIT);
-
-    // ... changing the colours and/or fonts
-    mainInfoBar->SetOwnBackgroundColour(0xc8ffff);
-    mainInfoBar->SetForegroundColour(0x123312);
-    mainInfoBar->SetFont(GetFont().Bold().Larger());
-
-    // ... and changing the effect (only does anything under MSW currently)
-    mainInfoBar->SetShowHideEffects(wxSHOW_EFFECT_EXPAND, wxSHOW_EFFECT_EXPAND);
-    mainInfoBar->SetEffectDuration(1500);
-
-	mainInfoBar->ShowMessage("Sorry, it didn't work out.", wxICON_WARNING);
-	
-    // to use the info bars we need to use sizer for the window layout
-    wxBoxSizer * const sizer = new wxBoxSizer(wxVERTICAL);
-    sizer->Add(mainInfoBar, wxSizerFlags().Expand());
-    SetSizer(sizer);
+	Notification n;
+	n.message = "Hallo";
+	displayNotification(n);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	
-	wxString value; 
-	wxGetEnv("Path", &value);
-	std::cout	 << value << std::endl;
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -1000,23 +1007,8 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
 	
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 's');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 's');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 's');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 's');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, '\n');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 'x');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 'x');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 'x');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 'y');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, 'z');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, '\n');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, '1');
-	getLoggerView()->add(LoggerSelection::VAL::CNC, '2');
-	
 	getLoggerView()->add(LoggerSelection::VAL::CNC, "\nStefan Hölzer\nSonja Mack");
-	getLoggerView()->add(LoggerSelection::VAL::CNC, " Vor der Stephanskuppe 2\n");
-
+	getLoggerView()->add(LoggerSelection::VAL::CNC, " irgendwo\n");
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -2326,6 +2318,9 @@ bool MainFrame::connectSerialPort() {
 	m_connect->SetBitmap(bmpD);
 	m_connect->Refresh();
 	m_connect->Update();
+	
+	mainViewInfobar->Dismiss();
+	monitorViewInfobar->Dismiss();
 	
 	startAnimationControl();
 	m_serialTimer->Stop();
@@ -4532,6 +4527,10 @@ void MainFrame::requestReset() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	getLogger()->Clear();
+	
+	mainViewInfobar->Dismiss();
+	monitorViewInfobar->Dismiss();
+	
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RESET);
 	cnc->setup(true);
 	
@@ -7961,10 +7960,10 @@ void MainFrame::onSelectStepMode(wxCommandEvent& event) {
 
 
 
-
-
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onIdle(wxIdleEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	//CNC_PRINT_LOCATION
 }
+
+

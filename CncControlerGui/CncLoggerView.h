@@ -38,6 +38,8 @@ class CncLoggerView : public CncLoggerViewBase {
 		void trace							(const char c);
 		void trace							(const wxString& text);
 		
+		void openTraceHistory();
+		
 	protected:
 		
 		virtual void onClearTraceHistory(wxCommandEvent& event);

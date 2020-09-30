@@ -874,7 +874,7 @@ bool CncControl::dispatchEventQueue() {
 	static       CncMilliTimestamp tsLastUpdate     = 0;
 	
 	if ( isInterrupted() ) {
-		std::cerr << "SerialCallback: Interrupt detected"<< std::endl;
+		std::cerr << "CncControl::dispatchEventQueue: Interrupt detected"<< std::endl;
 		return false;
 	}
 	
@@ -1068,22 +1068,31 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 	wxString msg(cmi.message.str().c_str());
 	const wxDateTime now = wxDateTime::UNow();
 	const char type = (char)msg[0];
-	msg.assign(msg.SubString(1, msg.length() - 1));
+	const char last = (char)msg[msg.length() - 1];
 	
-	if ( type != 'D' )
-		THE_APP->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
+	msg.assign(msg.SubString(1, msg.length() - 1));
+	if ( last != '\n')
+		msg.append('\n');
+	
+	if ( type != 'D' ) {
+		MainFrame::Notification notification;
+		notification.location	= MainFrame::Notification::Location::NL_MonitorView;
+		notification.type		= type;
+		notification.title		= "Controller Callback";
+		notification.message	= msg;
+		THE_APP->displayNotification(notification);
+	}
 	
 	switch ( type ) {
 		
-		case 'W':	
-					cnc::msg.logWarning(now.Format("Warning Message received: %H:%M:%S.%l\n"));
+		case 'W':	cnc::msg.logWarning(now.Format("Warning Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logWarning(msg);
-					cnc::cex1 << "Received the following CNC Controller Warning: '" << msg << "'\n";
+					cnc::cex1 << "Received the following CNC Controller Warning: '" << msg << "'";
 					break;
 					
 		case 'E':	cnc::msg.logError(now.Format("Error Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logError(msg);
-					std::cerr << "Received the following CNC Controller Error: '" << msg << "'\n";
+					std::cerr << "Received the following CNC Controller Error: '" << msg << "'";
 					break;
 					
 		case 'D':	cnc::msg.logDebug(now.Format("Debug Message received: %H:%M:%S.%l \n"));
@@ -1093,7 +1102,7 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 
 		default:	cnc::msg.logInfo(now.Format("Info Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logInfo(msg);
-					std::cout << "Received the following CNC Controller Information: '" << msg << "'\n";
+					std::cout << "Received the following CNC Controller Information: '" << msg << "'";
 	}
 	
 	cnc::msg.setTextColour(wxColour(192, 192, 192));

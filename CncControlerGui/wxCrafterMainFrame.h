@@ -29,6 +29,7 @@
 #include <wx/tglbtn.h>
 #include <wx/button.h>
 #include <wx/panel.h>
+#include <wx/infobar.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/statline.h>
@@ -102,6 +103,7 @@ protected:
     wxBitmapButton* m_rcStop;
     wxButton* m_btnEmergenyStop;
     wxPanel* m_winMainView;
+    wxInfoBar* m_mainViewInfobar;
     wxSimplebook* m_mainViewBook;
     wxPanel* m_mainBookSourcePanel;
     wxButton* m_openSourceExtern;
@@ -316,6 +318,7 @@ protected:
     wxTextCtrl* m_filePreviewDetails;
     wxTextCtrl* m_currentFileMangerPreviewFileName;
     wxPanel* m_winMonitorView;
+    wxInfoBar* m_monitorViewInfobar;
     wxSimplebook* m_monitorViewBook;
     wxPanel* m_monitorBookCncPanel;
     wxNotebook* m_outboundNotebook;
@@ -984,6 +987,7 @@ public:
     wxBitmapButton* GetRcStop() { return m_rcStop; }
     wxButton* GetBtnEmergenyStop() { return m_btnEmergenyStop; }
     wxAuiToolBar* GetAuibarMain() { return m_auibarMain; }
+    wxInfoBar* GetMainViewInfobar() { return m_mainViewInfobar; }
     wxButton* GetOpenSourceExtern() { return m_openSourceExtern; }
     wxButton* GetOpenSvgExtern() { return m_openSvgExtern; }
     wxStaticLine* GetStaticLine44728() { return m_staticLine44728; }
@@ -1198,6 +1202,7 @@ public:
     wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
     wxSimplebook* GetMainViewBook() { return m_mainViewBook; }
     wxPanel* GetWinMainView() { return m_winMainView; }
+    wxInfoBar* GetMonitorViewInfobar() { return m_monitorViewInfobar; }
     wxStaticText* GetStaticText11481() { return m_staticText11481; }
     wxListCtrl* GetCncSummaryListCtrl() { return m_cncSummaryListCtrl; }
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
