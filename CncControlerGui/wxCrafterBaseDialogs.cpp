@@ -126,6 +126,14 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     
     flexGridSizer7276->Add(m_osEnvironmentList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
+    wxFlexGridSizer* flexGridSizer172 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer172->SetFlexibleDirection( wxBOTH );
+    flexGridSizer172->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer172->AddGrowableCol(0);
+    flexGridSizer172->AddGrowableRow(1);
+    
+    flexGridSizer7276->Add(flexGridSizer172, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     wxFlexGridSizer* flexGridSizer7288 = new wxFlexGridSizer(2, 2, 0, 0);
     flexGridSizer7288->SetFlexibleDirection( wxBOTH );
     flexGridSizer7288->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -133,7 +141,7 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     flexGridSizer7288->AddGrowableRow(0);
     flexGridSizer7288->AddGrowableRow(1);
     
-    flexGridSizer7276->Add(flexGridSizer7288, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer172->Add(flexGridSizer7288, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticText7294 = new wxStaticText(m_panelOSEnvironment, wxID_ANY, _("Parameter:"), wxDefaultPosition, wxDLG_UNIT(m_panelOSEnvironment, wxSize(-1,-1)), 0);
     wxFont m_staticText7294Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
@@ -165,6 +173,13 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     
     flexGridSizer7288->Add(m_osEnvValue, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
+    m_staticText174 = new wxStaticText(m_panelOSEnvironment, wxID_ANY, _("Press <ctrl>wihle selecting an entry to get an external box."), wxDefaultPosition, wxDLG_UNIT(m_panelOSEnvironment, wxSize(-1,-1)), 0);
+    m_staticText174->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_staticText174Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText174->SetFont(m_staticText174Font);
+    
+    flexGridSizer172->Add(m_staticText174, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    
     m_paneAppEnvironment = new wxPanel(m_listbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_paneAppEnvironmentImgIndex;
     m_paneAppEnvironmentImgIndex = m_listbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("application-side-list")));
@@ -185,6 +200,14 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     
     flexGridSizer7340->Add(m_appEnvironmentList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
+    wxFlexGridSizer* flexGridSizer175 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer175->SetFlexibleDirection( wxBOTH );
+    flexGridSizer175->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer175->AddGrowableCol(0);
+    flexGridSizer175->AddGrowableRow(1);
+    
+    flexGridSizer7340->Add(flexGridSizer175, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     wxFlexGridSizer* flexGridSizer72881 = new wxFlexGridSizer(2, 2, 0, 0);
     flexGridSizer72881->SetFlexibleDirection( wxBOTH );
     flexGridSizer72881->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -192,7 +215,7 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     flexGridSizer72881->AddGrowableRow(0);
     flexGridSizer72881->AddGrowableRow(1);
     
-    flexGridSizer7340->Add(flexGridSizer72881, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer175->Add(flexGridSizer72881, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticText72942 = new wxStaticText(m_paneAppEnvironment, wxID_ANY, _("Parameter:"), wxDefaultPosition, wxDLG_UNIT(m_paneAppEnvironment, wxSize(-1,-1)), 0);
     wxFont m_staticText72942Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
@@ -223,6 +246,13 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     #endif
     
     flexGridSizer72881->Add(m_appEnvValue, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText1741 = new wxStaticText(m_paneAppEnvironment, wxID_ANY, _("Press <ctrl>wihle selecting an entry to get an external box."), wxDefaultPosition, wxDLG_UNIT(m_paneAppEnvironment, wxSize(-1,-1)), 0);
+    m_staticText1741->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_staticText1741Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText1741->SetFont(m_staticText1741Font);
+    
+    flexGridSizer175->Add(m_staticText1741, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
     m_panelModules = new wxPanel(m_listbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelModulesImgIndex;
@@ -351,7 +381,26 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     
     m_staticLine7334 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
-    flexGridSizer7280->Add(m_staticLine7334, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer7280->Add(m_staticLine7334, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer179 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer179->SetFlexibleDirection( wxBOTH );
+    flexGridSizer179->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer179->AddGrowableCol(1);
+    flexGridSizer179->AddGrowableRow(0);
+    
+    flexGridSizer7280->Add(flexGridSizer179, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_btRefresh = new wxButton(this, wxID_ANY, _("Refresh"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btRefresh->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("refresh")), wxLEFT);
+    m_btRefresh->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btRefreshFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btRefresh->SetFont(m_btRefreshFont);
+    m_btRefresh->SetToolTip(_("Refresh dialog"));
+    
+    flexGridSizer179->Add(m_btRefresh, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(2));
     
     m_btClose = new wxButton(this, wxID_ANY, _("Close"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -362,7 +411,7 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     m_btClose->SetFont(m_btCloseFont);
     m_btClose->SetToolTip(_("Close dialog"));
     
-    flexGridSizer7280->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer179->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
     
     #if wxVERSION_NUMBER >= 2900
@@ -374,7 +423,7 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     #endif
     
     SetName(wxT("CncOSEnvironmentDialogBase"));
-    SetSize(500,600);
+    SetSize(wxDLG_UNIT(this, wxSize(500,600)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -392,10 +441,12 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
 #endif
     // Connect events
     this->Connect(wxEVT_SIZE, wxSizeEventHandler(CncOSEnvironmentDialogBase::onSize), NULL, this);
+    m_listbook->Connect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(CncOSEnvironmentDialogBase::onSelectListBook), NULL, this);
     m_osEnvironmentList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectOSEnvironmentItem), NULL, this);
     m_appEnvironmentList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectAppEnvironmentItem), NULL, this);
     m_modulesSortedBy->Connect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncOSEnvironmentDialogBase::sortModules), NULL, this);
     m_moduleList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectModulesItem), NULL, this);
+    m_btRefresh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncOSEnvironmentDialogBase::onRefresh), NULL, this);
     m_btClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncOSEnvironmentDialogBase::onClose), NULL, this);
     
 }
@@ -403,10 +454,12 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
 CncOSEnvironmentDialogBase::~CncOSEnvironmentDialogBase()
 {
     this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(CncOSEnvironmentDialogBase::onSize), NULL, this);
+    m_listbook->Disconnect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(CncOSEnvironmentDialogBase::onSelectListBook), NULL, this);
     m_osEnvironmentList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectOSEnvironmentItem), NULL, this);
     m_appEnvironmentList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectAppEnvironmentItem), NULL, this);
     m_modulesSortedBy->Disconnect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncOSEnvironmentDialogBase::sortModules), NULL, this);
     m_moduleList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectModulesItem), NULL, this);
+    m_btRefresh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncOSEnvironmentDialogBase::onRefresh), NULL, this);
     m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncOSEnvironmentDialogBase::onClose), NULL, this);
     
 }
@@ -477,7 +530,7 @@ CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, 
     m_observeCounterLabel->SetMinSize(wxSize(30,-1));
     
     SetName(wxT("CncConnectProgressBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -528,6 +581,7 @@ CncUsbConnectionDetectedBase::CncUsbConnectionDetectedBase(wxWindow* parent, wxW
     }
     SetIcons( app_icons );
 
+    this->SetFocus();
     
     wxFlexGridSizer* flexGridSizer5915 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer5915->SetFlexibleDirection( wxBOTH );
@@ -596,7 +650,7 @@ CncUsbConnectionDetectedBase::CncUsbConnectionDetectedBase(wxWindow* parent, wxW
     m_connect->SetMinSize(wxSize(120,-1));
     
     SetName(wxT("CncUsbConnectionDetectedBase"));
-    SetSize(500,300);
+    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -652,8 +706,8 @@ CncLastProcessingTimestampSummaryBase::CncLastProcessingTimestampSummaryBase(wxW
     
     flexGridSizer61->Add(m_tsSummary, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_tsSummary->InsertColumn(m_tsSummary->GetColumnCount(), _("Area"), wxLIST_FORMAT_LEFT, -1);
-    m_tsSummary->InsertColumn(m_tsSummary->GetColumnCount(), _("Time Consumed"), wxLIST_FORMAT_LEFT, -1);
+    m_tsSummary->InsertColumn(m_tsSummary->GetColumnCount(), _("Area"), wxLIST_FORMAT_LEFT, 120);
+    m_tsSummary->InsertColumn(m_tsSummary->GetColumnCount(), _("Time Consumed"), wxLIST_FORMAT_LEFT, 200);
     m_tsSummary->SetMinSize(wxSize(330,180));
     
     wxFlexGridSizer* flexGridSizer65 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -674,7 +728,7 @@ CncLastProcessingTimestampSummaryBase::CncLastProcessingTimestampSummaryBase(wxW
     flexGridSizer65->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
     
     SetName(wxT("CncLastProcessingTimestampSummaryBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -730,7 +784,7 @@ CncAutoProgressDialogBase::CncAutoProgressDialogBase(wxWindow* parent, wxWindowI
     m_animationCtrl->SetMinSize(wxSize(40,40));
     
     SetName(wxT("CncAutoProgressDialogBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -997,7 +1051,7 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     #endif
     
     SetName(wxT("CncExternalViewBoxBase"));
-    SetSize(800,600);
+    SetSize(wxDLG_UNIT(this, wxSize(800,600)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

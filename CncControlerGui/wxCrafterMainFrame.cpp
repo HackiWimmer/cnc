@@ -3549,12 +3549,25 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5146->Add(m_staticText5142, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
+    wxFlexGridSizer* flexGridSizer9295 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer9295->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9295->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9295->AddGrowableCol(0);
+    flexGridSizer9295->AddGrowableRow(0);
+    
+    flexGridSizer4359->Add(flexGridSizer9295, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     m_currentInboundFilePreviewFileName = new wxTextCtrl(m_monitorTemplatePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_monitorTemplatePanel, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
     #if wxVERSION_NUMBER >= 3000
     m_currentInboundFilePreviewFileName->SetHint(wxT(""));
     #endif
     
-    flexGridSizer4359->Add(m_currentInboundFilePreviewFileName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9295->Add(m_currentInboundFilePreviewFileName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_bmpButton9297 = new wxBitmapButton(m_monitorTemplatePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_reload")), wxDefaultPosition, wxDLG_UNIT(m_monitorTemplatePanel, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_bmpButton9297->SetToolTip(_("Reload"));
+    
+    flexGridSizer9295->Add(m_bmpButton9297, 0, wxALL, WXC_FROM_DIP(0));
     
     m_winFileView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
@@ -4736,18 +4749,18 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4502->Add(m_debuggerPropertyManagerGrid, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_positionMonitorView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(284,140)), wxTAB_TRAVERSAL);
+    m_accelaerationMonitorView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(284,140)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_positionMonitorView, wxAuiPaneInfo().Name(wxT("PositionMonitor")).Caption(_("CNC Position/Speed Monitor")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(384,40).MinSize(384,40).MaxSize(384,40).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_accelaerationMonitorView, wxAuiPaneInfo().Name(wxT("AccelerationMonitor")).Caption(_("CNC Acceleration Monitor")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(384,40).MinSize(384,40).MaxSize(384,40).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     wxFlexGridSizer* flexGridSizer7498 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer7498->SetFlexibleDirection( wxBOTH );
     flexGridSizer7498->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer7498->AddGrowableCol(0);
     flexGridSizer7498->AddGrowableRow(0);
-    m_positionMonitorView->SetSizer(flexGridSizer7498);
+    m_accelaerationMonitorView->SetSizer(flexGridSizer7498);
     
-    m_notebookSpeedMonitor = new wxNotebook(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxBK_RIGHT|wxBK_DEFAULT);
+    m_notebookSpeedMonitor = new wxNotebook(m_accelaerationMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_accelaerationMonitorView, wxSize(-1,-1)), wxBK_RIGHT|wxBK_DEFAULT);
     wxFont m_notebookSpeedMonitorFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
     m_notebookSpeedMonitor->SetFont(m_notebookSpeedMonitorFont);
     m_notebookSpeedMonitor->SetName(wxT("m_notebookSpeedMonitor"));
@@ -5341,8 +5354,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_miViewMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Motion Monitor"), wxT(""), wxITEM_CHECK);
     m_menuView->Append(m_miViewMonitor);
     
-    m_miViewPosMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Position Monitor"), wxT(""), wxITEM_CHECK);
-    m_menuView->Append(m_miViewPosMonitor);
+    m_miViewAccelMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Acceleration Monitor"), wxT(""), wxITEM_CHECK);
+    m_menuView->Append(m_miViewAccelMonitor);
     
     m_miViewDebugger = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Debugger"), wxT(""), wxITEM_CHECK);
     m_menuView->Append(m_miViewDebugger);
@@ -5910,6 +5923,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btClearMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btSaveOutboundAsTemplate2->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveOutboundAsNewTplFromButton), NULL, this);
     m_btToggleOutboundEditorWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
+    m_bmpButton9297->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onReloadMonitorPreview), NULL, this);
     m_externFileManagerPreview->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
     m_heartbeatState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
@@ -5973,7 +5987,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miViewTemplateManager->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewTemplateManager), NULL, this);
     this->Connect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Connect(m_miViewMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMonitor), NULL, this);
-    this->Connect(m_miViewPosMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewPosistionMonitor), NULL, this);
+    this->Connect(m_miViewAccelMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAccelerationMonitor), NULL, this);
     this->Connect(m_miViewDebugger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewDebugger), NULL, this);
     this->Connect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
     this->Connect(m_miViewLogger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewLogger), NULL, this);
@@ -6170,6 +6184,7 @@ MainFrameBClass::~MainFrameBClass()
     m_btClearMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btSaveOutboundAsTemplate2->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveOutboundAsNewTplFromButton), NULL, this);
     m_btToggleOutboundEditorWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
+    m_bmpButton9297->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onReloadMonitorPreview), NULL, this);
     m_externFileManagerPreview->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
     m_heartbeatState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
@@ -6233,7 +6248,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miViewTemplateManager->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewTemplateManager), NULL, this);
     this->Disconnect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Disconnect(m_miViewMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMonitor), NULL, this);
-    this->Disconnect(m_miViewPosMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewPosistionMonitor), NULL, this);
+    this->Disconnect(m_miViewAccelMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAccelerationMonitor), NULL, this);
     this->Disconnect(m_miViewDebugger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewDebugger), NULL, this);
     this->Disconnect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
     this->Disconnect(m_miViewLogger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewLogger), NULL, this);

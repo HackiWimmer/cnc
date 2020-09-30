@@ -8,24 +8,26 @@
 #include "CncSha1Wrapper.h"
 #include "CncFileNameService.h"
 
-wxString CncFileNameService::_configFileName("CncController.ini");
-wxString CncFileNameService::_lruFileName("CncControllerLruStore.ini");
+wxPathList	CncFileNameService::_pathList;
 
-wxString CncFileNameService::_preconfiguredSpeedConfigFileName(wxString("Database") + wxFileName::GetPathSeparator() + "PreconfiguredSpeedSetups.ini");
-wxString CncFileNameService::_appTempDir("CncGuiController-TempFiles");
+wxString	CncFileNameService::_configFileName("CncController.ini");
+wxString	CncFileNameService::_lruFileName("CncControllerLruStore.ini");
 
-wxString CncFileNameService::_ret(wxT(""));
-wxString CncFileNameService::_executablePath(wxT(""));
-wxString CncFileNameService::_homeDirectory(wxT(""));
-wxString CncFileNameService::_tempDirectoryOS(wxT(""));
-wxString CncFileNameService::_tempDirectoryApp(wxT(""));
-wxString CncFileNameService::_tempDirectorySession(wxT(""));
-wxString CncFileNameService::_configDirectory(wxT(""));
-wxString CncFileNameService::_baseDirectory(wxT(""));
-wxString CncFileNameService::_databaseDirectory(wxT(""));
-wxString CncFileNameService::_session(wxT(""));
+wxString	CncFileNameService::_preconfiguredSpeedConfigFileName(wxString("Database") + wxFileName::GetPathSeparator() + "PreconfiguredSpeedSetups.ini");
+wxString	CncFileNameService::_appTempDir("CncGuiController-TempFiles");
 
-wxString globalSessionString;
+wxString	CncFileNameService::_ret(wxT(""));
+wxString	CncFileNameService::_executablePath(wxT(""));
+wxString	CncFileNameService::_homeDirectory(wxT(""));
+wxString	CncFileNameService::_tempDirectoryOS(wxT(""));
+wxString	CncFileNameService::_tempDirectoryApp(wxT(""));
+wxString	CncFileNameService::_tempDirectorySession(wxT(""));
+wxString	CncFileNameService::_configDirectory(wxT(""));
+wxString	CncFileNameService::_baseDirectory(wxT(""));
+wxString	CncFileNameService::_databaseDirectory(wxT(""));
+wxString	CncFileNameService::_session(wxT(""));
+
+wxString 	globalSessionString;
 
 // ----------------------------------------------------------
 class CncWoodworkingSession {
@@ -191,6 +193,17 @@ void CncFileNameService::init() {
 	
 	_baseDirectory 		= _configDirectory;
 	_databaseDirectory 	= _baseDirectory + "Database" + sep;
+	
+	// fill path store
+	_pathList.AddEnvList("PATH");
+	_pathList.Add(CncFileNameService::getExecutableDir());
+	_pathList.Add(CncFileNameService::getBaseDir());
+	_pathList.Add(CncFileNameService::getDatabaseDir());
+	_pathList.Add(CncFileNameService::getConfigDir());
+	_pathList.Add(CncFileNameService::getHomeDir());
+	_pathList.Add(CncFileNameService::getTempDirOS());
+	_pathList.Add(CncFileNameService::getTempDirApp());
+	_pathList.Add(CncFileNameService::getTempDirSession());
 }
 ///////////////////////////////////////////////////////////////////
 void CncFileNameService::trace(std::ostream& os) {

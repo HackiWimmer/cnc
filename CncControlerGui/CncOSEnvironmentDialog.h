@@ -12,6 +12,8 @@ class CncOSEnvironmentDialog : public CncOSEnvironmentDialogBase {
 		
 		CncContextListCtrl* contextControl;
 		
+		void update();
+		
 		const unsigned int PAGE_ENVIRONMENT = 0;
 		const unsigned int PAGE_MODULES 	= 1;
 
@@ -27,7 +29,8 @@ class CncOSEnvironmentDialog : public CncOSEnvironmentDialogBase {
 		const unsigned int VER_COL_VALUE 	= 1;
 		
 	protected:
-	
+    virtual void onRefresh(wxCommandEvent& event);
+		virtual void onSelectListBook(wxListbookEvent& event);
 		virtual void sortModules(wxCommandEvent& event);
 		virtual void selectModulesItem(wxListEvent& event);
 		virtual void selectOSEnvironmentItem(wxListEvent& event);
@@ -36,8 +39,9 @@ class CncOSEnvironmentDialog : public CncOSEnvironmentDialogBase {
 		virtual void onClose(wxCommandEvent& event);
 		virtual void onSize(wxSizeEvent& event);
 			
-		void evaluateOSEnvrionemnt();
-		void evaluateAppEnvrionemnt();
+		void evaluate();
+		void evaluateOSEnvrionment();
+		void evaluateAppEnvrionment();
 		void evaluateLoadedModules();
 		void evaluateVersionInfo();
 		

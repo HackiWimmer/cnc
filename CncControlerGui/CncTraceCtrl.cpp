@@ -89,7 +89,6 @@ void CncTraceCtrl::openHistroyView() {
 	dlg.SetSize(800, 900);
 	dlg.CenterOnParent();
 	dlg.setWordWrap(false);
-	dlg.setMessage(content);
 	dlg.ShowModal();
 }
 //////////////////////////////////////////////////////////////

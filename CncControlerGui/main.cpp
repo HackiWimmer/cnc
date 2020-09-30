@@ -218,7 +218,8 @@ class MainLogger : public wxLog {
 				case wxLOG_Status:		std::cout << msg << std::endl;
 										break;
 										
-				default:				std::cerr << msg << std::endl;
+				default:				std::cerr << "wxLog::DoLogRecord(" << wxString(getLogLevelAsStr(level)).Trim() << ") occured!" << std::endl;
+										std::cerr << msg << std::endl;
 										GblFunc::stacktrace(std::cerr);
 			}
 		}

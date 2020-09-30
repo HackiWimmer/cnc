@@ -1,0 +1,12 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/win_resources.rc
+wx/msw/wx.rc
+C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/wx/msw/wx.rc
+

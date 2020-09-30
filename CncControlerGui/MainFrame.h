@@ -61,7 +61,6 @@ class CncMonitorHSplitterWindow;
 class CncTemplateObserver;
 class CncStatisticsPane;
 class CncSvgViewer;
-class CncGameportController;
 class CncSpeedMonitor;
 class CncDefaultSpeedSlider;
 class CncPreprocessor;
@@ -77,7 +76,6 @@ class CncManuallyMoveCoordinates;
 class CncSpeedPlayground;
 class CncGamepadControllerSpy;
 class CncGamepadControllerState;
-class CncGamepadEventFilter;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -168,6 +166,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onReloadMonitorPreview(wxCommandEvent& event);
 		virtual void viewControllerMsgHistory(wxCommandEvent& event);
 		virtual void onSelectStepSensitivity(wxCommandEvent& event);
 		virtual void onSelectStepMode(wxCommandEvent& event);
@@ -255,7 +254,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void renameUserPerspective(wxCommandEvent& event);
 		virtual void removeUserPerspective(wxCommandEvent& event);
 		virtual void viewDebugger(wxCommandEvent& event);
-		virtual void viewPosistionMonitor(wxCommandEvent& event);
+		virtual void viewAccelerationMonitor(wxCommandEvent& event);
 		virtual void toggleTemplateManager(wxCommandEvent& event);
 		virtual void clearPositionSpy(wxCommandEvent& event);
 		virtual void onSelectManuallyMove(wxCommandEvent& event);
@@ -464,7 +463,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void selectMainBookTestPanel();	
 		
 		void selectMonitorBookCncPanel();
-		void selectMonitorBookTemplatePanel();
+		void selectMonitorBookTemplatePanel(bool force = false);
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
@@ -724,8 +723,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void openFileFromFileManager(const wxString& fn);
 		void openNavigatorFromGamepad();
 		
-		bool openFileExtern(const wxString& tool, const char* file);
-		bool openFileExtern(const wxString& tool, wxString& file);
+		bool openFileExtern(const wxString& tool, const char* file, bool checkToolExists=true);
+		bool openFileExtern(const wxString& tool, wxString& file, bool checkToolExists=true);
 		
 		CncTemplateFormat getTemplateFormat(const wxString& fn);
 		const char* getTemplateFormatName(const wxString& fn);

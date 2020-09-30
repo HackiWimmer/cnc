@@ -123,6 +123,12 @@ wxString CncContextListCtrl::OnGetItemText(long item, long column) const {
 	else if ( index++ == item ) return eval(column, "Common.OnlineUpdateCoordinates",					formatBool		(THE_CONTEXT->isOnlineUpdateCoordinates()));
 	else if ( index++ == item ) return eval(column, "Common.UpdateInterval",							formatInt		(THE_CONTEXT->getUpdateInterval()));
 	
+	else if ( index++ == item ) return eval(column, "Serial.CanGamePort",								formatBool		(THE_CONTEXT->canGamePort()));
+	else if ( index++ == item ) return eval(column, "Serial.CanSpeedMonitoring",						formatBool		(THE_CONTEXT->canSpeedMonitoring()));
+	else if ( index++ == item ) return eval(column, "Serial.HasHardware",								formatBool		(THE_CONTEXT->hasHardware()));
+	
+	// ....
+	
 	wxASSERT ( index < MAX_ITEM_COUNT );
 	return _("");
 }

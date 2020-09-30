@@ -1,0 +1,3 @@
+C:/@Development/@Projekte/c++/CNCGuiController/cmake-build-Release/CncControllerGui/CMakeFiles/CncControllerGui.dir
+C:/@Development/@Projekte/c++/CNCGuiController/cmake-build-Release/CncControllerGui/CMakeFiles/edit_cache.dir
+C:/@Development/@Projekte/c++/CNCGuiController/cmake-build-Release/CncControllerGui/CMakeFiles/rebuild_cache.dir

@@ -975,9 +975,10 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 	
-	CncDoublePosition pos; 
-	bool ret = cnc->convertPositionToHardwareCoordinate(cnc->getCurCtlPosMetric(), pos);
-	std::cout << ret << ": " << pos << std::endl;
+	wxString value; 
+	wxGetEnv("Path", &value);
+	std::cout	 << value << std::endl;
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -2395,6 +2396,9 @@ bool MainFrame::connectSerialPort() {
 	
 	m_connect->Refresh();
 	m_connect->Update();
+
+	if ( cncOsEnvDialog && cncOsEnvDialog->IsShownOnScreen() == true )
+		cncOsEnvDialog->update();
 
 	stopAnimationControl();
 	enableControls();
@@ -4292,11 +4296,13 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 		lastMonitorPreviewFileName.clear();
 	
 	// check if a preview update is necessary
-	if ( lastMonitorPreviewFileName == getCurrentTemplatePathFileName() && sourceEditor->GetModify() == false)
+	const bool isFileChanged	= lastMonitorPreviewFileName != getCurrentTemplatePathFileName();
+	const bool isModified		= sourceEditor->GetModify() || force;
+	
+	if ( isFileChanged == false && isModified == false)
 		return;
 		
-	MF_PRINT_LOCATION_CTX_FILE
-	
+	// Open ...
 	lastMonitorPreviewFileName = getCurrentTemplatePathFileName();
 	
 	// wxString tfn(CncFileNameService::getCncTemplatePreviewFileName(getCurrentTemplateFormat()));
@@ -4809,7 +4815,7 @@ void MainFrame::openPyCam(wxCommandEvent& event) {
 void MainFrame::openCalculator(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString cmd("calc");
-	openFileExtern(cmd, _(""));
+	openFileExtern(cmd, _(""), false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableTestControls(bool state) {
@@ -4867,6 +4873,14 @@ void MainFrame::updateRenderResolution() {
 void MainFrame::updateRenderResolution(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updateRenderResolution();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onReloadMonitorPreview(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	const wxString fileName(m_currentInboundFilePreviewFileName->GetValue());
+	const wxFileName fn(fileName);
+	if ( fn.Exists() )
+		openPreview(monitorFilePreview, fileName);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
@@ -5050,13 +5064,10 @@ void MainFrame::selectMonitorBookCncPanel() {
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::selectMonitorBookTemplatePanel() {
+void MainFrame::selectMonitorBookTemplatePanel(bool force) {
 ///////////////////////////////////////////////////////////////////
-	MF_PRINT_LOCATION_CTX_FILE
-	
 	if ( m_externFileManagerPreview->IsChecked() == false ) {
-		prepareAndShowMonitorTemplatePreview(sourceEditor->IsModified());
-	
+		prepareAndShowMonitorTemplatePreview(sourceEditor->IsModified() || force);
 		m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
 	} else {
 		
@@ -5116,33 +5127,33 @@ void MainFrame::hideAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
 ///////////////////////////////////////////////////////////////////
 wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 ///////////////////////////////////////////////////////////////////
-	if      ( name == "Toolbar" ) 			return m_auibarMain;
-	else if ( name == "SourceView")			return m_winMainView;
-	else if ( name == "Logger")				return m_winLoggerView;
-	else if ( name == "Outbound")			return m_winMonitorView;
-	else if ( name == "TemplateManager")	return m_winFileView;
-	else if ( name == "StatusBar")			return m_statusBar;
-	else if ( name == "SerialSpy")			return m_serialSpyView;
-	else if ( name == "UnitCalculator")		return m_svgUnitCalulator;
-	else if ( name == "Debugger")			return m_debuggerView;
-	else if ( name == "PositionMonitor")	return m_positionMonitorView;
-	else if ( name == "SecureRunPanel")		return m_secureRunPanel;
+	if      ( name == "Toolbar" ) 				return m_auibarMain;
+	else if ( name == "SourceView")				return m_winMainView;
+	else if ( name == "Logger")					return m_winLoggerView;
+	else if ( name == "Outbound")				return m_winMonitorView;
+	else if ( name == "TemplateManager")		return m_winFileView;
+	else if ( name == "StatusBar")				return m_statusBar;
+	else if ( name == "SerialSpy")				return m_serialSpyView;
+	else if ( name == "UnitCalculator")			return m_svgUnitCalulator;
+	else if ( name == "Debugger")				return m_debuggerView;
+	else if ( name == "AccelerationMonitor")	return m_accelaerationMonitorView;
+	else if ( name == "SecureRunPanel")			return m_secureRunPanel;
 	
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
 wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 ///////////////////////////////////////////////////////////////////
-	if      ( name == "Toolbar" ) 			return m_miToolbar;
-	else if ( name == "StatusBar")			return m_miViewStatusbar;
-	else if ( name == "SourceView")			return m_miViewMainView;
-	else if ( name == "Logger")				return m_miViewLogger;
-	else if ( name == "Outbound")			return m_miViewMonitor;
-	else if ( name == "TemplateManager")	return m_miViewTemplateManager;
-	else if ( name == "SerialSpy")			return m_miViewSpy;
-	else if ( name == "UnitCalculator")		return m_miViewUnitCalculator;
-	else if ( name == "Debugger")			return m_miViewDebugger;
-	else if ( name == "PositionMonitor")	return m_miViewPosMonitor;
+	if      ( name == "Toolbar" ) 				return m_miToolbar;
+	else if ( name == "StatusBar")				return m_miViewStatusbar;
+	else if ( name == "SourceView")				return m_miViewMainView;
+	else if ( name == "Logger")					return m_miViewLogger;
+	else if ( name == "Outbound")				return m_miViewMonitor;
+	else if ( name == "TemplateManager")		return m_miViewTemplateManager;
+	else if ( name == "SerialSpy")				return m_miViewSpy;
+	else if ( name == "UnitCalculator")			return m_miViewUnitCalculator;
+	else if ( name == "Debugger")				return m_miViewDebugger;
+	else if ( name == "AccelerationMonitor")	return m_miViewAccelMonitor;
 	
 	return NULL;
 }
@@ -5250,9 +5261,9 @@ void MainFrame::viewDebugger(wxCommandEvent& event) {
 	toggleAuiPane("Debugger");
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::viewPosistionMonitor(wxCommandEvent& event) {
+void MainFrame::viewAccelerationMonitor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	toggleAuiPane("PositionMonitor");
+	toggleAuiPane("AccelerationMonitor");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
@@ -5725,16 +5736,23 @@ void MainFrame::toogleSvgEditSearchFlag(wxCommandEvent& event) {
 	searchConditionsChanged();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::openFileExtern(const wxString& tool, const char* file) {
+bool MainFrame::openFileExtern(const wxString& tool, const char* file, bool checkToolExists) {
 ///////////////////////////////////////////////////////////////////
 	wxString f(file);
-	return openFileExtern(tool, f);
+	return openFileExtern(tool, f, checkToolExists);
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::openFileExtern(const wxString& tool, wxString& file) {
+bool MainFrame::openFileExtern(const wxString& tool, wxString& file, bool checkToolExists) {
 ///////////////////////////////////////////////////////////////////
-	startAnimationControl();
+	if ( checkToolExists == true ) {
+		if ( CncFileNameService::findAbsoluteValidPath(tool).IsEmpty() ) {
+			std::cerr << "MainFrame::openFileExtern: Failed:" << std::endl;
+			std::cerr << " Can't find tool:" << tool << std::endl;
+			return false;
+		}
+	}
 	
+	startAnimationControl();
 	wxString cmd(tool);
 	if ( file.IsEmpty() == false ) {
 		
@@ -5751,12 +5769,11 @@ bool MainFrame::openFileExtern(const wxString& tool, wxString& file) {
 	}
 	
 	cnc::trc.logInfoMessage(wxString::Format("Open: %s", cmd));
-	
 	wxExecute(cmd);
-	wxASSERT(cnc);
+	
 	waitActive(1500);
-
 	stopAnimationControl();
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -7461,7 +7478,7 @@ void MainFrame::enableSourceEditorMenuItems(bool enable) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::showOSEnvironment(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( cncOsEnvDialog->IsShownOnScreen() == false )
+	if ( cncOsEnvDialog && cncOsEnvDialog->IsShownOnScreen() == false )
 		cncOsEnvDialog->Show();
 }
 /////////////////////////////////////////////////////////////////////

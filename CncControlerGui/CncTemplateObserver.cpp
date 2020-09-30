@@ -208,34 +208,39 @@ void CncTemplateObserver::performActions() {
 	
 		switch ( m_actionSelection->GetSelection() ) {
 			
-			case ACTION_PREVIEW:	THE_APP->selectMonitorBookTemplatePanel();
-									logInformation(wxString::Format(" --> Action: '%s' performed\n", "Update Preview"), styles.taAction);
-									break;
-									
-			case ACTION_RUN:		
-			case ACTION_DEBUG:		
-									if ( THE_APP->cnc->isEmulator() == false ) {
-										logError(wxString::Format(" --> This action isn't allowed for none emulator serials\n", fn));
-										m_actionSelection->SetSelection(ACTION_PREVIEW);
-										
-									} else {
-										THE_APP->selectMonitorBookCncPanel();
-										
-										if ( m_actionSelection->GetSelection() == ACTION_RUN ) {
-											wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-											wxPostEvent(THE_APP->GetRcRun(), evt);
-											
-											logInformation(wxString::Format(" --> Action: '%s' performed\n", "Run Template"), styles.taAction);
-											
-										} else {
-											wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-											wxPostEvent(THE_APP->GetRcDebug(), evt);
-											
-											logInformation(wxString::Format(" --> Action: '%s' performed\n", "Run Template"), styles.taAction);
-										}
-									}
-									
-									break;
+			case ACTION_PREVIEW:
+			{
+				const bool force = true;
+				THE_APP->selectMonitorBookTemplatePanel(force);
+				logInformation(wxString::Format(" --> Action: '%s' performed\n", "Update Preview"), styles.taAction);
+				break;
+			}
+			case ACTION_RUN:
+			case ACTION_DEBUG:
+			{
+				if ( THE_APP->cnc->isEmulator() == false ) {
+					logError(wxString::Format(" --> This action isn't allowed for none emulator serials\n", fn));
+					m_actionSelection->SetSelection(ACTION_PREVIEW);
+					
+				} else {
+					THE_APP->selectMonitorBookCncPanel();
+					
+					if ( m_actionSelection->GetSelection() == ACTION_RUN ) {
+						wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
+						wxPostEvent(THE_APP->GetRcRun(), evt);
+						
+						logInformation(wxString::Format(" --> Action: '%s' performed\n", "Run Template"), styles.taAction);
+						
+					} else {
+						wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
+						wxPostEvent(THE_APP->GetRcDebug(), evt);
+						
+						logInformation(wxString::Format(" --> Action: '%s' performed\n", "Run Template"), styles.taAction);
+					}
+				}
+				
+				break;
+			}
 		}
 	}
 }

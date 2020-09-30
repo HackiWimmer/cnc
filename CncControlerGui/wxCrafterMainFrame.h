@@ -446,6 +446,7 @@ protected:
     wxPanel* m_panel5144;
     wxStaticText* m_staticText5142;
     wxTextCtrl* m_currentInboundFilePreviewFileName;
+    wxBitmapButton* m_bmpButton9297;
     wxPanel* m_winFileView;
     wxPanel* m_fileViews;
     wxStaticText* m_staticText8353;
@@ -559,7 +560,7 @@ protected:
     wxButton* m_button75611;
     wxPanel* m_debuggerView;
     wxPropertyGridManager* m_debuggerPropertyManagerGrid;
-    wxPanel* m_positionMonitorView;
+    wxPanel* m_accelaerationMonitorView;
     wxNotebook* m_notebookSpeedMonitor;
     wxPanel* m_panelSpeedMonitor;
     wxPanel* m_speedMonitorPlaceholder;
@@ -640,7 +641,7 @@ protected:
     wxMenuItem* m_miViewTemplateManager;
     wxMenuItem* m_miViewMainView;
     wxMenuItem* m_miViewMonitor;
-    wxMenuItem* m_miViewPosMonitor;
+    wxMenuItem* m_miViewAccelMonitor;
     wxMenuItem* m_miViewDebugger;
     wxMenuItem* m_miViewSpy;
     wxMenuItem* m_miViewLogger;
@@ -849,6 +850,7 @@ protected:
     virtual void viewControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
+    virtual void onReloadMonitorPreview(wxCommandEvent& event) { event.Skip(); }
     virtual void onChangePreviewMode(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickHeartbeatState(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
@@ -895,7 +897,7 @@ protected:
     virtual void viewTemplateManager(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMainView(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMonitor(wxCommandEvent& event) { event.Skip(); }
-    virtual void viewPosistionMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewAccelerationMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void viewDebugger(wxCommandEvent& event) { event.Skip(); }
     virtual void viewSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void viewLogger(wxCommandEvent& event) { event.Skip(); }
@@ -1324,6 +1326,7 @@ public:
     wxStaticText* GetStaticText5142() { return m_staticText5142; }
     wxPanel* GetPanel5144() { return m_panel5144; }
     wxTextCtrl* GetCurrentInboundFilePreviewFileName() { return m_currentInboundFilePreviewFileName; }
+    wxBitmapButton* GetBmpButton9297() { return m_bmpButton9297; }
     wxPanel* GetMonitorTemplatePanel() { return m_monitorTemplatePanel; }
     wxSimplebook* GetMonitorViewBook() { return m_monitorViewBook; }
     wxPanel* GetWinMonitorView() { return m_winMonitorView; }
@@ -1457,7 +1460,7 @@ public:
     wxPanel* GetSpeedPanel() { return m_speedPanel; }
     wxPanel* GetPanelPositionMonitor() { return m_panelPositionMonitor; }
     wxNotebook* GetNotebookSpeedMonitor() { return m_notebookSpeedMonitor; }
-    wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }
+    wxPanel* GetAccelaerationMonitorView() { return m_accelaerationMonitorView; }
     wxStaticBitmap* GetStaticBitmap8269() { return m_staticBitmap8269; }
     wxStaticText* GetStaticText8271() { return m_staticText8271; }
     wxBitmapButton* GetBtDearctivateSecureRunMode() { return m_btDearctivateSecureRunMode; }

@@ -62,12 +62,14 @@ protected:
     wxTextCtrl* m_osEnvParam;
     wxStaticText* m_staticText7296;
     wxTextCtrl* m_osEnvValue;
+    wxStaticText* m_staticText174;
     wxPanel* m_paneAppEnvironment;
     wxListCtrl* m_appEnvironmentList;
     wxStaticText* m_staticText72942;
     wxTextCtrl* m_appEnvParam;
     wxStaticText* m_staticText72964;
     wxTextCtrl* m_appEnvValue;
+    wxStaticText* m_staticText1741;
     wxPanel* m_panelModules;
     wxRadioBox* m_modulesSortedBy;
     wxListCtrl* m_moduleList;
@@ -83,14 +85,17 @@ protected:
     wxStaticText* m_staticText7990;
     wxListCtrl* m_versionInfoList;
     wxStaticLine* m_staticLine7334;
+    wxButton* m_btRefresh;
     wxButton* m_btClose;
 
 protected:
     virtual void onSize(wxSizeEvent& event) { event.Skip(); }
+    virtual void onSelectListBook(wxListbookEvent& event) { event.Skip(); }
     virtual void selectOSEnvironmentItem(wxListEvent& event) { event.Skip(); }
     virtual void selectAppEnvironmentItem(wxListEvent& event) { event.Skip(); }
     virtual void sortModules(wxCommandEvent& event) { event.Skip(); }
     virtual void selectModulesItem(wxListEvent& event) { event.Skip(); }
+    virtual void onRefresh(wxCommandEvent& event) { event.Skip(); }
     virtual void onClose(wxCommandEvent& event) { event.Skip(); }
 
 public:
@@ -105,12 +110,14 @@ public:
     wxTextCtrl* GetOsEnvParam() { return m_osEnvParam; }
     wxStaticText* GetStaticText7296() { return m_staticText7296; }
     wxTextCtrl* GetOsEnvValue() { return m_osEnvValue; }
+    wxStaticText* GetStaticText174() { return m_staticText174; }
     wxPanel* GetPanelOSEnvironment() { return m_panelOSEnvironment; }
     wxListCtrl* GetAppEnvironmentList() { return m_appEnvironmentList; }
     wxStaticText* GetStaticText72942() { return m_staticText72942; }
     wxTextCtrl* GetAppEnvParam() { return m_appEnvParam; }
     wxStaticText* GetStaticText72964() { return m_staticText72964; }
     wxTextCtrl* GetAppEnvValue() { return m_appEnvValue; }
+    wxStaticText* GetStaticText1741() { return m_staticText1741; }
     wxPanel* GetPaneAppEnvironment() { return m_paneAppEnvironment; }
     wxRadioBox* GetModulesSortedBy() { return m_modulesSortedBy; }
     wxListCtrl* GetModuleList() { return m_moduleList; }
@@ -128,6 +135,7 @@ public:
     wxPanel* GetPanelVersions() { return m_panelVersions; }
     wxListbook* GetListbook() { return m_listbook; }
     wxStaticLine* GetStaticLine7334() { return m_staticLine7334; }
+    wxButton* GetBtRefresh() { return m_btRefresh; }
     wxButton* GetBtClose() { return m_btClose; }
     CncOSEnvironmentDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Application Environment"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,600), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP|wxRESIZE_BORDER);
     virtual ~CncOSEnvironmentDialogBase();

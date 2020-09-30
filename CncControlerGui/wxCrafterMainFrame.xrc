@@ -5963,10 +5963,32 @@ Preview</label>
                           </object>
                         </object>
                       </object>
-                      <object class="sizeritem">
+                      <object class="sizeritem" name="flexGridSizer9295">
                         <flag>wxALL|wxEXPAND</flag>
-                        <object class="wxTextCtrl" name="m_currentInboundFilePreviewFileName">
-                          <style>wxTE_RIGHT|wxTE_READONLY</style>
+                        <object class="wxFlexGridSizer">
+                          <cols>2</cols>
+                          <rows>1</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols>0</growablecols>
+                          <growablerows>0</growablerows>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <object class="wxTextCtrl" name="m_currentInboundFilePreviewFileName">
+                              <style>wxTE_RIGHT|wxTE_READONLY</style>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <object class="wxBitmapButton" name="m_bmpButton9297">
+                              <bitmap>bitmaps/CodeLite/16-file_reload.png</bitmap>
+                              <style>wxBU_AUTODRAW</style>
+                              <tooltip>
+                                <![CDATA[Reload]]>
+                              </tooltip>
+                              <default>0</default>
+                            </object>
+                          </object>
                         </object>
                       </object>
                     </object>
@@ -8256,8 +8278,8 @@ State</label>
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo" name="PositionMonitor">
-        <caption>CNC Position/Speed Monitor</caption>
+      <object class="wxAuiPaneInfo" name="AccelerationMonitor">
+        <caption>CNC Acceleration Monitor</caption>
         <caption_visible>1</caption_visible>
         <top_dockable>1</top_dockable>
         <left_dockable>1</left_dockable>
@@ -8277,7 +8299,7 @@ State</label>
         <minimize_button>1</minimize_button>
         <maximize_button>1</maximize_button>
         <pin_button>1</pin_button>
-        <object class="wxPanel" name="m_positionMonitorView">
+        <object class="wxPanel" name="m_accelaerationMonitorView">
           <style>wxTAB_TRAVERSAL</style>
           <size>284,140</size>
           <object class="wxFlexGridSizer">
@@ -9338,9 +9360,9 @@ State</label>
             <![CDATA[]]>
           </help>
         </object>
-        <object class="wxMenuItem" name="m_miViewPosMonitor">
+        <object class="wxMenuItem" name="m_miViewAccelMonitor">
           <checkable>1</checkable>
-          <label>CNC Position Monitor</label>
+          <label>CNC Acceleration Monitor</label>
           <accel>
             <![CDATA[]]>
           </accel>

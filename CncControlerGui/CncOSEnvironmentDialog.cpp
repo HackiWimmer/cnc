@@ -1,9 +1,11 @@
 #include <wx/arrstr.h>
 #include <wx/dynlib.h>
+#include "OSD/CncAsyncKeyboardState.h"
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "CncFileNameService.h"
 #include "CncContextListCtrl.h"
+#include "CncMessageDialog.h"
 #include "GlobalFunctions.h"
 #include "CncOSEnvironmentDialog.h"
 
@@ -17,10 +19,7 @@ CncOSEnvironmentDialog::CncOSEnvironmentDialog(wxWindow* parent)
 	contextControl->setControls(m_cncContextPara, m_cncContextValue);
 	GblFunc::replaceControl(m_cncContextListPlaceholder, contextControl);
 	
-	evaluateOSEnvrionemnt();
-	evaluateAppEnvrionemnt();
-	evaluateLoadedModules();
-	evaluateVersionInfo();
+	evaluate();
 	
 	m_listbook->SetSelection(PAGE_ENVIRONMENT);
 }
@@ -33,6 +32,31 @@ CncOSEnvironmentDialog::~CncOSEnvironmentDialog() {
 	wxDELETE( contextControl );
 }
 //////////////////////////////////////////////////////////////////////////////
+void CncOSEnvironmentDialog::evaluate() {
+//////////////////////////////////////////////////////////////////////////////
+	contextControl->Refresh();
+	
+	evaluateOSEnvrionment();
+	evaluateAppEnvrionment();
+	evaluateLoadedModules();
+	evaluateVersionInfo();
+}
+//////////////////////////////////////////////////////////////////////////////
+void CncOSEnvironmentDialog::onSelectListBook(wxListbookEvent& event) {
+//////////////////////////////////////////////////////////////////////////////
+	evaluate();
+}
+//////////////////////////////////////////////////////////////////////////////
+void CncOSEnvironmentDialog::onRefresh(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////////////////
+	evaluate();
+}
+//////////////////////////////////////////////////////////////////////////////
+void CncOSEnvironmentDialog::update() {
+//////////////////////////////////////////////////////////////////////////////
+	evaluate();
+}
+//////////////////////////////////////////////////////////////////////////////
 void CncOSEnvironmentDialog::evaluateVersionInfo() {
 //////////////////////////////////////////////////////////////////////////////
 	if ( m_versionInfoList->GetColumnCount() == 0 ) {
@@ -40,6 +64,7 @@ void CncOSEnvironmentDialog::evaluateVersionInfo() {
 		m_versionInfoList->AppendColumn("Version", 	wxLIST_FORMAT_LEFT, 500);
 	}
 	
+	m_versionInfoList->DeleteAllItems();
 	const VersionInfoMap& vim = THE_CONTEXT->versionInfoMap;
 	for (auto it = vim.cbegin(); it != vim.cend(); ++it ) {
 		
@@ -50,7 +75,7 @@ void CncOSEnvironmentDialog::evaluateVersionInfo() {
 	}
 }
 //////////////////////////////////////////////////////////////////////////////
-void CncOSEnvironmentDialog::evaluateOSEnvrionemnt() {
+void CncOSEnvironmentDialog::evaluateOSEnvrionment() {
 //////////////////////////////////////////////////////////////////////////////
 	if ( m_osEnvironmentList->GetColumnCount() == 0 ) {
 		m_osEnvironmentList->AppendColumn("Parameter", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
@@ -89,7 +114,7 @@ void CncOSEnvironmentDialog::evaluateOSEnvrionemnt() {
 		m_osEnvironmentList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 //////////////////////////////////////////////////////////////////////////////
-void CncOSEnvironmentDialog::evaluateAppEnvrionemnt() {
+void CncOSEnvironmentDialog::evaluateAppEnvrionment() {
 //////////////////////////////////////////////////////////////////////////////
 	if ( m_appEnvironmentList->GetColumnCount() == 0 ) {
 		m_appEnvironmentList->AppendColumn("Parameter", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
@@ -249,23 +274,62 @@ void CncOSEnvironmentDialog::sizeModulesColumns(bool onlyLastColumn) {
 //////////////////////////////////////////////////////////////////////////////
 void CncOSEnvironmentDialog::selectOSEnvironmentItem(wxListEvent& event) {
 //////////////////////////////////////////////////////////////////////////////
-	unsigned int index = event.m_itemIndex;
+	const bool ctlKey = CncAsyncKeyboardState::isControlPressed();
+	const unsigned int index = event.m_itemIndex;
 	
-	m_osEnvParam->SetValue(m_osEnvironmentList->GetItemText(index, ENV_COL_PARAM));
-	m_osEnvValue->SetValue(m_osEnvironmentList->GetItemText(index, ENV_COL_VALUE));
+	const wxString key(m_osEnvironmentList->GetItemText(index, ENV_COL_PARAM));
+	const wxString val(m_osEnvironmentList->GetItemText(index, ENV_COL_VALUE));
+	
+	m_osEnvParam->SetValue(key);
+	m_osEnvValue->SetValue(val);
+	
+	if ( IsShownOnScreen() ) {
+		if ( ctlKey == true ) {
+			wxString content;
+			if ( wxGetEnv(key, &content) ) {
+				
+				content.Replace(";", "\n");
+				content.Replace(",", "\n");
+				
+				CncMessageDialog dlg(this, content, key, "OS Environment Item");
+				dlg.SetSize(800, 900);
+				dlg.CenterOnParent();
+				dlg.setWordWrap(false);
+				dlg.ShowModal();
+			}
+		}
+	}
 }
 //////////////////////////////////////////////////////////////////////////////
 void CncOSEnvironmentDialog::selectAppEnvironmentItem(wxListEvent& event) {
 //////////////////////////////////////////////////////////////////////////////
-	unsigned int index = event.m_itemIndex;
+	const bool ctlKey = CncAsyncKeyboardState::isControlPressed();
+	const unsigned int index = event.m_itemIndex;
 	
-	m_appEnvParam->SetValue(m_appEnvironmentList->GetItemText(index, ENV_COL_PARAM));
-	m_appEnvValue->SetValue(m_appEnvironmentList->GetItemText(index, ENV_COL_VALUE));
+	const wxString key(m_appEnvironmentList->GetItemText(index, ENV_COL_PARAM));
+	const wxString val(m_appEnvironmentList->GetItemText(index, ENV_COL_VALUE));
+	
+	m_osEnvParam->SetValue(key);
+	m_osEnvValue->SetValue(val);
+	
+	if ( IsShownOnScreen() ) {
+		if ( ctlKey == true ) {
+			wxString content(val);
+			content.Replace(";", "\n");
+			content.Replace(",", "\n");
+			
+			CncMessageDialog dlg(this, content, key, "App Environment Item");
+			dlg.SetSize(800, 900);
+			dlg.CenterOnParent();
+			dlg.setWordWrap(false);
+			dlg.ShowModal();
+		}
+	}
 }
 //////////////////////////////////////////////////////////////////////////////
 void CncOSEnvironmentDialog::selectModulesItem(wxListEvent& event) {
 //////////////////////////////////////////////////////////////////////////////
-	unsigned int index = event.m_itemIndex;
+	const unsigned int index = event.m_itemIndex;
 	
 	m_modAddress->SetValue(m_moduleList->GetItemText(index, MOD_COL_ADDR));
 	m_modName->SetValue(m_moduleList->GetItemText(index, MOD_COL_NAME));
