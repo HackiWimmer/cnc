@@ -72,6 +72,8 @@ class HexDecoder {
 			
 			int32_t ret = 0;
 			sscanf(hexToken, "%8X", &ret);
+			
+			std::cout << "hexToken: " << hexToken << " = " << ret << std::endl;
 			return ret;
 		}
 		

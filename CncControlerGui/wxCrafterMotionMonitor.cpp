@@ -190,7 +190,7 @@ CncMonitorReplayPaneBase::CncMonitorReplayPaneBase(wxWindow* parent, wxWindowID 
     m_totalVerties->SetMinSize(wxSize(54,-1));
     
     SetName(wxT("CncMonitorReplayPaneBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -426,12 +426,27 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer181->AddGrowableRow(1);
     m_splitterPageOverview->SetSizer(flexGridSizer181);
     
+    wxFlexGridSizer* flexGridSizer223 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer223->SetFlexibleDirection( wxBOTH );
+    flexGridSizer223->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer223->AddGrowableCol(1);
+    flexGridSizer223->AddGrowableRow(0);
+    
+    flexGridSizer181->Add(flexGridSizer223, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
     m_staticText186 = new wxStaticText(m_splitterPageOverview, wxID_ANY, _("Overview:"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(-1,-1)), 0);
     m_staticText186->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_staticText186Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText186->SetFont(m_staticText186Font);
     
-    flexGridSizer181->Add(m_staticText186, 0, wxALL, WXC_FROM_DIP(1));
+    flexGridSizer223->Add(m_staticText186, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText225 = new wxStaticText(m_splitterPageOverview, wxID_ANY, _("[Impulses, Length = [steps]]"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(-1,-1)), 0);
+    m_staticText225->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_staticText225Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText225->SetFont(m_staticText225Font);
+    
+    flexGridSizer223->Add(m_staticText225, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
     m_moveSequencesListPlaceholder = new wxListCtrl(m_splitterPageOverview, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(350,-1)), wxLC_REPORT);
     
@@ -439,7 +454,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     m_moveSequencesListPlaceholder->SetMinSize(wxSize(350,-1));
     
     m_splitterPageContent = new wxPanel(m_splitter196, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter196, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_splitter196->SplitVertically(m_splitterPageOverview, m_splitterPageContent, 0);
+    m_splitter196->SplitHorizontally(m_splitterPageOverview, m_splitterPageContent, 0);
     
     wxFlexGridSizer* flexGridSizer182 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer182->SetFlexibleDirection( wxBOTH );
@@ -448,12 +463,27 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer182->AddGrowableRow(1);
     m_splitterPageContent->SetSizer(flexGridSizer182);
     
+    wxFlexGridSizer* flexGridSizer220 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer220->SetFlexibleDirection( wxBOTH );
+    flexGridSizer220->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer220->AddGrowableCol(1);
+    flexGridSizer220->AddGrowableRow(0);
+    
+    flexGridSizer182->Add(flexGridSizer220, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
     m_contentLabel = new wxStaticText(m_splitterPageContent, wxID_ANY, _("Content:"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageContent, wxSize(-1,-1)), 0);
     m_contentLabel->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_contentLabelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_contentLabel->SetFont(m_contentLabelFont);
     
-    flexGridSizer182->Add(m_contentLabel, 0, wxALL, WXC_FROM_DIP(1));
+    flexGridSizer220->Add(m_contentLabel, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticText222 = new wxStaticText(m_splitterPageContent, wxID_ANY, _(" [Distance = [steps]]"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageContent, wxSize(-1,-1)), 0);
+    m_staticText222->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_staticText222Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText222->SetFont(m_staticText222Font);
+    
+    flexGridSizer220->Add(m_staticText222, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
     m_moveSequencesPlaceholder = new wxListCtrl(m_splitterPageContent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageContent, wxSize(-1,-1)), wxLC_REPORT);
     
@@ -479,7 +509,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer190->Add(m_selectedClientIds, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     SetName(wxT("CncPreprocessorBase"));
-    SetSize(700,700);
+    SetSize(wxDLG_UNIT(this, wxSize(700,700)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -587,7 +617,7 @@ CncMotionVertexTraceBase::CncMotionVertexTraceBase(wxWindow* parent, wxWindowID 
     flexGridSizer7950->Add(m_motionVertexIndexListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     SetName(wxT("CncMotionVertexTraceBase"));
-    SetSize(500,300);
+    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -642,7 +672,7 @@ CncParsingSynopsisTraceBase::CncParsingSynopsisTraceBase(wxWindow* parent, wxWin
     flexGridSizer7972->Add(m_parsingSynopsisListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     SetName(wxT("CncParsingSynopsisTraceBase"));
-    SetSize(500,300);
+    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -731,7 +761,7 @@ CncStatisticsPaneBase::CncStatisticsPaneBase(wxWindow* parent, wxWindowID id, co
     flexGridSizer7050->Add(m_replayPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     SetName(wxT("CncStatisticsPaneBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -1198,7 +1228,7 @@ GL3DOptionPaneBase::GL3DOptionPaneBase(wxWindow* parent, wxWindowID id, const wx
     flexGridSizer3580->Add(m_staticLine644534, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     SetName(wxT("GL3DOptionPaneBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -1264,6 +1294,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
         wxC1306InitBitmapResources();
         bBitmapLoaded = true;
     }
+    this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     
     wxFlexGridSizer* flexGridSizer2360 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer2360->SetFlexibleDirection( wxBOTH );
@@ -1387,7 +1418,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     SetName(wxT("GL3DDrawPaneBase"));
-    SetSize(200,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(200,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

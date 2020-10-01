@@ -23,15 +23,15 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 //////////////////////////////////////////////////////////////////
 {
 	// path list entries control
-	pathListEntries = new CncPathListEntryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	pathListEntries = new CncPathListEntryListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_pathListEntriesPlaceholder, pathListEntries);
 	
 	// move sequences control
-	moveSequence = new CncMoveSequenceListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL);
+	moveSequence = new CncMoveSequenceListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL);
 	GblFunc::replaceControl(m_moveSequencesPlaceholder, moveSequence);
 
 	// move sequences control
-	moveSequenceOverview = new CncMoveSequenceOverviewListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL, moveSequence, m_contentLabel);
+	moveSequenceOverview = new CncMoveSequenceOverviewListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL, moveSequence, m_contentLabel);
 	GblFunc::replaceControl(m_moveSequencesListPlaceholder, moveSequenceOverview);
 
 	const wxFont font = THE_CONTEXT->outboundListBookFont;

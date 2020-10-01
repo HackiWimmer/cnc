@@ -354,7 +354,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void requestReset(wxCommandEvent& event);
 		virtual void requestEnableStepperMotors(wxCommandEvent& event);
 		virtual void emergencyStop(wxCommandEvent& event);
-		virtual void defineDebugSerial(wxCommandEvent& event);
 		virtual void defineMinMonitoring(wxCommandEvent& event);
 		virtual void defineNormalMonitoring(wxCommandEvent& event);
 		virtual void saveTemplate(wxCommandEvent& event);
@@ -857,7 +856,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void hideAuiPane(const wxString& name, bool update=true);
 		
 		void hideAllAuiPanes(bool update=true);
-		void viewAllAuiPanes(bool withSpy=false);
+		void viewAllAuiPanes();
 		
 		void clearPositionSpy();
 		void clearMotionMonitor();

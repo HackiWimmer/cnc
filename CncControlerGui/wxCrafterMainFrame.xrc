@@ -3977,6 +3977,7 @@ Summary</label>
                                       <selected>1</selected>
                                       <object class="wxPanel" name="m_cncSummary">
                                         <style>wxTAB_TRAVERSAL</style>
+                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
                                           <rows>4</rows>
@@ -3990,6 +3991,7 @@ Summary</label>
                                             <object class="wxStaticText" name="m_staticText11481">
                                               <label>Configuration Summary:</label>
                                               <style/>
+                                              <fg>wxSYS_COLOUR_3DLIGHT</fg>
                                               <font>
                                                 <size>12</size>
                                                 <style>normal</style>
@@ -4007,10 +4009,10 @@ Summary</label>
                                           </object>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
-                                            <border>1</border>
                                             <object class="wxListCtrl" name="m_cncSummaryListCtrl">
-                                              <style>wxLC_VIRTUAL|wxLC_REPORT</style>
-                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                              <style>wxLC_VIRTUAL|wxLC_REPORT|wxBORDER_NONE</style>
+                                              <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                              <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                               <tooltip>
                                                 <![CDATA[Only a placeholder]]>
                                               </tooltip>
@@ -4062,29 +4064,23 @@ Parameters</label>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_additionalParameters">
                                         <style>wxTAB_TRAVERSAL</style>
+                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                         <object class="wxFlexGridSizer">
-                                          <cols>3</cols>
-                                          <rows>0</rows>
+                                          <cols>1</cols>
+                                          <rows>2</rows>
                                           <vgap>0</vgap>
                                           <hgap>0</hgap>
-                                          <growablecols>2</growablecols>
-                                          <growablerows/>
-                                          <object class="sizeritem">
-                                            <flag>wxALL</flag>
-                                            <border>7</border>
-                                            <object class="wxStaticBitmap" name="m_staticBitmap92606">
-                                              <bitmap>bitmaps/application-tile-horizontal.png</bitmap>
-                                            </object>
-                                          </object>
+                                          <growablecols>0</growablecols>
+                                          <growablerows>1</growablerows>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
-                                            <border>7</border>
-                                            <minsize>250,-1</minsize>
-                                            <object class="wxStaticText" name="m_staticText1603237">
-                                              <label>Parameter:</label>
+                                            <border>5</border>
+                                            <object class="wxStaticText" name="m_staticText114811">
+                                              <label>Additional Parameters:</label>
                                               <style/>
+                                              <fg>wxSYS_COLOUR_3DLIGHT</fg>
                                               <font>
-                                                <size>9</size>
+                                                <size>12</size>
                                                 <style>normal</style>
                                                 <weight>bold</weight>
                                                 <family>swiss</family>
@@ -4093,105 +4089,146 @@ Parameters</label>
                                               </font>
                                             </object>
                                           </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL</flag>
-                                            <border>7</border>
-                                            <object class="wxStaticText" name="m_staticText9268">
-                                              <label>Value:</label>
-                                              <style/>
-                                              <font>
-                                                <size>9</size>
-                                                <style>normal</style>
-                                                <weight>bold</weight>
-                                                <family>swiss</family>
-                                                <underlined>0</underlined>
-                                                <face>Segoe UI</face>
-                                              </font>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
+                                          <object class="sizeritem" name="flexGridSizer9248">
                                             <flag>wxALL|wxEXPAND</flag>
-                                            <border>5</border>
-                                            <object class="wxStaticLine" name="m_staticLine9270">
-                                              <style>wxLI_HORIZONTAL</style>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>5</border>
-                                            <object class="wxStaticLine" name="m_staticLine9272">
-                                              <style>wxLI_HORIZONTAL</style>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>5</border>
-                                            <object class="wxStaticLine" name="m_staticLine9274">
-                                              <style>wxLI_HORIZONTAL</style>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL</flag>
-                                            <border>7</border>
-                                            <object class="wxStaticBitmap" name="m_staticBitmap9260">
-                                              <bitmap>bitmaps/ruby.png</bitmap>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>7</border>
-                                            <object class="wxStaticText" name="m_staticText160323">
-                                              <label>Render Resolution:</label>
-                                              <style/>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>3</border>
-                                            <object class="wxComboBox" name="m_cbRenderResolution">
-                                              <style>wxCB_SORT|wxCB_READONLY|wxCB_DROPDOWN</style>
-                                              <selection>0</selection>
-                                              <content>
-                                                <item>
-                                                  <![CDATA[0.001 mm - 9999 PPI]]>
-                                                </item>
-                                              </content>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL</flag>
-                                            <border>7</border>
-                                            <object class="wxStaticBitmap" name="m_staticBitmap9262">
-                                              <bitmap>bitmaps/sports-shuttlecock.png</bitmap>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL</flag>
-                                            <border>7</border>
-                                            <object class="wxStaticText" name="m_staticText9255">
-                                              <label>Artificially Step Delay:</label>
-                                              <style/>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>3</border>
-                                            <object class="wxSlider" name="m_stepDelay">
-                                              <style>wxSL_HORIZONTAL</style>
-                                              <font>
-                                                <size>6</size>
-                                                <style>normal</style>
-                                                <weight>normal</weight>
-                                                <family>swiss</family>
-                                                <underlined>0</underlined>
-                                                <face>Segoe UI</face>
-                                              </font>
-                                              <tooltip>
-                                                <![CDATA[Artificially Step Delay]]>
-                                              </tooltip>
-                                              <min>0</min>
-                                              <max>128</max>
-                                              <value>0</value>
+                                            <border>1</border>
+                                            <option>1</option>
+                                            <object class="wxFlexGridSizer">
+                                              <cols>3</cols>
+                                              <rows>0</rows>
+                                              <vgap>0</vgap>
+                                              <hgap>0</hgap>
+                                              <growablecols>2</growablecols>
+                                              <growablerows/>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <border>7</border>
+                                                <object class="wxStaticBitmap" name="m_staticBitmap92606">
+                                                  <bitmap>bitmaps/application-tile-horizontal.png</bitmap>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>7</border>
+                                                <minsize>250,-1</minsize>
+                                                <object class="wxStaticText" name="m_staticText1603237">
+                                                  <label>Parameter:</label>
+                                                  <style/>
+                                                  <fg>wxSYS_COLOUR_3DLIGHT</fg>
+                                                  <font>
+                                                    <size>9</size>
+                                                    <style>normal</style>
+                                                    <weight>bold</weight>
+                                                    <family>swiss</family>
+                                                    <underlined>0</underlined>
+                                                    <face>Segoe UI</face>
+                                                  </font>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <border>7</border>
+                                                <object class="wxStaticText" name="m_staticText9268">
+                                                  <label>Value:</label>
+                                                  <style/>
+                                                  <fg>wxSYS_COLOUR_3DLIGHT</fg>
+                                                  <font>
+                                                    <size>9</size>
+                                                    <style>normal</style>
+                                                    <weight>bold</weight>
+                                                    <family>swiss</family>
+                                                    <underlined>0</underlined>
+                                                    <face>Segoe UI</face>
+                                                  </font>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>5</border>
+                                                <object class="wxStaticLine" name="m_staticLine9270">
+                                                  <style>wxLI_HORIZONTAL</style>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>5</border>
+                                                <object class="wxStaticLine" name="m_staticLine9272">
+                                                  <style>wxLI_HORIZONTAL</style>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>5</border>
+                                                <object class="wxStaticLine" name="m_staticLine9274">
+                                                  <style>wxLI_HORIZONTAL</style>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <border>7</border>
+                                                <object class="wxStaticBitmap" name="m_staticBitmap9260">
+                                                  <bitmap>bitmaps/ruby.png</bitmap>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>7</border>
+                                                <object class="wxStaticText" name="m_staticText160323">
+                                                  <label>Render Resolution:</label>
+                                                  <style/>
+                                                  <fg>wxSYS_COLOUR_3DLIGHT</fg>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>3</border>
+                                                <object class="wxComboBox" name="m_cbRenderResolution">
+                                                  <style>wxCB_SORT|wxCB_READONLY|wxCB_DROPDOWN</style>
+                                                  <selection>0</selection>
+                                                  <content>
+                                                    <item>
+                                                      <![CDATA[0.001 mm - 9999 PPI]]>
+                                                    </item>
+                                                  </content>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <border>7</border>
+                                                <object class="wxStaticBitmap" name="m_staticBitmap9262">
+                                                  <bitmap>bitmaps/sports-shuttlecock.png</bitmap>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <border>7</border>
+                                                <object class="wxStaticText" name="m_staticText9255">
+                                                  <label>Artificially Step Delay:</label>
+                                                  <style/>
+                                                  <fg>wxSYS_COLOUR_3DLIGHT</fg>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>3</border>
+                                                <object class="wxSlider" name="m_stepDelay">
+                                                  <style>wxSL_HORIZONTAL</style>
+                                                  <font>
+                                                    <size>6</size>
+                                                    <style>normal</style>
+                                                    <weight>normal</weight>
+                                                    <family>swiss</family>
+                                                    <underlined>0</underlined>
+                                                    <face>Segoe UI</face>
+                                                  </font>
+                                                  <tooltip>
+                                                    <![CDATA[Artificially Step Delay]]>
+                                                  </tooltip>
+                                                  <min>0</min>
+                                                  <max>128</max>
+                                                  <value>0</value>
+                                                </object>
+                                              </object>
                                             </object>
                                           </object>
                                         </object>
@@ -4204,6 +4241,7 @@ Ctlr-Config</label>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_controllerConfiguration">
                                         <style>wxTAB_TRAVERSAL</style>
+                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
                                           <rows>2</rows>
@@ -4228,6 +4266,7 @@ Ctlr-Config</label>
                                                 <object class="wxStaticText" name="m_staticText12831">
                                                   <label>Requested Controller Configuration:</label>
                                                   <style/>
+                                                  <fg>wxSYS_COLOUR_3DLIGHT</fg>
                                                   <font>
                                                     <size>12</size>
                                                     <style>normal</style>
@@ -4258,7 +4297,8 @@ Ctlr-Config</label>
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>1</border>
                                             <object class="unknown" name="m_dvListCtrlControllerConfig">
-                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                              <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                              <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                               <font>
                                                 <size>8</size>
                                                 <style>wxFONTFAMILY_SWISS</style>
@@ -4279,6 +4319,7 @@ Ctrl-PinReport</label>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_controllerPinReport">
                                         <style>wxTAB_TRAVERSAL</style>
+                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                         <font>
                                           <size>8</size>
                                           <style>wxFONTFAMILY_SWISS</style>
@@ -4314,6 +4355,7 @@ Ctrl-PinReport</label>
                                                 <object class="wxStaticText" name="m_staticText128313">
                                                   <label>Requested  Controller Pin Report:</label>
                                                   <style/>
+                                                  <fg>wxSYS_COLOUR_3DLIGHT</fg>
                                                   <font>
                                                     <size>12</size>
                                                     <style>normal</style>
@@ -4341,7 +4383,8 @@ Ctrl-PinReport</label>
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>1</border>
                                             <object class="unknown" name="m_dvListCtrlControllerPins">
-                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                              <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                              <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                             </object>
                                           </object>
                                         </object>
@@ -5625,6 +5668,7 @@ Source</label>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_panel7697">
                                         <style>wxTAB_TRAVERSAL</style>
+                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
                                           <rows>3</rows>
@@ -5651,6 +5695,7 @@ Source</label>
                                                   <label>Serial Outbound File Content:</label>
                                                   <style/>
                                                   <size>-1,26</size>
+                                                  <fg>wxSYS_COLOUR_3DLIGHT</fg>
                                                   <font>
                                                     <size>12</size>
                                                     <style>normal</style>
@@ -5751,7 +5796,6 @@ Source</label>
                                                         <growablerows>0</growablerows>
                                                         <object class="sizeritem">
                                                           <flag>wxALL|wxEXPAND</flag>
-                                                          <border>1</border>
                                                           <object class="wxScrolledWindow" name="m_scrollWin7361">
                                                             <style>wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
                                                             <scrollrate>5,5</scrollrate>
@@ -5791,7 +5835,6 @@ Source</label>
                                               <growablerows/>
                                               <object class="sizeritem">
                                                 <flag>wxALL</flag>
-                                                <border>1</border>
                                                 <minsize>100,-1</minsize>
                                                 <object class="wxStaticText" name="m_outboundPosition">
                                                   <label/>
@@ -5810,7 +5853,6 @@ Source</label>
                                               </object>
                                               <object class="sizeritem">
                                                 <flag>wxALL|wxEXPAND</flag>
-                                                <border>1</border>
                                                 <object class="wxTextCtrl" name="m_outboundEditStatus">
                                                   <style>wxTE_READONLY|wxBORDER_NONE</style>
                                                   <bg>wxSYS_COLOUR_3DLIGHT</bg>
@@ -5826,7 +5868,6 @@ Source</label>
                                               </object>
                                               <object class="sizeritem">
                                                 <flag>wxALL</flag>
-                                                <border>1</border>
                                                 <object class="wxStaticText" name="m_outboundEditMode">
                                                   <label>edit mode</label>
                                                   <style/>
@@ -5853,56 +5894,19 @@ Preview</label>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_panel7699">
                                         <style>wxTAB_TRAVERSAL</style>
+                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
-                                          <rows>3</rows>
+                                          <rows>1</rows>
                                           <vgap>0</vgap>
                                           <hgap>0</hgap>
                                           <growablecols>0</growablecols>
-                                          <growablerows>1</growablerows>
-                                          <object class="sizeritem" name="flexGridSizer6141">
-                                            <flag>wxALL</flag>
-                                            <border>5</border>
-                                            <object class="wxFlexGridSizer">
-                                              <cols>2</cols>
-                                              <rows>0</rows>
-                                              <vgap>0</vgap>
-                                              <hgap>0</hgap>
-                                              <growablecols/>
-                                              <growablerows/>
-                                              <object class="sizeritem">
-                                                <flag>wxALL</flag>
-                                                <border>1</border>
-                                                <minsize>-1,26</minsize>
-                                                <object class="wxStaticText" name="m_staticText6140">
-                                                  <label>Serial Outbound File Preview:</label>
-                                                  <style/>
-                                                  <size>-1,26</size>
-                                                  <font>
-                                                    <size>12</size>
-                                                    <style>normal</style>
-                                                    <weight>bold</weight>
-                                                    <family>swiss</family>
-                                                    <underlined>0</underlined>
-                                                    <face>Segoe UI</face>
-                                                  </font>
-                                                </object>
-                                              </object>
-                                            </object>
-                                          </object>
+                                          <growablerows>0</growablerows>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
                                             <object class="wxPanel" name="m_outboundPreviewPlaceholder">
                                               <style>wxTAB_TRAVERSAL</style>
                                               <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL</flag>
-                                            <border>1</border>
-                                            <object class="wxStaticText" name="m_staticText6218">
-                                              <label/>
-                                              <style/>
                                             </object>
                                           </object>
                                         </object>
@@ -7762,16 +7766,14 @@ State</label>
                 <object class="sizeritem">
                   <flag>wxALL</flag>
                   <minsize>26,26</minsize>
-                  <object class="wxButton" name="m_enableSerialSpy">
-                    <label/>
+                  <object class="wxBitmapToggleButton" name="m_enableSerialSpy">
                     <style/>
                     <size>26,26</size>
+                    <bitmap>bitmaps/16-connected.png</bitmap>
                     <tooltip>
                       <![CDATA[Enable Serial Spy]]>
                     </tooltip>
-                    <bitmap>bitmaps/16-connected.png</bitmap>
-                    <bitmapposition>wxLEFT</bitmapposition>
-                    <default>0</default>
+                    <checked>0</checked>
                   </object>
                 </object>
                 <object class="sizeritem">
@@ -9608,28 +9610,6 @@ State</label>
         <object class="wxMenuItem" name="m_menuItemDisplayParserDetails">
           <checkable>1</checkable>
           <label>Log Parser Details</label>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-          <checked>1</checked>
-          <help>
-            <![CDATA[]]>
-          </help>
-        </object>
-        <object class="separator"/>
-        <object class="wxMenuItem" name="m_menuItemDebugSerial">
-          <checkable>1</checkable>
-          <label>Spy Serial (very slow)</label>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-          <help>
-            <![CDATA[]]>
-          </help>
-        </object>
-        <object class="wxMenuItem" name="m_menuItemFreezeLogger">
-          <checkable>1</checkable>
-          <label>Unfreeze Logger</label>
           <accel>
             <![CDATA[]]>
           </accel>

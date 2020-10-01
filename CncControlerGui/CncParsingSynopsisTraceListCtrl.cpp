@@ -42,7 +42,7 @@ CncParsingSynopsisListCtrl::CncParsingSynopsisListCtrl(wxWindow *parent, long st
 	
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
 	
-	SetBackgroundColour(wxColour(191, 205, 219));
+	SetBackgroundColour(wxColour(0,  0,  0));
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
@@ -53,7 +53,7 @@ CncParsingSynopsisListCtrl::CncParsingSynopsisListCtrl(wxWindow *parent, long st
 	errorItemAttr		= defaultItemAttr;
 	separatorItemAttr	= defaultItemAttr;
 	
-	infoItemAttr		.SetTextColour(wxColour(  0,   0,   0));
+	infoItemAttr		.SetTextColour(*wxLIGHT_GREY);
 	warningItemAttr		.SetTextColour(wxColour(242, 242,   0));
 	errorItemAttr		.SetTextColour(wxColour(255, 128, 128));
 	

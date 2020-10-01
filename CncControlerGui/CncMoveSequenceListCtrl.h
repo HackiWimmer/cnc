@@ -37,16 +37,13 @@ class CncMoveSequenceListCtrl : public CncLargeScaledListCtrl {
 	public:
 
 		static const int COL_TYPE 			=  0;
-		static const int COL_SPEED			=  1;
-		static const int COL_OPTIMIZED		=  2;
-		static const int COL_CLD_ID			=  3;
-		static const int COL_DISTANCE_X		=  4;
-		static const int COL_DISTANCE_Y		=  5;
-		static const int COL_DISTANCE_Z		=  6;
-
-		static const int TOTAL_COL_COUNT	=  7;
+		static const int COL_CLD_ID			=  1;
+		static const int COL_DISTANCE_X		=  2;
+		static const int COL_DISTANCE_Y		=  3;
+		static const int COL_DISTANCE_Z		=  4;
+		static const int TOTAL_COL_COUNT	=  5;
 		static const int COL_SEARCH			= COL_CLD_ID;
-		static const int COL_STRECH			= COL_CLD_ID;
+		static const int COL_STRECH			= -1;
 
 		CncMoveSequenceListCtrl(wxWindow *parent, long style);
 		virtual ~CncMoveSequenceListCtrl();
@@ -84,10 +81,15 @@ class CncMoveSequenceOverviewListCtrl : public CncLargeScaledListCtrl {
 		static const int COL_NUM 			=  0;
 		static const int COL_CNT 			=  1;
 		static const int COL_REF 			=  2;
-		static const int COL_FIRST_CLD_ID	=  3;
-		static const int COL_LAST_CLD_ID	=  4;
-		
-		static const int TOTAL_COL_COUNT	=  5;
+		static const int COL_OPTIMIZED		=  3;
+		static const int COL_SPEED			=  4;
+		static const int COL_IMPULSES		=  5;
+		static const int COL_DISTANCE_X		=  6;
+		static const int COL_DISTANCE_Y		=  7;
+		static const int COL_DISTANCE_Z		=  8;
+		static const int COL_FIRST_CLD_ID	=  9;
+		static const int COL_LAST_CLD_ID	= 10;
+		static const int TOTAL_COL_COUNT	= 11;
 		
 		CncMoveSequenceOverviewListCtrl(wxWindow *parent, long style, CncMoveSequenceListCtrl* slave, wxStaticText*	label);
 		virtual ~CncMoveSequenceOverviewListCtrl();

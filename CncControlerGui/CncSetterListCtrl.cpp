@@ -45,7 +45,7 @@ CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(191, 205, 219));
+	SetBackgroundColour(wxColour(  0,  0,  0));
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
@@ -56,7 +56,7 @@ CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
-	defaultItemAttr.SetTextColour(GetTextColour());
+	defaultItemAttr.SetTextColour(*wxLIGHT_GREY);
 	
 	wxFont separatorFont(font);
 	separatorFont.MakeBold();

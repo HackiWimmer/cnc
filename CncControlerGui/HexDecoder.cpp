@@ -96,6 +96,9 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 		ret.more.append(wxString::Format("Total Size   = %ld | ", (long)decodeHexValueAsInt32(value)));
 		
 		if ( readNextHexBytes(restToken, 4, value) == false ) return;
+		ret.more.append(wxString::Format("Impulse #    = %ld | ", (long)decodeHexValueAsInt32(value)));
+		
+		if ( readNextHexBytes(restToken, 4, value) == false ) return;
 		const int32_t x = decodeHexValueAsInt32(value);
 		
 		if ( readNextHexBytes(restToken, 4, value) == false ) return;

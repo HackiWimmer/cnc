@@ -50,8 +50,9 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(191, 205, 219));
-	
+	SetBackgroundColour(wxColour(  0,   0,   0));
+	SetTextColour(*wxLIGHT_GREY);
+
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
 	imageList->Add(ImageLibPathList().Bitmap("BMP_NO_CHG"));	// 0
@@ -75,7 +76,7 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 
 	speedItemAttr.SetBackgroundColour(GetBackgroundColour());
 	speedItemAttr.SetFont(font.Bold());
-	speedItemAttr.SetTextColour(wxColour(63, 72, 204));
+	speedItemAttr.SetTextColour(wxColour(125, 133, 221));
 }
 /////////////////////////////////////////////////////////////
 CncPathListEntryListCtrl::~CncPathListEntryListCtrl() {

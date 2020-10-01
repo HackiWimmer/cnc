@@ -779,11 +779,11 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_toolMagazinePlaceholder, toolMagazine);
 	
 	// pos spy control
-	positionSpy = new CncPosSpyListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	positionSpy = new CncPosSpyListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_positionSpy, positionSpy);
 
 	// pos spy control
-	setterList = new CncSetterListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	setterList = new CncSetterListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_setterList, setterList);
 	
 	// motion vertex list control
@@ -803,7 +803,7 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_motionSynopsisPlaceholder, parsingSynopisis);
 
 	// summary list
-	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_cncSummaryListCtrl, cncSummaryListCtrl);
 	
 	// serial spy list control
@@ -2136,19 +2136,12 @@ void MainFrame::initialize(void) {
 	if ( CncConfig::getGlobalCncConfig()->getShowTestMenuFlag() == false )
 		m_menuBar->Remove(m_menuBar->FindMenu("Test"));
 		
-	//initilaize debug state
-	m_menuItemDebugSerial->Check(false);
-	
-	decorateSerialSpy();
+	enableSerialSpy(false);
 	
 	resetMinMaxPositions();
 	initializeLruMenu();
 	initializeConnectionSelector();
 	
-	// initilaize debug state
-	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->enableSpyOutput(true);
-	else				   						cnc->enableSpyOutput(false); 
-
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
@@ -2328,9 +2321,6 @@ bool MainFrame::connectSerialPort() {
 	THE_CONTEXT->hardwareOriginOffset.reset();
 	updateHardwareReference();
 	
-	if ( m_clearSerialSpyOnConnect->GetValue() )
-		clearSerialSpy();
-		
 	const wxString sel(m_portSelector->GetStringSelection());
 	if ( sel.IsEmpty() ) 
 		return false;
@@ -2352,9 +2342,12 @@ bool MainFrame::connectSerialPort() {
 	
 	statisticsPane->setCncControl(cnc);
 	
+	enableSerialSpy(false);
 	selectSerialSpyMode();
+	if ( m_clearSerialSpyOnConnect->GetValue() )
+		clearSerialSpy();
+
 	clearPositionSpy();
-	
 	lastPortName.clear();
 	
 	bool ret = false;
@@ -2807,7 +2800,6 @@ void MainFrame::defineMinMonitoring() {
 ///////////////////////////////////////////////////////////////////
 	m_menuItemUpdCoors->Check(false);
 	m_menuItemUpdDraw->Check(false);
-	m_menuItemDebugSerial->Check(false);
 	m_menuItemDisplayParserDetails->Check(false);
 	switchMonitorButton(false);
 	updateMonitoring();
@@ -2822,7 +2814,6 @@ void MainFrame::defineNormalMonitoring() {
 ///////////////////////////////////////////////////////////////////
 	m_menuItemUpdCoors->Check(true);
 	m_menuItemUpdDraw->Check(true);
-	m_menuItemDebugSerial->Check(false);
 	m_menuItemDisplayParserDetails->Check(true);
 	switchMonitorButton(true);
 	updateMonitoring();
@@ -2865,12 +2856,6 @@ void MainFrame::defineOnlineDrawing(wxCommandEvent& event) {
 	updateMonitoring();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::defineDebugSerial(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateMonitoring();
-	decorateSerialSpy();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::updateMonitoring() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
@@ -2883,8 +2868,6 @@ void MainFrame::updateMonitoring() {
 	THE_CONTEXT->setOnlineUpdateCoordinates(m_menuItemUpdCoors->IsChecked());
 	THE_CONTEXT->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
 	THE_CONTEXT->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
-	
-	cnc->enableSpyOutput(m_menuItemDebugSerial->IsChecked());
 	
 	if ( isDisplayParserDetails() == false ) {
 		m_dvListCtrlSvgUAInboundPathList->DeleteAllItems();
@@ -5352,7 +5335,7 @@ void MainFrame::hideAllAuiPanes(bool update) {
 		GetAuimgrMain()->Update();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::viewAllAuiPanes(bool withSpy) {
+void MainFrame::viewAllAuiPanes() {
 ///////////////////////////////////////////////////////////////////
 	wxAuiPaneInfoArray panes = m_auimgrMain->GetAllPanes();
 	for (unsigned int i = 0; i < panes.GetCount(); ++i) {
@@ -5362,9 +5345,6 @@ void MainFrame::viewAllAuiPanes(bool withSpy) {
 	}
 	
 	GetAuimgrMain()->Update();
-
-	if ( withSpy )
-		showAuiPane(m_serialSpyView, m_miViewSpy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::disableSlider(wxMouseEvent& event) {
@@ -6216,29 +6196,25 @@ void MainFrame::markSerialSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableSerialSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_menuItemDebugSerial->Check(!m_menuItemDebugSerial->IsChecked());
-	updateMonitoring();
-	decorateSerialSpy();
+	enableSerialSpy(m_enableSerialSpy->GetValue());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableSerialSpy(bool state) {
 ///////////////////////////////////////////////////////////////////
-	m_menuItemDebugSerial->Check(state);
-	updateMonitoring();
+	if ( cnc ) 
+		cnc->enableSpyOutput(state);
+	
+	m_enableSerialSpy->SetValue(state);
 	decorateSerialSpy();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSerialSpy() {
 ///////////////////////////////////////////////////////////////////
-	if ( m_menuItemDebugSerial->IsChecked() ) {
-		m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_CONNECTED")); 
-		m_enableSerialSpy->SetToolTip("Disable Serial Spy");
-		cnc::spy.enableMessage(); 
-	} else {
-		m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_DISCONNECTED")); 
-		m_enableSerialSpy->SetToolTip("Enable Serial Spy");
-		cnc::spy.disableMessage();
-	}
+	const bool b = m_enableSerialSpy->GetValue();
+	
+	m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap(b ? "BMP_CONNECTED": "BMP_DISCONNECTED")); 
+	m_enableSerialSpy->SetToolTip(b ? "Disable Serial Spy" : "Enable Serial Spy");
+	b ? cnc::spy.enableMessage() : cnc::spy.disableMessage();
 	
 	m_enableSerialSpy->Refresh();
 	m_enableSerialSpy->Update();

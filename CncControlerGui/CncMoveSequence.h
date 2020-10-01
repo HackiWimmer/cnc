@@ -206,26 +206,31 @@ class CncMoveSequence {
 		void 					addStepPosY   (int32_t dy)							{ addStepPosXYZ( 0, dy,  0); }
 		void 					addStepPosZ   (int32_t dz)							{ addStepPosXYZ( 0,  0, dz); }
 
-		bool 					hasMore() const 					{ return getCount() > 0; }
+		bool 					hasMore() const 									{ return getCount() > 0; }
 		unsigned int 			getCount() const;
 
 		void 					clear();
 
 		bool					flush(FlushResult& result);
 
-		const unsigned int		getFlushedSize()  					{ return moveSequenceFlushedSize; }
+		const unsigned int		getFlushedSize()  			const	{ return moveSequenceFlushedSize; }
 
-		const unsigned char*	getBuffer() 						{ return moveSequenceBuffer; }
-		const unsigned int   	getBufferSize()  					{ return moveSequenceBufferSize; }
+		const unsigned char*	getBuffer() 				const	{ return moveSequenceBuffer; }
+		const unsigned int   	getBufferSize()  			const	{ return moveSequenceBufferSize; }
 
-		const PortionIndex& 	getPortionIndex()					{ return portionIndex; }
+		const PortionIndex& 	getPortionIndex()			const	{ return portionIndex; }
 
-		int32_t 				getAccumulatedDeltaX()				{ return data.targetX; }
-		int32_t 				getAccumulatedDeltaY()				{ return data.targetY; }
-		int32_t 				getAccumulatedDeltaZ()				{ return data.targetZ; }
+		int32_t 				getAccumulatedDeltaX()		const	{ return data.targetX; }
+		int32_t 				getAccumulatedDeltaY()		const	{ return data.targetY; }
+		int32_t 				getAccumulatedDeltaZ()		const	{ return data.targetZ; }
 
-		const MoveSequence::const_iterator const_begin() const { return sequence.cbegin(); }
-		const MoveSequence::const_iterator const_end()   const { return sequence.cend(); }
+		int32_t					getImpulseCount()			const	{ return data.impulseCount;};
+		int32_t					getLengthX()				const	{ return data.lengthX; }
+		int32_t					getLengthY()				const	{ return data.lengthY; }
+		int32_t					getLengthZ()				const	{ return data.lengthZ; }
+
+		const MoveSequence::const_iterator const_begin()	const	{ return sequence.cbegin(); }
+		const MoveSequence::const_iterator const_end()		const	{ return sequence.cend(); }
 
 	private:
 		

@@ -31,7 +31,7 @@ CncSummaryListCtrl::CncSummaryListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
+	SetBackgroundColour(wxColour(  0,  0,  0));
 
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
@@ -44,7 +44,7 @@ CncSummaryListCtrl::CncSummaryListCtrl(wxWindow *parent, long style)
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
-	defaultItemAttr.SetTextColour(GetTextColour());
+	defaultItemAttr.SetTextColour(*wxLIGHT_GREY);
 	
 	wxFont headlineFont(font);
 	headlineFont.MakeBold();

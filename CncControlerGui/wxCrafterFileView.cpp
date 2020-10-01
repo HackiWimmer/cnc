@@ -78,7 +78,7 @@ CncFilePreviewWndBase::CncFilePreviewWndBase(wxWindow* parent, wxWindowID id, co
     flexGridSizer3782->Add(m_previewPlaceHolder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     SetName(wxT("CncFilePreviewWndBase"));
-    SetSize(500,300);
+    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -129,6 +129,7 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent, wxWindowID id, const wx
     flexGridSizer3760->Add(m_previewBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panel3764 = new wxPanel(m_previewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_previewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel3764->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_previewBook->AddPage(m_panel3764, _("Page"), false);
     
     wxFlexGridSizer* flexGridSizer3768 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -282,7 +283,7 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent, wxWindowID id, const wx
     m_3D_Perspective4->SetMinSize(wxSize(26,26));
     
     SetName(wxT("CncFilePreviewBase"));
-    SetSize(500,300);
+    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -408,7 +409,7 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     m_currentDirectory->SetMinSize(wxSize(-1,19));
     
     SetName(wxT("CncFileViewBase"));
-    SetSize(-1,-1);
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

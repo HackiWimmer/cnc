@@ -136,9 +136,11 @@ protected:
     wxSplitterWindow* m_splitter196;
     wxPanel* m_splitterPageOverview;
     wxStaticText* m_staticText186;
+    wxStaticText* m_staticText225;
     wxListCtrl* m_moveSequencesListPlaceholder;
     wxPanel* m_splitterPageContent;
     wxStaticText* m_contentLabel;
+    wxStaticText* m_staticText222;
     wxListCtrl* m_moveSequencesPlaceholder;
     wxTextCtrl* m_selectedClientIds;
 
@@ -166,9 +168,11 @@ public:
     wxBitmapButton* GetBtClearMoveSequences() { return m_btClearMoveSequences; }
     wxStaticLine* GetStaticLine188() { return m_staticLine188; }
     wxStaticText* GetStaticText186() { return m_staticText186; }
+    wxStaticText* GetStaticText225() { return m_staticText225; }
     wxListCtrl* GetMoveSequencesListPlaceholder() { return m_moveSequencesListPlaceholder; }
     wxPanel* GetSplitterPageOverview() { return m_splitterPageOverview; }
     wxStaticText* GetContentLabel() { return m_contentLabel; }
+    wxStaticText* GetStaticText222() { return m_staticText222; }
     wxListCtrl* GetMoveSequencesPlaceholder() { return m_moveSequencesPlaceholder; }
     wxPanel* GetSplitterPageContent() { return m_splitterPageContent; }
     wxSplitterWindow* GetSplitter196() { return m_splitter196; }

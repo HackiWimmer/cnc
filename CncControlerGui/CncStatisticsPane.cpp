@@ -20,7 +20,7 @@ CncStatisticsPane::CncStatisticsPane(wxWindow* parent)
 ///////////////////////////////////////////////////////////////////
 {
 	// statistic summary
-	statisticSummaryListCtrl = new CncStatisticSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	statisticSummaryListCtrl = new CncStatisticSummaryListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_statisticSummaryListCtrl, statisticSummaryListCtrl);
 	
 	// replay control

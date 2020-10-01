@@ -330,6 +330,7 @@ protected:
     wxButton* m_btCancelRun;
     wxButton* m_btConfirmRun;
     wxPanel* m_additionalParameters;
+    wxStaticText* m_staticText114811;
     wxStaticBitmap* m_staticBitmap92606;
     wxStaticText* m_staticText1603237;
     wxStaticText* m_staticText9268;
@@ -441,9 +442,7 @@ protected:
     wxTextCtrl* m_outboundEditStatus;
     wxStaticText* m_outboundEditMode;
     wxPanel* m_panel7699;
-    wxStaticText* m_staticText6140;
     wxPanel* m_outboundPreviewPlaceholder;
-    wxStaticText* m_staticText6218;
     wxPanel* m_monitorTemplatePanel;
     wxPanel* m_monitorTemplatePreviewPlaceHolder;
     wxPanel* m_panel5144;
@@ -535,7 +534,7 @@ protected:
     wxTextCtrl* m_metricValueTo;
     wxButton* m_btUCClose;
     wxPanel* m_serialSpyView;
-    wxButton* m_enableSerialSpy;
+    wxBitmapToggleButton* m_enableSerialSpy;
     wxButton* m_MarkSerialSpy;
     wxButton* m_clearSerialSpy;
     wxComboBox* m_cbSerialSpyMode;
@@ -674,9 +673,6 @@ protected:
     wxMenuItem* m_menuItemAllowEvents;
     wxMenuItem* m_menuItemDisplayParserDetails;
     wxMenuItem* m_menuSeparator726;
-    wxMenuItem* m_menuItemDebugSerial;
-    wxMenuItem* m_menuItemFreezeLogger;
-    wxMenuItem* m_menuSeparator1725;
     wxMenuItem* m_menuItemMinMonitoring;
     wxMenuItem* m_menuItemNormalMonitoring;
     wxMenu* m_menuRequestor;
@@ -917,7 +913,6 @@ protected:
     virtual void defineOnlineDrawing(wxCommandEvent& event) { event.Skip(); }
     virtual void defineAllowEvents(wxCommandEvent& event) { event.Skip(); }
     virtual void displayUserAgent(wxCommandEvent& event) { event.Skip(); }
-    virtual void defineDebugSerial(wxCommandEvent& event) { event.Skip(); }
     virtual void defineMinMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void defineNormalMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleIdleRequests(wxCommandEvent& event) { event.Skip(); }
@@ -1208,6 +1203,7 @@ public:
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
     wxPanel* GetCncSummary() { return m_cncSummary; }
+    wxStaticText* GetStaticText114811() { return m_staticText114811; }
     wxStaticBitmap* GetStaticBitmap92606() { return m_staticBitmap92606; }
     wxStaticText* GetStaticText1603237() { return m_staticText1603237; }
     wxStaticText* GetStaticText9268() { return m_staticText9268; }
@@ -1319,9 +1315,7 @@ public:
     wxTextCtrl* GetOutboundEditStatus() { return m_outboundEditStatus; }
     wxStaticText* GetOutboundEditMode() { return m_outboundEditMode; }
     wxPanel* GetPanel7697() { return m_panel7697; }
-    wxStaticText* GetStaticText6140() { return m_staticText6140; }
     wxPanel* GetOutboundPreviewPlaceholder() { return m_outboundPreviewPlaceholder; }
-    wxStaticText* GetStaticText6218() { return m_staticText6218; }
     wxPanel* GetPanel7699() { return m_panel7699; }
     wxListbook* GetListbookPostProcessor() { return m_listbookPostProcessor; }
     wxPanel* GetCncPostProcessor() { return m_cncPostProcessor; }
@@ -1419,7 +1413,7 @@ public:
     wxTextCtrl* GetMetricValueTo() { return m_metricValueTo; }
     wxButton* GetBtUCClose() { return m_btUCClose; }
     wxPanel* GetSvgUnitCalulator() { return m_svgUnitCalulator; }
-    wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
+    wxBitmapToggleButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
     wxButton* GetMarkSerialSpy() { return m_MarkSerialSpy; }
     wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
     wxComboBox* GetCbSerialSpyMode() { return m_cbSerialSpyMode; }

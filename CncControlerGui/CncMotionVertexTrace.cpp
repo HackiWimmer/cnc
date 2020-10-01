@@ -9,10 +9,10 @@ CncMotionVertexTrace::CncMotionVertexTrace(wxWindow* parent)
 , motionVertexIndexList(NULL)
 /////////////////////////////////////////////////////////////////////
 {
-	motionVertexDataList = new CncVertexTrace::DataListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	motionVertexDataList = new CncVertexTrace::DataListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_motionVertexDataListPlaceholder, motionVertexDataList);
 	
-	motionVertexIndexList = new CncVertexTrace::IndexListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	motionVertexIndexList = new CncVertexTrace::IndexListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_motionVertexIndexListPlaceholder, motionVertexIndexList);
 }
 /////////////////////////////////////////////////////////////////////

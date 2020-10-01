@@ -48,7 +48,7 @@ CncVertexTrace::DataListCtrl::DataListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(191, 205, 219));
+	SetBackgroundColour(wxColour(  0,   0,   0));
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
@@ -59,7 +59,7 @@ CncVertexTrace::DataListCtrl::DataListCtrl(wxWindow *parent, long style)
 	
 	dataItemAttr.SetBackgroundColour(GetBackgroundColour());
 	dataItemAttr.SetFont(font);
-	dataItemAttr.SetTextColour(GetTextColour());
+	dataItemAttr.SetTextColour(*wxLIGHT_GREY);
 }
 /////////////////////////////////////////////////////////////
 CncVertexTrace::DataListCtrl::~DataListCtrl() {
@@ -251,7 +251,7 @@ CncVertexTrace::IndexListCtrl::IndexListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(191, 205, 219));
+	SetBackgroundColour(wxColour(  0,   0,   0));
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
@@ -261,7 +261,7 @@ CncVertexTrace::IndexListCtrl::IndexListCtrl(wxWindow *parent, long style)
 	
 	indexItemAttr.SetBackgroundColour(GetBackgroundColour());
 	indexItemAttr.SetFont(font);
-	indexItemAttr.SetTextColour(GetTextColour());
+	indexItemAttr.SetTextColour(*wxLIGHT_GREY);
 }
 /////////////////////////////////////////////////////////////
 CncVertexTrace::IndexListCtrl::~IndexListCtrl() {

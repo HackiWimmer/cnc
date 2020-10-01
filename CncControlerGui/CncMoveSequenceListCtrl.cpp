@@ -35,8 +35,6 @@ CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 {
 	// add colums
 	AppendColumn("Type",	 		wxLIST_FORMAT_LEFT, 	44);
-	AppendColumn("Speed [mm/min]",	wxLIST_FORMAT_RIGHT, 	100);
-	AppendColumn("Opt.",			wxLIST_FORMAT_CENTRE, 	44);
 	AppendColumn("Client ID(s)",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("X-Distance", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Y-Distance", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -48,7 +46,8 @@ CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(191, 205, 219));
+	SetBackgroundColour(wxColour(  0,   0,   0));
+	SetTextColour(*wxLIGHT_GREY);
 
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
@@ -165,6 +164,9 @@ void CncMoveSequenceListCtrl::updateColumnWidth() {
 	if ( GetColumnCount() <= 0 )
 		return;
 		
+	if ( COL_STRECH < 0 )
+		return;
+		
 	// avoid flicker
 	if ( IsFrozen() == false )
 		Freeze();
@@ -253,8 +255,7 @@ wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
 	
 	if ( moveSequence->getCount() == 0 ) {
 		switch ( column ) {
-			case CncMoveSequenceListCtrl::COL_TYPE:		return wxString::Format("%d", 		2); 
-			case CncMoveSequenceListCtrl::COL_SPEED:	return wxString::Format("%lf", 		moveSequence->getCurrentSpeedInfo().value );
+			case CncMoveSequenceListCtrl::COL_TYPE:		return wxString::Format("%d",		2); 
 		}
 		
 		return _("");
@@ -267,9 +268,7 @@ wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
 	const CncMoveSequence::SequencePoint& sp = *it;
 	
 	switch ( column ) {
-		case CncMoveSequenceListCtrl::COL_TYPE:			return wxString::Format("%d", 		3); 
-		case CncMoveSequenceListCtrl::COL_SPEED:		return wxString::Format("%lf", 		moveSequence->getCurrentSpeedInfo().value );
-		case CncMoveSequenceListCtrl::COL_OPTIMIZED:	return                              moveSequence->isOptimized() ? "X" : "";
+		case CncMoveSequenceListCtrl::COL_TYPE:			return wxString::Format("%d",		3); 
 		case CncMoveSequenceListCtrl::COL_CLD_ID:		return wxString::Format(fmt, 		sp.clientID);
 		case CncMoveSequenceListCtrl::COL_DISTANCE_X:	return wxString::Format("%10ld",	(long)sp.x);
 		case CncMoveSequenceListCtrl::COL_DISTANCE_Y:	return wxString::Format("%10ld", 	(long)sp.y);
@@ -302,9 +301,15 @@ CncMoveSequenceOverviewListCtrl::CncMoveSequenceOverviewListCtrl(wxWindow *paren
 	wxASSERT( contentLabel != NULL );
 	
 	// add colums
-	AppendColumn("#",	 			wxLIST_FORMAT_RIGHT, 	 44);
-	AppendColumn("Count",			wxLIST_FORMAT_RIGHT, 	 44);
+	AppendColumn("#",	 			wxLIST_FORMAT_RIGHT,	 44);
+	AppendColumn("Count",			wxLIST_FORMAT_RIGHT,	 44);
 	AppendColumn("Sequence ID",		wxLIST_FORMAT_LEFT, 	110);
+	AppendColumn("Opt.",			wxLIST_FORMAT_CENTRE,	 44);
+	AppendColumn("Speed [mm/min]",	wxLIST_FORMAT_RIGHT,	100);
+	AppendColumn("Impulses",		wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
+	AppendColumn("X-Tot Length",	wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
+	AppendColumn("Y-Tot Length",	wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
+	AppendColumn("Z-Tot Length",	wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
 	AppendColumn("First C.-ID",		wxLIST_FORMAT_RIGHT,	 64);
 	AppendColumn("Last C.-ID",		wxLIST_FORMAT_RIGHT,	 64);
 
@@ -314,7 +319,8 @@ CncMoveSequenceOverviewListCtrl::CncMoveSequenceOverviewListCtrl(wxWindow *paren
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(191, 205, 219));
+	SetBackgroundColour(wxColour(  0,   0,   0));
+	SetTextColour(*wxLIGHT_GREY);
 }
 /////////////////////////////////////////////////////////////
 CncMoveSequenceOverviewListCtrl::~CncMoveSequenceOverviewListCtrl() {
@@ -353,7 +359,13 @@ wxString CncMoveSequenceOverviewListCtrl::OnGetItemText(long item, long column) 
 	switch ( column ) {
 		case COL_NUM:			return wxString::Format("%ld", 	item);
 		case COL_CNT:			return wxString::Format("%u", 	seq.getCount());
-		case COL_REF:			return wxString::Format("%lld", seq.getReference());
+		case COL_REF:			return wxString::Format("%lld",	seq.getReference());
+		case COL_OPTIMIZED:		return                          seq.isOptimized() ? "X" : "";
+		case COL_SPEED:			return wxString::Format("%.1lf",seq.getCurrentSpeedInfo().value );
+		case COL_IMPULSES:		return wxString::Format("%ld",  seq.getImpulseCount());
+		case COL_DISTANCE_X:	return wxString::Format("%ld",  seq.getLengthX());
+		case COL_DISTANCE_Y:	return wxString::Format("%ld",  seq.getLengthY());
+		case COL_DISTANCE_Z:	return wxString::Format("%ld",  seq.getLengthZ());
 		case COL_FIRST_CLD_ID:	return wxString::Format(fmt,	seq.getFirstClientId());
 		case COL_LAST_CLD_ID:	return wxString::Format(fmt, 	seq.getLastClientId());
 	}

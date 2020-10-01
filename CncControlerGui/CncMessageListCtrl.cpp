@@ -51,7 +51,7 @@ CncMessageListCtrl::CncMessageListCtrl(wxWindow *parent, long style)
 	
 	itemAttrInfo.SetBackgroundColour(GetBackgroundColour());
 	itemAttrInfo.SetFont(font);
-	itemAttrInfo.SetTextColour(wxColour(255, 255, 255));
+	itemAttrInfo.SetTextColour(*wxLIGHT_GREY);
 	
 	itemAttrWarning.SetBackgroundColour(GetBackgroundColour());
 	itemAttrWarning.SetFont(boldFont);
