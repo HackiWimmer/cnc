@@ -32,24 +32,39 @@ class HexDecoder {
 		
 		/////////////////////////////////////////////////////////
 		static const wxString& reorderHexInt32String(wxString& hexToken) {
-			if ( hexToken.length() > 8 ) {
+			if ( hexToken.length() != 8 ) {
 				std::cerr << "HexDecoder::reorderHexInt32String: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
 				return _T("00000000");
 			}
 			
-			wxString unordered(hexToken);
-			unordered.append(wxString('0', 8 - hexToken.length()));
-			
 			char hex[9];
-			hex[0] = (char)unordered[6];
-			hex[1] = (char)unordered[7];
-			hex[2] = (char)unordered[4];
-			hex[3] = (char)unordered[5];
-			hex[4] = (char)unordered[2];
-			hex[5] = (char)unordered[3];
-			hex[6] = (char)unordered[0];
-			hex[7] = (char)unordered[1];
+			hex[0] = (char)hexToken[6];
+			hex[1] = (char)hexToken[7];
+			hex[2] = (char)hexToken[4];
+			hex[3] = (char)hexToken[5];
+			hex[4] = (char)hexToken[2];
+			hex[5] = (char)hexToken[3];
+			hex[6] = (char)hexToken[0];
+			hex[7] = (char)hexToken[1];
 			hex[8] = '\0';
+			
+			hexToken.assign(hex);
+			return hexToken;
+		}
+		
+		/////////////////////////////////////////////////////////
+		static const wxString& reorderHexInt16String(wxString& hexToken) {
+			if ( hexToken.length() != 4 ) {
+				std::cerr << "HexDecoder::reorderHexInt16String: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
+				return _T("0000");
+			}
+			
+			char hex[5];
+			hex[0] = (char)hexToken[2];
+			hex[1] = (char)hexToken[3];
+			hex[2] = (char)hexToken[0];
+			hex[3] = (char)hexToken[1];
+			hex[4] = '\0';
 			
 			hexToken.assign(hex);
 			return hexToken;
@@ -72,8 +87,6 @@ class HexDecoder {
 			
 			int32_t ret = 0;
 			sscanf(hexToken, "%8X", &ret);
-			
-			std::cout << "hexToken: " << hexToken << " = " << ret << std::endl;
 			return ret;
 		}
 		
@@ -98,7 +111,7 @@ class HexDecoder {
 		}
 		
 		/////////////////////////////////////////////////////////
-		static int8_t decodeHexValueAsInt8(const wxString& hexToken) {
+		static uint8_t decodeHexValueAsInt8(const wxString& hexToken) {
 			//  examples are: 00,  2C,  FA
 			if ( hexToken.length() != 2 ) {
 				std::cerr << "HexDecoder::decodeHexValueAsInt8: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
@@ -114,7 +127,7 @@ class HexDecoder {
 			
 			int32_t ret = 0;
 			sscanf(hexToken, "%2X", &ret);
-			return (int8_t)ret;
+			return (uint8_t)ret;
 		}
 		
 		
@@ -207,7 +220,7 @@ class HexDecoder {
 				wxString value;
 				
 				while ( tokenizer.HasMoreTokens() ) {
-					wxString token = tokenizer.GetNextToken();
+					const wxString token(tokenizer.GetNextToken());
 					
 					if ( token.IsEmpty() == false ) {
 						count++;
@@ -215,14 +228,14 @@ class HexDecoder {
 						switch ( count%4 ) {
 							case 1:	
 							case 2:
-							case 3: value << token; 
+							case 3: value.Prepend(token); 
 									break;
 									
-							case 0: value << token;
+							case 0: value.Prepend(token);
 									if ( ret.length() != 0 ) 
 										ret << ", ";
 									
-									ret << decodeHexValueAsInt32(reorderHexInt32String(value));
+									ret << decodeHexValueAsInt32(value);
 									value.clear();
 									break;
 						}
@@ -241,23 +254,12 @@ class HexDecoder {
 class SpyHexDecoder : public HexDecoder {
 	
 	protected:
-		wxString hexString;
-		
-		unsigned char context;
-		unsigned char cmd;
-		unsigned char pid;
-		unsigned int  index;
-		unsigned int  portion;
-		
-		static const unsigned int IDX_DEF_PID				= 2;
-		static const unsigned int IDX_DEF_SIZE				= 3;
-		
-		static const unsigned int IDX_MSG_TYPE				= 3;
-		
-		static const unsigned int IDX_HB_SIZE				= 3;
-		
-		static const unsigned int IDX_GETTER_PID			= 3;
-		static const unsigned int IDX_GETTER_SIZE			= 4;
+		const wxString	hexString;
+		unsigned char	context;
+		unsigned char	cmd;
+		unsigned char	pid;
+		unsigned int	index;
+		unsigned int	portion;
 		
 	public:
 	
@@ -273,87 +275,38 @@ class SpyHexDecoder : public HexDecoder {
 			wxString	portion;
 			wxString	more;
 			
+			struct Inbound {
+				wxString	prev;
+				wxString	next;
+			} inbound;
+			
 			void clear() {
-				context.clear();
-				cmd.clear();
-				pid.clear();
-				index.clear();
-				portion.clear();
-				more.clear();
+				context				.clear();
+				cmd					.clear();
+				pid					.clear();
+				index				.clear();
+				portion				.clear();
+				more				.clear();
 			}
 		};
 		
-		//////////////////////////////////////////////////////////
-		SpyHexDecoder(const wxString& contextInfo, const wxString& hs) 
-		: HexDecoder()
-		, hexString(hs)
-		, context(0)
-		, cmd(0)
-		, pid(0)
-		, index(0)
-		, portion(0)
-		{
-			unsigned int counter = 0;
-			wxStringTokenizer tokenizer(contextInfo, " ");
-			while ( tokenizer.HasMoreTokens() ) {
-				wxString token = tokenizer.GetNextToken();
-				
-				switch ( counter ) {
-					case 0:	cmd 	= decodeHexValueAsInteger(token); 
-							break;
-							
-					case 1:	context = decodeHexValueAsInteger(token); 
-							break;
-							
-					case 2: pid     = decodeHexValueAsInteger(token); 
-							break;
-							
-					case 3: index   = decodeHexValueAsInteger(token);
-							portion = decodeHexValueAsInteger(token); 
-							break;
-				}
-				
-				counter++;
-			}
-		}
+		SpyHexDecoder(const wxString& context, const wxString& hexString);
+		virtual ~SpyHexDecoder();
 		
-		//////////////////////////////////////////////////////////
-		virtual ~SpyHexDecoder() {
-		}
-		
-		//////////////////////////////////////////////////////////
-		void decode(SpyHexDecoder::Details& ret) {
-			if ( context == 0 )
-				return;
-				
-			switch ( ret.type ) {
-				case Details::DT_OUTBOUND:	decodeOutbound(ret);
-											break;
-									
-				case Details::DT_INBOUND:	decodeInbound(ret);
-											break;
-											
-				case Details::DT_UNKNOWN:
-				default:					ret.more.assign("decode(SpyHexDecoder::Details& ret): Unknown type, nothing will be done!");
-				
-			}
-			
-			ret.more.Replace("\n", "; ", true);
-			ret.more.Replace("; ;", "",  true);
-			return;
-		}
+		virtual void	display() {}
+		void			decode(SpyHexDecoder::Details& ret);
 		
 	private:
 		
-		unsigned int getByteCount(const wxString& hexValues);
-		bool readNextHexBytes(wxString& hexValues, unsigned int count, wxString& ret);
-		bool skipNextHexBytes(wxString& hexValues, unsigned int count);
+		unsigned int	getByteCount(const wxString& hexValues);
+		bool			readNextHexBytes(wxString& hexValues, unsigned int count, wxString& ret);
+		bool			skipNextHexBytes(wxString& hexValues, unsigned int count);
 		
-		void decodeOutbound(SpyHexDecoder::Details& ret);
-		void decodeInbound(SpyHexDecoder::Details& ret);
+		void			decodeOutbound(SpyHexDecoder::Details& ret);
+		void			decodeInbound(SpyHexDecoder::Details& ret);
 		
-		void decodeValuesDefault(SpyHexDecoder::Details& ret, wxString& restToken);
-		void decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString& restToken);
+		void			decodeValuesDefault(SpyHexDecoder::Details& ret, wxString& restToken);
+		void			decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString& restToken);
 
 };
 

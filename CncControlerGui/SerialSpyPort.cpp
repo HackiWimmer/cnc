@@ -23,22 +23,18 @@ void SerialSpyPort::spyReadData(void *buffer, unsigned int nbByte) {
 			return;
 
 		if ( spyRead == true ) {
-			lastFetchResult.index += nbByte;
-			cnc::spy << wxString::Format(" Serial::<< 0x{%02X %02X %02X %04X} 0x[ ", lastFetchResult.cmd, lastFetchResult.ret, lastFetchResult.pid, lastFetchResult.index);
-			
 			const unsigned char* b = (const unsigned char*) buffer;
 			for ( unsigned int i=0; i<nbByte; i++ ) {
-				cnc::spy << wxString::Format("%02X ", b[i]);
+				
+				lastFetchResult.index++;
+				cnc::spy << wxString::Format(" Serial::<< 0x{%02X %02X %02X %04X} 0x[ %02X ]\n", 
+												lastFetchResult.cmd, 
+												lastFetchResult.ret, 
+												lastFetchResult.pid, 
+												lastFetchResult.index, 
+												b[i]
+											);
 			}
-			cnc::spy << ']';
-			
-			// special handling to show text messages
-			if ( nbByte == 1 && ( lastFetchResult.pid == PID_TEXT || lastFetchResult.pid == PID_MSG ) ) {
-				if ( b[0] >= 32 && b[0] <= 127 ) 
-					cnc::spy << wxString::Format(" '%c'", b[0]);
-			}
-			
-			cnc::spy << std::endl;
 		}
 	}
 }
@@ -60,14 +56,18 @@ void SerialSpyPort::spyWriteData(void *buffer, unsigned int nbByte) {
 		}
 	}
 	
-	// Artificially waste time
-	typedef IndividualCommandEvent::EvtMainFrame ID;
-	typedef IndividualCommandEvent::ValueName VN;
-
-	IndividualCommandEvent evt(ID::WaitActive);
-	evt.setValue(VN::VAL1, cncControl->getStepDelay());
-	evt.setValue(VN::VAL2, false);
-	wxPostEvent(THE_FRAME, evt);
+	// Artificially waste time - on demand
+	const int stepDelay = cncControl->getStepDelay();
+	if ( stepDelay > 0 ) {
+		
+		typedef IndividualCommandEvent::EvtMainFrame ID;
+		typedef IndividualCommandEvent::ValueName VN;
+		
+		IndividualCommandEvent evt(ID::WaitActive);
+		evt.setValue(VN::VAL1, cncControl->getStepDelay());
+		evt.setValue(VN::VAL2, false);
+		wxPostEvent(THE_FRAME, evt);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 int SerialSpyPort::readData(void *buffer, unsigned int nbByte) {

@@ -942,6 +942,9 @@ bool Serial::sendSignal(const unsigned char cmd) {
 		return false;
 	}
 	
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd, ArduinoCMDs::getCMDLabel(cmd)));
+	
 	lastFetchResult.init(cmd);
 	return writeData(cmd);
 }
@@ -1106,6 +1109,9 @@ bool Serial::processStartInteractiveMove() {
 	unsigned char cmd[LEN];
 	cmd[0] = CMD_MOVE_INTERACTIVE;
 	
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
+
 	lastFetchResult.init(cmd[0]);
 	return writeData(cmd, LEN);
 }
@@ -1126,6 +1132,9 @@ bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncL
 	cmd[4] = (unsigned char)y;
 	cmd[5] = (unsigned char)z;
 	
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
+		
 	lastFetchResult.init(cmd[0]);
 	return writeData(cmd, LEN);
 }
@@ -1256,6 +1265,9 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 	
 	bool fetchMore = true;
 	while ( fetchMore ) {
+		
+lastFetchResult.index = 0;
+
 		
 		// read one byte from serial
 		unsigned char ret = fetchControllerResult(sfi);
@@ -1513,7 +1525,7 @@ bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 	// handle nested RET_SOH
 	if ( pid == RET_SOH )
 		return true;
-		
+
 	lastFetchResult.pid = pid;
 	
 	switch( pid ) {

@@ -26,7 +26,9 @@ CncTraceCtrl::CncTraceCtrl(wxWindow *parent, wxWindowID id, const wxString &valu
 	
 	SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
 	SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+	
 	SetToolTip(_("Trace Information"));
+	//Enable(false);
 	
 	displayTimer.Start(timerInterval);
 }

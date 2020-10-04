@@ -66,11 +66,13 @@ class CncMoveSequenceOverviewListCtrl : public CncLargeScaledListCtrl {
 	private:
 		
 		typedef std::vector<CncMoveSequence> MoveSequences;
+		wxListItemAttr 				defaultItemAttr;
 		MoveSequences 				moveSequences;
 		CncMoveSequenceListCtrl* 	slaveSequenceList;
 		wxStaticText*				contentLabel;
 		
 		virtual wxString OnGetItemText(long item, long column) const;
+		virtual wxListItemAttr* OnGetItemAttr(long item) const;
 		virtual bool isItemValid(long item) const;
 		
 		void onPaint(wxPaintEvent& event);

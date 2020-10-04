@@ -399,6 +399,7 @@ class CncControl {
 		const char* getPortName() 										{ return getSerial()->getPortName(); }
 		const char* getClassName() 										{ return getSerial()->getClassName(); }
 		const CncPortType getPortType() 								{ return getSerial()->getPortType(); }
+		bool isSpyOutputOn()											{ return getSerial()->isSpyOutputOn(); }
 		bool isCommandActive() 											{ return getSerial()->isCommandActive(); }
 		bool isOutputAsTemplateAvailable()								{ return getSerial()->isOutputAsTemplateAvailable(); }
 		bool isEmulator() 												{ return getSerial()->isEmulator(); }

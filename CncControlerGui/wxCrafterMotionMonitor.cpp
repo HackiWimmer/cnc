@@ -448,10 +448,10 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer223->Add(m_staticText225, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
-    m_moveSequencesListPlaceholder = new wxListCtrl(m_splitterPageOverview, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(350,-1)), wxLC_REPORT);
+    m_moveSequencesListPlaceholder = new wxListCtrl(m_splitterPageOverview, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(-1,-1)), wxLC_REPORT);
+    m_moveSequencesListPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
     flexGridSizer181->Add(m_moveSequencesListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_moveSequencesListPlaceholder->SetMinSize(wxSize(350,-1));
     
     m_splitterPageContent = new wxPanel(m_splitter196, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter196, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_splitter196->SplitHorizontally(m_splitterPageOverview, m_splitterPageContent, 0);
@@ -486,6 +486,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer220->Add(m_staticText222, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
     m_moveSequencesPlaceholder = new wxListCtrl(m_splitterPageContent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageContent, wxSize(-1,-1)), wxLC_REPORT);
+    m_moveSequencesPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
     flexGridSizer182->Add(m_moveSequencesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     

@@ -143,8 +143,6 @@ void CncCspyBuf::addLine(const wxString& line, int type) {
 		return;
 	c->addLine(line, (CncSerialSpyListCtrl::LineType)type);
 }
-
-
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::logCommand(const wxString& cmd) {
 ///////////////////////////////////////////////////////////

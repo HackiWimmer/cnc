@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <object class="wxPanel" name="CncSerialSpyPanelBase">
+    <size>500,300</size>
+    <style>wxTAB_TRAVERSAL</style>
+    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>1</growablerows>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <object class="wxPanel" name="m_panel9492">
+          <style>wxTAB_TRAVERSAL</style>
+          <bg>wxSYS_COLOUR_3DLIGHT</bg>
+          <object class="wxFlexGridSizer">
+            <cols>8</cols>
+            <rows>1</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>5</growablecols>
+            <growablerows>0</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <minsize>26,26</minsize>
+              <object class="wxBitmapToggleButton" name="m_enableSerialSpy">
+                <style/>
+                <size>26,26</size>
+                <bitmap>bitmaps/16-connected.png</bitmap>
+                <tooltip>
+                  <![CDATA[Enable Serial Spy]]>
+                </tooltip>
+                <checked>0</checked>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <minsize>26,26</minsize>
+              <object class="wxButton" name="m_MarkSerialSpy">
+                <label/>
+                <style/>
+                <size>26,26</size>
+                <tooltip>
+                  <![CDATA[Add a Marker]]>
+                </tooltip>
+                <bitmap>bitmaps/book-add.png</bitmap>
+                <bitmapposition>wxLEFT</bitmapposition>
+                <default>0</default>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxStaticLine" name="m_staticLine9487">
+                <style>wxLI_VERTICAL</style>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <minsize>26,26</minsize>
+              <object class="wxButton" name="m_clearSerialSpy">
+                <label/>
+                <style/>
+                <size>26,26</size>
+                <tooltip>
+                  <![CDATA[Clear the Spy Trace]]>
+                </tooltip>
+                <bitmap>bitmaps/16-clean.png</bitmap>
+                <bitmapposition>wxLEFT</bitmapposition>
+                <default>0</default>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxStaticLine" name="m_staticLine94873">
+                <style>wxLI_VERTICAL</style>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxComboBox" name="m_cbSerialSpyMode">
+                <style>wxCB_READONLY</style>
+                <font>
+                  <size>8</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <family>swiss</family>
+                  <underlined>0</underlined>
+                  <face>Segoe UI</face>
+                </font>
+                <selection>2</selection>
+                <content>
+                  <item>
+                    <![CDATA[Spy - In]]>
+                  </item>
+                  <item>
+                    <![CDATA[Spy - Out]]>
+                  </item>
+                  <item>
+                    <![CDATA[Spy - In/Out]]>
+                  </item>
+                </content>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxStaticLine" name="m_staticLine9489">
+                <style>wxLI_VERTICAL</style>
+              </object>
+            </object>
+            <object class="sizeritem" name="flexGridSizer4706">
+              <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>7</cols>
+                <rows>1</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols/>
+                <growablerows/>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <minsize>26,26</minsize>
+                  <object class="wxBitmapToggleButton" name="m_liveDecoding">
+                    <style/>
+                    <size>26,26</size>
+                    <bitmap>bitmaps/brick-edit.png</bitmap>
+                    <tooltip>
+                      <![CDATA[Live Decoding]]>
+                    </tooltip>
+                    <checked>1</checked>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <minsize>26,26</minsize>
+                  <object class="wxBitmapToggleButton" name="m_autoScroling">
+                    <style/>
+                    <size>26,26</size>
+                    <bitmap>bitmaps/auto-scroll.png</bitmap>
+                    <tooltip>
+                      <![CDATA[Auto Scrolling]]>
+                    </tooltip>
+                    <checked>1</checked>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <minsize>26,26</minsize>
+                  <object class="wxBitmapToggleButton" name="m_autoColumnSizing">
+                    <style/>
+                    <size>26,26</size>
+                    <bitmap>bitmaps/format-table-column-width.png</bitmap>
+                    <tooltip>
+                      <![CDATA[Auto Column Sizing]]>
+                    </tooltip>
+                    <checked>1</checked>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <minsize>26,26</minsize>
+                  <object class="wxBitmapToggleButton" name="m_clearSerialSpyOnConnect">
+                    <style/>
+                    <size>26,26</size>
+                    <bitmap>bitmaps/brick-delete.png</bitmap>
+                    <tooltip>
+                      <![CDATA[Clear on Connect]]>
+                    </tooltip>
+                    <checked>1</checked>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <minsize>26,26</minsize>
+                  <object class="wxBitmapToggleButton" name="m_clearSerialSpyBeforNextRun">
+                    <style/>
+                    <size>26,26</size>
+                    <bitmap>bitmaps/script-delete.png</bitmap>
+                    <tooltip>
+                      <![CDATA[Clear before next Run]]>
+                    </tooltip>
+                    <checked>0</checked>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>1</border>
+                  <object class="wxStaticLine" name="m_staticLine9495">
+                    <style>wxLI_VERTICAL</style>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>1</border>
+                  <minsize>26,26</minsize>
+                  <object class="wxBitmapButton" name="m_openDetails">
+                    <bitmap>bitmaps/document-open-6.png</bitmap>
+                    <size>26,26</size>
+                    <style>wxBU_AUTODRAW</style>
+                    <tooltip>
+                      <![CDATA[Open Details]]>
+                    </tooltip>
+                    <default>0</default>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer4704">
+        <flag>wxALL|wxEXPAND</flag>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>1</cols>
+          <rows>2</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>1</border>
+            <object class="wxPanel" name="m_serialSpyPlaceholder">
+              <style>wxTAB_TRAVERSAL</style>
+              <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <object class="unknown" name="m_infobar"/>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

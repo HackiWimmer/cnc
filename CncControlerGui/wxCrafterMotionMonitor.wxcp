@@ -4034,11 +4034,11 @@
                     }, {
                      "type": "string",
                      "m_label": "Size:",
-                     "m_value": "350,-1"
+                     "m_value": "-1,-1"
                     }, {
                      "type": "string",
                      "m_label": "Minimum Size:",
-                     "m_value": "350,-1"
+                     "m_value": "-1,-1"
                     }, {
                      "type": "string",
                      "m_label": "Name:",
@@ -4050,7 +4050,7 @@
                     }, {
                      "type": "colour",
                      "m_label": "Bg Colour:",
-                     "colour": "<Default>"
+                     "colour": "ActiveCaption"
                     }, {
                      "type": "colour",
                      "m_label": "Fg Colour:",
@@ -4428,7 +4428,7 @@
                     }, {
                      "type": "colour",
                      "m_label": "Bg Colour:",
-                     "colour": "<Default>"
+                     "colour": "ActiveCaption"
                     }, {
                      "type": "colour",
                      "m_label": "Fg Colour:",

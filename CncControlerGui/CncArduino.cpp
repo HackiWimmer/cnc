@@ -125,7 +125,7 @@ void ArduinoPIDs::init() {
 	
 	pids[PID_UNKNOWN]                         .setup("Default PID", "");
 
-	pids[PID_HEARTBEAT]                       .setup("Hertbeat", "");
+	pids[PID_HEARTBEAT]                       .setup("Heartbeat", "");
 	pids[PID_MSG]                             .setup("Message", "");
 	pids[PID_TEXT]                            .setup("Plain Text", "");
 	pids[PID_GETTER]                          .setup("Getter", "");

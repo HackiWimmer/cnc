@@ -17,9 +17,9 @@
 #include "CncMotionMonitor.h"
 #include "CncFileView.h"
 #include "CncToolMagazine.h"
+#include "CncSerialSpyPanel.h"
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
-#include "CncSerialSpyListCtrl.h"
 #include "CncGamepadControllerState.h"
 #include "CncMotionMonitorVertexTrace.h"
 #include "CncParsingSynopsisTrace.h"
@@ -188,10 +188,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void onOpenGLContextObserver(wxCommandEvent& event);
 		virtual void changeMonitorListBook(wxListbookEvent& event);
 		virtual void showStacktraceStore(wxCommandEvent& event);
-		virtual void onSelectSpyInboundDetails(wxDataViewEvent& event);
-		virtual void onSelectSpyOutboundDetails(wxDataViewEvent& event);
-		virtual void onSelectSpyUnknownDetails(wxDataViewEvent& event);
-		virtual void openSpyDetailWindow(wxCommandEvent& event);
 		virtual void dclickHeartbeatState(wxMouseEvent& event);
 		virtual void showOSEnvironment(wxCommandEvent& event);
 		virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event);
@@ -217,7 +213,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void toggleIdleRequests(wxCommandEvent& event);
 		virtual void cncMainViewChanged(wxNotebookEvent& event);
 		virtual void rcSecureDlg(wxCommandEvent& event);
-		virtual void leaveSerialSpy(wxMouseEvent& event);
 		virtual void changeConfigToolbook(wxToolbookEvent& event);
 		virtual void warmStartController(wxCommandEvent& event);
 		virtual void setReferencePosition(wxCommandEvent& event);
@@ -241,7 +236,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void goPosSypLastId(wxCommandEvent& event);
 		virtual void goPosSypNextId(wxCommandEvent& event);
 		virtual void goPosSypPrevId(wxCommandEvent& event);
-		virtual void selectSerialSpyMode(wxCommandEvent& event);
 		virtual void clearSetterList(wxCommandEvent& event);
 		virtual void loopRepeatTest(wxCommandEvent& event);
 		virtual void selectPositionSpyContent(wxCommandEvent& event);
@@ -270,11 +264,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void selectUCUnitTo(wxCommandEvent& event);
 		virtual void closeUnitCalculator(wxCommandEvent& event);
 		virtual void viewUnitCalculator(wxCommandEvent& event);
-		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
 		virtual void paintDrawPaneWindow(wxPaintEvent& event);
-		virtual void enableSerialSpy(wxCommandEvent& event);
-		virtual void clearSerialSpy(wxCommandEvent& event);
 		virtual void nootebookConfigChanged(wxListbookEvent& event);
 		virtual void cancelRun(wxCommandEvent& event);
 		virtual void confirmRun(wxCommandEvent& event);
@@ -462,10 +453,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void initialize(void);
 		bool secureRun() { return processTemplateIntern(); }
 		
-		wxListCtrl* getCtrlSerialSpy() 			{ return serialSpyListCtrl; }
-		
-		CncMotionMonitor* getMotionMonitor() 	{ return motionMonitor; }
-		wxMenuItem* GetMiMotorEnableState()		{ return m_miMotorEnableState; }
+		wxListCtrl* 		getCtrlSerialSpy()			{ return (wxListCtrl* )(serialSpyPanel->getSerialSpyCtrl()); }
+		CncMotionMonitor*	getMotionMonitor()			{ return motionMonitor; }
+		wxMenuItem*			GetMiMotorEnableState()		{ return m_miMotorEnableState; }
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void selectMainBookSourcePanel(int sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL);
@@ -498,9 +488,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void notifyConfigUpdate();
 		void changeWorkpieceThickness();
 		void changeCrossingThickness();
-		
-		void updateSpyDetailWindow();
-		
 		void decorateSwitchToolOnOff(bool state);
 		
 		//////////////////////////////////////////////////////////////////////////////////
@@ -602,6 +589,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncContext;
 		friend class CncGampadDeactivator;
 		friend class CncTransactionLock;
+		friend class CncSerialSpyPanel;
 
 		friend class GamepadThread;
 		friend class SerialThread;
@@ -655,7 +643,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncParsingSynopsisTrace*		parsingSynopisis;
 		CncGCodeSequenceListCtrl*		gCodeSequenceList;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
-		CncSerialSpyListCtrl* 			serialSpyListCtrl;
+		CncSerialSpyPanel* 				serialSpyPanel;
 		CncSvgViewer*					outboundEditorSvgView;
 		CncNavigatorPanel*				navigatorPanel;
 		GL3DOptionPane* 				optionPane3D;
@@ -664,7 +652,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMonitorVSplitterWindow* 		cnc3DVSplitterWindow;
 		CncMonitorHSplitterWindow* 		cnc3DHSplitterWindow;
 		CncTemplateObserver* 			templateObserver;
-		CncMessageDialog*				spyDetailWindow;
 		CncOpenGLContextObserver*		openGLContextObserver;
 		CncOSEnvironmentDialog* 		cncOsEnvDialog;
 		CncExternalViewBox* 			cncExtMainPreview;
@@ -880,14 +867,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void disableGuiControls();
 		void enableGuiControls(bool state = true);
 		void enableMenuItems(bool state = true);
-		
-		void enableSerialSpy(bool state = true);
-		void disableSerialSpy() { enableSerialSpy(false); }
-		void decorateSerialSpy();
-		void selectSerialSpyMode();
-		
-		void clearSerialSpy();
-		
 		void activate3DPerspectiveButton(wxButton* bt);
 
 		///////////////////////////////////////////////////////////////

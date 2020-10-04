@@ -61,12 +61,6 @@
   <object class="wxBitmap" name="16-whole-word@2x">bitmaps\16-whole-word@2x.png</object>
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
-  <object class="wxBitmap" name="24-info">bitmaps\24-info.png</object>
-  <object class="wxBitmap" name="24-info@2x">bitmaps\24-info@2x.png</object>
-  <object class="wxBitmap" name="24-redo">bitmaps\24-redo.png</object>
-  <object class="wxBitmap" name="24-redo@2x">bitmaps\24-redo@2x.png</object>
-  <object class="wxBitmap" name="24-undo">bitmaps\24-undo.png</object>
-  <object class="wxBitmap" name="24-undo@2x">bitmaps\24-undo@2x.png</object>
   <object class="wxBitmap" name="CubeHardwareDimensions">bitmaps\CubeHardwareDimensions.png</object>
   <object class="wxBitmap" name="CubeHardwareReference">bitmaps\CubeHardwareReference.png</object>
   <object class="wxBitmap" name="ToolPin">bitmaps\ToolPin.png</object>
@@ -90,11 +84,9 @@
   <object class="wxBitmap" name="arrow-out">bitmaps\arrow-out.png</object>
   <object class="wxBitmap" name="arrow-right-3">bitmaps\arrow-right-3.png</object>
   <object class="wxBitmap" name="basket-3">bitmaps\basket-3.png</object>
-  <object class="wxBitmap" name="book-add">bitmaps\book-add.png</object>
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
   <object class="wxBitmap" name="bookmark-toolbar">bitmaps\bookmark-toolbar.png</object>
   <object class="wxBitmap" name="brick">bitmaps\brick.png</object>
-  <object class="wxBitmap" name="brick-delete">bitmaps\brick-delete.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bug-go">bitmaps\bug-go.png</object>
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
@@ -112,7 +104,6 @@
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
   <object class="wxBitmap" name="document-open-5">bitmaps\document-open-5.png</object>
-  <object class="wxBitmap" name="document-open-6">bitmaps\document-open-6.png</object>
   <object class="wxBitmap" name="document-preview">bitmaps\document-preview.png</object>
   <object class="wxBitmap" name="document-save-3">bitmaps\document-save-3.png</object>
   <object class="wxBitmap" name="document-save-6">bitmaps\document-save-6.png</object>
@@ -156,7 +147,6 @@
   <object class="wxBitmap" name="ruby">bitmaps\ruby.png</object>
   <object class="wxBitmap" name="ruler2">bitmaps\ruler2.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
-  <object class="wxBitmap" name="script-delete">bitmaps\script-delete.png</object>
   <object class="wxBitmap" name="script-gear">bitmaps\script-gear.png</object>
   <object class="wxBitmap" name="security-low-2">bitmaps\security-low-2.png</object>
   <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>

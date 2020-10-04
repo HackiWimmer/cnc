@@ -66,7 +66,8 @@ void CncLoggerView::initialize() {
 /////////////////////////////////////////////////////////////////////
 	if ( timeCtrl == NULL ) {
 		wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-		timeCtrl = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RICH | wxTE_CENTRE | wxTE_READONLY | wxTE_MULTILINE | wxTE_DONTWRAP);
+		//timeCtrl = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RICH | wxTE_CENTRE | wxTE_READONLY | wxTE_MULTILINE | wxTE_DONTWRAP);
+		timeCtrl = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RICH | wxTE_CENTRE | wxTE_READONLY );
 		timeCtrl->SetFont(font);
 		timeCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
 		timeCtrl->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));

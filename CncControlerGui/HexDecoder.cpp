@@ -1,6 +1,44 @@
 #include "HexDecoder.h"
 
 //////////////////////////////////////////////////////////
+SpyHexDecoder::SpyHexDecoder(const wxString& contextInfo, const wxString& hs) 
+: HexDecoder	()
+, hexString		(hs)
+, context		(0)
+, cmd			(0)
+, pid			(0)
+, index			(0)
+, portion		(0)
+//////////////////////////////////////////////////////////
+{
+	unsigned int counter = 0;
+	wxStringTokenizer tokenizer(contextInfo, " ");
+	while ( tokenizer.HasMoreTokens() ) {
+		wxString token = tokenizer.GetNextToken();
+		
+		switch ( counter ) {
+			case 0:	cmd 	= decodeHexValueAsInteger(token); 
+					break;
+					
+			case 1:	context = decodeHexValueAsInteger(token); 
+					break;
+					
+			case 2: pid     = decodeHexValueAsInteger(token); 
+					break;
+					
+			case 3: index   = decodeHexValueAsInteger(token);
+					portion = decodeHexValueAsInteger(token); 
+					break;
+		}
+		
+		counter++;
+	}
+}
+//////////////////////////////////////////////////////////
+SpyHexDecoder::~SpyHexDecoder() {
+//////////////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////////////
 unsigned int SpyHexDecoder::getByteCount(const wxString& hexValues) {
 //////////////////////////////////////////////////////////
 	const int freq = hexValues.Freq(' ');
@@ -31,8 +69,19 @@ bool SpyHexDecoder::readNextHexBytes(wxString& hexValues, unsigned int count, wx
 		return false;
 	}
 	
-	ret.assign(hexValues.SubString(0, neededLen));
-	ret.Replace(" ", "", true);
+	if ( true ) {
+		// reverse byte order
+		wxString tmp(hexValues.SubString(0, neededLen));
+		wxStringTokenizer t(tmp, " ");
+		ret.clear();
+		while ( t.HasMoreTokens() ) {
+			ret.Prepend(t.GetNextToken());
+		}
+	}
+	else {
+		ret.assign(hexValues.SubString(0, neededLen));
+		ret.Replace(" ", "", true);
+	}
 	
 	hexValues.assign(hexValues.SubString(neededLen + 1, hexValues.length() - 1));
 	return true;
@@ -63,7 +112,7 @@ void SpyHexDecoder::decodeValuesDefault(SpyHexDecoder::Details& ret, wxString& r
 	wxString value;
 	
 	while ( tokenizer.HasMoreTokens() ) {
-		wxString token = tokenizer.GetNextToken();
+		const wxString token(tokenizer.GetNextToken());
 		
 		if ( token.IsEmpty() == false ) {
 			count++;
@@ -71,10 +120,10 @@ void SpyHexDecoder::decodeValuesDefault(SpyHexDecoder::Details& ret, wxString& r
 			switch ( count%4 ) {
 				case 1:	
 				case 2:
-				case 3: value << token; 
+				case 3: value.Prepend(token); 
 						break;
 						
-				case 0: value << token;
+				case 0: value.Prepend(token);
 						if ( count > 4 )
 							ret.more << ", ";
 							
@@ -226,6 +275,28 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 	}
 }
 //////////////////////////////////////////////////////////
+void SpyHexDecoder::decode(SpyHexDecoder::Details& ret) {
+//////////////////////////////////////////////////////////
+	if ( context == 0 )
+		return;
+		
+	switch ( ret.type ) {
+		case Details::DT_OUTBOUND:	decodeOutbound(ret);
+									break;
+							
+		case Details::DT_INBOUND:	decodeInbound(ret);
+									break;
+									
+		case Details::DT_UNKNOWN:
+		default:					ret.more.assign("decode(SpyHexDecoder::Details& ret): Unknown type, nothing will be done!");
+		
+	}
+	
+	ret.more.Replace("\n", "; ", true);
+	ret.more.Replace("; ;", "",  true);
+	return;
+}
+//////////////////////////////////////////////////////////
 void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 //////////////////////////////////////////////////////////
 	wxString temp;
@@ -254,29 +325,88 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 	wxString value;
 	switch ( cmd ) {
 		case CMD_GETTER:
-				if ( readNextHexBytes(restToken, 1, value) == false ) break;
-				ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(value), decodeHexValueAsArduinoPID(value));
-				
-				decodeValuesDefault(ret, restToken);
+		{
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
 				break;
 				
+			ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(value), decodeHexValueAsArduinoPID(value));
+			decodeValuesDefault(ret, restToken);
+			break;
+		}
 		case CMD_SETTER:
-				if ( readNextHexBytes(restToken, 1, value) == false ) break;
-				ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(value), decodeHexValueAsArduinoPID(value));
-
-				if ( readNextHexBytes(restToken, 1, value) == false ) break;
-				ret.more << "; size = ";
-				ret.more << decodeHexValueAsInteger(value);
-				
-				decodeValuesDefault(ret, restToken);
+		{
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
 				break;
 				
+			ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(value), decodeHexValueAsArduinoPID(value));
+
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
+				break;
+				
+			ret.more << "; Size = ";
+			ret.more << decodeHexValueAsInteger(value);
+			
+			decodeValuesDefault(ret, restToken);
+			break;
+		}
+		case CMD_MOVE:
+		case CMD_RENDER_AND_MOVE:
+		case CMD_MOVE_UNIT_LIMIT_IS_FREE:
+		{
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
+				break;
+			
+			const int size = decodeHexValueAsInteger(value);
+			ret.more << "Size = ";
+			ret.more << size;
+			
+			if ( size > 0 && size < 4 ) {
+				const char* label = (size == 1 ? "Z" : "XYZ");
+				
+				for ( unsigned int i = 0; i < size; i++ ) {
+					if ( readNextHexBytes(restToken, 4, value) == false ) return;
+						ret.more.append(wxString::Format("; %c=%ld", label[i], (long)decodeHexValueAsInt32(value)));
+				}
+			}
+			
+			break;
+		}
 		case CMD_MOVE_SEQUENCE:
 		case CMD_RENDER_AND_MOVE_SEQUENCE:
-				decodeMoveSeqOutbound(ret, restToken);
-				break;
-		
-		default: decodeValuesDefault(ret, restToken);
+		{
+			decodeMoveSeqOutbound(ret, restToken);
+			break;
+		}
+		case CMD_RESET_CONTROLLER:
+		case CMD_PRINT_CONFIG:
+		case CMD_PRINT_TIMESTAMP:
+		case CMD_PRINT_VERSION:
+		case CMD_PRINT_PIN_REPORT:
+		case CMD_POP_SERIAL:
+		case CMD_POP_SERIAL_WAIT:
+		case CMD_IDLE:
+		case CMD_HEARTBEAT:
+		case CMD_PERFORM_TEST:
+		case CMD_MOVE_INTERACTIVE:
+		{
+			ret.more << wxString::Format("<Command without further content>");
+			break;
+		}
+		case SIG_INTERRUPPT:
+		case SIG_HALT:
+		case SIG_PAUSE:
+		case SIG_RESUME:
+		case SIG_QUIT_MOVE:
+		case SIG_UPDATE:
+		case SIG_SOFTWARE_RESET:
+		{
+			ret.more << wxString::Format("<Signal without further content>");
+			break;
+		}
+		default: 
+		{
+			ret.more << wxString::Format("!Command isn't registered to decode!");
+		}
 	}
 }
 //////////////////////////////////////////////////////////
@@ -289,8 +419,19 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 	ret.cmd     .assign(wxString::Format("%s [%c]", ArduinoCMDs::getCMDLabel((unsigned int)cmd), cmd));
 	ret.index   .assign(wxString::Format("[%08d]", index));
 	
-	if ( pid != RET_NULL )	ret.pid.assign(wxString::Format("%s [%03d]", ArduinoPIDs::getPIDLabelWithDefault((unsigned int)pid, "???"), pid));
-	else					ret.pid.assign("n.a.");
+	//if ( pid != RET_NULL )	ret.pid.assign(wxString::Format("%s [%03d]", ArduinoPIDs::getPIDLabelWithDefault((unsigned int)pid, "???"), pid));
+	//else					ret.pid.assign("n.a.");
+
+	
+	//std::cout << ret.context << ", " << ret.cmd << ", " << index << ", " << ret.collectedInbound << std::endl; 
+	
+	
+	//return;
+	
+	
+	
+	
+	/*
 	
 	// default values processing
 	auto decodeValues = [&]() {
@@ -306,11 +447,138 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 		ret.more.assign(wxString::Format("Value(s) = %s", decodeHexStringAsInt32s(hexString, temp))); 
 	};
 	
+	*/
+	
+	
+	
+	const int BYTE_STRING_LEN = 2;
+	// ----------------------------------------------------------------------
+	wxString tmpRet;
+	auto lastInboundBytes = [&](int byteCount) {
+		
+		if ( (int)ret.inbound.prev.length() >= byteCount * BYTE_STRING_LEN ) {
+			tmpRet.assign(ret.inbound.prev.Right(byteCount * BYTE_STRING_LEN));
+			
+			switch ( byteCount ) {
+				case 2: return reorderHexInt16String(tmpRet);
+				case 4: return reorderHexInt32String(tmpRet);
+			}
+		}
+		else {
+			tmpRet.assign(wxString('0', byteCount * BYTE_STRING_LEN));
+		}
+		
+		return tmpRet;
+	};
+	
+	// ----------------------------------------------------------------------
+	auto inboundByteAtIndex = [&](int idx) {
+		if ( idx > 0 )	tmpRet.assign(ret.inbound.prev.Mid((idx - 1) * BYTE_STRING_LEN, BYTE_STRING_LEN));
+		else			tmpRet.assign("00");
+		return tmpRet;
+	};
+	
+	// ----------------------------------------------------------------------
 	// context dependent handling
 	switch ( context ) {
+		
+		// Context ----------------------------------------------------------------------------
+		case RET_SOH:
+		{
+			if  	( index == 0x01 ) { ret.more.assign(wxString::Format("%s",     decodeHexValueAsArduinoPID(hexString))); break; } // break RET_SOH:
+			else if ( index == 0x02 ) { ret.more.assign(wxString::Format("%s ...", decodeHexValueAsArduinoPID(hexString))); break; } // break RET_SOH:
+			
+			// PID dependent handling
+			switch ( pid ) {
+				
+				// ...........................................................
+				case PID_TEXT:
+				{	
+					ret.more.assign(decodeHexValueAsCharacterString(hexString, temp));
+					break;
+				}
+				// ...........................................................
+				case PID_MSG:
+				{	
+					if      ( index == 0x03 ) {
+						// message type E, W, I ...
+						ret.more.assign(wxString::Format("Msg Type = %c", decodeHexValueAsCharacter(hexString))); 
+					}
+					else if ( index == 0x04 ) {
+						
+						// message ID ?
+						const bool b = decodeHexValueAsInt8(hexString) == MT_MID_FLAG;
+						if ( b )	ret.more.assign("MT_MID_FLAG");
+						else		ret.more.assign(decodeHexValueAsCharacterString(hexString, temp)); 
+					}
+					else if ( index == 0x05 ) {
+						
+						// standard message
+						const bool b = decodeHexValueAsInt8( inboundByteAtIndex(0x04) ) == MT_MID_FLAG;
+						if ( b )	ret.more.assign(wxString::Format("%s", ArduinoErrorCodes::getECLabel(decodeHexValueAsInt8(hexString))));
+						else 		ret.more.assign(decodeHexValueAsCharacterString(hexString, temp)); 
+					}
+					else if ( index  > 0x05 ) {
+						ret.more.assign(decodeHexValueAsCharacterString(hexString, temp)); 
+					}
+					
+					break;
+				}
+				// ...........................................................
+				case PID_GETTER:
+				{
+					if      ( index == 0x03 ) { ret.more.assign(wxString::Format("Content = %s", decodeHexValueAsArduinoPID( hexString ))); }
+					else if ( index == 0x04 ) { ret.more.assign(wxString::Format("Size    = %s", decodeHexStringAsIntegers ( hexString, temp ))); }
+					else if ( index  > 0x05 ) {
+						
+						// every 4 bytes
+						if ( ( index - 0x04 ) % 4 == 0 )
+							ret.more.assign(wxString::Format("val     = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) )));
+						
+						// last byte
+						if ( index == (unsigned int)(0x05 + decodeHexValueAsInt8( inboundByteAtIndex(0x04) ) * 4) )
+							ret.more.assign(wxString::Format("%s", decodeHexValueAsArduinoPID ( hexString )));
+					}
+					
+					break;
+				}
+				// ...........................................................
+				case PID_HEARTBEAT:
+				{
+					if      ( index == 0x06 ) { ret.more.assign(wxString::Format("Id     = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
+					else if ( index == 0x07 ) { ret.more.assign(wxString::Format("Limit  = %d",   (int)decodeHexValueAsInt8 ( lastInboundBytes(1) ))); }
+					else if ( index == 0x08 ) { ret.more.assign(wxString::Format("Switch = %d",   (int)decodeHexValueAsInt8 ( lastInboundBytes(1) ))); }
+					else if ( index == 0x09 ) { ret.more.assign(wxString::Format("Const  = %d",   (int)decodeHexValueAsInt8 ( lastInboundBytes(1) ))); }
+					else if ( index == 0x0A ) { ret.more.assign(wxString::Format("Const  = %d",   (int)decodeHexValueAsInt8 ( lastInboundBytes(1) ))); }
+					else if ( index == 0x0B ) { ret.more.assign(wxString::Format("%s", decodeHexValueAsArduinoPID ( hexString ))); }
+					
+					break;
+				}
+				// ...........................................................
+				case PID_XYZ_POS_MAJOR:
+				case PID_XYZ_POS_DETAIL:
+				{
+					if      ( index == 0x06 ) { ret.more.assign(wxString::Format("X = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
+					else if ( index == 0x0A ) { ret.more.assign(wxString::Format("Y = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
+					else if ( index == 0x0E ) { ret.more.assign(wxString::Format("Z = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
+					else if ( index == 0x12 ) { ret.more.assign(wxString::Format("F = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
+					else if ( index == 0x13 ) { ret.more.assign(wxString::Format("%s", decodeHexValueAsArduinoPID ( hexString ))); }
+					
+					break;
+				}
+				
+				// more PIDs on demand
+				default:	;
+			}
+			
+			break;
+		} //RET_SOH:
+		
+		// Context ----------------------------------------------------------------------------
 		case RET_NULL:		ret.more << decodeHexValueAsArduinoPID(hexString);
 							break;
-							
+		
+		// Context ----------------------------------------------------------------------------
 		case RET_OK:
 		case RET_MORE:
 		case RET_LIMIT:
@@ -320,41 +588,7 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 		case RET_QUIT:		ret.more << decodeHexStringAsIntegers(hexString, temp);
 							break;
 							
-		case RET_SOH:		if ( pid == RET_NULL ) {
-								ret.more.assign(wxString::Format("PID = %s", decodeHexValueAsArduinoPID(hexString)));
-								break;
-							}
-							
-							// PID dependent handling
-							switch ( pid ) {
-								case PID_TEXT:				ret.more.assign(decodeHexValueAsCharacterString(hexString, temp));
-															break;
-															
-								case PID_MSG:				if ( index == IDX_MSG_TYPE )	ret.more.assign(wxString::Format("Msg Type = %c", decodeHexValueAsCharacter(hexString)));
-															else							ret.more.assign(decodeHexValueAsCharacterString(hexString, temp));
-															break;
-															
-								case PID_HEARTBEAT:			if ( index == IDX_HB_SIZE ) 	ret.more.assign(wxString::Format("Size = %s", decodeHexStringAsIntegers(hexString, temp)));
-															else					 		decodeValues();
-															break;
-															
-								case PID_GETTER:			switch ( index ) {
-																case IDX_GETTER_PID: 		ret.more.assign(wxString::Format("PID = %s", decodeHexValueAsArduinoPID(hexString)));
-																							break;
-																							
-																case IDX_GETTER_SIZE: 		ret.more.assign(wxString::Format("Size = %s", decodeHexStringAsIntegers(hexString, temp)));
-																							break;
-																							
-																default:					decodeValues();
-															}
-															break;
-								// more PIDs on demand
-								default:					decodeValues();
-														
-							}
-							
-							break;
-							
+		// Context ----------------------------------------------------------------------------
 		default:			ret.more << "Unknown context: ";
 							ret.more << context;
 							ret.more << ", Value(s): ";

@@ -232,6 +232,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncSerialSpyPanel.h"/>
+      <File Name="CncSerialSpyPanel.cpp"/>
       <File Name="CncInfoBar.cpp"/>
       <File Name="CncInfoBar.h"/>
       <File Name="CncAutoFreezer.cpp"/>
@@ -367,6 +369,9 @@
       <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Debug;release2;Gprof;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterSerialSpy.cpp"/>
+      <File Name="wxCrafterSerialSpy.h"/>
+      <File Name="wxCrafterSerialSpy_bitmaps.cpp"/>
       <File Name="wxCrafterLoggerPanel.cpp"/>
       <File Name="wxCrafterLoggerPanel.h"/>
       <File Name="wxCrafterLoggerPanel_bitmaps.cpp"/>
@@ -560,6 +565,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
+    <File Name="wxCrafterSerialSpy.wxcp"/>
     <File Name="wxCrafterLoggerPanel.wxcp"/>
     <File Name="wxCrafterLCDPanel.wxcp"/>
     <File Name="wxCrafterArduinoEnv.wxcp"/>

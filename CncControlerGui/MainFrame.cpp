@@ -313,7 +313,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , parsingSynopisis						(NULL)
 , gCodeSequenceList						(NULL)
 , cncSummaryListCtrl					(NULL)
-, serialSpyListCtrl						(NULL)
+, serialSpyPanel						(NULL)
 , outboundEditorSvgView					(NULL)
 , navigatorPanel						(NULL)
 , optionPane3D							(NULL)
@@ -322,7 +322,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , cnc3DVSplitterWindow					(NULL)
 , cnc3DHSplitterWindow					(NULL)
 , templateObserver						(NULL)
-, spyDetailWindow						(NULL)
 , openGLContextObserver					(new CncOpenGLContextObserver(this))
 , cncOsEnvDialog						(new CncOSEnvironmentDialog(this))
 , cncExtMainPreview						(NULL)
@@ -484,7 +483,7 @@ MainFrame::~MainFrame() {
 	cncDELETE( cncPreprocessor );
 	cncDELETE( parsingSynopisis );
 	cncDELETE( cncSummaryListCtrl );
-	cncDELETE( serialSpyListCtrl );
+	cncDELETE( serialSpyPanel );
 	cncDELETE( outboundEditorSvgView );
 	cncDELETE( gCodeSequenceList );
 	cncDELETE( navigatorPanel );
@@ -807,8 +806,8 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_cncSummaryListCtrl, cncSummaryListCtrl);
 	
 	// serial spy list control
-	serialSpyListCtrl = new CncSerialSpyListCtrl(this, wxLC_VRULES | wxLC_SINGLE_SEL); 
-	GblFunc::replaceControl(m_serialSpyPlaceholder, serialSpyListCtrl);
+	serialSpyPanel = new CncSerialSpyPanel(this); 
+	GblFunc::replaceControl(m_serialSpyPlaceholder, serialSpyPanel);
 	
 	// Outbound editor svg viewer
 	outboundEditorSvgView = new CncSvgViewer(this); 
@@ -2136,7 +2135,7 @@ void MainFrame::initialize(void) {
 	if ( CncConfig::getGlobalCncConfig()->getShowTestMenuFlag() == false )
 		m_menuBar->Remove(m_menuBar->FindMenu("Test"));
 		
-	enableSerialSpy(false);
+	serialSpyPanel->enableSerialSpy(false);
 	
 	resetMinMaxPositions();
 	initializeLruMenu();
@@ -2341,11 +2340,7 @@ bool MainFrame::connectSerialPort() {
 	setControllerZero(true, true, true);
 	
 	statisticsPane->setCncControl(cnc);
-	
-	enableSerialSpy(false);
-	selectSerialSpyMode();
-	if ( m_clearSerialSpyOnConnect->GetValue() )
-		clearSerialSpy();
+	serialSpyPanel->initDuringConnect();
 
 	clearPositionSpy();
 	lastPortName.clear();
@@ -2362,7 +2357,6 @@ bool MainFrame::connectSerialPort() {
 			cnc->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 			notifyConfigUpdate();
 			decorateSwitchToolOnOff(cnc->getToolState());
-			selectSerialSpyMode();
 			setRefPostionState(true);
 			
 			m_connect->SetBitmap(bmpC);
@@ -4116,8 +4110,7 @@ bool MainFrame::processTemplateIntern() {
 		begRun.parameter.PRC.user			= "Hacki Wimmer";
 	cnc->processTrigger(begRun);
 	
-	if ( m_clearSerialSpyBeforNextRun->GetValue() )
-		clearSerialSpy();
+	serialSpyPanel->clearSerialSpyBeforNextRun();
 	
 	clearPositionSpy();
 	
@@ -5097,8 +5090,8 @@ void MainFrame::hideAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
 	GetAuimgrMain()->GetPane(pane).DestroyOnClose(false);
 	pane->Close(true);
 	
-	if ( pane == getAUIPaneByName("SerialSpy") )
-		enableSerialSpy(false);
+	if ( serialSpyPanel && pane == getAUIPaneByName("SerialSpy") )
+		serialSpyPanel->enableSerialSpy(false);
 	
 	if ( menu != NULL )
 		menu->Check(false);
@@ -5255,7 +5248,7 @@ void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 		menu->Check(!evt.pane->window->IsShown());
 
 	if ( evt.pane->window == m_serialSpyView )
-		enableSerialSpy(false);
+		serialSpyPanel->enableSerialSpy(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onPerspectiveTimer(wxTimerEvent& event) {
@@ -6171,55 +6164,6 @@ void MainFrame::clearControllerMsgHistory(wxCommandEvent& event) {
 	getCtrlMsgHistoryList()->clearAll();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::clearSerialSpy() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(serialSpyListCtrl);
-	serialSpyListCtrl->clear();
-	serialSpyListCtrl->clearDetails();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::clearSerialSpy(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	clearSerialSpy();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::markSerialSpy(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(serialSpyListCtrl);
-	wxString defaultValue(wxString::Format("Marker::%06d", serialSpyListCtrl->getItemCount()));
-	wxTextEntryDialog dlg(this, "Marker Label:", "Add Spy Marker . . .", defaultValue);
-	dlg.SetMaxLength(64);
-	
-	if ( dlg.ShowModal() == wxID_OK )
-		serialSpyListCtrl->addLine(dlg.GetValue(), CncSerialSpyListCtrl::LineType::LT_Marker);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::enableSerialSpy(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	enableSerialSpy(m_enableSerialSpy->GetValue());
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::enableSerialSpy(bool state) {
-///////////////////////////////////////////////////////////////////
-	if ( cnc ) 
-		cnc->enableSpyOutput(state);
-	
-	m_enableSerialSpy->SetValue(state);
-	decorateSerialSpy();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::decorateSerialSpy() {
-///////////////////////////////////////////////////////////////////
-	const bool b = m_enableSerialSpy->GetValue();
-	
-	m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap(b ? "BMP_CONNECTED": "BMP_DISCONNECTED")); 
-	m_enableSerialSpy->SetToolTip(b ? "Disable Serial Spy" : "Enable Serial Spy");
-	b ? cnc::spy.enableMessage() : cnc::spy.disableMessage();
-	
-	m_enableSerialSpy->Refresh();
-	m_enableSerialSpy->Update();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// do nothing
@@ -6584,14 +6528,11 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_PATH_LIST);
 	}
 	
-	if ( tss != ClientIdSelSource::TSS_MOVE_SEQ_OVW ) {
-		if ( cncPreprocessor != NULL )
+	if ( tss != ClientIdSelSource::TSS_MOVE_SEQ_OVW && tss != ClientIdSelSource::TSS_MOVE_SEQ ) {
+		if ( cncPreprocessor != NULL ) {
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_MOVE_SEQ_OVERVIEW);
-	}
-
-	if ( tss != ClientIdSelSource::TSS_MOVE_SEQ ) {
-		if ( cncPreprocessor != NULL )
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_MOVE_SEQ_CONTENT);
+		}
 	}
 	
 	if ( tss != ClientIdSelSource::TSS_VERTEX_DATA_TRACE) {
@@ -6758,21 +6699,6 @@ void MainFrame::searchPosSpy(wxCommandEvent& event) {
 	
 	if ( ret == false ) 
 		cnc::trc.logWarning(wxString::Format("Position Spy Search: Nothing found for '%s'", what));
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::selectSerialSpyMode() {
-/////////////////////////////////////////////////////////////////////
-	int sm = m_cbSerialSpyMode->GetSelection();
-	switch ( sm ) {
-		case 0:		cnc->setSpyMode(Serial::SypMode::SM_READ); 		break;
-		case 1:		cnc->setSpyMode(Serial::SypMode::SM_WRITE); 	break;
-		default:	cnc->setSpyMode(Serial::SypMode::SM_ALL);		break;
-	}
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::selectSerialSpyMode(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	selectSerialSpyMode();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::displayIntervalChanged(wxScrollEvent& event) {
@@ -7041,13 +6967,6 @@ void MainFrame::warmStartController(wxCommandEvent& event) {
 void MainFrame::changeConfigToolbook(wxToolbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	m_pgMgrSetup->SelectPage(event.GetSelection());
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::leaveSerialSpy(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	wxASSERT(serialSpyListCtrl);
-	// currently nothing more to do
-	//serialSpyListCtrl->clearDetails();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::decorateGamepadState(bool state) {
@@ -7466,76 +7385,6 @@ void MainFrame::dclickHeartbeatState(wxMouseEvent& event) {
 	decorateIdleState(m_miRqtIdleMessages->IsChecked());
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::updateSpyDetailWindow() {
-/////////////////////////////////////////////////////////////////////
-	wxDataViewListCtrl* listCtrl = NULL;
-	wxString headline;
-	if      ( m_spyUnknownDetails->IsShownOnScreen() )		{ listCtrl = m_spyUnknownDetails;  headline.assign("Info"); }
-	else if ( m_spyInboundDetails->IsShownOnScreen() ) 		{ listCtrl = m_spyInboundDetails;  headline.assign("Inbound Details"); }
-	else if ( m_spyOutboundDetails->IsShownOnScreen() )		{ listCtrl = m_spyOutboundDetails; headline.assign("Outbound Details"); }
-	
-	if ( listCtrl != NULL && listCtrl->GetItemCount() > 0) {
-		
-		const int row = 0;
-		wxString details;
-		for ( unsigned int col = 0; col < listCtrl->GetColumnCount(); col++ ) {
-			
-			wxDataViewColumn* dvc = listCtrl->GetColumn(col);
-			wxVariant value;
-			listCtrl->GetValue(value, row, col);
-			
-			if ( listCtrl->GetColumnCount() > 1 && col == listCtrl->GetColumnCount() - 1 ) {
-				details.append(wxString::Format("\n%s:\n%s", dvc->GetTitle(), value.GetString()));
-			}
-			else {
-				const unsigned int size = 24;
-				wxString title(dvc->GetTitle().Left(size));
-				wxString spacer(' ',  ( listCtrl->GetColumnCount() > 1 ? size - title.Length() : 0 ));
-				details.append(wxString::Format("%s%s: %s\n", title, spacer, value.GetString()));
-			}
-		}
-		
-		details.Replace(" | ", "\n", true);
-		details.Replace(" |", "\n",  true);
-		details.Replace("| ", "\n",  true);
-		details.Replace("|", "\n", 	 true);
-		
-		if ( spyDetailWindow != NULL && spyDetailWindow->IsShownOnScreen() == true ) {
-			spyDetailWindow->setHeadline(headline);
-			spyDetailWindow->setMessage(details);
-		}
-	}
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::openSpyDetailWindow(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( spyDetailWindow == NULL ) {
-		spyDetailWindow = new CncMessageDialog(this, "", "", "Serial Spy Details");
-		spyDetailWindow->SetSize(800, 900);
-		spyDetailWindow->setWordWrap(true);
-	}
-	
-	if ( spyDetailWindow->IsShownOnScreen() == false )
-		spyDetailWindow->Show();
-	
-	updateSpyDetailWindow();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::onSelectSpyInboundDetails(wxDataViewEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	m_spyInboundDetails->UnselectAll();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::onSelectSpyOutboundDetails(wxDataViewEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	m_spyOutboundDetails->UnselectAll();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::onSelectSpyUnknownDetails(wxDataViewEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	m_spyUnknownDetails->UnselectAll();
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::showStacktraceStore(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	CncFileContentDialog dlg(this, CncFileNameService::getStackTraceFileName(), "All collected stacktraces", "Stacktrace Store");
@@ -7931,6 +7780,10 @@ void MainFrame::onSelectStepMode(wxCommandEvent& event) {
 		navigatorPanel->setStepMode(sm);
 	}
 }
+
+
+
+
 
 
 
