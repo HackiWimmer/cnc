@@ -7,14 +7,14 @@
 
 namespace AE {
 	
-	static const int minPinIndex 	= PN_D0;
-	static const int maxPinIndex 	= PN_A5;
+	static const int minDPinIndex 	= MIN_DPIN;
+	static const int maxDPinIndex	= MAX_DPIN;
 	
-	static const int minDPinIndex 	= PN_D0;
-	static const int maxDPinIndex	= PN_D13;
+	static const int minAPinIndex 	= MIN_APIN;
+	static const int maxAPinIndex 	= MAX_APIN;
 	
-	static const int minAPinIndex 	= PN_A0;
-	static const int maxAPinIndex 	= PN_A5;
+	static const int minPinIndex 	= minDPinIndex;
+	static const int maxPinIndex 	= maxAPinIndex;
 
 	static const int maxPins 		= maxPinIndex + 1;
 	

@@ -6,14 +6,17 @@
   typedef unsigned char byte;  
 #endif
 
-#include "AnalogPinController/CommonDefinitions.h"
-#include "AnalogPinController/CncInterface.h"
-  
 // .....................................................................
 // Pin setup
 // .....................................................................
 #include "ArdoPin.h"
 
+// .....................................................................
+// 
+// .....................................................................
+#include "AnalogPinController/CommonDefinitions.h"
+#include "AnalogPinController/CncInterface.h"
+  
 // .....................................................................
 // Signals
 // .....................................................................
@@ -34,7 +37,6 @@
   const unsigned char MAX_CMDS                            =  255;
   const unsigned char CMD_INVALID                         = '\0'; 
   const unsigned char CMD_POP_SERIAL                      = '~'; 
-  const unsigned char CMD_POP_SERIAL_WAIT                 = '#'; 
 
   const unsigned char CMD_IDLE                            =  'i'; // 105 0x69
   const unsigned char CMD_HEARTBEAT                       =  'h'; // 104 0x68

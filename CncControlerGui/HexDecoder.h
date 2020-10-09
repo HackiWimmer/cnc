@@ -111,16 +111,36 @@ class HexDecoder {
 		}
 		
 		/////////////////////////////////////////////////////////
-		static uint8_t decodeHexValueAsInt8(const wxString& hexToken) {
+		static int8_t decodeHexValueAsInt8(const wxString& hexToken) {
 			//  examples are: 00,  2C,  FA
 			if ( hexToken.length() != 2 ) {
-				std::cerr << "HexDecoder::decodeHexValueAsInt8: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
+				std::cerr << "HexDecoder::decodeHexValueAsUInt8: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
 				return 0;
 			}
 			
 			for ( unsigned int i = 0; i < hexToken.length(); i++ ) {
 				if ( isxdigit((char)(hexToken[i])) == 0 ) {
-					std::cerr << "HexDecoder::decodeHexValueAsInt8: Digit error at pos: " << i << " - " << hexToken << std::endl;
+					std::cerr << "HexDecoder::decodeHexValueAsUInt8: Digit error at pos: " << i << " - " << hexToken << std::endl;
+					return 0;
+				}
+			}
+			
+			int32_t ret = 0;
+			sscanf(hexToken, "%2X", &ret);
+			return (int8_t)ret;
+		}
+		
+		/////////////////////////////////////////////////////////
+		static uint8_t decodeHexValueAsUInt8(const wxString& hexToken) {
+			//  examples are: 00,  2C,  FA
+			if ( hexToken.length() != 2 ) {
+				std::cerr << "HexDecoder::decodeHexValueAsUInt8: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
+				return 0;
+			}
+			
+			for ( unsigned int i = 0; i < hexToken.length(); i++ ) {
+				if ( isxdigit((char)(hexToken[i])) == 0 ) {
+					std::cerr << "HexDecoder::decodeHexValueAsUInt8: Digit error at pos: " << i << " - " << hexToken << std::endl;
 					return 0;
 				}
 			}
@@ -129,7 +149,6 @@ class HexDecoder {
 			sscanf(hexToken, "%2X", &ret);
 			return (uint8_t)ret;
 		}
-		
 		
 		/////////////////////////////////////////////////////////
 		static int decodeHexValueAsInteger(const wxString& hexToken) {

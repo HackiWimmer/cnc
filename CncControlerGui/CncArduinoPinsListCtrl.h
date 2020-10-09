@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <wx/anybutton.h>
 #include "ArduinoData.h"
 #include "CncLargeScaleListCtrl.h"
 
@@ -37,6 +38,7 @@ class CncArduinoPinsListCtrl : public CncLargeScaledListCtrl {
 		CncArduinoPinsListCtrl(wxWindow *parent, long style);
 		virtual ~CncArduinoPinsListCtrl();
 		
+		void sort(wxAnyButton* sortButton);
 		void updatePinValue(const char type, unsigned int name, const char mode, int value);
 		
 		wxDECLARE_NO_COPY_CLASS(CncArduinoPinsListCtrl);

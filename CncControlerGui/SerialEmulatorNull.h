@@ -2,6 +2,8 @@
 #define SERIAL_EMULATOR_CLASS
 
 #include <ostream>
+#include <wx/event.h>
+#include <wx/timer.h>
 #include "OSD/CncTimeFunctions.h"
 #include "SerialSpyPort.h"
 #include "CncLimitStates.h"
@@ -185,31 +187,30 @@ struct LastCommand {
 	} Serial;
 };
 
-class SerialEmulatorNULL  : public SerialSpyPort,
+class SerialEmulatorNULL  : public wxEvtHandler,
+							public SerialSpyPort,
 							public ArduinoPositionRenderer,
 							public ArduinoAccelManager,
 							public CncCommandDecoder::CallbackInterface
 {
 	private:
 		
-		int32_t posReplyThreshold;
+		uint32_t 			posReplyThreshold;
+		uint32_t 			movementTracker;
 		
+		wxTimer				serialTimer;
 		CncLimitStates 		limitStates;
 		CncNanoTimestamp 	tsMoveStart;
 		uint64_t			usToSleep;
 		
+		bool				interactiveMove;
 		bool				stepperEnableState;
 		
-		int32_t 			positionCounter;
-		int32_t 			stepCounterX;
-		int32_t 			stepCounterY;
-		int32_t				stepCounterZ;
+		int32_t 			interactiveX;
+		int32_t 			interactiveY;
+		int32_t				interactiveZ;
 
-		int32_t 			positionOverflowCounter;
-		int32_t 			stepOverflowCounterX;
-		int32_t 			stepOverflowCounterY;
-		int32_t 			stepOverflowCounterZ;
-
+		
 		SetterMap 			setterMap;
 		CncLongPosition 	targetMajorPos;
 		CncLongPosition 	curEmulatorPos;
@@ -217,8 +218,13 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		double 				cfgFeedSpeed_MMMin;
 		double 				rtmFeedSpeed_MMMin;
 		
+		void onTimer(wxTimerEvent& event);
+		
 		inline bool writeMoveCmdIntern(unsigned char *buffer, unsigned int nbByte);
 		inline bool writeMoveSeqIntern(unsigned char *buffer, unsigned int nbByte);
+		
+		inline bool writeMoveInteractive(unsigned char *buffer, unsigned int nbByte);
+		inline bool writePopSerial(unsigned char *buffer, unsigned int nbByte);
 		
 		// init feed speed and calling renderAndMove
 		inline bool initRenderAndMove(int32_t dx, int32_t dy, int32_t dz);
@@ -227,7 +233,6 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 
 		
 		inline void reset();
-		inline void resetCounter();
 		inline unsigned char signalHandling();
 		
 		inline bool translateStepAxisRetValue(unsigned char ret);
@@ -276,6 +281,8 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		
 		virtual bool writeMoveRenderedCallback(int32_t x , int32_t y , int32_t z) 				{ return true; }
 
+		virtual bool writeSigUpdate(unsigned char *buffer, unsigned int nbByte);
+
 		virtual bool writeHeartbeat(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeGetter(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeSetter(unsigned char *buffer, unsigned int nbByte);
@@ -286,6 +293,8 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		virtual int performText(unsigned char *buffer, unsigned int nbByte, const char* response);
 		virtual int performMajorMove(unsigned char *buffer, unsigned int nbByte);
 		virtual int performSequenceMove(unsigned char *buffer, unsigned int nbByte);
+		virtual int performInteractiveMove(unsigned char *buffer, unsigned int nbByte);
+		virtual int performPopSerial(unsigned char *buffer, unsigned int nbByte);
 		
 		int  readData(void *buffer, unsigned int nbByte)  final;
 		bool writeData(void *buffer, unsigned int nbByte) final;
@@ -304,25 +313,6 @@ class SerialEmulatorNULL  : public SerialSpyPort,
 		inline bool evaluateLimitStateY();
 		inline bool evaluateLimitStateZ();
 		
-		// position movement counting
-		inline void incPosistionCounter();
-		inline void incStepCounterX(int32_t dx);
-		inline void incStepCounterY(int32_t dy);
-		inline void incStepCounterZ(int32_t dz);
-
-		void resetEmuPositionCounter();
-		int32_t getEmuPositionCounter() { return positionCounter; }
-		int32_t getEmuPositionOverflowCounter() { return positionOverflowCounter; }
-
-		void resetEmuStepCounter();
-		int32_t getEmuStepCounterX() { return stepCounterX; }
-		int32_t getEmuStepCounterY() { return stepCounterY; }
-		int32_t getEmuStepCounterZ() { return stepCounterZ; }
-
-		int32_t getEmuStepOverflowCounterX() { return stepOverflowCounterX; }
-		int32_t getEmuStepOverflowCounterY() { return stepOverflowCounterY; }
-		int32_t getEmuStepOverflowCounterZ() { return stepOverflowCounterZ; }
-
 		void setFeedSpeed_MMMin(double value)			{ cfgFeedSpeed_MMMin = value;     }
 		double getFeedSpeed_MMMin()						{ return cfgFeedSpeed_MMMin;      }
 		double getFeedSpeed_MMSec()						{ return cfgFeedSpeed_MMMin / 60; }

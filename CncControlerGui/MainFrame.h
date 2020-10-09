@@ -167,6 +167,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void leaveSerialSpy(wxMouseEvent& event);
 		virtual void onReloadMonitorPreview(wxCommandEvent& event);
 		virtual void viewControllerMsgHistory(wxCommandEvent& event);
 		virtual void onSelectStepSensitivity(wxCommandEvent& event);

@@ -20,6 +20,8 @@
 #include <wx/arrstr.h>
 #include <wx/bmpbuttn.h>
 #include <wx/infobar.h>
+#include <wx/stattext.h>
+#include <wx/slider.h>
 #include <wx/imaglist.h>
 #include <wx/bitmap.h>
 #include <map>
@@ -53,6 +55,7 @@ protected:
     wxComboBox* m_cbSerialSpyMode;
     wxStaticLine* m_staticLine9489;
     wxBitmapToggleButton* m_liveDecoding;
+    wxBitmapToggleButton* m_liveDebug;
     wxBitmapToggleButton* m_autoScroling;
     wxBitmapToggleButton* m_autoColumnSizing;
     wxBitmapToggleButton* m_clearSerialSpyOnConnect;
@@ -61,6 +64,10 @@ protected:
     wxBitmapButton* m_openDetails;
     wxPanel* m_serialSpyPlaceholder;
     wxInfoBar* m_infobar;
+    wxStaticLine* m_staticLine9537;
+    wxStaticText* m_staticText9524;
+    wxSlider* m_sliderUpdateInterval;
+    wxStaticText* m_staticText9539;
 
 protected:
     virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
@@ -68,9 +75,11 @@ protected:
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void selectSerialSpyMode(wxCommandEvent& event) { event.Skip(); }
     virtual void onLiveDecoding(wxCommandEvent& event) { event.Skip(); }
+    virtual void onLiveDebug(wxCommandEvent& event) { event.Skip(); }
     virtual void onAutoScrolling(wxCommandEvent& event) { event.Skip(); }
     virtual void onAutoColumnSize(wxCommandEvent& event) { event.Skip(); }
     virtual void openSpyDetailWindow(wxCommandEvent& event) { event.Skip(); }
+    virtual void onUpdateIntervalSlider(wxScrollEvent& event) { event.Skip(); }
 
 public:
     wxBitmapToggleButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
@@ -81,6 +90,7 @@ public:
     wxComboBox* GetCbSerialSpyMode() { return m_cbSerialSpyMode; }
     wxStaticLine* GetStaticLine9489() { return m_staticLine9489; }
     wxBitmapToggleButton* GetLiveDecoding() { return m_liveDecoding; }
+    wxBitmapToggleButton* GetLiveDebug() { return m_liveDebug; }
     wxBitmapToggleButton* GetAutoScroling() { return m_autoScroling; }
     wxBitmapToggleButton* GetAutoColumnSizing() { return m_autoColumnSizing; }
     wxBitmapToggleButton* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
@@ -90,6 +100,10 @@ public:
     wxPanel* GetPanel9492() { return m_panel9492; }
     wxPanel* GetSerialSpyPlaceholder() { return m_serialSpyPlaceholder; }
     wxInfoBar* GetInfobar() { return m_infobar; }
+    wxStaticLine* GetStaticLine9537() { return m_staticLine9537; }
+    wxStaticText* GetStaticText9524() { return m_staticText9524; }
+    wxSlider* GetSliderUpdateInterval() { return m_sliderUpdateInterval; }
+    wxStaticText* GetStaticText9539() { return m_staticText9539; }
     CncSerialSpyPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncSerialSpyPanelBase();
 };

@@ -12,25 +12,28 @@
 static const short POINT_LENGTH = 3;
 int pointA[POINT_LENGTH], pointB[POINT_LENGTH];
 
+
+///////////////////////////////////////////////////////////////////
+wxDEFINE_EVENT(wxEVT_SERIAL_EMU_NULL_TIMER, wxTimerEvent);
+
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
-: SerialSpyPort							(cnc)
+: wxEvtHandler							()
+, SerialSpyPort							(cnc)
 , ArduinoPositionRenderer				()
 , ArduinoAccelManager					()
 , CncCommandDecoder::CallbackInterface	()
-, posReplyThreshold						(1)
+, posReplyThreshold						(1L)
+, movementTracker						(0L)
+, serialTimer							(this, wxEVT_SERIAL_EMU_NULL_TIMER)
 , limitStates							()
 , tsMoveStart							(0LL)
 , usToSleep								(0LL)
+, interactiveMove						(false)
 , stepperEnableState					(false)
-, positionCounter						(MIN_LONG)
-, stepCounterX							(MIN_LONG)
-, stepCounterY							(MIN_LONG)
-, stepCounterZ							(MIN_LONG)
-, positionOverflowCounter				(0)
-, stepOverflowCounterX					(0)
-, stepOverflowCounterY					(0)
-, stepOverflowCounterZ					(0)
+, interactiveX							(0L)
+, interactiveY							(0L)
+, interactiveZ							(0L)
 , setterMap								()
 , targetMajorPos						(0L, 0L, 0L)
 , curEmulatorPos						(0L, 0L, 0L)
@@ -44,12 +47,31 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 
 ///////////////////////////////////////////////////////////////////
 {
+	this->Bind(wxEVT_TIMER, &SerialEmulatorNULL::onTimer, this, wxEVT_SERIAL_EMU_NULL_TIMER, wxEVT_SERIAL_EMU_NULL_TIMER);
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::~SerialEmulatorNULL() {
 ///////////////////////////////////////////////////////////////////
 	reset();
+	this->Unbind(wxEVT_TIMER, &SerialEmulatorNULL::onTimer, this, wxEVT_SERIAL_EMU_NULL_TIMER, wxEVT_SERIAL_EMU_NULL_TIMER);
+}
+/////////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::onTimer(wxTimerEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( checkRuntimeEnv() != RET_OK ) {
+		serialTimer.Stop();
+		replyPosition(true);
+	}
+	else {
+		
+		const int32_t factor = 10;
+		
+		renderAndMove(interactiveX * factor, interactiveY * factor, interactiveZ * factor);
+		
+		replyPosition(false);
+		serialTimer.Start(20);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::waitDuringRead(unsigned int millis) {
@@ -88,39 +110,23 @@ void SerialEmulatorNULL::reset() {
 	
 	lastCommand.MoveSequence.reset();
 	
-	posReplyThreshold = 1;
+	posReplyThreshold = 1L;
+	
+	// log the distance to zero
+	movementTracker += ArdoObj::absolute(curEmulatorPos.getX());
+	movementTracker += ArdoObj::absolute(curEmulatorPos.getY());
+	movementTracker += ArdoObj::absolute(curEmulatorPos.getZ());
+	
 	curEmulatorPos.setXYZ(0L, 0L, 0L);
 	
 	setterMap.clear();
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::resetPositionCounter() {
-///////////////////////////////////////////////////////////////////
-	positionCounter			= MIN_LONG;
-	positionOverflowCounter	= 0;
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::resetStepCounter() {
-///////////////////////////////////////////////////////////////////
-	stepCounterX			= MIN_LONG;
-	stepCounterY			= MIN_LONG;
-	stepCounterZ			= MIN_LONG;
-	stepOverflowCounterX	= 0;
-	stepOverflowCounterY	= 0;
-	stepOverflowCounterZ	= 0;
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::resetCounter() {
-///////////////////////////////////////////////////////////////////
-	resetPositionCounter();
-	resetStepCounter();
-}
-///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::evaluatePositions(GetterValues& ret) {
 ///////////////////////////////////////////////////////////////////
-	ret.push_back(targetMajorPos.getX());
-	ret.push_back(targetMajorPos.getY());
-	ret.push_back(targetMajorPos.getZ());
+	ret.push_back(curEmulatorPos.getX());
+	ret.push_back(curEmulatorPos.getY());
+	ret.push_back(curEmulatorPos.getZ());
 	
 	return true;
 }
@@ -234,8 +240,14 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 			case CMD_RENDER_AND_MOVE:
 			case CMD_MOVE_UNIT_LIMIT_IS_FREE:		ret = performMajorMove((unsigned char*)(buffer), nbByte);
 													break;
+													
+			case CMD_MOVE_INTERACTIVE:				ret = performInteractiveMove((unsigned char*)(buffer), nbByte);
+													break;
 			
-			case CMD_MOVE_SEQUENCE:					
+			case CMD_POP_SERIAL:					ret = performPopSerial((unsigned char*)(buffer), nbByte);
+													break;
+			
+			case CMD_MOVE_SEQUENCE:
 			case CMD_RENDER_AND_MOVE_SEQUENCE:		ret = performSequenceMove((unsigned char*)(buffer), nbByte);;
 													break;
 			
@@ -453,6 +465,24 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 	return performSerialBytes(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
+int SerialEmulatorNULL::performInteractiveMove(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	if ( interactiveMove == false ) {
+		interactiveMove = true;
+		serialTimer.Start(1, true);
+	}
+	return 0;
+}
+///////////////////////////////////////////////////////////////////
+int SerialEmulatorNULL::performPopSerial(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	
+	CNC_PRINT_LOCATION
+	
+	
+	return performMajorMove(buffer, nbByte);
+}
+///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false )
@@ -474,9 +504,11 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case SIG_HALT:
 		case SIG_PAUSE:
 		case SIG_RESUME:
-		case SIG_QUIT_MOVE: 				lastSignal = cmd;
+		case SIG_QUIT_MOVE:					lastSignal = cmd;
 											return true;
-									
+											
+		case SIG_UPDATE:					lastSignal = cmd;
+											return writeSigUpdate(buffer, nbByte);
 		// commands
 		case CMD_IDLE:						lastCommand.cmd = cmd;
 											lastCommand.ret = RET_OK;
@@ -500,6 +532,13 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case CMD_MOVE_UNIT_LIMIT_IS_FREE:	lastCommand.cmd = cmd;
 											return writeMoveCmdIntern(buffer, nbByte);
 		
+		case CMD_MOVE_INTERACTIVE:			lastCommand.cmd = cmd;
+											return writeMoveInteractive(buffer, nbByte);
+											
+		case CMD_POP_SERIAL:				lastCommand.cmd = cmd;
+											lastCommand.ret = RET_OK;
+											return writePopSerial(buffer, nbByte);
+
 		case CMD_MOVE_SEQUENCE:
 		case CMD_RENDER_AND_MOVE_SEQUENCE:	if ( lastCommand.MoveSequence.isActive() == false) 
 												lastCommand.MoveSequence.cmd = cmd;
@@ -511,6 +550,20 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		default:							lastCommand.cmd = cmd;
 											lastCommand.ret = RET_OK;
 	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::writeSigUpdate(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	int32_t x = 0L, y = 0L, z = 0L;
+	
+	if ( CncCommandDecoder::decodeSigUpdate(buffer, nbByte, x, y, z) == false ) 
+		return false;
+	
+	interactiveX = x;
+	interactiveY = y;
+	interactiveZ = z;
 	
 	return true;
 }
@@ -645,13 +698,37 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 
 		// special handling for later use
 		switch ( pid ) {
-			case PID_ENABLE_STEPPERS:		stepperEnableState = (bool)( values.size() > 0 ? values.front() : 0 ); break;
-			case PID_POS_REPLY_THRESHOLD:	posReplyThreshold  = ( values.size() > 0 ? values.front() : 0 ); break;
-			
-			case PID_X_POS:   				curEmulatorPos.setX(( values.size() > 0 ? values.front() : 0 )); break;
-			case PID_Y_POS:   				curEmulatorPos.setY(( values.size() > 0 ? values.front() : 0 )); break;
-			case PID_Z_POS:  				curEmulatorPos.setZ(( values.size() > 0 ? values.front() : 0 )); break;
-			
+			case PID_ENABLE_STEPPERS:
+			{
+				stepperEnableState = (bool)( values.size() > 0 ? values.front() : 0 ); 
+				break;
+			}
+			case PID_POS_REPLY_THRESHOLD:
+			{
+				posReplyThreshold  = ( values.size() > 0 ? values.front() : 1L ); 
+				break;
+			}
+			case PID_X_POS:
+			{
+				const int32_t x = values.size() > 0 ? values.front() : 0;
+				curEmulatorPos.setX(x); 
+				movementTracker += ArdoObj::absolute(x);
+				break;
+			}
+			case PID_Y_POS:
+			{
+				const int32_t y = values.size() > 0 ? values.front() : 0;
+   				curEmulatorPos.setY(y);
+				movementTracker += ArdoObj::absolute(y); 
+				break;
+			}
+			case PID_Z_POS:
+			{
+				const int32_t z = values.size() > 0 ? values.front() : 0;
+				curEmulatorPos.setZ(z);
+				movementTracker += ArdoObj::absolute(z); 
+				break;
+			}
 			case PID_ACCEL_PROFILE:
 			{
 				/*
@@ -780,6 +857,42 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::writeMoveInteractive(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	if ( writeMoveRawCallback(buffer, nbByte)  == false )
+		return false;
+		
+	if ( interactiveMove == true ) 
+		return false;
+	
+	// reset
+	interactiveX = 0;
+	interactiveY = 0;
+	interactiveZ = 0;
+	
+	// For intractive moves the impulse count at the move start isn't defined - by concept.
+	// Therefore, to get a fully supported acceleration at the begining a value of 0 is used here,
+	// which initialzes the accel manager to the interactive mode. The deacceleration phase isn't much
+	// imported here, because we can loose steps . . . 
+	const uint32_t defaultImpulses = 0;
+
+	const double speed = getFeedSpeed_MMSec();
+	const bool ret = speed ? initMove(defaultImpulses, speed) : true;
+	
+	lastSignal = CMD_INVALID;
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::writePopSerial(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	replyPosition(true);
+	
+	// reset last signal
+	lastSignal = CMD_INVALID;
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::initializeFeedProfile(int32_t dx , int32_t dy , int32_t dz) {
 ///////////////////////////////////////////////////////////////////
 	static ArduinoImpulseCalculator impulseCalculator;
@@ -813,7 +926,7 @@ bool SerialEmulatorNULL::initRenderAndMove(int32_t dx , int32_t dy , int32_t dz)
 	if ( renderAndMove(dx, dy, dz) == false )
 		return false;
 		
-	return completeFeedProfile();;
+	return completeFeedProfile();
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::renderAndMove(int32_t dx, int32_t dy, int32_t dz) {
@@ -848,11 +961,7 @@ bool SerialEmulatorNULL::translateStepAxisRetValue(unsigned char ret) {
 void SerialEmulatorNULL::replyPosition(bool force) {
 ///////////////////////////////////////////////////////////////////
 	// simulate a direct controller callback.
-	static int64_t lastReplyDistance = 0L;
-	const  int64_t stepCounter       = stepCounterX + stepCounterY + stepCounterZ;
-	const  int64_t diff              = stepCounter - lastReplyDistance;
-	
-	if ( diff >= posReplyThreshold || force == true ) {
+	if ( movementTracker >= posReplyThreshold || force == true ) {
 		// due to the fact, that the emulators runs in the 
 		// same thread as the main loop it makes not sense 
 		// to write here someting to the serial. This is 
@@ -877,7 +986,8 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 		
 		sendSerialControllerCallback(ci);
 		
-		lastReplyDistance = stepCounter;
+		// reset
+		movementTracker = 0;
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -888,7 +998,6 @@ unsigned char SerialEmulatorNULL::signalHandling() {
 	
 		case SIG_INTERRUPPT:		return RET_INTERRUPT;
 		case SIG_HALT:				return RET_HALT;
-		case SIG_QUIT_MOVE:			return RET_QUIT;
 		
 		case SIG_PAUSE:				// pause handling
 									while ( lastSignal == SIG_PAUSE ) {
@@ -900,82 +1009,16 @@ unsigned char SerialEmulatorNULL::signalHandling() {
 		case SIG_RESUME:			lastSignal = CMD_INVALID; 
 									break;
 		
+		case SIG_QUIT_MOVE:			interactiveMove = false;
+									return RET_QUIT;
+		
+		case SIG_UPDATE:			return RET_OK;
+		
 		default:					; // Do nothing
 	}
 	
 	return RET_OK;
 }
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::resetEmuPositionCounter() {
-///////////////////////////////////////////////////////////////////
-    positionCounter 		= MIN_LONG;
-    positionOverflowCounter = 0;
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::resetEmuStepCounter() {
-///////////////////////////////////////////////////////////////////
-    stepCounterX 			= MIN_LONG;
-    stepCounterY 			= MIN_LONG;
-    stepCounterZ 			= MIN_LONG;
-    stepOverflowCounterX 	= 0;
-    stepOverflowCounterY 	= 0;
-    stepOverflowCounterZ 	= 0;
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::incPosistionCounter() {
-///////////////////////////////////////////////////////////////////
-    // detect overflows
-    if ( positionCounter == MAX_LONG ) {
-        positionCounter = MIN_LONG;
-        positionOverflowCounter++;
-    }
-
-    positionCounter++;
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::incStepCounterX(int32_t dx) {
-///////////////////////////////////////////////////////////////////
-    // detect overflows
-    int32_t test = MAX_LONG - ArdoObj::absolute(dx);
-    if ( test < stepCounterX ) {
-        stepCounterX  = MIN_LONG;
-        stepCounterX += (test - stepCounterX);
-        stepOverflowCounterX++;
-        return;
-    }
-
-    stepCounterX += ArdoObj::absolute(dx);
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::incStepCounterY(int32_t dy) {
-///////////////////////////////////////////////////////////////////
-    // detect overflows
-    int32_t test = MAX_LONG - ArdoObj::absolute(dy);
-    if ( test < stepCounterY ) {
-        stepCounterY  = MIN_LONG;
-        stepCounterY += (test - stepCounterY);
-        stepOverflowCounterY++;
-        return;
-    }
-
-    stepCounterY += ArdoObj::absolute(dy);
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::incStepCounterZ(int32_t dz) {
-///////////////////////////////////////////////////////////////////
-    // detect overflows
-    int32_t test = MAX_LONG - ArdoObj::absolute(dz);
-    if ( test < stepCounterZ ) {
-        stepCounterZ  = MIN_LONG;
-        stepCounterZ += (test - stepCounterZ);
-        stepOverflowCounterZ++;
-        return;
-    }
-
-    stepCounterZ += ArdoObj::absolute(dz);
-}
-
-
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::notifyACMStateChange(State s) {
 ///////////////////////////////////////////////////////////////////
@@ -1022,7 +1065,7 @@ void SerialEmulatorNULL::notifyMovePartAfter() {
 		} \
 		\
 		curEmulatorPos.inc##axis(d); \
-		incStepCounter##axis(d); \
+		movementTracker += ArdoObj::absolute(d); \
 		\
 	}
 	
@@ -1065,7 +1108,6 @@ void SerialEmulatorNULL::notifyMovePartAfter() {
 	
 	// position mnagement
 	replyPosition(false);
-	incPosistionCounter();
 }
 ///////////////////////////////////////////////////////////////////
 byte SerialEmulatorNULL::initiateStep(AxisId aid) {

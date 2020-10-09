@@ -239,6 +239,8 @@ class Serial : public SerialOSD {
 		static const unsigned int LONG_BUF_SIZE = sizeof(int32_t);
 		
 	private:
+		
+		// Readbuffer, primary filled by peekData
 		typedef std::queue<unsigned char> ReadBuffer;
 		ReadBuffer readBuffer; 
 		
@@ -275,6 +277,9 @@ class Serial : public SerialOSD {
 						serial->shouldCallbackSynchronizeAppPosition = false; 
 				}
 		};
+		
+		// 
+		int readBufferedData(void *buffer, unsigned int nbByte);
 		
 		//cnc control object
 		CncControl* cncControl;
@@ -410,7 +415,7 @@ class Serial : public SerialOSD {
 		bool isIdleActive()			{ return SerialCommandLocker::getLockedCommand() == CMD_IDLE; }
 		
 		// port writting
-		bool popSerial(bool returnImmediately=true);
+		bool popSerial();
 		bool processIdle();
 		
 		bool processGetter(unsigned char pid, GetterValues& ret);

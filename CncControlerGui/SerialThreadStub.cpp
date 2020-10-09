@@ -132,10 +132,18 @@ int SerialThreadStub::readData(void *buffer, unsigned int nbByte) {
 		return 0;
 
 	wakeUpOnDemand();
-	const bool ret = APP_PROXY::getSerialThread(this)->getSerialAppEndPoint()->readBytes((unsigned char*)buffer, (int)nbByte); 
 	
-	spyReadData(buffer, ret);
-	return ret;
+	// first, read buffered data
+	int bytesRead         = readBufferedData(buffer, nbByte);
+	const int bytesToRead = nbByte - bytesRead;
+	
+	// then, read from serial
+	if ( bytesToRead > 0 )
+		bytesRead += APP_PROXY::getSerialThread(this)->getSerialAppEndPoint()->readBytes((unsigned char*)buffer, bytesToRead); 
+	
+	// last, support spy
+	spyReadData(buffer, bytesRead);
+	return bytesRead;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialThreadStub::writeData(void *buffer, unsigned int nbByte) { 

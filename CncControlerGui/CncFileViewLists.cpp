@@ -251,6 +251,7 @@ bool CncLruFileViewListCtrl::load(wxFileConfig* config) {
 	if ( config == NULL )
 		return false;
 	
+	CncLargeScaledListCtrl::clear();
 	lruList.clear();
 	
 	for ( unsigned int i = 1; i <= maxSize; i++ ) {
@@ -294,8 +295,10 @@ bool CncLruFileViewListCtrl::save(wxFileConfig* config) {
 /////////////////////////////////////////////////////////////////////
 void CncLruFileViewListCtrl::onSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	event.Skip();
+	
 	updateColumnWidth();
-	event.Skip(true);
+	Refresh();
 }
 //////////////////////////////////////////////////
 void CncLruFileViewListCtrl::onKeyDown(wxKeyEvent& event) {
@@ -496,7 +499,9 @@ bool CncFileViewListCtrl::isItemValid(long item) const {
 /////////////////////////////////////////////////////////////////////
 void CncFileViewListCtrl::deleteAllEntries() {
 /////////////////////////////////////////////////////////////////////
+	CncLargeScaledListCtrl::clear();
 	fileEntries.clear();
+	
 	SetItemCount(fileEntries.size());
 	Refresh();
 }

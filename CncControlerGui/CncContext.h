@@ -23,7 +23,7 @@ struct CncContext {
 		
 		OSType os						= OSType::UNDEF;
 		bool probeMode					= true;
-		bool gamePortMode				= false;
+		bool interactiveMoveMode				= false;
 		bool speedMonitor				= false;
 		bool onlineUpdateCoordinates	= true;
 		bool onlineUpdateDrawPane		= true;
@@ -166,16 +166,16 @@ struct CncContext {
 		const wxString& traceCommandLineParameter(wxString& s) const;
 
 		void setProbeMode(bool state); 
-		bool isProbeMode() 					{ return probeMode; }
+		bool isProbeMode() 							{ return probeMode; }
 		
-		void setGamePortMode(bool state) 	{ gamePortMode = state; }
-		bool canGamePort()					{ return gamePortMode;  }
+		void setInteractiveMoveingMode(bool state) 	{ interactiveMoveMode = state; }
+		bool canInteractiveMoveing()				{ return interactiveMoveMode;  }
 		
-		void setSpeedMonitoring(bool state)	{ speedMonitor = state; } 
-		bool canSpeedMonitoring() 			{ return speedMonitor; }
+		void setSpeedMonitoring(bool state)			{ speedMonitor = state; } 
+		bool canSpeedMonitoring() 					{ return speedMonitor; }
 		
-		void setHardwareFlag(bool state)	{ hardwareFlag = state; } 
-		bool hasHardware()		 			{ return hardwareFlag; }
+		void setHardwareFlag(bool state)			{ hardwareFlag = state; } 
+		bool hasHardware()		 					{ return hardwareFlag; }
 		
 		bool isOnlineUpdateCoordinates() 						{ return onlineUpdateCoordinates; }
 		bool isOnlineUpdateDrawPane() 							{ return onlineUpdateDrawPane; }

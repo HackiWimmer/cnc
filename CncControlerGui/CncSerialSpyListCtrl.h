@@ -8,7 +8,7 @@
 #include "OSD/CncTimeFunctions.h"
 #include "CncLargeScaleListCtrl.h"
 
-wxDECLARE_EVENT(wxEVT_SERIAL_TIMER, wxTimerEvent);
+wxDECLARE_EVENT(wxEVT_SPY_DISPLAY_TIMER, wxTimerEvent);
 
 class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 	
@@ -29,12 +29,12 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 						LT_Disable			= 14,
 						LT_Time				= 15,
 						LT_Command			= 16,
+						LT_DebugEntry		= 17,
 						
 						LT_Default 			=  0
 		};
 		
 	private:
-		static const int refreshInterval = 1000;
 		
 		// ---------------------------------------------------
 		struct LineInfo {
@@ -62,11 +62,19 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		// ---------------------------------------------------
 		struct Entry {
 			wxString line; 
+			wxString appendix; 
 			LineType lt;
 			 
 			Entry(const wxString& l, const LineType t)
-			: line	(l)
-			, lt	(t)
+			: line		(l)
+			, appendix	("")
+			, lt		(t)
+			{}
+			
+			Entry(const wxString& l, const wxString& a, const LineType t)
+			: line		(l)
+			, appendix	(a)
+			, lt		(t)
 			{}
 		};
 		
@@ -79,6 +87,7 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		wxListItemAttr		itemAttrResultMore;
 		wxListItemAttr		itemAttrResultError;
 		wxListItemAttr		itemAttrResultWarning;
+		wxListItemAttr		itemAttrResultDebug;
 		wxListItemAttr		itemAttrResultLimit;
 		wxListItemAttr		itemAttrResultHalt;
 		wxListItemAttr		itemAttrResultQuit;
@@ -89,15 +98,17 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		wxListItemAttr		itemAttrResultCommand;
 		
 		Entries				entries;
-		wxTimer				serialTimer;
+		wxTimer				spyDisplaylTimer;
+		int 				refreshInterval;
 		wxAnyButton *		openDetails;
 		bool				liveDecoding;
+		bool				considerDebug;
 		bool				autoScrolling;
 		bool				autoColumnSizing;
 		CncMilliTimestamp	tsLast;
 		 
 		void					refreshList();
-		void					startRefreshInterval() { serialTimer.Start(refreshInterval); }
+		void					startRefreshInterval() { spyDisplaylTimer.Start(refreshInterval); }
 		
 		bool 					decodeSerialSpyLineIntern(long item, SpyHexDecoder::Details& details) const ;
 		
@@ -112,6 +123,7 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		void					onTimer(wxTimerEvent& event);
 		void					onSelectListItem(wxListEvent& event);
 		void					onActivateListItem(wxListEvent& event);
+		void					onEndDragList(wxListEvent& event);
 		void					onKeyDown(wxKeyEvent& event);
 		
 	public:
@@ -127,13 +139,20 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		void flush();
 		
 		const wxString 			getLine(long item) const;
+		const wxString 			getSelectedLine() const;
+		long 		 			getSelectedItem() const;
 		
-		void 					installOpenDetails(wxAnyButton* b) { openDetails = b; }
+		void 					setRefreshInterval(int v)			{ refreshInterval = v; }
+		
+		void 					installOpenDetails(wxAnyButton* b)	{ openDetails = b; }
 		void					enableLiveDecoding(bool state);
 		void					enableAutoScrolling(bool state);
 		void					enableAutoColumnSizing(bool state);
+		void					enableDebugEntries(bool state);
 		
 		void 					addLine(const wxString& line, const LineType lt = LT_Default);
+		void 					addLine(const wxString& line, const wxString& appendix, const LineType lt = LT_Default);
+		
 		void 					clearAll();
 		void 					updateColumnWidth();
 		bool 					copyToClipboard(bool allRows=false);
@@ -141,6 +160,12 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		const wxString&			decodeSerialSpyLine(long item, wxString& ret) const; 
 		const wxString&			decodeSelectedSpyLine(wxString& ret) const; 
 		
+		const wxColor&			getSelectedSpyLineBgColour(wxColor& ret) const; 
+		const wxColor&			getSelectedSpyLineFgColour(wxColor& ret) const; 
+		const wxFont&			getSelectedSpyLineFont(wxFont& ret) const;
+		bool					fitsTextIntoCell(long item, long col);
+		bool					fitsDecodedTextForSelectedItem();
+			
 		wxDECLARE_NO_COPY_CLASS(CncSerialSpyListCtrl);
 		wxDECLARE_EVENT_TABLE();
 };

@@ -977,9 +977,7 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	Notification n;
-	n.message = "Hallo";
-	displayNotification(n);
+	cnc->popSerial();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -1569,7 +1567,7 @@ void MainFrame::onGamepadThreadUpadte(GamepadEvent& event) {
 	if ( cnc == NULL || cnc->isConnected() == false )
 		return;
 	
-	if ( THE_CONTEXT->canGamePort() == false ) {
+	if ( THE_CONTEXT->canInteractiveMoveing() == false ) {
 		cnc::trc.logInfo("The gamepad isn't available for this connetion port . . . ");
 		return;
 	}
@@ -2402,7 +2400,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	struct InitialSetup {
 		wxString serialFileName		= "";
 		bool probeMode				= false;
-		bool gamePortMode			= false;
+		bool interactiveMoving		= false;
 		bool secureDlg				= false;
 		bool pathListEntries		= false;
 		bool moveSequences			= false;
@@ -2417,7 +2415,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		
 		setup.serialFileName.assign("dev/null");
 		setup.probeMode			= true;
-		setup.gamePortMode		= false;
+		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
@@ -2430,7 +2428,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundTxtFileName());
 		setup.probeMode			= true;
-		setup.gamePortMode		= false;
+		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
@@ -2443,7 +2441,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundSvgFileName());
 		setup.probeMode			= true;
-		setup.gamePortMode		= false;
+		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
@@ -2456,7 +2454,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundGCodeFileName());
 		setup.probeMode			= true;
-		setup.gamePortMode		= false;
+		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
@@ -2469,7 +2467,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
 		setup.probeMode			= true;
-		setup.gamePortMode		= false;
+		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
@@ -2482,7 +2480,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		
 		setup.serialFileName.assign("::Arduino");
 		setup.probeMode			= true;
-		setup.gamePortMode		= true;
+		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= true;
 		setup.hasHardware		= true;
@@ -2495,7 +2493,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		
 		setup.serialFileName.assign(wxString::Format("\\\\.\\%s", sel));
 		setup.probeMode			= false;
-		setup.gamePortMode		= true;
+		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
 		setup.speedMonitor		= true;
 		setup.hasHardware		= true;
@@ -2522,7 +2520,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	// config setup
 	serialFileName.assign(setup.serialFileName);
 	THE_CONTEXT->setProbeMode(setup.probeMode);
-	THE_CONTEXT->setGamePortMode(setup.gamePortMode);
+	THE_CONTEXT->setInteractiveMoveingMode(setup.interactiveMoving);
 	THE_CONTEXT->setSpeedMonitoring(setup.speedMonitor);
 	THE_CONTEXT->setHardwareFlag(setup.hasHardware);
 	
@@ -3985,6 +3983,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		
 		bool ret = true;
 		
+		serialSpyPanel->clearSerialSpyBeforNextRun();
+		
 		CncRunEventFilter cef;
 		
 		// deactivate idle requests
@@ -4109,8 +4109,6 @@ bool MainFrame::processTemplateIntern() {
 		begRun.parameter.SET.hardwareResZ 	= THE_CONFIG->getDisplayFactZ();
 		begRun.parameter.PRC.user			= "Hacki Wimmer";
 	cnc->processTrigger(begRun);
-	
-	serialSpyPanel->clearSerialSpyBeforNextRun();
 	
 	clearPositionSpy();
 	
@@ -6872,6 +6870,8 @@ void MainFrame::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 		if ( evaluateMovement() == true ) {
 			if ( startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR) )
 				updateInteractiveMove(x, y, z);
+			else
+				std::cerr << "interactiveMoveStart failed" << std::endl;
 		}
 	};
 	
@@ -6975,7 +6975,7 @@ void MainFrame::decorateGamepadState(bool state) {
 	else 					m_gamepadState->SetBitmap((ImageLibGamepad().Bitmap("BMP_DEACTIVATED")));
 	
 	if ( gamepadStatusCtl != NULL ) {
-		if ( THE_CONTEXT->canGamePort() == false ) {
+		if ( THE_CONTEXT->canInteractiveMoveing() == false ) {
 			gamepadStatusCtl->trace("The gamepad isn't available for the current connetion port . . . ");
 		}
 		else {
@@ -7746,6 +7746,9 @@ void MainFrame::cncTransactionLockCallback() {
 		}
 	}
 	
+	if ( cnc && cnc->isSpyOutputOn() )
+		cnc::spy.addMarker("Transaction initiated . . . ");
+	
 	getLoggerView()->popProcessMode(LoggerSelection::VAL::CNC);
 	speedMonitor->deactivate();
 } 
@@ -7754,6 +7757,9 @@ void MainFrame::cncTransactionReleaseCallback() {
 /////////////////////////////////////////////////////////////////////
 	speedMonitor->activate(THE_CONTEXT->canSpeedMonitoring());
 	getLoggerView()->pushUpdateMode(LoggerSelection::VAL::CNC);
+	
+	if ( cnc && cnc->isSpyOutputOn() )
+		cnc::spy.addMarker("Transaction released . . . ");
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clickAdditionalParameters(wxCommandEvent& event) {
@@ -7796,3 +7802,6 @@ void MainFrame::onIdle(wxIdleEvent& event) {
 }
 
 
+void MainFrame::leaveSerialSpy(wxMouseEvent& event)
+{
+}

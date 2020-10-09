@@ -299,9 +299,8 @@ bool CncControl::setup(bool doReset) {
 	// evaluate limit states
 	evaluateLimitState();
 	
-	std::cout << " Starting controller initialization . . .";
 	THE_APP->getLoggerView()->logCurrentPosition(LoggerSelection::VAL::CNC);
-	std::cout << std::endl;
+	std::cout << " Starting controller initialization . . ." << std::endl;
 	
 	// setup probe mode
 	if ( enableProbeMode(THE_CONTEXT->isProbeMode()) == false ) {
@@ -1846,11 +1845,16 @@ bool CncControl::stopInteractiveMove() {
 			return false;
 		}
 		
-		// read somthing left information on demand
-		if ( getSerial()->isCommandActive() == false )
-			getSerial()->popSerial();
-			
+		// do this immediately after sending the quit signal
 		currentInteractiveMoveInfo.reset();
+		
+		// read somthing left information on demand
+		if ( getSerial()->isCommandActive() == false ) {
+			if ( isSpyOutputOn() )
+				cnc::spy.addDebugEntry("CncControl::stopInteractiveMove before popSerial() ");
+
+			getSerial()->popSerial();
+		}
 	}
 	
 	return true;

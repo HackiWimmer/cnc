@@ -583,35 +583,6 @@ public:
 };
 
 
-class ImageLibPins : public wxImageList
-{
-protected:
-    // Maintain a map of all bitmaps representd by their name
-    std::map<wxString, wxBitmap> m_bitmaps;
-    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
-    wxString m_resolution;
-    int m_imagesWidth;
-    int m_imagesHeight;
-
-
-protected:
-
-public:
-    ImageLibPins();
-    const wxBitmap& Bitmap(const wxString &name) const {
-        if ( !m_bitmaps.count(name + m_resolution) )
-            return wxNullBitmap;
-        return m_bitmaps.find(name + m_resolution)->second;
-    }
-
-    void SetBitmapResolution(const wxString &res = wxEmptyString) {
-        m_resolution = res;
-    }
-
-    virtual ~ImageLibPins();
-};
-
-
 class ImageLibLogger : public wxImageList
 {
 protected:
@@ -725,35 +696,6 @@ public:
     }
 
     virtual ~ImageLibSwitch();
-};
-
-
-class ImageLibStepper : public wxImageList
-{
-protected:
-    // Maintain a map of all bitmaps representd by their name
-    std::map<wxString, wxBitmap> m_bitmaps;
-    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
-    wxString m_resolution;
-    int m_imagesWidth;
-    int m_imagesHeight;
-
-
-protected:
-
-public:
-    ImageLibStepper();
-    const wxBitmap& Bitmap(const wxString &name) const {
-        if ( !m_bitmaps.count(name + m_resolution) )
-            return wxNullBitmap;
-        return m_bitmaps.find(name + m_resolution)->second;
-    }
-
-    void SetBitmapResolution(const wxString &res = wxEmptyString) {
-        m_resolution = res;
-    }
-
-    virtual ~ImageLibStepper();
 };
 
 

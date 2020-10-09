@@ -706,10 +706,14 @@ void ArduinoMainLoop::setup() {
   AE::pinMode(PIN_Y_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Z_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MIN_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  
   AE::pinMode(READ_EXT_INNTERRUPT_PIN,  PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
 
   AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER, ENABLE_STATE_OFF);
-  AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,    TOOL_STATE_ON);
+  
+  #warning ON ????
+  AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,     TOOL_STATE_ON);
+  AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_IS_TOOL_POWERED, TOOL_STATE_ON);
 
   // analog pins
   AE::pinMode(PIN_INTERRUPT_LED,        PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,   ANALOG_LOW);
@@ -769,9 +773,8 @@ void ArduinoMainLoop::loop() {
 
     // SB command -  Peek Serial
     case CMD_POP_SERIAL:
-    case CMD_POP_SERIAL_WAIT:
           // Do nothing this here
-          // is a controller only command
+          // This is a calling controller only command
           r = RET_NULL;
           break;
     

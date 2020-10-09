@@ -10,19 +10,92 @@
   #define ENABLE_STATE_OFF                                  PL_HIGH
   #define ENABLE_STATE_ON                                   PL_LOW 
 
-// -------------------------------------------------------------------------------
-// Choose one dedicated pin setup below exclusivly
-// -------------------------------------------------------------------------------
-  #define PIN_SETUP_CNC_SHIELD                              0
-  #define PIN_SETUP_CL57Y                                   1
+  #ifndef SKETCH_COMPILE
+
+    //#define ARDUINO_AVR_UNO
+    #define ARDUINO_AVR_MEGA2560
+    
+    #define digitalPinToPort(P) AE::getDigitalPinToPort(P)   
+    
+    namespace AE {
+      // C++ Application Environment
+      static const short PN_NOT_A_PIN = 0xFF;
+      
+      enum PinName   { PN_NULL=PN_NOT_A_PIN, 
+                       
+                       #if defined(ARDUINO_AVR_MEGA2560)
+                         PN_D0 = 0, PN_D1 = 1, PN_D2 = 3, PN_D3 = 3, PN_D4 = 4, PN_D5 = 5, PN_D6 = 6, PN_D7 = 7, PN_D8 = 8, PN_D9 = 9, 
+                         PN_D10=10, PN_D11=11, PN_D12=12, PN_D13=13, PN_D14=14, PN_D15=15, PN_D16=16, PN_D17=17, PN_D18=18, PN_D19=19, 
+                         PN_D20=20, PN_D21=21, PN_D22=22, PN_D23=23, PN_D24=24, PN_D25=25, PN_D26=26, PN_D27=27, PN_D28=28, PN_D29=29, 
+                         PN_D30=30, PN_D31=31, PN_D32=32, PN_D33=33, PN_D34=34, PN_D35=35, PN_D36=36, PN_D37=37, PN_D38=38, PN_D39=39, 
+                         PN_D40=40, PN_D41=41, PN_D42=42, PN_D43=43, PN_D44=44, PN_D45=45, PN_D46=46, PN_D47=47, PN_D48=48, PN_D49=49, 
+                         PN_D50=50, PN_D51=51, PN_D52=52, PN_D53=53,
+                        
+                         PN_A0 = 54, PN_A1 = 55, PN_A2 = 56, PN_A3 = 57, PN_A4 = 58, PN_A5 = 59, PN_A6=60, PN_A7 = 61, PN_A8 = 628, PN_A9 = 63, 
+                         PN_A10= 64, PN_A11= 65, PN_A12= 66, PN_A13= 67, PN_A14= 68, PN_A15= 69
+                       #endif 
+                       
+                       #if defined(ARDUINO_AVR_UNO)
+                         PN_D0 = 0, PN_D1 = 1, PN_D2 = 3, PN_D3 = 3, PN_D4 = 4, PN_D5 = 5, PN_D6 = 6, PN_D7 = 7, PN_D8 = 8, PN_D9 = 9, 
+                         PN_D10=10, PN_D11=11, PN_D12=12, PN_D13=13,
+                        
+                         PN_A0 = 54, PN_A1 = 55, PN_A2 = 56, PN_A3 = 57, PN_A4 = 58, PN_A5 = 59
+                       #endif 
+                     };
   
+                       
+      enum PinLevel  { PL_UNDEFINED = -1, PL_LOW = 0, PL_HIGH = 1 };
+      enum PinMode   { PM_INPUT, PM_OUTPUT, PM_INPUT_PULLUP };
+      enum PinType   { PT_UNKNOWN = 0, PT_ANALOG = 1, PT_DIGITAL = 2 };
+    };
+    
+  #else
+    // Arduino Sketch Environment
+    #define AE
+    
+    static const short PN_NOT_A_PIN = NOT_A_PIN;
+    enum PinName   { PN_NULL=PN_NOT_A_PIN, 
+
+                     #if defined(ARDUINO_AVR_MEGA2560)
+                       PN_D0 = 0, PN_D1 = 1, PN_D2 = 3, PN_D3 = 3, PN_D4 = 4, PN_D5 = 5, PN_D6 = 6, PN_D7 = 7, PN_D8 = 8, PN_D9 = 9, 
+                       PN_D10=10, PN_D11=11, PN_D12=12, PN_D13=13, PN_D14=14, PN_D15=15, PN_D16=16, PN_D17=17, PN_D18=18, PN_D19=19, 
+                       PN_D20=20, PN_D21=21, PN_D22=22, PN_D23=23, PN_D24=24, PN_D25=25, PN_D26=26, PN_D27=27, PN_D28=28, PN_D29=29, 
+                       PN_D30=30, PN_D31=31, PN_D32=32, PN_D33=33, PN_D34=34, PN_D35=35, PN_D36=36, PN_D37=37, PN_D38=38, PN_D39=39, 
+                       PN_D40=40, PN_D41=41, PN_D42=42, PN_D43=43, PN_D44=44, PN_D45=45, PN_D46=46, PN_D47=47, PN_D48=48, PN_D49=49, 
+                       PN_D50=50, PN_D51=51, PN_D52=52, PN_D53=53,
+                       
+                       PN_A0 = A0, PN_A1 = A1, PN_A2 = A2, PN_A3 = A3, PN_A4 = A4, PN_A5=A5, PN_A6=A6, PN_A7=A7, PN_A8=A8, PN_A9=A9, 
+                       PN_A10=A10, PN_A11=A11, PN_A12=A12, PN_A13=A13, PN_A14=A14, PN_A15=A15
+                     #endif                     
+                     
+                     #if defined(ARDUINO_AVR_UNO)
+                       PN_D0 = 0, PN_D1 = 1, PN_D2 = 3, PN_D3 = 3, PN_D4 = 4, PN_D5 = 5, PN_D6 = 6, PN_D7 = 7, PN_D8 = 8, PN_D9 = 9, 
+                       PN_D10=10, PN_D11=11, PN_D12=12, PN_D13=13,
+                       
+                       PN_A0 = A0, PN_A1 = A1, PN_A2 = A2, PN_A3 = A3, PN_A4 = A4, PN_A5=A5
+                     #endif                     
+                   };
+
+    enum PinLevel  { PL_UNDEFINED = -1, PL_LOW = LOW, PL_HIGH = HIGH };
+    enum PinMode   { PM_INPUT = INPUT, PM_OUTPUT = OUTPUT, PM_INPUT_PULLUP = INPUT_PULLUP };
+    enum PinType   { PT_UNKNOWN = 0, PT_ANALOG = 1, PT_DIGITAL = 2 };
+
+#endif
+
 // -------------------------------------------------------------------------------
 // PIN_SETUP_CL57Y
 // -------------------------------------------------------------------------------
-  #if ( PIN_SETUP_CL57Y )
+  #if defined(ARDUINO_AVR_MEGA2560)
+
+    #define MIN_DPIN                                        AE::PN_D0
+    #define MAX_DPIN                                        AE::PN_D53
+    
+    #define MIN_APIN                                        AE::PN_A0
+    #define MAX_APIN                                        AE::PN_A14
+
+    #define MAX_PINS                                        AE::PN_A14
 
     #define SETUP_ID                                        200
-    #define MAX_PINS                                        64
     #define BOARD_TYPE                                      MEGA_2560
     
     const unsigned char PIN_IR_1                            =   2;
@@ -137,18 +210,19 @@
 // -------------------------------------------------------------------------------
 // PIN_SETUP_CNC_SHIEDL
 // -------------------------------------------------------------------------------
-  #if ( PIN_SETUP_CNC_SHIELD )
+#if defined(ARDUINO_AVR_UNO)
   
+    #define MIN_DPIN                                        AE::PN_D0
+    #define MAX_DPIN                                        AE::PN_D13
+    
+    #define MIN_APIN                                        AE::PN_A0
+    #define MAX_APIN                                        AE::PN_A5
+    
+    #define MAX_PINS                                        AE::PN_A5
+    
     #define SETUP_ID                                        100
-    #define MAX_PINS                                        32
     #define BOARD_TYPE                                      UNO
     
-    #define TOOL_STATE_OFF                                  PL_LOW
-    #define TOOL_STATE_ON                                   PL_HIGH 
-  
-    #define ENABLE_STATE_OFF                                PL_HIGH
-    #define ENABLE_STATE_ON                                 PL_LOW 
-
     const unsigned char PIN_IR_1                            =   0;
     const unsigned char PIN_IR_2                            =   0;
     
@@ -170,6 +244,8 @@
   
     const unsigned char PIN_ENABLE_TOOL                     =  12;
     const unsigned char PIN_EXTERNAL_INTERRUPT              =  13;
+    const unsigned char PIN_IS_TOOL_POWERED                 =   0;
+    
   
     // A0 CNC Shield: Reset/Abort
     // A1 CNC Shield: Feed Hold
@@ -184,24 +260,35 @@
     #define PIN_INTERRUPT_LED                            AE::PN_A3   
     const unsigned char PIN_INTERRUPT_LED_ID                 =  3;
 
-    #define READ_LMT_PIN_X_MIN                            AE::digitalRead(PIN_X_MIN_LIMIT)
-    #define READ_LMT_PIN_X_MAX                            AE::digitalRead(PIN_X_MAX_LIMIT)
-    #define READ_LMT_PIN_Y_MIN                            AE::digitalRead(PIN_Y_MIN_LIMIT)
-    #define READ_LMT_PIN_Y_MAX                            AE::digitalRead(PIN_Y_MAX_LIMIT)
-    #define READ_LMT_PIN_Z_MIN                            AE::digitalRead(PIN_Z_MIN_LIMIT)
-    #define READ_LMT_PIN_Z_MAX                            AE::digitalRead(PIN_Z_MAX_LIMIT)
+    #define READ_LMT_PIN_X_MIN                            ( AE::digitalRead(PIN_X_MIN_LIMIT) )
+    #define READ_LMT_PIN_X_MAX                            ( AE::digitalRead(PIN_X_MAX_LIMIT) )
+    #define READ_LMT_PIN_X                                ( AE::digitalRead(PIN_X_MIN_LIMIT) && AE::digitalRead(PIN_X_MAX_LIMIT) )
+
+    #define READ_LMT_PIN_Y_MIN                            ( AE::digitalRead(PIN_Y_MIN_LIMIT) )
+    #define READ_LMT_PIN_Y_MAX                            ( AE::digitalRead(PIN_Y_MAX_LIMIT) )
+    #define READ_LMT_PIN_Y                                ( AE::digitalRead(PIN_Y_MIN_LIMIT) && AE::digitalRead(PIN_Y_MAX_LIMIT) )
+    
+    #define READ_LMT_PIN_Z_MIN                            ( AE::digitalRead(PIN_Z_MIN_LIMIT) )
+    #define READ_LMT_PIN_Z_MAX                            ( AE::digitalRead(PIN_Z_MAX_LIMIT) )
+    #define READ_LMT_PIN_Z                                ( AE::digitalRead(PIN_Z_MIN_LIMIT) && AE::digitalRead(PIN_Z_MAX_LIMIT) )
+    
     #define READ_EXT_INNTERRUPT_PIN                       AE::digitalRead(PIN_EXTERNAL_INTERRUPT)
 
-    #define READ_STEPPER_ENABLE_PIN                       AE::digitalRead(PIN_STEPPER_ENABLE)
-    #define READ_TOOL_ENABLE_PIN                          AE::digitalRead(PIN_TOOL_ENABLE)
+    #define READ_ENABLE_STEPPER_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)
+    #define READ_ENABLE_TOOL_PIN                          AE::digitalRead(PIN_ENABLE_TOOL)
+    #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
+
+    #define READ_STEPPER_ENABLE_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)
+    #define READ_TOOL_ENABLE_PIN                          AE::digitalRead(PIN_ENABLE_TOOL)
+    #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
     
-    #define WRITE_DIR_PIN_X                               AE::digitalWrite(PIN_X_DIR, value); 
-    #define WRITE_DIR_PIN_Y                               AE::digitalWrite(PIN_Y_DIR, value); 
-    #define WRITE_DIR_PIN_Z                               AE::digitalWrite(PIN_Z_DIR, value); 
-    
-    #define WRITE_STP_PIN_X                               AE::digitalWrite(PIN_X_STP, value); 
-    #define WRITE_STP_PIN_Y                               AE::digitalWrite(PIN_Y_STP, value); 
-    #define WRITE_STP_PIN_Z                               AE::digitalWrite(PIN_Z_STP, value); 
+    #define WRITE_DIR_PIN_X(value)                        AE::digitalWrite(PIN_X_DIR, value); 
+    #define WRITE_DIR_PIN_Y(value)                        AE::digitalWrite(PIN_Y_DIR, value); 
+    #define WRITE_DIR_PIN_Z(value)                        AE::digitalWrite(PIN_Z_DIR, value); 
+
+    #define WRITE_STP_PIN_X(value)                        AE::digitalWrite(PIN_X_STP, value); 
+    #define WRITE_STP_PIN_Y(value)                        AE::digitalWrite(PIN_Y_STP, value); 
+    #define WRITE_STP_PIN_Z(value)                        AE::digitalWrite(PIN_Z_STP, value); 
     
   #endif  // PIN_SETUP_CNC_SHIELD
 

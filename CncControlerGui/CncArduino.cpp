@@ -33,8 +33,7 @@ void ArduinoCMDs::init() {
 	
 	cmds[CMD_HEARTBEAT]                        = "Pull Heartbeat Callback";
 	cmds[CMD_IDLE]                             = "Pull Idle Callback";
-	cmds[CMD_POP_SERIAL]                       = "Pop Serial without Timeout";
-	cmds[CMD_POP_SERIAL_WAIT]                  = "Pop Serial with Timeout";
+	cmds[CMD_POP_SERIAL]                       = "Pop Serial";
 	cmds[CMD_RESET_CONTROLLER]                 = "Push Reset Controller";
 	
 	cmds[CMD_SETTER]                           = "Push Setter";
@@ -152,6 +151,7 @@ void ArduinoPIDs::init() {
 	pids[PID_POS_REPLY_THRESHOLD]             .setup("Position Reply Threshold", "impulses");
 	pids[PID_PROBE_MODE]                      .setup("Probe Mode State", "bool");
 
+	pids[PID_XYZ_INTERACTIVE_POS]             .setup("XYZ Interactive Pos", "steps");
 	pids[PID_XYZ_POS_MAJOR]                   .setup("XYZ Pos - Type Major", "steps");
 	pids[PID_XYZ_POS_DETAIL]                  .setup("XYZ Pos - Type Detail", "steps");
 	pids[PID_XYZ_POS]                         .setup("XYZ Pos", "steps");
@@ -333,24 +333,25 @@ void ArduinoDigitalPins::init() {
 		pins[i]  = s.c_str();
 	}
 
-	pins[PIN_X_STP]              = "STEP PIN X";
-	pins[PIN_Y_STP]              = "STEP PIN Y";
-	pins[PIN_Z_STP]              = "STEP PIN Z";
-	pins[PIN_X_DIR]              = "DIR PIN X";
-	pins[PIN_Y_DIR]              = "DIR PIN Y";
-	pins[PIN_Z_DIR]              = "DIR PIN Z";
+	pins[PIN_X_STP]                 = "STEP PIN X";
+	pins[PIN_Y_STP]                 = "STEP PIN Y";
+	pins[PIN_Z_STP]                 = "STEP PIN Z";
+	pins[PIN_X_DIR]                 = "DIR PIN X";
+	pins[PIN_Y_DIR]                 = "DIR PIN Y";
+	pins[PIN_Z_DIR]                 = "DIR PIN Z";
 	
-	pins[PIN_ENABLE_STEPPER]     = "STEPPER ENABLE PIN";
+	pins[PIN_ENABLE_STEPPER]        = "STEPPER ENABLE PIN";
 	
-	pins[PIN_X_MIN_LIMIT]        = "LIMIT PIN X Min";
-	pins[PIN_X_MAX_LIMIT]        = "LIMIT PIN X Max";
-	pins[PIN_Y_MIN_LIMIT]        = "LIMIT PIN Y Min";
-	pins[PIN_Y_MAX_LIMIT]        = "LIMIT PIN Y Max";
-	pins[PIN_Z_MIN_LIMIT]        = "LIMIT PIN Z Min";
-	pins[PIN_Z_MAX_LIMIT]        = "LIMIT PIN Z Max";
+	pins[PIN_X_MIN_LIMIT]           = "LIMIT PIN X Min";
+	pins[PIN_X_MAX_LIMIT]           = "LIMIT PIN X Max";
+	pins[PIN_Y_MIN_LIMIT]           = "LIMIT PIN Y Min";
+	pins[PIN_Y_MAX_LIMIT]           = "LIMIT PIN Y Max";
+	pins[PIN_Z_MIN_LIMIT]           = "LIMIT PIN Z Min";
+	pins[PIN_Z_MAX_LIMIT]           = "LIMIT PIN Z Max";
 	
-	pins[PIN_ENABLE_TOOL]        = "TOOL ENABLE PIN";
-	pins[PIN_EXTERNAL_INTERRUPT] = "External Interrupt PIN";
+	pins[PIN_ENABLE_TOOL]           = "TOOL ENABLE PIN";
+	pins[PIN_IS_TOOL_POWERED]       = "IS TOOL POWERED PIN";
+	pins[PIN_EXTERNAL_INTERRUPT]    = "EXTERNAL INTERRUPT PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoDigitalPins::getPinLabel(unsigned int id) {

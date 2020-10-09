@@ -332,7 +332,7 @@ bool Serial::isMoveCommand(unsigned char cmd) {
 ///////////////////////////////////////////////////////////////////
 bool Serial::dataAvailable() {
 ///////////////////////////////////////////////////////////////////
-	static unsigned char buffer[1];
+	unsigned char buffer[1];
 	return peekData(buffer, 1) > 0;
 }
 ///////////////////////////////////////////////////////////////////
@@ -343,6 +343,9 @@ int Serial::peekData(void *buffer, unsigned int nbByte) {
 	//bytes available. The function return -1 when nothing could
 	//be read, the number of bytes actually read.
 	
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.addMarker("Peek Data");
+	
 	int bytesRead = readData(buffer, nbByte);
 	unsigned char *p = (unsigned char*)buffer;
 	
@@ -351,6 +354,35 @@ int Serial::peekData(void *buffer, unsigned int nbByte) {
 		p++;
 	}
 	
+	if ( bytesRead > 0 && traceSpyInfo && spyWrite )
+		cnc::spy.addMarker(wxString::Format(" %d Byte(s) peeked . . . ", bytesRead));
+	
+	return bytesRead;
+}
+///////////////////////////////////////////////////////////////////
+int Serial::readBufferedData(void *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	if ( readBuffer.empty() || nbByte == 0 )
+		return 0;
+	
+	// if buffered data exists
+	unsigned char *p		 = (unsigned char*)buffer;
+	unsigned int bytesToRead = nbByte;
+	
+	while ( readBuffer.empty() == false ) {
+		*p = readBuffer.front();
+		readBuffer.pop();
+		p++;
+		
+		if ( --bytesToRead == 0 )
+			break;
+	}
+	
+	// prefill buffer
+	buffer = p;
+	
+	// return the byte count are already read
+	const int bytesRead = nbByte - bytesToRead;
 	return bytesRead;
 }
 ///////////////////////////////////////////////////////////////////
@@ -364,20 +396,10 @@ int Serial::readData(void *buffer, unsigned int nbByte) {
 	if ( nbByte == 0 )
 		return 0;
 		
-	unsigned char *p		 = (unsigned char*)buffer;
-	unsigned int bytesToRead = nbByte;
+	const int bytesRead   = readBufferedData(buffer, nbByte);
+	const int bytesToRead = nbByte - bytesRead;
 	
-	while ( readBuffer.empty() == false ) {
-		*p = readBuffer.front();
-		readBuffer.pop();
-		
-		p++;
-		
-		if ( --bytesToRead == 0 )
-			return nbByte;
-	}
-		
-	return SerialOSD::readData(p, bytesToRead);
+	return bytesToRead > 0 ? SerialOSD::readData(buffer, bytesToRead) : bytesRead;
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::writeData(void *buffer, unsigned int nbByte) {
@@ -537,11 +559,19 @@ bool Serial::clearRemainingBytes(bool trace) {
 	unsigned int bytes   = 0;
 	unsigned int counter = 0;
 	
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.addMarker(CNC_LOG_FUNCT);
+		
 	while ( ( bytes = readData(oneReadBuf, maxBytes - 1)) ) {
 		std::cout << CNC_LOG_FUNCT;
 		
+		const wxString appendix(wxString::Format("Cleared bytes (# %u):", bytes));
+		
+		if ( traceSpyInfo && spyWrite )
+			cnc::spy.addMarker(appendix);
+			
 		if ( trace == true ) {
-			std::cout << ": Remaining bytes (# " << bytes << "): ";
+			std::cout << ": " << appendix;
 			
 			wxString bStr;
 			for (unsigned int i=0; i<bytes; i++)
@@ -591,10 +621,9 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 	unsigned int cnt = 0;
 	
 	while ( remainingBytes > 0 ) {
-		#warning this causes a dead look in case of using the serial thread
-		//bytesRead = readData(oneReadBuf, std::min(remainingBytes, maxBytes));
+		bytesRead = readData(oneReadBuf, std::min(remainingBytes, maxBytes));
+		//bytesRead = readData(oneReadBuf, 1);
 		
-		bytesRead = readData(oneReadBuf, 1);
 		if ( bytesRead > 0 ) {
 			
 			// Make the memcpy below safe
@@ -694,14 +723,14 @@ int Serial::readDataUntilMultyByteClose(unsigned char* buffer, unsigned int nbBy
 	return byteCounter;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::popSerial(bool returnImmediately) {
+bool Serial::popSerial() {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
 		std::cerr << "SERIAL::popSerial()::ERROR: Not connected\n";
 		return false;
 	}
 	
-	const unsigned char cmd = returnImmediately ? CMD_POP_SERIAL : CMD_POP_SERIAL_WAIT;
+	const unsigned char cmd = CMD_POP_SERIAL;
 	
 	SerialCommandLocker scl(cmd);
 	if ( scl.lock(cncControl) == false )
@@ -1255,7 +1284,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 																	   << '"' << ArduinoCMDs::getCMDLabel((int)sfi.command) << '"'\
 																	   << std::endl; \
 		 \
-		lastFetchResult.ret = ret; \
+		lastFetchResult.ret		= ret; \
 		handshakeInfo.command	= sfi.command; \
 		handshakeInfo.handshake = ret; \
 		cncControl->SerialControllerCallback(handshakeInfo);
@@ -1266,8 +1295,8 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 	bool fetchMore = true;
 	while ( fetchMore ) {
 		
-lastFetchResult.index = 0;
-
+		// reset the index
+		lastFetchResult.index = 0;
 		
 		// read one byte from serial
 		unsigned char ret = fetchControllerResult(sfi);
@@ -1342,7 +1371,7 @@ lastFetchResult.index = 0;
 						return false;
 					}
 					
-					// Don't wait while command == CMD_PEEK_SERIAL 
+					// Don't wait while command == CMD_POP_SERIAL 
 					if ( sfi.command == CMD_POP_SERIAL ) {
 						if ( dataAvailable() == false) {
 							// break fetch loop
@@ -1367,11 +1396,16 @@ lastFetchResult.index = 0;
 			// -----------------------------------------------------------
 			//evaluateResult..........................................
 			default: {
-				
-				std::cerr << "Serial::evaluateResult : Invalid Acknowlege:" << std::endl
-						  << " Command               : '" << sfi.command << "' - " << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl
-						  << " Acknowlege as integer : " << (int)ret << std::endl;
+				std::stringstream ss;
+				ss	<< "Serial::evaluateResult : Invalid Acknowlege:" << std::endl
+					<< " Command               : '" << sfi.command << "' - " << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl
+					<< " Acknowlege as integer : "  << (int)ret << std::endl;
 						  
+				if ( traceSpyInfo )
+					cnc::spy.finalizeRET_ERROR(ss.str().c_str());
+					
+				std::cerr << ss.str().c_str();
+				
 				cncControl->SerialCallback();
 				
 				if ( clearRemainingBytes(true) == false )
@@ -1553,7 +1587,8 @@ bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 		case RET_QUIT:
 		case RET_LIMIT:				msg.assign(wxString::Format("Serial::RET_SOH_Handler: Received %s. Can't read content info", decodeContollerResult(pid)));
 									std::cerr << msg << std::endl;
-									cnc::spy.finalizeRET_ERROR(msg);
+									if ( traceSpyInfo )
+										cnc::spy.finalizeRET_ERROR(msg);
 									return false;
 			
 		//RET_SOH_Handler..........................................

@@ -5,6 +5,7 @@
   <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="BMP_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bug-error.png</object>
   <object class="wxBitmap" name="BMP_IN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-step_in.png</object>
   <object class="wxBitmap" name="BMP_IN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-step_in@2x.png</object>
   <object class="wxBitmap" name="BMP_IN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-step_in@2x.png</object>
@@ -14,12 +15,14 @@
   <object class="wxBitmap" name="BMP_OUT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-step_out.png</object>
   <object class="wxBitmap" name="BMP_OUT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-step_out@2x.png</object>
   <object class="wxBitmap" name="BMP_OUT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-step_out@2x.png</object>
-  <object class="wxBitmap" name="BMP_RET_ERROR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\plugin_not_ok.png</object>
-  <object class="wxBitmap" name="BMP_RET_OK">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\plugin_ok.png</object>
+  <object class="wxBitmap" name="BMP_RET_ERROR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-error-5 (2).png</object>
+  <object class="wxBitmap" name="BMP_RET_OK">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-accept-2.png</object>
+  <object class="wxBitmap" name="BMP_RET_WARNING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-warning-panel (2).png</object>
   <object class="wxBitmap" name="auto-scroll">bitmaps\auto-scroll.png</object>
   <object class="wxBitmap" name="book-add">bitmaps\book-add.png</object>
   <object class="wxBitmap" name="brick-delete">bitmaps\brick-delete.png</object>
   <object class="wxBitmap" name="brick-edit">bitmaps\brick-edit.png</object>
+  <object class="wxBitmap" name="bug-error">bitmaps\bug-error.png</object>
   <object class="wxBitmap" name="document-open-6">bitmaps\document-open-6.png</object>
   <object class="wxBitmap" name="format-table-column-width">bitmaps\format-table-column-width.png</object>
   <object class="wxBitmap" name="script-delete">bitmaps\script-delete.png</object>

@@ -17,8 +17,11 @@ class CncSerialSpyPanel : public CncSerialSpyPanelBase {
 		void		enableSerialSpy(bool state);
 		void		clearSerialSpyBeforNextRun();
 		void		clearSerialSpyOnConnect();
+		void		updateIntervalSlider();
 		
 	protected:
+		virtual void onLiveDebug(wxCommandEvent& event);
+		virtual void onUpdateIntervalSlider(wxScrollEvent& event);
 		virtual void onAutoColumnSize(wxCommandEvent& event);
 		virtual void onAutoScrolling(wxCommandEvent& event);
 		virtual void clearSerialSpy(wxCommandEvent& event);

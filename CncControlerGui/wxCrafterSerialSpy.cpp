@@ -36,7 +36,7 @@ CncSerialSpyPanelBase::CncSerialSpyPanelBase(wxWindow* parent, wxWindowID id, co
     
     flexGridSizer27261->Add(m_panel9492, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer27302 = new wxFlexGridSizer(1, 8, 0, 0);
+    wxFlexGridSizer* flexGridSizer27302 = new wxFlexGridSizer(1, 9, 0, 0);
     flexGridSizer27302->SetFlexibleDirection( wxBOTH );
     flexGridSizer27302->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer27302->AddGrowableCol(5);
@@ -93,7 +93,7 @@ CncSerialSpyPanelBase::CncSerialSpyPanelBase(wxWindow* parent, wxWindowID id, co
     
     flexGridSizer27302->Add(m_staticLine9489, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer4706 = new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* flexGridSizer4706 = new wxFlexGridSizer(1, 8, 0, 0);
     flexGridSizer4706->SetFlexibleDirection( wxBOTH );
     flexGridSizer4706->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -105,6 +105,13 @@ CncSerialSpyPanelBase::CncSerialSpyPanelBase(wxWindow* parent, wxWindowID id, co
     
     flexGridSizer4706->Add(m_liveDecoding, 0, wxALL, WXC_FROM_DIP(0));
     m_liveDecoding->SetMinSize(wxSize(26,26));
+    
+    m_liveDebug = new wxBitmapToggleButton(m_panel9492, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("bug-error")), wxDefaultPosition, wxDLG_UNIT(m_panel9492, wxSize(26,26)), 0);
+    m_liveDebug->SetToolTip(_("Further consider Debug Entries"));
+    m_liveDebug->SetValue(false);
+    
+    flexGridSizer4706->Add(m_liveDebug, 0, wxALL, WXC_FROM_DIP(0));
+    m_liveDebug->SetMinSize(wxSize(26,26));
     
     m_autoScroling = new wxBitmapToggleButton(m_panel9492, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("auto-scroll")), wxDefaultPosition, wxDLG_UNIT(m_panel9492, wxSize(26,26)), 0);
     m_autoScroling->SetToolTip(_("Auto Scrolling"));
@@ -144,23 +151,64 @@ CncSerialSpyPanelBase::CncSerialSpyPanelBase(wxWindow* parent, wxWindowID id, co
     flexGridSizer4706->Add(m_openDetails, 0, wxALL, WXC_FROM_DIP(1));
     m_openDetails->SetMinSize(wxSize(26,26));
     
-    wxFlexGridSizer* flexGridSizer4704 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer4704->SetFlexibleDirection( wxBOTH );
-    flexGridSizer4704->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4704->AddGrowableCol(0);
-    flexGridSizer4704->AddGrowableRow(0);
+    wxFlexGridSizer* flexGridSizer9518 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer9518->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9518->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9518->AddGrowableCol(0);
+    flexGridSizer9518->AddGrowableRow(0);
     
-    flexGridSizer27261->Add(flexGridSizer4704, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer27261->Add(flexGridSizer9518, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer9514 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer9514->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9514->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9514->AddGrowableCol(0);
+    flexGridSizer9514->AddGrowableRow(0);
+    
+    flexGridSizer9518->Add(flexGridSizer9514, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_serialSpyPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_serialSpyPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer4704->Add(m_serialSpyPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer9514->Add(m_serialSpyPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_infobar = new wxInfoBar(this, wxID_ANY);
     m_infobar->SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     
-    flexGridSizer4704->Add(m_infobar, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9514->Add(m_infobar, 0, wxALL|wxEXPAND, WXC_FROM_DIP(4));
+    
+    m_staticLine9537 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer9518->Add(m_staticLine9537, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer9520 = new wxFlexGridSizer(1, 4, 0, 0);
+    flexGridSizer9520->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9520->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9520->AddGrowableCol(2);
+    flexGridSizer9520->AddGrowableRow(0);
+    
+    flexGridSizer9518->Add(flexGridSizer9520, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    flexGridSizer9520->Add(3, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText9524 = new wxStaticText(this, wxID_ANY, _("Update Interval:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText9524->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_staticText9524Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText9524->SetFont(m_staticText9524Font);
+    
+    flexGridSizer9520->Add(m_staticText9524, 0, wxALL, WXC_FROM_DIP(3));
+    
+    m_sliderUpdateInterval = new wxSlider(this, wxID_ANY, 800, 100, 1000, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxSL_HORIZONTAL);
+    m_sliderUpdateInterval->SetToolTip(_("Update Interval"));
+    
+    flexGridSizer9520->Add(m_sliderUpdateInterval, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText9539 = new wxStaticText(this, wxID_ANY, _("[ms]"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText9539->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_staticText9539Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText9539->SetFont(m_staticText9539Font);
+    
+    flexGridSizer9520->Add(m_staticText9539, 0, wxALL, WXC_FROM_DIP(3));
     
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     SetName(wxT("CncSerialSpyPanelBase"));
@@ -174,9 +222,13 @@ CncSerialSpyPanelBase::CncSerialSpyPanelBase(wxWindow* parent, wxWindowID id, co
     m_clearSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::clearSerialSpy), NULL, this);
     m_cbSerialSpyMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncSerialSpyPanelBase::selectSerialSpyMode), NULL, this);
     m_liveDecoding->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::onLiveDecoding), NULL, this);
+    m_liveDebug->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::onLiveDebug), NULL, this);
     m_autoScroling->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::onAutoScrolling), NULL, this);
     m_autoColumnSizing->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::onAutoColumnSize), NULL, this);
     m_openDetails->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::openSpyDetailWindow), NULL, this);
+    m_sliderUpdateInterval->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSerialSpyPanelBase::onUpdateIntervalSlider), NULL, this);
+    m_sliderUpdateInterval->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSerialSpyPanelBase::onUpdateIntervalSlider), NULL, this);
+    m_sliderUpdateInterval->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSerialSpyPanelBase::onUpdateIntervalSlider), NULL, this);
     
 }
 
@@ -187,9 +239,13 @@ CncSerialSpyPanelBase::~CncSerialSpyPanelBase()
     m_clearSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::clearSerialSpy), NULL, this);
     m_cbSerialSpyMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncSerialSpyPanelBase::selectSerialSpyMode), NULL, this);
     m_liveDecoding->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::onLiveDecoding), NULL, this);
+    m_liveDebug->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::onLiveDebug), NULL, this);
     m_autoScroling->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::onAutoScrolling), NULL, this);
     m_autoColumnSizing->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::onAutoColumnSize), NULL, this);
     m_openDetails->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSerialSpyPanelBase::openSpyDetailWindow), NULL, this);
+    m_sliderUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSerialSpyPanelBase::onUpdateIntervalSlider), NULL, this);
+    m_sliderUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSerialSpyPanelBase::onUpdateIntervalSlider), NULL, this);
+    m_sliderUpdateInterval->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSerialSpyPanelBase::onUpdateIntervalSlider), NULL, this);
     
 }
 
@@ -271,6 +327,19 @@ ImageLibSpy::ImageLibSpy()
     {
         wxBitmap bmp;
         wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_RET_WARNING"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_RET_WARNING"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
         bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_RET_ERROR"));
         if(bmp.IsOk()) {
             if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
@@ -303,6 +372,19 @@ ImageLibSpy::ImageLibSpy()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_MARKER@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_DEBUG"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_DEBUG"), bmp));
         }
     }
     

@@ -608,6 +608,7 @@ bool CncArduinoController::processSignalUpdate(byte& retValue) {
       }
 
       // init the movment update
+      // As Int8 to resolve also negative values
       updateInteractiveMoveValues((int8_t)dx, (int8_t)dy, (int8_t)dz);
       
       ret       = true;

@@ -1,5 +1,6 @@
 .codelite/
-CallGraph/
+CallGraph/**
+cmake-build-Release/**
 CncControlerGui/Release/**
 CncControlerGui/Debug/**
 CncControlerGui/Gprof/**

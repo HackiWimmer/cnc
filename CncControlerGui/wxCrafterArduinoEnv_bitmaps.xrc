@@ -7,13 +7,39 @@
   <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
   <object class="wxBitmap" name="16-pull">bitmaps\16-pull.png</object>
   <object class="wxBitmap" name="16-pull@2x">bitmaps\16-pull@2x.png</object>
-  <object class="wxBitmap" name="Arduino_Logo1">bitmaps\Arduino\Arduino_Logo1.png</object>
-  <object class="wxBitmap" name="Clockwise">bitmaps\Stepper\Clockwise.png</object>
-  <object class="wxBitmap" name="CounterClockwise">bitmaps\Stepper\CounterClockwise.png</object>
+  <object class="wxBitmap" name="16-sort">bitmaps\CodeLite\16-sort.png</object>
+  <object class="wxBitmap" name="16-sort@2x">bitmaps\CodeLite\16-sort@2x.png</object>
+  <object class="wxBitmap" name="24-redo">bitmaps\CodeLite\24-redo.png</object>
+  <object class="wxBitmap" name="24-redo@2x">bitmaps\CodeLite\24-redo@2x.png</object>
+  <object class="wxBitmap" name="24-stop">bitmaps\CodeLite\24-stop.png</object>
+  <object class="wxBitmap" name="24-stop@2x">bitmaps\CodeLite\24-stop@2x.png</object>
+  <object class="wxBitmap" name="24-undo">bitmaps\CodeLite\24-undo.png</object>
+  <object class="wxBitmap" name="24-undo@2x">bitmaps\CodeLite\24-undo@2x.png</object>
+  <object class="wxBitmap" name="BMP_ANALOG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\user-extended-away (2).png</object>
+  <object class="wxBitmap" name="BMP_DIR_CCW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-undo.png</object>
+  <object class="wxBitmap" name="BMP_DIR_CCW@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-undo@2x.png</object>
+  <object class="wxBitmap" name="BMP_DIR_CCW@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-undo@2x.png</object>
+  <object class="wxBitmap" name="BMP_DIR_CW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-redo.png</object>
+  <object class="wxBitmap" name="BMP_DIR_CW@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-redo@2x.png</object>
+  <object class="wxBitmap" name="BMP_DIR_CW@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-redo@2x.png</object>
+  <object class="wxBitmap" name="BMP_DIR_UNKNOWN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-stop.png</object>
+  <object class="wxBitmap" name="BMP_DIR_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-stop@2x.png</object>
+  <object class="wxBitmap" name="BMP_DIR_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-stop@2x.png</object>
+  <object class="wxBitmap" name="BMP_HIGH">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\user-available.png</object>
+  <object class="wxBitmap" name="BMP_INPUT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-redo.png</object>
+  <object class="wxBitmap" name="BMP_INPUT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-redo@2x.png</object>
+  <object class="wxBitmap" name="BMP_INPUT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-redo@2x.png</object>
+  <object class="wxBitmap" name="BMP_LOW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-record.png</object>
+  <object class="wxBitmap" name="BMP_LOW@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-record@2x.png</object>
+  <object class="wxBitmap" name="BMP_LOW@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-record@2x.png</object>
+  <object class="wxBitmap" name="BMP_OUTPUT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-undo.png</object>
+  <object class="wxBitmap" name="BMP_OUTPUT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-undo@2x.png</object>
+  <object class="wxBitmap" name="BMP_OUTPUT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-undo@2x.png</object>
   <object class="wxBitmap" name="ToggelSwitch">bitmaps\Switch\ToggelSwitch.png</object>
   <object class="wxBitmap" name="application-view-tile">bitmaps\application-view-tile.png</object>
+  <object class="wxBitmap" name="arduino_logo">bitmaps\Arduino\arduino_logo.png</object>
   <object class="wxBitmap" name="bug (2)">bitmaps\bug (2).png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="emergency-button-klein">bitmaps\emergency-button-klein.png</object>
-  <object class="wxBitmap" name="steppermotor0">bitmaps\Stepper\steppermotor0.png</object>
+  <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
 </resource>

@@ -142,6 +142,20 @@ bool AE::ArduinoData::isAnalogPin(AE::PinName pin) {
 		case PN_A3:
 		case PN_A4:
 		case PN_A5:	return true;
+		
+		#if defined(ARDUINO_AVR_MEGA2560)
+			case PN_A6:
+			case PN_A7:
+			case PN_A8:
+			case PN_A9:
+			case PN_A10:
+			case PN_A11:
+			case PN_A12:
+			case PN_A13:
+			case PN_A14:
+			case PN_A15:	return true;
+		#endif
+		
 		default:	;
 	}
 

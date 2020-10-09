@@ -331,6 +331,7 @@ protected:
     wxButton* m_btConfirmRun;
     wxPanel* m_additionalParameters;
     wxStaticText* m_staticText114811;
+    wxPanel* m_panel9494;
     wxStaticBitmap* m_staticBitmap92606;
     wxStaticText* m_staticText1603237;
     wxStaticText* m_staticText9268;
@@ -1183,6 +1184,7 @@ public:
     wxStaticBitmap* GetStaticBitmap9262() { return m_staticBitmap9262; }
     wxStaticText* GetStaticText9255() { return m_staticText9255; }
     wxSlider* GetStepDelay() { return m_stepDelay; }
+    wxPanel* GetPanel9494() { return m_panel9494; }
     wxPanel* GetAdditionalParameters() { return m_additionalParameters; }
     wxStaticText* GetStaticText12831() { return m_staticText12831; }
     wxButton* GetBtRequestCtlConfig() { return m_btRequestCtlConfig; }

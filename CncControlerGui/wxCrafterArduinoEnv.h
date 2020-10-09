@@ -17,18 +17,22 @@
 #include <wx/panel.h>
 #include <wx/button.h>
 #include <wx/statline.h>
+#include <wx/textctrl.h>
 #include <wx/splitter.h>
 #include <wx/stattext.h>
+#include <wx/bmpbuttn.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
-#include <wx/bmpbuttn.h>
 #include <wx/statbmp.h>
-#include <wx/textctrl.h>
 #include <wx/propgrid/manager.h>
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/tglbtn.h>
+#include <wx/slider.h>
 #include <wx/timer.h>
+#include <wx/bitmap.h>
+#include <map>
+#include <wx/icon.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -55,10 +59,15 @@ protected:
     wxStaticLine* m_staticLine247;
     wxButton* m_btPeriphery;
     wxButton* m_btConfiguration;
+    wxTextCtrl* m_boardType;
+    wxSplitterWindow* m_splitter250;
+    wxPanel* m_splitterPage254;
+    wxStaticText* m_staticText91;
+    wxBitmapButton* m_btSortPins;
+    wxPanel* m_pinListPlaceholder;
+    wxPanel* m_splitterPage258;
     wxSplitterWindow* m_splitterMainH;
     wxPanel* m_splitterPageTop;
-    wxStaticText* m_staticText91;
-    wxPanel* m_pinListPlaceholder;
     wxSimplebook* m_contextBook;
     wxPanel* m_panelArduinosPeriphery;
     wxStaticText* m_staticText83;
@@ -99,20 +108,22 @@ protected:
     wxStaticText* m_staticText152;
     wxBitmapButton* m_btSSBit1;
     wxStaticLine* m_staticLine121;
-    wxStaticBitmap* m_bmpStepper;
-    wxStaticText* m_staticText215;
-    wxStaticBitmap* m_bmpDirectionX;
-    wxTextCtrl* m_posStepperX;
-    wxStaticLine* m_staticLine217;
-    wxStaticBitmap* m_bmpStepper10;
-    wxStaticText* m_staticText21512;
-    wxStaticBitmap* m_bmpDirectionY;
-    wxTextCtrl* m_posStepperY;
-    wxStaticLine* m_staticLine219;
-    wxStaticBitmap* m_bmpStepper3;
     wxStaticText* m_staticText2155;
-    wxStaticBitmap* m_bmpDirectionZ;
+    wxTextCtrl* m_speed;
+    wxStaticBitmap* m_staticBitmap335;
+    wxStaticText* m_staticText3132;
+    wxStaticText* m_staticText215;
+    wxTextCtrl* m_posStepperX;
+    wxStaticBitmap* m_bmpDirectionX;
+    wxStaticText* m_staticText313;
+    wxStaticText* m_staticText21512;
+    wxTextCtrl* m_posStepperY;
+    wxStaticBitmap* m_bmpDirectionY;
+    wxStaticText* m_staticText3131;
+    wxStaticText* m_staticText21554;
     wxTextCtrl* m_posStepperZ;
+    wxStaticBitmap* m_bmpDirectionZ;
+    wxStaticText* m_staticText31327;
     wxPanel* m_panelConfiguration;
     wxStaticText* m_staticText9117;
     wxPropertyGridManager* m_pgMgrConfig;
@@ -125,6 +136,10 @@ protected:
     wxStaticBitmap* m_staticBitmap203;
     wxPanel* m_splitterPageBottom;
     wxPanel* m_loggerPlaceholder;
+    wxStaticLine* m_staticLine309;
+    wxStaticText* m_staticText305;
+    wxSlider* m_sliderUpdateInterval;
+    wxStaticText* m_staticText311;
     wxPanel* m_panelStatusbar;
     wxStaticText* m_staticText127;
     wxTextCtrl* m_curLimitStates;
@@ -146,9 +161,11 @@ protected:
     virtual void onClearTrace(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectArduinoPeriphery(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectConfiguration(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSortPins(wxCommandEvent& event) { event.Skip(); }
     virtual void onConfigChanged(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void onConfigChanging(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void onEmergencyButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void onLoggerUpdateInterval(wxScrollEvent& event) { event.Skip(); }
     virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
     virtual void onContinuousTimer(wxTimerEvent& event) { event.Skip(); }
 
@@ -158,9 +175,12 @@ public:
     wxStaticLine* GetStaticLine247() { return m_staticLine247; }
     wxButton* GetBtPeriphery() { return m_btPeriphery; }
     wxButton* GetBtConfiguration() { return m_btConfiguration; }
+    wxTextCtrl* GetBoardType() { return m_boardType; }
     wxPanel* GetPanelToolbar() { return m_panelToolbar; }
     wxStaticText* GetStaticText91() { return m_staticText91; }
+    wxBitmapButton* GetBtSortPins() { return m_btSortPins; }
     wxPanel* GetPinListPlaceholder() { return m_pinListPlaceholder; }
+    wxPanel* GetSplitterPage254() { return m_splitterPage254; }
     wxStaticText* GetStaticText83() { return m_staticText83; }
     wxStaticText* GetStaticText85() { return m_staticText85; }
     wxStaticText* GetStaticText87() { return m_staticText87; }
@@ -199,20 +219,22 @@ public:
     wxStaticText* GetStaticText152() { return m_staticText152; }
     wxBitmapButton* GetBtSSBit1() { return m_btSSBit1; }
     wxStaticLine* GetStaticLine121() { return m_staticLine121; }
-    wxStaticBitmap* GetBmpStepper() { return m_bmpStepper; }
-    wxStaticText* GetStaticText215() { return m_staticText215; }
-    wxStaticBitmap* GetBmpDirectionX() { return m_bmpDirectionX; }
-    wxTextCtrl* GetPosStepperX() { return m_posStepperX; }
-    wxStaticLine* GetStaticLine217() { return m_staticLine217; }
-    wxStaticBitmap* GetBmpStepper10() { return m_bmpStepper10; }
-    wxStaticText* GetStaticText21512() { return m_staticText21512; }
-    wxStaticBitmap* GetBmpDirectionY() { return m_bmpDirectionY; }
-    wxTextCtrl* GetPosStepperY() { return m_posStepperY; }
-    wxStaticLine* GetStaticLine219() { return m_staticLine219; }
-    wxStaticBitmap* GetBmpStepper3() { return m_bmpStepper3; }
     wxStaticText* GetStaticText2155() { return m_staticText2155; }
-    wxStaticBitmap* GetBmpDirectionZ() { return m_bmpDirectionZ; }
+    wxTextCtrl* GetSpeed() { return m_speed; }
+    wxStaticBitmap* GetStaticBitmap335() { return m_staticBitmap335; }
+    wxStaticText* GetStaticText3132() { return m_staticText3132; }
+    wxStaticText* GetStaticText215() { return m_staticText215; }
+    wxTextCtrl* GetPosStepperX() { return m_posStepperX; }
+    wxStaticBitmap* GetBmpDirectionX() { return m_bmpDirectionX; }
+    wxStaticText* GetStaticText313() { return m_staticText313; }
+    wxStaticText* GetStaticText21512() { return m_staticText21512; }
+    wxTextCtrl* GetPosStepperY() { return m_posStepperY; }
+    wxStaticBitmap* GetBmpDirectionY() { return m_bmpDirectionY; }
+    wxStaticText* GetStaticText3131() { return m_staticText3131; }
+    wxStaticText* GetStaticText21554() { return m_staticText21554; }
     wxTextCtrl* GetPosStepperZ() { return m_posStepperZ; }
+    wxStaticBitmap* GetBmpDirectionZ() { return m_bmpDirectionZ; }
+    wxStaticText* GetStaticText31327() { return m_staticText31327; }
     wxPanel* GetPanelArduinosPeriphery() { return m_panelArduinosPeriphery; }
     wxStaticText* GetStaticText9117() { return m_staticText9117; }
     wxPropertyGridManager* GetPgMgrConfig() { return m_pgMgrConfig; }
@@ -224,8 +246,14 @@ public:
     wxStaticBitmap* GetStaticBitmap203() { return m_staticBitmap203; }
     wxPanel* GetSplitterPageTop() { return m_splitterPageTop; }
     wxPanel* GetLoggerPlaceholder() { return m_loggerPlaceholder; }
+    wxStaticLine* GetStaticLine309() { return m_staticLine309; }
+    wxStaticText* GetStaticText305() { return m_staticText305; }
+    wxSlider* GetSliderUpdateInterval() { return m_sliderUpdateInterval; }
+    wxStaticText* GetStaticText311() { return m_staticText311; }
     wxPanel* GetSplitterPageBottom() { return m_splitterPageBottom; }
     wxSplitterWindow* GetSplitterMainH() { return m_splitterMainH; }
+    wxPanel* GetSplitterPage258() { return m_splitterPage258; }
+    wxSplitterWindow* GetSplitter250() { return m_splitter250; }
     wxStaticText* GetStaticText127() { return m_staticText127; }
     wxTextCtrl* GetCurLimitStates() { return m_curLimitStates; }
     wxStaticLine* GetStaticLine186() { return m_staticLine186; }
@@ -241,6 +269,64 @@ public:
     wxTimer* GetContinuousTimer() { return m_continuousTimer; }
     CncArduinoEnvironmentBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Arduino-/Periphery-Environment"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,1000), long style = wxCAPTION|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX|wxSTAY_ON_TOP);
     virtual ~CncArduinoEnvironmentBase();
+};
+
+
+class ImageLibPins : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibPins();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibPins();
+};
+
+
+class ImageLibStepper : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibStepper();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibStepper();
 };
 
 #endif

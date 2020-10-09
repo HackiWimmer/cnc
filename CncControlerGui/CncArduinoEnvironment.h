@@ -32,6 +32,8 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		void activateOnClose(bool state) { canClose = state; }
 		
 	protected:
+		virtual void onLoggerUpdateInterval(wxScrollEvent& event);
+		virtual void onSortPins(wxCommandEvent& event);
 		virtual void onConfigChanged(wxPropertyGridEvent& event);
 		virtual void onConfigChanging(wxPropertyGridEvent& event);
 		virtual void onSelectConfiguration(wxCommandEvent& event);
@@ -142,6 +144,8 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		bool publishStatesUpdate();
 		bool publishLimitSwitchUpdate(int name, bool state);
 		void publishForceUpdate();
+		
+		void setUpdateInterval();
 		
 		void updateLimitStates();
 		void updateSupportStates();

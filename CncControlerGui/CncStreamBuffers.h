@@ -121,6 +121,7 @@ class CncCspyBuf : public LoggerStreamBuf {
 		virtual void flush();
 		
 		void addLine(const wxString& line, int type);
+		void addLine(const wxString& line, const wxString& appendix, int type);
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -315,6 +316,7 @@ class CncSerialSpyStream : public CncTraceLogStream {
 		///////////////////////////////////////////////////////////
 		void logCommand				(const wxString& cmd);
 		void addMarker				(const wxString& mt);
+		void addDebugEntry			(const wxString& mt);
 		void enableMessage			(const char* additional = NULL);
 		void disableMessage			(const char* additional = NULL);
 		

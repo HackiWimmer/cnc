@@ -2,6 +2,7 @@
 #define CNC_MESSAGE_LIST_CTRL_H
 
 #include <wx/datetime.h>
+#include <wx/timer.h>
 #include "CncLargeScaleListCtrl.h"
 
 class CncMessageListCtrl : public CncLargeScaledListCtrl {
@@ -33,26 +34,30 @@ class CncMessageListCtrl : public CncLargeScaledListCtrl {
 		typedef std::vector<Message> MesageList;
 		MesageList messages;
 		
-		wxListItemAttr itemAttrInfo;
-		wxListItemAttr itemAttrWarning;
-		wxListItemAttr itemAttrError;
-		wxListItemAttr itemAttrDebug;
-		wxListItemAttr itemAttrSeparator;
+		int 			updateInterval;
+		wxTimer			displayTimer;
+		wxListItemAttr	itemAttrInfo;
+		wxListItemAttr	itemAttrWarning;
+		wxListItemAttr	itemAttrError;
+		wxListItemAttr	itemAttrDebug;
+		wxListItemAttr	itemAttrSeparator;
 		
 		virtual wxString OnGetItemText(long item, long column) const;
 		virtual int OnGetItemColumnImage(long item, long column) const;
 		virtual wxListItemAttr *OnGetItemAttr(long item) const;
 
+		void onDisplayTimer(wxTimerEvent& event);
 		void onSize(wxSizeEvent& event);
 		void onSelectListItem(wxListEvent& event);
 		void onActivateListItem(wxListEvent& event);
 		
 	protected:
+		
 		virtual bool isItemValid(long item) const;
 		void updateColumnWidth();
-
-	public:
 	
+	public:
+		
 		static const int COL_TIM			= 0;
 		static const int COL_TYP			= 1;
 		static const int COL_MSG			= 2;
@@ -64,6 +69,7 @@ class CncMessageListCtrl : public CncLargeScaledListCtrl {
 		CncMessageListCtrl(wxWindow *parent, long style);
 		virtual ~CncMessageListCtrl();
 		
+		void setUpdateInterval(int value);
 		void appendMessage(const char type, const wxString& message);
 		void appendMessage(const char type, const wxString& message, const wxString& context);
 		void clear();

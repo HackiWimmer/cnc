@@ -106,10 +106,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auibarMain->AddStretchSpacer(1);
     
+    m_auibarMain->AddSeparator();
+    
     m_staticBitmap9222 = new wxStaticBitmap(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snail")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0 );
     m_auibarMain->AddControl(m_staticBitmap9222);
-    
-    m_auibarMain->AddSeparator();
     
     m_staticText9216 = new wxStaticText(m_auibarMain, wxID_ANY, _("F"), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     wxFont m_staticText9216Font(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
@@ -2338,7 +2338,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1076->Add(m_notebookConfig, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_cncSummary = new wxPanel(m_notebookConfig, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookConfig, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_cncSummary->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     int m_cncSummaryImgIndex;
     m_cncSummaryImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database")));
     m_notebookConfig->AddPage(m_cncSummary, _("Setup\nSummary"), true, m_cncSummaryImgIndex);
@@ -2351,7 +2350,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cncSummary->SetSizer(flexGridSizer2603);
     
     m_staticText11481 = new wxStaticText(m_cncSummary, wxID_ANY, _("Configuration Summary:"), wxDefaultPosition, wxDLG_UNIT(m_cncSummary, wxSize(-1,-1)), 0);
-    m_staticText11481->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_staticText11481Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText11481->SetFont(m_staticText11481Font);
     
@@ -2393,37 +2391,41 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2609->Add(m_btConfirmRun, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
     m_additionalParameters = new wxPanel(m_notebookConfig, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookConfig, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_additionalParameters->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     int m_additionalParametersImgIndex;
     m_additionalParametersImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("tools-equalizer-blue")));
     m_notebookConfig->AddPage(m_additionalParameters, _("Additional\nParameters"), false, m_additionalParametersImgIndex);
     
-    wxFlexGridSizer* flexGridSizer9394 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer9394 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer9394->SetFlexibleDirection( wxBOTH );
     flexGridSizer9394->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9394->AddGrowableCol(0);
-    flexGridSizer9394->AddGrowableRow(1);
+    flexGridSizer9394->AddGrowableRow(2);
     m_additionalParameters->SetSizer(flexGridSizer9394);
     
     m_staticText114811 = new wxStaticText(m_additionalParameters, wxID_ANY, _("Additional Parameters:"), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), 0);
-    m_staticText114811->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_staticText114811Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText114811->SetFont(m_staticText114811Font);
     
     flexGridSizer9394->Add(m_staticText114811, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
+    flexGridSizer9394->Add(0, 8, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_panel9494 = new wxPanel(m_additionalParameters, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel9494->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer9394->Add(m_panel9494, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     wxFlexGridSizer* flexGridSizer9248 = new wxFlexGridSizer(0, 3, 0, 0);
     flexGridSizer9248->SetFlexibleDirection( wxBOTH );
     flexGridSizer9248->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9248->AddGrowableCol(2);
+    m_panel9494->SetSizer(flexGridSizer9248);
     
-    flexGridSizer9394->Add(flexGridSizer9248, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_staticBitmap92606 = new wxStaticBitmap(m_additionalParameters, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("application-tile-horizontal")), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), 0 );
+    m_staticBitmap92606 = new wxStaticBitmap(m_panel9494, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("application-tile-horizontal")), wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), 0 );
     
     flexGridSizer9248->Add(m_staticBitmap92606, 0, wxALL, WXC_FROM_DIP(7));
     
-    m_staticText1603237 = new wxStaticText(m_additionalParameters, wxID_ANY, _("Parameter:"), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), 0);
+    m_staticText1603237 = new wxStaticText(m_panel9494, wxID_ANY, _("Parameter:"), wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), 0);
     m_staticText1603237->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_staticText1603237Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText1603237->SetFont(m_staticText1603237Font);
@@ -2431,51 +2433,51 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer9248->Add(m_staticText1603237, 0, wxALL|wxEXPAND, WXC_FROM_DIP(7));
     m_staticText1603237->SetMinSize(wxSize(250,-1));
     
-    m_staticText9268 = new wxStaticText(m_additionalParameters, wxID_ANY, _("Value:"), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), 0);
+    m_staticText9268 = new wxStaticText(m_panel9494, wxID_ANY, _("Value:"), wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), 0);
     m_staticText9268->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_staticText9268Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText9268->SetFont(m_staticText9268Font);
     
     flexGridSizer9248->Add(m_staticText9268, 0, wxALL, WXC_FROM_DIP(7));
     
-    m_staticLine9270 = new wxStaticLine(m_additionalParameters, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine9270 = new wxStaticLine(m_panel9494, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer9248->Add(m_staticLine9270, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticLine9272 = new wxStaticLine(m_additionalParameters, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine9272 = new wxStaticLine(m_panel9494, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer9248->Add(m_staticLine9272, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticLine9274 = new wxStaticLine(m_additionalParameters, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine9274 = new wxStaticLine(m_panel9494, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer9248->Add(m_staticLine9274, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticBitmap9260 = new wxStaticBitmap(m_additionalParameters, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ruby")), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), 0 );
+    m_staticBitmap9260 = new wxStaticBitmap(m_panel9494, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ruby")), wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), 0 );
     
     flexGridSizer9248->Add(m_staticBitmap9260, 0, wxALL, WXC_FROM_DIP(7));
     
-    m_staticText160323 = new wxStaticText(m_additionalParameters, wxID_ANY, _("Render Resolution:"), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), 0);
+    m_staticText160323 = new wxStaticText(m_panel9494, wxID_ANY, _("Render Resolution:"), wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), 0);
     m_staticText160323->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     
     flexGridSizer9248->Add(m_staticText160323, 0, wxALL|wxEXPAND, WXC_FROM_DIP(7));
     
     wxArrayString m_cbRenderResolutionArr;
     m_cbRenderResolutionArr.Add(wxT("0.001 mm - 9999 PPI"));
-    m_cbRenderResolution = new wxComboBox(m_additionalParameters, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), m_cbRenderResolutionArr, wxCB_SORT|wxCB_READONLY|wxCB_DROPDOWN);
+    m_cbRenderResolution = new wxComboBox(m_panel9494, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), m_cbRenderResolutionArr, wxCB_SORT|wxCB_READONLY|wxCB_DROPDOWN);
     m_cbRenderResolution->SetSelection(0);
     
     flexGridSizer9248->Add(m_cbRenderResolution, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
-    m_staticBitmap9262 = new wxStaticBitmap(m_additionalParameters, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("sports-shuttlecock")), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), 0 );
+    m_staticBitmap9262 = new wxStaticBitmap(m_panel9494, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("sports-shuttlecock")), wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), 0 );
     
     flexGridSizer9248->Add(m_staticBitmap9262, 0, wxALL, WXC_FROM_DIP(7));
     
-    m_staticText9255 = new wxStaticText(m_additionalParameters, wxID_ANY, _("Artificially Step Delay:"), wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), 0);
+    m_staticText9255 = new wxStaticText(m_panel9494, wxID_ANY, _("Artificially Step Delay:"), wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), 0);
     m_staticText9255->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     
     flexGridSizer9248->Add(m_staticText9255, 0, wxALL, WXC_FROM_DIP(7));
     
-    m_stepDelay = new wxSlider(m_additionalParameters, wxID_ANY, 0, 0, 128, wxDefaultPosition, wxDLG_UNIT(m_additionalParameters, wxSize(-1,-1)), wxSL_HORIZONTAL);
+    m_stepDelay = new wxSlider(m_panel9494, wxID_ANY, 0, 0, 128, wxDefaultPosition, wxDLG_UNIT(m_panel9494, wxSize(-1,-1)), wxSL_HORIZONTAL);
     wxFont m_stepDelayFont(6, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_stepDelay->SetFont(m_stepDelayFont);
     m_stepDelay->SetToolTip(_("Artificially Step Delay"));
@@ -2483,7 +2485,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer9248->Add(m_stepDelay, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
     m_controllerConfiguration = new wxPanel(m_notebookConfig, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookConfig, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_controllerConfiguration->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     int m_controllerConfigurationImgIndex;
     m_controllerConfigurationImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-member_public")));
     m_notebookConfig->AddPage(m_controllerConfiguration, _("Requested\nCtlr-Config"), false, m_controllerConfigurationImgIndex);
@@ -2504,7 +2505,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1306->Add(flexGridSizer1311, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_staticText12831 = new wxStaticText(m_controllerConfiguration, wxID_ANY, _("Requested Controller Configuration:"), wxDefaultPosition, wxDLG_UNIT(m_controllerConfiguration, wxSize(-1,-1)), 0);
-    m_staticText12831->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_staticText12831Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText12831->SetFont(m_staticText12831Font);
     
@@ -2532,7 +2532,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_dvListCtrlControllerConfig->AppendTextColumn(_("Unit"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_dvListCtrlControllerConfig->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_controllerPinReport = new wxPanel(m_notebookConfig, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookConfig, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_controllerPinReport->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     wxFont m_controllerPinReportFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("wxT(\"Segoe UI\")"));
     m_controllerPinReport->SetFont(m_controllerPinReportFont);
     m_controllerPinReport->SetToolTip(_("Request Controller Pin Report"));
@@ -2555,7 +2554,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer13061->Add(flexGridSizer13112, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_staticText128313 = new wxStaticText(m_controllerPinReport, wxID_ANY, _("Requested  Controller Pin Report:"), wxDefaultPosition, wxDLG_UNIT(m_controllerPinReport, wxSize(-1,-1)), 0);
-    m_staticText128313->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_staticText128313Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText128313->SetFont(m_staticText128313Font);
     

@@ -82,6 +82,9 @@ struct CncCommandDecoder {
 	static int32_t convertBytesToInt32(const unsigned char *buffer, unsigned int& idx, int32_t& ret);
 	
 	// ----------------------------------------------------------
+	static bool decodeSigUpdate(const unsigned char *buffer, unsigned int nbByte,
+			                    int32_t& dx, int32_t& dy, int32_t& dz);
+
 	static bool decodeMoveSequence(const unsigned char *buffer, unsigned int nbByte,
 								   CncMoveSequence* ret);
 	

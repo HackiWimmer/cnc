@@ -370,8 +370,6 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 
 	return ret;
 }
-
-
 ///////////////////////////////////////////////////////////////////
 bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbByte, int32_t& x , int32_t& y , int32_t& z) {
 ///////////////////////////////////////////////////////////////////
@@ -427,6 +425,46 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 	}
 	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncCommandDecoder::decodeSigUpdate(const unsigned char *buffer, unsigned int nbByte, int32_t& x , int32_t& y , int32_t& z) {
+///////////////////////////////////////////////////////////////////
+	x = 0; y = 0; z = 0;
+	
+	if ( nbByte <= 0 || buffer == NULL ) {
+		std::cerr << "CncCommandDecoder::decodeSigUpdate(): Empty buffer" << std::endl;
+		return false;
+	}
+	
+	if ( nbByte < 2 ) {
+		std::cerr << "CncCommandDecoder::decodeSigUpdate(); Buffer too short (A)" << std::endl;
+		return false;
+	}
+	
+	const unsigned char len = buffer[1];
+	if ( nbByte < len ) { 
+		std::cerr << "CncCommandDecoder::decodeSigUpdate(): Buffer too short (C1)" << std::endl; 
+		return false; 
+	}
+	
+	const unsigned char pid = buffer[2];
+	switch ( pid ) {
+		case PID_XYZ_INTERACTIVE_POS:
+		{
+			// As Int8 to resolve also negative values
+			x = (int8_t)buffer[3];
+			y = (int8_t)buffer[4];
+			z = (int8_t)buffer[5];
+			
+			return true;
+		}
+		default:
+		{
+			std::cerr << "CncCommandDecoder::decodeSigUpdate(): Invalid PID: " << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+		}
+	}
+	
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncCommandDecoder::decodeSetter(const unsigned char *buffer, unsigned int nbByte,

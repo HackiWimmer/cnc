@@ -21,6 +21,8 @@ CncSerialSpyPanel::CncSerialSpyPanel(wxWindow* parent)
 	serialSpyListCtrl->enableAutoColumnSizing(m_autoScroling->GetValue());
 	serialSpyListCtrl->installOpenDetails(m_openDetails);
 	
+	updateIntervalSlider();
+	
 	wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
 	const wxColour fg = *wxLIGHT_GREY;
 	const wxColour bg = *wxBLACK;
@@ -35,9 +37,26 @@ CncSerialSpyPanel::CncSerialSpyPanel(wxWindow* parent)
 CncSerialSpyPanel::~CncSerialSpyPanel() {
 /////////////////////////////////////////////////////////////
 }
+/////////////////////////////////////////////////////////////
+void CncSerialSpyPanel::onUpdateIntervalSlider(wxScrollEvent& event) {
+/////////////////////////////////////////////////////////////
+	updateIntervalSlider();
+}
+/////////////////////////////////////////////////////////////
+void CncSerialSpyPanel::updateIntervalSlider() {
+/////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
+	
+	const int val = m_sliderUpdateInterval->GetValue();
+	
+	serialSpyListCtrl->setRefreshInterval(val);
+	m_sliderUpdateInterval->SetToolTip(wxString::Format("Update Interval: %d [ms]", val));
+}
 ///////////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::initDuringConnect() {
 ///////////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
+	
 	enableSerialSpy(m_enableSerialSpy->GetValue());
 	selectSerialSpyMode();
 	clearSerialSpyOnConnect();
@@ -60,6 +79,8 @@ void CncSerialSpyPanel::decorateSerialSpy() {
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::enableSerialSpy(bool state) {
 /////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
+	
 	if ( THE_APP->getCncControl() ) 
 		THE_APP->getCncControl()->enableSpyOutput(state);
 	
@@ -70,12 +91,28 @@ void CncSerialSpyPanel::enableSerialSpy(bool state) {
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::clearSerialSpyBeforNextRun() {
 /////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
+	
+	if ( m_clearSerialSpyBeforNextRun->GetValue() == false )
+		return;
+		
 	serialSpyListCtrl->clearAll();
+	
+	if (m_enableSerialSpy->GetValue() == true )
+		serialSpyListCtrl->addLine("Cleared before Run ", CncSerialSpyListCtrl::LineType::LT_Marker);
 }
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::clearSerialSpyOnConnect() {
 /////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
+	
+	if ( m_clearSerialSpyOnConnect->GetValue() == false )
+		return;
+		
 	serialSpyListCtrl->clearAll();
+	
+	if (m_enableSerialSpy->GetValue() == true )
+		serialSpyListCtrl->addLine("Cleared on Connect ", CncSerialSpyListCtrl::LineType::LT_Marker);
 }
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::selectSerialSpyMode() {
@@ -94,6 +131,9 @@ void CncSerialSpyPanel::selectSerialSpyMode() {
 void CncSerialSpyPanel::clearSerialSpy(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////
 	serialSpyListCtrl->clearAll();
+	
+	if (m_enableSerialSpy->GetValue() == true )
+		serialSpyListCtrl->addLine("Cleared by Call", CncSerialSpyListCtrl::LineType::LT_Marker);
 }
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::enableSerialSpy(wxCommandEvent& event) {
@@ -104,23 +144,39 @@ void CncSerialSpyPanel::enableSerialSpy(wxCommandEvent& event) {
 	decorateSerialSpy();
 }
 /////////////////////////////////////////////////////////////
+void CncSerialSpyPanel::onLiveDebug(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
+	serialSpyListCtrl->enableDebugEntries(m_liveDebug->GetValue());
+}
+/////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::onAutoColumnSize(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
 	serialSpyListCtrl->enableAutoColumnSizing(m_autoColumnSizing->GetValue());
 }
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::onAutoScrolling(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
 	serialSpyListCtrl->enableAutoScrolling(m_autoScroling->GetValue());
+}
+/////////////////////////////////////////////////////////////
+void CncSerialSpyPanel::selectSerialSpyMode(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
+	selectSerialSpyMode();
 }
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::onLiveDecoding(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
 	serialSpyListCtrl->enableLiveDecoding(m_liveDecoding->GetValue());
 }
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::markSerialSpy(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////
+	m_infobar->Dismiss();
 	wxString defaultValue(wxString::Format("Marker::%06d", serialSpyListCtrl->getItemCount()));
 	
 	wxTextEntryDialog dlg(this, "Marker Label:", "Add Spy Marker . . .", defaultValue);
@@ -142,11 +198,21 @@ void CncSerialSpyPanel::openSpyDetailWindow(wxCommandEvent& event) {
 	details.Replace("| ",  "\n", true);
 	details.Replace("|",   "\n", true);
 	
-	if ( details.IsEmpty() == false )
-		m_infobar->ShowMessage(details);
-}
-/////////////////////////////////////////////////////////////
-void CncSerialSpyPanel::selectSerialSpyMode(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////
-	selectSerialSpyMode();
+	if (    details.Contains("\n")								== true
+		 || serialSpyListCtrl->fitsDecodedTextForSelectedItem()	== false
+		) 
+	{
+		wxColour fg = *wxLIGHT_GREY;
+		wxColour bg = *wxBLACK;
+		serialSpyListCtrl->getSelectedSpyLineFgColour(fg);
+		serialSpyListCtrl->getSelectedSpyLineBgColour(bg);
+		
+		wxString line(serialSpyListCtrl->getSelectedLine());
+		line.Trim(false).Trim(true);
+		details.Prepend(wxString::Format("%ld - %s\n\n", serialSpyListCtrl->getSelectedItem(), line));
+		
+		m_infobar->SetBackgroundColour(bg);
+		m_infobar->SetForegroundColour(fg);
+		m_infobar->ShowMessage(details, wxICON_NONE);
+	}
 }

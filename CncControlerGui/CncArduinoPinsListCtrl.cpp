@@ -2,7 +2,7 @@
 #include <wx/imaglist.h>
 #include "CncCommon.h"
 #include "CncArduino.h"
-#include "wxCrafterImages.h"
+#include "wxCrafterArduinoEnv.h"
 #include "CncArduinoPinsListCtrl.h"
 
 // ----------------------------------------------------------------------------
@@ -14,9 +14,44 @@ wxBEGIN_EVENT_TABLE(CncArduinoPinsListCtrl, CncLargeScaledListCtrl)
 	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 	CncArduinoPinsListCtrl::onActivateListItem	)
 wxEND_EVENT_TABLE()
 
+///////////////////////////////////////////////////////////////
+namespace PinSorting {
+	
+	enum Mode { SM_DES_ByIndex, SM_DES_ByTypeName };
+	Mode CurrentMode = SM_DES_ByIndex;
+	
+	//--------------------------------------------------------
+	bool wxCALLBACK desByIndex(const AE::PinData& p1, const AE::PinData& p2) {
+		return p1.uidx < p2.uidx;
+	}
+	
+	//--------------------------------------------------------
+	bool wxCALLBACK desByTypeName(const AE::PinData& p1, const AE::PinData& p2) {
+		
+		const wxString l1(p1.type == 'D' ? ArduinoDigitalPins::getPinLabel(p1.name) : ArduinoAnalogPins::getPinLabel(p1.name));
+		const wxString l2(p2.type == 'D' ? ArduinoDigitalPins::getPinLabel(p2.name) : ArduinoAnalogPins::getPinLabel(p2.name));
+		
+		const wxString s1(wxString::Format("%s-%c-%d", 
+											( l1.Contains("Unknown") ? "AAAAAAA": l1 ), 
+											p1.type,
+											p1.name
+						));
+						 
+		const wxString s2(wxString::Format("%s-%c-%d", 
+											( l2.Contains("Unknown") ? "AAAAAAA": l2 ), 
+											p2.type,
+											p2.name
+						));
+		
+		return s1.Cmp(s2) > 0;
+	}
+};
+	
 /////////////////////////////////////////////////////////////
 CncArduinoPinsListCtrl::CncArduinoPinsListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
+, pinIndex				()
+, pins					()
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -55,6 +90,8 @@ CncArduinoPinsListCtrl::CncArduinoPinsListCtrl(wxWindow *parent, long style)
 		pinIndex[AE::ArduinoData::buildDislpayName(it->type, it->name)] = std::distance(pins.begin(), it);
 	
 	SetItemCount(pins.size());
+	
+	PinSorting::CurrentMode = PinSorting::Mode::SM_DES_ByIndex; //SM_DES_ByTypeName
 }
 /////////////////////////////////////////////////////////////
 CncArduinoPinsListCtrl::~CncArduinoPinsListCtrl() {
@@ -151,4 +188,33 @@ void CncArduinoPinsListCtrl::onSelectListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncArduinoPinsListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////
+void CncArduinoPinsListCtrl::sort(wxAnyButton* sortButton) {
+/////////////////////////////////////////////////////////////////////
+	switch ( PinSorting::CurrentMode ) {
+		
+		case PinSorting::Mode::SM_DES_ByIndex:
+		{
+			std::sort(pins.begin(), pins.end(), PinSorting::desByIndex);
+			PinSorting::CurrentMode = PinSorting::Mode::SM_DES_ByTypeName;
+			
+			if ( sortButton )
+				sortButton->SetToolTip("Sort: By Used/Type/Label");
+				
+			break;
+		}
+		case PinSorting::Mode::SM_DES_ByTypeName:
+		{
+			std::sort(pins.begin(), pins.end(), PinSorting::desByTypeName);
+			PinSorting::CurrentMode = PinSorting::Mode::SM_DES_ByIndex;
+			
+			if ( sortButton )
+				sortButton->SetToolTip("Sort: By Type/Num");
+				
+			break;
+		}
+	}
+	
+	Refresh();
 }

@@ -39,10 +39,12 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 	// pin list  control
 	pinList = new CncArduinoPinsListCtrl(this, wxLC_SINGLE_SEL|wxALWAYS_SHOW_SB|wxVSCROLL ); 
 	GblFunc::replaceControl(m_pinListPlaceholder, pinList);
+	pinList->sort(m_btSortPins);
 	
 	// logger control
 	logger = new CncMessageListCtrl(this, wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_loggerPlaceholder, logger);
+	setUpdateInterval();
 	
 	wxBitmap bmp = ImageLibSwitch().Bitmap("BMP_TOGGLE_SWITCH_1");
 	
@@ -114,7 +116,6 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 	initValues();
 	enableControls(false, true);
 	
-	
 	m_bmpDirectionX->SetBitmap(ImageLibStepper().Bitmap("BMP_DIR_CCW"));
 	m_bmpDirectionY->SetBitmap(ImageLibStepper().Bitmap("BMP_DIR_CCW"));
 	m_bmpDirectionZ->SetBitmap(ImageLibStepper().Bitmap("BMP_DIR_CCW"));
@@ -125,6 +126,10 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 	
 	m_pgPropTraceGetters->SetValue(false);
 	m_pgPropTraceSetters->SetValue(false);
+	
+	if		( SETUP_ID == 100 )	{ m_boardType->ChangeValue("UNO");     }
+	else if ( SETUP_ID == 200 )	{ m_boardType->ChangeValue("MEGA");    }
+	else						{ m_boardType->ChangeValue("UNKNOWN"); }
 }
 ///////////////////////////////////////////////////////////////////
 CncArduinoEnvironment::~CncArduinoEnvironment() {
@@ -688,8 +693,6 @@ void CncArduinoEnvironment::updateSupportStates() {
 
 	updateStateCtrl(m_curSupportStates, supportStates);
 }
-
-
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::onConfigChanged(wxPropertyGridEvent& event) {
 ///////////////////////////////////////////////////////////////////
@@ -712,4 +715,22 @@ void CncArduinoEnvironment::onConfigChanged(wxPropertyGridEvent& event) {
 void CncArduinoEnvironment::onConfigChanging(wxPropertyGridEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// currently nothing to do 
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::onSortPins(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	pinList->sort(m_btSortPins);
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::onLoggerUpdateInterval(wxScrollEvent& event) {
+///////////////////////////////////////////////////////////////////
+	setUpdateInterval();
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::setUpdateInterval() {
+///////////////////////////////////////////////////////////////////
+	const int val = m_sliderUpdateInterval->GetValue();
+	
+	logger->setUpdateInterval(val);
+	m_sliderUpdateInterval->SetToolTip(wxString::Format("Update Interval: %d [ms]", val));
 }

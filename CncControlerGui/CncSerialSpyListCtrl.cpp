@@ -11,14 +11,15 @@
 // ----------------------------------------------------------------------------
 // CncSerialSpyListCtrl Event Table
 // ----------------------------------------------------------------------------
-wxDEFINE_EVENT(wxEVT_SERIAL_TIMER, 	wxTimerEvent);
+wxDEFINE_EVENT(wxEVT_SPY_DISPLAY_TIMER, 	wxTimerEvent);
 
 wxBEGIN_EVENT_TABLE(CncSerialSpyListCtrl, CncLargeScaledListCtrl)
-	EVT_KEY_DOWN			(						CncSerialSpyListCtrl::onKeyDown			)
-	EVT_SIZE				(						CncSerialSpyListCtrl::onSize			)
-	EVT_TIMER				(wxEVT_SERIAL_TIMER,	CncSerialSpyListCtrl::onTimer			)
-	EVT_LIST_ITEM_SELECTED	(wxID_ANY,				CncSerialSpyListCtrl::onSelectListItem	)
-	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY,				CncSerialSpyListCtrl::onActivateListItem)
+	EVT_KEY_DOWN			(							CncSerialSpyListCtrl::onKeyDown			)
+	EVT_SIZE				(							CncSerialSpyListCtrl::onSize			)
+	EVT_TIMER				(wxEVT_SPY_DISPLAY_TIMER,	CncSerialSpyListCtrl::onTimer			)
+	EVT_LIST_ITEM_SELECTED	(wxID_ANY,					CncSerialSpyListCtrl::onSelectListItem	)
+	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY,					CncSerialSpyListCtrl::onActivateListItem)
+	EVT_LIST_COL_END_DRAG	(wxID_ANY,					CncSerialSpyListCtrl::onEndDragList)
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
@@ -31,6 +32,7 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 , itemAttrResultMore		()
 , itemAttrResultError		()
 , itemAttrResultWarning		()
+, itemAttrResultDebug		()
 , itemAttrResultLimit		()
 , itemAttrResultHalt		()
 , itemAttrResultQuit		()
@@ -40,9 +42,11 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 , itemAttrResultDisable		()
 , itemAttrResultCommand		()
 , entries					()
-, serialTimer				(this, wxEVT_SERIAL_TIMER)
+, spyDisplaylTimer			(this, wxEVT_SPY_DISPLAY_TIMER)
+, refreshInterval			(800)
 , openDetails				(NULL)
 , liveDecoding				(false)
+, considerDebug				(false)
 , autoScrolling				(false)
 , autoColumnSizing			(false)
 , tsLast					(CncTimeFunctions::getMilliTimestamp())
@@ -85,6 +89,10 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 	itemAttrResultMore.SetFont(defaultFont);
 	itemAttrResultMore.SetTextColour(*wxBLACK);
 
+	itemAttrResultQuit.SetBackgroundColour(wxColour(255, 217, 83));
+	itemAttrResultQuit.SetFont(defaultFont);
+	itemAttrResultQuit.SetTextColour(*wxBLACK);
+
 	itemAttrResultError.SetBackgroundColour(wxColour(176, 0, 0));
 	itemAttrResultError.SetFont(defaultFont);
 	itemAttrResultError.SetTextColour(*wxWHITE);
@@ -93,8 +101,11 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 	itemAttrResultWarning.SetFont(defaultFont);
 	itemAttrResultWarning.SetTextColour(*wxWHITE);
 
+	itemAttrResultDebug.SetBackgroundColour(wxColour(255, 162, 117));
+	itemAttrResultDebug.SetFont(defaultFont);
+	itemAttrResultDebug.SetTextColour(*wxRED);
+
 	itemAttrResultLimit 	= itemAttrResultWarning;
-	itemAttrResultQuit 		= itemAttrResultWarning;
 	itemAttrResultHalt 		= itemAttrResultError;
 	itemAttrResultInterrupt = itemAttrResultError;
 	
@@ -117,8 +128,10 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibSpy().Bitmap("BMP_IN"));
 	imageList->Add(ImageLibSpy().Bitmap("BMP_OUT"));
 	imageList->Add(ImageLibSpy().Bitmap("BMP_RET_OK"));
+	imageList->Add(ImageLibSpy().Bitmap("BMP_RET_WARNING"));
 	imageList->Add(ImageLibSpy().Bitmap("BMP_RET_ERROR"));
 	imageList->Add(ImageLibSpy().Bitmap("BMP_MARKER"));
+	imageList->Add(ImageLibSpy().Bitmap("BMP_DEBUG"));
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
 
 	startRefreshInterval();
@@ -151,15 +164,22 @@ void CncSerialSpyListCtrl::enableAutoColumnSizing(bool state) {
 	Refresh();
 }
 /////////////////////////////////////////////////////////////
+void CncSerialSpyListCtrl::enableDebugEntries(bool state) {
+/////////////////////////////////////////////////////////////
+	considerDebug = state;
+}
+/////////////////////////////////////////////////////////////
 int CncSerialSpyListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	typedef CncSerialSpyListCtrl::LineInfo::Type Type;
 	
-	const int BMP_IN		= 0;
-	const int BMP_OUT		= 1;
-	const int BMP_RET_OK	= 2;
-	const int BMP_RET_ERROR	= 3;
-	const int BMP_MARKER	= 4;
+	const int BMP_IN			= 0;
+	const int BMP_OUT			= 1;
+	const int BMP_RET_OK		= 2;
+	const int BMP_RET_WARNING	= 3;
+	const int BMP_RET_ERROR		= 4;
+	const int BMP_MARKER		= 5;
+	const int BMP_DEBUG			= 6;
 	
 	if ( column == COL_TYPE && isItemValid(item) == true ) {
 		const Entry& le = entries.at(item);
@@ -170,14 +190,19 @@ int CncSerialSpyListCtrl::OnGetItemColumnImage(long item, long column) const {
 			case LT_ResultMore:
 				return BMP_RET_OK;
 			
-			case LT_ResultError:
+			case LT_DebugEntry:
+				return BMP_DEBUG;
+				
+			case LT_ResultQuit:
 			case LT_ResultWarning:
+				return BMP_RET_WARNING;
+				
+			case LT_ResultError:
 			case LT_ResultLimit:
 			case LT_ResultHalt:
-			case LT_ResultQuit:
 			case LT_ResultInterrupt:
 				return BMP_RET_ERROR;
-			
+				
 			case LT_Command:
 				return BMP_OUT;
 			
@@ -185,7 +210,7 @@ int CncSerialSpyListCtrl::OnGetItemColumnImage(long item, long column) const {
 			case LT_Enable:
 			case LT_Disable:
 				return BMP_MARKER;
-			
+				
 			default:
 				switch ( LineInfo::decodeType(le.line) ) {
 					case Type::LIT_OUTBOUND: return BMP_OUT;
@@ -215,6 +240,7 @@ wxListItemAttr* CncSerialSpyListCtrl::OnGetItemAttr(long item) const {
 			case LT_ResultQuit:			return (wxListItemAttr*)(&itemAttrResultQuit);
 			case LT_ResultInterrupt:	return (wxListItemAttr*)(&itemAttrResultInterrupt);
 			
+			case LT_DebugEntry:			return (wxListItemAttr*)(&itemAttrResultDebug);
 			case LT_Marker:				return (wxListItemAttr*)(&itemAttrResultMarker);
 			case LT_Enable:				return (wxListItemAttr*)(&itemAttrResultEnable);
 			case LT_Disable:			return (wxListItemAttr*)(&itemAttrResultDisable);
@@ -246,11 +272,13 @@ wxString CncSerialSpyListCtrl::OnGetItemText(long item, long column) const {
 	const Entry& le = entries.at(item);
 	wxString ret;
 	
+	const wxString decoded( le.appendix.IsEmpty() == false ? le.appendix : ( liveDecoding ? decodeSerialSpyLine(item, ret) : "" ) );
+	
 	switch ( column ) {
 		case COL_NUM:		return wxString::Format("%ld",		(item + 1) % LONG_MAX );
 		case COL_TYPE:		return wxString::Format("%d",		(int)le.lt);
 		case COL_LINE:		return wxString::Format("%s",		le.line);
-		case COL_DECODED:	return wxString::Format("%s",		liveDecoding ? decodeSerialSpyLine(item, ret) : "");
+		case COL_DECODED:	return wxString::Format("%s",		decoded);
 	}
 	
 	return _("");
@@ -284,9 +312,30 @@ const wxString CncSerialSpyListCtrl::getLine(long item) const {
 	return _("");
 }
 /////////////////////////////////////////////////////////////
+long CncSerialSpyListCtrl::getSelectedItem() const {
+/////////////////////////////////////////////////////////////
+	return getLastSelection();
+}
+/////////////////////////////////////////////////////////////
+const wxString CncSerialSpyListCtrl::getSelectedLine() const {
+/////////////////////////////////////////////////////////////
+	return getLine(getLastSelection());
+}
+/////////////////////////////////////////////////////////////
 void CncSerialSpyListCtrl::addLine(const wxString& line, const LineType lt) {
 /////////////////////////////////////////////////////////////
-	entries.push_back(std::move(Entry(line, lt)));
+	if ( considerDebug == false && lt == LT_DebugEntry )
+		return;
+		
+	addLine(line, "", lt);
+}
+/////////////////////////////////////////////////////////////
+void CncSerialSpyListCtrl::addLine(const wxString& line, const wxString& appendix, const LineType lt) {
+/////////////////////////////////////////////////////////////
+	if ( considerDebug == false && lt == LT_DebugEntry )
+		return;
+	
+	entries.push_back(std::move(Entry(line, appendix, lt)));
 	
 	if ( lt >= LT_ResultOk && lt <= LT_ResultInterrupt ) {
 		if ( CncTimeFunctions::getMilliTimestamp() - tsLast > refreshInterval / 2 ) {
@@ -431,6 +480,11 @@ void CncSerialSpyListCtrl::onActivateListItem(wxListEvent& event) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
+void CncSerialSpyListCtrl::onEndDragList(wxListEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	CNC_PRINT_LOCATION
+}
+/////////////////////////////////////////////////////////////////////
 void CncSerialSpyListCtrl::onSelectListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	long item = event.m_itemIndex;
@@ -497,6 +551,11 @@ bool CncSerialSpyListCtrl::decodeSerialSpyLineIntern(long item, SpyHexDecoder::D
 	}
 		
 	const Entry& le = entries.at(item);
+	if ( le.appendix.IsEmpty() == false ) {
+		details.more.assign(le.appendix);
+		return true;
+	}
+	
 	const wxString line(le.line);
 	
 	CncSerialSpyListCtrl::LineInfo lineInfo;
@@ -549,6 +608,7 @@ bool CncSerialSpyListCtrl::decodeSerialSpyLineIntern(long item, SpyHexDecoder::D
 	
 	SpyHexDecoder shd(lineInfo.context, lineInfo.hexString);
 	shd.decode(details);
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -557,7 +617,7 @@ const wxString& CncSerialSpyListCtrl::decodeSerialSpyLine(long item, wxString& r
 	SpyHexDecoder::Details details;
 	decodeSerialSpyLineIntern(item, details);
 	
-	ret.assign(details.more);
+	ret.Append(details.more);
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -569,12 +629,69 @@ const wxString& CncSerialSpyListCtrl::decodeSelectedSpyLine(wxString& ret) const
 	if ( isItemValid(item) == false )
 		return ret;
 		
-	SpyHexDecoder::Details details;
-	decodeSerialSpyLineIntern(item, details);
+	return decodeSerialSpyLine(item, ret);
+}
+///////////////////////////////////////////////////////////////////
+const wxColor& CncSerialSpyListCtrl::getSelectedSpyLineBgColour(wxColor& ret) const {
+///////////////////////////////////////////////////////////////////
+	long item = getLastSelection();
+
+	if ( isItemValid(item) == false )
+		return ret;
 	
-	ret.Prepend(wxString::Format("%s\n\n", getLine(item)));
-	ret.assign(details.more);
+	if ( OnGetItemAttr(item) )
+		ret = OnGetItemAttr(item)->GetBackgroundColour();
+		
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+const wxColor& CncSerialSpyListCtrl::getSelectedSpyLineFgColour(wxColor& ret) const {
+///////////////////////////////////////////////////////////////////
+	long item = getLastSelection();
+
+	if ( isItemValid(item) == false )
+		return ret;
+	
+	if ( OnGetItemAttr(item) )
+		ret = OnGetItemAttr(item)->GetTextColour();
+		
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+const wxFont& CncSerialSpyListCtrl::getSelectedSpyLineFont(wxFont& ret) const {
+///////////////////////////////////////////////////////////////////
+	long item = getLastSelection();
+
+	if ( isItemValid(item) == false )
+		return ret;
+	
+	if ( OnGetItemAttr(item) )
+		ret = OnGetItemAttr(item)->GetFont();
+		
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncSerialSpyListCtrl::fitsTextIntoCell(long item, long col) {
+///////////////////////////////////////////////////////////////////
+	const int cw = GetColumnWidth(col);
+	if ( cw < 10 )
+		return false;
+	
+	wxClientDC dc(this);
+	dc.SetFont(GetItemFont(item));
+	const wxSize size = dc.GetTextExtent(GetItemText(item, col));
+	
+	return cw >= size.GetWidth();
+}
+///////////////////////////////////////////////////////////////////
+bool CncSerialSpyListCtrl::fitsDecodedTextForSelectedItem() {
+///////////////////////////////////////////////////////////////////
+	long item = getLastSelection();
+
+	if ( isItemValid(item) == false )
+		return false;
+		
+	return fitsTextIntoCell(item, COL_LINE) && fitsTextIntoCell(item, COL_DECODED);
 }
 
 

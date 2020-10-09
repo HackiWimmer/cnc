@@ -9,24 +9,31 @@
 // ----------------------------------------------------------------------------
 // CncMessageListCtrl Event Table
 // ----------------------------------------------------------------------------
+wxDEFINE_EVENT(wxEVT_MSG_LIST_DISPLAY_TIMER,  wxTimerEvent);
 
 wxBEGIN_EVENT_TABLE(CncMessageListCtrl, CncLargeScaledListCtrl)
-	EVT_SIZE				(			CncMessageListCtrl::onSize				)
-	EVT_LIST_ITEM_SELECTED	(wxID_ANY, 	CncMessageListCtrl::onSelectListItem	)
-	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 	CncMessageListCtrl::onActivateListItem	)
+	EVT_SIZE				(								CncMessageListCtrl::onSize				)
+	EVT_LIST_ITEM_SELECTED	(wxID_ANY,						CncMessageListCtrl::onSelectListItem	)
+	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY,						CncMessageListCtrl::onActivateListItem	)
+	EVT_TIMER				(wxEVT_MSG_LIST_DISPLAY_TIMER,	CncMessageListCtrl::onDisplayTimer		)
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
 CncMessageListCtrl::CncMessageListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
-, messages()
-, itemAttrInfo()
-, itemAttrWarning()
-, itemAttrError()
-, itemAttrDebug()
-, itemAttrSeparator()
+, messages			()
+, updateInterval	(0)
+, displayTimer		(this, wxEVT_MSG_LIST_DISPLAY_TIMER)
+, itemAttrInfo		()
+, itemAttrWarning	()
+, itemAttrError		()
+, itemAttrDebug		()
+, itemAttrSeparator	()
 /////////////////////////////////////////////////////////////
 {
+	// init
+	setUpdateInterval(updateInterval);
+	
 	// add colums
 	AppendColumn("Time", 		wxLIST_FORMAT_LEFT, 	 84);
 	AppendColumn("Type", 		wxLIST_FORMAT_CENTER, 	 40);
@@ -76,24 +83,24 @@ CncMessageListCtrl::~CncMessageListCtrl() {
 /////////////////////////////////////////////////////////////
 void CncMessageListCtrl::clear() {
 /////////////////////////////////////////////////////////////
+	CncLargeScaledListCtrl::clear();
 	messages.clear();
 	SetItemCount(messages.size());
 }
 /////////////////////////////////////////////////////////////
 void CncMessageListCtrl::appendMessage(const char type, const wxString& message) {
 /////////////////////////////////////////////////////////////
-	messages.push_back(std::move(Message(type, message)));
-	SetItemCount(messages.size());
-	
-	EnsureVisible((long)(messages.size() - 1));
+	appendMessage(type, message, "");
 }
 /////////////////////////////////////////////////////////////
 void CncMessageListCtrl::appendMessage(const char type, const wxString& message, const wxString& context) {
 /////////////////////////////////////////////////////////////
 	messages.push_back(std::move(Message(type, message, context)));
-	SetItemCount(messages.size());
-
-	EnsureVisible((long)(messages.size() - 1));
+	
+	if ( displayTimer.IsRunning() == false ) {
+		SetItemCount(messages.size());
+		EnsureVisible((long)(messages.size() - 1));
+	}
 }
 /////////////////////////////////////////////////////////////
 bool CncMessageListCtrl::isItemValid(long item) const {
@@ -151,8 +158,9 @@ void CncMessageListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncMessageListCtrl::onSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	event.Skip();
 	updateColumnWidth();
-	event.Skip(true);
+	Refresh();
 }
 /////////////////////////////////////////////////////////////////////
 void CncMessageListCtrl::updateColumnWidth() {
@@ -179,4 +187,24 @@ void CncMessageListCtrl::updateColumnWidth() {
 	SetColumnWidth(COL_STRECH, size);
 
 	GblFunc::freeze(this, false);
+}
+/////////////////////////////////////////////////////////////////////
+void CncMessageListCtrl::setUpdateInterval(int value) {
+/////////////////////////////////////////////////////////////////////
+	updateInterval = value;
+	
+	if ( updateInterval > 50 )	displayTimer.Start(updateInterval);
+	else						displayTimer.Stop();
+}
+//////////////////////////////////////////////////
+void CncMessageListCtrl::onDisplayTimer(wxTimerEvent& event) {
+//////////////////////////////////////////////////
+	if ( messages.size() == 0 )
+		return;
+	
+	if ( GetItemCount() == (long)messages.size() )
+		return;
+	
+	SetItemCount(messages.size());
+	EnsureVisible((long)(messages.size() - 1));
 }

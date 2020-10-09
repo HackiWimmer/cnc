@@ -223,7 +223,7 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 							return;
 						
 						switch ( byteCount ) {
-							case 1:		values[i] = decodeHexValueAsInt8 (value); break;
+							case 1:		values[i] = decodeHexValueAsUInt8 (value); break;
 							case 2:		values[i] = decodeHexValueAsInt16(value); break;
 							case 4:		values[i] = decodeHexValueAsInt32(value); break;
 						}
@@ -363,7 +363,7 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 			if ( size > 0 && size < 4 ) {
 				const char* label = (size == 1 ? "Z" : "XYZ");
 				
-				for ( unsigned int i = 0; i < size; i++ ) {
+				for ( int i = 0; i < size; i++ ) {
 					if ( readNextHexBytes(restToken, 4, value) == false ) return;
 						ret.more.append(wxString::Format("; %c=%ld", label[i], (long)decodeHexValueAsInt32(value)));
 				}
@@ -383,7 +383,6 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 		case CMD_PRINT_VERSION:
 		case CMD_PRINT_PIN_REPORT:
 		case CMD_POP_SERIAL:
-		case CMD_POP_SERIAL_WAIT:
 		case CMD_IDLE:
 		case CMD_HEARTBEAT:
 		case CMD_PERFORM_TEST:
@@ -392,12 +391,35 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 			ret.more << wxString::Format("<Command without further content>");
 			break;
 		}
+		case SIG_UPDATE:
+		{
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
+				break;
+			ret.more << "LEN = " << decodeHexValueAsInteger(value);
+			
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
+				break;
+			ret.more << wxString::Format("; PID = [%03d] %s", decodeHexValueAsInteger(value), decodeHexValueAsArduinoPID(value));
+			
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
+				break;
+			ret.more << "; X = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
+				
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
+				break;
+			ret.more << "; Y = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
+			
+			if ( readNextHexBytes(restToken, 1, value) == false ) 
+				break;
+			ret.more << "; Z = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
+			
+			break;
+		}
 		case SIG_INTERRUPPT:
 		case SIG_HALT:
 		case SIG_PAUSE:
 		case SIG_RESUME:
 		case SIG_QUIT_MOVE:
-		case SIG_UPDATE:
 		case SIG_SOFTWARE_RESET:
 		{
 			ret.more << wxString::Format("<Signal without further content>");
@@ -418,38 +440,6 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 	ret.context .assign(decodeContollerResult(context));
 	ret.cmd     .assign(wxString::Format("%s [%c]", ArduinoCMDs::getCMDLabel((unsigned int)cmd), cmd));
 	ret.index   .assign(wxString::Format("[%08d]", index));
-	
-	//if ( pid != RET_NULL )	ret.pid.assign(wxString::Format("%s [%03d]", ArduinoPIDs::getPIDLabelWithDefault((unsigned int)pid, "???"), pid));
-	//else					ret.pid.assign("n.a.");
-
-	
-	//std::cout << ret.context << ", " << ret.cmd << ", " << index << ", " << ret.collectedInbound << std::endl; 
-	
-	
-	//return;
-	
-	
-	
-	
-	/*
-	
-	// default values processing
-	auto decodeValues = [&]() {
-		if ( index > IDX_DEF_SIZE && hexString.length() == 2 ) {
-			int val = decodeHexValueAsInteger(hexString);
-			
-			if ( val < 32 ) {
-				ret.more.assign(wxString::Format("ret = %s", ArduinoPIDs::getPIDLabelWithDefault((unsigned int)val, "-"))); 
-				return;
-			}
-		}
-			
-		ret.more.assign(wxString::Format("Value(s) = %s", decodeHexStringAsInt32s(hexString, temp))); 
-	};
-	
-	*/
-	
-	
 	
 	const int BYTE_STRING_LEN = 2;
 	// ----------------------------------------------------------------------
@@ -507,15 +497,15 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 					else if ( index == 0x04 ) {
 						
 						// message ID ?
-						const bool b = decodeHexValueAsInt8(hexString) == MT_MID_FLAG;
+						const bool b = decodeHexValueAsUInt8(hexString) == MT_MID_FLAG;
 						if ( b )	ret.more.assign("MT_MID_FLAG");
 						else		ret.more.assign(decodeHexValueAsCharacterString(hexString, temp)); 
 					}
 					else if ( index == 0x05 ) {
 						
 						// standard message
-						const bool b = decodeHexValueAsInt8( inboundByteAtIndex(0x04) ) == MT_MID_FLAG;
-						if ( b )	ret.more.assign(wxString::Format("%s", ArduinoErrorCodes::getECLabel(decodeHexValueAsInt8(hexString))));
+						const bool b = decodeHexValueAsUInt8( inboundByteAtIndex(0x04) ) == MT_MID_FLAG;
+						if ( b )	ret.more.assign(wxString::Format("%s", ArduinoErrorCodes::getECLabel(decodeHexValueAsUInt8(hexString))));
 						else 		ret.more.assign(decodeHexValueAsCharacterString(hexString, temp)); 
 					}
 					else if ( index  > 0x05 ) {
@@ -536,7 +526,7 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 							ret.more.assign(wxString::Format("val     = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) )));
 						
 						// last byte
-						if ( index == (unsigned int)(0x05 + decodeHexValueAsInt8( inboundByteAtIndex(0x04) ) * 4) )
+						if ( index == (unsigned int)(0x05 + decodeHexValueAsUInt8( inboundByteAtIndex(0x04) ) * 4) )
 							ret.more.assign(wxString::Format("%s", decodeHexValueAsArduinoPID ( hexString )));
 					}
 					
@@ -546,10 +536,10 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 				case PID_HEARTBEAT:
 				{
 					if      ( index == 0x06 ) { ret.more.assign(wxString::Format("Id     = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
-					else if ( index == 0x07 ) { ret.more.assign(wxString::Format("Limit  = %d",   (int)decodeHexValueAsInt8 ( lastInboundBytes(1) ))); }
-					else if ( index == 0x08 ) { ret.more.assign(wxString::Format("Switch = %d",   (int)decodeHexValueAsInt8 ( lastInboundBytes(1) ))); }
-					else if ( index == 0x09 ) { ret.more.assign(wxString::Format("Const  = %d",   (int)decodeHexValueAsInt8 ( lastInboundBytes(1) ))); }
-					else if ( index == 0x0A ) { ret.more.assign(wxString::Format("Const  = %d",   (int)decodeHexValueAsInt8 ( lastInboundBytes(1) ))); }
+					else if ( index == 0x07 ) { ret.more.assign(wxString::Format("Limit  = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
+					else if ( index == 0x08 ) { ret.more.assign(wxString::Format("Switch = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
+					else if ( index == 0x09 ) { ret.more.assign(wxString::Format("Const  = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
+					else if ( index == 0x0A ) { ret.more.assign(wxString::Format("Const  = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
 					else if ( index == 0x0B ) { ret.more.assign(wxString::Format("%s", decodeHexValueAsArduinoPID ( hexString ))); }
 					
 					break;
@@ -557,6 +547,7 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 				// ...........................................................
 				case PID_XYZ_POS_MAJOR:
 				case PID_XYZ_POS_DETAIL:
+				case PID_LIMIT:
 				{
 					if      ( index == 0x06 ) { ret.more.assign(wxString::Format("X = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
 					else if ( index == 0x0A ) { ret.more.assign(wxString::Format("Y = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
