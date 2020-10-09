@@ -1,3 +1,0 @@
-C:/@Development/@Projekte/c++/CNCGuiController/cmake-build-Release/CncControllerTest/CMakeFiles/CncControllerTest.dir
-C:/@Development/@Projekte/c++/CNCGuiController/cmake-build-Release/CncControllerTest/CMakeFiles/edit_cache.dir
-C:/@Development/@Projekte/c++/CNCGuiController/cmake-build-Release/CncControllerTest/CMakeFiles/rebuild_cache.dir

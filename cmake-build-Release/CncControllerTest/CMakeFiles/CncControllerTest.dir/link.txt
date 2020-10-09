@@ -1,3 +1,0 @@
-C:\@Development\CMake\bin\cmake.exe -E remove -f CMakeFiles\CncControllerTest.dir/objects.a
-C:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ar.exe cr CMakeFiles\CncControllerTest.dir/objects.a @CMakeFiles\CncControllerTest.dir\objects1.rsp
-C:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\g++.exe    -Wl,--whole-archive CMakeFiles\CncControllerTest.dir/objects.a -Wl,--no-whole-archive  -o C:\@Development\@Projekte\c++\CNCGuiController\cmake-build-Release\output\CncControllerTest.exe -Wl,--out-implib,C:\@Development\@Projekte\c++\CNCGuiController\cmake-build-Release\output\libCncControllerTest.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\CncControllerTest.dir\linklibs.rsp

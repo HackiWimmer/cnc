@@ -1,3 +1,0 @@
-C:\@Development\CMake\bin\cmake.exe -E remove -f CMakeFiles\CncControllerGui.dir/objects.a
-C:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ar.exe cr CMakeFiles\CncControllerGui.dir/objects.a @CMakeFiles\CncControllerGui.dir\objects1.rsp
-C:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\g++.exe    -Wl,--whole-archive CMakeFiles\CncControllerGui.dir/objects.a -Wl,--no-whole-archive  -o C:\@Development\@Projekte\c++\CNCGuiController\cmake-build-Release\output\CncControllerGui.exe -Wl,--out-implib,C:\@Development\@Projekte\c++\CNCGuiController\cmake-build-Release\output\libCncControllerGui.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\CncControllerGui.dir\linklibs.rsp
