@@ -1012,19 +1012,20 @@ const CncUnit CncConfig::getDisplayUnit() 							{ return currentUnit; }
 const CncUnit CncConfig::getDefaultDisplayUnit()					{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? CncMetric : CncSteps ); }
 const char*  CncConfig::getDefaultDisplayUnitAsStr()				{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? "mm" : "steps" ); }
 
-const wxString& CncConfig::getFileBrowser(wxString& ret)			{ PROPERTY(CncApplication_Tool_FILE_BROWSER) 			ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getSVGFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_SVG_FILE_VIEWER) 		ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getBINFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_BIN_FILE_VIEWER) 		ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getGCodeFileViewer(wxString& ret)		{ PROPERTY(CncApplication_Tool_GCODE_FILE_VIEWER) 		ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getXMLFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_XML_FILE_VIEWER) 		ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getBrowser(wxString& ret)				{ PROPERTY(CncApplication_Tool_BROWSER) 				ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getEditorTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_EXTERNAL_EDITOR) 		ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getPyCamTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_PY_CAM); 				ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getDefaultSpeedModeXYZ(wxString& ret)	{ PROPERTY(CncConfig_DEF_SPEED_MODE_XYZ) 				ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getDefaultPort(wxString& ret)			{ PROPERTY(CncApplication_Com_DEFALT_PORT) 				ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getDefaultTplDir(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_DIRECTORY) 		ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getDefaultTplFile(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_FILE) 				ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getRunConfirmationMode(wxString& ret)	{ PROPERTY(CncApplication_CONFIRMATION_MODE) 			ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getFileBrowser(wxString& ret)			{ PROPERTY(CncApplication_Tool_FILE_BROWSER)			ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getSVGFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_SVG_FILE_VIEWER)			ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getBINFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_BIN_FILE_VIEWER)			ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getGCodeFileViewer(wxString& ret)		{ PROPERTY(CncApplication_Tool_GCODE_FILE_VIEWER)		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getXMLFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_XML_FILE_VIEWER)			ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getBrowser(wxString& ret)				{ PROPERTY(CncApplication_Tool_BROWSER)					ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getEditorTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_EXTERNAL_EDITOR)			ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getHexEditorTool(wxString& ret)			{ PROPERTY(CncApplication_Tool_EXTERNAL_HEX_EDITOR)		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getPyCamTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_PY_CAM)					ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultSpeedModeXYZ(wxString& ret)	{ PROPERTY(CncConfig_DEF_SPEED_MODE_XYZ)				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultPort(wxString& ret)			{ PROPERTY(CncApplication_Com_DEFALT_PORT)				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultTplDir(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_DIRECTORY)			ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultTplFile(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_FILE)				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getRunConfirmationMode(wxString& ret)	{ PROPERTY(CncApplication_CONFIRMATION_MODE)			ret.assign(p->GetValue().GetString()); return ret; }
 
 ////////////////////////////////////////////////////////////////////////
 // config setters

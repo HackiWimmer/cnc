@@ -11,8 +11,8 @@ class CncArduinoPinsListCtrl : public CncLargeScaledListCtrl {
 		
 	private:
 		
-		typedef std::map<wxString, unsigned int> PinIndex;
-		PinIndex pinIndex;
+		typedef std::map<wxString, AE::PinData> PinAlias;
+		PinAlias pinAlias;
 		
 		typedef std::vector<AE::PinData> PinList;
 		PinList pins;

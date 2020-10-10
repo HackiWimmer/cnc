@@ -119,13 +119,18 @@ void AE::ArduinoData::fillTransferData(TransferData& td) {
 		td.pins[counter++] = it->second;
 	}
 	
-	td.stepperDirX = traceInfo.stepperDirX;
-	td.stepperDirY = traceInfo.stepperDirY;
-	td.stepperDirZ = traceInfo.stepperDirZ;
+	td.stepperDirX		= traceInfo.stepperDirX;
+	td.stepperDirY		= traceInfo.stepperDirY;
+	td.stepperDirZ		= traceInfo.stepperDirZ;
+	td.stepperDirH		= traceInfo.stepperDirH;
 	
-	td.stepperPosX = traceInfo.stepperPosX;
-	td.stepperPosY = traceInfo.stepperPosY;
-	td.stepperPosZ = traceInfo.stepperPosZ;
+	td.stepperPosX		= traceInfo.stepperPosX;
+	td.stepperPosY		= traceInfo.stepperPosY;
+	td.stepperPosZ		= traceInfo.stepperPosZ;
+	td.stepperPosH		= traceInfo.stepperPosH;
+	
+	td.cfgSpeed_MM_SEC	= traceInfo.cfgSpeed_MM_SEC;
+	td.msdSpeed_MM_SEC	= traceInfo.msdSpeed_MM_SEC;
 }
 ////////////////////////////////////////////////////////////////////
 bool AE::ArduinoData::isPin(unsigned int pin) {

@@ -224,12 +224,154 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     m_panelArduinosPeriphery->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_contextBook->AddPage(m_panelArduinosPeriphery, _("Arduino\nPeriphery"), false);
     
-    wxFlexGridSizer* flexGridSizer122 = new wxFlexGridSizer(5, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer122 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer122->SetFlexibleDirection( wxBOTH );
     flexGridSizer122->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer122->AddGrowableCol(0);
-    flexGridSizer122->AddGrowableRow(4);
     m_panelArduinosPeriphery->SetSizer(flexGridSizer122);
+    
+    wxFlexGridSizer* flexGridSizer345 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer345->SetFlexibleDirection( wxBOTH );
+    flexGridSizer345->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer122->Add(flexGridSizer345, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer168 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer168->SetFlexibleDirection( wxBOTH );
+    flexGridSizer168->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer345->Add(flexGridSizer168, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText170 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support Switches:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText170->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_staticText170Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText170->SetFont(m_staticText170Font);
+    
+    flexGridSizer168->Add(m_staticText170, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer134 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer134->SetFlexibleDirection( wxBOTH );
+    flexGridSizer134->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer168->Add(flexGridSizer134, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer1449 = new wxFlexGridSizer(5, 2, 0, 0);
+    flexGridSizer1449->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1449->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer134->Add(flexGridSizer1449, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText181 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    
+    flexGridSizer1449->Add(m_staticText181, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticText17222 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("On       Off"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText17222->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_staticText17222Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText17222->SetFont(m_staticText17222Font);
+    
+    flexGridSizer1449->Add(m_staticText17222, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticText14610 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support Button 1:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText14610->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer1449->Add(m_staticText14610, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btSSBit8 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
+    
+    flexGridSizer1449->Add(m_btSSBit8, 0, wxALL, WXC_FROM_DIP(5));
+    m_btSSBit8->SetMinSize(wxSize(42,24));
+    
+    m_staticText14812 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support Button 2:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText14812->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer1449->Add(m_staticText14812, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btSSBit7 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
+    
+    flexGridSizer1449->Add(m_btSSBit7, 0, wxALL, WXC_FROM_DIP(5));
+    m_btSSBit7->SetMinSize(wxSize(42,24));
+    
+    m_staticText15014 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support Button 3:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText15014->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer1449->Add(m_staticText15014, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btSSBit6 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
+    
+    flexGridSizer1449->Add(m_btSSBit6, 0, wxALL, WXC_FROM_DIP(5));
+    m_btSSBit6->SetMinSize(wxSize(42,24));
+    
+    m_staticText15216 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("<FREE>:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText15216->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+    
+    flexGridSizer1449->Add(m_staticText15216, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btSSBit5 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
+    
+    flexGridSizer1449->Add(m_btSSBit5, 0, wxALL, WXC_FROM_DIP(5));
+    m_btSSBit5->SetMinSize(wxSize(42,24));
+    
+    wxFlexGridSizer* flexGridSizer144 = new wxFlexGridSizer(5, 2, 0, 0);
+    flexGridSizer144->SetFlexibleDirection( wxBOTH );
+    flexGridSizer144->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer134->Add(flexGridSizer144, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText183 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    
+    flexGridSizer144->Add(m_staticText183, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticText17221 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("On       Off"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText17221->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_staticText17221Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText17221->SetFont(m_staticText17221Font);
+    
+    flexGridSizer144->Add(m_staticText17221, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticText146 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support switch 1:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText146->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer144->Add(m_staticText146, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btSSBit4 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
+    
+    flexGridSizer144->Add(m_btSSBit4, 0, wxALL, WXC_FROM_DIP(5));
+    m_btSSBit4->SetMinSize(wxSize(42,24));
+    
+    m_staticText148 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support switch 2:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText148->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer144->Add(m_staticText148, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btSSBit3 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
+    
+    flexGridSizer144->Add(m_btSSBit3, 0, wxALL, WXC_FROM_DIP(5));
+    m_btSSBit3->SetMinSize(wxSize(42,24));
+    
+    m_staticText150 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Tool powered:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText150->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+    
+    flexGridSizer144->Add(m_staticText150, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btSSBit2 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
+    
+    flexGridSizer144->Add(m_btSSBit2, 0, wxALL, WXC_FROM_DIP(5));
+    m_btSSBit2->SetMinSize(wxSize(42,24));
+    
+    m_staticText152 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Cable connected:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText152->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+    
+    flexGridSizer144->Add(m_staticText152, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btSSBit1 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
+    
+    flexGridSizer144->Add(m_btSSBit1, 0, wxALL, WXC_FROM_DIP(5));
+    m_btSSBit1->SetMinSize(wxSize(42,24));
+    
+    m_staticLine347 = new wxStaticLine(m_panelArduinosPeriphery, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer345->Add(m_staticLine347, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer67 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer67->SetFlexibleDirection( wxBOTH );
@@ -237,7 +379,7 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     flexGridSizer67->AddGrowableCol(0);
     flexGridSizer67->AddGrowableRow(0);
     
-    flexGridSizer122->Add(flexGridSizer67, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer345->Add(flexGridSizer67, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer79 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer79->SetFlexibleDirection( wxBOTH );
@@ -375,189 +517,69 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     flexGridSizer60Z->Add(m_btMaxZ, 0, wxALL, WXC_FROM_DIP(5));
     m_btMaxZ->SetMinSize(wxSize(42,24));
     
-    m_staticLine1213 = new wxStaticLine(m_panelArduinosPeriphery, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer122->Add(m_staticLine1213, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    wxFlexGridSizer* flexGridSizer168 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer168->SetFlexibleDirection( wxBOTH );
-    flexGridSizer168->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer122->Add(flexGridSizer168, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText170 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support Switches:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText170->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_staticText170Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText170->SetFont(m_staticText170Font);
-    
-    flexGridSizer168->Add(m_staticText170, 0, wxALL, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer134 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer134->SetFlexibleDirection( wxBOTH );
-    flexGridSizer134->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer168->Add(flexGridSizer134, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer1449 = new wxFlexGridSizer(5, 2, 0, 0);
-    flexGridSizer1449->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1449->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer134->Add(flexGridSizer1449, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_staticText181 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    
-    flexGridSizer1449->Add(m_staticText181, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_staticText17222 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("On       Off"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText17222->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    wxFont m_staticText17222Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText17222->SetFont(m_staticText17222Font);
-    
-    flexGridSizer1449->Add(m_staticText17222, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_staticText14610 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support Button 1:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText14610->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer1449->Add(m_staticText14610, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btSSBit8 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
-    
-    flexGridSizer1449->Add(m_btSSBit8, 0, wxALL, WXC_FROM_DIP(5));
-    m_btSSBit8->SetMinSize(wxSize(42,24));
-    
-    m_staticText14812 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support Button 2:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText14812->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer1449->Add(m_staticText14812, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btSSBit7 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
-    
-    flexGridSizer1449->Add(m_btSSBit7, 0, wxALL, WXC_FROM_DIP(5));
-    m_btSSBit7->SetMinSize(wxSize(42,24));
-    
-    m_staticText15014 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support Button 3:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText15014->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer1449->Add(m_staticText15014, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btSSBit6 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
-    
-    flexGridSizer1449->Add(m_btSSBit6, 0, wxALL, WXC_FROM_DIP(5));
-    m_btSSBit6->SetMinSize(wxSize(42,24));
-    
-    m_staticText15216 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("<FREE>:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText15216->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
-    
-    flexGridSizer1449->Add(m_staticText15216, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btSSBit5 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
-    
-    flexGridSizer1449->Add(m_btSSBit5, 0, wxALL, WXC_FROM_DIP(5));
-    m_btSSBit5->SetMinSize(wxSize(42,24));
-    
-    wxFlexGridSizer* flexGridSizer144 = new wxFlexGridSizer(5, 2, 0, 0);
-    flexGridSizer144->SetFlexibleDirection( wxBOTH );
-    flexGridSizer144->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer134->Add(flexGridSizer144, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_staticText183 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    
-    flexGridSizer144->Add(m_staticText183, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_staticText17221 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("On       Off"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText17221->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    wxFont m_staticText17221Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText17221->SetFont(m_staticText17221Font);
-    
-    flexGridSizer144->Add(m_staticText17221, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_staticText146 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support switch 1:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText146->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer144->Add(m_staticText146, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btSSBit4 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
-    
-    flexGridSizer144->Add(m_btSSBit4, 0, wxALL, WXC_FROM_DIP(5));
-    m_btSSBit4->SetMinSize(wxSize(42,24));
-    
-    m_staticText148 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Support switch 2:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText148->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer144->Add(m_staticText148, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btSSBit3 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
-    
-    flexGridSizer144->Add(m_btSSBit3, 0, wxALL, WXC_FROM_DIP(5));
-    m_btSSBit3->SetMinSize(wxSize(42,24));
-    
-    m_staticText150 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Tool powered:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText150->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
-    
-    flexGridSizer144->Add(m_staticText150, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btSSBit2 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
-    
-    flexGridSizer144->Add(m_btSSBit2, 0, wxALL, WXC_FROM_DIP(5));
-    m_btSSBit2->SetMinSize(wxSize(42,24));
-    
-    m_staticText152 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Cable connected:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
-    m_staticText152->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
-    
-    flexGridSizer144->Add(m_staticText152, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btSSBit1 = new wxBitmapButton(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ToggelSwitch")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(42,24)), wxBU_AUTODRAW);
-    
-    flexGridSizer144->Add(m_btSSBit1, 0, wxALL, WXC_FROM_DIP(5));
-    m_btSSBit1->SetMinSize(wxSize(42,24));
-    
     m_staticLine121 = new wxStaticLine(m_panelArduinosPeriphery, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer122->Add(m_staticLine121, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    wxFlexGridSizer* flexGridSizer136 = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer136 = new wxFlexGridSizer(6, 1, 0, 0);
     flexGridSizer136->SetFlexibleDirection( wxBOTH );
     flexGridSizer136->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer136->AddGrowableCol(0);
-    flexGridSizer136->AddGrowableRow(0);
-    flexGridSizer136->AddGrowableRow(1);
-    flexGridSizer136->AddGrowableRow(2);
-    flexGridSizer136->AddGrowableRow(3);
     
     flexGridSizer122->Add(flexGridSizer136, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizerSpeed = new wxFlexGridSizer(1, 5, 0, 0);
+    wxFlexGridSizer* flexGridSizerSpeed = new wxFlexGridSizer(1, 8, 0, 0);
     flexGridSizerSpeed->SetFlexibleDirection( wxBOTH );
     flexGridSizerSpeed->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizerSpeed->AddGrowableCol(2);
+    flexGridSizerSpeed->AddGrowableCol(4);
     flexGridSizerSpeed->AddGrowableRow(0);
     
     flexGridSizer136->Add(flexGridSizerSpeed, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_staticText2155 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("F:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxALIGN_CENTRE);
     m_staticText2155->SetForegroundColour(wxColour(wxT("rgb(255,255,0)")));
-    wxFont m_staticText2155Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    wxFont m_staticText2155Font(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Consolas"));
     m_staticText2155->SetFont(m_staticText2155Font);
     
-    flexGridSizerSpeed->Add(m_staticText2155, 0, wxALL|wxALIGN_CENTER|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizerSpeed->Add(m_staticText2155, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
     
-    flexGridSizerSpeed->Add(12, 0, 1, wxALL, WXC_FROM_DIP(0));
+    flexGridSizerSpeed->Add(10, 0, 1, wxALL, WXC_FROM_DIP(0));
     
-    m_speed = new wxTextCtrl(m_panelArduinosPeriphery, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
-    m_speed->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_speed->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
-    wxFont m_speedFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_speed->SetFont(m_speedFont);
+    m_cfgSpeed = new wxTextCtrl(m_panelArduinosPeriphery, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
+    m_cfgSpeed->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_cfgSpeed->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_cfgSpeedFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_cfgSpeed->SetFont(m_cfgSpeedFont);
+    m_cfgSpeed->SetToolTip(_("Configured Speed"));
     #if wxVERSION_NUMBER >= 3000
-    m_speed->SetHint(wxT(""));
+    m_cfgSpeed->SetHint(wxT(""));
     #endif
     
-    flexGridSizerSpeed->Add(m_speed, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizerSpeed->Add(m_cfgSpeed, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText21552 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("F':"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_staticText21552->SetForegroundColour(wxColour(wxT("rgb(213,213,0)")));
+    wxFont m_staticText21552Font(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Consolas"));
+    m_staticText21552->SetFont(m_staticText21552Font);
+    
+    flexGridSizerSpeed->Add(m_staticText21552, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    
+    m_msdSpeed = new wxTextCtrl(m_panelArduinosPeriphery, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
+    m_msdSpeed->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_msdSpeed->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_msdSpeedFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_msdSpeed->SetFont(m_msdSpeedFont);
+    m_msdSpeed->SetToolTip(_("Measured Speed"));
+    #if wxVERSION_NUMBER >= 3000
+    m_msdSpeed->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizerSpeed->Add(m_msdSpeed, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_staticBitmap335 = new wxStaticBitmap(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snail")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0 );
     
-    flexGridSizerSpeed->Add(m_staticBitmap335, 0, wxALL|wxEXPAND|wxALIGN_CENTER, WXC_FROM_DIP(9));
+    flexGridSizerSpeed->Add(m_staticBitmap335, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(9));
     
     m_staticText3132 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("[mm/s]"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(40,-1)), wxALIGN_RIGHT);
     m_staticText3132->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
@@ -577,7 +599,7 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     
     m_staticText215 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("X:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxALIGN_CENTRE);
     m_staticText215->SetForegroundColour(wxColour(wxT("rgb(255,128,128)")));
-    wxFont m_staticText215Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    wxFont m_staticText215Font(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Consolas"));
     m_staticText215->SetFont(m_staticText215Font);
     
     flexGridSizerStepperX->Add(m_staticText215, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
@@ -617,7 +639,7 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     
     m_staticText21512 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Y:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxALIGN_CENTRE);
     m_staticText21512->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    wxFont m_staticText21512Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    wxFont m_staticText21512Font(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Consolas"));
     m_staticText21512->SetFont(m_staticText21512Font);
     
     flexGridSizerStepperY->Add(m_staticText21512, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
@@ -657,7 +679,7 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     
     m_staticText21554 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Z:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxALIGN_CENTRE);
     m_staticText21554->SetForegroundColour(wxColour(wxT("rgb(0,183,0)")));
-    wxFont m_staticText21554Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    wxFont m_staticText21554Font(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Consolas"));
     m_staticText21554->SetFont(m_staticText21554Font);
     
     flexGridSizerStepperZ->Add(m_staticText21554, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
@@ -686,6 +708,92 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     
     flexGridSizerStepperZ->Add(m_staticText31327, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
     m_staticText31327->SetMinSize(wxSize(40,-1));
+    
+    wxFlexGridSizer* flexGridSizerStepperH = new wxFlexGridSizer(1, 5, 0, 0);
+    flexGridSizerStepperH->SetFlexibleDirection( wxBOTH );
+    flexGridSizerStepperH->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizerStepperH->AddGrowableCol(2);
+    flexGridSizerStepperH->AddGrowableRow(0);
+    
+    flexGridSizer136->Add(flexGridSizerStepperH, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText215544 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("H:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_staticText215544->SetForegroundColour(wxColour(wxT("rgb(255,0,255)")));
+    wxFont m_staticText215544Font(14, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Consolas"));
+    m_staticText215544->SetFont(m_staticText215544Font);
+    
+    flexGridSizerStepperH->Add(m_staticText215544, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    
+    flexGridSizerStepperH->Add(10, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_posStepperH = new wxTextCtrl(m_panelArduinosPeriphery, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
+    m_posStepperH->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_posStepperH->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_posStepperHFont(14, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_posStepperH->SetFont(m_posStepperHFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_posStepperH->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizerStepperH->Add(m_posStepperH, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_bmpDirectionH = new wxStaticBitmap(m_panelArduinosPeriphery, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("24-stop")), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0 );
+    
+    flexGridSizerStepperH->Add(m_bmpDirectionH, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    
+    m_staticText313278 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("[steps]"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(40,-1)), wxALIGN_RIGHT);
+    m_staticText313278->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_staticText313278Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText313278->SetFont(m_staticText313278Font);
+    
+    flexGridSizerStepperH->Add(m_staticText313278, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    m_staticText313278->SetMinSize(wxSize(40,-1));
+    
+    wxFlexGridSizer* flexGridSizer350 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer350->SetFlexibleDirection( wxBOTH );
+    flexGridSizer350->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer350->AddGrowableCol(0);
+    
+    flexGridSizer136->Add(flexGridSizer350, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    flexGridSizer350->Add(0, 5, 1, wxALL, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer353 = new wxFlexGridSizer(1, 4, 0, 0);
+    flexGridSizer353->SetFlexibleDirection( wxBOTH );
+    flexGridSizer353->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer353->AddGrowableCol(1);
+    flexGridSizer353->AddGrowableRow(0);
+    
+    flexGridSizer350->Add(flexGridSizer353, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText355 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("Update Interval:"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText355->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_staticText355Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText355->SetFont(m_staticText355Font);
+    
+    flexGridSizer353->Add(m_staticText355, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_valuesUpdateInterval = new wxSlider(m_panelArduinosPeriphery, wxID_ANY, 800, 50, 1000, wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxSL_HORIZONTAL);
+    
+    flexGridSizer353->Add(m_valuesUpdateInterval, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_valuesUpdateIntervalValue = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("1234"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxALIGN_RIGHT);
+    m_valuesUpdateIntervalValue->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_valuesUpdateIntervalValueFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_valuesUpdateIntervalValue->SetFont(m_valuesUpdateIntervalValueFont);
+    
+    flexGridSizer353->Add(m_valuesUpdateIntervalValue, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticText3551 = new wxStaticText(m_panelArduinosPeriphery, wxID_ANY, _("[ms]"), wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), 0);
+    m_staticText3551->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_staticText3551Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText3551->SetFont(m_staticText3551Font);
+    
+    flexGridSizer353->Add(m_staticText3551, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticLine3522 = new wxStaticLine(m_panelArduinosPeriphery, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelArduinosPeriphery, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer350->Add(m_staticLine3522, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_panelConfiguration = new wxPanel(m_contextBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_contextBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_panelConfiguration->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
@@ -775,7 +883,7 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     
     flexGridSizer19->Add(m_staticLine309, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer303 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer303 = new wxFlexGridSizer(1, 4, 0, 0);
     flexGridSizer303->SetFlexibleDirection( wxBOTH );
     flexGridSizer303->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer303->AddGrowableCol(1);
@@ -790,9 +898,16 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     
     flexGridSizer303->Add(m_staticText305, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_sliderUpdateInterval = new wxSlider(m_splitterPageBottom, wxID_ANY, 800, 0, 1000, wxDefaultPosition, wxDLG_UNIT(m_splitterPageBottom, wxSize(-1,-1)), wxSL_HORIZONTAL);
+    m_loggerUpdateInterval = new wxSlider(m_splitterPageBottom, wxID_ANY, 800, 0, 1000, wxDefaultPosition, wxDLG_UNIT(m_splitterPageBottom, wxSize(-1,-1)), wxSL_HORIZONTAL);
     
-    flexGridSizer303->Add(m_sliderUpdateInterval, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer303->Add(m_loggerUpdateInterval, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_loggerUpdateIntervalValue = new wxStaticText(m_splitterPageBottom, wxID_ANY, _("1234"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageBottom, wxSize(-1,-1)), wxALIGN_RIGHT);
+    m_loggerUpdateIntervalValue->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_loggerUpdateIntervalValueFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_loggerUpdateIntervalValue->SetFont(m_loggerUpdateIntervalValueFont);
+    
+    flexGridSizer303->Add(m_loggerUpdateIntervalValue, 0, wxALL, WXC_FROM_DIP(5));
     
     m_staticText311 = new wxStaticText(m_splitterPageBottom, wxID_ANY, _("[ms]"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageBottom, wxSize(-1,-1)), 0);
     m_staticText311->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
@@ -899,7 +1014,7 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     #endif
     
     SetName(wxT("CncArduinoEnvironmentBase"));
-    SetSize(wxDLG_UNIT(this, wxSize(800,1000)));
+    SetSize(wxDLG_UNIT(this, wxSize(1000,1000)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -923,12 +1038,15 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     m_btPeriphery->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onSelectArduinoPeriphery), NULL, this);
     m_btConfiguration->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onSelectConfiguration), NULL, this);
     m_btSortPins->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onSortPins), NULL, this);
+    m_valuesUpdateInterval->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncArduinoEnvironmentBase::onValuesUpdateInterval), NULL, this);
+    m_valuesUpdateInterval->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncArduinoEnvironmentBase::onValuesUpdateInterval), NULL, this);
+    m_valuesUpdateInterval->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncArduinoEnvironmentBase::onValuesUpdateInterval), NULL, this);
     m_pgMgrConfig->Connect(wxEVT_PG_CHANGED, wxPropertyGridEventHandler(CncArduinoEnvironmentBase::onConfigChanged), NULL, this);
     m_pgMgrConfig->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(CncArduinoEnvironmentBase::onConfigChanging), NULL, this);
     m_btEmergency->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onEmergencyButton), NULL, this);
-    m_sliderUpdateInterval->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
-    m_sliderUpdateInterval->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
-    m_sliderUpdateInterval->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
+    m_loggerUpdateInterval->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
+    m_loggerUpdateInterval->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
+    m_loggerUpdateInterval->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
     m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncArduinoEnvironmentBase::onStartupTimer), NULL, this);
     m_continuousTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncArduinoEnvironmentBase::onContinuousTimer), NULL, this);
     
@@ -943,12 +1061,15 @@ CncArduinoEnvironmentBase::~CncArduinoEnvironmentBase()
     m_btPeriphery->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onSelectArduinoPeriphery), NULL, this);
     m_btConfiguration->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onSelectConfiguration), NULL, this);
     m_btSortPins->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onSortPins), NULL, this);
+    m_valuesUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncArduinoEnvironmentBase::onValuesUpdateInterval), NULL, this);
+    m_valuesUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncArduinoEnvironmentBase::onValuesUpdateInterval), NULL, this);
+    m_valuesUpdateInterval->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncArduinoEnvironmentBase::onValuesUpdateInterval), NULL, this);
     m_pgMgrConfig->Disconnect(wxEVT_PG_CHANGED, wxPropertyGridEventHandler(CncArduinoEnvironmentBase::onConfigChanged), NULL, this);
     m_pgMgrConfig->Disconnect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(CncArduinoEnvironmentBase::onConfigChanging), NULL, this);
     m_btEmergency->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onEmergencyButton), NULL, this);
-    m_sliderUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
-    m_sliderUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
-    m_sliderUpdateInterval->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
+    m_loggerUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
+    m_loggerUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
+    m_loggerUpdateInterval->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
     m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncArduinoEnvironmentBase::onStartupTimer), NULL, this);
     m_continuousTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncArduinoEnvironmentBase::onContinuousTimer), NULL, this);
     

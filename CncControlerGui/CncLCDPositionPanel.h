@@ -23,7 +23,6 @@ class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 		virtual void onPaint(wxPaintEvent& event);
 		virtual void onSize(wxSizeEvent& event);
 		virtual void onStartupTimer(wxTimerEvent& event);
-		virtual void onUpdateTimer(wxTimerEvent& event);
 };
 
 #endif // CNCLCDPOSITIONPANEL_H

@@ -197,6 +197,12 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			registerProperty(CncApplication_Tool_EXTERNAL_EDITOR, prop);
 			
 			//...............
+			prop = tools->AppendChild( new wxFileProperty("External Hex Editor", NEXT_PROP_ID, "notepad"));
+			prop->Enable(true);
+			prop->SetHelpString("");
+			registerProperty(CncApplication_Tool_EXTERNAL_HEX_EDITOR, prop);
+			
+			//...............
 			prop = tools->AppendChild( new wxFileProperty("PyCam", NEXT_PROP_ID, ""));
 			prop->Enable(true);
 			prop->SetHelpString("");

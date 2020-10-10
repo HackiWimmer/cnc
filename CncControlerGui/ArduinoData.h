@@ -41,6 +41,10 @@ namespace AE {
 		, mode(m)
 		, value(v)
 		{}
+		
+		bool operator == (const PinData& val) const {
+			return uidx == val.uidx;
+		}
 	};
 
 	// -----------------------------------------------------
@@ -51,11 +55,16 @@ namespace AE {
 		int32_t		stepperDirX		= DIRECTION_UNKNOWN;
 		int32_t		stepperDirY		= DIRECTION_UNKNOWN;
 		int32_t		stepperDirZ		= DIRECTION_UNKNOWN;
+		int32_t		stepperDirH		= DIRECTION_UNKNOWN;
 		
 		int32_t		stepperPosX		= 0;
 		int32_t		stepperPosY		= 0;
 		int32_t		stepperPosZ		= 0;
-
+		int32_t		stepperPosH		= 0;
+		
+		int32_t		cfgSpeed_MM_SEC	= 0;
+		int32_t		msdSpeed_MM_SEC	= 0;
+		
 		TransferData();
 		~TransferData();
 		
@@ -73,10 +82,15 @@ namespace AE {
 		int32_t		stepperDirX		= DIRECTION_UNKNOWN;
 		int32_t		stepperDirY		= DIRECTION_UNKNOWN;
 		int32_t		stepperDirZ		= DIRECTION_UNKNOWN;
+		int32_t		stepperDirH		= DIRECTION_UNKNOWN;
 		
 		int32_t		stepperPosX		= 0;
 		int32_t		stepperPosY		= 0;
 		int32_t		stepperPosZ		= 0;
+		int32_t		stepperPosH		= 0;
+		
+		int32_t		cfgSpeed_MM_SEC	= 0;
+		int32_t		msdSpeed_MM_SEC	= 0;
 	};
 	
 	struct ArduinoData {

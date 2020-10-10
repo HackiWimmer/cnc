@@ -6,7 +6,8 @@
 //////////////////////////////////////////////////////////////////
 class CncPathListManager {
 	
-	public:
+public:
+	/*
 		struct Data {
 			
 			unsigned int posChgCounter		= 0;
@@ -16,7 +17,7 @@ class CncPathListManager {
 				
 			}
 		};
-		
+	*/
 	protected:
 	
 		// Path position (CncPathListEntry) entries
@@ -37,7 +38,7 @@ class CncPathListManager {
 		
 		double totalDistance;
 		
-		Data data;
+		//Data data;
 		
 		//////////////////////////////////////////////////////////////
 		void appendEntry(CncPathListEntry& cpe);

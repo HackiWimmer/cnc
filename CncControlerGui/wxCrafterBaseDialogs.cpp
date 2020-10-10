@@ -380,6 +380,7 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     flexGridSizer7301->Add(flexGridSizer7280, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticLine7334 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine7334->SetToolTip(_("we"));
     
     flexGridSizer7280->Add(m_staticLine7334, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -708,7 +709,7 @@ CncLastProcessingTimestampSummaryBase::CncLastProcessingTimestampSummaryBase(wxW
     
     m_tsSummary->InsertColumn(m_tsSummary->GetColumnCount(), _("Area"), wxLIST_FORMAT_LEFT, 120);
     m_tsSummary->InsertColumn(m_tsSummary->GetColumnCount(), _("Time Consumed"), wxLIST_FORMAT_LEFT, 200);
-    m_tsSummary->SetMinSize(wxSize(330,180));
+    m_tsSummary->SetMinSize(wxSize(330,280));
     
     wxFlexGridSizer* flexGridSizer65 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer65->SetFlexibleDirection( wxBOTH );

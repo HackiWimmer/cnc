@@ -189,12 +189,15 @@ void CncMessageListCtrl::updateColumnWidth() {
 	GblFunc::freeze(this, false);
 }
 /////////////////////////////////////////////////////////////////////
-void CncMessageListCtrl::setUpdateInterval(int value) {
+bool CncMessageListCtrl::setUpdateInterval(int value) {
 /////////////////////////////////////////////////////////////////////
 	updateInterval = value;
 	
-	if ( updateInterval > 50 )	displayTimer.Start(updateInterval);
+	bool ret = true;
+	if ( updateInterval > 50 )	ret = displayTimer.Start(updateInterval);
 	else						displayTimer.Stop();
+	
+	return ret;
 }
 //////////////////////////////////////////////////
 void CncMessageListCtrl::onDisplayTimer(wxTimerEvent& event) {

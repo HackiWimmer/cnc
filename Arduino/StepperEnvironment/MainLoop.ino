@@ -177,8 +177,7 @@ uint8_t ArduinoMainLoop::getPinMode(uint8_t pin) {
   
 #else
 
-  #warning impl. missing getPinMode()
-  return NOT_A_PIN;
+  return AE::getPinMode(pin);
   
 #endif
 }
@@ -223,7 +222,6 @@ bool ArduinoMainLoop::convertLongToFloat(const int32_t val, float& ret) {
 /////////////////////////////////////////////////////////////////////////////////////
 void ArduinoMainLoop::sendHeartbeat(unsigned char limitState, unsigned char supportState) {
 /////////////////////////////////////////////////////////////////////////////////////
-  
   SWB.init();
   SWB.put(RET_SOH);
   SWB.put(PID_HEARTBEAT);
@@ -235,9 +233,6 @@ void ArduinoMainLoop::sendHeartbeat(unsigned char limitState, unsigned char supp
   SWB.put((unsigned char)255); // reserved
   
   SWB.write();
-
-  #warning
-  //PRINT_DEBUG_VALUE1("READ_LMT_PINS", READ_LMT_PINS)
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool ArduinoMainLoop::peakSerial(unsigned char& c) {
@@ -693,27 +688,25 @@ void ArduinoMainLoop::setup() {
   LastErrorCodes::clear(); 
 
   // digital pins
-  AE::pinMode(PIN_X_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,          PL_LOW);
-  AE::pinMode(PIN_Y_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,          PL_LOW);
-  AE::pinMode(PIN_Z_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,          PL_LOW);
-  AE::pinMode(PIN_X_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_X_DIR,          PL_LOW);
-  AE::pinMode(PIN_Y_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,          PL_LOW);
-  AE::pinMode(PIN_Z_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,          PL_LOW);
+  AE::pinMode(PIN_X_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,            PL_LOW);
+  AE::pinMode(PIN_Y_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,            PL_LOW);
+  AE::pinMode(PIN_Z_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,            PL_LOW);
+  AE::pinMode(PIN_X_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_X_DIR,            PL_LOW);
+  AE::pinMode(PIN_Y_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,            PL_LOW);
+  AE::pinMode(PIN_Z_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,            PL_LOW);
 
-  AE::pinMode(PIN_X_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MIN_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_X_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Y_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MIN_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Y_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Z_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MIN_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_X_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_X_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Y_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Y_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Z_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   
-  AE::pinMode(READ_EXT_INNTERRUPT_PIN,  PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,    LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(READ_EXT_INNTERRUPT_PIN,  PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_IS_TOOL_POWERED,      PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  TOOL_STATE_OFF);
 
-  AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER, ENABLE_STATE_OFF);
-  
-  #warning ON ????
-  AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,     TOOL_STATE_ON);
-  AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_IS_TOOL_POWERED, TOOL_STATE_ON);
+  AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,   ENABLE_STATE_OFF);
+  AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,      TOOL_STATE_OFF);
 
   // analog pins
   AE::pinMode(PIN_INTERRUPT_LED,        PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,   ANALOG_LOW);

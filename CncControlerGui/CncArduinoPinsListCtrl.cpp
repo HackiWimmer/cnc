@@ -17,40 +17,53 @@ wxEND_EVENT_TABLE()
 ///////////////////////////////////////////////////////////////
 namespace PinSorting {
 	
-	enum Mode { SM_DES_ByIndex, SM_DES_ByTypeName };
+	enum Mode { SM_DES_ByIndex, SM_DES_ByUsedTypeName, SM_DES_ByUsedTypeIndex };
 	Mode CurrentMode = SM_DES_ByIndex;
 	
 	//--------------------------------------------------------
-	bool wxCALLBACK desByIndex(const AE::PinData& p1, const AE::PinData& p2) {
+	bool desByIndex(const AE::PinData& p1, const AE::PinData& p2) {
 		return p1.uidx < p2.uidx;
 	}
 	
 	//--------------------------------------------------------
-	bool wxCALLBACK desByTypeName(const AE::PinData& p1, const AE::PinData& p2) {
+	bool desByUsedTypeName(const AE::PinData& p1, const AE::PinData& p2) {
 		
 		const wxString l1(p1.type == 'D' ? ArduinoDigitalPins::getPinLabel(p1.name) : ArduinoAnalogPins::getPinLabel(p1.name));
 		const wxString l2(p2.type == 'D' ? ArduinoDigitalPins::getPinLabel(p2.name) : ArduinoAnalogPins::getPinLabel(p2.name));
 		
 		const wxString s1(wxString::Format("%s-%c-%d", 
-											( l1.Contains("Unknown") ? "AAAAAAA": l1 ), 
+											( l1.Contains("Unknown") ? "ZZZZZZZZ": l1 ), 
 											p1.type,
 											p1.name
 						));
 						 
 		const wxString s2(wxString::Format("%s-%c-%d", 
-											( l2.Contains("Unknown") ? "AAAAAAA": l2 ), 
+											( l2.Contains("Unknown") ? "ZZZZZZZZ": l2 ), 
 											p2.type,
 											p2.name
 						));
 		
-		return s1.Cmp(s2) > 0;
+		return s1.Cmp(s2) < 0;
+	}
+	
+	//--------------------------------------------------------
+	bool desByUsedTypeIndex(const AE::PinData& p1, const AE::PinData& p2) {
+		
+		const wxString l1(p1.type == 'D' ? ArduinoDigitalPins::getPinLabel(p1.name) : ArduinoAnalogPins::getPinLabel(p1.name));
+		const wxString l2(p2.type == 'D' ? ArduinoDigitalPins::getPinLabel(p2.name) : ArduinoAnalogPins::getPinLabel(p2.name));
+		
+		const wxString s1(wxString::Format("%s", ( l1.Contains("Unknown") ? "Z": wxString::Format("%03d-%c", p1.uidx, p1.type) ) ));
+		const wxString s2(wxString::Format("%s", ( l2.Contains("Unknown") ? "Z": wxString::Format("%03d-%c", p2.uidx, p2.type) ) ));
+		
+		return s1.Cmp(s2) < 0;
+
 	}
 };
 	
 /////////////////////////////////////////////////////////////
 CncArduinoPinsListCtrl::CncArduinoPinsListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
-, pinIndex				()
+, pinAlias				()
 , pins					()
 /////////////////////////////////////////////////////////////
 {
@@ -85,9 +98,9 @@ CncArduinoPinsListCtrl::CncArduinoPinsListCtrl(wxWindow *parent, long style)
 	for ( unsigned int i=AE::minAPinIndex; i<=AE::maxAPinIndex; i++ )
 		pins.push_back(AE::PinData('A', i - AE::minAPinIndex, i));
 	
-	// build up index
+	// build up alias
 	for ( auto it = pins.begin(); it != pins.end(); ++it )
-		pinIndex[AE::ArduinoData::buildDislpayName(it->type, it->name)] = std::distance(pins.begin(), it);
+		pinAlias[AE::ArduinoData::buildDislpayName(it->type, it->name)] = *it;
 	
 	SetItemCount(pins.size());
 	
@@ -100,14 +113,19 @@ CncArduinoPinsListCtrl::~CncArduinoPinsListCtrl() {
 /////////////////////////////////////////////////////////////
 void CncArduinoPinsListCtrl::updatePinValue(const char type, unsigned int name, const char mode, int value) {
 /////////////////////////////////////////////////////////////
-	auto it = pinIndex.find(AE::ArduinoData::buildDislpayName(type, name));
-	if ( it == pinIndex.end() ) 
+	auto itAlias = pinAlias.find(AE::ArduinoData::buildDislpayName(type, name));
+	if ( itAlias == pinAlias.end() ) {
+		std::cerr << CNC_LOG_LOCATION << ": Can't find: " << AE::ArduinoData::buildDislpayName(type, name) << std::endl;
 		return;
+	}
 		
-	AE::PinData& p = pins.at(it->second);
+	const AE::PinData ref = itAlias->second;
+	auto itPin = std::find(pins.begin(), pins.end(), ref);
+	if ( itPin != pins.end() ) {
+		itPin->value = value;
+		itPin->mode  = mode;
+	}
 	
-	p.value = value;
-	p.mode 	= mode;
 	Refresh();
 }
 /////////////////////////////////////////////////////////////////////
@@ -197,16 +215,26 @@ void CncArduinoPinsListCtrl::sort(wxAnyButton* sortButton) {
 		case PinSorting::Mode::SM_DES_ByIndex:
 		{
 			std::sort(pins.begin(), pins.end(), PinSorting::desByIndex);
-			PinSorting::CurrentMode = PinSorting::Mode::SM_DES_ByTypeName;
+			PinSorting::CurrentMode = PinSorting::Mode::SM_DES_ByUsedTypeName;
 			
 			if ( sortButton )
 				sortButton->SetToolTip("Sort: By Used/Type/Label");
 				
 			break;
 		}
-		case PinSorting::Mode::SM_DES_ByTypeName:
+		case PinSorting::Mode::SM_DES_ByUsedTypeName:
 		{
-			std::sort(pins.begin(), pins.end(), PinSorting::desByTypeName);
+			std::sort(pins.begin(), pins.end(), PinSorting::desByUsedTypeName);
+			PinSorting::CurrentMode = PinSorting::Mode::SM_DES_ByUsedTypeIndex;
+			
+			if ( sortButton )
+				sortButton->SetToolTip("Sort: By Used/Type/Num");
+				
+			break;
+		}
+		case PinSorting::Mode::SM_DES_ByUsedTypeIndex:
+		{
+			std::sort(pins.begin(), pins.end(), PinSorting::desByUsedTypeIndex);
 			PinSorting::CurrentMode = PinSorting::Mode::SM_DES_ByIndex;
 			
 			if ( sortButton )

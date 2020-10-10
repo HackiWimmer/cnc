@@ -7,12 +7,10 @@
 #include <wx/string.h>
 #include <wx/font.h>
 #include "OSD/CncTimeFunctions.h"
+#include "CncAverage.h"
 
-typedef std::map<wxString, wxString> VersionInfoMap;
-typedef std::vector<wxString> CommandLineParameterMap;
-
-//#ifdef __WXMSW__
-//#ifdef __WXGTK__
+typedef std::map<wxString, wxString>	VersionInfoMap;
+typedef std::vector<wxString>			CommandLineParameterMap;
 
 struct CncContext {
 	
@@ -61,8 +59,9 @@ struct CncContext {
 		};
 		
 		struct TsTplProcessing {
-
+			
 			private:
+				
 				CncNanoTimestamp tsTotalStart	= CncTimeFunctions::getNanoTimestamp();
 				CncNanoTimestamp tsTotalEnd	 	= CncTimeFunctions::getNanoTimestamp();
 
@@ -76,6 +75,17 @@ struct CncContext {
 				CncNanoTimestamp tsSerialEnd	= CncTimeFunctions::getNanoTimestamp();
 
 			public:
+				
+				struct MeasuredDurations {
+					
+					CncAverage<long> md1;
+					CncAverage<long> md2;
+					CncAverage<long> md3;
+					CncAverage<long> md4;
+					CncAverage<long> md5;
+					
+				} measuredDurations;
+				
 				// -------------------------------------------------------
 				void logTotalTimeStart() 	{ tsTotalStart	= CncTimeFunctions::getNanoTimestamp(); }
 				void logTotalTimeEnd() 		{ tsTotalEnd	= CncTimeFunctions::getNanoTimestamp(); }
@@ -126,21 +136,45 @@ struct CncContext {
 				const wxString& getSerialTimeConsumedFormated(wxString& ret) const { return getTimeConsumedFormated(ret, tsSerialStart, tsSerialEnd); }
 				const wxString& getPostTimeConsumedFormated(wxString& ret)   const { return getTimeConsumedFormated(ret, tsPostStart,   tsPostEnd);   }
 
+				// -------------------------------------------------------
 				friend std::ostream &operator<< (std::ostream& ostr, const TsTplProcessing& ts) {
-					wxString value;
-
+					
+					// ---------------------------------------------------
+					auto formatDuartion = [](wxString& ret, const CncAverage<long>& a) { 
+						const long f = 1000;
+						
+						ret.assign(wxString::Format("[min=% 5ld, avg=% 5ld, max=% 5ld]", 
+													a.getMin() / f,
+													a.getAvg() / f, 
+													a.getMax() / f
+								  ));
+						
+						//ostr << a.getMin() / f << " < " << a.getAvg() / f << " > " << a.getMax() / f << "[us] s = " << a.getSum() / f / 100 << "[ms] c = " << a.count();
+						
+						return ret;
+					};
+					
 					const CncNanoTimestamp rest = ts.getTotalDurationNanos()
 												- ts.getPreDurationNanos()
 												- ts.getSerialDurationNanos()
 												- ts.getPostDurationNanos();
-
-					ostr 	<< "Time consumed:"												<< std::endl
-							<< " * Total  : " << ts.getTotalTimeConsumedFormated(value)		<< std::endl
-							<< " * Pre    : " << ts.getPreTimeConsumedFormated(value) 		<< std::endl
-							<< " * Serial : " << ts.getSerialTimeConsumedFormated(value)	<< std::endl
-							<< " * Post   : " << ts.getPostTimeConsumedFormated(value) 		<< std::endl
-							<< " * Rest   : " << ts.getTimeConsumedFormated(value, rest)	<< std::endl;
-
+					
+					wxString value;
+					ostr 	<< "Time consumed:"														<< std::endl
+							<< " * Total  : " << ts.getTotalTimeConsumedFormated	(value)			<< std::endl
+							<< " * Pre    : " << ts.getPreTimeConsumedFormated		(value) 		<< std::endl
+							<< " * Serial : " << ts.getSerialTimeConsumedFormated	(value)			<< std::endl
+							<< " * Post   : " << ts.getPostTimeConsumedFormated		(value)			<< std::endl
+							<< " * Rest   : " << ts.getTimeConsumedFormated			(value, rest)	<< std::endl
+							
+							<< "Durations:"															<< std::endl
+							<< " * m1     : " << formatDuartion(value, ts.measuredDurations.md1)	<< std::endl
+							<< " * m2     : " << formatDuartion(value, ts.measuredDurations.md2)	<< std::endl
+							<< " * m3     : " << formatDuartion(value, ts.measuredDurations.md3)	<< std::endl
+							<< " * m4     : " << formatDuartion(value, ts.measuredDurations.md4)	<< std::endl
+							<< " * m5     : " << formatDuartion(value, ts.measuredDurations.md5)	<< std::endl
+							
+							;
 					return ostr;
 				}
 

@@ -24,16 +24,20 @@ SerialThreadStub::~SerialThreadStub() {
 bool SerialThreadStub::connect(const char* portName) { 
 ///////////////////////////////////////////////////////////////////
 	typedef IndividualCommandEvent::EvtSerialStub ID;
-	wxASSERT( isSerialThreadInstalled() == true );
+	const bool ok = isSerialThreadInstalled();
+	wxASSERT( ok == true );
 	
-	wakeUpOnDemand();
-	setConnected(isSerialThreadRunning());
-	
-	if ( isConnected() ) {
-		IndividualCommandEvent evt(ID::NotifyConneting);
-		wxPostEvent(THE_FRAME, evt);
+	if ( ok == true ) {
+		wakeUpOnDemand();
+		setConnected(isSerialThreadRunning());
+		
+		if ( isConnected() ) {
+			IndividualCommandEvent evt(ID::NotifyConneting);
+			wxPostEvent(THE_FRAME, evt);
+		}
 	}
-	return true; 
+	
+	return ok; 
 }
 ///////////////////////////////////////////////////////////////////
 void SerialThreadStub::notifySetupSuccesfullyFinsihed() {
@@ -42,12 +46,20 @@ void SerialThreadStub::notifySetupSuccesfullyFinsihed() {
 		return;
  
 	typedef IndividualCommandEvent::EvtSerialStub ID;
-	wxASSERT( isSerialThreadInstalled() == true );
+	const bool ok = isSerialThreadInstalled();
+	wxASSERT( ok == true );
 	
-	wakeUpOnDemand();
-	
-	IndividualCommandEvent evt(ID::NotifyConneted);
-	wxPostEvent(THE_FRAME, evt);
+	if ( ok == true ) {
+		wakeUpOnDemand();
+		
+		IndividualCommandEvent evt(ID::NotifyConneted);
+		wxPostEvent(THE_FRAME, evt);
+	}
+	else {
+		IndividualCommandEvent evt(ID::NotifyFatalError);
+		evt.setValue(IndividualCommandEvent::ValueName::VAL1, CNC_LOG_LOCATION);
+		wxPostEvent(THE_FRAME, evt);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void SerialThreadStub::disconnect(void) {
@@ -57,16 +69,24 @@ void SerialThreadStub::disconnect(void) {
 	if ( isConnected() == false ) 
 		return;
 	
-	wxASSERT( isSerialThreadInstalled() == true );
+	const bool ok = isSerialThreadInstalled();
+	wxASSERT( ok == true );
 	
-	wakeUpOnDemand();
-	setConnected(false);
-	
-	if ( isSerialThreadRunning() == false )
-		pauseSerialThread();
-	
-	IndividualCommandEvent evt(ID::NotifyDisconnected);
-	wxPostEvent(THE_FRAME, evt);
+	if ( ok == true ) {
+		wakeUpOnDemand();
+		setConnected(false);
+		
+		if ( isSerialThreadRunning() == false )
+			pauseSerialThread();
+		
+		IndividualCommandEvent evt(ID::NotifyDisconnected);
+		wxPostEvent(THE_FRAME, evt);
+	}
+	else {
+		IndividualCommandEvent evt(ID::NotifyFatalError);
+		evt.setValue(IndividualCommandEvent::ValueName::VAL1, CNC_LOG_LOCATION);
+		wxPostEvent(THE_FRAME, evt);
+	}
 }
 /////////////////////////////////////////////////////////////////////
 bool SerialThreadStub::isSerialThreadInstalled() {
@@ -76,10 +96,7 @@ bool SerialThreadStub::isSerialThreadInstalled() {
 /////////////////////////////////////////////////////////////////////
 bool SerialThreadStub::isSerialThreadRunning() {
 /////////////////////////////////////////////////////////////////////
-	if ( isSerialThreadInstalled() == false )
-		return false;
-		
-	return APP_PROXY::getSerialThread(this)->IsRunning();
+	return ( isSerialThreadInstalled() == true ? APP_PROXY::getSerialThread(this)->IsRunning() : false );
 }
 /////////////////////////////////////////////////////////////////////
 void SerialThreadStub::resumeSerialThread() {
@@ -115,31 +132,54 @@ void SerialThreadStub::pauseSerialThread(){
 ///////////////////////////////////////////////////////////////////
 void SerialThreadStub::wakeUpOnDemand() {
 ///////////////////////////////////////////////////////////////////
+	typedef IndividualCommandEvent::EvtSerialStub ID;
+	
 	if ( isSerialThreadRunning() == false ) {
 		resumeSerialThread();
 		
 		wxASSERT ( isSerialThreadRunning() );
+		
+		IndividualCommandEvent evt(ID::NotifyFatalError);
+		evt.setValue(IndividualCommandEvent::ValueName::VAL1, CNC_LOG_LOCATION);
+		wxPostEvent(THE_FRAME, evt);
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void SerialThreadStub::onPeriodicallyAppEvent(bool interrupted) {
 ///////////////////////////////////////////////////////////////////
+	// nothing to do
 }
 ///////////////////////////////////////////////////////////////////
 int SerialThreadStub::readData(void *buffer, unsigned int nbByte) { 
 ///////////////////////////////////////////////////////////////////
+	typedef IndividualCommandEvent::EvtSerialStub ID;
+
 	if ( isConnected() == false )
 		return 0;
-
+	
 	wakeUpOnDemand();
 	
 	// first, read buffered data
 	int bytesRead         = readBufferedData(buffer, nbByte);
 	const int bytesToRead = nbByte - bytesRead;
 	
-	// then, read from serial
-	if ( bytesToRead > 0 )
-		bytesRead += APP_PROXY::getSerialThread(this)->getSerialAppEndPoint()->readBytes((unsigned char*)buffer, bytesToRead); 
+	if ( APP_PROXY::getSerialThread(this) != NULL) {
+		if ( APP_PROXY::getSerialThread(this)->getSerialAppEndPoint() != NULL ) {
+			// then, read from serial
+			if ( bytesToRead > 0 )
+				bytesRead += APP_PROXY::getSerialThread(this)->getSerialAppEndPoint()->readBytes((unsigned char*)buffer, bytesToRead); 
+		}
+		else {
+			IndividualCommandEvent evt(ID::NotifyFatalError);
+			evt.setValue(IndividualCommandEvent::ValueName::VAL1, CNC_LOG_LOCATION);
+			wxPostEvent(THE_FRAME, evt);
+		}
+	}
+	else {
+		IndividualCommandEvent evt(ID::NotifyFatalError);
+		evt.setValue(IndividualCommandEvent::ValueName::VAL1, CNC_LOG_LOCATION);
+		wxPostEvent(THE_FRAME, evt);
+	}
 	
 	// last, support spy
 	spyReadData(buffer, bytesRead);
@@ -148,11 +188,32 @@ int SerialThreadStub::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialThreadStub::writeData(void *buffer, unsigned int nbByte) { 
 ///////////////////////////////////////////////////////////////////
+	typedef IndividualCommandEvent::EvtSerialStub ID;
+	
 	if ( isConnected() == false )
 		return false;
 		
 	spyWriteData(buffer, nbByte);
 	
 	wakeUpOnDemand();
+	
+	if ( APP_PROXY::getSerialThread(this) == NULL) {
+		
+		IndividualCommandEvent evt(ID::NotifyFatalError);
+		evt.setValue(IndividualCommandEvent::ValueName::VAL1, CNC_LOG_LOCATION);
+		wxPostEvent(THE_FRAME, evt);
+		
+		return false;
+	}
+		
+	if ( APP_PROXY::getSerialThread(this)->getSerialAppEndPoint() == NULL ) {
+		
+		IndividualCommandEvent evt(ID::NotifyFatalError);
+		evt.setValue(IndividualCommandEvent::ValueName::VAL1, CNC_LOG_LOCATION);
+		wxPostEvent(THE_FRAME, evt);
+		
+		return false;
+	}
+	
 	return APP_PROXY::getSerialThread(this)->getSerialAppEndPoint()->write((unsigned char*)buffer, (int)nbByte); 
 }

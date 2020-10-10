@@ -127,7 +127,7 @@
     const unsigned char PIN_Y_MIN_LIMIT                     =  35;
     const unsigned char PIN_Y_MAX_LIMIT                     =  34;
     const unsigned char PIN_Z_MIN_LIMIT                     =  33;
-    const unsigned char PIN_Z_MAX_LIMIT                     =  33;
+    const unsigned char PIN_Z_MAX_LIMIT                     =  32;
     const unsigned char PIN_EXTERNAL_INTERRUPT              =  31;
 
     #define PIN_INTERRUPT                                AE::PN_A0   

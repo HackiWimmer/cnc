@@ -23,14 +23,13 @@ class SerialThread : public wxThread {
 	
 	protected:
 		
-		enum class SerialPriority 	{ DISCONNECTED=0, CONNECTED=1 };
+		enum class SerialState		{ DISCONNECTED=0, CONNECTED=1 };
 
 		MainFrame* 					pHandler;
 		bool 						exit;
 		bool						processAdmChl;
 		bool						interruped;
-		bool						connected;
-		SerialPriority				serialPriority;
+		SerialState					serialState;
 		
 		ArduinoMainLoop				arduinoMainLoop;
 		
@@ -40,7 +39,6 @@ class SerialThread : public wxThread {
 		CncNanoTimestamp 			tsDtRef;
 
 		CncNanoTimespan 			tsHbInterval;
-		CncNanoTimespan 			tsDtInterval;
 
 		AE::ArduinoData*			arduinoDataStore;
 		
@@ -77,6 +75,7 @@ class SerialThread : public wxThread {
 		
 		// thread interface
 		void 						stop();
+		bool						transferData(AE::TransferData& td);
 		bool						notifyConnecting();
 		bool						notifyConnected();
 		bool						notifyDisconnected();
@@ -140,6 +139,7 @@ class SerialThread : public wxThread {
 		
 		static void 				ardoTraceStepperDir(char sid, int32_t dir);
 		static void 				ardoTraceStepperPos(char sid, int32_t pos);
+		static void 				ardoTraceSpeed(char sid, int32_t val);
 
 		static const char*			ardoGetCmdLabel(unsigned char c);
 		static const char*			ardoGetPidLabel(unsigned char p);
@@ -156,6 +156,7 @@ class SerialThread : public wxThread {
 		static void 				delay(uint32_t milliSeconds);
 		static void 				delayMicroseconds(int16_t microsSeconds);
 		static uint8_t				getDigitalPinToPort(uint8_t pin);
+		static uint8_t				getPinMode(uint8_t pin);
 		
 		wxDECLARE_NO_COPY_CLASS(SerialThread);
 };

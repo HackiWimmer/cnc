@@ -107,6 +107,14 @@ void			AE::ardoTraceStepperPos(char id, int32_t pos)
 #endif
 
 // .................................................................
+void			AE::ardoTraceSpeed(char id, int32_t val)
+#ifdef JOIN_SERIAL_THREAD
+				{ SerialThread::ardoTraceSpeed(id, val); }
+#else
+				{}
+#endif
+
+// .................................................................
 const char*		AE::ardoGetCmdLabel(unsigned char c)
 #ifdef JOIN_SERIAL_THREAD
 				{ return SerialThread::ardoGetCmdLabel(c); }
@@ -255,6 +263,14 @@ uint32_t 		AE::micros()
 
 // .................................................................
 uint8_t			AE::getDigitalPinToPort(uint8_t pin)
+#ifdef JOIN_SERIAL_THREAD
+				{ return SerialThread::getDigitalPinToPort(pin); }
+#else
+				{ return 0; }
+#endif
+
+// .................................................................
+uint8_t			AE::getPinMode(uint8_t pin)
 #ifdef JOIN_SERIAL_THREAD
 				{ return SerialThread::getDigitalPinToPort(pin); }
 #else

@@ -8,6 +8,7 @@
 
 ///////////////////////////////////////////////////////
 typedef void (*WriteFunctionType)(void);
+
 class CncArduinoController;
 class ArduinoMainLoop {
 

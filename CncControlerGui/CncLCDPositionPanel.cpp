@@ -88,9 +88,3 @@ void CncLCDPositionPanel::updateValues() {
 	lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());
 	lcdZ->SetValue(THE_APP->GetZAxisCtl()->GetValue());
 }
-///////////////////////////////////////////////////////////////////
-void CncLCDPositionPanel::onUpdateTimer(wxTimerEvent& event) {
-///////////////////////////////////////////////////////////////////
-	#warning remove timer
-	//updateValues();
-}

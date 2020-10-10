@@ -370,7 +370,6 @@ class CncConfig {
 		const double getFeedrateY()								{ return getDisplayFactY(); }
 		const double getFeedrateZ()								{ return getDisplayFactZ(); }
 		
-		
 		const double getDispFactX3D() 							{ return dispFactX3D; }
 		const double getDispFactY3D() 							{ return dispFactY3D; }
 		const double getDispFactZ3D()							{ return dispFactZ3D; }
@@ -386,6 +385,7 @@ class CncConfig {
 		const wxString& getXMLFileViewer(wxString& ret);
 		const wxString& getBrowser(wxString& ret);
 		const wxString& getEditorTool(wxString& ret);
+		const wxString& getHexEditorTool(wxString& ret);
 		const wxString& getPyCamTool(wxString& ret);
 		const wxString& getDefaultSpeedModeXYZ(wxString& ret);
 		const wxString& getDefaultPort(wxString& ret);

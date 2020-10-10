@@ -15,7 +15,7 @@ CncPathListManager::CncPathListManager()
 , maxPosZ(0.0)
 , totalDistance(0.0)
 
-, data()
+//, data()
 //////////////////////////////////////////////////////////////////
 {
 	//preallocate memory

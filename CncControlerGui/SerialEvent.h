@@ -41,10 +41,6 @@ class SerialEvent : public wxThreadEvent {
 		} message;
 		
 		// --------------------------------------------------------------------
-		AE::TransferData data;
-
-
-		// --------------------------------------------------------------------
 		SerialEvent(wxEventType eventType = wxEVT_SERIAL_THREAD, int id = 0)
 		: wxThreadEvent(eventType, id)
 		{}
@@ -52,13 +48,12 @@ class SerialEvent : public wxThreadEvent {
 		explicit SerialEvent(const SerialEvent& event)
 		: wxThreadEvent(event)
 		{
-
-	        // make sure our string member (which uses COW, aka refcounting) is not
-	        // shared by other wxString instances:
-	        message.setMessage(message.getMessage().Clone());
-	        message.setContext(message.getContext().Clone());
+			// make sure our string member (which uses COW, aka refcounting) is not
+			// shared by other wxString instances:
+			message.setMessage(message.getMessage().Clone());
+			message.setContext(message.getContext().Clone());
 		}
-
+		
 		virtual wxEvent *Clone() const {
 			return new SerialEvent(*this);
 		}

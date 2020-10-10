@@ -287,8 +287,6 @@ void CncMetricRulerSetup::createRulerY(GLI::GLAxisRuler& ruler) {
 		if ( cnc::dblCompareNull(fmod(iy, majorScanning)) == true ) {
 			// add label
 			const int label = majorScanning * ( y / majorScanning );
-			#warning ruler y !!!
-			//std::cout << x << std::endl;
 			addLabel(ruler.axisLables, x, y, z, GLUT_BITMAP_8_BY_13, wxString::Format("% +4d", label));
 			
 			// add major scanning line

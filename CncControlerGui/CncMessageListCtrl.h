@@ -69,7 +69,7 @@ class CncMessageListCtrl : public CncLargeScaledListCtrl {
 		CncMessageListCtrl(wxWindow *parent, long style);
 		virtual ~CncMessageListCtrl();
 		
-		void setUpdateInterval(int value);
+		bool setUpdateInterval(int value);
 		void appendMessage(const char type, const wxString& message);
 		void appendMessage(const char type, const wxString& message, const wxString& context);
 		void clear();

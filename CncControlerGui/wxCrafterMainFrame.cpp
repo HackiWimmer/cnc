@@ -4445,6 +4445,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btUCClose->SetMinSize(wxSize(20,20));
     
     m_serialSpyView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_serialSpyView->SetToolTip(_("reewrewr"));
     
     m_auimgrMain->AddPane(m_serialSpyView, wxAuiPaneInfo().Name(wxT("SerialSpy")).Caption(_("CNC Serial Spy")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
@@ -5012,7 +5013,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_splitterPageLogger = new wxPanel(m_secureSplitterMainH, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMainH, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_secureSplitterMainH->SplitHorizontally(m_splitterPageMonitor, m_splitterPageLogger, 0);
     
-    wxFlexGridSizer* flexGridSizer8265 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer8265 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer8265->SetFlexibleDirection( wxBOTH );
     flexGridSizer8265->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer8265->AddGrowableCol(0);
@@ -5023,6 +5024,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_secLoggerPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
     
     flexGridSizer8265->Add(m_secLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticLine9501 = new wxStaticLine(m_splitterPageLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLogger, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer8265->Add(m_staticLine9501, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_lcdPositionPlaceholder = new wxPanel(m_splitterPageLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLogger, wxSize(280,-1)), wxTAB_TRAVERSAL);
     m_lcdPositionPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
@@ -5268,24 +5273,30 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuBar->Append(m_menuTools, _("Tools"));
     
     m_miIniFile = new wxMenuItem(m_menuTools, wxID_ANY, _("Configuration File"), wxT(""), wxITEM_NORMAL);
-    m_miIniFile->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
+    m_miIniFile->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-mime-c")));
     m_menuTools->Append(m_miIniFile);
     
+    m_menuTools->AppendSeparator();
+    
     m_miExternalEditor = new wxMenuItem(m_menuTools, wxID_ANY, _("External Editor"), wxT(""), wxITEM_NORMAL);
-    m_miExternalEditor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
+    m_miExternalEditor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-tools")));
     m_menuTools->Append(m_miExternalEditor);
     
+    m_miHexEditor = new wxMenuItem(m_menuTools, wxID_ANY, _("Hex Editor"), wxT(""), wxITEM_NORMAL);
+    m_miHexEditor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-tools")));
+    m_menuTools->Append(m_miHexEditor);
+    
     m_miCalculator = new wxMenuItem(m_menuTools, wxID_ANY, _("Calculator"), wxT(""), wxITEM_NORMAL);
-    m_miCalculator->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
+    m_miCalculator->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-tools")));
     m_menuTools->Append(m_miCalculator);
     
     m_miPyCam = new wxMenuItem(m_menuTools, wxID_ANY, _("PyCAM"), wxT(""), wxITEM_NORMAL);
-    m_miPyCam->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
+    m_miPyCam->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-tools")));
     m_menuTools->Append(m_miPyCam);
     
     m_menuTools->AppendSeparator();
     
-    m_miSpeedPlayground = new wxMenuItem(m_menuTools, wxID_ANY, _("Speed Playground"), wxT(""), wxITEM_NORMAL);
+    m_miSpeedPlayground = new wxMenuItem(m_menuTools, wxID_ANY, _("Acceleration Playground"), wxT(""), wxITEM_NORMAL);
     m_miSpeedPlayground->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("car")));
     m_menuTools->Append(m_miSpeedPlayground);
     
@@ -5647,8 +5658,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_metricValueFrom->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectMetricUnitFromValue), NULL, this);
     m_cbMetricUnitTo->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectMetricUnitTo), NULL, this);
     m_btUCClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::closeUnitCalculator), NULL, this);
-    m_serialSpyView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveSerialSpy), NULL, this);
-    m_serialSpyView->Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(MainFrameBClass::leaveSerialSpy), NULL, this);
     m_btTogglePosSpy->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::togglePositionSpy), NULL, this);
     m_btCopyPosSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyPositionSpy), NULL, this);
     m_btSearchPosSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchPosSpy), NULL, this);
@@ -5731,6 +5740,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miRqtWarmstart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::warmStartController), NULL, this);
     this->Connect(m_miIniFile->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openConfigurationFile), NULL, this);
     this->Connect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);
+    this->Connect(m_miHexEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openHexEditor), NULL, this);
     this->Connect(m_miCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openCalculator), NULL, this);
     this->Connect(m_miPyCam->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openPyCam), NULL, this);
     this->Connect(m_miSpeedPlayground->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSpeedPlayground), NULL, this);
@@ -5897,8 +5907,6 @@ MainFrameBClass::~MainFrameBClass()
     m_metricValueFrom->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectMetricUnitFromValue), NULL, this);
     m_cbMetricUnitTo->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectMetricUnitTo), NULL, this);
     m_btUCClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::closeUnitCalculator), NULL, this);
-    m_serialSpyView->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveSerialSpy), NULL, this);
-    m_serialSpyView->Disconnect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(MainFrameBClass::leaveSerialSpy), NULL, this);
     m_btTogglePosSpy->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::togglePositionSpy), NULL, this);
     m_btCopyPosSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyPositionSpy), NULL, this);
     m_btSearchPosSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchPosSpy), NULL, this);
@@ -5981,6 +5989,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miRqtWarmstart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::warmStartController), NULL, this);
     this->Disconnect(m_miIniFile->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openConfigurationFile), NULL, this);
     this->Disconnect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);
+    this->Disconnect(m_miHexEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openHexEditor), NULL, this);
     this->Disconnect(m_miCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openCalculator), NULL, this);
     this->Disconnect(m_miPyCam->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openPyCam), NULL, this);
     this->Disconnect(m_miSpeedPlayground->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSpeedPlayground), NULL, this);

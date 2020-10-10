@@ -81,19 +81,12 @@ void CncStatisticsPane::logStatistics(bool force) {
 	double elapsedTimeSEC	= 0.0;
 	double speed_MM_MIN		= 0.0;
 	double speed_MM_SEC		= 0.0;
-	long   speed_SP_SEC		= 0;
-	long   speed_RPM		= 0;
 	
 	if ( measurementTimeSpan > 0L ) {
 		elapsedTimeMSEC = measurementTimeSpan / (1000.0 * 1000.0);
 		elapsedTimeSEC  = elapsedTimeMSEC / (1000.0);
 		speed_MM_SEC 	= cnc->getTotalDistanceMetric() / elapsedTimeSEC;
 		speed_MM_MIN 	= speed_MM_SEC * 60;
-		
-		#warning
-		//const int stepsXYZ = ( THE_CONFIG->getStepsX() + THE_CONFIG->getStepsY() + THE_CONFIG->getStepsZ() ) / 3;
-		speed_SP_SEC    = 0;//cnc->getStepCounter() / elapsedTimeSEC;
-		speed_RPM		= 0;//(speed_SP_SEC / stepsXYZ ) * 60;
 	}
 
 	static wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel), speedSPSEC(_maxSpeedLabel), speedRPM(_maxSpeedLabel);
@@ -105,8 +98,6 @@ void CncStatisticsPane::logStatistics(bool force) {
 	if ( setupSpeedValue ) {
 		speedMMMIN.assign(CncNumberFormatter::toString(speed_MM_MIN, 1));
 		speedMMSEC.assign(CncNumberFormatter::toString(speed_MM_SEC, 1));
-		speedSPSEC.assign(CncNumberFormatter::toString(speed_SP_SEC));
-		speedRPM  .assign(CncNumberFormatter::toString(speed_RPM));
 	}
 	
 	// statistic keys
@@ -116,7 +107,6 @@ void CncStatisticsPane::logStatistics(bool force) {
 	static const char* SKEY_DISTANCE 	= "Distance";
 	static const char* SKEY_TIME 		= "Time consumend";
 	static const char* SKEY_SPEED 		= "Feed speed AVG";
-	static const char* SKEY_SPEED_EXT	= "Performance AVG";
 	
 	// add rows - ones a time
 	if ( statisticSummaryListCtrl->getItemCount() == 0 ) {
@@ -125,7 +115,6 @@ void CncStatisticsPane::logStatistics(bool force) {
 		statisticSummaryListCtrl->addKey(SKEY_STEP_CNT, 	"Total, X, Y, Z", 		"steps");
 		statisticSummaryListCtrl->addKey(SKEY_DISTANCE, 	"Total, X, Y, Z", 		"mm");
 		statisticSummaryListCtrl->addKey(SKEY_TIME, 		"Total, Stepping", 		"ms");
-		statisticSummaryListCtrl->addKey(SKEY_SPEED_EXT, 	"steps/sec, rpm", 		"unit");
 		statisticSummaryListCtrl->addKey(SKEY_SPEED, 		"mm/sec, mm/min", 		"mm/unit");
 	}
 	
@@ -154,11 +143,6 @@ void CncStatisticsPane::logStatistics(bool force) {
 															, _("")
 															, CncNumberFormatter::toString((double)(THE_CONTEXT->timestamps.getTotalDurationMillis()), 1)
 															, CncNumberFormatter::toString(elapsedTimeMSEC, 1));
-	
-	statisticSummaryListCtrl->updateValues(SKEY_SPEED_EXT	, _("")
-															, _("")
-															, speedSPSEC
-															, speedRPM);
 	
 	statisticSummaryListCtrl->updateValues(SKEY_SPEED		, _("")
 															, _("")

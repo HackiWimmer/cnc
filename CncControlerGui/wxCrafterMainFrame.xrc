@@ -7745,6 +7745,9 @@ State</label>
         <pin_button>1</pin_button>
         <object class="wxPanel" name="m_serialSpyView">
           <style>wxTAB_TRAVERSAL</style>
+          <tooltip>
+            <![CDATA[reewrewr]]>
+          </tooltip>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
             <rows>1</rows>
@@ -8717,7 +8720,7 @@ State</label>
                         <object class="wxPanel" name="m_splitterPageLogger">
                           <style>wxTAB_TRAVERSAL</style>
                           <object class="wxFlexGridSizer">
-                            <cols>2</cols>
+                            <cols>3</cols>
                             <rows>1</rows>
                             <vgap>0</vgap>
                             <hgap>0</hgap>
@@ -8728,6 +8731,13 @@ State</label>
                               <object class="wxPanel" name="m_secLoggerPlaceholder">
                                 <style>wxTAB_TRAVERSAL</style>
                                 <bg>wxSYS_COLOUR_INFOBK</bg>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <border>1</border>
+                              <object class="wxStaticLine" name="m_staticLine9501">
+                                <style>wxLI_VERTICAL</style>
                               </object>
                             </object>
                             <object class="sizeritem">
@@ -9306,7 +9316,7 @@ State</label>
         <style/>
         <object class="wxMenuItem" name="m_miIniFile">
           <label>Configuration File</label>
-          <bitmap>bitmaps/executable.png</bitmap>
+          <bitmap>bitmaps/CodeLite/16-mime-c.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -9314,9 +9324,20 @@ State</label>
             <![CDATA[]]>
           </help>
         </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="m_miExternalEditor">
           <label>External Editor</label>
-          <bitmap>bitmaps/executable.png</bitmap>
+          <bitmap>bitmaps/CodeLite/16-tools.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
+        </object>
+        <object class="wxMenuItem" name="m_miHexEditor">
+          <label>Hex Editor</label>
+          <bitmap>bitmaps/CodeLite/16-tools.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -9326,7 +9347,7 @@ State</label>
         </object>
         <object class="wxMenuItem" name="m_miCalculator">
           <label>Calculator</label>
-          <bitmap>bitmaps/executable.png</bitmap>
+          <bitmap>bitmaps/CodeLite/16-tools.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -9336,7 +9357,7 @@ State</label>
         </object>
         <object class="wxMenuItem" name="m_miPyCam">
           <label>PyCAM</label>
-          <bitmap>bitmaps/executable.png</bitmap>
+          <bitmap>bitmaps/CodeLite/16-tools.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -9346,7 +9367,7 @@ State</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miSpeedPlayground">
-          <label>Speed Playground</label>
+          <label>Acceleration Playground</label>
           <bitmap>bitmaps/car.png</bitmap>
           <accel>
             <![CDATA[]]>

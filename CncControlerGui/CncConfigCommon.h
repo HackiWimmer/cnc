@@ -84,7 +84,8 @@
 	#define CncApplication_Tool_GCODE_FILE_VIEWER 			"CncApplication.Tools/OSD_GCODE_FILE_VIEWER"
 	#define CncApplication_Tool_XML_FILE_VIEWER 			"CncApplication.Tools/OSD_XML_FILE_VIEWER"
 	#define CncApplication_Tool_BROWSER					 	"CncApplication.Tools/OSD_BROWSER"
-	#define CncApplication_Tool_EXTERNAL_EDITOR 			"CncApplication.Tools/OSD_EXTERNAL_EDITOR"
+	#define CncApplication_Tool_EXTERNAL_EDITOR				"CncApplication.Tools/OSD_EXTERNAL_EDITOR"
+	#define CncApplication_Tool_EXTERNAL_HEX_EDITOR			"CncApplication.Tools/OSD_EXTERNAL_HEX_EDITOR"
 	#define CncApplication_Tool_PY_CAM 						"CncApplication.Tools/OSD_PY_CAM"
 	
 	#define CncSvg_Parser_REVERSE_Y_AXIS					"CncSvg.Parser/CONVERT_TO_RIGHT_HAND"

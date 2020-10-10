@@ -602,6 +602,7 @@ protected:
     wxPanel* m_secSpeedMonitorPlaceholder;
     wxPanel* m_splitterPageLogger;
     wxPanel* m_secLoggerPlaceholder;
+    wxStaticLine* m_staticLine9501;
     wxPanel* m_lcdPositionPlaceholder;
     wxMenuBar* m_menuBar;
     wxMenu* m_menuFile;
@@ -674,7 +675,9 @@ protected:
     wxMenuItem* m_miRqtWarmstart;
     wxMenu* m_menuTools;
     wxMenuItem* m_miIniFile;
+    wxMenuItem* m_menuItem74601;
     wxMenuItem* m_miExternalEditor;
+    wxMenuItem* m_miHexEditor;
     wxMenuItem* m_miCalculator;
     wxMenuItem* m_miPyCam;
     wxMenuItem* m_menuItem7460;
@@ -836,8 +839,6 @@ protected:
     virtual void selectMetricUnitFromValue(wxCommandEvent& event) { event.Skip(); }
     virtual void selectMetricUnitTo(wxCommandEvent& event) { event.Skip(); }
     virtual void closeUnitCalculator(wxCommandEvent& event) { event.Skip(); }
-    virtual void leaveSerialSpy(wxMouseEvent& event) { event.Skip(); }
-    virtual void leaveSerialSpy(wxMouseCaptureLostEvent& event) { event.Skip(); }
     virtual void togglePositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void copyPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void searchPosSpy(wxCommandEvent& event) { event.Skip(); }
@@ -899,6 +900,7 @@ protected:
     virtual void warmStartController(wxCommandEvent& event) { event.Skip(); }
     virtual void openConfigurationFile(wxCommandEvent& event) { event.Skip(); }
     virtual void openExternalEditor(wxCommandEvent& event) { event.Skip(); }
+    virtual void openHexEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void openPyCam(wxCommandEvent& event) { event.Skip(); }
     virtual void openSpeedPlayground(wxCommandEvent& event) { event.Skip(); }
@@ -1445,6 +1447,7 @@ public:
     wxSplitterWindow* GetSecureSplitterDrawingH() { return m_secureSplitterDrawingH; }
     wxPanel* GetSplitterPageMonitor() { return m_splitterPageMonitor; }
     wxPanel* GetSecLoggerPlaceholder() { return m_secLoggerPlaceholder; }
+    wxStaticLine* GetStaticLine9501() { return m_staticLine9501; }
     wxPanel* GetLcdPositionPlaceholder() { return m_lcdPositionPlaceholder; }
     wxPanel* GetSplitterPageLogger() { return m_splitterPageLogger; }
     wxSplitterWindow* GetSecureSplitterMainH() { return m_secureSplitterMainH; }

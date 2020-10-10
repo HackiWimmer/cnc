@@ -167,7 +167,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-		virtual void leaveSerialSpy(wxMouseEvent& event);
+		virtual void openHexEditor(wxCommandEvent& event);
 		virtual void onReloadMonitorPreview(wxCommandEvent& event);
 		virtual void viewControllerMsgHistory(wxCommandEvent& event);
 		virtual void onSelectStepSensitivity(wxCommandEvent& event);
@@ -398,7 +398,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void onSerialThreadCompletion(SerialEvent& event);
 		void onSerialThreadHeartbeat(SerialEvent& event);
 		void onSerialThreadMessage(SerialEvent& event);
-		void onSerialThreadData(SerialEvent& event);
+		void onSerialThreadDataNotification(SerialEvent& event);
 		void onSerialThreadPinNotification(SerialEvent& event);
 		
 		void onNavigatorPanel(CncNavigatorPanelEvent& event);
@@ -428,7 +428,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 						GAMEPAD_MESSAGE				= 10,
 						SERIAL_HEARTBEAT			= 11,
 						SERIAL_MESSAGE				= 12,
-						SERIAL_DATA					= 13,
+						SERIAL_DATA_NOTIFICATION	= 13,
 						SERIAL_PIN_NOTIFICATION		= 14
 					  };
 					  
@@ -550,6 +550,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
 		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ return parsingSynopisis; }
 		
+		bool readSerialThreadData(AE::TransferData& td);
+		
 		bool startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z);
 		bool startInteractiveMove(CncInteractiveMoveDriver imd);
 		bool updateInteractiveMove();
@@ -595,6 +597,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class GamepadThread;
 		friend class SerialThread;
 		friend class SerialThreadStub;
+		
+		friend class CncArduinoEnvironment;
 
 		// to remove . . .
 			friend class CncFileView;

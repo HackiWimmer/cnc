@@ -626,7 +626,7 @@ void CncSpeedMonitor::Diagram::plotMain(wxAutoBufferedPaintDC& dc, const wxRect&
 		
 		//----------------------------------------------------------------
 		auto getTsAsPx = [&](CncMilliTimestamp tsFirst, auto it) {
-			#warning
+			#warning - this calculation is not 100% correct
 			return plotTRange - abs((long)(it->ts - tsFirst)) / timeCompression + timeOffset / timeCompression;
 		};
 		

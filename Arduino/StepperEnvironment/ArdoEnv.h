@@ -37,6 +37,7 @@
 
       extern void                     ardoTraceStepperDir(char id, int32_t dir);
       extern void                     ardoTraceStepperPos(char id, int32_t pos);
+      extern void                     ardoTraceSpeed(char id, int32_t val);
 
       extern const char*              ardoGetCmdLabel(unsigned char c);
       extern const char*              ardoGetPidLabel(unsigned char p);
@@ -66,6 +67,7 @@
       extern inline void              delayMicroseconds(uint16_t microsSeconds);  
   
       extern inline uint8_t           getDigitalPinToPort(uint8_t pin);
+      extern inline uint8_t           getPinMode(uint8_t pin);
    
     }; // namespace AE 
   
@@ -91,6 +93,7 @@
     #define ARDO_DEBUG_VALUE(vName, vValue)                     AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
     #define ARDO_TRACE_STEPPER_DIR(sid, value)                  AE::ardoTraceStepperDir(sid, value);
     #define ARDO_TRACE_STEPPER_POS(sid, value)                  AE::ardoTraceStepperPos(sid, value);
+    #define ARDO_TRACE_SPEED(sid, value)                        AE::ardoTraceSpeed(sid, value);
     
     #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 
@@ -144,6 +147,7 @@
     #define ARDO_DEBUG_VALUE(a,b)                               // to eliminate this within the arduino context
     #define ARDO_TRACE_STEPPER_DIR(a, b)                        // to eliminate this within the arduino context
     #define ARDO_TRACE_STEPPER_POS(a, b)                        // to eliminate this within the arduino context
+    #define ARDO_TRACE_SPEED(sid, value)                        // to eliminate this within the arduino context
 
   #endif // #ifndef SKETCH_COMPILE
 

@@ -106,10 +106,16 @@ namespace ArdoObj {
 
   // --------------------------------------------------------------
   inline uint32_t sqrt(uint32_t x) {
-    register uint32_t xr;   // result register
-    register uint32_t q2;   // scan-bit register
-    register unsigned char f; // flag (one bit)
-
+    #ifdef SKETCH_COMPILE
+      register uint32_t xr;   // result register
+      register uint32_t q2;   // scan-bit register
+      register unsigned char f; // flag (one bit)
+    #else
+      uint32_t xr;   // result register
+      uint32_t q2;   // scan-bit register
+      unsigned char f; // flag (one bit)
+    #endif
+    
     xr = 0;             // clear result
     q2 = 0x40000000L;       // higest possible result bit
     do {

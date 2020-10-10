@@ -26,12 +26,12 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		void notifyResumed();
 		
 		void notifyPinUpdate();
-		
-		void update(const AE::TransferData& data);
+		void notifyDataUpdate();
 		
 		void activateOnClose(bool state) { canClose = state; }
 		
 	protected:
+		virtual void onValuesUpdateInterval(wxScrollEvent& event);
 		virtual void onLoggerUpdateInterval(wxScrollEvent& event);
 		virtual void onSortPins(wxCommandEvent& event);
 		virtual void onConfigChanged(wxPropertyGridEvent& event);
@@ -54,39 +54,40 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 			wxButton* 	button	= NULL;
 			char		type	= '\0';
 			int 		name	=   -1;
-			int			value	=   -1;
+			bool		value	= LimitSwitch::LIMIT_SWITCH_OFF;
 			
 			LimitSwitchInfo()
-			: LimitSwitchInfo (NULL, '\0' , -1, -1)
+			: LimitSwitchInfo (NULL, '\0' , -1, LimitSwitch::LIMIT_SWITCH_OFF)
 			{}
 			
-			LimitSwitchInfo(wxButton* b, char t, int n, int v)
+			LimitSwitchInfo(wxButton* b, char t, int n, bool v)
 			: button(b), type(t), name(n), value(v)
 			{}
 			
-			int setValueOn()  { value = 0; return value; }
-			int setValueOff() { value = 1; return value; }
+			int setValueOn()  { value = LimitSwitch::LIMIT_SWITCH_ON;  return value; }
+			int setValueOff() { value = LimitSwitch::LIMIT_SWITCH_OFF; return value; }
 			
 			int toogleValue() {
-				value = value == 0 ? 1 : 0;
+				value = value == LimitSwitch::LIMIT_SWITCH_OFF  ? LimitSwitch::LIMIT_SWITCH_ON 
+																: LimitSwitch::LIMIT_SWITCH_OFF;
 				return value;
 			}
 			
-			bool getBoolValue() {
-				return value == 0 ? true : false;
-			}
+			bool isLimit()		const { return value == LimitSwitch::LIMIT_SWITCH_ON; }
+			bool getBoolValue()	const { return value == LimitSwitch::LIMIT_SWITCH_ON ? true : false; }
+			bool getPinValue()	const { return value; }
 		};
 		
 		struct SupportSwitchInfo {
 			wxButton* 	button	= NULL;
 			char		type	= '\0';
-			int			value	=   -1;
+			bool		value	= OFF;
 			
 			SupportSwitchInfo()
-			: SupportSwitchInfo (NULL, '\0', -1)
+			: SupportSwitchInfo (NULL, '\0', OFF)
 			{}
 			
-			SupportSwitchInfo(wxButton* b, char t, int v)
+			SupportSwitchInfo(wxButton* b, char t, bool v)
 			: button(b), type(t), value(v)
 			{}
 			
@@ -98,9 +99,8 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 				return value;
 			}
 			
-			bool getBoolValue() {
-				return value == 0 ? true : false;
-			}
+			bool getBoolValue()	const { return value == ON ? true : false; }
+			bool getPinValue()	const { return value; }
 		};
 		
 
@@ -145,7 +145,10 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		bool publishLimitSwitchUpdate(int name, bool state);
 		void publishForceUpdate();
 		
-		void setUpdateInterval();
+		void setLoggerUpdateInterval();
+		void setValuesUpdateInterval();
+		
+		void update(const AE::TransferData& data);
 		
 		void updateLimitStates();
 		void updateSupportStates();
@@ -173,3 +176,4 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 };
 
 #endif // CNCARDUINOENVIRONMENT_H
+

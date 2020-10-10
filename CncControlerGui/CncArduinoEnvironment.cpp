@@ -4,6 +4,7 @@
 #include "GlobalFunctions.h"
 #include "SerialThread.h"
 #include "SerialAdminChannel.h"
+#include "MainFrame.h"
 #include "../Arduino/StepperEnvironment/ArdoEnv.h"
 #include "wxCrafterImages.h"
 #include "CncArduinoEnvironment.h"
@@ -18,20 +19,20 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 , logger  (NULL)
 , lsOn    (NULL)
 , lsOff   (NULL)
-, lsiMinX (m_btMinX,   'D', PIN_X_MIN_LIMIT, -1)
-, lsiMaxX (m_btMaxX,   'D', PIN_X_MAX_LIMIT, -1)
-, lsiMinY (m_btMinY,   'D', PIN_Y_MIN_LIMIT, -1)
-, lsiMaxY (m_btMaxY,   'D', PIN_Y_MAX_LIMIT, -1)
-, lsiMinZ (m_btMinZ,   'D', PIN_Z_MIN_LIMIT, -1)
-, lsiMaxZ (m_btMaxZ,   'D', PIN_Z_MAX_LIMIT, -1)
-, ssiBit8 (m_btSSBit8, 'B', -1)
-, ssiBit7 (m_btSSBit7, 'B', -1)
-, ssiBit6 (m_btSSBit6, 'B', -1)
-, ssiBit5 (m_btSSBit5, 'B', -1)
-, ssiBit4 (m_btSSBit4, 'S', -1)
-, ssiBit3 (m_btSSBit3, 'S', -1)
-, ssiBit2 (m_btSSBit2, 'S', -1)
-, ssiBit1 (m_btSSBit1, 'S', -1)
+, lsiMinX (m_btMinX,   'D', PIN_X_MIN_LIMIT, LimitSwitch::LIMIT_SWITCH_OFF)
+, lsiMaxX (m_btMaxX,   'D', PIN_X_MAX_LIMIT, LimitSwitch::LIMIT_SWITCH_OFF)
+, lsiMinY (m_btMinY,   'D', PIN_Y_MIN_LIMIT, LimitSwitch::LIMIT_SWITCH_OFF)
+, lsiMaxY (m_btMaxY,   'D', PIN_Y_MAX_LIMIT, LimitSwitch::LIMIT_SWITCH_OFF)
+, lsiMinZ (m_btMinZ,   'D', PIN_Z_MIN_LIMIT, LimitSwitch::LIMIT_SWITCH_OFF)
+, lsiMaxZ (m_btMaxZ,   'D', PIN_Z_MAX_LIMIT, LimitSwitch::LIMIT_SWITCH_OFF)
+, ssiBit8 (m_btSSBit8, 'B', OFF)
+, ssiBit7 (m_btSSBit7, 'B', OFF)
+, ssiBit6 (m_btSSBit6, 'B', OFF)
+, ssiBit5 (m_btSSBit5, 'B', OFF)
+, ssiBit4 (m_btSSBit4, 'S', OFF)
+, ssiBit3 (m_btSSBit3, 'S', OFF)
+, ssiBit2 (m_btSSBit2, 'S', OFF)
+, ssiBit1 (m_btSSBit1, 'S', OFF)
 , limitStates  ('\0')
 , supportStates('\0')
 ///////////////////////////////////////////////////////////////////
@@ -44,7 +45,8 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 	// logger control
 	logger = new CncMessageListCtrl(this, wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_loggerPlaceholder, logger);
-	setUpdateInterval();
+	setLoggerUpdateInterval();
+	setValuesUpdateInterval();
 	
 	wxBitmap bmp = ImageLibSwitch().Bitmap("BMP_TOGGLE_SWITCH_1");
 	
@@ -61,30 +63,44 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 	irOn  = new wxBitmap(m_btEmergency->GetBitmap().ConvertToImage().Rotate90());
 	irOff = new wxBitmap(m_btEmergency->GetBitmap().ConvertToImage());
 	
-	m_btEmergency->SetValue(false); decorateEmergencySwitch();
+	m_btEmergency->SetValue(LimitSwitch::EMERGENCY_SWITCH_OFF); 
+	decorateEmergencySwitch();
 	
-	// deco
-	auto setupBtn = [&](wxButton* btn, const wxBitmap& bmp, bool enable) {
-		btn->SetBitmap(bmp);
-		btn->SetBitmapDisabled(btn->GetBitmap().ConvertToDisabled()); 
-		btn->Enable(enable); 
+	// decorate and init limit buttons
+	auto setupLmtBtn = [&](LimitSwitchInfo& lsi, const wxBitmap& bmp, bool enable) {
+		lsi.button->SetBitmap(bmp);
+		lsi.button->SetBitmapDisabled(lsi.button->GetBitmap().ConvertToDisabled()); 
+		lsi.button->Enable(enable);
+		
+		if ( &bmp == lsOn )	lsi.setValueOn();
+		else				lsi.setValueOff();
 	};
 	
-	setupBtn(lsiMinX.button, *lsOff, true); 
-	setupBtn(lsiMaxX.button, *lsOff, true);
-	setupBtn(lsiMinY.button, *lsOff, true);
-	setupBtn(lsiMaxY.button, *lsOff, true);
-	setupBtn(lsiMinZ.button, *lsOff, true);
-	setupBtn(lsiMaxZ.button, *lsOff, true);
-
-	setupBtn(ssiBit8.button, *lsOff, true);
-	setupBtn(ssiBit7.button, *lsOff, true);
-	setupBtn(ssiBit6.button, *lsOff, true);
-	setupBtn(ssiBit5.button, *lsOff, false);
-	setupBtn(ssiBit4.button, *lsOff, true);
-	setupBtn(ssiBit3.button, *lsOff, true);
-	setupBtn(ssiBit2.button, *lsOff, false);
-	setupBtn(ssiBit1.button, *lsOff, false);
+	setupLmtBtn(lsiMinX, *lsOff, true); 
+	setupLmtBtn(lsiMaxX, *lsOff, true);
+	setupLmtBtn(lsiMinY, *lsOff, true);
+	setupLmtBtn(lsiMaxY, *lsOff, true);
+	setupLmtBtn(lsiMinZ, *lsOff, true);
+	setupLmtBtn(lsiMaxZ, *lsOff, true);
+	
+	// decorate and init support buttons
+	auto setupSptBtn = [&](SupportSwitchInfo& swi, const wxBitmap& bmp, bool enable) {
+		swi.button->SetBitmap(bmp);
+		swi.button->SetBitmapDisabled(swi.button->GetBitmap().ConvertToDisabled()); 
+		swi.button->Enable(enable);
+		
+		if ( &bmp == lsOn )	swi.setValueOn();
+		else				swi.setValueOff();
+	};
+	
+	setupSptBtn(ssiBit8, *lsOff, true);
+	setupSptBtn(ssiBit7, *lsOff, true);
+	setupSptBtn(ssiBit6, *lsOff, true);
+	setupSptBtn(ssiBit5, *lsOff, false);
+	setupSptBtn(ssiBit4, *lsOff, true);
+	setupSptBtn(ssiBit3, *lsOff, true);
+	setupSptBtn(ssiBit2, *lsOff, false);
+	setupSptBtn(ssiBit1, *lsOff, false);
 	
 	// events
 	lsiMinX.button->Connect(wxEVT_LEFT_DOWN, 		wxMouseEventHandler(CncArduinoEnvironment::onLsLeftDown), 		NULL, this);
@@ -191,11 +207,8 @@ void CncArduinoEnvironment::initValues() {
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::enableControls(bool state, bool all) {
 ///////////////////////////////////////////////////////////////////
-	if ( all == true ) {
-		m_btEmergency->Enable(state);
-	} else {
-		m_btEmergency->Enable(true);
-	}
+	if ( all == true )	{ m_btEmergency->Enable(state); }
+	else				{ m_btEmergency->Enable(true);  }
 	
 	m_btForceUpdate->Enable(state);
 	m_btClearTrace->Enable(state);
@@ -234,10 +247,11 @@ void CncArduinoEnvironment::notifyConnecting() {
 ///////////////////////////////////////////////////////////////////
 	appendSep();
 	
-	if ( m_btEmergency->GetValue() == true ) {
+	if ( m_btEmergency->GetValue() == LimitSwitch::EMERGENCY_SWITCH_ON ) {
+		
 		// alway release the emergency button
+		m_btEmergency->SetValue(LimitSwitch::EMERGENCY_SWITCH_OFF);
 		wxCommandEvent dummy;
-		m_btEmergency->SetValue(false);
 		onEmergencyButton(dummy);
 
 		appendInfo("Releasing the Emergency Button . . .", CNC_LOG_FUNCT);
@@ -293,7 +307,10 @@ void CncArduinoEnvironment::onStartupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::onContinuousTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	// currently nothing to do
+	AE::TransferData td;
+	THE_APP->readSerialThreadData(td);
+	
+	update(td);
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::updatePinValue(const char type, unsigned int num, const char mode, int value) {
@@ -313,6 +330,10 @@ void CncArduinoEnvironment::update(const AE::TransferData& data) {
 	m_posStepperX->ChangeValue(wxString::Format("%ld", (long)data.stepperPosX));
 	m_posStepperY->ChangeValue(wxString::Format("%ld", (long)data.stepperPosY));
 	m_posStepperZ->ChangeValue(wxString::Format("%ld", (long)data.stepperPosZ));
+	m_posStepperH->ChangeValue(wxString::Format("%ld", (long)data.stepperPosH));
+	
+	m_cfgSpeed->ChangeValue(wxString::Format("%ld", (long)data.cfgSpeed_MM_SEC));
+	m_msdSpeed->ChangeValue(wxString::Format("%ld", (long)data.msdSpeed_MM_SEC));
 	
 	auto updateDirectionBitmap = [&](int32_t dir) {
 		switch (dir) {
@@ -326,13 +347,26 @@ void CncArduinoEnvironment::update(const AE::TransferData& data) {
 	m_bmpDirectionX->SetBitmap(updateDirectionBitmap(data.stepperDirX));
 	m_bmpDirectionY->SetBitmap(updateDirectionBitmap(data.stepperDirY));
 	m_bmpDirectionZ->SetBitmap(updateDirectionBitmap(data.stepperDirZ));
+	m_bmpDirectionH->SetBitmap(updateDirectionBitmap(data.stepperDirH));
+	
+	m_lastUpdate->ChangeValue(wxDateTime::UNow().FormatISOTime());
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::notifyPinUpdate() {
 ///////////////////////////////////////////////////////////////////
 	if ( reConnectRequired == true )
 		appendWarning("Reconnect required!", CNC_LOG_FUNCT);
-	
+		
+	AE::TransferData td;
+	THE_APP->readSerialThreadData(td);
+	update(td);
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::notifyDataUpdate() {
+///////////////////////////////////////////////////////////////////
+	AE::TransferData td;
+	THE_APP->readSerialThreadData(td);
+	update(td);
 }
 ///////////////////////////////////////////////////////////////////
 CncArduinoEnvironment::LimitSwitchInfo* CncArduinoEnvironment::findLimitSwichInfo(wxButton* bt) {
@@ -349,12 +383,8 @@ CncArduinoEnvironment::LimitSwitchInfo* CncArduinoEnvironment::findLimitSwichInf
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::decorateEmergencySwitch() {
 ///////////////////////////////////////////////////////////////////
-	if ( m_btEmergency->GetValue() == true ) m_btEmergency->SetBitmap(*irOn);
-	else									 m_btEmergency->SetBitmap(*irOff);
-	
-	if ( m_btEmergency->GetValue() == true ) m_emergencyLabel->SetForegroundColour(*wxRED);
-	else									 m_emergencyLabel->SetForegroundColour(*wxWHITE);
-	
+	m_btEmergency->SetBitmap(				m_btEmergency->GetValue() == LimitSwitch::EMERGENCY_SWITCH_ON ? *irOn  : *irOff);
+	m_emergencyLabel->SetForegroundColour(	m_btEmergency->GetValue() == LimitSwitch::EMERGENCY_SWITCH_ON ? *wxRED : *wxWHITE);
 	m_emergencyLabel->Refresh();
 }
 ///////////////////////////////////////////////////////////////////
@@ -363,9 +393,7 @@ void CncArduinoEnvironment::decorateSwitch(wxButton* bt, bool state) {
 	if ( bt == NULL )
 		return;
 		
-	if ( state == false ) 	bt->SetBitmap(*lsOff);
-	else 					bt->SetBitmap(*lsOn );
-	
+	bt->SetBitmap( state == LimitSwitch::LIMIT_SWITCH_OFF ? *lsOff : *lsOn );
 	bt->Refresh();
 }
 ///////////////////////////////////////////////////////////////////
@@ -437,9 +465,10 @@ void CncArduinoEnvironment::onLsLeftDown(wxMouseEvent& event) {
 		
 	lsi->setValueOn();
 	
-	decorateSwitch(lsi->button, 			lsi->getBoolValue());
-	publishLimitSwitchUpdate(lsi->name, 	lsi->getBoolValue());
+	decorateSwitch(lsi->button, lsi->getPinValue());
 	updateLimitStates();
+	
+	publishLimitSwitchUpdate(lsi->name, lsi->getPinValue());
 	publishStatesUpdate();
 	
 	event.Skip();
@@ -457,9 +486,10 @@ void CncArduinoEnvironment::onLsLeftUp(wxMouseEvent& event) {
 		
 	lsi->setValueOff();
 		
-	decorateSwitch(lsi->button,				lsi->getBoolValue());
-	publishLimitSwitchUpdate(lsi->name, 	lsi->getBoolValue());
+	decorateSwitch(lsi->button, lsi->getPinValue());
 	updateLimitStates();
+	
+	publishLimitSwitchUpdate(lsi->name, lsi->getPinValue());
 	publishStatesUpdate();
 	
 	event.Skip();
@@ -499,19 +529,20 @@ void CncArduinoEnvironment::publishForceUpdate() {
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::onEmergencyButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	decorateEmergencySwitch();
-	
 	SerialThread* ss = SerialThread::theSerialThread();
 	if ( ss == NULL )
 		return;
 		
+	decorateEmergencySwitch();
+	updateLimitStates();
+	
 	typedef SerialAdminMessage::Mid 			MID;
 	typedef SerialAdminMessage::ValueName 		VN;
 
 	SerialAdminMessage pinUpdate;
 	pinUpdate.setMid(MID::SET_ANALOG_PIN);
 	pinUpdate.setValue<unsigned int>(VN::VAL1, PIN_INTERRUPT_ID);
-	pinUpdate.setValue<int         >(VN::VAL2, m_btEmergency->GetValue() ? 255 : 0);
+	pinUpdate.setValue<int         >(VN::VAL2, m_btEmergency->GetValue() == LimitSwitch::EMERGENCY_SWITCH_ON ? 255 : 0);
 	
 	if ( ss->IsRunning() == false )
 		ss->Resume();
@@ -521,7 +552,7 @@ void CncArduinoEnvironment::onEmergencyButton(wxCommandEvent& event) {
 		return;
 	}
 	
-	if ( m_btEmergency->GetValue() == true ) {
+	if ( m_btEmergency->GetValue() == LimitSwitch::EMERGENCY_SWITCH_ON ) {
 		reConnectRequired = true;
 		enableControls(false);
 	}
@@ -673,8 +704,7 @@ void CncArduinoEnvironment::updateLimitStates() {
 	setBit(limitStates, LimitSwitch::BIT_LS_Z_MIN, 			lsiMinZ.getBoolValue());
 	setBit(limitStates, LimitSwitch::BIT_LS_Z_MAX, 			lsiMaxZ.getBoolValue());
 	
-	#warning use BIT_EMERGENCY_SWITCH value instead of false
-	setBit(limitStates, LimitSwitch::BIT_EMERGENCY_SWITCH, 	false);
+	setBit(limitStates, LimitSwitch::BIT_EMERGENCY_SWITCH, 	m_btEmergency->GetValue() == LimitSwitch::EMERGENCY_SWITCH_ON);
 	setBit(limitStates, LimitSwitch::BIT_1, 				false);
 
 	updateStateCtrl(m_curLimitStates, limitStates);
@@ -724,13 +754,30 @@ void CncArduinoEnvironment::onSortPins(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::onLoggerUpdateInterval(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	setUpdateInterval();
+	setLoggerUpdateInterval();
 }
 ///////////////////////////////////////////////////////////////////
-void CncArduinoEnvironment::setUpdateInterval() {
+void CncArduinoEnvironment::setLoggerUpdateInterval() {
 ///////////////////////////////////////////////////////////////////
-	const int val = m_sliderUpdateInterval->GetValue();
+	const int val = m_loggerUpdateInterval->GetValue();
 	
-	logger->setUpdateInterval(val);
-	m_sliderUpdateInterval->SetToolTip(wxString::Format("Update Interval: %d [ms]", val));
+	if ( logger->setUpdateInterval(val) ) {
+		m_loggerUpdateInterval->SetToolTip(wxString::Format("Update Interval: %d [ms]", val));
+		m_loggerUpdateIntervalValue->SetLabel(wxString::Format("%d", val));
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::onValuesUpdateInterval(wxScrollEvent& event) {
+///////////////////////////////////////////////////////////////////
+	setValuesUpdateInterval();
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::setValuesUpdateInterval() {
+///////////////////////////////////////////////////////////////////
+	const int val = m_valuesUpdateInterval->GetValue();
+	
+	if ( m_continuousTimer->Start(val) ) {
+		m_valuesUpdateInterval->SetToolTip(wxString::Format("Update Interval: %d [ms]", val));
+		m_valuesUpdateIntervalValue->SetLabel(wxString::Format("%d", val));
+	}
 }

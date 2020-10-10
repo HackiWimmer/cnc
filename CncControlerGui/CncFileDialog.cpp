@@ -31,9 +31,10 @@ CncFileDialogLRUList::~CncFileDialogLRUList() {
 /////////////////////////////////////////////////////////////
 CncFileDialog* CncFileDialogLRUList::getFileDialog() {
 /////////////////////////////////////////////////////////////
-	#warning
-	wxWindow* panel = GetParent();
-	return glblCncFileDialogPointer;//panel != NULL ? static_cast<CncFileDialog*>(panel->GetParent()) : NULL ;
+	//wxWindow* panel = GetParent();
+	//return panel != NULL ? static_cast<CncFileDialog*>(panel->GetParent()) : NULL;
+	
+	return glblCncFileDialogPointer; 
 }
 /////////////////////////////////////////////////////////////
 void CncFileDialogLRUList::addFileName(const wxString& fn) {

@@ -47,14 +47,12 @@ SerialThread::SerialThread(MainFrame *handler)
 , exit				( false )
 , processAdmChl		( true )
 , interruped		( false )
-, connected			( false )
-, serialPriority	( SerialPriority::DISCONNECTED )
+, serialState		( SerialState::DISCONNECTED )
 , arduinoMainLoop	()
 , tsStartup			( CncTimeFunctions::getNanoTimestamp() )
 , tsHbRef			( CncTimeFunctions::getNanoTimestamp() )
 , tsDtRef			( CncTimeFunctions::getNanoTimestamp() )
 , tsHbInterval		( 1000 * 1000 * 1000 ) 	// 1s
-, tsDtInterval		( 2000 * 1000 * 1000 ) 	// 2s
 , arduinoDataStore	( new AE::ArduinoData() )
 , adminChannel		( new SerialAdminChannel())
 , adminSender		( new SerialAdminChannelSender(adminChannel))
@@ -108,6 +106,19 @@ void SerialThread::stop() {
 ///////////////////////////////////////////////////////////////////
 	exit = true;
 }
+////////////////////////////////////////////////////////////////////
+bool SerialThread::transferData(AE::TransferData& td) {
+////////////////////////////////////////////////////////////////////
+	if ( ARDUINO_DATA_STORE == NULL )
+		return false; 
+		
+	{
+		wxCriticalSectionLocker enter(pHandler->pSerialThreadCS);
+		ARDUINO_DATA_STORE->fillTransferData(td);
+	}
+	
+	return true;
+}
 ///////////////////////////////////////////////////////////////////
 bool SerialThread::notifyConnecting() {
 ///////////////////////////////////////////////////////////////////
@@ -116,17 +127,13 @@ bool SerialThread::notifyConnecting() {
 ///////////////////////////////////////////////////////////////////
 bool SerialThread::notifyConnected() {
 ///////////////////////////////////////////////////////////////////
-	connected 		= true;
-	serialPriority	= SerialPriority::CONNECTED;
-	
+	serialState	= SerialState::CONNECTED;
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialThread::notifyDisconnected() {
 ///////////////////////////////////////////////////////////////////
-	connected 		= false;
-	serialPriority	= SerialPriority::DISCONNECTED;
-	
+	serialState	= SerialState::DISCONNECTED;
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -140,54 +147,65 @@ wxThread::ExitCode SerialThread::Entry() {
 	tsHbRef = CncTimeFunctions::getNanoTimestamp();
 	tsDtRef = CncTimeFunctions::getNanoTimestamp();
 	
+	// setup .....
+	bool isSetupOk = false;
 	try {
 		
 		arduinoMainLoop.setup();
-		
-		while ( !TestDestroy() ) {
-			// recheck this here after the sleep
-			if ( TestDestroy() ) break;
-			if ( exit == true  ) break;
-			
-			idleThread();
-			
-			if ( adminChannel->size() > 0 )
-				;//dispatchAdminChannel();
-				
-			// running the main loop
-			if ( interruped == false ) {
-				
-				//const bool somethingTodo = app2ctl->size() != 0;
-				arduinoMainLoop.loop();
-				
-				// thread data
-				if ( CncTimeFunctions::getTimeSpanToNow(tsDtRef) > tsDtInterval )
-					publishData();
-			}
-			
-			// always publish thread heartbeats, but note:
-			// if publishData() was triggered before the member tsHbRef 
-			// will be modified also. Therefore, no heartbeat will be published 
-			// immediately after publishData()
-			if ( CncTimeFunctions::getTimeSpanToNow(tsHbRef) > tsHbInterval )
-				publishHeartbeat();
-				
-		} // while
+		isSetupOk = true;
 		
 	} catch (const SerialInterruptException& e) {
-		publishMessage('E', wxString::Format("Caught an interrupt: %s", e.what()), CNC_LOG_FUNCT);
+		publishMessage('E', wxString::Format("Setup: Caught an interrupt: %s", e.what()), CNC_LOG_FUNCT);
 		
-		connected  		= false;
 		interruped 		= true;
-		serialPriority 	= SerialPriority::DISCONNECTED;
+		serialState 	= SerialState::DISCONNECTED;
 		
 	} catch (...) {
-		publishMessage('E', wxString::Format("Caught an unknown exception:"), CNC_LOG_FUNCT);
+		publishMessage('E', wxString::Format("Setup: Caught an unknown exception:"), CNC_LOG_FUNCT);
 		
-		connected  		= false;
 		interruped 		= true;
-		serialPriority 	= SerialPriority::DISCONNECTED;
+		serialState 	= SerialState::DISCONNECTED;
 	}
+	
+	// loop .....
+	if ( isSetupOk == true ) {
+		while ( !TestDestroy() ) {
+			
+			try {
+				
+				idleThread();
+				
+				// recheck this here after the sleep
+				if ( TestDestroy() ) break;
+				if ( exit == true  ) break;
+				
+				if ( adminChannel->size() > 0 )
+					;//dispatchAdminChannel();
+					
+				// running the main loop
+				// const bool somethingTodo = app2ctl->size() != 0;
+				arduinoMainLoop.loop();
+				
+				// always publish thread heartbeats
+				if ( CncTimeFunctions::getTimeSpanToNow(tsHbRef) > tsHbInterval )
+					publishHeartbeat();
+					
+			} catch (const SerialInterruptException& e) {
+				publishMessage('E', wxString::Format("Loop: Caught an interrupt: %s", e.what()), CNC_LOG_FUNCT);
+				
+				interruped 		= true;
+				serialState 	= SerialState::DISCONNECTED;
+				
+			} catch (...) {
+				publishMessage('E', wxString::Format("Loop: Caught an unknown exception:"), CNC_LOG_FUNCT);
+				
+				interruped 		= true;
+				serialState 	= SerialState::DISCONNECTED;
+			}
+			
+		} // while
+		
+	} // if
 	
 	// post complete event
 	wxQueueEvent(THE_FRAME, new SerialEvent(wxEVT_SERIAL_THREAD, MainFrame::EventId::COMPLETED));
@@ -207,12 +225,12 @@ void SerialThread::idleThread() {
 	if ( ++idleCounter < 1024 )	{ return; }
 	
 	// and now idle
-	switch ( serialPriority ) {
+	switch ( serialState ) {
 		
-		case SerialPriority::CONNECTED:		this->Sleep(50);
+		case SerialState::CONNECTED:		this->Sleep(50);
 											break;
 											
-		case SerialPriority::DISCONNECTED:
+		case SerialState::DISCONNECTED:
 		default:							this->Sleep(250);
 	}
 	
@@ -226,21 +244,7 @@ void SerialThread::publishPinNotification() {
 ///////////////////////////////////////////////////////////////////
 void SerialThread::publishData(bool force) {
 ///////////////////////////////////////////////////////////////////
-	static AE::TransferData lastDataSend;
-	
-	SerialEvent* evt = new SerialEvent(wxEVT_SERIAL_THREAD, MainFrame::EventId::SERIAL_DATA);
-	arduinoDataStore->fillTransferData(evt->data);
-	
-	if ( force == false && evt->data.isSomethingChanged(lastDataSend) == false )
-		wxDELETE( evt );
-	
-	if ( evt != NULL ) {
-		lastDataSend = evt->data;
-		wxQueueEvent(THE_FRAME, evt);
-	}
-
-	tsHbRef = CncTimeFunctions::getNanoTimestamp();
-	tsDtRef = tsHbRef;
+	wxQueueEvent(THE_FRAME, new SerialEvent(wxEVT_SERIAL_THREAD, MainFrame::EventId::SERIAL_DATA_NOTIFICATION));
 }
 ///////////////////////////////////////////////////////////////////
 void SerialThread::publishHeartbeat() {
@@ -310,7 +314,6 @@ void SerialThread::dispatchAdminChannel() {
 				case MID::FORCE_DATA_NOTIFICATION:
 				{
 					if ( interruped == false ) {
-						publishData(true);
 						publishDataNotification = false;
 					}
 					
@@ -543,6 +546,25 @@ uint8_t SerialThread::getDigitalPinToPort(uint8_t pin) {
 	return AE::PN_NOT_A_PIN;
 }
 ////////////////////////////////////////////////////////////////////
+uint8_t SerialThread::getPinMode(uint8_t pin) {
+////////////////////////////////////////////////////////////////////
+	if ( SerialThread::isInterruped() == true )
+		return AE::PN_NOT_A_PIN;
+		
+	if ( ARDUINO_DATA_STORE == NULL )
+		return AE::PN_NOT_A_PIN;
+	
+	if ( auto it = ARDUINO_DATA_STORE->pins.find((AE::PinName)pin); it != ARDUINO_DATA_STORE->pins.end() ) {
+		switch ( it->second.mode ) {
+			case 'I': return PM_INPUT;
+			case 'O': return PM_OUTPUT;
+			case 'P': return PM_INPUT_PULLUP;
+		}
+	}
+	
+	return AE::PN_NOT_A_PIN;
+}
+////////////////////////////////////////////////////////////////////
 bool SerialThread::ardoConfigGetTraceGetters() {
 ////////////////////////////////////////////////////////////////////
 	return ARDUINO_DATA_STORE ? ARDUINO_DATA_STORE->exterConfig.traceGetters : false;
@@ -562,6 +584,8 @@ void SerialThread::ardoTraceStepperDir(char sid, int32_t dir) {
 		case 'X': ARDUINO_DATA_STORE->traceInfo.stepperDirX = dir; break;
 		case 'Y': ARDUINO_DATA_STORE->traceInfo.stepperDirY = dir; break;
 		case 'Z': ARDUINO_DATA_STORE->traceInfo.stepperDirZ = dir; break;
+		
+		case 'H': ARDUINO_DATA_STORE->traceInfo.stepperDirH = dir; break;
 	}
 }
 ////////////////////////////////////////////////////////////////////
@@ -574,5 +598,18 @@ void SerialThread::ardoTraceStepperPos(char sid, int32_t pos) {
 		case 'X': ARDUINO_DATA_STORE->traceInfo.stepperPosX = pos; break;
 		case 'Y': ARDUINO_DATA_STORE->traceInfo.stepperPosY = pos; break;
 		case 'Z': ARDUINO_DATA_STORE->traceInfo.stepperPosZ = pos; break;
+		
+		case 'H': ARDUINO_DATA_STORE->traceInfo.stepperPosH = pos; break;
+	}
+}
+////////////////////////////////////////////////////////////////////
+void SerialThread::ardoTraceSpeed(char sid, int32_t val) {
+////////////////////////////////////////////////////////////////////
+	if ( ARDUINO_DATA_STORE == NULL )
+		return; 
+		
+	switch ( sid ) {
+		case 'C': ARDUINO_DATA_STORE->traceInfo.cfgSpeed_MM_SEC = val; break;
+		case 'M': ARDUINO_DATA_STORE->traceInfo.msdSpeed_MM_SEC = val; break;
 	}
 }

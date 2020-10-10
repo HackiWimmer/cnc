@@ -274,6 +274,8 @@ void CncArduinoController::setSpeedValue_MMSec1000(int32_t f, bool activateAccel
   ArduinoAccelManager::activate(activateAcceleration);
 
   ARDO_DEBUG_VALUE("F [mm/sec]", cfgF1000_MMSEC / 1000.0)
+  ARDO_TRACE_SPEED('C', cfgF1000_MMSEC / 1000.0)
+  
   if ( activateAcceleration == false ) {
     ARDO_DEBUG_VALUE("ArduinoAccelManager", "Is deactivated!")
   }
@@ -681,12 +683,18 @@ byte CncArduinoController::checkRuntimeEnv() {
     return RET_ERROR;
   }
 
+  if ( READ_LMT_PINS == LimitSwitch::LIMIT_SWITCH_ON ) {
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_LIMIT_SWITCH_ACTIVE);
+    return RET_LIMIT;
+  }
+
   if ( isProbeMode() == OFF ) {
     
-    if ( READ_IS_TOOL_POWERED_PIN == TOOL_STATE_OFF ) {
+    if ( READ_ENABLE_TOOL_PIN != READ_IS_TOOL_POWERED_PIN ) {
       ArduinoMainLoop::pushMessage(MT_ERROR, E_TOOL_NOT_ENALED); 
       return RET_ERROR;
     }
+    
   }
   
   return RET_OK;   
@@ -742,6 +750,7 @@ void CncArduinoController::notifyMovePartAfter() {
 
       // measure the current speed again on demand
       MEASURE_SPEED
+      ARDO_TRACE_SPEED('M', cmsF1000_MMMin / (60 * 1000.0))
     }
 
     // this has to be the last action within this function

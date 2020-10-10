@@ -103,28 +103,8 @@
 	#include <dbt.h>
 #endif
 
-
-CncAverage<long> m1, m2, m3, m4, m5;
-
-void summarizeTest() {
-	auto xxxxx = [&](const CncAverage<long>& a) { 
-		const long f = 1000;
-		std::cout << a.getMin() / f << " < " << a.getAvg() / f << " > " << a.getMax() / f << "[us] s = " << a.getSum() / f / 100 << "[ms] c = " << a.count() << std::endl;
-	};
-	
-	
-	#warning
-	std::cout << "m1: ";	xxxxx(m1);
-	std::cout << "m2: ";	xxxxx(m2);
-	std::cout << "m3: ";	xxxxx(m3);
-	std::cout << "m4: ";	xxxxx(m4);
-	std::cout << "m5: ";	xxxxx(m5);
-}
-
-
-
 ////////////////////////////////////////////////////////////////////
-extern GlobalConstStringDatabase 	globalStrings;
+extern GlobalConstStringDatabase globalStrings;
 extern void GlobalStreamRedirectionReset();
 
 ////////////////////////////////////////////////////////////////////
@@ -169,9 +149,10 @@ class CncRunEventFilter : public wxEventFilter {
 		
 		// currently no filter active
 		virtual int FilterEvent(wxEvent& event) {
-			#warning
 			return Event_Skip;
 			
+			// examples how to use 
+			/*
 			if ( event.GetEventCategory() == wxEVT_CATEGORY_TIMER )
 				return Event_Skip;
 				
@@ -184,6 +165,7 @@ class CncRunEventFilter : public wxEventFilter {
 			//const wxEventType t = event.GetEventType();
 			//const wxWindow* wnd = (wxWindow*)event.GetEventObject();
 			return Event_Ignore;
+			*/
 		}
 };
 
@@ -387,7 +369,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
 	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadHeartbeat, 		this, MainFrame::EventId::SERIAL_HEARTBEAT);
 	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadMessage, 			this, MainFrame::EventId::SERIAL_MESSAGE);
-	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadData, 			this, MainFrame::EventId::SERIAL_DATA);
+	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadDataNotification,	this, MainFrame::EventId::SERIAL_DATA_NOTIFICATION);
 	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadPinNotification, 	this, MainFrame::EventId::SERIAL_PIN_NOTIFICATION);
 	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 			&MainFrame::onNavigatorPanel, 				this);
 	
@@ -437,7 +419,7 @@ MainFrame::~MainFrame() {
 	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
 	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadHeartbeat, 		this, MainFrame::EventId::SERIAL_HEARTBEAT);
 	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadMessage, 			this, MainFrame::EventId::SERIAL_MESSAGE);
-	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadData, 			this, MainFrame::EventId::SERIAL_DATA);
+	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadDataNotification,	this, MainFrame::EventId::SERIAL_DATA_NOTIFICATION);
 	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadPinNotification, 	this, MainFrame::EventId::SERIAL_PIN_NOTIFICATION);
 
 	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, 		&MainFrame::onNavigatorPanel, 				this);
@@ -1051,7 +1033,7 @@ void MainFrame::activateSecureMode(bool state) {
 		showAuiPane("StatusBar", 		false);
 		
 		GblFunc::swapControls(m_secMonitorPlaceholder,				drawPane3D->GetDrawPanePanel());
-		GblFunc::swapControls(m_secLoggerPlaceholder, 				getLogger());
+		GblFunc::swapControls(m_secLoggerPlaceholder, 				getLoggerView());
 		GblFunc::swapControls(m_secSpeedMonitorPlaceholder,			speedMonitor->GetDrawingAreaBook());
 		GblFunc::swapControls(m_fileViewsPlaceholder,				m_fileViews);
 		
@@ -1066,7 +1048,7 @@ void MainFrame::activateSecureMode(bool state) {
 		else 															perspectiveHandler.restoreLoggedPerspective();
 		
 		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),		m_secMonitorPlaceholder);
-		GblFunc::swapControls(getLogger(),							m_secLoggerPlaceholder);
+		GblFunc::swapControls(getLoggerView(),						m_secLoggerPlaceholder);
 		GblFunc::swapControls(speedMonitor->GetDrawingAreaBook(),	m_secSpeedMonitorPlaceholder);
 		GblFunc::swapControls(m_fileViews,							m_fileViewsPlaceholder);
 		
@@ -1261,26 +1243,26 @@ void MainFrame::onTraceTimer(wxTimerEvent& event) {
 		case 0: {
 					callCounter = 1;
 					updateAppPositionControls();
-					m1.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
+					THE_CONTEXT->timestamps.measuredDurations.md1.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
 					break;
 		}
 		case 1: {
 					callCounter = 2;
 					updateCtlPositionControls();
-					m2.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
+					THE_CONTEXT->timestamps.measuredDurations.md2.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
 					break;
 		}
 		case 2: {
 					callCounter = 3;
 					updateSpeedControls();
-					m3.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
+					THE_CONTEXT->timestamps.measuredDurations.md3.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
 					break;
 		}
 		case 3: {
 					callCounter = 0;
 					if ( isProcessing() ) {
 						statisticsPane->logStatistics(false);
-						m4.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
+						THE_CONTEXT->timestamps.measuredDurations.md4.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
 					}
 					break;
 		}
@@ -1643,15 +1625,22 @@ void MainFrame::onSerialThreadMessage(SerialEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onSerialThreadData(SerialEvent& event) {
-///////////////////////////////////////////////////////////////////
-	//std::cout << CNC_LOG_LOCATION << std::endl;
-	cncArduinoEnvironment->update(event.data);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::onSerialThreadPinNotification(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cncArduinoEnvironment->notifyPinUpdate();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSerialThreadDataNotification(SerialEvent& event) {
+///////////////////////////////////////////////////////////////////
+	cncArduinoEnvironment->notifyDataUpdate();
+}
+/////////////////////////////////////////////////////////////////////
+bool MainFrame::readSerialThreadData(AE::TransferData& td) {
+/////////////////////////////////////////////////////////////////////
+	if ( serialThread == NULL )
+		return false;
+		
+	return serialThread->transferData(td);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
@@ -4072,14 +4061,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		cnc->processTrigger(endRun);
 
 		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
-		
-		
-		
-		#warning
-		summarizeTest();
-
-		
-		
 
 		return ret;
 	}
@@ -4775,6 +4756,13 @@ void MainFrame::openExternalEditor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString tool;
 	CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+	openFileExtern(tool, _(""));
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openHexEditor(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString tool;
+	CncConfig::getGlobalCncConfig()->getHexEditorTool(tool);
 	openFileExtern(tool, _(""));
 }
 ///////////////////////////////////////////////////////////////////
@@ -5477,10 +5465,6 @@ void MainFrame::dclickDurationCount(wxMouseEvent& event) {
 		CncLastProcessingTimestampSummary dlg (this);
 		wxStringTokenizer tokenizer(msg, "\n");
 		
-		// remove first line
-		if ( tokenizer.HasMoreTokens() )
-			tokenizer.GetNextToken();
-			
 		// token rest
 		while ( tokenizer.HasMoreTokens() ) {
 			wxString token = tokenizer.GetNextToken();
@@ -7466,6 +7450,15 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 			break;
 		}
 		//-----------------------------------------------------------
+		case ESS_ID::NotifyFatalError:
+		{
+			std::cerr << "ESS_ID::NotifyFatalError:" << std::endl;
+			std::cerr << ( ice->hasValue(VN::VAL1) ? ice->getValue<const char*>(VN::VAL1) 
+												   : " No context info available." ) 
+					  << std::endl;
+			break;
+		}
+		//-----------------------------------------------------------
 		case ESS_ID::NotifyConneting:
 		{
 			showArduinoEnv(true);
@@ -7791,17 +7784,9 @@ void MainFrame::onSelectStepMode(wxCommandEvent& event) {
 
 
 
-
-
-
-
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onIdle(wxIdleEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	//CNC_PRINT_LOCATION
 }
 
-
-void MainFrame::leaveSerialSpy(wxMouseEvent& event)
-{
-}

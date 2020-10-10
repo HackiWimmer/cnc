@@ -24,11 +24,11 @@
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/statbmp.h>
+#include <wx/slider.h>
 #include <wx/propgrid/manager.h>
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/tglbtn.h>
-#include <wx/slider.h>
 #include <wx/timer.h>
 #include <wx/bitmap.h>
 #include <map>
@@ -70,22 +70,6 @@ protected:
     wxPanel* m_splitterPageTop;
     wxSimplebook* m_contextBook;
     wxPanel* m_panelArduinosPeriphery;
-    wxStaticText* m_staticText83;
-    wxStaticText* m_staticText85;
-    wxStaticText* m_staticText87;
-    wxStaticText* m_limitSwicthLabelX;
-    wxStaticText* m_staticText172;
-    wxBitmapButton* m_btMinX;
-    wxBitmapButton* m_btMaxX;
-    wxStaticText* m_limitSwicthLabelY;
-    wxStaticText* m_staticText17218;
-    wxBitmapButton* m_btMinY;
-    wxBitmapButton* m_btMaxY;
-    wxStaticText* m_limitSwicthLabelZ;
-    wxStaticText* m_staticText17219;
-    wxBitmapButton* m_btMinZ;
-    wxBitmapButton* m_btMaxZ;
-    wxStaticLine* m_staticLine1213;
     wxStaticText* m_staticText170;
     wxStaticText* m_staticText181;
     wxStaticText* m_staticText17222;
@@ -107,9 +91,27 @@ protected:
     wxBitmapButton* m_btSSBit2;
     wxStaticText* m_staticText152;
     wxBitmapButton* m_btSSBit1;
+    wxStaticLine* m_staticLine347;
+    wxStaticText* m_staticText83;
+    wxStaticText* m_staticText85;
+    wxStaticText* m_staticText87;
+    wxStaticText* m_limitSwicthLabelX;
+    wxStaticText* m_staticText172;
+    wxBitmapButton* m_btMinX;
+    wxBitmapButton* m_btMaxX;
+    wxStaticText* m_limitSwicthLabelY;
+    wxStaticText* m_staticText17218;
+    wxBitmapButton* m_btMinY;
+    wxBitmapButton* m_btMaxY;
+    wxStaticText* m_limitSwicthLabelZ;
+    wxStaticText* m_staticText17219;
+    wxBitmapButton* m_btMinZ;
+    wxBitmapButton* m_btMaxZ;
     wxStaticLine* m_staticLine121;
     wxStaticText* m_staticText2155;
-    wxTextCtrl* m_speed;
+    wxTextCtrl* m_cfgSpeed;
+    wxStaticText* m_staticText21552;
+    wxTextCtrl* m_msdSpeed;
     wxStaticBitmap* m_staticBitmap335;
     wxStaticText* m_staticText3132;
     wxStaticText* m_staticText215;
@@ -124,6 +126,15 @@ protected:
     wxTextCtrl* m_posStepperZ;
     wxStaticBitmap* m_bmpDirectionZ;
     wxStaticText* m_staticText31327;
+    wxStaticText* m_staticText215544;
+    wxTextCtrl* m_posStepperH;
+    wxStaticBitmap* m_bmpDirectionH;
+    wxStaticText* m_staticText313278;
+    wxStaticText* m_staticText355;
+    wxSlider* m_valuesUpdateInterval;
+    wxStaticText* m_valuesUpdateIntervalValue;
+    wxStaticText* m_staticText3551;
+    wxStaticLine* m_staticLine3522;
     wxPanel* m_panelConfiguration;
     wxStaticText* m_staticText9117;
     wxPropertyGridManager* m_pgMgrConfig;
@@ -138,7 +149,8 @@ protected:
     wxPanel* m_loggerPlaceholder;
     wxStaticLine* m_staticLine309;
     wxStaticText* m_staticText305;
-    wxSlider* m_sliderUpdateInterval;
+    wxSlider* m_loggerUpdateInterval;
+    wxStaticText* m_loggerUpdateIntervalValue;
     wxStaticText* m_staticText311;
     wxPanel* m_panelStatusbar;
     wxStaticText* m_staticText127;
@@ -162,6 +174,7 @@ protected:
     virtual void onSelectArduinoPeriphery(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectConfiguration(wxCommandEvent& event) { event.Skip(); }
     virtual void onSortPins(wxCommandEvent& event) { event.Skip(); }
+    virtual void onValuesUpdateInterval(wxScrollEvent& event) { event.Skip(); }
     virtual void onConfigChanged(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void onConfigChanging(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void onEmergencyButton(wxCommandEvent& event) { event.Skip(); }
@@ -181,22 +194,6 @@ public:
     wxBitmapButton* GetBtSortPins() { return m_btSortPins; }
     wxPanel* GetPinListPlaceholder() { return m_pinListPlaceholder; }
     wxPanel* GetSplitterPage254() { return m_splitterPage254; }
-    wxStaticText* GetStaticText83() { return m_staticText83; }
-    wxStaticText* GetStaticText85() { return m_staticText85; }
-    wxStaticText* GetStaticText87() { return m_staticText87; }
-    wxStaticText* GetLimitSwicthLabelX() { return m_limitSwicthLabelX; }
-    wxStaticText* GetStaticText172() { return m_staticText172; }
-    wxBitmapButton* GetBtMinX() { return m_btMinX; }
-    wxBitmapButton* GetBtMaxX() { return m_btMaxX; }
-    wxStaticText* GetLimitSwicthLabelY() { return m_limitSwicthLabelY; }
-    wxStaticText* GetStaticText17218() { return m_staticText17218; }
-    wxBitmapButton* GetBtMinY() { return m_btMinY; }
-    wxBitmapButton* GetBtMaxY() { return m_btMaxY; }
-    wxStaticText* GetLimitSwicthLabelZ() { return m_limitSwicthLabelZ; }
-    wxStaticText* GetStaticText17219() { return m_staticText17219; }
-    wxBitmapButton* GetBtMinZ() { return m_btMinZ; }
-    wxBitmapButton* GetBtMaxZ() { return m_btMaxZ; }
-    wxStaticLine* GetStaticLine1213() { return m_staticLine1213; }
     wxStaticText* GetStaticText170() { return m_staticText170; }
     wxStaticText* GetStaticText181() { return m_staticText181; }
     wxStaticText* GetStaticText17222() { return m_staticText17222; }
@@ -218,9 +215,27 @@ public:
     wxBitmapButton* GetBtSSBit2() { return m_btSSBit2; }
     wxStaticText* GetStaticText152() { return m_staticText152; }
     wxBitmapButton* GetBtSSBit1() { return m_btSSBit1; }
+    wxStaticLine* GetStaticLine347() { return m_staticLine347; }
+    wxStaticText* GetStaticText83() { return m_staticText83; }
+    wxStaticText* GetStaticText85() { return m_staticText85; }
+    wxStaticText* GetStaticText87() { return m_staticText87; }
+    wxStaticText* GetLimitSwicthLabelX() { return m_limitSwicthLabelX; }
+    wxStaticText* GetStaticText172() { return m_staticText172; }
+    wxBitmapButton* GetBtMinX() { return m_btMinX; }
+    wxBitmapButton* GetBtMaxX() { return m_btMaxX; }
+    wxStaticText* GetLimitSwicthLabelY() { return m_limitSwicthLabelY; }
+    wxStaticText* GetStaticText17218() { return m_staticText17218; }
+    wxBitmapButton* GetBtMinY() { return m_btMinY; }
+    wxBitmapButton* GetBtMaxY() { return m_btMaxY; }
+    wxStaticText* GetLimitSwicthLabelZ() { return m_limitSwicthLabelZ; }
+    wxStaticText* GetStaticText17219() { return m_staticText17219; }
+    wxBitmapButton* GetBtMinZ() { return m_btMinZ; }
+    wxBitmapButton* GetBtMaxZ() { return m_btMaxZ; }
     wxStaticLine* GetStaticLine121() { return m_staticLine121; }
     wxStaticText* GetStaticText2155() { return m_staticText2155; }
-    wxTextCtrl* GetSpeed() { return m_speed; }
+    wxTextCtrl* GetCfgSpeed() { return m_cfgSpeed; }
+    wxStaticText* GetStaticText21552() { return m_staticText21552; }
+    wxTextCtrl* GetMsdSpeed() { return m_msdSpeed; }
     wxStaticBitmap* GetStaticBitmap335() { return m_staticBitmap335; }
     wxStaticText* GetStaticText3132() { return m_staticText3132; }
     wxStaticText* GetStaticText215() { return m_staticText215; }
@@ -235,6 +250,15 @@ public:
     wxTextCtrl* GetPosStepperZ() { return m_posStepperZ; }
     wxStaticBitmap* GetBmpDirectionZ() { return m_bmpDirectionZ; }
     wxStaticText* GetStaticText31327() { return m_staticText31327; }
+    wxStaticText* GetStaticText215544() { return m_staticText215544; }
+    wxTextCtrl* GetPosStepperH() { return m_posStepperH; }
+    wxStaticBitmap* GetBmpDirectionH() { return m_bmpDirectionH; }
+    wxStaticText* GetStaticText313278() { return m_staticText313278; }
+    wxStaticText* GetStaticText355() { return m_staticText355; }
+    wxSlider* GetValuesUpdateInterval() { return m_valuesUpdateInterval; }
+    wxStaticText* GetValuesUpdateIntervalValue() { return m_valuesUpdateIntervalValue; }
+    wxStaticText* GetStaticText3551() { return m_staticText3551; }
+    wxStaticLine* GetStaticLine3522() { return m_staticLine3522; }
     wxPanel* GetPanelArduinosPeriphery() { return m_panelArduinosPeriphery; }
     wxStaticText* GetStaticText9117() { return m_staticText9117; }
     wxPropertyGridManager* GetPgMgrConfig() { return m_pgMgrConfig; }
@@ -248,7 +272,8 @@ public:
     wxPanel* GetLoggerPlaceholder() { return m_loggerPlaceholder; }
     wxStaticLine* GetStaticLine309() { return m_staticLine309; }
     wxStaticText* GetStaticText305() { return m_staticText305; }
-    wxSlider* GetSliderUpdateInterval() { return m_sliderUpdateInterval; }
+    wxSlider* GetLoggerUpdateInterval() { return m_loggerUpdateInterval; }
+    wxStaticText* GetLoggerUpdateIntervalValue() { return m_loggerUpdateIntervalValue; }
     wxStaticText* GetStaticText311() { return m_staticText311; }
     wxPanel* GetSplitterPageBottom() { return m_splitterPageBottom; }
     wxSplitterWindow* GetSplitterMainH() { return m_splitterMainH; }
@@ -267,7 +292,7 @@ public:
     wxPanel* GetPanelStatusbar() { return m_panelStatusbar; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }
     wxTimer* GetContinuousTimer() { return m_continuousTimer; }
-    CncArduinoEnvironmentBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Arduino-/Periphery-Environment"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,1000), long style = wxCAPTION|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX|wxSTAY_ON_TOP);
+    CncArduinoEnvironmentBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Arduino-/Periphery-Environment"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1000,1000), long style = wxCAPTION|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX|wxSTAY_ON_TOP);
     virtual ~CncArduinoEnvironmentBase();
 };
 
