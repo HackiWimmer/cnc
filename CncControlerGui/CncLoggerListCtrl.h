@@ -22,6 +22,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 				wxListItemAttr	listItemAttr;
 				
 				LoggerEntry();
+				LoggerEntry(const wxString& t, const wxString& r, const wxListItemAttr& a);
 		};
 		
 		typedef std::vector<LoggerEntry> Entries;
@@ -29,6 +30,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		Entries					entries;
 		UpdateMode				updateMode;
 		UpdateMode				updateModePreviously;
+		bool					joinTheApp;
 		bool					showOnDemand;
 		bool					anyUpdate;
 		long					selectedItem;
@@ -66,7 +68,8 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		
 		void clearAll();
 		
-		void setShowOnDemand(bool s) { showOnDemand = s; }
+		void setJoinTheAppState(bool s)	{ joinTheApp = s; }
+		void setShowOnDemand(bool s) 	{ showOnDemand = s; }
 		
 		void logRowNumber(long rn=wxNOT_FOUND);
 		long getLoggedRowNumber();
@@ -82,12 +85,32 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		void add(const char c);
 		void add(const wxString& text);
 		
+		void add(const wxString& text, const wxListItemAttr& lia);
+		
 		bool writeToFile(const wxFileName& fn, bool allRows=false);
 		bool copyToClipboard(bool allRows=false);
 		bool openAsTextView(bool allRows=false);
 		
 		wxDECLARE_NO_COPY_CLASS(CncLoggerListCtrl);
 		wxDECLARE_EVENT_TABLE();
+};
+
+class CncExtLoggerListCtrl : public CncLoggerListCtrl {
+	
+	public:
+		
+		CncExtLoggerListCtrl(wxWindow *parent, long style)
+		: CncLoggerListCtrl(parent, style)
+		{}
+		
+		virtual ~CncExtLoggerListCtrl()
+		{}
+		
+		typedef wxListItemAttr LIA;
+		void addSeparator	(const wxString& s) { const LIA lia(wxColour(255, 255, 255), wxColour(185, 122,  87),	GetFont()); add(s, lia); }
+		void addDebugEntry	(const wxString& s) { const LIA lia(wxColour(128, 128,   0), GetBackgroundColour(),		GetFont()); add(s, lia); }
+		void addWarnEntry	(const wxString& s) { const LIA lia(wxColour(255, 201,  14), GetBackgroundColour(),		GetFont()); add(s, lia); }
+		void addErrorEntry	(const wxString& s) { const LIA lia(wxColour(255, 128, 128), GetBackgroundColour(),		GetFont()); add(s, lia); }
 };
 
 #endif

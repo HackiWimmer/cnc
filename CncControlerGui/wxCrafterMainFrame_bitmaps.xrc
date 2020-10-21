@@ -94,7 +94,6 @@
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bug-go">bitmaps\bug-go.png</object>
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
-  <object class="wxBitmap" name="car">bitmaps\car.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="clear">bitmaps\clear.png</object>
   <object class="wxBitmap" name="close">bitmaps\close.png</object>
@@ -103,12 +102,13 @@
   <object class="wxBitmap" name="database-error">bitmaps\database-error.png</object>
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
-  <object class="wxBitmap" name="db_update">bitmaps\db_update.png</object>
+  <object class="wxBitmap" name="db">bitmaps\db.png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
   <object class="wxBitmap" name="document-open-5">bitmaps\document-open-5.png</object>
   <object class="wxBitmap" name="document-preview">bitmaps\document-preview.png</object>
+  <object class="wxBitmap" name="document-properties-4">bitmaps\document-properties-4.png</object>
   <object class="wxBitmap" name="document-save-3">bitmaps\document-save-3.png</object>
   <object class="wxBitmap" name="document-save-6">bitmaps\document-save-6.png</object>
   <object class="wxBitmap" name="document-save-as (2)">bitmaps\document-save-as (2).png</object>
@@ -144,6 +144,7 @@
   <object class="wxBitmap" name="options16">bitmaps\gamepad\options16.png</object>
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
+  <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
   <object class="wxBitmap" name="playstation-cross-dark-icon16">bitmaps\gamepad\playstation-cross-dark-icon16.png</object>
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
   <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
@@ -165,6 +166,7 @@
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
+  <object class="wxBitmap" name="table-edit">bitmaps\table-edit.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>

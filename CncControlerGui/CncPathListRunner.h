@@ -74,6 +74,8 @@ class CncPathListRunner {
 			bool optSkipEmptyMoves		= true;
 			bool optCombineMoves		= true;
 			
+			// for testing only
+			bool trace					= true;
 		};
 		
 		CncPathListRunner::Setup& getSetup() { return setup; }
@@ -89,6 +91,7 @@ class CncPathListRunner {
 		bool onPhysicallyClientIdChange(const CncPathListEntry& curr);
 		bool onPhysicallySpeedChange(const CncPathListEntry& curr);
 		bool onPhysicallyMoveRaw(const CncPathListEntry& curr);
+		bool onPhysicallyMoveRawAsSequence(const CncPathListEntry& curr);
 		bool onPhysicallyMoveAnalysed(CncPathList::const_iterator& it, const CncPathList::const_iterator& end);
 		
 		bool destroyMoveSequence();
@@ -106,6 +109,8 @@ class CncPathListRunner {
 		
 		void onPhysicallySwitchToolState(bool state);
 		bool onPhysicallyExecute(const CncPathListManager& plm);
+		
+		void autoSetup();
 };
 
 #endif

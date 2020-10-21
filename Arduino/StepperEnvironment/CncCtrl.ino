@@ -683,18 +683,21 @@ byte CncArduinoController::checkRuntimeEnv() {
     return RET_ERROR;
   }
 
+  /*
   if ( READ_LMT_PINS == LimitSwitch::LIMIT_SWITCH_ON ) {
     ArduinoMainLoop::pushMessage(MT_ERROR, E_LIMIT_SWITCH_ACTIVE);
     return RET_LIMIT;
   }
+  */
 
   if ( isProbeMode() == OFF ) {
-    
+    #warning reactivate this again if the corresponding info is available
+    /*
     if ( READ_ENABLE_TOOL_PIN != READ_IS_TOOL_POWERED_PIN ) {
       ArduinoMainLoop::pushMessage(MT_ERROR, E_TOOL_NOT_ENALED); 
       return RET_ERROR;
     }
-    
+    */    
   }
   
   return RET_OK;   
@@ -733,8 +736,8 @@ void CncArduinoController::notifyMovePartAfter() {
   posReplyCounter++;
   
   // speed management
+  const bool bReply = isReplyDue();
   if ( cfgF1000_MMSEC > 0 ) {
-    const bool bReply              = isReplyDue();
     const int32_t curDistV_UM      = ArduinoAccelManager::Setup::feedRate_UM[RS::stepSignatureIndex];
     
     // determine the time deviation between the measured and configured sight
@@ -758,8 +761,8 @@ void CncArduinoController::notifyMovePartAfter() {
   }
   
   // finalize position management
-  if ( isReplyDue() )
-    sendCurrentPositions(PID_XYZ_POS_DETAIL, false);  
+  if ( bReply )
+    sendCurrentPositions(PID_XYZ_POS_DETAIL, false);
 
   #undef MEASURE_SPEED
   #undef WAIT_US
@@ -948,41 +951,6 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::process(const ArduinoCmdDecoderMoveSequence::Result& seq) {
-/////////////////////////////////////////////////////////////////////////////////////
-  switch ( seq.cmd ) {
-    case CMD_MOVE_SEQUENCE:  return renderMove(seq.dx, seq.dy, seq.dz);
-    default:                 return renderMove(seq.dx, seq.dy, seq.dz);
-  }
-  
-  return RET_OK;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::initialize(const ArduinoCmdDecoderMoveSequence::Result& seq) {
-/////////////////////////////////////////////////////////////////////////////////////  
-  ARDO_DEBUG_MESSAGE('S', "MoveSequence started")
-  
-  tsMoveStart = ArdoTs::now();
-  tsMoveLast  = tsMoveStart;
-
-  const int32_t ic = seq.impulseCount;// impulseCalculator.calculate(seq.lengthX, seq.lengthY, seq.lengthZ);
-  if ( ic < 0 )
-    return RET_ERROR;
-   
-  if ( cfgF1000_MMSEC && ArduinoAccelManager::initMove(ic, cfgF1000_MMSEC) == false )
-    return RET_ERROR;
- 
-  return RET_OK;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::finalize(const ArduinoCmdDecoderMoveSequence::Result&) {
-/////////////////////////////////////////////////////////////////////////////////////  
-  sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
-  ARDO_DEBUG_MESSAGE('S', "MoveSequence finished")
-
-  return RET_OK;
-}
-/////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::process(const ArduinoCmdDecoderMove::Result& mv) {
 /////////////////////////////////////////////////////////////////////////////////////
   // select underlying mechanism 
@@ -994,21 +962,17 @@ byte CncArduinoController::process(const ArduinoCmdDecoderMove::Result& mv) {
   return RET_ERROR;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz) {
+byte CncArduinoController::process(const ArduinoCmdDecoderMoveSequence::Result& seq) {
 /////////////////////////////////////////////////////////////////////////////////////
-  bool retX = true;
-  bool retY = true;
-  bool retZ = true;
+  const byte ret = renderMove(seq.dx, seq.dy, seq.dz);
   
-  if ( dx != 0 ) { retX = X->resolveLimit(); }
-  if ( dy != 0 ) { retY = Y->resolveLimit(); }
-  if ( dz != 0 ) { retZ = Z->resolveLimit(); }
-
-  //PRINT_DEBUG_VALUE("retX", retX);
-  //PRINT_DEBUG_VALUE("retY", retY);
-  //PRINT_DEBUG_VALUE("retZ", retZ);
+  // renderMove() processes the linear distance betwenn two points. Due to a performance 
+  // improvement the position reply isn't continious active for each step. Therefore, to
+  // get straight lines a the monitoring the current position has to be reported at the 
+  // end of each linear distance.
+  sendCurrentPositions(PID_XYZ_POS_MAJOR, true);  
   
-  return (retX == true && retY == true && retZ == true) ? RET_OK : RET_LIMIT;
+  return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::movePosition(int32_t dx, int32_t dy, int32_t dz) {
@@ -1029,4 +993,46 @@ byte CncArduinoController::movePosition(int32_t dx, int32_t dy, int32_t dz) {
     return RET_ERROR;
 
   return renderMove(dx, dy, dz);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+byte CncArduinoController::initialize(const ArduinoCmdDecoderMoveSequence::Result& seq) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  ARDO_DEBUG_MESSAGE('S', "MoveSequence started")
+  
+  tsMoveStart = ArdoTs::now();
+  tsMoveLast  = tsMoveStart;
+
+  const int32_t ic = seq.impulseCount;
+  if ( ic < 0 )
+    return RET_ERROR;
+   
+  if ( cfgF1000_MMSEC && ArduinoAccelManager::initMove(ic, cfgF1000_MMSEC) == false )
+    return RET_ERROR;
+ 
+  return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+byte CncArduinoController::finalize(const ArduinoCmdDecoderMoveSequence::Result&) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
+  ARDO_DEBUG_MESSAGE('S', "MoveSequence finished")
+
+  return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+byte CncArduinoController::moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz) {
+/////////////////////////////////////////////////////////////////////////////////////
+  bool retX = true;
+  bool retY = true;
+  bool retZ = true;
+  
+  if ( dx != 0 ) { retX = X->resolveLimit(); }
+  if ( dy != 0 ) { retY = Y->resolveLimit(); }
+  if ( dz != 0 ) { retZ = Z->resolveLimit(); }
+
+  //PRINT_DEBUG_VALUE("retX", retX);
+  //PRINT_DEBUG_VALUE("retY", retY);
+  //PRINT_DEBUG_VALUE("retZ", retZ);
+  
+  return (retX == true && retY == true && retZ == true) ? RET_OK : RET_LIMIT;
 }

@@ -788,7 +788,7 @@ void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequ
 
 	// perform any rest offset
 	completeFeedProfile();
-
+	
 	// reset last signal
 	lastSignal = CMD_INVALID;
 }
@@ -938,6 +938,12 @@ bool SerialEmulatorNULL::renderAndMove(int32_t dx, int32_t dy, int32_t dz) {
 	tsMoveStart = CncTimeFunctions::getNanoTimestamp();
 	if ( renderMove(dx, dy, dz) != RET_OK )
 		return false;
+		
+	// renderMove() processes the linear distance betwenn two points. Due to a performance 
+	// improvement the position reply isn't continious active for each step. Therefore, to
+	// get straight lines a the monitoring the current position has to be reported at the 
+	// end of each linear distance.
+	replyPosition(true);
 	
 	// do something with this coordinates
 	return writeMoveRenderedCallback(dx, dy, dz);

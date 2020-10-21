@@ -3,19 +3,17 @@
 
 //////////////////////////////////////////////////////////////
 CncPathListManager::CncPathListManager()
-: list()
-, isFirstPath(false)
-, isCorrected(false)
-, referencePos()
-, minPosX(0.0)
-, minPosY(0.0)
-, minPosZ(0.0)
-, maxPosX(0.0)
-, maxPosY(0.0)
-, maxPosZ(0.0)
-, totalDistance(0.0)
-
-//, data()
+: list				()
+, isFirstPath		(false)
+, isCorrected		(false)
+, referencePos		()
+, minPosX			(0.0)
+, minPosY			(0.0)
+, minPosZ			(0.0)
+, maxPosX			(0.0)
+, maxPosY			(0.0)
+, maxPosZ			(0.0)
+, totalDistance		(0.0)
 //////////////////////////////////////////////////////////////////
 {
 	//preallocate memory
@@ -29,19 +27,22 @@ CncPathListManager::~CncPathListManager() {
 //////////////////////////////////////////////////////////////////
 std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {
 //////////////////////////////////////////////////////////////////
+	const CncDoublePosition& rp = getReferencePos();
+	const CncDoublePosition& sp = getStartPos();
+	
 	ostr << "CncPathListInfo entries : " << list.size() 												<< std::endl;
-	ostr << " is corrected           : " << isPathCorrected() 											<< std::endl;
-	ostr << " is first path          : " << getFirstPathFlag() 											<< std::endl;
-	ostr << " total distance         : " << cnc::dblFormat1(getTotalDistance()) 						<< std::endl;
-	ostr << " minPos (x, y, z)       : " << cnc::dblFormat3(getMinPosX(), getMinPosY(), getMinPosZ()) 	<< std::endl;
-	ostr << " maxPos (X, Y, z)       : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ()) 	<< std::endl;
-	ostr << " referencePos           : " << getReferencePos() 											<< std::endl;
-	ostr << " startPos               : " << getStartPos() 												<< std::endl;
-
-	ostr << " path list:" << std::endl;
+	ostr << " Is corrected           : " << isPathCorrected() 											<< std::endl;
+	ostr << " Is first Path          : " << getFirstPathFlag() 											<< std::endl;
+	ostr << " Total Distance         : " << cnc::dblFormat1(getTotalDistance()) 						<< std::endl;
+	ostr << " Min Pos (x, y, z)      : " << cnc::dblFormat3(getMinPosX(), getMinPosY(), getMinPosZ())	<< std::endl;
+	ostr << " Max Pos (X, Y, z)      : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ())	<< std::endl;
+	ostr << " Reference Pos          : " << cnc::dblFormat3(rp.getX(),    rp.getY(),    rp.getZ())		<< std::endl;
+	ostr << " Start Pos              : " << cnc::dblFormat3(sp.getX(),    sp.getY(),    sp.getZ())		<< std::endl;
+	ostr << " Entries                : " << std::endl;
+	
 	for ( auto it=getPathList().begin(); it!=getPathList().end(); ++it )
 		it->traceEntry(ostr);
-
+	
 	return ostr;
 }
 //////////////////////////////////////////////////////////////////

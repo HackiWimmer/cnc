@@ -1814,6 +1814,10 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 		return false;
 	}
 	
+	// empty move sequence nothing to do 
+	if ( sequence.getCount() == 0 )
+		return true;
+	
 	SerialCommandLocker scl(sequence.getType());
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "SERIAL::processMoveSequence(): Serial is currently in fetching mode: This command will be rejected:" << std::endl;
@@ -1831,13 +1835,20 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 		return false;
 	}
 	
+	// runtime check 
 	if ( writeMoveSequenceRawCallback( result.buffer, result.flushedSize) == false ) {
 		std::clog << "SERIAL::processMoveSequence(): writeMoveSequenceRawCallback failed" << std::endl;
 		return false;
 	}
 	
+	// runtime check - should not appear, becaue sequence.getCount() is checked above
+	if ( sequence.getPortionIndex().size() == 0 ) {
+		std::cerr << "SERIAL::processMoveSequence(): empty portion" << std::endl;
+		return false;
+	}
+	
 	unsigned int totalFlushedSize	= sequence.getFlushedSize();
-	unsigned int currentFlushedSize	= *(sequence.getPortionIndex().begin());
+	unsigned int currentFlushedSize	= sequence.getPortionIndex().size() > 0 ? *(sequence.getPortionIndex().begin()) : 0;
 	unsigned char* moveSequence 	= result.buffer;
 	moveCommand[0] 					= moveSequence[0];
 	

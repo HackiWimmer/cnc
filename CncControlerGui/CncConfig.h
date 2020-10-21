@@ -44,6 +44,11 @@ static const int TOOL_MAGAZINE_MAX_ID = 999;
 
 class CncConfig {
 	
+	private:
+		std::stringstream loadTrace;
+		std::stringstream saveTrace;
+		std::stringstream obsoleteTrace;
+	
 	public:
 		typedef CncUnitCalculatorBase::Unit Unit;
 		
@@ -177,6 +182,9 @@ class CncConfig {
 		// global config pointer - don't use this directly
 		static CncConfig* globalCncConfig;
 		
+		void updateLoadTrace(wxTextCtrl* lTrace, wxTextCtrl* oTrace);
+		void updateSaveTrace(wxTextCtrl* sTrace);
+
 		ToolMagazine& getToolMagazine() { return toolMagazine; }
 		ToolMagazineParameter& getToolMagazineParameter() { return toolMagazineParameter; }
 		
@@ -304,6 +312,7 @@ class CncConfig {
 		const bool getPreProcessorAnalyseFlag();
 		const bool getPreProcessoSkipEmptyFlag();
 		const bool getPreProcessorCombineMovesFlag();
+		const bool getPreProcessorUseOperatingTrace();
 		const bool getPreProcessorCntPathListEntries();
 		const bool getPreProcessorCntMoveSequneces();
 
@@ -386,6 +395,7 @@ class CncConfig {
 		const wxString& getBrowser(wxString& ret);
 		const wxString& getEditorTool(wxString& ret);
 		const wxString& getHexEditorTool(wxString& ret);
+		const wxString& getVeuszPlotterTool(wxString& ret);
 		const wxString& getPyCamTool(wxString& ret);
 		const wxString& getDefaultSpeedModeXYZ(wxString& ret);
 		const wxString& getDefaultPort(wxString& ret);

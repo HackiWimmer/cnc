@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-binary-file">bitmaps\16-binary-file.png</object>
+  <object class="wxBitmap" name="16-binary-file@2x">bitmaps\16-binary-file@2x.png</object>
   <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
   <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
+  <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
+  <object class="wxBitmap" name="16-file_save_all">bitmaps\CodeLite\16-file_save_all.png</object>
+  <object class="wxBitmap" name="16-file_save_all@2x">bitmaps\CodeLite\16-file_save_all@2x.png</object>
   <object class="wxBitmap" name="arrow-rotate-anticlockwise">bitmaps\arrow-rotate-anticlockwise.png</object>
   <object class="wxBitmap" name="arrow-rotate-clockwise">bitmaps\arrow-rotate-clockwise.png</object>
   <object class="wxBitmap" name="database-link">bitmaps\database-link.png</object>

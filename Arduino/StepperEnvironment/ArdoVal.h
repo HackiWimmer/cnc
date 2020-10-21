@@ -367,4 +367,10 @@
   const int32_t   C_2_15                                 =   32768;
   const int32_t   C_2_16                                 =   65536;
 
+  const uint8_t   POS_STORE_SID_CTL_POS                  =  1;
+  const uint8_t   POS_STORE_SID_APP_POS                  =  2;
+  const uint8_t   POS_STORE_SID_DIRECT_MOVE              =  3;
+  const uint8_t   POS_STORE_SID_RENDER_AND_MOVE          =  4;
+  const uint8_t   POS_STORE_SID_STEPPING                 =  5;
+
 #endif

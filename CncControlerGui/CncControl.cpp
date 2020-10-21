@@ -1004,7 +1004,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		// --------------------------------------------------------
 		case CITPosition:
 		{
-			bool postAppPosToo = ci.synchronizeAppPos == true;
+			#warning
+			bool postAppPosToo = true;//ci.synchronizeAppPos == true;
 			
 			// update controller position
 			switch ( ci.posType ) {
@@ -1014,7 +1015,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 										break;
 										
 				case PID_Y_POS: 		curCtlPos.setY(ci.yCtrlPos); 
-										if (postAppPosToo ) 
+										if ( postAppPosToo ) 
 											curAppPos.setY(ci.yCtrlPos);
 										break;
 				
@@ -1178,6 +1179,8 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 		// the compairison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos || force == true) {
+			CncContext::PositionStorage::addPos(CncContext::PositionStorage::TRIGGER_APP_POS, curCtlPos);
+			
 			THE_APP->addAppPosition(	pid, 
 										getClientId(), 
 										configuredSpeedMode, 
@@ -1194,15 +1197,18 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 void CncControl::postCtlPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) {
+		CncContext::PositionStorage::addPos(CncContext::PositionStorage::TRIGGER_CTL_POS, curCtlPos);
+		
 		// a position compairsion isn't necessay here because the serialControllerCallback(...)
 		// call this method only on position changes
 		THE_APP->addCtlPosition(	pid, 
 									getClientId(), 
-									configuredSpeedMode, 
+									cnc::getCncSpeedTypeAsCharacter(configuredSpeedMode), 
 									getConfiguredFeedSpeed_MM_MIN(), 
 									getRealtimeFeedSpeed_MM_MIN(), 
 									curCtlPos
 								);
+								
 	}
 }
 ///////////////////////////////////////////////////////////////////

@@ -227,6 +227,11 @@ void CncFileNameService::trace(std::ostream& os) {
 	os << "LRU Filename                      : " << CncFileNameService::getLruFileName() 							<< std::endl;
 	os << "Speed Config Filename             : " << CncFileNameService::getSpeedConfigFileName() 					<< std::endl;
 	os << "Stack Trace Filename              : " << CncFileNameService::getStackTraceFileName() 					<< std::endl;
+	
+	os << "Search Path Entries               : " << ""											 					<< std::endl;
+	for ( size_t i=0; i< _pathList.GetCount(); i++ ) {
+		os << wxString::Format(" - Path(%00ld): ", (long)i) << _pathList.Item(i)				 					<< std::endl;
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncFileNameService::deleteFile(wxString fn) {
@@ -234,6 +239,15 @@ void CncFileNameService::deleteFile(wxString fn) {
 	wxFileName f(fn);
 	if ( f.Exists() && f.IsFileWritable() )
 		wxRemoveFile(fn);
+}
+///////////////////////////////////////////////////////////////////
+const char* CncFileNameService::getTempFileName(const wxString& extention) {
+///////////////////////////////////////////////////////////////////
+	_ret = wxFileName::CreateTempFileName(_tempDirectorySession);
+	_ret.append(".");
+	_ret.append(extention);
+	
+	return _ret;
 }
 ///////////////////////////////////////////////////////////////////
 const char* CncFileNameService::getTempFileName(CncTemplateFormat f) {

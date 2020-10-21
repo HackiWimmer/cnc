@@ -16,16 +16,16 @@ extern GlobalConstStringDatabase globalStrings;
 ///////////////////////////////////////////////////////////////////
 CncMoveSequence::CncMoveSequence(unsigned char cmd)
 : reference(CncTimeFunctions::getNanoTimestamp())
-, sequence()
-, portionIndex()
-, data()
-, optimizedClientIds()
-, maxSerialSize(MAX_SERIAL_BUFFER_SIZE - 4)
-, moveCmd(cmd)
-, moveSequenceBuffer(NULL)
-, moveSequenceBufferSize(0)
-, moveSequenceFlushedSize(0)
-, speedInfo()
+, sequence					()
+, portionIndex				()
+, data						()
+, optimizedClientIds		()
+, maxSerialSize				(MAX_SERIAL_BUFFER_SIZE - 4)
+, moveCmd					(cmd)
+, moveSequenceBuffer		(NULL)
+, moveSequenceBufferSize	(0)
+, moveSequenceFlushedSize	(0)
+, speedInfo					()
 ///////////////////////////////////////////////////////////////////
 {
 	wxASSERT(isValid());
@@ -38,9 +38,11 @@ CncMoveSequence::~CncMoveSequence() {
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::clear() {
 ///////////////////////////////////////////////////////////////////
-	sequence.clear();
-	data.reset();
-	optimizedClientIds.clear();
+	sequence			.clear();
+	portionIndex		.clear();
+	data				.reset();
+	optimizedClientIds	.clear();
+	
 	destroyBuffer();
 }
 ///////////////////////////////////////////////////////////////////
@@ -310,7 +312,9 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	auto updatePortionSize = [&] (unsigned int offset, unsigned char value) {
 		// copy value
 		const unsigned char s = ( portionIndex.size() == 1 ? value - offset : value );
-		memcpy(moveSequenceBuffer + portionIndex.back(), &s, 1);
+		
+		if ( portionIndex.size() > 0 )	memcpy(moveSequenceBuffer + portionIndex.back(), &s, 1);
+		else 							memcpy(moveSequenceBuffer                      , &s, 1);
 	};
 
 	flushHeader();
@@ -519,6 +523,45 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 
 	return byteCount;
 }
-
-
+///////////////////////////////////////////////////////////////////
+std::ostream& CncMoveSequence::outputOperator(std::ostream &ostr, const CncLongPosition startPos) const {
+///////////////////////////////////////////////////////////////////
+	CncDoublePosition startPosMetric; THE_CONFIG->convertStepsToMetric(startPosMetric, startPos);
+	
+	ostr << "Type                    : " << ArduinoCMDs::getCMDLabel((int)getType())	<< std::endl
+		 << "Reference               : " << getReference()								<< std::endl
+		 << "Start Position          : " << cnc::longFormat(startPos)					<< std::endl
+		 << "Start Position Metric   : " << cnc::dblFormat(startPosMetric)				<< std::endl
+		 << "Buffer Size             : " << getBufferSize()								<< std::endl
+		 << "Item Count              : " << getCount()									<< std::endl
+		 << "Impulse Count           : " << getImpulseCount()							<< std::endl
+		 << "Length X                : " << getLengthX()								<< std::endl
+		 << "Length Y                : " << getLengthY()								<< std::endl
+		 << "Length Z                : " << getLengthZ()								<< std::endl
+		 << "Is optimized            : " << isOptimized()								<< std::endl
+		 << "First Client ID         : " << getFirstClientId()							<< std::endl
+		 << "Last  Client ID         : " << getLastClientId()							<< std::endl
+		 << "Entries: "																	<< std::endl
+	;
+	
+	CncLongPosition iterStartPos(startPos);
+	for ( auto it = sequence.begin(); it != sequence.end(); ++it ) {
+		const SequencePoint& sp = *it;
+		const CncLongPosition newPos(iterStartPos.getX() + sp.x, iterStartPos.getY() + sp.y, iterStartPos.getZ() + sp.z);
+		CncDoublePosition newPosMetric; THE_CONFIG->convertStepsToMetric(newPosMetric, newPos);
+		
+		ostr << "MSE: ( P ) " 
+			 << wxString::Format("% 6ld", sp.clientID)				<< " " 
+			 << wxString::Format("% 8ld", sp.x)						<< ", " 
+			 << wxString::Format("% 8ld", sp.y)						<< ", " 
+			 << wxString::Format("% 8ld", sp.z)						<< " --> "
+			 << cnc::longFormat(newPos)								<< "| "
+			 << cnc::dblFormat(newPosMetric)						<< std::endl
+		;
+		
+		iterStartPos = newPos;
+	}
+	
+	return ostr;
+}
 

@@ -11,20 +11,20 @@ const CncNanoTimestamp	CncPathListEntry::NoReference			  = -1LL;
 //////////////////////////////////////////////////////////////////
 std::ostream& CncPathListEntry::outputOperator(std::ostream &ostr) const {
 //////////////////////////////////////////////////////////////////
-	ostr << "CncPathListEntry: " 								<< std::endl;
-	ostr << " PathList Reference : "	<< pathListReference 	<< std::endl;
-	ostr << " Type               : "	<< type      			<< std::endl;
+	ostr << " CncPathListEntry: "								<< std::endl;
+	ostr << "  PathList Reference : "	<< pathListReference 	<< std::endl;
+	ostr << "  Type               : "	<< type					<< std::endl;
 
-	ostr << " Client ID          : "	<< clientId		 		<< std::endl;
-	ostr << " Already rendered   : "	<< alreadyRendered 		<< std::endl;
+	ostr << "  Client ID          : "	<< clientId		 		<< std::endl;
+	ostr << "  Already rendered   : "	<< alreadyRendered		<< std::endl;
 
-	ostr << " Entry Target       : "	<< entryTarget			<< std::endl;
-	ostr << " Entry Distance     : "	<< entryDistance 		<< std::endl;
+	ostr << "  Entry Target       : "	<< entryTarget			<< std::endl;
+	ostr << "  Entry Distance     : "	<< entryDistance 		<< std::endl;
 
-	ostr << " FeedSpeed Mode     : "	<< feedSpeedMode   		<< std::endl;
-	ostr << " FeedSpeed Value    : "	<< feedSpeed_MM_MIN		<< std::endl;
+	ostr << "  FeedSpeed Mode     : "	<< feedSpeedMode		<< std::endl;
+	ostr << "  FeedSpeed Value    : "	<< feedSpeed_MM_MIN		<< std::endl;
 
-	ostr << " Total Distance     : "	<< totalDistance 		<< std::endl;
+	ostr << "  Total Distance     : "	<< totalDistance		<< std::endl;
 
 	return ostr;
 }
@@ -33,31 +33,45 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 //////////////////////////////////////////////////////////////////
 
 	if ( isClientIdChange() ) {
-		ostr << " PLE: "
-			 << pathListReference 	<< "("
-			 << " C "				<< "): "
-			 << clientId			<< std::endl;
-
+		ostr << traceIndent
+			 << "PLE: "
+			 << pathListReference								<< "("
+			 << " C "											<< "): "
+			 << wxString::Format("% 5ld", clientId)				<< std::endl;
 	}
 	else if ( isPositionChange() ) {
-		ostr << " PLE: "
-			 << pathListReference 	<< "("
-			 << " P "				<< "): "
-			 << entryDistance 		<< " > "
-			 << entryTarget 		<< " | "
-			 << alreadyRendered		<< std::endl;
-
+		ostr << traceIndent
+			 << "PLE: "
+			 << pathListReference								<< "("
+			 << " P "											<< "): "
+			 << wxString::Format("% 5ld", clientId)				<< "  "
+			 << cnc::dblFormat(entryDistance)					<< " --> "
+			 << cnc::dblFormat(entryTarget)						<< " | "
+			 << "td = " << cnc::dblFormat1(totalDistance)		<< " | "
+			 << "ar = " << alreadyRendered						<< std::endl;
 	}
 	else if ( isSpeedChange() ) {
-		ostr << " PLE: "
-			 << pathListReference 	<< "("
-			 << " S "				<< "): "
-			 << feedSpeedMode 		<< ", "
-			 << feedSpeed_MM_MIN	<< std::endl;
+		ostr << traceIndent
+			 << "PLE: "
+			 << pathListReference								<< "("
+			 << " S "											<< "): "
+			 << wxString::Format("% 5ld", clientId)				<< "  "
+			 << cnc::getCncSpeedTypeAsCharacter(feedSpeedMode)	<< ", "
+			 << cnc::dblFormat1(feedSpeed_MM_MIN)				<< std::endl;
+	}
+	else if ( isNothingChanged() ) {
+		ostr << traceIndent
+			 << "PLE: "
+			 << pathListReference								<< "("
+			 << " L "											<< "): "
+			 << wxString::Format("% 5ld", clientId)				<< "  "
+			 << cnc::dblFormat(entryTarget)						<< std::endl;
 	}
 	else {
-		//if ( type != CHG_NOTHING )
-			ostr << (*this);
+		// should not appear
+		ostr << "Undefined Type: [" << type << "]:"
+			 << "Default output"								<< std::endl
+			 << (*this);
 	}
 }
 //////////////////////////////////////////////////////////////////

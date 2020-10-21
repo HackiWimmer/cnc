@@ -781,6 +781,12 @@ void CncBaseEditor::changeBinaryViewType(const BinaryFileParser::ViewType bvt) {
 		std::cerr << "CncBaseEditor::changeBinaryViewType(): Error while changing view type" << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
+void CncBaseEditor::setNewTemplateFileName(const wxString& fileName) {
+///////////////////////////////////////////////////////////////////
+	fileInfo.fileName.Assign(fileName);
+	fileInfo.format = cnc::getTemplateFormatFromFileName(fileName);
+}
+///////////////////////////////////////////////////////////////////
 bool CncBaseEditor::openFile(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
 	if ( wxFileName::Exists(fileName) == false ) {
@@ -895,7 +901,9 @@ bool CncBaseEditor::save() {
 		default: 			ret = false;
 	}
 	
-	cnc::trc.logInfo(wxString::Format("File '%s' saved . . . ", fileInfo.fileName.GetFullPath()));
+	if ( ret == true )
+		cnc::trc.logInfo(wxString::Format("File '%s' saved . . . ", fileInfo.fileName.GetFullPath()));
+		
 	decorateParentTabName(false);
 	DiscardEdits();
 	

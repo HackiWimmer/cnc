@@ -32,6 +32,7 @@
 #include <wx/infobar.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
+#include <wx/listbook.h>
 #include <wx/statline.h>
 #include <wx/notebook.h>
 #include <wx/combobox.h>
@@ -40,7 +41,6 @@
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
 #include <wx/splitter.h>
-#include <wx/listbook.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
 #include <wx/scrolwin.h>
@@ -106,6 +106,12 @@ protected:
     wxInfoBar* m_mainViewInfobar;
     wxSimplebook* m_mainViewBook;
     wxPanel* m_mainBookSourcePanel;
+    wxListbook* m_listbookSource;
+    wxPanel* m_panel9530;
+    wxStaticText* m_staticText51376;
+    wxPanel* m_panelTemplateObserverPlaceholder;
+    wxPanel* m_panel9532;
+    wxStaticText* m_staticText513767;
     wxButton* m_openSourceExtern;
     wxButton* m_openSvgExtern;
     wxStaticLine* m_staticLine44728;
@@ -116,8 +122,6 @@ protected:
     wxStaticLine* m_staticLine4472;
     wxBitmapToggleButton* m_btSvgToggleWordWrap;
     wxNotebook* m_templateNotebook;
-    wxPanel* m_panelTplObserver;
-    wxPanel* m_panelTemplateObserverPlaceholder;
     wxPanel* m_panelTplEdit;
     wxBitmapToggleButton* m_tbCaseSensitive;
     wxBitmapToggleButton* m_tbWholeWord;
@@ -166,6 +170,8 @@ protected:
     wxButton* m_saveConfiguration;
     wxListbook* m_listbookSetupConfig;
     wxPanel* m_setupConfigPage;
+    wxNotebook* m_notebook9505;
+    wxPanel* m_panelProperties;
     wxToolbook* m_configurationToolbook;
     wxPanel* m_panel5618;
     wxPanel* m_panel5620;
@@ -174,6 +180,12 @@ protected:
     wxPanel* m_panel5614;
     wxPanel* m_panel5616;
     wxPropertyGridManager* m_pgMgrSetup;
+    wxPanel* m_panelLoadTrace;
+    wxTextCtrl* m_cfgLoadTrace;
+    wxPanel* m_panelSaveTrace;
+    wxTextCtrl* m_cfgSaveTrace;
+    wxPanel* m_panelObsoleteTRace;
+    wxTextCtrl* m_cfgObsoleteTrace;
     wxPanel* m_setupToolMagazine;
     wxScrolledWindow* m_scrollWin8945;
     wxPanel* m_toolMagazinePlaceholder;
@@ -682,6 +694,7 @@ protected:
     wxMenuItem* m_miPyCam;
     wxMenuItem* m_menuItem7460;
     wxMenuItem* m_miSpeedPlayground;
+    wxMenuItem* m_miPositionStorage;
     wxMenu* m_menuTest;
     wxMenuItem* m_miUnitTestFramework;
     wxMenuItem* m_menuItem3361;
@@ -904,6 +917,7 @@ protected:
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void openPyCam(wxCommandEvent& event) { event.Skip(); }
     virtual void openSpeedPlayground(wxCommandEvent& event) { event.Skip(); }
+    virtual void openPositionStorage(wxCommandEvent& event) { event.Skip(); }
     virtual void unitTestFramework(wxCommandEvent& event) { event.Skip(); }
     virtual void loopRepeatTest(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction1(wxCommandEvent& event) { event.Skip(); }
@@ -953,6 +967,10 @@ public:
     wxButton* GetBtnEmergenyStop() { return m_btnEmergenyStop; }
     wxAuiToolBar* GetAuibarMain() { return m_auibarMain; }
     wxInfoBar* GetMainViewInfobar() { return m_mainViewInfobar; }
+    wxStaticText* GetStaticText51376() { return m_staticText51376; }
+    wxPanel* GetPanelTemplateObserverPlaceholder() { return m_panelTemplateObserverPlaceholder; }
+    wxPanel* GetPanel9530() { return m_panel9530; }
+    wxStaticText* GetStaticText513767() { return m_staticText513767; }
     wxButton* GetOpenSourceExtern() { return m_openSourceExtern; }
     wxButton* GetOpenSvgExtern() { return m_openSvgExtern; }
     wxStaticLine* GetStaticLine44728() { return m_staticLine44728; }
@@ -962,8 +980,6 @@ public:
     wxButton* GetRemoveTemplate() { return m_removeTemplate; }
     wxStaticLine* GetStaticLine4472() { return m_staticLine4472; }
     wxBitmapToggleButton* GetBtSvgToggleWordWrap() { return m_btSvgToggleWordWrap; }
-    wxPanel* GetPanelTemplateObserverPlaceholder() { return m_panelTemplateObserverPlaceholder; }
-    wxPanel* GetPanelTplObserver() { return m_panelTplObserver; }
     wxBitmapToggleButton* GetTbCaseSensitive() { return m_tbCaseSensitive; }
     wxBitmapToggleButton* GetTbWholeWord() { return m_tbWholeWord; }
     wxBitmapToggleButton* GetTbRegEx() { return m_tbRegEx; }
@@ -1007,6 +1023,8 @@ public:
     wxSimplebook* GetSimpleBookSourceExt() { return m_simpleBookSourceExt; }
     wxPanel* GetPanelTplSourceExt() { return m_panelTplSourceExt; }
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
+    wxPanel* GetPanel9532() { return m_panel9532; }
+    wxListbook* GetListbookSource() { return m_listbookSource; }
     wxPanel* GetMainBookSourcePanel() { return m_mainBookSourcePanel; }
     wxStaticText* GetStaticText5137() { return m_staticText5137; }
     wxButton* GetLoadConfiguration() { return m_loadConfiguration; }
@@ -1019,6 +1037,14 @@ public:
     wxPanel* GetPanel5616() { return m_panel5616; }
     wxToolbook* GetConfigurationToolbook() { return m_configurationToolbook; }
     wxPropertyGridManager* GetPgMgrSetup() { return m_pgMgrSetup; }
+    wxPanel* GetPanelProperties() { return m_panelProperties; }
+    wxTextCtrl* GetCfgLoadTrace() { return m_cfgLoadTrace; }
+    wxPanel* GetPanelLoadTrace() { return m_panelLoadTrace; }
+    wxTextCtrl* GetCfgSaveTrace() { return m_cfgSaveTrace; }
+    wxPanel* GetPanelSaveTrace() { return m_panelSaveTrace; }
+    wxTextCtrl* GetCfgObsoleteTrace() { return m_cfgObsoleteTrace; }
+    wxPanel* GetPanelObsoleteTRace() { return m_panelObsoleteTRace; }
+    wxNotebook* GetNotebook9505() { return m_notebook9505; }
     wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
     wxPanel* GetToolMagazinePlaceholder() { return m_toolMagazinePlaceholder; }
     wxScrolledWindow* GetScrollWin8945() { return m_scrollWin8945; }

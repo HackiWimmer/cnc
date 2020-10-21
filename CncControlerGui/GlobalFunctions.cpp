@@ -243,3 +243,35 @@ const wxString& GblFunc::stacktrace(wxString& ret, int maxLines) {
 	ret.assign(ss.str().c_str());
 	return ret;
 }
+//////////////////////////////////////////////////////////////////
+bool GblFunc::executeExternalProgram(const wxString& tool, const wxString& file, bool checkToolExists) {
+//////////////////////////////////////////////////////////////////
+	if ( checkToolExists == true ) {
+		if ( wxFileName(tool).Exists() == false ) {
+			if ( CncFileNameService::findAbsoluteValidPath(tool).IsEmpty() ) {
+				std::cerr << "MainFrame::openFileExtern: Failed:" << std::endl;
+				std::cerr << " Can't find tool:" << tool << std::endl;
+				return false;
+			}
+		}
+	}
+	
+	wxString cmd(tool);
+	if ( file.IsEmpty() == false ) {
+		
+		if ( wxFileName(file).Exists() == false ) {
+			std::cerr << "MainFrame::openFileExtern: Failed:" << std::endl;
+			std::cerr << " Can't open:" << file << std::endl;
+			return false;
+		}
+		
+		cmd += " \"";
+		cmd += file;
+		cmd += "\"";
+	}
+	
+	cnc::trc.logInfoMessage(wxString::Format("Open: %s", cmd));
+	wxExecute(cmd);
+	
+	return true;
+}

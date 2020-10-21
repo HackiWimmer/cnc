@@ -2,6 +2,7 @@
 #include "ArduinoEnvWrapper.h"
 #include "GlobalFunctions.h"
 #include "MainFrame.h"
+#include "CncContext.h"
 #include "CncUserEvents.h"
 #include "CncArduino.h"
 #include "WireCircularBuffer.h"
@@ -565,6 +566,14 @@ uint8_t SerialThread::getPinMode(uint8_t pin) {
 	return AE::PN_NOT_A_PIN;
 }
 ////////////////////////////////////////////////////////////////////
+void SerialThread::traceMove(uint8_t sid, int32_t dx, int32_t dy, int32_t dz) {
+////////////////////////////////////////////////////////////////////
+	{
+		wxCriticalSectionLocker enter(pHandler->pSerialThreadCS);
+		CncContext::PositionStorage::addMove(sid, dx, dy, dz);
+	}
+}
+////////////////////////////////////////////////////////////////////
 bool SerialThread::ardoConfigGetTraceGetters() {
 ////////////////////////////////////////////////////////////////////
 	return ARDUINO_DATA_STORE ? ARDUINO_DATA_STORE->exterConfig.traceGetters : false;
@@ -591,9 +600,6 @@ void SerialThread::ardoTraceStepperDir(char sid, int32_t dir) {
 ////////////////////////////////////////////////////////////////////
 void SerialThread::ardoTraceStepperPos(char sid, int32_t pos) {
 ////////////////////////////////////////////////////////////////////
-	if ( ARDUINO_DATA_STORE == NULL )
-		return; 
-
 	switch ( sid ) {
 		case 'X': ARDUINO_DATA_STORE->traceInfo.stepperPosX = pos; break;
 		case 'Y': ARDUINO_DATA_STORE->traceInfo.stepperPosY = pos; break;
@@ -612,4 +618,10 @@ void SerialThread::ardoTraceSpeed(char sid, int32_t val) {
 		case 'C': ARDUINO_DATA_STORE->traceInfo.cfgSpeed_MM_SEC = val; break;
 		case 'M': ARDUINO_DATA_STORE->traceInfo.msdSpeed_MM_SEC = val; break;
 	}
+}
+////////////////////////////////////////////////////////////////////
+void SerialThread::ardoTraceMove(uint8_t sid, int32_t dx, int32_t dy, int32_t dz) {
+////////////////////////////////////////////////////////////////////
+	if ( SERIAL_THREAD != NULL )
+		SERIAL_THREAD->traceMove(sid, dx, dy, dz);
 }

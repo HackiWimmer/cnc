@@ -200,18 +200,18 @@ AE::PinName AE::ArduinoData::convertPinName(const char type, int name) {
 	return idx >= minAPinIndex && idx <= maxAPinIndex ? (PinName)idx : PN_NULL;
 }
 ////////////////////////////////////////////////////////////////////
-wxString AE::ArduinoData::buildDislpayName(PinName pin) {
+wxString AE::ArduinoData::buildDisplayName(PinName pin) {
 ////////////////////////////////////////////////////////////////////
 	if ( isPin(pin) == false )
 		return "";
 		
-	if ( isAnalogPin(pin) ) return buildDislpayName('A', ((int)pin) - minDPinIndex );
-	else 					return buildDislpayName('D', (int)pin);
+	if ( isAnalogPin(pin) ) return buildDisplayName('A', ((int)pin) - minDPinIndex );
+	else 					return buildDisplayName('D', (int)pin);
 	
 	return "";
 }
 ////////////////////////////////////////////////////////////////////
-wxString AE::ArduinoData::buildDislpayName(const char type, int name) {
+wxString AE::ArduinoData::buildDisplayName(const char type, int name) {
 ////////////////////////////////////////////////////////////////////
 	if ( type != 'A' && type != 'D' )
 		return "";

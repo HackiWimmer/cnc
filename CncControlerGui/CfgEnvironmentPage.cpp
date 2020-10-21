@@ -98,7 +98,6 @@ void CncConfig::setupEnvironmentCfgPage(wxConfigBase& config) {
 		factors = root->AppendChild( new wxPropertyCategory(curCatName));
 		registerCategory(curCatName, factors);
 		{
-			
 			//...............
 			prop = factors->AppendChild( new wxStringProperty("Display Factor X axis", NEXT_PROP_ID, ""));
 			prop->Enable(false);

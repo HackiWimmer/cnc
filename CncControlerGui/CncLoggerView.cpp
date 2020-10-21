@@ -2,6 +2,7 @@
 #include "CncLoggerListCtrl.h"
 #include "CncFileNameService.h"
 #include "CncTraceCtrl.h"
+#include "CncConfig.h"
 #include "CncLoggerView.h"
 
 /////////////////////////////////////////////////////////////////////
@@ -21,6 +22,10 @@ CncLoggerView::CncLoggerView(wxWindow* parent)
 /////////////////////////////////////////////////////////////////////
 CncLoggerView::~CncLoggerView() {
 /////////////////////////////////////////////////////////////////////
+	// this will document any content logged during the shutdown processing
+	// without any change to read it in the gui.
+	saveAll(false);
+	
 	for (auto it = loggerLists.begin(); it != loggerLists.end(); ++it ) {
 		// delete containing pointers
 		delete (*it);
@@ -87,6 +92,7 @@ void CncLoggerView::initialize() {
 		loggerLists.push_back(startup);
 
 		CncLoggerListCtrl* standard = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
+		standard->setJoinTheAppState(true);
 		standard->setShowOnDemand(m_btLoggerOnDemand->GetValue());
 		GblFunc::replaceControl(m_standardLoggerPlaceholder, standard);
 		loggerLists.push_back(standard);
@@ -230,9 +236,16 @@ void CncLoggerView::onSave(wxCommandEvent& event) {
 	const wxFileName fn(fileName);
 	
 	loggerLists.at(currentLoggerIndex)->writeToFile(fn);
+	if ( fn.Exists() ) {
+		 
+		wxString tool;
+		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+		
+		GblFunc::executeExternalProgram(tool, fileName, true);
+	}
 }
 /////////////////////////////////////////////////////////////////////
-void CncLoggerView::onSaveAll(wxCommandEvent& event) {
+void CncLoggerView::saveAll(bool doOpen) {
 /////////////////////////////////////////////////////////////////////
 	if ( loggerLists.size() != MaxLoggerCount )
 		return;
@@ -245,6 +258,17 @@ void CncLoggerView::onSaveAll(wxCommandEvent& event) {
 	const wxFileName fn(fileName);
 	
 	loggerLists.at(currentLoggerIndex)->writeToFile(fn, true);
+	
+	if ( doOpen && fn.Exists() ) {
+		wxString tool;
+		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+		GblFunc::executeExternalProgram(tool, fileName, true);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::onSaveAll(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	saveAll(true);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::onView(wxCommandEvent& event) {

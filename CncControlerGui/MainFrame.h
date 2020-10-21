@@ -77,6 +77,7 @@ class CncManuallyMoveCoordinates;
 class CncSpeedPlayground;
 class CncGamepadControllerSpy;
 class CncGamepadControllerState;
+class CncPositionStorageView;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -167,6 +168,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void openPositionStorage(wxCommandEvent& event);
 		virtual void openHexEditor(wxCommandEvent& event);
 		virtual void onReloadMonitorPreview(wxCommandEvent& event);
 		virtual void viewControllerMsgHistory(wxCommandEvent& event);
@@ -459,7 +461,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		wxMenuItem*			GetMiMotorEnableState()		{ return m_miMotorEnableState; }
 		
 		//////////////////////////////////////////////////////////////////////////////////
-		void selectMainBookSourcePanel(int sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL);
+		void selectMainBookSourcePanel(int sourcePageToSelect = SourceBookSelection::VAL::EDITOR);
 		void selectMainBookPreviewPanel();
 		void selectMainBookSetupPanel();
 		void selectMainBookReferencePanel();
@@ -668,6 +670,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncLoggerListCtrl* 				controllersMsgHistoryList;
 		CncMainInfoBar*					mainViewInfobar;
 		CncMainInfoBar*					monitorViewInfobar;
+		CncPositionStorageView*			positionStorage;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;
@@ -720,8 +723,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// File handling
-		void reloadTemplate(int sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL);
-		void introduceCurrentFile(int sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL);
+		void reloadTemplate(int sourcePageToSelect = SourceBookSelection::VAL::EDITOR);
+		void introduceCurrentFile(int sourcePageToSelect = SourceBookSelection::VAL::EDITOR);
 		
 		void openPreview(CncFilePreview* ctrl, const wxString& fn);
 		void openMainPreview(const wxString& fn);
@@ -861,7 +864,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void selectEditorToolBox(bool fileLoaded);
 		void fillFileDetails(bool fileLoaded, const char* extFileName = NULL);
-		void prepareNewTemplateFile();
 		void decorateExtTemplatePages(CncTemplateFormat tf);
 		void prepareAndShowMonitorTemplatePreview(bool force=false);
 		

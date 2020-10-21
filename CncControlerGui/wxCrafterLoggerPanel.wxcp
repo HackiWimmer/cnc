@@ -1568,7 +1568,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/CodeLite/16-file_save.png"
+               "m_path": "bitmaps/CodeLite/16-file_save.1.png"
               }, {
                "type": "choice",
                "m_label": "Direction",

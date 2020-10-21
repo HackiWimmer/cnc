@@ -231,7 +231,12 @@ class CncMoveSequence {
 
 		const MoveSequence::const_iterator const_begin()	const	{ return sequence.cbegin(); }
 		const MoveSequence::const_iterator const_end()		const	{ return sequence.cend(); }
-
+		
+		std::ostream& outputOperator(std::ostream &ostr, const CncLongPosition startPos = {0,0,0}) const;
+		friend std::ostream &operator<<(std::ostream &ostr, const CncMoveSequence &s) {
+			return s.outputOperator(ostr);
+		}
+		
 	private:
 		
 		SpeedInfo				speedInfo;

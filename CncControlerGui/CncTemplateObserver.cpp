@@ -111,7 +111,7 @@ void CncTemplateObserver::startObservation() {
 	logTemplateModificationTimeStamp();
 	logTimestamp();
 	
-	THE_APP->reloadTemplate(TemplateBookSelection::VAL::OBSERVER);
+	THE_APP->reloadTemplate(SourceBookSelection::VAL::OBSERVER);
 	THE_APP->selectMonitorBookTemplatePanel();
 	
 	enableObservationTimer(true);
@@ -201,7 +201,7 @@ void CncTemplateObserver::performActions() {
 	
 	wxString fn(THE_APP->getCurrentTemplatePathFileName());
 	
-	if ( THE_APP->openFile(TemplateBookSelection::VAL::OBSERVER) == false ) {
+	if ( THE_APP->openFile(SourceBookSelection::VAL::OBSERVER) == false ) {
 		logError(wxString::Format("CncTemplateObserver::performActions() Can't open template '%s'\n", fn));
 		
 	} else {

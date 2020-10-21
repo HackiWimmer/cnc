@@ -30,27 +30,13 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     flexGridSizer6517->AddGrowableRow(1);
     this->SetSizer(flexGridSizer6517);
     
-    wxFlexGridSizer* flexGridSizer6506 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer6506->SetFlexibleDirection( wxBOTH );
-    flexGridSizer6506->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer6506->AddGrowableCol(0);
-    
-    flexGridSizer6517->Add(flexGridSizer6506, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_staticText6508 = new wxStaticText(this, wxID_ANY, _("Externally Template Modification Observer:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_staticText6508->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    wxFont m_staticText6508Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText6508->SetFont(m_staticText6508Font);
-    
-    flexGridSizer6506->Add(m_staticText6508, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
     wxFlexGridSizer* flexGridSizer6550 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer6550->SetFlexibleDirection( wxBOTH );
     flexGridSizer6550->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer6550->AddGrowableCol(1);
     flexGridSizer6550->AddGrowableRow(0);
     
-    flexGridSizer6506->Add(flexGridSizer6550, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
+    flexGridSizer6517->Add(flexGridSizer6550, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
     wxFlexGridSizer* flexGridSizer6551 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer6551->SetFlexibleDirection( wxBOTH );
@@ -196,7 +182,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     m_observeTimer = new wxTimer;
     
     SetName(wxT("CncTemplateObserverBase"));
-    SetSize(500,300);
+    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

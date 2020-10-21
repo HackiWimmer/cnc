@@ -38,6 +38,7 @@
       extern void                     ardoTraceStepperDir(char id, int32_t dir);
       extern void                     ardoTraceStepperPos(char id, int32_t pos);
       extern void                     ardoTraceSpeed(char id, int32_t val);
+      extern void                     ardoTraceMove(uint8_t sid, int32_t dx, int32_t dy, int32_t dz);
 
       extern const char*              ardoGetCmdLabel(unsigned char c);
       extern const char*              ardoGetPidLabel(unsigned char p);
@@ -83,17 +84,18 @@
 
     #define NOT_A_PIN               AE::PN_NOT_A_PIN
 
-    #define PRINT_DEBUG_VALUE1(vName, vV1)                      AE::ardoDebugValue(vName, vV1, ARDO_LOG_FUNCT);
-    #define PRINT_DEBUG_VALUE2(vName, vV1, vV2)                 AE::ardoDebugValue(vName, vV1, vV2, ARDO_LOG_FUNCT);
-    #define PRINT_DEBUG_VALUE3(vName, vV1, vV2, vV3)            AE::ardoDebugValue(vName, vV1, vV2, vV3, ARDO_LOG_FUNCT);
-    #define PRINT_DEBUG_VALUE4(vName, vV1, vV2, vV3, vV4)       AE::ardoDebugValue(vName, vV1, vV2, vV3, vV4, ARDO_LOG_FUNCT);
-    #define PRINT_DEBUG_VALUE5(vName, vV1, vV2, vV3, vV4, vV5)  AE::ardoDebugValue(vName, vV1, vV2, vV3, vV4, vV5, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE1(vName, vV1)                                    AE::ardoDebugValue(vName, vV1, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE2(vName, vV1, vV2)                               AE::ardoDebugValue(vName, vV1, vV2, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE3(vName, vV1, vV2, vV3)                          AE::ardoDebugValue(vName, vV1, vV2, vV3, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE4(vName, vV1, vV2, vV3, vV4)                     AE::ardoDebugValue(vName, vV1, vV2, vV3, vV4, ARDO_LOG_FUNCT);
+    #define PRINT_DEBUG_VALUE5(vName, vV1, vV2, vV3, vV4, vV5)                AE::ardoDebugValue(vName, vV1, vV2, vV3, vV4, vV5, ARDO_LOG_FUNCT);
 
-    #define ARDO_DEBUG_MESSAGE(type, msg)                       AE::ardoDebugMessage(type, msg, ARDO_LOG_FUNCT);
-    #define ARDO_DEBUG_VALUE(vName, vValue)                     AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
-    #define ARDO_TRACE_STEPPER_DIR(sid, value)                  AE::ardoTraceStepperDir(sid, value);
-    #define ARDO_TRACE_STEPPER_POS(sid, value)                  AE::ardoTraceStepperPos(sid, value);
-    #define ARDO_TRACE_SPEED(sid, value)                        AE::ardoTraceSpeed(sid, value);
+    #define ARDO_DEBUG_MESSAGE(type, msg)                                     AE::ardoDebugMessage(type, msg, ARDO_LOG_FUNCT);
+    #define ARDO_DEBUG_VALUE(vName, vValue)                                   AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
+    #define ARDO_TRACE_STEPPER_DIR(sid, value)                                AE::ardoTraceStepperDir(sid, value);
+    #define ARDO_TRACE_STEPPER_POS(sid, value)                                AE::ardoTraceStepperPos(sid, value);
+    #define ARDO_TRACE_SPEED(sid, value)                                      AE::ardoTraceSpeed(sid, value);
+    #define ARDO_TRACE_MOVE(sid, dx, dy, dz)                                  AE::ardoTraceMove(sid, dx, dy, dz);
     
     #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 
@@ -137,17 +139,18 @@
     }
     
     // addition helper functions
-    #define PRINT_DEBUG_VALUE1(vName, vV1)                      printDebugValue(vName, vV1);
-    #define PRINT_DEBUG_VALUE2(vName, vV1, vV2)                 printDebugValue(vName, vV1, vV2);
-    #define PRINT_DEBUG_VALUE3(vName, vV1, vV2, vV3)            printDebugValue(vName, vV1, vV2, vV3);
-    #define PRINT_DEBUG_VALUE4(vName, vV1, vV2, vV3, vV4)       printDebugValue(vName, vV1, vV2, vV3, vV4);
-    #define PRINT_DEBUG_VALUE5(vName, vV1, vV2, vV3, vV4, vV5)  printDebugValue(vName, vV1, vV2, vV3, vV4, vV5);
+    #define PRINT_DEBUG_VALUE1(vName, vV1)                                  printDebugValue(vName, vV1);
+    #define PRINT_DEBUG_VALUE2(vName, vV1, vV2)                             printDebugValue(vName, vV1, vV2);
+    #define PRINT_DEBUG_VALUE3(vName, vV1, vV2, vV3)                        printDebugValue(vName, vV1, vV2, vV3);
+    #define PRINT_DEBUG_VALUE4(vName, vV1, vV2, vV3, vV4)                   printDebugValue(vName, vV1, vV2, vV3, vV4);
+    #define PRINT_DEBUG_VALUE5(vName, vV1, vV2, vV3, vV4, vV5)              printDebugValue(vName, vV1, vV2, vV3, vV4, vV5);
 
-    #define ARDO_DEBUG_MESSAGE(a,b)                             // to eliminate this within the arduino context
-    #define ARDO_DEBUG_VALUE(a,b)                               // to eliminate this within the arduino context
-    #define ARDO_TRACE_STEPPER_DIR(a, b)                        // to eliminate this within the arduino context
-    #define ARDO_TRACE_STEPPER_POS(a, b)                        // to eliminate this within the arduino context
-    #define ARDO_TRACE_SPEED(sid, value)                        // to eliminate this within the arduino context
+    #define ARDO_DEBUG_MESSAGE(a,b)                                         // to eliminate this within the arduino context
+    #define ARDO_DEBUG_VALUE(a,b)                                           // to eliminate this within the arduino context
+    #define ARDO_TRACE_STEPPER_DIR(a, b)                                    // to eliminate this within the arduino context
+    #define ARDO_TRACE_STEPPER_POS(a, b)                                    // to eliminate this within the arduino context
+    #define ARDO_TRACE_SPEED(sid, value)                                    // to eliminate this within the arduino context
+    #define ARDO_TRACE_MOVE(sid, dx, dy, dz)                                // to eliminate this within the arduino context
 
   #endif // #ifndef SKETCH_COMPILE
 

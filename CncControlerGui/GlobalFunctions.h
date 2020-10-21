@@ -27,6 +27,8 @@ class GblFunc {
 	
 		static void appendToStackTraceFile(const wxString& st);
 		static void appendToStackTraceFileTS(const wxString& st);
+		
+		static bool executeExternalProgram(const wxString& tool, const wxString& file, bool checkToolExists=true);
 };
 
 #define APPEND_THREAD_ID_TO_STACK_TRACE_FILE			GblFunc::appendToStackTraceFileTS(wxString::Format("%s: TID=[%ld]",    CNC_LOG_FUNCT, wxThread::GetCurrentId()));

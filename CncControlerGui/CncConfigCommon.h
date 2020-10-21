@@ -86,6 +86,7 @@
 	#define CncApplication_Tool_BROWSER					 	"CncApplication.Tools/OSD_BROWSER"
 	#define CncApplication_Tool_EXTERNAL_EDITOR				"CncApplication.Tools/OSD_EXTERNAL_EDITOR"
 	#define CncApplication_Tool_EXTERNAL_HEX_EDITOR			"CncApplication.Tools/OSD_EXTERNAL_HEX_EDITOR"
+	#define CncApplication_Tool_VEUSZ_PLOTTER				"CncApplication.Tools/OSD_VEUSZ_PLOTTER"
 	#define CncApplication_Tool_PY_CAM 						"CncApplication.Tools/OSD_PY_CAM"
 	
 	#define CncSvg_Parser_REVERSE_Y_AXIS					"CncSvg.Parser/CONVERT_TO_RIGHT_HAND"
@@ -103,6 +104,7 @@
 	#define CncWork_Ctl_PRE_PROSSOR_ANALYSE					"CncWork.Controller/PRE_PROSSOR_ANALYSE"
 	#define CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY				"CncWork.Controller/PRE_PROSSOR_SKIP_EMPTY"
 	#define CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES			"CncWork.Controller/PRE_PROSSOR_COMBINE_MOVES"
+	#define CncWork_Ctl_PRE_PROSSOR_USE_OPERATING_TRACE		"CncWork.Controller/PRE_PROSSOR_USE_OPERATING_TRACE"
 	#define CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES	"CncWork.Controller/PRE_PROSSOR_CNT_PATH_LIST_ENTRIES"
 	#define CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES		"CncWork.Controller/PRE_PROSSOR_CNT_SEQUENCE_MOVES"
 

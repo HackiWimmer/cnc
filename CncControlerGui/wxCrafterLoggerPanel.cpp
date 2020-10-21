@@ -161,7 +161,7 @@ CncLoggerViewBase::CncLoggerViewBase(wxWindow* parent, wxWindowID id, const wxPo
     
     m_btSave = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btSave->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_save")), wxLEFT);
+    m_btSave->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_save.1")), wxLEFT);
     m_btSave->SetBitmapMargins(2,2);
     #endif
     m_btSave->SetToolTip(_("Save visible Logger content  to Clipborad"));

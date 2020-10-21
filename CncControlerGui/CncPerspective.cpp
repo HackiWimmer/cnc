@@ -5,11 +5,10 @@
 #include "wxCrafterImages.h"
 #include "CncPerspective.h"
 
-const char* configGroupName 				= "Perspectives";
-const char* paneListSuffix 					= ".PaneList";
-const char* userPerspectivePrefix			= "*";
-
-const char  nameEnclose						= '\'';
+const char* CncPerspective::configGroupName 				= "Perspectives";
+const char* CncPerspective::paneListSuffix 					= ".PaneList";
+const char* CncPerspective::userPerspectivePrefix			= "*";
+const char  CncPerspective::nameEnclose						= '\'';
 
 ///////////////////////////////////////////////////////////////////
 CncPerspective::CncPerspective(wxConfigBase* cfg, wxMenu* m) 

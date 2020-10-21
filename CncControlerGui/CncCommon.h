@@ -8,6 +8,7 @@
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
 
+#include "CncPosition.h"
 #include "CncStreamBuffers.h"
 #include "StdStreamRedirector.h"
 
@@ -76,6 +77,7 @@ namespace cnc {
 #define CNC_PRINT_FUNCT 			std::cout << CNC_LOG_FUNCT 				<< std::endl;
 #define CNC_PRINT_FUNCT_A(msg)		std::cout << CNC_LOG_FUNCT_A(msg) 		<< std::endl;
 
+
 namespace cnc {
 	
 	typedef std::vector<int32_t> 						SetterValueList;
@@ -101,6 +103,10 @@ namespace cnc {
 	
 	bool dblCompare(const double a, const double b, const double eps = std::numeric_limits<double>::epsilon());
 	bool dblCompareNull(const double a, const double eps = std::numeric_limits<double>::epsilon());
+	
+	const wxString& longFormat(const CncLongPosition& p);
+	const wxString& dblFormat(const CncDoublePosition& p);
+	
 	const wxString& dblFormat1(const double d);
 	const wxString& dblFormat2(const double d1, const double d2, const wxString& delimiter = _T(","));
 	const wxString& dblFormat3(const double d1, const double d2, const double d3, const wxString& delimiter = _T(","));
@@ -160,9 +166,17 @@ class MonitorBookSelection {
 class TemplateBookSelection {
 	public:
 		enum VAL {
+			SOURCE_PANEL				= 0,
+			EXT_INFO_PANEL				= 1
+		};
+};
+
+//-----------------------------------------------------------------
+class SourceBookSelection {
+	public:
+		enum VAL {
 			OBSERVER					= 0,
-			SOURCE_PANEL				= 1,
-			EXT_INFO_PANEL				= 2
+			EDITOR						= 1
 		};
 };
 

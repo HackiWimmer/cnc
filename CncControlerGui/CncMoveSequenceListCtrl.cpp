@@ -85,6 +85,7 @@ CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 	infoText->SetFont(infoFont);
 	infoText->SetLabel("Disabled, because the corresponding\nconfiguration parameter\n'Work::Preprocessor\\Analyse Pathes' isn't active!");
 	infoText->SetPosition(pt);
+	infoText->SetForegroundColour(GetTextColour());
 }
 /////////////////////////////////////////////////////////////
 CncMoveSequenceListCtrl::~CncMoveSequenceListCtrl() {
@@ -236,13 +237,11 @@ void CncMoveSequenceListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 	event.Skip();
 
-	const bool show = THE_CONFIG->getPreProcessorAnalyseFlag() == false && active;
+	const bool show = THE_CONFIG->getPreProcessorAnalyseFlag() == false && active && moveSequence == NULL;
 	infoText->Show(show);
 	
-	if ( active ) {
-		if ( THE_CONFIG->getPreProcessorAnalyseFlag() == false ) 
-			clear();
-	}
+	if ( show ) 
+		clearAll();
 }
 /////////////////////////////////////////////////////////////
 wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
@@ -250,18 +249,18 @@ wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
 	static const wxString fmt(globalStrings.moveSeqRefFormat);
 
 	if ( moveSequence == NULL )
-		return _("");
+		return _("a");
 	
 	if ( moveSequence->getCount() == 0 ) {
 		switch ( column ) {
 			case CncMoveSequenceListCtrl::COL_TYPE:		return wxString::Format("%d",		2); 
 		}
 		
-		return _("");
+		return _("b");
 	}
 
-	if ( item < 0 || item > (long)(moveSequence->getCount() -1) )
-		return _("");
+	if ( item < 0 || item > (long)(moveSequence->getCount() - 1) )
+		return _("c");
 
 	auto it = moveSequence->const_begin() + item;
 	const CncMoveSequence::SequencePoint& sp = *it;
@@ -274,7 +273,7 @@ wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
 		case CncMoveSequenceListCtrl::COL_DISTANCE_Z:	return wxString::Format("%10ld", 	(long)sp.z);
 	}
 	
-	return _("");
+	return _("d");
 }
 
 

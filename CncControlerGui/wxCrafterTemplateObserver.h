@@ -13,8 +13,8 @@
 #include <wx/panel.h>
 #include <wx/artprov.h>
 #include <wx/sizer.h>
-#include <wx/stattext.h>
 #include <wx/checkbox.h>
+#include <wx/stattext.h>
 #include <wx/radiobox.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
@@ -39,7 +39,6 @@
 class CncTemplateObserverBase : public wxPanel
 {
 protected:
-    wxStaticText* m_staticText6508;
     wxCheckBox* m_observationMode;
     wxStaticText* m_staticText6553;
     wxRadioBox* m_actionSelection;
@@ -59,7 +58,6 @@ protected:
     virtual void observe(wxTimerEvent& event) { event.Skip(); }
 
 public:
-    wxStaticText* GetStaticText6508() { return m_staticText6508; }
     wxCheckBox* GetObservationMode() { return m_observationMode; }
     wxStaticText* GetStaticText6553() { return m_staticText6553; }
     wxRadioBox* GetActionSelection() { return m_actionSelection; }

@@ -1,8 +1,9 @@
 #include <wx/propgrid/manager.h>
 #include "wxCrafterImages.h"
-#include "MainFrameProxy.h"
 #include "CncConfigCommon.h"
 #include "CncConfig.h"
+#include "MainFrameProxy.h"
+#include "CncPreprocessor.h"
 #include "CncConfigProperty.h"
 
 extern wxPropertyGridManager* 	globlSetupGrid;
@@ -38,6 +39,16 @@ void CncConfig::pgChangedWorkingCfgPage(wxPropertyGridEvent& event) {
 		p = getProperty(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES); 
 		wxASSERT(p); 
 		p->Enable(analyse);
+	}
+	else if ( name == CncWork_Ctl_PRE_PROSSOR_USE_OPERATING_TRACE ) {
+		APP_PROXY::getCncPreProcessor()->enableOperatingTrace	(THE_CONFIG->getPreProcessorUseOperatingTrace());
+		CNC_PRINT_LOCATION
+	}
+	else if ( name == CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES ) {
+		APP_PROXY::getCncPreProcessor()->enablePathListEntries(THE_CONFIG->getPreProcessorCntPathListEntries());
+	}
+	else if ( name == CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES ) {
+		APP_PROXY::getCncPreProcessor()->enableMoveSequences	(THE_CONFIG->getPreProcessorCntMoveSequneces());
 	}
 }
 ////////////////////////////////////////////////////////////////////////
@@ -196,6 +207,13 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetEditor( wxT("CheckBox") );
 			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES, prop);
 			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Display operating trace information by default", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_USE_OPERATING_TRACE, prop);
+
 			//...............
 			prop = ctl->AppendChild( new wxBoolProperty("Connect List 'PathListEnties' by default", NEXT_PROP_ID, true));
 			prop->Enable(true);

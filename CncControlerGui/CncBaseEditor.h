@@ -71,6 +71,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		bool selectLineNumbers(unsigned long firstLine, unsigned long lastLine);
 		
 		void prepareNewTemplateFile(CncTemplateFormat tf);
+		void setNewTemplateFileName(const wxString& fileName);
 		bool openFile(const wxString& fileName);
 		bool saveFile();
 		bool saveFileAs(const wxString& fileName);

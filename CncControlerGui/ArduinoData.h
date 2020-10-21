@@ -123,8 +123,8 @@ namespace AE {
 		static PinLevel 	convertPinLevel(bool state);
 		static PinName 		convertPinName(unsigned char pin);
 		static PinName		convertPinName(const char type, int name);
-		static wxString		buildDislpayName(PinName pin);
-		static wxString		buildDislpayName(const char type, int name);
+		static wxString		buildDisplayName(PinName pin);
+		static wxString		buildDisplayName(const char type, int name);
 	};
 	
 };

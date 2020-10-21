@@ -105,7 +105,6 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 
     // render interface
     virtual byte        checkRuntimeEnv();
-
     virtual void        notifyMovePartInit    (){}
     virtual void        notifyMovePartBefore  ();
     virtual void        notifyMovePartAfter   ();

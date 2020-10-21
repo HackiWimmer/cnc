@@ -100,7 +100,7 @@ CncArduinoPinsListCtrl::CncArduinoPinsListCtrl(wxWindow *parent, long style)
 	
 	// build up alias
 	for ( auto it = pins.begin(); it != pins.end(); ++it )
-		pinAlias[AE::ArduinoData::buildDislpayName(it->type, it->name)] = *it;
+		pinAlias[AE::ArduinoData::buildDisplayName(it->type, it->name)] = *it;
 	
 	SetItemCount(pins.size());
 	
@@ -113,9 +113,9 @@ CncArduinoPinsListCtrl::~CncArduinoPinsListCtrl() {
 /////////////////////////////////////////////////////////////
 void CncArduinoPinsListCtrl::updatePinValue(const char type, unsigned int name, const char mode, int value) {
 /////////////////////////////////////////////////////////////
-	auto itAlias = pinAlias.find(AE::ArduinoData::buildDislpayName(type, name));
+	auto itAlias = pinAlias.find(AE::ArduinoData::buildDisplayName(type, name));
 	if ( itAlias == pinAlias.end() ) {
-		std::cerr << CNC_LOG_LOCATION << ": Can't find: " << AE::ArduinoData::buildDislpayName(type, name) << std::endl;
+		std::cerr << CNC_LOG_LOCATION << ": Can't find: '" << (int)type << "', '" << name << "', " << AE::ArduinoData::buildDisplayName(type, name) << "'" << std::endl;
 		return;
 	}
 		

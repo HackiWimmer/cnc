@@ -230,7 +230,6 @@ class SerialEmulatorNULL  : public wxEvtHandler,
 		inline bool initRenderAndMove(int32_t dx, int32_t dy, int32_t dz);
 		// render and step axis
 		inline bool renderAndMove(int32_t dx, int32_t dy, int32_t dz);
-
 		
 		inline void reset();
 		inline unsigned char signalHandling();

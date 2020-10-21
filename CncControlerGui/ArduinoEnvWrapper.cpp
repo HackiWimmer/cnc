@@ -115,6 +115,14 @@ void			AE::ardoTraceSpeed(char id, int32_t val)
 #endif
 
 // .................................................................
+void			AE::ardoTraceMove(uint8_t sid, int32_t dx, int32_t dy, int32_t dz)
+#ifdef JOIN_SERIAL_THREAD
+				{ SerialThread::ardoTraceMove(sid, dx, dy, dz); }
+#else
+				{}
+#endif
+
+// .................................................................
 const char*		AE::ardoGetCmdLabel(unsigned char c)
 #ifdef JOIN_SERIAL_THREAD
 				{ return SerialThread::ardoGetCmdLabel(c); }

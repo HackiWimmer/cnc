@@ -53,7 +53,7 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		prop->Enable(true);
 		prop->SetHelpString(_T("Restart required"));
 		prop->SetEditor( wxT("ComboBox") );
-		CncConfig::registerProperty(CncApplication_DEF_DISPLAY_UNIT, prop);
+		registerProperty(CncApplication_DEF_DISPLAY_UNIT, prop);
 		
 		//...............
 		prop = root->AppendChild( new wxBoolProperty("Auto connect port on startup", NEXT_PROP_ID, true));
@@ -201,6 +201,12 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			prop->Enable(true);
 			prop->SetHelpString("");
 			registerProperty(CncApplication_Tool_EXTERNAL_HEX_EDITOR, prop);
+			
+			//...............
+			prop = tools->AppendChild( new wxFileProperty("External Veusz Plotter", NEXT_PROP_ID, "notepad"));
+			prop->Enable(true);
+			prop->SetHelpString("");
+			registerProperty(CncApplication_Tool_VEUSZ_PLOTTER, prop);
 			
 			//...............
 			prop = tools->AppendChild( new wxFileProperty("PyCam", NEXT_PROP_ID, ""));

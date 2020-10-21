@@ -116,6 +116,14 @@ class CncPreprocessorBase : public wxPanel
 {
 protected:
     wxListbook* m_listbookPreProcessor;
+    wxPanel* m_panel227;
+    wxStaticText* m_staticText6138142;
+    wxBitmapToggleButton* m_btConnectOperatingTrace;
+    wxBitmapButton* m_btClearOperatingTrace10;
+    wxBitmapButton* m_btClearOperatingTrace11;
+    wxBitmapButton* m_btClearOperatingTrace;
+    wxStaticLine* m_staticLine249;
+    wxPanel* m_operatingTracePlaceholder;
     wxPanel* m_panel7622;
     wxStaticText* m_staticText61381;
     wxStaticText* m_staticText7891;
@@ -145,12 +153,24 @@ protected:
     wxTextCtrl* m_selectedClientIds;
 
 protected:
+    virtual void connectOperatingTrace(wxCommandEvent& event) { event.Skip(); }
+    virtual void copyOperatingTrace(wxCommandEvent& event) { event.Skip(); }
+    virtual void saveOperatingTrace(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearOperatingTrace(wxCommandEvent& event) { event.Skip(); }
     virtual void connectPathListEntries(wxCommandEvent& event) { event.Skip(); }
     virtual void clearPathListEntries(wxCommandEvent& event) { event.Skip(); }
     virtual void connectMoveSequences(wxCommandEvent& event) { event.Skip(); }
     virtual void clearMoveSequences(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText6138142() { return m_staticText6138142; }
+    wxBitmapToggleButton* GetBtConnectOperatingTrace() { return m_btConnectOperatingTrace; }
+    wxBitmapButton* GetBtClearOperatingTrace10() { return m_btClearOperatingTrace10; }
+    wxBitmapButton* GetBtClearOperatingTrace11() { return m_btClearOperatingTrace11; }
+    wxBitmapButton* GetBtClearOperatingTrace() { return m_btClearOperatingTrace; }
+    wxStaticLine* GetStaticLine249() { return m_staticLine249; }
+    wxPanel* GetOperatingTracePlaceholder() { return m_operatingTracePlaceholder; }
+    wxPanel* GetPanel227() { return m_panel227; }
     wxStaticText* GetStaticText61381() { return m_staticText61381; }
     wxStaticText* GetStaticText7891() { return m_staticText7891; }
     wxTextCtrl* GetPathListRowCount() { return m_pathListRowCount; }

@@ -110,6 +110,7 @@ byte ArduinoPositionRenderer::stepping() {
     if ( RS::empty() )
       return RET_OK;
 
+    ARDO_TRACE_MOVE(POS_STORE_SID_STEPPING, (int32_t)RS::dx(), (int32_t)RS::dy(), (int32_t)RS::dz());    
     notifyMovePartInit();  
       
     RS::impulseCount++;
@@ -153,6 +154,7 @@ byte ArduinoPositionRenderer::stepping() {
 /////////////////////////////////////////////////////////////////////////////////////
 byte ArduinoPositionRenderer::directMove(int8_t dx, int8_t dy, int8_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
+  ARDO_TRACE_MOVE(POS_STORE_SID_DIRECT_MOVE, (int32_t)dx, (int32_t)dy, (int32_t)dz);
   mode = DirectMove;
 
   if ( SET_DIRECTION_X(dx) == false )
@@ -181,6 +183,8 @@ byte ArduinoPositionRenderer::directMove(int8_t dx, int8_t dy, int8_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
 byte ArduinoPositionRenderer::renderMove(int32_t dx, int32_t dy, int32_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
+  ARDO_TRACE_MOVE(POS_STORE_SID_RENDER_AND_MOVE, dx, dy, dz);
+
   // avoid empty processing
   if ( dx == 0 && dy == 0 && dz == 0 ) 
     return RET_OK;

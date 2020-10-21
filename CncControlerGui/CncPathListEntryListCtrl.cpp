@@ -92,8 +92,8 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 		
 	const CncPathListEntry& cpe = pathLists.at(item);
 	
-	const bool displaySpeed    = ( cpe.isSpeedChange()    == true || cpe.isNothingChange() == true );
-	const bool displayPosition = ( cpe.isPositionChange() == true || cpe.isNothingChange() == true );
+	const bool displaySpeed    = ( cpe.isSpeedChange()    == true || cpe.isNothingChanged() == true );
+	const bool displayPosition = ( cpe.isPositionChange() == true || cpe.isNothingChanged() == true );
 	
 	switch ( column ) {
 		case CncPathListEntryListCtrl::COL_TYPE:			return wxString::Format("%d", 		cpe.type);

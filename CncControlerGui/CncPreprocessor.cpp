@@ -5,7 +5,25 @@
 #include "CncContext.h"
 #include "CncMoveSequenceListCtrl.h"
 #include "CncPathListEntryListCtrl.h"
+#include "CncLoggerListCtrl.h"
+#include "CncFileNameService.h"
 #include "CncPreprocessor.h"
+
+
+class CncOperatingTrace : public CncExtLoggerListCtrl {
+	public:
+		
+		CncOperatingTrace(wxWindow *parent, long style)
+		: CncExtLoggerListCtrl(parent, style)
+		{}
+		
+		virtual ~CncOperatingTrace()
+		{}
+		
+		typedef wxListItemAttr LIA;
+		void addMovSeqSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(128, 128, 255), GetFont()); add(s, lia); }
+		void addPthLstSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(255, 140, 198), GetFont()); add(s, lia); }
+};
 
 // ----------------------------------------------------------------------------
 // CncPreprocessor Event Table
@@ -17,9 +35,11 @@ wxEND_EVENT_TABLE()
 //////////////////////////////////////////////////////////////////
 CncPreprocessor::CncPreprocessor(wxWindow* parent)
 : CncPreprocessorBase(parent)
-, pathListEntries(NULL)
-, moveSequenceOverview(NULL)
-, moveSequence(NULL)
+, useOperatingTrace		(true)
+, pathListEntries		(NULL)
+, moveSequenceOverview	(NULL)
+, moveSequence			(NULL)
+, operatingTrace		(NULL)
 //////////////////////////////////////////////////////////////////
 {
 	// path list entries control
@@ -29,26 +49,32 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 	// move sequences control
 	moveSequence = new CncMoveSequenceListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL);
 	GblFunc::replaceControl(m_moveSequencesPlaceholder, moveSequence);
-
+	
 	// move sequences control
 	moveSequenceOverview = new CncMoveSequenceOverviewListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL, moveSequence, m_contentLabel);
 	GblFunc::replaceControl(m_moveSequencesListPlaceholder, moveSequenceOverview);
-
+	
+	// operating trace
+	operatingTrace = new CncOperatingTrace(this, wxLC_SINGLE_SEL); 
+	GblFunc::replaceControl(m_operatingTracePlaceholder, operatingTrace);
+	
 	const wxFont font = THE_CONTEXT->outboundListBookFont;
 	m_listbookPreProcessor->GetListView()->SetFont(font);
 }
 //////////////////////////////////////////////////////////////////
 CncPreprocessor::~CncPreprocessor() {
 //////////////////////////////////////////////////////////////////
-	delete pathListEntries;
-	delete moveSequenceOverview;
-	delete moveSequence;
+	wxDELETE( pathListEntries );
+	wxDELETE( moveSequenceOverview );
+	wxDELETE( moveSequence );
+	wxDELETE( operatingTrace ); 
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearAll() {
 //////////////////////////////////////////////////////////////////
 	clearPathListEntries();
 	clearMoveSequences();
+	clearOperatingTrace();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearPathListEntries() {
@@ -62,18 +88,27 @@ void CncPreprocessor::clearMoveSequences() {
 	moveSequence->clearAll();
 }
 //////////////////////////////////////////////////////////////////
-void CncPreprocessor::freeze() {
+void CncPreprocessor::clearOperatingTrace() {
+//////////////////////////////////////////////////////////////////
+	operatingTrace->clearAll();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::popProcessMode() {
 //////////////////////////////////////////////////////////////////
 	pathListEntries->freeze();
 	moveSequence->freeze();
 	moveSequenceOverview->freeze();
+	
+	operatingTrace->popProcessMode();
 }
 //////////////////////////////////////////////////////////////////
-void CncPreprocessor::thaw() {
+void CncPreprocessor::pushUpdateMode() {
 //////////////////////////////////////////////////////////////////
 	pathListEntries->thaw();
 	moveSequence->thaw();
 	moveSequenceOverview->thaw();
+	
+	operatingTrace->pushUpdateMode();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::enablePathListEntries(bool state) {
@@ -85,7 +120,6 @@ void CncPreprocessor::enablePathListEntries(bool state) {
 	state == true ? m_btConnectPathListEntries->SetToolTip("Disable List")	: m_btConnectPathListEntries->SetToolTip("Enable List");
 	
 	m_btConnectPathListEntries->SetValue(state);
-	
 	m_btConnectPathListEntries->Refresh();
 	m_btConnectPathListEntries->Update();
 	
@@ -102,7 +136,6 @@ void CncPreprocessor::enableMoveSequences(bool state) {
 	state == true ? m_btConnectMoveSequences->SetToolTip("Disable List")	: m_btConnectMoveSequences->SetToolTip("Enable List");
 	
 	m_btConnectMoveSequences->SetValue(state);
-	
 	m_btConnectMoveSequences->Refresh();
 	m_btConnectMoveSequences->Update();
 	
@@ -111,6 +144,23 @@ void CncPreprocessor::enableMoveSequences(bool state) {
 		
 	moveSequence->setActive(state);
 	moveSequence->Refresh();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::enableOperatingTrace(bool state) {
+//////////////////////////////////////////////////////////////////
+	wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
+	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
+	
+	state == true ? m_btConnectOperatingTrace->SetBitmap(bmpOn) 			: m_btConnectOperatingTrace->SetBitmap(bmpOff);
+	state == true ? m_btConnectOperatingTrace->SetToolTip("Disable List")	: m_btConnectOperatingTrace->SetToolTip("Enable List");
+	
+	m_btConnectOperatingTrace->SetValue(state);
+	m_btConnectOperatingTrace->Refresh();
+	m_btConnectOperatingTrace->Update();
+
+	useOperatingTrace = state;
+	if ( useOperatingTrace == false )
+		clearOperatingTrace();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::addMoveSequence(const CncMoveSequence& seq) {
@@ -127,6 +177,67 @@ void CncPreprocessor::addPathListEntry(const CncPathListEntry& cpe) {
 		return;
 	
 	pathListEntries->addPathListEntry(cpe);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addOperatingTrace(const wxString& s) {
+//////////////////////////////////////////////////////////////////
+	if ( useOperatingTrace == false )
+		return;
+		
+	operatingTrace->add(s);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addOperatingTrace(const std::stringstream& s) {
+//////////////////////////////////////////////////////////////////
+	addOperatingTrace(s.str().c_str());
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addOperatingTraceMovSeqSep(const wxString& s) {
+//////////////////////////////////////////////////////////////////
+	if ( useOperatingTrace == false )
+		return;
+		
+	operatingTrace->addMovSeqSep(s);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addOperatingTracePthLstSep(const wxString& s) {
+//////////////////////////////////////////////////////////////////
+	if ( useOperatingTrace == false )
+		return;
+		
+	operatingTrace->addPthLstSep(s);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addOperatingTraceSeparator(const wxString& s) {
+//////////////////////////////////////////////////////////////////
+	if ( useOperatingTrace == false )
+		return;
+		
+	operatingTrace->addSeparator(s);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addOperatingTraceDebugEntry(const wxString& s) {
+//////////////////////////////////////////////////////////////////
+	if ( useOperatingTrace == false )
+		return;
+		
+	operatingTrace->addDebugEntry(s);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addOperatingTraceWarnEntry(const wxString& s) {
+//////////////////////////////////////////////////////////////////
+	if ( useOperatingTrace == false )
+		return;
+		
+	operatingTrace->addWarnEntry(s);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addOperatingTraceErrorEntry(const wxString& s) {
+//////////////////////////////////////////////////////////////////
+	if ( useOperatingTrace == false )
+		return;
+		
+	operatingTrace->addErrorEntry(s);
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearMoveSequences(wxCommandEvent& event) {
@@ -147,6 +258,11 @@ void CncPreprocessor::connectMoveSequences(wxCommandEvent& event) {
 void CncPreprocessor::connectPathListEntries(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 	enablePathListEntries(m_btConnectPathListEntries->GetValue());
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::connectOperatingTrace(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	enableOperatingTrace(m_btConnectOperatingTrace->GetValue());
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::selectClientId(long id, ListType lt) {
@@ -195,3 +311,30 @@ void CncPreprocessor::onIndividualCommand(wxCommandEvent& event) {
 	}
 }
 
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::clearOperatingTrace(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	clearOperatingTrace();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::copyOperatingTrace(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	operatingTrace->copyToClipboard(true);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::saveOperatingTrace(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	const wxString& fileName(wxString::Format("%s%s%s%s",	CncFileNameService::getTempDirSession(), 
+															"CncPreprocessorOperatingTrace", 
+															wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S"), 
+															".txt")
+											 );
+	const wxFileName fn(fileName);
+	
+	operatingTrace->writeToFile(fn, true);
+	if ( fn.Exists() ) {
+		wxString tool;
+		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+		GblFunc::executeExternalProgram(tool, fileName, true);
+	}
+}

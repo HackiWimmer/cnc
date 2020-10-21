@@ -5,6 +5,7 @@
 #include "CncConfigCommon.h"
 #include "CncUnitCalculator.h"
 #include "CncContext.h"
+#include "CncPerspective.h"
 #include "wxCrafterImages.h"
 #include "CncConfig.h"
 
@@ -16,11 +17,11 @@ wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 ////////////////////////////////////////////////////////////////////////
 // init static members
 unsigned int CncConfig::globalPropertyCounter	= 0;
-CncConfig*   CncConfig::globalCncConfig 		= NULL;
+CncConfig*   CncConfig::globalCncConfig			= NULL;
 
 ////////////////////////////////////////////////////////////////////////
 // global variables - uses in dedicated pages
-wxPropertyGridManager* globlSetupGrid 	= NULL;
+wxPropertyGridManager* globlSetupGrid			= NULL;
 
 ConfigPGEventMap  globalPGEventMap;
 ConfigPropertyMap globalPropertyMap;
@@ -63,7 +64,10 @@ bool CncConfig::ToolMagazineEntry::deserialize(const wxString& input) {
 }
 ////////////////////////////////////////////////////////////////////////
 CncConfig::CncConfig(MainFrame* app) 
-: changed(true)
+: loadTrace()
+, saveTrace()
+, obsoleteTrace()
+, changed(true)
 , notificationActivated(true)
 , osdConfigList()
 , currentUnit(CncSteps)
@@ -438,7 +442,7 @@ void CncConfig::registerProperty(const wxString& name, wxPGProperty* prop) {
 	if ( prop->IsEnabled() == false ) { 
 		globlSetupGrid->SetPropertyAttribute(prop, Attribute_READONLY, "TRUE", 0);
 		prop->Enable(true);
-		prop->SetBackgroundColour(*wxLIGHT_GREY);
+		prop->SetBackgroundColour(wxColour(64, 64, 64));
 		prop->SetHelpString(wxString::Format("%s\n%s", "<Readonly>", prop->GetHelpString()));
 	}
 	
@@ -482,9 +486,12 @@ void CncConfig::setupGlobalConfigurationGrid(wxPropertyGridManager* sg, wxConfig
 	
 	// decoration grid
 	globlSetupGrid->GetGrid()->ResetColours();
-	globlSetupGrid->GetGrid()->SetCaptionBackgroundColour(wxColour(128,128,255));
-	globlSetupGrid->GetGrid()->SetCaptionTextColour(wxColour(255,255,255));
-	globlSetupGrid->GetGrid()->SetCellBackgroundColour(wxColour(255,255,255));
+	globlSetupGrid->GetGrid()->SetCaptionBackgroundColour(*wxBLACK);
+	globlSetupGrid->GetGrid()->SetCaptionTextColour(*wxWHITE);
+	globlSetupGrid->GetGrid()->SetCellBackgroundColour(*wxWHITE);
+	globlSetupGrid->GetGrid()->SetCellTextColour(*wxBLACK);
+	globlSetupGrid->GetGrid()->SetMarginColour(*wxBLACK);
+	globlSetupGrid->GetGrid()->SetLineColour(*wxLIGHT_GREY);
 	
 	// decorate ans setup pages
 	setupWorkingCfgPage(cfg);
@@ -501,12 +508,10 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 	if ( val.Trim(true).Trim(false).IsEmpty() )
 		return false;
 		
-	wxString propName(wxString::Format("%s/%s", groupName, entryName));
+	const wxString propName(wxString::Format("%s/%s", groupName, entryName));
 	wxPGProperty* prop = CncConfig::getProperty(propName, true);
 	if ( prop == NULL )
 		return loadNonGuiConfig(groupName, entryName, value);
-	
-	wxString propType(prop->GetValueType());
 	
 	if ( entryName.StartsWith("OSD_") == true ) {
 		// add the ODS list string
@@ -515,47 +520,56 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 		osdConfigList.get(groupName, entryName, val);
 	} 
 	
-	prop->SetValueFromString(val);
-	//prop->SetValue(val);
+	// SetValueFromString cut paths down to file if wxPG_FULL_VALUE isn't set
+	prop->SetValueFromString(val, wxPG_FULL_VALUE );
 	
-	/*
-	if ( propType == wxPG_VARIANT_TYPE_LONG ) {
-		prop->SetValueFromString(val);
-	}
-
-	#define wxPG_VARIANT_TYPE_STRING        wxPGGlobalVars->m_strstring
-	#define wxPG_VARIANT_TYPE_LONG          wxPGGlobalVars->m_strlong
-	#define wxPG_VARIANT_TYPE_BOOL          wxPGGlobalVars->m_strbool
-	#define wxPG_VARIANT_TYPE_LIST          wxPGGlobalVars->m_strlist
-	#define wxPG_VARIANT_TYPE_DOUBLE        wxS("double")
-	#define wxPG_VARIANT_TYPE_ARRSTRING     wxS("arrstring")
-	#define wxPG_VARIANT_TYPE_DATETIME      wxS("datetime")
-	#define wxPG_VARIANT_TYPE_LONGLONG      wxS("longlong")
-	#define wxPG_VARIANT_TYPE_ULONGLONG     wxS("ulonglong")
-	*/
+	const wxString propType(prop->GetValueType());
+	
+	loadTrace 	<< groupName << "." << entryName			<< ":\t[" 
+				<< prop->GetValueType()						<< "], " 
+				<< prop->GetValueAsString()					<< ", " 
+				<< prop->GetValueAsString(wxPG_FULL_VALUE)	<< ", " 
+				<< prop->GetValue().GetString()				<< std::endl;
 	
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////
 bool CncConfig::loadNonGuiConfig(const wxString& groupName, const wxString& entryName, const wxString& value) {
 ////////////////////////////////////////////////////////////////////////
+	bool entryIsKnown = false;
+	
+	// "Perspectives"
+	if ( groupName == CncPerspective::getConfigGroupName() ) {
+		entryIsKnown = true;
+	}
 	// tool magazine
-	if ( groupName == CncToolMagazine_SECTION_NAME ) {
-		
+	else if ( groupName == CncToolMagazine_SECTION_NAME ) {
 		long toolId;
 		entryName.ToLong(&toolId);
 		
 		CncConfig::ToolMagazineEntry tme;
 		tme.deserialize(value);
 
-		if ( toolId >= TOOL_MAGAZINE_MIN_ID && toolId <= TOOL_MAGAZINE_MAX_ID )
+		if ( toolId >= TOOL_MAGAZINE_MIN_ID && toolId <= TOOL_MAGAZINE_MAX_ID ) {
 			toolMagazine[toolId] = tme;
+			entryIsKnown = true;
+		}
+	}
+	// tool magazine parameter
+	else if ( groupName == CncToolMagazineParam_SECTION_NAME ) {
+		if      ( entryName == CncToolMagazineParam_USE_DEF_TOOL)		{ entryIsKnown = true; toolMagazineParameter.useDefaultTool  = ( value == "0" ? false : true ); }
+		else if ( entryName == CncToolMagazineParam_MAP_DEF_TOOL_TO)	{ entryIsKnown = true; toolMagazineParameter.defaultMappedTo =  value; }
 	}
 	
-	// tool magazine parameter
-	if ( groupName == CncToolMagazineParam_SECTION_NAME ) {
-		if      ( entryName == CncToolMagazineParam_USE_DEF_TOOL)		{ toolMagazineParameter.useDefaultTool  = ( value == "0" ? false : true ); }
-		else if ( entryName == CncToolMagazineParam_MAP_DEF_TOOL_TO)	{ toolMagazineParameter.defaultMappedTo =  value; }
+	if ( entryIsKnown == false ) {
+		obsoleteTrace	<< groupName << "." << entryName 
+						<< ": Property isn't used currently." 
+						<< std::endl;
+	}
+	else {
+		loadTrace		<< groupName << "." << entryName 
+						<< ": Property is loaded."
+						<< std::endl;
 	}
 	
 	return true;
@@ -568,6 +582,9 @@ void CncConfig::loadConfiguration(wxConfigBase& config) {
 		
 	// ....... todo
 	toolMagazine.clear();
+	
+	loadTrace.str() = "";
+	obsoleteTrace.str() = "";
 	
 	// enumeration variables
 	wxArrayString groupNames;
@@ -610,18 +627,31 @@ void CncConfig::saveConfiguration(wxConfigBase& config) {
 	if ( globlSetupGrid == NULL )
 		return;
 		
-	wxMessageDialog dlg(NULL, _T("Do you realy save the current configuration?"), _T("Save Configuration  . . . "), wxYES|wxNO|wxCENTRE|wxICON_QUESTION);
+	wxMessageDialog dlg(NULL,	_T("Do you realy save the current configuration?"), 
+								_T("Save Configuration  . . . "), 
+								wxYES|wxNO|wxCENTRE|wxICON_QUESTION
+						);
+						
 	if ( dlg.ShowModal() != wxID_YES )
 		return;
+		
+	saveTrace.str() = "";
 	
 	for ( wxPGVIterator it = globlSetupGrid->GetVIterator(wxPG_ITERATE_ALL); !it.AtEnd(); it.Next() ) {
 		wxPGProperty* p = it.GetProperty();
 		
 		if ( p != NULL && p->IsCategory() == false ) {
 			
-			wxString entry(p->GetName());
+			const wxString entry(p->GetName());
 			if ( entry.StartsWith("#") == false ) {
-				wxString val(p->GetValueAsString());
+				
+				saveTrace	<< entry									<< " :\t[" 
+							<< p->GetValueType()						<< "], " 
+							<< p->GetValueAsString()					<< ", " 
+							<< p->GetValueAsString(wxPG_FULL_VALUE)		<< ", " 
+							<< p->GetValue().GetString()				<< std::endl;
+				
+				wxString val(p->GetValueAsString(wxPG_FULL_VALUE));
 				
 				if ( entry.Contains("OSD_") == true ) {
 					// add the ODS value string
@@ -666,6 +696,21 @@ void CncConfig::saveNonGuiConfig(wxConfigBase& config) {
 	
 	
 	//...
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::updateLoadTrace(wxTextCtrl* lTrace, wxTextCtrl*oTrace) {
+////////////////////////////////////////////////////////////////////////
+	if ( lTrace != NULL )
+		lTrace->ChangeValue(loadTrace.str().c_str());
+		
+	if ( oTrace != NULL )
+		oTrace->ChangeValue(obsoleteTrace.str().c_str());
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::updateSaveTrace(wxTextCtrl* sTrace) {
+////////////////////////////////////////////////////////////////////////
+	if ( sTrace != NULL )
+		sTrace->ChangeValue(saveTrace.str().c_str());
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::releaseChangedCallback(wxPGProperty* prop) {
@@ -966,8 +1011,10 @@ const bool CncConfig::getInverseCtrlDirectionZFlag()				{ PROPERTY(CncWork_Ctl_I
 const bool CncConfig::getPreProcessorAnalyseFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_ANALYSE) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessoSkipEmptyFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCombineMovesFlag()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorUseOperatingTrace()			{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_USE_OPERATING_TRACE) 	return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCntPathListEntries()			{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES) 	return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCntMoveSequneces()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES) 		return p->GetValue().GetBool(); }
+
 
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }
@@ -1020,6 +1067,7 @@ const wxString& CncConfig::getXMLFileViewer(wxString& ret)			{ PROPERTY(CncAppli
 const wxString& CncConfig::getBrowser(wxString& ret)				{ PROPERTY(CncApplication_Tool_BROWSER)					ret.assign(p->GetValue().GetString()); return ret; }
 const wxString& CncConfig::getEditorTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_EXTERNAL_EDITOR)			ret.assign(p->GetValue().GetString()); return ret; }
 const wxString& CncConfig::getHexEditorTool(wxString& ret)			{ PROPERTY(CncApplication_Tool_EXTERNAL_HEX_EDITOR)		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getVeuszPlotterTool(wxString& ret)		{ PROPERTY(CncApplication_Tool_VEUSZ_PLOTTER)			ret.assign(p->GetValue().GetString()); return ret; }
 const wxString& CncConfig::getPyCamTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_PY_CAM)					ret.assign(p->GetValue().GetString()); return ret; }
 const wxString& CncConfig::getDefaultSpeedModeXYZ(wxString& ret)	{ PROPERTY(CncConfig_DEF_SPEED_MODE_XYZ)				ret.assign(p->GetValue().GetString()); return ret; }
 const wxString& CncConfig::getDefaultPort(wxString& ret)			{ PROPERTY(CncApplication_Com_DEFALT_PORT)				ret.assign(p->GetValue().GetString()); return ret; }

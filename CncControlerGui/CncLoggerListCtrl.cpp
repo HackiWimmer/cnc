@@ -21,8 +21,15 @@ CncLoggerListCtrl::LoggerEntry::LoggerEntry()
 , result		()
 , listItemAttr	(defaultItemAttr)
 /////////////////////////////////////////////////////////////
-{
-}
+{}
+
+/////////////////////////////////////////////////////////////
+CncLoggerListCtrl::LoggerEntry::LoggerEntry(const wxString& t, const wxString& r, const wxListItemAttr& a)
+: text			(t)
+, result		(r)
+, listItemAttr	(a)
+/////////////////////////////////////////////////////////////
+{}
 
 // ----------------------------------------------------------------------------
 // CncSetterListCtrl Event Table
@@ -49,6 +56,7 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 , entries					() 
 , updateMode				(UM_Normal)
 , updateModePreviously		(UM_Normal)
+, joinTheApp				(false)
 , showOnDemand				(false)
 , anyUpdate					(false)
 , selectedItem				(wxNOT_FOUND)
@@ -207,6 +215,21 @@ void CncLoggerListCtrl::add(const wxString& text) {
 	updateContent();
 }
 /////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::add(const wxString& text, const wxListItemAttr& lia) {
+/////////////////////////////////////////////////////////////
+	if ( entries.size() == 0 )
+		next();
+	
+	wxListItemAttr prevAttr(entries.back().listItemAttr);
+	
+	entries.push_back(std::move(LoggerEntry(text,"", lia)));
+	next();
+	
+	entries.back().listItemAttr = prevAttr;
+	
+	updateContent();
+}
+/////////////////////////////////////////////////////////////
 bool CncLoggerListCtrl::isItemValid(long item) const {
 /////////////////////////////////////////////////////////////
 	return item >= 0 && item < (long)(entries.size());
@@ -270,14 +293,16 @@ void CncLoggerListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::updateContent() {
 /////////////////////////////////////////////////////////////
-	if (   showOnDemand 		== true  
-		&& IsShownOnScreen()	== false 
-		&& IsShown() 			== true
-	   ) 
-	{
-		if ( CNC_READY ) {
-			THE_APP->showAuiPane("Logger");
-			THE_APP->getLoggerView()->select(LoggerSelection::VAL::CNC);
+	if ( joinTheApp == true ) {
+		if (   showOnDemand 		== true  
+			&& IsShownOnScreen()	== false 
+			&& IsShown() 			== true
+		   ) 
+		{
+			if ( CNC_READY ) {
+				THE_APP->showAuiPane("Logger");
+				THE_APP->getLoggerView()->select(LoggerSelection::VAL::CNC);
+			}
 		}
 	}
 	
@@ -289,8 +314,8 @@ void CncLoggerListCtrl::updateContent() {
 	SetItemCount(entries.size());
 	
 	if ( IsShownOnScreen() == true ) {
-		Refresh();
 		EnsureVisible(GetItemCount() - 1);
+		Refresh();
 	}
 }
 //////////////////////////////////////////////////
@@ -300,8 +325,8 @@ void CncLoggerListCtrl::onDisplayTimer(wxTimerEvent& event) {
 		
 		SetItemCount(entries.size());
 		if ( IsShownOnScreen() == true ) {
-			Refresh();
 			EnsureVisible(GetItemCount() - 1);
+			Refresh();
 		}
 		anyUpdate = false;
 	}
@@ -315,6 +340,7 @@ void CncLoggerListCtrl::onSize(wxSizeEvent& event) {
 //////////////////////////////////////////////////
 void CncLoggerListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
+	wxPaintDC dc(this);
 	event.Skip();
 }
 //////////////////////////////////////////////////
@@ -343,6 +369,9 @@ void CncLoggerListCtrl::onKeyDown(wxKeyEvent& event) {
 void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 //////////////////////////////////////////////////////////////
 	if ( selectedItem == wxNOT_FOUND )
+		return;
+		
+	if ( joinTheApp == false )
 		return;
 	
 	const bool ctlKey = CncAsyncKeyboardState::isControlPressed();

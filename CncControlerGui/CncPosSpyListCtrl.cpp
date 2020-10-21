@@ -46,7 +46,7 @@ CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
 	// add colums
 	AppendColumn("Type", 			wxLIST_FORMAT_LEFT, 	 44);
 	AppendColumn("Reference", 		wxLIST_FORMAT_RIGHT, 	 70);
-	AppendColumn("Mode",			wxLIST_FORMAT_CENTER, 	 42);
+	AppendColumn("Mode",			wxLIST_FORMAT_CENTER, 	 50);
 	AppendColumn("Speed [mm/min]", 	wxLIST_FORMAT_LEFT, 	100);
 	AppendColumn("X-Target", 		wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
 	AppendColumn("Y-Target", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -189,7 +189,7 @@ int CncPosSpyListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	switch ( column ) {
 		case COL_PID: 	if ( GetItemText(translateItem(item), column) == majorPosPid )	return 0;
-						else											return 1;
+						else															return 1;
 						
 		case COL_REF:	return -1;
 		

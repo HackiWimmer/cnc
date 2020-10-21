@@ -6,6 +6,12 @@
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-console">bitmaps\16-console.png</object>
   <object class="wxBitmap" name="16-console@2x">bitmaps\16-console@2x.png</object>
+  <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
+  <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
+  <object class="wxBitmap" name="16-database">bitmaps\CodeLite\16-database.png</object>
+  <object class="wxBitmap" name="16-database@2x">bitmaps\CodeLite\16-database@2x.png</object>
+  <object class="wxBitmap" name="16-file_save_all">bitmaps\CodeLite\16-file_save_all.png</object>
+  <object class="wxBitmap" name="16-file_save_all@2x">bitmaps\CodeLite\16-file_save_all@2x.png</object>
   <object class="wxBitmap" name="16-x-close">bitmaps\16-x-close.png</object>
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
@@ -19,6 +25,7 @@
   <object class="wxBitmap" name="info">bitmaps\info.png</object>
   <object class="wxBitmap" name="loading-throb">bitmaps\loading-throb.gif</object>
   <object class="wxBitmap" name="package-link">bitmaps\package-link.png</object>
+  <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
   <object class="wxBitmap" name="refresh">bitmaps\refresh.png</object>
   <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>

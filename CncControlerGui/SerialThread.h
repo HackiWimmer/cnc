@@ -67,6 +67,7 @@ class SerialThread : public wxThread {
 		void publishData(bool force = false);
 		void publishHeartbeat();
 		void dispatchAdminChannel();
+		void traceMove(uint8_t sid, int32_t dx, int32_t dy, int32_t dz);
 		
 	public:
 
@@ -140,6 +141,7 @@ class SerialThread : public wxThread {
 		static void 				ardoTraceStepperDir(char sid, int32_t dir);
 		static void 				ardoTraceStepperPos(char sid, int32_t pos);
 		static void 				ardoTraceSpeed(char sid, int32_t val);
+		static void					ardoTraceMove(uint8_t sid, int32_t dx, int32_t dy, int32_t dz);
 
 		static const char*			ardoGetCmdLabel(unsigned char c);
 		static const char*			ardoGetPidLabel(unsigned char p);

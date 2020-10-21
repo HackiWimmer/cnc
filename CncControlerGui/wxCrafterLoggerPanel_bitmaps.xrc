@@ -3,8 +3,7 @@
   <!-- Handler Generation is ON -->
   <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
-  <object class="wxBitmap" name="16-file_save">bitmaps\CodeLite\16-file_save.png</object>
-  <object class="wxBitmap" name="16-file_save@2x">bitmaps\CodeLite\16-file_save@2x.png</object>
+  <object class="wxBitmap" name="16-file_save.1">bitmaps\CodeLite\16-file_save.1.png</object>
   <object class="wxBitmap" name="16-file_save_all">bitmaps\CodeLite\16-file_save_all.png</object>
   <object class="wxBitmap" name="16-file_save_all@2x">bitmaps\CodeLite\16-file_save_all@2x.png</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>

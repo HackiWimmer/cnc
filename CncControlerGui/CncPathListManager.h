@@ -6,18 +6,6 @@
 //////////////////////////////////////////////////////////////////
 class CncPathListManager {
 	
-public:
-	/*
-		struct Data {
-			
-			unsigned int posChgCounter		= 0;
-			unsigned int speedChgCounter	= 0;
-			
-			void reset() {
-				
-			}
-		};
-	*/
 	protected:
 	
 		// Path position (CncPathListEntry) entries
@@ -37,8 +25,6 @@ public:
 		double maxPosZ;
 		
 		double totalDistance;
-		
-		//Data data;
 		
 		//////////////////////////////////////////////////////////////
 		void appendEntry(CncPathListEntry& cpe);
@@ -104,9 +90,7 @@ public:
 		bool eraseEntryAndRecalcuate(const CncPathList::iterator& itToErase);
 		
 		std::ostream& outputOperator(std::ostream &ostr) const;
-		friend std::ostream& operator<<(std::ostream &ostr, const CncPathListManager &a) {
-			return a.outputOperator(ostr);
-		}
+		friend std::ostream& operator<<(std::ostream &ostr, const CncPathListManager &a) { return a.outputOperator(ostr); }
 };
 
 #endif

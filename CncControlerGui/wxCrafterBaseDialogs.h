@@ -29,6 +29,9 @@
 #include <wx/filename.h>
 #include <wx/animate.h>
 #include <wx/simplebook.h>
+#include <wx/frame.h>
+#include <wx/splitter.h>
+#include <wx/bmpbuttn.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -208,7 +211,7 @@ protected:
 public:
     wxListCtrl* GetTsSummary() { return m_tsSummary; }
     wxButton* GetBtClose() { return m_btClose; }
-    CncLastProcessingTimestampSummaryBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Last Processing Timestamp Summary"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    CncLastProcessingTimestampSummaryBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Last Processing Timestamp Summary"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncLastProcessingTimestampSummaryBase();
 };
 
@@ -289,6 +292,65 @@ public:
     wxPanel* GetStatus() { return m_status; }
     CncExternalViewBoxBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("no caption available"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxSTAY_ON_TOP);
     virtual ~CncExternalViewBoxBase();
+};
+
+
+class CncPositionStorageViewBase : public wxFrame
+{
+protected:
+    wxSplitterWindow* m_splitter189;
+    wxPanel* m_splitterPageOverview;
+    wxStaticText* m_staticText245;
+    wxListCtrl* m_overview;
+    wxTextCtrl* m_helpText;
+    wxPanel* m_splitterPageStorage;
+    wxStaticText* m_staticText241;
+    wxListCtrl* m_details;
+    wxStaticText* m_staticText233;
+    wxStaticLine* m_staticLine235;
+    wxBitmapButton* m_btExport;
+    wxBitmapButton* m_btSave;
+    wxBitmapButton* m_btCopy;
+    wxStaticLine* m_staticLine239;
+    wxStaticText* m_staticText217;
+    wxTextCtrl* m_detailsSid;
+    wxStaticText* m_staticText221;
+    wxTextCtrl* m_detailsType;
+    wxStaticText* m_staticText225;
+    wxTextCtrl* m_detailsEntries;
+    wxStaticLine* m_staticLine237;
+
+protected:
+    virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
+    virtual void onOverviewItemSelected(wxListEvent& event) { event.Skip(); }
+    virtual void onExportDetails(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSaveDetails(wxCommandEvent& event) { event.Skip(); }
+    virtual void onCopyDetails(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText245() { return m_staticText245; }
+    wxListCtrl* GetOverview() { return m_overview; }
+    wxTextCtrl* GetHelpText() { return m_helpText; }
+    wxPanel* GetSplitterPageOverview() { return m_splitterPageOverview; }
+    wxStaticText* GetStaticText241() { return m_staticText241; }
+    wxListCtrl* GetDetails() { return m_details; }
+    wxStaticText* GetStaticText233() { return m_staticText233; }
+    wxStaticLine* GetStaticLine235() { return m_staticLine235; }
+    wxBitmapButton* GetBtExport() { return m_btExport; }
+    wxBitmapButton* GetBtSave() { return m_btSave; }
+    wxBitmapButton* GetBtCopy() { return m_btCopy; }
+    wxStaticLine* GetStaticLine239() { return m_staticLine239; }
+    wxStaticText* GetStaticText217() { return m_staticText217; }
+    wxTextCtrl* GetDetailsSid() { return m_detailsSid; }
+    wxStaticText* GetStaticText221() { return m_staticText221; }
+    wxTextCtrl* GetDetailsType() { return m_detailsType; }
+    wxStaticText* GetStaticText225() { return m_staticText225; }
+    wxTextCtrl* GetDetailsEntries() { return m_detailsEntries; }
+    wxStaticLine* GetStaticLine237() { return m_staticLine237; }
+    wxPanel* GetSplitterPageStorage() { return m_splitterPageStorage; }
+    wxSplitterWindow* GetSplitter189() { return m_splitter189; }
+    CncPositionStorageViewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Position Storage"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(540,400), long style = wxDEFAULT_FRAME_STYLE);
+    virtual ~CncPositionStorageViewBase();
 };
 
 #endif

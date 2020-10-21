@@ -18,6 +18,12 @@ class CncPerspective {
 		bool renameUserPerspective(const wxString& from, const wxString& to);
 		
 	public:
+		
+		static const char* configGroupName;
+		static const char* paneListSuffix;
+		static const char* userPerspectivePrefix;
+		static const char  nameEnclose;
+		
 		CncPerspective(wxConfigBase* cfg, wxMenu* menu);
 		~CncPerspective();
 		

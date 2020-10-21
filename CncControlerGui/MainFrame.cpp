@@ -85,6 +85,7 @@
 #include "CncOSEnvironmentDialog.h"
 #include "CncContext.h"
 #include "CncManuallyMoveCoordinates.h"
+#include "CncPositionStorageView.h"
 #include "CncLastProcessingTimestampSummary.h"
 #include "CncFileDialog.h"
 #include "CncArduinoEnvironment.h"
@@ -262,7 +263,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , GlobalConfigManager					(this, GetPgMgrSetup(), globalConfig)
 , gamepadThread							(NULL)
 , serialThread							(NULL)
-, cncSpeedPlayground					(NULL)
+, cncSpeedPlayground					(new CncSpeedPlayground(this))
 , isDebugMode							(false)
 , isZeroReferenceValid					(false)
 , canClose								(true)
@@ -315,6 +316,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , controllersMsgHistoryList				(NULL)
 , mainViewInfobar						(new CncMainInfoBar(this))
 , monitorViewInfobar					(new CncMainInfoBar(this))
+, positionStorage						(new CncPositionStorageView(this))
 , perspectiveHandler					(globalConfig, m_menuPerspective)
 , config								(globalConfig)
 , lruStore								(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -333,6 +335,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 {
 ///////////////////////////////////////////////////////////////////
 	APPEND_THREAD_ID_TO_STACK_TRACE_FILE;
+	
+	THE_CONFIG->updateLoadTrace(m_cfgLoadTrace, m_cfgObsoleteTrace);
 	
 	m_auimgrMain->SetArtProvider(new clAuiDockArt());
 	
@@ -379,6 +383,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 		m_listbookMonitor->GetListView()->SetFont(font);
 		m_listbookPostProcessor->GetListView()->SetFont(font);
 		m_listbookManallyMotionControl->GetListView()->SetFont(font);
+		m_listbookSource->GetListView()->SetFont(font);
 		m_listbookSetupConfig->GetListView()->SetFont(font);
 		m_listbookReferences->GetListView()->SetFont(font);
 		m_testCaseBook->GetListView()->SetFont(font);
@@ -954,17 +959,22 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
+
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	cnc->popSerial();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
+	
+	long l = 12333;
+	
+	double d = l;
+	
+	std::cout << wxString::Format("%ld", (long)d) << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -1589,14 +1599,14 @@ void MainFrame::onSerialThreadHeartbeat(SerialEvent& event) {
 void MainFrame::onSerialThreadMessage(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	const char type = (char)event.message.type;
-	cncArduinoEnvironment->appendMessage(type, event.message.getMessage(), event.message.getContext());
 	
-	bool alreadyTraced = cncArduinoEnvironment->IsShownOnScreen();
-	if ( cncSpeedPlayground && cncSpeedPlayground->IsShownOnScreen() ) {
-		alreadyTraced = true;
-		
+	if ( cncArduinoEnvironment->IsShownOnScreen() )
+		cncArduinoEnvironment->appendMessage(type, event.message.getMessage(), event.message.getContext());
+	
+	if ( cncSpeedPlayground->IsShownOnScreen() )
 		cncSpeedPlayground->appendArdoMessage(type, event.message.getMessage(), event.message.getContext());
-	}
+	
+	const bool alreadyTraced = cncArduinoEnvironment->IsShownOnScreen() || cncSpeedPlayground->IsShownOnScreen();
 	
 	//-------------------------------------------------------------
 	auto log2Std = [&](std::ostream & o) {
@@ -2391,11 +2401,12 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		bool probeMode				= false;
 		bool interactiveMoving		= false;
 		bool secureDlg				= false;
-		bool pathListEntries		= false;
-		bool moveSequences			= false;
-		bool vertexTrace			= false;
 		bool speedMonitor			= false;
 		bool hasHardware			= false;
+		bool pathListEntries		= THE_CONFIG->getPreProcessorCntPathListEntries()	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
+		bool moveSequences			= THE_CONFIG->getPreProcessorCntMoveSequneces()		&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
+		bool operatingTrace			= THE_CONFIG->getPreProcessorUseOperatingTrace()	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
+		bool vertexTrace			= true												&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 
 	} setup;
 	
@@ -2408,9 +2419,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
-		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 	} 
 	else if ( sel == _portEmulatorTEXT ) {
 		cnc = new CncControl(CncEMU_TXT);
@@ -2421,9 +2429,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
-		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 	} 
 	else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
@@ -2434,9 +2439,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
-		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 	}
 	else if ( sel == _portEmulatorGCODE ) {
 		cnc = new CncControl(CncEMU_GCODE);
@@ -2447,9 +2449,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
-		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 	} 
 	else if ( sel == _portEmulatorBIN) {
 		cnc = new CncControl(CncEMU_BIN);
@@ -2460,9 +2459,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.secureDlg			= false;
 		setup.speedMonitor		= false;
 		setup.hasHardware		= false;
-		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 	} 
 	else if ( sel == _portEmulatorArduino) {
 		cnc = new CncControl(CncPORT_EMU_ARDUINO);
@@ -2473,9 +2469,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.secureDlg			= false;
 		setup.speedMonitor		= true;
 		setup.hasHardware		= true;
-		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
-		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
 	} 
 	else {
 		cnc = new CncControl(CncPORT);
@@ -2486,20 +2479,14 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.secureDlg			= false;
 		setup.speedMonitor		= true;
 		setup.hasHardware		= true;
-		setup.pathListEntries	= false;
-		setup.moveSequences		= false;
-		setup.vertexTrace		= false;
 	}
 	
 	const bool startDisabled = false;
 	if ( startDisabled == true ) {
 		cnc::cex1 << "MainFrame::createCncControl(): Flag startDisabled is active!" << std::endl;
-		
-//		bool pathListEntries		= THE_CONFIG->getPreProcessorCntPathListEntries();
-//		bool moveSequences			= THE_CONFIG->getPreProcessorCntMoveSequneces();
-
 		setup.pathListEntries	= false;
 		setup.moveSequences		= false;
+		setup.operatingTrace	= false;
 		setup.vertexTrace		= false;
 		
 		decoratePosSpyConnectButton(false);
@@ -2521,6 +2508,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	if ( cncPreprocessor != NULL ) {
 		cncPreprocessor->enablePathListEntries(setup.pathListEntries);
 		cncPreprocessor->enableMoveSequences(setup.moveSequences);
+		cncPreprocessor->enableOperatingTrace(setup.operatingTrace);
 	}
 	
 	return serialFileName;
@@ -3069,21 +3057,12 @@ void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 	prepareMotionMonitorViewType();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::prepareNewTemplateFile() {
-///////////////////////////////////////////////////////////////////
-	const CncTemplateFormat tf = getCurrentTemplateFormat();
-
-	sourceEditor->SetReadOnly(false);
-	sourceEditor->clearContent();
-	sourceEditor->prepareNewTemplateFile(tf);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::newTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( saveTemplateOnDemand() == false )
 		return;
-	
-	wxString templateName("..\\Templates\\");
+		
+	const wxString templateName("..\\Templates\\");
     wxFileDialog newFileDialog(this, 
 								_("New Template File"), 
 								templateName,
@@ -3092,26 +3071,35 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 
 	if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
-        return; 
+		return; 
+	
+	// store old template file values
+	const wxString ov(getCurrentTemplateFileName());
+	const wxString oh(getCurrentTemplatePathFileName());
 
-	wxString ov = getCurrentTemplateFileName();
-	wxString oh = getCurrentTemplatePathFileName();
-
+	// set new template file values
 	m_inputFileName->SetValue(newFileDialog.GetFilename());
 	m_inputFileName->SetHint(newFileDialog.GetPath());
 	
-	prepareNewTemplateFile();
+	// prepare editor
+	sourceEditor->SetReadOnly(false);
+	sourceEditor->clearContent();
+	sourceEditor->prepareNewTemplateFile(getCurrentTemplateFormat());
+	sourceEditor->setNewTemplateFileName(getCurrentTemplatePathFileName());
 
-	if ( !saveFile() ) {
+	// first save te new template
+	if ( saveFile() == false ) {
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
-	} else {
-		if ( !openFile() ) {
-			m_inputFileName->SetValue(ov);
-			m_inputFileName->SetHint(oh);
-		} else {
-			prepareAndShowMonitorTemplatePreview(true);
-		}
+	} 
+	
+	// then reopen it . . 
+	if ( openFile() == false) {
+		m_inputFileName->SetValue(ov);
+		m_inputFileName->SetHint(oh);
+	} 
+	else {
+		prepareAndShowMonitorTemplatePreview(true);
 	}
 	
 	introduceCurrentFile();
@@ -3132,13 +3120,16 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 		return;
 	}
 
-	wxString ov = getCurrentTemplateFileName();
-	wxString oh = getCurrentTemplatePathFileName();
+	// store old template file values
+	const wxString ov = getCurrentTemplateFileName();
+	const wxString oh = getCurrentTemplatePathFileName();
 
+	// set new template file values
 	m_inputFileName->SetValue(openFileDialog.GetFilename());
 	m_inputFileName->SetHint(openFileDialog.GetPath());
 
-	if ( !openFile() ) {
+	// then open it . . 
+	if ( openFile() == false ) {
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
 		
@@ -3150,9 +3141,8 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::reloadTemplate(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
-	if ( !openFile(sourcePageToSelect) ) {
+	if ( openFile(sourcePageToSelect) == false )
 		std::cerr << "Error while reloding template: " << getCurrentTemplateFileName().c_str() << std::endl;
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::reloadTemplate(wxCommandEvent& event) {
@@ -4978,10 +4968,13 @@ void MainFrame::selectMainBookSourcePanel(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
 	m_mainViewBook->SetSelection(MainBookSelection::VAL::SOURCE_PANEL);
 	
-	if ( sourcePageToSelect < 0 || sourcePageToSelect > (int)(m_templateNotebook->GetPageCount() - 1) )
-		sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL;
+	if ( sourcePageToSelect < 0 || sourcePageToSelect > (int)(m_listbookSource->GetPageCount() - 1) )
+		sourcePageToSelect = SourceBookSelection::VAL::EDITOR;
+		
+	m_listbookSource->SetSelection(sourcePageToSelect);
 	
-	m_templateNotebook->SetSelection(sourcePageToSelect);
+	if ( sourcePageToSelect == SourceBookSelection::VAL::EDITOR )
+		m_templateNotebook->SetSelection(TemplateBookSelection::VAL::SOURCE_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookPreviewPanel() {
@@ -5698,37 +5691,15 @@ bool MainFrame::openFileExtern(const wxString& tool, const char* file, bool chec
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openFileExtern(const wxString& tool, wxString& file, bool checkToolExists) {
 ///////////////////////////////////////////////////////////////////
-	if ( checkToolExists == true ) {
-		if ( CncFileNameService::findAbsoluteValidPath(tool).IsEmpty() ) {
-			std::cerr << "MainFrame::openFileExtern: Failed:" << std::endl;
-			std::cerr << " Can't find tool:" << tool << std::endl;
-			return false;
-		}
-	}
-	
 	startAnimationControl();
-	wxString cmd(tool);
-	if ( file.IsEmpty() == false ) {
-		
-		if ( wxFileName(file).Exists() == false ) {
-			std::cerr << "MainFrame::openFileExtern: Failed:" << std::endl;
-			std::cerr << " Can't open:" << file << std::endl;
-			stopAnimationControl();
-			return false;
-		}
-		
-		cmd += " \"";
-		cmd += file;
-		cmd += "\"";
-	}
 	
-	cnc::trc.logInfoMessage(wxString::Format("Open: %s", cmd));
-	wxExecute(cmd);
+	const bool ret = GblFunc::executeExternalProgram(tool, file, checkToolExists);
+	if ( ret == true )
+		waitActive(1500);
 	
-	waitActive(1500);
 	stopAnimationControl();
 	
-	return true;
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleTemplateWordWrapMode(wxCommandEvent& event) {
@@ -6408,14 +6379,14 @@ void MainFrame::setupGridSelected(wxPropertyGridEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::saveConfiguration(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->saveConfiguration(*config);
+	THE_CONFIG->saveConfiguration(*config);
+	THE_CONFIG->updateSaveTrace(m_cfgSaveTrace);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::loadConfiguration(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->loadConfiguration(*config);
+	THE_CONFIG->loadConfiguration(*config);
+	THE_CONFIG->updateLoadTrace(m_cfgLoadTrace, m_cfgObsoleteTrace);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::copyPositionSpy(wxCommandEvent& event) {
@@ -6491,7 +6462,8 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	if ( isRunning == true )	return;
 	else						isRunning = true;
 	
-	cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
+	// debugging only
+	//cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
 	
 	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {
 		if ( positionSpy != NULL )
@@ -7527,10 +7499,28 @@ SerialThread* MainFrame::getSerialThread(SerialThreadStub* sts) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::openSpeedPlayground(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( cncSpeedPlayground == NULL )
-		cncSpeedPlayground = new CncSpeedPlayground(this);
-		
-	cncSpeedPlayground->Show(cncSpeedPlayground->IsShownOnScreen() == false);
+	if ( cncSpeedPlayground->IsShown() == false )
+		cncSpeedPlayground->Show();
+
+	if ( cncSpeedPlayground->IsIconized() == true )
+		cncSpeedPlayground->Restore();
+	
+	cncSpeedPlayground->Raise();
+	cncSpeedPlayground->SetFocus();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::openPositionStorage(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	CncContext::PositionStorage::storage = positionStorage;
+	
+	if ( positionStorage->IsShown() == false )
+		positionStorage->Show();
+	
+	if ( positionStorage->IsIconized() == true )
+		positionStorage->Restore();
+	
+	positionStorage->Raise();
+	positionStorage->SetFocus();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::updateHardwareReference() {
@@ -7743,12 +7733,16 @@ void MainFrame::cncTransactionLockCallback() {
 		cnc::spy.addMarker("Transaction initiated . . . ");
 	
 	getLoggerView()->popProcessMode(LoggerSelection::VAL::CNC);
+	getCncPreProcessor()->popProcessMode();
+	positionStorage->popProcessMode();
 	speedMonitor->deactivate();
 } 
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cncTransactionReleaseCallback() {
 /////////////////////////////////////////////////////////////////////
 	speedMonitor->activate(THE_CONTEXT->canSpeedMonitoring());
+	positionStorage->pushProcessMode();
+	getCncPreProcessor()->pushUpdateMode();
 	getLoggerView()->pushUpdateMode(LoggerSelection::VAL::CNC);
 	
 	if ( cnc && cnc->isSpyOutputOn() )
@@ -7789,4 +7783,7 @@ void MainFrame::onIdle(wxIdleEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	//CNC_PRINT_LOCATION
 }
+
+
+
 
