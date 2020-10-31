@@ -1060,8 +1060,6 @@ const double CncConfig::getMaxSpeedZ_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEE
 const double CncConfig::getMaxSpeedXY_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_XY_MM_MIN) 				return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxSpeedXYZ_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_XYZ_MM_MIN) 				return p->GetValue().GetDouble(); }
 
-
-#warning replace this with A;B;C
 const double CncConfig::getAccelStartSpeedX_MM_MIN()				{ PROPERTY(CncConfig_ACCEL_START_SPEED_X_MM_MIN) 		return p->GetValue().GetDouble(); }
 const double CncConfig::getAccelStopSpeedX_MM_MIN()					{ PROPERTY(CncConfig_ACCEL_STOP_SPEED_X_MM_MIN) 		return p->GetValue().GetDouble(); }
 const double CncConfig::getAccelStartSpeedY_MM_MIN()				{ PROPERTY(CncConfig_ACCEL_START_SPEED_Y_MM_MIN) 		return p->GetValue().GetDouble(); }

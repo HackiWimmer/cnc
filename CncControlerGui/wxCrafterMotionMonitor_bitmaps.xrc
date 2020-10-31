@@ -23,5 +23,6 @@
   <object class="wxBitmap" name="media-seek-forward-7">bitmaps\media-seek-forward-7.png</object>
   <object class="wxBitmap" name="media-skip-backward-7">bitmaps\media-skip-backward-7.png</object>
   <object class="wxBitmap" name="media-skip-forward-7">bitmaps\media-skip-forward-7.png</object>
+  <object class="wxBitmap" name="office-chart-ring">bitmaps\office-chart-ring.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
 </resource>

@@ -1,3 +1,4 @@
+#include "CncParsingSynopsisTrace.h"
 #include "MainFrame.h"
 #include "MainFrameProxy.h"
 

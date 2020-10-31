@@ -30,7 +30,7 @@ void GCodePathHandlerCnc::finishWorkImpl() {
 	getSetup().cnc->switchToolOff();
 	getSetup().cnc->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
 	
-	#warning ????
+	#warning why set zero ?
 	currentPos.setXYZ(0.0, 0.0, 0.0);
 	getSetup().cnc->moveXYToZeroPos();
 }

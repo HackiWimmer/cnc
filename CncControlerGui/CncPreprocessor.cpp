@@ -5,10 +5,10 @@
 #include "CncContext.h"
 #include "CncMoveSequenceListCtrl.h"
 #include "CncPathListEntryListCtrl.h"
+#include "CncParsingSynopsisTrace.h"
 #include "CncLoggerListCtrl.h"
 #include "CncFileNameService.h"
 #include "CncPreprocessor.h"
-
 
 class CncOperatingTrace : public CncExtLoggerListCtrl {
 	public:
@@ -39,6 +39,7 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 , pathListEntries		(NULL)
 , moveSequenceOverview	(NULL)
 , moveSequence			(NULL)
+, parsingSynopisis		(NULL)
 , operatingTrace		(NULL)
 //////////////////////////////////////////////////////////////////
 {
@@ -54,6 +55,10 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 	moveSequenceOverview = new CncMoveSequenceOverviewListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL, moveSequence, m_contentLabel);
 	GblFunc::replaceControl(m_moveSequencesListPlaceholder, moveSequenceOverview);
 	
+	// parsing synopisis
+	parsingSynopisis = new CncParsingSynopsisTrace(this); 
+	GblFunc::replaceControl(m_motionSynopsisPlaceholder, parsingSynopisis);
+
 	// operating trace
 	operatingTrace = new CncOperatingTrace(this, wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_operatingTracePlaceholder, operatingTrace);
@@ -67,6 +72,7 @@ CncPreprocessor::~CncPreprocessor() {
 	wxDELETE( pathListEntries );
 	wxDELETE( moveSequenceOverview );
 	wxDELETE( moveSequence );
+	wxDELETE( parsingSynopisis );
 	wxDELETE( operatingTrace ); 
 }
 //////////////////////////////////////////////////////////////////
@@ -337,4 +343,16 @@ void CncPreprocessor::saveOperatingTrace(wxCommandEvent& event) {
 		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
 		GblFunc::executeExternalProgram(tool, fileName, true);
 	}
+}
+void CncPreprocessor::clearParsingSynopis(wxCommandEvent& event)
+{
+}
+void CncPreprocessor::connectParsingSynopis(wxCommandEvent& event)
+{
+}
+void CncPreprocessor::copyParsingSynopis(wxCommandEvent& event)
+{
+}
+void CncPreprocessor::saveParsingSynopis(wxCommandEvent& event)
+{
 }

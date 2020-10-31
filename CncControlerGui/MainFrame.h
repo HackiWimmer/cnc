@@ -22,7 +22,6 @@
 #include "CncSetterListCtrl.h"
 #include "CncGamepadControllerState.h"
 #include "CncMotionMonitorVertexTrace.h"
-#include "CncParsingSynopsisTrace.h"
 #include "CncSummaryListCtrl.h"
 #include "Codelite/wxPNGAnimation.h"
 #include "CncNavigatorPanel.h"
@@ -57,6 +56,7 @@ class CncOutboundEditor;
 class CncFilePreviewWnd;
 class CncFilePreview;
 class CncReferencePosition;
+class CncParsingSynopsisTrace;
 class CncMonitorVSplitterWindow;
 class CncMonitorHSplitterWindow;
 class CncTemplateObserver;
@@ -550,7 +550,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		CncGCodeSequenceListCtrl* getGCodeSequenceList() 	{ return gCodeSequenceList; }
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
-		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ return parsingSynopisis; }
+		CncParsingSynopsisTrace* getParsingSynopsisTrace();
 		
 		bool readSerialThreadData(AE::TransferData& td);
 		
@@ -647,7 +647,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncDefaultSpeedSlider*			defaultSpeedSlider;
 		CncMotionVertexTrace* 			motionVertexCtrl;
 		CncPreprocessor*				cncPreprocessor;
-		CncParsingSynopsisTrace*		parsingSynopisis;
 		CncGCodeSequenceListCtrl*		gCodeSequenceList;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
 		CncSerialSpyPanel* 				serialSpyPanel;

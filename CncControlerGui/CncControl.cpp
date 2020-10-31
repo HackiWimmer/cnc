@@ -1004,8 +1004,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		// --------------------------------------------------------
 		case CITPosition:
 		{
-			#warning
-			bool postAppPosToo = true;//ci.synchronizeAppPos == true;
+			bool postAppPosToo = ci.synchronizeAppPos == true;
 			
 			// update controller position
 			switch ( ci.posType ) {

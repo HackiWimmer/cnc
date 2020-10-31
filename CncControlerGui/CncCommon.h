@@ -207,10 +207,9 @@ class OutboundMonitorSelection{
 	public:
 		enum VAL {
 			MOTION_MONITOR_PANAL		= 0,
-			CNC_PARSER_SYNOPSIS			= 1,
-			CNC_SETTER_PANEL			= 2,
-			CNC_MSG_HIST_PANEL			= 3,
-			MOTION_VERTEX_TRACE			= 4
+			CNC_SETTER_PANEL			= 1,
+			CNC_MSG_HIST_PANEL			= 2,
+			MOTION_VERTEX_TRACE			= 3
 		};
 };
 

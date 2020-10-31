@@ -5590,30 +5590,6 @@ Interval [ms]:</label>
                                       </object>
                                     </object>
                                     <object class="listbookpage">
-                                      <label>Parsing
-Synopsis</label>
-                                      <bitmap>bitmaps/office-chart-ring.png</bitmap>
-                                      <selected>0</selected>
-                                      <object class="wxPanel" name="m_motionSynopsis">
-                                        <style>wxTAB_TRAVERSAL</style>
-                                        <object class="wxFlexGridSizer">
-                                          <cols>1</cols>
-                                          <rows>1</rows>
-                                          <vgap>0</vgap>
-                                          <hgap>0</hgap>
-                                          <growablecols>0</growablecols>
-                                          <growablerows>0</growablerows>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <object class="wxPanel" name="m_motionSynopsisPlaceholder">
-                                              <style>wxTAB_TRAVERSAL</style>
-                                              <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
-                                            </object>
-                                          </object>
-                                        </object>
-                                      </object>
-                                    </object>
-                                    <object class="listbookpage">
                                       <label>Processed
 Setters</label>
                                       <bitmap>bitmaps/16-struct.png</bitmap>

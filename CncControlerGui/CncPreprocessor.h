@@ -8,6 +8,7 @@
 class CncPathListEntryListCtrl;
 class CncMoveSequenceListCtrl;
 class CncMoveSequenceOverviewListCtrl;
+class CncParsingSynopsisTrace;
 class CncOperatingTrace;
 
 class CncPreprocessor : public CncPreprocessorBase {
@@ -18,6 +19,7 @@ class CncPreprocessor : public CncPreprocessorBase {
 		CncPathListEntryListCtrl* 			pathListEntries;
 		CncMoveSequenceOverviewListCtrl* 	moveSequenceOverview;
 		CncMoveSequenceListCtrl* 			moveSequence;
+		CncParsingSynopsisTrace*			parsingSynopisis;
 		CncOperatingTrace*					operatingTrace;
 		
 		void updatePathListContent();
@@ -28,6 +30,8 @@ class CncPreprocessor : public CncPreprocessorBase {
 
 		CncPreprocessor(wxWindow* parent);
 		virtual ~CncPreprocessor();
+		
+		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ wxASSERT(parsingSynopisis != NULL); return parsingSynopisis; }
 		
 		void popProcessMode();
 		void pushUpdateMode();
@@ -53,13 +57,16 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void addOperatingTraceDebugEntry(const wxString& s);
 		void addOperatingTraceWarnEntry	(const wxString& s);
 		void addOperatingTraceErrorEntry(const wxString& s);
-
 		
 		void selectClientId(long id, CncPreprocessor::ListType lt);
 		
 		void updateContent();
 
 	protected:
+		virtual void clearParsingSynopis(wxCommandEvent& event);
+		virtual void connectParsingSynopis(wxCommandEvent& event);
+		virtual void copyParsingSynopis(wxCommandEvent& event);
+		virtual void saveParsingSynopis(wxCommandEvent& event);
 		virtual void copyOperatingTrace(wxCommandEvent& event);
 		virtual void saveOperatingTrace(wxCommandEvent& event);
 		virtual void clearOperatingTrace(wxCommandEvent& event);

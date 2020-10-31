@@ -56,6 +56,7 @@
 #include "CncFilePreviewWnd.h"
 #include "CncSpeedPlayground.h"
 #include "CncGamepadControllerSpy.h"
+#include "CncParsingSynopsisTrace.h"
 #include "SVGPathHandlerCnc.h"
 #include "ManuallyParser.h"
 #include "SVGFileParser.h"
@@ -294,7 +295,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , defaultSpeedSlider					(new CncDefaultSpeedSlider(m_defaultSpeedSlider, m_configuredFeedSpeed))
 , motionVertexCtrl						(NULL)
 , cncPreprocessor						(NULL)
-, parsingSynopisis						(NULL)
 , gCodeSequenceList						(NULL)
 , cncSummaryListCtrl					(NULL)
 , serialSpyPanel						(NULL)
@@ -471,7 +471,6 @@ MainFrame::~MainFrame() {
 	cncDELETE( speedMonitor );
 	cncDELETE( defaultSpeedSlider );
 	cncDELETE( cncPreprocessor );
-	cncDELETE( parsingSynopisis );
 	cncDELETE( cncSummaryListCtrl );
 	cncDELETE( serialSpyPanel );
 	cncDELETE( outboundEditorSvgView );
@@ -787,10 +786,6 @@ void MainFrame::installCustControls() {
 	cncPreprocessor = new CncPreprocessor(this); 
 	GblFunc::replaceControl(m_preprocessorPlaceholder, cncPreprocessor);
 	
-	// parsing synopsis
-	parsingSynopisis = new CncParsingSynopsisTrace(this); 
-	GblFunc::replaceControl(m_motionSynopsisPlaceholder, parsingSynopisis);
-
 	// summary list
 	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_cncSummaryListCtrl, cncSummaryListCtrl);
@@ -6062,7 +6057,7 @@ void MainFrame::clearMotionMonitor() {
 
 	motionMonitor->clear();
 	statisticsPane->clear();
-	parsingSynopisis->clear();
+	getParsingSynopsisTrace()->clear();
 	cncPreprocessor->clearAll();
 	
 	decorateOutboundEditor();
@@ -7777,6 +7772,12 @@ void MainFrame::onSelectStepMode(wxCommandEvent& event) {
 		const CncStepMode sm = m_rbStepMode->GetSelection() == 0 ? SM_INTERACTIVE : SM_STEPWISE;
 		navigatorPanel->setStepMode(sm);
 	}
+}
+/////////////////////////////////////////////////////////////////////
+CncParsingSynopsisTrace* MainFrame::getParsingSynopsisTrace() { 
+////////////////////////////////////////////////////////////////////
+	wxASSERT( cncPreprocessor != NULL );
+	return cncPreprocessor->getParsingSynopsisTrace(); 
 }
 
 

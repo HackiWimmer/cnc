@@ -3,6 +3,7 @@
 #include "CncPathListRunner.h"
 #include "CncContext.h"
 #include "CncConfig.h"
+#include "CncParsingSynopsisTrace.h"
 #include "CncPreprocessor.h"
 #include "MainFrame.h"
 #include "FileParser.h"

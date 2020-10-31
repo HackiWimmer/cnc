@@ -424,8 +424,6 @@ protected:
     wxButton* m_3D_Perspective3;
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
-    wxPanel* m_motionSynopsis;
-    wxPanel* m_motionSynopsisPlaceholder;
     wxPanel* m_cncSetters;
     wxStaticText* m_staticText1150;
     wxTextCtrl* m_setterListCount;
@@ -1282,8 +1280,6 @@ public:
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
     wxPanel* GetMotionMonitor() { return m_motionMonitor; }
-    wxPanel* GetMotionSynopsisPlaceholder() { return m_motionSynopsisPlaceholder; }
-    wxPanel* GetMotionSynopsis() { return m_motionSynopsis; }
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
     wxTextCtrl* GetSetterListCount() { return m_setterListCount; }
     wxButton* GetBtClearSetterList() { return m_btClearSetterList; }

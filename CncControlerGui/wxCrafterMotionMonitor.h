@@ -116,7 +116,15 @@ class CncPreprocessorBase : public wxPanel
 {
 protected:
     wxListbook* m_listbookPreProcessor;
-    wxPanel* m_panel227;
+    wxPanel* m_panelParsingSynopsis;
+    wxStaticText* m_staticText61381422;
+    wxBitmapToggleButton* m_btConnectOperatingTrace4;
+    wxBitmapButton* m_btClearOperatingTrace105;
+    wxBitmapButton* m_btClearOperatingTrace116;
+    wxBitmapButton* m_btClearOperatingTrace7;
+    wxStaticLine* m_staticLine275;
+    wxPanel* m_motionSynopsisPlaceholder;
+    wxPanel* m_panelOperatingTrace;
     wxStaticText* m_staticText6138142;
     wxBitmapToggleButton* m_btConnectOperatingTrace;
     wxBitmapButton* m_btClearOperatingTrace10;
@@ -124,7 +132,7 @@ protected:
     wxBitmapButton* m_btClearOperatingTrace;
     wxStaticLine* m_staticLine249;
     wxPanel* m_operatingTracePlaceholder;
-    wxPanel* m_panel7622;
+    wxPanel* m_panelPathListEntries;
     wxStaticText* m_staticText61381;
     wxStaticText* m_staticText7891;
     wxTextCtrl* m_pathListRowCount;
@@ -133,7 +141,7 @@ protected:
     wxBitmapButton* m_btClearPathListEntries;
     wxStaticLine* m_staticLine219;
     wxListCtrl* m_pathListEntriesPlaceholder;
-    wxPanel* m_panel7630;
+    wxPanel* m_panelMoveSequences;
     wxStaticText* m_staticText613814;
     wxStaticText* m_staticText78912;
     wxTextCtrl* m_moveSequenceRowCount;
@@ -153,6 +161,10 @@ protected:
     wxTextCtrl* m_selectedClientIds;
 
 protected:
+    virtual void connectParsingSynopis(wxCommandEvent& event) { event.Skip(); }
+    virtual void copyParsingSynopis(wxCommandEvent& event) { event.Skip(); }
+    virtual void saveParsingSynopis(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearParsingSynopis(wxCommandEvent& event) { event.Skip(); }
     virtual void connectOperatingTrace(wxCommandEvent& event) { event.Skip(); }
     virtual void copyOperatingTrace(wxCommandEvent& event) { event.Skip(); }
     virtual void saveOperatingTrace(wxCommandEvent& event) { event.Skip(); }
@@ -163,6 +175,14 @@ protected:
     virtual void clearMoveSequences(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText61381422() { return m_staticText61381422; }
+    wxBitmapToggleButton* GetBtConnectOperatingTrace4() { return m_btConnectOperatingTrace4; }
+    wxBitmapButton* GetBtClearOperatingTrace105() { return m_btClearOperatingTrace105; }
+    wxBitmapButton* GetBtClearOperatingTrace116() { return m_btClearOperatingTrace116; }
+    wxBitmapButton* GetBtClearOperatingTrace7() { return m_btClearOperatingTrace7; }
+    wxStaticLine* GetStaticLine275() { return m_staticLine275; }
+    wxPanel* GetMotionSynopsisPlaceholder() { return m_motionSynopsisPlaceholder; }
+    wxPanel* GetPanelParsingSynopsis() { return m_panelParsingSynopsis; }
     wxStaticText* GetStaticText6138142() { return m_staticText6138142; }
     wxBitmapToggleButton* GetBtConnectOperatingTrace() { return m_btConnectOperatingTrace; }
     wxBitmapButton* GetBtClearOperatingTrace10() { return m_btClearOperatingTrace10; }
@@ -170,7 +190,7 @@ public:
     wxBitmapButton* GetBtClearOperatingTrace() { return m_btClearOperatingTrace; }
     wxStaticLine* GetStaticLine249() { return m_staticLine249; }
     wxPanel* GetOperatingTracePlaceholder() { return m_operatingTracePlaceholder; }
-    wxPanel* GetPanel227() { return m_panel227; }
+    wxPanel* GetPanelOperatingTrace() { return m_panelOperatingTrace; }
     wxStaticText* GetStaticText61381() { return m_staticText61381; }
     wxStaticText* GetStaticText7891() { return m_staticText7891; }
     wxTextCtrl* GetPathListRowCount() { return m_pathListRowCount; }
@@ -179,7 +199,7 @@ public:
     wxBitmapButton* GetBtClearPathListEntries() { return m_btClearPathListEntries; }
     wxStaticLine* GetStaticLine219() { return m_staticLine219; }
     wxListCtrl* GetPathListEntriesPlaceholder() { return m_pathListEntriesPlaceholder; }
-    wxPanel* GetPanel7622() { return m_panel7622; }
+    wxPanel* GetPanelPathListEntries() { return m_panelPathListEntries; }
     wxStaticText* GetStaticText613814() { return m_staticText613814; }
     wxStaticText* GetStaticText78912() { return m_staticText78912; }
     wxTextCtrl* GetMoveSequenceRowCount() { return m_moveSequenceRowCount; }
@@ -197,7 +217,7 @@ public:
     wxPanel* GetSplitterPageContent() { return m_splitterPageContent; }
     wxSplitterWindow* GetSplitter196() { return m_splitter196; }
     wxTextCtrl* GetSelectedClientIds() { return m_selectedClientIds; }
-    wxPanel* GetPanel7630() { return m_panel7630; }
+    wxPanel* GetPanelMoveSequences() { return m_panelMoveSequences; }
     wxListbook* GetListbookPreProcessor() { return m_listbookPreProcessor; }
     CncPreprocessorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,700), long style = wxTAB_TRAVERSAL);
     virtual ~CncPreprocessorBase();
@@ -235,13 +255,11 @@ public:
 class CncParsingSynopsisTraceBase : public wxPanel
 {
 protected:
-    wxStaticText* m_staticText7928;
     wxPanel* m_parsingSynopsisListPlaceholder;
 
 protected:
 
 public:
-    wxStaticText* GetStaticText7928() { return m_staticText7928; }
     wxPanel* GetParsingSynopsisListPlaceholder() { return m_parsingSynopsisListPlaceholder; }
     CncParsingSynopsisTraceBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncParsingSynopsisTraceBase();

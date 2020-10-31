@@ -3296,23 +3296,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2311->Add(m_staticLine2341, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_motionSynopsis = new wxPanel(m_listbookMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbookMonitor, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_motionSynopsisImgIndex;
-    m_motionSynopsisImgIndex = m_listbookMonitor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("office-chart-ring")));
-    m_listbookMonitor->AddPage(m_motionSynopsis, _("Parsing\nSynopsis"), false, m_motionSynopsisImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer7960 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer7960->SetFlexibleDirection( wxBOTH );
-    flexGridSizer7960->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer7960->AddGrowableCol(0);
-    flexGridSizer7960->AddGrowableRow(0);
-    m_motionSynopsis->SetSizer(flexGridSizer7960);
-    
-    m_motionSynopsisPlaceholder = new wxPanel(m_motionSynopsis, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_motionSynopsis, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_motionSynopsisPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer7960->Add(m_motionSynopsisPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
     m_cncSetters = new wxPanel(m_listbookMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbookMonitor, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_cncSettersImgIndex;
     m_cncSettersImgIndex = m_listbookMonitor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-struct")));

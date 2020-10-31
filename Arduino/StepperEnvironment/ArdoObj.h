@@ -267,8 +267,7 @@ namespace ArdoObj {
       
       explicit ValueInfo(unsigned char t)
       : type(t)
-      {
-        
+      {       
       }
   
       ValueInfo(Size s, int32_t x, int32_t y, int32_t z)
