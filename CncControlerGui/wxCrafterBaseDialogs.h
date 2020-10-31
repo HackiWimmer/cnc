@@ -302,6 +302,7 @@ protected:
     wxPanel* m_splitterPageOverview;
     wxStaticText* m_staticText245;
     wxListCtrl* m_overview;
+    wxStaticText* m_staticText2451;
     wxTextCtrl* m_helpText;
     wxPanel* m_splitterPageStorage;
     wxStaticText* m_staticText241;
@@ -319,17 +320,21 @@ protected:
     wxStaticText* m_staticText225;
     wxTextCtrl* m_detailsEntries;
     wxStaticLine* m_staticLine237;
+    wxTimer* m_activationTimer;
 
 protected:
     virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
+    virtual void onActivateWindow(wxActivateEvent& event) { event.Skip(); }
     virtual void onOverviewItemSelected(wxListEvent& event) { event.Skip(); }
     virtual void onExportDetails(wxCommandEvent& event) { event.Skip(); }
     virtual void onSaveDetails(wxCommandEvent& event) { event.Skip(); }
     virtual void onCopyDetails(wxCommandEvent& event) { event.Skip(); }
+    virtual void onActivationTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText245() { return m_staticText245; }
     wxListCtrl* GetOverview() { return m_overview; }
+    wxStaticText* GetStaticText2451() { return m_staticText2451; }
     wxTextCtrl* GetHelpText() { return m_helpText; }
     wxPanel* GetSplitterPageOverview() { return m_splitterPageOverview; }
     wxStaticText* GetStaticText241() { return m_staticText241; }
@@ -349,7 +354,8 @@ public:
     wxStaticLine* GetStaticLine237() { return m_staticLine237; }
     wxPanel* GetSplitterPageStorage() { return m_splitterPageStorage; }
     wxSplitterWindow* GetSplitter189() { return m_splitter189; }
-    CncPositionStorageViewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Position Storage"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(540,400), long style = wxDEFAULT_FRAME_STYLE);
+    wxTimer* GetActivationTimer() { return m_activationTimer; }
+    CncPositionStorageViewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Position Storage - Path Evaluator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(540,400), long style = wxDEFAULT_FRAME_STYLE);
     virtual ~CncPositionStorageViewBase();
 };
 

@@ -243,6 +243,7 @@ void CncReferencePosition::showInformation() {
 		wxRichToolTip tip("Additional information", infoMessage);
 		
 		tip.SetIcon(wxICON_INFORMATION);
+		tip.SetTipKind(wxTipKind_TopLeft);
 		tip.ShowFor(m_btSet);
 	} 
 	else {

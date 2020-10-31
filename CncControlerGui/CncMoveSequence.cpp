@@ -1,6 +1,8 @@
 #include "CncArduino.h"
+#include "CncContext.h"
 #include "CncConfig.h"
 #include "CncMoveSequence.h"
+#include "CncFlowPositionConverter.h"
 #include "GlobalStrings.h"
 
 extern GlobalConstStringDatabase globalStrings;
@@ -13,7 +15,7 @@ extern GlobalConstStringDatabase globalStrings;
 	#include <winsock.h>
 #endif
 
-///////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 CncMoveSequence::CncMoveSequence(unsigned char cmd)
 : reference(CncTimeFunctions::getNanoTimestamp())
 , sequence					()
@@ -161,8 +163,8 @@ unsigned int CncMoveSequence::determineSafeBufferSize() const {
 	const unsigned int headerSize 	= getHeaderSize();
 	const unsigned int pointSize 	= getPointSize();
 
-	//                                                              			offset to be always safe
-	const unsigned int portionCount	= getCount() * pointSize / maxSerialSize 	+ 1;
+	//                                                                          offset to be always safe
+	const unsigned int portionCount	= getCount() * pointSize / maxSerialSize	+ 1;
 	const unsigned int dataSize		= getCount() * pointSize					+ pointSize;
 
 	// + ( portionCount * 1 ): Each portion start with one byte of the
@@ -172,24 +174,27 @@ unsigned int CncMoveSequence::determineSafeBufferSize() const {
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::addMetricPosXYZ(double dx, double dy, double dz) {
 ///////////////////////////////////////////////////////////////////
-	const double sx = dx * THE_CONFIG->getCalculationFactX();
-	const double sy = dy * THE_CONFIG->getCalculationFactY();
-	const double sz = dz * THE_CONFIG->getCalculationFactZ();
+	// using the flow converter here to avoid to loos the reset 
+	// while still round the values
+	static CncFlowPositionConverter flowCnv;
 	
-	addStepPosXYZ(  (int32_t)round(sx), 
-					(int32_t)round(sy),
-					(int32_t)round(sz));
+	// add givven movements
+	flowCnv.set(dx, dy, dz);
+	
+	// the the converted values
+	const CncLongPosition& p = flowCnv.get();
+	addStepPosXYZ(p.getX(), p.getY(), p.getZ());
 }
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::addStepPosXYZ(int32_t dx, int32_t dy, int32_t dz)  {
 ///////////////////////////////////////////////////////////////////
 	if ( isValid() == false )
 		return;
-
+		
 	if ( dx == 0 && dy == 0 && dz == 0 )
 		return;
 
-	//std::cout << "CncMoveSequence::addStepPosXYZF: " << getLastClientId() << std::endl;
+	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_MOV_SEQ_ADD, dx, dy, dz);
 
 	sequence.push_back(SequencePoint(getLastClientId(), dx, dy, dz));
 	data.add(dx, dy, dz);
@@ -407,24 +412,8 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 	if ( sequenceBuffer == NULL )
 		return 0;
 
-	typedef ArdoObj::ValueInfo::Byte Byte;
-	
 	unsigned char* pointer	= sequenceBuffer;
 	unsigned int byteCount	= 0;
-
-	// -------------------------------------------------------------
-	auto setBit = [&](unsigned char& value, int idx) {
-		switch ( idx ) {
-			case Byte::Z:      value |= (1 << 7); break;
-			case Byte::Y:      value |= (1 << 6); break;
-			case Byte::X:      value |= (1 << 5); break;
-			case Byte::Q:      value |= (1 << 4); break;
-			case Byte::L4:     value |= (1 << 3); break;
-			case Byte::L2:     value |= (1 << 2); break;
-			case Byte::L1:     value |= (1 << 1); break;
-			case Byte::L0:     value |= (1 << 0); break;
-		}
-	};
 
 	// -------------------------------------------------------------
 	auto copy = [&] (unsigned char* dest, void* src, unsigned int len) {
@@ -435,17 +424,26 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 
 	// -------------------------------------------------------------
 	auto putOneByte = [&](int8_t x, int8_t y, int8_t z) {
-		unsigned char xyz = 0;
+		unsigned char xyz = 0; // --> 0b00000000
+		
+		if 		( x > 0 )	{ xyz |= (1 << ArdoObj::OneByte::Index::Pos::X); }
+		else if ( x < 0 )	{ xyz |= (1 << ArdoObj::OneByte::Index::Neg::X); }
 
-		if 		( x > 0 ) 	setBit(xyz, 1);
-		else if ( x < 0 )	setBit(xyz, 2);
+		if 		( y > 0 )	{ xyz |= (1 << ArdoObj::OneByte::Index::Pos::Y); }
+		else if ( y < 0 )	{ xyz |= (1 << ArdoObj::OneByte::Index::Neg::Y); }
 
-		if 		( y > 0 ) 	setBit(xyz, 3);
-		else if ( y < 0 ) 	setBit(xyz, 4);
-
-		if 		( z > 0 ) 	setBit(xyz, 5);
-		else if ( z < 0 )	setBit(xyz, 6);
-
+		if 		( z > 0 )	{ xyz |= (1 << ArdoObj::OneByte::Index::Pos::Z); }
+		else if ( z < 0 )	{ xyz |= (1 << ArdoObj::OneByte::Index::Neg::Z); }
+		
+		if ( false ) {
+			std::cout	<< CNC_LOG_FUNCT	<< ": "
+						<< (int)x			<< ", " 
+						<< (int)y			<< ", " 
+						<< (int)z			<< " -> " 
+						<< ArdoObj::OneByte::getAsString(xyz) << std::endl
+						;
+		}
+		
 		copy(pointer, &xyz, sizeof(unsigned char));
 	};
 
@@ -470,7 +468,7 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 		copy(pointer, &valueType, 1);
 		
 		ArdoObj::ValueInfo vi(valueType);
-		if ( vi.getByteCount() == 0 ) {
+		if      ( vi.getByteCount() == 0 ) {
 			
 			putOneByte(sp.x, sp.y, sp.z);
 		}
@@ -512,9 +510,7 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 	// -------------------------------------------------------------
 	if 		( moveCmd == CMD_RENDER_AND_MOVE_SEQUENCE )	flushPoint_RENDER_AND_MOVE_SEQUENCE();
 	else if ( moveCmd == CMD_MOVE_SEQUENCE ) 			flushPoint_MOVE_SEQUENCE();
-	else {
-		std::cerr << "fCncMoveSequence::flushPoint: Invalid Command: " << moveCmd << std::endl;
-	}
+	else    { std::cerr << "CncMoveSequence::flushPoint: Invalid Command: " << moveCmd << std::endl; }
 
 	if ( false ) {
 		std::cout << " moveCmd                : " << (int)moveCmd	<< std::endl;

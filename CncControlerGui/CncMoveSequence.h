@@ -23,17 +23,17 @@ class CncMoveSequence {
 			} param;
 
 			explicit SequencePoint(long clientID)                     				 : x(0), y(0), z(0), clientID(clientID), param() {}
-			SequencePoint(long clientID, int32_t z)   								 : x(0), y(0), z(z), clientID(clientID), param() {}
-			SequencePoint(long clientID, int32_t x, int32_t y)						 : x(x), y(y), z(0), clientID(clientID), param() {}
-			SequencePoint(long clientID, int32_t x, int32_t y, int32_t z)			 : x(x), y(y), z(z), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t Z)   								 : x(0), y(0), z(Z), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t X, int32_t Y)						 : x(X), y(Y), z(0), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t X, int32_t Y, int32_t Z)			 : x(X), y(Y), z(Z), clientID(clientID), param() {}
 
 			//                                       pid             + 3                                 * value
 			static const unsigned int MaxPointSize = sizeof(int32_t) + ArdoObj::ValueInfo::MaxValueCount * sizeof(int32_t);
 
-			bool isOneByte() const { return ( cnc::between(x, -2, +2)               && cnc::between(y, -2, +2)               && cnc::between(z, -2, +2)                ); } 
-			bool isInt8()    const { return ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   && cnc::between(z, INT8_MIN, INT8_MAX)    ); }
-			bool isInt16()   const { return ( cnc::between(x, INT16_MIN, INT16_MAX) && cnc::between(y, INT16_MIN, INT16_MAX) && cnc::between(z, INT16_MIN, INT16_MAX)  ); } 
-			bool isInt32()   const { return ( cnc::between(x, INT32_MIN, INT32_MAX) && cnc::between(y, INT32_MIN, INT32_MAX) && cnc::between(z, INT32_MIN, INT32_MAX)  ); } 
+			bool isOneByte() const { return ( cnc::between(x,        -2,        +2) && cnc::between(y,        -2,        +2) && cnc::between(z,        -2,        +2) ); } 
+			bool isInt8()    const { return ( cnc::between(x,  INT8_MIN,  INT8_MAX) && cnc::between(y,  INT8_MIN,  INT8_MAX) && cnc::between(z,  INT8_MIN,  INT8_MAX) ); }
+			bool isInt16()   const { return ( cnc::between(x, INT16_MIN, INT16_MAX) && cnc::between(y, INT16_MIN, INT16_MAX) && cnc::between(z, INT16_MIN, INT16_MAX) ); } 
+			bool isInt32()   const { return ( cnc::between(x, INT32_MIN, INT32_MAX) && cnc::between(y, INT32_MIN, INT32_MAX) && cnc::between(z, INT32_MIN, INT32_MAX) ); } 
 
 			bool hasX() const { return x != 0; }
 			bool hasY() const { return y != 0; }

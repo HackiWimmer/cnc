@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iomanip>
 #include <wx/msgdlg.h>
 #include "MainFrame.h"
 #include "GlobalFunctions.h"
@@ -524,9 +525,13 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 	prop->SetValueFromString(val, wxPG_FULL_VALUE );
 	
 	const wxString propType(prop->GetValueType());
-	
-	loadTrace 	<< groupName << "." << entryName			<< ":\t[" 
-				<< prop->GetValueType()						<< "], " 
+	const wxString propKName(wxString::Format("%s.%s", groupName, entryName));
+	const wxString className(prop->GetClassInfo()->GetClassName());
+
+	loadTrace 	<< propKName								<< ":" 
+				<< std::setw(60 - propKName.length())		<< "[" 
+				<< propType									<< "], ["
+				<< className								<< "], "
 				<< prop->GetValueAsString()					<< ", " 
 				<< prop->GetValueAsString(wxPG_FULL_VALUE)	<< ", " 
 				<< prop->GetValue().GetString()				<< std::endl;
@@ -561,14 +566,18 @@ bool CncConfig::loadNonGuiConfig(const wxString& groupName, const wxString& entr
 		else if ( entryName == CncToolMagazineParam_MAP_DEF_TOOL_TO)	{ entryIsKnown = true; toolMagazineParameter.defaultMappedTo =  value; }
 	}
 	
+	const wxString propKName(wxString::Format("%s.%s", groupName, entryName));
+	
 	if ( entryIsKnown == false ) {
-		obsoleteTrace	<< groupName << "." << entryName 
-						<< ": Property isn't used currently." 
+		obsoleteTrace	<< propKName << ":"
+						<< std::setw(60 - propKName.length()) << " "
+						<< "Property isn't used currently."
 						<< std::endl;
 	}
 	else {
-		loadTrace		<< groupName << "." << entryName 
-						<< ": Property is loaded."
+		loadTrace		<< propKName << ":"
+						<< std::setw(59 - propKName.length()) << " "
+						<< "[*], [NonGui] Property is loaded."
 						<< std::endl;
 	}
 	
@@ -645,8 +654,11 @@ void CncConfig::saveConfiguration(wxConfigBase& config) {
 			const wxString entry(p->GetName());
 			if ( entry.StartsWith("#") == false ) {
 				
-				saveTrace	<< entry									<< " :\t[" 
-							<< p->GetValueType()						<< "], " 
+				const wxString className(p->GetClassInfo()->GetClassName());
+				saveTrace	<< entry									<< ":"
+							<< std::setw(60 - entry.length())			<< "[" 
+							<< p->GetValueType()						<< "], ["
+							<< className								<< "], " 
 							<< p->GetValueAsString()					<< ", " 
 							<< p->GetValueAsString(wxPG_FULL_VALUE)		<< ", " 
 							<< p->GetValue().GetString()				<< std::endl;
@@ -893,11 +905,11 @@ const wxString& CncConfig::getToolType(wxString& ret, int toolId) {
 ////////////////////////////////////////////////////////////////////////
 unsigned int CncConfig::calculateThreshold(double pitch, unsigned int steps) {
 ////////////////////////////////////////////////////////////////////////
-	double metric = getReplyThresholdMetric();
+	const double metric = getReplyThresholdMetric();
 	if ( metric < 0.0 )
 		return 1;
 	
-	double min = pitch/steps;
+	const double min = pitch/steps;
 	if ( metric <= min )
 		return 1;
 		
@@ -912,17 +924,17 @@ void CncConfig::calculateThresholds() {
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setRenderResolution(double res) {
 ////////////////////////////////////////////////////////////////////////
-	renderResolutionMM = res < 0.01 ? 0.01 : res;
-	renderResolutionMM = res > 1.0  ? 1.0  : renderResolutionMM;
+	renderResolutionMM = res < 0.005 ? 0.005 : res;
+	renderResolutionMM = res > 1.0   ? 1.0   : renderResolutionMM;
 	
 	if ( THE_APP == NULL )
 		return;
 		
-	wxComboBox* cb = THE_APP->GetCbRenderResolution();
-	unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, renderResolutionMM);
-	wxString item(wxString::Format(renderSelectorFormat, renderResolutionMM, ppi));
+	wxComboBox* cb         = THE_APP->GetCbRenderResolution();
+	const unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, renderResolutionMM);
+	const wxString item(wxString::Format(renderSelectorFormat, renderResolutionMM, ppi));
 
-	int itemExits  = cb->FindString(item);
+	const int itemExits  = cb->FindString(item);
 	if ( itemExits < 0 )
 		cb->Append(item);
 		
@@ -935,7 +947,7 @@ void CncConfig::setRenderResolution(const wxString& sel) {
 	if ( pos <= 0 )
 		pos = sel.length();
 	
-	wxString selection = sel.SubString(0, pos - 1);
+	const wxString selection = sel.SubString(0, pos - 1);
 	double resolution; selection.ToDouble(&resolution);
 	
 	setRenderResolution(resolution);
@@ -949,30 +961,36 @@ void CncConfig::setupSelectorRenderResolution() {
 		
 		auto appendList = [&](float resolution) {
 			
-			unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, resolution);
+			const unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, resolution);
 			cb->Append(wxString::Format(renderSelectorFormat, resolution, ppi));
 		};
 		
-		appendList(0.01);
-		appendList(0.02);
-		appendList(0.03);
-		appendList(0.04);
-		appendList(0.05);
-		appendList(0.06);
-		appendList(0.07);
-		appendList(0.08);
-		appendList(0.09);
-		appendList(0.10);
-		appendList(0.20);
+		appendList(0.005);
+		appendList(0.006);
+		appendList(0.007);
+		appendList(0.008);
+		appendList(0.009);
+		appendList(0.010);
+		appendList(0.020);
+		appendList(0.030);
+		appendList(0.040);
+		appendList(0.050);
+		appendList(0.060);
+		appendList(0.070);
+		appendList(0.080);
+		appendList(0.090);
+		appendList(0.100);
+		appendList(0.200);
 		appendList(0.262);
-		appendList(0.30);
-		appendList(0.40);
-		appendList(0.50);
-		appendList(0.60);
-		appendList(0.70);
-		appendList(0.80);
-		appendList(0.90);
+		appendList(0.300);
+		appendList(0.400);
+		appendList(0.500);
+		appendList(0.600);
+		appendList(0.700);
+		appendList(0.800);
+		appendList(0.900);
 		
+		// default . . . 96 PPI
 		setRenderResolution(0.262);
 	}
 }

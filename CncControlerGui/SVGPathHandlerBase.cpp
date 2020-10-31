@@ -1,4 +1,5 @@
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "SVGPathHandlerBase.h"
 
 //////////////////////////////////////////////////////////////////
@@ -45,9 +46,9 @@ bool SVGPathHandlerBase::processLinearMove(const LinearMoveParam& param) {
 	newPosAbsY = unitCalculator.convert(newPosAbsY);
 	
 	// . . . and append
-	const CncPathListEntry cpe = pathListMgr.addEntryAbs(newPosAbsX, newPosAbsY, param.absZ, param.alreadyRendered);
+	const CncPathListEntry& cpe = pathListMgr.addEntryAbs(newPosAbsX, newPosAbsY, param.absZ, param.alreadyRendered);
+	logNextPathListEntry(cpe);
 	
-	//appendDebugValueDetail(cpe);
 	return true;
 }
 

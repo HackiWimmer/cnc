@@ -26,6 +26,8 @@ class CncPositionStorageView : public CncPositionStorageViewBase {
 		bool addMove	(uint8_t sid, double dx, double dy, double dz);
 		
 	protected:
+    virtual void onActivationTimer(wxTimerEvent& event);
+		virtual void onActivateWindow(wxActivateEvent& event);
 		virtual void onCopyDetails(wxCommandEvent& event);
 		virtual void onExportDetails(wxCommandEvent& event);
 		virtual void onSaveDetails(wxCommandEvent& event);
@@ -43,6 +45,14 @@ class CncPositionStorageView : public CncPositionStorageViewBase {
 			wxString label	= "";
 			wxString help	= "";
 			Format format	= LONG;
+			
+			static const char* getFormatAsString(Format f) {
+				switch ( f ) {
+					case LONG:		return "LONG";
+					case DOUBLE:	return "DOUBLE";
+				}
+				return "Unknown OverviewItemInfo Format";
+			}
 		};
 		
 		// -----------------------------------------------------

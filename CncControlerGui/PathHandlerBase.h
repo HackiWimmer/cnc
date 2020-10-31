@@ -72,9 +72,11 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		void tracePositions(const char* userPerspectivePrefix);
 		void traceFirstMove(double moveX, double moveY);
 		
-		// 
+		void logNextPathListEntry(const CncPathListEntry& cpe);
+		
+		// Curve lib callback
 		virtual bool callback(const CncCurveLib::Point& p);
-
+		
 		virtual bool processLinearMove(bool alreadyRendered) = 0;
 		void processClientId(long id);
 		void processSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN);

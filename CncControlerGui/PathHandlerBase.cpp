@@ -1,12 +1,10 @@
 #include <iostream>
 #include "CncUnitCalculator.h"
-
 #include "CncPathListRunner.h"
-
+#include "CncContext.h"
 #include "CncConfig.h"
 #include "CncPreprocessor.h"
 #include "MainFrame.h"
-
 #include "FileParser.h"
 #include "OSD/CncTimeFunctions.h"
 #include "PathHandlerBase.h"
@@ -14,20 +12,20 @@
 //////////////////////////////////////////////////////////////////
 PathHandlerBase::PathHandlerBase() 
 : CncCurveLib::Caller()
-, pathListMgr()
-, fileParser(NULL)
-, firstPath(true)
-, nextPath(false)
-, startPos({0.0, 0.0, 0.0})
-, currentPos({0.0, 0.0, 0.0})
-, totalLength(0.0)
-, unitCalculator(Unit::mm, Unit::mm)
-, lineCurve(this)
-, ellipticalCurve(this)
-, quadraticBezierCurve(this)
-, cubicBezierCurve(this)
-, lastQuadraticControlPoint()
-, lastCubicControlPoint()
+, pathListMgr				()
+, fileParser				(NULL)
+, firstPath					(true)
+, nextPath					(false)
+, startPos					({0.0, 0.0, 0.0})
+, currentPos				({0.0, 0.0, 0.0})
+, totalLength				(0.0)
+, unitCalculator			(Unit::mm, Unit::mm)
+, lineCurve					(this)
+, ellipticalCurve			(this)
+, quadraticBezierCurve		(this)
+, cubicBezierCurve			(this)
+, lastQuadraticControlPoint	()
+, lastCubicControlPoint		()
 {
 //////////////////////////////////////////////////////////////////
 	// init default setup
@@ -112,6 +110,14 @@ void PathHandlerBase::tracePositions(const char* userPerspectivePrefix) {
 void PathHandlerBase::traceCurrentPosition() {
 //////////////////////////////////////////////////////////////////
 	std::clog << "CurrentPos: " << currentPos << std::endl;
+}
+//////////////////////////////////////////////////////////////////
+void PathHandlerBase::logNextPathListEntry(const CncPathListEntry& cpe) {
+//////////////////////////////////////////////////////////////////
+	appendDebugValueDetail(cpe);
+	
+	const CncDoublePosition& p =  cpe.entryTarget;
+	CncContext::PositionStorage::addPos(CncContext::PositionStorage::TRIGGER_PH_CB_POS, p);
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::processClientId(long id) {
@@ -639,10 +645,17 @@ void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 	quadraticBezierCurve.init(s);
 	cubicBezierCurve.init(s);
 	
-	std::stringstream ss;
-	ss << " " << getName() << ": Setup " << unitCalculator;
-	THE_APP->getParsingSynopsisTrace()->addSeparator();
-	THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("%s", ss.str()));
+	{
+		std::stringstream ss;
+		ss << " " << getName() << ": Setup " << unitCalculator;
+		THE_APP->getParsingSynopsisTrace()->addSeparator();
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("%s", ss.str()));
+	}
+	{
+		std::stringstream ss;
+		ss << " " << s;
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("%s", ss.str()));
+	}
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::tracePathList(std::ostream &ostr) {

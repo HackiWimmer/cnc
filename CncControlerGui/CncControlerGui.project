@@ -232,6 +232,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncFlowPositionConverter.cpp"/>
+      <File Name="CncFlowPositionConverter.h"/>
       <File Name="CncPositionStorageView.h"/>
       <File Name="CncPositionStorageView.cpp"/>
       <File Name="CncSerialSpyPanel.h"/>

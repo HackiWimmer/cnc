@@ -74,37 +74,38 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	unsigned int idx = 0;
 
 	// ------------------------------------------------------------------------
-	auto determineDataStructure = [](unsigned char type, unsigned int& byteCount, unsigned int& valCount) {
-		ArdoObj::ValueInfo vi(type);
+	auto readOneByteToPos = [&] (CncLongPosition& pos) {
+		const unsigned char b = buffer[idx++];
+		pos.setX( ArdoObj::OneByte::getX(b) );
+		pos.setY( ArdoObj::OneByte::getY(b) );
+		pos.setZ( ArdoObj::OneByte::getZ(b) );
 		
-		if ( vi.isValid() == false )
-			return false;
-			
-		byteCount = (unsigned int)(vi.getByteCount()); 
-		valCount  = (unsigned int)(vi.getValueCount());
-		
-		return true;
+		if ( false ) {
+			std::cout	<< CNC_LOG_FUNCT	<< ": "
+						<< pos.getX()		<< ", " 
+						<< pos.getY()		<< ", " 
+						<< pos.getZ()		<< " -> " 
+						<< ArdoObj::OneByte::getAsString(b) << std::endl
+						;
+		}
+		return 1;
 	};
 
 	// ------------------------------------------------------------------------
-	auto readOneByteToPos = [&] (CncLongPosition& pos) {
-		unsigned char buf[1];
-		buf[0] = buffer[idx++];
-
-		pos.setX( buf[0] &   1 ?  +1 : buf[0] &   2 ? -1 : 0 );
-		pos.setY( buf[0] &   4 ?  +1 : buf[0] &   8 ? -1 : 0 );
-		pos.setZ( buf[0] &  16 ?  +1 : buf[0] &  32 ? -1 : 0 );
-		return 1;
- 	};
-
-	// ------------------------------------------------------------------------
 	auto readOneByte = [&] (int32_t& x, int32_t& y, int32_t& z) {
-		unsigned char buf[1];
-		buf[0] = buffer[idx++];
-
-		x = buf[0] &   1 ?  +1 : buf[0] &   2 ? -1 : 0 ;
-		y = buf[0] &   4 ?  +1 : buf[0] &   8 ? -1 : 0 ;
-		z = buf[0] &  16 ?  +1 : buf[0] &  32 ? -1 : 0 ;
+		const unsigned char b = buffer[idx++];
+		x = ArdoObj::OneByte::getX(b);
+		y = ArdoObj::OneByte::getY(b);
+		z = ArdoObj::OneByte::getZ(b);
+		
+		if ( false ) {
+			std::cout	<< CNC_LOG_FUNCT	<< ": "
+						<< x				<< ", " 
+						<< y				<< ", " 
+						<< z				<< " -> " 
+						<< ArdoObj::OneByte::getAsString(b) << std::endl
+						;
+		}
 		return 1;
 	};
 
@@ -146,10 +147,16 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	auto readPosition = [&] (CncLongPosition& pos) {
 
 		const unsigned char valueType 	= buffer[idx++];
-		unsigned int byteCount 			= 0;
-		unsigned int valCount 			= 0;
-		determineDataStructure(valueType, byteCount, valCount);
-
+		const ArdoObj::ValueInfo vi(valueType);
+		
+		if ( vi.isValid() == false ) {
+			std::cerr << CNC_LOG_FUNCT << ": Invalid ValueInfo" << std::endl;
+			return 0;
+		}
+			
+		const unsigned int byteCount = (unsigned int)(vi.getByteCount()); 
+		const unsigned int valCount  = (unsigned int)(vi.getValueCount());
+		
 		const bool trace = false;
 		if ( trace )
 			std::cout << "readPosition: " << (int)valueType << ", " << byteCount << ", " << valCount << ", ";
@@ -186,9 +193,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		}
 
 		// assign x, y, z depending on given pid
-		ArdoObj::ValueInfo vi(valueType);
-		
-		if 		( vi.hasXYZ() )	{ pos.setX(values[0]); pos.setY(values[1]); pos.setZ(values[2]); }
+		if		( vi.hasXYZ() )	{ pos.setX(values[0]); pos.setY(values[1]); pos.setZ(values[2]); }
 		else if ( vi.hasXY()  ) { pos.setX(values[0]); pos.setY(values[1]); pos.setZ(0);         }
 		else if ( vi.hasX()   ) { pos.setX(values[0]); pos.setY(0);         pos.setZ(0);         }
 		else if ( vi.hasY()   ) { pos.setX(0);         pos.setY(values[0]); pos.setZ(0);         }
@@ -197,7 +202,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		if ( trace )
 			std::cout << "byteCounter: " << byteCounter << ", pos: " << pos << std::endl;
 
-		return byteCounter;
+		return (int)byteCounter;
 	};
 
 	// ------------------------------------------------------------------------
@@ -296,7 +301,11 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 			CncLongPosition pos;
 			if ( sequence.Out.cmd == CMD_RENDER_AND_MOVE_SEQUENCE ) {
 				
-				byteCounter += readPosition(pos);
+				unsigned int bc = readPosition(pos);
+				if ( bc == 0 )
+					return false;
+					
+				byteCounter += bc;
 			}
 			else if ( sequence.Out.cmd == CMD_MOVE_SEQUENCE ) {
 				

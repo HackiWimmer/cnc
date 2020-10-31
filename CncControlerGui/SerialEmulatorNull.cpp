@@ -795,6 +795,10 @@ void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequ
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
+	
+	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_SERIAL_NULL, dx, dy, dz);
+	
+	
 	renderAndMove(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////

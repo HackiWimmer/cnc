@@ -1134,12 +1134,12 @@ CncPositionStorageViewBase::CncPositionStorageViewBase(wxWindow* parent, wxWindo
     flexGridSizer199->AddGrowableRow(0);
     m_splitterPageOverview->SetSizer(flexGridSizer199);
     
-    wxFlexGridSizer* flexGridSizer202 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer202 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer202->SetFlexibleDirection( wxBOTH );
     flexGridSizer202->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer202->AddGrowableCol(0);
     flexGridSizer202->AddGrowableRow(1);
-    flexGridSizer202->AddGrowableRow(2);
+    flexGridSizer202->AddGrowableRow(3);
     
     flexGridSizer199->Add(flexGridSizer202, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -1157,7 +1157,14 @@ CncPositionStorageViewBase::CncPositionStorageViewBase(wxWindow* parent, wxWindo
     
     flexGridSizer202->Add(m_overview, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_helpText = new wxTextCtrl(m_splitterPageOverview, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE);
+    m_staticText2451 = new wxStaticText(m_splitterPageOverview, wxID_ANY, _("Additional Info:"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(-1,-1)), 0);
+    m_staticText2451->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_staticText2451Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText2451->SetFont(m_staticText2451Font);
+    
+    flexGridSizer202->Add(m_staticText2451, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_helpText = new wxTextCtrl(m_splitterPageOverview, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(-1,-1)), wxTE_READONLY|wxTE_NO_VSCROLL|wxTE_MULTILINE);
     m_helpText->SetBackgroundColour(wxColour(wxT("rgb(51,51,51)")));
     m_helpText->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     
@@ -1317,6 +1324,8 @@ CncPositionStorageViewBase::CncPositionStorageViewBase(wxWindow* parent, wxWindo
     
     flexGridSizer228->Add(28, 0, 1, wxALL, WXC_FROM_DIP(0));
     
+    m_activationTimer = new wxTimer;
+    
     SetName(wxT("CncPositionStorageViewBase"));
     SetSize(wxDLG_UNIT(this, wxSize(540,400)));
     if (GetSizer()) {
@@ -1336,19 +1345,26 @@ CncPositionStorageViewBase::CncPositionStorageViewBase(wxWindow* parent, wxWindo
 #endif
     // Connect events
     this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncPositionStorageViewBase::onCloseWindow), NULL, this);
+    this->Connect(wxEVT_ACTIVATE, wxActivateEventHandler(CncPositionStorageViewBase::onActivateWindow), NULL, this);
     m_overview->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncPositionStorageViewBase::onOverviewItemSelected), NULL, this);
     m_btExport->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPositionStorageViewBase::onExportDetails), NULL, this);
     m_btSave->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPositionStorageViewBase::onSaveDetails), NULL, this);
     m_btCopy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPositionStorageViewBase::onCopyDetails), NULL, this);
+    m_activationTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncPositionStorageViewBase::onActivationTimer), NULL, this);
     
 }
 
 CncPositionStorageViewBase::~CncPositionStorageViewBase()
 {
     this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncPositionStorageViewBase::onCloseWindow), NULL, this);
+    this->Disconnect(wxEVT_ACTIVATE, wxActivateEventHandler(CncPositionStorageViewBase::onActivateWindow), NULL, this);
     m_overview->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncPositionStorageViewBase::onOverviewItemSelected), NULL, this);
     m_btExport->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPositionStorageViewBase::onExportDetails), NULL, this);
     m_btSave->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPositionStorageViewBase::onSaveDetails), NULL, this);
     m_btCopy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPositionStorageViewBase::onCopyDetails), NULL, this);
+    m_activationTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncPositionStorageViewBase::onActivationTimer), NULL, this);
     
+    m_activationTimer->Stop();
+    wxDELETE( m_activationTimer );
+
 }

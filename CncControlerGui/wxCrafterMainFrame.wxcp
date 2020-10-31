@@ -11037,7 +11037,7 @@
                               }, {
                                "type": "multi-string",
                                "m_label": "Tooltip:",
-                               "m_value": "rtrt"
+                               "m_value": ""
                               }, {
                                "type": "colour",
                                "m_label": "Bg Colour:",
@@ -11249,7 +11249,7 @@
                              "border": 0,
                              "gbSpan": "1,1",
                              "gbPosition": "0,0",
-                             "m_styles": ["wxTE_MULTILINE"],
+                             "m_styles": ["wxTE_MULTILINE", "wxTE_DONTWRAP"],
                              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                              "m_properties": [{
                                "type": "winid",
@@ -11466,7 +11466,7 @@
                              "border": 0,
                              "gbSpan": "1,1",
                              "gbPosition": "0,0",
-                             "m_styles": ["wxTE_MULTILINE"],
+                             "m_styles": ["wxTE_MULTILINE", "wxTE_DONTWRAP"],
                              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                              "m_properties": [{
                                "type": "winid",
@@ -11683,7 +11683,7 @@
                              "border": 0,
                              "gbSpan": "1,1",
                              "gbPosition": "0,0",
-                             "m_styles": ["wxTE_MULTILINE"],
+                             "m_styles": ["wxTE_MULTILINE", "wxTE_DONTWRAP"],
                              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                              "m_properties": [{
                                "type": "winid",

@@ -75,7 +75,8 @@ bool GCodePathHandlerCnc::changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
-	const CncPathListEntry cpe = pathListMgr.addEntryAbs(currentPos.getX(), currentPos.getY(), currentPos.getZ(), alreadyRendered);
-	appendDebugValueDetail(cpe);
+	const CncPathListEntry& cpe = pathListMgr.addEntryAbs(currentPos.getX(), currentPos.getY(), currentPos.getZ(), alreadyRendered);
+	logNextPathListEntry(cpe);
+	
 	return true;
 }

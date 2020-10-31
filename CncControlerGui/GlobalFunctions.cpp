@@ -271,7 +271,7 @@ bool GblFunc::executeExternalProgram(const wxString& tool, const wxString& file,
 	}
 	
 	cnc::trc.logInfoMessage(wxString::Format("Open: %s", cmd));
-	wxExecute(cmd);
+	wxExecute(cmd, wxEXEC_ASYNC);
 	
 	return true;
 }

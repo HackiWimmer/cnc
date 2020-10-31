@@ -110,13 +110,12 @@ void SerialThread::stop() {
 ////////////////////////////////////////////////////////////////////
 bool SerialThread::transferData(AE::TransferData& td) {
 ////////////////////////////////////////////////////////////////////
-	if ( ARDUINO_DATA_STORE == NULL )
-		return false; 
-		
-	{
-		wxCriticalSectionLocker enter(pHandler->pSerialThreadCS);
-		ARDUINO_DATA_STORE->fillTransferData(td);
-	}
+	if ( ARDUINO_DATA_STORE == NULL )	return false;
+	if ( TestDestroy() )				return false;
+	if ( exit == true  )				return false;
+
+	wxCriticalSectionLocker enter(pHandler->pSerialThreadCS);
+	ARDUINO_DATA_STORE->fillTransferData(td);
 	
 	return true;
 }

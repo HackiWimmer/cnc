@@ -25,7 +25,7 @@ struct CncContext {
 		
 		OSType os						= OSType::UNDEF;
 		bool probeMode					= true;
-		bool interactiveMoveMode				= false;
+		bool interactiveMoveMode		= false;
 		bool speedMonitor				= false;
 		bool onlineUpdateCoordinates	= true;
 		bool onlineUpdateDrawPane		= true;
@@ -47,6 +47,11 @@ struct CncContext {
 			static const uint8_t TRIGGER_DRM_POS			= POS_STORE_SID_DIRECT_MOVE;
 			static const uint8_t TRIGGER_RAM_POS			= POS_STORE_SID_RENDER_AND_MOVE;
 			static const uint8_t TRIGGER_STP_POS			= POS_STORE_SID_STEPPING;
+			static const uint8_t TRIGGER_PH_CB_POS			= POS_STORE_SID_PATH_HANDLER_OUTPUT;
+			static const uint8_t TRIGGER_PH_LST_RUN			= POS_STORE_SID_PATH_LIST_RUNNER;
+			static const uint8_t TRIGGER_MOV_SEQ_ADD		= POS_STORE_SID_MOV_SEQ_ADD;
+			static const uint8_t TRIGGER_SERIAL_NULL		= POS_STORE_SID_SERIAL_NULL;
+			
 			static const uint8_t MAX_SIDS					= 16;
 			
 			static CncPositionStorageView*	storage;

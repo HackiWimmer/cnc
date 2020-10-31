@@ -3,6 +3,7 @@
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "CncFileNameService.h"
+#include "MainFrame.h"
 #include "GlobalFunctions.h"
 #include "CncPositionStorageView.h"
 
@@ -24,35 +25,71 @@ CncPositionStorageView::CncPositionStorageView(wxWindow* parent)
 	// -------------------------------------------------------------
 	// setup overview content . . . 
 	{
-		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "Trigger Controller Position"; oi.help = "";
+		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "Trigger Controller Position"; 
+		oi.help =	"The position will traced at the point the serial callback " \
+					"receives the next controller position";
 		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_CTL_POS );
 		addStorage(STORE::TRIGGER_CTL_POS);
 	}
 	{
-		OverviewItemInfo oi; oi.format = OFMT::DOUBLE, oi.label = "Trigger Application Position"; oi.help = "";
+		OverviewItemInfo oi; oi.format = OFMT::DOUBLE, oi.label = "Trigger Application Position"; 
+		oi.help =	"The position will traced at the point the serial callback " \
+					"receives the next application position";
 		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_APP_POS );
 		addStorage(STORE::TRIGGER_APP_POS);
 	}
 	{
-		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "Trigger Direct Move"; oi.help = "";
+		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "Trigger Direct Move"; 
+		oi.help =	"The position will traced at the point the controller will trigger " \
+					"the next direct move.";
 		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_DRM_POS );
 		addStorage(STORE::TRIGGER_DRM_POS);
 	}
 	{
-		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "Trigger Render and Move"; oi.help = "";
+		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "Trigger Render and Move"; 
+		oi.help =	"The position will traced at the point the controller will trigger " \
+					"the next render cycle.";
 		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_RAM_POS );
 		addStorage(STORE::TRIGGER_RAM_POS);
 	}
 	{
-		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "Trigger Stepping"; oi.help = "";
+		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "Trigger Stepping"; 
+		oi.help =	"The position will traced at the point the controller produces the next motor step.";
 		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_STP_POS );
 		addStorage(STORE::TRIGGER_STP_POS);
 	}
+	{
+		OverviewItemInfo oi; oi.format = OFMT::DOUBLE, oi.label = "Pathhandler Output";
+		oi.help = 	"The position will traced at the point the Pathhandler generates a PathListEntry " \
+					"and hand over it to the PathListManager."; 
+		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_PH_CB_POS );
+		addStorage(STORE::TRIGGER_PH_CB_POS);
+	}
+	{
+		OverviewItemInfo oi; oi.format = OFMT::DOUBLE, oi.label = "PathListRunner Output";
+		oi.help = 	"The position will traced at the point the PathListRunnner generates an Output."; 
+		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_PH_LST_RUN );
+		addStorage(STORE::TRIGGER_PH_LST_RUN);
+	}
+	{
+		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "MoveSequence Add as in32_t";
+		oi.help = 	"The position will traced at the point ......."; 
+		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_MOV_SEQ_ADD );
+		addStorage(STORE::TRIGGER_MOV_SEQ_ADD);
+	}
+	{
+		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "TRIGGER_SERIAL_NULL";
+		oi.help = 	"The position will traced at the point ......."; 
+		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_SERIAL_NULL );
+		addStorage(STORE::TRIGGER_SERIAL_NULL);
+	}
+
+	
 	
 	// -------------------------------------------------------------
 	// setup overview gui . . . 
 	m_overview->EnableCheckBoxes(true);
-	m_overview->AppendColumn("Context");
+	m_overview->AppendColumn("Eval|Context");
 	m_overview->SetColumnWidth(0, 300);
 	
 	for (auto it = overview.begin(); it != overview.end(); ++it )
@@ -233,9 +270,9 @@ void CncPositionStorageView::onOverviewItemUnChecked(wxListEvent& event) {
 void CncPositionStorageView::onOverviewItemStateChange(long item) {
 ////////////////////////////////////////////////////////////////////
 	const uint8_t sid = item2Sid(item);
-	
 	CncContext::PositionStorage::enablePosStorageFor(sid, m_overview->IsItemChecked(item));
 	clear(sid);
+	updateDetails();
 }
 ////////////////////////////////////////////////////////////////////
 void CncPositionStorageView::onOverviewItemSelected(wxListEvent& event) {
@@ -292,6 +329,7 @@ void CncPositionStorageView::updateDetails() {
 	
 	wxString label;
 	m_detailsEntries->ChangeValue(wxString::Format("%ld", (long)l.size()));
+	m_detailsType->ChangeValue(OverviewItemInfo::getFormatAsString(format));
 	
 	m_details->DeleteAllItems();
 	for ( auto it= l.begin(); it != l.end(); ++it ) {
@@ -455,14 +493,15 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 		vt.append("Set('StyleSheet/axis3d/TickLabels/size', u'10pt')\n");
 		vt.append("Set('StyleSheet/axis3d/GridLines/color', u'#dcdcdc')\n");
 		vt.append("Set('StyleSheet/axis3d/GridLines/hide', False)\n");
+		
 		vt.append("Add('page', name=u'CncPage1', autoadd=False)\n");
 		vt.append("To(u'CncPage1')\n");
 		
 		vt.append("Add('scene3d', name=u'CncScene3D1', autoadd=False)\n");
 		vt.append("To(u'CncScene3D1')\n");
-		vt.append("Set('xRotation', -130.0)\n");
-		vt.append("Set('yRotation', -180.0)\n");
-		vt.append("Set('zRotation', -180.0)\n");
+		vt.append("Set('xRotation', 30.0)\n");
+		vt.append("Set('yRotation',  0.0)\n");
+		vt.append("Set('zRotation',  0.0)\n");
 		
 		vt.append("Add('graph3d', name=u'CncGraph3D1', autoadd=False)\n");
 		vt.append("To(u'CncGraph3D1')\n");
@@ -496,9 +535,9 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 		vt.append("To('..')\n");
 		vt.append("Add('point3d', name=u'CncPoint3D1', autoadd=False)\n");
 		vt.append("To(u'CncPoint3D1')\n");
-		vt.append("Set('marker', u'circledot')\n");
+		vt.append("Set('marker', u'dot')\n");
 		vt.append("Set('color', u'blue')\n");
-		vt.append("Set('markerSize', 2.0)\n");
+		vt.append("Set('markerSize', 1.0)\n");
 		
 		vt.append("Set('xData', u'x1')\n");
 		vt.append("Set('yData', u'y1')\n");
@@ -508,6 +547,9 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 		vt.append("Set('zAxis', u'Z')\n");
 		vt.append("Set('scalePoints', [])\n");
 		vt.append("Set('Color/points', [])\n");
+		vt.append("Set('PlotLine/hide', False)\n");
+		vt.append("Set('MarkerLine/hide', True)\n");
+		vt.append("Set('Error/hide', True)\n");
 		
 		vt.append("To('..')\n");
 		vt.append("To('..')\n");
@@ -534,5 +576,16 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 	// export
 	GblFunc::executeExternalProgram(exportTool, fnVSZ.GetFullPath(), true);
 }
-
-
+////////////////////////////////////////////////////////////////////
+void CncPositionStorageView::onActivateWindow(wxActivateEvent& event) {
+////////////////////////////////////////////////////////////////////
+	if ( event.GetActive() == true )
+		m_activationTimer->Start(100, true);
+	
+	event.Skip();
+}
+////////////////////////////////////////////////////////////////////
+void CncPositionStorageView::onActivationTimer(wxTimerEvent& event) {
+////////////////////////////////////////////////////////////////////
+	THE_APP->Raise();
+}

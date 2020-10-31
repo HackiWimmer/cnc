@@ -1,6 +1,7 @@
 #include <math.h>
 #include "CncCommon.h"
 #include "MainFrameProxy.h"
+#include "CncContext.h"
 #include "CncConfig.h"
 #include "FileParser.h"
 #include "CncControl.h"
@@ -235,6 +236,12 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 		cpp->addOperatingTrace(ss);
 	}
 
+	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, 
+												curr.entryDistance.getX(), 
+												curr.entryDistance.getY(), 
+												curr.entryDistance.getZ());
+												
+
 	return setup.cnc->moveRelLinearMetricXYZ(	curr.entryDistance.getX(), 
 												curr.entryDistance.getY(), 
 												curr.entryDistance.getZ(), 
@@ -254,6 +261,11 @@ bool CncPathListRunner::onPhysicallyMoveRawAsSequence(const CncPathListEntry& cu
 	cms.addClientId(clientId);
 	cms.setCurrentSpeedInfo(si);
 	
+	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, 
+							curr.entryDistance.getX(), 
+							curr.entryDistance.getY(), 
+							curr.entryDistance.getZ());
+
 	cms.addMetricPosXYZ(	curr.entryDistance.getX(),
 							curr.entryDistance.getY(),
 							curr.entryDistance.getZ());
@@ -291,8 +303,9 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 
 	// -----------------------------------------------------------
 	auto addSequenceEntryFromValues = [&](double dx, double dy, double dz) {
-		currentSequence->addMetricPosXYZ(dx, dy, dz);
 		
+		CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, dx, dy, dz);
+		currentSequence->addMetricPosXYZ(dx, dy, dz);
 		return true;
 	};
 	
@@ -300,7 +313,12 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	auto addSequenceEntryFromEntry = [&](const CncPathListEntry* e) {
 		if ( e == NULL )
 			return false;
-
+		
+		CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, 
+											e->entryDistance.getX(), 
+											e->entryDistance.getY(), 
+											e->entryDistance.getZ());
+											
 		currentSequence->addMetricPosXYZ(	e->entryDistance.getX(),
 											e->entryDistance.getY(),
 											e->entryDistance.getZ());
@@ -339,8 +357,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	}
 	
 //
-addSequenceEntryFromEntry(curr);
-return true;
+//addSequenceEntryFromEntry(curr);
+//return true;
 
 	// -----------------------------------------------------------
 	// check if nothing more than curr available

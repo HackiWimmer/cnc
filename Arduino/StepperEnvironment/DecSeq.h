@@ -150,14 +150,10 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
         // copy bytes
         switch ( byteCount ){
     
-          // format:   bit: 78543210    
-          //                  zzyyxx
-          //                  -+-+-+ 
-          //                          bit  +               bit  -     0
           case 0:   b = AML::readSerialByteWithTimeout();
-                    v[0] = bitRead(b, 0) ? +1 : bitRead(b, 1) ? -1 :  0;
-                    v[1] = bitRead(b, 2) ? +1 : bitRead(b, 3) ? -1 :  0;
-                    v[2] = bitRead(b, 4) ? +1 : bitRead(b, 5) ? -1 :  0;
+                    v[0] = ArdoObj::OneByte::getX(b);
+                    v[1] = ArdoObj::OneByte::getY(b);
+                    v[2] = ArdoObj::OneByte::getZ(b);
                     
                     readIndex -= 1;
                     count     += ArdoObj::ValueInfo::MaxValueCount; // to break the while loop

@@ -971,7 +971,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer9517->AddGrowableRow(0);
     m_panelLoadTrace->SetSizer(flexGridSizer9517);
     
-    m_cfgLoadTrace = new wxTextCtrl(m_panelLoadTrace, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelLoadTrace, wxSize(-1,-1)), wxTE_MULTILINE);
+    m_cfgLoadTrace = new wxTextCtrl(m_panelLoadTrace, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelLoadTrace, wxSize(-1,-1)), wxTE_MULTILINE|wxTE_DONTWRAP);
     m_cfgLoadTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_cfgLoadTrace->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_cfgLoadTraceFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
@@ -991,7 +991,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer95171->AddGrowableRow(0);
     m_panelSaveTrace->SetSizer(flexGridSizer95171);
     
-    m_cfgSaveTrace = new wxTextCtrl(m_panelSaveTrace, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelSaveTrace, wxSize(-1,-1)), wxTE_MULTILINE);
+    m_cfgSaveTrace = new wxTextCtrl(m_panelSaveTrace, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelSaveTrace, wxSize(-1,-1)), wxTE_MULTILINE|wxTE_DONTWRAP);
     m_cfgSaveTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_cfgSaveTrace->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_cfgSaveTraceFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
@@ -1011,7 +1011,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer95173->AddGrowableRow(0);
     m_panelObsoleteTRace->SetSizer(flexGridSizer95173);
     
-    m_cfgObsoleteTrace = new wxTextCtrl(m_panelObsoleteTRace, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelObsoleteTRace, wxSize(-1,-1)), wxTE_MULTILINE);
+    m_cfgObsoleteTrace = new wxTextCtrl(m_panelObsoleteTRace, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelObsoleteTRace, wxSize(-1,-1)), wxTE_MULTILINE|wxTE_DONTWRAP);
     m_cfgObsoleteTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_cfgObsoleteTrace->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     wxFont m_cfgObsoleteTraceFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));

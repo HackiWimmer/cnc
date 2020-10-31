@@ -357,6 +357,7 @@
   const int32_t   MIN_LONG                               = -2147483648L;
   const int32_t   MAX_LONG                               = +2147483647L;
 
+  // constant values for fixed point arithmetics
   const int32_t   C_2_08                                 =     256;
   const int32_t   C_2_09                                 =     512;
   const int32_t   C_2_10                                 =    1024;
@@ -367,10 +368,15 @@
   const int32_t   C_2_15                                 =   32768;
   const int32_t   C_2_16                                 =   65536;
 
+  // Position store trace ids
   const uint8_t   POS_STORE_SID_CTL_POS                  =  1;
   const uint8_t   POS_STORE_SID_APP_POS                  =  2;
   const uint8_t   POS_STORE_SID_DIRECT_MOVE              =  3;
   const uint8_t   POS_STORE_SID_RENDER_AND_MOVE          =  4;
   const uint8_t   POS_STORE_SID_STEPPING                 =  5;
-
+  const uint8_t   POS_STORE_SID_PATH_HANDLER_OUTPUT      =  6;
+  const uint8_t   POS_STORE_SID_PATH_LIST_RUNNER         =  7;
+  const uint8_t   POS_STORE_SID_MOV_SEQ_ADD              =  8;
+  const uint8_t   POS_STORE_SID_SERIAL_NULL              =  9;
+  
 #endif

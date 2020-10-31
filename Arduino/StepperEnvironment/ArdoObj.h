@@ -178,6 +178,35 @@ namespace ArdoObj {
   };
 
   // --------------------------------------------------------------
+  struct OneByte {
+      // format:   bit: 78543210    
+      //                  zZyYxX
+      //                  -+-+-+ 
+      struct Index  {
+        struct Neg { static const int X=1, Y=3, Z=5; };
+        struct Pos { static const int X=0, Y=2, Z=4; };
+      };
+
+      static int8_t getX(const unsigned char c) { return c &  1 ? ( +1 ) : c &  2 ? ( -1 ) : ( 0 ); }
+      static int8_t getY(const unsigned char c) { return c &  4 ? ( +1 ) : c &  8 ? ( -1 ) : ( 0 ); }
+      static int8_t getZ(const unsigned char c) { return c & 16 ? ( +1 ) : c & 32 ? ( -1 ) : ( 0 ); }
+
+      static const char* getAsString(unsigned char b) {
+          static char ret[8];
+          ret[0] = b & 128 ? '1' : '0';
+          ret[1] = b &  64 ? '1' : '0';
+          ret[2] = b &  32 ? 'z' : '0';
+          ret[3] = b &  16 ? 'Z' : '0';
+          ret[4] = b &   8 ? 'y' : '0';
+          ret[5] = b &   4 ? 'Y' : '0';
+          ret[6] = b &   2 ? 'x' : '0';
+          ret[7] = b &   1 ? 'X' : '0';
+  
+        return ret;
+      }
+  };
+  
+  // --------------------------------------------------------------
   // Stores value information, 
   // Used within the MoveSequence processing
   struct ValueInfo {
@@ -238,7 +267,9 @@ namespace ArdoObj {
       
       explicit ValueInfo(unsigned char t)
       : type(t)
-      {}
+      {
+        
+      }
   
       ValueInfo(Size s, int32_t x, int32_t y, int32_t z)
       : type(0)
@@ -248,9 +279,9 @@ namespace ArdoObj {
         setBit(Byte::L2, s == Size::Int16);
         setBit(Byte::L4, s == Size::Int32);
   
-        setBit(Byte::X,  x != 0L);
-        setBit(Byte::Y,  y != 0L);
-        setBit(Byte::Z,  z != 0L);
+        setBit(Byte::X,  s == Size::One ? true : x != 0L);
+        setBit(Byte::Y,  s == Size::One ? true : y != 0L);
+        setBit(Byte::Z,  s == Size::One ? true : z != 0L);
       }
   
       void set(unsigned char t) { type = t; }

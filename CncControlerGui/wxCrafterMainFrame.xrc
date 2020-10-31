@@ -1488,7 +1488,7 @@ Configuration</label>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
                                             <object class="wxTextCtrl" name="m_cfgLoadTrace">
-                                              <style>wxTE_MULTILINE</style>
+                                              <style>wxTE_MULTILINE|wxTE_DONTWRAP</style>
                                               <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                               <fg>wxSYS_COLOUR_3DLIGHT</fg>
                                               <font>
@@ -1520,7 +1520,7 @@ Configuration</label>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
                                             <object class="wxTextCtrl" name="m_cfgSaveTrace">
-                                              <style>wxTE_MULTILINE</style>
+                                              <style>wxTE_MULTILINE|wxTE_DONTWRAP</style>
                                               <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                               <fg>wxSYS_COLOUR_3DLIGHT</fg>
                                               <font>
@@ -1552,7 +1552,7 @@ Configuration</label>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
                                             <object class="wxTextCtrl" name="m_cfgObsoleteTrace">
-                                              <style>wxTE_MULTILINE</style>
+                                              <style>wxTE_MULTILINE|wxTE_DONTWRAP</style>
                                               <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                               <fg>wxSYS_COLOUR_3DLIGHT</fg>
                                               <font>

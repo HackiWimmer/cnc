@@ -253,6 +253,7 @@ MainFrameBase::~MainFrameBase() {
 	
 	//hosuekeeping
 	CncFileNameService::sessionHousekeeping();
+	CncFileNameService::sessionHousekeeping();
 	
 	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Finalized . . .")
 }
@@ -448,6 +449,8 @@ MainFrame::~MainFrame() {
 	cncDELETE( cncOsEnvDialog );
 	cncDELETE( outboundNbInfo );
 	cncDELETE( templateNbInfo );
+	cncDELETE( positionStorage );
+	cncDELETE( cncSpeedPlayground );
 	cncDELETE( cnc );
 	cncDELETE( statisticsPane );
 	cncDELETE( drawPane3D );
@@ -1721,6 +1724,8 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		 
 	}
 	
+	cncSpeedPlayground->Show(false);
+	positionStorage->Show(false);
 	cncArduinoEnvironment->activateOnClose(true);
 	
 	event.Skip();

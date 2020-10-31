@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 245,
+  "m_objCounter": 248,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC3105InitBitmapResources",
   "m_bitmapsFile": "wxCrafterBaseDialogs_bitmaps.cpp",
@@ -8414,7 +8414,7 @@
     }, {
      "type": "string",
      "m_label": "Title:",
-     "m_value": "Cnc Position Storage"
+     "m_value": "Cnc Position Storage - Path Evaluator"
     }, {
      "type": "virtualFolderPicker",
      "m_label": "Virtual Folder:",
@@ -8468,6 +8468,13 @@
      "m_eventHandler": "wxCloseEventHandler",
      "m_functionNameAndSignature": "onCloseWindow(wxCloseEvent& event)",
      "m_description": "Process a close event. This event applies to wxFrame and wxDialog classes",
+     "m_noBody": false
+    }, {
+     "m_eventName": "wxEVT_ACTIVATE",
+     "m_eventClass": "wxActivateEvent",
+     "m_eventHandler": "wxActivateEventHandler",
+     "m_functionNameAndSignature": "onActivateWindow(wxActivateEvent& event)",
+     "m_description": "Process a wxEVT_ACTIVATE event",
      "m_noBody": false
     }],
    "m_children": [{
@@ -8738,7 +8745,7 @@
               }, {
                "type": "string",
                "m_label": "# Rows:",
-               "m_value": "3"
+               "m_value": "4"
               }, {
                "type": "string",
                "m_label": "Growable columns:",
@@ -8746,7 +8753,7 @@
               }, {
                "type": "string",
                "m_label": "Growable rows:",
-               "m_value": "1,2"
+               "m_value": "1,3"
               }, {
                "type": "string",
                "m_label": "Horizontal gap:",
@@ -8907,12 +8914,87 @@
                 }],
                "m_children": []
               }, {
+               "m_type": 4405,
+               "proportion": 0,
+               "border": 5,
+               "gbSpan": "1,1",
+               "gbPosition": "0,0",
+               "m_styles": [],
+               "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+               "m_properties": [{
+                 "type": "winid",
+                 "m_label": "ID:",
+                 "m_winid": "wxID_ANY"
+                }, {
+                 "type": "string",
+                 "m_label": "Size:",
+                 "m_value": "-1,-1"
+                }, {
+                 "type": "string",
+                 "m_label": "Minimum Size:",
+                 "m_value": "-1,-1"
+                }, {
+                 "type": "string",
+                 "m_label": "Name:",
+                 "m_value": "m_staticText2451"
+                }, {
+                 "type": "multi-string",
+                 "m_label": "Tooltip:",
+                 "m_value": ""
+                }, {
+                 "type": "colour",
+                 "m_label": "Bg Colour:",
+                 "colour": "<Default>"
+                }, {
+                 "type": "colour",
+                 "m_label": "Fg Colour:",
+                 "colour": "ControlLight"
+                }, {
+                 "type": "font",
+                 "m_label": "Font:",
+                 "m_value": "9,normal, bold, swiss, 0, Segoe UI"
+                }, {
+                 "type": "bool",
+                 "m_label": "Hidden",
+                 "m_value": false
+                }, {
+                 "type": "bool",
+                 "m_label": "Disabled",
+                 "m_value": false
+                }, {
+                 "type": "bool",
+                 "m_label": "Focused",
+                 "m_value": false
+                }, {
+                 "type": "string",
+                 "m_label": "Class Name:",
+                 "m_value": ""
+                }, {
+                 "type": "string",
+                 "m_label": "Include File:",
+                 "m_value": ""
+                }, {
+                 "type": "string",
+                 "m_label": "Style:",
+                 "m_value": ""
+                }, {
+                 "type": "multi-string",
+                 "m_label": "Label:",
+                 "m_value": "Additional Info:"
+                }, {
+                 "type": "string",
+                 "m_label": "Wrap:",
+                 "m_value": "-1"
+                }],
+               "m_events": [],
+               "m_children": []
+              }, {
                "m_type": 4406,
                "proportion": 0,
                "border": 0,
                "gbSpan": "1,1",
                "gbPosition": "0,0",
-               "m_styles": ["wxTE_READONLY", "wxTE_MULTILINE"],
+               "m_styles": ["wxTE_READONLY", "wxTE_NO_VSCROLL", "wxTE_MULTILINE"],
                "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                "m_properties": [{
                  "type": "winid",
@@ -10535,6 +10617,40 @@
           }]
         }]
       }]
+    }, {
+     "m_type": 4483,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "m_activationTimer"
+      }, {
+       "type": "integer",
+       "m_label": "Interval",
+       "m_value": 1000
+      }, {
+       "type": "bool",
+       "m_label": "Start the timer",
+       "m_value": false
+      }, {
+       "type": "bool",
+       "m_label": "One Shot Timer",
+       "m_value": false
+      }],
+     "m_events": [{
+       "m_eventName": "wxEVT_TIMER",
+       "m_eventClass": "wxTimerEvent",
+       "m_eventHandler": "wxTimerEventHandler",
+       "m_functionNameAndSignature": "onActivationTimer(wxTimerEvent& event)",
+       "m_description": "Process a timer event",
+       "m_noBody": false
+      }],
+     "m_children": []
     }]
   }]
 }
