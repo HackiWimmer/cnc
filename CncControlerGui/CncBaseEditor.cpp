@@ -247,24 +247,31 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 	
 	// try to select current line as client id
 	if ( publishSelection == true ) {
-
+		// ------------------------------------------------------------
 		auto tryToSelectClientId = [&](long cid) {
-
 			SelectEventBlocker blocker(this);
 			APP_PROXY::tryToSelectClientId(cid, ClientIdSelSource::ID::TSS_EDITOR);
 		};
-
-
+		
+		// ------------------------------------------------------------
 		if ( fileInfo.format == TplSvg ) {
-			SearchAnchor();							// Set an anchor for the next search
-			const long prevPos = GetCurrentPos();	// Store position
-			const long sp = SearchPrev(0, "<");		// find start
-
+			SearchAnchor();										// Set an anchor for the next search
+			const long prevSelStart	= GetSelectionStart();		// Store selection
+			const long prevSelEnd	= GetSelectionEnd();		// Store selection
+			const long prevPos		= GetCurrentPos();			// Store position
+			const long sp			= SearchPrev(0, "<");		// Find start
+			
 			if ( sp != wxNOT_FOUND )	tryToSelectClientId(LineFromPosition(sp) + 1);
 			else						tryToSelectClientId(                   y + 1);
 			
-			SetCurrentPos(prevPos);					// Restore position
-			SetSelection(prevPos, prevPos);
+			if ( CncAsyncKeyboardState::isControlPressed() ) {
+				// Currently nothing to do
+				// Streaches the selection to the command start automatically
+			}
+			else {
+				SetCurrentPos(prevPos);					// Restore position
+				SetSelection(prevSelStart, prevSelEnd);	// Restore selection
+			}
 		}
 		else {
 			

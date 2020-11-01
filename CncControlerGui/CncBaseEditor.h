@@ -32,13 +32,13 @@ class CncBaseEditor : public wxStyledTextCtrl {
 			
 			// common variables
 			CncTemplateFormat				format;
-			wxFileName					fileName;
-			GLContextBase::ModelType 	modelType;
-			cnc::LineNumberTranslater	lineNumberTranslater;
-			CncDimensions				modelViewType;
+			wxFileName						fileName;
+			GLContextBase::ModelType		modelType;
+			cnc::LineNumberTranslater		lineNumberTranslater;
+			CncDimensions					modelViewType;
 			
 			// binary format specials
-			BinaryFileParser::ViewType 	binaryViewType;
+			BinaryFileParser::ViewType		binaryViewType;
 			CncTemplateFormat				binaryOrigFomat;
 			
 			FileInfo() { reset(); }

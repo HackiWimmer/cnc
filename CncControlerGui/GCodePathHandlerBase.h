@@ -40,14 +40,14 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		virtual bool processDwellIntern(int64_t microseconds) { return true; }
 		virtual bool processLinearMove(bool alreadyRendered) = 0;
 		virtual bool changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value = 0.0) = 0;
-		virtual bool initNextPath() = 0;
-		virtual void prepareWorkImpl() = 0;
-		virtual void finishWorkImpl() = 0;
+		virtual bool initNextPath()		= 0;
+		virtual void prepareWorkImpl()	= 0;
+		virtual void finishWorkImpl()	= 0;
 		
 	private:
 		
-		CutterCompensation cutterCompMode;
-		int toolLengthOffsetId;
+		CutterCompensation	cutterCompMode;
+		int 				toolLengthOffsetId;
 		
 		void updateCurrentPosition(GCodeBlock& gcb);
 };

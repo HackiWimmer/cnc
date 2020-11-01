@@ -1300,21 +1300,31 @@ bool CncControl::moveZToZeroPos() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = true;
 	if ( curAppPos != zeroAppPos ) {
-		int32_t moveZ=0;
-		moveZ = zeroAppPos.getZ() - curAppPos.getZ();
+		const int32_t moveZ = zeroAppPos.getZ() - curAppPos.getZ();
 		ret = moveRelLinearStepsXYZ(0, 0, moveZ, false);
 	}
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+bool CncControl::moveXYToStartPos() {
+///////////////////////////////////////////////////////////////////
+	const CncLongPosition pos(startAppPos.getX(), startAppPos.getY(), curAppPos.getZ());
+	return moveToPos(pos);
+}
+///////////////////////////////////////////////////////////////////
 bool CncControl::moveToStartPos() {
 ///////////////////////////////////////////////////////////////////
+	return moveToPos(startAppPos);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveToPos(const CncLongPosition& pos) {
+///////////////////////////////////////////////////////////////////
 	bool ret = true;
-	if ( curAppPos != startAppPos ) {
-		int32_t moveX=0, moveY=0;
-		moveX = startAppPos.getX() - curAppPos.getX(); 
-		moveY = startAppPos.getY() - curAppPos.getY();
-		moveRelLinearStepsXY(moveX, moveY, false);
+	if ( curAppPos != pos ) {
+		const int32_t moveX = pos.getX() - curAppPos.getX(); 
+		const int32_t moveY = pos.getY() - curAppPos.getY();
+		const int32_t moveZ = pos.getZ() - curAppPos.getZ();
+		moveRelLinearStepsXYZ(moveX, moveY, moveZ, false);
 	}
 	return ret;
 }

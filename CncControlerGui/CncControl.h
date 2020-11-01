@@ -363,7 +363,9 @@ class CncControl {
 		bool moveZToZeroPos();
 		
 		// Moves curPos to startPos
+		bool moveXYToStartPos();
 		bool moveToStartPos();
+		bool moveToPos(const CncLongPosition& pos);
 		
 		// Moves curPos to zeroPos
 		bool simpleMoveXYToZeroPos(CncDimensions dim);

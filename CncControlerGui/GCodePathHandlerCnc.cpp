@@ -4,8 +4,9 @@
 
 //////////////////////////////////////////////////////////////////
 GCodePathHandlerCnc::GCodePathHandlerCnc(CncControl* cnc) 
-: GCodePathHandlerBase()
-, CncPathListRunner(cnc)
+: GCodePathHandlerBase	()
+, CncPathListRunner		(cnc)
+, phBegPosition			(0, 0, 0)
 {
 //////////////////////////////////////////////////////////////////
 	changeInputUnit(Unit::mm);
@@ -22,6 +23,8 @@ GCodePathHandlerCnc::~GCodePathHandlerCnc() {
 //////////////////////////////////////////////////////////////////
 void GCodePathHandlerCnc::prepareWorkImpl() {
 //////////////////////////////////////////////////////////////////
+	// log current position
+	phBegPosition = getSetup().cnc->getCurCtlPos();
 }
 //////////////////////////////////////////////////////////////////
 void GCodePathHandlerCnc::finishWorkImpl() {
@@ -30,9 +33,8 @@ void GCodePathHandlerCnc::finishWorkImpl() {
 	getSetup().cnc->switchToolOff();
 	getSetup().cnc->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
 	
-	#warning why set zero ?
-	currentPos.setXYZ(0.0, 0.0, 0.0);
-	getSetup().cnc->moveXYToZeroPos();
+	getSetup().cnc->moveToPos(phBegPosition);
+	currentPos.set(getSetup().cnc->getCurCtlPosMetric());
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::initNextPath() {

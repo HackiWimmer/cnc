@@ -28,6 +28,10 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		virtual void prepareWorkImpl();
 		virtual void finishWorkImpl();
 		
+	private:
+		
+		CncLongPosition	phBegPosition;
+	
 };
 
 #endif
