@@ -32,9 +32,6 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 	   ) 
 	{
 		THE_CONFIG->calculateSpeedValues();
-		
-		#warning reactivate PP_PROXY::initSpeedConfigPlayground() if nesseccary
-		//APP_PROXY::initSpeedConfigPlayground();
 	}
 }
 ////////////////////////////////////////////////////////////////////////

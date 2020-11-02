@@ -34,6 +34,7 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 
 	if ( isClientIdChange() ) {
 		ostr << traceIndent
+			 << wxString::Format("%05ld", listIndex) 			<< " "
 			 << "PLE: "
 			 << pathListReference								<< "("
 			 << " C "											<< "): "
@@ -41,6 +42,7 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 	}
 	else if ( isPositionChange() ) {
 		ostr << traceIndent
+			 << wxString::Format("%05ld", listIndex) 			<< " "
 			 << "PLE: "
 			 << pathListReference								<< "("
 			 << " P "											<< "): "
@@ -52,6 +54,7 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 	}
 	else if ( isSpeedChange() ) {
 		ostr << traceIndent
+			 << wxString::Format("%05ld", listIndex) 			<< " "
 			 << "PLE: "
 			 << pathListReference								<< "("
 			 << " S "											<< "): "
@@ -61,6 +64,7 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 	}
 	else if ( isNothingChanged() ) {
 		ostr << traceIndent
+			 << wxString::Format("%05ld", listIndex) 			<< " "
 			 << "PLE: "
 			 << pathListReference								<< "("
 			 << " L "											<< "): "

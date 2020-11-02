@@ -156,8 +156,24 @@ class CncMoveSequence {
 	public:
 	
 		struct SpeedInfo {
-			char mode 		= '-';
-			double value	= 0.0;
+			char	mode;
+			double	value;
+			
+			SpeedInfo() 
+			: mode  ('-')
+			, value (0.0)
+			{}
+			
+			SpeedInfo(char m, double v)
+			: mode  (m)
+			, value (v)
+			{}
+			
+			SpeedInfo(const SpeedInfo& si)
+			: mode  (si.mode)
+			, value (si.value)
+			{}
+			
 		};
 
 		struct FlushResult {

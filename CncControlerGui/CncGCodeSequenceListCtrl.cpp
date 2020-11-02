@@ -83,9 +83,6 @@ void CncGCodeSequenceListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////
 void CncGCodeSequenceListCtrl::addBlock(const GCodeBlock& gcb) {
 /////////////////////////////////////////////////////////////
-	#warning reactivate again
-	//return;
-
 	static wxString value;
 	static CncColumContainer cc(CncGCodeSequenceListCtrl::TOTAL_COL_COUNT);
 	

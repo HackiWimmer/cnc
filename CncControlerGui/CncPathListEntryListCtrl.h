@@ -41,11 +41,11 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		static const int COL_TARGET_Y		=  8;
 		static const int COL_TARGET_Z		=  9;
 		static const int COL_TOTAL_DISTANCE = 10;
+		static const int COL_STRECH 		= 11;
 		
-		static const int TOTAL_COL_COUNT	= 11;
+		static const int TOTAL_COL_COUNT	= 12;
 		
 		static const int COL_SEARCH			= COL_CLD_ID;
-		static const int COL_STRECH			= COL_REF;
 		
 		CncPathListEntryListCtrl(wxWindow *parent, long style);
 		virtual ~CncPathListEntryListCtrl();

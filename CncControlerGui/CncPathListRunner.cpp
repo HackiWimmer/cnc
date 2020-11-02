@@ -10,6 +10,81 @@
 #include "CncMoveSequence.h"
 #include "CncPathListRunner.h"
 
+////////////////////////////////////////////////////////////////////
+CncPathListRunner::Move::Move(const CncPathListEntry* e)
+: dx		(e->entryDistance.getX())
+, dy		(e->entryDistance.getY())
+, dz		(e->entryDistance.getZ())
+, mxy		(dx != 0.0 ? dy/dx : DBL_MAX)
+, vxy		(sqrt(pow(dx, 2) + pow(dy, 2)))
+, mz		(vxy != 0.0 ? dz / vxy : DBL_MAX)
+////////////////////////////////////////////////////////////////////
+{
+}
+////////////////////////////////////////////////////////////////////
+CncPathListRunner::Move::Move(const Move& m)
+: dx		(m.dx)
+, dy		(m.dy)
+, dz		(m.dz)
+, mxy		(m.mxy)
+, vxy		(m.vxy)
+, mz		(m.mz)
+////////////////////////////////////////////////////////////////////
+{
+}
+////////////////////////////////////////////////////////////////////
+bool CncPathListRunner::Move::isXYZPitchEqual(const Move& mNext) const {
+////////////////////////////////////////////////////////////////////
+	const double epsilon = 0.001;
+	return ( cnc::dblCompare(mxy, mNext.mxy, epsilon) == true && cnc::dblCompare(mz, mNext.mz, epsilon) == true );
+}
+////////////////////////////////////////////////////////////////////
+bool CncPathListRunner::Move::isXYPitchDiffToStrong(const Move& mNext) const {
+////////////////////////////////////////////////////////////////////
+	const float max = 45 * PI / 180; // 15 degrees
+	return std::abs(getXYPitchDiffenceAsRadians(mNext)) > max;
+}
+////////////////////////////////////////////////////////////////////
+bool CncPathListRunner::Move::isZPitchDiffToStrong(const Move& mNext) const {
+////////////////////////////////////////////////////////////////////
+	const float max = 45 * PI / 180; // 15 degrees
+	return std::abs(getZPitchDiffenceAsRadians(mNext)) > max;
+}
+////////////////////////////////////////////////////////////////////
+bool CncPathListRunner::Move::isXYZPitchDiffToStrong(const Move& mNext) const {
+////////////////////////////////////////////////////////////////////
+	return isXYPitchDiffToStrong(mNext) || isZPitchDiffToStrong(mNext);
+}
+////////////////////////////////////////////////////////////////////
+float CncPathListRunner::Move::getXYPitchDiffenceAsRadians(const Move& mNext) const {
+////////////////////////////////////////////////////////////////////
+	const float a1 = atan2(dx, dy);
+	const float a2 = atan2(mNext.dx, mNext.dy);
+
+	//std::cout << "(" << dx << ", " << dy << "), (" << mNext.dx << ", " << mNext.dy << "), " << (a1 - a2) *180/PI << ", " << a1 << ", " << a2 << std::endl;
+
+	return (a1 - a2);
+}
+////////////////////////////////////////////////////////////////////
+float CncPathListRunner::Move::getZPitchDiffenceAsRadians(const Move& mNext) const {
+////////////////////////////////////////////////////////////////////
+	const float a1 = atan2(dz, vxy);
+	const float a2 = atan2(mNext.dz, mNext.vxy);
+
+	return (a1 - a2);
+}
+////////////////////////////////////////////////////////////////////
+float CncPathListRunner::Move::getXYPitchDiffenceAsDegree(const Move& mNext) const {
+////////////////////////////////////////////////////////////////////
+	return getXYPitchDiffenceAsRadians(mNext) * 180 / PI;
+}
+////////////////////////////////////////////////////////////////////
+float CncPathListRunner::Move::getZPitchDiffenceAsDegree(const Move& mNext) const {
+////////////////////////////////////////////////////////////////////
+	return getZPitchDiffenceAsRadians(mNext) * 180 / PI;
+}
+
+
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::CncPathListRunner(const CncPathListRunner::Setup& s) 
 : currentSequence(NULL)
@@ -17,7 +92,7 @@ CncPathListRunner::CncPathListRunner(const CncPathListRunner::Setup& s)
 //////////////////////////////////////////////////////////////////
 {
 	wxASSERT( setup.cnc != NULL );
-	initNextMoveSequence();
+	initializeNextMoveSequence(CLIENT_ID.INVALID);
 }
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::CncPathListRunner(CncControl* cnc) 
@@ -25,10 +100,10 @@ CncPathListRunner::CncPathListRunner(CncControl* cnc)
 , setup()
 {
 	setup.cnc 				= cnc;
-	autoSetup();
+	autoSetup(false);
 
 	wxASSERT( setup.cnc != NULL );
-	initNextMoveSequence();
+	initializeNextMoveSequence(CLIENT_ID.INVALID);
 }
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::~CncPathListRunner() {
@@ -36,26 +111,30 @@ CncPathListRunner::~CncPathListRunner() {
 	destroyMoveSequence();
 }
 //////////////////////////////////////////////////////////////////
-void CncPathListRunner::autoSetup() {
+void CncPathListRunner::autoSetup(bool trace) {
 //////////////////////////////////////////////////////////////////
 	setup.optAnalyse		= THE_CONFIG->getPreProcessorAnalyseFlag();
 	setup.optCombineMoves 	= THE_CONFIG->getPreProcessorCombineMovesFlag();
 	setup.optSkipEmptyMoves = THE_CONFIG->getPreProcessoSkipEmptyFlag();
 	setup.trace				= THE_CONFIG->getPreProcessorUseOperatingTrace();
 	
+	if ( trace && setup.trace == true )
+		traceSetup();
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListRunner::traceSetup() {
+//////////////////////////////////////////////////////////////////
+	std::stringstream ss;
+	ss << "CNC Pointer         : " << setup.cnc					<< std::endl;
+	ss << "Analyse Pathes      : " << setup.optAnalyse			<< std::endl;
+	ss << "Combine Moves       : " << setup.optCombineMoves		<< std::endl;
+	ss << "Skip empty Moves    : " << setup.optSkipEmptyMoves	<< std::endl;
+	
 	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
 	wxASSERT( cpp != NULL );
 	
-	if ( setup.trace == true ) {
-		std::stringstream ss;
-		ss << "CNC Pointer         : " << setup.cnc					<< std::endl;
-		ss << "Analyse Pathes      : " << setup.optAnalyse			<< std::endl;
-		ss << "Combine Moves       : " << setup.optCombineMoves		<< std::endl;
-		ss << "Skip empty Moves    : " << setup.optSkipEmptyMoves	<< std::endl;
-		
-		cpp->addOperatingTraceSeparator("Current Setup");
-		cpp->addOperatingTrace(ss);
-	}
+	cpp->addOperatingTraceSeparator("Current Setup");
+	cpp->addOperatingTrace(ss);
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListRunner::logMeasurementStart() {
@@ -88,6 +167,67 @@ bool CncPathListRunner::checkDebugState() {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
+bool CncPathListRunner::finalizeCurrMoveSequence(long nextClientId) {
+//////////////////////////////////////////////////////////////////
+	return initializeNextMoveSequence(nextClientId);
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::initializeNextMoveSequence(long clientId) {
+//////////////////////////////////////////////////////////////////
+	CncMoveSequence::SpeedInfo defSi;
+	return initializeNextMoveSequence(defSi.value, defSi.mode, clientId);
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::initializeNextMoveSequence(double value_MM_MIN, char mode, long clientId) {
+//////////////////////////////////////////////////////////////////
+	if ( setup.optAnalyse == true ) {
+		
+		CncMoveSequence::SpeedInfo si(value_MM_MIN, mode);
+		
+		// to hand over the speed info on demand
+		if ( cnc::dblCompareNull(si.value) == true && currentSequence != NULL )
+			si = currentSequence->getCurrentSpeedInfo();
+		
+		// this will also publish the current sequence
+		if ( destroyMoveSequence() == false ) {
+			std::cerr << CNC_LOG_FUNCT << ": destroyMoveSequence failed!" << std::endl;
+			return false;
+		}
+		
+		currentSequence = new CncMoveSequence(CMD_RENDER_AND_MOVE_SEQUENCE);
+		currentSequence->addClientId(clientId);
+		currentSequence->setCurrentSpeedInfo(si);
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::addSequenceEntryFromValues(double dx, double dy, double dz) {
+//////////////////////////////////////////////////////////////////
+	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, dx, dy, dz);
+	currentSequence->addMetricPosXYZ(dx, dy, dz);
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::addSequenceEntryFromEntry(const CncPathListEntry* e) {
+//////////////////////////////////////////////////////////////////
+	if ( e == NULL )
+		return false;
+		
+	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, 
+										e->entryDistance.getX(), 
+										e->entryDistance.getY(), 
+										e->entryDistance.getZ());
+										
+	currentSequence->addMetricPosXYZ(	e->entryDistance.getX(),
+										e->entryDistance.getY(),
+										e->entryDistance.getZ());
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+// don't call this functions directly. use initializeNextMoveSequence() 
+// or finalizeCurrMoveSequence() instead
 bool CncPathListRunner::destroyMoveSequence() {
 //////////////////////////////////////////////////////////////////	
 	bool ret = true;
@@ -100,67 +240,47 @@ bool CncPathListRunner::destroyMoveSequence() {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::initNextMoveSequence(double value_MM_MIN, char mode) {
-//////////////////////////////////////////////////////////////////
-	if ( setup.optAnalyse == true ) {
-		// to hand over the client id to the next sequence
-		const long clientId = currentSequence != NULL ? currentSequence->getClientId(): CLIENT_ID.INVALID;
-
-		if ( destroyMoveSequence() == false ) {
-			std::cerr << "CncPathListRunner::initNextMoveSequence(): destroyMoveSequence failed!" << std::endl;
-			return false;
-		}
-		
-		CncMoveSequence::SpeedInfo si;
-		si.value = value_MM_MIN;
-		si.mode  = mode;
-		
-		currentSequence = new CncMoveSequence(CMD_RENDER_AND_MOVE_SEQUENCE);
-		currentSequence->addClientId(clientId);
-		currentSequence->setCurrentSpeedInfo(si);
-	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
+// don't call this functions directly. use initializeNextMoveSequence() 
+// or finalizeCurrMoveSequence() instead
 bool CncPathListRunner::publishMoveSequence() {
-//////////////////////////////////////////////////////////////////	
-	bool ret = true;
-	
-	if ( setup.optAnalyse == true ) {
-		
-		if ( currentSequence == NULL ) {
-			std::cerr << "CncPathListRunner::publishMoveSequence(): Invalid Sequence!" << std::endl;
-			return false;
-		}
-		
-		CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
-		wxASSERT( cpp != NULL );
-		
-		if ( setup.trace == true ) {
-			std::stringstream ss; 
-			currentSequence->outputOperator(ss, setup.cnc->getCurCtlPos());
-			
-			cpp->addOperatingTraceMovSeqSep("Next CncMoveSequence");
-			cpp->addOperatingTrace(ss);
-		}
-			
-		// if the corresponding list isn't connected this call does nothing and returns only
-		cpp->addMoveSequence(*currentSequence);
-		
-		if ( currentSequence->getCount() > 0 ) {
+//////////////////////////////////////////////////////////////////
+	if ( setup.optAnalyse == false )
+		return true;
 
-			wxASSERT( setup.cnc != NULL );
-			setup.cnc->setClientId(currentSequence->getLastClientId());
-			ret = setup.cnc->processMoveSequence(*currentSequence);
-
-			if ( ret == true )
-				currentSequence->clear();
-		}
-		else {
-			std::clog << "CncPathListRunner::publishMoveSequence(): Empty Sequence" << std::endl;
-		}
+	if ( currentSequence == NULL ) {
+		std::cerr << "CncPathListRunner::publishMoveSequence(): Invalid Sequence!" << std::endl;
+		return false;
 	}
+	
+	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+	wxASSERT( cpp != NULL );
+		
+	// if the corresponding list isn't connected this call does nothing and returns only
+	cpp->addMoveSequence(*currentSequence);
+	
+	if ( setup.trace == true ) {
+		std::stringstream ss; 
+		currentSequence->outputOperator(ss, setup.cnc->getCurCtlPos());
+		
+		cpp->addOperatingTraceMovSeqSep("Try to publish next CncMoveSequence");
+		cpp->addOperatingTrace(ss);
+	}
+		
+	if ( currentSequence->getCount() == 0 ) {
+		if ( setup.trace == true ) {
+			const char* msg = "Call of publishMoveSequence(): Empty CncMoveSequence, nothing was publsihed.";
+			cpp->addOperatingTraceMovSeqSep(msg);
+		}
+		
+		return true;
+	}
+	
+	wxASSERT( setup.cnc != NULL );
+	setup.cnc->setClientId(currentSequence->getLastClientId());
+	const bool ret = setup.cnc->processMoveSequence(*currentSequence);
+
+	if ( setup.trace == true )
+		cpp->addOperatingTraceMovSeqSep(wxString::Format("Call of publishMoveSequence() returned with %d", (int)ret));
 		
 	return ret;
 }
@@ -194,10 +314,10 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr) {
+bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next) {
 //////////////////////////////////////////////////////////////////
 	if ( curr.isSpeedChange() == false ) {
-		std::cerr << "onPhysicallySpeedChange::onPhysicallySpeedChange(): Invalid Type!" << std::endl;
+		std::cerr << CNC_LOG_FUNCT << ": Invalid Type!" << std::endl;
 		return false;
 	}
 	
@@ -206,9 +326,10 @@ bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr) {
 	
 	if ( setup.trace == true )
 		APP_PROXY::getCncPreProcessor()->addOperatingTraceSeparator(wxString::Format("Speed Change (%c - %5.1lf)", cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), curr.feedSpeed_MM_MIN));
-
-	if ( initNextMoveSequence(curr.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode)) == false ) {
-		std::cerr << "onPhysicallySpeedChange::onPhysicallySpeedChange(): initNextMoveSequence failed!" << std::endl;
+		
+	const long nextClientID = next ? next->clientId : CLIENT_ID.INVALID;
+	if ( initializeNextMoveSequence(curr.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), nextClientID) == false ) {
+		std::cerr << CNC_LOG_FUNCT << ": initNextMoveSequence failed!" << std::endl;
 		return false;
 	}
 	
@@ -249,117 +370,60 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 											);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyMoveRawAsSequence(const CncPathListEntry& curr) {
-//////////////////////////////////////////////////////////////////
-	CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
-	
-	CncMoveSequence::SpeedInfo si;
-	si.value = curr.feedSpeed_MM_MIN;
-	si.mode  = cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode);
-	
-	const long clientId = currentSequence != NULL ? currentSequence->getClientId(): CLIENT_ID.INVALID;
-	cms.addClientId(clientId);
-	cms.setCurrentSpeedInfo(si);
-	
-	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, 
-							curr.entryDistance.getX(), 
-							curr.entryDistance.getY(), 
-							curr.entryDistance.getZ());
-
-	cms.addMetricPosXYZ(	curr.entryDistance.getX(),
-							curr.entryDistance.getY(),
-							curr.entryDistance.getZ());
-							
-	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
-	wxASSERT( cpp != NULL );
-	
-	cpp->addMoveSequence(cms);
-		
-	if ( setup.trace == true ) {
-		std::stringstream ss; 
-		cms.outputOperator(ss, setup.cnc->getCurCtlPos());
-		
-		cpp->addOperatingTraceMovSeqSep("Next CncMoveSequence");
-		cpp->addOperatingTrace(ss);
-	}
-	
-	wxASSERT ( setup.cnc != NULL );
-	return setup.cnc->processMoveSequence(cms);
-}
-//////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& itCurr, const CncPathList::const_iterator& itEnd) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(currentSequence != NULL);
 
-	// -----------------------------------------------------------
-	auto getCurr = [&](const CncPathList::const_iterator& it) {
-		return &(*it);
-	};
-
-	// -----------------------------------------------------------
-	auto getNext = [&](const CncPathList::const_iterator& it) {
-		return it + 1 != itEnd ? &(*(it + 1)) : NULL;
-	};
-
-	// -----------------------------------------------------------
-	auto addSequenceEntryFromValues = [&](double dx, double dy, double dz) {
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	auto getCurrEntry    = [&](const CncPathList::const_iterator& it) { return &(*it); };
+	auto getNextEntry    = [&](const CncPathList::const_iterator& it) { return it + 1 != itEnd ? &(*(it + 1)) : NULL; };
+	
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	auto getNextPosEntry = [&](const CncPathList::const_iterator& it, const CncPathListEntry* defaultRet=NULL) { 
 		
-		CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, dx, dy, dz);
-		currentSequence->addMetricPosXYZ(dx, dy, dz);
-		return true;
+		uint32_t index = 1;
+		while ( it + index != itEnd ) {
+			
+			if ( (it + index)->isPositionChange() )
+				return &(*(it + index));
+				
+			index++;
+		}
+		
+		return defaultRet; 
 	};
 	
-	// -----------------------------------------------------------
-	auto addSequenceEntryFromEntry = [&](const CncPathListEntry* e) {
-		if ( e == NULL )
-			return false;
-		
-		CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, 
-											e->entryDistance.getX(), 
-											e->entryDistance.getY(), 
-											e->entryDistance.getZ());
-											
-		currentSequence->addMetricPosXYZ(	e->entryDistance.getX(),
-											e->entryDistance.getY(),
-											e->entryDistance.getZ());
-		return true;
-	};
-
-	// -----------------------------------------------------------
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	auto isEmptyMove = [&](double dx, double dy, double dz) {
 		return (cnc::dblCompareNull(dx) == true &&	cnc::dblCompareNull(dy) == true &&	cnc::dblCompareNull(dz) == true);
 	};
-
+	
+	// -----------------------------------------------------------
+	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+	wxASSERT( cpp != NULL );
 
 	// -----------------------------------------------------------
 	// entries in focus ...
-	const CncPathListEntry* curr  = getCurr(itCurr);
-	const CncPathListEntry* next  = getNext(itCurr);
+	const CncPathListEntry* curr  = getCurrEntry(itCurr);
+	const CncPathListEntry* next  = getNextEntry(itCurr);
 	
 	wxASSERT(curr != NULL);
-
+	
+	// -----------------------------------------------------------
 	// debugging only ... 
-	const bool addCurrentEntryOnlyCurrentSequence = true;
-	if ( addCurrentEntryOnlyCurrentSequence == true )
+	const bool addCurrentEntryOnlyToCurrentSequence = false;
+	if ( addCurrentEntryOnlyToCurrentSequence == true )
 		return addSequenceEntryFromEntry(curr);
-
+	
 	// -----------------------------------------------------------
 	// check if current is a empty move
-	if ( setup.optSkipEmptyMoves == true )  {
-		if (    cnc::dblCompareNull(curr->entryDistance.getX()) == true
-			 &&	cnc::dblCompareNull(curr->entryDistance.getY()) == true
-			 &&	cnc::dblCompareNull(curr->entryDistance.getZ()) == true
-		   ) {
-
+	if ( setup.optSkipEmptyMoves == true ) {
+		if ( isEmptyMove(curr->entryDistance.getX(), curr->entryDistance.getY(), curr->entryDistance.getZ()) ) {
 			// skip
 			return true;
 		}
 	}
 	
-//
-//addSequenceEntryFromEntry(curr);
-//return true;
-
 	// -----------------------------------------------------------
 	// check if nothing more than curr available
 	if ( next == NULL ) {
@@ -367,77 +431,129 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		return true;
 	}
 	
+	// -----------------------------------------------------------
+	// Form here on try to optimize
+	
 	// initialize distances
 	double cx = curr->entryDistance.getX();
 	double cy = curr->entryDistance.getY();
 	double cz = curr->entryDistance.getZ();
 	
+	long nextClientID 				= CLIENT_ID.INVALID;
+	bool finalizeCurrentSequence	= false;
+	
 	// create navigation pointers
 	const CncPathListEntry* c = curr;
 	const CncPathListEntry* n = next;
-
-	// loop: preview next entries
-	auto skipToNext = [&]() { ++itCurr; c = n; n = getNext(itCurr); };
 	
-	if ( false ) {
-		while ( n != NULL ) {
-			
-			if ( isCncInterrupted() == true )
-				return false;
-
-			if ( checkDebugState() == false )
-				return false;
-
-			// don't combine entries over a speed change
-			if ( c->isSpeedChange()  == true )
-				break;
-
-			if ( c->isClientIdChange() == true ) {
-				wxASSERT ( currentSequence != NULL );
-				currentSequence->addClientId(n->clientId);
-			}
-
-			// skip the next entry if it is an empty move
-			const bool empty = isEmptyMove(c->entryDistance.getX(), c->entryDistance.getY(), c->entryDistance.getZ());
-			if ( setup.optSkipEmptyMoves == true && empty ) {
-				skipToNext();
-				continue;
-			}
-			
-			const Move mCurr(c);
-			const Move mNext(n);
-			
-			// .....
-			if ( mCurr.isPitchToStrong(mNext) == true ) {
-				
-				//std::cout << "isPitchToStrong: " << mCurr.getPitchDiffenceAsDegree(mNext) << std::endl;
-				//MessageBoxA(0,"","",0);
-			}
-			
-			// stop here if nothing should be combined
-			if ( setup.optCombineMoves == false ) 
-				break;
-				
-			// stop here if the next pitch isn't equal with the reference
-			if ( mCurr.isPitchEqual(mNext) == false ) 
-				break;
-				
-			// concatenate next to the current summary
-			cx += mNext.dx;
-			cy += mNext.dy;
-			cz += mNext.dz;
-			
-			skipToNext();
-			
-		} // while
+	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	auto skipToNextEntry = [&]() { 
+		++itCurr; 
+		c = n; 
+		n = getNextEntry(itCurr); 
 		
-	} // if
+		APP_PROXY::getCncPreProcessor()->addPathListEntry(*c);
+	};
+	
+	while ( n != NULL ) {
+		
+		// check common break conditions
+		if ( isCncInterrupted() == true  )	return false;
+		if ( checkDebugState()  == false )	return false;
+		
+		nextClientID = n->clientId;
+		
+		// check type: Don't combine entries over a speed change
+		if ( c->isSpeedChange() == true )  {
+			finalizeCurrentSequence = true;
+			break;
+		}
+		
+		// check type: Register new client id
+		if ( c->isClientIdChange() == true ) {
+			
+			if ( onPhysicallyClientIdChange(*c) == false )
+				return false;
+			
+			skipToNextEntry();
+			continue;
+		}
+		
+		// check content: Skip this entry if it's an empty move
+		// this also handle c->isNothingChanged()
+		const bool empty = isEmptyMove(c->entryDistance.getX(), c->entryDistance.getY(), c->entryDistance.getZ());
+		if ( setup.optSkipEmptyMoves == true && empty ) {
+			
+			skipToNextEntry();
+			continue;
+		}
+		
+		// init move structures
+		const Move mCurr(c);
+		const Move mNext(getNextPosEntry(itCurr, n));
+		
+		// check pitch: Stop here if the pitch to nect step is to strong 
+		if ( mCurr.isXYPitchDiffToStrong(mNext) == true ) {
+			cpp->addOperatingTrace(wxString::Format("--> XY: An entanglement of %.1f degree between X and Y is too strong to keep also the next entry together\n", mCurr.getXYPitchDiffenceAsDegree(mNext)));
+			
+			wxString x;
+			cpp->addOperatingTrace(wxString::Format(" Curr : %s", c->traceEntryToString(x)));
+			cpp->addOperatingTrace(wxString::Format(" Next : %s", getNextPosEntry(itCurr, n)->traceEntryToString(x)));
+			
+			finalizeCurrentSequence = true;
+			break;
+		}
+		
+		// check pitch: Stop here if the pitch to nect step is to strong 
+		if ( mCurr.isZPitchDiffToStrong(mNext) == true ) {
+			cpp->addOperatingTrace(wxString::Format("--> Z: An entanglement of %.1f degree between Z and the XY Pane is too strong to keep also the next entry together\n", mCurr.getZPitchDiffenceAsDegree(mNext)));
+			
+			wxString x;
+			cpp->addOperatingTrace(wxString::Format(" Curr : %s", c->traceEntryToString(x)));
+			cpp->addOperatingTrace(wxString::Format(" Next : %s", getNextPosEntry(itCurr, n)->traceEntryToString(x)));
+			
+			finalizeCurrentSequence = true;
+			break;
+		}
+		
+		// stop here if nothing should be combined
+		if ( setup.optCombineMoves == false ) 
+			break;
+		
+		
+		
+		// stop here if the next pitch isn't equal with the reference
+		// why ?????
+		
+		
+		//, mxy		(dx != 0.0 ? dy/dx : DBL_MAX)
+		//, vxy		(sqrt(pow(dx, 2) + pow(dy, 2)))
+		//, mz		(vxy != 0.0 ? dz / vxy : DBL_MAX)
+		// 	return ( cnc::dblCompare(mxy, mNext.mxy, epsilon) == true && cnc::dblCompare(mz, mNext.mz, epsilon) == true );
+
+		if ( mCurr.isXYZPitchEqual(mNext) == false ) 
+			break;
+		
+		
+		// concatenate next to the current summary
+		cx += mNext.dx;
+		cy += mNext.dy;
+		cz += mNext.dz;
+		
+		skipToNextEntry();
+		
+	} // while a next entry is available
 	
 	// finally check this again
 	if ( setup.optSkipEmptyMoves == true && isEmptyMove(cx, cy, cz) )
 		return true;
 
+	// add the current distance
 	addSequenceEntryFromValues(cx, cy, cz);
+	
+	if ( finalizeCurrentSequence == true )
+		return finalizeCurrMoveSequence(nextClientID);
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -448,40 +564,47 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		return false;
 	}
 	
+	if ( plm.getPathList().size() == 0 )
+		return true;
+	
 	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
 	wxASSERT( cpp != NULL );
 	
-	autoSetup();
+	autoSetup(false);
 	
 	if ( setup.trace == true ) {
 		std::stringstream ss; ss << plm << std::endl;
 		cpp->addOperatingTracePthLstSep("Next CncPathListManager");
 		cpp->addOperatingTrace(ss);
+		
+		traceSetup();
 	}
 	
 	// freeze to speed up performace
 	CncAutoFreezer caf(cpp);
 	
-	// over all path list manager entries
-	for ( auto it = plm.const_begin(); it != plm.const_end(); ++it) {
-		const CncPathListEntry& curr  = *it;
+	// Main loop over all path list manager entries
+	auto beg = plm.const_begin();
+	auto end = plm.const_end();
+	for ( auto it = beg; it != end; ++it) {
+		
+		const CncPathListEntry& curr = *it;
+		const CncPathListEntry* next = it + 1 != end ? &(*(it + 1)) : NULL;
 
-		// runtime check
-		if ( isCncInterrupted() == true )
-			return false;
-
+		// common runtime check
+		if ( isCncInterrupted() == true )	return false;
+		if ( checkDebugState() == false )	return false;
+		
 		// if the corresponding gui list isn't connected this call 
 		// does nothing and returns only
 		APP_PROXY::getCncPreProcessor()->addPathListEntry(curr);
-		
-		// runtime check
-		if ( checkDebugState() == false )
-			return false;
-		
+
+		// ----------------------------------------------------------
 		if ( curr.isNothingChanged() == true ) {
 			continue;
 		}
 		
+		// ----------------------------------------------------------
 		// client id change
 		if ( curr.isClientIdChange() == true ) {
 			if ( onPhysicallyClientIdChange(curr) == false )
@@ -490,28 +613,27 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 			continue;
 		}
 		
+		// ----------------------------------------------------------
 		// speed change
 		if ( curr.isSpeedChange() == true ) {
-			if ( onPhysicallySpeedChange(curr) == false )
+			if ( onPhysicallySpeedChange(curr, next) == false )
 				return false;
 			
 			continue;
 		}
 		
+		// ----------------------------------------------------------
 		// position change
 		if ( curr.isPositionChange() == true ) {
+			
 			if ( setup.optAnalyse == false ) {
 				
-				if ( false ) {
-					if ( onPhysicallyMoveRawAsSequence(curr) == false )
-						return false;
-				}
-				else {
-					if ( onPhysicallyMoveRaw(curr) == false )
-						return false;
-				}
+				if ( onPhysicallyMoveRaw(curr) == false )
+					return false;
 			}
 			else {
+				
+				// Note: this call may be increments it
 				if ( onPhysicallyMoveAnalysed(it, plm.const_end()) == false ) {
 					return false;
 				}
@@ -525,5 +647,5 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		
 	} // for
 	
-	return publishMoveSequence();
+	return finalizeCurrMoveSequence(CLIENT_ID.INVALID);
 }

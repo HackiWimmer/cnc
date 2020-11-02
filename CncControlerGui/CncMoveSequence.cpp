@@ -109,6 +109,8 @@ long CncMoveSequence::getLastClientId() const {
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::addClientId(long cid) {
 ///////////////////////////////////////////////////////////////////
+	optimizedClientIds.push_back(cid);
+	/*
 	if  ( optimizedClientIds.size() > 0 ) {
 		
 		// if  ( optimizedClientIds.back() != cid )
@@ -118,6 +120,7 @@ void CncMoveSequence::addClientId(long cid) {
 		
 		optimizedClientIds.push_back(cid);
 	}
+	*/
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int CncMoveSequence::getCount() const {
@@ -546,7 +549,8 @@ std::ostream& CncMoveSequence::outputOperator(std::ostream &ostr, const CncLongP
 		const CncLongPosition newPos(iterStartPos.getX() + sp.x, iterStartPos.getY() + sp.y, iterStartPos.getZ() + sp.z);
 		CncDoublePosition newPosMetric; THE_CONFIG->convertStepsToMetric(newPosMetric, newPos);
 		
-		ostr << "MSE: ( P ) " 
+		ostr << wxString::Format("  %05ld ", (long)std::distance(sequence.begin(), it))
+			 << "MSE: ( P ) " 
 			 << wxString::Format("% 6ld", sp.clientID)				<< " " 
 			 << wxString::Format("% 8ld", sp.x)						<< ", " 
 			 << wxString::Format("% 8ld", sp.y)						<< ", " 

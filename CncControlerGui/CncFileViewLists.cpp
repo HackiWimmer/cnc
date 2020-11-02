@@ -70,8 +70,15 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	popupMenu = new wxMenu("");
+	popupMenu->Append(miSaveLruListEntry, wxT("Save LRU List [ctrl + S]"));
 	popupMenu->Append(miRemoveLruListEntry, wxT("Remove selected LRU List Entry"));
 	
+	//............................................
+	popupMenu->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [&](wxCommandEvent& event) {
+		this->save();
+	 }, miSaveLruListEntry, miSaveLruListEntry);
+	 
 	//............................................
 	popupMenu->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [&](wxCommandEvent& event) {
@@ -274,6 +281,16 @@ bool CncLruFileViewListCtrl::load(wxFileConfig* config) {
 	return true;
 }
 ////////////////////////////////////////////////////////////////
+bool CncLruFileViewListCtrl::save() {
+////////////////////////////////////////////////////////////////
+	const bool ret = save(APP_PROXY::getLruStore());
+	
+	if ( ret )	std::clog << "LRU List saved . . . "		<< std::endl;
+	else		std::cerr << "Save LRU List failed . . . "	<< std::endl;
+		
+	return ret;
+}
+////////////////////////////////////////////////////////////////
 bool CncLruFileViewListCtrl::save(wxFileConfig* config) {
 ////////////////////////////////////////////////////////////////
 	if ( config == NULL )
@@ -308,8 +325,7 @@ void CncLruFileViewListCtrl::onKeyDown(wxKeyEvent& event) {
 	
 	// save
 	if ( c == 'S' && ctlKey == true ) {
-		save(APP_PROXY::getLruStore());
-		std::clog << "LRU List saved . . . " << std::endl;
+		save();
 		return;
 	}
 	

@@ -42,10 +42,12 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		
 	protected:
 		virtual bool isItemValid(long item) const;
+		bool save();
 		
 	public:
 		
-		static const int miRemoveLruListEntry		= 8000;
+		static const int miSaveLruListEntry			= 8000;
+		static const int miRemoveLruListEntry		= 8001;
 		
 		static const int COL_FILE 					= 0;
 		static const int TOTAL_COL_COUNT			= 1;

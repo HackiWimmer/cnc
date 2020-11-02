@@ -27,6 +27,8 @@ struct CncPathListEntry{
 	// Data
 	enum Type {CHG_NOTHING=0, CHG_CLIENTID=1, CHG_SPEED=2, CHG_POSITION=3};
 
+	long				listIndex			= -1;
+
 	Type				type				= CHG_NOTHING;
 	CncNanoTimestamp	pathListReference  	= NoReference;
 
@@ -43,7 +45,7 @@ struct CncPathListEntry{
 
 	// -----------------------------------------------------------
 	// Interface
-	bool isNothingChanged()  const { return type == CHG_NOTHING; }
+	bool isNothingChanged() const { return type == CHG_NOTHING; }
 	bool isClientIdChange() const { return type == CHG_CLIENTID; }
 	bool isPositionChange()	const { return type == CHG_POSITION; }
 	bool isSpeedChange() 	const { return type == CHG_SPEED; 	 }

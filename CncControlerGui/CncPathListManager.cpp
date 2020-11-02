@@ -35,7 +35,7 @@ std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {
 	ostr << " Is first Path          : " << getFirstPathFlag() 											<< std::endl;
 	ostr << " Total Distance         : " << cnc::dblFormat1(getTotalDistance()) 						<< std::endl;
 	ostr << " Min Pos (x, y, z)      : " << cnc::dblFormat3(getMinPosX(), getMinPosY(), getMinPosZ())	<< std::endl;
-	ostr << " Max Pos (X, Y, z)      : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ())	<< std::endl;
+	ostr << " Max Pos (x, y, z)      : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ())	<< std::endl;
 	ostr << " Reference Pos          : " << cnc::dblFormat3(rp.getX(),    rp.getY(),    rp.getZ())		<< std::endl;
 	ostr << " Start Pos              : " << cnc::dblFormat3(sp.getX(),    sp.getY(),    sp.getZ())		<< std::endl;
 	ostr << " Entries                : " << std::endl;
@@ -141,6 +141,7 @@ void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 	maxPosZ = std::max(maxPosZ, cpe.entryTarget.getZ());
 	
 	// store
+	cpe.listIndex = (long)list.size();
 	list.push_back(cpe);
 }
 //////////////////////////////////////////////////////////////////

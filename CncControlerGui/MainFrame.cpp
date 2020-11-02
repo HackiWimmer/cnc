@@ -962,40 +962,58 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	auto xxxx = [&](double a, double b, double c, double d) {
+		/*
+		const double epsilon	= 0.001;
+		const double dx0		= std::abs(a);
+		const double dx1		= std::abs(b);
+		const double dy0		= std::abs(c);
+		const double dy1		= std::abs(d);
+		 * 
+		if (	dx0					>= epsilon 
+			&&	dx1					>= epsilon 
+			&&	std::abs(dx0 - dx1)	<= epsilon
+		) {
+			std::cout << "A: ";
+			return PI / 2.0;
+		}
+		
+		if (	dy0					>= epsilon 
+			&&	dy1					>= epsilon 
+			&&	std::abs(dy0 - dy1)	<= epsilon
+		) {
+			std::cout << "B: ";
+			return PI / 2.0;
+		}
+		*/
+		const float a1 = atan2(a, b);
+		const float a2 = atan2(c, d);
+		
+		std::cout << "C: ";
+		return (double)(abs(a1 - a2));
+	};
+	
+	std::cout << xxxx(0.0,     0.0,    0.0,    0.0) * 180 / 3.14 << std::endl;
+	std::cout << xxxx(0.0,   100.0,    0.0, -100.0) * 180 / 3.14 << std::endl;
+	std::cout << xxxx(100.0,   0.0, -100.0,    0.0) * 180 / 3.14 << std::endl;
+	std::cout << xxxx(100.0, 100.0, -100.0,  100.0) * 180 / 3.14 << std::endl;
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	
-	long l = 12333;
-	
-	double d = l;
-	
-	std::cout << wxString::Format("%ld", (long)d) << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	
-	//CncTransactionLock
-	std::cout << "start: " << wxDateTime::UNow().Format() << std::endl;
-	getLoggerView()->popProcessMode(LoggerSelection::VAL::CNC);
-	for ( int i=0; i< 10000; i++)
-		std::cout << "asdadsada dad 	qwe qwee q1e qe eqwe" << std::endl;
-		
-	std::cout << "finish: " << wxDateTime::UNow().Format() << std::endl;
-	getLoggerView()->pushUpdateMode(LoggerSelection::VAL::CNC);
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
-	
-	getLoggerView()->add(LoggerSelection::VAL::CNC, "\nStefan Hölzer\nSonja Mack");
-	getLoggerView()->add(LoggerSelection::VAL::CNC, " irgendwo\n");
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {

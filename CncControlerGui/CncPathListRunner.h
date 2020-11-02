@@ -10,7 +10,7 @@ class FileParser;
 class CncPathListRunner {
 	
 	private:
-
+		
 		struct Move {
 			double dx;
 			double dy;
@@ -19,50 +19,20 @@ class CncPathListRunner {
 			double vxy;
 			double mz;
 
-			explicit Move(const CncPathListEntry* e)
-			: dx(e->entryDistance.getX())
-			, dy(e->entryDistance.getY())
-			, dz(e->entryDistance.getZ())
-			, mxy(dx != 0.0 ? dy/dx : DBL_MAX)
-			, vxy(sqrt(pow(dx, 2) + pow(dy, 2)))
-			, mz(vxy != 0.0 ? dz / vxy : DBL_MAX)
-			{}
+			explicit Move(const CncPathListEntry* e);
+			explicit Move(const Move& m);
 
-			explicit Move(const Move& m)
-			: dx(m.dx)
-			, dy(m.dy)
-			, dz(m.dz)
-			, mxy(m.mxy)
-			, vxy(m.vxy)
-			, mz(m.mz)
-			{}
-
-			bool isPitchEqual(const Move& m) const {
-				const double epsilon = 0.001;
-				return ( cnc::dblCompare(mxy, m.mxy, epsilon) == true && cnc::dblCompare(mz, m.mz, epsilon) == true );
-			}
-
-			bool isPitchToStrong(const Move& m) const {
-				const float max = 15 * PI / 180; // 15 degrees
-				const float a1 = atan2(dx, dy);
-				const float a2 = atan2(m.dx, m.dy);
-
-				return abs(a1 - a2) > max;
-			}
-
-			float getPitchDiffenceAsRadians(const Move& m) const {
-				const float a1 = atan2(dx, dy);
-				const float a2 = atan2(m.dx, m.dy);
-
-				return abs(a1 - a2);
-			}
-
-			float getPitchDiffenceAsDegree(const Move& m) const {
-				const float a1 = atan2(dx, dy);
-				const float a2 = atan2(m.dx, m.dy);
-
-				return abs(a1 - a2) * 180 / PI;
-			}
+			bool	isXYZPitchEqual(const Move& m) const;
+			
+			bool	isZPitchDiffToStrong(const Move& m) const;
+			bool	isXYPitchDiffToStrong(const Move& m) const;
+			bool	isXYZPitchDiffToStrong(const Move& m) const;
+			
+			float	getXYPitchDiffenceAsRadians(const Move& m) const;
+			float	getXYPitchDiffenceAsDegree(const Move& m) const;
+			
+			float	getZPitchDiffenceAsRadians(const Move& m) const;
+			float	getZPitchDiffenceAsDegree(const Move& m) const;
 		};
 
 	public:
@@ -87,15 +57,23 @@ class CncPathListRunner {
 		
 		inline bool isCncInterrupted();
 		inline bool checkDebugState();
+		
+		void traceSetup();
 
 		bool onPhysicallyClientIdChange(const CncPathListEntry& curr);
-		bool onPhysicallySpeedChange(const CncPathListEntry& curr);
+		bool onPhysicallySpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next);
 		bool onPhysicallyMoveRaw(const CncPathListEntry& curr);
-		bool onPhysicallyMoveRawAsSequence(const CncPathListEntry& curr);
 		bool onPhysicallyMoveAnalysed(CncPathList::const_iterator& it, const CncPathList::const_iterator& end);
 		
+		bool initializeNextMoveSequence(long nextClientId);
+		bool initializeNextMoveSequence(double value_MM_MIN, char mode, long nextClientId);
+		bool finalizeCurrMoveSequence(long nextClientId);
+		bool addSequenceEntryFromValues(double dx, double dy, double dz);
+		bool addSequenceEntryFromEntry(const CncPathListEntry* e);
+		
+		// don't call this functions directly. use initializeNextMoveSequence() 
+		// or finalizeCurrMoveSequence() instead
 		bool destroyMoveSequence();
-		bool initNextMoveSequence(double value_MM_MIN = 0.0, char mode = '-');
 		bool publishMoveSequence();
 		
 	public:
@@ -110,7 +88,7 @@ class CncPathListRunner {
 		void onPhysicallySwitchToolState(bool state);
 		bool onPhysicallyExecute(const CncPathListManager& plm);
 		
-		void autoSetup();
+		void autoSetup(bool trace);
 };
 
 #endif
