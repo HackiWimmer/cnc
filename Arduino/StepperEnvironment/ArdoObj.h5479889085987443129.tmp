@@ -157,13 +157,10 @@ namespace ArdoObj {
   // --------------------------------------------------------------
   struct SpeedTuple {
     
-      static int32_t encode(char mode, int32_t value_MMSec1000);
+      static int32_t encode(char mode, int32_t value);
       
-      static char    decodeMode           (int32_t encodedValue);
-      
-      static int32_t decodeValue_MMSec1000(int32_t encodedValue);
-      static int32_t decodeValue_MMSec    (int32_t encodedValue);
-      static int32_t decodeValue_MMMin    (int32_t encodedValue);
+      static char    decodeMode (int32_t encodedValue);
+      static int32_t decodeValue(int32_t encodedValue);
   };
  
   // --------------------------------------------------------------

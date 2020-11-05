@@ -7,8 +7,8 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 	
 	public:
 		
-		enum Preview { FILE = 0, TEMPLATE = 1 };
-	
+		enum Default		{ VIEW1 = 0, VIEW2 = 1, VIEW3 = 2, VIEW4 = 3 };
+		enum Preview		{ FILE = 0, TEMPLATE = 1 };
 	
 	public:
 		enum SwapState { SS_DEFAULT, SS_SWAPED };
@@ -30,11 +30,11 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 		void setStatusTextRight(const wxString& text)	{ m_statusTextRight->ChangeValue(text); }
 		
 	protected:
-		
-		
-		bool guiSensitivity;
-		
-		virtual void onViewBookChnaged(wxNotebookEvent& event);
+		virtual void onAttachPage1(wxCommandEvent& event);
+		virtual void onAttachPage2(wxCommandEvent& event);
+		virtual void onAttachPage3(wxCommandEvent& event);
+		virtual void onAttachPage4(wxCommandEvent& event);
+		virtual void onViewBookChanged(wxNotebookEvent& event);
 		virtual void onMotion(wxMouseEvent& event);
 		virtual void onMinMax(wxCommandEvent& event);
 		virtual void onStartMove(wxMouseEvent& event);
@@ -47,6 +47,7 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 	private:
 
 		static const unsigned int MAX_VIEWS = 4;
+		bool		guiSensitivity;
 		wxWindow* 	sourceCtrl	[MAX_VIEWS];
 		wxWindow* 	targetCtrl	[MAX_VIEWS];
 		wxString	title		[MAX_VIEWS];

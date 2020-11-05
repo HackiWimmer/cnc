@@ -174,7 +174,7 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 
 	// reporting
 	typedef CncUnitCalculator<float> UC;
-	APP_PROXY::parsingSynopsisTraceAddSeparator();
+	APP_PROXY::parsingSynopsisTraceAddSeparator("RootNode:");
 	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format("Translated RootNode: %s",  ss.str()));
 	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Input Unit        : %s",  UC::getUnitAsStr(svgRootNode.getInputUnit())));
 	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Output Unit       : %s",  UC::getUnitAsStr(svgRootNode.getOutputUnit())));
@@ -524,8 +524,7 @@ bool SVGFileParser::postprocess() {
 	auto check_1_Less_2 = [&](double d1, double d2, const char* msg) {
 		if ( d1 > d2 ) {
 			if ( ret == true ) {
-				APP_PROXY::parsingSynopsisTraceAddSeparator();
-				APP_PROXY::parsingSynopsisTraceAddError("Post Processing Error Summary:");
+				APP_PROXY::parsingSynopsisTraceAddSeparator("Post Processing Error Summary:");
 			}
 			
 			APP_PROXY::parsingSynopsisTraceAddError(wxString::Format("%s %12.3lf > %12.3lf", msg, d1, d2));
@@ -534,8 +533,7 @@ bool SVGFileParser::postprocess() {
 	};
 	
 	const char type = 'I';
-	APP_PROXY::parsingSynopsisTraceAddSeparator();
-	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format("Boundings:"));
+	APP_PROXY::parsingSynopsisTraceAddSeparator("Boundings:");
 	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf", cncDistX, cncDistY));
 	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf", svgDistX, svgDistY));
 	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf", cncMinX, cncMinY));

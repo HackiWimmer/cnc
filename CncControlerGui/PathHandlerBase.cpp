@@ -649,13 +649,13 @@ void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 	{
 		std::stringstream ss;
 		ss << " " << getName() << ": Setup " << unitCalculator;
-		THE_APP->getParsingSynopsisTrace()->addSeparator();
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("%s", ss.str()));
+		THE_APP->getParsingSynopsisTrace()->addSeparator("Setup");
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("%s\n", ss.str()));
 	}
 	{
 		std::stringstream ss;
 		ss << " " << s;
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("%s", ss.str()));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("%s\n", ss.str()));
 	}
 }
 //////////////////////////////////////////////////////////////////

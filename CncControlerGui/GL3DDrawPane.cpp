@@ -1,4 +1,5 @@
 #include <wx/dcclient.h>
+#include "MainFrame.h"
 #include "CncMotionMonitor.h"
 #include "GL3DDrawPane.h"
 
@@ -42,6 +43,8 @@ void GL3DDrawPane::setMotionMonitor(CncMotionMonitor* m) {
 		
 	motionMonitor->getContextOptions().registerCallback(this);
 	motionMonitor->registerCallback(this);
+	
+	showFromPerspective1();
 	
 	// initialize grid
 	notifyChange(motionMonitor->getContextOptions());
@@ -134,5 +137,119 @@ void GL3DDrawPane::onPaintScalePane3D(wxPaintEvent& event) {
 	dc.SetBrush(brush);
 	dc.DrawRectangle(rect);
 }
+///////////////////////////////////////////////////////////////////
+void GL3DDrawPane::activate3DPerspectiveButton(wxButton* bt) {
+///////////////////////////////////////////////////////////////////
+	static wxColour active(171, 171, 171);
+	static wxColour inactive(240, 240, 240);
 
+	m_3D_Top->SetBackgroundColour(inactive);
+	m_3D_Bottom->SetBackgroundColour(inactive);
+	m_3D_Front->SetBackgroundColour(inactive);
+	m_3D_Rear->SetBackgroundColour(inactive);
+	m_3D_Left->SetBackgroundColour(inactive);
+	m_3D_Right->SetBackgroundColour(inactive);
+	m_3D_Perspective1->SetBackgroundColour(inactive);
+	m_3D_Perspective2->SetBackgroundColour(inactive);
+	m_3D_Perspective3->SetBackgroundColour(inactive);
+	m_3D_Perspective4->SetBackgroundColour(inactive);
+	
+	if ( bt != NULL )
+		bt->SetBackgroundColour(active);
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::onToggleOptionPane(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->toggleMotionMonitorOptionPane(false);
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromTop() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Top);
+	motionMonitor->viewTop();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromBottom() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Bottom);
+	motionMonitor->viewBottom();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromFront() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Front);
+	motionMonitor->viewFront();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromRear() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Rear);
+	motionMonitor->viewRear();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromLeft() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Left);
+	motionMonitor->viewLeft();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromRight() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Right);
+	motionMonitor->viewRight();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromPerspective1() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Perspective1);
+	motionMonitor->viewIso1();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromPerspective2() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Perspective2);
+	motionMonitor->viewIso2();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromPerspective3() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Perspective3);
+	motionMonitor->viewIso3();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::showFromPerspective4() {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	activate3DPerspectiveButton(m_3D_Perspective4);
+	motionMonitor->viewIso4();
+}
 

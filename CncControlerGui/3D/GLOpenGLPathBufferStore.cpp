@@ -319,6 +319,23 @@ long GLOpenGLPathBuffer::getFirstEntryForClientId(long clientId) const {
 	return ret;
 }
 /////////////////////////////////////////////////////////////
+long GLOpenGLPathBuffer::getLastEntryForClientId(long clientId) const {
+/////////////////////////////////////////////////////////////
+	long ret = CLIENT_ID.INVALID;
+	
+	auto cldIt = clientIdIndex.find(clientId);
+	if ( cldIt != clientIdIndex.end() ) {
+		const IndexList& index = cldIt->second;
+		
+		for (auto it = index.begin(); it != index.end(); ++it) {
+			if ( ret < 0 )	ret = (long)it->first;
+			else 			ret = std::max((long)it->first, ret);
+		}
+	}
+	
+	return ret;
+}
+/////////////////////////////////////////////////////////////
 const wxString& GLOpenGLPathBuffer::getIndexForClientIdAsString(long clientId, wxString& ret, bool summerize) {
 /////////////////////////////////////////////////////////////
 	ret.clear();
@@ -646,6 +663,20 @@ long GLOpenGLPathBufferStore::findFirstIndexForClientId(long cliendId) {
 	}
 	
 	return CLIENT_ID.INVALID;;
+}
+/////////////////////////////////////////////////////////////
+long GLOpenGLPathBufferStore::findLastEntryForClientId(long cliendId) {
+/////////////////////////////////////////////////////////////
+	unsigned long count = 0;
+	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
+
+		if ( it->hasClientID(cliendId) == true )
+			return count + it->getLastEntryForClientId(cliendId);
+		
+		count += it->getNumVerties();
+	}
+	
+	return CLIENT_ID.INVALID;
 }
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBufferStore::setColours(const GLOpenGLPathBuffer::VertexColours& colours) {

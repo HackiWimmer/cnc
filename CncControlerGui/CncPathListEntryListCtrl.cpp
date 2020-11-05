@@ -21,11 +21,15 @@ wxEND_EVENT_TABLE()
 /////////////////////////////////////////////////////////////
 CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
-, defaultItemAttr()
-, initialItemAttr()
-, clientIdItemAttr()
-, speedItemAttr()
-, pathLists()
+, defaultItemAttr			()
+, initialItemAttr			()
+, clientIdItemAttr			()
+, speedItemAttr				()
+, defaultItemAttrSelected	()
+, initialItemAttrSelected	()
+, clientIdItemAttrSelected	()
+, speedItemAttrSelected		()
+, pathLists					()
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -65,7 +69,7 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
 	defaultItemAttr.SetTextColour(GetTextColour());
-
+	
 	initialItemAttr.SetBackgroundColour(GetBackgroundColour());
 	initialItemAttr.SetFont(font.Underlined().Bold());
 	initialItemAttr.SetTextColour(GetTextColour());
@@ -77,6 +81,23 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	speedItemAttr.SetBackgroundColour(GetBackgroundColour());
 	speedItemAttr.SetFont(font.Bold());
 	speedItemAttr.SetTextColour(wxColour(125, 133, 221));
+	
+	defaultItemAttrSelected		= defaultItemAttr;
+	initialItemAttrSelected		= initialItemAttr;
+	clientIdItemAttrSelected	= clientIdItemAttr;
+	speedItemAttrSelected		= speedItemAttr;
+	
+	defaultItemAttrSelected.SetTextColour(*wxYELLOW);
+	defaultItemAttrSelected.SetFont(defaultItemAttrSelected.GetFont().Bold());
+
+	initialItemAttrSelected.SetTextColour(*wxYELLOW);
+	initialItemAttrSelected.SetFont(initialItemAttrSelected.GetFont().Bold());
+
+	clientIdItemAttrSelected.SetTextColour(*wxYELLOW);
+	clientIdItemAttrSelected.SetFont(clientIdItemAttrSelected.GetFont().Bold());
+	
+	speedItemAttrSelected.SetTextColour(*wxYELLOW);
+	speedItemAttrSelected.SetFont(speedItemAttrSelected.GetFont().Bold());
 }
 /////////////////////////////////////////////////////////////
 CncPathListEntryListCtrl::~CncPathListEntryListCtrl() {
@@ -139,13 +160,14 @@ wxListItemAttr* CncPathListEntryListCtrl::OnGetItemAttr(long item) const {
 		return (wxListItemAttr*)(&defaultItemAttr);
 		
 	const CncPathListEntry& cpe = pathLists.at(item);
-
-	if 		( cpe.type == CncPathListEntry::Type::CHG_NOTHING ) 	return (wxListItemAttr*)(&initialItemAttr);
-	else if	( cpe.type == CncPathListEntry::Type::CHG_CLIENTID )	return (wxListItemAttr*)(&clientIdItemAttr);
-	else if ( cpe.type == CncPathListEntry::Type::CHG_SPEED ) 		return (wxListItemAttr*)(&speedItemAttr);
-
+	const bool b = (item == getLastSelection());
+	
+	if 		( cpe.type == CncPathListEntry::Type::CHG_NOTHING ) 	return (wxListItemAttr*)( b ? (&initialItemAttrSelected)  : (&initialItemAttr) );
+	else if	( cpe.type == CncPathListEntry::Type::CHG_CLIENTID )	return (wxListItemAttr*)( b ? (&clientIdItemAttrSelected) : (&clientIdItemAttr) );
+	else if ( cpe.type == CncPathListEntry::Type::CHG_SPEED ) 		return (wxListItemAttr*)( b ? (&speedItemAttrSelected)    : (&speedItemAttr) );
+	
 	// this indicates to use the default style
-	return (wxListItemAttr*)(&defaultItemAttr);
+	return (wxListItemAttr*)( b ? (&defaultItemAttrSelected) : (&defaultItemAttr) );
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::onSize(wxSizeEvent& event) {
@@ -195,7 +217,7 @@ void CncPathListEntryListCtrl::onSelectListItem(wxListEvent& event) {
 	GetItemText(item, COL_SEARCH).ToLong(&ln);
 	
 	SelectEventBlocker blocker(this);
-	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_MOVE_SEQ_OVW);
+	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_PATH_LIST);
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::onActivateListItem(wxListEvent& event) {
@@ -220,8 +242,8 @@ bool CncPathListEntryListCtrl::searchReferenceById(const long id) {
 /////////////////////////////////////////////////////////////
 	long item = -1;
 	
-	// skip all item which should be hidden
 	for ( auto it = pathLists.begin(); it != pathLists.end(); ++it ) {
+		// skip all items which should be hidden
 		item++;
 		
 		if ( it->clientId == id ) {
@@ -229,8 +251,104 @@ bool CncPathListEntryListCtrl::searchReferenceById(const long id) {
 			return true;
 		}
 	}
-
+	
 	return false;
+}
+/////////////////////////////////////////////////////////////
+bool CncPathListEntryListCtrl::skipToFirstReference() {
+/////////////////////////////////////////////////////////////
+	if ( pathLists.size() == 0 )
+		return false;
+	
+	// skip forward to the first position change
+	long item = 0;
+	for ( auto it = pathLists.begin(); it != pathLists.end(); ++it ) {
+		if ( it->isPositionChange() )
+			break;
+			
+		item++;
+	}
+	
+	return selectItem(item, true);
+}
+/////////////////////////////////////////////////////////////
+bool CncPathListEntryListCtrl::skipToPrevReference() {
+/////////////////////////////////////////////////////////////
+	if ( pathLists.size() == 0 )
+		return false;
+		
+	long item = getLastSelection();
+	
+	if ( isItemValid(item) == false )
+		skipToLastReference();
+		
+	item = getLastSelection();
+	if ( isItemValid(item) == false )
+		return false;
+		
+	const long refClientID	= pathLists.at(item).clientId;
+	const long ritem		= pathLists.size() - 1 - item;
+
+	for ( auto it = pathLists.rbegin() + ritem; it != pathLists.rend(); ++it ) {
+		item--;
+		
+		if ( it->clientId != refClientID )
+			break;
+	}
+	
+	return selectItem(item, true);
+}
+/////////////////////////////////////////////////////////////
+bool CncPathListEntryListCtrl::skipToNextReference() {
+/////////////////////////////////////////////////////////////
+	if ( pathLists.size() == 0 )
+		return false;
+		
+	long item = getLastSelection();
+	
+	if ( isItemValid(item) == false )
+		skipToFirstReference();
+	
+	item = getLastSelection();
+	if ( isItemValid(item) == false )
+		return false;
+	
+	const long refClientID	= pathLists.at(item).clientId;
+	for ( auto it = pathLists.begin() + item; it != pathLists.end(); ++it ) {
+		if ( it->clientId != refClientID ) {
+			// skip forward to the first position change
+			if ( it->isPositionChange() ) {
+				// skip backwards to the previous position change
+				if ( it->isPositionChange() )
+					break;
+			}
+		}
+			
+		item++;
+	}
+	
+	return selectItem(item, true);
+}
+/////////////////////////////////////////////////////////////
+bool CncPathListEntryListCtrl::skipToLastReference() {
+/////////////////////////////////////////////////////////////
+	if ( pathLists.size() == 0 )
+		return false;
+
+	const long refClientID	= pathLists.back().clientId;
+	long item 				= wxNOT_FOUND;
+	
+	for ( auto it = pathLists.rbegin(); it != pathLists.rend(); ++it ) {
+		if ( it->clientId != refClientID ) {
+			// skip backwards to the previous position change
+			if ( it->isPositionChange() )
+				break;
+		}
+		
+		item = std::abs(std::distance(pathLists.rend(), it));
+	}
+	
+	return selectItem(item, true);
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::clearAll() {

@@ -39,6 +39,13 @@ class CncParsingSynopsisListCtrl : public CncLargeScaledListCtrl {
 		void onSelectListItem(wxListEvent& event);
 		void onActivateListItem(wxListEvent& event);
 
+		void popProcessMode()						{ }
+		void pushUpdateMode()						{ }
+
+		bool writeToFile(const wxFileName& fn, bool allRows=false);
+		bool copyToClipboard(bool allRows=false);
+		bool openAsTextView(bool allRows=false);
+
 		wxDECLARE_NO_COPY_CLASS(CncParsingSynopsisListCtrl);
 		wxDECLARE_EVENT_TABLE();
 };

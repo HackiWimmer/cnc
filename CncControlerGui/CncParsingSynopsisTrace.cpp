@@ -16,4 +16,17 @@ CncParsingSynopsisTrace::~CncParsingSynopsisTrace() {
 //////////////////////////////////////////////////////////////////
 	delete synopsisTrace;
 }
+//////////////////////////////////////////////////////////////////
+void CncParsingSynopsisTrace::addEntry(const char type, const wxString& entry) { 
+//////////////////////////////////////////////////////////////////
+	switch ( type ) {
+		case 'W':		synopsisTrace->addWarnEntry(entry); 
+						break;
+		case 'E':		synopsisTrace->addErrorEntry(entry); 
+						break;
+		case 'S':		synopsisTrace->addSeparator(entry);
+						break;
+		default:		synopsisTrace->addInfoEntry(entry); 
+	}
+}
 

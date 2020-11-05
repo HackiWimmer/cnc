@@ -56,13 +56,13 @@ wxEND_EVENT_TABLE()
 //////////////////////////////////////////////////
 CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList) 
 : CncGlCanvas(parent, attribList)
-, monitor(new GLContextCncPath(this, "GLMotionMonitor"))
-, cameraRotationTimer(this, wxEVT_MONITOR_CAMERA_TIMER)
-, cameraRotationStepWidth(0)
-, cameraRotationSpeed(100)
-, zoom(2.0f)
-, currentClientID(-1L)
-, processMode(false)
+, monitor					(new GLContextCncPath(this, "GLMotionMonitor"))
+, cameraRotationTimer		(this, wxEVT_MONITOR_CAMERA_TIMER)
+, cameraRotationStepWidth	(0)
+, cameraRotationSpeed		(100)
+, zoom						(2.0f)
+, currentClientID			(CLIENT_ID.INVALID)
+, processMode				(false)
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
@@ -85,6 +85,17 @@ CncMotionMonitor::~CncMotionMonitor() {
 //////////////////////////////////////////////////
 	if ( monitor != NULL ) 
 		delete monitor;
+}
+//////////////////////////////////////////////////
+bool CncMotionMonitor::Show(bool show) {
+//////////////////////////////////////////////////
+	return CncGlCanvas::Show(show);
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::synchronizeClientId() { 
+//////////////////////////////////////////////////
+	if ( currentClientID > 0 )
+		monitor->setCurrentClientId(currentClientID); 
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::notifyCncPathChanged() {
@@ -181,6 +192,19 @@ void CncMotionMonitor::reconstruct() {
 		onPaint();
 		
 	popProcessMode();
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::setCurrentClientId(long id) {
+////////////////////////////////////////////////// 
+	currentClientID = id; 
+	if ( IsShownOnScreen() == true ) {
+		monitor->setCurrentClientId(id); 
+	}
+	/*
+	else {
+		monitor->setVirtualEndToLast();
+	}
+	*/
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::appendVertex(const GLI::VerticeLongData& vd) {

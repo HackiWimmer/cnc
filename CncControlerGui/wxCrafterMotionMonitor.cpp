@@ -262,12 +262,23 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     m_panelParsingSynopsisImgIndex = m_listbookPreProcessor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("office-chart-ring")));
     m_listbookPreProcessor->AddPage(m_panelParsingSynopsis, _("Parsing\nSynopsis"), false, m_panelParsingSynopsisImgIndex);
     
+    wxFlexGridSizer* flexGridSizer357 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer357->SetFlexibleDirection( wxBOTH );
+    flexGridSizer357->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer357->AddGrowableCol(0);
+    flexGridSizer357->AddGrowableRow(0);
+    m_panelParsingSynopsis->SetSizer(flexGridSizer357);
+    
+    m_plParsingSynopsis = new wxPanel(m_panelParsingSynopsis, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelParsingSynopsis, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer357->Add(m_plParsingSynopsis, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     wxFlexGridSizer* flexGridSizer257 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer257->SetFlexibleDirection( wxBOTH );
     flexGridSizer257->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer257->AddGrowableCol(0);
     flexGridSizer257->AddGrowableRow(2);
-    m_panelParsingSynopsis->SetSizer(flexGridSizer257);
+    m_plParsingSynopsis->SetSizer(flexGridSizer257);
     
     wxFlexGridSizer* flexGridSizer7635311 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer7635311->SetFlexibleDirection( wxBOTH );
@@ -277,11 +288,22 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer257->Add(flexGridSizer7635311, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticText61381422 = new wxStaticText(m_panelParsingSynopsis, wxID_ANY, _("Parsing Synopisis:"), wxDefaultPosition, wxDLG_UNIT(m_panelParsingSynopsis, wxSize(-1,-1)), 0);
+    wxFlexGridSizer* flexGridSizer311 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer311->SetFlexibleDirection( wxBOTH );
+    flexGridSizer311->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer7635311->Add(flexGridSizer311, 0, wxALL, WXC_FROM_DIP(3));
+    
+    m_bmpButton304911 = new wxBitmapButton(m_plParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("abb-export")), wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(26,26)), wxBU_AUTODRAW);
+    
+    flexGridSizer311->Add(m_bmpButton304911, 0, wxALL, WXC_FROM_DIP(1));
+    m_bmpButton304911->SetMinSize(wxSize(26,26));
+    
+    m_staticText61381422 = new wxStaticText(m_plParsingSynopsis, wxID_ANY, _("Parsing Synopsis:"), wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(-1,-1)), 0);
     wxFont m_staticText61381422Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText61381422->SetFont(m_staticText61381422Font);
     
-    flexGridSizer7635311->Add(m_staticText61381422, 0, wxALL, WXC_FROM_DIP(3));
+    flexGridSizer311->Add(m_staticText61381422, 0, wxALL, WXC_FROM_DIP(3));
     
     wxFlexGridSizer* flexGridSizer7678673 = new wxFlexGridSizer(0, 4, 0, 0);
     flexGridSizer7678673->SetFlexibleDirection( wxBOTH );
@@ -289,36 +311,36 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7635311->Add(flexGridSizer7678673, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
-    m_btConnectOperatingTrace4 = new wxBitmapToggleButton(m_panelParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_panelParsingSynopsis, wxSize(26,26)), 0);
+    m_btConnectOperatingTrace4 = new wxBitmapToggleButton(m_plParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(26,26)), 0);
     m_btConnectOperatingTrace4->SetToolTip(_("Connect"));
     m_btConnectOperatingTrace4->SetValue(true);
     
     flexGridSizer7678673->Add(m_btConnectOperatingTrace4, 0, wxALL, WXC_FROM_DIP(1));
     m_btConnectOperatingTrace4->SetMinSize(wxSize(26,26));
     
-    m_btClearOperatingTrace105 = new wxBitmapButton(m_panelParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxDefaultPosition, wxDLG_UNIT(m_panelParsingSynopsis, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btClearOperatingTrace105 = new wxBitmapButton(m_plParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearOperatingTrace105->SetToolTip(_("Copy Operating Trace to Clipboard"));
     
     flexGridSizer7678673->Add(m_btClearOperatingTrace105, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearOperatingTrace105->SetMinSize(wxSize(26,26));
     
-    m_btClearOperatingTrace116 = new wxBitmapButton(m_panelParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")), wxDefaultPosition, wxDLG_UNIT(m_panelParsingSynopsis, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btClearOperatingTrace116 = new wxBitmapButton(m_plParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")), wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearOperatingTrace116->SetToolTip(_("Save Operating Trace to File"));
     
     flexGridSizer7678673->Add(m_btClearOperatingTrace116, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearOperatingTrace116->SetMinSize(wxSize(26,26));
     
-    m_btClearOperatingTrace7 = new wxBitmapButton(m_panelParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_panelParsingSynopsis, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btClearOperatingTrace7 = new wxBitmapButton(m_plParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearOperatingTrace7->SetToolTip(_("Clear"));
     
     flexGridSizer7678673->Add(m_btClearOperatingTrace7, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearOperatingTrace7->SetMinSize(wxSize(26,26));
     
-    m_staticLine275 = new wxStaticLine(m_panelParsingSynopsis, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelParsingSynopsis, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine275 = new wxStaticLine(m_plParsingSynopsis, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
-    flexGridSizer257->Add(m_staticLine275, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer257->Add(m_staticLine275, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_motionSynopsisPlaceholder = new wxPanel(m_panelParsingSynopsis, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelParsingSynopsis, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_motionSynopsisPlaceholder = new wxPanel(m_plParsingSynopsis, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_motionSynopsisPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
     flexGridSizer257->Add(m_motionSynopsisPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
@@ -328,12 +350,23 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     m_panelOperatingTraceImgIndex = m_listbookPreProcessor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-binary-file")));
     m_listbookPreProcessor->AddPage(m_panelOperatingTrace, _("Operating\nTrace"), false, m_panelOperatingTraceImgIndex);
     
+    wxFlexGridSizer* flexGridSizer354 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer354->SetFlexibleDirection( wxBOTH );
+    flexGridSizer354->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer354->AddGrowableCol(0);
+    flexGridSizer354->AddGrowableRow(0);
+    m_panelOperatingTrace->SetSizer(flexGridSizer354);
+    
+    m_plOperatingTrace = new wxPanel(m_panelOperatingTrace, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelOperatingTrace, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer354->Add(m_plOperatingTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     wxFlexGridSizer* flexGridSizer229 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer229->SetFlexibleDirection( wxBOTH );
     flexGridSizer229->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer229->AddGrowableCol(0);
     flexGridSizer229->AddGrowableRow(2);
-    m_panelOperatingTrace->SetSizer(flexGridSizer229);
+    m_plOperatingTrace->SetSizer(flexGridSizer229);
     
     wxFlexGridSizer* flexGridSizer763531 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer763531->SetFlexibleDirection( wxBOTH );
@@ -343,11 +376,22 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer229->Add(flexGridSizer763531, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticText6138142 = new wxStaticText(m_panelOperatingTrace, wxID_ANY, _("Operating Trace:"), wxDefaultPosition, wxDLG_UNIT(m_panelOperatingTrace, wxSize(-1,-1)), 0);
+    wxFlexGridSizer* flexGridSizer308 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer308->SetFlexibleDirection( wxBOTH );
+    flexGridSizer308->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer763531->Add(flexGridSizer308, 0, wxALL, WXC_FROM_DIP(3));
+    
+    m_bmpButton304910 = new wxBitmapButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("abb-export")), wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(26,26)), wxBU_AUTODRAW);
+    
+    flexGridSizer308->Add(m_bmpButton304910, 0, wxALL, WXC_FROM_DIP(1));
+    m_bmpButton304910->SetMinSize(wxSize(26,26));
+    
+    m_staticText6138142 = new wxStaticText(m_plOperatingTrace, wxID_ANY, _("Operating Trace:"), wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(-1,-1)), 0);
     wxFont m_staticText6138142Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText6138142->SetFont(m_staticText6138142Font);
     
-    flexGridSizer763531->Add(m_staticText6138142, 0, wxALL, WXC_FROM_DIP(3));
+    flexGridSizer308->Add(m_staticText6138142, 0, wxALL, WXC_FROM_DIP(3));
     
     wxFlexGridSizer* flexGridSizer767867 = new wxFlexGridSizer(0, 4, 0, 0);
     flexGridSizer767867->SetFlexibleDirection( wxBOTH );
@@ -355,36 +399,36 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer763531->Add(flexGridSizer767867, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
-    m_btConnectOperatingTrace = new wxBitmapToggleButton(m_panelOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_panelOperatingTrace, wxSize(26,26)), 0);
+    m_btConnectOperatingTrace = new wxBitmapToggleButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(26,26)), 0);
     m_btConnectOperatingTrace->SetToolTip(_("Connect"));
     m_btConnectOperatingTrace->SetValue(true);
     
     flexGridSizer767867->Add(m_btConnectOperatingTrace, 0, wxALL, WXC_FROM_DIP(1));
     m_btConnectOperatingTrace->SetMinSize(wxSize(26,26));
     
-    m_btClearOperatingTrace10 = new wxBitmapButton(m_panelOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxDefaultPosition, wxDLG_UNIT(m_panelOperatingTrace, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btClearOperatingTrace10 = new wxBitmapButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearOperatingTrace10->SetToolTip(_("Copy Operating Trace to Clipboard"));
     
     flexGridSizer767867->Add(m_btClearOperatingTrace10, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearOperatingTrace10->SetMinSize(wxSize(26,26));
     
-    m_btClearOperatingTrace11 = new wxBitmapButton(m_panelOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")), wxDefaultPosition, wxDLG_UNIT(m_panelOperatingTrace, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btClearOperatingTrace11 = new wxBitmapButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")), wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearOperatingTrace11->SetToolTip(_("Save Operating Trace to File"));
     
     flexGridSizer767867->Add(m_btClearOperatingTrace11, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearOperatingTrace11->SetMinSize(wxSize(26,26));
     
-    m_btClearOperatingTrace = new wxBitmapButton(m_panelOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_panelOperatingTrace, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btClearOperatingTrace = new wxBitmapButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearOperatingTrace->SetToolTip(_("Clear"));
     
     flexGridSizer767867->Add(m_btClearOperatingTrace, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearOperatingTrace->SetMinSize(wxSize(26,26));
     
-    m_staticLine249 = new wxStaticLine(m_panelOperatingTrace, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelOperatingTrace, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine249 = new wxStaticLine(m_plOperatingTrace, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
-    flexGridSizer229->Add(m_staticLine249, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer229->Add(m_staticLine249, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_operatingTracePlaceholder = new wxPanel(m_panelOperatingTrace, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelOperatingTrace, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_operatingTracePlaceholder = new wxPanel(m_plOperatingTrace, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_operatingTracePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
     flexGridSizer229->Add(m_operatingTracePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
@@ -394,12 +438,23 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     m_panelPathListEntriesImgIndex = m_listbookPreProcessor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("database-link")));
     m_listbookPreProcessor->AddPage(m_panelPathListEntries, _("Path List\nEntries"), false, m_panelPathListEntriesImgIndex);
     
+    wxFlexGridSizer* flexGridSizer348 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer348->SetFlexibleDirection( wxBOTH );
+    flexGridSizer348->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer348->AddGrowableCol(0);
+    flexGridSizer348->AddGrowableRow(0);
+    m_panelPathListEntries->SetSizer(flexGridSizer348);
+    
+    m_plPathListView = new wxPanel(m_panelPathListEntries, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer348->Add(m_plPathListView, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     wxFlexGridSizer* flexGridSizer7624 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer7624->SetFlexibleDirection( wxBOTH );
     flexGridSizer7624->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer7624->AddGrowableCol(0);
     flexGridSizer7624->AddGrowableRow(2);
-    m_panelPathListEntries->SetSizer(flexGridSizer7624);
+    m_plPathListView->SetSizer(flexGridSizer7624);
     
     wxFlexGridSizer* flexGridSizer7635 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer7635->SetFlexibleDirection( wxBOTH );
@@ -409,11 +464,22 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7624->Add(flexGridSizer7635, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticText61381 = new wxStaticText(m_panelPathListEntries, wxID_ANY, _("Path List Entries [mm]:"), wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(-1,-1)), 0);
+    wxFlexGridSizer* flexGridSizer306 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer306->SetFlexibleDirection( wxBOTH );
+    flexGridSizer306->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer7635->Add(flexGridSizer306, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_bmpButton3049 = new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("abb-export")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), wxBU_AUTODRAW);
+    
+    flexGridSizer306->Add(m_bmpButton3049, 0, wxALL, WXC_FROM_DIP(1));
+    m_bmpButton3049->SetMinSize(wxSize(26,26));
+    
+    m_staticText61381 = new wxStaticText(m_plPathListView, wxID_ANY, _("Path List Entries [mm]:"), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), 0);
     wxFont m_staticText61381Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText61381->SetFont(m_staticText61381Font);
     
-    flexGridSizer7635->Add(m_staticText61381, 0, wxALL, WXC_FROM_DIP(3));
+    flexGridSizer306->Add(m_staticText61381, 0, wxALL, WXC_FROM_DIP(3));
     
     wxFlexGridSizer* flexGridSizer7889 = new wxFlexGridSizer(0, 3, 0, 0);
     flexGridSizer7889->SetFlexibleDirection( wxBOTH );
@@ -421,13 +487,13 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7635->Add(flexGridSizer7889, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(5));
     
-    m_staticText7891 = new wxStaticText(m_panelPathListEntries, wxID_ANY, _("Rows:"), wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(-1,-1)), 0);
+    m_staticText7891 = new wxStaticText(m_plPathListView, wxID_ANY, _("Rows:"), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), 0);
     wxFont m_staticText7891Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText7891->SetFont(m_staticText7891Font);
     
     flexGridSizer7889->Add(m_staticText7891, 0, wxALL, WXC_FROM_DIP(2));
     
-    m_pathListRowCount = new wxTextCtrl(m_panelPathListEntries, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(80,-1)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
+    m_pathListRowCount = new wxTextCtrl(m_plPathListView, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(80,-1)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
     wxFont m_pathListRowCountFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_pathListRowCount->SetFont(m_pathListRowCountFont);
     #if wxVERSION_NUMBER >= 3000
@@ -437,34 +503,63 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer7889->Add(m_pathListRowCount, 0, wxALL, WXC_FROM_DIP(2));
     m_pathListRowCount->SetMinSize(wxSize(80,-1));
     
-    m_staticLine7903 = new wxStaticLine(m_panelPathListEntries, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(-1,-1)), wxLI_VERTICAL);
+    m_staticLine7903 = new wxStaticLine(m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer7889->Add(m_staticLine7903, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer7678 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer7678 = new wxFlexGridSizer(1, 9, 0, 0);
     flexGridSizer7678->SetFlexibleDirection( wxBOTH );
     flexGridSizer7678->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
     flexGridSizer7635->Add(flexGridSizer7678, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
-    m_btConnectPathListEntries = new wxBitmapToggleButton(m_panelPathListEntries, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(26,26)), 0);
+    m_btConnectPathListEntries = new wxBitmapToggleButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), 0);
     m_btConnectPathListEntries->SetToolTip(_("Connect"));
     m_btConnectPathListEntries->SetValue(true);
     
     flexGridSizer7678->Add(m_btConnectPathListEntries, 0, wxALL, WXC_FROM_DIP(1));
     m_btConnectPathListEntries->SetMinSize(wxSize(26,26));
     
-    m_btClearPathListEntries = new wxBitmapButton(m_panelPathListEntries, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btClearPathListEntries = new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearPathListEntries->SetToolTip(_("Clear"));
     
     flexGridSizer7678->Add(m_btClearPathListEntries, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearPathListEntries->SetMinSize(wxSize(26,26));
     
-    m_staticLine219 = new wxStaticLine(m_panelPathListEntries, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine285 = new wxStaticLine(m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer7678->Add(m_staticLine285, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btPathListEntryFirst = new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-skip-backward-7")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btPathListEntryFirst->SetToolTip(_("Skip to First Client ID"));
+    
+    flexGridSizer7678->Add(m_btPathListEntryFirst, 0, wxALL, WXC_FROM_DIP(1));
+    m_btPathListEntryFirst->SetMinSize(wxSize(26,26));
+    
+    m_btPathListEntryPrev = new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-seek-backward-7")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btPathListEntryPrev->SetToolTip(_("Skip to Prev Client ID"));
+    
+    flexGridSizer7678->Add(m_btPathListEntryPrev, 0, wxALL, WXC_FROM_DIP(1));
+    m_btPathListEntryPrev->SetMinSize(wxSize(26,26));
+    
+    m_btPathListEntryNext = new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-seek-forward-7")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btPathListEntryNext->SetToolTip(_("Skip to NextClient ID"));
+    
+    flexGridSizer7678->Add(m_btPathListEntryNext, 0, wxALL, WXC_FROM_DIP(1));
+    m_btPathListEntryNext->SetMinSize(wxSize(26,26));
+    
+    m_btPathListEntryLast = new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-skip-forward-7")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btPathListEntryLast->SetToolTip(_("Skip to Last Client ID"));
+    
+    flexGridSizer7678->Add(m_btPathListEntryLast, 0, wxALL, WXC_FROM_DIP(1));
+    m_btPathListEntryLast->SetMinSize(wxSize(26,26));
+    
+    m_staticLine219 = new wxStaticLine(m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer7624->Add(m_staticLine219, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_pathListEntriesPlaceholder = new wxListCtrl(m_panelPathListEntries, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPathListEntries, wxSize(-1,-1)), wxLC_REPORT);
+    m_pathListEntriesPlaceholder = new wxListCtrl(m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), wxLC_REPORT);
+    m_pathListEntriesPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
     flexGridSizer7624->Add(m_pathListEntriesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -473,12 +568,23 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     m_panelMoveSequencesImgIndex = m_listbookPreProcessor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("database-table")));
     m_listbookPreProcessor->AddPage(m_panelMoveSequences, _("Move\nSequences"), false, m_panelMoveSequencesImgIndex);
     
+    wxFlexGridSizer* flexGridSizer351 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer351->SetFlexibleDirection( wxBOTH );
+    flexGridSizer351->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer351->AddGrowableCol(0);
+    flexGridSizer351->AddGrowableRow(0);
+    m_panelMoveSequences->SetSizer(flexGridSizer351);
+    
+    m_plMoveSequences = new wxPanel(m_panelMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer351->Add(m_plMoveSequences, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     wxFlexGridSizer* flexGridSizer76242 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer76242->SetFlexibleDirection( wxBOTH );
     flexGridSizer76242->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer76242->AddGrowableCol(0);
     flexGridSizer76242->AddGrowableRow(2);
-    m_panelMoveSequences->SetSizer(flexGridSizer76242);
+    m_plMoveSequences->SetSizer(flexGridSizer76242);
     
     wxFlexGridSizer* flexGridSizer76353 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer76353->SetFlexibleDirection( wxBOTH );
@@ -488,11 +594,22 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer76242->Add(flexGridSizer76353, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticText613814 = new wxStaticText(m_panelMoveSequences, wxID_ANY, _("Move Sequences [steps]:"), wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(-1,-1)), 0);
+    wxFlexGridSizer* flexGridSizer302 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer302->SetFlexibleDirection( wxBOTH );
+    flexGridSizer302->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer76353->Add(flexGridSizer302, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_bmpButton304 = new wxBitmapButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("abb-export")), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26,26)), wxBU_AUTODRAW);
+    
+    flexGridSizer302->Add(m_bmpButton304, 0, wxALL, WXC_FROM_DIP(1));
+    m_bmpButton304->SetMinSize(wxSize(26,26));
+    
+    m_staticText613814 = new wxStaticText(m_plMoveSequences, wxID_ANY, _("Move Sequences [steps]:"), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(-1,-1)), 0);
     wxFont m_staticText613814Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText613814->SetFont(m_staticText613814Font);
     
-    flexGridSizer76353->Add(m_staticText613814, 0, wxALL, WXC_FROM_DIP(3));
+    flexGridSizer302->Add(m_staticText613814, 0, wxALL, WXC_FROM_DIP(3));
     
     wxFlexGridSizer* flexGridSizer78891 = new wxFlexGridSizer(0, 3, 0, 0);
     flexGridSizer78891->SetFlexibleDirection( wxBOTH );
@@ -500,13 +617,13 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer76353->Add(flexGridSizer78891, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(5));
     
-    m_staticText78912 = new wxStaticText(m_panelMoveSequences, wxID_ANY, _("Rows:"), wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(-1,-1)), 0);
+    m_staticText78912 = new wxStaticText(m_plMoveSequences, wxID_ANY, _("Rows:"), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(-1,-1)), 0);
     wxFont m_staticText78912Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText78912->SetFont(m_staticText78912Font);
     
     flexGridSizer78891->Add(m_staticText78912, 0, wxALL, WXC_FROM_DIP(2));
     
-    m_moveSequenceRowCount = new wxTextCtrl(m_panelMoveSequences, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(80,-1)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
+    m_moveSequenceRowCount = new wxTextCtrl(m_plMoveSequences, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(80,-1)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
     wxFont m_moveSequenceRowCountFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_moveSequenceRowCount->SetFont(m_moveSequenceRowCountFont);
     #if wxVERSION_NUMBER >= 3000
@@ -516,34 +633,62 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer78891->Add(m_moveSequenceRowCount, 0, wxALL, WXC_FROM_DIP(2));
     m_moveSequenceRowCount->SetMinSize(wxSize(80,-1));
     
-    m_staticLine7901 = new wxStaticLine(m_panelMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(-1,-1)), wxLI_VERTICAL);
+    m_staticLine7901 = new wxStaticLine(m_plMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer78891->Add(m_staticLine7901, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer76786 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer76786 = new wxFlexGridSizer(0, 9, 0, 0);
     flexGridSizer76786->SetFlexibleDirection( wxBOTH );
     flexGridSizer76786->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
     flexGridSizer76353->Add(flexGridSizer76786, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
-    m_btConnectMoveSequences = new wxBitmapToggleButton(m_panelMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(26,26)), 0);
+    m_btConnectMoveSequences = new wxBitmapToggleButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26,26)), 0);
     m_btConnectMoveSequences->SetToolTip(_("Connect"));
     m_btConnectMoveSequences->SetValue(true);
     
     flexGridSizer76786->Add(m_btConnectMoveSequences, 0, wxALL, WXC_FROM_DIP(1));
     m_btConnectMoveSequences->SetMinSize(wxSize(26,26));
     
-    m_btClearMoveSequences = new wxBitmapButton(m_panelMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btClearMoveSequences = new wxBitmapButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearMoveSequences->SetToolTip(_("Clear"));
     
     flexGridSizer76786->Add(m_btClearMoveSequences, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearMoveSequences->SetMinSize(wxSize(26,26));
     
-    m_staticLine188 = new wxStaticLine(m_panelMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine2854 = new wxStaticLine(m_plMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer76786->Add(m_staticLine2854, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btMoveSeqFirst = new wxBitmapButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-skip-backward-7")), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btMoveSeqFirst->SetToolTip(_("Skip to First Client ID"));
+    
+    flexGridSizer76786->Add(m_btMoveSeqFirst, 0, wxALL, WXC_FROM_DIP(1));
+    m_btMoveSeqFirst->SetMinSize(wxSize(26,26));
+    
+    m_btMoveSeqPrev = new wxBitmapButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-seek-backward-7")), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btMoveSeqPrev->SetToolTip(_("Skip to Prev Client ID"));
+    
+    flexGridSizer76786->Add(m_btMoveSeqPrev, 0, wxALL, WXC_FROM_DIP(1));
+    m_btMoveSeqPrev->SetMinSize(wxSize(26,26));
+    
+    m_btMoveSeqNext = new wxBitmapButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-seek-forward-7")), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btMoveSeqNext->SetToolTip(_("Skip to NextClient ID"));
+    
+    flexGridSizer76786->Add(m_btMoveSeqNext, 0, wxALL, WXC_FROM_DIP(1));
+    m_btMoveSeqNext->SetMinSize(wxSize(26,26));
+    
+    m_btMoveSeqLast = new wxBitmapButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-skip-forward-7")), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btMoveSeqLast->SetToolTip(_("Skip to Last Client ID"));
+    
+    flexGridSizer76786->Add(m_btMoveSeqLast, 0, wxALL, WXC_FROM_DIP(1));
+    m_btMoveSeqLast->SetMinSize(wxSize(26,26));
+    
+    m_staticLine188 = new wxStaticLine(m_plMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer76242->Add(m_staticLine188, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_splitter196 = new wxSplitterWindow(m_panelMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(-1,-1)), wxSP_3D);
+    m_splitter196 = new wxSplitterWindow(m_plMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(-1,-1)), wxSP_3D);
     m_splitter196->SetSashGravity(0.44);
     m_splitter196->SetMinimumPaneSize(10);
     
@@ -630,7 +775,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer76242->Add(flexGridSizer190, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_selectedClientIds = new wxTextCtrl(m_panelMoveSequences, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMoveSequences, wxSize(-1,-1)), wxTE_READONLY);
+    m_selectedClientIds = new wxTextCtrl(m_plMoveSequences, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(-1,-1)), wxTE_READONLY);
     m_selectedClientIds->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_selectedClientIdsFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_selectedClientIds->SetFont(m_selectedClientIdsFont);
@@ -647,35 +792,59 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
          GetSizer()->Fit(this);
     }
     // Connect events
+    m_bmpButton304911->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachParsingSynopsisView), NULL, this);
     m_btConnectOperatingTrace4->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectParsingSynopis), NULL, this);
     m_btClearOperatingTrace105->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::copyParsingSynopis), NULL, this);
-    m_btClearOperatingTrace116->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::saveParsingSynopis), NULL, this);
+    m_btClearOperatingTrace116->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::saveParsingSynopsis), NULL, this);
     m_btClearOperatingTrace7->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearParsingSynopis), NULL, this);
+    m_bmpButton304910->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachOperatingTraceView), NULL, this);
     m_btConnectOperatingTrace->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectOperatingTrace), NULL, this);
     m_btClearOperatingTrace10->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::copyOperatingTrace), NULL, this);
     m_btClearOperatingTrace11->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::saveOperatingTrace), NULL, this);
     m_btClearOperatingTrace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearOperatingTrace), NULL, this);
+    m_bmpButton3049->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachPathListEntriesView), NULL, this);
     m_btConnectPathListEntries->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectPathListEntries), NULL, this);
     m_btClearPathListEntries->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearPathListEntries), NULL, this);
+    m_btPathListEntryFirst->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryFirst), NULL, this);
+    m_btPathListEntryPrev->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryPrev), NULL, this);
+    m_btPathListEntryNext->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryNext), NULL, this);
+    m_btPathListEntryLast->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryLast), NULL, this);
+    m_bmpButton304->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachMoveSequenceView), NULL, this);
     m_btConnectMoveSequences->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectMoveSequences), NULL, this);
     m_btClearMoveSequences->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearMoveSequences), NULL, this);
+    m_btMoveSeqFirst->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onMoveSequenceEntryFirst), NULL, this);
+    m_btMoveSeqPrev->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onMoveSequenceEntryPrev), NULL, this);
+    m_btMoveSeqNext->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onMoveSequenceEntryNext), NULL, this);
+    m_btMoveSeqLast->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onMoveSequenceEntryLast), NULL, this);
     
 }
 
 CncPreprocessorBase::~CncPreprocessorBase()
 {
+    m_bmpButton304911->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachParsingSynopsisView), NULL, this);
     m_btConnectOperatingTrace4->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectParsingSynopis), NULL, this);
     m_btClearOperatingTrace105->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::copyParsingSynopis), NULL, this);
-    m_btClearOperatingTrace116->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::saveParsingSynopis), NULL, this);
+    m_btClearOperatingTrace116->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::saveParsingSynopsis), NULL, this);
     m_btClearOperatingTrace7->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearParsingSynopis), NULL, this);
+    m_bmpButton304910->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachOperatingTraceView), NULL, this);
     m_btConnectOperatingTrace->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectOperatingTrace), NULL, this);
     m_btClearOperatingTrace10->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::copyOperatingTrace), NULL, this);
     m_btClearOperatingTrace11->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::saveOperatingTrace), NULL, this);
     m_btClearOperatingTrace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearOperatingTrace), NULL, this);
+    m_bmpButton3049->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachPathListEntriesView), NULL, this);
     m_btConnectPathListEntries->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectPathListEntries), NULL, this);
     m_btClearPathListEntries->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearPathListEntries), NULL, this);
+    m_btPathListEntryFirst->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryFirst), NULL, this);
+    m_btPathListEntryPrev->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryPrev), NULL, this);
+    m_btPathListEntryNext->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryNext), NULL, this);
+    m_btPathListEntryLast->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryLast), NULL, this);
+    m_bmpButton304->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachMoveSequenceView), NULL, this);
     m_btConnectMoveSequences->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectMoveSequences), NULL, this);
     m_btClearMoveSequences->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearMoveSequences), NULL, this);
+    m_btMoveSeqFirst->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onMoveSequenceEntryFirst), NULL, this);
+    m_btMoveSeqPrev->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onMoveSequenceEntryPrev), NULL, this);
+    m_btMoveSeqNext->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onMoveSequenceEntryNext), NULL, this);
+    m_btMoveSeqLast->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onMoveSequenceEntryLast), NULL, this);
     
 }
 
@@ -1431,12 +1600,20 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     }
     this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     
+    wxFlexGridSizer* flexGridSizer314 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer314->SetFlexibleDirection( wxBOTH );
+    flexGridSizer314->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer314->AddGrowableCol(0);
+    flexGridSizer314->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer314);
+    
     wxFlexGridSizer* flexGridSizer2360 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer2360->SetFlexibleDirection( wxBOTH );
     flexGridSizer2360->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2360->AddGrowableCol(1);
     flexGridSizer2360->AddGrowableRow(0);
-    this->SetSizer(flexGridSizer2360);
+    
+    flexGridSizer314->Add(flexGridSizer2360, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer48671 = new wxFlexGridSizer(6, 1, 0, 0);
     flexGridSizer48671->SetFlexibleDirection( wxBOTH );
@@ -1551,14 +1728,156 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     flexGridSizer4867->Add(m_scalePane3D, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     m_scalePane3D->SetMinSize(wxSize(5,-1));
     
+    wxFlexGridSizer* flexGridSizer316 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer316->SetFlexibleDirection( wxBOTH );
+    flexGridSizer316->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer314->Add(flexGridSizer316, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_optionDlg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_optionDlg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("tooloptions")), wxLEFT);
+    m_optionDlg->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_optionDlg, 0, wxALL, WXC_FROM_DIP(1));
+    m_optionDlg->SetMinSize(wxSize(26,26));
+    
+    m_staticLine32511 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer316->Add(m_staticLine32511, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_3D_Top = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Top->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewUp")), wxLEFT);
+    m_3D_Top->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Top, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Top->SetMinSize(wxSize(26,26));
+    
+    m_3D_Bottom = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Bottom->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewDown")), wxLEFT);
+    m_3D_Bottom->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Bottom, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Bottom->SetMinSize(wxSize(26,26));
+    
+    m_3D_Front = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Front->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewFront")), wxLEFT);
+    m_3D_Front->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Front, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Front->SetMinSize(wxSize(26,26));
+    
+    m_3D_Rear = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Rear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewButtom")), wxLEFT);
+    m_3D_Rear->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Rear, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Rear->SetMinSize(wxSize(26,26));
+    
+    m_3D_Left = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Left->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewLeft")), wxLEFT);
+    m_3D_Left->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Left, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Left->SetMinSize(wxSize(26,26));
+    
+    m_3D_Right = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Right->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewRight")), wxLEFT);
+    m_3D_Right->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Right, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Right->SetMinSize(wxSize(26,26));
+    
+    m_staticLine32512 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer316->Add(m_staticLine32512, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_3D_Perspective1 = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Perspective1->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewIso1")), wxLEFT);
+    m_3D_Perspective1->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Perspective1, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Perspective1->SetMinSize(wxSize(26,26));
+    
+    m_3D_Perspective2 = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Perspective2->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewIso2")), wxLEFT);
+    m_3D_Perspective2->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Perspective2, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Perspective2->SetMinSize(wxSize(26,26));
+    
+    m_3D_Perspective3 = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Perspective3->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewIso3")), wxLEFT);
+    m_3D_Perspective3->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Perspective3, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Perspective3->SetMinSize(wxSize(26,26));
+    
+    m_3D_Perspective4 = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Perspective4->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewIso4")), wxLEFT);
+    m_3D_Perspective4->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer316->Add(m_3D_Perspective4, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Perspective4->SetMinSize(wxSize(26,26));
+    
+    m_staticLine325 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer316->Add(m_staticLine325, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     SetName(wxT("GL3DDrawPaneBase"));
     SetSize(wxDLG_UNIT(this, wxSize(200,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
+    // Connect events
+    m_optionDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleOptionPane), NULL, this);
+    m_3D_Top->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromTop), NULL, this);
+    m_3D_Bottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromBottom), NULL, this);
+    m_3D_Front->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromFront), NULL, this);
+    m_3D_Rear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromRear), NULL, this);
+    m_3D_Left->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromLeft), NULL, this);
+    m_3D_Right->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromRight), NULL, this);
+    m_3D_Perspective1->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromPerspective1), NULL, this);
+    m_3D_Perspective2->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromPerspective2), NULL, this);
+    m_3D_Perspective3->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromPerspective3), NULL, this);
+    m_3D_Perspective4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromPerspective4), NULL, this);
+    
 }
 
 GL3DDrawPaneBase::~GL3DDrawPaneBase()
 {
+    m_optionDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleOptionPane), NULL, this);
+    m_3D_Top->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromTop), NULL, this);
+    m_3D_Bottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromBottom), NULL, this);
+    m_3D_Front->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromFront), NULL, this);
+    m_3D_Rear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromRear), NULL, this);
+    m_3D_Left->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromLeft), NULL, this);
+    m_3D_Right->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromRight), NULL, this);
+    m_3D_Perspective1->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromPerspective1), NULL, this);
+    m_3D_Perspective2->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromPerspective2), NULL, this);
+    m_3D_Perspective3->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromPerspective3), NULL, this);
+    m_3D_Perspective4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onShowFromPerspective4), NULL, this);
+    
 }

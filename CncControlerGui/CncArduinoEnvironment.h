@@ -28,6 +28,8 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		void notifyPinUpdate();
 		void notifyDataUpdate();
 		
+		void shutdownTimer();
+		
 		void activateOnClose(bool state) { canClose = state; }
 		
 	protected:

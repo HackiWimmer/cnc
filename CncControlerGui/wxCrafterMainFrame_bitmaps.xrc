@@ -78,6 +78,7 @@
   <object class="wxBitmap" name="ViewLeft">bitmaps\ViewLeft.png</object>
   <object class="wxBitmap" name="ViewRight">bitmaps\ViewRight.png</object>
   <object class="wxBitmap" name="ViewUp">bitmaps\ViewUp.png</object>
+  <object class="wxBitmap" name="abb-export">bitmaps\abb-export.png</object>
   <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
   <object class="wxBitmap" name="actionrun">bitmaps\actionrun.png</object>
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
@@ -167,7 +168,6 @@
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
   <object class="wxBitmap" name="table-edit">bitmaps\table-edit.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>
-  <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
   <object class="wxBitmap" name="view-calendar-month">bitmaps\view-calendar-month.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>

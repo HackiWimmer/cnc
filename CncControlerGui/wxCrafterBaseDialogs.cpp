@@ -820,11 +820,11 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     SetIcons( app_icons );
 
     
-    wxFlexGridSizer* flexGridSizer71 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer71 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer71->SetFlexibleDirection( wxBOTH );
     flexGridSizer71->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer71->AddGrowableCol(0);
-    flexGridSizer71->AddGrowableRow(1);
+    flexGridSizer71->AddGrowableRow(2);
     this->SetSizer(flexGridSizer71);
     
     m_caption = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
@@ -876,8 +876,11 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer98->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     m_btClose->SetMinSize(wxSize(20,20));
     
+    m_staticLine259 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer71->Add(m_staticLine259, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
     m_viewBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_viewBook->SetToolTip(_("qew"));
     m_viewBook->SetName(wxT("m_viewBook"));
     m_viewBook->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -894,7 +897,7 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     m_page1->SetSizer(flexGridSizer142);
     
     m_placeholder1 = new wxPanel(m_page1, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_page1, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_placeholder1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_placeholder1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     
     flexGridSizer142->Add(m_placeholder1, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -905,12 +908,26 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer91->AddGrowableRow(0);
     m_placeholder1->SetSizer(flexGridSizer91);
     
+    wxFlexGridSizer* flexGridSizer252 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer252->SetFlexibleDirection( wxBOTH );
+    flexGridSizer252->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer91->Add(flexGridSizer252, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
     m_staticText93 = new wxStaticText(m_placeholder1, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder1, wxSize(-1,-1)), 0);
     m_staticText93->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_staticText93Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText93->SetFont(m_staticText93Font);
     
-    flexGridSizer91->Add(m_staticText93, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    flexGridSizer252->Add(m_staticText93, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    m_button2501 = new wxButton(m_placeholder1, wxID_ANY, _("Attach\nAgain"), wxDefaultPosition, wxDLG_UNIT(m_placeholder1, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button2501->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-home@2x")), wxLEFT);
+    m_button2501->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer252->Add(m_button2501, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
     
     m_page2 = new wxPanel(m_viewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_viewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_viewBook->AddPage(m_page2, _("Page"), false);
@@ -923,23 +940,37 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     m_page2->SetSizer(flexGridSizer1422);
     
     m_placeholder2 = new wxPanel(m_page2, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_page2, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_placeholder2->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_placeholder2->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     
     flexGridSizer1422->Add(m_placeholder2, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer914 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer914 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer914->SetFlexibleDirection( wxBOTH );
     flexGridSizer914->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer914->AddGrowableCol(0);
     flexGridSizer914->AddGrowableRow(0);
     m_placeholder2->SetSizer(flexGridSizer914);
     
+    wxFlexGridSizer* flexGridSizer251 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer251->SetFlexibleDirection( wxBOTH );
+    flexGridSizer251->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer914->Add(flexGridSizer251, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
     m_staticText935 = new wxStaticText(m_placeholder2, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder2, wxSize(-1,-1)), 0);
     m_staticText935->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_staticText935Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText935->SetFont(m_staticText935Font);
     
-    flexGridSizer914->Add(m_staticText935, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    flexGridSizer251->Add(m_staticText935, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    m_button250 = new wxButton(m_placeholder2, wxID_ANY, _("Attach\nAgain"), wxDefaultPosition, wxDLG_UNIT(m_placeholder2, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button250->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-home@2x")), wxLEFT);
+    m_button250->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer251->Add(m_button250, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
     
     m_page3 = new wxPanel(m_viewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_viewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_viewBook->AddPage(m_page3, _("Page"), false);
@@ -952,7 +983,7 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     m_page3->SetSizer(flexGridSizer14227);
     
     m_placeholder3 = new wxPanel(m_page3, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_page3, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_placeholder3->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_placeholder3->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     
     flexGridSizer14227->Add(m_placeholder3, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -963,12 +994,26 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer9149->AddGrowableRow(0);
     m_placeholder3->SetSizer(flexGridSizer9149);
     
+    wxFlexGridSizer* flexGridSizer254 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer254->SetFlexibleDirection( wxBOTH );
+    flexGridSizer254->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer9149->Add(flexGridSizer254, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
     m_staticText93510 = new wxStaticText(m_placeholder3, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder3, wxSize(-1,-1)), 0);
     m_staticText93510->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_staticText93510Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText93510->SetFont(m_staticText93510Font);
     
-    flexGridSizer9149->Add(m_staticText93510, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    flexGridSizer254->Add(m_staticText93510, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    m_button2502 = new wxButton(m_placeholder3, wxID_ANY, _("Attach\nAgain"), wxDefaultPosition, wxDLG_UNIT(m_placeholder3, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button2502->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-home@2x")), wxLEFT);
+    m_button2502->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer254->Add(m_button2502, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
     
     m_page4 = new wxPanel(m_viewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_viewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_viewBook->AddPage(m_page4, _("Page"), false);
@@ -981,7 +1026,7 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     m_page4->SetSizer(flexGridSizer1422712);
     
     m_placeholder4 = new wxPanel(m_page4, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_page4, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_placeholder4->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_placeholder4->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     
     flexGridSizer1422712->Add(m_placeholder4, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -992,12 +1037,26 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer914914->AddGrowableRow(0);
     m_placeholder4->SetSizer(flexGridSizer914914);
     
+    wxFlexGridSizer* flexGridSizer256 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer256->SetFlexibleDirection( wxBOTH );
+    flexGridSizer256->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer914914->Add(flexGridSizer256, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
     m_staticText9351015 = new wxStaticText(m_placeholder4, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder4, wxSize(-1,-1)), 0);
     m_staticText9351015->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_staticText9351015Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText9351015->SetFont(m_staticText9351015Font);
     
-    flexGridSizer914914->Add(m_staticText9351015, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    flexGridSizer256->Add(m_staticText9351015, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    m_button2503 = new wxButton(m_placeholder4, wxID_ANY, _("Attach\nagain"), wxDefaultPosition, wxDLG_UNIT(m_placeholder4, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button2503->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-home@2x")), wxLEFT);
+    m_button2503->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer256->Add(m_button2503, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
     
     m_status = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
@@ -1075,7 +1134,11 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     m_moveArea->Connect(wxEVT_MOTION, wxMouseEventHandler(CncExternalViewBoxBase::onMotion), NULL, this);
     m_btMinMax->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onMinMax), NULL, this);
     m_btClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onCloseFromButton), NULL, this);
-    m_viewBook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(CncExternalViewBoxBase::onViewBookChnaged), NULL, this);
+    m_viewBook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(CncExternalViewBoxBase::onViewBookChanged), NULL, this);
+    m_button2501->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onAttachPage1), NULL, this);
+    m_button250->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onAttachPage2), NULL, this);
+    m_button2502->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onAttachPage3), NULL, this);
+    m_button2503->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onAttachPage4), NULL, this);
     
 }
 
@@ -1087,7 +1150,11 @@ CncExternalViewBoxBase::~CncExternalViewBoxBase()
     m_moveArea->Disconnect(wxEVT_MOTION, wxMouseEventHandler(CncExternalViewBoxBase::onMotion), NULL, this);
     m_btMinMax->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onMinMax), NULL, this);
     m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onCloseFromButton), NULL, this);
-    m_viewBook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(CncExternalViewBoxBase::onViewBookChnaged), NULL, this);
+    m_viewBook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(CncExternalViewBoxBase::onViewBookChanged), NULL, this);
+    m_button2501->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onAttachPage1), NULL, this);
+    m_button250->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onAttachPage2), NULL, this);
+    m_button2502->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onAttachPage3), NULL, this);
+    m_button2503->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onAttachPage4), NULL, this);
     
 }
 

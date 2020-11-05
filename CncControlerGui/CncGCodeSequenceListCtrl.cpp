@@ -39,7 +39,9 @@ CncGCodeSequenceListCtrl::CncGCodeSequenceListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(191, 205, 219));
+	SetBackgroundColour(*wxBLACK);
+	SetForegroundColour(wxColour(227, 227, 227));
+	SetTextColour(wxColour(227, 227, 227));
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);

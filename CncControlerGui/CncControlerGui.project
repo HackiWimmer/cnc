@@ -544,8 +544,6 @@
       <File Name="CncContextListCtrl.h"/>
       <File Name="CncOpenGLContextObserverListCtrl.cpp"/>
       <File Name="CncOpenGLContextObserverListCtrl.h"/>
-      <File Name="CncParsingSynopsisTraceListCtrl.cpp"/>
-      <File Name="CncParsingSynopsisTraceListCtrl.h"/>
       <File Name="CncMotionMonitorVertexTrace.cpp"/>
       <File Name="CncMotionMonitorVertexTrace.h"/>
       <File Name="CncMoveSequenceListCtrl.h"/>

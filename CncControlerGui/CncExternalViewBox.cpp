@@ -28,6 +28,12 @@ CncExternalViewBox::CncExternalViewBox(wxWindow* parent, long style)
 //////////////////////////////////////////////////////////////////
 CncExternalViewBox::~CncExternalViewBox() {
 //////////////////////////////////////////////////////////////////
+	for (unsigned int i=0; i<MAX_VIEWS; i++) {
+		if ( sourceCtrl[i] != NULL ) {
+			if ( swapState[i] == SS_SWAPED )
+				swapControls(i);
+		}
+	}
 }
 //////////////////////////////////////////////////////////////////
 const CncExternalViewBox::SwapState CncExternalViewBox::getSwapState(unsigned int idx) const {
@@ -157,7 +163,7 @@ void CncExternalViewBox::onMotion(wxMouseEvent& event) {
 	}
 }
 //////////////////////////////////////////////////////////////////
-void CncExternalViewBox::onViewBookChnaged(wxNotebookEvent& event) {
+void CncExternalViewBox::onViewBookChanged(wxNotebookEvent& event) {
 //////////////////////////////////////////////////////////////////
 	typedef IndividualCommandEvent::EvtMainFrame ID;
 	typedef IndividualCommandEvent::ValueName VN;
@@ -168,4 +174,28 @@ void CncExternalViewBox::onViewBookChnaged(wxNotebookEvent& event) {
 	evt.setValue(VN::VAL3, event.GetSelection());
 	
 	wxPostEvent(THE_FRAME, evt);
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::onAttachPage1(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	swapControls();
+	Show(false);
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::onAttachPage2(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	swapControls();
+	Show(false);
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::onAttachPage3(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	swapControls();
+	Show(false);
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::onAttachPage4(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	swapControls();
+	Show(false);
 }

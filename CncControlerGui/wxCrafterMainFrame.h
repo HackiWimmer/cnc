@@ -342,7 +342,7 @@ protected:
     wxButton* m_btCancelRun;
     wxButton* m_btConfirmRun;
     wxPanel* m_additionalParameters;
-    wxStaticText* m_staticText114811;
+    wxStaticText* m_staticText1148q11;
     wxPanel* m_panel9494;
     wxStaticBitmap* m_staticBitmap92606;
     wxStaticText* m_staticText1603237;
@@ -369,8 +369,8 @@ protected:
     wxPanel* m_cnc3DPane;
     wxListbook* m_listbookMonitor;
     wxPanel* m_motionMonitor;
-    wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
-    wxPanel* m_placeholderPanel;
+    wxButton* m_btDetachMonitor;
+    wxStaticText* m_staticText114811;
     wxStaticLine* m_staticLine50163;
     wxBitmapToggleButton* m_btnOrigin;
     wxBitmapToggleButton* m_btnRuler;
@@ -381,11 +381,13 @@ protected:
     wxStaticLine* m_staticLine5016;
     wxBitmapToggleButton* m_switchMonitoing;
     wxStaticLine* m_staticLine3525;
-    wxButton* m_3D_Refreh;
-    wxButton* m_3D_Clear;
-    wxStaticLine* m_staticLine47803;
     wxStaticText* m_staticText32334;
     wxSlider* m_displayInterval;
+    wxPanel* m_panel9552;
+    wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
+    wxStaticLine* m_staticLine95453;
+    wxButton* m_3D_Refreh;
+    wxButton* m_3D_Clear;
     wxPanel* m_3DSplitterPlaceholder;
     wxPanel* m_3DOutboundStatistics;
     wxStaticLine* m_staticLine7091;
@@ -410,20 +412,6 @@ protected:
     wxStaticLine* m_staticLine50083;
     wxStaticText* m_staticText395;
     wxTextCtrl* m_cmdDuration;
-    wxButton* m_motionMonitorOptionDlg;
-    wxStaticLine* m_staticLine34832;
-    wxButton* m_3D_Top;
-    wxButton* m_3D_Bottom;
-    wxButton* m_3D_Front;
-    wxButton* m_3D_Rear;
-    wxButton* m_3D_Left;
-    wxButton* m_3D_Right;
-    wxStaticLine* m_staticLine3483;
-    wxButton* m_3D_Perspective1;
-    wxButton* m_3D_Perspective2;
-    wxButton* m_3D_Perspective3;
-    wxButton* m_3D_Perspective4;
-    wxStaticLine* m_staticLine2341;
     wxPanel* m_cncSetters;
     wxStaticText* m_staticText1150;
     wxTextCtrl* m_setterListCount;
@@ -810,7 +798,7 @@ protected:
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void changeMonitorListBook(wxListbookEvent& event) { event.Skip(); }
-    virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void detachMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorOrigin(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorRuler(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorHelpLines(wxCommandEvent& event) { event.Skip(); }
@@ -818,22 +806,15 @@ protected:
     virtual void motionMonitorPostionMarker(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorFlyPath(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
-    virtual void refreshMotionMonitor(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void displayIntervalThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
+    virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void refreshMotionMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorStatisticPane(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
-    virtual void toggleMotionMonitorOptionPane(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromRear3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void show3D(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void refreshSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void viewControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
@@ -865,6 +846,13 @@ protected:
     virtual void openTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPortSec(wxCommandEvent& event) { event.Skip(); }
     virtual void connectSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromRear3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void show3D(wxCommandEvent& event) { event.Skip(); }
     virtual void newTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplate(wxCommandEvent& event) { event.Skip(); }
@@ -1197,7 +1185,7 @@ public:
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
     wxPanel* GetCncSummary() { return m_cncSummary; }
-    wxStaticText* GetStaticText114811() { return m_staticText114811; }
+    wxStaticText* GetStaticText1148q11() { return m_staticText1148q11; }
     wxStaticBitmap* GetStaticBitmap92606() { return m_staticBitmap92606; }
     wxStaticText* GetStaticText1603237() { return m_staticText1603237; }
     wxStaticText* GetStaticText9268() { return m_staticText9268; }
@@ -1224,8 +1212,8 @@ public:
     wxPanel* GetCncParameters() { return m_cncParameters; }
     wxPanel* GetPreprocessorPlaceholder() { return m_preprocessorPlaceholder; }
     wxPanel* GetCncPrePorcessor() { return m_cncPrePorcessor; }
-    wxBitmapToggleButton* GetBtSaveOutboundAsTemplate1() { return m_btSaveOutboundAsTemplate1; }
-    wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
+    wxButton* GetBtDetachMonitor() { return m_btDetachMonitor; }
+    wxStaticText* GetStaticText114811() { return m_staticText114811; }
     wxStaticLine* GetStaticLine50163() { return m_staticLine50163; }
     wxBitmapToggleButton* GetBtnOrigin() { return m_btnOrigin; }
     wxBitmapToggleButton* GetBtnRuler() { return m_btnRuler; }
@@ -1236,11 +1224,13 @@ public:
     wxStaticLine* GetStaticLine5016() { return m_staticLine5016; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
-    wxButton* Get3D_Refreh() { return m_3D_Refreh; }
-    wxButton* Get3D_Clear() { return m_3D_Clear; }
-    wxStaticLine* GetStaticLine47803() { return m_staticLine47803; }
     wxStaticText* GetStaticText32334() { return m_staticText32334; }
     wxSlider* GetDisplayInterval() { return m_displayInterval; }
+    wxBitmapToggleButton* GetBtSaveOutboundAsTemplate1() { return m_btSaveOutboundAsTemplate1; }
+    wxStaticLine* GetStaticLine95453() { return m_staticLine95453; }
+    wxButton* Get3D_Refreh() { return m_3D_Refreh; }
+    wxButton* Get3D_Clear() { return m_3D_Clear; }
+    wxPanel* GetPanel9552() { return m_panel9552; }
     wxPanel* Get3DSplitterPlaceholder() { return m_3DSplitterPlaceholder; }
     wxStaticLine* GetStaticLine7091() { return m_staticLine7091; }
     wxButton* GetBtShowHideStatistics() { return m_btShowHideStatistics; }
@@ -1265,20 +1255,6 @@ public:
     wxStaticText* GetStaticText395() { return m_staticText395; }
     wxTextCtrl* GetCmdDuration() { return m_cmdDuration; }
     wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
-    wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
-    wxStaticLine* GetStaticLine34832() { return m_staticLine34832; }
-    wxButton* Get3D_Top() { return m_3D_Top; }
-    wxButton* Get3D_Bottom() { return m_3D_Bottom; }
-    wxButton* Get3D_Front() { return m_3D_Front; }
-    wxButton* Get3D_Rear() { return m_3D_Rear; }
-    wxButton* Get3D_Left() { return m_3D_Left; }
-    wxButton* Get3D_Right() { return m_3D_Right; }
-    wxStaticLine* GetStaticLine3483() { return m_staticLine3483; }
-    wxButton* Get3D_Perspective1() { return m_3D_Perspective1; }
-    wxButton* Get3D_Perspective2() { return m_3D_Perspective2; }
-    wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
-    wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
-    wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
     wxPanel* GetMotionMonitor() { return m_motionMonitor; }
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
     wxTextCtrl* GetSetterListCount() { return m_setterListCount; }

@@ -2,8 +2,25 @@
 #define CNCPARSINGSYNOPSISTRACE_H
 
 #include "wxCrafterMotionMonitor.h"
-#include "CncParsingSynopsisTraceListCtrl.h"
+#include "CncLoggerListCtrl.h"
 
+// ----------------------------------------------------------------------------
+class CncParsingSynopsisListCtrl : public CncExtLoggerListCtrl {
+	public:
+		
+		CncParsingSynopsisListCtrl(wxWindow *parent, long style)
+		: CncExtLoggerListCtrl(parent, style)
+		{}
+
+		virtual ~CncParsingSynopsisListCtrl()
+		{}
+		
+		typedef wxListItemAttr LIA;
+		//void addMovSeqSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(128, 128, 255), GetFont()); add(s, lia); }
+		//void addPthLstSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(255, 140, 198), GetFont()); add(s, lia); }
+};
+
+// ----------------------------------------------------------------------------
 class CncParsingSynopsisTrace : public CncParsingSynopsisTraceBase {
 	private:
 		CncParsingSynopsisListCtrl* synopsisTrace;
@@ -12,12 +29,20 @@ class CncParsingSynopsisTrace : public CncParsingSynopsisTraceBase {
 		CncParsingSynopsisTrace(wxWindow* parent);
 		virtual ~CncParsingSynopsisTrace();
 		
-		void clear() 											{ synopsisTrace->clear(); addInfo("Trace cleared . . . "); }
+		void clearAll()												{ synopsisTrace->clearAll(); addInfo("Trace cleared . . . "); }
 		
-		void addEntry(const char type, const wxString& entry) 	{ synopsisTrace->addEntry(type, entry); }
-		void addInfo(const wxString& entry)						{ synopsisTrace->addInfo(entry); }
-		void addWarning(const wxString& entry)					{ synopsisTrace->addWarning(entry); }
-		void addError(const wxString& entry)					{ synopsisTrace->addError(entry); }
-		void addSeparator(const wxString& entry="")				{ synopsisTrace->addSeparator(entry); }
+		void addEntry(const char type, const wxString& entry);
+		void addInfo(const wxString& entry)							{ addEntry('I', entry); }
+		void addWarning(const wxString& entry)						{ addEntry('W', entry); }
+		void addError(const wxString& entry)						{ addEntry('E', entry); }
+		void addSeparator(const wxString& entry="")					{ addEntry('S', entry); }
+		
+		void popProcessMode()										{ synopsisTrace->popProcessMode(); }
+		void pushUpdateMode()										{ synopsisTrace->pushUpdateMode(); }
+
+		bool writeToFile(const wxFileName& fn, bool allRows=false)	{ return synopsisTrace->writeToFile(fn, allRows); }
+		bool copyToClipboard(bool allRows=false)					{ return synopsisTrace->copyToClipboard(allRows); }
+		bool openAsTextView(bool allRows=false)						{ return synopsisTrace->openAsTextView(allRows); }
+
 };
 #endif // CNCPARSINGSYNOPSISTRACE_H

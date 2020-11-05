@@ -309,6 +309,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , openGLContextObserver					(new CncOpenGLContextObserver(this))
 , cncOsEnvDialog						(new CncOSEnvironmentDialog(this))
 , cncExtMainPreview						(NULL)
+, cncExtMotionMonitor					(NULL)
 , cncArduinoEnvironment					(new CncArduinoEnvironment(this))
 , cncLCDPositionPanel					(NULL)
 , cncManuallyMoveCoordPanel				(NULL)
@@ -445,6 +446,7 @@ MainFrame::~MainFrame() {
 	
 	cncDELETE( openGLContextObserver );
 	cncDELETE( cncExtMainPreview );
+	cncDELETE( cncExtMotionMonitor );
 	cncDELETE( cncArduinoEnvironment );
 	cncDELETE( cncOsEnvDialog );
 	cncDELETE( outboundNbInfo );
@@ -719,7 +721,6 @@ void MainFrame::installCustControls() {
 	drawPane3D->setMotionMonitor(motionMonitor);
 	optionPane3D->setMotionMonitor(motionMonitor);
 	statisticsPane->setMotionMonitor(motionMonitor);
-	activate3DPerspectiveButton(m_3D_Perspective1);
 	
 	// Controllers message history
 	controllersMsgHistoryList = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
@@ -759,8 +760,11 @@ void MainFrame::installCustControls() {
 	
 	// external preview
 	cncExtMainPreview = new CncExternalViewBox(this);
-	cncExtMainPreview->setupView(0, mainFilePreview, 		"External File Preview . . . ");
-	cncExtMainPreview->setupView(1, monitorFilePreview, 	"External Template Preview . . . ");
+	cncExtMainPreview->setupView(CncExternalViewBox::Preview::FILE,			mainFilePreview,		"External File Preview . . . ");
+	cncExtMainPreview->setupView(CncExternalViewBox::Preview::TEMPLATE,		monitorFilePreview,		"External Template Preview . . . ");
+	
+	cncExtMotionMonitor = new CncExternalViewBox(this);
+	cncExtMotionMonitor->setupView(CncExternalViewBox::Default::VIEW1,		cnc3DHSplitterWindow,	"External Motion Monitor . . . ");
 
 	// tool magazine
 	toolMagazine = new CncToolMagazine(this); 
@@ -963,41 +967,19 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	auto xxxx = [&](double a, double b, double c, double d) {
-		/*
-		const double epsilon	= 0.001;
-		const double dx0		= std::abs(a);
-		const double dx1		= std::abs(b);
-		const double dy0		= std::abs(c);
-		const double dy1		= std::abs(d);
-		 * 
-		if (	dx0					>= epsilon 
-			&&	dx1					>= epsilon 
-			&&	std::abs(dx0 - dx1)	<= epsilon
-		) {
-			std::cout << "A: ";
-			return PI / 2.0;
-		}
-		
-		if (	dy0					>= epsilon 
-			&&	dy1					>= epsilon 
-			&&	std::abs(dy0 - dy1)	<= epsilon
-		) {
-			std::cout << "B: ";
-			return PI / 2.0;
-		}
-		*/
-		const float a1 = atan2(a, b);
-		const float a2 = atan2(c, d);
-		
-		std::cout << "C: ";
-		return (double)(abs(a1 - a2));
-	};
+	double F   = 25000;
+	int32_t f  = (F / 60.0 )* 1000;
+	char M     = 'W';
 	
-	std::cout << xxxx(0.0,     0.0,    0.0,    0.0) * 180 / 3.14 << std::endl;
-	std::cout << xxxx(0.0,   100.0,    0.0, -100.0) * 180 / 3.14 << std::endl;
-	std::cout << xxxx(100.0,   0.0, -100.0,    0.0) * 180 / 3.14 << std::endl;
-	std::cout << xxxx(100.0, 100.0, -100.0,  100.0) * 180 / 3.14 << std::endl;
+	std::cout << "f : " << f << std::endl;
+	int32_t t = ArdoObj::SpeedTuple::encode(M, f);
+
+	std::cout << "t : " << t << std::endl;
+	
+	std::cout << "V1: " << ArdoObj::SpeedTuple::decodeMode(t) << std::endl;
+	std::cout << "V2: " << ArdoObj::SpeedTuple::decodeValue_MMSec1000(t) << std::endl;
+	std::cout << "V2: " << ArdoObj::SpeedTuple::decodeValue_MMSec(t) << std::endl;
+	std::cout << "V2: " << ArdoObj::SpeedTuple::decodeValue_MMMin(t) << std::endl;
 
 }
 ///////////////////////////////////////////////////////////////////
@@ -1057,6 +1039,12 @@ void MainFrame::activateSecureMode(bool state) {
 		
 		showAuiPane("SecureRunPanel", 	false);
 		showAuiPane("StatusBar", 		false);
+		
+		if ( cncExtMainPreview->IsShownOnScreen() )
+			cncExtMainPreview->Show(false);
+			
+		if ( cncExtMotionMonitor->IsShownOnScreen() )
+			cncExtMotionMonitor->Show(false);
 		
 		GblFunc::swapControls(m_secMonitorPlaceholder,				drawPane3D->GetDrawPanePanel());
 		GblFunc::swapControls(m_secLoggerPlaceholder, 				getLoggerView());
@@ -1716,6 +1704,9 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		 
 	}
 	
+	// This has to be done before the serial thread stops
+	cncArduinoEnvironment->shutdownTimer();
+	
 	// Destroy the serial thread
 	if ( serialThread != NULL) {
 		if ( serialThread->IsRunning() == false) {
@@ -1737,8 +1728,13 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		 
 	}
 	
+	// hide all external windows 
 	cncSpeedPlayground->Show(false);
 	positionStorage->Show(false);
+	
+	cncExtMainPreview->Show(false);
+	cncExtMotionMonitor->Show(false);
+
 	cncArduinoEnvironment->activateOnClose(true);
 	
 	event.Skip();
@@ -5350,6 +5346,8 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 		switch ( sel ) {
 			case OutboundSelection::VAL::MOTION_MONITOR_PANAL:
 			{
+				motionMonitor->synchronizeClientId();
+				
 				if ( cnc )
 					cnc->updatePreview3D();
 					
@@ -5982,17 +5980,6 @@ void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
 	static wxColour active(171, 171, 171);
 	static wxColour inactive(240, 240, 240);
 
-	m_3D_Top->SetBackgroundColour(inactive);
-	m_3D_Bottom->SetBackgroundColour(inactive);
-	m_3D_Front->SetBackgroundColour(inactive);
-	m_3D_Rear->SetBackgroundColour(inactive);
-	m_3D_Left->SetBackgroundColour(inactive);
-	m_3D_Right->SetBackgroundColour(inactive);
-	m_3D_Perspective1->SetBackgroundColour(inactive);
-	m_3D_Perspective2->SetBackgroundColour(inactive);
-	m_3D_Perspective3->SetBackgroundColour(inactive);
-	m_3D_Perspective4->SetBackgroundColour(inactive);
-
 	m_3D_TopSec->SetBackgroundColour(inactive);
 	m_3D_BottomSec->SetBackgroundColour(inactive);
 	m_3D_FrontSec->SetBackgroundColour(inactive);
@@ -6009,63 +5996,94 @@ void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::showFromFront3D(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	motionMonitor->viewFront();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::showFromRear3D(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	motionMonitor->viewRear();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::showFromTop3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	motionMonitor->viewTop();
+	motionMonitorViewTop();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromBottom3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	motionMonitor->viewBottom();
+	motionMonitorViewBottom();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::showFromFront3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	motionMonitorViewFront();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::showFromRear3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	motionMonitorViewRear();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromLeft3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	motionMonitor->viewLeft();
+	motionMonitorViewLeft();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromRight3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	motionMonitor->viewRight();
+	motionMonitorViewRight();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::show3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxButton* bt = (wxButton*)event.GetEventObject();
 	
-	if ( bt == m_3D_Perspective1 || bt == m_3D_Perspective1Sec ) {
-		activate3DPerspectiveButton(bt);
-		motionMonitor->viewIso1();
-		
-	} else if ( bt == m_3D_Perspective2 || bt == m_3D_Perspective2Sec ) {
-		activate3DPerspectiveButton(bt);
-		motionMonitor->viewIso2();
-		
-	} else if ( bt == m_3D_Perspective3 || bt == m_3D_Perspective3Sec ) {
-		activate3DPerspectiveButton(bt);
-		motionMonitor->viewIso3();
-		
-	} else if ( bt == m_3D_Perspective4 || bt == m_3D_Perspective4Sec ) {
-		activate3DPerspectiveButton(bt);
-		motionMonitor->viewIso4();
-		
-	} 
+	if      ( bt == m_3D_Perspective1Sec )	motionMonitorViewPerspective1();
+	else if ( bt == m_3D_Perspective2Sec )	motionMonitorViewPerspective2();
+	else if ( bt == m_3D_Perspective3Sec )	motionMonitorViewPerspective3();
+	else if ( bt == m_3D_Perspective4Sec )	motionMonitorViewPerspective4();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewTop() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromTop();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewBottom() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromBottom();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewLeft() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromLeft();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewRight() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromRight();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewFront() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromFront();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewRear() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromRear();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewPerspective1() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromPerspective1();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewPerspective2() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromPerspective2();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewPerspective3() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromPerspective3();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorViewPerspective4() {
+///////////////////////////////////////////////////////////////////
+	drawPane3D->showFromPerspective4();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearMotionMonitor() {
@@ -6075,7 +6093,6 @@ void MainFrame::clearMotionMonitor() {
 
 	motionMonitor->clear();
 	statisticsPane->clear();
-	getParsingSynopsisTrace()->clear();
 	cncPreprocessor->clearAll();
 	
 	decorateOutboundEditor();
@@ -6490,7 +6507,8 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	
 	if ( tss != ClientIdSelSource::TSS_MONITOR ) {
 		if ( motionMonitor != NULL ) {
-			motionMonitor->setCurrentClientId(firstClientId);
+			// the monitor uses lastClientId to display all ids to lastClientId (incl.)
+			motionMonitor->setCurrentClientId(lastClientId);
 			motionMonitor->Refresh();
 		}
 	}
@@ -7796,6 +7814,20 @@ CncParsingSynopsisTrace* MainFrame::getParsingSynopsisTrace() {
 ////////////////////////////////////////////////////////////////////
 	wxASSERT( cncPreprocessor != NULL );
 	return cncPreprocessor->getParsingSynopsisTrace(); 
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachMotionMonitor(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT( cncExtMotionMonitor != NULL );
+
+	const bool isExtViewActive = !cncExtMotionMonitor->IsShown();
+	
+	if ( cncExtMotionMonitor != NULL ) {
+		
+		// prepare extern preview
+		cncExtMotionMonitor->selectView(CncExternalViewBox::Default::VIEW1);
+		cncExtMotionMonitor->Show(isExtViewActive);
+	}
 }
 
 

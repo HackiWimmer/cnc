@@ -17,6 +17,7 @@
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="24-connected@2x">bitmaps\24-connected@2x.png</object>
   <object class="wxBitmap" name="24-help@2x">bitmaps\24-help@2x.png</object>
+  <object class="wxBitmap" name="24-home@2x">bitmaps\24-home@2x.png</object>
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
   <object class="wxBitmap" name="aui-minimize">bitmaps\aui-minimize.png</object>
   <object class="wxBitmap" name="aui-minimize@2x">bitmaps\aui-minimize@2x.png</object>

@@ -24,13 +24,17 @@ wxEND_EVENT_TABLE()
 /////////////////////////////////////////////////////////////
 CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
-, active				(true)
-, moveSequence			(NULL)
-, defaultItemAttr		()
-, initialItemAttr		()
-, clientIdItemAttr		()
-, speedItemAttr			()
-, infoText				(new wxStaticText(this, wxID_ANY, ""))
+, active					(true)
+, moveSequence				(NULL)
+, defaultItemAttr			()
+, initialItemAttr			()
+, clientIdItemAttr			()
+, speedItemAttr				()
+, defaultItemAttrSelected	()
+, initialItemAttrSelected	()
+, clientIdItemAttrSelected	()
+, speedItemAttrSelected		()
+, infoText					(new wxStaticText(this, wxID_ANY, ""))
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -75,6 +79,23 @@ CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 	speedItemAttr.SetFont(font.Italic());
 	speedItemAttr.SetTextColour(GetTextColour());
 	
+	defaultItemAttrSelected		= defaultItemAttr;
+	initialItemAttrSelected		= initialItemAttr;
+	clientIdItemAttrSelected	= clientIdItemAttr;
+	speedItemAttrSelected		= speedItemAttr;
+	
+	defaultItemAttrSelected.SetTextColour(*wxYELLOW);
+	defaultItemAttrSelected.SetFont(defaultItemAttrSelected.GetFont().Bold());
+
+	initialItemAttrSelected.SetTextColour(*wxYELLOW);
+	initialItemAttrSelected.SetFont(initialItemAttrSelected.GetFont().Bold());
+
+	clientIdItemAttrSelected.SetTextColour(*wxYELLOW);
+	clientIdItemAttrSelected.SetFont(clientIdItemAttrSelected.GetFont().Bold());
+	
+	speedItemAttrSelected.SetTextColour(*wxYELLOW);
+	speedItemAttrSelected.SetFont(speedItemAttrSelected.GetFont().Bold());
+
 	wxPoint pt;
 	pt.x = 100;
 	pt.y = 100;
@@ -121,13 +142,14 @@ int CncMoveSequenceListCtrl::OnGetItemColumnImage(long item, long column) const 
 wxListItemAttr* CncMoveSequenceListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
 	//enum Type {CHG_NOTHING=0, CHG_CLIENTID=1, CHG_SPEED=2, CHG_POSITION=3};
-
-	if 		( getItemText(item, COL_TYPE) == "0" ) return (wxListItemAttr*)(&initialItemAttr);
-	else if	( getItemText(item, COL_TYPE) == "1" ) return (wxListItemAttr*)(&clientIdItemAttr);
-	else if ( getItemText(item, COL_TYPE) == "2" ) return (wxListItemAttr*)(&speedItemAttr);
+	const bool b = (item == getLastSelection());
+	
+	if 		( getItemText(item, COL_TYPE) == "0" ) return (wxListItemAttr*)( b ? (&initialItemAttrSelected)  : (&initialItemAttr) );
+	else if	( getItemText(item, COL_TYPE) == "1" ) return (wxListItemAttr*)( b ? (&clientIdItemAttrSelected) : (&clientIdItemAttr) );
+	else if ( getItemText(item, COL_TYPE) == "2" ) return (wxListItemAttr*)( b ? (&speedItemAttrSelected)    : (&speedItemAttr) );
 
 	// this indicates to use the default style
-	return (wxListItemAttr*)(&defaultItemAttr);
+	return (wxListItemAttr*)( b ? (&defaultItemAttrSelected) : (&defaultItemAttr) );
 }
 /////////////////////////////////////////////////////////////
 void CncMoveSequenceListCtrl::onSelectListItem(wxListEvent& event) {
@@ -290,10 +312,11 @@ wxEND_EVENT_TABLE()
 /////////////////////////////////////////////////////////////
 CncMoveSequenceOverviewListCtrl::CncMoveSequenceOverviewListCtrl(wxWindow *parent, long style, CncMoveSequenceListCtrl* slave, wxStaticText* label) 
 : CncLargeScaledListCtrl(parent, style)
-, defaultItemAttr		()
-, moveSequences			()
-, slaveSequenceList		(slave)
-, contentLabel			(label)
+, defaultItemAttr			()
+, defaultItemAttrSelected	()
+, moveSequences				()
+, slaveSequenceList			(slave)
+, contentLabel				(label)
 /////////////////////////////////////////////////////////////
 {
 	wxASSERT( slaveSequenceList != NULL );
@@ -324,6 +347,10 @@ CncMoveSequenceOverviewListCtrl::CncMoveSequenceOverviewListCtrl(wxWindow *paren
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
 	defaultItemAttr.SetTextColour(GetTextColour());
+	
+	defaultItemAttrSelected = defaultItemAttr;
+	defaultItemAttrSelected.SetTextColour(*wxYELLOW);
+	defaultItemAttrSelected.SetFont(defaultItemAttrSelected.GetFont().Bold());
 }
 /////////////////////////////////////////////////////////////
 CncMoveSequenceOverviewListCtrl::~CncMoveSequenceOverviewListCtrl() {
@@ -354,8 +381,10 @@ void CncMoveSequenceOverviewListCtrl::addMoveSequence(const CncMoveSequence& seq
 /////////////////////////////////////////////////////////////
 wxListItemAttr* CncMoveSequenceOverviewListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
+	const bool b = (item == getLastSelection());
+	
 	// this indicates to use the default style
-	return (wxListItemAttr*)(&defaultItemAttr);
+	return (wxListItemAttr*)( b ? (&defaultItemAttrSelected) : (&defaultItemAttr) );
 }
 /////////////////////////////////////////////////////////////
 wxString CncMoveSequenceOverviewListCtrl::OnGetItemText(long item, long column) const {
@@ -448,3 +477,75 @@ bool CncMoveSequenceOverviewListCtrl::searchReferenceById(const long id) {
 	
 	return false;
 }
+/////////////////////////////////////////////////////////////
+bool CncMoveSequenceOverviewListCtrl::skipToFirstReference() {
+/////////////////////////////////////////////////////////////
+	if ( moveSequences.size() == 0 )
+		return false;
+		
+	return selectItem(0, true);
+}
+/////////////////////////////////////////////////////////////
+bool CncMoveSequenceOverviewListCtrl::skipToPrevReference() {
+/////////////////////////////////////////////////////////////
+	if ( moveSequences.size() == 0 )
+		return false;
+		
+	long item = getLastSelection();
+	
+	if ( isItemValid(item) == false )
+		skipToLastReference();
+		
+	if ( isItemValid(item) == false )
+		return false;
+		
+	const CncMoveSequence* seq	= &(moveSequences.at(item));
+	const long firstClientId	= seq->getFirstClientId();
+	const long ritem			= moveSequences.size() - 1 - item;
+	
+	// skip to previous client id
+	for ( auto it = moveSequences.rbegin() + ritem; it != moveSequences.rend(); ++it ) {
+		if ( it->getFirstClientId() != firstClientId )
+			break;
+			
+		item--;
+	}
+	
+	return selectItem(item, true);
+}
+/////////////////////////////////////////////////////////////
+bool CncMoveSequenceOverviewListCtrl::skipToNextReference() {
+/////////////////////////////////////////////////////////////
+	if ( moveSequences.size() == 0 )
+		return false;
+		
+	long item = getLastSelection();
+	
+	if ( isItemValid(item) == false )
+		skipToFirstReference();
+		
+	if ( isItemValid(item) == false )
+		return false;
+		
+	const CncMoveSequence* seq = &(moveSequences.at(item));
+	const long lastClientId    = seq->getLastClientId();
+	
+	// skip to next client id
+	for ( auto it = moveSequences.begin() + item; it != moveSequences.end(); ++it ) {
+		if ( it->getLastClientId() != lastClientId )
+			break;
+		
+		item++;
+	}
+	
+	return selectItem(item, true);
+}
+/////////////////////////////////////////////////////////////
+bool CncMoveSequenceOverviewListCtrl::skipToLastReference() {
+/////////////////////////////////////////////////////////////
+	if ( moveSequences.size() == 0 )
+		return false;
+		
+	return selectItem(moveSequences.size() - 1, true);
+}
+

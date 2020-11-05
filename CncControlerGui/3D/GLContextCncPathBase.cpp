@@ -540,7 +540,8 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 		return;
 
 	GLOpenGLPathBufferStore* store = cncPath.getOpenGLBufferStore();
-	const long entry = store->findFirstEntryForClientId(currentClientId);
+	//const long entry = store->findFirstEntryForClientId(currentClientId);
+	const long entry = store->findLastEntryForClientId(currentClientId);
 
 	if ( entry < 0 )
 		return;

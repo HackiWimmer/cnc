@@ -21,6 +21,11 @@ class CncMoveSequenceListCtrl : public CncLargeScaledListCtrl {
 		wxListItemAttr clientIdItemAttr;
 		wxListItemAttr speedItemAttr;
 		
+		wxListItemAttr defaultItemAttrSelected;
+		wxListItemAttr initialItemAttrSelected;
+		wxListItemAttr clientIdItemAttrSelected;
+		wxListItemAttr speedItemAttrSelected;
+
 		wxStaticText* infoText;
 
 		virtual wxString OnGetItemText(long item, long column) const;
@@ -67,6 +72,7 @@ class CncMoveSequenceOverviewListCtrl : public CncLargeScaledListCtrl {
 		
 		typedef std::vector<CncMoveSequence> MoveSequences;
 		wxListItemAttr 				defaultItemAttr;
+		wxListItemAttr 				defaultItemAttrSelected;
 		MoveSequences 				moveSequences;
 		CncMoveSequenceListCtrl* 	slaveSequenceList;
 		wxStaticText*				contentLabel;
@@ -101,6 +107,11 @@ class CncMoveSequenceOverviewListCtrl : public CncLargeScaledListCtrl {
 		
 		bool searchReference(const wxString& what);
 		bool searchReferenceById(const long id);
+
+		bool skipToFirstReference();
+		bool skipToPrevReference();
+		bool skipToNextReference();
+		bool skipToLastReference();
 
 		wxDECLARE_NO_COPY_CLASS(CncMoveSequenceOverviewListCtrl);
 		wxDECLARE_EVENT_TABLE();

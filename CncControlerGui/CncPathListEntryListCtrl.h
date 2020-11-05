@@ -13,6 +13,11 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		wxListItemAttr clientIdItemAttr;
 		wxListItemAttr speedItemAttr;
 		
+		wxListItemAttr defaultItemAttrSelected;
+		wxListItemAttr initialItemAttrSelected;
+		wxListItemAttr clientIdItemAttrSelected;
+		wxListItemAttr speedItemAttrSelected;
+		
 		typedef std::vector<CncPathListEntry> PathLists;
 		PathLists pathLists;
 
@@ -55,7 +60,12 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 
 		bool searchReference(const wxString& what);
 		bool searchReferenceById(const long id);
-
+		
+		bool skipToFirstReference();
+		bool skipToPrevReference();
+		bool skipToNextReference();
+		bool skipToLastReference();
+		
 		wxDECLARE_NO_COPY_CLASS(CncPathListEntryListCtrl);
 		wxDECLARE_EVENT_TABLE();
 		

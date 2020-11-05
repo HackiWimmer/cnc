@@ -8,8 +8,10 @@
 #include "CncParsingSynopsisTrace.h"
 #include "CncLoggerListCtrl.h"
 #include "CncFileNameService.h"
+#include "CncExternalViewBox.h"
 #include "CncPreprocessor.h"
 
+// ----------------------------------------------------------------------------
 class CncOperatingTrace : public CncExtLoggerListCtrl {
 	public:
 		
@@ -35,12 +37,16 @@ wxEND_EVENT_TABLE()
 //////////////////////////////////////////////////////////////////
 CncPreprocessor::CncPreprocessor(wxWindow* parent)
 : CncPreprocessorBase(parent)
-, useOperatingTrace		(true)
-, pathListEntries		(NULL)
-, moveSequenceOverview	(NULL)
-, moveSequence			(NULL)
-, parsingSynopisis		(NULL)
-, operatingTrace		(NULL)
+, useOperatingTrace				(true)
+, pathListEntries				(NULL)
+, moveSequenceOverview			(NULL)
+, moveSequence					(NULL)
+, parsingSynopsis				(NULL)
+, operatingTrace				(NULL)
+, externalPathListEntriesView	(NULL)
+, externalMoveSequenceView		(NULL)
+, externalParsingSynopsisView	(NULL)
+, externalOperatingTraceView	(NULL)
 //////////////////////////////////////////////////////////////////
 {
 	// path list entries control
@@ -56,12 +62,21 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 	GblFunc::replaceControl(m_moveSequencesListPlaceholder, moveSequenceOverview);
 	
 	// parsing synopisis
-	parsingSynopisis = new CncParsingSynopsisTrace(this); 
-	GblFunc::replaceControl(m_motionSynopsisPlaceholder, parsingSynopisis);
+	parsingSynopsis = new CncParsingSynopsisTrace(this); 
+	GblFunc::replaceControl(m_motionSynopsisPlaceholder, parsingSynopsis);
 
 	// operating trace
 	operatingTrace = new CncOperatingTrace(this, wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_operatingTracePlaceholder, operatingTrace);
+	
+	externalPathListEntriesView	= new CncExternalViewBox(this);
+	externalMoveSequenceView	= new CncExternalViewBox(this);
+	externalParsingSynopsisView	= new CncExternalViewBox(this);
+	externalOperatingTraceView	= new CncExternalViewBox(this);
+	externalPathListEntriesView ->setupView(CncExternalViewBox::Default::VIEW1,		m_plPathListView,			"External PathList Entries View. . . ");
+	externalMoveSequenceView	->setupView(CncExternalViewBox::Default::VIEW1,		m_plMoveSequences,			"External Move Sequences View. . . ");
+	externalParsingSynopsisView	->setupView(CncExternalViewBox::Default::VIEW1,		m_plParsingSynopsis,		"External Move Sequences View. . . ");
+	externalOperatingTraceView	->setupView(CncExternalViewBox::Default::VIEW1,		m_plOperatingTrace,			"External Move Sequences View. . . ");
 	
 	const wxFont font = THE_CONTEXT->outboundListBookFont;
 	m_listbookPreProcessor->GetListView()->SetFont(font);
@@ -69,10 +84,15 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 //////////////////////////////////////////////////////////////////
 CncPreprocessor::~CncPreprocessor() {
 //////////////////////////////////////////////////////////////////
+	wxDELETE( externalPathListEntriesView );
+	wxDELETE( externalMoveSequenceView );
+	wxDELETE( externalParsingSynopsisView );
+	wxDELETE( externalOperatingTraceView );
+
 	wxDELETE( pathListEntries );
 	wxDELETE( moveSequenceOverview );
 	wxDELETE( moveSequence );
-	wxDELETE( parsingSynopisis );
+	wxDELETE( parsingSynopsis );
 	wxDELETE( operatingTrace ); 
 }
 //////////////////////////////////////////////////////////////////
@@ -81,6 +101,7 @@ void CncPreprocessor::clearAll() {
 	clearPathListEntries();
 	clearMoveSequences();
 	clearOperatingTrace();
+	parsingSynopsis->clearAll();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearPathListEntries() {
@@ -105,6 +126,7 @@ void CncPreprocessor::popProcessMode() {
 	moveSequence->freeze();
 	moveSequenceOverview->freeze();
 	
+	parsingSynopsis->popProcessMode();
 	operatingTrace->popProcessMode();
 }
 //////////////////////////////////////////////////////////////////
@@ -114,6 +136,7 @@ void CncPreprocessor::pushUpdateMode() {
 	moveSequence->thaw();
 	moveSequenceOverview->thaw();
 	
+	parsingSynopsis->pushUpdateMode();
 	operatingTrace->pushUpdateMode();
 }
 //////////////////////////////////////////////////////////////////
@@ -338,21 +361,120 @@ void CncPreprocessor::saveOperatingTrace(wxCommandEvent& event) {
 	const wxFileName fn(fileName);
 	
 	operatingTrace->writeToFile(fn, true);
+	
 	if ( fn.Exists() ) {
 		wxString tool;
 		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
 		GblFunc::executeExternalProgram(tool, fileName, true);
 	}
 }
-void CncPreprocessor::clearParsingSynopis(wxCommandEvent& event)
-{
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::connectParsingSynopis(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	#warning CncPreprocessor::connectParsingSynopis impl missing
 }
-void CncPreprocessor::connectParsingSynopis(wxCommandEvent& event)
-{
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::clearParsingSynopis(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	parsingSynopsis->clearAll();
 }
-void CncPreprocessor::copyParsingSynopis(wxCommandEvent& event)
-{
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::copyParsingSynopis(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	parsingSynopsis->copyToClipboard(true);
 }
-void CncPreprocessor::saveParsingSynopis(wxCommandEvent& event)
-{
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::saveParsingSynopsis(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	const wxString& fileName(wxString::Format("%s%s%s%s",	CncFileNameService::getTempDirSession(), 
+															"CncPreprocessorParsingSynopsis", 
+															wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S"), 
+															".txt")
+											 );
+	const wxFileName fn(fileName);
+	
+	parsingSynopsis->writeToFile(fn, true);
+	
+	if ( fn.Exists() ) {
+		wxString tool;
+		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+		GblFunc::executeExternalProgram(tool, fileName, true);
+	}
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::detachView(CncExternalViewBox* viewbox) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT( viewbox != NULL );
+	const bool isExtViewActive = !viewbox->IsShown();
+	
+	viewbox->selectView(CncExternalViewBox::Default::VIEW1);
+	viewbox->Show(isExtViewActive);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onDetachPathListEntriesView(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	detachView(externalPathListEntriesView);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onDetachMoveSequenceView(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	detachView(externalMoveSequenceView);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onDetachParsingSynopsisView(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	detachView(externalParsingSynopsisView);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onDetachOperatingTraceView(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	detachView(externalOperatingTraceView);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onPathListEntryFirst(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(pathListEntries);
+	pathListEntries->skipToFirstReference();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onPathListEntryPrev(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(pathListEntries);
+	pathListEntries->skipToPrevReference();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onPathListEntryNext(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(pathListEntries);
+	pathListEntries->skipToNextReference();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onPathListEntryLast(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(pathListEntries);
+	pathListEntries->skipToLastReference();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onMoveSequenceEntryFirst(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(moveSequenceOverview);
+	moveSequenceOverview->skipToFirstReference();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onMoveSequenceEntryPrev(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(moveSequenceOverview);
+	moveSequenceOverview->skipToPrevReference();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onMoveSequenceEntryNext(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(moveSequenceOverview);
+	moveSequenceOverview->skipToNextReference();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onMoveSequenceEntryLast(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(moveSequenceOverview);
+	moveSequenceOverview->skipToLastReference();
 }

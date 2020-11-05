@@ -59,7 +59,10 @@ class CncMotionMonitor : public CncGlCanvas
 		CncMotionMonitor(wxWindow *parent, int *attribList = NULL);
 		virtual ~CncMotionMonitor();
 		
+		virtual bool Show(bool show);
 		virtual void update(bool force=false);
+		
+		void synchronizeClientId();
 
 		// is used from global key down hook, that's the reason why it is public
 		void onKeyDown(wxKeyEvent& event);
@@ -121,7 +124,7 @@ class CncMotionMonitor : public CncGlCanvas
 		
 		// client id
 		long getCurrentClientId() 			{ return currentClientID; }
-		void setCurrentClientId(long id) 	{ currentClientID = id; monitor->setCurrentClientId(id); }
+		void setCurrentClientId(long id);
 		void resetCurrentClientId() 		{ setCurrentClientId(-1L); }
 		
 		void updateMonitorAndOptions();
@@ -147,14 +150,11 @@ class CncMotionMonitor : public CncGlCanvas
 		
 	protected:
 		GLContextCncPathBase* 		monitor;
-		
-		wxTimer cameraRotationTimer;
-		int cameraRotationStepWidth;
-		int cameraRotationSpeed;
-		
-		float zoom;
-		
-		bool currentClientID;
+		wxTimer 					cameraRotationTimer;
+		int 						cameraRotationStepWidth;
+		int 						cameraRotationSpeed;
+		float 						zoom;
+		long 						currentClientID;
 		
 		virtual void notifyCncPathChanged();
 		

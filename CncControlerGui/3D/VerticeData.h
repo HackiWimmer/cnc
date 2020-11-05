@@ -44,7 +44,7 @@ namespace GLI {
 					case CncSpeedWork: 			return Mode::CM_WORK;
 					case CncSpeedRapid: 		return Mode::CM_RAPID;
 					case CncSpeedMax: 			return Mode::CM_WORK;
-					case CncSpeedUserDefined: 	return Mode::CM_WORK;
+					case CncSpeedUserDefined: 	return Mode::CM_USER_DEFINED;
 				}
 				
 				return Mode::CM_RAPID;

@@ -217,16 +217,14 @@ void CncLoggerListCtrl::add(const wxString& text) {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::add(const wxString& text, const wxListItemAttr& lia) {
 /////////////////////////////////////////////////////////////
+	if ( text.IsEmpty() )
+		return;
+		
 	if ( entries.size() == 0 )
 		next();
 	
 	wxListItemAttr prevAttr(entries.back().listItemAttr);
-	
-	entries.push_back(std::move(LoggerEntry(text,"", lia)));
-	next();
-	
-	entries.back().listItemAttr = prevAttr;
-	
+	entries.push_back(std::move(LoggerEntry(text, "", lia)));
 	updateContent();
 }
 /////////////////////////////////////////////////////////////
@@ -450,7 +448,7 @@ bool CncLoggerListCtrl::writeToFile(const wxFileName& fn, bool allRows) {
 	
 	if ( entries.size() > 0 ) {
 		const size_t firstRow = allRows ? 0                 : GetTopItem();
-		const size_t lastRow  = allRows ? GetItemCount() -1 : firstRow + std::min(GetCountPerPage(), GetItemCount() - 1);
+		const size_t lastRow  = allRows ? GetItemCount() - 1 : firstRow + std::min(GetCountPerPage(), GetItemCount() - 1);
 		
 		// check boundaries
 		if ( firstRow >= entries.size() || lastRow >= entries.size() )  {
@@ -462,7 +460,7 @@ bool CncLoggerListCtrl::writeToFile(const wxFileName& fn, bool allRows) {
 		}
 		
 		auto beg = entries.begin() + firstRow;
-		auto end = entries.begin() + lastRow;
+		auto end = entries.begin() + lastRow + 1;
 		
 		for ( auto it = beg; it != end; ++it )
 			out << wxString::Format("%s\n", it->text);

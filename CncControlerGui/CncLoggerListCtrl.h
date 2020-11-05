@@ -108,6 +108,7 @@ class CncExtLoggerListCtrl : public CncLoggerListCtrl {
 		
 		typedef wxListItemAttr LIA;
 		void addSeparator	(const wxString& s) { const LIA lia(wxColour(255, 255, 255), wxColour(185, 122,  87),	GetFont()); add(s, lia); }
+		void addInfoEntry	(const wxString& s) { const LIA lia(GetTextColour(),         GetBackgroundColour(),		GetFont()); add(s, lia); }
 		void addDebugEntry	(const wxString& s) { const LIA lia(wxColour(128, 128,   0), GetBackgroundColour(),		GetFont()); add(s, lia); }
 		void addWarnEntry	(const wxString& s) { const LIA lia(wxColour(255, 201,  14), GetBackgroundColour(),		GetFont()); add(s, lia); }
 		void addErrorEntry	(const wxString& s) { const LIA lia(wxColour(255, 128, 128), GetBackgroundColour(),		GetFont()); add(s, lia); }

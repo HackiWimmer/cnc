@@ -120,8 +120,8 @@
 	wxMenuItem* APP_PROXY::GetMiOpenGLContextObserver()
 	{ return THE_APP->m_miOpenGLContextObserver; }
 
-	void APP_PROXY::parsingSynopsisTraceAddSeparator()
-	{ THE_APP->getParsingSynopsisTrace()->addSeparator(); }
+	void APP_PROXY::parsingSynopsisTraceAddSeparator(const wxString& entry)
+	{ THE_APP->getParsingSynopsisTrace()->addSeparator(entry); }
 
 	void APP_PROXY::parsingSynopsisTraceAddEntry(const char type, const wxString& info)
 	{ THE_APP->getParsingSynopsisTrace()->addEntry(type, info); }

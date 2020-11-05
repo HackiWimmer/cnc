@@ -168,6 +168,14 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void show3D(wxCommandEvent& event);
+    virtual void showFromBottom3D(wxCommandEvent& event);
+    virtual void showFromFront3D(wxCommandEvent& event);
+    virtual void showFromLeft3D(wxCommandEvent& event);
+    virtual void showFromRear3D(wxCommandEvent& event);
+    virtual void showFromRight3D(wxCommandEvent& event);
+    virtual void showFromTop3D(wxCommandEvent& event);
+    virtual void detachMotionMonitor(wxCommandEvent& event);
 		virtual void openPositionStorage(wxCommandEvent& event);
 		virtual void openHexEditor(wxCommandEvent& event);
 		virtual void onReloadMonitorPreview(wxCommandEvent& event);
@@ -282,13 +290,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void moveZToMid(wxCommandEvent& event);
 		virtual void refreshMotionMonitor(wxCommandEvent& event);
 		virtual void clearMotionMonitor(wxCommandEvent& event);
-		virtual void show3D(wxCommandEvent& event);
-		virtual void showFromBottom3D(wxCommandEvent& event);
-		virtual void showFromFront3D(wxCommandEvent& event);
-		virtual void showFromLeft3D(wxCommandEvent& event);
-		virtual void showFromRear3D(wxCommandEvent& event);
-		virtual void showFromRight3D(wxCommandEvent& event);
-		virtual void showFromTop3D(wxCommandEvent& event);
 		virtual void testSwitchToolOnOff(wxCommandEvent& event);
 		virtual void testCountXSpinCtl(wxSpinEvent& event);
 		virtual void testCountXUpdated(wxCommandEvent& event);
@@ -521,6 +522,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void updateAndSetSpeedSlider(float value);
 		void updateCncSpeed(float value, CncSpeedMode mode);
 		
+		void toggleMotionMonitorOptionPane(bool forceHide);
+		void toggleMotionMonitorStatisticPane(bool forceHide);
+		
 	protected:
 	
 		void tryToSelectClientId(long clientId, ClientIdSelSource::ID tss);
@@ -582,6 +586,18 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void cncTransactionLockCallback();
 		void cncTransactionReleaseCallback();
+		
+		void motionMonitorViewTop();
+		void motionMonitorViewBottom();
+		void motionMonitorViewLeft();
+		void motionMonitorViewRight();
+		void motionMonitorViewFront();
+		void motionMonitorViewRear();
+		
+		void motionMonitorViewPerspective1();
+		void motionMonitorViewPerspective2();
+		void motionMonitorViewPerspective3();
+		void motionMonitorViewPerspective4();
 		
 		friend class MainFrameProxy;
 		friend class CncMsgHistoryLoggerProxy;
@@ -661,6 +677,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncOpenGLContextObserver*		openGLContextObserver;
 		CncOSEnvironmentDialog* 		cncOsEnvDialog;
 		CncExternalViewBox* 			cncExtMainPreview;
+		CncExternalViewBox* 			cncExtMotionMonitor;
 		CncArduinoEnvironment*			cncArduinoEnvironment;
 		CncLCDPositionPanel*			cncLCDPositionPanel;
 		CncManuallyMoveCoordinates*		cncManuallyMoveCoordPanel;
@@ -824,9 +841,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// control handling
-		void toggleMotionMonitorOptionPane(bool forceHide);
-		void toggleMotionMonitorStatisticPane(bool forceHide);
-		
 		void decoratePortSelector(bool list=false);
 		
 		void updateSetterList();

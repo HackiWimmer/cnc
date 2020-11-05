@@ -10,6 +10,7 @@ class CncMoveSequenceListCtrl;
 class CncMoveSequenceOverviewListCtrl;
 class CncParsingSynopsisTrace;
 class CncOperatingTrace;
+class CncExternalViewBox;
 
 class CncPreprocessor : public CncPreprocessorBase {
 	
@@ -19,11 +20,16 @@ class CncPreprocessor : public CncPreprocessorBase {
 		CncPathListEntryListCtrl* 			pathListEntries;
 		CncMoveSequenceOverviewListCtrl* 	moveSequenceOverview;
 		CncMoveSequenceListCtrl* 			moveSequence;
-		CncParsingSynopsisTrace*			parsingSynopisis;
+		CncParsingSynopsisTrace*			parsingSynopsis;
 		CncOperatingTrace*					operatingTrace;
+		CncExternalViewBox*					externalPathListEntriesView;
+		CncExternalViewBox*					externalMoveSequenceView;
+		CncExternalViewBox*					externalParsingSynopsisView;
+		CncExternalViewBox*					externalOperatingTraceView;
 		
 		void updatePathListContent();
 		void updateMoveSequenceListContent(bool force = false);
+		void detachView(CncExternalViewBox* viewbox);
 		
 	public:
 		enum ListType{ LT_PATH_LIST, LT_MOVE_SEQ_OVERVIEW, LT_MOVE_SEQ_CONTENT};
@@ -31,7 +37,7 @@ class CncPreprocessor : public CncPreprocessorBase {
 		CncPreprocessor(wxWindow* parent);
 		virtual ~CncPreprocessor();
 		
-		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ wxASSERT(parsingSynopisis != NULL); return parsingSynopisis; }
+		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ wxASSERT(parsingSynopsis != NULL); return parsingSynopsis; }
 		
 		void popProcessMode();
 		void pushUpdateMode();
@@ -63,10 +69,23 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void updateContent();
 
 	protected:
+
+		virtual void onDetachOperatingTraceView(wxCommandEvent& event);
+		virtual void onDetachParsingSynopsisView(wxCommandEvent& event);
+		virtual void onDetachMoveSequenceView(wxCommandEvent& event);
+		virtual void onDetachPathListEntriesView(wxCommandEvent& event);
+		virtual void onMoveSequenceEntryFirst(wxCommandEvent& event);
+		virtual void onMoveSequenceEntryLast(wxCommandEvent& event);
+		virtual void onMoveSequenceEntryNext(wxCommandEvent& event);
+		virtual void onMoveSequenceEntryPrev(wxCommandEvent& event);
+		virtual void onPathListEntryFirst(wxCommandEvent& event);
+		virtual void onPathListEntryLast(wxCommandEvent& event);
+		virtual void onPathListEntryNext(wxCommandEvent& event);
+		virtual void onPathListEntryPrev(wxCommandEvent& event);
 		virtual void clearParsingSynopis(wxCommandEvent& event);
 		virtual void connectParsingSynopis(wxCommandEvent& event);
 		virtual void copyParsingSynopis(wxCommandEvent& event);
-		virtual void saveParsingSynopis(wxCommandEvent& event);
+		virtual void saveParsingSynopsis(wxCommandEvent& event);
 		virtual void copyOperatingTrace(wxCommandEvent& event);
 		virtual void saveOperatingTrace(wxCommandEvent& event);
 		virtual void clearOperatingTrace(wxCommandEvent& event);

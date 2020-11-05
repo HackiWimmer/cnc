@@ -1146,7 +1146,9 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 				case PID_SPEED_MM_SEC:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
 												return false;
 												
-											configuredFeedSpeed_MM_MIN = 60.0 * cei.setterValueList.front() / FLT_FACT;
+											configuredFeedSpeed_MM_MIN	= 60.0 * cei.setterValueList.front() / FLT_FACT;
+											configuredSpeedMode			= CncSpeedUserDefined;
+											
 											break;
 											
 				case PID_ENABLE_STEPPERS:	// nothing to do here

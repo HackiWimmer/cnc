@@ -11,6 +11,17 @@
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
   <object class="wxBitmap" name="16-file_save_all">bitmaps\CodeLite\16-file_save_all.png</object>
   <object class="wxBitmap" name="16-file_save_all@2x">bitmaps\CodeLite\16-file_save_all@2x.png</object>
+  <object class="wxBitmap" name="ViewButtom">bitmaps\ViewButtom.png</object>
+  <object class="wxBitmap" name="ViewDown">bitmaps\ViewDown.png</object>
+  <object class="wxBitmap" name="ViewFront">bitmaps\ViewFront.png</object>
+  <object class="wxBitmap" name="ViewIso1">bitmaps\ViewIso1.png</object>
+  <object class="wxBitmap" name="ViewIso2">bitmaps\ViewIso2.png</object>
+  <object class="wxBitmap" name="ViewIso3">bitmaps\ViewIso3.png</object>
+  <object class="wxBitmap" name="ViewIso4">bitmaps\ViewIso4.png</object>
+  <object class="wxBitmap" name="ViewLeft">bitmaps\ViewLeft.png</object>
+  <object class="wxBitmap" name="ViewRight">bitmaps\ViewRight.png</object>
+  <object class="wxBitmap" name="ViewUp">bitmaps\ViewUp.png</object>
+  <object class="wxBitmap" name="abb-export">bitmaps\abb-export.png</object>
   <object class="wxBitmap" name="arrow-rotate-anticlockwise">bitmaps\arrow-rotate-anticlockwise.png</object>
   <object class="wxBitmap" name="arrow-rotate-clockwise">bitmaps\arrow-rotate-clockwise.png</object>
   <object class="wxBitmap" name="database-link">bitmaps\database-link.png</object>
@@ -24,5 +35,6 @@
   <object class="wxBitmap" name="media-skip-backward-7">bitmaps\media-skip-backward-7.png</object>
   <object class="wxBitmap" name="media-skip-forward-7">bitmaps\media-skip-forward-7.png</object>
   <object class="wxBitmap" name="office-chart-ring">bitmaps\office-chart-ring.png</object>
+  <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
 </resource>

@@ -94,14 +94,24 @@ class GLOpenGLPathBuffer {
 				inline void normalizeVertexColour() {
 					const VertexColours& vc = GLOpenGLPathBuffer::vertexColours;
 					switch ( getType() ) {
-						case 'R':		updateColour(vc.rapid.Red(), vc.rapid.Green(),	vc.rapid.Blue(), vc.rapid.Alpha()); 
-										break;
-						case 'W':		updateColour(vc.work.Red(), vc.work.Green(),	vc.work.Blue(),  vc.work.Alpha()); 
-										break;
-						case 'M':		updateColour(vc.max.Red(), 	vc.max.Green(),		vc.max.Blue(), 	 vc.max.Alpha()); 
-										break;
-						default:		updateColour(vc.user.Red(), vc.user.Green(),	vc.user.Blue(),  vc.user.Alpha()); 
-										break;
+						case cnc::RAPID_SPEED_CHAR:
+									updateColour(vc.rapid.Red(),vc.rapid.Green(),	vc.rapid.Blue(),	vc.rapid.Alpha()); 
+									break;
+									
+						case cnc::WORK_SPEED_CHAR:
+									updateColour(vc.work.Red(),	vc.work.Green(),	vc.work.Blue(),		vc.work.Alpha()); 
+									break;
+									
+						case cnc::MAX_SPEED_CHAR:
+									updateColour(vc.max.Red(),	vc.max.Green(),		vc.max.Blue(),		vc.max.Alpha()); 
+									break;
+									
+						case cnc::USER_DEFIND_SPEED_CHAR:
+									updateColour(vc.user.Red(),	vc.user.Green(),	vc.user.Blue(),		vc.user.Alpha()); 
+									break;
+									
+						default:	updateColour(vc.user.Red(),	vc.user.Green(),	vc.user.Blue(),		vc.user.Alpha()); 
+									break;
 					}
 				}
 				
@@ -303,6 +313,8 @@ class GLOpenGLPathBuffer {
 		
 		long getFirstEntryForClientId(long clientId) const;
 		long getFirstIndexForClientId(long clientId) const;
+		
+		long getLastEntryForClientId(long clientId) const;
 
 		// --------------------------------------------------------------
 		const wxString& getIndexForClientIdAsString(long clientId, wxString& ret, bool summerize);
@@ -411,6 +423,7 @@ class GLOpenGLPathBufferStore {
 		void display(GLOpenGLPathBuffer::DisplayType dt, long vertices = -1);
 		long findFirstEntryForClientId(long cliendId);
 		long findFirstIndexForClientId(long cliendId);
+		long findLastEntryForClientId(long cliendId);
 		void setColours(const GLOpenGLPathBuffer::VertexColours& colours);
 		
 		const wxString& getIndexForClientIdAsString(long clientId, wxString& ret, bool summerize);
