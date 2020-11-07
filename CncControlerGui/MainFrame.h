@@ -207,10 +207,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void selectMetricUnitTo(wxCommandEvent& event);
 		virtual void toggleMotionMonitorOptionPane(wxCommandEvent& event);
 		virtual void toggleMotionMonitorStatisticPane(wxCommandEvent& event);
-		virtual void motionMonitorBoundBox(wxCommandEvent& event);
-		virtual void motionMonitorHelpLines(wxCommandEvent& event);
-		virtual void motionMonitorOrigin(wxCommandEvent& event);
-		virtual void motionMonitorRuler(wxCommandEvent& event);
 		virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event);
 		virtual void extractSourceAsNewTpl(wxCommandEvent& event);
 		virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event);
@@ -218,8 +214,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void selectBinaryEditorViewMode(wxCommandEvent& event);
 		virtual void traceSessionId(wxCommandEvent& event);
 		virtual void openSessionDialog(wxCommandEvent& event);
-		virtual void motionMonitorPostionMarker(wxCommandEvent& event);
-		virtual void motionMonitorFlyPath(wxCommandEvent& event);
 		virtual void updateRenderResolution(wxCommandEvent& event);
 		virtual void toggleIdleRequests(wxCommandEvent& event);
 		virtual void cncMainViewChanged(wxNotebookEvent& event);
@@ -288,8 +282,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void moveXToMid(wxCommandEvent& event);
 		virtual void moveYToMid(wxCommandEvent& event);
 		virtual void moveZToMid(wxCommandEvent& event);
-		virtual void refreshMotionMonitor(wxCommandEvent& event);
-		virtual void clearMotionMonitor(wxCommandEvent& event);
 		virtual void testSwitchToolOnOff(wxCommandEvent& event);
 		virtual void testCountXSpinCtl(wxSpinEvent& event);
 		virtual void testCountXUpdated(wxCommandEvent& event);
@@ -524,6 +516,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void toggleMotionMonitorOptionPane(bool forceHide);
 		void toggleMotionMonitorStatisticPane(bool forceHide);
+		
+		void clearMotionMonitor();
 		
 	protected:
 	
@@ -867,7 +861,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void viewAllAuiPanes();
 		
 		void clearPositionSpy();
-		void clearMotionMonitor();
 		void prepareMotionMonitorViewType();
 
 		wxWindow* getAUIPaneByName(const wxString& name);

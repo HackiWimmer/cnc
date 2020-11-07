@@ -214,7 +214,7 @@ bool CncControl::processSetter(unsigned char pid, const cnc::SetterValueList& va
 			std::cerr << std::endl << "CncControl::processSetter: Setter failed." << std::endl;
 			std::cerr << " Id:    " << ArduinoPIDs::getPIDLabel((int)pid) << std::endl;
 			std::cerr << " Value(s): ";
-			cnc::traceSetterValueList(std::cerr, values, pid < PID_FLOAT_RANG_START ? 1 : FLT_FACT);
+			cnc::traceSetterValueList(std::cerr, pid, values, pid < PID_FLOAT_RANG_START ? 1 : FLT_FACT);
 			std::cerr << std::endl;
 			return false;
 		}
@@ -737,7 +737,7 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	if ( value <= 0.0 )			value = 0.0;
 	if ( value > maxValue )		value = maxValue;
 
-	// avoid the setter below if nothing will change
+	// avoid the code below if nothing will change
 	if ( configuredSpeedMode != s ) {
 		configuredSpeedMode = s;
 		
@@ -751,8 +751,11 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false ) {
 		configuredFeedSpeed_MM_MIN = value;
 		
-		if ( processSetter(PID_SPEED_MM_SEC, (int32_t)(configuredFeedSpeed_MM_MIN * FLT_FACT / 60)) == false ) {
-			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_MM_SEC) failed" << std::endl;
+		const int32_t val = configuredFeedSpeed_MM_MIN * FLT_FACT / 60;
+		const char mode   = cnc::getCncSpeedTypeAsCharacter(configuredSpeedMode);
+		
+		if ( processSetter(PID_SPEED_MM_SEC, ArdoObj::SpeedTuple::encode(mode, val)) == false ) {
+			std::cerr << CNC_LOG_FUNCT << " processSetter(PID_SPEED_MM_SEC) failed" << std::endl;
 			return false;
 		}
 	}
@@ -1136,27 +1139,39 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 			size_t size = cei.setterValueList.size();
 			
 			switch ( cei.setterPid ) {
-				case PID_TOOL_SWITCH:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
-												return false;
-												
-											toolPowerState = (bool)cei.setterValueList.front();
-											displayToolState(toolPowerState);
-											break;
-											
-				case PID_SPEED_MM_SEC:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
-												return false;
-												
-											configuredFeedSpeed_MM_MIN	= 60.0 * cei.setterValueList.front() / FLT_FACT;
-											configuredSpeedMode			= CncSpeedUserDefined;
-											
-											break;
-											
-				case PID_ENABLE_STEPPERS:	// nothing to do here
-											break;
-											
-				default:					std::cerr << "CncControl::SerialExecuteControllerCallback(): Not registered Setter PID: " 
-				                                      << ArduinoPIDs::getPIDLabel(cei.setterPid) 
-													  << std::endl;
+				case PID_TOOL_SWITCH:
+				{
+					if ( checkSetterCount(cei.setterPid, size, 1) == false )
+						return false;
+						
+					toolPowerState = (bool)cei.setterValueList.front();
+					displayToolState(toolPowerState);
+					break;
+				}
+				case PID_SPEED_MM_SEC:
+				{
+					if ( checkSetterCount(cei.setterPid, size, 1) == false )
+						return false;
+					
+					const char mode   = ArdoObj::SpeedTuple::decodeMode(cei.setterValueList.front());
+					const int32_t val = ArdoObj::SpeedTuple::decodeValue_MMSec1000(cei.setterValueList.front());
+					
+					configuredFeedSpeed_MM_MIN	= 60.0 * val / FLT_FACT;
+					configuredSpeedMode			= cnc::getCncSpeedType(mode);
+					
+					break;
+				}
+				case PID_ENABLE_STEPPERS:
+				{
+					// nothing to do here
+					break;
+				}
+				default:
+				{
+					std::cerr	<< "CncControl::SerialExecuteControllerCallback(): Not registered Setter PID: " 
+								<< ArduinoPIDs::getPIDLabel(cei.setterPid) 
+								<< std::endl;
+				}
 			}
 			
 			break;

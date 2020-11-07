@@ -450,6 +450,15 @@ public:
 class GL3DDrawPaneBase : public wxPanel
 {
 protected:
+    wxButton* m_btnOrigin;
+    wxButton* m_btnRuler;
+    wxButton* m_btnHelpLines;
+    wxButton* m_btnPosMarker;
+    wxButton* m_btnBoundBox;
+    wxButton* m_btnFlyPath;
+    wxStaticLine* m_staticLine372;
+    wxButton* m_btnRefresh;
+    wxButton* m_btnClear;
     wxPanel* m_rotatePaneZ3D;
     wxStaticText* m_staticText487556;
     wxPanel* m_rotatePaneY3D;
@@ -478,6 +487,14 @@ protected:
     wxStaticLine* m_staticLine325;
 
 protected:
+    virtual void onToggleOrigin(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleRuler(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleHelpLines(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTogglePosMarker(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleBoundBox(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleFlyPathes(wxCommandEvent& event) { event.Skip(); }
+    virtual void onRefreshMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void onClearMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleOptionPane(wxCommandEvent& event) { event.Skip(); }
     virtual void onShowFromTop(wxCommandEvent& event) { event.Skip(); }
     virtual void onShowFromBottom(wxCommandEvent& event) { event.Skip(); }
@@ -491,6 +508,15 @@ protected:
     virtual void onShowFromPerspective4(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxButton* GetBtnOrigin() { return m_btnOrigin; }
+    wxButton* GetBtnRuler() { return m_btnRuler; }
+    wxButton* GetBtnHelpLines() { return m_btnHelpLines; }
+    wxButton* GetBtnPosMarker() { return m_btnPosMarker; }
+    wxButton* GetBtnBoundBox() { return m_btnBoundBox; }
+    wxButton* GetBtnFlyPath() { return m_btnFlyPath; }
+    wxStaticLine* GetStaticLine372() { return m_staticLine372; }
+    wxButton* GetBtnRefresh() { return m_btnRefresh; }
+    wxButton* GetBtnClear() { return m_btnClear; }
     wxPanel* GetRotatePaneZ3D() { return m_rotatePaneZ3D; }
     wxStaticText* GetStaticText487556() { return m_staticText487556; }
     wxPanel* GetRotatePaneY3D() { return m_rotatePaneY3D; }

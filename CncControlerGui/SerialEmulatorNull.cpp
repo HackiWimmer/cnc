@@ -750,8 +750,12 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 				break;
 			}
 			
-			case PID_SPEED_MM_SEC: 			setFeedSpeed_MMMin((double)(60.0 * values.front()/FLT_FACT));
-											break;
+			case PID_SPEED_MM_SEC:
+			{
+				const int32_t val = ArdoObj::SpeedTuple::decodeValue_MMSec1000(values.front());
+				setFeedSpeed_MMMin((double)(60.0 * val / FLT_FACT));
+				break;
+			}
 		}
 		
 		return true;

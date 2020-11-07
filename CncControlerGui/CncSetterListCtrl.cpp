@@ -16,17 +16,24 @@ wxDEFINE_EVENT(wxEVT_SETTER_DISPLAY_TIMER,  wxTimerEvent);
 wxBEGIN_EVENT_TABLE(CncSetterListCtrl, CncLargeScaledListCtrl)
 	EVT_PAINT(								CncSetterListCtrl::onPaint)
 	EVT_SIZE(								CncSetterListCtrl::onSize)
+	EVT_LIST_ITEM_SELECTED	(wxID_ANY, 		CncSetterListCtrl::onSelectListItem)
+	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 		CncSetterListCtrl::onActivateListItem)
 	EVT_TIMER(wxEVT_SETTER_DISPLAY_TIMER,	CncSetterListCtrl::onDisplayTimer)
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
 CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
-, setterEntries()
-, defaultItemAttr()
-, separatorRunItemAttr()
-, separatorResetItemAttr()
-, separatorSetupItemAttr()
+, setterEntries					()
+, selSetterNum					(NULL)
+, selSetterPid					(NULL)
+, selSetterKey					(NULL)
+, selSetterValue				(NULL)
+, selSetterUnit					(NULL)
+, defaultItemAttr				()
+, separatorRunItemAttr			()
+, separatorResetItemAttr		()
+, separatorSetupItemAttr		()
 , displayTimer					(this, wxEVT_SETTER_DISPLAY_TIMER)
 , displayTimerInterval			(333)
 /////////////////////////////////////////////////////////////
@@ -42,7 +49,8 @@ CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::REVERSE);
 	
-	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+	wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+	//wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
 	SetBackgroundColour(wxColour(  0,  0,  0));
@@ -145,7 +153,7 @@ wxString CncSetterListCtrl::OnGetItemText(long item, long column) const {
 		static std::string retVal;
 		
 		std::stringstream ss;
-		cnc::traceSetterValueList(ss, se.values, pid < PID_FLOAT_RANG_START ? 1 : FLT_FACT);
+		cnc::traceSetterValueList(ss, pid, se.values, pid < PID_FLOAT_RANG_START ? 1 : FLT_FACT);
 		
 		switch ( column ) {
 			case COL_TYPE:	return _("");
@@ -210,21 +218,25 @@ void CncSetterListCtrl::updateColumnWidth() {
 	SetColumnWidth(COL_NUM, 	 64);
 	SetColumnWidth(COL_PID, 	 40);
 	SetColumnWidth(COL_KEY, 	wxLIST_AUTOSIZE);
-	SetColumnWidth(COL_VAL, 	120);
-	SetColumnWidth(COL_UNIT, 	 58);
+	SetColumnWidth(COL_VAL, 	wxLIST_AUTOSIZE);
+	SetColumnWidth(COL_UNIT, 	 70);
 	
 	// try to strech the second (key) column
 	const int scrollbarWidth = 26;
 	int size = GetSize().GetWidth() 
-	         - GetColumnWidth(COL_NUM) 
-			 - GetColumnWidth(COL_VAL) 
+			 - GetColumnWidth(COL_NUM) 
 			 - GetColumnWidth(COL_UNIT)
 			 - GetColumnWidth(COL_TYPE) 
 			 - GetColumnWidth(COL_PID) 
 			 - scrollbarWidth;
-			 
+	size /= 2;
+	
 	if ( size > GetColumnWidth(COL_KEY) )
 		SetColumnWidth(COL_KEY, size);
+		
+	if ( size > GetColumnWidth(COL_VAL) )
+		SetColumnWidth(COL_VAL, size);
+		
 		
 	if ( IsFrozen() == true )
 		Thaw();
@@ -249,4 +261,21 @@ void CncSetterListCtrl::onPaint(wxPaintEvent& event) {
 	THE_APP->GetSetterListCount()->SetToolTip(THE_APP->GetSetterListCount()->GetLabel());
 	
 	event.Skip();
+}
+//////////////////////////////////////////////////
+void CncSetterListCtrl::onActivateListItem(wxListEvent& event) {
+//////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////
+void CncSetterListCtrl::onSelectListItem(wxListEvent& event) {
+//////////////////////////////////////////////////
+	const long item = event.m_itemIndex;
+	if ( item == wxNOT_FOUND )
+		return;
+	
+	if (selSetterNum)	selSetterNum	->ChangeValue(GetItemText(item, COL_NUM));
+	if (selSetterPid)	selSetterPid	->ChangeValue(GetItemText(item, COL_PID));
+	if (selSetterKey)	selSetterKey	->ChangeValue(GetItemText(item, COL_KEY));
+	if (selSetterValue)	selSetterValue	->ChangeValue(GetItemText(item, COL_VAL));
+	if (selSetterUnit)	selSetterUnit	->SetLabel(GetItemText   (item, COL_UNIT));
 }

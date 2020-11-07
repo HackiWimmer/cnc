@@ -16,6 +16,8 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		virtual void notifyChange(CncMotionMonitor& mm);
 		virtual void notifyCameraAngleChange(int angle);
 		
+		void enable(bool state);
+		
 		void setMotionMonitor(CncMotionMonitor* m);
 		
 		void showFromTop();
@@ -30,6 +32,14 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		void showFromPerspective4();
 		
 	protected:
+		virtual void onClearMonitor(wxCommandEvent& event);
+		virtual void onRefreshMonitor(wxCommandEvent& event);
+		virtual void onToggleBoundBox(wxCommandEvent& event);
+		virtual void onToggleFlyPathes(wxCommandEvent& event);
+		virtual void onToggleHelpLines(wxCommandEvent& event);
+		virtual void onToggleOrigin(wxCommandEvent& event);
+		virtual void onTogglePosMarker(wxCommandEvent& event);
+		virtual void onToggleRuler(wxCommandEvent& event);
 		virtual void onToggleOptionPane(wxCommandEvent& event);
 		virtual void onShowFromTop(wxCommandEvent& event)			{ showFromTop();          }
 		virtual void onShowFromBottom(wxCommandEvent& event)		{ showFromBottom();       }

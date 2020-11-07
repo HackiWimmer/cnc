@@ -87,8 +87,11 @@ namespace cnc {
 	const char WORK_SPEED_CHAR			= 'W';
 	const char MAX_SPEED_CHAR 			= 'M';
 	const char USER_DEFIND_SPEED_CHAR 	= 'U';
-	const char getCncSpeedTypeAsCharacter(CncSpeedMode s);
-	const char* getCncSpeedTypeAsString(CncSpeedMode s);
+	
+	const char 		getCncSpeedTypeAsCharacter(CncSpeedMode s);
+	const char*		getCncSpeedTypeAsString(CncSpeedMode s);
+	CncSpeedMode	getCncSpeedType(char m);
+	bool			isCncSpeedType(char m);
 	
 	extern CncBasicLogStream  cex1;
 	extern CncTraceLogStream  trc;
@@ -116,7 +119,7 @@ namespace cnc {
 	const char* getTemplateFormatAsString(const CncTemplateFormat tf);
 	const char* getExtention(const CncTemplateFormat tf);
 	
-	void traceSetterValueList(std::ostream& s, const SetterValueList& values, int32_t factor = 1);
+	void traceSetterValueList(std::ostream& s, unsigned char pid, const SetterValueList& values, int32_t factor = 1);
 	void traceLineNumberTranslater(std::ostream& s, const LineNumberTranslater& lnt);
 	
 	CncStepSensitivity getStepSensitivityOfIndex(unsigned int index);

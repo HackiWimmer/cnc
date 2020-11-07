@@ -1,5 +1,6 @@
 #include <functional>
 #include <wx/filename.h>
+#include "ArduinoEnvWrapper.h"
 #include "CncCommon.h"
 
 namespace cnc {
@@ -83,13 +84,39 @@ const wxString& cnc::rformat(const char* str, unsigned int len, char c) {
 	return _("");
 }
 //////////////////////////////////////////////////////////////
-void cnc::traceSetterValueList(std::ostream& s, const cnc::SetterValueList& values, int32_t factor) {
+void cnc::traceSetterValueList(std::ostream& s, unsigned char pid, const cnc::SetterValueList& values, int32_t factor) {
 //////////////////////////////////////////////////////////////
+	
+	//-------------------------------------------------------
+	auto trace = [&](int32_t val) {
+		if ( factor == 1 ) 	s << wxString::Format("%ld",   (long)val);
+		else				s << wxString::Format("%.2lf", (double)(val/factor));
+	};
+	
 	unsigned int counter = 0;
 	for ( auto it = values.begin(); it != values.end(); it++) {
 		
-		if ( factor == 1 ) 	s << wxString::Format("%ld",   (long)(*it));
-		else				s << wxString::Format("%.2lf", (double)((*it)/factor));
+		const int32_t val = (*it);
+		switch ( pid ) {
+			case PID_SPEED_MM_SEC:
+			{
+				trace(ArdoObj::SpeedTuple::decodeValue_MMSec1000(val));
+				const char m = ArdoObj::SpeedTuple::decodeMode(val);
+				s << " - " << ( m ? ArdoObj::SpeedTuple::decodeMode(val) : '?');
+				break;
+			}
+			case PID_SPEED_MM_MIN:
+			{
+				trace(ArdoObj::SpeedTuple::decodeValue_MMSec1000(val) * 60);
+				const char m = ArdoObj::SpeedTuple::decodeMode(val);
+				s << " - " << ( m ? ArdoObj::SpeedTuple::decodeMode(val) : '?');
+				break;
+			}
+			default:
+			{
+				trace(val);
+			}
+		}
 		
 		if ( ++counter != values.size() )
 			s << ", ";
@@ -169,6 +196,29 @@ const char* cnc::getCncSpeedTypeAsString(CncSpeedMode s) {
 	
 	return "Unknown Speed mode";
 
+}
+//////////////////////////////////////////////////////////////
+CncSpeedMode cnc::getCncSpeedType(char m) {
+//////////////////////////////////////////////////////////////
+	switch( m ) {
+		case cnc::WORK_SPEED_CHAR:	return CncSpeedWork;
+		case cnc::RAPID_SPEED_CHAR:	return CncSpeedRapid;
+		case cnc::MAX_SPEED_CHAR:	return CncSpeedMax;
+	}
+	
+	return CncSpeedUserDefined;
+}
+//////////////////////////////////////////////////////////////
+bool cnc::isCncSpeedType(char m) {
+//////////////////////////////////////////////////////////////
+	switch( m ) {
+		case cnc::WORK_SPEED_CHAR:
+		case cnc::RAPID_SPEED_CHAR:
+		case cnc::MAX_SPEED_CHAR:
+		case cnc::USER_DEFIND_SPEED_CHAR: return true;
+	}
+	
+	return false;
 }
 //////////////////////////////////////////////////////////////
 const char* cnc::getTemplateFormatAsString(const CncTemplateFormat tf) {

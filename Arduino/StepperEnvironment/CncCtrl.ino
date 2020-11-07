@@ -270,7 +270,9 @@ byte CncArduinoController::performTest() {
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::setSpeedValue_MMSec1000(int32_t f, bool activateAcceleration) {
 /////////////////////////////////////////////////////////////////////////////////////
+  f = ArdoObj::SpeedTuple::decodeValue_MMSec1000(f);
   cfgF1000_MMSEC = ArdoObj::absolute(f);
+  
   ArduinoAccelManager::activate(activateAcceleration);
 
   ARDO_DEBUG_VALUE("F [mm/sec]", cfgF1000_MMSEC / 1000.0)

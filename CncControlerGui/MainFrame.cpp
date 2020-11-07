@@ -774,9 +774,14 @@ void MainFrame::installCustControls() {
 	positionSpy = new CncPosSpyListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_positionSpy, positionSpy);
 
-	// pos spy control
+	// setter control
 	setterList = new CncSetterListCtrl(this, wxLC_HRULES | wxLC_SINGLE_SEL); 
-	GblFunc::replaceControl(m_setterList, setterList);
+	GblFunc::replaceControl(m_setterListPlaceholder, setterList);
+	setterList->setSelNumCtrl  (m_selSetterNum);
+	setterList->setSelPidCtrl  (m_selSetterPid);
+	setterList->setSelKeyCtrl  (m_selSetterKey);
+	setterList->setSelValCtrl  (m_selSetterValue);
+	setterList->setSelUnitCtrl (m_selSetterUnit);
 	
 	// motion vertex list control
 	motionVertexCtrl = new CncMotionVertexTrace(this); 
@@ -839,12 +844,6 @@ void MainFrame::registerGuiControls() {
 	
 	registerGuiControl(m_defaultSpeedSlider);
 	registerGuiControl(m_searchConnections);
-	registerGuiControl(m_btnOrigin);
-	registerGuiControl(m_btnRuler);
-	registerGuiControl(m_btnHelpLines);
-	registerGuiControl(m_btnBoundBox);
-	registerGuiControl(m_btnPosMarker);
-	registerGuiControl(m_btnFlyPath);
 	registerGuiControl(m_btToggleOutboundEditorWordWrap);
 	registerGuiControl(m_rcSecureDlg);
 	registerGuiControl(m_btProbeMode);
@@ -857,8 +856,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btSelectCncPreview);
 	registerGuiControl(m_btSelectTemplatePreview);
 	registerGuiControl(m_cbRenderResolution);
-	registerGuiControl(m_3D_Refreh);
-	registerGuiControl(m_3D_Clear);
 	registerGuiControl(m_cbContentPosSpy);
 	registerGuiControl(m_testToolPowerBtn);
 	registerGuiControl(m_portSelector);
@@ -966,21 +963,6 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	double F   = 25000;
-	int32_t f  = (F / 60.0 )* 1000;
-	char M     = 'W';
-	
-	std::cout << "f : " << f << std::endl;
-	int32_t t = ArdoObj::SpeedTuple::encode(M, f);
-
-	std::cout << "t : " << t << std::endl;
-	
-	std::cout << "V1: " << ArdoObj::SpeedTuple::decodeMode(t) << std::endl;
-	std::cout << "V2: " << ArdoObj::SpeedTuple::decodeValue_MMSec1000(t) << std::endl;
-	std::cout << "V2: " << ArdoObj::SpeedTuple::decodeValue_MMSec(t) << std::endl;
-	std::cout << "V2: " << ArdoObj::SpeedTuple::decodeValue_MMMin(t) << std::endl;
-
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -2655,9 +2637,7 @@ void MainFrame::enableControls(bool state) {
 	// run control
 	enableRunControls(state);
 	
-	// at least update motion monitor
-	if ( state == true )
-		motionMonitor->Refresh();
+	drawPane3D->enable(state);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
@@ -6098,17 +6078,6 @@ void MainFrame::clearMotionMonitor() {
 	decorateOutboundEditor();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::clearMotionMonitor(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	clearMotionMonitor();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::refreshMotionMonitor(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( cnc )
-		cnc->updatePreview3D();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int sel = event.GetSelection();
@@ -7018,60 +6987,6 @@ void MainFrame::decorateIdleState(bool state) {
 void MainFrame::toggleIdleRequests(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	decorateIdleState(event.IsChecked());
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::motionMonitorFlyPath(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( motionMonitor == NULL )
-		return;
-		
-	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showFlyPath);
-	motionMonitor->reconstruct();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::motionMonitorPostionMarker(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( motionMonitor == NULL )
-		return;
-	
-	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showPosMarker);
-	motionMonitor->updateMonitorAndOptions();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::motionMonitorBoundBox(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( motionMonitor == NULL )
-		return;
-		
-	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showBoundBox);
-	motionMonitor->updateMonitorAndOptions();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::motionMonitorOrigin(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( motionMonitor == NULL )
-		return;
-		
-	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showOrigin);
-	motionMonitor->updateMonitorAndOptions();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::motionMonitorRuler(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( motionMonitor == NULL )
-		return;
-	
-	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showRuler);
-	motionMonitor->updateMonitorAndOptions();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::motionMonitorHelpLines(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( motionMonitor == NULL )
-		return;
-		
-	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showHelpLines);
-	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::openSessionDialog(wxCommandEvent& event) {

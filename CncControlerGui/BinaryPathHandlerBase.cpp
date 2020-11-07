@@ -176,10 +176,9 @@ bool BinaryPathHandlerHumanReadableView::displaySetter(const unsigned char* buff
 		
 	readableContent << wxString::Format("\n//%s\ncnc->exec('S', '%u', ", ArduinoPIDs::getPIDLabel(si.pid), si.pid);
 	
-	for ( auto it = si.values.begin(); it != si.values.end(); ++it ) {
-		const int32_t& v = *it;
-		readableContent << v << " ";
-	}
+	readableContent << "[";
+	cnc::traceSetterValueList(readableContent, si.pid, si.values, 1);
+	readableContent << "]";
 	readableContent << " );";
 	readableContent << std::endl;
 	

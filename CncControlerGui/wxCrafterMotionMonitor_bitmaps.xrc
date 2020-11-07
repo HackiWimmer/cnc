@@ -9,8 +9,12 @@
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
+  <object class="wxBitmap" name="16-file_reload">bitmaps\CodeLite\16-file_reload.png</object>
+  <object class="wxBitmap" name="16-file_reload@2x">bitmaps\CodeLite\16-file_reload@2x.png</object>
   <object class="wxBitmap" name="16-file_save_all">bitmaps\CodeLite\16-file_save_all.png</object>
   <object class="wxBitmap" name="16-file_save_all@2x">bitmaps\CodeLite\16-file_save_all@2x.png</object>
+  <object class="wxBitmap" name="16-marker">bitmaps\16-marker.png</object>
+  <object class="wxBitmap" name="16-marker@2x">bitmaps\16-marker@2x.png</object>
   <object class="wxBitmap" name="ViewButtom">bitmaps\ViewButtom.png</object>
   <object class="wxBitmap" name="ViewDown">bitmaps\ViewDown.png</object>
   <object class="wxBitmap" name="ViewFront">bitmaps\ViewFront.png</object>
@@ -27,6 +31,7 @@
   <object class="wxBitmap" name="database-link">bitmaps\database-link.png</object>
   <object class="wxBitmap" name="database-table">bitmaps\database-table.png</object>
   <object class="wxBitmap" name="git-reset-repo">bitmaps\git-reset-repo.png</object>
+  <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
   <object class="wxBitmap" name="media-playback-pause-7">bitmaps\media-playback-pause-7.png</object>
   <object class="wxBitmap" name="media-playback-start-7">bitmaps\media-playback-start-7.png</object>
   <object class="wxBitmap" name="media-playback-stop-7">bitmaps\media-playback-stop-7.png</object>
@@ -35,6 +40,10 @@
   <object class="wxBitmap" name="media-skip-backward-7">bitmaps\media-skip-backward-7.png</object>
   <object class="wxBitmap" name="media-skip-forward-7">bitmaps\media-skip-forward-7.png</object>
   <object class="wxBitmap" name="office-chart-ring">bitmaps\office-chart-ring.png</object>
+  <object class="wxBitmap" name="ruler2">bitmaps\ruler2.png</object>
+  <object class="wxBitmap" name="snap-orto">bitmaps\snap-orto.png</object>
+  <object class="wxBitmap" name="table-border-outline">bitmaps\table-border-outline.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
+  <object class="wxBitmap" name="view-grid">bitmaps\view-grid.png</object>
 </resource>

@@ -110,8 +110,10 @@ void SerialEmulatorTextStreamer::notifySetter(const CncCommandDecoder::SetterInf
 			return true;
 		};
 		
-		if ( checkValue() == true ) 
-			currentSpeedValue = 60.0 * (double)si.values.front() / FLT_FACT;
+		if ( checkValue() == true ) {
+			const int32_t val = ArdoObj::SpeedTuple::decodeValue_MMSec1000(si.values.front());
+			currentSpeedValue = 60.0 * (double)val / FLT_FACT;
+		}
 	}
 	
 	writeEncodedSetterCallback(si);

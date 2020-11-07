@@ -372,22 +372,11 @@ protected:
     wxButton* m_btDetachMonitor;
     wxStaticText* m_staticText114811;
     wxStaticLine* m_staticLine50163;
-    wxBitmapToggleButton* m_btnOrigin;
-    wxBitmapToggleButton* m_btnRuler;
-    wxBitmapToggleButton* m_btnHelpLines;
-    wxBitmapToggleButton* m_btnBoundBox;
-    wxBitmapToggleButton* m_btnPosMarker;
-    wxBitmapToggleButton* m_btnFlyPath;
-    wxStaticLine* m_staticLine5016;
     wxBitmapToggleButton* m_switchMonitoing;
     wxStaticLine* m_staticLine3525;
     wxStaticText* m_staticText32334;
     wxSlider* m_displayInterval;
-    wxPanel* m_panel9552;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
-    wxStaticLine* m_staticLine95453;
-    wxButton* m_3D_Refreh;
-    wxButton* m_3D_Clear;
     wxPanel* m_3DSplitterPlaceholder;
     wxPanel* m_3DOutboundStatistics;
     wxStaticLine* m_staticLine7091;
@@ -417,7 +406,16 @@ protected:
     wxTextCtrl* m_setterListCount;
     wxButton* m_btClearSetterList;
     wxButton* m_btRefreshSetterList;
-    wxListCtrl* m_setterList;
+    wxListCtrl* m_setterListPlaceholder;
+    wxPanel* m_panel9571;
+    wxTextCtrl* m_selSetterNum;
+    wxStaticText* m_staticText9566;
+    wxTextCtrl* m_selSetterPid;
+    wxStaticText* m_staticText95664;
+    wxTextCtrl* m_selSetterKey;
+    wxStaticText* m_staticText9562;
+    wxTextCtrl* m_selSetterValue;
+    wxStaticText* m_selSetterUnit;
     wxPanel* m_conrollerMessages;
     wxStaticText* m_staticText1283132;
     wxButton* m_btViewMsgHistory;
@@ -799,19 +797,11 @@ protected:
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void changeMonitorListBook(wxListbookEvent& event) { event.Skip(); }
     virtual void detachMotionMonitor(wxCommandEvent& event) { event.Skip(); }
-    virtual void motionMonitorOrigin(wxCommandEvent& event) { event.Skip(); }
-    virtual void motionMonitorRuler(wxCommandEvent& event) { event.Skip(); }
-    virtual void motionMonitorHelpLines(wxCommandEvent& event) { event.Skip(); }
-    virtual void motionMonitorBoundBox(wxCommandEvent& event) { event.Skip(); }
-    virtual void motionMonitorPostionMarker(wxCommandEvent& event) { event.Skip(); }
-    virtual void motionMonitorFlyPath(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void displayIntervalThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void refreshMotionMonitor(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorStatisticPane(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
@@ -1215,22 +1205,11 @@ public:
     wxButton* GetBtDetachMonitor() { return m_btDetachMonitor; }
     wxStaticText* GetStaticText114811() { return m_staticText114811; }
     wxStaticLine* GetStaticLine50163() { return m_staticLine50163; }
-    wxBitmapToggleButton* GetBtnOrigin() { return m_btnOrigin; }
-    wxBitmapToggleButton* GetBtnRuler() { return m_btnRuler; }
-    wxBitmapToggleButton* GetBtnHelpLines() { return m_btnHelpLines; }
-    wxBitmapToggleButton* GetBtnBoundBox() { return m_btnBoundBox; }
-    wxBitmapToggleButton* GetBtnPosMarker() { return m_btnPosMarker; }
-    wxBitmapToggleButton* GetBtnFlyPath() { return m_btnFlyPath; }
-    wxStaticLine* GetStaticLine5016() { return m_staticLine5016; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
     wxStaticText* GetStaticText32334() { return m_staticText32334; }
     wxSlider* GetDisplayInterval() { return m_displayInterval; }
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate1() { return m_btSaveOutboundAsTemplate1; }
-    wxStaticLine* GetStaticLine95453() { return m_staticLine95453; }
-    wxButton* Get3D_Refreh() { return m_3D_Refreh; }
-    wxButton* Get3D_Clear() { return m_3D_Clear; }
-    wxPanel* GetPanel9552() { return m_panel9552; }
     wxPanel* Get3DSplitterPlaceholder() { return m_3DSplitterPlaceholder; }
     wxStaticLine* GetStaticLine7091() { return m_staticLine7091; }
     wxButton* GetBtShowHideStatistics() { return m_btShowHideStatistics; }
@@ -1260,7 +1239,16 @@ public:
     wxTextCtrl* GetSetterListCount() { return m_setterListCount; }
     wxButton* GetBtClearSetterList() { return m_btClearSetterList; }
     wxButton* GetBtRefreshSetterList() { return m_btRefreshSetterList; }
-    wxListCtrl* GetSetterList() { return m_setterList; }
+    wxListCtrl* GetSetterListPlaceholder() { return m_setterListPlaceholder; }
+    wxTextCtrl* GetSelSetterNum() { return m_selSetterNum; }
+    wxStaticText* GetStaticText9566() { return m_staticText9566; }
+    wxTextCtrl* GetSelSetterPid() { return m_selSetterPid; }
+    wxStaticText* GetStaticText95664() { return m_staticText95664; }
+    wxTextCtrl* GetSelSetterKey() { return m_selSetterKey; }
+    wxStaticText* GetStaticText9562() { return m_staticText9562; }
+    wxTextCtrl* GetSelSetterValue() { return m_selSetterValue; }
+    wxStaticText* GetSelSetterUnit() { return m_selSetterUnit; }
+    wxPanel* GetPanel9571() { return m_panel9571; }
     wxPanel* GetCncSetters() { return m_cncSetters; }
     wxStaticText* GetStaticText1283132() { return m_staticText1283132; }
     wxButton* GetBtViewMsgHistory() { return m_btViewMsgHistory; }

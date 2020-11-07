@@ -856,13 +856,13 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 			std::clog << " This Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 	<< "]"
 												 <<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 	<< "]"
 												 <<   "["; 
-												 cnc::traceSetterValueList(std::clog, values, 1);
+												 cnc::traceSetterValueList(std::clog, pid, values, 1);
 			std::clog                            << "]\n";
 		} else {
 			std::clog << " This Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 	<< "]"
 			                                     <<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 	<< "]"
 												 <<   "[";
-												 cnc::traceSetterValueList(std::clog, values, FLT_FACT);
+												 cnc::traceSetterValueList(std::clog, pid, values, FLT_FACT);
 			std::clog                            << "]\n";
 		}
 		return true;
@@ -874,14 +874,14 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 			ss << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0])						<< "]"
 										<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 						<< "]"
 										<<   "[";
-										cnc::traceSetterValueList(ss, values, 1);
+										cnc::traceSetterValueList(ss, pid, values, 1);
 			ss 							<<   "]";
 		} 
 		else {
 			ss << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 						<< "]"
 										<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 						<< "]"
 										<<   "[";
-										cnc::traceSetterValueList(ss, values, FLT_FACT);
+										cnc::traceSetterValueList(ss, pid, values, FLT_FACT);
 			ss 							<<   "]";
 		}
 		
