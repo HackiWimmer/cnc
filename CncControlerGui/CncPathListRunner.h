@@ -33,6 +33,12 @@ class CncPathListRunner {
 			
 			float	getZPitchDiffenceAsRadians(const Move& m) const;
 			float	getZPitchDiffenceAsDegree(const Move& m) const;
+			
+			static	float maxXYPitchRadians;
+			static	float maxZPitchRadians;
+			
+			static	float degree2Radians(float d)	{ return d * PI / 180.0; }
+			static	float radians2Degree(float r)	{ return r * 180.0 / PI; }
 		};
 
 	public:

@@ -33,9 +33,11 @@ struct GlobalConstStringDatabase {
 	const wxString programTitel			= wxString("Woodworking CNC Controller");
 	const wxString copyRight			= wxString("invented by Hacki Wimmer 2016 - 2021");
 	const wxString versionNumber		= VersionInfo::number;
-	const wxString programVersion 		= wxString(wxString::Format("%s.%s", versionNumber, buildFlag));
+	const wxString programVersion		= wxString(wxString::Format("%s.%s", versionNumber, buildFlag));
 	
-
+	// config
+	const wxString renderSelectorFormat = wxString("%0.3lf mm - %u PPI");
+	
 	// position spy
 	const wxString posSpyRefFormat		= wxString("%+08ld");
 	const wxString pathListRefFormat	= wxString("%+08ld");

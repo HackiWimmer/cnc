@@ -88,9 +88,9 @@ void cnc::traceSetterValueList(std::ostream& s, unsigned char pid, const cnc::Se
 //////////////////////////////////////////////////////////////
 	
 	//-------------------------------------------------------
-	auto trace = [&](int32_t val) {
+	auto trace = [&](int32_t val, const wxString& fltForm = "%.2lf") {
 		if ( factor == 1 ) 	s << wxString::Format("%ld",   (long)val);
-		else				s << wxString::Format("%.2lf", (double)(val/factor));
+		else				s << wxString::Format(fltForm, (double)(val)/factor);
 	};
 	
 	unsigned int counter = 0;
@@ -110,6 +110,11 @@ void cnc::traceSetterValueList(std::ostream& s, unsigned char pid, const cnc::Se
 				trace(ArdoObj::SpeedTuple::decodeValue_MMSec1000(val) * 60);
 				const char m = ArdoObj::SpeedTuple::decodeMode(val);
 				s << " - " << ( m ? ArdoObj::SpeedTuple::decodeMode(val) : '?');
+				break;
+			}
+			case PID_ACCEL_PROFILE:
+			{
+				trace(val, "%.3lf");
 				break;
 			}
 			default:

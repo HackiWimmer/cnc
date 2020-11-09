@@ -169,7 +169,7 @@ void ArduinoPIDs::init() {
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");
 
 	pids[PID_PULSE_WIDTH_HIGH]                .setup("Step Pulse Width High", "us");
-	pids[PID_ACCEL_PROFILE]                   .setup("Accel Profile X,Y,Z(startSpeed, stopSpeed)", "mm/min");
+	pids[PID_ACCEL_PROFILE]                   .setup("Accel Profile", "<mixed>");
 	pids[PID_ACCEL_START_SPEED]               .setup("Accel start speed", "mm/min");
 	pids[PID_ACCEL_STOP_SPEED]                .setup("Accel stop speed", "mm/min");
 	

@@ -292,7 +292,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer311->SetFlexibleDirection( wxBOTH );
     flexGridSizer311->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer7635311->Add(flexGridSizer311, 0, wxALL, WXC_FROM_DIP(3));
+    flexGridSizer7635311->Add(flexGridSizer311, 0, wxALL, WXC_FROM_DIP(0));
     
     m_bmpButton304911 = new wxBitmapButton(m_plParsingSynopsis, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("abb-export")), wxDefaultPosition, wxDLG_UNIT(m_plParsingSynopsis, wxSize(26,26)), wxBU_AUTODRAW);
     
@@ -380,7 +380,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer308->SetFlexibleDirection( wxBOTH );
     flexGridSizer308->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer763531->Add(flexGridSizer308, 0, wxALL, WXC_FROM_DIP(3));
+    flexGridSizer763531->Add(flexGridSizer308, 0, wxALL, WXC_FROM_DIP(0));
     
     m_bmpButton304910 = new wxBitmapButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("abb-export")), wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(26,26)), wxBU_AUTODRAW);
     
@@ -877,7 +877,7 @@ CncMotionVertexTraceBase::CncMotionVertexTraceBase(wxWindow* parent, wxWindowID 
     wxFont m_staticText7928Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText7928->SetFont(m_staticText7928Font);
     
-    flexGridSizer7922->Add(m_staticText7928, 0, wxALL, WXC_FROM_DIP(3));
+    flexGridSizer7922->Add(m_staticText7928, 0, wxALL, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer7924 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer7924->SetFlexibleDirection( wxBOTH );

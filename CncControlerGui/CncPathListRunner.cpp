@@ -10,6 +10,10 @@
 #include "CncMoveSequence.h"
 #include "CncPathListRunner.h"
 
+
+float CncPathListRunner::Move::maxXYPitchRadians	= CncPathListRunner::Move::degree2Radians(15);
+float CncPathListRunner::Move::maxZPitchRadians		= CncPathListRunner::Move::degree2Radians(15);
+
 ////////////////////////////////////////////////////////////////////
 CncPathListRunner::Move::Move(const CncPathListEntry* e)
 : dx		(e->entryDistance.getX())
@@ -41,14 +45,12 @@ bool CncPathListRunner::Move::isXYZPitchEqual(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
 bool CncPathListRunner::Move::isXYPitchDiffToStrong(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
-	const float max = 45 * PI / 180; // 15 degrees
-	return std::abs(getXYPitchDiffenceAsRadians(mNext)) > max;
+	return std::abs(getXYPitchDiffenceAsRadians(mNext)) > maxXYPitchRadians;
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListRunner::Move::isZPitchDiffToStrong(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
-	const float max = 45 * PI / 180; // 15 degrees
-	return std::abs(getZPitchDiffenceAsRadians(mNext)) > max;
+	return std::abs(getZPitchDiffenceAsRadians(mNext)) > maxZPitchRadians;
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListRunner::Move::isXYZPitchDiffToStrong(const Move& mNext) const {
@@ -61,8 +63,12 @@ float CncPathListRunner::Move::getXYPitchDiffenceAsRadians(const Move& mNext) co
 	const float a1 = atan2(dx, dy);
 	const float a2 = atan2(mNext.dx, mNext.dy);
 
-	//std::cout << "(" << dx << ", " << dy << "), (" << mNext.dx << ", " << mNext.dy << "), " << (a1 - a2) *180/PI << ", " << a1 << ", " << a2 << std::endl;
-
+	/*
+	std::cout	<< "(" << dx << ", " << dy << "), (" << mNext.dx << ", " << mNext.dy << "), " 
+				<< (a1 - a2) *180/PI << ", " << a1 << ", " << a2 
+				<< " ----- " << maxXYPitchRadians <<  std::endl;
+	*/
+	
 	return (a1 - a2);
 }
 ////////////////////////////////////////////////////////////////////
@@ -118,6 +124,10 @@ void CncPathListRunner::autoSetup(bool trace) {
 	setup.optSkipEmptyMoves = THE_CONFIG->getPreProcessoSkipEmptyFlag();
 	setup.trace				= THE_CONFIG->getPreProcessorUseOperatingTrace();
 	
+	typedef CncPathListRunner::Move Move;
+	Move::maxXYPitchRadians	= Move::degree2Radians(THE_CONFIG->getMaxXYPitchToKeep());
+	Move::maxZPitchRadians	= Move::degree2Radians(THE_CONFIG->getMaxZPitchToKeep());
+	
 	if ( trace && setup.trace == true )
 		traceSetup();
 }
@@ -129,6 +139,8 @@ void CncPathListRunner::traceSetup() {
 	ss << "Analyse Pathes      : " << setup.optAnalyse			<< std::endl;
 	ss << "Combine Moves       : " << setup.optCombineMoves		<< std::endl;
 	ss << "Skip empty Moves    : " << setup.optSkipEmptyMoves	<< std::endl;
+	ss << "Max XY Pitch        : " << Move::maxXYPitchRadians	<< std::endl;
+	ss << "Max  Z Pitch        : " << Move::maxZPitchRadians	<< std::endl;
 	
 	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
 	wxASSERT( cpp != NULL );

@@ -11,12 +11,9 @@
 const char CncOSDConfigList::OSDEntry::groupKeySeparator	= '/';
 
 ///////////////////////////////////////////////////////////////////
-const wxString& CncOSDConfigList::OSDEntry::makeId(const wxString& group, const wxString& key) {
+const wxString CncOSDConfigList::OSDEntry::makeId(const wxString& group, const wxString& key) {
 ///////////////////////////////////////////////////////////////////
-	static wxString ret;
-
-	ret.assign(wxString::Format("%s%c%s", group, OSDEntry::groupKeySeparator, key));
-	return ret;
+	return wxString::Format("%s%c%s", group, OSDEntry::groupKeySeparator, key);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -154,7 +151,7 @@ bool CncOSDConfigList::add(const wxString& group, const wxString& key, const wxS
 	wxString k(key);
 	k.Trim().Trim(true);
 
-	if ( k.StartsWith("OSD_") == false )
+	if ( k.StartsWith(getOSDPrefix()) == false )
 		return false;
 
 	OSDEntry e(g, k, value);
@@ -167,7 +164,7 @@ bool CncOSDConfigList::add(const wxString& group, const wxString& key, const wxS
 ///////////////////////////////////////////////////////////////////
 bool CncOSDConfigList::update(const wxString& group, const wxString& key, const wxString& value) {
 ///////////////////////////////////////////////////////////////////
-	return update(OSDEntry::makeId(group, key), value);;
+	return update(OSDEntry::makeId(group, key), value);
 }
 ///////////////////////////////////////////////////////////////////
 const wxString& CncOSDConfigList::get(const wxString& group, const wxString& key, wxString& value) const {

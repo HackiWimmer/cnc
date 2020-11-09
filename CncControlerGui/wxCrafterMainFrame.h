@@ -87,6 +87,7 @@ protected:
     wxBitmapButton* m_btSelectTemplatePreview;
     wxStaticBitmap* m_staticBitmap9222;
     wxStaticText* m_staticText9216;
+    wxStaticText* m_defaultSpeedSliderValue;
     wxStaticText* m_defaultSpeedLabelText;
     wxSlider* m_defaultSpeedSlider;
     wxBitmapButton* m_rcReset;
@@ -106,11 +107,14 @@ protected:
     wxInfoBar* m_mainViewInfobar;
     wxSimplebook* m_mainViewBook;
     wxPanel* m_mainBookSourcePanel;
+    wxPanel* m_panelTemplateSource;
     wxListbook* m_listbookSource;
     wxPanel* m_panel9530;
+    wxButton* m_btDetachExternalTemplateSource;
     wxStaticText* m_staticText51376;
     wxPanel* m_panelTemplateObserverPlaceholder;
     wxPanel* m_panel9532;
+    wxButton* m_btDetachTemplateSource;
     wxStaticText* m_staticText513767;
     wxButton* m_openSourceExtern;
     wxButton* m_openSvgExtern;
@@ -165,12 +169,14 @@ protected:
     wxPanel* m_splitterPage6090;
     wxTextCtrl* m_nestedSource;
     wxPanel* m_mainBookSetup;
+    wxPanel* m_panelConfiguration;
+    wxButton* m_btDetachConfiguration;
     wxStaticText* m_staticText5137;
     wxButton* m_loadConfiguration;
     wxButton* m_saveConfiguration;
     wxListbook* m_listbookSetupConfig;
     wxPanel* m_setupConfigPage;
-    wxNotebook* m_notebook9505;
+    wxNotebook* m_notebookSetupConfig;
     wxPanel* m_panelProperties;
     wxToolbook* m_configurationToolbook;
     wxPanel* m_panel5618;
@@ -181,15 +187,19 @@ protected:
     wxPanel* m_panel5616;
     wxPropertyGridManager* m_pgMgrSetup;
     wxPanel* m_panelLoadTrace;
+    wxToolbook* m_toolbook9585;
+    wxPanel* m_panel9577;
     wxTextCtrl* m_cfgLoadTrace;
-    wxPanel* m_panelSaveTrace;
+    wxPanel* m_panel9581;
     wxTextCtrl* m_cfgSaveTrace;
-    wxPanel* m_panelObsoleteTRace;
+    wxPanel* m_panel9583;
     wxTextCtrl* m_cfgObsoleteTrace;
     wxPanel* m_setupToolMagazine;
     wxScrolledWindow* m_scrollWin8945;
     wxPanel* m_toolMagazinePlaceholder;
     wxPanel* m_mainBookReference;
+    wxPanel* m_panelReferences;
+    wxButton* m_btDetachReference;
     wxStaticText* m_staticText7793;
     wxStaticLine* m_staticLine7834;
     wxListbook* m_listbookReferences;
@@ -228,6 +238,8 @@ protected:
     wxButton* m_btEvaluateDimensionZAxis;
     wxButton* m_btEvaluateDimensionXYPlane;
     wxPanel* m_mainBookManually;
+    wxPanel* m_panelTemplateManually;
+    wxButton* m_btDetachManuallyTemplate;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
     wxListbook* m_listbookManallyMotionControl;
@@ -280,8 +292,10 @@ protected:
     wxScrolledWindow* m_scrollWin8703;
     wxPanel* m_gamepadStatusPlaceholder;
     wxPanel* m_mainBookTest;
+    wxPanel* m_panelMainTest;
     wxListbook* m_testCaseBook;
     wxPanel* m_testIntervalPage;
+    wxButton* m_btDetachTest1;
     wxStaticText* m_staticText2117;
     wxStaticLine* m_staticLine2253;
     wxComboBox* m_testIntervalMode;
@@ -317,6 +331,7 @@ protected:
     wxCheckBox* m_testModeZ;
     wxStaticText* m_testDurationCounterZ;
     wxPanel* m_testToolPage;
+    wxButton* m_btDetachTest2;
     wxStaticText* m_staticText211726;
     wxStaticLine* m_staticLine225337;
     wxPanel* m_panel8592;
@@ -341,21 +356,6 @@ protected:
     wxListCtrl* m_cncSummaryListCtrl;
     wxButton* m_btCancelRun;
     wxButton* m_btConfirmRun;
-    wxPanel* m_additionalParameters;
-    wxStaticText* m_staticText1148q11;
-    wxPanel* m_panel9494;
-    wxStaticBitmap* m_staticBitmap92606;
-    wxStaticText* m_staticText1603237;
-    wxStaticText* m_staticText9268;
-    wxStaticLine* m_staticLine9270;
-    wxStaticLine* m_staticLine9272;
-    wxStaticLine* m_staticLine9274;
-    wxStaticBitmap* m_staticBitmap9260;
-    wxStaticText* m_staticText160323;
-    wxComboBox* m_cbRenderResolution;
-    wxStaticBitmap* m_staticBitmap9262;
-    wxStaticText* m_staticText9255;
-    wxSlider* m_stepDelay;
     wxPanel* m_controllerConfiguration;
     wxStaticText* m_staticText12831;
     wxButton* m_btRequestCtlConfig;
@@ -369,6 +369,7 @@ protected:
     wxPanel* m_cnc3DPane;
     wxListbook* m_listbookMonitor;
     wxPanel* m_motionMonitor;
+    wxPanel* m_panelMotionMonitor;
     wxButton* m_btDetachMonitor;
     wxStaticText* m_staticText114811;
     wxStaticLine* m_staticLine50163;
@@ -402,6 +403,8 @@ protected:
     wxStaticText* m_staticText395;
     wxTextCtrl* m_cmdDuration;
     wxPanel* m_cncSetters;
+    wxPanel* m_panelSetterList;
+    wxButton* m_btDetachSetterList;
     wxStaticText* m_staticText1150;
     wxTextCtrl* m_setterListCount;
     wxButton* m_btClearSetterList;
@@ -416,7 +419,9 @@ protected:
     wxStaticText* m_staticText9562;
     wxTextCtrl* m_selSetterValue;
     wxStaticText* m_selSetterUnit;
-    wxPanel* m_conrollerMessages;
+    wxPanel* m_controllerMessages;
+    wxPanel* m_panelControllerMessages;
+    wxButton* m_btDetachControllerMessages;
     wxStaticText* m_staticText1283132;
     wxButton* m_btViewMsgHistory;
     wxButton* m_btClearMsgHistory;
@@ -722,7 +727,7 @@ protected:
     virtual void onSelectCncMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectTemplatePreview(wxCommandEvent& event) { event.Skip(); }
     virtual void rcReset(wxCommandEvent& event) { event.Skip(); }
-    virtual void clickAdditionalParameters(wxCommandEvent& event) { event.Skip(); }
+    virtual void clickWorkingParameters(wxCommandEvent& event) { event.Skip(); }
     virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebugConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebug(wxCommandEvent& event) { event.Skip(); }
@@ -735,6 +740,7 @@ protected:
     virtual void rcStop(wxCommandEvent& event) { event.Skip(); }
     virtual void emergencyStop(wxCommandEvent& event) { event.Skip(); }
     virtual void cncMainViewChanged(wxNotebookEvent& event) { event.Skip(); }
+    virtual void detachTemplateSource(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateSourceExtern(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateSvgExtern(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
@@ -752,6 +758,7 @@ protected:
     virtual void selectUAInboundPathList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUAUseDirectiveList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUADetailInfo(wxDataViewEvent& event) { event.Skip(); }
+    virtual void detachConfiguration(wxCommandEvent& event) { event.Skip(); }
     virtual void loadConfiguration(wxCommandEvent& event) { event.Skip(); }
     virtual void saveConfiguration(wxCommandEvent& event) { event.Skip(); }
     virtual void changeConfigToolbook(wxToolbookEvent& event) { event.Skip(); }
@@ -759,11 +766,13 @@ protected:
     virtual void setupGridChanging(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridSelected(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridCommandButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void detachReference(wxCommandEvent& event) { event.Skip(); }
     virtual void onResetHardwareReference(wxCommandEvent& event) { event.Skip(); }
     virtual void onEvaluateHardwareReference(wxCommandEvent& event) { event.Skip(); }
     virtual void onTakeoverHardwareDimensions(wxCommandEvent& event) { event.Skip(); }
     virtual void onEvaluateHardwareZAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void onEvaluateHardwareXYPlane(wxCommandEvent& event) { event.Skip(); }
+    virtual void detachManuallyTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void moveHome(wxCommandEvent& event) { event.Skip(); }
     virtual void moveToZeroXY(wxCommandEvent& event) { event.Skip(); }
     virtual void moveToZeroXYZ(wxCommandEvent& event) { event.Skip(); }
@@ -782,6 +791,7 @@ protected:
     virtual void onSelectStepSensitivity(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectStepMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCaseBookChanged(wxListbookEvent& event) { event.Skip(); }
+    virtual void detachTest(wxCommandEvent& event) { event.Skip(); }
     virtual void selectTestIntervalMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCountXSpinCtl(wxSpinEvent& event) { event.Skip(); }
     virtual void testCountXUpdated(wxCommandEvent& event) { event.Skip(); }
@@ -791,8 +801,6 @@ protected:
     virtual void nootebookConfigChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
     virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateRenderResolution(wxCommandEvent& event) { event.Skip(); }
-    virtual void stepDelayChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void changeMonitorListBook(wxListbookEvent& event) { event.Skip(); }
@@ -805,8 +813,10 @@ protected:
     virtual void toggleMotionMonitorStatisticPane(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
+    virtual void detachSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void refreshSetterList(wxCommandEvent& event) { event.Skip(); }
+    virtual void detachControllerMessages(wxCommandEvent& event) { event.Skip(); }
     virtual void viewControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
@@ -926,6 +936,7 @@ public:
     wxBitmapButton* GetBtSelectTemplatePreview() { return m_btSelectTemplatePreview; }
     wxStaticBitmap* GetStaticBitmap9222() { return m_staticBitmap9222; }
     wxStaticText* GetStaticText9216() { return m_staticText9216; }
+    wxStaticText* GetDefaultSpeedSliderValue() { return m_defaultSpeedSliderValue; }
     wxStaticText* GetDefaultSpeedLabelText() { return m_defaultSpeedLabelText; }
     wxSlider* GetDefaultSpeedSlider() { return m_defaultSpeedSlider; }
     wxBitmapButton* GetRcReset() { return m_rcReset; }
@@ -943,9 +954,11 @@ public:
     wxButton* GetBtnEmergenyStop() { return m_btnEmergenyStop; }
     wxAuiToolBar* GetAuibarMain() { return m_auibarMain; }
     wxInfoBar* GetMainViewInfobar() { return m_mainViewInfobar; }
+    wxButton* GetBtDetachExternalTemplateSource() { return m_btDetachExternalTemplateSource; }
     wxStaticText* GetStaticText51376() { return m_staticText51376; }
     wxPanel* GetPanelTemplateObserverPlaceholder() { return m_panelTemplateObserverPlaceholder; }
     wxPanel* GetPanel9530() { return m_panel9530; }
+    wxButton* GetBtDetachTemplateSource() { return m_btDetachTemplateSource; }
     wxStaticText* GetStaticText513767() { return m_staticText513767; }
     wxButton* GetOpenSourceExtern() { return m_openSourceExtern; }
     wxButton* GetOpenSvgExtern() { return m_openSvgExtern; }
@@ -1001,7 +1014,9 @@ public:
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetPanel9532() { return m_panel9532; }
     wxListbook* GetListbookSource() { return m_listbookSource; }
+    wxPanel* GetPanelTemplateSource() { return m_panelTemplateSource; }
     wxPanel* GetMainBookSourcePanel() { return m_mainBookSourcePanel; }
+    wxButton* GetBtDetachConfiguration() { return m_btDetachConfiguration; }
     wxStaticText* GetStaticText5137() { return m_staticText5137; }
     wxButton* GetLoadConfiguration() { return m_loadConfiguration; }
     wxButton* GetSaveConfiguration() { return m_saveConfiguration; }
@@ -1015,18 +1030,22 @@ public:
     wxPropertyGridManager* GetPgMgrSetup() { return m_pgMgrSetup; }
     wxPanel* GetPanelProperties() { return m_panelProperties; }
     wxTextCtrl* GetCfgLoadTrace() { return m_cfgLoadTrace; }
-    wxPanel* GetPanelLoadTrace() { return m_panelLoadTrace; }
+    wxPanel* GetPanel9577() { return m_panel9577; }
     wxTextCtrl* GetCfgSaveTrace() { return m_cfgSaveTrace; }
-    wxPanel* GetPanelSaveTrace() { return m_panelSaveTrace; }
+    wxPanel* GetPanel9581() { return m_panel9581; }
     wxTextCtrl* GetCfgObsoleteTrace() { return m_cfgObsoleteTrace; }
-    wxPanel* GetPanelObsoleteTRace() { return m_panelObsoleteTRace; }
-    wxNotebook* GetNotebook9505() { return m_notebook9505; }
+    wxPanel* GetPanel9583() { return m_panel9583; }
+    wxToolbook* GetToolbook9585() { return m_toolbook9585; }
+    wxPanel* GetPanelLoadTrace() { return m_panelLoadTrace; }
+    wxNotebook* GetNotebookSetupConfig() { return m_notebookSetupConfig; }
     wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
     wxPanel* GetToolMagazinePlaceholder() { return m_toolMagazinePlaceholder; }
     wxScrolledWindow* GetScrollWin8945() { return m_scrollWin8945; }
     wxPanel* GetSetupToolMagazine() { return m_setupToolMagazine; }
     wxListbook* GetListbookSetupConfig() { return m_listbookSetupConfig; }
+    wxPanel* GetPanelConfiguration() { return m_panelConfiguration; }
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
+    wxButton* GetBtDetachReference() { return m_btDetachReference; }
     wxStaticText* GetStaticText7793() { return m_staticText7793; }
     wxStaticLine* GetStaticLine7834() { return m_staticLine7834; }
     wxStaticText* GetStaticText89618() { return m_staticText89618; }
@@ -1064,7 +1083,9 @@ public:
     wxButton* GetBtEvaluateDimensionXYPlane() { return m_btEvaluateDimensionXYPlane; }
     wxPanel* GetHardwareDimensionsPanel() { return m_hardwareDimensionsPanel; }
     wxListbook* GetListbookReferences() { return m_listbookReferences; }
+    wxPanel* GetPanelReferences() { return m_panelReferences; }
     wxPanel* GetMainBookReference() { return m_mainBookReference; }
+    wxButton* GetBtDetachManuallyTemplate() { return m_btDetachManuallyTemplate; }
     wxStaticText* GetStaticText779() { return m_staticText779; }
     wxStaticLine* GetStaticLine783() { return m_staticLine783; }
     wxStaticText* GetStaticText1171() { return m_staticText1171; }
@@ -1116,7 +1137,9 @@ public:
     wxScrolledWindow* GetScrollWin8703() { return m_scrollWin8703; }
     wxPanel* GetGamepadPanel() { return m_gamepadPanel; }
     wxListbook* GetListbookManallyMotionControl() { return m_listbookManallyMotionControl; }
+    wxPanel* GetPanelTemplateManually() { return m_panelTemplateManually; }
     wxPanel* GetMainBookManually() { return m_mainBookManually; }
+    wxButton* GetBtDetachTest1() { return m_btDetachTest1; }
     wxStaticText* GetStaticText2117() { return m_staticText2117; }
     wxStaticLine* GetStaticLine2253() { return m_staticLine2253; }
     wxComboBox* GetTestIntervalMode() { return m_testIntervalMode; }
@@ -1152,6 +1175,7 @@ public:
     wxCheckBox* GetTestModeZ() { return m_testModeZ; }
     wxStaticText* GetTestDurationCounterZ() { return m_testDurationCounterZ; }
     wxPanel* GetTestIntervalPage() { return m_testIntervalPage; }
+    wxButton* GetBtDetachTest2() { return m_btDetachTest2; }
     wxStaticText* GetStaticText211726() { return m_staticText211726; }
     wxStaticLine* GetStaticLine225337() { return m_staticLine225337; }
     wxStaticText* GetTestToolPowerState() { return m_testToolPowerState; }
@@ -1159,6 +1183,7 @@ public:
     wxButton* GetTestToolPowerBtn() { return m_testToolPowerBtn; }
     wxPanel* GetTestToolPage() { return m_testToolPage; }
     wxListbook* GetTestCaseBook() { return m_testCaseBook; }
+    wxPanel* GetPanelMainTest() { return m_panelMainTest; }
     wxPanel* GetMainBookTest() { return m_mainBookTest; }
     wxPanel* GetFilePreviewPlaceholder() { return m_filePreviewPlaceholder; }
     wxStaticText* GetStaticText4402() { return m_staticText4402; }
@@ -1175,21 +1200,6 @@ public:
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
     wxPanel* GetCncSummary() { return m_cncSummary; }
-    wxStaticText* GetStaticText1148q11() { return m_staticText1148q11; }
-    wxStaticBitmap* GetStaticBitmap92606() { return m_staticBitmap92606; }
-    wxStaticText* GetStaticText1603237() { return m_staticText1603237; }
-    wxStaticText* GetStaticText9268() { return m_staticText9268; }
-    wxStaticLine* GetStaticLine9270() { return m_staticLine9270; }
-    wxStaticLine* GetStaticLine9272() { return m_staticLine9272; }
-    wxStaticLine* GetStaticLine9274() { return m_staticLine9274; }
-    wxStaticBitmap* GetStaticBitmap9260() { return m_staticBitmap9260; }
-    wxStaticText* GetStaticText160323() { return m_staticText160323; }
-    wxComboBox* GetCbRenderResolution() { return m_cbRenderResolution; }
-    wxStaticBitmap* GetStaticBitmap9262() { return m_staticBitmap9262; }
-    wxStaticText* GetStaticText9255() { return m_staticText9255; }
-    wxSlider* GetStepDelay() { return m_stepDelay; }
-    wxPanel* GetPanel9494() { return m_panel9494; }
-    wxPanel* GetAdditionalParameters() { return m_additionalParameters; }
     wxStaticText* GetStaticText12831() { return m_staticText12831; }
     wxButton* GetBtRequestCtlConfig() { return m_btRequestCtlConfig; }
     wxDataViewListCtrl* GetDvListCtrlControllerConfig() { return m_dvListCtrlControllerConfig; }
@@ -1234,7 +1244,9 @@ public:
     wxStaticText* GetStaticText395() { return m_staticText395; }
     wxTextCtrl* GetCmdDuration() { return m_cmdDuration; }
     wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
+    wxPanel* GetPanelMotionMonitor() { return m_panelMotionMonitor; }
     wxPanel* GetMotionMonitor() { return m_motionMonitor; }
+    wxButton* GetBtDetachSetterList() { return m_btDetachSetterList; }
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
     wxTextCtrl* GetSetterListCount() { return m_setterListCount; }
     wxButton* GetBtClearSetterList() { return m_btClearSetterList; }
@@ -1249,12 +1261,15 @@ public:
     wxTextCtrl* GetSelSetterValue() { return m_selSetterValue; }
     wxStaticText* GetSelSetterUnit() { return m_selSetterUnit; }
     wxPanel* GetPanel9571() { return m_panel9571; }
+    wxPanel* GetPanelSetterList() { return m_panelSetterList; }
     wxPanel* GetCncSetters() { return m_cncSetters; }
+    wxButton* GetBtDetachControllerMessages() { return m_btDetachControllerMessages; }
     wxStaticText* GetStaticText1283132() { return m_staticText1283132; }
     wxButton* GetBtViewMsgHistory() { return m_btViewMsgHistory; }
     wxButton* GetBtClearMsgHistory() { return m_btClearMsgHistory; }
     wxTextCtrl* GetControllerMsgHistoryPlaceholder() { return m_controllerMsgHistoryPlaceholder; }
-    wxPanel* GetConrollerMessages() { return m_conrollerMessages; }
+    wxPanel* GetPanelControllerMessages() { return m_panelControllerMessages; }
+    wxPanel* GetControllerMessages() { return m_controllerMessages; }
     wxPanel* GetMotionVertexPlaceholder() { return m_motionVertexPlaceholder; }
     wxPanel* GetMotionVertexTrace() { return m_motionVertexTrace; }
     wxListbook* GetListbookMonitor() { return m_listbookMonitor; }
@@ -1463,20 +1478,6 @@ protected:
     wxComboBox* m_manuallyToolId;
     wxCheckBox* m_checkBoxToolEnabled;
     wxStaticLine* m_staticLine83901;
-    wxStaticText* m_staticText83998;
-    wxStaticText* m_staticText8399;
-    wxStaticText* m_staticText85409;
-    wxStaticText* m_staticText8540;
-    wxStaticText* m_staticText8542;
-    wxStaticText* m_staticText8544;
-    wxStaticText* m_staticText8546;
-    wxStaticText* m_staticText8548;
-    wxStaticText* m_staticText8563;
-    wxTextCtrl* m_fxMax;
-    wxTextCtrl* m_fyMax;
-    wxTextCtrl* m_fzMax;
-    wxTextCtrl* m_fxyMax;
-    wxTextCtrl* m_fxyzMax;
     wxStaticLine* m_staticLine5109;
     wxStaticText* m_staticText8578;
     wxTextCtrl* m_metricCommon;
@@ -1518,7 +1519,6 @@ protected:
     wxStaticLine* m_staticLine5135;
 
 protected:
-    virtual void onLBDownMax(wxMouseEvent& event) { event.Skip(); }
     virtual void onSetCommonValue(wxCommandEvent& event) { event.Skip(); }
     virtual void onZeroXYZ(wxCommandEvent& event) { event.Skip(); }
     virtual void onReverseXYZ(wxCommandEvent& event) { event.Skip(); }
@@ -1555,20 +1555,6 @@ public:
     wxComboBox* GetManuallyToolId() { return m_manuallyToolId; }
     wxCheckBox* GetCheckBoxToolEnabled() { return m_checkBoxToolEnabled; }
     wxStaticLine* GetStaticLine83901() { return m_staticLine83901; }
-    wxStaticText* GetStaticText83998() { return m_staticText83998; }
-    wxStaticText* GetStaticText8399() { return m_staticText8399; }
-    wxStaticText* GetStaticText85409() { return m_staticText85409; }
-    wxStaticText* GetStaticText8540() { return m_staticText8540; }
-    wxStaticText* GetStaticText8542() { return m_staticText8542; }
-    wxStaticText* GetStaticText8544() { return m_staticText8544; }
-    wxStaticText* GetStaticText8546() { return m_staticText8546; }
-    wxStaticText* GetStaticText8548() { return m_staticText8548; }
-    wxStaticText* GetStaticText8563() { return m_staticText8563; }
-    wxTextCtrl* GetFxMax() { return m_fxMax; }
-    wxTextCtrl* GetFyMax() { return m_fyMax; }
-    wxTextCtrl* GetFzMax() { return m_fzMax; }
-    wxTextCtrl* GetFxyMax() { return m_fxyMax; }
-    wxTextCtrl* GetFxyzMax() { return m_fxyzMax; }
     wxStaticLine* GetStaticLine5109() { return m_staticLine5109; }
     wxStaticText* GetStaticText8578() { return m_staticText8578; }
     wxTextCtrl* GetMetricCommon() { return m_metricCommon; }

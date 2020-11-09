@@ -2,16 +2,20 @@
 #include <iomanip>
 #include <wx/msgdlg.h>
 #include "MainFrame.h"
+#include "GlobalStrings.h"
 #include "GlobalFunctions.h"
 #include "CncConfigCommon.h"
 #include "CncUnitCalculator.h"
 #include "CncContext.h"
 #include "CncPerspective.h"
+#include "CncConfigProperties.h"
 #include "wxCrafterImages.h"
 #include "CncConfig.h"
 
 #include "../Arduino/StepperEnvironment/ArdoObj.h"
 #include "../Arduino/StepperEnvironment/CncAcmr.h"
+
+extern GlobalConstStringDatabase globalStrings;
 
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 
@@ -21,13 +25,91 @@ unsigned int CncConfig::globalPropertyCounter	= 0;
 CncConfig*   CncConfig::globalCncConfig			= NULL;
 
 ////////////////////////////////////////////////////////////////////////
-// global variables - uses in dedicated pages
-wxPropertyGridManager* globlSetupGrid			= NULL;
-
-ConfigPGEventMap  globalPGEventMap;
-ConfigPropertyMap globalPropertyMap;
-
-const wxString    renderSelectorFormat("%0.3lf mm - %u PPI");
+namespace Cnc {
+	namespace Config {
+		
+		// global variables - uses in dedicated pages
+		wxPropertyGridManager*	globlSetupGrid			= NULL;
+		
+		ConfigPGEventMap 		globalPGEventMap;
+		ConfigCategoryMap		globalCategoryMap;
+		ConfigPropertyMap		globalPropertyMap;
+		
+		// ------------------------------------------------------------
+		wxString getPropertyShortNameFormId(const wxString& propId) {
+			wxString name(propId);
+			name.assign(name.AfterLast('|'));
+			return name;
+		}
+		// ------------------------------------------------------------
+		wxString getPropertySectionNameFormId(const wxString& propId) {
+			if ( propId.Contains("|") == false )
+				return _("/");
+				
+			return propId.BeforeLast('|');
+		}
+		// ------------------------------------------------------------
+		wxString getPropertyShortName(const wxPGProperty& prop) {
+			wxString name(prop.GetName());
+			name.assign(name.AfterLast('.'));
+			return name;
+		}
+		// ------------------------------------------------------------
+		wxString getPropertyLongName(const wxPGProperty& prop) {
+			return prop.GetName();
+		}
+		// ------------------------------------------------------------
+		wxString getPropertySectionName(const wxPGProperty& prop) {
+			return prop.GetAttribute(Attribute_SEC_NAME).GetString();
+		}
+		// ------------------------------------------------------------
+		wxString getPropertyPath(const wxPGProperty& prop) {
+			wxString path;
+			const wxPGProperty* p = &prop;
+			while ( p != NULL ) {
+				path.Prepend(wxString::Format("%s+", getPropertyShortName(*p)));
+				p = p->GetParent();
+			}
+			if ( path.IsEmpty() == false )
+				path.Prepend('/');
+			
+			return path;
+		}
+		// ------------------------------------------------------------
+		const wxPGProperty* getCategory(const wxPGProperty& prop) {
+			const wxPGProperty* catProp = &prop;
+			
+			// initial check to avoid the assertion at the end
+			if ( catProp->IsCategory() )
+				return catProp;
+				
+			while ( catProp->GetParent() != NULL ) {
+				catProp = catProp->GetParent();
+				
+				if ( catProp->IsCategory() )
+					break;
+			}
+			
+			return catProp;
+		}
+		// ------------------------------------------------------------
+		wxString getCategoryName(const wxPGProperty& prop) {
+			const wxPGProperty* cat = getCategory(prop);
+			if ( cat == NULL)
+				return _("");
+			
+			return cat->GetName();
+		}
+		// ------------------------------------------------------------
+		bool compare(const wxPGProperty& prop, const wxString& propId) {
+			const wxString sN1(getPropertyShortName(prop));
+			const wxString sN2(getPropertyShortNameFormId(propId));
+			
+			return sN1 == sN2;
+		}
+		
+	}; // namespace Config
+}; // namespace Cnc
 
 ////////////////////////////////////////////////////////////////////////
 const wxString& CncConfig::ToolMagazineEntry::serialize(wxString& ret ) {
@@ -227,27 +309,16 @@ void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
 	ArduinoAccelManager::Setup(getFeedrateX(), getFeedrateY(), getFeedrateZ());
 	
-	const float MAX_MM_MIN = 24000.0;
+	const double maxSpeed  = getMaxSpeedXYZ_MM_MIN();
+	const double defRSpeed = getDefaultRapidSpeed_MM_MIN();
+	const double defWSpeed = getDefaultWorkSpeed_MM_MIN();
+	
 	wxPGProperty* prop = NULL;
-	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_XY_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		if (prop != NULL) prop->SetValue(MAX_MM_MIN); }
+	prop = getProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN); 
+	if (prop != NULL) { prop->SetValue(std::min(maxSpeed, defRSpeed)); }
 	
-	{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_PERCENT);
-		if (prop != NULL) {
-			const double val = MAX_MM_MIN * prop->GetValue().GetDouble();
-			{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
-		}
-	}
-	
-	{ prop = getProperty(CncConfig_DEF_WORK_SPEED_PERCENT);
-		if (prop != NULL) {
-			const double val = MAX_MM_MIN* prop->GetValue().GetDouble();
-			{ prop = getProperty(CncConfig_DEF_WORK_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
-		}
-	}
+	prop = getProperty(CncConfig_DEF_WORK_SPEED_MM_MIN); 
+	if (prop != NULL) { prop->SetValue(std::min(maxSpeed, defWSpeed)); }
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::calculateFactors() {
@@ -385,92 +456,111 @@ const double CncConfig::getDurationPositionAbs(unsigned int duration) {
 	}
 	return 0.0;
 }
+
+
+
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::registerPageRoot(wxPGProperty* prop, PGFuncPtrStore& fps) {
 ////////////////////////////////////////////////////////////////////////
 	if ( prop == NULL ) {
-		std::cerr << "CncConfig::registerPageRoot: Invalid property!" << std::endl;
+		std::cerr	<< CNC_LOG_FUNCT 
+					<< " : Invalid property!" 
+					<< std::endl;
 		return;
 	}
 	
-	auto it = globalPGEventMap.find(prop);
-	if ( it != globalPGEventMap.end() ){
-		//MessageBoxA(0,"CncConfig::registerPageRoot: Root property with name '' alreday exists!","CncConfig::registerPageRoot",0);
-		std::cerr << "CncConfig::registerPageRoot: Root property with name '" << fps.name << "' alreday exists!" << std::endl;
+	if ( auto it = Cnc::Config::globalPGEventMap.find(prop); it != Cnc::Config::globalPGEventMap.end() ){
+		std::cerr	<< CNC_LOG_FUNCT 
+					<< " : Root property with name '" 
+					<< fps.name 
+					<< "' alreday exists!" 
+					<< std::endl;
 		return;
 	}
 	
-	globalPGEventMap[prop] = fps;
+	Cnc::Config::globalPGEventMap[prop] = fps;
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::registerCategory(const wxString& name, wxPGProperty* prop) {
 ////////////////////////////////////////////////////////////////////////
-	/*
-	static wxBitmap bmp;
-	bmp = ImageLibConfig().Bitmap(_("BMP_VALUE_CATEGORY"));
+	if ( prop == NULL ) {
+		std::cerr	<< CNC_LOG_FUNCT 
+					<< " : Invalid Category!" 
+					<< std::endl;
+		return;
+	}
 	
-	globlSetupGrid->SetPropertyImage(prop, bmp);
-	*/
+	if ( auto it = Cnc::Config::globalCategoryMap.find(name); it != Cnc::Config::globalCategoryMap.end() ) {
+		std::cerr	<< CNC_LOG_FUNCT 
+					<< ": A Category with name '" 
+					<< name 
+					<< "' alreday exists!" 
+					<< std::endl;
+		return; 
+	}
+	
+	const wxString catName(wxString::Format("CAT:%s:%ld", name, (long)Cnc::Config::globalCategoryMap.size()));
+	
+	Cnc::Config::globalCategoryMap[catName] = prop;
+	prop->SetName(catName);
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::registerProperty(const wxString& name, wxPGProperty* prop) {
+void CncConfig::registerProperty(const wxString& propId, wxPGProperty* prop) {
 ////////////////////////////////////////////////////////////////////////
 	if ( prop == NULL ) {
-		std::cerr << "CncConfig::registerProperty: Invalid property!" << std::endl;
+		std::cerr	<< CNC_LOG_FUNCT 
+					<< ": Invalid property!" << std::endl;
 		return;
 	}
 	
-	auto it = globalPropertyMap.find(name);
-	if ( it != globalPropertyMap.end() ){
-		std::cerr << "CncConfig::registerProperty: Property with name '" << name << "' alreday exists!" << std::endl;
+	const wxString shortName(Cnc::Config::getPropertyShortNameFormId(propId));
+	const wxString sectionName(Cnc::Config::getPropertySectionNameFormId(propId));
+	
+	if ( auto it = Cnc::Config::globalPropertyMap.find(shortName); it != Cnc::Config::globalPropertyMap.end() ){
+		std::cerr	<< CNC_LOG_FUNCT 
+					<< ": A Property with name '" 
+					<< shortName 
+					<< "' alreday exists!" 
+					<< std::endl;
 		return;
 	}
 	
-	// decoration
-	static wxBitmap bmp;
-	bmp = ImageLibConfig().Bitmap(_("BMP_VALUE_INACTIVE"));
-	if ( prop->IsEnabled() == true ) {
-		if      ( prop->GetValueType() == wxPG_VARIANT_TYPE_STRING ) 		bmp = ImageLibConfig().Bitmap(_("BMP_VALUE_STRING"));
-		else if ( prop->GetValueType() == wxPG_VARIANT_TYPE_LONG ) 			bmp = ImageLibConfig().Bitmap(_("BMP_VALUE_LONG"));
-		else if ( prop->GetValueType() == wxPG_VARIANT_TYPE_DOUBLE ) 		bmp = ImageLibConfig().Bitmap(_("BMP_VALUE_DOUBLE"));
-		else if ( prop->GetValueType() == wxPG_VARIANT_TYPE_BOOL ) 			bmp = ImageLibConfig().Bitmap(_("BMP_VALUE_BOOL"));
-		else if ( prop->GetValueType() == wxPG_VARIANT_TYPE_LIST ) 			bmp = ImageLibConfig().Bitmap(_("BMP_VALUE_ENUM"));
-		else													 			bmp = ImageLibConfig().Bitmap(_("BMP_VALUE_UNKNOWN"));
-	}
-	globlSetupGrid->SetPropertyImage(prop, bmp);
-	
-	// redecorate enabled = false
-	if ( prop->IsEnabled() == false ) { 
-		globlSetupGrid->SetPropertyAttribute(prop, Attribute_READONLY, "TRUE", 0);
-		prop->Enable(true);
-		prop->SetBackgroundColour(wxColour(64, 64, 64));
-		prop->SetHelpString(wxString::Format("%s\n%s", "<Readonly>", prop->GetHelpString()));
-	}
-	
-	prop->SetName(name);
-	globalPropertyMap[name] = prop;
+	// this stores the property with its short name
+	Cnc::Config::globalPropertyMap[shortName] = prop;
+	// after the next line prop->GetName() contains the long name 
+	// (property's name with all (non-category, non-root) parents). 
+	prop->SetName(shortName);
+	// this defines the file storage section
+	prop->SetAttribute(Attribute_SEC_NAME, sectionName);
 }
 ////////////////////////////////////////////////////////////////////////
-wxPGProperty* CncConfig::getProperty(const wxString& name, bool silent) {
+wxPGProperty* CncConfig::getProperty(const wxString& propId, bool silent) {
 ////////////////////////////////////////////////////////////////////////
-	auto it = globalPropertyMap.find(name);
-	if ( it != globalPropertyMap.end() )
+	const wxString shortName(Cnc::Config::getPropertyShortNameFormId(propId));
+
+	if ( auto it = Cnc::Config::globalPropertyMap.find(shortName); it != Cnc::Config::globalPropertyMap.end() )
 		return it->second;
 	
-	if ( silent == false )
-		std::cerr << "CncConfig::getProperty: No property with name '" << name << "' exists!" << std::endl;
-		
+	if ( silent == false ) {
+		std::cerr	<< CNC_LOG_FUNCT 
+					<< ": No property with short name '" 
+					<< shortName 
+					<< "' exists!" 
+					<< std::endl;
+	}
+	
 	return NULL;
 }
 ////////////////////////////////////////////////////////////////////////
 wxPGProperty* CncConfig::getPageRoot(wxPGProperty* prop) {
 ////////////////////////////////////////////////////////////////////////
+	wxASSERT( prop != NULL );
 	wxPGProperty* pageParent = prop;
 	
 	while ( pageParent->GetParent() != NULL && 
 	        pageParent->GetParent() != prop->GetGrid()->GetRoot() && 
 			pageParent->GetParent()->GetName() != "<Root>") {
-		pageParent = pageParent->GetParent() ;
+		pageParent = pageParent->GetParent();
 	}
 	
 	//std::clog << pageParent->GetName() << std::endl;
@@ -481,26 +571,57 @@ void CncConfig::setupGlobalConfigurationGrid(wxPropertyGridManager* sg, wxConfig
 ////////////////////////////////////////////////////////////////////////
 	wxASSERT(sg);
 	
-	globlSetupGrid = sg;
-	globlSetupGrid->Clear();
+	// register custom editors
+	wxPropertyGrid::RegisterEditorClass(new CncPGStaticTextCtrlEditor(),	"StaticTextCtrl");
+	wxPropertyGrid::RegisterEditorClass(new CncPGSliderCtrlEditor(),		"SliderTextCtrl");
+	
+	Cnc::Config::globlSetupGrid = sg;
+	Cnc::Config::globlSetupGrid->Clear();
 	globalPropertyCounter = 0;
 	
-	// decoration grid
-	globlSetupGrid->GetGrid()->ResetColours();
-	globlSetupGrid->GetGrid()->SetCaptionBackgroundColour(*wxBLACK);
-	globlSetupGrid->GetGrid()->SetCaptionTextColour(*wxWHITE);
-	globlSetupGrid->GetGrid()->SetCellBackgroundColour(*wxWHITE);
-	globlSetupGrid->GetGrid()->SetCellTextColour(*wxBLACK);
-	globlSetupGrid->GetGrid()->SetMarginColour(*wxBLACK);
-	globlSetupGrid->GetGrid()->SetLineColour(*wxLIGHT_GREY);
-	
-	// decorate ans setup pages
-	setupWorkingCfgPage(cfg);
-	setupGeneralCfgPage(cfg);
-	setupApplicationCfgPage(cfg);
-	setupEnvironmentCfgPage(cfg);
-	setupSvgCfgPage(cfg);
-	setupGCodeCfgPage(cfg);
+	// decoration grid part 1. 
+	// do this before building the pages below
+	{
+		const wxColour bgCol1(140, 140, 140);
+		const wxColour bgCol2( 64,  64,  64);
+		const wxColour fgCol1(  0,   0,   0);
+		
+		//wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+		//Cnc::Config::globlSetupGrid->GetGrid()->SetFont(font);
+		
+		Cnc::Config::globlSetupGrid->GetGrid()->ResetColours();
+		Cnc::Config::globlSetupGrid->GetGrid()->SetCaptionBackgroundColour	(bgCol2);
+		Cnc::Config::globlSetupGrid->GetGrid()->SetCaptionTextColour		(wxColour(224, 224, 224));
+		Cnc::Config::globlSetupGrid->GetGrid()->SetCellBackgroundColour		(bgCol1);
+		Cnc::Config::globlSetupGrid->GetGrid()->SetCellTextColour			(fgCol1);
+		Cnc::Config::globlSetupGrid->GetGrid()->SetCellDisabledTextColour	(fgCol1);
+		Cnc::Config::globlSetupGrid->GetGrid()->SetMarginColour				(bgCol2);
+		Cnc::Config::globlSetupGrid->GetGrid()->SetLineColour				(*wxLIGHT_GREY);
+		Cnc::Config::globlSetupGrid->GetGrid()->SetEmptySpaceColour			(bgCol1);
+		
+		Cnc::Config::globlSetupGrid->GetGrid()->SetSelectionBackgroundColour(wxColour(239, 228, 176));
+		Cnc::Config::globlSetupGrid->GetGrid()->SetSelectionTextColour		(wxColour(132,   0,   0));
+		
+		CncCfgStaticProperty::cellTextColour								= wxColour(fgCol1);
+		CncCfgStaticProperty::cellBackgroungColour							= wxColour(bgCol1);
+	}
+	// decorate and setup pages
+	{
+		setupWorkingCfgPage		(cfg);
+		setupGeneralCfgPage		(cfg);
+		setupApplicationCfgPage	(cfg);
+		setupEnvironmentCfgPage	(cfg);
+		setupSvgCfgPage			(cfg);
+		setupGCodeCfgPage		(cfg);
+	}
+	// decoration grid part 2
+	// do this after building the pages above
+	{
+		for ( size_t i = 0; i< Cnc::Config::globlSetupGrid->GetPageCount(); i++) {
+			Cnc::Config::globlSetupGrid->SelectPage(i);
+			Cnc::Config::globlSetupGrid->GetGrid()->SetColumnCount(3);
+		}
+	}
 }
 ////////////////////////////////////////////////////////////////////////
 bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxString& entryName, const wxString& value) {
@@ -509,12 +630,11 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 	if ( val.Trim(true).Trim(false).IsEmpty() )
 		return false;
 		
-	const wxString propName(wxString::Format("%s/%s", groupName, entryName));
-	wxPGProperty* prop = CncConfig::getProperty(propName, true);
+	wxPGProperty* prop = CncConfig::getProperty(entryName, true);
 	if ( prop == NULL )
 		return loadNonGuiConfig(groupName, entryName, value);
-	
-	if ( entryName.StartsWith("OSD_") == true ) {
+		
+	if ( entryName.StartsWith(CncOSDConfigList::getOSDPrefix()) == true ) {
 		// add the ODS list string
 		osdConfigList.add(groupName, entryName, val);
 		// get the correct OSD value
@@ -522,7 +642,7 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 	} 
 	
 	// SetValueFromString cut paths down to file if wxPG_FULL_VALUE isn't set
-	prop->SetValueFromString(val, wxPG_FULL_VALUE );
+	prop->SetValueFromString(val, wxPG_FULL_VALUE);
 	
 	const wxString propType(prop->GetValueType());
 	const wxString propKName(wxString::Format("%s.%s", groupName, entryName));
@@ -535,7 +655,7 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 				<< prop->GetValueAsString()					<< ", " 
 				<< prop->GetValueAsString(wxPG_FULL_VALUE)	<< ", " 
 				<< prop->GetValue().GetString()				<< std::endl;
-	
+				
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////
@@ -586,7 +706,7 @@ bool CncConfig::loadNonGuiConfig(const wxString& groupName, const wxString& entr
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::loadConfiguration(wxConfigBase& config) {
 ////////////////////////////////////////////////////////////////////////
-	if ( globlSetupGrid == NULL )
+	if ( Cnc::Config::globlSetupGrid == NULL )
 		return;
 		
 	// ....... todo
@@ -633,7 +753,7 @@ void CncConfig::loadConfiguration(wxConfigBase& config) {
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::saveConfiguration(wxConfigBase& config) {
 ////////////////////////////////////////////////////////////////////////
-	if ( globlSetupGrid == NULL )
+	if ( Cnc::Config::globlSetupGrid == NULL )
 		return;
 		
 	wxMessageDialog dlg(NULL,	_T("Do you realy save the current configuration?"), 
@@ -646,17 +766,21 @@ void CncConfig::saveConfiguration(wxConfigBase& config) {
 		
 	saveTrace.str() = "";
 	
-	for ( wxPGVIterator it = globlSetupGrid->GetVIterator(wxPG_ITERATE_ALL); !it.AtEnd(); it.Next() ) {
+	for ( wxPGVIterator it = Cnc::Config::globlSetupGrid->GetVIterator(wxPG_ITERATE_ALL); !it.AtEnd(); it.Next() ) {
 		wxPGProperty* p = it.GetProperty();
 		
 		if ( p != NULL && p->IsCategory() == false ) {
 			
-			const wxString entry(p->GetName());
-			if ( entry.StartsWith("#") == false ) {
+			const wxString shortName(Cnc::Config::getPropertyShortName(*p));
+			const wxString sectionName(Cnc::Config::getPropertySectionName(*p));
+			
+			if ( sectionName.StartsWith("#") == false ) {
 				
 				const wxString className(p->GetClassInfo()->GetClassName());
-				saveTrace	<< entry									<< ":"
-							<< std::setw(60 - entry.length())			<< "[" 
+				const wxString savePath(wxString::Format("/%s/%s", sectionName, shortName));
+				
+				saveTrace	<< savePath									<< ":"
+							<< std::setw(60 - savePath.length())		<< "[" 
 							<< p->GetValueType()						<< "], ["
 							<< className								<< "], " 
 							<< p->GetValueAsString()					<< ", " 
@@ -665,14 +789,17 @@ void CncConfig::saveConfiguration(wxConfigBase& config) {
 				
 				wxString val(p->GetValueAsString(wxPG_FULL_VALUE));
 				
-				if ( entry.Contains("OSD_") == true ) {
+				if ( shortName.StartsWith(CncOSDConfigList::getOSDPrefix()) == true ) {
+					
+					const wxString osdId(CncOSDConfigList::makeId(sectionName, shortName));
 					// add the ODS value string
-					osdConfigList.update(entry, val);
+					osdConfigList.update(osdId, val);
 					// get the complete OSD list
-					osdConfigList.getList(entry, val);
+					osdConfigList.getList(osdId, val);
 				}
 				
-				config.Write(wxString::Format("/%s", entry), val);
+				//std::cout << "save: " << savePath << "=" << val << std::endl;
+				config.Write(savePath, val);
 			}
 		}
 	}
@@ -747,8 +874,8 @@ void CncConfig::setupGridChanged(wxPropertyGridEvent& event) {
 	if ( p == NULL )
 		return;
 	
-	auto it = globalPGEventMap.find(CncConfig::getPageRoot(p));
-	if ( it != globalPGEventMap.end() && it->second.propertyChanged != NULL)
+	auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
+	if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertyChanged != NULL)
 		(*(it->second.propertyChanged))(event);
 		
 	wxASSERT( theApp != NULL );
@@ -768,20 +895,20 @@ void CncConfig::setupGridChanging(wxPropertyGridEvent& event) {
 		event.SetValidationFailureBehavior(wxPG_VFB_SHOW_MESSAGE_ON_STATUSBAR);
 	} else {
 		// process the event
-		auto it = globalPGEventMap.find(CncConfig::getPageRoot(p));
-		if ( it != globalPGEventMap.end()  && it->second.propertyChanging != NULL )
+		auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
+		if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertyChanging != NULL )
 			(*(it->second.propertyChanging))(event);
 	}
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setupGridCommandButton(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////
-	wxPGProperty* p = globlSetupGrid->GetSelectedProperty();
+	wxPGProperty* p = Cnc::Config::globlSetupGrid->GetSelectedProperty();
 	if ( p == NULL )
 		return;
 	
-	auto it = globalPGEventMap.find(CncConfig::getPageRoot(p));
-	if ( it != globalPGEventMap.end() && it->second.propertyCommandButton != NULL )
+	auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
+	if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertyCommandButton != NULL )
 		(*(it->second.propertyCommandButton))(event);
 }
 ////////////////////////////////////////////////////////////////////////
@@ -791,8 +918,8 @@ void CncConfig::setupGridSelected(wxPropertyGridEvent& event) {
 	if ( p == NULL )
 		return;
 	
-	auto it = globalPGEventMap.find(CncConfig::getPageRoot(p));
-	if ( it != globalPGEventMap.end() && it->second.propertySelected != NULL )
+	auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
+	if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertySelected != NULL )
 		(*(it->second.propertySelected))(event);
 }
 ////////////////////////////////////////////////////////////////////////
@@ -919,7 +1046,7 @@ unsigned int CncConfig::calculateThreshold(double pitch, unsigned int steps) {
 void CncConfig::calculateThresholds() {
 ////////////////////////////////////////////////////////////////////////
 	replyThreshold = calculateThreshold(getPitchX(), getStepsX());
-	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS)->SetValue((int)replyThreshold);
+	getProperty(CncWork_Ctl_REPLY_THRESHOLD_STEPS)->SetValue((int)replyThreshold);
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setRenderResolution(double res) {
@@ -930,15 +1057,18 @@ void CncConfig::setRenderResolution(double res) {
 	if ( THE_APP == NULL )
 		return;
 		
-	wxComboBox* cb         = THE_APP->GetCbRenderResolution();
-	const unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, renderResolutionMM);
-	const wxString item(wxString::Format(renderSelectorFormat, renderResolutionMM, ppi));
-
-	const int itemExits  = cb->FindString(item);
-	if ( itemExits < 0 )
-		cb->Append(item);
+	//std::cout << CNC_LOG_LOCATION_A(": ") << res << ", " << renderResolutionMM << std::endl;
 		
-	cb->SetStringSelection(item);
+	wxEnumProperty* prop = wxDynamicCast(getProperty(CncWork_Ctl_PRE_PROSSOR_RENDER_RESOLUTION), wxEnumProperty);
+	if ( prop ) {
+		const unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, renderResolutionMM);
+		const wxString item(wxString::Format(globalStrings.renderSelectorFormat, renderResolutionMM, ppi));
+		
+		if ( prop->GetChoices().Index(item) < 0 )
+			prop->AddChoice(item);
+			
+		prop->SetChoiceSelection(prop->GetChoices().Index(item));
+	}
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setRenderResolution(const wxString& sel) {
@@ -947,54 +1077,12 @@ void CncConfig::setRenderResolution(const wxString& sel) {
 	if ( pos <= 0 )
 		pos = sel.length();
 	
+	//std::cout << CNC_LOG_LOCATION_A(": ") << sel << std::endl;
 	const wxString selection = sel.SubString(0, pos - 1);
 	double resolution; selection.ToDouble(&resolution);
 	
 	setRenderResolution(resolution);
 }
-////////////////////////////////////////////////////////////////////////
-void CncConfig::setupSelectorRenderResolution() {
-////////////////////////////////////////////////////////////////////////
-	if ( THE_APP != NULL ) {
-		wxComboBox* cb = THE_APP->GetCbRenderResolution();
-		cb->Clear();
-		
-		auto appendList = [&](float resolution) {
-			
-			const unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, resolution);
-			cb->Append(wxString::Format(renderSelectorFormat, resolution, ppi));
-		};
-		
-		appendList(0.005);
-		appendList(0.006);
-		appendList(0.007);
-		appendList(0.008);
-		appendList(0.009);
-		appendList(0.010);
-		appendList(0.020);
-		appendList(0.030);
-		appendList(0.040);
-		appendList(0.050);
-		appendList(0.060);
-		appendList(0.070);
-		appendList(0.080);
-		appendList(0.090);
-		appendList(0.100);
-		appendList(0.200);
-		appendList(0.262);
-		appendList(0.300);
-		appendList(0.400);
-		appendList(0.500);
-		appendList(0.600);
-		appendList(0.700);
-		appendList(0.800);
-		appendList(0.900);
-		
-		// default . . . 96 PPI
-		setRenderResolution(0.262);
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////
 const char CncConfig::getRunConfirmationModeAsChar() {
 ////////////////////////////////////////////////////////////////////////
@@ -1033,13 +1121,13 @@ const bool CncConfig::getPreProcessorUseOperatingTrace()			{ PROPERTY(CncWork_Ct
 const bool CncConfig::getPreProcessorCntPathListEntries()			{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES) 	return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCntMoveSequneces()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES) 		return p->GetValue().GetBool(); }
 
-
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsZ() 							{ PROPERTY(CncConfig_STEPS_Z) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getHighPulsWidthX() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_X) 			 	return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getHighPulsWidthY() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Y) 			 	return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getHighPulsWidthZ() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Z) 				return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getArtificallyStepDelay()				{ PROPERTY(CncWork_Ctl_ARTIFICIALLY_STEP_DELAY) 		return p->GetValue().GetInteger(); }
 
 const double CncConfig::getMaxDimension() 							{ return std::max(std::max(getMaxDimensionX(), getMaxDimensionY()), getMaxDimensionZ()); }
 const double CncConfig::getMaxDimensionX() 							{ PROPERTY(CncConfig_MAX_DIMENSION_X)					return p->GetValue().GetDouble(); } 
@@ -1048,28 +1136,22 @@ const double CncConfig::getMaxDimensionZ() 							{ PROPERTY(CncConfig_MAX_DIMEN
 const double CncConfig::getPitchX() 								{ PROPERTY(CncConfig_PITCH_X) 						 	return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchY() 								{ PROPERTY(CncConfig_PITCH_Y)							return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchZ() 								{ PROPERTY(CncConfig_PITCH_Z) 						 	return p->GetValue().GetDouble(); }
-const double CncConfig::getMaxDurationThickness()					{ PROPERTY(CncWork_Wpt_MAX_THICKNESS_CROSS)				return p->GetValue().GetDouble(); }
+const double CncConfig::getMaxDurationThickness()					{ PROPERTY(CncSvg_Parser_MAX_THICKNESS_CROSS)			return p->GetValue().GetDouble(); }
 const double CncConfig::getReplyThresholdMetric()					{ PROPERTY(CncWork_Ctl_REPLY_THRESHOLD_METRIC)			double ret; p->GetValueAsString().ToDouble(&ret); return ret; }
 
 const double CncConfig::getDefaultRapidSpeed_MM_MIN()				{ PROPERTY(CncConfig_DEF_RAPID_SPEED_MM_MIN)			return p->GetValue().GetDouble(); }
 const double CncConfig::getDefaultWorkSpeed_MM_MIN()				{ PROPERTY(CncConfig_DEF_WORK_SPEED_MM_MIN)				return p->GetValue().GetDouble(); }
-
-const double CncConfig::getMaxSpeedX_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_X_MM_MIN) 				return p->GetValue().GetDouble(); }
-const double CncConfig::getMaxSpeedY_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_Y_MM_MIN) 				return p->GetValue().GetDouble(); }
-const double CncConfig::getMaxSpeedZ_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_Z_MM_MIN) 				return p->GetValue().GetDouble(); }
-const double CncConfig::getMaxSpeedXY_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_XY_MM_MIN) 				return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxSpeedXYZ_MM_MIN()						{ PROPERTY(CncConfig_MAX_SPEED_XYZ_MM_MIN) 				return p->GetValue().GetDouble(); }
 
-const double CncConfig::getAccelStartSpeedX_MM_MIN()				{ PROPERTY(CncConfig_ACCEL_START_SPEED_X_MM_MIN) 		return p->GetValue().GetDouble(); }
-const double CncConfig::getAccelStopSpeedX_MM_MIN()					{ PROPERTY(CncConfig_ACCEL_STOP_SPEED_X_MM_MIN) 		return p->GetValue().GetDouble(); }
-const double CncConfig::getAccelStartSpeedY_MM_MIN()				{ PROPERTY(CncConfig_ACCEL_START_SPEED_Y_MM_MIN) 		return p->GetValue().GetDouble(); }
-const double CncConfig::getAccelStopSpeedY_MM_MIN()					{ PROPERTY(CncConfig_ACCEL_STOP_SPEED_Y_MM_MIN) 		return p->GetValue().GetDouble(); }
-const double CncConfig::getAccelStartSpeedZ_MM_MIN()				{ PROPERTY(CncConfig_ACCEL_START_SPEED_Z_MM_MIN) 		return p->GetValue().GetDouble(); }
-const double CncConfig::getAccelStopSpeedZ_MM_MIN()					{ PROPERTY(CncConfig_ACCEL_STOP_SPEED_Z_MM_MIN) 		return p->GetValue().GetDouble(); }
-	
-const double CncConfig::getMaxWorkSpeedX_MM_MIN()					{ PROPERTY(CncConfig_MAX_WORK_SPEED_X_MM_MIN)			return p->GetValue().GetDouble(); }
-const double CncConfig::getMaxWorkSpeedY_MM_MIN()					{ PROPERTY(CncConfig_MAX_WORK_SPEED_Y_MM_MIN)			return p->GetValue().GetDouble(); }
-const double CncConfig::getMaxWorkSpeedZ_MM_MIN()					{ PROPERTY(CncConfig_MAX_WORK_SPEED_Z_MM_MIN)			return p->GetValue().GetDouble(); }
+const double CncConfig::getMaxXYPitchToKeep()						{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_MAX_XY_PITCH) 		return p->GetValue().GetDouble(); }
+const double CncConfig::getMaxZPitchToKeep()						{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_MAX_Z_PITCH) 		return p->GetValue().GetDouble(); }
+
+const double CncConfig::getAccelFunctParamA()						{ PROPERTY(CncConfig_ACCEL_FUNC_PARA_A)					return p->GetValue().GetDouble(); }
+const double CncConfig::getAccelFunctParamB()						{ PROPERTY(CncConfig_ACCEL_FUNC_PARA_B)					return p->GetValue().GetDouble(); }
+const double CncConfig::getAccelFunctParamC()						{ PROPERTY(CncConfig_ACCEL_FUNC_PARA_C)					return p->GetValue().GetDouble(); }
+const double CncConfig::getDeaccelFunctParamA()						{ PROPERTY(CncConfig_DEACCEL_FUNC_PARA_A)				return p->GetValue().GetDouble(); }
+const double CncConfig::getDeaccelFunctParamB()						{ PROPERTY(CncConfig_DEACCEL_FUNC_PARA_B)				return p->GetValue().GetDouble(); }
+const double CncConfig::getDeaccelFunctParamC()						{ PROPERTY(CncConfig_DEACCEL_FUNC_PARA_C)				return p->GetValue().GetDouble(); }
 
 const CncUnit CncConfig::getDisplayUnit() 							{ return currentUnit; }
 const CncUnit CncConfig::getDefaultDisplayUnit()					{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? CncMetric : CncSteps ); }

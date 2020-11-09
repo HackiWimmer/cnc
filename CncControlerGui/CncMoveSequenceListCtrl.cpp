@@ -482,7 +482,10 @@ bool CncMoveSequenceOverviewListCtrl::skipToFirstReference() {
 /////////////////////////////////////////////////////////////
 	if ( moveSequences.size() == 0 )
 		return false;
-		
+	
+	if ( getLastSelection() == 0 ) 
+		{ wxBell(); return false; }
+
 	return selectItem(0, true);
 }
 /////////////////////////////////////////////////////////////
@@ -511,6 +514,9 @@ bool CncMoveSequenceOverviewListCtrl::skipToPrevReference() {
 		item--;
 	}
 	
+	if ( isItemValid(item) == false ) 
+		{ wxBell(); return false; }
+		
 	return selectItem(item, true);
 }
 /////////////////////////////////////////////////////////////
@@ -524,8 +530,8 @@ bool CncMoveSequenceOverviewListCtrl::skipToNextReference() {
 	if ( isItemValid(item) == false )
 		skipToFirstReference();
 		
-	if ( isItemValid(item) == false )
-		return false;
+	if ( isItemValid(item) == false ) 
+		{ wxBell(); return false; }
 		
 	const CncMoveSequence* seq = &(moveSequences.at(item));
 	const long lastClientId    = seq->getLastClientId();
@@ -538,6 +544,9 @@ bool CncMoveSequenceOverviewListCtrl::skipToNextReference() {
 		item++;
 	}
 	
+	if ( isItemValid(item) == false ) 
+		{ wxBell(); return false; }
+		
 	return selectItem(item, true);
 }
 /////////////////////////////////////////////////////////////
@@ -546,6 +555,10 @@ bool CncMoveSequenceOverviewListCtrl::skipToLastReference() {
 	if ( moveSequences.size() == 0 )
 		return false;
 		
+	const long item = getLastSelection();
+	if ( item == (long)(moveSequences.size() - 1) )
+		{ wxBell(); return false; }
+	
 	return selectItem(moveSequences.size() - 1, true);
 }
 

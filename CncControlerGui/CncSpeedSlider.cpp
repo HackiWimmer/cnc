@@ -6,7 +6,7 @@
 #include "CncSpeedSlider.h"
 
 ///////////////////////////////////////////////////////////////////
-CncSpeedSliderInterface::CncSpeedSliderInterface(wxSlider* s, wxTextCtrl* l, wxStaticText* u) 
+CncSpeedSliderInterface::CncSpeedSliderInterface(wxSlider* s, CncValueCtrl* l, CncValueCtrl* u) 
 : slider				(s)
 , sliderValue			(l)
 , sliderUnit			(u)
@@ -20,19 +20,21 @@ CncSpeedSliderInterface::CncSpeedSliderInterface(wxSlider* s, wxTextCtrl* l, wxS
 ///////////////////////////////////////////////////////////////////
 CncSpeedSliderInterface::~CncSpeedSliderInterface() {
 ///////////////////////////////////////////////////////////////////
-	
+	wxDELETE( sliderValue );
+	wxDELETE( sliderUnit );
 }
 ///////////////////////////////////////////////////////////////////
 void CncSpeedSliderInterface::enable(bool state) {
 ///////////////////////////////////////////////////////////////////
 	slider->Enable(state);
-	sliderValue->Enable(state);
+	sliderValue->enable(state);
+	sliderUnit->enable(state);
 }
 ///////////////////////////////////////////////////////////////////
 void CncSpeedSliderInterface::showUnit(bool state) {
 ///////////////////////////////////////////////////////////////////
 	if ( sliderUnit != NULL ) {
-		sliderUnit->SetLabel( state ? "[mm/min]" : "");
+		sliderUnit->updateValue( state ? "[mm/min]" : "");
 		updateControls();
 	}
 }
@@ -126,7 +128,7 @@ int CncSpeedSliderInterface::getValueMM_SEC() {
 
 
 ///////////////////////////////////////////////////////////////////
-CncDefaultSpeedSlider::CncDefaultSpeedSlider(wxSlider* slider, wxTextCtrl* label, wxStaticText* unit)
+CncDefaultSpeedSlider::CncDefaultSpeedSlider(wxSlider* slider, CncValueCtrl* label, CncValueCtrl* unit)
 : wxEvtHandler 				()
 , CncSpeedSliderInterface	(slider, label, unit)
 ///////////////////////////////////////////////////////////////////
@@ -151,7 +153,7 @@ CncDefaultSpeedSlider::~CncDefaultSpeedSlider() {
 ///////////////////////////////////////////////////////////////////
 void CncDefaultSpeedSlider::updateControls() {
 ///////////////////////////////////////////////////////////////////
-	sliderValue->ChangeValue(CncNumberFormatter::toString(getValueMM_MIN()));
+	sliderValue->updateValue(CncNumberFormatter::toString(getValueMM_MIN()));
 }
 ///////////////////////////////////////////////////////////////////
 void CncDefaultSpeedSlider::onChangedSlider(wxScrollEvent& event) {

@@ -3,7 +3,14 @@
 #include "CncConfigCommon.h"
 #include "CncConfig.h"
 
-extern wxPropertyGridManager* 	globlSetupGrid;
+////////////////////////////////////////////////////////////////////////
+namespace Cnc {
+	namespace Config {
+		extern wxPropertyGridManager* globlSetupGrid;
+		
+		extern bool compare(const wxPGProperty& prop, const wxString& propId);
+	};
+};
 
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::pgChangedApplicationCfgPage(wxPropertyGridEvent& event) {
@@ -17,18 +24,19 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 ////////////////////////////////////////////////////////////////////////
 	wxPropertyGridPage* page	= NULL;
 	wxPGProperty* root 			= NULL;
-	wxString curCatName;
+	wxString curCatLabel;
 	
 	wxArrayString pgParameterMgrArr;
 	wxArrayInt pgParameterMgrIntArr;
 	wxFloatingPointValidator<float> validator(3, NULL, wxNUM_VAL_DEFAULT);
 	
-	curCatName.assign("Application");
-	page = globlSetupGrid->AddPage(curCatName, ImageLibConfig().Bitmap(_("BMP_APP_CFG")));
-	root = page->Append( new wxPropertyCategory(curCatName) );
+	curCatLabel.assign("Application");
+	page = Cnc::Config::globlSetupGrid->AddPage(curCatLabel, ImageLibConfig().Bitmap(_("BMP_APP_CFG")));
+	root = page->Append( new wxPropertyCategory(curCatLabel) );
+	registerCategory(curCatLabel, root);
 	
 	PGFuncPtrStore fps;
-	fps.name.assign(curCatName);
+	fps.name.assign(curCatLabel);
 	fps.propertyChanged 		= &CncConfig::pgChangedApplicationCfgPage;
 	fps.propertyChanging		= NULL;
 	fps.propertySelected		= NULL;
@@ -118,9 +126,9 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		
 		//...................
 		wxPGProperty* port = NULL;
-		curCatName.assign("Port");
-		port = root->AppendChild( new wxPropertyCategory(curCatName));
-		registerCategory(curCatName, port);
+		curCatLabel.assign("Port");
+		port = root->AppendChild( new wxPropertyCategory(curCatLabel));
+		registerCategory(curCatLabel, port);
 		{
 			//...............
 			prop = port->AppendChild( new wxStringProperty("Default port", NEXT_PROP_ID, ""));
@@ -131,9 +139,9 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		
 		//...................
 		wxPGProperty* tpl = NULL;
-		curCatName.assign("Template");
-		tpl = root->AppendChild( new wxPropertyCategory(curCatName));
-		registerCategory(curCatName, tpl);
+		curCatLabel.assign("Template");
+		tpl = root->AppendChild( new wxPropertyCategory(curCatLabel));
+		registerCategory(curCatLabel, tpl);
 		{
 			//...............
 			prop = tpl->AppendChild( new wxDirProperty("Default directory", NEXT_PROP_ID, ""));
@@ -150,9 +158,9 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 
 		//...................
 		wxPGProperty* tools = NULL;
-		curCatName.assign("Tools");
-		tools = root->AppendChild( new wxPropertyCategory(curCatName));
-		registerCategory(curCatName, tools);
+		curCatLabel.assign("Tools");
+		tools = root->AppendChild( new wxPropertyCategory(curCatLabel));
+		registerCategory(curCatLabel, tools);
 		{
 			//...............
 			prop = tools->AppendChild( new wxFileProperty("File Browser", NEXT_PROP_ID, ""));

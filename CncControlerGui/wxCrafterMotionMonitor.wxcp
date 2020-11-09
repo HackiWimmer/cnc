@@ -2239,7 +2239,7 @@
                  "m_children": [{
                    "m_type": 4403,
                    "proportion": 0,
-                   "border": 3,
+                   "border": 0,
                    "gbSpan": "1,1",
                    "gbPosition": "0,0",
                    "m_styles": [],
@@ -3243,7 +3243,7 @@
                  "m_children": [{
                    "m_type": 4403,
                    "proportion": 0,
-                   "border": 3,
+                   "border": 0,
                    "gbSpan": "1,1",
                    "gbPosition": "0,0",
                    "m_styles": [],
@@ -8072,7 +8072,7 @@
        "m_children": [{
          "m_type": 4405,
          "proportion": 0,
-         "border": 3,
+         "border": 0,
          "gbSpan": "1,1",
          "gbPosition": "0,0",
          "m_styles": [],

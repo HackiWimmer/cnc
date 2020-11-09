@@ -732,13 +732,12 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			case PID_ACCEL_PROFILE:
 			{
 				/*
-			    values[ 0] / FLT_FACT // Feedrate X
-			    values[ 1] / FLT_FACT // Feedrate Y
-			    values[ 2] / FLT_FACT // Feedrate Z
-
-			    values[3] / FLT_FACT // HighPulsWidth X
-			    values[4] / FLT_FACT // HighPulsWidth Y
-			    values[5] / FLT_FACT // HighPulsWidth Z
+					values[ 0] / FLT_FACT // Feedrate X
+					values[ 1] / FLT_FACT // Feedrate Y
+					values[ 2] / FLT_FACT // Feedrate Z
+					values[ 3] / FLT_FACT // HighPulsWidth X
+					values[ 4] / FLT_FACT // HighPulsWidth Y
+					values[ 5] / FLT_FACT // HighPulsWidth Z
 				*/
 
 				setupACM((float)values[ 6] / FLT_FACT,

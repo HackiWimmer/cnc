@@ -52,12 +52,6 @@ void CncManuallyMoveCoordinates::initialize() {
 ///////////////////////////////////////////////////////////////////
 	enableControls(true);
 	updateValidators();
-	
-	m_fxMax  ->ChangeValue(wxString::Format("%5.1lf", THE_CONFIG->getMaxSpeedX_MM_MIN()  ));
-	m_fyMax  ->ChangeValue(wxString::Format("%5.1lf", THE_CONFIG->getMaxSpeedY_MM_MIN()  ));
-	m_fzMax  ->ChangeValue(wxString::Format("%5.1lf", THE_CONFIG->getMaxSpeedZ_MM_MIN()  ));
-	m_fxyMax ->ChangeValue(wxString::Format("%5.1lf", THE_CONFIG->getMaxSpeedXY_MM_MIN() ));
-	m_fxyzMax->ChangeValue(wxString::Format("%5.1lf", THE_CONFIG->getMaxSpeedXYZ_MM_MIN()));
 }
 ///////////////////////////////////////////////////////////////////
 void CncManuallyMoveCoordinates::updateValidators() {

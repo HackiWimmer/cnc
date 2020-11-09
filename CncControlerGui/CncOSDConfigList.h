@@ -49,7 +49,7 @@ class CncOSDConfigList {
 				return o;
 			}
 
-			static const wxString& makeId(const wxString& group, const wxString& key);
+			static const wxString makeId(const wxString& group, const wxString& key);
 
 		};
 
@@ -74,15 +74,20 @@ class CncOSDConfigList {
 		
 		const wxString& getList(const wxString& id, wxString& values) const;
 		const wxString& getList(const wxString& group, const wxString& key, wxString& values) const;
-
+		
 		friend std::ostream &operator<< (std::ostream &o, const CncOSDConfigList &a) {
 			for (auto it = a.configMap.begin(); it != a.configMap.end(); ++it)
 				o << it->second;
 
 			return o;
 		}
-
-
+		
+		static const wxString getOSDPrefix() { return "OSD_"; }
+			
+		static const wxString makeId(const wxString& group, const wxString& key) {
+			return OSDEntry::makeId(group, key);
+		}
+		
 		static void test();
 };
 

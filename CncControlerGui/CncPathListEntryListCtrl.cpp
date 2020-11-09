@@ -269,6 +269,9 @@ bool CncPathListEntryListCtrl::skipToFirstReference() {
 		item++;
 	}
 	
+	if ( getLastSelection() == item )
+		{ wxBell(); return false; }
+		
 	return selectItem(item, true);
 }
 /////////////////////////////////////////////////////////////
@@ -284,7 +287,7 @@ bool CncPathListEntryListCtrl::skipToPrevReference() {
 		
 	item = getLastSelection();
 	if ( isItemValid(item) == false )
-		return false;
+		{ wxBell(); return false; }
 		
 	const long refClientID	= pathLists.at(item).clientId;
 	const long ritem		= pathLists.size() - 1 - item;
@@ -295,6 +298,9 @@ bool CncPathListEntryListCtrl::skipToPrevReference() {
 		if ( it->clientId != refClientID )
 			break;
 	}
+	
+	if ( isItemValid(item) == false )
+		{ wxBell(); return false; }
 	
 	return selectItem(item, true);
 }
@@ -311,7 +317,7 @@ bool CncPathListEntryListCtrl::skipToNextReference() {
 	
 	item = getLastSelection();
 	if ( isItemValid(item) == false )
-		return false;
+		{ wxBell(); return false; }
 	
 	const long refClientID	= pathLists.at(item).clientId;
 	for ( auto it = pathLists.begin() + item; it != pathLists.end(); ++it ) {
@@ -327,6 +333,9 @@ bool CncPathListEntryListCtrl::skipToNextReference() {
 		item++;
 	}
 	
+	if ( isItemValid(item) == false )
+		{ wxBell(); return false; }
+		
 	return selectItem(item, true);
 }
 /////////////////////////////////////////////////////////////
@@ -348,6 +357,9 @@ bool CncPathListEntryListCtrl::skipToLastReference() {
 		item = std::abs(std::distance(pathLists.rend(), it));
 	}
 	
+	if ( getLastSelection() == item )
+		{ wxBell(); return false; }
+		
 	return selectItem(item, true);
 }
 /////////////////////////////////////////////////////////////

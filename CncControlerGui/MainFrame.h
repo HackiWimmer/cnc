@@ -70,6 +70,7 @@ class CncLruFileViewListCtrl;
 class CncMotionVertexTrace;
 class CncOpenGLContextObserver;
 class CncOSEnvironmentDialog;
+class CncExternalViewBoxCluster;
 class CncExternalViewBox;
 class CncArduinoEnvironment;
 class CncLCDPositionPanel;
@@ -168,21 +169,28 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void show3D(wxCommandEvent& event);
-    virtual void showFromBottom3D(wxCommandEvent& event);
-    virtual void showFromFront3D(wxCommandEvent& event);
-    virtual void showFromLeft3D(wxCommandEvent& event);
-    virtual void showFromRear3D(wxCommandEvent& event);
-    virtual void showFromRight3D(wxCommandEvent& event);
-    virtual void showFromTop3D(wxCommandEvent& event);
-    virtual void detachMotionMonitor(wxCommandEvent& event);
+		virtual void detachControllerMessages(wxCommandEvent& event);
+		virtual void detachSetterList(wxCommandEvent& event);
+		virtual void detachManuallyTemplate(wxCommandEvent& event);
+		virtual void detachReference(wxCommandEvent& event);
+		virtual void detachTemplateSource(wxCommandEvent& event);
+		virtual void detachTest(wxCommandEvent& event);
+		virtual void detachConfiguration(wxCommandEvent& event);
+		virtual void clickWorkingParameters(wxCommandEvent& event);
+		virtual void show3D(wxCommandEvent& event);
+		virtual void showFromBottom3D(wxCommandEvent& event);
+		virtual void showFromFront3D(wxCommandEvent& event);
+		virtual void showFromLeft3D(wxCommandEvent& event);
+		virtual void showFromRear3D(wxCommandEvent& event);
+		virtual void showFromRight3D(wxCommandEvent& event);
+		virtual void showFromTop3D(wxCommandEvent& event);
+		virtual void detachMotionMonitor(wxCommandEvent& event);
 		virtual void openPositionStorage(wxCommandEvent& event);
 		virtual void openHexEditor(wxCommandEvent& event);
 		virtual void onReloadMonitorPreview(wxCommandEvent& event);
 		virtual void viewControllerMsgHistory(wxCommandEvent& event);
 		virtual void onSelectStepSensitivity(wxCommandEvent& event);
 		virtual void onSelectStepMode(wxCommandEvent& event);
-		virtual void clickAdditionalParameters(wxCommandEvent& event);
 		virtual void onDeactivateSecureRunMode(wxCommandEvent& event);
 		virtual void requestResolveLimitStates(wxCommandEvent& event);
 		virtual void requestToolTest(wxCommandEvent& event);
@@ -214,7 +222,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void selectBinaryEditorViewMode(wxCommandEvent& event);
 		virtual void traceSessionId(wxCommandEvent& event);
 		virtual void openSessionDialog(wxCommandEvent& event);
-		virtual void updateRenderResolution(wxCommandEvent& event);
 		virtual void toggleIdleRequests(wxCommandEvent& event);
 		virtual void cncMainViewChanged(wxNotebookEvent& event);
 		virtual void rcSecureDlg(wxCommandEvent& event);
@@ -310,7 +317,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void svgEditFind(wxCommandEvent& event);
 		virtual void svgEditFindPrev(wxCommandEvent& event);
 		virtual void dclickDurationCount(wxMouseEvent& event);
-		virtual void stepDelayChanged(wxScrollEvent& event);
 		virtual void displayUserAgent(wxCommandEvent& event);
 		virtual void updateToolControls(wxCommandEvent& event);
 		virtual void onSerialTimer(wxTimerEvent& event);
@@ -670,8 +676,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncTemplateObserver* 			templateObserver;
 		CncOpenGLContextObserver*		openGLContextObserver;
 		CncOSEnvironmentDialog* 		cncOsEnvDialog;
+		CncExternalViewBoxCluster*		cncExtViewBoxCluster;
 		CncExternalViewBox* 			cncExtMainPreview;
-		CncExternalViewBox* 			cncExtMotionMonitor;
 		CncArduinoEnvironment*			cncArduinoEnvironment;
 		CncLCDPositionPanel*			cncLCDPositionPanel;
 		CncManuallyMoveCoordinates*		cncManuallyMoveCoordPanel;
@@ -773,10 +779,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// configuration
-		void updateStepDelay();
 		void updateUnit();
 		void updateFileContentPosition(long x, long y);
-		void updateRenderResolution();
 		
 		void decorateSearchButton();
 		void decorateOutboundSaveControls(bool state);

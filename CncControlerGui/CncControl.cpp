@@ -323,21 +323,19 @@ bool CncControl::setup(bool doReset) {
 	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthX()));
 	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthY()));
 	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthZ()));
-	
-	#warning use config values
-	accelList.push_back(FLT_FACT * 0.0);
-	accelList.push_back(FLT_FACT * 0.5);
-	accelList.push_back(FLT_FACT * 333.0/60);
-	accelList.push_back(FLT_FACT * 0.0);
-	accelList.push_back(FLT_FACT * 0.5);
-	accelList.push_back(FLT_FACT * 333.0/60);
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getAccelFunctParamA()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getAccelFunctParamB()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getAccelFunctParamC() /60.0));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getDeaccelFunctParamA()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getDeaccelFunctParamB()));
+	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getDeaccelFunctParamC() / 60.0));
 	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, THE_CONFIG->getReplyThresholdSteps()));
 	
-	int32_t dirValueX = THE_CONFIG->getInverseCtrlDirectionXFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
-	int32_t dirValueY = THE_CONFIG->getInverseCtrlDirectionYFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
-	int32_t dirValueZ = THE_CONFIG->getInverseCtrlDirectionZFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
+	const int32_t dirValueX = THE_CONFIG->getInverseCtrlDirectionXFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
+	const int32_t dirValueY = THE_CONFIG->getInverseCtrlDirectionYFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
+	const int32_t dirValueZ = THE_CONFIG->getInverseCtrlDirectionZFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
 
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_X, dirValueX));
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Y, dirValueY));

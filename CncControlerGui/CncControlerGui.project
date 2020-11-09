@@ -506,13 +506,13 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Config">
+      <File Name="CncConfigProperties.cpp"/>
+      <File Name="CncConfigProperties.h"/>
       <File Name="CncContext.cpp"/>
       <File Name="CncContext.h"/>
       <File Name="CncConfigCommon.h"/>
       <File Name="CncOSDConfigList.cpp"/>
       <File Name="CncOSDConfigList.h"/>
-      <File Name="CncConfigProperty.cpp"/>
-      <File Name="CncConfigProperty.h"/>
       <File Name="CncConfig.cpp"/>
       <File Name="CncConfig.h"/>
       <VirtualDirectory Name="Pages">

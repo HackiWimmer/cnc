@@ -13,7 +13,7 @@
 #include "OSD/CncTimeFunctions.h"
 #include "CncTextCtrl.h"
 #include "CncLoggerProxy.h"
-#include "CncConfigProperty.h"
+#include "CncConfigProperties.h"
 #include "CncFileNameService.h"
 #include "CncStreamBuffers.h"
 #include "CncContext.h"
@@ -247,7 +247,6 @@ class MainApp : public wxApp {
 			// init file and dir names
 			CncFileNameService::init();
 			CncTimeFunctions::init();
-			CncTextCtrlEditor::init();
 
 			GblFunc::appendToStackTraceFile("Starting up ......................");
 			globalFileConfig = new wxFileConfig(wxT("CncController"), 

@@ -56,5 +56,25 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 		wxPoint 	moveDelta;
 };
 
+class CncExternalViewBoxCluster {
+	
+public:
+		
+		enum Node { EVB_Config, EVB_Source, EVB_Reference, EVB_Manually, EVB_Test, EVB_Monitor, EVB_SetterList, EVB_CtrlMsg, EVB_ENUM_COUNT };
+		typedef std::map<Node, CncExternalViewBox*> Cluster;
+		
+		CncExternalViewBoxCluster(wxWindow* parent);
+		~CncExternalViewBoxCluster();
+		
+		CncExternalViewBox*		getNode(Node n) const;
+		bool					detachNode(Node n);
+		bool					setupView1(Node n, wxWindow* wnd, const wxString& title);
+		bool 					hideNode(Node n);
+		bool 					hideAll();
+		
+	private:
+		Cluster cluster;
+		
+};
 
 #endif // CNCEXTERNALVIEWBOX_H

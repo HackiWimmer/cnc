@@ -31,6 +31,7 @@
   <object class="wxBitmap" name="16-file_reload@2x">bitmaps\16-file_reload@2x.png</object>
   <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>
   <object class="wxBitmap" name="16-file_save@2x">bitmaps\16-file_save@2x.png</object>
+  <object class="wxBitmap" name="16-file_save.1">bitmaps\CodeLite\16-file_save.1.png</object>
   <object class="wxBitmap" name="16-fold">bitmaps\16-fold.png</object>
   <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
   <object class="wxBitmap" name="16-globals">bitmaps\16-globals.png</object>
@@ -51,6 +52,8 @@
   <object class="wxBitmap" name="16-record@2x">bitmaps\16-record@2x.png</object>
   <object class="wxBitmap" name="16-regular-expression">bitmaps\16-regular-expression.png</object>
   <object class="wxBitmap" name="16-regular-expression@2x">bitmaps\16-regular-expression@2x.png</object>
+  <object class="wxBitmap" name="16-remote-folder">bitmaps\CodeLite\16-remote-folder.png</object>
+  <object class="wxBitmap" name="16-remote-folder@2x">bitmaps\CodeLite\16-remote-folder@2x.png</object>
   <object class="wxBitmap" name="16-sort">bitmaps\16-sort.png</object>
   <object class="wxBitmap" name="16-sort@2x">bitmaps\16-sort@2x.png</object>
   <object class="wxBitmap" name="16-struct">bitmaps\16-struct.png</object>
@@ -65,6 +68,7 @@
   <object class="wxBitmap" name="16-whole-word@2x">bitmaps\16-whole-word@2x.png</object>
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
+  <object class="wxBitmap" name="CncDebug">bitmaps\RunCtrl\CncDebug.png</object>
   <object class="wxBitmap" name="CubeHardwareDimensions">bitmaps\CubeHardwareDimensions.png</object>
   <object class="wxBitmap" name="CubeHardwareReference">bitmaps\CubeHardwareReference.png</object>
   <object class="wxBitmap" name="ToolPin">bitmaps\ToolPin.png</object>
@@ -84,7 +88,6 @@
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
-  <object class="wxBitmap" name="application-tile-horizontal">bitmaps\application-tile-horizontal.png</object>
   <object class="wxBitmap" name="application-view-gallery">bitmaps\application-view-gallery.png</object>
   <object class="wxBitmap" name="arrow-out">bitmaps\arrow-out.png</object>
   <object class="wxBitmap" name="arrow-right-3">bitmaps\arrow-right-3.png</object>
@@ -93,7 +96,6 @@
   <object class="wxBitmap" name="bookmark-toolbar">bitmaps\bookmark-toolbar.png</object>
   <object class="wxBitmap" name="brick">bitmaps\brick.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
-  <object class="wxBitmap" name="bug-go">bitmaps\bug-go.png</object>
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="clear">bitmaps\clear.png</object>
@@ -102,7 +104,6 @@
   <object class="wxBitmap" name="database-error">bitmaps\database-error.png</object>
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
-  <object class="wxBitmap" name="db">bitmaps\db.png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
@@ -116,24 +117,31 @@
   <object class="wxBitmap" name="edit-rename">bitmaps\edit-rename.png</object>
   <object class="wxBitmap" name="enumerator">bitmaps\enumerator.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
-  <object class="wxBitmap" name="feed">bitmaps\feed.png</object>
   <object class="wxBitmap" name="feed-subscribe">bitmaps\feed-subscribe.png</object>
   <object class="wxBitmap" name="filepreview">bitmaps\filepreview.png</object>
   <object class="wxBitmap" name="flag-blue-2">bitmaps\flag-blue-2.png</object>
   <object class="wxBitmap" name="folder-development">bitmaps\folder-development.png</object>
   <object class="wxBitmap" name="gamepad-active">bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="git-reset">bitmaps\git-reset.png</object>
-  <object class="wxBitmap" name="go-bottom">bitmaps\go-bottom.png</object>
-  <object class="wxBitmap" name="go-down-2">bitmaps\go-down-2.png</object>
   <object class="wxBitmap" name="go-down-7">bitmaps\go-down-7.png</object>
   <object class="wxBitmap" name="go-first-view">bitmaps\go-first-view.png</object>
   <object class="wxBitmap" name="go-last-view">bitmaps\go-last-view.png</object>
-  <object class="wxBitmap" name="go-next-2">bitmaps\go-next-2.png</object>
   <object class="wxBitmap" name="go-next-context">bitmaps\go-next-context.png</object>
   <object class="wxBitmap" name="go-up-7">bitmaps\go-up-7.png</object>
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
+  <object class="wxBitmap" name="iconmonstr-control-panel-14-16">bitmaps\RunCtrl\iconmonstr-control-panel-14-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-control-panel-8-16">bitmaps\RunCtrl\iconmonstr-control-panel-8-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-finish-16">bitmaps\RunCtrl\iconmonstr-finish-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-lock-10-16">bitmaps\RunCtrl\iconmonstr-lock-10-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-next-breakpoint-16">bitmaps\RunCtrl\iconmonstr-next-breakpoint-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-next-step-16">bitmaps\RunCtrl\iconmonstr-next-step-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-pause-16">bitmaps\RunCtrl\iconmonstr-pause-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-process-1-16">bitmaps\RunCtrl\iconmonstr-process-1-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-stop-16">bitmaps\RunCtrl\iconmonstr-stop-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-synchronization-8-16">bitmaps\RunCtrl\iconmonstr-synchronization-8-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-window-21-16">bitmaps\RunCtrl\iconmonstr-window-21-16.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
   <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
   <object class="wxBitmap" name="network-wireless-full (2)">bitmaps\network-wireless-full (2).png</object>
@@ -145,19 +153,15 @@
   <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
   <object class="wxBitmap" name="playstation-cross-dark-icon16">bitmaps\gamepad\playstation-cross-dark-icon16.png</object>
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
-  <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
-  <object class="wxBitmap" name="ruby">bitmaps\ruby.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="script-gear">bitmaps\script-gear.png</object>
   <object class="wxBitmap" name="security-low-2">bitmaps\security-low-2.png</object>
-  <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="settings">bitmaps\settings.png</object>
   <object class="wxBitmap" name="shape-group">bitmaps\shape-group.png</object>
   <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
   <object class="wxBitmap" name="snap-orto">bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="software-update-available-3 (2)">bitmaps\software-update-available-3 (2).png</object>
   <object class="wxBitmap" name="software-update-inactive (2)">bitmaps\software-update-inactive (2).png</object>
-  <object class="wxBitmap" name="sports-shuttlecock">bitmaps\sports-shuttlecock.png</object>
   <object class="wxBitmap" name="system-run-4">bitmaps\system-run-4.png</object>
   <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
@@ -165,7 +169,6 @@
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
   <object class="wxBitmap" name="table-edit">bitmaps\table-edit.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>
-  <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
   <object class="wxBitmap" name="view-calendar-month">bitmaps\view-calendar-month.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>
@@ -175,6 +178,5 @@
   <object class="wxBitmap" name="view-process-system">bitmaps\view-process-system.png</object>
   <object class="wxBitmap" name="weather-lightning (2)">bitmaps\weather-lightning (2).png</object>
   <object class="wxBitmap" name="window-close-3">bitmaps\window-close-3.png</object>
-  <object class="wxBitmap" name="window-new-2">bitmaps\window-new-2.png</object>
   <object class="wxBitmap" name="world-link">bitmaps\world-link.png</object>
 </resource>

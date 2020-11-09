@@ -292,7 +292,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , positionSpy							(NULL)
 , setterList							(NULL)
 , speedMonitor							(NULL)
-, defaultSpeedSlider					(new CncDefaultSpeedSlider(m_defaultSpeedSlider, m_configuredFeedSpeed))
+, defaultSpeedSlider					(new CncDefaultSpeedSlider(m_defaultSpeedSlider, new CncValueCtrl(m_defaultSpeedSliderValue)))
 , motionVertexCtrl						(NULL)
 , cncPreprocessor						(NULL)
 , gCodeSequenceList						(NULL)
@@ -308,8 +308,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , templateObserver						(NULL)
 , openGLContextObserver					(new CncOpenGLContextObserver(this))
 , cncOsEnvDialog						(new CncOSEnvironmentDialog(this))
+, cncExtViewBoxCluster					(NULL)
 , cncExtMainPreview						(NULL)
-, cncExtMotionMonitor					(NULL)
 , cncArduinoEnvironment					(new CncArduinoEnvironment(this))
 , cncLCDPositionPanel					(NULL)
 , cncManuallyMoveCoordPanel				(NULL)
@@ -391,7 +391,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 		m_testCaseBook->GetListView()->SetFont(font);
 	}
 	
-	defaultSpeedSlider->setToolTipWindow(m_configuredFeedSpeed);
+	defaultSpeedSlider->showValue(true);
+	defaultSpeedSlider->setToolTipWindow(m_defaultSpeedSliderValue);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -445,8 +446,8 @@ MainFrame::~MainFrame() {
 	cncDELETE ( lruStore );
 	
 	cncDELETE( openGLContextObserver );
+	cncDELETE( cncExtViewBoxCluster );
 	cncDELETE( cncExtMainPreview );
-	cncDELETE( cncExtMotionMonitor );
 	cncDELETE( cncArduinoEnvironment );
 	cncDELETE( cncOsEnvDialog );
 	cncDELETE( outboundNbInfo );
@@ -758,14 +759,22 @@ void MainFrame::installCustControls() {
 	monitorFilePreview = new CncFilePreview(this, "GLMontiorPreview");
 	GblFunc::replaceControl(m_monitorTemplatePreviewPlaceHolder, monitorFilePreview);
 	
-	// external preview
+	// External previews
 	cncExtMainPreview = new CncExternalViewBox(this);
 	cncExtMainPreview->setupView(CncExternalViewBox::Preview::FILE,			mainFilePreview,		"External File Preview . . . ");
 	cncExtMainPreview->setupView(CncExternalViewBox::Preview::TEMPLATE,		monitorFilePreview,		"External Template Preview . . . ");
 	
-	cncExtMotionMonitor = new CncExternalViewBox(this);
-	cncExtMotionMonitor->setupView(CncExternalViewBox::Default::VIEW1,		cnc3DHSplitterWindow,	"External Motion Monitor . . . ");
-
+	// External views
+	cncExtViewBoxCluster = new CncExternalViewBoxCluster(this);
+	cncExtViewBoxCluster->setupView1(CncExternalViewBoxCluster::Node::EVB_Config,		m_panelConfiguration,		"External Configuration . . . ");
+	cncExtViewBoxCluster->setupView1(CncExternalViewBoxCluster::Node::EVB_Source,		m_panelTemplateSource,		"External Source View . . . ");
+	cncExtViewBoxCluster->setupView1(CncExternalViewBoxCluster::Node::EVB_Reference,	m_panelReferences,			"External Reference View . . . ");
+	cncExtViewBoxCluster->setupView1(CncExternalViewBoxCluster::Node::EVB_Manually,		m_panelTemplateManually,	"External Manually View . . . ");
+	cncExtViewBoxCluster->setupView1(CncExternalViewBoxCluster::Node::EVB_Test,			m_panelMainTest,			"External Test View . . . ");
+	cncExtViewBoxCluster->setupView1(CncExternalViewBoxCluster::Node::EVB_Monitor,		m_panelMotionMonitor,		"External Motion Monitor . . . ");
+	cncExtViewBoxCluster->setupView1(CncExternalViewBoxCluster::Node::EVB_SetterList,	m_panelSetterList,			"External Setter List View . . . ");
+	cncExtViewBoxCluster->setupView1(CncExternalViewBoxCluster::Node::EVB_CtrlMsg,		m_panelControllerMessages,	"External Controller Messages View . . . ");
+	
 	// tool magazine
 	toolMagazine = new CncToolMagazine(this); 
 	GblFunc::replaceControl(m_toolMagazinePlaceholder, toolMagazine);
@@ -855,7 +864,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btSelectInboundPreview);
 	registerGuiControl(m_btSelectCncPreview);
 	registerGuiControl(m_btSelectTemplatePreview);
-	registerGuiControl(m_cbRenderResolution);
 	registerGuiControl(m_cbContentPosSpy);
 	registerGuiControl(m_testToolPowerBtn);
 	registerGuiControl(m_portSelector);
@@ -919,10 +927,12 @@ void MainFrame::displayNotification(const Notification& notification) {
 	
 	typedef MainFrame::Notification::Location Loc;
 	switch ( notification.location ) {
-		case Loc::NL_MainView:		mainViewInfobar->showMessage(notification.type, msg);
+		case Loc::NL_MainView:		wxBell();
+									mainViewInfobar->showMessage(notification.type, msg);
 									break;
 									
-		case Loc::NL_MonitorView:	monitorViewInfobar->showMessage(notification.type, msg);
+		case Loc::NL_MonitorView:	wxBell();
+									monitorViewInfobar->showMessage(notification.type, msg);
 									break;
 	}
 	
@@ -958,11 +968,12 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
-
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	wxBell();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -1025,9 +1036,8 @@ void MainFrame::activateSecureMode(bool state) {
 		if ( cncExtMainPreview->IsShownOnScreen() )
 			cncExtMainPreview->Show(false);
 			
-		if ( cncExtMotionMonitor->IsShownOnScreen() )
-			cncExtMotionMonitor->Show(false);
-		
+		cncExtViewBoxCluster->hideAll();
+			
 		GblFunc::swapControls(m_secMonitorPlaceholder,				drawPane3D->GetDrawPanePanel());
 		GblFunc::swapControls(m_secLoggerPlaceholder, 				getLoggerView());
 		GblFunc::swapControls(m_secSpeedMonitorPlaceholder,			speedMonitor->GetDrawingAreaBook());
@@ -1715,7 +1725,7 @@ void MainFrame::onClose(wxCloseEvent& event) {
 	positionStorage->Show(false);
 	
 	cncExtMainPreview->Show(false);
-	cncExtMotionMonitor->Show(false);
+	cncExtViewBoxCluster->hideAll();
 
 	cncArduinoEnvironment->activateOnClose(true);
 	
@@ -2137,9 +2147,6 @@ void MainFrame::initialize(void) {
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
-	
-	// curve lib resulotion
-	THE_CONFIG->setupSelectorRenderResolution();
 	
 	notifyConfigUpdate();
 }
@@ -3909,7 +3916,7 @@ void MainFrame::updateSetterList() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	// check if currentla a run is active and return if so to avoid 
+	// check if currently a run is active and return if so to avoid 
 	// a controller request during this mode
 	bool runActive = !m_rcRun->IsEnabled();
 
@@ -3980,13 +3987,21 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		
 		// restart the trace timer using the previous timeout value
 		m_traceTimer->Start(-1);
-
+		
+		MainFrame::Notification notification;
+		
 		const CncTemplateFormat tf = getCurrentTemplateFormat();
 		const wxString fn (getCurrentTemplatePathFileName());
 		
 		if ( tf != TplManual && tf != TplTest ) {
-			if ( fn.IsEmpty() == true )
+			if ( fn.IsEmpty() == true ) {
+				notification.location	= MainFrame::Notification::Location::NL_MonitorView;
+				notification.type		= 'W';
+				notification.title		= "Run Template";
+				notification.message	= "Not template loaded . . . ";
+				displayNotification(notification);
 				return false;
+			}
 		}
 		
 		// do this before the clearing opertions below, 
@@ -4097,7 +4112,7 @@ bool MainFrame::processTemplateIntern() {
 	THE_CONTEXT->timestamps.logTotalTimeStart();
 	motionMonitor->pushProcessMode();
 	
-	updateStepDelay();
+	cnc->setStepDelay(THE_CONFIG->getArtificallyStepDelay());
 	disableControls();
 	resetMinMaxPositions();
 	notifyConfigUpdate();
@@ -4809,17 +4824,6 @@ void MainFrame::selectUAUseDirectiveList(wxDataViewEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::updateRenderResolution() {
-///////////////////////////////////////////////////////////////////
-	THE_CONFIG->setRenderResolution(m_cbRenderResolution->GetStringSelection());
-	notifyConfigUpdate();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateRenderResolution(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateRenderResolution();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::onReloadMonitorPreview(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	const wxString fileName(m_currentInboundFilePreviewFileName->GetValue());
@@ -5383,23 +5387,6 @@ void MainFrame::displayUserAgent(wxCommandEvent& event) {
 void MainFrame::updateToolControls(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updateMonitoring();
-}
-
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateStepDelay() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	cnc->setStepDelay(m_stepDelay->GetValue());
-	
-	wxString val;
-	val << m_stepDelay->GetValue();
-	val << " ms";
-	m_stepDelay->SetToolTip(val);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::stepDelayChanged(wxScrollEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateStepDelay();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::createAnimationControl() {
@@ -6928,6 +6915,8 @@ void MainFrame::warmStartController(wxCommandEvent& event) {
 void MainFrame::changeConfigToolbook(wxToolbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	m_pgMgrSetup->SelectPage(event.GetSelection());
+	m_pgMgrSetup->SetDescription("", "");
+	//m_pgMgrSetup->GetCurrentPage()->FitColumns();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::decorateGamepadState(bool state) {
@@ -7700,12 +7689,13 @@ void MainFrame::cncTransactionReleaseCallback() {
 		cnc::spy.addMarker("Transaction released . . . ");
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::clickAdditionalParameters(wxCommandEvent& event) {
+void MainFrame::clickWorkingParameters(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::VAL::SETUP_PANEL);
 	
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::ADDITIONAL_PARAMETERS);
+	m_listbookSetupConfig->SetSelection(0);
+	m_notebookSetupConfig->SetSelection(0);
+	m_configurationToolbook->SetSelection(0);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onSelectStepSensitivity(wxCommandEvent& event) {
@@ -7733,16 +7723,42 @@ CncParsingSynopsisTrace* MainFrame::getParsingSynopsisTrace() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachMotionMonitor(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxASSERT( cncExtMotionMonitor != NULL );
-
-	const bool isExtViewActive = !cncExtMotionMonitor->IsShown();
-	
-	if ( cncExtMotionMonitor != NULL ) {
-		
-		// prepare extern preview
-		cncExtMotionMonitor->selectView(CncExternalViewBox::Default::VIEW1);
-		cncExtMotionMonitor->Show(isExtViewActive);
-	}
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Monitor);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachConfiguration(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Config);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachManuallyTemplate(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Manually);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachReference(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Reference);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachTemplateSource(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Source);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachTest(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Test);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachControllerMessages(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_CtrlMsg);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachSetterList(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_SetterList);
 }
 
 

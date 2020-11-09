@@ -6,6 +6,94 @@
 extern wxFrame* THE_FRAME;
 
 //////////////////////////////////////////////////////////////////
+CncExternalViewBoxCluster::CncExternalViewBoxCluster(wxWindow* parent) 
+: cluster		()
+//////////////////////////////////////////////////////////////////
+{
+	cluster[EVB_Monitor]	= new CncExternalViewBox(parent);
+	cluster[EVB_Config]		= new CncExternalViewBox(parent);
+	cluster[EVB_Source]		= new CncExternalViewBox(parent);
+	cluster[EVB_Reference]	= new CncExternalViewBox(parent);
+	cluster[EVB_Manually]	= new CncExternalViewBox(parent);
+	cluster[EVB_Test]		= new CncExternalViewBox(parent);
+	cluster[EVB_SetterList]	= new CncExternalViewBox(parent);
+	cluster[EVB_CtrlMsg]	= new CncExternalViewBox(parent);
+	
+	const bool b = static_cast<int>(Node::EVB_ENUM_COUNT) == cluster.size();
+	wxASSERT_MSG(b, wxString::Format("Wrong number of cluster nodes. Required=%d, Registered=%d", static_cast<int>(Node::EVB_ENUM_COUNT), (int)cluster.size()));
+}
+//////////////////////////////////////////////////////////////////
+CncExternalViewBoxCluster::~CncExternalViewBoxCluster() {
+//////////////////////////////////////////////////////////////////
+	for ( auto it = cluster.begin(); it != cluster.end(); ++it ) {
+		wxDELETE( it->second );
+	}
+	
+	cluster.clear();
+}
+//////////////////////////////////////////////////////////////////
+bool CncExternalViewBoxCluster::setupView1(Node n, wxWindow* wnd, const wxString& title) {
+//////////////////////////////////////////////////////////////////
+	CncExternalViewBox* evb = getNode(n);
+	if ( evb == NULL )
+		return false;
+		
+	if ( wnd == NULL )
+		return false;
+	
+	return evb->setupView(CncExternalViewBox::Default::VIEW1, wnd, title);
+}
+//////////////////////////////////////////////////////////////////
+CncExternalViewBox* CncExternalViewBoxCluster::getNode(Node n) const {
+//////////////////////////////////////////////////////////////////
+	if ( auto it = cluster.find(n); it != cluster.end() ) {
+		return it->second;
+	}
+	
+	wxASSERT_MSG(NULL, wxString::Format("%s: getNode(%d) failed!", CNC_LOG_FUNCT, (int)n));
+	return NULL;
+}
+//////////////////////////////////////////////////////////////////
+bool CncExternalViewBoxCluster::detachNode(Node n) {
+//////////////////////////////////////////////////////////////////
+	CncExternalViewBox* evb = getNode(n);
+	if ( evb == NULL )
+		return false;
+		
+	const bool isExtViewActive = !evb->IsShown();
+	
+	// prepare extern preview
+	evb->selectView(CncExternalViewBox::Default::VIEW1);
+	evb->Show(isExtViewActive);
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncExternalViewBoxCluster::hideNode(Node n) {
+//////////////////////////////////////////////////////////////////
+	CncExternalViewBox* evb = getNode(n);
+	if ( evb == NULL )
+		return false;
+	
+	return evb->Show(false);
+}
+//////////////////////////////////////////////////////////////////
+bool CncExternalViewBoxCluster::hideAll() {
+//////////////////////////////////////////////////////////////////
+	bool ret = true;
+	
+	for ( auto it = cluster.begin(); it != cluster.end(); ++it ) {
+		if ( hideNode(it->first) == false )
+			ret = false;
+	}
+	
+	return ret;
+}
+
+
+
+
+//////////////////////////////////////////////////////////////////
 CncExternalViewBox::CncExternalViewBox(wxWindow* parent, long style)
 : CncExternalViewBoxBase(parent, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(500, 300), wxSTAY_ON_TOP | style)
 , guiSensitivity(true)

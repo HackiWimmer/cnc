@@ -238,9 +238,8 @@ class OutboundCfgSelection{
 	public:
 		enum VAL {
 			SUMMARY_PANEL				= 0,
-			ADDITIONAL_PARAMETERS		= 1,
-			CNC_CONFIG_PANEL			= 2,
-			CNC_PIN_PANEL				= 3
+			CNC_CONFIG_PANEL			= 1,
+			CNC_PIN_PANEL				= 2
 		};
 };
 

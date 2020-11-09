@@ -4,12 +4,44 @@
 #include "wxCrafterSpeedMonitor.h"
 
 // -------------------------------------------------------------
+class CncValueCtrl {
+	
+	public:
+		
+		CncValueCtrl(wxWindow *ctrl) 
+		: control(ctrl)
+		{}
+		
+		virtual ~CncValueCtrl()
+		{}
+		
+		bool enable(bool state) {
+			if ( control == NULL )
+				return false;
+				
+			return control->Enable(state);
+		}
+		
+		void updateValue(const wxString& value) {
+			if ( control == NULL )
+				return;
+				
+			if		( control->IsKindOf(wxCLASSINFO(wxTextCtrl)) )		wxDynamicCast(control, wxTextCtrl)->ChangeValue(value);
+			else if ( control->IsKindOf(wxCLASSINFO(wxStaticText)) )	wxDynamicCast(control, wxStaticText)->SetLabel(value);
+		}
+		
+	private:
+		wxWindow* control;
+};
+
+
+// -------------------------------------------------------------
 class CncSpeedSliderInterface {
 	
 	protected:
 		wxSlider*		slider;
-		wxTextCtrl*		sliderValue;
-		wxStaticText*	sliderUnit;
+		CncValueCtrl*	sliderValue;
+		CncValueCtrl*	sliderUnit;
 		wxWindow*		toolTipWindow;
 		bool 			bShowvalue;
 		
@@ -17,7 +49,7 @@ class CncSpeedSliderInterface {
 		virtual void updateControls() = 0;
 		
 	public:
-		CncSpeedSliderInterface(wxSlider* slider, wxTextCtrl* label, wxStaticText* unit);
+		CncSpeedSliderInterface(wxSlider* slider, CncValueCtrl* label, CncValueCtrl* unit);
 		virtual ~CncSpeedSliderInterface();
 		
 		void enable(bool state);
@@ -53,7 +85,7 @@ class CncDefaultSpeedSlider : public wxEvtHandler, public CncSpeedSliderInterfac
 		virtual void updateControls();
 		
 	public:
-		CncDefaultSpeedSlider(wxSlider* slider, wxTextCtrl* label, wxStaticText* unit = NULL);
+		CncDefaultSpeedSlider(wxSlider* slider, CncValueCtrl* label, CncValueCtrl* unit = NULL);
 		virtual ~CncDefaultSpeedSlider();
 };
 

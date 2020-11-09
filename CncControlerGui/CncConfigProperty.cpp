@@ -5,7 +5,70 @@
 #include <wx/textentry.h>
 #include <wx/valnum.h>
 #include <wx/propgrid/propgrid.h>
-#include "CncConfigProperty.h"
+#include "CncConfigProperties.h"
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+WX_PG_IMPLEMENT_INTERNAL_EDITOR_CLASS(StaticTextCtrl, CncPGStaticTextCtrlEditor, wxPGTextCtrlEditor)
+
+CncPGStaticTextCtrlEditor::CncPGStaticTextCtrlEditor() 
+: wxPGTextCtrlEditor()
+//////////////////////////////////////////////////////////////////////////////////////////
+{
+}
+//////////////////////////////////////////////////////////////////////////////////////////
+CncPGStaticTextCtrlEditor::~CncPGStaticTextCtrlEditor() {
+//////////////////////////////////////////////////////////////////////////////////////////
+	wxPG_EDITOR(StaticTextCtrl) = NULL;
+}
+//////////////////////////////////////////////////////////////////////////////////////////
+wxPGWindowList CncPGStaticTextCtrlEditor::CreateControls(wxPropertyGrid* propGrid,
+														 wxPGProperty* property,
+														 const wxPoint& pos,
+														 const wxSize& sz ) const {
+//////////////////////////////////////////////////////////////////////////////////////////
+	wxPGWindowList wl = wxPGTextCtrlEditor::CreateControls(propGrid, property, pos, sz);
+	if ( wl.m_primary )
+		wl.m_primary->Enable(false);
+	
+	if ( wl.m_secondary )
+		wl.m_secondary->Enable(false);
+		
+	return wl;
+}
+
+
+
+
+
+
+const wxPGEditor* CncCfgStaticProperty::DoGetEditorClass() const
+{ 
+	//std::cout << "editorPointer " << editorPointer<< std::endl;
+	
+	wxPropertyGridInterface::GetEditorByName("");
+	
+	//return editorPointer;
+	return new CncPGStaticTextCtrlEditor(); 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // initialize the global pointer
 wxPGEditor* CncTextCtrlEditor::cncTextCtrlEditor = NULL;

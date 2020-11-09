@@ -16,7 +16,7 @@
 #include "CncOSDConfigList.h"
 #include "CncCommon.h"
 
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////// 
 typedef void (*PropertyEventFunc)(wxPropertyGridEvent& event);
 typedef void (*PropertyCommandFunc)(wxCommandEvent& event);
 struct PGFuncPtrStore {
@@ -28,8 +28,8 @@ struct PGFuncPtrStore {
 };
 
 typedef std::map<wxPGProperty*, PGFuncPtrStore>		ConfigPGEventMap;
+typedef std::map<const wxString, wxPGProperty*> 	ConfigCategoryMap;
 typedef std::map<const wxString, wxPGProperty*> 	ConfigPropertyMap;
-
 
 wxDECLARE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 
@@ -222,9 +222,6 @@ class CncConfig {
 		void setRenderResolution(double res);
 		void setRenderResolution(const wxString& sel);
 		
-		// curve lib gui utils
-		void setupSelectorRenderResolution();
-		
 		// user events
 		void loadConfiguration(wxConfigBase& config);
 		void saveConfiguration(wxConfigBase& config);
@@ -323,23 +320,19 @@ class CncConfig {
 		
 		const double getMeasurePlateThickness()					{ return 1.2; } //TODO
 		
-		const double getMaxSpeedX_MM_MIN();
-		const double getMaxSpeedY_MM_MIN();
-		const double getMaxSpeedZ_MM_MIN();
-		const double getMaxSpeedXY_MM_MIN();
 		const double getMaxSpeedXYZ_MM_MIN();
 		
-		const double getAccelStartSpeedX_MM_MIN();
-		const double getAccelStopSpeedX_MM_MIN();
-		const double getAccelStartSpeedY_MM_MIN();
-		const double getAccelStopSpeedY_MM_MIN();
-		const double getAccelStartSpeedZ_MM_MIN();
-		const double getAccelStopSpeedZ_MM_MIN();
-			
-		const double getMaxWorkSpeedX_MM_MIN();
-		const double getMaxWorkSpeedY_MM_MIN();
-		const double getMaxWorkSpeedZ_MM_MIN();
-
+		const double getAccelFunctParamA();
+		const double getAccelFunctParamB();
+		const double getAccelFunctParamC();
+		const double getDeaccelFunctParamA();
+		const double getDeaccelFunctParamB();
+		const double getDeaccelFunctParamC();
+		
+		const double getMaxXYPitchToKeep();
+		const double getMaxZPitchToKeep();
+		
+		const unsigned int getArtificallyStepDelay();
 		const unsigned int getStepsX();
 		const unsigned int getStepsY();
 		const unsigned int getStepsZ();
