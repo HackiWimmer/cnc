@@ -588,18 +588,14 @@ void GLContextBase::normalizeCamera() {
 /////////////////////////////////////////////////////////////////
 float GLContextBase::getMaxScaleFactor() {
 /////////////////////////////////////////////////////////////////
-	float scaleFact = viewPort->getDisplayFactor() * zoom / 0.1;
-	scaleFact *= modelScale.getMaxScaleFactor();
-	
-	return scaleFact;
+	const float scaleFact = viewPort->getDisplayFactor() * zoom / 0.1;
+	return scaleFact * modelScale.getMaxScaleFactor();
 }
 /////////////////////////////////////////////////////////////////
 float GLContextBase::getCurrentScaleFactor() {
 /////////////////////////////////////////////////////////////////
-	float scaleFact = viewPort->getDisplayFactor() * zoom / getAutoScaleFactor();
-	scaleFact *= modelScale.factX();
-	
-	return scaleFact;
+	const float scaleFact = viewPort->getDisplayFactor() * zoom / getAutoScaleFactor();
+	return scaleFact * modelScale.getScaleFactor();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::decorateProbeMode(bool state) {

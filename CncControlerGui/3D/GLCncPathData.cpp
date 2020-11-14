@@ -140,3 +140,64 @@ void GLI::GLCncPath::spoolVertiesForCurrentId() {
 			break;
 	}
 }
+////////////////////////////////////////////
+const float GLI::GLCncPath::getMinScaleFact() const {
+////////////////////////////////////////////
+	return 0.1;
+}
+////////////////////////////////////////////
+const float GLI::GLCncPath::getAutoScaleFact() const {
+////////////////////////////////////////////
+	if ( vectiesBuffer.getVertexCount() < 1 )
+		return getMinScaleFact();
+		
+	const float x = minVecties.getX(), X = maxVecties.getX();
+	const float y = minVecties.getY(), Y = maxVecties.getY();
+	const float z = minVecties.getZ(), Z = maxVecties.getZ();
+	
+	const float totalDistX = X - x;
+	const float totalDistY = Y - y;
+	const float totalDistZ = Z - z;
+	
+	// range: -2 >= ret <= 2
+	const float ret = std::max(std::max(totalDistZ, totalDistY), totalDistX);
+	
+	//                                      * 1.1 => 90%
+	return std::max(getMinScaleFact(), ret) * 1.1;
+}
+////////////////////////////////////////////
+const GLI::BoundBox& GLI::GLCncPath::getBoundBox() {
+////////////////////////////////////////////
+	static GLI::BoundBox bBox;
+	bBox.clear();
+	
+	// a bound box of 2 or less points didn't make sense
+	if ( vectiesBuffer.getVertexCount() < 3 )
+		return bBox;
+	
+	const float x = minVecties.getX(), X = maxVecties.getX();
+	const float y = minVecties.getY(), Y = maxVecties.getY();
+	const float z = minVecties.getZ(), Z = maxVecties.getZ();
+	
+	// bottom - push_back(BoundBoxLine)
+	bBox.push_back(std::make_pair(GLCncPathVertices(x,y,z), GLCncPathVertices(X,y,z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(X,y,z), GLCncPathVertices(X,y,Z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(X,y,Z), GLCncPathVertices(x,y,Z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(x,y,Z), GLCncPathVertices(x,y,z)));
+	
+	// top - push_back(BoundBoxLine)
+	bBox.push_back(std::make_pair(GLCncPathVertices(x,Y,z), GLCncPathVertices(X,Y,z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(X,Y,z), GLCncPathVertices(X,Y,Z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(X,Y,Z), GLCncPathVertices(x,Y,Z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(x,Y,Z), GLCncPathVertices(x,Y,z)));
+	
+	// perpendicular - push_back(BoundBoxLine)
+	bBox.push_back(std::make_pair(GLCncPathVertices(x,y,z), GLCncPathVertices(x,Y,z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(X,y,z), GLCncPathVertices(X,Y,z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(X,y,Z), GLCncPathVertices(X,Y,Z)));
+	bBox.push_back(std::make_pair(GLCncPathVertices(x,y,Z), GLCncPathVertices(x,Y,Z)));
+	
+	return bBox;
+}
+
+

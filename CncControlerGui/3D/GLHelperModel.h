@@ -9,69 +9,32 @@ namespace GLI {
 		public:
 			////////////////////////////////////////////
 			ModelScale()
-			: _step(0.1f), _x(1.0f), _y(1.0f), _z(1.0f)
+			: _step(0.1f), _scale(1.0f)
+			{}
+			
+			explicit ModelScale(float f)
+			: _step(0.1f), _scale(f)
+			{}
+			
+			explicit ModelScale(const ModelScale& ms)
+			: _step(ms.getStepWidth()), _scale(ms.getScaleFactor())
+			{}
+			
+			~ModelScale() 
 			{}
 			
 			////////////////////////////////////////////
-			ModelScale(float f)
-			: _step(0.1f), _x(f), _y(f), _z(f)
-			{}
-			
-			////////////////////////////////////////////
-			ModelScale(float x, float y, float z)
-			: _step(0.1f), _x(x), _y(y), _z(z)
-			{}
-			
-			////////////////////////////////////////////
-			ModelScale(const ModelScale& ms)
-			: _step(ms.getStepWidth()), _x(ms.factX()), _y(ms.factY()), _z(ms.factZ())
-			{}
-			
-			////////////////////////////////////////////
-			~ModelScale() {
-			}
-			
-			////////////////////////////////////////////
-			const float factX() const { return _x; }
-			const float factY() const { return _y; }
-			const float factZ() const { return _z; }
-			
-			////////////////////////////////////////////
-			float getMaxScaleFactor() { return 4.0; }
-			
-			// all three axis are always modified in sync!
-			void resetScale() { _x = 1.0; _y = 1.0; _z = 1.0; }
-			
-			////////////////////////////////////////////
-			// all three axis are always modified in sync!
-			void incScale() { 
-				float test = _x + _step;
-				if ( test >= getMaxScaleFactor() )
-					return;
-					
-				_x += _step; _y += _step; _z += _step; 
-			}
-			
-			////////////////////////////////////////////
-			// all three axis are always modified in sync!
-			void decScale() { 
-				float test = _x - _step;
-				if ( test <= _step )
-					return;
-				
-				_x -= _step; _y -= _step; _z -= _step; 
-			}
-			
-			////////////////////////////////////////////
-			const float getStepWidth() const { return _step; }
-			void setStepWidth(float f) {
-				if ( f >= 0.01f && f <= 10.0f )
-					_step = f;
-			}
+			const float getStepWidth()		const	{ return _step; }
+			const float getScaleFactor()	const	{ return _scale; }
+			const float getMaxScaleFactor()	const 	{ return 4.0; }
+			void resetScale()						{ _scale = 1.0; }
+			void incScale() 						{ _scale = std::min(_scale + _step, getMaxScaleFactor()); }
+			void decScale()							{ _scale = std::max(_scale - _step, _step); }
+			void setStepWidth(float f) 				{ _step = ( f >= 0.01f && f <= 10.0f  ? f : _step); } 
 			
 		private:
 			float _step;
-			float _x, _y, _z;
+			float _scale;
 	};
 	
 	////////////////////////////////////////////////////////////////
