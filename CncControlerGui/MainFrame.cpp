@@ -968,12 +968,48 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
+#include "SvgColourScheme.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	wxBell();
+	SvgColourDecoder cs;
+	auto checkStr = [&](const wxString& str) {
+		cs.setColour(str);	std::cout << str << " --> " << cs << std::endl; 
+	}; 
+	
+	auto traceCol = [&](const wxColour& col) {
+		if ( col.IsOk() )
+			std::cout << "rgb(" << (int)col.Red() << "," << (int)col.Green() << "," << (int)col.Blue() << ")" << std::endl;
+		else
+			std::cerr << "Invalid colour" << std::endl;
+	};
+	
+	if ( false ) {
+		checkStr("HackiWimmer");
+		checkStr("red");
+		checkStr("green");
+		checkStr("blue");
+		
+		checkStr("#80d380;");
+		checkStr("rgb(153,68,0);");
+		checkStr("hsl(240,100%,50%);");
+	}
+	
+	if ( true ) {
+		SvgColourAttributeDecoder cad;
+		cad.setDefaultFillColour(*wxRED);
+		
+		cad.decode("stroke:#e48080;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:round;paint-order:stroke fill markers;fill-opacity:1;stroke-opacity:1;fill:black");
+		traceCol(cad.getFillColour());
+		traceCol(cad.getStrokeColour());
+		
+		cad.reset();
+		cad.decode("stroke:#e48080;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:round;paint-order:stroke fill markers;fill-opacity:1;stroke-opacity:1");
+		traceCol(cad.getFillColour());
+		traceCol(cad.getStrokeColour());
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {

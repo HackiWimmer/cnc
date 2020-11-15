@@ -1108,6 +1108,7 @@ const bool CncConfig::getUseMainPreviewFlag()						{ PROPERTY(CncApplication_USE
 const bool CncConfig::getUseMonitorPeviewFlag()						{ PROPERTY(CncApplication_USE_MONITOR_PREVIEW) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getShowTestMenuFlag()							{ PROPERTY(CncApplication_SHOW_TEST_MENU) 					return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgConvertToRightHandFlag()				{ PROPERTY(CncSvg_Parser_REVERSE_Y_AXIS) 					return p->GetValue().GetBool(); }
+const bool CncConfig::getSvgUseColourScheme()						{ PROPERTY(CncSvg_Parser_USE_COLOUR_SCHEME) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getAvoidDupSetterValuesFlag()					{ PROPERTY(CncWork_Ctl_AVOID_DUP_SETTER_VALUES) 			return p->GetValue().GetBool(); }
 const bool CncConfig::getRequestIdleRequestFlag()					{ PROPERTY(CncWork_Ctl_REQUEST_IDLE_REQUESTS) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getInterruptByPosOutOfRangeFlag()				{ PROPERTY(CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE) 		return p->GetValue().GetBool(); }

@@ -62,10 +62,10 @@ void CncPathListManager::reset() {
 			std::cout << (*it);
 	}
 
-	isFirstPath   						= false;
-	isCorrected 						= false;
-	referencePos						= CncPathListEntry::ZeroTarget;
-	totalDistance						= 0.0;
+	isFirstPath   			= false;
+	isCorrected 			= false;
+	referencePos			= CncPathListEntry::ZeroTarget;
+	totalDistance			= 0.0;
 		
 	const bool initialize	= list.size() > 0;
 	CncPathListEntry cpe;

@@ -491,9 +491,14 @@
         <File Name="SVGPathHandlerCnc.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Utils">
+        <File Name="SvgCncContext.cpp"/>
+        <File Name="SvgCncContext.h"/>
+        <File Name="SVGUserAgentInfo.cpp"/>
+        <File Name="SVGUserAgent.cpp"/>
+        <File Name="SvgColourScheme.cpp"/>
+        <File Name="SvgColourScheme.h"/>
         <File Name="SvgViewBox.cpp"/>
         <File Name="SvgTransformMatrix.h"/>
-        <File Name="SvgCncParameters.h"/>
         <File Name="SvgEditPopup.cpp"/>
         <File Name="SvgEditPopup.h"/>
         <File Name="SVGElementConverter.cpp"/>

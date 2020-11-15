@@ -131,12 +131,12 @@ void DEBUG_CTRL::currentNodeAddToCategory(const wxString& catLabel, const wxStri
 
 ////////////////////////////////////////////////////////////////////////////
 FileParser::FileParser(const wxString& fn) 
-: fileName(fn)
-, runInfo()
-, debugControls()
-, inboundSourceControl(NULL)
-, currentLineNumber(UNDEFINED_LINE_NUMBER)
-, toolIds()
+: fileName				(fn)
+, runInfo				()
+, debugControls			()
+, inboundSourceControl	(NULL)
+, currentLineNumber		(UNDEFINED_LINE_NUMBER)
+, toolIds				()
 {
 ////////////////////////////////////////////////////////////////////////////
 	displayToolId(-1);

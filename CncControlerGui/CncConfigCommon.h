@@ -83,6 +83,7 @@
 	#define CncApplication_Tool_PY_CAM 						"CncApplication_Tools|OSD_PY_CAM"
 	
 	#define CncSvg_Parser_REVERSE_Y_AXIS					"CncSvg_Parser|CONVERT_TO_RIGHT_HAND"
+	#define CncSvg_Parser_USE_COLOUR_SCHEME					"CncSvg_Parser|USE_COLOUR_SCHEME"
 	#define CncSvg_Parser_MAX_THICKNESS_CROSS				"CncSvg_Parser|MAX_THICKNESS_PER_CROSSING"
 	
 	#define CncGCode_Parser_PLACEHOLDER						"CncGCode_Parser|CGODE_PLACEHOLDER"

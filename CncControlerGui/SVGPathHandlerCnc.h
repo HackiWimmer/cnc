@@ -5,7 +5,7 @@
 #include "SerialPort.h"
 //#include "CncToolCorrection.h"
 #include "CncUnitCalculator.h"
-#include "SvgCncParameters.h"
+#include "SvgCncContext.h"
 #include "CncPathListRunner.h"
 #include "CncCommon.h"
 
@@ -23,7 +23,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		SvgOriginalPathInfo origPathInfo;
 		bool 				initialized;
 		bool 				debugState;
-		SvgCncParameters 	currentCncParameters;
+		SvgCncContext 	currentCncParameters;
 
 		// spool path to cnc control
 		bool moveLinearZ  (double z);
@@ -65,8 +65,8 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		const char* getViewBox() 			{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
 		const SVGRootNode& getSvgRootNode()	{ return svgRootNode; }
 
-		SvgCncParameters& getSvgCncParameters();
-		void setCncWorkingParameters(SvgCncParameters& cwp);
+		SvgCncContext& getSvgCncContext();
+		void setSvgCncContext(SvgCncContext& cwp);
 		void setDebugState(bool state) { debugState = state; }
 		
 		virtual void logMeasurementStart();

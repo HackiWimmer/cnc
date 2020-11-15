@@ -300,6 +300,7 @@ class CncConfig {
 		const bool getUseMonitorPeviewFlag();
 		const bool getShowTestMenuFlag();
 		const bool getSvgConvertToRightHandFlag();
+		const bool getSvgUseColourScheme();
 		const bool getAvoidDupSetterValuesFlag();
 		const bool getRequestIdleRequestFlag();
 		const bool getInterruptByPosOutOfRangeFlag();

@@ -62,6 +62,13 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 			prop->SetHelpString(_T("Template file reload + new run required"));
 			prop->SetEditor( wxT("CheckBox") );
 			registerProperty(CncSvg_Parser_REVERSE_Y_AXIS, prop);
+			
+			//...............
+			prop = parser->AppendChild( new wxBoolProperty("Using colour scheme", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T("Colour scheme is used to define path handling, like inner- or outer- tool-path-correction."));
+			prop->SetEditor( wxT("CheckBox") );
+			registerProperty(CncSvg_Parser_USE_COLOUR_SCHEME, prop);
 		}
 		
 		//...................

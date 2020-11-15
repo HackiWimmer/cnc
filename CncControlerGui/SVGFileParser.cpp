@@ -14,19 +14,20 @@
 #include "CncConfig.h"
 #include "CncControl.h"
 #include "SVGPathHandlerCnc.h"
+#include "SvgColourScheme.h"
 #include "SVGFileParser.h"
 
 //////////////////////////////////////////////////////////////////
 SVGFileParser::SVGFileParser(const wxString& fn, CncControl* cnc) 
-: SVGNodeParser()
-, FileParser(fn)
-, cncControl(cnc)
-, pathHandler(new SVGPathHandlerCnc(cnc))
-, svgUserAgent()
-, currentNodeName()
-, debugBase(NULL)
-, debugPath(NULL)
-, debugDetail(NULL)
+: SVGNodeParser		()
+, FileParser		(fn)
+, cncControl		(cnc)
+, pathHandler		(new SVGPathHandlerCnc(cnc))
+, svgUserAgent		()
+, currentNodeName	()
+, debugBase			(NULL)
+, debugPath			(NULL)
+, debugDetail		(NULL)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
@@ -92,8 +93,11 @@ void SVGFileParser::enableUserAgentControls(bool state) {
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::setPathHandler(PathHandlerBase* ph) {
 //////////////////////////////////////////////////////////////////
-	std::cerr << "SVGFileParser::setPathHandler: Invalid call, this class didn't support this method!" << std::endl;
-	std::cerr << "Nothig will be set." << std::endl;
+	std::cerr	<< CNC_LOG_FUNCT << ": Invalid call, this class didn't support this method!" 
+				<< std::endl
+				<< "Nothig will be set." 
+				<< std::endl
+				;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) {
@@ -213,27 +217,51 @@ void SVGFileParser::debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrS
 	debugXMLAttribute(attribute->GetNext(), attrString);
 }
 //////////////////////////////////////////////////////////////////
-void SVGFileParser::initXMLNode(wxXmlNode *child) {
+void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
+	static SvgColourAttributeDecoder	cad;
+	static SvgColourDecoder				cs;
+	
 	wxXmlAttribute* attr = child->GetAttributes();
 	svgUserAgent.setNodeType(child->GetName());
 	svgUserAgent.addXMLAttributes(attr);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::registerXMLNode(wxXmlNode *child) {
-//////////////////////////////////////////////////////////////////
-	initXMLNode(child);
 	
-	if ( runInfo.getCurrentDebugState() == false )
-		return;
-
-	SvgCncParameters cwp = pathHandler->getSvgCncParameters();
-	appendDebugValueBase("Reverse Path", cwp.getCorrectionType());
+	SvgCncContext& cwp = pathHandler->getSvgCncContext();
+	cwp.setCurrentLineNumber(getCurrentLineNumber());
 	
-	wxString content;
-	wxXmlAttribute* attr = child->GetAttributes();
-	debugXMLAttribute(attr, content);
-	appendDebugValueBase("Attributes", content);
+	if ( THE_CONFIG->getSvgUseColourScheme() == true ) {
+		
+		const wxString& style = svgUserAgent.getCurrentAttribute("style", "");
+		if ( style.IsEmpty() == false ) {
+			cad.reset();
+			cad.decode(style);
+			cwp.setFillColour(cad.getFillColour());
+			cwp.setStrokeColour(cad.getStrokeColour());
+		}
+		
+		const wxString& fill = svgUserAgent.getCurrentAttribute("fill", "");
+		if ( fill.IsEmpty() == false ) {
+			cs.setColour(fill);
+			cwp.setFillColour(cs.getColour());
+		}
+		
+		const wxString& stroke = svgUserAgent.getCurrentAttribute("stroke", "");
+		if ( stroke.IsEmpty() == false ) {
+			cs.setColour(stroke);
+			cwp.setStrokeColour(cs.getColour());
+		}
+		
+		cwp.determineColourEffects();
+	}
+	
+	// ----------------------------------------------------------
+	if ( runInfo.getCurrentDebugState() == true ) {
+		appendDebugValueBase("Reverse Path", cwp.getCorrectionType());
+		
+		wxString content;
+		debugXMLAttribute(attr, content);
+		appendDebugValueBase("Attributes", content);
+	}
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::clearControls() {
@@ -269,7 +297,7 @@ bool SVGFileParser::spool() {
 			pathHandler->processWait(uai.cncPause.microseconds);
 		}
 		
-		pathHandler->setCncWorkingParameters(uai.cncParameters);
+		pathHandler->setSvgCncContext(uai.cncParameters);
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(uai.nodeName);
@@ -461,29 +489,31 @@ bool SVGFileParser::preprocess() {
 		
 	// Start processing the XML file.
 	if ( doc.GetRoot()->GetName().Upper() != "SVG") {
-		std::cerr << "SVGFileParser: Can't evaluate svg tag\n";
+		std::cerr << CNC_LOG_FUNCT << ": Can't evaluate svg tag\n";
 		return false;
 	}
 	
-	wxString w = doc.GetRoot()->GetAttribute("width");
-	wxString h = doc.GetRoot()->GetAttribute("height");
-	wxString v = doc.GetRoot()->GetAttribute("viewBox");
+	const wxString w = doc.GetRoot()->GetAttribute("width");
+	const wxString h = doc.GetRoot()->GetAttribute("height");
+	const wxString v = doc.GetRoot()->GetAttribute("viewBox");
 	
 	if ( setSVGRootNode(w, h, v) == false ) {
-		std::cerr << "SVGFileParser: setSVGRootNode() failed\n";
+		std::cerr << CNC_LOG_FUNCT << ": setSVGRootNode() failed\n";
 		return false;
 	}
 	
 	// main entry point foor evaluateing all XML nodes
 	wxXmlNode *child = doc.GetRoot()->GetChildren();
-	bool ret = processXMLNode(child);
+	const bool ret = processXMLNode(child);
 	
 	if ( ret == false ) {
-		std::cerr << "SVGFileParser: processXMLNode return false \n";
-		std::cerr << " Current line numer: " << getCurrentLineNumber() << std::endl;
-		std::cerr << " Duration counter: " << cncControl->getDurationCounter() << std::endl;
-		std::cerr << " File parsing stopped" << std::endl;
-	} else {
+		std::cerr	<< CNC_LOG_FUNCT << " will return false"						<< std::endl
+					<< " Current line numer: "	<< getCurrentLineNumber()			<< std::endl
+					<< " Duration counter: "	<< cncControl->getDurationCounter()	<< std::endl
+					<< " File parsing stopped"	<< std::endl
+					;
+	}
+	else {
 		// fill the user agent controls
 		svgUserAgent.expand();
 	}
@@ -556,48 +586,32 @@ bool SVGFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
+	
 	while ( child ) {
 		// important! the current node name has to be set before setCurrentLineNumer() 
-		// to get a correct result in this overlaoded function
+		// to get a correct result in this overloaded functions
 		currentNodeName.assign(child->GetName());
 		setCurrentLineNumber(child->GetLineNumber());
 		registerXMLNode(child);
 		
-		pathHandler->getSvgCncParameters().currentLineNumber = child->GetLineNumber();
-
-		if ( child->GetName() == SvgNodeTemplates::CncParameterBlockNodeName ) {
-			if ( evaluateCncParameters(child) == false )
+		// ----------------------------------------------------------
+		if ( currentNodeName.IsSameAs("PATH", false) ) {
+			registerNextDebugNode(currentNodeName);
+			
+			const wxString data(child->GetAttribute("d", ""));
+			if ( evaluatePath(data)  == false )
 				return false;
-				
-			registerNextDebugNode(currentNodeName);
-			svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncParameters());
-				
-		} else if (child->GetName() == SvgNodeTemplates::CncBreakBlockNodeName ) {
-			registerNextDebugNode(currentNodeName);
-			
-			SvgCncBreak scb;
-			scb.currentLineNumber = getCurrentLineNumber();
-			svgUserAgent.initNextCncBreakNode(scb);
-			
-		} else if (child->GetName() == SvgNodeTemplates::CncPauseBlockNodeName ) {
-			registerNextDebugNode(currentNodeName);
-		
-			SvgCncPause scp;
-			scp.currentLineNumber = getCurrentLineNumber();
-			double p = 0.0;
-			if ( child->GetAttribute("p", "0.0").ToDouble(&p) )
-				scp.microseconds = (int64_t)(p * 1000 * 1000);
-			
-			svgUserAgent.initNextCncPauseNode(scp);
-			
-		} else if (child->GetName().Upper() == "SYMBOL" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("SYMBOL", false) ) {
 			wxString a(child->GetAttribute("id", ""));
 			svgUserAgent.addID(a, child->GetName().c_str());
 			
 			a.assign(child->GetAttribute("transform", ""));
 			svgUserAgent.addTransform(a);
-			
-		} else if (child->GetName().Upper() == "G" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("G", false) ) {
 			wxString a(child->GetAttribute("id", ""));
 			svgUserAgent.addID(a, child->GetName().c_str());
 			
@@ -606,80 +620,115 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			
 			a.assign(child->GetAttribute("style", ""));
 			svgUserAgent.addStyle(a);
-			
-		} else if ( child->GetName().Upper() == "PATH" ) {
-			registerNextDebugNode(currentNodeName);
-			
-			wxString data(child->GetAttribute("d", ""));
-			if ( evaluatePath(data)  == false )
-				return false;
-				
-		} else if ( child->GetName().Upper() == "CIRCLE" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("CIRCLE", false) ) {
 			registerNextDebugNode(currentNodeName);
 			
 			wxString ret; 
 			if ( SVGElementConverter::convertCircleToPathData(child, ret) )
-				if  ( evaluatePath(ret) == false )
+				if ( evaluatePath(ret) == false )
 					return false;
-					
-		} else if ( child->GetName().Upper() == "ELLIPSE" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("ELLIPSE", false) ) {
 			registerNextDebugNode(currentNodeName);
 			
 			wxString ret; 
 			if ( SVGElementConverter::convertEllipseToPathData(child, ret) )
 				if ( evaluatePath(ret) == false )
 					return false;
-					
-		} else if ( child->GetName().Upper() == "LINE" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("LINE", false) ) {
 			registerNextDebugNode(currentNodeName);
-
+			
 			wxString ret; 
 			if ( SVGElementConverter::convertLineToPathData(child, ret) )
 				if ( evaluatePath(ret) == false )
 					return false;
-					
-		} else if ( child->GetName().Upper() == "POLYGON" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("POLYGON", false ) ) {
 			registerNextDebugNode(currentNodeName);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertPolygonToPathData(child, ret) )
 				if ( evaluatePath(ret) == false )
 					return false;
-					
-		} else if ( child->GetName().Upper() == "POLYLINE" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("POLYLINE", false) ) {
 			registerNextDebugNode(currentNodeName);
-
+			
 			wxString ret; 
 			if ( SVGElementConverter::convertPolylineToPathData(child, ret) )
 				if ( evaluatePath(ret) == false )
 					return false;
-					
-		} else if ( child->GetName().Upper() == "RECT" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("RECT", false) ) {
 			registerNextDebugNode(currentNodeName);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertRectToPathData(child, ret) )
 				if ( evaluatePath(ret) == false )
 					return false;
-					
-		} else if ( child->GetName().Upper() == "USE" ) {
+		}
+		// ----------------------------------------------------------
+		else if ( currentNodeName.IsSameAs("USE", false) ) {
 			registerNextDebugNode(currentNodeName);
 			
 			UseDirectiveVector& udv = svgUserAgent.getUseInfoVector();
 			UseDirective ud;
 			evaluateUse(child->GetAttributes(), ud.attributes);
 			udv.push_back(svgUserAgent.evaluateUseDirective(ud));
-			
-		} else if (child->GetName().Upper() == "CNC") {
-			cnc::cex1 << "Obsolete Node. <CNC> isn't longer supported. Line number: " << child->GetLineNumber() << std::endl;
 		}
-
+		// ----------------------------------------------------------
+		else if ( currentNodeName.StartsWith("Cnc") ) {
+			
+			// ------------------------------------------------------
+			if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) ) {
+				if ( evaluateCncParameters(child) == false )
+					return false;
+					
+				registerNextDebugNode(currentNodeName);
+				svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
+			}
+			// ------------------------------------------------------
+			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) ) {
+				registerNextDebugNode(currentNodeName);
+				
+				SvgCncBreak scb;
+				scb.currentLineNumber = getCurrentLineNumber();
+				svgUserAgent.initNextCncBreakNode(scb);
+			}
+			// ------------------------------------------------------
+			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) ) {
+				registerNextDebugNode(currentNodeName);
+			
+				SvgCncPause scp;
+				scp.currentLineNumber = getCurrentLineNumber();
+				double p = 0.0;
+				if ( child->GetAttribute("p", "0.0").ToDouble(&p) )
+					scp.microseconds = (int64_t)(p * 1000 * 1000);
+				
+				svgUserAgent.initNextCncPauseNode(scp);
+			}
+			// ------------------------------------------------------
+			else if ( currentNodeName.IsSameAs("CNC", false) ) {
+				cnc::cex1 << "Obsolete Node. <CNC> isn't longer supported. Line number: " << child->GetLineNumber() << std::endl;
+			}
+		}
+		
 		// check the debug state before the next node
 		if ( evaluateDebugState() == false )
 			return false;
 			
 		// recursion call to get the complete depth
 		wxXmlNode* last = child;
+		
+		// GetChildren() returns the first child of this node
 		if ( processXMLNode(child->GetChildren()) == false ) {
 			return false;
 		}
@@ -694,7 +743,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			if ( a.IsEmpty() == false )
 				svgUserAgent.removeLastTransform();
 			
-			// only style attributes frmom <g> are colleted before
+			// only style attributes from <g> are colleted before
 			if ( last->GetName().Upper() == "G" ) {
 				a.assign(last->GetAttribute("style", ""));
 				if ( a.IsEmpty() == false )
@@ -711,7 +760,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		if ( evaluateDebugState() == false )
 			return false;
 	}
-
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -726,13 +775,13 @@ void SVGFileParser::evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm)
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::initNextPath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
-	svgUserAgent.initNextPath(pathHandler->getSvgCncParameters(), data);
+	svgUserAgent.initNextPath(pathHandler->getSvgCncContext(), data);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	SvgCncParameters& cwp = pathHandler->getSvgCncParameters();
+	SvgCncContext& cwp = pathHandler->getSvgCncContext();
 	
 	wxString attr = child->GetAttribute("reverse", "no");
 	cwp.setReverseFlag(attr);

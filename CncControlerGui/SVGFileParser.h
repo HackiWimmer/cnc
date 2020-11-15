@@ -55,7 +55,6 @@ class SVGFileParser : public SVGNodeParser
 		
 		bool spool();
 		
-		void initXMLNode(wxXmlNode *child);
 		void registerXMLNode(wxXmlNode *child);
 		void debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrString);
 		

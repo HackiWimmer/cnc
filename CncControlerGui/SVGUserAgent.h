@@ -6,11 +6,11 @@
 #include <string>
 #include <wx/dataview.h>
 #include <wx/xml/xml.h>
-#include "SVGUserAgentInfo.h"
-#include "SvgCncParameters.h"
+#include "SvgCncContext.h"
 #include "DataControlModel.h"
 #include "CncConfig.h"
 #include "CncPosition.h"
+#include "SVGUserAgentInfo.h"
 
 struct SvgUserAgentOutputControls {
 	wxDataViewListCtrl* inboundPathList 	= NULL;
@@ -25,377 +25,58 @@ class SVGUserAgent{
 ////////////////////////////////////////////////////////////////
 
 	private:
-		wxString nodeName;
-		wxString elementId;
+		wxString					nodeName;
+		wxString					elementId;
 		
-		SVGUserAgentInfo defaultUserAgent;
-		UserAgentVector userAgent;
+		SVGUserAgentInfo			defaultUserAgent;
+		UserAgentVector				userAgent;
 		
-		DoubleStringMap collectedAttributes;
-		DoubleStringMap collectedIds;
-		TransformVector collectedTransforms;
-		StyleVector     collectedStyles;
+		DoubleStringMap				collectedAttributes;
+		DoubleStringMap				collectedIds;
+		TransformVector				collectedTransforms;
+		StyleVector					collectedStyles;
 		
-		UseDirectiveVector useInfo;
+		UseDirectiveVector			useInfo;
+		SvgUserAgentOutputControls	oCtl;
 		
-		SvgUserAgentOutputControls oCtl;
+		SVGUserAgentInfo& getCurentUserAgent();
+		SVGUserAgentInfo& getUserAgent(unsigned int pos);
 		
-		/////////////////////////////////////////////////////////
-		SVGUserAgentInfo& getCurentUserAgent() {
-			return userAgent.back();
-		}
-		
-		/////////////////////////////////////////////////////////
-		void updateCurrentUserAgent(SVGUserAgentInfo& data) {
-			userAgent.back() = data;
-		}
-		
-		/////////////////////////////////////////////////////////
-		SVGUserAgentInfo& getUserAgent(unsigned int pos) {
-			if ( pos < userAgent.size() ) {
-				return userAgent.at(pos);
-			}
-
-			std::cerr << "SVGUserAgent::getUserAgent: iinfalid index: "<< pos << std::endl;
-			return defaultUserAgent;
-		}
-		
-		/////////////////////////////////////////////////////////
-		void displayUseDirective() {
-			if ( oCtl.useDirectiveList == NULL )
-				return;
-				
-			DcmItemList rows;
-			
-			for ( UseDirectiveVector::iterator it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 ) {
-				UseDirective ud = *it1;
-				wxString data;
-				for ( DoubleStringMap::iterator it2 = ud.attributes.begin(); it2 != ud.attributes.end(); ++it2 ) {
-					data << it2->first;
-					data << "=";
-					data << it2->second;
-					data << " ";
-				}
-				DataControlModel::addKeyValueRow(rows, ud.id, data);
-			}
-			
-			for ( DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it ) {
-				oCtl.useDirectiveList->AppendItem(*it);
-			}
-		}
+		void updateCurrentUserAgent(SVGUserAgentInfo& data);
+		void displayUseDirective();
 	
 	public:
-		/////////////////////////////////////////////////////////
-		SVGUserAgent() {
-			oCtl.inboundPathList 	= NULL;
-			oCtl.useDirectiveList 	= NULL;
-			oCtl.detailInfo			= NULL;
-			
-			//preallocate space
-			userAgent.reserve(THE_CONFIG->getConstReserveCapacity());
-		}
+		SVGUserAgent();
+		virtual ~SVGUserAgent();
 		
-		/////////////////////////////////////////////////////////
-		virtual ~SVGUserAgent() {
-			userAgent.clear();
-			collectedIds.clear();
-			collectedAttributes.clear();
-			collectedStyles.clear();
-		}
+		void setOutputControls(SvgUserAgentOutputControls& oc);
+		void initalize();
+		void clearControls();
+		void evaluateTraceInfo(wxXmlNode* tr);
 		
-		/////////////////////////////////////////////////////////
-		void setOutputControls(SvgUserAgentOutputControls& oc) {
-			oCtl.inboundPathList 	= oc.inboundPathList;
-			oCtl.useDirectiveList	= oc.useDirectiveList;
-			oCtl.detailInfo			= oc.detailInfo;
-		}
+		bool initNextPath(SvgCncContext& cwp, const wxString& origPath);
+		bool initNextCncParameterNode(const SvgCncContext& cwp);
+		bool initNextCncBreakNode(const SvgCncBreak& scb);
+		bool initNextCncPauseNode(const SvgCncPause& scp);
+		bool setNodeType(const wxString& t);
+		bool addID(const wxString& id, const char* nodeName = "");
+		bool addTransform(const wxString& cmd);
+		bool addStyle(const wxString& s);
+		bool removeId(const wxString& id);
+		bool removeLastTransform();
+		bool removeLastStyle();
+		bool addXMLAttributes(wxXmlAttribute *attribute);
+		bool addPathElement(char c, unsigned int count, double values[]);
+		bool displayDetailInfo(unsigned int pos);
+		bool hasCurrentAttribute(const wxString& key);
+		bool expand();
 		
-		/////////////////////////////////////////////////////////
-		void initalize() {
-			userAgent.clear();
-			collectedIds.clear();
-			collectedAttributes.clear();
-			collectedStyles.clear();
-			
-			if ( oCtl.inboundPathList != NULL ) 
-				oCtl.inboundPathList->DeleteAllItems();
-				
-			if ( oCtl.useDirectiveList != NULL ) 
-				oCtl.useDirectiveList->DeleteAllItems();
-		}
+		UseDirectiveVector& getUseInfoVector();
+		const UserAgentVector& getList();
+		UseDirective& evaluateUseDirective(UseDirective& ud);
 		
-		/////////////////////////////////////////////////////////
-		bool initNextPath(SvgCncParameters& cwp, const wxString& origPath) {
-			SVGUserAgentInfo sua;
-			sua.lineNumber 			= cwp.currentLineNumber;
-			sua.nodeName 			= nodeName;
-			sua.elementId			= ( elementId.IsEmpty() == false ? elementId : "");
-			sua.nodeType			= SVGUserAgentInfo::NT_PATH;
-			sua.originalPath		= origPath;
-			sua.cncParameters 		= cwp;
-			
-			// move the following list
-			sua.attributes.swap(collectedAttributes);
-			
-			// copy the following lists
-			sua.ids				= collectedIds;
-			sua.transformList 	= collectedTransforms;
-			sua.styleList		= collectedStyles;
+		const wxString& getCurrentAttribute(const wxString& key, const wxString& defValue = _(""));
 		
-			userAgent.push_back(sua);
-			return true;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool initNextCncParameterNode(const SvgCncParameters& cwp) {
-			SVGUserAgentInfo sua;
-			sua.lineNumber 			= cwp.currentLineNumber;
-			sua.nodeName 			= nodeName;
-			sua.elementId			= "";
-			sua.nodeType			= SVGUserAgentInfo::NT_CNC_PARAM;
-			sua.originalPath		= "";
-			sua.cncParameters 		= cwp;
-			
-			// copy the following lists - why ????
-			sua.styleList		= collectedStyles;
-			
-			userAgent.push_back(sua);
-			return true;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool initNextCncBreakNode(const SvgCncBreak& scb) {
-			SVGUserAgentInfo sua;
-			sua.lineNumber 			= scb.currentLineNumber;
-			sua.nodeName 			= nodeName;
-			sua.elementId			= "";
-			sua.nodeType			= SVGUserAgentInfo::NT_CNC_BREAK;
-			sua.originalPath		= "";
-			sua.cncBreak			= scb;
-			
-			userAgent.push_back(sua);
-			return true;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool initNextCncPauseNode(const SvgCncPause& scp) {
-			SVGUserAgentInfo sua;
-			sua.lineNumber 			= scp.currentLineNumber;
-			sua.nodeName 			= nodeName;
-			sua.elementId			= "";
-			sua.nodeType			= SVGUserAgentInfo::NT_CNC_PAUSE;
-			sua.originalPath		= "";
-			sua.cncPause			= scp;
-			
-			userAgent.push_back(sua);
-			return true;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool setNodeType(const wxString& t) {
-			nodeName = t;
-			return true;
-		}
-
-		/////////////////////////////////////////////////////////
-		bool addID(const wxString& id, const char* nodeName = "") {
-			if ( id.IsEmpty() == false ) {
-				collectedIds[id] = nodeName;
-				return true;
-			}
-			return false;
-		}
-		/////////////////////////////////////////////////////////
-		bool addTransform(const wxString& cmd) {
-			if ( cmd.IsEmpty() == false ) {
-				collectedTransforms.push_back(cmd);
-				return true;
-			}
-			
-			return false;
-		}
-		/////////////////////////////////////////////////////////
-		bool addStyle(const wxString& s) {
-			if ( s.IsEmpty() == false ) {
-				collectedStyles.push_back(s);
-				return true;
-			}
-			return false;
-		}
-		/////////////////////////////////////////////////////////
-		bool removeId(const wxString& id) {
-			DoubleStringMap::iterator it;
-			it = collectedIds.find(id);
-			if ( it != collectedIds.end() ) {
-				collectedIds.erase(it);
-				return true;
-			}
-			return false;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool removeLastTransform() {
-			if ( collectedTransforms.size() > 0 ) {
-				collectedTransforms.pop_back();
-				return true;
-			}
-			return false;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool removeLastStyle() {
-			if ( collectedStyles.size() > 0 ) {
-				collectedStyles.pop_back();
-				return true;
-			}
-			return false;
-		}
-		/////////////////////////////////////////////////////////
-		bool addXMLAttributes(wxXmlAttribute *attribute) {
-			if ( attribute == NULL )
-				return true;
-				
-			if ( attribute->GetName() == "id" ) {
-				addID(attribute->GetValue(), "#elem");
-				elementId = attribute->GetValue();
-			}
-			
-			collectedAttributes[attribute->GetName()] = attribute->GetValue();
-			
-			// recursion call to get the compelete depth
-			return addXMLAttributes(attribute->GetNext());
-		}
-		
-		/////////////////////////////////////////////////////////
-		UseDirectiveVector& getUseInfoVector() {
-			return useInfo;
-		}
-		
-		/////////////////////////////////////////////////////////
-		const UserAgentVector& getList() {
-			return userAgent;
-		}
-		
-		/////////////////////////////////////////////////////////
-		UseDirective& evaluateUseDirective(UseDirective& ud) {
-			// search xlink:href, fill ud.id and remove xlink:href key from map
-			DoubleStringMap::iterator it;
-			it = ud.attributes.find("xlink:href");
-			
-			if ( it != ud.attributes.end() ) {
-				ud.id = it->second.substr(1);
-				ud.attributes.erase(it);
-			} 
-			
-			return ud;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool addPathElement(char c, unsigned int count, double values[]) {
-			SVGUserAgentInfo sua = getCurentUserAgent();
-			if ( sua.lineNumber > 0 ) {
-				PathInfo pi;
-				pi.cmd 		= c;
-				pi.count 	= count;
-				for (unsigned int i=0; i<count; i++ )
-					pi.values[i] = values[i];
-					
-				sua.pathInfoList.push_back(pi);
-				updateCurrentUserAgent(sua);
-				return true;
-			}
-			
-			return false;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool displayDetailInfo(unsigned int pos) {
-			if ( oCtl.detailInfo != NULL ) {
-				DcmItemList rows;
-				SVGUserAgentInfo sua = getUserAgent(pos);
-				sua.getDetails(rows);
-				
-				for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-					oCtl.detailInfo->AppendItem(*it);
-				}
-				return true;
-			}
-			return false;
-		}
-		
-		/////////////////////////////////////////////////////////
-		bool expand() {
-			displayUseDirective();
-			
-			// first fill the inbount path list
-			if ( oCtl.inboundPathList != NULL ) {
-				for ( auto it=userAgent.begin(); it != userAgent.end(); ++it) {
-					
-					DcmItemList rows;
-					wxString val(it->nodeName);
-					
-					if ( it->elementId.IsEmpty() == false ) {
-						val.append(",  id = ");
-						val.append(it->elementId);
-					}
-					
-					// append items
-					DataControlModel::addKeyCheckValueRow(rows, (int)it->lineNumber, it->shouldProceed(), val);
-					for (DcmItemList::iterator itr = rows.begin(); itr != rows.end(); ++itr)
-						oCtl.inboundPathList->AppendItem(*itr);
-				}
-				
-				// fill the detail list for the first item
-				if ( oCtl.inboundPathList->GetItemCount() > 0 ) {
-					oCtl.inboundPathList->Select(oCtl.inboundPathList->RowToItem(0));
-					if ( oCtl.detailInfo != NULL )
-						oCtl.detailInfo->DeleteAllItems();
-					displayDetailInfo(0);
-				}
-			}
-			
-			return true;
-		}
-		
-		/////////////////////////////////////////////////////////
-		void clearControls() {
-			if ( oCtl.inboundPathList != NULL )
-				oCtl.inboundPathList->DeleteAllItems();
-				
-			if ( oCtl.useDirectiveList != NULL )
-				oCtl.useDirectiveList->DeleteAllItems();
-				
-			if ( oCtl.detailInfo != NULL )
-				oCtl.detailInfo->DeleteAllItems();
-		}
-		
-		/////////////////////////////////////////////////////////
-		void evaluateTraceInfo(wxXmlNode* tr) {
-			// over all stored pathes
-			for ( UserAgentVector::iterator itUav = userAgent.begin(); itUav != userAgent.end(); ++itUav ) {
-				SVGUserAgentInfo uai  = *itUav;
-				wxXmlNode* n = new wxXmlNode();
-				n->SetName("UserAgentInfo");
-				n->SetType( wxXML_ELEMENT_NODE);
-				n->AddAttribute("type", uai.nodeName);
-				n->AddAttribute("line", wxString() << uai.lineNumber);
-				
-				tr->AddChild(n);
-			}
-			
-			for ( UseDirectiveVector::iterator it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 ) {
-				UseDirective ud = *it1;
-				wxXmlNode* n = new wxXmlNode();
-				n->SetName("UseDirective");
-				n->SetType( wxXML_ELEMENT_NODE);
-				n->AddAttribute("ID", ud.id);
-				
-				for ( DoubleStringMap::iterator it2 = ud.attributes.begin(); it2 != ud.attributes.end(); ++it2 ) {
-					n->AddAttribute(it2->first, it2->second);
-				}
-				tr->AddChild(n);
-			}
-		}
 };
 
 #endif

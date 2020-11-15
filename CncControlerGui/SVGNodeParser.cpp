@@ -6,23 +6,23 @@
 //////////////////////////////////////////////////////////////////
 SVGNodeParser::SVGNodeParser()
 : pathHandler(NULL)
-{
 //////////////////////////////////////////////////////////////////
+{
 }
 //////////////////////////////////////////////////////////////////
 SVGNodeParser::SVGNodeParser(SVGPathHandlerBase* ph)
 : pathHandler(ph)
-{
 //////////////////////////////////////////////////////////////////
+{
 }
 //////////////////////////////////////////////////////////////////
 SVGNodeParser::~SVGNodeParser() {
 //////////////////////////////////////////////////////////////////
-	if ( pathHandler != NULL )
-		delete pathHandler;
+	wxDELETE(pathHandler);
 }
 ///////////////////////////////////////////////////////////////////////
 inline int SVGNodeParser::getCommandParaCount(char c) {
+///////////////////////////////////////////////////////////////////////
 	int ret = -1;
 	
 	switch ( c ) {
@@ -46,10 +46,10 @@ inline int SVGNodeParser::getCommandParaCount(char c) {
 		case 'C': 	ret = 6; break;
 		case 'a':
 		case 'A': 	ret = 7; break;
-
+		
 		default: 	ret = -1;
 	}
- 
+	
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
@@ -66,9 +66,11 @@ bool SVGNodeParser::evaluatePath(const wxString& data) {
 			
 		if ( isalpha(data[i]) && sPos < 0 ) {
 			sPos = i;
-		} else if ( isalpha(data[i]) ) {
-			token = data.SubString(sPos, i - 1);
+		}
+		else if ( isalpha(data[i]) ) {
+			token.assign(data.SubString(sPos, i - 1));
 			token.Trim(true).Trim(false);
+			
 			if ( processPathCommand(token) == false )
 				return false;
 				
@@ -76,8 +78,9 @@ bool SVGNodeParser::evaluatePath(const wxString& data) {
 		} 
 		
 		if ( i == data.Length() - 1 ) {
-			token = data.SubString(sPos, i);
+			token.assign(data.SubString(sPos, i));
 			token.Trim(true).Trim(false);
+			
 			if ( processPathCommand(token) == false )
 				return false;
 		}
@@ -105,30 +108,42 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 		if ( i == 0 ) {
 			c = para[0].GetValue();
 			sPos++;
+			
 			if ( (parameterCount = getCommandParaCount(c) ) < 0 ) {
-				std::cerr << "Not known command: " << c << std::endl;
+				std::cerr	<< CNC_LOG_FUNCT 
+							<< "Not known command: "
+							<< c << std::endl
+							;
 				return false;
 			}
-		} else {
+		}
+		else {
 			if ( para[i] == ' ' || para[i] == ',' || para[i] == '-' || para[i] == '+' ) {
+				
 				// handle exponential presentation
 				if ( (para[i] == '-' || para[i] == '+') && ( para[i-1] == 'e' || para[i-1] == 'E') ) 
 					continue;
 				
 				if ( i != sPos ) {
-					token = para.SubString(sPos, i - 1);
+					token.assign(para.SubString(sPos, i - 1));
 					token.ToDouble(&values[valueCounter++]);
 
 					if ( valueCounter == MAX_PARAMETER_VALUES ) {
-						std::cerr << "Max parameters count reached for: " << para.c_str() << std::endl;
+						std::cerr	<< CNC_LOG_FUNCT 
+									<< ": Max parameters count reached for: " 
+									<< para.c_str() 
+									<< std::endl
+									;
 						return false;
 					}
 				}
+				
 				if ( para[i] == '-'|| para[i] == '+' )	sPos = i;
 				else									sPos = i + 1;
 				
-			} else if ( i == para.Length() - 1 ) {
-				token = para.SubString(sPos, i);
+			}
+			else if ( i == para.Length() - 1 ) {
+				token.assign(para.SubString(sPos, i));
 				token.ToDouble(&values[valueCounter++]);
 			}
 		}
@@ -140,8 +155,7 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 				c = c - 1;
 			}
 			
-			bool ret = addPathElement(c, valueCounter, values);
-			
+			const bool ret = addPathElement(c, valueCounter, values);
 			if ( ret == false )
 				return false;
 			
@@ -152,19 +166,19 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 			return false;
 	}
 	
-	bool ret = true;
-	if ( valueCounter != 0 ) {
-		std::cerr << "SVGFileParser:" << std::endl;
-		std::cerr << "Parameters count error in: " << para.c_str() << std::endl;
-		std::cerr << "Defined parameter count: " << parameterCount << "; Current value count: " << valueCounter << std::endl;
-		std::cerr << "Stored value list: " << std::endl;
-
-		for (unsigned int i=0; i<valueCounter; i++) {
+	const bool ret = (valueCounter == 0);
+	if ( ret == false ) {
+		std::cerr	<< CNC_LOG_FUNCT_A(":") 								<< std::endl
+					<< "Parameters count error in: "	<< para.c_str()		<< std::endl
+					<< "Defined parameter count: "		<< parameterCount 
+					<< "; Current value count: "		<< valueCounter		<< std::endl
+					<< "Stored value list: "								<< std::endl
+					;
+					
+		for (unsigned int i=0; i<valueCounter; i++)
 			std::cerr << "[" << i << "]=" << values[i] << "\t";
-		}	
+			
 		std::cerr << std::endl;
-		
-		ret = false;
 	}
 	
 	return ret;
@@ -173,20 +187,19 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 bool SVGNodeParser::addPathElement(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( pathHandler == NULL ) {
-		std::cerr << "SVGParser::addPathElement: Failed: Member pathHandler is NULL " << std::endl;
+		std::cerr << CNC_LOG_FUNCT << ": Failed: Member pathHandler is NULL " << std::endl;
 		return false;
 	}
 	
 	// Please note: The following command will process the current path directly, 
 	// b u t  this method is virtual and possibly overriden!
-	
 	return pathHandler->processCommand_2DXY(c, count, values);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGNodeParser::processSvgNode(const wxString& node) {
 //////////////////////////////////////////////////////////////////
 	if ( pathHandler == NULL ) {
-		std::cerr << "SVGParser::processSvgNode: Failed: Member pathHandler is NULL " << std::endl;
+		std::cerr << CNC_LOG_FUNCT << ": Failed: Member pathHandler is NULL " << std::endl;
 		return false;
 	}
 
@@ -216,7 +229,7 @@ bool SVGNodeParser::processSvgNode(const wxString& node) {
 		return ret;
 	}
 
-	std::cerr << "SVGParser::processSvgNode: Failed: "	<< std::endl;
+	std::cerr << CNC_LOG_FUNCT << ": Failed: "			<< std::endl;
 	std::cerr << SVGElementConverter::getErrorInfo() 	<< std::endl;
 	std::cerr << "Node: " << node 						<< std::endl;
 	SVGElementConverter::resetErrorInfo();
