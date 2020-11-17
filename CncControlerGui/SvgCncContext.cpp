@@ -103,7 +103,6 @@ void SvgCncContext::determineColourEffects() {
 	guidePath			= false;
 	
 	if ( THE_CONFIG->getSvgUseColourScheme() == true ) {
-		
 		// ----------------------------------------------------------
 		if ( strokeColourDecoder.matchesBlack() ) {
 			if ( fillColourDecoder.matchesWhite() ) {

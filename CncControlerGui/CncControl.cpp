@@ -74,6 +74,8 @@ CncControl::CncControl(CncPortType pt)
 ///////////////////////////////////////////////////////////////////
 CncControl::~CncControl() {
 ///////////////////////////////////////////////////////////////////
+	setterMap.clear();
+	
 	assert(serialPort);
 	
 	if ( getToolState() == TOOL_STATE_ON )
@@ -739,9 +741,7 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	if ( configuredSpeedMode != s ) {
 		configuredSpeedMode = s;
 		
-		Serial::Trigger::SpeedChange tr;
-		tr.currentSpeedMode  = configuredSpeedMode;
-		tr.currentSpeedValue = configuredFeedSpeed_MM_MIN;
+		const Serial::Trigger::SpeedChange tr(configuredSpeedMode, configuredFeedSpeed_MM_MIN);
 		processTrigger(tr);
 	}
 	
@@ -2295,7 +2295,6 @@ void CncControl::updatePreview3D() {
 		return;
 		
 	if ( THE_CONTEXT->isOnlineUpdateDrawPane() ) 
-		//THE_APP->getMotionMonitor()->Refresh();
 		THE_APP->getMotionMonitor()->update(true);
 }
 ///////////////////////////////////////////////////////////////////
@@ -2309,4 +2308,14 @@ void CncControl::sendIdleMessage() {
 	
 	getSerial()->processIdle();
 }
-
+///////////////////////////////////////////////////////////////////
+void CncControl::addGuidePath(const CncPathListManager& plm) {
+///////////////////////////////////////////////////////////////////
+	// first release the trigger
+	const Serial::Trigger::GuidePath tr(&plm);
+	processTrigger(tr);
+	
+	// do this last because appendGuidPath and follows use std::move(plm)
+	if ( THE_APP->getMotionMonitor() )
+		THE_APP->getMotionMonitor()->appendGuidPath(plm);
+}

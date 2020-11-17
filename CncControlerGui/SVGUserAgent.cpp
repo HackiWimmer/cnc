@@ -247,21 +247,35 @@ bool SVGUserAgent::addXMLAttributes(wxXmlAttribute *attribute) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::hasCurrentAttribute(const wxString& key) {
 /////////////////////////////////////////////////////////
+	// first search it at the current collection
+	const DoubleStringMap& collAttrMap = collectedAttributes;
+	if ( auto it = collAttrMap.find(key); it != collAttrMap.end() )
+		return true;
+		
 	if ( userAgent.size() > 0 ) {
+		// second try to find it here
 		const DoubleStringMap& attrMap = getCurentUserAgent().attributes;
 		if ( auto it = attrMap.find(key); it != attrMap.end() )
 			return true;
 	}
+	
 	return false;
 }
 /////////////////////////////////////////////////////////
 const wxString& SVGUserAgent::getCurrentAttribute(const wxString& key, const wxString& defValue) {
 /////////////////////////////////////////////////////////
+	// first search it at the current collection
+	const DoubleStringMap& collAttrMap = collectedAttributes;
+	if ( auto it = collAttrMap.find(key); it != collAttrMap.end() )
+		return it->second;
+		
 	if ( userAgent.size() > 0 ) {
+		// second try to find it here
 		const DoubleStringMap& attrMap = getCurentUserAgent().attributes;
 		if ( auto it = attrMap.find(key); it != attrMap.end() )
 			return it->second;
 	}
+	
 	return defValue;
 }
 /////////////////////////////////////////////////////////

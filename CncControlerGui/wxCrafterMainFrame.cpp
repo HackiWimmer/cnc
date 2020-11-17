@@ -731,6 +731,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1488->Add(flexGridSizer1490, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_staticText1498 = new wxStaticText(m_panelTplUserAgent, wxID_ANY, _("Inbound Path List:"), wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), 0);
+    m_staticText1498->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_staticText1498Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1498Font.SetWeight(wxFONTWEIGHT_BOLD);
     m_staticText1498->SetFont(m_staticText1498Font);
@@ -747,6 +748,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_dvListCtrlSvgUAInboundPathList->AppendToggleColumn(_("Considered"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_CENTER, wxDATAVIEW_COL_RESIZABLE);
     m_dvListCtrlSvgUAInboundPathList->AppendTextColumn(_("Node"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_staticText14983 = new wxStaticText(m_panelTplUserAgent, wxID_ANY, _("Use Directives:"), wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), 0);
+    m_staticText14983->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_staticText14983Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText14983Font.SetWeight(wxFONTWEIGHT_BOLD);
     m_staticText14983->SetFont(m_staticText14983Font);
@@ -770,6 +772,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1488->Add(flexGridSizer1492, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_staticText1500 = new wxStaticText(m_panelTplUserAgent, wxID_ANY, _("Detail Info:"), wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), 0);
+    m_staticText1500->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_staticText1500Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1500Font.SetWeight(wxFONTWEIGHT_BOLD);
     m_staticText1500->SetFont(m_staticText1500Font);

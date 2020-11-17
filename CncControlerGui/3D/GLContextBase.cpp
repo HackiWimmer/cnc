@@ -18,26 +18,27 @@ const wxGLCanvas* GLContextBase::currentCanvas = NULL;
 
 /////////////////////////////////////////////////////////////////
 GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name) 
-: wxGLContext(canvas)
-, associatedCanvas(canvas)
-, contextName(name)
-, enabled(true)
-, initialized(false)
-, currentMouseVertexInfo()
-, options()
-, zoom(1.0f)
-, viewMode(V2D_TOP)
-, coordOriginInfo()
-, modelType(ModelType::MT_RIGHT_HAND)
-, viewPort(NULL)
-, modelScale()
-, modelRotate()
-, cameraPos()
-, lastReshapeX(0)
-, lastReshapeY(0)
-, lastReshapeW(0)
-, lastReshapeH(0)
-, theTexture(0)
+: wxGLContext				(canvas)
+, associatedCanvas			(canvas)
+, contextName				(name)
+, enabled					(true)
+, initialized				(false)
+, guidePathes				()
+, currentMouseVertexInfo	()
+, options					()
+, zoom						(1.0f)
+, viewMode					(V2D_TOP)
+, coordOriginInfo			()
+, modelType					(ModelType::MT_RIGHT_HAND)
+, viewPort					(NULL)
+, modelScale				()
+, modelRotate				()
+, cameraPos					()
+, lastReshapeX				(0)
+, lastReshapeY				(0)
+, lastReshapeW				(0)
+, lastReshapeH				(0)
+, theTexture				(0)
 {
 /////////////////////////////////////////////////////////////////
 	// With respect to the GTK implementation SetCurrent() isn't 
@@ -53,10 +54,22 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name)
 /////////////////////////////////////////////////////////////////
 GLContextBase::~GLContextBase() {
 /////////////////////////////////////////////////////////////////
+	clearGuidePathes();
+	
 	if ( viewPort != NULL )
 		delete viewPort;
 		
 	viewPort = NULL;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::clearGuidePathes() {
+/////////////////////////////////////////////////////////////////
+	guidePathes.clear();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::addGuidePath(const GLGuidePath& gp) {
+/////////////////////////////////////////////////////////////////
+	guidePathes.push_back(std::move(gp));
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::globalInit() {

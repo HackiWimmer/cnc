@@ -11,12 +11,11 @@
 
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc) 
-: SVGPathHandlerBase()
-, CncPathListRunner(cnc)
-, cncControl(cnc)
-, initialized(false)
-, debugState(false)
-, currentCncParameters()
+: SVGPathHandlerBase	()
+, CncPathListRunner		(cnc)
+, cncControl			(cnc)
+, initialized			(false)
+, debugState			(false)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
@@ -46,11 +45,6 @@ void SVGPathHandlerCnc::initNextClientId(long id) {
 	processClientId(id);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::isInitialized() {
-//////////////////////////////////////////////////////////////////
-	return initialized;
-}
-//////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::appendDebugValueDetail(const char* key, wxVariant value) {
 //////////////////////////////////////////////////////////////////
 	if ( debugState == false )
@@ -63,16 +57,6 @@ void SVGPathHandlerCnc::appendDebugValueDetail(const char* key, wxVariant value)
 	row.push_back(wxString(key));
 	row.push_back(value.GetString());
 	fileParser->appendDebugValueDetail(row);
-}
-//////////////////////////////////////////////////////////////////
-SvgCncContext& SVGPathHandlerCnc::getSvgCncContext() {
-//////////////////////////////////////////////////////////////////
-	return currentCncParameters;
-}
-//////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::setSvgCncContext(SvgCncContext& cwp) {
-//////////////////////////////////////////////////////////////////
-	currentCncParameters = cwp;
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::setSvgRootNode(const SVGRootNode& srn) {
@@ -116,30 +100,15 @@ inline void SVGPathHandlerCnc::appendDebugValueDetail(const CncCurveLib::Paramet
 	appendDebugValueDetail("Render steps",		wxString::Format("%u", 		ps.RI.steps));
 	appendDebugValueDetail("Render increment",	wxString::Format("%.5lf", 	ps.RI.increment));
 	appendDebugValueDetail("Render resolution",	wxString::Format("%.5lf", 	ps.RI.resolution));
-	
-	/*
-	#warning
-	std::cout << std::endl;
-	std::cout << "Curve length       : "<< 	wxString::Format("%.5lf", 	ps.RI.curveLength) 	<< std::endl;
-	std::cout << "Render samples     : " <<	wxString::Format("%u", 		ps.RI.samples) 		<< std::endl;
-	std::cout << "Render steps       : " <<	wxString::Format("%u", 		ps.RI.steps) 		<< std::endl;
-	std::cout << "Render increment   : " <<	wxString::Format("%.5lf", 	ps.RI.increment)	<< std::endl;
-	std::cout << "Render resolution  : " <<	wxString::Format("%.5lf", 	ps.RI.resolution)	<< std::endl;
-	*/
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::initNextPath() {
 //////////////////////////////////////////////////////////////////
-	SvgOriginalPathInfo sopi;
-	return initNextPath(sopi);
-}
-//////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
-//////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("initNextPath");
-	origPathInfo	 	= sopi;
 	
-	PathHandlerBase::initNextPath();
+	nextPath = true;
+	if ( currentCncContext.isGuidePath() )	pathListMgr.initNextGuidePath(CncPathListManager::GuideType::HELP_PATH);
+	else									pathListMgr.initNextCncPath();
 	
 	// Z depth management
 	wxASSERT(cncControl);
@@ -147,10 +116,10 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 	cncControl->processTrigger(tr);
 	
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
-	double zDepth = -currentCncParameters.getCurrentZDepth();
+	double zDepth = -currentCncContext.getCurrentZDepth();
 	
-	if ( currentCncParameters.isCurrentZDepthAbs() == true ) {
-		zDepth = cc->getWorkpieceThickness() - currentCncParameters.getCurrentZDepth();
+	if ( currentCncContext.isCurrentZDepthAbs() == true ) {
+		zDepth = cc->getWorkpieceThickness() - currentCncContext.getCurrentZDepth();
 		
 		if ( zDepth > cc->getWorkpieceThickness() )
 			zDepth = cc->getWorkpieceThickness();
@@ -165,11 +134,11 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 	if ( cnc::dblCompare(cc->setCurrentZDepth(zDepth), zDepth) == false ) {
 		if ( cc->getWorkpieceThickness() != 0 ) {
 			std::cerr << "SVGPathHandlerCnc::initNextPath: error while setting Z depth: ";
-			std::cerr << currentCncParameters.getCurrentZDepthMode() << ( currentCncParameters.isCurrentZDepthAbs() ? zDepth : -zDepth);
+			std::cerr << currentCncContext.getCurrentZDepthMode() << ( currentCncContext.isCurrentZDepthAbs() ? zDepth : -zDepth);
 			std::cerr << ", Wpt: " << cc->getWorkpieceThickness() << std::endl;
 		} else {
-			std::clog << "Warning: ZDept operation [" << currentCncParameters.getCurrentZDepthMode();
-			std::clog << ( currentCncParameters.isCurrentZDepthAbs() ? zDepth : -zDepth);
+			std::clog << "Warning: ZDept operation [" << currentCncContext.getCurrentZDepthMode();
+			std::clog << ( currentCncContext.isCurrentZDepthAbs() ? zDepth : -zDepth);
 			std::clog << "] ignored because the current workpiece thickness is 0.0 mm" << std::endl;
 		}
 		//return false;
@@ -185,7 +154,7 @@ bool SVGPathHandlerCnc::finishCurrentPath() {
 	PathHandlerBase::finishCurrentPath();
 	
 	// reverse path
-	if ( currentCncParameters.getReverseFlag() == true ) {
+	if ( currentCncContext.getReverseFlag() == true ) {
 		if ( pathListMgr.reversePath() == false )
 			return false;
 	}
@@ -202,6 +171,7 @@ bool SVGPathHandlerCnc::runCurrentPath() {
 	cncControl->switchToolOn();
 
 	while ( cncControl->hasNextDuration() ) {
+		
 		ret = repeatCurrentPath();
 		if ( ret == false )
 			break;

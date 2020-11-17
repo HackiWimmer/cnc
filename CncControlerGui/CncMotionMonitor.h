@@ -5,10 +5,12 @@
 #include <wx/timer.h>
 
 #include "3D/CncGLCanvas.h"
-#include "CncPosition.h"
-#include "CncCommon.h"
 #include "3D/VerticeData.h"
 #include "3D/GLContextCncPathBase.h"
+#include "3D/GLContextBase.h"
+#include "CncPathListManager.h"
+#include "CncPosition.h"
+#include "CncCommon.h"
 
 wxDECLARE_EVENT(wxEVT_MOTION_MONITOR_TIMER, wxTimerEvent);
 
@@ -74,6 +76,7 @@ class CncMotionMonitor : public CncGlCanvas
 		void clear();
 		void appendVertex(const GLI::VerticeLongData& vd);
 		void appendVertex(long clientId, CncSpeedMode sm, const CncLongPosition& pos);
+		void appendGuidPath(const CncPathListManager& plm);
 		
 		void centerViewport();
 		void resetRotation();

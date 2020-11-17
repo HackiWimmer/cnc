@@ -36,6 +36,7 @@ class SerialEmulatorBinaryStreamer : public SerialEmulatorNULL
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr);
 		virtual void processTrigger(const Serial::Trigger::EndRun& tr);
 		virtual void processTrigger(const Serial::Trigger::NextPath& tr);
+		virtual void processTrigger(const Serial::Trigger::GuidePath& tr);
 };
 
 #endif

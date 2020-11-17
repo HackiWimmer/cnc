@@ -65,7 +65,7 @@ class CncPathListRunner {
 		inline bool checkDebugState();
 		
 		void traceSetup();
-
+		
 		bool onPhysicallyClientIdChange(const CncPathListEntry& curr);
 		bool onPhysicallySpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next);
 		bool onPhysicallyMoveRaw(const CncPathListEntry& curr);

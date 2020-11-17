@@ -161,6 +161,7 @@ class GLContextCncPathBase : public GLContextBase {
 		virtual void determineModel();
 		virtual void markCurrentPosition();
 		
+		void drawGuidePathes();
 		void drawHardwareBox();
 		void drawBoundBox();
 		void drawRuler();

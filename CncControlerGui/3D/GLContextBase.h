@@ -8,7 +8,7 @@
 #include "3D/GLViewPort.h"
 #include "3D/GLHelperModel.h"
 #include "3D/GLHelperCamera.h"
-
+#include "3D/GLGuidePath.h"
 #include "3D/GLInclude.h"
 
 /////////////////////////////////////////////////////////////////
@@ -29,6 +29,7 @@ struct GLContextOptions {
 	bool showHardwareBox				= true;
 	bool showRuler						= true;
 	bool showHelpLines					= true;
+	bool showGuidePathes				= true;
 	
 	bool helpLines3D_XYPlane			= true;
 	bool helpLines3D_XZPlane			= false;
@@ -77,7 +78,6 @@ struct GLContextOptions {
 	}
 };
 
-
 /////////////////////////////////////////////////////////////////
 class GLContextBase : public wxGLContext {
 	
@@ -102,7 +102,12 @@ class GLContextBase : public wxGLContext {
 							V2D_CAM_ROT_XY_ZTOP
 						};
 		
+		typedef std::vector<GLGuidePath> GuidePathes;
+		
 		// common 
+		void clearGuidePathes();
+		void addGuidePath(const GLGuidePath& gp);
+		
 		const char* getContextName() const { return contextName; }
 		virtual void keyboardHandler(unsigned char c);
 		
@@ -245,6 +250,8 @@ class GLContextBase : public wxGLContext {
 
 		bool				enabled;
 		bool 				initialized;
+		
+		GuidePathes			guidePathes;
 		
 		MouseVertexInfo		currentMouseVertexInfo;
 		GLContextOptions 	options;

@@ -7,7 +7,7 @@
 #include "CncPosition.h"
 #include "CncCommon.h"
 
-struct CncPathListEntry{
+struct CncPathListEntry {
 
 	// -----------------------------------------------------------
 	// Default
@@ -59,6 +59,6 @@ struct CncPathListEntry{
 	}
 };
 
-typedef std::vector<CncPathListEntry> CncPathList;
+typedef std::vector<CncPathListEntry>	CncPathList;
 
 #endif

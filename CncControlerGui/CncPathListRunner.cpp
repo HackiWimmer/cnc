@@ -5,6 +5,7 @@
 #include "CncConfig.h"
 #include "FileParser.h"
 #include "CncControl.h"
+#include "CncMotionMonitor.h"
 #include "CncAutoFreezer.h"
 #include "CncPreprocessor.h"
 #include "CncMoveSequence.h"
@@ -579,6 +580,12 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	if ( plm.getPathList().size() == 0 )
 		return true;
 	
+	// forward guide pathes
+	if ( plm.getPathType() == CncPathListManager::PathType::PT_GUIDE_PATH ) {
+		setup.cnc->addGuidePath(plm);
+		return true;
+	}
+	
 	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
 	wxASSERT( cpp != NULL );
 	
@@ -595,7 +602,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	// freeze to speed up performace
 	CncAutoFreezer caf(cpp);
 	
-	// Main loop over all path list manager entries
+	// Main loop over all path list manager cnc entries
 	auto beg = plm.const_begin();
 	auto end = plm.const_end();
 	for ( auto it = beg; it != end; ++it) {

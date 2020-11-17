@@ -3,9 +3,7 @@
 
 #include "SVGPathHandlerBase.h"
 #include "SerialPort.h"
-//#include "CncToolCorrection.h"
 #include "CncUnitCalculator.h"
-#include "SvgCncContext.h"
 #include "CncPathListRunner.h"
 #include "CncCommon.h"
 
@@ -19,11 +17,9 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		
 		typedef CncUnitCalculatorBase::Unit Unit;
 		
-		CncControl* 		cncControl;
-		SvgOriginalPathInfo origPathInfo;
-		bool 				initialized;
-		bool 				debugState;
-		SvgCncContext 	currentCncParameters;
+		CncControl* 			cncControl;
+		bool 					initialized;
+		bool 					debugState;
 
 		// spool path to cnc control
 		bool moveLinearZ  (double z);
@@ -42,40 +38,37 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
 		virtual void appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
 		
-		virtual bool isInitialized();
+		virtual bool isInitialized() { return initialized; }
 		
 		// z axis management
 		virtual bool isZAxisUp();
 		virtual bool isZAxisDown();
 		virtual bool physicallyMoveZAxisUp();
 		virtual bool physicallyMoveZAxisDown();
-
+		
 	public:
+		
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
-
-		virtual const char* getName() { return "SVGPathHandlerCnc"; }
-		virtual void initNextClientId(long id);
-		
-		virtual void setSvgRootNode(const SVGRootNode& srn);
+		virtual const char* getName()		{ return "SVGPathHandlerCnc"; }
 
 		Unit getUnit() 						{ return svgRootNode.getOutputUnit(); }
 		double getW() 						{ return svgRootNode.getWidth();      }
 		double getH() 						{ return svgRootNode.getHeight();     }
 		const char* getViewBox() 			{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
 		const SVGRootNode& getSvgRootNode()	{ return svgRootNode; }
-
-		SvgCncContext& getSvgCncContext();
-		void setSvgCncContext(SvgCncContext& cwp);
-		void setDebugState(bool state) { debugState = state; }
 		
+		void setDebugState(bool state)		{ debugState = state; }
+		
+		virtual void initNextClientId(long id);
+		
+		virtual void setSvgRootNode(const SVGRootNode& srn);
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();
 
 		// path handling
 		virtual void prepareWork();
 		virtual bool initNextPath();
-		virtual bool initNextPath(const SvgOriginalPathInfo& sopi);
 		virtual bool finishCurrentPath();
 		virtual bool runCurrentPath();
 		virtual void finishWork();

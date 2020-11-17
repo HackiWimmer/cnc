@@ -19,10 +19,9 @@
 
 //////////////////////////////////////////////////////////////////
 SVGFileParser::SVGFileParser(const wxString& fn, CncControl* cnc) 
-: SVGNodeParser		()
+: SVGParserBase		(new SVGPathHandlerCnc(cnc))
 , FileParser		(fn)
 , cncControl		(cnc)
-, pathHandler		(new SVGPathHandlerCnc(cnc))
 , svgUserAgent		()
 , currentNodeName	()
 , debugBase			(NULL)
@@ -36,7 +35,6 @@ SVGFileParser::SVGFileParser(const wxString& fn, CncControl* cnc)
 //////////////////////////////////////////////////////////////////
 SVGFileParser::~SVGFileParser() {
 //////////////////////////////////////////////////////////////////
-	delete pathHandler;
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::logMeasurementStart() {
@@ -200,7 +198,7 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::broadcastDebugState(bool state) {
 //////////////////////////////////////////////////////////////////
-	pathHandler->setDebugState(state);
+	getPathHandler()->setDebugState(state);
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrString) {
@@ -273,7 +271,7 @@ void SVGFileParser::clearControls() {
 void SVGFileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
 //////////////////////////////////////////////////////////////////
 	FileParser::initNextRunPhase(p);
-	pathHandler->setDebugState(runInfo.getCurrentDebugState());
+	getPathHandler()->setDebugState(runInfo.getCurrentDebugState());
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::spool() {
@@ -445,12 +443,7 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	if ( uai.shouldProceed() == false )
 		return true;
 		
-	static SvgOriginalPathInfo sopi;
-	sopi.pathData.assign(uai.originalPath);
-	sopi.transformInfo.assign(uai.getTransformInfoAsString());
-	sopi.useTransformInfo.assign(transform);
-	
-	if ( pathHandler->initNextPath(sopi) == false )
+	if ( pathHandler->initNextPath() == false )
 		return false;
 	
 	initNextClientId(uai.lineNumber);
@@ -526,7 +519,7 @@ bool SVGFileParser::postprocess() {
 	if ( cncControl == NULL )
 		return true;
 	
-	const SVGRootNode& rn 	= pathHandler->getSvgRootNode();
+	const SVGRootNode& rn = getPathHandler()->getSvgRootNode();
 	CncUnitCalculator<float> to_mm(rn.getOutputUnit(), Unit::mm);
 	
 	const CncDoublePosition min(cncControl->getMinPositionsMetric());

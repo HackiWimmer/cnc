@@ -4091,8 +4091,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
 		}
 		
-		Serial::Trigger::EndRun endRun;
-		endRun.succcess = ret;
+		const Serial::Trigger::EndRun endRun(ret);
 		cnc->processTrigger(endRun);
 
 		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
@@ -4117,13 +4116,15 @@ bool MainFrame::processTemplateIntern() {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
 
-	Serial::Trigger::BeginRun begRun;
-		begRun.parameter.SRC.fileName		= getCurrentTemplatePathFileName();
-		begRun.parameter.SRC.fileType		= getCurrentTemplateFormatName();
-		begRun.parameter.SET.hardwareResX 	= THE_CONFIG->getDisplayFactX();
-		begRun.parameter.SET.hardwareResY 	= THE_CONFIG->getDisplayFactY();
-		begRun.parameter.SET.hardwareResZ 	= THE_CONFIG->getDisplayFactZ();
-		begRun.parameter.PRC.user			= "Hacki Wimmer";
+	CncBinaryTemplateStreamer::ParameterSet ps;
+	ps.SRC.fileName		= getCurrentTemplatePathFileName();
+	ps.SRC.fileType		= getCurrentTemplateFormatName();
+	ps.SET.hardwareResX	= THE_CONFIG->getDisplayFactX();
+	ps.SET.hardwareResY	= THE_CONFIG->getDisplayFactY();
+	ps.SET.hardwareResZ	= THE_CONFIG->getDisplayFactZ();
+	ps.PRC.user			= "Hacki Wimmer";
+
+	const Serial::Trigger::BeginRun begRun(ps);
 	cnc->processTrigger(begRun);
 	
 	clearPositionSpy();
@@ -7068,14 +7069,14 @@ void MainFrame::saveOutboundAsNewTplFromMenu(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxString outboundFile(cnc->getPortName());
+	const wxString outboundFile(cnc->getPortName());
 	
 	if ( wxFile::Exists(outboundFile) == false ) {
 		std::cerr << "MainFrame::saveOutboundAsNewTemplate: Can't found '" << outboundFile << "'" << std::endl;
 		return;
 	}
 	
-	wxString headline("Save Outbound as new Template");
+	const wxString headline("Save Outbound as new Template");
 	wxString inboundFile(getCurrentTemplatePathFileName());
 	inboundFile.append(".");
 	inboundFile.append(outboundEditor->getExtention());
@@ -7098,7 +7099,7 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 		newFile.assign(saveFileDialog.GetPath());
 		if ( wxFile::Exists(newFile) == true ) {
 			
-			wxString msg(wxString::Format("Template '%s'\nalready exists. Overide it?", newFile));
+			const wxString msg(wxString::Format("Template '%s'\nalready exists. Overide it?", newFile));
 			wxMessageDialog dlg(this, msg, headline, wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
 			
 			if ( dlg.ShowModal() == wxID_YES ) 
@@ -7118,12 +7119,12 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 		return;
 	}
 	
-	wxString msg("Should the new template opened directly into the editor?");
+	const wxString msg("Should the new template opened directly into the editor?");
 	wxMessageDialog dlg(this, msg, headline, wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
 
 	if ( dlg.ShowModal() == wxID_YES ) {
 		
-		wxFileName tpl(newFile);
+		const wxFileName tpl(newFile);
 		m_inputFileName->SetValue(tpl.GetFullName());
 		m_inputFileName->SetHint(tpl.GetFullPath());
 		

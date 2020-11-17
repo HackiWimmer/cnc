@@ -8244,7 +8244,7 @@
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Fg Colour:",
-                                                 "colour": "<Default>"
+                                                 "colour": "ButtonHighlight"
                                                 }, {
                                                  "type": "font",
                                                  "m_label": "Font:",
@@ -8519,7 +8519,7 @@
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Fg Colour:",
-                                                 "colour": "<Default>"
+                                                 "colour": "ButtonHighlight"
                                                 }, {
                                                  "type": "font",
                                                  "m_label": "Font:",
@@ -8799,7 +8799,7 @@
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Fg Colour:",
-                                                 "colour": "<Default>"
+                                                 "colour": "ButtonHighlight"
                                                 }, {
                                                  "type": "font",
                                                  "m_label": "Font:",

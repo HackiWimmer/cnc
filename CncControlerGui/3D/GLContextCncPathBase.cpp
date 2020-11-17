@@ -278,7 +278,7 @@ void GLContextCncPathBase::determineModel() {
 		return;
 	}
 	
-	
+	drawGuidePathes();
 	drawRuler();
 	
 	switch ( drawType ) {
@@ -288,6 +288,65 @@ void GLContextCncPathBase::determineModel() {
 	
 	drawBoundBox();
 	drawHardwareBox();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawGuidePathes() {
+/////////////////////////////////////////////////////////////////
+	if ( options.showGuidePathes == false )
+		return; 
+	
+	for ( auto it = guidePathes.begin(); it != guidePathes.end(); ++it ) {
+		const GLGuidePath& gp = *it;
+		
+		if ( gp.size() > 0 ) {
+			
+			glMatrixMode(GL_MODELVIEW);
+			
+			bool stripple = false;
+			switch ( gp.getStyle() ) {
+				case wxPENSTYLE_DOT:
+				{
+					glLineStipple(1, 0xAAAA);
+					glEnable(GL_LINE_STIPPLE);
+					stripple = true;
+					break;
+				}
+				case wxPENSTYLE_SHORT_DASH :
+				{
+					glLineStipple(2, 0xAAAA);
+					glEnable(GL_LINE_STIPPLE);
+					stripple = true;
+					break;
+				}
+				case wxPENSTYLE_LONG_DASH  :
+				{
+					glLineStipple(4, 0xAAAA);
+					glEnable(GL_LINE_STIPPLE);
+					stripple = true;
+					break;
+				}
+				default:
+				{
+					stripple = false;
+					break;
+				}
+			}
+			
+			glColor4ub(gp.getColour().Red(), gp.getColour().Green(), gp.getColour().Blue(), 255);
+			
+			glBegin(GL_LINE_LOOP);
+				
+				for ( auto itGp = gp.begin(); itGp != gp.end(); ++itGp ) {
+					const CncDoublePosition& p1 = *itGp;
+					glVertex3f(p1.getX(), p1.getY(), p1.getZ());
+				}
+				
+			glEnd();
+			
+			if ( stripple == true )
+				glDisable(GL_LINE_STIPPLE);
+		}
+	}
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawHardwareBox() {

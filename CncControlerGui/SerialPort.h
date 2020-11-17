@@ -22,6 +22,7 @@ typedef std::vector<int32_t> 							GetterValues;
 typedef std::map<unsigned char, GetterValues> 			GetterListValues;
 
 class CncControl;
+class CncPathListManager;
 
 //------------------------------------------------------------
 class SerialCommandLocker {
@@ -204,31 +205,48 @@ struct SvgOutputParameters  {
 	bool 				onlyFirstCrossing 	= true;
 };
 
-struct SvgOriginalPathInfo {
-	wxString pathData					= "";
-	wxString transformInfo				= "";
-	wxString useTransformInfo			= "";
-};
-
 class Serial : public SerialOSD {
 	public:
 		
 		struct Trigger {
 			struct BeginRun {
-				CncBinaryTemplateStreamer::ParameterSet parameter;
+				const CncBinaryTemplateStreamer::ParameterSet parameter;
+				
+				BeginRun(const CncBinaryTemplateStreamer::ParameterSet& ps)
+				: parameter(ps)
+				{}
 			};
 			
 			struct EndRun {
-				bool succcess = false;
+				const bool succcess = false;
+				
+				explicit EndRun(bool s)
+				: succcess(s)
+				{}
 			};
 			
 			struct NextPath {
-				
+				NextPath()
+				{}
 			};
 			
 			struct SpeedChange {
-				CncSpeedMode 		currentSpeedMode  = CncSpeedUserDefined;
-				double				currentSpeedValue = 0.0;
+				const CncSpeedMode	currentSpeedMode;
+				const double		currentSpeedValue;
+				
+				SpeedChange(CncSpeedMode sm = CncSpeedUserDefined, double sv = 0.0)
+				: currentSpeedMode (sm)
+				, currentSpeedValue(sv)
+				{}
+				
+			};
+			
+			struct GuidePath {
+				const CncPathListManager* plm;
+				
+				GuidePath(const CncPathListManager* m)
+				: plm(m)
+				{}
 			};
 		};
 		
@@ -454,6 +472,7 @@ class Serial : public SerialOSD {
 		virtual void processTrigger(const Serial::Trigger::EndRun& tr)		{}
 		virtual void processTrigger(const Serial::Trigger::NextPath& tr)	{}
 		virtual void processTrigger(const Serial::Trigger::SpeedChange& tr)	{}
+		virtual void processTrigger(const Serial::Trigger::GuidePath& tr)	{}
 		
 		size_t getTotalDistanceStepsX() { return totalDistanceSteps[0]; }
 		size_t getTotalDistanceStepsY() { return totalDistanceSteps[1]; }

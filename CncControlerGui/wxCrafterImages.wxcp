@@ -2464,49 +2464,11 @@
      "m_properties": [{
        "type": "string",
        "m_label": "Name:",
-       "m_value": "BMP_RUN"
-      }, {
-       "type": "filePicker",
-       "m_label": "Bitmap File:",
-       "m_path": "bitmaps/secureRun.png"
-      }],
-     "m_events": [],
-     "m_children": []
-    }, {
-     "m_type": 4482,
-     "proportion": 0,
-     "border": 5,
-     "gbSpan": "1,1",
-     "gbPosition": "0,0",
-     "m_styles": [],
-     "m_sizerFlags": [],
-     "m_properties": [{
-       "type": "string",
-       "m_label": "Name:",
-       "m_value": "BMP_PAUSE"
-      }, {
-       "type": "filePicker",
-       "m_label": "Bitmap File:",
-       "m_path": "bitmaps/secureRunPause.png"
-      }],
-     "m_events": [],
-     "m_children": []
-    }, {
-     "m_type": 4482,
-     "proportion": 0,
-     "border": 5,
-     "gbSpan": "1,1",
-     "gbPosition": "0,0",
-     "m_styles": [],
-     "m_sizerFlags": [],
-     "m_properties": [{
-       "type": "string",
-       "m_label": "Name:",
        "m_value": "BMP_SECURE_DLG_YES"
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/window-new-2.png"
+       "m_path": "bitmaps/RunCtrl/iconmonstr-lock-10-16.png"
       }],
      "m_events": [],
      "m_children": []

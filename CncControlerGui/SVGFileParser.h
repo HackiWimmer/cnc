@@ -4,7 +4,7 @@
 #include <iostream>
 #include "CncControl.h"
 #include "FileParser.h"
-#include "SVGNodeParser.h"
+#include "SVGParserBase.h"
 #include "SVGPathHandlerCnc.h" 
 #include "SvgTransformMatrix.h"
 #include "SVGUserAgent.h"
@@ -18,14 +18,12 @@ class wxMenuItem;
 
 typedef CncUnitCalculatorBase::Unit Unit;
 
-/////////////////////////////////////////////////////////////////////////////
-class SVGFileParser : public SVGNodeParser
+class SVGFileParser : public SVGParserBase
                     , public FileParser 
 {
 	protected:
-	
+		
 		CncControl* 		cncControl;
-		SVGPathHandlerCnc* 	pathHandler;
 		SVGUserAgent 		svgUserAgent;
 		
 		wxString 			currentNodeName;
@@ -71,7 +69,14 @@ class SVGFileParser : public SVGNodeParser
 		virtual ~SVGFileParser();
 		
 		virtual void setPathHandler(PathHandlerBase* ph);
-		SVGPathHandlerCnc* getPathHandler() { return pathHandler; }
+		
+		
+		SVGPathHandlerCnc* getPathHandler() {
+			
+			SVGPathHandlerCnc* ret = static_cast<SVGPathHandlerCnc*>(pathHandler);
+			wxASSERT( ret );
+			return ret;
+		}
 		
 		virtual void broadcastDebugState(bool state);
 		virtual void clearControls();

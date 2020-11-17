@@ -343,4 +343,9 @@ void SerialEmulatorTextStreamer::finalizeFile(const Serial::Trigger::EndRun& tr)
 	
 	footerStream << "<File/>\n";
 }
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::GuidePath& tr) {
+///////////////////////////////////////////////////////////////////
+	#warning processTrigger(const Serial::Trigger::GuidePath& tr) impl. missing 
+}
 

@@ -14,6 +14,7 @@
 #include <wx/pen.h>
 #include "CommandTemplates.h"
 #include "CncToolStateControl.h"
+#include "CncPathListManager.h"
 #include "CncCommon.h"
 #include "PenHandler.h"
 #include "CncConfig.h"
@@ -414,7 +415,10 @@ class CncControl {
 		void processTrigger(const Serial::Trigger::EndRun& tr)			{ getSerial()->processTrigger(tr); }
 		void processTrigger(const Serial::Trigger::NextPath& tr)		{ getSerial()->processTrigger(tr); }
 		void processTrigger(const Serial::Trigger::SpeedChange& tr)		{ getSerial()->processTrigger(tr); }
-
+		void processTrigger(const Serial::Trigger::GuidePath& tr)		{ getSerial()->processTrigger(tr); }
+		
+		void addGuidePath(const CncPathListManager& plm);
+		
 		// 3D control
 		void updatePreview3D();
 		

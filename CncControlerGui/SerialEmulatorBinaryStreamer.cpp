@@ -85,4 +85,8 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::NextPat
 ///////////////////////////////////////////////////////////////////
 	//std::clog << "SerialEmulatorStreamer::processTrigger(TrNextPath)" << std::endl;
 }
-
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::GuidePath& tr) {
+///////////////////////////////////////////////////////////////////
+	#warning processTrigger(const Serial::Trigger::GuidePath& tr) impl. missing 
+}

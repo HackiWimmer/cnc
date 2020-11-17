@@ -80,6 +80,9 @@
 
 	CncReferencePosition* APP_PROXY::getRefPositionDlg()
 	{ return THE_APP->refPositionDlg; }
+	
+	CncMotionMonitor* APP_PROXY::getMotionMonitor()
+	{ return THE_APP->getMotionMonitor(); }
 
 	wxBitmapButton* APP_PROXY::GetBtSelectReferences()
 	{ return THE_APP->GetBtSelectReferences(); }

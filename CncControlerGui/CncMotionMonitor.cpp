@@ -131,6 +131,8 @@ void CncMotionMonitor::decorateProbeMode(bool state) {
 void CncMotionMonitor::clear() {
 //////////////////////////////////////////////////
 	monitor->clearPathData();
+	monitor->clearGuidePathes();
+	
 	onPaint();
 }
 //////////////////////////////////////////////////
@@ -197,14 +199,15 @@ void CncMotionMonitor::reconstruct() {
 void CncMotionMonitor::setCurrentClientId(long id) {
 ////////////////////////////////////////////////// 
 	currentClientID = id; 
-	if ( IsShownOnScreen() == true ) {
+	
+	if ( IsShownOnScreen() == true )
 		monitor->setCurrentClientId(id); 
-	}
-	/*
-	else {
-		monitor->setVirtualEndToLast();
-	}
-	*/
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::appendGuidPath(const CncPathListManager& plm) {
+//////////////////////////////////////////////////
+	GLGuidePath gp(plm);
+	monitor->addGuidePath(gp);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::appendVertex(const GLI::VerticeLongData& vd) {

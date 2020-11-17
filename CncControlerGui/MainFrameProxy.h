@@ -23,6 +23,7 @@
 
 class CncPreprocessor;
 class CncReferencePosition;
+class CncMotionMonitor;
 class CncControl;
 class SerialThread;
 class SerialThreadStub;
@@ -108,6 +109,7 @@ class MainFrameProxy {
 		static CncControl* 				getCncControl();
 		static CncPreprocessor* 		getCncPreProcessor();
 		static CncReferencePosition*	getRefPositionDlg();
+		static CncMotionMonitor*		getMotionMonitor();
 
 	private:
 		MainFrameProxy() {}

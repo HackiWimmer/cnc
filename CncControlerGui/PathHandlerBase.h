@@ -129,7 +129,6 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		virtual void initNextClientId(long id) {}
 		
 		void setFileParser(FileParser* fp) { fileParser = fp; }
-		void setPathList(const CncPathListManager& newPathList);
 		void initCurrentPos(const CncDoublePosition& pos);
 		
 		unsigned int getDataPointCount() const { return pathListMgr.getPathListSize(); }

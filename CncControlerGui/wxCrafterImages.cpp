@@ -1981,32 +1981,6 @@ ImageLibSecureRun::ImageLibSecureRun()
     {
         wxBitmap bmp;
         wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_RUN"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_RUN"), bmp));
-        }
-    }
-    
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PAUSE"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_PAUSE"), bmp));
-        }
-    }
-    
-    {
-        wxBitmap bmp;
-        wxIcon icn;
         bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SECURE_DLG_YES"));
         if(bmp.IsOk()) {
             if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){

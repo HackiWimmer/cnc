@@ -97,6 +97,7 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		virtual void processTrigger(const Serial::Trigger::EndRun&   tr);
 		virtual void processTrigger(const Serial::Trigger::NextPath& tr);
 		virtual void processTrigger(const Serial::Trigger::SpeedChange& tr);
+		virtual void processTrigger(const Serial::Trigger::GuidePath& tr);
 };
 
 #endif

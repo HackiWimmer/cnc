@@ -2,8 +2,23 @@
 #include "CncPathListManager.h"
 
 //////////////////////////////////////////////////////////////
+#define ASSERT_CHECK_PLML_SIZE_NOT_NULL \
+	if ( getPathList().size() == 0 ) { \
+		std::cerr	<< CNC_LOG_FUNCT \
+					<< ": Cant be the first entry. Use initNext[Cnc|Guide]Path() before!" \
+					<< " Nothing will be added!" \
+					<< std::endl; \
+		return defaultEntry; \
+	}
+ 
+//////////////////////////////////////////////////////////////
 CncPathListManager::CncPathListManager()
-: list				()
+: pathList			()
+, guideList			()
+, pathType			(PT_CNC_PATH)
+, guideType 		(NO_GUIDE_PATH)
+, defaultEntry		()
+, lastCncEntry		(NULL)
 , isFirstPath		(false)
 , isCorrected		(false)
 , referencePos		()
@@ -16,116 +31,87 @@ CncPathListManager::CncPathListManager()
 , totalDistance		(0.0)
 //////////////////////////////////////////////////////////////////
 {
-	//preallocate memory
-	list.reserve(THE_CONFIG->getConstReserveCapacity());
-	reset();
+	// reservate memory
+	pathList .reserve(THE_CONFIG->getConstReserveCapacity());
+	guideList.reserve(THE_CONFIG->getConstReserveCapacity());
+	
+	// create initial entry
+	initNextPath();
 }
 //////////////////////////////////////////////////////////////////
 CncPathListManager::~CncPathListManager() {
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
-std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {
+const char* CncPathListManager::getPathTypeAsStr() const {
 //////////////////////////////////////////////////////////////////
-	const CncDoublePosition& rp = getReferencePos();
-	const CncDoublePosition& sp = getStartPos();
-	
-	ostr << "CncPathListInfo entries : " << list.size() 												<< std::endl;
-	ostr << " Is corrected           : " << isPathCorrected() 											<< std::endl;
-	ostr << " Is first Path          : " << getFirstPathFlag() 											<< std::endl;
-	ostr << " Total Distance         : " << cnc::dblFormat1(getTotalDistance()) 						<< std::endl;
-	ostr << " Min Pos (x, y, z)      : " << cnc::dblFormat3(getMinPosX(), getMinPosY(), getMinPosZ())	<< std::endl;
-	ostr << " Max Pos (x, y, z)      : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ())	<< std::endl;
-	ostr << " Reference Pos          : " << cnc::dblFormat3(rp.getX(),    rp.getY(),    rp.getZ())		<< std::endl;
-	ostr << " Start Pos              : " << cnc::dblFormat3(sp.getX(),    sp.getY(),    sp.getZ())		<< std::endl;
-	ostr << " Entries                : " << std::endl;
-	
-	for ( auto it=getPathList().begin(); it!=getPathList().end(); ++it )
-		it->traceEntry(ostr);
-	
-	return ostr;
-}
-//////////////////////////////////////////////////////////////////
-void CncPathListManager::clear() {
-//////////////////////////////////////////////////////////////////
-	resetMinMax();
-	list.clear();
-	
-	reset();
-}
-//////////////////////////////////////////////////////////////////
-void CncPathListManager::reset() {
-//////////////////////////////////////////////////////////////////
-	if ( false ) {
-		std::cout << "CncPathListManager::reset() size = " << list.size() << std::endl;
-		for ( auto it = list.begin(); it != list.end(); ++it)
-			std::cout << (*it);
+	switch ( pathType ) {
+		case PT_CNC_PATH: 		return "CNC Path";
+		case PT_GUIDE_PATH: 	return "GUIDE Path";
 	}
-
+	
+	return wxString::Format("%s: ?????", CNC_LOG_FUNCT);
+}
+//////////////////////////////////////////////////////////////////
+CncPathList& CncPathListManager::getPathListIntern() {
+//////////////////////////////////////////////////////////////////
+	return pathType == PT_CNC_PATH ? pathList : guideList;
+}
+//////////////////////////////////////////////////////////////////
+const CncPathList& CncPathListManager::getPathList() const {
+//////////////////////////////////////////////////////////////////
+	return pathType == PT_CNC_PATH ? pathList : guideList;
+}
+//////////////////////////////////////////////////////////////////
+unsigned int CncPathListManager::getPathListSize() const {
+//////////////////////////////////////////////////////////////////
+	return pathType == PT_CNC_PATH ? pathList.size() : guideList.size();
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::initNextGuidePath(GuideType gt) {
+//////////////////////////////////////////////////////////////////
+	pathType  = PT_GUIDE_PATH;
+	guideType = gt == NO_GUIDE_PATH ? HELP_PATH : gt;
+	initNextPath();
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::initNextCncPath() {
+//////////////////////////////////////////////////////////////////
+	pathType  = PT_CNC_PATH;
+	guideType = NO_GUIDE_PATH;
+	initNextPath();
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::initNextPath() {
+//////////////////////////////////////////////////////////////////
 	isFirstPath   			= false;
 	isCorrected 			= false;
 	referencePos			= CncPathListEntry::ZeroTarget;
 	totalDistance			= 0.0;
-		
-	const bool initialize	= list.size() > 0;
+	
+	const bool b = pathType == PT_CNC_PATH && lastCncEntry != NULL;
+
 	CncPathListEntry cpe;
 	cpe.type				= CncPathListEntry::CHG_NOTHING;
-	cpe.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 	cpe.entryDistance		= CncPathListEntry::NoDistance;
+	cpe.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 	
-	cpe.clientId			= initialize == true ? last()->clientId         : CncPathListEntry::DefaultClientID;
-	cpe.feedSpeedMode		= initialize == true ? last()->feedSpeedMode    : CncPathListEntry::DefaultSpeedMode;
-	cpe.feedSpeed_MM_MIN	= initialize == true ? last()->feedSpeed_MM_MIN : CncPathListEntry::DefaultSpeedValue;
-	cpe.entryTarget			= initialize == true ? last()->entryTarget      : CncPathListEntry::ZeroTarget;
+	cpe.clientId			= b ? lastCncEntry->clientId         : CncPathListEntry::DefaultClientID;
+	cpe.feedSpeedMode		= b ? lastCncEntry->feedSpeedMode    : CncPathListEntry::DefaultSpeedMode;
+	cpe.feedSpeed_MM_MIN	= b ? lastCncEntry->feedSpeed_MM_MIN : CncPathListEntry::DefaultSpeedValue;
+	cpe.entryTarget			= b ? lastCncEntry->entryTarget      : CncPathListEntry::ZeroTarget;
 	
-	resetMinMax();
-	list.clear();
-
+	clear();
 	appendEntry(cpe);
-}
-//////////////////////////////////////////////////////////////////
-void CncPathListManager::resetMinMax() {
-//////////////////////////////////////////////////////////////////
-	minPosX			= DBL_MAX;
-	minPosY			= DBL_MAX;
-	minPosZ			= DBL_MAX;
-
-	maxPosX			= DBL_MIN;
-	maxPosY			= DBL_MIN;
-	maxPosZ			= DBL_MIN;
-}
-//////////////////////////////////////////////////////////////////
-const CncDoublePosition& CncPathListManager::getStartPos() const {
-//////////////////////////////////////////////////////////////////
-	static CncDoublePosition p(0.0, 0.0, 0.0);
-	if ( list.size() > 0 )
-		return const_begin()->entryTarget;
-	
-	return p; 
-}
-//////////////////////////////////////////////////////////////////
-bool CncPathListManager::isPathClosed() const {
-//////////////////////////////////////////////////////////////////
-	if ( getPathListSize() > 0 ) {
-		const CncPathList::const_iterator itFirst = const_begin();
-		const CncPathList::const_iterator itLast  = const_end() - 1;
-		
-		return ( cnc::dblCompare((*itFirst).entryTarget.getX(), (*itLast).entryTarget.getX()) &&
-				 cnc::dblCompare((*itFirst).entryTarget.getY(), (*itLast).entryTarget.getY()) &&
-				 cnc::dblCompare((*itFirst).entryTarget.getZ(), (*itLast).entryTarget.getZ())
-			   ); 
-	}
-	
-	return false;
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 	// additionally calculate length and distance
-	if ( list.size() > 0 ) {
+	if ( pathList.size() > 0 ) {
 		totalDistance += sqrt(  pow(cpe.entryDistance.getX(), 2)
-				              + pow(cpe.entryDistance.getY(), 2)
-						      + pow(cpe.entryDistance.getZ(), 2)
+							  + pow(cpe.entryDistance.getY(), 2)
+							  + pow(cpe.entryDistance.getZ(), 2)
 						 );
 
 		cpe.totalDistance = totalDistance;
@@ -140,153 +126,195 @@ void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 	maxPosY = std::max(maxPosY, cpe.entryTarget.getY());
 	maxPosZ = std::max(maxPosZ, cpe.entryTarget.getZ());
 	
+	// determine index
+	cpe.listIndex = (long)getPathList().size();
+	
 	// store
-	cpe.listIndex = (long)list.size();
-	list.push_back(cpe);
+	switch ( pathType ) {
+		case PT_CNC_PATH: 		pathList.push_back(cpe);
+								lastCncEntry = &pathList.back();
+								break;
+								
+		case PT_GUIDE_PATH: 	guideList.push_back(cpe); 
+								break;
+	}
 }
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryAdm(long clientId) {
 //////////////////////////////////////////////////////////////////
+	ASSERT_CHECK_PLML_SIZE_NOT_NULL // will return the defaultEntry on failure
+
 	CncPathListEntry cpe;
+	CncPathListEntry& prevEntry	= getPathListIntern().back();
 
 	cpe.type					= CncPathListEntry::CHG_CLIENTID;
-	cpe.clientId				= clientId;
 	cpe.entryDistance			= CncPathListEntry::NoDistance;
-
-	// calculate
-	if ( list.size() == 0 ) {
-		cpe.pathListReference	= CncPathListEntry::NoReference;
-
-		cpe.alreadyRendered		= CncPathListEntry::DefaultAlreadyRendered;
-		cpe.entryTarget			= CncPathListEntry::ZeroTarget;
-
-		cpe.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
-		cpe.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
-	}
-	else {
-		cpe.pathListReference	= list.back().pathListReference;
-
-		cpe.alreadyRendered		= list.back().alreadyRendered;
-		cpe.entryTarget			= list.back().entryTarget;
-
-		cpe.feedSpeedMode		= list.back().feedSpeedMode;
-		cpe.feedSpeed_MM_MIN	= list.back().feedSpeed_MM_MIN;
-	}
+	cpe.clientId				= clientId;
+	
+	cpe.pathListReference		= prevEntry.pathListReference;
+	cpe.alreadyRendered			= prevEntry.alreadyRendered;
+	cpe.entryTarget				= prevEntry.entryTarget;
+	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
+	cpe.feedSpeed_MM_MIN		= prevEntry.feedSpeed_MM_MIN;
 
 	// append
-	appendEntry(cpe);
-	return list.back();
+	//appendEntry(cpe);
+	return appendEntry(cpe), getPathList().back();
 }
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN) {
 //////////////////////////////////////////////////////////////////
+	ASSERT_CHECK_PLML_SIZE_NOT_NULL // will return the defaultEntry on failure
+
 	CncPathListEntry cpe;
+	CncPathListEntry& prevEntry	= getPathListIntern().back();
 
 	cpe.type					= CncPathListEntry::CHG_SPEED;
+	cpe.entryDistance			= CncPathListEntry::NoDistance;
 	cpe.feedSpeedMode			= mode;
 	cpe.feedSpeed_MM_MIN		= feedSpeed_MM_MIN;
-	cpe.entryDistance			= CncPathListEntry::NoDistance;
-
-	// calculate
-	if ( list.size() == 0 ) {
-		cpe.pathListReference	= CncPathListEntry::NoReference;
-		cpe.clientId			= CncPathListEntry::DefaultClientID;
-
-		cpe.alreadyRendered		= CncPathListEntry::DefaultAlreadyRendered;
-		cpe.entryTarget			= CncPathListEntry::ZeroTarget;
-	}
-	else {
-		cpe.pathListReference	= list.back().pathListReference;
-		cpe.clientId			= list.back().clientId;
-
-		cpe.alreadyRendered		= list.back().alreadyRendered;
-		cpe.entryTarget			= list.back().entryTarget;
-	}
+	
+	cpe.pathListReference		= prevEntry.pathListReference;
+	cpe.clientId				= prevEntry.clientId;
+	cpe.alreadyRendered			= prevEntry.alreadyRendered;
+	cpe.entryTarget				= prevEntry.entryTarget;
 	
 	// append
-	appendEntry(cpe);
-	return list.back();
+	return appendEntry(cpe), getPathList().back();
 }
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryAbs(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
+	ASSERT_CHECK_PLML_SIZE_NOT_NULL // will return the defaultEntry on failure
+
 	CncPathListEntry cpe;
+	CncPathListEntry& prevEntry	= getPathListIntern().back();
 
 	cpe.type					= CncPathListEntry::CHG_POSITION;
 	cpe.alreadyRendered			= alreadyRendered;
-	cpe.entryTarget				= {newAbsPosX, newAbsPosY, newAbsPosZ};
-
-	// calculate
-	if ( list.size() == 0 ) {
-		cpe.pathListReference	= CncPathListEntry::NoReference;
-		cpe.clientId			= CncPathListEntry::DefaultClientID;
-		
-		cpe.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
-		cpe.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
-
-		cpe.entryDistance		= {newAbsPosX, newAbsPosY, newAbsPosZ};
-	}
-	else {
-		cpe.pathListReference	= list.back().pathListReference;
-		cpe.clientId			= list.back().clientId;
-
-		cpe.feedSpeedMode		= list.back().feedSpeedMode;
-		cpe.feedSpeed_MM_MIN	= list.back().feedSpeed_MM_MIN;
-
-		cpe.entryDistance.setX(newAbsPosX - list.back().entryTarget.getX());
-		cpe.entryDistance.setY(newAbsPosY - list.back().entryTarget.getY());
-		cpe.entryDistance.setZ(newAbsPosZ - list.back().entryTarget.getZ());
-	}
+	cpe.entryTarget				= { newAbsPosX, newAbsPosY, newAbsPosZ };
+	
+	cpe.pathListReference		= prevEntry.pathListReference;
+	cpe.clientId				= prevEntry.clientId;
+	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
+	cpe.feedSpeed_MM_MIN		= prevEntry.feedSpeed_MM_MIN;
+	
+	cpe.entryDistance.setX(newAbsPosX - prevEntry.entryTarget.getX());
+	cpe.entryDistance.setY(newAbsPosY - prevEntry.entryTarget.getY());
+	cpe.entryDistance.setZ(newAbsPosZ - prevEntry.entryTarget.getZ());
 	
 	// append
-	appendEntry(cpe);
-	return list.back();
+	return appendEntry(cpe), getPathList().back();
 }
 //////////////////////////////////////////////////////////////////
-const CncPathListEntry& CncPathListManager::addEntryRel(double newRelPosX, double newRelPosY, double newRelPosZ, bool alreadyRendered) {
+const CncPathListEntry& CncPathListManager::addEntryRel(double deltaX, double deltaY, double deltaZ, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
+	ASSERT_CHECK_PLML_SIZE_NOT_NULL // will return the defaultEntry on failure
+
 	CncPathListEntry cpe;
+	CncPathListEntry& prevEntry	= getPathListIntern().back();
 	
 	cpe.type					= CncPathListEntry::CHG_POSITION;
 	cpe.alreadyRendered			= alreadyRendered;
-	cpe.entryDistance			= {newRelPosX, newRelPosY, newRelPosZ};
+	cpe.entryDistance			= { deltaX, deltaY, deltaZ };
+	
+	cpe.pathListReference		= prevEntry.pathListReference;
+	cpe.clientId				= prevEntry.clientId;
+	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
+	cpe.feedSpeed_MM_MIN		= prevEntry.feedSpeed_MM_MIN;
 
-	// calculate
-	if ( list.size() == 0 ) {
-		cpe.pathListReference	= CncPathListEntry::NoReference;
-		cpe.clientId			= CncPathListEntry::DefaultClientID;
-		
-		cpe.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
-		cpe.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
-
-		cpe.entryTarget			= {newRelPosX, newRelPosY, newRelPosZ};
-		}
-	else {
-		cpe.pathListReference	= list.back().pathListReference;
-		cpe.clientId			= list.back().clientId;
-
-		cpe.feedSpeedMode		= list.back().feedSpeedMode;
-		cpe.feedSpeed_MM_MIN	= list.back().feedSpeed_MM_MIN;
-
-		cpe.entryTarget.setX(list.back().entryTarget.getX() + newRelPosX);
-		cpe.entryTarget.setY(list.back().entryTarget.getY() + newRelPosY);
-		cpe.entryTarget.setZ(list.back().entryTarget.getZ() + newRelPosZ);
-	}
+	cpe.entryTarget.setX(prevEntry.entryTarget.getX() + deltaX);
+	cpe.entryTarget.setY(prevEntry.entryTarget.getY() + deltaY);
+	cpe.entryTarget.setZ(prevEntry.entryTarget.getZ() + deltaZ);
 	
 	// append
-	appendEntry(cpe);
-	return list.back();
+	return appendEntry(cpe), getPathList().back();
 }
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryAbs(const CncDoublePosition& newAbsPos, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
-	return addEntryAbs(newAbsPos.getX(), newAbsPos.getY(),	newAbsPos.getZ(), alreadyRendered);
+	return addEntryAbs(	newAbsPos.getX(), 
+						newAbsPos.getY(),
+						newAbsPos.getZ(),
+						alreadyRendered
+					  );
 }
 //////////////////////////////////////////////////////////////////
-const CncPathListEntry& CncPathListManager::addEntryRel(const CncDoublePosition& newRelPos, bool alreadyRendered) {
+const CncPathListEntry& CncPathListManager::addEntryRel(const CncDoublePosition& distance, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
-	return addEntryRel(newRelPos.getX(), newRelPos.getY(),	newRelPos.getZ(), alreadyRendered);
+	return addEntryRel(	distance.getX(), 
+						distance.getY(),
+						distance.getZ(),
+						alreadyRendered
+					  );
 }
+//////////////////////////////////////////////////////////////////
+std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {
+//////////////////////////////////////////////////////////////////
+	const CncDoublePosition& rp = getReferencePos();
+	const CncDoublePosition& sp = getStartPos();
+	
+	ostr 	<< "CncPathListInfo entries : " << getPathList().size()											<< std::endl
+			<< " Path Type              : " << getPathTypeAsStr()											<< std::endl
+			<< " Is corrected           : " << isPathCorrected()											<< std::endl
+			<< " Is first Path          : " << getFirstPathFlag()											<< std::endl
+			<< " Total Distance         : " << cnc::dblFormat1(getTotalDistance()) 							<< std::endl
+			<< " Min Pos (x, y, z)      : " << cnc::dblFormat3(getMinPosX(), getMinPosY(), getMinPosZ())	<< std::endl
+			<< " Max Pos (x, y, z)      : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ())	<< std::endl
+			<< " Reference Pos          : " << cnc::dblFormat3(rp.getX(),    rp.getY(),    rp.getZ())		<< std::endl
+			<< " Start Pos              : " << cnc::dblFormat3(sp.getX(),    sp.getY(),    sp.getZ())		<< std::endl
+			<< " Entries                : " << std::endl
+			;
+	
+	for ( auto it = getPathList().begin(); it != getPathList().end(); ++it )
+		it->traceEntry(ostr);
+	
+	return ostr;
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::clear() {
+//////////////////////////////////////////////////////////////////
+	getPathListIntern().clear();
+	resetMinMax();
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::resetMinMax() {
+//////////////////////////////////////////////////////////////////
+	minPosX = minPosY = minPosZ = DBL_MAX;
+	maxPosX = maxPosY = maxPosZ = DBL_MIN;
+}
+//////////////////////////////////////////////////////////////////
+const CncDoublePosition& CncPathListManager::getStartPos() const {
+//////////////////////////////////////////////////////////////////
+	static CncDoublePosition p(0.0, 0.0, 0.0);
+	
+	if ( getPathList().size() > 0 )
+		return const_begin()->entryTarget;
+	
+	return p; 
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::isPathClosed() const {
+//////////////////////////////////////////////////////////////////
+	if ( getPathListSize() > 0 ) {
+		
+		const CncPathList::const_iterator itFirst = const_begin();
+		const CncPathList::const_iterator itLast  = const_end() - 1;
+		const bool xc = cnc::dblCompare((*itFirst).entryTarget.getX(), (*itLast).entryTarget.getX());
+		const bool yc = cnc::dblCompare((*itFirst).entryTarget.getY(), (*itLast).entryTarget.getY());
+		const bool zc = cnc::dblCompare((*itFirst).entryTarget.getZ(), (*itLast).entryTarget.getZ());
+		
+		return ( xc && yc && zc ); 
+	}
+	
+	return true;
+}
+
+
+
+
+
+
 //////////////////////////////////////////////////////////////////
 bool CncPathListManager::eraseEntryAndRecalcuate(const CncPathList::iterator& itToErase) {
 //////////////////////////////////////////////////////////////////
@@ -303,11 +331,11 @@ bool CncPathListManager::eraseEntryAndRecalcuate(const CncPathList::iterator& it
 	bool first = itToErase == begin() ? true : false;
 	
 	// remove entry
-	if ( list.erase(itToErase) == end() )
+	if ( getPathListIntern().erase(itToErase) == end() )
 		return false;
 		
-	// nothing further to do if the list is now empty
-	if ( list.size() == 0 )
+	// nothing further to do if the pathList is now empty
+	if ( getPathList().size() == 0 )
 		return true;
 	
 	// redetermine additional values
@@ -381,8 +409,8 @@ bool CncPathListManager::reversePath() {
 	const double oldStopSpeed  		= last()->feedSpeed_MM_MIN;
 	const bool oldStopRenderFlag    = last()->alreadyRendered;
 
-	// reverse list
-	std::reverse(list.begin(), list.end());
+	// reverse pathList
+	std::reverse(begin(), end());
 
 	// correct new first entry
 	begin()->entryDistance		= begin()->entryTarget - referencePos;
@@ -395,12 +423,12 @@ bool CncPathListManager::reversePath() {
 	last()->feedSpeed_MM_MIN	= oldStartSpeed;
 	last()->feedSpeedMode		= oldStartMode;
 
-	// reset length - will be recalculate in next loop
+	// initNextCncPath length - will be recalculate in next loop
 	totalDistance = 0.0;
 
 	// over all entries
-	for (CncPathList::iterator it = list.begin(); it != list.end(); ++it) {
-		if ( std::distance(list.begin(), it) > 0 ) {
+	for (auto it = getPathListIntern().begin(); it != getPathListIntern().end(); ++it) {
+		if ( std::distance(getPathListIntern().begin(), it) > 0 ) {
 			// reverse relative move steps
 			(*it).entryDistance = it->entryTarget - (it - 1)->entryTarget;
 
@@ -421,3 +449,5 @@ bool CncPathListManager::reversePath() {
 
 	return true;
 }
+
+

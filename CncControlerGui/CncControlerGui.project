@@ -148,6 +148,8 @@
       <File Name="Gl3DOptionPane.cpp"/>
       <File Name="3D/CncGLCanvas.cpp"/>
       <VirtualDirectory Name="Base">
+        <File Name="3D/GLGuidePath.cpp"/>
+        <File Name="3D/GLGuidePath.h"/>
         <File Name="3D/GLCommon.cpp"/>
         <File Name="3D/GLCommon.h"/>
         <File Name="3D/GLContextCncPathBase.cpp"/>
@@ -479,10 +481,12 @@
     </VirtualDirectory>
     <VirtualDirectory Name="Inbound - SVG">
       <VirtualDirectory Name="Parser">
-        <File Name="SVGFileParser.cpp"/>
-        <File Name="SVGFileParser.h"/>
         <File Name="SVGNodeParser.cpp"/>
         <File Name="SVGNodeParser.h"/>
+        <File Name="SVGParserBase.h"/>
+        <File Name="SVGParserBase.cpp"/>
+        <File Name="SVGFileParser.cpp"/>
+        <File Name="SVGFileParser.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="PathHandler">
         <File Name="SVGPathHandlerBase.cpp"/>
