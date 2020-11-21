@@ -742,7 +742,7 @@ protected:
     virtual void cncMainViewChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void detachTemplateSource(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateSourceExtern(wxCommandEvent& event) { event.Skip(); }
-    virtual void openTemplateSvgExtern(wxCommandEvent& event) { event.Skip(); }
+    virtual void openTemplateExtern(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void renameTemplateFromButton(wxCommandEvent& event) { event.Skip(); }

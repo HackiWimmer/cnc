@@ -46,6 +46,8 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		virtual bool physicallyMoveZAxisUp();
 		virtual bool physicallyMoveZAxisDown();
 		
+		virtual bool performCorrections();
+		
 	public:
 		
 		SVGPathHandlerCnc(CncControl* cnc);

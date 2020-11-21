@@ -570,10 +570,16 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	return true;
 }
 //////////////////////////////////////////////////////////////////
+bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm) {
+//////////////////////////////////////////////////////////////////
+	return onPhysicallyExecute(plm);
+}
+
+//////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
 	if ( setup.cnc == NULL ) {
-		std::cerr << "CncPathListRunner::execute(): Invalid cnc control!" << std::endl;
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!\n");
 		return false;
 	}
 	
@@ -603,8 +609,8 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	CncAutoFreezer caf(cpp);
 	
 	// Main loop over all path list manager cnc entries
-	auto beg = plm.const_begin();
-	auto end = plm.const_end();
+	auto beg = plm.cbegin();
+	auto end = plm.cend();
 	for ( auto it = beg; it != end; ++it) {
 		
 		const CncPathListEntry& curr = *it;
@@ -653,7 +659,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 			else {
 				
 				// Note: this call may be increments it
-				if ( onPhysicallyMoveAnalysed(it, plm.const_end()) == false ) {
+				if ( onPhysicallyMoveAnalysed(it, plm.cend()) == false ) {
 					return false;
 				}
 			}

@@ -25,37 +25,42 @@ class SvgCncContext {
 		
 		bool					reversePath;
 		bool					guidePath;
+		
 		double					currentZDepth;
 		char					currentZDepthMode;
 		int						currentLineNumber;
+		
 		CncToolCorretionType	toolPathCorrection;
 		SvgColourDecoder		fillColourDecoder;
 		SvgColourDecoder		strokeColourDecoder;
-	
+		
 	public:
 		
 		SvgCncContext();
 		~SvgCncContext();
 		
-		CncToolCorretionType getCorrectionType() 	const { return toolPathCorrection; }
-		bool isGuidePath()							const { return guidePath; }
-		bool getReverseFlag() 						const { return reversePath; }
-		bool isCurrentZDepthAbs()					const { return currentZDepthMode == 'Z'; }
-		bool isCurrentZDepthRel()					const { return !isCurrentZDepthAbs(); }
+		CncToolCorretionType	getToolCorrectionType()					const { return toolPathCorrection; }
+		const char* 			getToolCorrectionTypeAsStr()			const;
 		
-		int getCurrentLineNumber()					const { return currentLineNumber; }
+		bool					hasSomethingToCorrect()					const;
+		bool					hasToolCorrection()						const;
+		bool					hasReverseCorrection() 					const	{ return reversePath; }
 		
-		double getCurrentZDepth() 					const { return currentZDepth; }
-		char getCurrentZDepthMode()					const { return currentZDepthMode; }
+		bool					isGuidePath()							const	{ return guidePath; }
+		bool					isCurrentZDepthAbs()					const	{ return currentZDepthMode == 'Z'; }
+		bool					isCurrentZDepthRel()					const	{ return !isCurrentZDepthAbs(); }
 		
-		void getParameterList(DcmItemList& rows);
-		const char* getCorrectionTypeAsString();
-		const char* getZDeptAsString();
+		int						getCurrentLineNumber()					const	{ return currentLineNumber; }
+		double					getCurrentZDepth() 						const	{ return currentZDepth; }
+		char					getCurrentZDepthMode()					const	{ return currentZDepthMode; }
+		const char* 			getZDeptAsStr()							const;
 		
-		void setCurrentLineNumber(int cln);
-		void setCurrentZDepth(wxString& flag);
-		void setReverseFlag(wxString& flag);
-		void setCorrectionType(wxString& type);
+		void 					getParameterList(DcmItemList& rows)		const;
+		
+		void 					setCurrentLineNumber(int cln);
+		void					setCurrentZDepth(const wxString& flag);
+		void					setReverseFlag(const wxString& flag);
+		void					setToolCorrectionType(const wxString& type);
 		
 		void setFillColour(const wxColour & col);
 		void setStrokeColour(const wxColour & col);

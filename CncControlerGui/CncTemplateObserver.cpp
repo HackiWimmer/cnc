@@ -13,6 +13,8 @@ CncTemplateObserver::CncTemplateObserver(wxWindow* parent)
 //////////////////////////////////////////////////////////////
 {
 	m_observerTrace->Clear();
+	observationActive = m_observationMode->GetValue();
+	m_btOpenExtern->Enable(observationActive);
 }
 //////////////////////////////////////////////////////////////
 CncTemplateObserver::~CncTemplateObserver() {
@@ -61,9 +63,15 @@ void CncTemplateObserver::activateSourecEditor(bool state) {
 	THE_APP->sourceEditor->Enable(state);
 }
 //////////////////////////////////////////////////////////////
+void CncTemplateObserver::openTemplateExtern(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////
+	THE_APP->openTemplateExtern();
+}
+//////////////////////////////////////////////////////////////
 void CncTemplateObserver::changeObservationMode(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////
 	observationActive = m_observationMode->GetValue();
+	m_btOpenExtern->Enable(observationActive);
 	
 	activateSourecEditor(!observationActive);
 	changeObservation(observationActive);

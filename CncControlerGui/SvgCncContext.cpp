@@ -3,13 +3,13 @@
 
 //////////////////////////////////////////////////////////////////
 SvgCncContext::SvgCncContext()
-: reversePath 			(false)
-, currentZDepth			(0.0)
-, currentZDepthMode		('Z')
-, currentLineNumber		(UNDEFINED_LINE_NUMBER)
-, toolPathCorrection			(CncCT_None)
-, fillColourDecoder		()
-, strokeColourDecoder	()
+: reversePath 				(false)
+, currentZDepth				(0.0)
+, currentZDepthMode			('Z')
+, currentLineNumber			(UNDEFINED_LINE_NUMBER)
+, toolPathCorrection		(CncCT_None)
+, fillColourDecoder			()
+, strokeColourDecoder		()
 //////////////////////////////////////////////////////////////////
 {
 }
@@ -18,72 +18,97 @@ SvgCncContext::~SvgCncContext() {
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
+bool SvgCncContext::hasSomethingToCorrect() const {
+//////////////////////////////////////////////////////////////////
+	const bool b1 = hasToolCorrection();
+	const bool b2 = hasReverseCorrection();
+	
+	return b1 || b2;
+}
+//////////////////////////////////////////////////////////////////
+bool SvgCncContext::hasToolCorrection() const {
+//////////////////////////////////////////////////////////////////
+	switch ( toolPathCorrection ) {
+		case CncCT_Pocket:
+		case CncCT_Inner:
+		case CncCT_Outer:	return true;
+		
+		case CncCT_Center:
+		case CncCT_None:	return false;
+	}
+	
+	return false;
+}
+//////////////////////////////////////////////////////////////////
 void SvgCncContext::setCurrentLineNumber(int cln) { 
 //////////////////////////////////////////////////////////////////
 	currentLineNumber = cln; 
 }
 //////////////////////////////////////////////////////////////////
-void SvgCncContext::setCurrentZDepth(wxString& flag) {
+void SvgCncContext::setCurrentZDepth(const wxString& flag) {
 //////////////////////////////////////////////////////////////////
 	//depth="z-1.0" || depth="Z5.0"
-	flag.Trim(true).Trim(false);
+	wxString f(flag);
+	f.Trim(true).Trim(false);
 	
 	currentZDepth		= 0.0;
 	currentZDepthMode 	= 'Z';
 	
-	if ( flag.IsEmpty() )
+	if ( f.IsEmpty() )
 		return;
 		
-	currentZDepthMode = (char)flag[0];
+	currentZDepthMode = (char)f[0];
 	if ( currentZDepthMode != 'z' && currentZDepthMode != 'Z' )
 		currentZDepthMode = 'Z';
 	
-	flag = flag.SubString(1, flag.Length()-1);
-	flag.ToDouble(&currentZDepth);
+	f = f.SubString(1, f.Length()-1);
+	f.ToDouble(&currentZDepth);
+}
+//////////////////////////////////////////////////////////////////
+void SvgCncContext::setReverseFlag(const wxString& flag) {
+//////////////////////////////////////////////////////////////////
+	wxString f(flag);
+	f.Trim(true).Trim(false);
+	reversePath = f.IsSameAs("YES") ;
+}
+//////////////////////////////////////////////////////////////////
+void SvgCncContext::setToolCorrectionType(const wxString& type) {
+//////////////////////////////////////////////////////////////////
+	wxString t(type);
+	t.Trim(true).Trim(false);
 	
-	//clog << "current z depth " << currentZDepthMode << currentZDepth << endl;
+	if      ( t.IsSameAs("INNER")  )	toolPathCorrection = CncCT_Inner;
+	else if ( t.IsSameAs("OUTER")  )	toolPathCorrection = CncCT_Outer;
+	else if ( t.IsSameAs("CENTER")   )	toolPathCorrection = CncCT_Center;
+	else if ( t.IsSameAs("POCKET") )	toolPathCorrection = CncCT_Pocket;
+	else if ( t.IsSameAs("NONE")   )	toolPathCorrection = CncCT_None;
+	else								toolPathCorrection = CncCT_None;
 }
 //////////////////////////////////////////////////////////////////
-void SvgCncContext::setReverseFlag(wxString& flag) {
-//////////////////////////////////////////////////////////////////
-	flag.Trim(true).Trim(false);
-	reversePath = (flag.MakeUpper() == "YES");
-}
-//////////////////////////////////////////////////////////////////
-void SvgCncContext::setCorrectionType(wxString& type) {
-//////////////////////////////////////////////////////////////////
-	type.Trim(true).Trim(false);
-	if      ( type.Upper() == "INNER")	toolPathCorrection = CncCT_Inner;
-	else if ( type.Upper() == "OUTER")	toolPathCorrection = CncCT_Outer;
-	else if ( type.Upper() == "NONE")	toolPathCorrection = CncCT_None;
-	else								toolPathCorrection = CncCT_Center;
-}
-//////////////////////////////////////////////////////////////////
-const char* SvgCncContext::getCorrectionTypeAsString() {
+const char* SvgCncContext::getToolCorrectionTypeAsStr() const {
 //////////////////////////////////////////////////////////////////
 	switch (toolPathCorrection) {
+		case CncCT_Pocket:	return "Pocket";
 		case CncCT_Center:	return "Center";
 		case CncCT_Inner:	return "Inner";
 		case CncCT_Outer:	return "Outer";
 		case CncCT_None:	return "None";
 	}
-	return "unkown";
-}
-//////////////////////////////////////////////////////////////////
-const char* SvgCncContext::getZDeptAsString() {
-//////////////////////////////////////////////////////////////////
-	static wxString s;
 	
-	s = wxString::Format("%c%.3lf", currentZDepthMode, currentZDepth);
-	return s;
+	return wxString::Format("%s: unkown", CNC_LOG_FUNCT);
 }
 //////////////////////////////////////////////////////////////////
-void SvgCncContext::getParameterList(DcmItemList& rows) {
+const char* SvgCncContext::getZDeptAsStr() const {
+//////////////////////////////////////////////////////////////////
+	return wxString::Format("%c%.3lf", currentZDepthMode, currentZDepth);
+}
+//////////////////////////////////////////////////////////////////
+void SvgCncContext::getParameterList(DcmItemList& rows) const {
 //////////////////////////////////////////////////////////////////
 	DataControlModel::addKeyValueRow(rows, "SVG CNC-Parameters", 	"");
 	DataControlModel::addKeyValueRow(rows, "  Reverse Path", 			reversePath ? "Yes" : "No");
-	DataControlModel::addKeyValueRow(rows, "  Correction Type", 		getCorrectionTypeAsString());
-	DataControlModel::addKeyValueRow(rows, "  Z Depth", 				getZDeptAsString());
+	DataControlModel::addKeyValueRow(rows, "  Correction Type", 		getToolCorrectionTypeAsStr());
+	DataControlModel::addKeyValueRow(rows, "  Z Depth", 				getZDeptAsStr());
 }
 //////////////////////////////////////////////////////////////////
 void SvgCncContext::setFillColour(const wxColour & col) {
@@ -122,12 +147,12 @@ void SvgCncContext::determineColourEffects() {
 		// ----------------------------------------------------------
 		else if ( strokeColourDecoder.matchesGray() ) {
 			if ( fillColourDecoder.matchesWhite() ) {
-				// one line cut
+				// on line cut
 				toolPathCorrection = CncCT_Center;
 			}
 			else if ( fillColourDecoder.matchesGray() ) {
 				// pocketing cut
-				toolPathCorrection = CncCT_Inner;
+				toolPathCorrection = CncCT_Pocket;
 			}
 			else if ( fillColourDecoder.matchesBlue() ) {
 				// guide

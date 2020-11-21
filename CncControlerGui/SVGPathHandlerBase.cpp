@@ -22,7 +22,7 @@ SvgCncContext& SVGPathHandlerBase::getSvgCncContext() {
 	return currentCncContext;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::setSvgCncContext(SvgCncContext& cwp) {
+void SVGPathHandlerBase::setSvgCncContext(const SvgCncContext& cwp) {
 //////////////////////////////////////////////////////////////////
 	currentCncContext = cwp;
 }

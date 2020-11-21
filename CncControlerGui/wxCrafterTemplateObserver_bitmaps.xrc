@@ -3,4 +3,6 @@
   <!-- Handler Generation is ON -->
   <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
   <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
+  <object class="wxBitmap" name="16-gtk">bitmaps\16-gtk.png</object>
+  <object class="wxBitmap" name="16-gtk@2x">bitmaps\16-gtk@2x.png</object>
 </resource>

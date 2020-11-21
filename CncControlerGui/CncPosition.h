@@ -4,7 +4,7 @@
 #include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-template <typename T> 
+template <class T> 
 class CncXYDimension {
 	
 	protected:
@@ -66,8 +66,19 @@ class CncZDimension {
 typedef CncZDimension<int32_t> CncZLongDimension;
 typedef CncZDimension<double> CncZDoubleDimension;
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////
+// Forward declare the class
+template <typename T> class CncPosition;
+
+// Forward declare the template operator
 template <typename T>
+bool operator== (const CncPosition<T> &a, const CncPosition<T> &b);
+
+// Forward declare the function
+bool operator== (const CncPosition<double> &a, const CncPosition<double> &b);
+
+template <class T>
 class CncPosition {
 	
 	public:
@@ -272,6 +283,11 @@ class CncPosition {
 			return ostr;
 		}
 		
+		
+		friend bool operator== (const CncPosition<double> &a, const CncPosition<double> &b);
+		friend bool operator== <>(const CncPosition<T> &a, const CncPosition<T> &b);
+		
+		/*
 		////////////////////////////////////////////////////////////////
 		friend bool operator== (const CncPosition<T> &a, const CncPosition<T> &b) {
 			return (    (a.getX() == b.getX())
@@ -279,6 +295,7 @@ class CncPosition {
 					 && (a.getZ() == b.getZ())
 					);
 		}
+		*/
 		
 		////////////////////////////////////////////////////////////////
 		friend bool operator!= (const CncPosition<T> &a, const CncPosition<T> &b) {
@@ -362,7 +379,16 @@ class CncPosition {
 		}
 };
 
+// ----------------------------------------------------------------------
+template <class T>
+bool operator== (const CncPosition<T> &a, const CncPosition<T> &b) {
+	return (    (a.getX() == b.getX())
+			 && (a.getY() == b.getY())
+			 && (a.getZ() == b.getZ())
+			);
+}
 
+// ----------------------------------------------------------------------
 typedef CncPosition<int32_t> 	CncLongPosition;
 typedef CncPosition<double> 	CncDoublePosition;
 

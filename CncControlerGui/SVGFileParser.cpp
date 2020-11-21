@@ -254,7 +254,7 @@ void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 	
 	// ----------------------------------------------------------
 	if ( runInfo.getCurrentDebugState() == true ) {
-		appendDebugValueBase("Reverse Path", cwp.getCorrectionType());
+		appendDebugValueBase("Reverse Path", cwp.hasReverseCorrection());
 		
 		wxString content;
 		debugXMLAttribute(attr, content);
@@ -277,14 +277,13 @@ void SVGFileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
 bool SVGFileParser::spool() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
-	UserAgentVector uav = svgUserAgent.getList();
 	
+	const UserAgentVector& uav = svgUserAgent.getList();
 	pathHandler->prepareWork();
 
-	// over all stored pathes#
-	SVGUserAgentInfo uai;
-	for ( UserAgentVector::iterator itUav = uav.begin(); itUav != uav.end(); ++itUav ) {
-		uai = *itUav;
+	// over all stored pathes
+	for ( auto itUav = uav.begin(); itUav != uav.end(); ++itUav ) {
+		const SVGUserAgentInfo& uai = *itUav;
 		
 		if ( uai.nodeName == SvgNodeTemplates::CncBreakBlockNodeName ) {
 			std::cout << " CncBreak at line " << uai.lineNumber << " detected. Processing will stop here." << std::endl;
@@ -296,12 +295,14 @@ bool SVGFileParser::spool() {
 		}
 		
 		pathHandler->setSvgCncContext(uai.cncParameters);
+		
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(uai.nodeName);
-		registerNextDebugNode(uai.nodeName);
 		
 		if ( runInfo.getCurrentDebugState() == true ) {
+			registerNextDebugNode(uai.nodeName);
+			
 			DcmItemList dil;
 			uai.getBaseDetails(dil);
 			appendDebugValueBase(dil);
@@ -317,8 +318,12 @@ bool SVGFileParser::spool() {
 			if ( runInfo.getStopFlag() == true )
 				return true;
 				
-			std::cerr << "SVGFileParser::performPath: Failed" << std::endl;
-			std::cerr << "Line number: " << uai.lineNumber << ", Node Type: " << uai.nodeName << std::endl;
+			std::cerr	<< CNC_LOG_FUNCT << ": Failed" 
+						<< std::endl
+						<< "Line number: " << uai.lineNumber 
+						<< ", Node Type: " << uai.nodeName 
+						<< std::endl
+						;
 			return false;
 		}
 		
@@ -327,11 +332,10 @@ bool SVGFileParser::spool() {
 	}
 	
 	pathHandler->finishWork();
-	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::performPath(SVGUserAgentInfo& uai) {
+bool SVGFileParser::performPath(const SVGUserAgentInfo& uai) {
 //////////////////////////////////////////////////////////////////
 	bool isSymbol = false;
 	
@@ -371,9 +375,9 @@ bool SVGFileParser::performPath(SVGUserAgentInfo& uai) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::prepareTransformMatrix(SVGUserAgentInfo& uai) {
+bool SVGFileParser::prepareTransformMatrix(const SVGUserAgentInfo& uai) {
 //////////////////////////////////////////////////////////////////
-	for (TransformVector::iterator it=uai.transformList.begin(); it!=uai.transformList.end(); ++it) {
+	for (auto it=uai.transformList.begin(); it!=uai.transformList.end(); ++it) {
 		if ( pathHandler->getSvgTransformMatrix().performTransformAsStringList(*it) == false ) {
 			return false;
 		}
@@ -381,16 +385,16 @@ bool SVGFileParser::prepareTransformMatrix(SVGUserAgentInfo& uai) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::performPathByIds(SVGUserAgentInfo& uai) {
+bool SVGFileParser::performPathByIds(const SVGUserAgentInfo& uai) {
 //////////////////////////////////////////////////////////////////
 	DoubleStringMap ids = uai.ids;
 	
-	for ( DoubleStringMap::iterator itIds = ids.begin(); itIds != ids.end(); ++itIds ) {
+	for ( auto itIds = ids.begin(); itIds != ids.end(); ++itIds ) {
 		// over all use directives
-		UseDirectiveVector udv = svgUserAgent.getUseInfoVector();
+		UseDirectiveVector& udv = svgUserAgent.getUseInfoVector();
 
-		for ( UseDirectiveVector::iterator it=udv.begin(); it!=udv.end(); ++it ) {
-			UseDirective ud = *it;
+		for ( auto it=udv.begin(); it!=udv.end(); ++it ) {
+			UseDirective& ud = *it;
 			//cout << ud.id << endl;
 			
 			// if current path matches this the current use directive
@@ -403,12 +407,10 @@ bool SVGFileParser::performPathByIds(SVGUserAgentInfo& uai) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::performUse(SVGUserAgentInfo& uai, UseDirective& ud) {
+bool SVGFileParser::performUse(const SVGUserAgentInfo& uai, UseDirective& ud) {
 //////////////////////////////////////////////////////////////////
-	DoubleStringMap::iterator it;
-	it = ud.attributes.find("transform");
-	
-	if ( it != ud.attributes.end() ) {
+	if ( auto it = ud.attributes.find("transform"); it != ud.attributes.end() ) {
+		
 		
 		#warning - the use transformation did not work correctly
 		
@@ -438,7 +440,7 @@ bool SVGFileParser::performUse(SVGUserAgentInfo& uai, UseDirective& ud) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) {
+bool SVGFileParser::spoolPath(const SVGUserAgentInfo& uai, const wxString& transform) {
 //////////////////////////////////////////////////////////////////
 	if ( uai.shouldProceed() == false )
 		return true;
@@ -447,11 +449,14 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 		return false;
 	
 	initNextClientId(uai.lineNumber);
+	
+	const PathInfoVector& pil = uai.getPathInfoList();
+	for ( auto itPiv = pil.cbegin(); itPiv != pil.cend(); ++itPiv ) {
+		const PathInfo& pi = *itPiv;
 		
-	for ( auto itPiv = uai.pathInfoList.begin(); itPiv != uai.pathInfoList.end(); ++itPiv ) {
-		if ( pathHandler->processCommand_2DXY(itPiv->cmd, itPiv->count, itPiv->values) == false ) {
-			std::cerr << "SVGFileParser::spoolPath failed" << std::endl;
-			uai.debug(*itPiv, std::cerr);
+		if ( pathHandler->processCommand_2DXY(itPiv->cmd, itPiv->cnt, itPiv->values) == false ) {
+			uai.debug(pi, std::cerr);
+			std::cerr << CNC_LOG_FUNCT_A(": failed") << std::endl;
 			return false;
 		}
 		
@@ -780,7 +785,7 @@ bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {
 	cwp.setReverseFlag(attr);
 	
 	attr = child->GetAttribute("correction", "none");
-	cwp.setCorrectionType(attr);
+	cwp.setToolCorrectionType(attr);
 	
 	attr = child->GetAttribute("depth", wxString::Format("Z%lf", 0.0));
 	cwp.setCurrentZDepth(attr);

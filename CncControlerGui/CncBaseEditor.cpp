@@ -120,24 +120,26 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 	
 	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
 	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
-	int c       = event.GetUnicodeKey();
-	
-	wxString find(GetSelectedText());
+	int c		= event.GetUnicodeKey();
+	bool skip	= true;
 	
 	// run
 	if      ( c == 'R' && ctlKey == true && shtKey == true) {
 		wxCommandEvent dummy;
 		THE_APP->rcRun(dummy);
-		
+		skip = false;
+
 	// debug
 	} if      ( c == 'D' && ctlKey == true && shtKey == true) {
 		wxCommandEvent dummy;
 		THE_APP->rcDebug(dummy);
-		
+		skip = false;
+
 	// find
 	} else if ( c == 'F' && ctlKey == true ) {
 		event.Skip(false);
 		
+		wxString find(GetSelectedText());
 		if ( find.IsEmpty() == false ) 
 			THE_APP->GetSourceEditSearch()->SetValue(find);
 			
@@ -162,44 +164,52 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 				else										std::clog << "Source Editor: Invalid line numer: " << ln << std::endl;
 			}
 		}
+		skip = false;
 		
 	// Undo
 	} else if ( c == 'Z' && ctlKey == true ) {
 		Undo();
+		skip = false;
 	
 	// Redo
 	} else if ( c == 'Y' && ctlKey == true ) {
 		Redo();
+		skip = false;
 		
 	// save
 	} else if ( c == 'S' && ctlKey == true ) {
 		THE_APP->saveFile();
+		skip = false;
 		
 	// goto home
 	} else if ( c == WXK_HOME && ctlKey == true ) {
 		GotoLine(0);
 		Home();
+		skip = false;
 		
 	// goto end
 	} else if ( c == WXK_END && ctlKey == true ) {
 		GotoLine(GetLineCount() - 1);
 		LineEnd();
+		skip = false;
 		
 	// select cur pos to home
 	} else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
 		SetSelection(GetCurrentPos(), 0);
+		skip = false;
 		
 	// select cur pos to end
 	} else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
 		SetSelection(GetCurrentPos(), GetLastPosition());
+		skip = false;
 	}
 	
-	event.Skip(true);
+	event.Skip(skip);
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onKeyUp(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	onUpdateFilePosition(true);
+	onUpdateFilePosition(false);
 	
 	// update tab label - on demand
 	decorateParentTabName(IsModified());
@@ -241,7 +251,7 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 	long x, y;
 	PositionToXY(GetInsertionPoint(), &x, &y);
 	
-	wxString label(wxString::Format("Column: %ld", x + 1));
+	const wxString label(wxString::Format("Column: %ld", x + 1));
 	if ( getCtlColumnPos() != NULL )
 		getCtlColumnPos()->SetLabel(label);
 	
@@ -595,6 +605,7 @@ void CncBaseEditor::setupDefaultStyle() {
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::setupStyle() {
+///////////////////////////////////////////////////////////////////
 	switch ( fileInfo.format ) {
 		case TplText:	setupTextStyle();		break;
 		case TplSvg:	setupSvgStyle();		break;

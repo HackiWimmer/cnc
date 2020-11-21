@@ -37,7 +37,7 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm)
 		
 		// fill guide path list
 		if ( isValid() ) {
-			for (auto it = plm.const_begin(); it != plm.const_end(); ++it) {
+			for (auto it = plm.cbegin(); it != plm.cend(); ++it) {
 				
 				const CncPathListEntry& entry =  *it;
 				if ( entry.isPositionChange() != true )

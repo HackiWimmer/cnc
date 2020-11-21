@@ -87,23 +87,23 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		virtual void appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
 		
 		//render functions
-		bool processMove_2DXY(char c, unsigned int count, double values[]);
-		bool processLine_2DXY(char c, unsigned int count, double values[]);
-		bool processHLine_2DXY(char c, unsigned int count, double values[]);
-		bool processVLine_2DXY(char c, unsigned int count, double values[]);
-		bool processClose_2DXY(char c, unsigned int count, double values[]);
+		bool processMove_2DXY(char c, unsigned int count,  const double values[]);
+		bool processLine_2DXY(char c, unsigned int count,  const double values[]);
+		bool processHLine_2DXY(char c, unsigned int count, const double values[]);
+		bool processVLine_2DXY(char c, unsigned int count, const double values[]);
+		bool processClose_2DXY(char c, unsigned int count, const double values[]);
 
 		bool processARC_2DXY(CncCurveLib::ParameterElliptical& ps);
-		bool processARC_2DXY(char c, unsigned int count, double values[]);
+		bool processARC_2DXY(char c, unsigned int count, const double values[]);
 
 		bool processQuadraticBezier_2DXY(CncCurveLib::ParameterQuadraticBezier& ps);
-		bool processQuadraticBezier_2DXY(char c, unsigned int count, double values[]);
+		bool processQuadraticBezier_2DXY(char c, unsigned int count, const double values[]);
 
 		bool processCubicBezier_2DXY(CncCurveLib::ParameterCubicBezier& ps);
-		bool processCubicBezier_2DXY(char c, unsigned int count, double values[]);
+		bool processCubicBezier_2DXY(char c, unsigned int count, const double values[]);
 
-		bool processQuadraticBezierSmooth_2DXY(char c, unsigned int count, double values[]);
-		bool processCubicBezierSmooth_2DXY(char c, unsigned int count, double values[]);
+		bool processQuadraticBezierSmooth_2DXY(char c, unsigned int count, const double values[]);
+		bool processCubicBezierSmooth_2DXY(char c, unsigned int count, const double values[]);
 		
 		virtual bool isInitialized();
 		
@@ -135,7 +135,7 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		const CncPathListManager& getPathList() { return pathListMgr; }
 		
 		// processing
-		bool processCommand_2DXY(char c, unsigned int count, double values[]);
+		bool processCommand_2DXY(char c, unsigned int count, const double values[]);
 		
 		bool isFirstPath() { return firstPath; }
 		bool isNextPath()  { return nextPath;  }

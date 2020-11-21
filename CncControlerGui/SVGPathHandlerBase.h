@@ -20,7 +20,7 @@ class SVGPathHandlerBase : public PathHandlerBase {
 		virtual void setSvgRootNode(const SVGRootNode& srn);
 		
 		SvgCncContext& getSvgCncContext();
-		void setSvgCncContext(SvgCncContext& cwp);
+		void setSvgCncContext(const SvgCncContext& cwp);
 		
 	protected:
 		

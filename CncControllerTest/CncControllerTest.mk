@@ -5,16 +5,15 @@
 ## Release
 ProjectName            :=CncControllerTest
 ConfigurationName      :=Release
-WorkspaceConfiguration := $(ConfigurationName)
 WorkspacePath          :=C:/@Development/@Projekte/c++/CNCGuiController
 ProjectPath            :=C:/@Development/@Projekte/c++/CNCGuiController/CncControllerTest
-IntermediateDirectory  :=../build-$(ConfigurationName)/CncControllerTest
-OutDir                 :=../build-$(ConfigurationName)/CncControllerTest
+IntermediateDirectory  :=$(ConfigurationName)
+OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=29/09/2020
+Date                   :=20/11/2020
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe
 SharedObjectLinkerName :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe -shared -fPIC
@@ -28,13 +27,14 @@ OutputSwitch           :=-o
 LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
-OutputFile             :=..\build-$(ConfigurationName)\bin\$(ProjectName)
+OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
 Preprocessors          :=$(PreprocessorSwitch)NDEBUG 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
-ObjectsFileList        :=$(IntermediateDirectory)/ObjectsList.txt
+ObjectsFileList        :="CncControllerTest.txt"
 PCHCompileFlags        :=
+MakeDirCommand         :=makedir
 RcCmpOptions           := 
 RcCompilerName         :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/windres.exe
 LinkOptions            :=  $(shell wx-config --libs)
@@ -61,7 +61,7 @@ AS       := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev
 ##
 ## User defined environment variables
 ##
-Objects0=../build-$(ConfigurationName)/CncControllerTest/main_app.cpp$(ObjectSuffix) ../build-$(ConfigurationName)/CncControllerTest/impl.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main_app.cpp$(ObjectSuffix) $(IntermediateDirectory)/impl.cpp$(ObjectSuffix) 
 
 
 
@@ -71,20 +71,20 @@ Objects=$(Objects0)
 ## Main Build Targets 
 ##
 .PHONY: all clean PreBuild PrePreBuild PostBuild MakeIntermediateDirs
-all: MakeIntermediateDirs $(OutputFile)
+all: $(OutputFile)
 
-$(OutputFile): ../build-$(ConfigurationName)/CncControllerTest/.d $(Objects) 
-	@if not exist "..\build-$(ConfigurationName)\CncControllerTest" mkdir "..\build-$(ConfigurationName)\CncControllerTest"
+$(OutputFile): $(IntermediateDirectory)/.d $(Objects) 
+	@$(MakeDirCommand) $(@D)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 MakeIntermediateDirs:
-	@if not exist "..\build-$(ConfigurationName)\CncControllerTest" mkdir "..\build-$(ConfigurationName)\CncControllerTest"
-	@if not exist ""..\build-$(ConfigurationName)\bin"" mkdir ""..\build-$(ConfigurationName)\bin""
+	@$(MakeDirCommand) "$(ConfigurationName)"
 
-../build-$(ConfigurationName)/CncControllerTest/.d:
-	@if not exist "..\build-$(ConfigurationName)\CncControllerTest" mkdir "..\build-$(ConfigurationName)\CncControllerTest"
+
+$(IntermediateDirectory)/.d:
+	@$(MakeDirCommand) "$(ConfigurationName)"
 
 PreBuild:
 
@@ -92,28 +92,24 @@ PreBuild:
 ##
 ## Objects
 ##
-../build-$(ConfigurationName)/CncControllerTest/main_app.cpp$(ObjectSuffix): main_app.cpp ../build-$(ConfigurationName)/CncControllerTest/main_app.cpp$(DependSuffix)
+$(IntermediateDirectory)/main_app.cpp$(ObjectSuffix): main_app.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main_app.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/main_app.cpp$(DependSuffix) -MM main_app.cpp
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControllerTest/main_app.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main_app.cpp$(ObjectSuffix) $(IncludePath)
-../build-$(ConfigurationName)/CncControllerTest/main_app.cpp$(DependSuffix): main_app.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT../build-$(ConfigurationName)/CncControllerTest/main_app.cpp$(ObjectSuffix) -MF../build-$(ConfigurationName)/CncControllerTest/main_app.cpp$(DependSuffix) -MM main_app.cpp
+$(IntermediateDirectory)/main_app.cpp$(PreprocessSuffix): main_app.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main_app.cpp$(PreprocessSuffix) main_app.cpp
 
-../build-$(ConfigurationName)/CncControllerTest/main_app.cpp$(PreprocessSuffix): main_app.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) ../build-$(ConfigurationName)/CncControllerTest/main_app.cpp$(PreprocessSuffix) main_app.cpp
-
-../build-$(ConfigurationName)/CncControllerTest/impl.cpp$(ObjectSuffix): impl.cpp ../build-$(ConfigurationName)/CncControllerTest/impl.cpp$(DependSuffix)
+$(IntermediateDirectory)/impl.cpp$(ObjectSuffix): impl.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/impl.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/impl.cpp$(DependSuffix) -MM impl.cpp
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControllerTest/impl.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/impl.cpp$(ObjectSuffix) $(IncludePath)
-../build-$(ConfigurationName)/CncControllerTest/impl.cpp$(DependSuffix): impl.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT../build-$(ConfigurationName)/CncControllerTest/impl.cpp$(ObjectSuffix) -MF../build-$(ConfigurationName)/CncControllerTest/impl.cpp$(DependSuffix) -MM impl.cpp
-
-../build-$(ConfigurationName)/CncControllerTest/impl.cpp$(PreprocessSuffix): impl.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) ../build-$(ConfigurationName)/CncControllerTest/impl.cpp$(PreprocessSuffix) impl.cpp
+$(IntermediateDirectory)/impl.cpp$(PreprocessSuffix): impl.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/impl.cpp$(PreprocessSuffix) impl.cpp
 
 
--include ../build-$(ConfigurationName)/CncControllerTest//*$(DependSuffix)
+-include $(IntermediateDirectory)/*$(DependSuffix)
 ##
 ## Clean
 ##
 clean:
-	$(RM) -r $(IntermediateDirectory)
+	$(RM) -r $(ConfigurationName)/
 
 

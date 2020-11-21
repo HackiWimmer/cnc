@@ -42,7 +42,6 @@ class SVGUserAgent{
 		SVGUserAgentInfo& getCurentUserAgent();
 		SVGUserAgentInfo& getUserAgent(unsigned int pos);
 		
-		void updateCurrentUserAgent(SVGUserAgentInfo& data);
 		void displayUseDirective();
 	
 	public:

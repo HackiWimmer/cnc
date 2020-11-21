@@ -26,6 +26,36 @@ class StackTrace {
 
 STACKTRACE_DB StackTrace::Database;
 
+
+bool GblFunc::replaceSizer(wxSizer* oldSizer, wxSizer* newSizer) {
+	
+	// only a test, currently this cashes
+	
+	wxASSERT_MSG( oldSizer != NULL, "Old sizer is NULL");
+	wxWindow* w1 = oldSizer->GetContainingWindow();
+	
+	std::cout << "1: "<< (long long)w1 << std::endl;
+	std::cout << "2: "<< (long long)w1->GetSizer() << std::endl;
+	
+	std::vector<wxSizerItem*> vector;
+	
+	for ( size_t i=0; i< oldSizer->GetItemCount(); i++ ) {
+		wxSizerItem* si = oldSizer->GetItem(i);
+		vector.push_back(si);
+	}
+	
+
+	std::cout << oldSizer->GetItemCount()<< std::endl;
+	std::cout << "ret: "<< w1->GetSizer()->Replace(oldSizer, newSizer, true) << std::endl;
+	//std::cout << oldSizer->GetItemCount()<< std::endl;
+	
+	for ( auto it = vector.begin(); it != vector.end(); ++it )
+		;//newSizer->Add(*it, wxSizerFlags(100).Expand());
+	
+	return true;
+}
+
+
 ///////////////////////////////////////////////////////////////////
 void GblFunc::swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl) {
 ///////////////////////////////////////////////////////////////////
@@ -48,6 +78,7 @@ void GblFunc::swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl) {
 	
 	wxASSERT( targetSizerItem  != NULL );
 	wxASSERT( sourceSizerItem  != NULL );
+
 	
 	targetSizerItem->AssignWindow(sourceCtrl);
 	sourceSizerItem->AssignWindow(targetCtrl);

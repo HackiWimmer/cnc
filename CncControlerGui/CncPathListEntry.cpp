@@ -1,19 +1,19 @@
 #include "CncPathListEntry.h"
 
-const bool 				CncPathListEntry::DefaultAlreadyRendered  = false;
-const long 				CncPathListEntry::DefaultClientID   	  = -1L;
-const CncSpeedMode 		CncPathListEntry::DefaultSpeedMode  	  =  CncSpeedUserDefined;
-const double			CncPathListEntry::DefaultSpeedValue 	  = -1.0;
-const CncDoublePosition	CncPathListEntry::ZeroTarget			  = {0.0, 0.0, 0.0};
-const CncDoubleDistance	CncPathListEntry::NoDistance			  = {0.0, 0.0, 0.0};
-const CncNanoTimestamp	CncPathListEntry::NoReference			  = -1LL;
+const bool 				CncPathListEntry::DefaultAlreadyRendered	= false;
+const long 				CncPathListEntry::DefaultClientID   		= -1L;
+const CncSpeedMode 		CncPathListEntry::DefaultSpeedMode  		=  CncSpeedUserDefined;
+const double			CncPathListEntry::DefaultSpeedValue 		= -1.0;
+const CncDoublePosition	CncPathListEntry::ZeroTarget				= {0.0, 0.0, 0.0};
+const CncDoubleDistance	CncPathListEntry::NoDistance				= {0.0, 0.0, 0.0};
+const CncNanoTimestamp	CncPathListEntry::NoReference				= -1LL;
 
 //////////////////////////////////////////////////////////////////
 std::ostream& CncPathListEntry::outputOperator(std::ostream &ostr) const {
 //////////////////////////////////////////////////////////////////
 	ostr << " CncPathListEntry: "								<< std::endl;
 	ostr << "  PathList Reference : "	<< pathListReference 	<< std::endl;
-	ostr << "  Type               : "	<< type					<< std::endl;
+	ostr << "  Content            : "	<< content				<< std::endl;
 
 	ostr << "  Client ID          : "	<< clientId		 		<< std::endl;
 	ostr << "  Already rendered   : "	<< alreadyRendered		<< std::endl;
@@ -73,7 +73,7 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 	}
 	else {
 		// should not appear
-		ostr << "Undefined Type: [" << type << "]:"
+		ostr << "Undefined Content: [" << content << "]:"
 			 << "Default output"								<< std::endl
 			 << (*this);
 	}

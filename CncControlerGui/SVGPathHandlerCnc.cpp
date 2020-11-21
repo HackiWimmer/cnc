@@ -110,11 +110,11 @@ bool SVGPathHandlerCnc::initNextPath() {
 	if ( currentCncContext.isGuidePath() )	pathListMgr.initNextGuidePath(CncPathListManager::GuideType::HELP_PATH);
 	else									pathListMgr.initNextCncPath();
 	
-	// Z depth management
 	wxASSERT(cncControl);
 	Serial::Trigger::NextPath tr;
 	cncControl->processTrigger(tr);
 	
+	// Z depth management
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	double zDepth = -currentCncContext.getCurrentZDepth();
 	
@@ -123,7 +123,8 @@ bool SVGPathHandlerCnc::initNextPath() {
 		
 		if ( zDepth > cc->getWorkpieceThickness() )
 			zDepth = cc->getWorkpieceThickness();
-	} else {
+	}
+	else {
 		
 		if ( zDepth < 0.0 ) {
 			//std::cout << "xx: " << zDepth << std::endl;
@@ -136,7 +137,8 @@ bool SVGPathHandlerCnc::initNextPath() {
 			std::cerr << "SVGPathHandlerCnc::initNextPath: error while setting Z depth: ";
 			std::cerr << currentCncContext.getCurrentZDepthMode() << ( currentCncContext.isCurrentZDepthAbs() ? zDepth : -zDepth);
 			std::cerr << ", Wpt: " << cc->getWorkpieceThickness() << std::endl;
-		} else {
+		}
+		else {
 			std::clog << "Warning: ZDept operation [" << currentCncContext.getCurrentZDepthMode();
 			std::clog << ( currentCncContext.isCurrentZDepthAbs() ? zDepth : -zDepth);
 			std::clog << "] ignored because the current workpiece thickness is 0.0 mm" << std::endl;
@@ -150,16 +152,7 @@ bool SVGPathHandlerCnc::initNextPath() {
 bool SVGPathHandlerCnc::finishCurrentPath() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("finsihCurrentPath");
-	
-	PathHandlerBase::finishCurrentPath();
-	
-	// reverse path
-	if ( currentCncContext.getReverseFlag() == true ) {
-		if ( pathListMgr.reversePath() == false )
-			return false;
-	}
-
-	return true;
+	return PathHandlerBase::finishCurrentPath();
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::runCurrentPath() {
@@ -169,7 +162,12 @@ bool SVGPathHandlerCnc::runCurrentPath() {
 	bool ret = true;
 	
 	cncControl->switchToolOn();
-
+	
+	if ( currentCncContext.hasSomethingToCorrect() ) {
+		if ( performCorrections() == false )
+			return false;
+	}
+	
 	while ( cncControl->hasNextDuration() ) {
 		
 		ret = repeatCurrentPath();
@@ -181,7 +179,6 @@ bool SVGPathHandlerCnc::runCurrentPath() {
 	
 	// path is finished now, reset the duration counter
 	cncControl->resetDurationCounter();
-
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
@@ -349,4 +346,82 @@ bool SVGPathHandlerCnc::physicallyMoveZAxisDown() {
 
 	return ret;
 }
+///////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::performCorrections() {
+///////////////////////////////////////////////////////////////////
+	#warning
+	std::cout << "before correction" << std::endl;
+	std::cout << pathListMgr << std::endl;
 
+	// tool correction
+	#warning THE_CONFIG->getToolDiameter() + unit;
+	const double toolDiameter = 10; //THE_CONFIG->getToolDiameter() / 2;
+
+	const CncToolCorretionType tct = currentCncContext.getToolCorrectionType();
+	switch ( tct ) {
+		// --------------------------------------------------------
+		case CncCT_Pocket:
+		{
+			// first create a guide path based on the current path
+			CncPathListManager guidePath(pathListMgr);
+			guidePath.changeToGuideType();
+			guidePath.roundCorners(toolDiameter);
+			publishGuidePath(guidePath);
+			
+			// then create the pocket
+			if ( pathListMgr.processPocket(toolDiameter) == false )
+				return false;
+				
+			break;
+		}
+		// --------------------------------------------------------
+		case CncCT_Inner:
+		{
+			// first create a guide path based on the current path
+			CncPathListManager guidePath(pathListMgr);
+			guidePath.roundCorners(toolDiameter);
+			guidePath.changeToGuideType();
+			publishGuidePath(guidePath);
+			
+			// then correct the current path
+			const double offset = toolDiameter / 2.0;
+			if ( pathListMgr.processInnerOffset(offset) == false )
+				return false;
+			
+			break;
+		}
+		// --------------------------------------------------------
+		case CncCT_Outer:
+		{
+			// first create a guide path based on the current path
+			CncPathListManager guidePath(pathListMgr);
+			guidePath.changeToGuideType();
+			publishGuidePath(guidePath);
+			
+			// then correct the current path
+			const double offset = toolDiameter / 2.0;
+			if ( pathListMgr.processOuterOffset(offset) == false )
+				return false;
+			
+			break;
+		}
+		// --------------------------------------------------------
+		case CncCT_Center:
+		case CncCT_None:
+		{
+			// nothing to do here
+		}
+	}
+	
+	// reverse path
+	if ( currentCncContext.hasReverseCorrection() == true ) {
+		if ( pathListMgr.reversePath() == false )
+			return false;
+	}
+	
+	#warning
+	std::cout << "after correction" << std::endl;
+	std::cout << pathListMgr << std::endl;
+	
+	return true;
+}

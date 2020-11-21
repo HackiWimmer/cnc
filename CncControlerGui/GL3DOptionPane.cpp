@@ -51,6 +51,7 @@ void GL3DOptionPane::propertyChanged(wxPropertyGridEvent& event) {
 	motionMonitor->getContextOptions().autoScale			= m_pgPropAutoScaling->GetValue().GetBool();
 	motionMonitor->getContextOptions().showRuler			= m_pgPropDrawRuler->GetValue().GetBool();
 	motionMonitor->getContextOptions().showHelpLines		= m_pgPropDrawHelpLines->GetValue().GetBool();
+	motionMonitor->getContextOptions().showGuidePathes		= m_pgPropDrawGuidePathes->GetValue().GetBool();
 	motionMonitor->getContextOptions().showBoundBox			= m_pgPropDrawBoundBox->GetValue().GetBool();
 	motionMonitor->getContextOptions().helpLines3D_XYPlane	= m_pgPropHLXYPlane->GetValue().GetBool();
 	motionMonitor->getContextOptions().helpLines3D_XZPlane	= m_pgPropHLXZPlane->GetValue().GetBool();
@@ -86,6 +87,7 @@ void GL3DOptionPane::notifyChange(GLContextOptions& options) {
 	m_pgPropAutoScaling->SetValue(options.autoScale);
 	m_pgPropDrawRuler->SetValue(options.showRuler);
 	m_pgPropDrawHelpLines->SetValue(options.showHelpLines);
+	m_pgPropDrawGuidePathes->SetValue(options.showGuidePathes);
 	m_pgPropDrawBoundBox->SetValue(options.showBoundBox);
 	m_pgPropHLXYPlane->SetValue(options.helpLines3D_XYPlane);
 	m_pgPropHLXZPlane->SetValue(options.helpLines3D_XZPlane);

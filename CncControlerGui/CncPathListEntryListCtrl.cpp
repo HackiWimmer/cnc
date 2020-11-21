@@ -33,7 +33,7 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("Type",	 		wxLIST_FORMAT_LEFT, 	44);
+	AppendColumn("Content",	 		wxLIST_FORMAT_LEFT, 	44);
 	AppendColumn("PathList ID",		wxLIST_FORMAT_LEFT, 	120);
 	AppendColumn("Client ID", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("F [mm/min]",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -117,7 +117,7 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 	const bool displayPosition = ( cpe.isPositionChange() == true || cpe.isNothingChanged() == true );
 	
 	switch ( column ) {
-		case CncPathListEntryListCtrl::COL_TYPE:			return wxString::Format("%d", 		cpe.type);
+		case CncPathListEntryListCtrl::COL_CONT:			return wxString::Format("%d", 		cpe.content);
 		case CncPathListEntryListCtrl::COL_REF: 			return wxString::Format("%lld", 	cpe.pathListReference);
 		case CncPathListEntryListCtrl::COL_CLD_ID:			return wxString::Format(fmt, 		cpe.clientId);
 		
@@ -137,11 +137,13 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 /////////////////////////////////////////////////////////////
 int CncPathListEntryListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
-	if ( column == COL_TYPE ) {
+	if ( column == COL_CONT ) {
 		
 		if ( isItemValid(item) == false )
 			return -1;
-			
+		
+		#warning
+		/*
 		const CncPathListEntry& cpe = pathLists.at(item);
 		switch ( cpe.type ) {
 			case CncPathListEntry::Type::CHG_NOTHING:		return 0;
@@ -149,6 +151,7 @@ int CncPathListEntryListCtrl::OnGetItemColumnImage(long item, long column) const
 			case CncPathListEntry::Type::CHG_SPEED:			return 2;
 			case CncPathListEntry::Type::CHG_POSITION:		return 3;
 		}
+		 */ 
 	}
 	
 	return -1;
@@ -162,12 +165,12 @@ wxListItemAttr* CncPathListEntryListCtrl::OnGetItemAttr(long item) const {
 	const CncPathListEntry& cpe = pathLists.at(item);
 	const bool b = (item == getLastSelection());
 	
-	if 		( cpe.type == CncPathListEntry::Type::CHG_NOTHING ) 	return (wxListItemAttr*)( b ? (&initialItemAttrSelected)  : (&initialItemAttr) );
-	else if	( cpe.type == CncPathListEntry::Type::CHG_CLIENTID )	return (wxListItemAttr*)( b ? (&clientIdItemAttrSelected) : (&clientIdItemAttr) );
-	else if ( cpe.type == CncPathListEntry::Type::CHG_SPEED ) 		return (wxListItemAttr*)( b ? (&speedItemAttrSelected)    : (&speedItemAttr) );
+	if      ( cpe.hasPositionChange() )		return (wxListItemAttr*)( b ? (&defaultItemAttrSelected)  : (&defaultItemAttr) );
+	else if	( cpe.hasClientIdChange() )		return (wxListItemAttr*)( b ? (&clientIdItemAttrSelected) : (&clientIdItemAttr) );
+	else if ( cpe.hasSpeedChange() )		return (wxListItemAttr*)( b ? (&speedItemAttrSelected)    : (&speedItemAttr) );
 	
 	// this indicates to use the default style
-	return (wxListItemAttr*)( b ? (&defaultItemAttrSelected) : (&defaultItemAttr) );
+	return (wxListItemAttr*)( b ? (&initialItemAttrSelected)  : (&initialItemAttr) );
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::onSize(wxSizeEvent& event) {
@@ -218,6 +221,20 @@ void CncPathListEntryListCtrl::onSelectListItem(wxListEvent& event) {
 	
 	SelectEventBlocker blocker(this);
 	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_PATH_LIST);
+	
+	
+	#warning
+	
+	
+	if ( isItemValid(item) == true ) {
+		CncPathListEntry& x =  pathLists.at(item);
+		
+		
+		
+	}
+	
+	
+	
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::onActivateListItem(wxListEvent& event) {

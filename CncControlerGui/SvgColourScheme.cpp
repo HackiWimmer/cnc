@@ -57,6 +57,12 @@ bool SvgColourDecoder::matchesBlue() const {
 //////////////////////////////////////////////////////////////////
 bool SvgColourDecoder::matchesGray() const {
 //////////////////////////////////////////////////////////////////
+	if ( matchesBlack() )
+		return false;
+	
+	if ( matchesWhite() )
+		return false;
+	
 	const bool r = currentTest.Red();
 	const bool g = currentTest.Green();
 	const bool b = currentTest.Blue();

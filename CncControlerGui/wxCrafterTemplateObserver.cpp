@@ -59,11 +59,22 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer6554->Add(12, 0, 1, wxALL, WXC_FROM_DIP(0));
     
+    wxFlexGridSizer* flexGridSizer24 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer24->SetFlexibleDirection( wxBOTH );
+    flexGridSizer24->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer6554->Add(flexGridSizer24, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_btOpenExtern = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btOpenExtern->SetToolTip(_("Open Source extern with configured tool"));
+    
+    flexGridSizer24->Add(m_btOpenExtern, 0, wxALL, WXC_FROM_DIP(5));
+    
     m_staticText6553 = new wxStaticText(this, wxID_ANY, _("This will setup the source editor\nas readonly"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText6553Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText6553->SetFont(m_staticText6553Font);
     
-    flexGridSizer6554->Add(m_staticText6553, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer24->Add(m_staticText6553, 0, wxALL, WXC_FROM_DIP(5));
     
     wxArrayString m_actionSelectionArr;
     m_actionSelectionArr.Add(_("Nothing"));
@@ -188,6 +199,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     }
     // Connect events
     m_observationMode->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(CncTemplateObserverBase::changeObservationMode), NULL, this);
+    m_btOpenExtern->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncTemplateObserverBase::openTemplateExtern), NULL, this);
     m_button6532->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncTemplateObserverBase::clearTrace), NULL, this);
     m_observeTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncTemplateObserverBase::observe), NULL, this);
     
@@ -196,6 +208,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
 CncTemplateObserverBase::~CncTemplateObserverBase()
 {
     m_observationMode->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(CncTemplateObserverBase::changeObservationMode), NULL, this);
+    m_btOpenExtern->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncTemplateObserverBase::openTemplateExtern), NULL, this);
     m_button6532->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncTemplateObserverBase::clearTrace), NULL, this);
     m_observeTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncTemplateObserverBase::observe), NULL, this);
     

@@ -56,11 +56,11 @@ class SVGFileParser : public SVGParserBase
 		void registerXMLNode(wxXmlNode *child);
 		void debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrString);
 		
-		inline bool performPath(SVGUserAgentInfo& uai);
-		inline bool performPathByIds(SVGUserAgentInfo& uai);
-		inline bool prepareTransformMatrix(SVGUserAgentInfo& uai);
-		inline bool performUse(SVGUserAgentInfo& uai, UseDirective& ud);
-		inline bool spoolPath(SVGUserAgentInfo& uai, const wxString& transform = "");
+		inline bool performPath(const SVGUserAgentInfo& uai);
+		inline bool performPathByIds(const SVGUserAgentInfo& uai);
+		inline bool prepareTransformMatrix(const SVGUserAgentInfo& uai);
+		inline bool performUse(const SVGUserAgentInfo& uai, UseDirective& ud);
+		inline bool spoolPath(const SVGUserAgentInfo& uai, const wxString& transform = "");
 		
 		virtual bool shouldAToolChangeProcessed() { return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
 

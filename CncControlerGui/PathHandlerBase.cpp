@@ -105,7 +105,7 @@ void PathHandlerBase::tracePositions(const char* userPerspectivePrefix) {
 		std::cout << " PL.First.Pos  : empty" << std::endl;
 		std::cout << " PL.Last.Pos   : empty" << std::endl;
 	}
-	std::cout << " PL.firstPath  : " << pathListMgr.getFirstPathFlag()   << std::endl;
+	std::cout << " PL.firstPath  : " << pathListMgr.isPathFlaggedAsFirst() << std::endl;
 	std::cout << " PL.Start Pos  : " << pathListMgr.getStartPos().getX() << std::endl;
 
 	std::cout << " StartPos      : " << startPos   << std::endl;
@@ -136,7 +136,7 @@ void PathHandlerBase::processSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN) {
 	pathListMgr.addEntryAdm(mode, feedSpeed_MM_MIN);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(2) // will return on failure
 	
@@ -196,7 +196,7 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, double values
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processClose_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processClose_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(0) // will return on failure
 	
@@ -214,7 +214,7 @@ bool PathHandlerBase::processClose_2DXY(char c, unsigned int count, double value
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processLine_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processLine_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(2) // will return on failure
 	
@@ -235,7 +235,7 @@ bool PathHandlerBase::processLine_2DXY(char c, unsigned int count, double values
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processHLine_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processHLine_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(1) // will return on failure
 	
@@ -254,7 +254,7 @@ bool PathHandlerBase::processHLine_2DXY(char c, unsigned int count, double value
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processVLine_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processVLine_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(1) // will return on failure
 	
@@ -294,7 +294,7 @@ bool PathHandlerBase::processARC_2DXY(CncCurveLib::ParameterElliptical& ps) {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processARC_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processARC_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(7) // will return on failure
 	
@@ -345,7 +345,7 @@ bool PathHandlerBase::processQuadraticBezier_2DXY(CncCurveLib::ParameterQuadrati
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processQuadraticBezier_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processQuadraticBezier_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(4) // will return on failure
 	
@@ -406,7 +406,7 @@ bool PathHandlerBase::processCubicBezier_2DXY(CncCurveLib::ParameterCubicBezier&
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processCubicBezier_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processCubicBezier_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(6) // will return on failure
 	
@@ -462,7 +462,7 @@ bool PathHandlerBase::processCubicBezier_2DXY(char c, unsigned int count, double
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processQuadraticBezierSmooth_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processQuadraticBezierSmooth_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(2) // will return on failure
 	
@@ -470,20 +470,22 @@ bool PathHandlerBase::processQuadraticBezierSmooth_2DXY(char c, unsigned int cou
 	
 	// p0 (startPos) for curve lib is always absolute
 	CncCurveLib::Point p0 = {currentPos.getX(), currentPos.getY()};
-	values[3] = values[1];
-	values[2] = values[0];
-	values[1] = lastQuadraticControlPoint.getLastControlPoint(p0).y; // todo abs or rel???
-	values[0] = lastQuadraticControlPoint.getLastControlPoint(p0).x; // todo abs or rel???
+	
+	double newValues[MAX_PARAMETER_VALUES];
+	newValues[3] = values[1];
+	newValues[2] = values[0];
+	newValues[1] = lastQuadraticControlPoint.getLastControlPoint(p0).y; // todo abs or rel???
+	newValues[0] = lastQuadraticControlPoint.getLastControlPoint(p0).x; // todo abs or rel???
 	
 	switch ( c ) {
 		case 't': c = 'q'; break;
 		case 'T': c = 'Q'; break;
 	}
 	
-	return processCommand_2DXY(c, 4, values);
+	return processCommand_2DXY(c, 4, newValues);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(4) // will return on failure
 	
@@ -491,22 +493,24 @@ bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, 
 	
 	// p0 (startPos) for curve lib is always absolute
 	CncCurveLib::Point p0 = {currentPos.getX(), currentPos.getY()};
-	values[5] = values[3];
-	values[4] = values[2];
-	values[3] = values[1];
-	values[2] = values[0];
-	values[1] = lastCubicControlPoint.getLastControlPoint(p0).y; // todo abs or rel ???
-	values[0] = lastCubicControlPoint.getLastControlPoint(p0).x; // todo abs or rel ???
+	
+	double newValues[MAX_PARAMETER_VALUES];
+	newValues[5] = values[3];
+	newValues[4] = values[2];
+	newValues[3] = values[1];
+	newValues[2] = values[0];
+	newValues[1] = lastCubicControlPoint.getLastControlPoint(p0).y; // todo abs or rel ???
+	newValues[0] = lastCubicControlPoint.getLastControlPoint(p0).x; // todo abs or rel ???
 	
 	switch ( c ) {
 		case 's': c = 'C'; break;
 		case 'S': c = 'C'; break;
 	}
 	
-	return processCommand_2DXY(c, 6, values);
+	return processCommand_2DXY(c, 6, newValues);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( isInitialized() == false ) {
 		std::cerr	<< CNC_LOG_FUNCT 

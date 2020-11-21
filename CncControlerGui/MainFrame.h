@@ -355,7 +355,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void openTemplate(wxCommandEvent& event);
 		virtual void reloadTemplate(wxCommandEvent& event);
 		virtual void openTemplateSourceExtern(wxCommandEvent& event);
-		virtual void openTemplateSvgExtern(wxCommandEvent& event);
+		virtual void openTemplateExtern(wxCommandEvent& event);
 		virtual void reloadTemplateFromButton(wxCommandEvent& event);
 		virtual void defineUpdateCoordinates(wxCommandEvent& event);
 		virtual void defineAllowEvents(wxCommandEvent& event);
@@ -477,6 +477,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		//////////////////////////////////////////////////////////////////////////////////
 		// svg edit popup callbacks
 		void openCurrentTemplateInBrowser();
+		void openTemplateExtern();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void displayNotification(const Notification& notification);
@@ -748,8 +749,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void openFileFromFileManager(const wxString& fn);
 		void openNavigatorFromGamepad();
 		
-		bool openFileExtern(const wxString& tool, const char* file, bool checkToolExists=true);
-		bool openFileExtern(const wxString& tool, wxString& file, bool checkToolExists=true);
+		bool openFileExtern(const wxString& tool, const wxString& file, bool checkToolExists=true);
 		
 		CncTemplateFormat getTemplateFormat(const wxString& fn);
 		const char* getTemplateFormatName(const wxString& fn);
@@ -767,7 +767,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		BinaryFileParser::ViewType getCurrentBinaryViewMode();
 		
 		bool openFile(int pageToSelect = -1);
-		bool saveFile();
+		bool saveFile(bool interactive = true);
 		bool saveFileAs();
 		
 		///////////////////////////////////////////////////////////////

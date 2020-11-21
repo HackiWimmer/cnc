@@ -3,9 +3,7 @@
 
 /////////////////////////////////////////////////////////
 SVGUserAgentInfo::SVGUserAgentInfo() 
-: transformInfoString		()
-, styleInfoString			()
-, lineNumber				(UNDEFINED_LINE_NUMBER)
+: lineNumber				(UNDEFINED_LINE_NUMBER)
 , nodeType					(NT_UNDEFINED)
 , nodeName					()
 , elementId					()
@@ -31,16 +29,18 @@ SVGUserAgentInfo::~SVGUserAgentInfo() {
 	pathInfoList.clear();
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgentInfo::isMemberOf(const wxString& id, const char* type) {
+bool SVGUserAgentInfo::isMemberOf(const wxString& id, const char* type) const {
 /////////////////////////////////////////////////////////
 	if ( id.length() > 0 ) {
-		DoubleStringMap::iterator it;
-		it = ids.find(id);
+		
+		auto it = ids.find(id);
 		if ( it != ids.end() ) {
 			if ( it->second == type )
 				return true;
 		}
-	} else {
+	} 
+	else {
+		
 		for (auto it=ids.begin(); it!=ids.end(); ++it) {
 			if ( it->second == type )
 				return true;
@@ -50,27 +50,27 @@ bool SVGUserAgentInfo::isMemberOf(const wxString& id, const char* type) {
 	return false;
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgentInfo::isMemberOfSymbol(const wxString& id) {
+bool SVGUserAgentInfo::isMemberOfSymbol(const wxString& id) const {
 /////////////////////////////////////////////////////////
 	return isMemberOf(id, "symbol");
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgentInfo::isMemberOfGroup(const wxString& id) {
+bool SVGUserAgentInfo::isMemberOfGroup(const wxString& id) const {
 /////////////////////////////////////////////////////////
 	return isMemberOf(id, "g");
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgentInfo::hasTransform() {
+bool SVGUserAgentInfo::hasTransform() const {
 /////////////////////////////////////////////////////////
 	return (transformList.size() > 0 );
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgentInfo::hasStyle() {
+bool SVGUserAgentInfo::hasStyle() const {
 /////////////////////////////////////////////////////////
 	return (styleList.size() > 0 );
 }
 /////////////////////////////////////////////////////////
-void SVGUserAgentInfo::debug(DoubleStringMap& dsm, std::ostream& out) {
+void SVGUserAgentInfo::debug(const DoubleStringMap& dsm, std::ostream& out) const {
 /////////////////////////////////////////////////////////
 	for (auto it=dsm.begin(); it!=dsm.end(); ++it) {
 		out << it->first;
@@ -80,15 +80,15 @@ void SVGUserAgentInfo::debug(DoubleStringMap& dsm, std::ostream& out) {
 	}
 }
 /////////////////////////////////////////////////////////
-void SVGUserAgentInfo::debug(PathInfo& pi, std::ostream& out) {
+void SVGUserAgentInfo::debug(const PathInfo& pi, std::ostream& out) const {
 /////////////////////////////////////////////////////////
-	out << "Command: " << pi.cmd << ", Count: " << pi.count << std::endl;
-	for (unsigned int i=0; i< pi.count; i++) {
+	out << "Command: " << pi.cmd << ", Count: " << pi.cnt << std::endl;
+	for (unsigned int i=0; i< pi.cnt; i++) {
 		out << "Value( " << i << "): " << pi.values[i] << std::endl;
 	}
 }
 /////////////////////////////////////////////////////////
-void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) {
+void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
 /////////////////////////////////////////////////////////
 	wxString value;
 	
@@ -126,29 +126,25 @@ void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) {
 	}
 }
 /////////////////////////////////////////////////////////
-const char* SVGUserAgentInfo::getTransformInfoAsString() {
+const char* SVGUserAgentInfo::getTransformInfoAsString() const {
 /////////////////////////////////////////////////////////
-	transformInfoString.clear();
-	for (auto it=transformList.begin(); it!=transformList.end(); ++it) {
-		transformInfoString.append(*it);
-		transformInfoString.append(" ");
-	}
+	wxString ret;
+	for (auto it=transformList.begin(); it!=transformList.end(); ++it)
+		ret.append(wxString::Format("%s ", *it));
 	
-	return transformInfoString.c_str();
+	return ret;
 }
 /////////////////////////////////////////////////////////
-const char* SVGUserAgentInfo::getStyleInfoAsString() {
+const char* SVGUserAgentInfo::getStyleInfoAsString() const {
 /////////////////////////////////////////////////////////
-	styleInfoString.clear();
-	for (auto it=styleList.begin(); it!=styleList.end(); ++it) {
-		styleInfoString.append(*it);
-		styleInfoString.append(" ");
-	}
+	wxString ret;
+	for (auto it=styleList.begin(); it!=styleList.end(); ++it)
+		ret.append(wxString::Format("%s ", *it));
 	
-	return styleInfoString.c_str();
+	return ret;
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgentInfo::shouldProceed() {
+bool SVGUserAgentInfo::shouldProceed() const {
 /////////////////////////////////////////////////////////
 	if ( nodeType == NT_CNC_PARAM )
 		return false;
@@ -161,27 +157,25 @@ bool SVGUserAgentInfo::shouldProceed() {
 	return true;
 }
 /////////////////////////////////////////////////////////
-void SVGUserAgentInfo::getPathDetails(DcmItemList& rows) {
+void SVGUserAgentInfo::getPathDetails(DcmItemList& rows) const {
 /////////////////////////////////////////////////////////
 	if ( nodeType != NT_PATH ) 
 		return;
 		
 	DataControlModel::addKeyValueRow(rows, "Path", originalPath);
 	for ( auto it=pathInfoList.begin(); it!=pathInfoList.end(); ++it ) {
-		PathInfo& pi = *it;
-		wxString command;
-		command << pi.cmd;
-		command << ", Count=";
-		command << (int)pi.count;
+		
+		const PathInfo& pi = *it;
+		const wxString command(wxString::Format("%c, Count=&u", pi.cmd, pi.cnt));
 		DataControlModel::addKeyValueRow(rows, "  Command", command);
 		
-		for ( unsigned int i=0; i<pi.count; i++ ) {
+		for ( unsigned int i=0; i<pi.cnt; i++ ) {
 			DataControlModel::addKeyValueRow(rows, wxString::Format(wxT("    Token(%d)"), i+1), pi.values[i]);
 		}
 	}
 }
 /////////////////////////////////////////////////////////
-void SVGUserAgentInfo::getDetails(DcmItemList& rows) {
+void SVGUserAgentInfo::getDetails(DcmItemList& rows) const {
 /////////////////////////////////////////////////////////
 	getBaseDetails(rows);
 	getPathDetails(rows);

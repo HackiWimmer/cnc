@@ -35,7 +35,7 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		
 	public:
 
-		static const int COL_TYPE 			=  0;
+		static const int COL_CONT 			=  0;
 		static const int COL_REF 			=  1;
 		static const int COL_CLD_ID			=  2;
 		static const int COL_F				=  3;

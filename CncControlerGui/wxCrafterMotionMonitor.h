@@ -23,8 +23,8 @@
 #include <wx/imaglist.h>
 #include <wx/bmpbuttn.h>
 #include <wx/tglbtn.h>
-#include <wx/listctrl.h>
 #include <wx/splitter.h>
+#include <wx/listctrl.h>
 #include <wx/simplebook.h>
 #include <wx/checkbox.h>
 #include <wx/choicebk.h>
@@ -151,7 +151,11 @@ protected:
     wxBitmapButton* m_btPathListEntryNext;
     wxBitmapButton* m_btPathListEntryLast;
     wxStaticLine* m_staticLine219;
+    wxSplitterWindow* m_pathListDetails;
+    wxPanel* m_splitterPage387;
     wxListCtrl* m_pathListEntriesPlaceholder;
+    wxPanel* m_splitterPage383;
+    wxTextCtrl* m_textCtrl395;
     wxPanel* m_panelMoveSequences;
     wxPanel* m_plMoveSequences;
     wxBitmapButton* m_bmpButton304;
@@ -239,6 +243,10 @@ public:
     wxBitmapButton* GetBtPathListEntryLast() { return m_btPathListEntryLast; }
     wxStaticLine* GetStaticLine219() { return m_staticLine219; }
     wxListCtrl* GetPathListEntriesPlaceholder() { return m_pathListEntriesPlaceholder; }
+    wxPanel* GetSplitterPage387() { return m_splitterPage387; }
+    wxTextCtrl* GetTextCtrl395() { return m_textCtrl395; }
+    wxPanel* GetSplitterPage383() { return m_splitterPage383; }
+    wxSplitterWindow* GetPathListDetails() { return m_pathListDetails; }
     wxPanel* GetPlPathListView() { return m_plPathListView; }
     wxPanel* GetPanelPathListEntries() { return m_panelPathListEntries; }
     wxBitmapButton* GetBmpButton304() { return m_bmpButton304; }
@@ -351,6 +359,7 @@ protected:
     wxPGProperty* m_pgPropAutoScaling;
     wxPGProperty* m_pgPropDrawOrigin;
     wxPGProperty* m_pgPropDrawFlyPath;
+    wxPGProperty* m_pgPropDrawGuidePathes;
     wxPGProperty* m_pgPropDrawHelpLines;
     wxPGProperty* m_pgPropPositionMarker;
     wxPGProperty* m_pgPropZoom;
@@ -451,6 +460,7 @@ class GL3DDrawPaneBase : public wxPanel
 {
 protected:
     wxButton* m_btnOrigin;
+    wxButton* m_btnGuidePathes;
     wxButton* m_btnRuler;
     wxButton* m_btnHelpLines;
     wxButton* m_btnPosMarker;
@@ -488,6 +498,7 @@ protected:
 
 protected:
     virtual void onToggleOrigin(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleGuidePathes(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleRuler(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleHelpLines(wxCommandEvent& event) { event.Skip(); }
     virtual void onTogglePosMarker(wxCommandEvent& event) { event.Skip(); }
@@ -509,6 +520,7 @@ protected:
 
 public:
     wxButton* GetBtnOrigin() { return m_btnOrigin; }
+    wxButton* GetBtnGuidePathes() { return m_btnGuidePathes; }
     wxButton* GetBtnRuler() { return m_btnRuler; }
     wxButton* GetBtnHelpLines() { return m_btnHelpLines; }
     wxButton* GetBtnPosMarker() { return m_btnPosMarker; }

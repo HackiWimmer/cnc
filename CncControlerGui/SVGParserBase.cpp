@@ -49,6 +49,15 @@ inline int SVGParserBase::getCommandParaCount(char c) {
 //////////////////////////////////////////////////////////////////
 bool SVGParserBase::evaluatePath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
+	// data contains the content of the d="" attribute, this a multi command context
+	// there's an example:
+	// d = "
+	//      M 0.68598735,110.12961 21.583664,93.092966 41.867069,42.606192 83.739072,47.632386 94.14101,38.983749 97.47977,6.2701413 
+	//      l -1.01348,-3.944304 4.18955,-2.06530296 27.86445,6.36728696 -1.82864,2.999917 -0.57888,4.9551207 37.64267,8.153743 33.85591
+	//      z
+	// "
+	// Main cause of this method is to token down data into single commands
+	
 	initNextPath(data);
 	
 	int sPos = -1;
@@ -85,6 +94,13 @@ bool SVGParserBase::evaluatePath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
 bool SVGParserBase::processPathCommand(const wxString& para) {
 //////////////////////////////////////////////////////////////////
+	// para contains one command context only
+	// there's an example:
+	// M 0.68598735,110.12961 21.583664,93.092966 41.867069,42.606192 83.739072,47.632386 94.14101,38.983749 97.47977,6.2701413
+	//
+	// Main cause of this method is to token down the values into a list of path elements 
+	// to finally call the virtual method addPathElement(...)
+	
 	if ( para.Length() == 0 )
 		return true;
 

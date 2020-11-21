@@ -14,6 +14,7 @@
 #include <wx/artprov.h>
 #include <wx/sizer.h>
 #include <wx/checkbox.h>
+#include <wx/bmpbuttn.h>
 #include <wx/stattext.h>
 #include <wx/radiobox.h>
 #include <wx/textctrl.h>
@@ -40,6 +41,7 @@ class CncTemplateObserverBase : public wxPanel
 {
 protected:
     wxCheckBox* m_observationMode;
+    wxBitmapButton* m_btOpenExtern;
     wxStaticText* m_staticText6553;
     wxRadioBox* m_actionSelection;
     wxStaticText* m_staticText7386;
@@ -54,11 +56,13 @@ protected:
 
 protected:
     virtual void changeObservationMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void openTemplateExtern(wxCommandEvent& event) { event.Skip(); }
     virtual void clearTrace(wxCommandEvent& event) { event.Skip(); }
     virtual void observe(wxTimerEvent& event) { event.Skip(); }
 
 public:
     wxCheckBox* GetObservationMode() { return m_observationMode; }
+    wxBitmapButton* GetBtOpenExtern() { return m_btOpenExtern; }
     wxStaticText* GetStaticText6553() { return m_staticText6553; }
     wxRadioBox* GetActionSelection() { return m_actionSelection; }
     wxStaticText* GetStaticText7386() { return m_staticText7386; }

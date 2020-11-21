@@ -558,10 +558,40 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7624->Add(m_staticLine219, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_pathListEntriesPlaceholder = new wxListCtrl(m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), wxLC_REPORT);
+    m_pathListDetails = new wxSplitterWindow(m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), wxSP_3D);
+    m_pathListDetails->SetSashGravity(0.5);
+    m_pathListDetails->SetMinimumPaneSize(10);
+    
+    flexGridSizer7624->Add(m_pathListDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPage387 = new wxPanel(m_pathListDetails, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_pathListDetails, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    wxFlexGridSizer* flexGridSizer391 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer391->SetFlexibleDirection( wxBOTH );
+    flexGridSizer391->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer391->AddGrowableCol(0);
+    flexGridSizer391->AddGrowableRow(0);
+    m_splitterPage387->SetSizer(flexGridSizer391);
+    
+    m_pathListEntriesPlaceholder = new wxListCtrl(m_splitterPage387, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage387, wxSize(-1,-1)), wxLC_REPORT);
     m_pathListEntriesPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer7624->Add(m_pathListEntriesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer391->Add(m_pathListEntriesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPage383 = new wxPanel(m_pathListDetails, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_pathListDetails, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_pathListDetails->SplitHorizontally(m_splitterPage387, m_splitterPage383, 0);
+    
+    wxFlexGridSizer* flexGridSizer393 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer393->SetFlexibleDirection( wxBOTH );
+    flexGridSizer393->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer393->AddGrowableCol(0);
+    flexGridSizer393->AddGrowableRow(0);
+    m_splitterPage383->SetSizer(flexGridSizer393);
+    
+    m_textCtrl395 = new wxTextCtrl(m_splitterPage383, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPage383, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE);
+    m_textCtrl395->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer393->Add(m_textCtrl395, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panelMoveSequences = new wxPanel(m_listbookPreProcessor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbookPreProcessor, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelMoveSequencesImgIndex;
@@ -1141,6 +1171,10 @@ GL3DOptionPaneBase::GL3DOptionPaneBase(wxWindow* parent, wxWindowID id, const wx
     m_pgPropDrawFlyPath->SetHelpString(wxT(""));
     m_pgPropDrawFlyPath->SetEditor( wxT("CheckBox") );
     
+    m_pgPropDrawGuidePathes = m_pgMgr3543->AppendIn( m_pgCatDisplayOptions,  new wxBoolProperty( _("Show Guide Pathes"), wxPG_LABEL, 1) );
+    m_pgPropDrawGuidePathes->SetHelpString(wxT(""));
+    m_pgPropDrawGuidePathes->SetEditor( wxT("CheckBox") );
+    
     m_pgPropDrawHelpLines = m_pgMgr3543->AppendIn( m_pgCatDisplayOptions,  new wxBoolProperty( _("Show Help Lines"), wxPG_LABEL, 1) );
     m_pgPropDrawHelpLines->SetHelpString(wxT(""));
     m_pgPropDrawHelpLines->SetEditor( wxT("CheckBox") );
@@ -1623,6 +1657,16 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     flexGridSizer363->Add(m_btnOrigin, 0, wxALL, WXC_FROM_DIP(1));
     m_btnOrigin->SetMinSize(wxSize(26,26));
     
+    m_btnGuidePathes = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btnGuidePathes->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("edit-guides")), wxLEFT);
+    m_btnGuidePathes->SetBitmapMargins(2,2);
+    #endif
+    m_btnGuidePathes->SetToolTip(_("Toggle: Show Guide Pathes"));
+    
+    flexGridSizer363->Add(m_btnGuidePathes, 0, wxALL, WXC_FROM_DIP(1));
+    m_btnGuidePathes->SetMinSize(wxSize(26,26));
+    
     m_btnRuler = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btnRuler->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ruler2")), wxLEFT);
@@ -1638,7 +1682,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     m_btnHelpLines->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-grid")), wxLEFT);
     m_btnHelpLines->SetBitmapMargins(2,2);
     #endif
-    m_btnHelpLines->SetToolTip(_("Toggle: Show HelpLines"));
+    m_btnHelpLines->SetToolTip(_("Toggle: Show Help Lines"));
     
     flexGridSizer363->Add(m_btnHelpLines, 0, wxALL, WXC_FROM_DIP(1));
     m_btnHelpLines->SetMinSize(wxSize(26,26));
@@ -1943,6 +1987,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     }
     // Connect events
     m_btnOrigin->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleOrigin), NULL, this);
+    m_btnGuidePathes->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleGuidePathes), NULL, this);
     m_btnRuler->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleRuler), NULL, this);
     m_btnHelpLines->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleHelpLines), NULL, this);
     m_btnPosMarker->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onTogglePosMarker), NULL, this);
@@ -1967,6 +2012,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
 GL3DDrawPaneBase::~GL3DDrawPaneBase()
 {
     m_btnOrigin->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleOrigin), NULL, this);
+    m_btnGuidePathes->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleGuidePathes), NULL, this);
     m_btnRuler->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleRuler), NULL, this);
     m_btnHelpLines->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onToggleHelpLines), NULL, this);
     m_btnPosMarker->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DDrawPaneBase::onTogglePosMarker), NULL, this);

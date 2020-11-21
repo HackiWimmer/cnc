@@ -55,6 +55,7 @@ void GL3DDrawPane::enable(bool state) {
 /////////////////////////////////////////////////////////////////
 	m_btnOrigin->Enable(state);
 	m_btnRuler->Enable(state);
+	m_btnGuidePathes->Enable(state);
 	m_btnHelpLines->Enable(state);
 	m_btnPosMarker->Enable(state);
 	m_btnBoundBox->Enable(state);
@@ -281,6 +282,12 @@ void GL3DDrawPane::onToggleFlyPathes(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showFlyPath);
 	motionMonitor->reconstruct();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::onToggleGuidePathes(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showGuidePathes);
+	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
 void GL3DDrawPane::onToggleHelpLines(wxCommandEvent& event) {

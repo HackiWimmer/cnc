@@ -968,48 +968,13 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
-#include "SvgColourScheme.h"
+#include <wx/wrapsizer.h>
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	SvgColourDecoder cs;
-	auto checkStr = [&](const wxString& str) {
-		cs.setColour(str);	std::cout << str << " --> " << cs << std::endl; 
-	}; 
-	
-	auto traceCol = [&](const wxColour& col) {
-		if ( col.IsOk() )
-			std::cout << "rgb(" << (int)col.Red() << "," << (int)col.Green() << "," << (int)col.Blue() << ")" << std::endl;
-		else
-			std::cerr << "Invalid colour" << std::endl;
-	};
-	
-	if ( false ) {
-		checkStr("HackiWimmer");
-		checkStr("red");
-		checkStr("green");
-		checkStr("blue");
-		
-		checkStr("#80d380;");
-		checkStr("rgb(153,68,0);");
-		checkStr("hsl(240,100%,50%);");
-	}
-	
-	if ( true ) {
-		SvgColourAttributeDecoder cad;
-		cad.setDefaultFillColour(*wxRED);
-		
-		cad.decode("stroke:#e48080;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:round;paint-order:stroke fill markers;fill-opacity:1;stroke-opacity:1;fill:black");
-		traceCol(cad.getFillColour());
-		traceCol(cad.getStrokeColour());
-		
-		cad.reset();
-		cad.decode("stroke:#e48080;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:round;paint-order:stroke fill markers;fill-opacity:1;stroke-opacity:1");
-		traceCol(cad.getFillColour());
-		traceCol(cad.getStrokeColour());
-	}
+	GblFunc::replaceSizer(m_openSourceExtern->GetContainingSizer(), new wxWrapSizer(wxVERTICAL));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -3297,32 +3262,37 @@ void MainFrame::openTemplateSourceExtern(wxCommandEvent& event) {
 	openFileExtern(tool, externalFile);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::openTemplateSvgExtern(wxCommandEvent& event) {
+void MainFrame::openTemplateExtern(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	openTemplateExtern();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openTemplateExtern() {
 ///////////////////////////////////////////////////////////////////
 	wxString tool;
 	
 	switch ( getCurrentTemplateFormat() ) {
 		case TplBinary:
 					// binary files are readonly, thereforenow saveFile() necessary here
-					CncConfig::getGlobalCncConfig()->getBINFileViewer(tool);
+					THE_CONFIG->getBINFileViewer(tool);
 					openFileExtern(tool, getCurrentTemplatePathFileName());
 					break;
 					
 		case TplSvg:
-					saveFile();
-					CncConfig::getGlobalCncConfig()->getSVGFileViewer(tool);
+					saveFile(false);
+					THE_CONFIG->getSVGFileViewer(tool);
 					openFileExtern(tool, getCurrentTemplatePathFileName());
 					break;
 					
 		case TplGcode:
-					saveFile();
-					CncConfig::getGlobalCncConfig()->getGCodeFileViewer(tool);
+					saveFile(false);
+					THE_CONFIG->getGCodeFileViewer(tool);
 					openFileExtern(tool, getCurrentTemplatePathFileName());
 					break;
 					
 		default:
 					std::clog << "No external editor availiable for current file: " 
-					          << getCurrentTemplatePathFileName().c_str() 
+							  << getCurrentTemplatePathFileName().c_str() 
 							  << std::endl;
 	}
 }
@@ -3332,20 +3302,23 @@ void MainFrame::activateMainWindow(wxActivateEvent& event) {
 	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::saveFile() {
+bool MainFrame::saveFile(bool interactive) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(sourceEditor);
-	
-	// First select the template page to get the rigth result 
-	// by getCurrentTemplateFormat
-	selectMainBookSourcePanel();
-	
 	// Deactivate observer
 	CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
 	
+	wxASSERT(sourceEditor);
 	bool ret = sourceEditor->saveFile();
-	if ( ret == true )
-		prepareAndShowMonitorTemplatePreview(true);
+	
+	if ( interactive == true ) {
+		
+		// First select the template page to get the rigth result 
+		// by getCurrentTemplateFormat
+		selectMainBookSourcePanel();
+		
+		if ( ret == true )
+			prepareAndShowMonitorTemplatePreview(true);
+	}
 	
 	return ret;
 }
@@ -4258,21 +4231,26 @@ void MainFrame::resetMinMaxPositions() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::saveTemplateOnDemand() {
 ///////////////////////////////////////////////////////////////////
-	wxString msg(wxString::Format("The current template file\n\n '%s'\n\nwas modified. Save it?", getCurrentTemplatePathFileName()));
+	const wxString msg(wxString::Format("Save Template?\n\n '%s'", getCurrentTemplatePathFileName()));
 	
 	if ( sourceEditor->IsModified() == true ) {
-		wxMessageDialog dlg(this, msg, _T("Save template . . . "), 
-		                    wxYES|wxNO|wxCANCEL|wxICON_QUESTION|wxCENTRE);
- 	
+		wxRichMessageDialog dlg(this, msg, _T("File Observer . . . "), 
+		                    wxYES|wxNO|wxCANCEL|wxCENTRE);
+		
+		dlg.SetFooterText("The current template was modified.");
+		dlg.SetFooterIcon(wxICON_WARNING);
+		
 		int ret = dlg.ShowModal();
-	
 		if ( ret == wxID_YES ) {
 			saveFile();
-		} else if ( ret == wxID_CANCEL ) {
+			selectMonitorBookCncPanel();
+			
+		} 
+		else if ( ret == wxID_CANCEL ) {
 			return false;
 		}
 	}
-
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -5703,13 +5681,7 @@ void MainFrame::toogleSvgEditSearchFlag(wxCommandEvent& event) {
 	searchConditionsChanged();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::openFileExtern(const wxString& tool, const char* file, bool checkToolExists) {
-///////////////////////////////////////////////////////////////////
-	wxString f(file);
-	return openFileExtern(tool, f, checkToolExists);
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::openFileExtern(const wxString& tool, wxString& file, bool checkToolExists) {
+bool MainFrame::openFileExtern(const wxString& tool, const wxString& file, bool checkToolExists) {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
 	

@@ -91,6 +91,8 @@ class CncPathListRunner {
 		void logMeasurementStart();
 		void logMeasurementEnd();
 		
+		bool publishGuidePath(const CncPathListManager& plm);
+		
 		void onPhysicallySwitchToolState(bool state);
 		bool onPhysicallyExecute(const CncPathListManager& plm);
 		

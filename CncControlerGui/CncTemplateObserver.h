@@ -9,7 +9,11 @@ class CncTemplateObserver : public CncTemplateObserverBase {
 		virtual ~CncTemplateObserver();
 		
 	protected:
-		
+		virtual void openTemplateExtern(wxCommandEvent& event);
+		virtual void clearTrace(wxCommandEvent& event);
+		virtual void changeObservationMode(wxCommandEvent& event);
+		virtual void observe(wxTimerEvent& event);
+
 		void startObservation();
 		void stopObservation();
 		
@@ -18,9 +22,6 @@ class CncTemplateObserver : public CncTemplateObserverBase {
 		
 		void enableControls(bool state);
 		
-		virtual void clearTrace(wxCommandEvent& event);
-		virtual void changeObservationMode(wxCommandEvent& event);
-		virtual void observe(wxTimerEvent& event);
 		
 		void changeObservation(bool state);
 		void logTimestamp();

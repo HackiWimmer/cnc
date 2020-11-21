@@ -36,11 +36,6 @@ SVGUserAgentInfo& SVGUserAgent::getCurentUserAgent() {
 	return userAgent.back();
 }
 /////////////////////////////////////////////////////////
-void SVGUserAgent::updateCurrentUserAgent(SVGUserAgentInfo& data) {
-/////////////////////////////////////////////////////////
-	userAgent.back() = data;
-}
-/////////////////////////////////////////////////////////
 SVGUserAgentInfo& SVGUserAgent::getUserAgent(unsigned int pos) {
 /////////////////////////////////////////////////////////
 	if ( pos < userAgent.size() )
@@ -61,10 +56,10 @@ void SVGUserAgent::displayUseDirective() {
 		
 	DcmItemList rows;
 	
-	for ( UseDirectiveVector::iterator it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 ) {
-		UseDirective ud = *it1;
+	for ( auto it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 ) {
+		UseDirective& ud = *it1;
 		wxString data;
-		for ( DoubleStringMap::iterator it2 = ud.attributes.begin(); it2 != ud.attributes.end(); ++it2 ) {
+		for ( auto it2 = ud.attributes.begin(); it2 != ud.attributes.end(); ++it2 ) {
 			data << it2->first;
 			data << "=";
 			data << it2->second;
@@ -73,7 +68,7 @@ void SVGUserAgent::displayUseDirective() {
 		DataControlModel::addKeyValueRow(rows, ud.id, data);
 	}
 	
-	for ( DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it ) {
+	for ( auto it = rows.begin(); it != rows.end(); ++it ) {
 		oCtl.useDirectiveList->AppendItem(*it);
 	}
 }
@@ -113,11 +108,11 @@ bool SVGUserAgent::initNextPath(SvgCncContext& cwp, const wxString& origPath) {
 	sua.attributes.swap(collectedAttributes);
 	
 	// copy the following lists
-	sua.ids				= collectedIds;
-	sua.transformList 	= collectedTransforms;
-	sua.styleList		= collectedStyles;
+	sua.ids					= collectedIds;
+	sua.transformList		= collectedTransforms;
+	sua.styleList			= collectedStyles;
 
-	userAgent.push_back(sua);
+	userAgent.push_back(std::move(sua));
 	return true;
 }
 /////////////////////////////////////////////////////////
@@ -134,7 +129,7 @@ bool SVGUserAgent::initNextCncParameterNode(const SvgCncContext& cwp) {
 	// copy the following lists - why ????
 	sua.styleList		= collectedStyles;
 	
-	userAgent.push_back(sua);
+	userAgent.push_back(std::move(sua));
 	return true;
 }
 /////////////////////////////////////////////////////////
@@ -148,7 +143,7 @@ bool SVGUserAgent::initNextCncBreakNode(const SvgCncBreak& scb) {
 	sua.originalPath		= "";
 	sua.cncBreak			= scb;
 	
-	userAgent.push_back(sua);
+	userAgent.push_back(std::move(sua));
 	return true;
 }
 /////////////////////////////////////////////////////////
@@ -162,7 +157,7 @@ bool SVGUserAgent::initNextCncPauseNode(const SvgCncPause& scp) {
 	sua.originalPath		= "";
 	sua.cncPause			= scp;
 	
-	userAgent.push_back(sua);
+	userAgent.push_back(std::move(sua));
 	return true;
 }
 /////////////////////////////////////////////////////////
@@ -202,9 +197,7 @@ bool SVGUserAgent::addStyle(const wxString& s) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::removeId(const wxString& id) {
 /////////////////////////////////////////////////////////
-	DoubleStringMap::iterator it;
-	it = collectedIds.find(id);
-	if ( it != collectedIds.end() ) {
+	if ( auto it = collectedIds.find(id); it != collectedIds.end() ) {
 		collectedIds.erase(it);
 		return true;
 	}
@@ -292,10 +285,7 @@ const UserAgentVector& SVGUserAgent::getList() {
 UseDirective& SVGUserAgent::evaluateUseDirective(UseDirective& ud) {
 /////////////////////////////////////////////////////////
 	// search xlink:href, fill ud.id and remove xlink:href key from map
-	DoubleStringMap::iterator it;
-	it = ud.attributes.find("xlink:href");
-	
-	if ( it != ud.attributes.end() ) {
+	if ( auto it = ud.attributes.find("xlink:href"); it != ud.attributes.end() ) {
 		ud.id = it->second.substr(1);
 		ud.attributes.erase(it);
 	} 
@@ -305,16 +295,9 @@ UseDirective& SVGUserAgent::evaluateUseDirective(UseDirective& ud) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::addPathElement(char c, unsigned int count, double values[]) {
 /////////////////////////////////////////////////////////
-	SVGUserAgentInfo sua = getCurentUserAgent();
+	SVGUserAgentInfo& sua = getCurentUserAgent();
 	if ( sua.lineNumber > 0 ) {
-		PathInfo pi;
-		pi.cmd 		= c;
-		pi.count 	= count;
-		for (unsigned int i=0; i<count; i++ )
-			pi.values[i] = values[i];
-			
-		sua.pathInfoList.push_back(pi);
-		updateCurrentUserAgent(sua);
+		sua.pathInfoList.push_back(std::move(PathInfo(c, count, values)));
 		return true;
 	}
 	
@@ -324,15 +307,17 @@ bool SVGUserAgent::addPathElement(char c, unsigned int count, double values[]) {
 bool SVGUserAgent::displayDetailInfo(unsigned int pos) {
 /////////////////////////////////////////////////////////
 	if ( oCtl.detailInfo != NULL ) {
+		
+		const SVGUserAgentInfo& sua = getUserAgent(pos);
 		DcmItemList rows;
-		SVGUserAgentInfo sua = getUserAgent(pos);
 		sua.getDetails(rows);
 		
-		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
+		for (auto it = rows.begin(); it != rows.end(); ++it)
 			oCtl.detailInfo->AppendItem(*it);
-		}
+			
 		return true;
 	}
+	
 	return false;
 }
 /////////////////////////////////////////////////////////
@@ -387,9 +372,10 @@ void SVGUserAgent::clearControls() {
 void SVGUserAgent::evaluateTraceInfo(wxXmlNode* tr) {
 /////////////////////////////////////////////////////////
 	// over all stored pathes
-	for ( UserAgentVector::iterator itUav = userAgent.begin(); itUav != userAgent.end(); ++itUav ) {
-		SVGUserAgentInfo uai  = *itUav;
-		wxXmlNode* n = new wxXmlNode();
+	for ( auto itUav = userAgent.begin(); itUav != userAgent.end(); ++itUav ) {
+		SVGUserAgentInfo& uai	= *itUav;
+		wxXmlNode*			n 	= new wxXmlNode();
+		
 		n->SetName("UserAgentInfo");
 		n->SetType( wxXML_ELEMENT_NODE);
 		n->AddAttribute("type", uai.nodeName);
@@ -398,16 +384,17 @@ void SVGUserAgent::evaluateTraceInfo(wxXmlNode* tr) {
 		tr->AddChild(n);
 	}
 	
-	for ( UseDirectiveVector::iterator it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 ) {
-		UseDirective ud = *it1;
-		wxXmlNode* n = new wxXmlNode();
+	for ( auto it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 ) {
+		UseDirective&  ud	= *it1;
+		wxXmlNode*		n	= new wxXmlNode();
+		
 		n->SetName("UseDirective");
 		n->SetType( wxXML_ELEMENT_NODE);
 		n->AddAttribute("ID", ud.id);
 		
-		for ( DoubleStringMap::iterator it2 = ud.attributes.begin(); it2 != ud.attributes.end(); ++it2 ) {
+		for ( auto it2 = ud.attributes.begin(); it2 != ud.attributes.end(); ++it2 ) 
 			n->AddAttribute(it2->first, it2->second);
-		}
+		
 		tr->AddChild(n);
 	}
 }

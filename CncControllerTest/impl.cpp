@@ -1,5 +1,11 @@
 #include <iostream>
 #include <cmath> 
+#include <algorithm>
+#include <numeric>
+#include <iostream>
+#include <utility>
+#include <vector>
+
 #include "impl.h"
 #include <wx/string.h>
 #include <wx/datetime.h>
@@ -15,7 +21,7 @@
 #include "C:\@Development\@Projekte\c++\CNCGuiController\Arduino\StepperEnvironment\CncAcmr.h"
 #include "C:\@Development\@Projekte\c++\CNCGuiController\Arduino\StepperEnvironment\CncAcmr.ino"
 
-
+ 
 #include "C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\CncGamePad.h"
 
 /////////////////////////////////////////////////////////////
@@ -136,10 +142,99 @@ template<> bool Foo<OPTIMISTIC>::f()
   return OPTIMISTIC;
 }
 
+class MyInt{
+	
+	public:
+		MyInt(int i_)
+		:i(i_)
+		{
+			for ( unsigned int k = 0; k< 10; k++)
+				values[k] = 0.1 * i;
+		}
+		
+		// copy semantic
+		MyInt(const MyInt&)= delete;
+		MyInt& operator= (const MyInt&)= delete;
+		
+		// move semantic
+		MyInt(MyInt&&)= default;
+		MyInt& operator= (MyInt&&)= default;
+		
+		int getVal() const {
+			return i;
+		}
+		
+		double getDouble(unsigned int k) const {
+			return values[k];
+		}
+		
+	private:
+		int i;
+		
+		double values[10];
+};
+
+class string
+{
+    // ...
+	public:
+		// copy constructor
+		string(const string& rhs);
+		// move constructor
+		string(string&& rhs) noexcept;
+		// copy assignment operator
+		auto operator=(const string& rhs) & -> string&;
+		// move assignment operator
+		auto operator=(string&& rhs) & noexcept -> string&;
+};
+
+
 ////////////////////////////////////////////////////
 void Implementation::run() {
 ////////////////////////////////////////////////////
 	std::cout << "Start . . ." << std::endl;
+	
+	
+	MyInt a(5);
+	MyInt b(10);
+
+	b = std::move(a);
+	
+	std::cout << a.getVal() <<", "<< b.getVal() << std::endl; 
+	
+	return;
+	
+	
+	
+    std::vector<MyInt> vecMyInt;
+    
+	for (auto i= 1; i <= 10; ++i) {
+        vecMyInt.push_back(std::move(MyInt(i)));
+    }
+    
+    std::for_each(vecMyInt.begin(), vecMyInt.end(), [](MyInt& myInt)
+	{ 
+		std::cout << myInt.getVal() << " ["; 
+		for ( unsigned int k = 0; k< 10; k++)
+			std::cout << myInt.getDouble(k) << " "; 
+			
+		std::cout << "]\n";
+	});
+    
+    std::cout << std::endl;
+	
+	for ( auto it = vecMyInt.begin(); it != vecMyInt.end(); ++it ) {
+		
+	}
+    
+    //auto myInt= MyInt(std::accumulate(vecMyInt.begin(), vecMyInt.end(),MyInt(1),[](MyInt& f, MyInt& s){ return f.getVal() * s.getVal(); }));
+    
+    //std::cout << "myInt.getVal(): " << myInt.getVal() << std::endl;
+    
+    std::cout << std::endl;
+
+	
+	return;
 	
 	Foo<true> foo;
 	foo.f();

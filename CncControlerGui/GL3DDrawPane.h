@@ -34,6 +34,7 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 	protected:
 		virtual void onClearMonitor(wxCommandEvent& event);
 		virtual void onRefreshMonitor(wxCommandEvent& event);
+		virtual void onToggleGuidePathes(wxCommandEvent& event);
 		virtual void onToggleBoundBox(wxCommandEvent& event);
 		virtual void onToggleFlyPathes(wxCommandEvent& event);
 		virtual void onToggleHelpLines(wxCommandEvent& event);

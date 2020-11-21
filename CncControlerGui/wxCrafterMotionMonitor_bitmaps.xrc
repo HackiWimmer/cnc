@@ -30,6 +30,7 @@
   <object class="wxBitmap" name="arrow-rotate-clockwise">bitmaps\arrow-rotate-clockwise.png</object>
   <object class="wxBitmap" name="database-link">bitmaps\database-link.png</object>
   <object class="wxBitmap" name="database-table">bitmaps\database-table.png</object>
+  <object class="wxBitmap" name="edit-guides">bitmaps\edit-guides.png</object>
   <object class="wxBitmap" name="git-reset-repo">bitmaps\git-reset-repo.png</object>
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
   <object class="wxBitmap" name="media-playback-pause-7">bitmaps\media-playback-pause-7.png</object>
