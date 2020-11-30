@@ -22,10 +22,12 @@
 #include "CncExceptions.h"
 #include "CncCommon.h"
 #include "CncContext.h"
+#include "CncBoundarySpace.h"
 #include "CncGamePad.h"
 #include "CncFileNameService.h"
 #include "CncLoggerView.h"
 #include "CncLoggerProxy.h"
+#include "CncMillingSoundController.h"
 #include "wxCrafterImages.h"
 #include "MainFrame.h"
 #include "CncControl.h"
@@ -44,6 +46,7 @@ CncControl::CncControl(CncPortType pt)
 , realtimeFeedSpeed_MM_MIN		(0.0)
 , defaultFeedSpeedRapid_MM_MIN	(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , defaultFeedSpeedWork_MM_MIN	(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
+, speedMemory_MM_MIN			()
 , configuredSpeedMode			(CncSpeedRapid)
 , configuredFeedSpeed_MM_MIN	(0.0)
 , durationCounter				(0)
@@ -486,65 +489,64 @@ inline void CncControl::setValue(wxTextCtrl *ctl, const char* val) {
 		ctl->ChangeValue(wxString::Format(wxT("%s"),val));
 }
 ///////////////////////////////////////////////////////////////////
+void CncControl::setZeroPosX(int32_t v) {
+///////////////////////////////////////////////////////////////////
+	curAppPos.setX(v);
+	zeroAppPos.setX(v);
+	startAppPos.setX(v);
+	
+	if ( isConnected() == true ) {
+		if ( processSetter(PID_X_POS, (int32_t)(v)) == false ) {
+			std::cerr << "Can't zero controllers X position!" << std::endl;
+			return;
+		}
+	}
+	
+	curCtlPos.setX(v);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::setZeroPosY(int32_t v) {
+///////////////////////////////////////////////////////////////////
+	curAppPos.setY(v);
+	zeroAppPos.setY(v);
+	startAppPos.setY(v);
+	
+	if ( isConnected() == true ) {
+		if ( processSetter(PID_Y_POS, (int32_t)(v)) == false ) {
+			std::cerr << "Can't zero controllers Y position!" << std::endl;
+			return;
+		}
+	}
+	
+	curCtlPos.setY(v);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::setZeroPosZ(int32_t v) {
+///////////////////////////////////////////////////////////////////
+	curAppPos.setZ(v);
+	zeroAppPos.setZ(v);
+	startAppPos.setZ(v);
+	
+	if ( isConnected() == true ) {
+		if ( processSetter(PID_Z_POS, (int32_t)(v)) == false ) {
+			std::cerr << "Can't zero controllers Z position!" << std::endl;
+			return;
+		}
+	}
+	
+	curCtlPos.setZ(v);
+}
+///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos(bool x, bool y, bool z) {
 ///////////////////////////////////////////////////////////////////
-	// -------------------------------------------------------------
-	auto setToZeroPosX =[&]() {
-		curAppPos.setX(0);
-		zeroAppPos.setX(0);
-		startAppPos.setX(0);
-		
-		if ( isConnected() == true ) {
-			if ( processSetter(PID_X_POS, (int32_t)(0)) == false ) {
-				std::cerr << "Can't zero controllers X position!" << std::endl;
-				return;
-			}
-		}
-		
-		curCtlPos.setX(0);
-	};
+	#warning ... ref pos
+	int32_t zVal = 0L;
+	if ( THE_BOUNDS->includesWpt() == true )
+		zVal = (long)round(THE_BOUNDS->getWorkpieceThickness() * THE_CONFIG->getCalculationFactZ());
 	
-	// -------------------------------------------------------------
-	auto setToZeroPosY = [&]() {
-		curAppPos.setY(0);
-		zeroAppPos.setY(0);
-		startAppPos.setY(0);
-		
-		if ( isConnected() == true ) {
-			if ( processSetter(PID_Y_POS, (int32_t)(0)) == false ) {
-				std::cerr << "Can't zero controllers Y position!" << std::endl;
-				return;
-			}
-		}
-		
-		curCtlPos.setY(0);
-	};
-	
-	// -------------------------------------------------------------
-	auto setToZeroPosZ = [&]() {
-		int32_t val = 0L;
-		
-		if ( THE_CONFIG->getReferenceIncludesWpt() == true )
-			val = (long)round(THE_CONFIG->getWorkpieceThickness() * THE_CONFIG->getCalculationFactZ());
-		
-		curAppPos.setZ(val);
-		zeroAppPos.setZ(val);
-		startAppPos.setZ(val);
-		
-		if ( isConnected() == true ) {
-			if ( processSetter(PID_Z_POS, (int32_t)(val)) == false ) {
-				std::cerr << "Can't zero controllers Z position!" << std::endl;
-				return;
-			}
-		}
-		
-		curCtlPos.setZ(val);
-	};
-	
-	// -------------------------------------------------------------
-	if ( x ) setToZeroPosX();
-	if ( y ) setToZeroPosY();
-	if ( z ) setToZeroPosZ();
+	if ( x ) setZeroPosX(0);
+	if ( y ) setZeroPosY(0);
+	if ( z ) setZeroPosZ(zVal);
 	
 	postAppPosition(PID_XYZ_POS_MAJOR);
 	postCtlPosition(PID_XYZ_POS_MAJOR);
@@ -736,10 +738,13 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	const double maxValue = THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
 	if ( value <= 0.0 )			value = 0.0;
 	if ( value > maxValue )		value = maxValue;
-
+	
+	bool somethingChanged = false;
+	
 	// avoid the code below if nothing will change
 	if ( configuredSpeedMode != s ) {
-		configuredSpeedMode = s;
+		configuredSpeedMode	= s;
+		somethingChanged	= true;
 		
 		const Serial::Trigger::SpeedChange tr(configuredSpeedMode, configuredFeedSpeed_MM_MIN);
 		processTrigger(tr);
@@ -747,7 +752,10 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	
 	// avoid the setter below if nothing will change
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false ) {
-		configuredFeedSpeed_MM_MIN = value;
+		configuredFeedSpeed_MM_MIN	= value;
+		somethingChanged			= true;
+		
+		CncMillingSound::adjust(configuredFeedSpeed_MM_MIN);
 		
 		const int32_t val = configuredFeedSpeed_MM_MIN * FLT_FACT / 60;
 		const char mode   = cnc::getCncSpeedTypeAsCharacter(configuredSpeedMode);
@@ -757,6 +765,9 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 			return false;
 		}
 	}
+	
+	if ( somethingChanged == true )
+		speedMemory_MM_MIN[configuredSpeedMode] = configuredFeedSpeed_MM_MIN;
 	
 	return true;
 }
@@ -773,6 +784,11 @@ bool CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s) {
 	}
 	
 	return changeCurrentFeedSpeedXYZ_MM_MIN(value, s);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::changeSpeedToPrevStoredSpeed_MM_MIN(CncSpeedMode s) {
+///////////////////////////////////////////////////////////////////
+	return changeCurrentFeedSpeedXYZ_MM_MIN(speedMemory_MM_MIN[s], s);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setDefaultRapidSpeed_MM_MIN(float s) { 
@@ -1193,7 +1209,7 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 		// the compairison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos || force == true) {
-			CncContext::PositionStorage::addPos(CncContext::PositionStorage::TRIGGER_APP_POS, curCtlPos);
+			PositionStorage::addPos(PositionStorage::TRIGGER_APP_POS, curCtlPos);
 			
 			THE_APP->addAppPosition(	pid, 
 										getClientId(), 
@@ -1211,7 +1227,7 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 void CncControl::postCtlPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) {
-		CncContext::PositionStorage::addPos(CncContext::PositionStorage::TRIGGER_CTL_POS, curCtlPos);
+		PositionStorage::addPos(PositionStorage::TRIGGER_CTL_POS, curCtlPos);
 		
 		// a position compairsion isn't necessay here because the serialControllerCallback(...)
 		// call this method only on position changes
@@ -1446,6 +1462,9 @@ void CncControl::switchToolOn() {
 
 	if ( toolPowerState == TOOL_STATE_OFF ) { 
 		if ( processSetter(PID_TOOL_SWITCH, TOOL_STATE_ON) ) {
+			
+			CncMillingSound::play(getConfiguredFeedSpeed_MM_MIN());
+			
 			toolPowerState = TOOL_STATE_ON;
 			displayToolState(toolPowerState);
 		}
@@ -1459,6 +1478,9 @@ void CncControl::switchToolOff(bool force) {
 
 	if ( toolPowerState == TOOL_STATE_ON || force == true ) {
 		if ( processSetter(PID_TOOL_SWITCH, TOOL_STATE_OFF) ) {
+			
+			CncMillingSound::stop();
+			
 			toolPowerState = TOOL_STATE_OFF;
 			displayToolState(toolPowerState);
 		}
@@ -1924,14 +1946,14 @@ bool CncControl::correctLimitPositions() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::convertPositionToHardwareCoordinate(const CncLongPosition& pos, CncLongPosition& ret) {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->hardwareOriginOffset.valid == false ) {
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == false ) {
 		ret = pos;
 		return false;
 	}
 	
-	ret.setX(abs(THE_CONTEXT->hardwareOriginOffset.dx) + pos.getX());
-	ret.setY(abs(THE_CONTEXT->hardwareOriginOffset.dy) + pos.getY());
-	ret.setZ(abs(THE_CONTEXT->hardwareOriginOffset.dz) + pos.getZ());
+	ret.setX(abs(THE_BOUNDS->getHardwareOffset().getAsStepsX()) + pos.getX());
+	ret.setY(abs(THE_BOUNDS->getHardwareOffset().getAsStepsY()) + pos.getY());
+	ret.setZ(abs(THE_BOUNDS->getHardwareOffset().getAsStepsZ()) + pos.getZ());
 	
 	return true;
 }
@@ -1977,16 +1999,12 @@ bool CncControl::evaluateHardwareReference() {
 		if ( ret == false ) { return returnFalse("Error while moveYToMinLimit()"); }
 	}
 	
-	// determine the current distance to Xmin, Ymin and Zmax
-	const int32_t dx = prevCtlPos.getX() + curCtlPos.getX();
-	const int32_t dy = prevCtlPos.getY() + curCtlPos.getY();
-	const int32_t dz = prevCtlPos.getZ() + curCtlPos.getZ();
+	CncLongPosition tmp(curCtlPos);
+	#warning necessary until Z has end switsches . . . 
+	tmp.setZ(0);
 	
-	// normalize the current distance to the origin (0, 0, 0)
-	THE_CONTEXT->hardwareOriginOffset.dx    = dx - prevCtlPos.getX();
-	THE_CONTEXT->hardwareOriginOffset.dy    = dy - prevCtlPos.getY();
-	THE_CONTEXT->hardwareOriginOffset.dz    = dz - prevCtlPos.getZ();
-	THE_CONTEXT->hardwareOriginOffset.valid = true; 
+	THE_BOUNDS->setHardwareOffset(tmp);
+	THE_BOUNDS->setHardwareOffsetValid(true); 
 	
 	// move to previous positions
 	moveRelLinearStepsXY(abs(prevCtlPos.getX() - curCtlPos.getX()), abs(prevCtlPos.getY() - curCtlPos.getY()), false);
@@ -2000,7 +2018,7 @@ bool CncControl::evaluateHardwareReference() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::evaluateHardwareDimensionsZAxis(DimensionZAxis& result) {
 ///////////////////////////////////////////////////////////////////
-	float 			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
+	float			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
 	CncLongPosition	prevCtlPos	= curCtlPos;
 	
 	// ------------------------------------------------------------
@@ -2309,7 +2327,7 @@ void CncControl::sendIdleMessage() {
 	getSerial()->processIdle();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::addGuidePath(const CncPathListManager& plm) {
+void CncControl::addGuidePath(const CncPathListManager& plm, double zOffset) {
 ///////////////////////////////////////////////////////////////////
 	// first release the trigger
 	const Serial::Trigger::GuidePath tr(&plm);
@@ -2317,5 +2335,5 @@ void CncControl::addGuidePath(const CncPathListManager& plm) {
 	
 	// do this last because appendGuidPath and follows use std::move(plm)
 	if ( THE_APP->getMotionMonitor() )
-		THE_APP->getMotionMonitor()->appendGuidPath(plm);
+		THE_APP->getMotionMonitor()->appendGuidPath(plm, zOffset);
 }

@@ -50,6 +50,7 @@
 	#define CncRuntime_CALCULATION_FACT_Y 					"#|CncRuntime|CALCULATION_FACT_Y"
 	#define CncRuntime_CALCULATION_FACT_Z 					"#|CncRuntime|CALCULATION_FACT_Z"
 	
+	/*
 	#define CncRuntime_Z_MAX_DURATIONS						"#|CncRuntime|Z_MAX_DURATIONS"
 	#define CncRuntime_Z_WORKPIECE_OFFSET					"#|CncRuntime|Z_WORKPIECE_OFFSET"
 	#define CncRuntime_Z_MAX_DURATION_THICKNESS				"#|CncRuntime|Z_MAX_DURATION_THICKNESS"
@@ -57,7 +58,7 @@
 	#define CncRuntime_Z_CURRENT_Z_DISTANCE					"#|CncRuntime|Z_CURRENT_Z_DISTANCE"
 	#define CncRuntime_Z_WORKPIECE_INCLUDED					"#|CncRuntime|Z_WORKPIECE_INCLUDED"
 	#define CncRuntime_Z_DURATION_THICKNESS					"#|CncRuntime|Z_DURATION_THICKNESS"
-	
+	*/
 	#define CncApplication_SHOW_SPLASH_SCREEN 				"CncApplication|SHOW_SPLASH_SCREEN"
 	#define CncApplication_DEF_DISPLAY_UNIT 				"CncApplication|DEF_DISPLAY_UNIT"
 	#define CncApplication_AUTO_CONNECT 					"CncApplication|AUTO_CONNECT"
@@ -83,8 +84,11 @@
 	#define CncApplication_Tool_PY_CAM 						"CncApplication_Tools|OSD_PY_CAM"
 	
 	#define CncSvg_Parser_REVERSE_Y_AXIS					"CncSvg_Parser|CONVERT_TO_RIGHT_HAND"
+	#define CncSvg_Parser_CONSIDER_VIEWBOX					"CncSvg_Parser|CONSIDER_VIEWBOX"
+	#define CncSvg_Parser_DEFAULT_VIEW_TYPE					"CncSvg_Parser|DEFAULT_VIEW_TYPE"
 	#define CncSvg_Parser_USE_COLOUR_SCHEME					"CncSvg_Parser|USE_COLOUR_SCHEME"
 	#define CncSvg_Parser_MAX_THICKNESS_CROSS				"CncSvg_Parser|MAX_THICKNESS_PER_CROSSING"
+	#define CncSvg_Parser_SUREFACE_Z_OFFSET					"CncSvg_Parser|SUREFACE_Z_OFFSET"
 	
 	#define CncGCode_Parser_PLACEHOLDER						"CncGCode_Parser|CGODE_PLACEHOLDER"
 	
@@ -92,6 +96,7 @@
 	#define CncWork_Ctl_REPLY_THRESHOLD_METRIC				"CncWork_Controller|REPLY_THRESHOLD_METRIC"
 	#define CncWork_Ctl_REPLY_THRESHOLD_STEPS				"CncWork_Controller|REPLY_THRESHOLD_STEPS"
 	#define CncWork_Ctl_AVOID_DUP_SETTER_VALUES				"CncWork_Controller|AVOID_DUP_SETTER_VALUES"
+	#define CncWork_Ctl_SIMULATE_MILLING_WITH_SOUND			"CncWork_Controller|AVOID_SIMULATE_MILLING_WITH_SOUND"
 	#define CncWork_Ctl_REQUEST_IDLE_REQUESTS				"CncWork_Controller|REQUEST_IDLE_REQUESTS"
 	#define CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE			"CncWork_Controller|INTERRUPT_BY_POS_OUTOFRANGE"
 	#define CncWork_Ctl_INVERSE_CTL_DIRECTION_X				"CncWork_Controller|INVERSE_CTL_DIRECTION_X"

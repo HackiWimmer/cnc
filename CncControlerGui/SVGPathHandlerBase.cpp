@@ -76,3 +76,4 @@ bool SVGPathHandlerBase::processLinearMove(const LinearMoveParam& param) {
 	return true;
 }
 
+

@@ -1,15 +1,18 @@
 #include "CncConfig.h"
 #include "MainFrame.h"
 #include "GlobalFunctions.h"
+#include "SvgCncContext.h"
 #include "SvgEditPopup.h"
 
-#define svgPathGenItemString								"PGen - Insert last SVG pattern"
-unsigned int SvgEditPopup::_idOffset 						= wxID_HIGHEST;
+#define svgPathGenItemString									"PGen - Insert last SVG pattern"
+unsigned int SvgEditPopup::_idOffset 							= wxID_HIGHEST;
 
-wxString SvgNodeTemplates::_ret								= _T("");
-const char* SvgNodeTemplates::CncParameterBlockNodeName		= "CncParameterBlock";
-const char* SvgNodeTemplates::CncBreakBlockNodeName			= "CncBreak";
-const char* SvgNodeTemplates::CncPauseBlockNodeName			= "CncPause";
+wxString SvgNodeTemplates::_ret									= _T("");
+const char* SvgNodeTemplates::CncParameterResetBlockNodeName	= "CncParameterReset";
+const char* SvgNodeTemplates::CncParameterPrintBlockNodeName	= "CncParameterPrint";
+const char* SvgNodeTemplates::CncParameterBlockNodeName			= "CncParameterBlock";
+const char* SvgNodeTemplates::CncBreakBlockNodeName				= "CncBreak";
+const char* SvgNodeTemplates::CncPauseBlockNodeName				= "CncPause";
 
 //////////////////////////////////////////////////////////
 const char* SvgNodeTemplates::getSamplesAsString() {
@@ -30,13 +33,59 @@ const char* SvgNodeTemplates::getSamplesAsString() {
 	_ret << "\t\t<!--path d=\"M 5,5\" stroke=\"black\" fill=\"none\" stroke-width=\"0.5\"/-->\n";
 	_ret << "\t<!--samples end /-->\n";
 	
+	_ret << "\n";
+	_ret << getCncParameterHelp();
+	_ret << "\n";
+	
+	return _ret.c_str();
+}
+//////////////////////////////////////////////////////////
+const char* SvgNodeTemplates::getCncParameterHelp() {
+//////////////////////////////////////////////////////////
+	std::stringstream ss;
+	SvgCncContext::provideUsage(ss, 10);
+	
+	_ret.clear();
+	_ret << "<!--\n";
+	_ret << "  Cnc parameter usage start\n\n";
+	_ret << ss.str();
+	_ret << "  Cnc parameter usage end\n";
+	_ret << "-->\n";
+	
 	return _ret.c_str();
 }
 //////////////////////////////////////////////////////////
 const char* SvgNodeTemplates::getCncParameterBlock() {
 //////////////////////////////////////////////////////////
+
+SvgCncContext::provideUsage(std::cout);
+
 	_ret.clear();
-	_ret  = wxString::Format("<%s\n depth=\"z-0.0\"\n reverse=\"no\"\n correction=\"none\"/>\n", SvgNodeTemplates::CncParameterBlockNodeName);
+	_ret  = wxString::Format("<%s " \
+							 "TooList=\"T_000={0.00}\" " \
+							 "ToolAdd=\"T_001={0.00}\" " \
+							 "ToolDelete=\"T_001\" " \
+							 "ToolSelect=\"T_000\" " \
+							 "ZDept=\"Z-0.00\" " \
+							 "UseColourScheme=\"Yes|No\" " \
+							 "PathModification=\"Center|Inner|Outer|Pocket\" " \
+							 "PathRule=\"EnsureClockwise|EnsureCounterClockwise|ReversePath\" " \
+							 "/>\n", 
+							 SvgNodeTemplates::CncParameterBlockNodeName);
+	return _ret.c_str();
+}
+//////////////////////////////////////////////////////////
+const char* SvgNodeTemplates::getCncParameterPrint() {
+//////////////////////////////////////////////////////////
+	_ret.clear();
+	_ret  = wxString::Format("<%s/>\n", SvgNodeTemplates::CncParameterPrintBlockNodeName);
+	return _ret.c_str();
+}
+//////////////////////////////////////////////////////////
+const char* SvgNodeTemplates::getCncParameterReset() {
+//////////////////////////////////////////////////////////
+	_ret.clear();
+	_ret  = wxString::Format("<%s/>\n", SvgNodeTemplates::CncParameterResetBlockNodeName);
 	return _ret.c_str();
 }
 //////////////////////////////////////////////////////////
@@ -191,7 +240,10 @@ wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool exte
 	wxMenu* cncMenu = new wxMenu("CNC Pattern");
 	popup->AppendSubMenu(cncMenu, "CNC Pattern . . .");
 	
+		cncMenu->Append(idOffset + STC_PM_CNC_PARAM_HELP, 		wxT("Insert CncParameterBlock Usage"));
 		cncMenu->Append(idOffset + STC_PM_CNC_PARAM_BLOCK, 		wxT("Insert CncParameterBlock"));
+		cncMenu->Append(idOffset + STC_PM_CNC_PARAM_PRINT, 		wxT("Insert CncParameterPrint"));
+		cncMenu->Append(idOffset + STC_PM_CNC_PARAM_RESET, 		wxT("Insert CncParameterReset"));
 		cncMenu->Append(idOffset + STC_PM_CNC_BREAK_BLOCK, 		wxT("Insert CncBreak"));
 		cncMenu->Append(idOffset + STC_PM_CNC_PAUSE_BLOCK, 		wxT("Insert CncPause"));
 	
@@ -237,10 +289,33 @@ wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool exte
 	 [](wxCommandEvent& event) {
 			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
 			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCncParameterHelp());
+	 }, idOffset + STC_PM_CNC_PARAM_HELP, wxID_ANY, new EditCtrlPointer(ctl));
+	 
+	//............................................
+	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [](wxCommandEvent& event) {
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
 			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCncParameterBlock());
 	 }, idOffset + STC_PM_CNC_PARAM_BLOCK, wxID_ANY, new EditCtrlPointer(ctl));
-	 
 	
+	//............................................
+	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [](wxCommandEvent& event) {
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCncParameterPrint());
+	 }, idOffset + STC_PM_CNC_PARAM_PRINT, wxID_ANY, new EditCtrlPointer(ctl));
+	
+	//............................................
+	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [](wxCommandEvent& event) {
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCncParameterReset());
+	 }, idOffset + STC_PM_CNC_PARAM_RESET, wxID_ANY, new EditCtrlPointer(ctl));
+	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {

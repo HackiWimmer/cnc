@@ -3,6 +3,7 @@
 #include <wx/tokenzr.h>
 #include "wxCrafterImages.h"
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "3D/GLCommon.h"
 #include "3D/GLContextBase.h"
 
@@ -126,13 +127,83 @@ bool GLContextBase::isSmoothingEnabled() {
 	return (bool)glIsEnabled(GL_LINE_SMOOTH);
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::drawSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks) {
+void GLContextBase::drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks) {
 /////////////////////////////////////////////////////////////////
 	GLUquadricObj* quadric = gluNewQuadric();
 	gluQuadricTexture(quadric, GL_TRUE);
 	gluQuadricDrawStyle(quadric, GLU_FILL);
-	gluCylinder(quadric, base, 0.0, height, slices, stacks);
+	gluCylinder(quadric, radius, 0.0, height, slices, stacks);
 	gluDeleteQuadric(quadric);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks) {
+/////////////////////////////////////////////////////////////////
+	GLUquadricObj* quadric = gluNewQuadric();
+	gluQuadricTexture(quadric, GL_TRUE);
+	gluQuadricDrawStyle(quadric, GLU_FILL);
+	gluCylinder(quadric, radius, radius, height, slices, stacks);
+	gluDeleteQuadric(quadric);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z) {
+/////////////////////////////////////////////////////////////////
+	const double maxDim			= THE_CONFIG->getMaxDimension();
+	const float toolDiameter	= THE_CONTEXT->getCurrentToolDiameter();
+	const float toolRadius		= toolDiameter / 2.0	/ maxDim;
+	const float refRadius		=  1.0					/ maxDim;
+	const float shaftRadius		=  4.0					/ maxDim;
+	const float shaftLength		= 25.0					/ maxDim;
+	const float totalLength		= 50.0					/ maxDim;
+	
+	const GLint slices = 32;
+	const GLint stacks = 32;
+	
+	// tool part
+	{
+		glPushMatrix();
+		
+			glColor3ub (255, 233, 157);
+			glTranslatef(x, y, z); 
+			
+			GLUquadricObj* quadric = gluNewQuadric();
+			gluQuadricTexture(quadric, GL_TRUE);
+			gluQuadricDrawStyle(quadric, GLU_LINE);
+			
+			switch ( d ) {
+				case CncDimension3D: 
+				{
+					if ( toolRadius > refRadius )	gluCylinder(quadric, toolRadius, toolRadius,  totalLength - shaftLength, slices, stacks);
+					else							gluCylinder(quadric, toolRadius, shaftRadius, totalLength - shaftLength, slices, stacks);
+					
+					break;
+				}
+				
+				default: 
+				{
+					gluCylinder(quadric, toolRadius, toolRadius,  totalLength - shaftLength, slices, stacks);
+				}
+			}
+			
+			gluDeleteQuadric(quadric);
+			
+		glPopMatrix();
+	}
+	
+	// shaft part
+	{
+		glPushMatrix();
+		
+			glColor3ub (255, 201, 14);
+			glTranslatef(x, y, z + (totalLength - shaftLength) );
+			
+			GLUquadricObj* quadric = gluNewQuadric();
+			gluQuadricTexture(quadric, GL_TRUE);
+			gluQuadricDrawStyle(quadric, GLU_LINE);
+			gluCylinder(quadric, shaftRadius, shaftRadius, totalLength - shaftLength, slices, stacks);
+			gluDeleteQuadric(quadric);
+			
+		glPopMatrix();
+	}
 }
 /////////////////////////////////////////////////////////////////
 GLViewPort::PreDefPos GLContextBase::convertViewMode(GLContextBase::ViewMode newMode) {
@@ -349,6 +420,7 @@ void GLContextBase::drawCoordinateOrigin() {
 			glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
 			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
 			drawSolidCone(croneDiameter, croneHight, 30, 30);
+			
 			/*
 			glColor3ub(255, 255, 255);
 			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
@@ -361,7 +433,7 @@ void GLContextBase::drawCoordinateOrigin() {
 		glPopMatrix();
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::drawPosMarker(float x, float y, float z) {
+void GLContextBase::drawCrossHair(float x, float y, float z) {
 /////////////////////////////////////////////////////////////////
 	if ( isViewMode2D() ) {
 
@@ -410,7 +482,7 @@ void GLContextBase::drawPosMarker(float x, float y, float z) {
 
 		glEnd();
 		glDisable(GL_LINE_STIPPLE);
-
+			
 	} else {
 		
 		glColor3ub (255, 201, 14);
@@ -422,15 +494,25 @@ void GLContextBase::drawPosMarker(float x, float y, float z) {
 			glVertex3f(x, y, +1.0f);
 
 		glEnd();
+		
 	}
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::drawCrossHair() {
+void GLContextBase::drawMousePosition() {
 /////////////////////////////////////////////////////////////////
 	if ( isViewMode2D() )
-		drawPosMarker(currentMouseVertexInfo.x, currentMouseVertexInfo.y, currentMouseVertexInfo.z);
+		drawCrossHair(currentMouseVertexInfo.x, currentMouseVertexInfo.y, currentMouseVertexInfo.z);
 		
 	currentMouseVertexInfo.reset();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawMovePosition(float x, float y, float z) {
+/////////////////////////////////////////////////////////////////
+	drawCrossHair(x, y, z);
+	
+	const CncDimensions dim = isViewMode3D() ? CncDimension3D : CncDimension2D;
+	if ( options.showMillingCutter )  
+		drawMillingCutter(dim, x, y, z);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::determineViewPort(int w, int h, int x, int y) {
@@ -683,7 +765,7 @@ void GLContextBase::display() {
 	glPushMatrix();
 	
 		if ( currentMouseVertexInfo.showCrossHair == true )
-			drawCrossHair();
+			drawMousePosition();
 
 	glPopMatrix();
 
@@ -724,7 +806,7 @@ bool GLContextBase::convertWinCoordsToVertex(int winX, int winY, GLdouble & vX, 
 
 	GLfloat x = (float)winX;
 	GLfloat y = (float)viewPort->getCurrentWindowHeigth() - (float)winY;
-	GLfloat z = 0;
+	GLfloat z;
 	
 	glReadPixels(winX, (int)y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
 	return gluUnProject(x, y, z, glModelview, glProjection, glViewport, &vX, &vY, &vZ) == GLU_TRUE;

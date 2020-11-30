@@ -14,42 +14,41 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		GCodePathHandlerBase();
 		virtual ~GCodePathHandlerBase();
 		
-		virtual const char* getName() { return "GCodePathHandlerBase"; }
+		virtual const char* getName() 													const	{ return "GCodePathHandlerBase"; }
 		
-		GCodePathHandlerBase::CutterCompensation getCutterCompensationMode() { return cutterCompMode; }
-		void setCutterCompensationMode(GCodePathHandlerBase::CutterCompensation ccm) { cutterCompMode = ccm; }
+		GCodePathHandlerBase::CutterCompensation getCutterCompensationMode() 			const	{ return cutterCompMode; }
+		void setCutterCompensationMode(GCodePathHandlerBase::CutterCompensation ccm)			{ cutterCompMode = ccm; }
 		
-		int getToolLengthOffsetId() { return toolLengthOffsetId; }
-		void setToolLengthOffsetId(int tloi) { toolLengthOffsetId = tloi; }
+		int					getToolLengthOffsetId()										const	{ return toolLengthOffsetId; }
+		void				setToolLengthOffsetId(int tloi)										{ toolLengthOffsetId = tloi; }
 		
-		virtual bool isPathListUsed() = 0;
-		virtual void prepareWork(); 
-		virtual void finishWork();
+		virtual bool		isPathListUsed()				const	= 0;
+		virtual void		switchToolState(bool state)				= 0;
+		virtual bool		initNextPath()							= 0;
+		virtual bool		prepareWork(); 
+		virtual bool		finishWork();
 		
-		bool processRapidLinearMove(GCodeBlock& gcb);
-		bool processLinearMove(GCodeBlock& gcb);
-		bool processArcMove(GCodeBlock& gcb, bool sweep);
-		bool processDwell(GCodeBlock& gcb);
-		bool moveToOrigin(GCodeBlock& gcb);
+		bool				processRapidLinearMove(GCodeBlock& gcb);
+		bool				processLinearMove(GCodeBlock& gcb);
+		bool				processArcMove(GCodeBlock& gcb, bool sweep);
+		bool				processDwell(GCodeBlock& gcb);
+		bool				moveToOrigin(GCodeBlock& gcb);
 		
-		virtual void switchToolState(bool state) 	{}
-		virtual bool initNextPathExt() 				{ return initNextPath(); }
 		
 	protected:
 		
-		virtual bool processDwellIntern(int64_t microseconds) { return true; }
-		virtual bool processLinearMove(bool alreadyRendered) = 0;
-		virtual bool changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value = 0.0) = 0;
-		virtual bool initNextPath()		= 0;
-		virtual void prepareWorkImpl()	= 0;
-		virtual void finishWorkImpl()	= 0;
+		virtual bool		processDwellIntern(int64_t microseconds) { return true; }
+		virtual bool		processLinearMove(bool alreadyRendered) = 0;
+		virtual bool		changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value = 0.0) = 0;
+		virtual bool		prepareWorkImpl()	= 0;
+		virtual bool		finishWorkImpl()	= 0;
 		
 	private:
 		
 		CutterCompensation	cutterCompMode;
 		int 				toolLengthOffsetId;
 		
-		void updateCurrentPosition(GCodeBlock& gcb);
+		void				updateCurrentPosition(GCodeBlock& gcb);
 };
 
 #endif

@@ -23,6 +23,7 @@ struct GLContextOptions {
 	
 	bool showOrigin						= true;
 	bool showViewPortBounderies			= true;
+	bool showMillingCutter				= true;
 	bool showPosMarker					= true;
 	bool showFlyPath					= true;
 	bool showBoundBox					= true;
@@ -268,9 +269,10 @@ class GLContextBase : public wxGLContext {
 		
 		virtual float getAutoScaleFactor() { return 1.0; }
 		
-		virtual void drawCrossHair();
+		virtual void drawMousePosition();
+		virtual void drawMovePosition(float x, float y, float z);
+		virtual void drawCrossHair(float x, float y, float z);
 		virtual void drawCoordinateOrigin();
-		virtual void drawPosMarker(float x, float y, float z);
 		
 		virtual void determineViewPort(int w, int h, int x=0, int y=0);
 		
@@ -302,7 +304,9 @@ class GLContextBase : public wxGLContext {
 		GLuint theTexture;
 		
 		void determineViewPortBounderies();
-		void drawSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks);
+		void drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
+		void drawSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
+		void drawMillingCutter(CncDimensions d, float x, float y, float z);
 
 };
 

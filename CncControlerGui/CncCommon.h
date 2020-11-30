@@ -35,6 +35,7 @@ static const int 	MAX_PARAMETER_VALUES 				=  10;
 static const int 	UNDEFINED_LINE_NUMBER 				= -1;
 
 static struct ClientIds {
+	const long	TPL_FACTOR				=    10L;
 	const long	INVALID					=    -1L;
 	const long	SVG_Z_UP				= -1000L;
 	const long	SVG_Z_DOWN				= -2000L;
@@ -42,11 +43,12 @@ static struct ClientIds {
 
 enum CncUnit 					{ CncSteps, CncMetric };
 enum CncInteractiveMoveDriver	{ IMD_NONE, IMD_GAMEPAD, IMD_NAVIGATOR };
-enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
+enum CncDirection 				{ CncUndefDir, CncClockwise, CncCounterClockwise };
 enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};
 enum CncSpeedMode				{ CncSpeedWork = 0, CncSpeedRapid = 1, CncSpeedMax = 2, CncSpeedUserDefined = 3 }; // dont change the values
 enum CncPortType 				{ CncPORT, CncPORT_EMU_ARDUINO, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
-enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3, CncCT_Pocket=4 };
+enum CncPathModificationType 	{ CncPM_None=0, CncPM_Inner, CncPM_Outer, CncPM_Center, CncPM_Pocket };
+enum CncPathRuleType 			{ CncPR_None=0, CncPR_EnsureClockwise, CncPR_EnsureCounterClockwise, CncPR_Reverse };
 enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
 enum CncStepSensitivity 		{ FINEST = 1, FINE = 20 , MEDIUM = 50, ROUGH = 80, ROUGHEST = 100 };
 enum CncStepMode		 		{ SM_INTERACTIVE = 0, SM_STEPWISE = 1 };
@@ -104,8 +106,21 @@ namespace cnc {
 	template<class T>
 	bool between(T val, T lo, T hi) 				{ return between( val, lo, hi, std::less<T>() ); }
 	
-	bool dblCompare(const double a, const double b, const double eps = std::numeric_limits<double>::epsilon());
+	bool dblCompare(const double a, const double b, const double eps = 0.000001 /*std::numeric_limits<double>::epsilon()*/);
 	bool dblCompareNull(const double a, const double eps = std::numeric_limits<double>::epsilon());
+	
+	namespace dblCmp {
+
+		const double epsilon = 0.000001;
+
+		inline bool eq(const double &a, const double &b)	{ return std::fabs(a - b) <= epsilon; }
+		inline bool nu(const double &a)						{ return eq(a, 0.0); }
+		
+		inline bool lt(const double &a, const double &b)	{ return eq(a, b) ? false : a < b; }
+		inline bool gt(const double &a, const double &b)	{ return eq(a, b) ? false : a > b; }
+		inline bool le(const double &a, const double &b)	{ return eq(a, b) ? true  : a < b; } 
+		inline bool ge(const double &a, const double &b)	{ return eq(a, b) ? true  : a > b; }
+	};
 	
 	const wxString& longFormat(const CncLongPosition& p);
 	const wxString& dblFormat(const CncDoublePosition& p);
@@ -179,7 +194,8 @@ class SourceBookSelection {
 	public:
 		enum VAL {
 			OBSERVER					= 0,
-			EDITOR						= 1
+			EDITOR						= 1,
+			CONTEXT						= 2
 		};
 };
 
@@ -213,6 +229,17 @@ class OutboundMonitorSelection{
 			CNC_SETTER_PANEL			= 1,
 			CNC_MSG_HIST_PANEL			= 2,
 			MOTION_VERTEX_TRACE			= 3
+		};
+};
+
+//-----------------------------------------------------------------
+class PreProcessorSelection{
+	public:
+		enum VAL {
+			PARSING_SYNOPSIS			= 0,
+			OPERATIG_TRACE				= 1,
+			PATH_LIST_ENTRIES			= 2,
+			MOVE_SEQ_ENTRIES			= 3
 		};
 };
 

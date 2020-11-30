@@ -249,6 +249,13 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetHelpString(_T(""));
 			prop->SetEditor( wxT("CheckBox") );
 			CncConfig::registerProperty(CncWork_Ctl_REQUEST_IDLE_REQUESTS, prop);
+			
+			//...............
+			prop = cCtl->AppendChild( new wxBoolProperty("Simulate Milling Tool with sound", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T("Availability: For serial emulators only.\nReconncet required . . . "));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_SIMULATE_MILLING_WITH_SOUND, prop);
 		}
 		
 		//...................
@@ -302,21 +309,6 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 				prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
 				CncConfig::registerProperty(CncWork_Ctl_REPLY_THRESHOLD_METRIC, prop);
 			}
-			
-			
-			//...............
-			prop = mCtl->AppendChild( new CncCfgSliderProperty("Slider Test", NEXT_PROP_ID, 48.1, 0.0, 100.0, 1000));
-			prop->SetAttribute(wxPG_ATTR_UNITS, "impulse");
-			registerProperty("HackiWimmer1", prop);
-			
-			//...............
-			prop = mCtl->AppendChild( new CncCfgSliderProperty("Slider Test", NEXT_PROP_ID, 0.0, -100.0, 100.0, 1000));
-			prop->SetAttribute(wxPG_ATTR_UNITS, "impulse");
-			prop->SetAttribute(wxPG_ATTR_UNITS, "impulse");
-			//prop->SetAttribute(Attribute_READONLY, "TRUE");
-			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(false);
-			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(4);
-			registerProperty("HackiWimmer2", prop);
 			
 		}
 	}

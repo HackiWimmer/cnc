@@ -43,15 +43,16 @@ BinaryPathHandlerHexView::BinaryPathHandlerHexView(FormatType ft)
 {
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHexView::prepareWork() {
+bool BinaryPathHandlerHexView::prepareWork() {
 /////////////////////////////////////////////////////////////
 	hexContent.str("");
 	resetLineNumberTranslation();
+	return true;
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHexView::finishWork() {
+bool BinaryPathHandlerHexView::finishWork() {
 /////////////////////////////////////////////////////////////
-	// currently nothing to do
+	return true;
 }
 /////////////////////////////////////////////////////////////
 bool BinaryPathHandlerHexView::processCommand(const unsigned char* buffer, int nbBytes) {
@@ -92,15 +93,16 @@ BinaryPathHandlerHumanReadableView::BinaryPathHandlerHumanReadableView(FormatTyp
 {
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHumanReadableView::prepareWork() {
+bool BinaryPathHandlerHumanReadableView::prepareWork() {
 /////////////////////////////////////////////////////////////
 	readableContent.str("");
 	resetLineNumberTranslation();
+	return true;
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHumanReadableView::finishWork() {
+bool BinaryPathHandlerHumanReadableView::finishWork() {
 /////////////////////////////////////////////////////////////
-	// currently nothing to do
+	return true;
 }
 /////////////////////////////////////////////////////////////
 bool BinaryPathHandlerHumanReadableView::displaySteps(const unsigned char* buffer, int nbBytes) {

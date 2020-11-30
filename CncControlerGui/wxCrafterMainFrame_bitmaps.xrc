@@ -85,6 +85,7 @@
   <object class="wxBitmap" name="abb-export">bitmaps\abb-export.png</object>
   <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
   <object class="wxBitmap" name="actionrun">bitmaps\actionrun.png</object>
+  <object class="wxBitmap" name="align-vertical-top">bitmaps\align-vertical-top.png</object>
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
@@ -100,6 +101,7 @@
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="clear">bitmaps\clear.png</object>
   <object class="wxBitmap" name="close">bitmaps\close.png</object>
+  <object class="wxBitmap" name="code-context">bitmaps\code-context.png</object>
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
   <object class="wxBitmap" name="database-error">bitmaps\database-error.png</object>
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>

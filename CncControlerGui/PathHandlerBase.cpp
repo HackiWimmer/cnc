@@ -105,7 +105,6 @@ void PathHandlerBase::tracePositions(const char* userPerspectivePrefix) {
 		std::cout << " PL.First.Pos  : empty" << std::endl;
 		std::cout << " PL.Last.Pos   : empty" << std::endl;
 	}
-	std::cout << " PL.firstPath  : " << pathListMgr.isPathFlaggedAsFirst() << std::endl;
 	std::cout << " PL.Start Pos  : " << pathListMgr.getStartPos().getX() << std::endl;
 
 	std::cout << " StartPos      : " << startPos   << std::endl;
@@ -122,7 +121,7 @@ void PathHandlerBase::logNextPathListEntry(const CncPathListEntry& cpe) {
 	appendDebugValueDetail(cpe);
 	
 	const CncDoublePosition& p =  cpe.entryTarget;
-	CncContext::PositionStorage::addPos(CncContext::PositionStorage::TRIGGER_PH_CB_POS, p);
+	PositionStorage::addPos(PositionStorage::TRIGGER_PH_CB_POS, p);
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::processClientId(long id) {
@@ -153,19 +152,16 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 		
 		// than give the path list manager the reference from where we are coming 
 		pathListMgr.setReferencePos(currentPos);
-		pathListMgr.setPathFirstFlag(firstPath);
+#warning
+//pathListMgr.setPathFirstFlag(firstPath);
 		firstPath = false;
 		
 		// the first move is always absolute!
 		currentPos.setX(startPos.getX());
 		currentPos.setY(startPos.getY());
-
-		// drive to first path
-		processSpeed(CncSpeedRapid, THE_CONFIG->getDefaultRapidSpeed_MM_MIN());
-		ret = processLinearMove(false);
 		
-		// reset speed mode
-		processSpeed(CncSpeedWork, THE_CONFIG->getDefaultWorkSpeed_MM_MIN());
+		// drive to first path
+		ret = processLinearMove(false);
 		nextPath = false;
 	}
 	else {
@@ -586,10 +582,12 @@ bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, const doub
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::prepareWork() {
+bool PathHandlerBase::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	pathListMgr.clear();
 	totalLength = 0.0;
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::initNextPath() {
@@ -607,21 +605,20 @@ bool PathHandlerBase::finishCurrentPath() {
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::runCurrentPath() {
 //////////////////////////////////////////////////////////////////
-	// currently nothing to do;
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::finishWork() {
+bool PathHandlerBase::finishWork() {
 //////////////////////////////////////////////////////////////////
-	// currently nothing to do;
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 //////////////////////////////////////////////////////////////////
 	unitCalculator.changeInputUnit(u);
 	
-	CncCurveLib::Setup s;
 	CncUnitCalculator<float> uc(Unit::mm, u);
+	CncCurveLib::Setup s;
 	s.resolution.size = uc.convert(THE_CONFIG->getRenderResolutionMM());
 	
 	lineCurve.init(s);

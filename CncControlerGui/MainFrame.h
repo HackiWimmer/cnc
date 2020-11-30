@@ -169,6 +169,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void onSelectTemplatePanel(wxListbookEvent& event);
 		virtual void detachControllerMessages(wxCommandEvent& event);
 		virtual void detachSetterList(wxCommandEvent& event);
 		virtual void detachManuallyTemplate(wxCommandEvent& event);
@@ -465,10 +466,12 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void selectMainBookSetupPanel();
 		void selectMainBookReferencePanel();
 		void selectMainBookManuelPanel();
-		void selectMainBookTestPanel();	
+		void selectMainBookTestPanel();
 		
 		void selectMonitorBookCncPanel();
 		void selectMonitorBookTemplatePanel(bool force = false);
+		
+		void selectParsingSynopsisTrace();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
@@ -489,7 +492,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		// configuration callbacks
 		void releaseControllerSetupFromConfig();
 		void notifyConfigUpdate();
-		void changeWorkpieceThickness();
 		void changeCrossingThickness();
 		void decorateSwitchToolOnOff(bool state);
 		
@@ -631,7 +633,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 	private:
 		// Member variables
 		bool 							isDebugMode;
-		bool 							isZeroReferenceValid;
 		bool 							canClose;
 		bool 							evaluatePositions;
 		bool 							ignoreDirControlEvents;
@@ -895,7 +896,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		///////////////////////////////////////////////////////////////
 		// misc
 		void traceSessionId();
-		void setControllerZero(bool x, bool y, bool z);
+		void setControllerZero(CncRefPositionMode m, double x, double y, double z);
 		void requestReset();
 		
 		void navigateX(CncDirection d);
@@ -903,7 +904,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void navigateZ(CncDirection d);
 		
 		void resetMinMaxPositions();
-		void setRefPostionState(bool state);
 		bool connectSerialPortDialog();
 		
 };

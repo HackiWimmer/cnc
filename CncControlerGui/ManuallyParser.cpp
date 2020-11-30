@@ -50,7 +50,7 @@ bool ManuallyParser::spool() {
 /////////////////////////////////////////////////////////////
 	long clientId = 1;
 	for ( auto it = moves.begin(); it != moves.end(); ++it ) {
-		initNextClientId(clientId++);
+		initNextClientId(CLIENT_ID.TPL_FACTOR * clientId++);
 		
 		if ( pathHandler->processLinearMove(*it) == false )
 			return false;

@@ -223,7 +223,7 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 							return;
 						
 						switch ( byteCount ) {
-							case 1:		values[i] = decodeHexValueAsUInt8 (value); break;
+							case 1:		values[i] = decodeHexValueAsUInt8(value); break;
 							case 2:		values[i] = decodeHexValueAsInt16(value); break;
 							case 4:		values[i] = decodeHexValueAsInt32(value); break;
 						}
@@ -233,12 +233,14 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 					
 					ArdoObj::ValueInfo vi(valueType);
 					
-					if 		( vi.hasXYZ() )	{ dx = values[0]; dy = values[1]; dz = values[2]; }
-					else if ( vi.hasXY()  ) { dx = values[0]; dy = values[1]; dz = 0;           }
-					else if ( vi.hasX()   ) { dx = values[0]; dy = values[1]; dz = 0;           }
-					else if ( vi.hasY()   ) { dx = 0;         dy = values[0]; dz = 0;           }
-					else if ( vi.hasZ()   ) { dx = 0;         dy = 0;         dz = values[0]; }
-					else					{ return;                                               }
+					if 		( vi.isXYZ() ) { dx = values[0]; dy = values[1]; dz = values[2]; }
+					else if ( vi.isXY()  ) { dx = values[0]; dy = values[1]; dz = 0;         }
+					else if ( vi.isXZ()  ) { dx = values[0]; dy = 0;         dz = values[1]; }
+					else if ( vi.isYZ()  ) { dx = 0;         dy = values[0]; dz = values[1]; }
+					else if ( vi.isX()   ) { dx = values[0]; dy = values[1]; dz = 0;         }
+					else if ( vi.isY()   ) { dx = 0;         dy = values[0]; dz = 0;         }
+					else if ( vi.isZ()   ) { dx = 0;         dy = 0;         dz = values[0]; }
+					else				   { return;                                         }
 				}
 				else {
 					// one byte xyz format

@@ -2,6 +2,7 @@
 #define CNCPOSITIONSTORAGEVIEW_H
 
 #include <vector>
+#include <map>
 #include "CncPosition.h"
 #include "wxCrafterBaseDialogs.h"
 

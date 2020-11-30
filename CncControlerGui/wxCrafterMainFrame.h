@@ -109,11 +109,11 @@ protected:
     wxPanel* m_mainBookSourcePanel;
     wxPanel* m_panelTemplateSource;
     wxListbook* m_listbookSource;
-    wxPanel* m_panel9530;
+    wxPanel* m_observerPanel;
     wxButton* m_btDetachExternalTemplateSource;
     wxStaticText* m_staticText51376;
     wxPanel* m_panelTemplateObserverPlaceholder;
-    wxPanel* m_panel9532;
+    wxPanel* m_editorPanel;
     wxButton* m_btDetachTemplateSource;
     wxStaticText* m_staticText513767;
     wxButton* m_openSourceExtern;
@@ -168,6 +168,10 @@ protected:
     wxTextCtrl* m_nestedDataHeader;
     wxPanel* m_splitterPage6090;
     wxTextCtrl* m_nestedSource;
+    wxPanel* m_contextPanel;
+    wxButton* m_btDetachTemplateContext;
+    wxStaticText* m_staticText5137673;
+    wxTextCtrl* m_templateContext;
     wxPanel* m_mainBookSetup;
     wxPanel* m_panelConfiguration;
     wxButton* m_btDetachConfiguration;
@@ -203,7 +207,7 @@ protected:
     wxStaticText* m_staticText7793;
     wxStaticLine* m_staticLine7834;
     wxListbook* m_listbookReferences;
-    wxPanel* m_panel8951;
+    wxPanel* m_hardareRefPanel;
     wxStaticText* m_staticText89618;
     wxStaticText* m_staticText896310;
     wxTextCtrl* m_hardwareOffsetX;
@@ -237,6 +241,8 @@ protected:
     wxButton* m_btTakeOverDimensions;
     wxButton* m_btEvaluateDimensionZAxis;
     wxButton* m_btEvaluateDimensionXYPlane;
+    wxPanel* m_SummaryPanel;
+    wxTextCtrl* m_bounderiesSummary;
     wxPanel* m_mainBookManually;
     wxPanel* m_panelTemplateManually;
     wxButton* m_btDetachManuallyTemplate;
@@ -740,6 +746,7 @@ protected:
     virtual void rcStop(wxCommandEvent& event) { event.Skip(); }
     virtual void emergencyStop(wxCommandEvent& event) { event.Skip(); }
     virtual void cncMainViewChanged(wxNotebookEvent& event) { event.Skip(); }
+    virtual void onSelectTemplatePanel(wxListbookEvent& event) { event.Skip(); }
     virtual void detachTemplateSource(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateSourceExtern(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateExtern(wxCommandEvent& event) { event.Skip(); }
@@ -957,7 +964,7 @@ public:
     wxButton* GetBtDetachExternalTemplateSource() { return m_btDetachExternalTemplateSource; }
     wxStaticText* GetStaticText51376() { return m_staticText51376; }
     wxPanel* GetPanelTemplateObserverPlaceholder() { return m_panelTemplateObserverPlaceholder; }
-    wxPanel* GetPanel9530() { return m_panel9530; }
+    wxPanel* GetObserverPanel() { return m_observerPanel; }
     wxButton* GetBtDetachTemplateSource() { return m_btDetachTemplateSource; }
     wxStaticText* GetStaticText513767() { return m_staticText513767; }
     wxButton* GetOpenSourceExtern() { return m_openSourceExtern; }
@@ -1012,7 +1019,11 @@ public:
     wxSimplebook* GetSimpleBookSourceExt() { return m_simpleBookSourceExt; }
     wxPanel* GetPanelTplSourceExt() { return m_panelTplSourceExt; }
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
-    wxPanel* GetPanel9532() { return m_panel9532; }
+    wxPanel* GetEditorPanel() { return m_editorPanel; }
+    wxButton* GetBtDetachTemplateContext() { return m_btDetachTemplateContext; }
+    wxStaticText* GetStaticText5137673() { return m_staticText5137673; }
+    wxTextCtrl* GetTemplateContext() { return m_templateContext; }
+    wxPanel* GetContextPanel() { return m_contextPanel; }
     wxListbook* GetListbookSource() { return m_listbookSource; }
     wxPanel* GetPanelTemplateSource() { return m_panelTemplateSource; }
     wxPanel* GetMainBookSourcePanel() { return m_mainBookSourcePanel; }
@@ -1062,7 +1073,7 @@ public:
     wxStaticLine* GetStaticLine89783() { return m_staticLine89783; }
     wxButton* GetBtResetHardwareReference() { return m_btResetHardwareReference; }
     wxButton* GetBtEvaluateHardwareReference() { return m_btEvaluateHardwareReference; }
-    wxPanel* GetPanel8951() { return m_panel8951; }
+    wxPanel* GetHardareRefPanel() { return m_hardareRefPanel; }
     wxStaticText* GetStaticText8961() { return m_staticText8961; }
     wxCheckBox* GetCbHardwareDimensionEvaluatedX() { return m_cbHardwareDimensionEvaluatedX; }
     wxStaticText* GetStaticText8963() { return m_staticText8963; }
@@ -1082,6 +1093,8 @@ public:
     wxButton* GetBtEvaluateDimensionZAxis() { return m_btEvaluateDimensionZAxis; }
     wxButton* GetBtEvaluateDimensionXYPlane() { return m_btEvaluateDimensionXYPlane; }
     wxPanel* GetHardwareDimensionsPanel() { return m_hardwareDimensionsPanel; }
+    wxTextCtrl* GetBounderiesSummary() { return m_bounderiesSummary; }
+    wxPanel* GetSummaryPanel() { return m_SummaryPanel; }
     wxListbook* GetListbookReferences() { return m_listbookReferences; }
     wxPanel* GetPanelReferences() { return m_panelReferences; }
     wxPanel* GetMainBookReference() { return m_mainBookReference; }

@@ -464,9 +464,11 @@ protected:
     wxButton* m_btnRuler;
     wxButton* m_btnHelpLines;
     wxButton* m_btnPosMarker;
+    wxButton* m_btnHardwareBox;
     wxButton* m_btnBoundBox;
     wxButton* m_btnFlyPath;
     wxStaticLine* m_staticLine372;
+    wxBitmapToggleButton* m_btnMillingCutter;
     wxButton* m_btnRefresh;
     wxButton* m_btnClear;
     wxPanel* m_rotatePaneZ3D;
@@ -483,6 +485,8 @@ protected:
     wxPanel* m_scalePane3D;
     wxButton* m_optionDlg;
     wxStaticLine* m_staticLine32511;
+    wxButton* m_3D_Reset;
+    wxStaticLine* m_staticLine325112;
     wxButton* m_3D_Top;
     wxButton* m_3D_Bottom;
     wxButton* m_3D_Front;
@@ -502,11 +506,14 @@ protected:
     virtual void onToggleRuler(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleHelpLines(wxCommandEvent& event) { event.Skip(); }
     virtual void onTogglePosMarker(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleHardwareBox(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleBoundBox(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleFlyPathes(wxCommandEvent& event) { event.Skip(); }
+    virtual void onShowMillingCutter(wxCommandEvent& event) { event.Skip(); }
     virtual void onRefreshMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void onClearMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleOptionPane(wxCommandEvent& event) { event.Skip(); }
+    virtual void onResetView(wxCommandEvent& event) { event.Skip(); }
     virtual void onShowFromTop(wxCommandEvent& event) { event.Skip(); }
     virtual void onShowFromBottom(wxCommandEvent& event) { event.Skip(); }
     virtual void onShowFromFront(wxCommandEvent& event) { event.Skip(); }
@@ -524,9 +531,11 @@ public:
     wxButton* GetBtnRuler() { return m_btnRuler; }
     wxButton* GetBtnHelpLines() { return m_btnHelpLines; }
     wxButton* GetBtnPosMarker() { return m_btnPosMarker; }
+    wxButton* GetBtnHardwareBox() { return m_btnHardwareBox; }
     wxButton* GetBtnBoundBox() { return m_btnBoundBox; }
     wxButton* GetBtnFlyPath() { return m_btnFlyPath; }
     wxStaticLine* GetStaticLine372() { return m_staticLine372; }
+    wxBitmapToggleButton* GetBtnMillingCutter() { return m_btnMillingCutter; }
     wxButton* GetBtnRefresh() { return m_btnRefresh; }
     wxButton* GetBtnClear() { return m_btnClear; }
     wxPanel* GetRotatePaneZ3D() { return m_rotatePaneZ3D; }
@@ -543,6 +552,8 @@ public:
     wxPanel* GetScalePane3D() { return m_scalePane3D; }
     wxButton* GetOptionDlg() { return m_optionDlg; }
     wxStaticLine* GetStaticLine32511() { return m_staticLine32511; }
+    wxButton* Get3D_Reset() { return m_3D_Reset; }
+    wxStaticLine* GetStaticLine325112() { return m_staticLine325112; }
     wxButton* Get3D_Top() { return m_3D_Top; }
     wxButton* Get3D_Bottom() { return m_3D_Bottom; }
     wxButton* Get3D_Front() { return m_3D_Front; }

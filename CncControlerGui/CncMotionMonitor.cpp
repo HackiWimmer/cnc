@@ -204,9 +204,9 @@ void CncMotionMonitor::setCurrentClientId(long id) {
 		monitor->setCurrentClientId(id); 
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::appendGuidPath(const CncPathListManager& plm) {
+void CncMotionMonitor::appendGuidPath(const CncPathListManager& plm, double zOffset) {
 //////////////////////////////////////////////////
-	GLGuidePath gp(plm);
+	GLGuidePath gp(plm, zOffset);
 	monitor->addGuidePath(gp);
 }
 //////////////////////////////////////////////////
@@ -362,6 +362,20 @@ void CncMotionMonitor::performMouseCoordAndToolTip() {
 								THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricZ()));
 								break;
 								
+		case VT::V3D_ISO1:
+		case VT::V3D_ISO2:
+		case VT::V3D_ISO3:
+		case VT::V3D_ISO4:		tt.assign(wxString::Format("(X,Y,Z) = %8.3lf, %8.3lf", 
+															context->getMouseVertexAsMetricX(), 
+															context->getMouseVertexAsMetricY(), 
+															context->getMouseVertexAsMetricZ()
+														  )
+								);
+								//THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricX()));
+								//THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricY()));
+								//THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricZ()));
+								//break;
+		
 		default:				tt.clear();
 	}
 	
@@ -516,7 +530,7 @@ void CncMotionMonitor::normalizeMonitor() {
 void CncMotionMonitor::pushProcessMode() {
 //////////////////////////////////////////////////
 	//set processing flags
-	normalizeMonitor();
+	//normalizeMonitor();
 	resetCurrentClientId();
 	
 	processMode = true;

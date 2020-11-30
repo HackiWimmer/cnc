@@ -11,18 +11,29 @@
 #include "CncMoveSequence.h"
 #include "CncPathListRunner.h"
 
-
+////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::maxXYPitchRadians	= CncPathListRunner::Move::degree2Radians(15);
 float CncPathListRunner::Move::maxZPitchRadians		= CncPathListRunner::Move::degree2Radians(15);
 
 ////////////////////////////////////////////////////////////////////
-CncPathListRunner::Move::Move(const CncPathListEntry* e)
-: dx		(e->entryDistance.getX())
-, dy		(e->entryDistance.getY())
-, dz		(e->entryDistance.getZ())
+CncPathListRunner::Move::Move(double dX, double dY, double dZ)
+: dx		(dX)
+, dy		(dY)
+, dz		(dZ)
 , mxy		(dx != 0.0 ? dy/dx : DBL_MAX)
 , vxy		(sqrt(pow(dx, 2) + pow(dy, 2)))
 , mz		(vxy != 0.0 ? dz / vxy : DBL_MAX)
+////////////////////////////////////////////////////////////////////
+{
+}
+////////////////////////////////////////////////////////////////////
+CncPathListRunner::Move::Move(const CncDoubleDistance& d) 
+: CncPathListRunner::Move::Move(d.getX(), d.getY(), d.getZ()) 
+{
+}
+////////////////////////////////////////////////////////////////////
+CncPathListRunner::Move::Move(const CncPathListEntry* e)
+: CncPathListRunner::Move::Move(e->entryDistance) 
 ////////////////////////////////////////////////////////////////////
 {
 }
@@ -44,24 +55,32 @@ bool CncPathListRunner::Move::isXYZPitchEqual(const Move& mNext) const {
 	return ( cnc::dblCompare(mxy, mNext.mxy, epsilon) == true && cnc::dblCompare(mz, mNext.mz, epsilon) == true );
 }
 ////////////////////////////////////////////////////////////////////
-bool CncPathListRunner::Move::isXYPitchDiffToStrong(const Move& mNext) const {
+bool CncPathListRunner::Move::isXYPitchDiffTooStrong(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
-	return std::abs(getXYPitchDiffenceAsRadians(mNext)) > maxXYPitchRadians;
+	const double absDiff = std::abs(getXYPitchDiffenceAsRadians(mNext));
+	
+	return ( absDiff > PI ? ( 2 * PI - absDiff ) : absDiff ) > maxXYPitchRadians;
 }
 ////////////////////////////////////////////////////////////////////
-bool CncPathListRunner::Move::isZPitchDiffToStrong(const Move& mNext) const {
+bool CncPathListRunner::Move::isZPitchDiffTooStrong(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
 	return std::abs(getZPitchDiffenceAsRadians(mNext)) > maxZPitchRadians;
 }
 ////////////////////////////////////////////////////////////////////
-bool CncPathListRunner::Move::isXYZPitchDiffToStrong(const Move& mNext) const {
+bool CncPathListRunner::Move::isXYZPitchDiffTooStrong(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
-	return isXYPitchDiffToStrong(mNext) || isZPitchDiffToStrong(mNext);
+	return isXYPitchDiffTooStrong(mNext) || isZPitchDiffTooStrong(mNext);
 }
 ////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::getXYPitchDiffenceAsRadians(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
-	const float a1 = atan2(dx, dy);
+	if ( cnc::dblCompareNull(dx) && cnc::dblCompareNull(dx) )
+		return 0.0;
+	
+	if ( cnc::dblCompareNull(mNext.dx) && cnc::dblCompareNull(mNext.dx) )
+		return 0.0;
+
+	const float a1 = atan2(dx,       dy);
 	const float a2 = atan2(mNext.dx, mNext.dy);
 
 	/*
@@ -75,7 +94,17 @@ float CncPathListRunner::Move::getXYPitchDiffenceAsRadians(const Move& mNext) co
 ////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::getZPitchDiffenceAsRadians(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
-	const float a1 = atan2(dz, vxy);
+	if ( cnc::dblCompareNull(dz) && cnc::dblCompareNull(vxy) )
+		return 0.0;
+	
+	if ( cnc::dblCompareNull(mNext.dz) && cnc::dblCompareNull(mNext.vxy) )
+		return 0.0;
+
+	if ( cnc::dblCompareNull(vxy) )
+		return dz > 0.0 ? +( PI / 2.0) : -( PI / 2.0 );
+		
+		
+	const float a1 = atan2(dz,       vxy);
 	const float a2 = atan2(mNext.dz, mNext.vxy);
 
 	return (a1 - a2);
@@ -90,6 +119,75 @@ float CncPathListRunner::Move::getZPitchDiffenceAsDegree(const Move& mNext) cons
 ////////////////////////////////////////////////////////////////////
 	return getZPitchDiffenceAsRadians(mNext) * 180 / PI;
 }
+
+////////////////////////////////////////////////////////////////////
+bool CncPathListRunner::Move::test() {
+////////////////////////////////////////////////////////////////////
+	
+	// ------------------------------------------------------------
+	auto pitchDiff = [](const Move& m1, const Move& m2) {
+		
+		std::cout	<< wxString::Format("XY Pitch: (%+.2lf, %+.2lf, %+.2lf)(%+.2lf, %+.2lf, %+.2lf)", m1.dx, m1.dy, m1.dz, m2.dx, m2.dy, m2.dz)
+					<< " = " 
+					<< wxString::Format("[%+7.2lf] [%+7.2lf]", atan2(m1.dx, m1.dy) * 180 / PI , atan2(m2.dx, m2.dy) * 180 / PI  )
+					<< " => " 
+					<< wxString::Format("%+7.2lf", m1.getXYPitchDiffenceAsDegree(m2))
+					<< "; " 
+					<< "Pitch too strong: " << ( m1.isXYPitchDiffTooStrong(m2) ? "Yes" : " No" )
+					<< std::endl
+					;
+		
+		return true;
+	};
+	
+	const Move m1[] = {
+		{+0.0, +0.0, +0.0},
+		{+0.5, +0.0, +0.0},
+		{+0.5, +0.5, +0.0},
+		{+0.0, +0.5, +0.0},
+		{-0.0, +0.5, +0.0},
+		{-0.5, +0.0, +0.0},
+		{-0.5, -0.5, +0.0},
+		{+0.0, -0.5, +0.0},
+		{+0.5, -0.5, +0.0},
+		{+0.2, -0.5, +0.0},
+	};
+
+	const Move m2[] = {
+		{+0.0, +0.0, +0.0},
+		{+0.5, +0.0, +0.0},
+		{+0.5, +0.5, +0.0},
+		{+0.0, +0.5, +0.0},
+		{-0.0, +0.5, +0.0},
+		{-0.5, +0.0, +0.0},
+		{-0.5, -0.5, +0.0},
+		{+0.0, -0.5, +0.0},
+		{+0.5, -0.5, +0.0},
+		{+0.2, -0.5, +0.0},
+	};
+	
+	maxXYPitchRadians = CncPathListRunner::Move::degree2Radians(46);
+	maxZPitchRadians  = CncPathListRunner::Move::degree2Radians(46);
+	
+	std::clog << "maxXYPitchRadians: " << maxXYPitchRadians * 180 / PI << std::endl;
+	std::clog << "maxZPitchRadians : " << maxZPitchRadians  * 180 / PI << std::endl;
+	
+	unsigned int s1 = sizeof(m1) / sizeof(*m1);
+	unsigned int s2 = sizeof(m2) / sizeof(*m2);
+	
+	for (unsigned int i = 0; i < s1; i++ ) {
+		for (unsigned int j = 0; j < s2; j++ ) {
+			
+			if (pitchDiff(m1[i], m2[j]) == false ) 
+				return false;
+		}
+		
+		std::cout << std::endl;
+	}
+	
+	return true;
+}
+
 
 
 //////////////////////////////////////////////////////////////////
@@ -217,7 +315,7 @@ bool CncPathListRunner::initializeNextMoveSequence(double value_MM_MIN, char mod
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::addSequenceEntryFromValues(double dx, double dy, double dz) {
 //////////////////////////////////////////////////////////////////
-	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, dx, dy, dz);
+	PositionStorage::addMove(PositionStorage::TRIGGER_PH_LST_RUN, dx, dy, dz);
 	currentSequence->addMetricPosXYZ(dx, dy, dz);
 	
 	return true;
@@ -228,7 +326,7 @@ bool CncPathListRunner::addSequenceEntryFromEntry(const CncPathListEntry* e) {
 	if ( e == NULL )
 		return false;
 		
-	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, 
+	PositionStorage::addMove(PositionStorage::TRIGGER_PH_LST_RUN, 
 										e->entryDistance.getX(), 
 										e->entryDistance.getY(), 
 										e->entryDistance.getZ());
@@ -300,13 +398,21 @@ bool CncPathListRunner::publishMoveSequence() {
 //////////////////////////////////////////////////////////////////
 void CncPathListRunner::onPhysicallySwitchToolState(bool state) {
 //////////////////////////////////////////////////////////////////
+	wxASSERT( setup.cnc != NULL );
+	
 	state == true ? getSetup().cnc->switchToolOn() 
 	              : getSetup().cnc->switchToolOff();
 }
 //////////////////////////////////////////////////////////////////
+bool CncPathListRunner::onPhysicallyChangeFeedSpeed(CncSpeedMode s) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT( setup.cnc != NULL );
+	return getSetup().cnc->changeSpeedToPrevStoredSpeed_MM_MIN(s);
+}
+//////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.isClientIdChange() == false ) {
+	if ( curr.hasClientIdChange() == false ) {
 		std::cerr << "CncPathListRunner::onPhysicallyClientIdChange(): Invalid Type!" << std::endl;
 		return false;
 	}
@@ -329,7 +435,7 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.isSpeedChange() == false ) {
+	if ( curr.hasSpeedChange() == false ) {
 		std::cerr << CNC_LOG_FUNCT << ": Invalid Type!" << std::endl;
 		return false;
 	}
@@ -370,15 +476,15 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 		cpp->addOperatingTrace(ss);
 	}
 
-	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_PH_LST_RUN, 
-												curr.entryDistance.getX(), 
-												curr.entryDistance.getY(), 
-												curr.entryDistance.getZ());
+	// Important: Move absolute to avoid a error propagation
+	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, 
+												curr.entryTarget.getX(), 
+												curr.entryTarget.getY(), 
+												curr.entryTarget.getZ());
 												
-
-	return setup.cnc->moveRelLinearMetricXYZ(	curr.entryDistance.getX(), 
-												curr.entryDistance.getY(), 
-												curr.entryDistance.getZ(), 
+	return setup.cnc->moveAbsLinearMetricXYZ(	curr.entryTarget.getX(), 
+												curr.entryTarget.getY(), 
+												curr.entryTarget.getZ(), 
 												curr.alreadyRendered
 											);
 }
@@ -477,19 +583,22 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		nextClientID = n->clientId;
 		
 		// check type: Don't combine entries over a speed change
-		if ( c->isSpeedChange() == true )  {
+		if ( c->hasSpeedChange() == true )  {
 			finalizeCurrentSequence = true;
+			#warning
 			break;
 		}
 		
 		// check type: Register new client id
-		if ( c->isClientIdChange() == true ) {
+		#warning
+		//if ( c->isClientIdChange() == true ) {
+		if ( c->hasClientIdChange() == true ) {
 			
 			if ( onPhysicallyClientIdChange(*c) == false )
 				return false;
 			
 			skipToNextEntry();
-			continue;
+			//continue;
 		}
 		
 		// check content: Skip this entry if it's an empty move
@@ -506,7 +615,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		const Move mNext(getNextPosEntry(itCurr, n));
 		
 		// check pitch: Stop here if the pitch to nect step is to strong 
-		if ( mCurr.isXYPitchDiffToStrong(mNext) == true ) {
+		if ( mCurr.isXYPitchDiffTooStrong(mNext) == true ) {
 			cpp->addOperatingTrace(wxString::Format("--> XY: An entanglement of %.1f degree between X and Y is too strong to keep also the next entry together\n", mCurr.getXYPitchDiffenceAsDegree(mNext)));
 			
 			wxString x;
@@ -518,7 +627,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		}
 		
 		// check pitch: Stop here if the pitch to nect step is to strong 
-		if ( mCurr.isZPitchDiffToStrong(mNext) == true ) {
+		if ( mCurr.isZPitchDiffTooStrong(mNext) == true ) {
 			cpp->addOperatingTrace(wxString::Format("--> Z: An entanglement of %.1f degree between Z and the XY Pane is too strong to keep also the next entry together\n", mCurr.getZPitchDiffenceAsDegree(mNext)));
 			
 			wxString x;
@@ -570,11 +679,22 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm) {
+bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm, double zOffset) {
 //////////////////////////////////////////////////////////////////
-	return onPhysicallyExecute(plm);
+	if ( setup.cnc == NULL ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!\n");
+		return false;
+	}
+	
+	if ( plm.getPathList().size() == 0 )
+		return true;
+	
+	if ( plm.getPathType() != CncPathListManager::PathType::PT_GUIDE_PATH )
+		return false;
+		
+	setup.cnc->addGuidePath(plm, zOffset);
+	return true;
 }
-
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
@@ -587,10 +707,8 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		return true;
 	
 	// forward guide pathes
-	if ( plm.getPathType() == CncPathListManager::PathType::PT_GUIDE_PATH ) {
-		setup.cnc->addGuidePath(plm);
-		return true;
-	}
+	if ( plm.getPathType() == CncPathListManager::PathType::PT_GUIDE_PATH )
+		return publishGuidePath(plm, 0.0);
 	
 	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
 	wxASSERT( cpp != NULL );
@@ -599,7 +717,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	
 	if ( setup.trace == true ) {
 		std::stringstream ss; ss << plm << std::endl;
-		cpp->addOperatingTracePthLstSep("Next CncPathListManager");
+		cpp->addOperatingTracePthLstSep("Next CncPathListManager\n");
 		cpp->addOperatingTrace(ss);
 		
 		traceSetup();
@@ -631,25 +749,27 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		
 		// ----------------------------------------------------------
 		// client id change
-		if ( curr.isClientIdChange() == true ) {
+		if ( curr.hasClientIdChange() == true ) {
 			if ( onPhysicallyClientIdChange(curr) == false )
 				return false;
 		
-			continue;
+			if ( curr.isClientIdChange() )
+				continue;
 		}
 		
 		// ----------------------------------------------------------
 		// speed change
-		if ( curr.isSpeedChange() == true ) {
+		if ( curr.hasSpeedChange() == true ) {
 			if ( onPhysicallySpeedChange(curr, next) == false )
 				return false;
 			
-			continue;
+			if ( curr.isSpeedChange() == true )
+				continue;
 		}
 		
 		// ----------------------------------------------------------
 		// position change
-		if ( curr.isPositionChange() == true ) {
+		if ( curr.hasPositionChange() == true ) {
 			
 			if ( setup.optAnalyse == false ) {
 				
@@ -664,11 +784,12 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 				}
 			}
 			
-			continue;
+			if ( curr.isPositionChange() == true )
+				continue;
 		}
 		
 		// safty: This should not appear
-		wxASSERT(NULL);
+		//wxASSERT(NULL);
 		
 	} // for
 	

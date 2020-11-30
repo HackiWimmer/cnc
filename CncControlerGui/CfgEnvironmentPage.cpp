@@ -173,21 +173,3 @@ void CncConfig::updateCalculatedFactors() {
 	{ prop = getProperty(CncRuntime_CALCULATION_FACT_Y); 	if (prop != NULL) prop->SetValue(getCalculationFactY(CncMetric)); }
 	{ prop = getProperty(CncRuntime_CALCULATION_FACT_Z); 	if (prop != NULL) prop->SetValue(getCalculationFactZ(CncMetric)); }
 }
-////////////////////////////////////////////////////////////////////////
-void CncConfig::updateCalculatedZAxisValues() {
-////////////////////////////////////////////////////////////////////////
-	wxPGProperty* prop = NULL;
-	
-	wxString list("Z-Feed-Table:\n");
-	for (unsigned int i=0; i<getMaxDurations(); i++) {
-		list.append(wxString::Format(" Duration step[% 2d] = % 2.3lf\n", i, getDurationThickness(i)));
-	}
-	
-	{ prop = getProperty(CncRuntime_Z_MAX_DURATIONS); 			if (prop != NULL) prop->SetValue((int)getMaxDurations()); }
-	{ prop = getProperty(CncRuntime_Z_WORKPIECE_OFFSET); 		if (prop != NULL) prop->SetValue(getWorkpieceOffset()); }
-	{ prop = getProperty(CncRuntime_Z_MAX_DURATION_THICKNESS); 	if (prop != NULL) prop->SetValue(getMaxDurationThickness()); }
-	{ prop = getProperty(CncRuntime_Z_CALCULATED_DURATIONS); 	if (prop != NULL) prop->SetValue((int)getDurationCount()); }
-	{ prop = getProperty(CncRuntime_Z_CURRENT_Z_DISTANCE); 		if (prop != NULL) prop->SetValue(getCurZDistance()); }
-	{ prop = getProperty(CncRuntime_Z_WORKPIECE_INCLUDED); 		if (prop != NULL) prop->SetValue(getReferenceIncludesWpt()); }
-	{ prop = getProperty(CncRuntime_Z_DURATION_THICKNESS); 		if (prop != NULL) prop->SetValue("See description below"); prop->SetHelpString(list); }
-}

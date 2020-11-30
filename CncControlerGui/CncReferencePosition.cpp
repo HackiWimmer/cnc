@@ -1,17 +1,24 @@
 #include <wx/gdicmn.h>
 #include <wx/richtooltip.h>
-#include "CncReferencePosition.h"
 #include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
+#include "MainFrame.h"
+#include "CncConfig.h"
+#include "CncBoundarySpace.h"
 #include "CncCommon.h"
+#include "CncContext.h"
+#include "wxCrafterImages.h"
+#include "CncReferencePosition.h"
+
 ///////////////////////////////////////////////////////////////////
 CncReferencePosition::CncReferencePosition(wxWindow* parent)
 : CncReferencePositionBase(parent)
-, navigationPanel(NULL)
-, infoMessage()
+, valid				(false)
+, navigationPanel	(NULL)
+, infoMessage		()
 ///////////////////////////////////////////////////////////////////
 {
-	setMode(CncRefPositionMode::CncRM_Mode1);
+	setMode(CncRefPositionMode::CncRM_Mode5);
 	setMeasurePlateThickness(0.0);
 	
 	//navigation panel control
@@ -21,21 +28,23 @@ CncReferencePosition::CncReferencePosition(wxWindow* parent)
 	cfg.alignment	= wxALIGN_RIGHT;
 	cfg.initToolTipMapAsCoordSytem();
 	
+	updatePreview();
+	
 	navigationPanel = new CncNavigatorPanel(this, cfg);
 	GblFunc::replaceControl(m_navigationPanelPlaceholder, navigationPanel);
 	
-	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 	&CncReferencePosition::onNavigatorPanel, 	this);
+	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 	&CncReferencePosition::onNavigatorPanel, this);
 }
 ///////////////////////////////////////////////////////////////////
 CncReferencePosition::~CncReferencePosition() {
 ///////////////////////////////////////////////////////////////////
-	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, &CncReferencePosition::onNavigatorPanel, 	this);
+	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, &CncReferencePosition::onNavigatorPanel, this);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncReferencePosition::isWorkpieceThicknessNeeded() {
+bool CncReferencePosition::isWorkpieceThicknessNeeded() const {
 ///////////////////////////////////////////////////////////////////
 	short mode = evaluateMode();
-	return ( mode == CncRefPositionMode::CncRM_Mode3 || mode == CncRefPositionMode::CncRM_Mode3 );
+	return ( mode == CncRefPositionMode::CncRM_Mode3 || mode == CncRefPositionMode::CncRM_Mode4 );
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::setMessage(const wxString& msg) {
@@ -48,12 +57,12 @@ void CncReferencePosition::setMeasurePlateThickness(const double mpt) {
 	m_measurePlateThickness->SetValue(wxString::Format("%1.2lf", mpt));
 }
 ///////////////////////////////////////////////////////////////////
-CncRefPositionMode CncReferencePosition::getReferenceMode() {
+CncRefPositionMode CncReferencePosition::getReferenceMode() const {
 ///////////////////////////////////////////////////////////////////
 	return (CncRefPositionMode)evaluateMode();
 }
 ///////////////////////////////////////////////////////////////////
-double CncReferencePosition::getWorkpieceThickness() {
+double CncReferencePosition::getWorkpieceThickness() const {
 ///////////////////////////////////////////////////////////////////
 	const wxString wpt = m_workpiceThickness->GetValue();
 	double ret = 0.0;
@@ -81,7 +90,7 @@ void CncReferencePosition::shiftReferenceMode() {
 	setMode(mode);
 }
 ///////////////////////////////////////////////////////////////////
-short CncReferencePosition::evaluateMode() {
+short CncReferencePosition::evaluateMode() const {
 ///////////////////////////////////////////////////////////////////
 	if (      m_btMode1->GetValue() == true ) return 1;
 	else if ( m_btMode2->GetValue() == true ) return 2;
@@ -127,6 +136,7 @@ void CncReferencePosition::setMode(short mode) {
 	}
 	
 	m_modeText->SetLabel(hint);
+	updatePreview();
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::onNavigatorPanel(CncNavigatorPanelEvent& event) {
@@ -214,6 +224,7 @@ void CncReferencePosition::set(wxCommandEvent& event) {
 		}
 	}
 	
+	valid = true;
 	EndModal(wxID_OK);
 }
 ///////////////////////////////////////////////////////////////////
@@ -269,10 +280,73 @@ void CncReferencePosition::determineZeroMode() {
 	
 	m_btSet->SetLabel(wxString::Format("Zero (%c, %c, %c)", evaluate(m_btZeroX), evaluate(m_btZeroY), evaluate(m_btZeroZ)));
 	m_btSet->Enable(m_btZeroX->GetValue() == true || m_btZeroY->GetValue() == true || m_btZeroZ->GetValue() == true);
+	
+	updatePreview();
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::onInfoTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_infoTimer->Stop();
 	showInformation();
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::updateWorkpieceThickness(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	updatePreview();
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::updatePreview() {
+///////////////////////////////////////////////////////////////////
+	CncBoundarySpace bs;
+	bs.setHardwareOffset(THE_BOUNDS->getHardwareOffset());
+	
+	bs.setWorkpieceThickness(getWorkpieceThickness());
+	bs.setRefPositionMode(getReferenceMode());
+	
+	CncDoublePosition rp(bs.getCalculatedRefPositionMetric());
+	
+	if ( shouldZeroX() )	m_previewX->ChangeValue(wxString::Format("%.3lf", rp.getX()));
+	else					m_previewX->ChangeValue(THE_APP->GetXAxis()->GetValue());
+	
+	if ( shouldZeroY() )	m_previewY->ChangeValue(wxString::Format("%.3lf", rp.getY()));
+	else					m_previewX->ChangeValue(THE_APP->GetYAxis()->GetValue());
+
+	if ( shouldZeroZ() )	m_previewZ->ChangeValue(wxString::Format("%.3lf", rp.getZ()));
+	else					m_previewX->ChangeValue(THE_APP->GetZAxis()->GetValue());
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::resetTempSetting() {
+///////////////////////////////////////////////////////////////////
+	m_btZeroX->SetValue(true);
+	m_btZeroY->SetValue(true);
+	m_btZeroZ->SetValue(true);
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::setEnforceFlag(bool s) {
+///////////////////////////////////////////////////////////////////
+	valid = !s;
+	
+	wxBitmap bmp(ImageLib24().Bitmap( valid ? "BMP_TRAFFIC_LIGHT_GREEN" : "BMP_TRAFFIC_LIGHT_RED")); 
+	const wxString mod(wxString::Format("Reference position mode: %d",      ( valid ? (int)getReferenceMode() : -1 ) ));
+	const wxString tip(wxString::Format("Reference position state: %s\n%s", ( valid ? "Valid" : "Invalid" ), mod));
+	
+	// display ref pos mode too
+	if ( valid == true ) {
+		const wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+		wxMemoryDC mdc(bmp);
+		mdc.SetFont(font);
+		mdc.SetTextForeground(wxColor(0, 0, 0));
+		mdc.DrawText(wxString::Format("%d", (int)getReferenceMode()), {5, 1});
+		bmp = mdc.GetAsBitmap();
+	}
+	
+	THE_APP->GetRefPosState()->SetToolTip(tip);
+	THE_APP->GetRefPosState()->SetBitmap(bmp);
+	THE_APP->GetStatusBar()->Refresh();
+	THE_APP->GetStatusBar()->Update();
+	
+	wxRichToolTip rTip("Reference Position Information", tip);
+	rTip.SetIcon(wxICON_INFORMATION);
+	//rTip.SetTipKind(wxTipKind_TopLeft);
+	rTip.ShowFor(THE_APP->GetRefPosState());
 }

@@ -37,6 +37,10 @@ class CncParsingSynopsisTrace : public CncParsingSynopsisTraceBase {
 		void addError(const wxString& entry)						{ addEntry('E', entry); }
 		void addSeparator(const wxString& entry="")					{ addEntry('S', entry); }
 		
+		bool hasDebugEntries()	const								{ return synopsisTrace->hasDebugEntries(); }
+		bool hasWarnEntries()	const								{ return synopsisTrace->hasWarnEntries();  }
+		bool hasErrorEntries()	const								{ return synopsisTrace->hasErrorEntries(); }
+		
 		void popProcessMode()										{ synopsisTrace->popProcessMode(); }
 		void pushUpdateMode()										{ synopsisTrace->pushUpdateMode(); }
 

@@ -407,7 +407,7 @@
 Observer</label>
                                   <bitmap>bitmaps/system-search-2.png</bitmap>
                                   <selected>0</selected>
-                                  <object class="wxPanel" name="m_panel9530">
+                                  <object class="wxPanel" name="m_observerPanel">
                                     <style>wxTAB_TRAVERSAL</style>
                                     <object class="wxFlexGridSizer">
                                       <cols>1</cols>
@@ -474,7 +474,7 @@ Observer</label>
 Editor</label>
                                   <bitmap>bitmaps/table-edit.png</bitmap>
                                   <selected>0</selected>
-                                  <object class="wxPanel" name="m_panel9532">
+                                  <object class="wxPanel" name="m_editorPanel">
                                     <style>wxTAB_TRAVERSAL</style>
                                     <object class="wxFlexGridSizer">
                                       <cols>1</cols>
@@ -1359,6 +1359,82 @@ Editor</label>
                                     </object>
                                   </object>
                                 </object>
+                                <object class="listbookpage">
+                                  <label>Template
+Context</label>
+                                  <bitmap>bitmaps/code-context.png</bitmap>
+                                  <selected>0</selected>
+                                  <object class="wxPanel" name="m_contextPanel">
+                                    <style>wxTAB_TRAVERSAL</style>
+                                    <object class="wxFlexGridSizer">
+                                      <cols>1</cols>
+                                      <rows>2</rows>
+                                      <vgap>0</vgap>
+                                      <hgap>0</hgap>
+                                      <growablecols>0</growablecols>
+                                      <growablerows>1</growablerows>
+                                      <object class="sizeritem" name="flexGridSizer96101">
+                                        <flag>wxALL|wxEXPAND</flag>
+                                        <object class="wxFlexGridSizer">
+                                          <cols>2</cols>
+                                          <rows>0</rows>
+                                          <vgap>0</vgap>
+                                          <hgap>0</hgap>
+                                          <growablecols/>
+                                          <growablerows/>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <border>1</border>
+                                            <minsize>26,26</minsize>
+                                            <object class="wxButton" name="m_btDetachTemplateContext">
+                                              <label/>
+                                              <style/>
+                                              <size>26,26</size>
+                                              <tooltip>
+                                                <![CDATA[Detach View]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/abb-export.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL|wxEXPAND</flag>
+                                            <border>5</border>
+                                            <object class="wxStaticText" name="m_staticText5137673">
+                                              <label>Template Context:</label>
+                                              <style/>
+                                              <font>
+                                                <size>12</size>
+                                                <style>normal</style>
+                                                <weight>bold</weight>
+                                                <family>swiss</family>
+                                                <underlined>0</underlined>
+                                                <face>Segoe UI</face>
+                                              </font>
+                                            </object>
+                                          </object>
+                                        </object>
+                                      </object>
+                                      <object class="sizeritem">
+                                        <flag>wxALL|wxEXPAND</flag>
+                                        <object class="wxTextCtrl" name="m_templateContext">
+                                          <style>wxTE_READONLY|wxTE_MULTILINE</style>
+                                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                          <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                          <font>
+                                            <size>9</size>
+                                            <style>normal</style>
+                                            <weight>normal</weight>
+                                            <family>modern</family>
+                                            <underlined>0</underlined>
+                                            <face>Consolas</face>
+                                          </font>
+                                        </object>
+                                      </object>
+                                    </object>
+                                  </object>
+                                </object>
                               </object>
                             </object>
                           </object>
@@ -1874,7 +1950,7 @@ Magazine</label>
 Reference</label>
                                   <bitmap>bitmaps/abb-import.png</bitmap>
                                   <selected>0</selected>
-                                  <object class="wxPanel" name="m_panel8951">
+                                  <object class="wxPanel" name="m_hardareRefPanel">
                                     <style>wxTAB_TRAVERSAL</style>
                                     <object class="wxFlexGridSizer">
                                       <cols>1</cols>
@@ -2375,7 +2451,7 @@ Dimensions</label>
                                                     <face>Segoe UI</face>
                                                   </font>
                                                   <tooltip>
-                                                    <![CDATA[Take over to teh Setup Parameters]]>
+                                                    <![CDATA[Take over to the Setup Parameters]]>
                                                   </tooltip>
                                                   <bitmap>bitmaps/system-settings.png</bitmap>
                                                   <bitmapposition>wxLEFT</bitmapposition>
@@ -2428,6 +2504,39 @@ Dimensions</label>
                                               </object>
                                             </object>
                                           </object>
+                                        </object>
+                                      </object>
+                                    </object>
+                                  </object>
+                                </object>
+                                <object class="listbookpage">
+                                  <label>Bounderies
+Summary</label>
+                                  <bitmap>bitmaps/align-vertical-top.png</bitmap>
+                                  <selected>0</selected>
+                                  <object class="wxPanel" name="m_SummaryPanel">
+                                    <style>wxTAB_TRAVERSAL</style>
+                                    <object class="wxFlexGridSizer">
+                                      <cols>1</cols>
+                                      <rows>1</rows>
+                                      <vgap>0</vgap>
+                                      <hgap>0</hgap>
+                                      <growablecols>0</growablecols>
+                                      <growablerows>0</growablerows>
+                                      <object class="sizeritem">
+                                        <flag>wxALL|wxEXPAND</flag>
+                                        <object class="wxTextCtrl" name="m_bounderiesSummary">
+                                          <style>wxTE_READONLY|wxTE_MULTILINE</style>
+                                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                          <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                          <font>
+                                            <size>9</size>
+                                            <style>normal</style>
+                                            <weight>normal</weight>
+                                            <family>modern</family>
+                                            <underlined>0</underlined>
+                                            <face>Consolas</face>
+                                          </font>
                                         </object>
                                       </object>
                                     </object>

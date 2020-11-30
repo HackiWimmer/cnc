@@ -26,7 +26,7 @@ class BinaryPathHandlerBase : public PathHandlerBase {
 		BinaryPathHandlerBase();
 		virtual ~BinaryPathHandlerBase();
 		
-		virtual const char* getName() { return "BinaryPathHandlerBase"; }
+		virtual const char* getName() const { return "BinaryPathHandlerBase"; }
 		
 		// common interface
 		virtual bool processCommand(const unsigned char* buffer, int nbBytes) { return true; };
@@ -51,8 +51,8 @@ class BinaryPathHandlerHexView : public BinaryPathHandlerBase {
 		explicit BinaryPathHandlerHexView(FormatType ft = FormatType::Raw);
 		virtual ~BinaryPathHandlerHexView() {}
 		
-		virtual void prepareWork(); 
-		virtual void finishWork();
+		virtual bool prepareWork(); 
+		virtual bool finishWork();
 		
 		virtual bool processCommand(const unsigned char* buffer, int nbBytes);
 		
@@ -88,8 +88,8 @@ class BinaryPathHandlerHumanReadableView : public BinaryPathHandlerBase
 		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence);
 
-		virtual void prepareWork(); 
-		virtual void finishWork();
+		virtual bool prepareWork(); 
+		virtual bool finishWork();
 		
 		virtual bool processCommand(const unsigned char* buffer, int nbBytes);
 

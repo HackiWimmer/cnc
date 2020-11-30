@@ -193,11 +193,13 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		}
 
 		// assign x, y, z depending on given pid
-		if		( vi.hasXYZ() )	{ pos.setX(values[0]); pos.setY(values[1]); pos.setZ(values[2]); }
-		else if ( vi.hasXY()  ) { pos.setX(values[0]); pos.setY(values[1]); pos.setZ(0);         }
-		else if ( vi.hasX()   ) { pos.setX(values[0]); pos.setY(0);         pos.setZ(0);         }
-		else if ( vi.hasY()   ) { pos.setX(0);         pos.setY(values[0]); pos.setZ(0);         }
-		else if ( vi.hasZ()   ) { pos.setX(0);         pos.setY(0);         pos.setZ(values[0]); }
+		if		( vi.isXYZ() ) { pos.setX(values[0]); pos.setY(values[1]); pos.setZ(values[2]); }
+		else if ( vi.isXY()  ) { pos.setX(values[0]); pos.setY(values[1]); pos.setZ(0);         }
+		else if ( vi.isXZ()  ) { pos.setX(values[0]); pos.setY(0);         pos.setZ(values[1]); }
+		else if ( vi.isYZ()  ) { pos.setX(0);         pos.setY(values[0]); pos.setZ(values[1]); }
+		else if ( vi.isX()   ) { pos.setX(values[0]); pos.setY(0);         pos.setZ(0);         }
+		else if ( vi.isY()   ) { pos.setX(0);         pos.setY(values[0]); pos.setZ(0);         }
+		else if ( vi.isZ()   ) { pos.setX(0);         pos.setY(0);         pos.setZ(values[0]); }
 		
 		if ( trace )
 			std::cout << "byteCounter: " << byteCounter << ", pos: " << pos << std::endl;
@@ -277,6 +279,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		unsigned int portionSize = buffer[idx] + 1;
 		
 		// debug
+		#warning
 		if ( false ) {
 			std::clog << " idx               : " << idx << std::endl;
 			std::clog << " portionSize       : " << portionSize << std::endl;

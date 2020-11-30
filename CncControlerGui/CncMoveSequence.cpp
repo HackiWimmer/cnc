@@ -197,7 +197,7 @@ void CncMoveSequence::addStepPosXYZ(int32_t dx, int32_t dy, int32_t dz)  {
 	if ( dx == 0 && dy == 0 && dz == 0 )
 		return;
 
-	CncContext::PositionStorage::addMove(CncContext::PositionStorage::TRIGGER_MOV_SEQ_ADD, dx, dy, dz);
+	PositionStorage::addMove(PositionStorage::TRIGGER_MOV_SEQ_ADD, dx, dy, dz);
 
 	sequence.push_back(SequencePoint(getLastClientId(), dx, dy, dz));
 	data.add(dx, dy, dz);
@@ -477,27 +477,32 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 		}
 		else if ( vi.getByteCount() == 1 ) {
 			
+			#warning
+			/*
 			if 		( vi.hasXYZ() ) { putInt8(sp.x); putInt8(sp.y); putInt8(sp.z); }
 			else if ( vi.hasXY()  ) { putInt8(sp.x); putInt8(sp.y); }
-			else if ( vi.hasX()   ) { putInt8(sp.x); }
-			else if ( vi.hasY()   ) { putInt8(sp.y); }
-			else if ( vi.hasZ()   ) { putInt8(sp.z); }
+			*/
+			if ( vi.hasX() ) { putInt8(sp.x); }
+			if ( vi.hasY() ) { putInt8(sp.y); }
+			if ( vi.hasZ() ) { putInt8(sp.z); }
 		}
 		else if ( vi.getByteCount() == 2 ) {
-
+			/*
 			if 		( vi.hasXYZ() ) { putInt16(sp.x); putInt16(sp.y); putInt16(sp.z); }
 			else if ( vi.hasXY()  ) { putInt16(sp.x); putInt16(sp.y); }
-			else if ( vi.hasX()   ) { putInt16(sp.x); }
-			else if ( vi.hasY()   ) { putInt16(sp.y); }
-			else if ( vi.hasZ()   ) { putInt16(sp.z); }
+			*/
+			if ( vi.hasX() ) { putInt16(sp.x); }
+			if ( vi.hasY() ) { putInt16(sp.y); }
+			if ( vi.hasZ() ) { putInt16(sp.z); }
 		}
 		else if ( vi.getByteCount() == 4 ) {
-			
+			/*
 			if 		( vi.hasXYZ() ) { putInt32(sp.x); putInt32(sp.y); putInt32(sp.z); }
 			else if ( vi.hasXY()  ) { putInt32(sp.x); putInt32(sp.y); }
-			else if ( vi.hasX()   ) { putInt32(sp.x); }
-			else if ( vi.hasY()   ) { putInt32(sp.y); }
-			else if ( vi.hasZ()   ) { putInt32(sp.z); }
+			*/ 
+			if ( vi.hasX() ) { putInt32(sp.x); }
+			if ( vi.hasY() ) { putInt32(sp.y); }
+			if ( vi.hasZ() ) { putInt32(sp.z); }
 		}
 		else {
 			std::cerr << "CncMoveSequence::flushPoint::flushPoint_RENDER_AND_MOVE_SEQUENCE: Invalid ByteCount: " << vi.getByteCount() << std::endl;

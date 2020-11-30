@@ -12,12 +12,21 @@
 #include "MainFrameProxy.h"
 #include "CncFileNameService.h"
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "CncControl.h"
+#include "CncTemplateContext.h"
 #include "SVGPathHandlerCnc.h"
 #include "SvgColourScheme.h"
 #include "SVGFileParser.h"
 
+#define SFP_ADD_SEP(msg)	APP_PROXY::parsingSynopsisTraceAddSeparator(wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_INF(msg)	APP_PROXY::parsingSynopsisTraceAddInfo     (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_WAR(msg)	APP_PROXY::parsingSynopsisTraceAddWarning  (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_ERR(msg)	APP_PROXY::parsingSynopsisTraceAddError    (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+
 //////////////////////////////////////////////////////////////////
+class svgUserAgent;
+
 SVGFileParser::SVGFileParser(const wxString& fn, CncControl* cnc) 
 : SVGParserBase		(new SVGPathHandlerCnc(cnc))
 , FileParser		(fn)
@@ -176,16 +185,15 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 
 	// reporting
 	typedef CncUnitCalculator<float> UC;
-	APP_PROXY::parsingSynopsisTraceAddSeparator("RootNode:");
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format("Translated RootNode: %s",  ss.str()));
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Input Unit        : %s",  UC::getUnitAsStr(svgRootNode.getInputUnit())));
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Output Unit       : %s",  UC::getUnitAsStr(svgRootNode.getOutputUnit())));
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Width        [px] : %12.3lf", svgRootNode.getWidth()));
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Heigth       [px] : %12.3lf", svgRootNode.getHeight()));
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Width        [mm] : %12.3lf", svgRootNode.getWidth_MM()));
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Heigth       [mm] : %12.3lf", svgRootNode.getHeight_MM()));
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Scale X           : %12.3lf", svgRootNode.getScaleX()));
-	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Scale Y           : %12.3lf", svgRootNode.getScaleY()));
+	SFP_ADD_SEP("RootNode:");
+	SFP_LOG_INF(wxString::Format("Translated RootNode: %s",  ss.str()));
+	SFP_LOG_INF(wxString::Format(" Input Unit        : %s",  UC::getUnitAsStr(svgRootNode.getInputUnit())));
+	SFP_LOG_INF(wxString::Format(" Width        [px] : %12.3lf", svgRootNode.getWidth()));
+	SFP_LOG_INF(wxString::Format(" Heigth       [px] : %12.3lf", svgRootNode.getHeight()));
+	SFP_LOG_INF(wxString::Format(" Width        [mm] : %12.3lf", svgRootNode.getWidth_MM()));
+	SFP_LOG_INF(wxString::Format(" Heigth       [mm] : %12.3lf", svgRootNode.getHeight_MM()));
+	SFP_LOG_INF(wxString::Format(" Scale X           : %12.3lf", svgRootNode.getScaleX()));
+	SFP_LOG_INF(wxString::Format(" Scale Y           : %12.3lf", svgRootNode.getScaleY()));
 	
 	pathHandler->setSvgRootNode(svgRootNode);
 	
@@ -217,9 +225,6 @@ void SVGFileParser::debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrS
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
-	static SvgColourAttributeDecoder	cad;
-	static SvgColourDecoder				cs;
-	
 	wxXmlAttribute* attr = child->GetAttributes();
 	svgUserAgent.setNodeType(child->GetName());
 	svgUserAgent.addXMLAttributes(attr);
@@ -227,7 +232,25 @@ void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 	SvgCncContext& cwp = pathHandler->getSvgCncContext();
 	cwp.setCurrentLineNumber(getCurrentLineNumber());
 	
-	if ( THE_CONFIG->getSvgUseColourScheme() == true ) {
+	// ----------------------------------------------------------
+	if ( runInfo.getCurrentDebugState() == true ) {
+		wxString content;
+		debugXMLAttribute(attr, content);
+		appendDebugValueBase("Attributes", content);
+	}
+}
+//////////////////////////////////////////////////////////////////
+void SVGFileParser::registerMovementNode() {
+//////////////////////////////////////////////////////////////////
+	static SvgColourAttributeDecoder	cad;
+	static SvgColourDecoder				cs;
+	
+	SvgCncContext& cwp	= pathHandler->getSvgCncContext();
+	const bool ucs		= cwp.useColourScheme();
+	SFP_ADD_SEP(wxString::Format("Parse next Movement Node"));
+	SFP_LOG_INF(wxString::Format("Use Colour Scheme    : %s", ucs ? "Yes" : "No"));
+	
+	if ( ucs == true ) {
 		
 		const wxString& style = svgUserAgent.getCurrentAttribute("style", "");
 		if ( style.IsEmpty() == false ) {
@@ -251,15 +274,6 @@ void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 		
 		cwp.determineColourEffects();
 	}
-	
-	// ----------------------------------------------------------
-	if ( runInfo.getCurrentDebugState() == true ) {
-		appendDebugValueBase("Reverse Path", cwp.hasReverseCorrection());
-		
-		wxString content;
-		debugXMLAttribute(attr, content);
-		appendDebugValueBase("Attributes", content);
-	}
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::clearControls() {
@@ -280,18 +294,27 @@ bool SVGFileParser::spool() {
 	
 	const UserAgentVector& uav = svgUserAgent.getList();
 	pathHandler->prepareWork();
-
+	
+	SvgCncContextSummary sumCtx;
+	
 	// over all stored pathes
 	for ( auto itUav = uav.begin(); itUav != uav.end(); ++itUav ) {
 		const SVGUserAgentInfo& uai = *itUav;
 		
+		// ----------------------------------------------------------------------
 		if ( uai.nodeName == SvgNodeTemplates::CncBreakBlockNodeName ) {
-			std::cout << " CncBreak at line " << uai.lineNumber << " detected. Processing will stop here." << std::endl;
+			std::cout << " CncBreak at line " << ( uai.lineNumber / CLIENT_ID.TPL_FACTOR )<< " detected. Processing will stop here." << std::endl;
 			break;
 		}
 		
+		// ----------------------------------------------------------------------
 		if ( uai.nodeName == SvgNodeTemplates::CncPauseBlockNodeName ) {
 			pathHandler->processWait(uai.cncPause.microseconds);
+		}
+		
+		// ----------------------------------------------------------------------
+		if ( uai.nodeName == SvgNodeTemplates::CncParameterBlockNodeName ) {
+			sumCtx.add(uai.cncParameters);
 		}
 		
 		pathHandler->setSvgCncContext(uai.cncParameters);
@@ -320,7 +343,7 @@ bool SVGFileParser::spool() {
 				
 			std::cerr	<< CNC_LOG_FUNCT << ": Failed" 
 						<< std::endl
-						<< "Line number: " << uai.lineNumber 
+						<< "Line number: " << uai.lineNumber / CLIENT_ID.TPL_FACTOR 
 						<< ", Node Type: " << uai.nodeName 
 						<< std::endl
 						;
@@ -331,8 +354,10 @@ bool SVGFileParser::spool() {
 			return false;
 	}
 	
-	pathHandler->finishWork();
-	return true;
+	THE_TPL_CTX->registerToolTotList(sumCtx.getToolTotList());
+	THE_TPL_CTX->registerToolSelList(sumCtx.getToolSelList());
+	
+	return pathHandler->finishWork();
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::performPath(const SVGUserAgentInfo& uai) {
@@ -445,10 +470,8 @@ bool SVGFileParser::spoolPath(const SVGUserAgentInfo& uai, const wxString& trans
 	if ( uai.shouldProceed() == false )
 		return true;
 		
-	if ( pathHandler->initNextPath() == false )
+	if ( pathHandler->activateNextPath(uai.lineNumber) == false )
 		return false;
-	
-	initNextClientId(uai.lineNumber);
 	
 	const PathInfoVector& pil = uai.getPathInfoList();
 	for ( auto itPiv = pil.cbegin(); itPiv != pil.cend(); ++itPiv ) {
@@ -481,6 +504,9 @@ bool SVGFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
+	SFP_ADD_SEP("Start SVG file parsing")
+	SFP_LOG_INF(wxString::Format("File name: '%s'", fileName))
+	
 	wxXmlDocument doc;
 	if ( !doc.Load(fileName) )
 		return false;
@@ -500,9 +526,8 @@ bool SVGFileParser::preprocess() {
 		return false;
 	}
 	
-	// main entry point foor evaluateing all XML nodes
-	wxXmlNode *child = doc.GetRoot()->GetChildren();
-	const bool ret = processXMLNode(child);
+	// main entry point to evaluate all further XML nodes
+	const bool ret = processXMLNode(doc.GetRoot()->GetChildren());
 	
 	if ( ret == false ) {
 		std::cerr	<< CNC_LOG_FUNCT << " will return false"						<< std::endl
@@ -525,7 +550,7 @@ bool SVGFileParser::postprocess() {
 		return true;
 	
 	const SVGRootNode& rn = getPathHandler()->getSvgRootNode();
-	CncUnitCalculator<float> to_mm(rn.getOutputUnit(), Unit::mm);
+	CncUnitCalculator<float> to_mm(rn.getInputUnit(), Unit::mm);
 	
 	const CncDoublePosition min(cncControl->getMinPositionsMetric());
 	const CncDoublePosition max(cncControl->getMaxPositionsMetric());
@@ -539,7 +564,7 @@ bool SVGFileParser::postprocess() {
 	const double cncMaxX	= max.getX();
 
 	// if the Y axis will be reversed svg is also a right hand coord system
-	const bool cnv = CncConfig::getGlobalCncConfig()->getSvgConvertToRightHandFlag();
+	const bool   cnv		= CncConfig::getGlobalCncConfig()->getSvgConvertToRightHandFlag();
 	const double cncMinY	= min.getY() * (cnv ? +1 : -1);
 	const double cncMaxY	= max.getY() * (cnv ? +1 : -1);
 	
@@ -548,26 +573,20 @@ bool SVGFileParser::postprocess() {
 	const double svgMinY	= to_mm.convert(rn.getViewbox().getMinY());
 	const double svgMaxY	= to_mm.convert(rn.getViewbox().getMaxY());
 	
-	bool ret = true;
+	// --------------------------------------------------------
 	auto check_1_Less_2 = [&](double d1, double d2, const char* msg) {
 		if ( d1 > d2 ) {
-			if ( ret == true ) {
-				APP_PROXY::parsingSynopsisTraceAddSeparator("Post Processing Error Summary:");
-			}
-			
-			APP_PROXY::parsingSynopsisTraceAddError(wxString::Format("%s %12.3lf > %12.3lf", msg, d1, d2));
-			ret = false;
+			SFP_LOG_ERR(wxString::Format("%s %12.3lf > %12.3lf", msg, d1, d2));
 		}
 	};
 	
-	const char type = 'I';
-	APP_PROXY::parsingSynopsisTraceAddSeparator("Boundings:");
-	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf", cncDistX, cncDistY));
-	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf", svgDistX, svgDistY));
-	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf", cncMinX, cncMinY));
-	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" SVG min      x, y  [mm]: %12.3lf, %12.3lf", svgMinX, svgMinY));
-	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" CNC max      x, y  [mm]: %12.3lf, %12.3lf", cncMaxX, cncMaxY));
-	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" SVG max      x, y  [mm]: %12.3lf, %12.3lf", svgMaxX, svgMaxY));
+	SFP_ADD_SEP("Boundings:");
+	SFP_LOG_INF(wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf", cncDistX, cncDistY));
+	SFP_LOG_INF(wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf", svgDistX, svgDistY));
+	SFP_LOG_INF(wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf", cncMinX, cncMinY));
+	SFP_LOG_INF(wxString::Format(" SVG min      x, y  [mm]: %12.3lf, %12.3lf", svgMinX, svgMinY));
+	SFP_LOG_INF(wxString::Format(" CNC max      x, y  [mm]: %12.3lf, %12.3lf", cncMaxX, cncMaxY));
+	SFP_LOG_INF(wxString::Format(" SVG max      x, y  [mm]: %12.3lf, %12.3lf", svgMaxX, svgMaxY));
 
 	check_1_Less_2(cncDistX, svgDistX, " CNC distance X out of range:  ");
 	check_1_Less_2(cncDistY, svgDistY, " CNC distance Y out of range:  ");
@@ -576,8 +595,17 @@ bool SVGFileParser::postprocess() {
 	check_1_Less_2(cncMaxX,  svgMaxX,  " CNC max bound X out of range: ");
 	check_1_Less_2(cncMaxY,  svgMaxY,  " CNC max bound Y out of range: ");
 	
-	if ( ret == false )  
+	const bool ret = APP_PROXY::parsingSynopsisTraceHasErrorEntries() == false;
+	
+	if ( ret == false ) {
+		SFP_ADD_SEP("Post Processing Error Summary:");
 		std::cerr << "SVG post processing decteced error(s). For more details please visit the parsing synopsis trace\n";
+	}
+	else {
+		if ( APP_PROXY::parsingSynopsisTraceHasWarnEntries() == true )
+		cnc::cex1 << "SVG post processing decteced warnig(s). For more details please visit the parsing synopsis trace\n";
+	}
+	
 	
 	return ret;
 }
@@ -594,6 +622,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		
 		// ----------------------------------------------------------
 		if ( currentNodeName.IsSameAs("PATH", false) ) {
+			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
 			
 			const wxString data(child->GetAttribute("d", ""));
@@ -621,6 +650,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("CIRCLE", false) ) {
+			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
 			
 			wxString ret; 
@@ -630,6 +660,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("ELLIPSE", false) ) {
+			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
 			
 			wxString ret; 
@@ -639,6 +670,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("LINE", false) ) {
+			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
 			
 			wxString ret; 
@@ -648,8 +680,9 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("POLYGON", false ) ) {
+			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
-
+			
 			wxString ret; 
 			if ( SVGElementConverter::convertPolygonToPathData(child, ret) )
 				if ( evaluatePath(ret) == false )
@@ -657,6 +690,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("POLYLINE", false) ) {
+			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
 			
 			wxString ret; 
@@ -666,8 +700,9 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("RECT", false) ) {
+			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
-
+			
 			wxString ret; 
 			if ( SVGElementConverter::convertRectToPathData(child, ret) )
 				if ( evaluatePath(ret) == false )
@@ -686,7 +721,16 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		else if ( currentNodeName.StartsWith("Cnc") ) {
 			
 			// ------------------------------------------------------
-			if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) ) {
+			if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) ) {
+				if ( resetCncParameters(child) == false )
+					return false;
+					
+				registerNextDebugNode(currentNodeName);
+				
+				svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
+			}
+			// ------------------------------------------------------
+			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) ) {
 				if ( evaluateCncParameters(child) == false )
 					return false;
 					
@@ -697,21 +741,27 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) ) {
 				registerNextDebugNode(currentNodeName);
 				
-				SvgCncBreak scb;
-				scb.currentLineNumber = getCurrentLineNumber();
+				SvgCncBreak scb; scb.setCurrentLineNumber(getCurrentLineNumber());
 				svgUserAgent.initNextCncBreakNode(scb);
 			}
 			// ------------------------------------------------------
 			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) ) {
 				registerNextDebugNode(currentNodeName);
 			
-				SvgCncPause scp;
-				scp.currentLineNumber = getCurrentLineNumber();
+				SvgCncPause scp; scp.setCurrentLineNumber(getCurrentLineNumber());
 				double p = 0.0;
 				if ( child->GetAttribute("p", "0.0").ToDouble(&p) )
 					scp.microseconds = (int64_t)(p * 1000 * 1000);
 				
 				svgUserAgent.initNextCncPauseNode(scp);
+			}
+			// ------------------------------------------------------
+			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterPrintBlockNodeName) ) {
+				if ( printCncParameters(child) == false )
+					return false;
+					
+				registerNextDebugNode(currentNodeName);
+				svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
 			}
 			// ------------------------------------------------------
 			else if ( currentNodeName.IsSameAs("CNC", false) ) {
@@ -776,19 +826,22 @@ void SVGFileParser::initNextPath(const wxString& data) {
 	svgUserAgent.initNextPath(pathHandler->getSvgCncContext(), data);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {
+bool SVGFileParser::resetCncParameters(wxXmlNode* node) {
 //////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl);
 	SvgCncContext& cwp = pathHandler->getSvgCncContext();
-	
-	wxString attr = child->GetAttribute("reverse", "no");
-	cwp.setReverseFlag(attr);
-	
-	attr = child->GetAttribute("correction", "none");
-	cwp.setToolCorrectionType(attr);
-	
-	attr = child->GetAttribute("depth", wxString::Format("Z%lf", 0.0));
-	cwp.setCurrentZDepth(attr);
-	
+	cwp.reset();
 	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::printCncParameters(wxXmlNode* node) {
+//////////////////////////////////////////////////////////////////
+	SvgCncContext& cwp = pathHandler->getSvgCncContext();
+	cwp.traceTo(std::cout, 1);
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::evaluateCncParameters(wxXmlNode* node) {
+//////////////////////////////////////////////////////////////////
+	SvgCncContext& cwp = pathHandler->getSvgCncContext();
+	return cwp.provide(node);
 }

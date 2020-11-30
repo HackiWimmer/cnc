@@ -3,6 +3,7 @@
 #include "3D/GLLabelCluster.h"
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "CncBoundarySpace.h"
 #include "3D/GLInclude.h"
 #include "3D/CncGLCanvas.h"
 #include <wx/bitmap.h>
@@ -240,7 +241,7 @@ void GLContextCncPathBase::markCurrentPosition() {
 	if ( cncPath.getOpenGLBufferStore() != NULL )
 		cncPath.getOpenGLBufferStore()->getVertex(vertex, cncPath.getVirtualEnd() - 1);
 	
-	drawPosMarker(vertex.getX(), vertex.getY(), vertex.getZ());
+	drawMovePosition(vertex.getX(), vertex.getY(), vertex.getZ());
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::clearPathData() {
@@ -333,6 +334,7 @@ void GLContextCncPathBase::drawGuidePathes() {
 			}
 			
 			glColor4ub(gp.getColour().Red(), gp.getColour().Green(), gp.getColour().Blue(), 255);
+			glLineWidth(1);
 			
 			glBegin(GL_LINE_LOOP);
 				
@@ -342,7 +344,6 @@ void GLContextCncPathBase::drawGuidePathes() {
 				}
 				
 			glEnd();
-			
 			if ( stripple == true )
 				glDisable(GL_LINE_STIPPLE);
 		}
@@ -354,13 +355,13 @@ void GLContextCncPathBase::drawHardwareBox() {
 	if ( options.showHardwareBox == false )
 		return; 
 
-	if ( THE_CONTEXT->hardwareOriginOffset.valid == false )
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == false )
 		return;
 		
 	// evaluate hardware origin as vertex
-	float originX = THE_CONTEXT->hardwareOriginOffset.dx / THE_CONFIG->getDispFactX3D();
-	float originY = THE_CONTEXT->hardwareOriginOffset.dy / THE_CONFIG->getDispFactY3D();
-	float originZ = THE_CONTEXT->hardwareOriginOffset.dz / THE_CONFIG->getDispFactZ3D();
+	float originX = THE_BOUNDS->getHardwareOffset().getAsStepsX() / THE_CONFIG->getDispFactX3D();
+	float originY = THE_BOUNDS->getHardwareOffset().getAsStepsY() / THE_CONFIG->getDispFactY3D();
+	float originZ = THE_BOUNDS->getHardwareOffset().getAsStepsZ() / THE_CONFIG->getDispFactZ3D();
 		
 	// evaluate hardware dimensions as vertex
 	float maxX    = THE_CONFIG->getMaxDimensionStepsX()  / THE_CONFIG->getDispFactX3D();

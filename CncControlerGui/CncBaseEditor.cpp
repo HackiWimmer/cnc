@@ -780,7 +780,9 @@ void CncBaseEditor::setupModelType() {
 	
 	switch ( tf ) {
 		case TplSvg:		fileInfo.modelType 		= cnv ? GLContextBase::ModelType::MT_RIGHT_HAND : GLContextBase::ModelType::MT_LEFT_HAND;
-							fileInfo.modelViewType	= CncDimensions::CncDimension2D; 
+							if ( THE_CONFIG->getSvg3DViewFlag() )	fileInfo.modelViewType	= CncDimensions::CncDimension3D; 
+							else 									fileInfo.modelViewType	= CncDimensions::CncDimension2D; 
+							
 							break;
 							
 		default:			fileInfo.modelType 		= GLContextBase::ModelType::MT_RIGHT_HAND; 

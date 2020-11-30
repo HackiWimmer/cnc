@@ -14,9 +14,9 @@ class SVGPathHandlerBase : public PathHandlerBase {
 		SVGPathHandlerBase();
 		virtual ~SVGPathHandlerBase();
 		
-		virtual const char* getName()  						{ return "SVGPathHandlerBase"; }
-		SVGTransformMatrix& getSvgTransformMatrix() 		{ return currentSvgTransformMatrix; }
-		
+		virtual const char* getName()  							const	{ return "SVGPathHandlerBase"; }
+		SVGTransformMatrix& getSvgTransformMatrix() 					{ return currentSvgTransformMatrix; }
+		virtual bool activateNextPath(long clientId)					{ return true; }
 		virtual void setSvgRootNode(const SVGRootNode& srn);
 		
 		SvgCncContext& getSvgCncContext();

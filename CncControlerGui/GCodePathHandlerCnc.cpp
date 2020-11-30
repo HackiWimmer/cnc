@@ -21,20 +21,23 @@ GCodePathHandlerCnc::~GCodePathHandlerCnc() {
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
-void GCodePathHandlerCnc::prepareWorkImpl() {
+bool GCodePathHandlerCnc::prepareWorkImpl() {
 //////////////////////////////////////////////////////////////////
 	// log current position
 	phBegPosition = getSetup().cnc->getCurCtlPos();
+	return true;
 }
 //////////////////////////////////////////////////////////////////
-void GCodePathHandlerCnc::finishWorkImpl() {
+bool GCodePathHandlerCnc::finishWorkImpl() {
 //////////////////////////////////////////////////////////////////
-	// controller handling
+	// controller handling#
+	#warning switchToolOff();
 	getSetup().cnc->switchToolOff();
 	getSetup().cnc->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
 	
 	getSetup().cnc->moveToPos(phBegPosition);
 	currentPos.set(getSetup().cnc->getCurCtlPosMetric());
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::initNextPath() {
@@ -42,11 +45,11 @@ bool GCodePathHandlerCnc::initNextPath() {
 	// execute path list
 	if ( onPhysicallyExecute(pathListMgr) == false )
 		return false;
-	
+
 	// default processing
 	if ( PathHandlerBase::initNextPath() == false )
 		return false;
-	
+
 	Serial::Trigger::NextPath tr;
 	getSetup().cnc->processTrigger(tr);
 	

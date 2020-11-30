@@ -8,6 +8,7 @@
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "MainFrame.h"
+#include "CncAutoFreezer.h"
 #include "CncFileNameService.h"
 #include "CncMessageDialog.h"
 #include "CncLoggerView.h"
@@ -223,9 +224,19 @@ void CncLoggerListCtrl::add(const wxString& text, const wxListItemAttr& lia) {
 	if ( entries.size() == 0 )
 		next();
 	
-	wxListItemAttr prevAttr(entries.back().listItemAttr);
 	entries.push_back(std::move(LoggerEntry(text, "", lia)));
 	updateContent();
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::tokenAndAdd(const wxString& text, const wxListItemAttr& lia) {
+/////////////////////////////////////////////////////////////
+	wxStringTokenizer lines(text, "\n");
+	
+	while ( lines.HasMoreTokens() ) {
+		const wxString& token = lines.GetNextToken();
+		entries.push_back(std::move(LoggerEntry(token, "", lia)));
+		next();
+	}
 }
 /////////////////////////////////////////////////////////////
 bool CncLoggerListCtrl::isItemValid(long item) const {
@@ -267,8 +278,8 @@ wxListItemAttr* CncLoggerListCtrl::OnGetItemAttr(long item) const {
 void CncLoggerListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////////////
 	// avoid flicker
-	if ( IsFrozen() == false )
-		Freeze();
+	const bool b = IsShownOnScreen() && IsFrozen() == false;
+	CncAutoFreezer caf( b ? this : NULL);
 		
 	// first set default sizes depending on content
 	SetColumnWidth(COL_LNR, 	 72);
@@ -284,9 +295,6 @@ void CncLoggerListCtrl::updateColumnWidth() {
 			 
 	if ( size > GetColumnWidth(COL_TXT) )
 		SetColumnWidth(COL_TXT, size);
-		
-	if ( IsFrozen() == true )
-		Thaw();
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::updateContent() {
@@ -374,44 +382,49 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 	
 	const bool ctlKey = CncAsyncKeyboardState::isControlPressed();
 	
-	if ( ctlKey == true ) {
+	if ( ctlKey == false )
+		return;
 		
-		wxString line(entries.at(selectedItem).text);
-		line.Trim(false);
-		line.MakeUpper();
 		
-		if ( line.StartsWith('[') == true ) {
-			line.assign(line.BeforeFirst(']'));
-			line.assign(line.AfterFirst('['));
-		} 
-		else if ( line.Contains("LINE") == true ) {
-			int p = line.Find("LINE");
-			bool start = false;
-			wxString ln;
-			for (unsigned int i=p; i<line.length(); i++ ) {
-				
-				if ( start == false && isdigit((char)line[i]) != 0 )
-					start = true;
-				
-				if ( start == true && isdigit((char)line[i]) == 0 )
-					break;
-					
-				if ( start == true )
-					ln.append(line[i]);
-			}
+	long lineNumber = -1;
+	
+	wxString line(entries.at(selectedItem).text);
+	line.Trim(false);
+	line.MakeUpper();
+	
+	// ---------------------------------------------------
+	if ( line.StartsWith('[') == true ) {
+		line.assign(line.BeforeFirst(']'));
+		line.assign(line.AfterFirst('['));
+	} 
+	// ---------------------------------------------------
+	else if ( line.Contains("LINE") == true ) {
+		int p = line.Find("LINE");
+		bool start = false;
+		wxString ln;
+		for (unsigned int i=p; i<line.length(); i++ ) {
 			
-			line.assign(ln);
+			if ( start == false && isdigit((char)line[i]) != 0 )
+				start = true;
 			
-		}
-		else {
-			// no line number syntax found
-			return;
+			if ( start == true && isdigit((char)line[i]) == 0 )
+				break;
+				
+			if ( start == true )
+				ln.append(line[i]);
 		}
 		
-		long lineNumber = -1;
-		if ( line.ToLong(&lineNumber) == false )
-			return;
+		line.assign(ln);
 		
+	}
+	// ---------------------------------------------------
+	else if ( line.Contains("PARSING SYNOPSIS TRACE") == true ) {
+		THE_APP->selectParsingSynopsisTrace();
+		return;
+	}
+	
+	// try to select the evaluated line number - on demand
+	if ( lineNumber > 0 && line.ToLong(&lineNumber) == true ) {
 		if ( CNC_READY )
 			THE_APP->selectSourceControlLineNumber(lineNumber - 1);
 	}
@@ -426,6 +439,19 @@ void CncLoggerListCtrl::onRightDown(wxMouseEvent& event) {
 void CncLoggerListCtrl::onSelectListItem(wxListEvent& event) {
 //////////////////////////////////////////////////
 	selectedItem = event.m_itemIndex;
+	
+	/*
+		if ( isItemValid(item) == false )
+		return _("");
+	
+	const LoggerEntry& le = entries.at(item);
+	
+	switch ( column ) {
+		case COL_LNR:	return wxString::Format("%06ld",	item + 1);
+		case COL_TXT:	return wxString::Format("%s",		le.text);
+		case COL_RET:	return wxString::Format("%s",		le.result);
+	}
+	*/
 }
 //////////////////////////////////////////////////
 void CncLoggerListCtrl::onActivateListItem(wxListEvent& event) {

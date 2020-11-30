@@ -24,7 +24,10 @@ namespace ClipperLib {
 	
 	bool				isPathClosed(const Path& p);
 	bool				closePath(Path& p);
+	bool				hasZAxisMovement(const Path& path);
+	bool				isHelix(const Path& path, double diameter);
 	
+	cInt getPathLength(const Path& path);
 	
 	std::ostream& operator<<(std::ostream& os, const IntPoint& p);
 	

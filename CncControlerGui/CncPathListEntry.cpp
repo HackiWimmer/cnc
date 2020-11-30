@@ -1,7 +1,7 @@
 #include "CncPathListEntry.h"
 
 const bool 				CncPathListEntry::DefaultAlreadyRendered	= false;
-const long 				CncPathListEntry::DefaultClientID   		= -1L;
+const long 				CncPathListEntry::DefaultClientID   		= CLIENT_ID.INVALID;
 const CncSpeedMode 		CncPathListEntry::DefaultSpeedMode  		=  CncSpeedUserDefined;
 const double			CncPathListEntry::DefaultSpeedValue 		= -1.0;
 const CncDoublePosition	CncPathListEntry::ZeroTarget				= {0.0, 0.0, 0.0};
@@ -31,52 +31,34 @@ std::ostream& CncPathListEntry::outputOperator(std::ostream &ostr) const {
 //////////////////////////////////////////////////////////////////
 void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 //////////////////////////////////////////////////////////////////
-
-	if ( isClientIdChange() ) {
-		ostr << traceIndent
-			 << wxString::Format("%05ld", listIndex) 			<< " "
-			 << "PLE: "
-			 << pathListReference								<< "("
-			 << " C "											<< "): "
-			 << wxString::Format("% 5ld", clientId)				<< std::endl;
-	}
-	else if ( isPositionChange() ) {
-		ostr << traceIndent
-			 << wxString::Format("%05ld", listIndex) 			<< " "
-			 << "PLE: "
-			 << pathListReference								<< "("
-			 << " P "											<< "): "
-			 << wxString::Format("% 5ld", clientId)				<< "  "
-			 << cnc::dblFormat(entryDistance)					<< " --> "
-			 << cnc::dblFormat(entryTarget)						<< " | "
-			 << "td = " << cnc::dblFormat1(totalDistance)		<< " | "
-			 << "ar = " << alreadyRendered						<< std::endl;
-	}
-	else if ( isSpeedChange() ) {
-		ostr << traceIndent
-			 << wxString::Format("%05ld", listIndex) 			<< " "
-			 << "PLE: "
-			 << pathListReference								<< "("
-			 << " S "											<< "): "
-			 << wxString::Format("% 5ld", clientId)				<< "  "
-			 << cnc::getCncSpeedTypeAsCharacter(feedSpeedMode)	<< ", "
-			 << cnc::dblFormat1(feedSpeed_MM_MIN)				<< std::endl;
-	}
-	else if ( isNothingChanged() ) {
-		ostr << traceIndent
-			 << wxString::Format("%05ld", listIndex) 			<< " "
-			 << "PLE: "
-			 << pathListReference								<< "("
-			 << " L "											<< "): "
-			 << wxString::Format("% 5ld", clientId)				<< "  "
-			 << cnc::dblFormat(entryTarget)						<< std::endl;
-	}
-	else {
-		// should not appear
-		ostr << "Undefined Content: [" << content << "]:"
-			 << "Default output"								<< std::endl
-			 << (*this);
-	}
+	wxString content;
+	content.append( isNothingChanged()		? 'L' : ' ' );
+	content.append( hasClientIdChange()		? 'C' : ' ' );
+	content.append( hasSpeedChange()		? 'S' : ' ' );
+	content.append( hasPositionChange()		? 'P' : ' ' );
+	
+	ostr << traceIndent
+		 << wxString::Format("%05ld", listIndex) 			<< " "
+		 << "PLE: "
+		 << pathListReference
+		 << wxString::Format("(%s): ", content)
+		;
+		
+	if ( isNothingChanged() == true )
+		return;
+		 
+	ostr << wxString::Format("% 5ld", clientId)				<< ", "
+		 
+		 << cnc::dblFormat1(feedSpeed_MM_MIN)				<< " "
+		 << cnc::getCncSpeedTypeAsCharacter(feedSpeedMode)	<< ", "
+		 
+		 << cnc::dblFormat(entryDistance)					<< " --> "
+		 << cnc::dblFormat(entryTarget)						<< " | "
+		 << "td = " << cnc::dblFormat1(totalDistance)		<< " | "
+		 << "ar = " << alreadyRendered
+		 
+		 << std::endl;
+		; 
 }
 //////////////////////////////////////////////////////////////////
 const wxString& CncPathListEntry::traceEntryToString(wxString& ret) const {

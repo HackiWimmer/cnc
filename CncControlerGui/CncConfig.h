@@ -116,10 +116,6 @@ class CncConfig {
 		double currentZDepth;
 		double maxZDistance;
 		
-		double workpieceThickness;
-		CncRefPositionMode referencePositionMode;
-		bool referenceIncludesWpt;
-		
 		float renderResolutionMM;
 		
 		const wxString defaultConfigValue = "";
@@ -150,7 +146,6 @@ class CncConfig {
 		static void pgChangedGCodeCfgPage(wxPropertyGridEvent& event);
 		
 		void updateCalculatedFactors();
-		void updateCalculatedZAxisValues();
 		
 		void broadcastConfigUpdateNotification();
 		
@@ -189,7 +184,8 @@ class CncConfig {
 		ToolMagazineParameter& getToolMagazineParameter() { return toolMagazineParameter; }
 		
 		// global config interface
-		static CncConfig* getGlobalCncConfig() { wxASSERT(globalCncConfig); return globalCncConfig; }
+		static bool available()					{ return globalCncConfig != NULL; }
+		static CncConfig* getGlobalCncConfig()	{ wxASSERT(globalCncConfig); return globalCncConfig; }
 		static void setupGlobalConfigurationGrid(wxPropertyGridManager* sg, wxConfigBase& config);
 		
 		// global shortcuts
@@ -197,6 +193,8 @@ class CncConfig {
 		#define THE_CONFIG  ( CncConfig::getGlobalCncConfig() )
 		#define THE_CONTEXT ( THE_CONFIG ? THE_CONFIG->getContext() : NULL )
 		#define THE_APP     ( THE_CONFIG ? THE_CONFIG->getTheApp()  : NULL )
+		#define THE_BOUNDS  ( THE_CONTEXT->boundarySpace )
+		#define THE_TPL_CTX ( THE_CONTEXT->templateContext)
 		
 		// notifications
 		void registerWindowForConfigNotification(wxWindow* wnd);
@@ -299,7 +297,9 @@ class CncConfig {
 		const bool getUseMainPreviewFlag();
 		const bool getUseMonitorPeviewFlag();
 		const bool getShowTestMenuFlag();
+		const bool getSvg3DViewFlag();
 		const bool getSvgConvertToRightHandFlag();
+		const bool getSvgConsiderViewboxFlag();
 		const bool getSvgUseColourScheme();
 		const bool getAvoidDupSetterValuesFlag();
 		const bool getRequestIdleRequestFlag();
@@ -313,11 +313,7 @@ class CncConfig {
 		const bool getPreProcessorUseOperatingTrace();
 		const bool getPreProcessorCntPathListEntries();
 		const bool getPreProcessorCntMoveSequneces();
-
-		
-		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
-		const double getWorkpieceThickness()					{ return workpieceThickness; }
-		const CncRefPositionMode getReferencePositionMode()     { return referencePositionMode; }
+		const bool getSimulateMillingWithSoundFlag();
 		
 		const double getMeasurePlateThickness()					{ return 1.2; } //TODO
 		
@@ -358,8 +354,7 @@ class CncConfig {
 		const double getPitchY();
 		const double getPitchZ();
 		const double getMaxDurationThickness();
-		const double getDurationThickness(unsigned int duration);
-		const double getDurationPositionAbs(unsigned int duration);
+		const double getSurefaceOffset();
 		const double getReplyThresholdMetric();
 		const double getDefaultRapidSpeed_MM_MIN();
 		const double getDefaultWorkSpeed_MM_MIN();
@@ -376,10 +371,11 @@ class CncConfig {
 		const double getDispFactX3D() 							{ return dispFactX3D; }
 		const double getDispFactY3D() 							{ return dispFactY3D; }
 		const double getDispFactZ3D()							{ return dispFactZ3D; }
+		
 		const double getWorkpieceOffset()						{ return workpieceOffset; }
-		const double getCurrentZDepth()							{ return currentZDepth; }
-		const double getMaxZDistance()							{ return maxZDistance; }
-		const double getCurZDistance() 							{ return getWorkpieceThickness() + workpieceOffset; }
+const double getCurrentZDepth()							{ return currentZDepth; }
+const double getMaxZDistance()							{ return maxZDistance; }
+const double getCurZDistance() 							{ return 0.0 /*getWorkpieceThickness()*/ + workpieceOffset; }
 		
 		const wxString& getFileBrowser(wxString& ret);
 		const wxString& getSVGFileViewer(wxString& ret);
@@ -402,11 +398,6 @@ class CncConfig {
 		CncConfig& setMaxDimensionX(const double val);
 		CncConfig& setMaxDimensionY(const double val);
 		CncConfig& setMaxDimensionZ(const double val);
-		CncConfig& setMaxZDistance(double d)					  { sc(); maxZDistance          = d; updateCalculatedZAxisValues(); return *this; }
-		CncConfig& setReferenceIncludesWpt(bool b) 				  { sc(); referenceIncludesWpt  = b; updateCalculatedZAxisValues(); return *this; }
-		CncConfig& setWorkpieceThickness(double t)                { sc(); workpieceThickness    = t; updateCalculatedZAxisValues(); return *this; }
-		CncConfig& setReferencePositionMode(CncRefPositionMode m) { sc(); referencePositionMode = m; updateCalculatedZAxisValues(); return *this; }
-		const double setCurrentZDepth(double dpt);
 };
 
 #endif

@@ -138,6 +138,21 @@
 	void APP_PROXY::parsingSynopsisTraceAddError(const wxString& info)
 	{ THE_APP->getParsingSynopsisTrace()->addError(info); }
 
+	bool APP_PROXY::parsingSynopsisTraceHasDebugEntries() { 
+		CncParsingSynopsisTrace* pst = THE_APP->getParsingSynopsisTrace(); 
+		return pst ? pst->hasDebugEntries() : false; 
+	}
+
+	bool APP_PROXY::parsingSynopsisTraceHasWarnEntries() {
+		CncParsingSynopsisTrace* pst = THE_APP->getParsingSynopsisTrace(); 
+		return pst ? pst->hasWarnEntries(): false; 
+	}
+
+	bool APP_PROXY::parsingSynopsisTraceHasErrorEntries() {
+		CncParsingSynopsisTrace* pst = THE_APP->getParsingSynopsisTrace(); 
+		return pst ? pst->hasErrorEntries(): false; 
+	}
+
 	int APP_PROXY::showReferencePositionDlg(wxString msg)
 	{ return THE_APP->showReferencePositionDlg(msg); }
 

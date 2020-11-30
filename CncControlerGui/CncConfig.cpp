@@ -166,9 +166,6 @@ CncConfig::CncConfig(MainFrame* app)
 , currentToolId(-1)
 , currentZDepth(0.0)
 , maxZDistance(50.0)
-, workpieceThickness(0.0)
-, referencePositionMode(CncRefPositionMode::CncRM_Mode1)
-, referenceIncludesWpt(false)
 , renderResolutionMM(0.1)
 ////////////////////////////////////////////////////////////////////////
 {
@@ -185,6 +182,10 @@ CncConfig::~CncConfig() {
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::init() {
 ////////////////////////////////////////////////////////////////////////
+	wxEnumProperty* prop = wxDynamicCast(getProperty(CncWork_Ctl_PRE_PROSSOR_RENDER_RESOLUTION), wxEnumProperty);
+	if ( prop )
+		setRenderResolution(prop->GetValueAsString());
+	
 	calculateFactors();
 	calculateSpeedValues();
 	calculateThresholds();
@@ -415,50 +416,7 @@ void CncConfig::initZAxisValues() {
 	} else {
 		std::cerr << "CncConfig: Invalid maxDurationThickness: " <<  getMaxDurationThickness() << std::endl;
 	}
-	
-	updateCalculatedZAxisValues();
 }
-////////////////////////////////////////////////////////////////////////
-const double CncConfig::setCurrentZDepth(double dpt) {
-////////////////////////////////////////////////////////////////////////
-	sc();
-	
-	currentZDepth = dpt;
-	
-	if ( currentZDepth > getWorkpieceThickness() )
-		currentZDepth = getWorkpieceThickness();
-		
-	// dpt is interpreted as abs value
-	if ( currentZDepth < 0.0 )
-		currentZDepth = 0.0;
-	
-	initZAxisValues();
-	return currentZDepth;
-}
-////////////////////////////////////////////////////////////////////////
-const double CncConfig::getDurationThickness(unsigned int duration) {
-////////////////////////////////////////////////////////////////////////
-	if ( duration < maxDurations ) {
-		return durationSteps[duration];
-	}
-	return 0.0;
-}
-////////////////////////////////////////////////////////////////////////
-const double CncConfig::getDurationPositionAbs(unsigned int duration) {
-////////////////////////////////////////////////////////////////////////
-	if ( duration < maxDurations ) {
-		double ret = workpieceOffset;
-		for (unsigned int i=0; i<duration ;i++) {
-			ret += durationSteps[i];
-		}
-		
-		return getCurZDistance() - ret;
-	}
-	return 0.0;
-}
-
-
-
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::registerPageRoot(wxPGProperty* prop, PGFuncPtrStore& fps) {
 ////////////////////////////////////////////////////////////////////////
@@ -1054,11 +1012,6 @@ void CncConfig::setRenderResolution(double res) {
 	renderResolutionMM = res < 0.005 ? 0.005 : res;
 	renderResolutionMM = res > 1.0   ? 1.0   : renderResolutionMM;
 	
-	if ( THE_APP == NULL )
-		return;
-		
-	//std::cout << CNC_LOG_LOCATION_A(": ") << res << ", " << renderResolutionMM << std::endl;
-		
 	wxEnumProperty* prop = wxDynamicCast(getProperty(CncWork_Ctl_PRE_PROSSOR_RENDER_RESOLUTION), wxEnumProperty);
 	if ( prop ) {
 		const unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, renderResolutionMM);
@@ -1108,7 +1061,9 @@ const bool CncConfig::getUseMainPreviewFlag()						{ PROPERTY(CncApplication_USE
 const bool CncConfig::getUseMonitorPeviewFlag()						{ PROPERTY(CncApplication_USE_MONITOR_PREVIEW) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getShowTestMenuFlag()							{ PROPERTY(CncApplication_SHOW_TEST_MENU) 					return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgConvertToRightHandFlag()				{ PROPERTY(CncSvg_Parser_REVERSE_Y_AXIS) 					return p->GetValue().GetBool(); }
-const bool CncConfig::getSvgUseColourScheme()						{ PROPERTY(CncSvg_Parser_USE_COLOUR_SCHEME) 				return p->GetValue().GetBool(); }
+const bool CncConfig::getSvgConsiderViewboxFlag()					{ PROPERTY(CncSvg_Parser_CONSIDER_VIEWBOX) 					return p->GetValue().GetBool(); }
+const bool CncConfig::getSvg3DViewFlag()							{ PROPERTY(CncSvg_Parser_DEFAULT_VIEW_TYPE)					return p->GetValueAsString().IsSameAs("3D"); }
+const bool CncConfig::getSvgUseColourScheme()						{ PROPERTY(CncSvg_Parser_USE_COLOUR_SCHEME)					return p->GetValue().GetBool(); }
 const bool CncConfig::getAvoidDupSetterValuesFlag()					{ PROPERTY(CncWork_Ctl_AVOID_DUP_SETTER_VALUES) 			return p->GetValue().GetBool(); }
 const bool CncConfig::getRequestIdleRequestFlag()					{ PROPERTY(CncWork_Ctl_REQUEST_IDLE_REQUESTS) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getInterruptByPosOutOfRangeFlag()				{ PROPERTY(CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE) 		return p->GetValue().GetBool(); }
@@ -1121,6 +1076,7 @@ const bool CncConfig::getPreProcessorCombineMovesFlag()				{ PROPERTY(CncWork_Ct
 const bool CncConfig::getPreProcessorUseOperatingTrace()			{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_USE_OPERATING_TRACE) 	return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCntPathListEntries()			{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES) 	return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCntMoveSequneces()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES) 		return p->GetValue().GetBool(); }
+const bool CncConfig::getSimulateMillingWithSoundFlag()				{ PROPERTY(CncWork_Ctl_SIMULATE_MILLING_WITH_SOUND) 		return p->GetValue().GetBool(); }
 
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }
@@ -1138,6 +1094,7 @@ const double CncConfig::getPitchX() 								{ PROPERTY(CncConfig_PITCH_X) 						
 const double CncConfig::getPitchY() 								{ PROPERTY(CncConfig_PITCH_Y)							return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchZ() 								{ PROPERTY(CncConfig_PITCH_Z) 						 	return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxDurationThickness()					{ PROPERTY(CncSvg_Parser_MAX_THICKNESS_CROSS)			return p->GetValue().GetDouble(); }
+const double CncConfig::getSurefaceOffset()							{ PROPERTY(CncSvg_Parser_SUREFACE_Z_OFFSET)				return p->GetValue().GetDouble(); }
 const double CncConfig::getReplyThresholdMetric()					{ PROPERTY(CncWork_Ctl_REPLY_THRESHOLD_METRIC)			double ret; p->GetValueAsString().ToDouble(&ret); return ret; }
 
 const double CncConfig::getDefaultRapidSpeed_MM_MIN()				{ PROPERTY(CncConfig_DEF_RAPID_SPEED_MM_MIN)			return p->GetValue().GetDouble(); }

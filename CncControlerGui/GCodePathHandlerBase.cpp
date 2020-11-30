@@ -15,16 +15,20 @@ GCodePathHandlerBase::~GCodePathHandlerBase() {
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
-void GCodePathHandlerBase::prepareWork() {
+bool GCodePathHandlerBase::prepareWork() {
 //////////////////////////////////////////////////////////////////
-	PathHandlerBase::prepareWork();
-	prepareWorkImpl();
+	if ( PathHandlerBase::prepareWork() == false)
+		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::prepareWork() failed!\n");
+		
+	return prepareWorkImpl();
 }
 //////////////////////////////////////////////////////////////////
-void GCodePathHandlerBase::finishWork() {
+bool GCodePathHandlerBase::finishWork() {
 //////////////////////////////////////////////////////////////////
-	PathHandlerBase::finishWork();
-	finishWorkImpl();
+	if ( PathHandlerBase::finishWork() == false)
+		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::finishWork() failed!\n");
+		
+	return finishWorkImpl();
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerBase::moveToOrigin(GCodeBlock& gcb) {

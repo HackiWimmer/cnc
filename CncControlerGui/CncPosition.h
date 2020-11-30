@@ -1,6 +1,8 @@
 #ifndef CNC_POSITION_H
 #define CNC_POSITION_H
 
+#include <cmath> 
+#include <ctgmath>
 #include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,16 +70,6 @@ typedef CncZDimension<double> CncZDoubleDimension;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// Forward declare the class
-template <typename T> class CncPosition;
-
-// Forward declare the template operator
-template <typename T>
-bool operator== (const CncPosition<T> &a, const CncPosition<T> &b);
-
-// Forward declare the function
-bool operator== (const CncPosition<double> &a, const CncPosition<double> &b);
-
 template <class T>
 class CncPosition {
 	
@@ -104,6 +96,8 @@ class CncPosition {
 		T zMin, zMax;
 		
 		T xPos, yPos, zPos;
+		
+		double floatingPointEpsilon;
 		
 		////////////////////////////////////////////////////////////////
 		inline void evaluateWatermarks() {
@@ -137,6 +131,7 @@ class CncPosition {
 		, yMin(0), yMax(0)
 		, zMin(0), zMax(0)
 		, xPos(0), yPos(0) , zPos(0)
+		, floatingPointEpsilon(0.000001)
 		{}
 		
 		////////////////////////////////////////////////////////////////
@@ -145,6 +140,7 @@ class CncPosition {
 		, yMin(y), yMax(y)
 		, zMin(z), zMax(z)
 		, xPos(x), yPos(y), zPos(z)
+		, floatingPointEpsilon(0.000001)
 		{}
 		
 		////////////////////////////////////////////////////////////////
@@ -153,6 +149,7 @@ class CncPosition {
 		, yMin(cp.getYMin()),   yMax(cp.getYMax())
 		, zMin(cp.getZMin()),   zMax(cp.getZMax())
 		, xPos(cp.getX()),      yPos(cp.getY()),     zPos(cp.getZ())
+		, floatingPointEpsilon(0.000001)
 		{}
 		
 		////////////////////////////////////////////////////////////////
@@ -172,7 +169,17 @@ class CncPosition {
 			
 			return *this;
 		}
-
+		
+		////////////////////////////////////////////////////////////////
+		double getFloatingPointPrecision() {
+			return floatingPointEpsilon;
+		}
+		
+		double setFloatingPointPrecision(double eps) {
+			floatingPointEpsilon = std::fabs(eps);
+			return floatingPointEpsilon;
+		}
+		
 		////////////////////////////////////////////////////////////////
 		const Watermarks& getWatermarks(Watermarks& wm) const {
 			wm.xMin = xMin; wm.yMin = yMin;
@@ -187,6 +194,14 @@ class CncPosition {
 			yMin = yMax = 0;
 			zMin = zMax = 0;
 		}
+		
+		////////////////////////////////////////////////////////////////
+		void resetWatermarksToCurrentPos() {
+			xMin = xMax = getX();
+			yMin = yMax = getY();
+			zMin = zMax = getZ();
+		}
+		
 		////////////////////////////////////////////////////////////////
 		T getXMin() const { return xMin; }
 		T getYMin() const { return yMin; } 
@@ -283,43 +298,54 @@ class CncPosition {
 			return ostr;
 		}
 		
-		
-		friend bool operator== (const CncPosition<double> &a, const CncPosition<double> &b);
-		friend bool operator== <>(const CncPosition<T> &a, const CncPosition<T> &b);
-		
-		/*
 		////////////////////////////////////////////////////////////////
-		friend bool operator== (const CncPosition<T> &a, const CncPosition<T> &b) {
-			return (    (a.getX() == b.getX())
-					 && (a.getY() == b.getY())
-					 && (a.getZ() == b.getZ())
+		bool isEqual(const CncPosition<T> &a) const {
+			return (    (a.getX() == getX())
+					 && (a.getY() == getY())
+					 && (a.getZ() == getZ())
 					);
 		}
-		*/
 		
 		////////////////////////////////////////////////////////////////
-		friend bool operator!= (const CncPosition<T> &a, const CncPosition<T> &b) {
-			return (!operator== (a, b));
+		bool isFloatingEqual(const CncPosition<double> &a, const double epsilon = -1.0) const {
+			const bool xc = std::fabs(a.getX() - getX()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
+			const bool yc = std::fabs(a.getY() - getY()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
+			const bool zc = std::fabs(a.getZ() - getZ()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
+			
+			return ( xc && yc && zc ); 
 		}
 		
 		////////////////////////////////////////////////////////////////
-		friend CncPosition<T> operator+ (const CncPosition<T> &a, const CncPosition<T> &b) {
+		bool operator== (const CncPosition<T> &a) const {
+			return (    (a.getX() == getX())
+					 && (a.getY() == getY())
+					 && (a.getZ() == getZ())
+					);
+		}
+		
+		////////////////////////////////////////////////////////////////
+		bool operator!= (const CncPosition<T> &a) const {
+			return (!operator== (a));
+		}
+		
+		////////////////////////////////////////////////////////////////
+		CncPosition<T> operator+ (const CncPosition<T> &a) const {
 			CncPosition<T> c(a);
 
-			c.setX(c.getX() + b.getX());
-			c.setY(c.getY() + b.getY());
-			c.setZ(c.getZ() + b.getZ());
+			c.setX(c.getX() + getX());
+			c.setY(c.getY() + getY());
+			c.setZ(c.getZ() + getZ());
 			
 			return c;
 		}
 		
 		////////////////////////////////////////////////////////////////
-		friend CncPosition<T> operator- (const CncPosition<T> &a, const CncPosition<T> &b) {
+		CncPosition<T> operator- (const CncPosition<T> &a) const {
 			CncPosition<T> c(a);
 
-			c.setX(c.getX() - b.getX());
-			c.setY(c.getY() - b.getY());
-			c.setZ(c.getZ() - b.getZ());
+			c.setX(c.getX() - getX());
+			c.setY(c.getY() - getY());
+			c.setZ(c.getZ() - getZ());
 			
 			return c;
 		}
@@ -380,19 +406,64 @@ class CncPosition {
 };
 
 // ----------------------------------------------------------------------
-template <class T>
-bool operator== (const CncPosition<T> &a, const CncPosition<T> &b) {
-	return (    (a.getX() == b.getX())
-			 && (a.getY() == b.getY())
-			 && (a.getZ() == b.getZ())
-			);
-}
-
-// ----------------------------------------------------------------------
 typedef CncPosition<int32_t> 	CncLongPosition;
 typedef CncPosition<double> 	CncDoublePosition;
 
+#define CncDistance				CncPosition
 typedef CncPosition<int32_t> 	CncLongDistance;
 typedef CncPosition<double> 	CncDoubleDistance;
+
+
+// ----------------------------------------------------------------------
+template <class T>
+class CncBounderies : public CncPosition<T>::Watermarks {
+	
+	public: 
+		CncBounderies<T>()
+		: CncPosition<T>::Watermarks()
+		{}
+		
+		explicit CncBounderies<T>(const CncBounderies<T>& b)
+		: CncPosition<T>::Watermarks()
+		{
+			this->xMin = b.xMin;
+			this->xMax = b.xMax;
+			this->yMin = b.yMin;
+			this->yMax = b.yMax;
+			this->zMin = b.zMin;
+			this->zMax = b.zMax;
+		}
+		
+		explicit CncBounderies<T>(const typename CncPosition<T>::Watermarks& w)
+		: CncPosition<T>::Watermarks()
+		{
+			this->xMin = w.xMin;
+			this->xMax = w.xMax;
+			this->yMin = w.yMin;
+			this->yMax = w.yMax;
+			this->zMin = w.zMin;
+			this->zMax = w.zMax;
+		}
+		
+		bool hasBounderies()												const;
+		bool fits(const CncBounderies<T> b)									const;
+		bool fitsInside(const CncBounderies<T> b)							const;
+		bool fitsInside(const CncPosition<T> p)								const;
+		bool fitsInside(const typename CncPosition<T>::Watermarks w)		const;
+		
+		CncDistance<T> getDistanceToMin(CncPosition<T> p)					const;
+		CncDistance<T> getDistanceToMax(CncPosition<T> p)					const;
+		
+		CncPosition<T> getMinBound()										const;
+		CncPosition<T> getMaxBound()										const;
+		
+		void setMinBound(CncPosition<T> p);
+		void setMaxBound(CncPosition<T> p);
+		void shift(CncPosition<T> p);
+};
+
+// ----------------------------------------------------------------------
+typedef CncBounderies<int32_t> 	CncLongBounderies;
+typedef CncBounderies<double> 	CncDoubleBounderies;
 
 #endif

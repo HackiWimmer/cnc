@@ -114,8 +114,6 @@ class SVGRootNode {
 		CncUnitCalculator<float> unitCalculator;
 		
 		void setup();
-		void convertToUnit(const Unit unit);
-		void convertToPx() { convertToUnit(Unit::px); }
 		
 	public:
 		
@@ -132,26 +130,22 @@ class SVGRootNode {
 		const float getScaleY()				const { return scaleY;  }
 		
 		const Unit getInputUnit()			const { return unitCalculator.getInputUnit();  }
-		const Unit getOutputUnit()			const { return unitCalculator.getOutputUnit(); }
-		
-		const double getWidth_MM()			const { CncUnitCalculator<float> uc(Unit::px, Unit::mm);  return uc.convert(width);  }
-		const double getHeight_MM()			const { CncUnitCalculator<float> uc(Unit::px, Unit::mm);  return uc.convert(height); }
+		const double getWidth_MM()			const { CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);  return uc.convert(width);  }
+		const double getHeight_MM()			const { CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);  return uc.convert(height); }
 		
 		const wxString& getRootTransformation(wxString& ret) const;
 		
 		friend std::ostream &operator<< (std::ostream &ostr, const SVGRootNode &a) {
 			typedef CncUnitCalculator<float> UC;
+			wxString rt;
 			
-			ostr 	<< " <svg"
-					<< " width=\""  << a.getWidth()		<< UC::getUnitAsStr(a.getOutputUnit()) << "\""
-					<< " height=\"" << a.getHeight()	<< UC::getUnitAsStr(a.getOutputUnit()) << "\"";
-			
-			ostr 	<< " viewBox=\"" << a.getViewbox().getViewBoxStr() << "\"";
-
-			wxString ret;
-			ostr 	<< " transform=\"" << a.getRootTransformation(ret) << "\"";
-			
-			ostr	<< "/>";
+			ostr	<< " <svg"
+					<< " width=\""		<< a.getWidth_MM()	<< UC::getUnitAsStr(Unit::mm)	<< "\""
+					<< " height=\""		<< a.getHeight_MM()	<< UC::getUnitAsStr(Unit::mm)	<< "\""
+					<< " viewBox=\""	<< a.getViewbox().getViewBoxStr()					<< "\""
+					<< " transform=\""	<< a.getRootTransformation(rt)						<< "\""
+					<< "/>"
+			;
 			
 			return ostr;
 		}

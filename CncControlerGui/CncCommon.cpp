@@ -137,7 +137,7 @@ void cnc::traceLineNumberTranslater(std::ostream& s, const LineNumberTranslater&
 //////////////////////////////////////////////////////////////
 bool cnc::dblCompare(const double a, const double b, const double eps) {
 //////////////////////////////////////////////////////////////
-	return std::abs(a - b) <= eps; 
+	return std::fabs(a - b) <= eps; 
 }
 //////////////////////////////////////////////////////////////
 bool cnc::dblCompareNull(const double a, const double eps) {

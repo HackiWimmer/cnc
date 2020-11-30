@@ -23,8 +23,8 @@ class CncOperatingTrace : public CncExtLoggerListCtrl {
 		{}
 		
 		typedef wxListItemAttr LIA;
-		void addMovSeqSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(128, 128, 255), GetFont()); add(s, lia); }
-		void addPthLstSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(255, 140, 198), GetFont()); add(s, lia); }
+		void addMovSeqSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(128, 128, 255), GetFont()); tokenAndAdd(s, lia); }
+		void addPthLstSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(255, 140, 198), GetFont()); tokenAndAdd(s, lia); }
 };
 
 // ----------------------------------------------------------------------------
@@ -118,6 +118,14 @@ void CncPreprocessor::clearMoveSequences() {
 void CncPreprocessor::clearOperatingTrace() {
 //////////////////////////////////////////////////////////////////
 	operatingTrace->clearAll();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::select(PreProcessorSelection::VAL page) {
+//////////////////////////////////////////////////////////////////
+	if ( page > m_listbookPreProcessor->GetPageCount() - 1)
+		return;
+	
+	m_listbookPreProcessor->SetSelection(page);
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::popProcessMode() {

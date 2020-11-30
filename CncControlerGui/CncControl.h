@@ -29,6 +29,17 @@ class CncControl {
 
 	private:
 		
+		struct CncSpeedMemory : public std::map<CncSpeedMode, float> {
+			
+			public:
+				CncSpeedMemory() {
+					(*this)[CncSpeedRapid]			= THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
+					(*this)[CncSpeedWork]			= THE_CONFIG->getDefaultWorkSpeed_MM_MIN();
+					(*this)[CncSpeedMax]			= THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
+					(*this)[CncSpeedUserDefined]	= 0.0;
+				}
+		};
+		
 		struct InteractiveMoveInfo {
 			
 			CncInteractiveMoveDriver	driver;
@@ -90,8 +101,9 @@ class CncControl {
 		float defaultFeedSpeedWork_MM_MIN;
 
 		// actual configured speed type and value
-		CncSpeedMode configuredSpeedMode;
-		float configuredFeedSpeed_MM_MIN;
+		CncSpeedMemory	speedMemory_MM_MIN;
+		CncSpeedMode	configuredSpeedMode;
+		float			configuredFeedSpeed_MM_MIN;
 
 		// Duration counter
 		unsigned int durationCounter;
@@ -198,8 +210,14 @@ class CncControl {
 		float getConfiguredFeedSpeed_MM_SEC() 		{ return configuredFeedSpeed_MM_MIN / 60.0; }
 		float getConfiguredFeedSpeed_MM_MIN() 		{ return configuredFeedSpeed_MM_MIN; }
 		
+		float getPrevStoredRapidSpeed_MM_MIN()		{ return speedMemory_MM_MIN[CncSpeedRapid]; }
+		float getPrevStoredWorkSpeed_MM_MIN()		{ return speedMemory_MM_MIN[CncSpeedWork]; }
+		float getPrevStoredMaxSpeed_MM_MIN()		{ return speedMemory_MM_MIN[CncSpeedMax]; }
+		float getPrevStoredUserDefSpeed_MM_MIN()	{ return speedMemory_MM_MIN[CncSpeedUserDefined]; }
+		
 		// Change the current speed parameter
 		bool changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s);
+		bool changeSpeedToPrevStoredSpeed_MM_MIN(CncSpeedMode s);
 		void setDefaultRapidSpeed_MM_MIN(float s);
 		void setDefaultWorkSpeed_MM_MIN(float s);
 		
@@ -226,6 +244,10 @@ class CncControl {
 		bool processMoveSequence(CncMoveSequence& moveSequence);
 		
 		// Zero positioning
+		void setZeroPosX(int32_t v);
+		void setZeroPosY(int32_t v);
+		void setZeroPosZ(int32_t v);
+		
 		void setZeroPos(bool x, bool y, bool z);
 		void setZeroPos();
 		// Start positioning
@@ -276,9 +298,6 @@ class CncControl {
 		bool hasNextDuration();
 		bool isFirstDuration();
 		bool isLastDuration();
-		// Z axis management
-		bool moveZToTop();
-		bool moveZToBottom();
 		
 		// Tool management
 		void switchToolOn();
@@ -362,6 +381,8 @@ class CncControl {
 		bool moveXYToZeroPos(CncDimensions dim = CncDimension1D);
 		bool moveXYZToZeroPos(CncDimensions dim = CncDimension1D);
 		bool moveZToZeroPos();
+		bool moveZToTop();
+		bool moveZToBottom();
 		
 		// Moves curPos to startPos
 		bool moveXYToStartPos();
@@ -417,7 +438,7 @@ class CncControl {
 		void processTrigger(const Serial::Trigger::SpeedChange& tr)		{ getSerial()->processTrigger(tr); }
 		void processTrigger(const Serial::Trigger::GuidePath& tr)		{ getSerial()->processTrigger(tr); }
 		
-		void addGuidePath(const CncPathListManager& plm);
+		void addGuidePath(const CncPathListManager& plm, double zOffset);
 		
 		// 3D control
 		void updatePreview3D();
@@ -431,3 +452,4 @@ class CncControl {
 };
 
 #endif
+

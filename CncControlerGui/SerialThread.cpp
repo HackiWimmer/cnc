@@ -569,7 +569,7 @@ void SerialThread::traceMove(uint8_t sid, int32_t dx, int32_t dy, int32_t dz) {
 ////////////////////////////////////////////////////////////////////
 	{
 		wxCriticalSectionLocker enter(pHandler->pSerialThreadCS);
-		CncContext::PositionStorage::addMove(sid, dx, dy, dz);
+		PositionStorage::addMove(sid, dx, dy, dz);
 	}
 }
 ////////////////////////////////////////////////////////////////////

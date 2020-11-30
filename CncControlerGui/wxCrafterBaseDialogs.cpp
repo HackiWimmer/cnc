@@ -1296,7 +1296,7 @@ CncPositionStorageViewBase::CncPositionStorageViewBase(wxWindow* parent, wxWindo
     flexGridSizer206->Add(0, 28, 1, wxALL, WXC_FROM_DIP(0));
     
     m_btExport = new wxBitmapButton(m_splitterPageStorage, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-database")), wxDefaultPosition, wxDLG_UNIT(m_splitterPageStorage, wxSize(26,26)), wxBU_AUTODRAW);
-    m_btExport->SetToolTip(_("Exprot to Veusz"));
+    m_btExport->SetToolTip(_("Export to Veusz"));
     
     flexGridSizer206->Add(m_btExport, 0, wxALL, WXC_FROM_DIP(1));
     m_btExport->SetMinSize(wxSize(26,26));

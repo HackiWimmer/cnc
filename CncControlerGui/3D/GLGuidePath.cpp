@@ -3,7 +3,7 @@
 #include "GLGuidePath.h"
 
 ///////////////////////////////////////////////////////////////////
-GLGuidePath::GLGuidePath(const CncPathListManager& plm)
+GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
 : std::vector<CncDoublePosition>	()
 , guideColour						(wxNullColour)
 , guideStyle						(wxPENSTYLE_INVALID)
@@ -43,9 +43,11 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm)
 				if ( entry.isPositionChange() != true )
 					continue;
 					
-				const double x = ( entry.entryTarget.getX() * THE_CONFIG->getCalculationFactX() ) / THE_CONFIG->getDispFactX3D(); 
-				const double y = ( entry.entryTarget.getY() * THE_CONFIG->getCalculationFactY() ) / THE_CONFIG->getDispFactY3D(); 
-				const double z = ( entry.entryTarget.getZ() * THE_CONFIG->getCalculationFactZ() ) / THE_CONFIG->getDispFactZ3D(); 
+				const double zv = entry.entryTarget.getZ() + zOffset;
+				
+				const double x  = ( entry.entryTarget.getX() * THE_CONFIG->getCalculationFactX() ) / THE_CONFIG->getDispFactX3D(); 
+				const double y  = ( entry.entryTarget.getY() * THE_CONFIG->getCalculationFactY() ) / THE_CONFIG->getDispFactY3D(); 
+				const double z  = (                       zv * THE_CONFIG->getCalculationFactZ() ) / THE_CONFIG->getDispFactZ3D(); 
 				
 				push_back(std::move(CncDoublePosition(x, y, z)));
 			}

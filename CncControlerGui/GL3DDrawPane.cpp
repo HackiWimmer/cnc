@@ -58,10 +58,12 @@ void GL3DDrawPane::enable(bool state) {
 	m_btnGuidePathes->Enable(state);
 	m_btnHelpLines->Enable(state);
 	m_btnPosMarker->Enable(state);
+	m_btnHardwareBox->Enable(state);
 	m_btnBoundBox->Enable(state);
 	m_btnFlyPath->Enable(state);
 	m_btnRefresh->Enable(state);
 	m_btnClear->Enable(state);
+	m_btnMillingCutter->Enable(state);
 	
 	// at least update motion monitor
 	if ( state == true )
@@ -270,7 +272,12 @@ void GL3DDrawPane::showFromPerspective4() {
 	activate3DPerspectiveButton(m_3D_Perspective4);
 	motionMonitor->viewIso4();
 }
-
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::onToggleHardwareBox(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showHardwareBox);
+	motionMonitor->updateMonitorAndOptions();
+}
 /////////////////////////////////////////////////////////////////////
 void GL3DDrawPane::onToggleBoundBox(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
@@ -308,6 +315,12 @@ void GL3DDrawPane::onTogglePosMarker(wxCommandEvent& event) {
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::onShowMillingCutter(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showMillingCutter);
+	motionMonitor->updateMonitorAndOptions();
+}
+/////////////////////////////////////////////////////////////////////
 void GL3DDrawPane::onToggleRuler(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showRuler);
@@ -323,4 +336,9 @@ void GL3DDrawPane::onRefreshMonitor(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->isOnlineUpdateDrawPane() ) 
 		motionMonitor->update(true);
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::onResetView(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->normalizeMonitor();
 }

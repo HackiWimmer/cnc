@@ -188,12 +188,14 @@ class ArduinoCmdDecoderMoveSequence : public ArduinoCmdDecoderBase {
       }
   
       // assign x, y, z and f depending on given type
-      if      ( result.vi.hasXYZ() ) { result.dx = v[0]; result.dy = v[1]; result.dz = v[2]; }
-      else if ( result.vi.hasXY()  ) { result.dx = v[0]; result.dy = v[1]; result.dz = 0;      }
-      else if ( result.vi.hasX()   ) { result.dx = v[0]; result.dy = 0;    result.dz = 0;      }
-      else if ( result.vi.hasY()   ) { result.dx = 0;    result.dy = v[0]; result.dz = 0;      }
-      else if ( result.vi.hasZ()   ) { result.dx = 0;    result.dy = 0;    result.dz = v[0]; }
-      else                           { logError(46, E_INVALID_MOVE_SEQUENCE); return -1;  }
+      if      ( result.vi.isXYZ() ) { result.dx = v[0]; result.dy = v[1]; result.dz = v[2]; }
+      else if ( result.vi.isXY()  ) { result.dx = v[0]; result.dy = v[1]; result.dz = 0;    }
+      else if ( result.vi.isXZ()  ) { result.dx = v[0]; result.dy = 0;    result.dz = v[1]; }
+      else if ( result.vi.isYZ()  ) { result.dx = 0;    result.dy = v[0]; result.dz = v[1]; }
+      else if ( result.vi.isX()   ) { result.dx = v[0]; result.dy = 0;    result.dz = 0;    }
+      else if ( result.vi.isY()   ) { result.dx = 0;    result.dy = v[0]; result.dz = 0;    }
+      else if ( result.vi.isZ()   ) { result.dx = 0;    result.dy = 0;    result.dz = v[0]; }
+      else                          { logError(46, E_INVALID_MOVE_SEQUENCE); return -1;     }
   
       if ( readIndex != 0 ) {
         logError(49, E_INVALID_MOVE_SEQUENCE);

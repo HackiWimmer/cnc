@@ -7,18 +7,19 @@
 #include "CncSourceEditor.h"
 #include "CncConfig.h"
 #include "MainFrame.h"
+#include "CncAutoFreezer.h"
 #include "CncGCodeSequenceListCtrl.h"
 #include "GCodePathHandlerBase.h"
 #include "GCodeFileParser.h"
 
 //////////////////////////////////////////////////////////////////
 GCodeFileParser::GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph) 
-: FileParser(fn)
-, pathHandler(ph)
-, gCodeSequence()
-, programEnd(false)
-, displayWarnings(true)
-, resumeOnError(true)
+: FileParser		(fn)
+, pathHandler		(ph)
+, gCodeSequence		()
+, programEnd		(false)
+, displayWarnings	(true)
+, resumeOnError		(true)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
@@ -107,7 +108,10 @@ void GCodeFileParser::logMeasurementEnd() {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
-	pathHandler->prepareWork();
+	if ( pathHandler->prepareWork() == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(": pathHandler->prepareWork() failed!\n");
+		return false;
+	}
 	
 	setDefaultParameters();
 	
@@ -154,7 +158,7 @@ bool GCodeFileParser::spool() {
 	
 	// over all commands
 	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
-	ctrl->freeze();
+	CncAutoFreezer caf(ctrl);
 	
 	for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it) {
 		performBlock(*it);
@@ -163,14 +167,12 @@ bool GCodeFileParser::spool() {
 			ctrl->addBlock(*it);
 	}
 	
-	ctrl->thaw();
 	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
-	pathHandler->finishWork();
-	return true;
+	return pathHandler->finishWork();
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
@@ -309,9 +311,9 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	// check the new path trigger and init it before 
 	// calling initNextClientId()
 	if ( gcb.cmdCode == 'G' && gcb.cmdNumber == 0 )
-		pathHandler->initNextPathExt();
+		pathHandler->initNextPath();
 	
-	initNextClientId(gcb.clientID);
+	initNextClientId(gcb.clientID * CLIENT_ID.TPL_FACTOR);
 	
 	switch ( gcb.cmdCode ) {
 		case 'G':	ret = processG(gcb);	break;
@@ -493,6 +495,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case 3: 	// GC_M_SpindleOnClockwise
 		{
+			#warning switchToolState
 			pathHandler->switchToolState(true);
 			return true;
 		}
@@ -502,7 +505,8 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		}
 		case 5:		// GC_M_SpindleOff
 		{
-			pathHandler->switchToolState(false);
+			#warning switchToolState
+			//pathHandler->switchToolState(false);
 			return true;
 		}
 		case 6:		// GC_M_ToolChange

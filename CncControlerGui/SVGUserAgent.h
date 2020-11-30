@@ -39,7 +39,6 @@ class SVGUserAgent{
 		UseDirectiveVector			useInfo;
 		SvgUserAgentOutputControls	oCtl;
 		
-		SVGUserAgentInfo& getCurentUserAgent();
 		SVGUserAgentInfo& getUserAgent(unsigned int pos);
 		
 		void displayUseDirective();
@@ -70,11 +69,12 @@ class SVGUserAgent{
 		bool hasCurrentAttribute(const wxString& key);
 		bool expand();
 		
-		UseDirectiveVector& getUseInfoVector();
-		const UserAgentVector& getList();
-		UseDirective& evaluateUseDirective(UseDirective& ud);
+		SVGUserAgentInfo&		getCurentUserAgent();
+		UseDirectiveVector&		getUseInfoVector();
+		const UserAgentVector&	getList();
+		UseDirective&			evaluateUseDirective(UseDirective& ud);
 		
-		const wxString& getCurrentAttribute(const wxString& key, const wxString& defValue = _(""));
+		const wxString&			getCurrentAttribute(const wxString& key, const wxString& defValue = _(""));
 		
 };
 

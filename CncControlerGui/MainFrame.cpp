@@ -36,11 +36,14 @@
 #include "OSD/webviewOSD.h"
 #include "GamepadEvent.h"
 #include "SerialThread.h"
+#include "CncMillingSoundController.h"
 #include "CncExceptions.h"
 #include "CncTextCtrl.h"
 #include "CncLoggerProxy.h"
 #include "CncLoggerView.h"
 #include "CncLoggerListCtrl.h"
+#include "CncBoundarySpace.h"
+#include "CncTemplateContext.h"
 #include "CncSourceEditor.h"
 #include "CncOutboundEditor.h"
 #include "CncNumberFormatter.h"
@@ -267,7 +270,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , serialThread							(NULL)
 , cncSpeedPlayground					(new CncSpeedPlayground(this))
 , isDebugMode							(false)
-, isZeroReferenceValid					(false)
 , canClose								(true)
 , evaluatePositions						(true)
 , ignoreDirControlEvents				(false)
@@ -545,37 +547,6 @@ void MainFrame::onConfigurationUpdated(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////////
 	// currently nothing to do
 	//std::clog << "MainFrame::configurationUpdated(wxCommandEvent& event)" << std::endl;
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::setRefPostionState(bool state) {
-///////////////////////////////////////////////////////////////////
-	isZeroReferenceValid = state;
-
-	wxBitmap bmp;
-	if ( isZeroReferenceValid == true ) bmp = ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_GREEN"); 
-	else 								bmp = ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_RED");
-	
-	wxString tip("Reference position state: ");
-	// display ref pos mode too
-	if ( isZeroReferenceValid == true ) {
-		wxMemoryDC mdc(bmp);
-		mdc.SetFont(wxFontInfo(8).FaceName("Arial"));
-		mdc.SetTextForeground(wxColor(0, 0, 0));
-		mdc.DrawText(wxString::Format("%d", (int)THE_CONFIG->getReferencePositionMode()), {5,1});
-		bmp = mdc.GetAsBitmap();
-		
-		tip.append("Valid\n");
-		tip.append(wxString::Format("Reference position mode: %d", (int)THE_CONFIG->getReferencePositionMode()));
-		
-	} else {
-		tip.append("Not Valid");
-		
-	}
-	
-	m_refPosState->SetToolTip(tip);
-	m_refPosState->SetBitmap(bmp);
-	m_statusBar->Refresh();
-	m_statusBar->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::disableGuiControls() {
@@ -968,13 +939,12 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
-#include <wx/wrapsizer.h>
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	GblFunc::replaceSizer(m_openSourceExtern->GetContainingSizer(), new wxWrapSizer(wxVERTICAL));
+	CncPathListRunner::test();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -2318,7 +2288,7 @@ bool MainFrame::connectSerialPort() {
 	startAnimationControl();
 	m_serialTimer->Stop();
 	
-	THE_CONTEXT->hardwareOriginOffset.reset();
+	THE_BOUNDS->resetHardwareOffset();
 	updateHardwareReference();
 	
 	const wxString sel(m_portSelector->GetStringSelection());
@@ -2338,7 +2308,7 @@ bool MainFrame::connectSerialPort() {
 		return false;
 		
 	// initialize the postion controls
-	setControllerZero(true, true, true);
+	setControllerZero(CncRM_Mode5, 0.0, 0.0, 0.0);
 	
 	statisticsPane->setCncControl(cnc);
 	serialSpyPanel->initDuringConnect();
@@ -2355,10 +2325,9 @@ bool MainFrame::connectSerialPort() {
 		
 		if ( (ret = cnc->setup()) == true ) {
 			
-			cnc->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
+			refPositionDlg->setEnforceFlag(cnc->isEmulator() == false);
 			notifyConfigUpdate();
 			decorateSwitchToolOnOff(cnc->getToolState());
-			setRefPostionState(true);
 			
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
@@ -2496,6 +2465,9 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		decoratePosSpyConnectButton(false);
 		m_menuItemUpdCoors->Check(false);
 	}
+	
+	const bool sound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() && setup.speedMonitor == true );
+	CncMillingSound::activate(sound);
 	
 	// config setup
 	serialFileName.assign(setup.serialFileName);
@@ -2658,22 +2630,27 @@ void MainFrame::connectSec(wxCommandEvent& event) {
 	connectSerialPortDialog();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::setControllerZero(bool x, bool y, bool z) {
+void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, double z) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	
-	CncLongPosition prevPos = cnc->getCurCtlPos();
+	wxASSERT( cnc );
+	wxASSERT( refPositionDlg );
 	
 	cnc->resetClientId();
-	cnc->setZeroPos(x, y, z);
-	setRefPostionState(true);
+	
+	if ( cnc::dblCmp::gt(x, DBL_MIN) ) cnc->setZeroPosX(THE_CONFIG->convertMetricToStepsX(x));
+	if ( cnc::dblCmp::gt(y, DBL_MIN) ) cnc->setZeroPosY(THE_CONFIG->convertMetricToStepsY(y));
+	if ( cnc::dblCmp::gt(z, DBL_MIN) ) cnc->setZeroPosZ(THE_CONFIG->convertMetricToStepsZ(z));
+	
+	refPositionDlg->resetTempSetting();
+	refPositionDlg->setEnforceFlag(false);
 	
 	// align the hardware offset
-	if ( THE_CONTEXT->hardwareOriginOffset.valid == true ) {
+	const CncLongPosition prevPos = cnc->getCurCtlPos();
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
 		
-		THE_CONTEXT->hardwareOriginOffset.dx -= prevPos.getX();
-		THE_CONTEXT->hardwareOriginOffset.dy -= prevPos.getY();
-		THE_CONTEXT->hardwareOriginOffset.dz -= prevPos.getZ();
+		CncLongPosition offset(THE_BOUNDS->getHardwareOffset().getAsSteps());
+		offset -= prevPos;
+		THE_BOUNDS->setHardwareOffset(offset);
 		
 		cnc::trc.logInfoMessage("The hardware offset was realigned to the new origin . . .");
 	}
@@ -2696,18 +2673,16 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 	
 	if ( ret == wxID_OK ) {
 		
-		double wpt = refPositionDlg->getWorkpieceThickness();
-		THE_CONFIG->setReferenceIncludesWpt(cnc::dblCompareNull(wpt) == false);
-		THE_CONFIG->setWorkpieceThickness(wpt);
-		THE_CONFIG->setReferencePositionMode(refPositionDlg->getReferenceMode());
-		notifyConfigUpdate();
+		THE_BOUNDS->setWorkpieceThickness(refPositionDlg->getWorkpieceThickness());
+		THE_BOUNDS->setRefPositionMode(refPositionDlg->getReferenceMode());
 		
 		motionMonitor->clear();
 		
 		CncTransactionLock ctl(this);
-		setControllerZero(refPositionDlg->shouldZeroX(), 
-		                  refPositionDlg->shouldZeroY(), 
-						  refPositionDlg->shouldZeroZ()
+		setControllerZero(refPositionDlg->getReferenceMode(),
+						  refPositionDlg->shouldZeroX() ? THE_BOUNDS->getCalculatedRefPositionMetric().getX() : DBL_MIN, 
+						  refPositionDlg->shouldZeroY() ? THE_BOUNDS->getCalculatedRefPositionMetric().getY() : DBL_MIN, 
+						  refPositionDlg->shouldZeroZ() ? THE_BOUNDS->getCalculatedRefPositionMetric().getZ() : DBL_MIN 
 						 );
 						 
 		motionMonitor->Refresh();
@@ -2735,26 +2710,6 @@ void MainFrame::notifyConfigUpdate() {
 		cncLCDPositionPanel->updateUnit();
 	
 	collectSummary();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::changeWorkpieceThickness() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	double wpt = CncConfig::getGlobalCncConfig()->getWorkpieceThickness();
-	
-	if ( cnc::dblCompareNull(wpt) == true )	m_lableWorkpieceThickness->SetBitmap(ImageLib16().Bitmap("BMP_NO_WPT"));
-	else 									m_lableWorkpieceThickness->SetBitmap(ImageLib16().Bitmap("BMP_WPT"));
-		
-	m_lableWorkpieceThickness->SetToolTip(wxString::Format("Workpiece thickness: %.3lf mm", wpt));
-	m_lableWorkpieceThickness->Refresh();
-	setRefPostionState(false);
-	
-	wxString msg("A workpiece thickness change requires a redefinition of the CNC reference position.\n\n");
-	msg << "This have to be done before the next CNC run.\n\n";
-	msg << "The set function below can be used to set it directly.";
-	
-	showReferencePositionDlg(msg);
-	m_crossings->ChangeValue(wxString() << CncConfig::getGlobalCncConfig()->getDurationCount());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::changeCrossingThickness() {
@@ -3025,6 +2980,8 @@ bool MainFrame::openFile(int sourcePageToSelect) {
 		clearMotionMonitor();
 		
 		introduceCurrentFile(sourcePageToSelect);
+		
+		THE_TPL_CTX->init(getCurrentTemplatePathFileName());
 	}
 	
 	updateFileContentPosition(0, 0);
@@ -3709,7 +3666,8 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 		                    wxOK|wxCENTRE|wxICON_ERROR);
  	
 		dlg.ShowModal();
-		setRefPostionState(false);
+		
+		refPositionDlg->setEnforceFlag(true);
 		return false;
 	}
 	
@@ -3726,9 +3684,10 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 bool MainFrame::checkReferencePositionState() {
 ///////////////////////////////////////////////////////////////////
 	const CncDoublePosition refPos(CncStartPositionResolver::getReferencePosition());
-	const bool zero = ( cnc->getCurAppPosMetric() != refPos );
-
-	if ( isZeroReferenceValid == false ) {
+	const bool zero			= ( cnc->getCurAppPosMetric() != refPos );
+	const bool refPosValid	= refPositionDlg->isReferenceStateValid();
+	
+	if ( refPosValid == false ) {
 		const CncTemplateFormat tf = getCurrentTemplateFormat();
 		
 		if ( tf != TplManual && tf != TplTest ) {
@@ -3866,16 +3825,7 @@ void MainFrame::collectSvgSpecificSummary() {
 	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Max duration thickness", 		wxString::Format("%4.3f",	cc->getMaxDurationThickness()),					"mm");
 	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Calculated durations", 			wxString::Format("%u",		cc->getDurationCount()),						"#");
 	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Current Z distance", 			wxString::Format("%4.3f",	cc->getCurZDistance()),							"mm");
-	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Wpt is included", 				wxString::Format("%d",		cc->getReferenceIncludesWpt()),					"-");
-	
-	for (unsigned int i=0; i<cc->getMaxDurations(); i++) {
-		if ( cc->getDurationThickness(i) != 0.0 ) {
-			cncSummaryListCtrl->addParameter(PT::PT_SVG, 
-			                                 wxString::Format("   Duration step[%02u]", i), 
-			                                 wxString::Format("%4.3f",	cc->getDurationThickness(i)),
-			                                 "mm");
-		}
-	}
+	//cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Wpt is included", 				wxString::Format("%d",		cc->getReferenceIncludesWpt()),					"-");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::collectGCodeSpecificSummary() {
@@ -3894,16 +3844,14 @@ void MainFrame::collectSummary() {
 		
 	typedef CncSummaryListCtrl::ParameterType PT;
 		
-	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	cncSummaryListCtrl->clear();
-	
 	cncSummaryListCtrl->addHeadline(PT::PT_HEADLINE, "Common Settings");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Tool", 					cc->getDefaultToolParamAsString(),												"-");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Workpiece thickness", 				wxString::Format("%4.3f", 	cc->getWorkpieceThickness()),						"mm");
-	//cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Curve lib resolution", 			wxString::Format("%0.3f", 	cc->getRenderResolution()),							"-");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Papid speed", 				wxString::Format("%4.3f", 	cc->getDefaultRapidSpeed_MM_MIN()),					"mm/min");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Work speed", 				wxString::Format("%4.3f", 	cc->getDefaultWorkSpeed_MM_MIN()),					"mm/min");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Reply Threshold", 					wxString::Format("%4.3f",	cc->getReplyThresholdMetric()),						"mm");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Tool", 					THE_CONFIG->getDefaultToolParamAsString(),												"-");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Workpiece thickness", 				wxString::Format("%4.3f", 	THE_BOUNDS->getWorkpieceThickness()),						"mm");
+	//cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Curve lib resolution", 			wxString::Format("%0.3f", 	THE_CONFIG->getRenderResolution()),							"-");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Papid speed", 				wxString::Format("%4.3f", 	THE_CONFIG->getDefaultRapidSpeed_MM_MIN()),					"mm/min");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Work speed", 				wxString::Format("%4.3f", 	THE_CONFIG->getDefaultWorkSpeed_MM_MIN()),					"mm/min");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Reply Threshold", 					wxString::Format("%4.3f",	THE_CONFIG->getReplyThresholdMetric()),						"mm");
 
 	// type specific . . .
 	switch ( getCurrentTemplateFormat() ) {
@@ -4053,16 +4001,25 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		}
 		
 		// prepare final statements
-		wxString probeMode(THE_CONTEXT->isProbeMode() ? "ON" :"OFF");
+		const wxString probeMode(THE_CONTEXT->isProbeMode() ? "ON" :"OFF");
+		
 		if ( ret == false) {
 			wxString hint("not successfully");
 			cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
 			ctl.setErrorMode();
 			
+			THE_TPL_CTX->resetValidRuns();
 		} 
 		else {
 			std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
+			
+			THE_TPL_CTX->registerValidRun();
 		}
+		
+		CncDoubleBounderies bounds;
+		bounds.setMinBound(cnc->getMinPositionsMetric());
+		bounds.setMaxBound(cnc->getMaxPositionsMetric());
+		THE_TPL_CTX->registerBounderies(bounds);
 		
 		const Serial::Trigger::EndRun endRun(ret);
 		cnc->processTrigger(endRun);
@@ -4175,7 +4132,8 @@ bool MainFrame::processTemplateIntern() {
 			std::cerr << "Validate positions failed" << std::endl;
 			std::cerr << "PC pos        : " << cnc->getCurAppPos() << std::endl;
 			std::cerr << "Controller pos: " << cnc->requestControllerPos() << std::endl;
-			setRefPostionState(false);
+			
+			refPositionDlg->setEnforceFlag(true);
 		}
 		
 		ret = false;
@@ -4191,7 +4149,7 @@ bool MainFrame::processTemplateIntern() {
 			cnc->isPositionOutOfRange(min, true);
 			cnc->isPositionOutOfRange(max, true);
 			
-			setRefPostionState(false);
+			refPositionDlg->setEnforceFlag(true);
 		//}
 	}
 	
@@ -4327,10 +4285,12 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::emergencyStop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
 	std::cerr << "Emergency Stop detected" << std::endl;
+
+	wxASSERT(cnc);
 	cnc->interrupt("Emergency Stop detected");
-	setRefPostionState(false);
+
+	refPositionDlg->setEnforceFlag(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::navigateX(CncDirection d) {
@@ -4350,7 +4310,7 @@ void MainFrame::navigateX(CncDirection d) {
 
 	switch ( d ) {
 		case CncClockwise: 	fact *= +1; break;
-		case CncAnticlockwise: fact *= -1; break;
+		case CncCounterClockwise: fact *= -1; break;
 		default: ;
 	}
 
@@ -4379,7 +4339,7 @@ void MainFrame::navigateY(CncDirection d) {
 
 	switch ( d ) {
 		case CncClockwise: 	fact *= +1; break;
-		case CncAnticlockwise: fact *= -1; break;
+		case CncCounterClockwise: fact *= -1; break;
 		default: ;
 	}
 	
@@ -4408,7 +4368,7 @@ void MainFrame::navigateZ(CncDirection d) {
 
 	switch ( d ) {
 		case CncClockwise: 	fact *= +1; break;
-		case CncAnticlockwise: fact *= -1; break;
+		case CncCounterClockwise: fact *= -1; break;
 		default: ;
 	}
 
@@ -4541,7 +4501,8 @@ d) X(mid), Y(mid), Z(mid)
 	wxASSERT( cnc );
 	CncTransactionLock ctl(this);
 	
-	if ( isZeroReferenceValid == false ) {
+	const bool refPosValid = refPositionDlg->isReferenceStateValid();
+	if ( refPosValid == false ) {
 		cnc::trc.logError("The current reference position isn't valid. Therefore, can't move home");
 		return;
 	}
@@ -5045,6 +5006,15 @@ void MainFrame::selectMonitorBookTemplatePanel(bool force) {
 			cncExtMainPreview->Show();
 		
 	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectParsingSynopsisTrace() {
+///////////////////////////////////////////////////////////////////
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::PREPOCESSOR_PANAL);
+	
+	wxASSERT(cncPreprocessor);
+	cncPreprocessor->select(PreProcessorSelection::VAL::PARSING_SYNOPSIS);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
@@ -5891,7 +5861,7 @@ void MainFrame::rcStop(wxCommandEvent& event) {
 void MainFrame::rcReset(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	requestReset();
-	setRefPostionState(false);
+	refPositionDlg->setEnforceFlag(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSwitchToolOnOff(bool state) {
@@ -6069,6 +6039,7 @@ void MainFrame::clearMotionMonitor() {
 
 	motionMonitor->clear();
 	statisticsPane->clear();
+	
 	cncPreprocessor->clearAll();
 	
 	decorateOutboundEditor();
@@ -6436,20 +6407,31 @@ void MainFrame::decoratePosSpyConnectButton(bool state) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectSourceControlLineNumber(long ln) {
 /////////////////////////////////////////////////////////////////////
+	ln /= CLIENT_ID.TPL_FACTOR;
 	ln--;
 	if ( ln <= 0L )
 		return;
 	
+	// debugging only
+	// std::cout << "ln: " << ln << std::endl;
+
 	wxASSERT( sourceEditor );
 	sourceEditor->selectLineNumber(ln);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectSourceControlLineNumbers(long firstLine, long lastLine) {
 /////////////////////////////////////////////////////////////////////
+	firstLine /= CLIENT_ID.TPL_FACTOR;
+	lastLine  /= CLIENT_ID.TPL_FACTOR;
+	
 	firstLine--;
 	lastLine--;
+	
 	if ( lastLine <= 0L || firstLine <= 0L )
 		return;
+	
+	// debugging only
+	// std::cout << "ln: " << firstLine << "," << lastLine << std::endl;
 	
 	wxASSERT( sourceEditor );
 	sourceEditor->selectLineNumbers(firstLine, lastLine);
@@ -6463,7 +6445,7 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	else						isRunning = true;
 	
 	// debugging only
-	//cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
+	// cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
 	
 	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {
 		if ( positionSpy != NULL )
@@ -7460,7 +7442,7 @@ void MainFrame::openSpeedPlayground(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::openPositionStorage(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	CncContext::PositionStorage::storage = positionStorage;
+	PositionStorage::storage = positionStorage;
 	
 	if ( positionStorage->IsShown() == false )
 		positionStorage->Show();
@@ -7478,10 +7460,10 @@ void MainFrame::updateHardwareReference() {
 	double dy = 0.0;
 	double dz = 0.0;
 	
-	if ( THE_CONTEXT->hardwareOriginOffset.valid == true ) {
-		dx = THE_CONFIG->convertStepsToMetricX(THE_CONTEXT->hardwareOriginOffset.dx);
-		dy = THE_CONFIG->convertStepsToMetricY(THE_CONTEXT->hardwareOriginOffset.dy);
-		dz = THE_CONFIG->convertStepsToMetricZ(THE_CONTEXT->hardwareOriginOffset.dz);
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
+		dx = THE_BOUNDS->getHardwareOffset().getAsMetricX();
+		dy = THE_BOUNDS->getHardwareOffset().getAsMetricY();
+		dz = THE_BOUNDS->getHardwareOffset().getAsMetricZ();
 	}
 	
 	m_hardwareOffsetX->ChangeValue(wxString::Format("%.3lf", dx));
@@ -7511,7 +7493,9 @@ void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 		disableControls();
 		CncTransactionLock ctl(this);
 
-		cnc->evaluateHardwareReference();
+		if ( cnc->evaluateHardwareReference() == true )
+			motionMonitor->clear();
+			
 		updateHardwareReference();
 		
 		enableControls();
@@ -7520,7 +7504,7 @@ void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onResetHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	THE_CONTEXT->hardwareOriginOffset.reset();
+	THE_BOUNDS->resetHardwareOffset();
 	updateHardwareReference();
 }
 /////////////////////////////////////////////////////////////////////
@@ -7768,6 +7752,16 @@ void MainFrame::detachControllerMessages(wxCommandEvent& event) {
 void MainFrame::detachSetterList(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_SetterList);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onSelectTemplatePanel(wxListbookEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( (wxWindow*)event.GetEventObject() == m_listbookSource ) {
+		unsigned int sel = event.GetSelection();
+		
+		if ( sel == SourceBookSelection::VAL::CONTEXT )
+			THE_TPL_CTX->updateGui(true);
+	}
 }
 
 

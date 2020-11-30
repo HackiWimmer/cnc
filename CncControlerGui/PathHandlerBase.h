@@ -107,11 +107,6 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		
 		virtual bool isInitialized();
 		
-		virtual bool isZAxisUp()   				{ return false; }
-		virtual bool isZAxisDown() 				{ return false; }
-		virtual bool physicallyMoveZAxisUp()	{ return true;  }
-		virtual bool physicallyMoveZAxisDown()	{ return true;  }
-
 		// transformation
 		virtual void transform(double& xAbs, double& yAbs) 	{}
 		
@@ -125,7 +120,7 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		PathHandlerBase();
 		virtual ~PathHandlerBase();
 		
-		virtual const char* getName() { return "PathHandlerBase"; }
+		virtual const char* getName() const { return "PathHandlerBase"; }
 		virtual void initNextClientId(long id) {}
 		
 		void setFileParser(FileParser* fp) { fileParser = fp; }
@@ -140,11 +135,11 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		bool isFirstPath() { return firstPath; }
 		bool isNextPath()  { return nextPath;  }
 
-		virtual void prepareWork();
+		virtual bool prepareWork();
 		virtual bool initNextPath();
 		virtual bool finishCurrentPath();
 		virtual bool runCurrentPath();
-		virtual void finishWork();
+		virtual bool finishWork();
 		
 		virtual void logMeasurementStart()	{}
 		virtual void logMeasurementEnd() 	{}

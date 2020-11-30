@@ -17,6 +17,7 @@ class CncPathListManager {
 		enum GuideType	{ NO_GUIDE_PATH, HELP_PATH, ORIG_PATH };
 		enum JoinType	{ jtSquare, jtRound, jtMiter };
 		enum EndType	{ etClosedPolygon, etClosedLine, etOpenButt, etOpenSquare, etOpenRound };
+		enum ExeRecomm	{ ER_STAIRS, ER_HELIX };
 	
 	private:
 		
@@ -27,11 +28,10 @@ class CncPathListManager {
 		PathType				pathType;
 		GuideType				guideType;
 		CncPathListEntry		defaultEntry;
-		CncPathListEntry*		prevCncStartEntry;
 		
-		bool					isFirstPath;	// stores if this path is the first path info
-		bool					isCorrected;	// stores if this path is corrected
+		ExeRecomm				executionRecommend;
 		
+		CncDoublePosition		notNormalizeStartDistance;
 		CncDoublePosition		referencePos;	// reference position - from where we are coming
 		
 		double 					minPosX;
@@ -43,8 +43,11 @@ class CncPathListManager {
 		
 		double 					totalDistance;
 		
-		void 					initNextPath();
-		void 					appendEntry(CncPathListEntry& cpe);
+		bool					adjustZOffset(double offset, bool relative=false);
+			
+		void					initNextPath(bool linked = true);
+		void					initNextPath(const CncPathListEntry& initialEntry);
+		void					appendEntry(CncPathListEntry& cpe);
 		CncPathList&			getPathListIntern();
 		
 	protected:
@@ -53,18 +56,23 @@ class CncPathListManager {
 		const CncPathList&		getProtectedGuideList()		const	{ return guideList; }
 		const ClipperLib::Path&	getProtectedClipperPath()	const 	{ return clipperPath; }
 		const CncPathListEntry&	getDefaultEntry()			const	{ return defaultEntry; }
-		CncPathListEntry*		getPrevCncStartEntry()		const	{ return prevCncStartEntry; }
 		
+		CncDirection			getOrientation(ClipperLib::Path& path) 					const;
+		bool					ensureDirection(CncDirection d, ClipperLib::Path& path) const;
 		void					resetStatistics();
+		
+		auto 					firstPosEntryIterator();
 		
 	public:
 		
 		CncPathListManager();
-		~CncPathListManager();
+		explicit CncPathListManager(const CncPathListEntry& initialEntry);
 		
 		explicit CncPathListManager(CncPathListManager& plm);
 		explicit CncPathListManager(const CncPathListManager& plm);
 		explicit CncPathListManager(CncPathListManager&& plm) = delete;
+		
+		~CncPathListManager();
 		
 		CncPathListManager& operator= (CncPathListManager&);
 		CncPathListManager& operator= (const CncPathListManager&);
@@ -77,85 +85,91 @@ class CncPathListManager {
 		static JoinType				transform(ClipperLib::JoinType jt);
 		static EndType				transform(ClipperLib::EndType et);
 		
-		const CncDoublePosition&	getStartPos()			const;
-		const CncDoublePosition&	getReferencePos()		const	{ return referencePos; }
+		bool						getTargetPos(CncDoublePosition& ret)	const;
+		
+		const CncDoublePosition&	getStartPos()				const;
+		const CncDoublePosition&	getNorNormalizedStartDist()	const	{ return notNormalizeStartDistance; }
+		const CncDoublePosition&	getReferencePos()			const	{ return referencePos; }
+		
+		ExeRecomm					getExecRecommendation()		const	{ return executionRecommend; }
+		
+		const char*					getPathTypeAsStr()			const;
+		const PathType				getPathType()				const	{ return pathType; }
+		const GuideType				getGuideType()				const	{ return guideType; }
+		
+		const CncPathList&			getPathList()				const;
+		unsigned int				getPathListSize()			const;
+		
+		bool						isPathClosed()				const;
+		
+		double						getTotalDistance()			const	{ return totalDistance; }
+		
+		double						getMinPosX()				const	{ return minPosX; }
+		double						getMinPosY()				const	{ return minPosY; }
+		double						getMinPosZ()				const	{ return minPosZ; }
+		double						getMaxPosX()				const	{ return maxPosX; }
+		double						getMaxPosY()				const	{ return maxPosY; }
+		double						getMaxPosZ()				const	{ return maxPosZ; }
+		
+		auto	begin()													{ return getPathListIntern().begin(); }
+		auto	end()													{ return getPathListIntern().end(); }
+		auto	first()													{ return getPathListIntern().begin(); }
+		auto	last()													{ return getPathListIntern().size() ? getPathListIntern().end() - 1 : getPathListIntern().end(); }
+		
+		auto	rbegin()												{ return getPathListIntern().rbegin(); }
+		auto	rend()													{ return getPathListIntern().rend(); }
+		auto	rfirst()												{ return getPathListIntern().rbegin(); }
+		auto	rlast()													{ return getPathListIntern().size() ? getPathListIntern().rend() - 1 : getPathListIntern().rend(); }
 
-		const char*					getPathTypeAsStr()		const;
-		const PathType				getPathType()			const	{ return pathType; }
-		const GuideType				getGuideType()			const	{ return guideType; }
+		auto	cbegin()											const	{ return getPathList().cbegin(); }
+		auto	cend()												const	{ return getPathList().cend(); }
+		auto	cfirst()											const	{ return getPathList().cbegin(); }
+		auto	clast()												const	{ return getPathList().size() ? getPathList().cend() - 1 : getPathList().cend(); }
 		
-		const CncPathList&			getPathList()			const;
-		unsigned int				getPathListSize()		const;
+		auto	crbegin()											const	{ return getPathList().crbegin(); }
+		auto	crend()												const	{ return getPathList().crend(); }
+		auto	crfirst()											const	{ return getPathList().cbegin(); }
+		auto	crlast()											const	{ return getPathList().size() ? getPathList().crend() - 1 : getPathList().crend(); }
 		
-		bool						isPathFlaggedAsFirst()	const	{ return isFirstPath; }
-		bool						isPathCorrected()		const	{ return isCorrected; }
-		bool						isPathClosed()			const;
-		
-		double						getTotalDistance()		const	{ return totalDistance; }
-		
-		double						getMinPosX()			const	{ return minPosX; }
-		double						getMinPosY()			const	{ return minPosY; }
-		double						getMinPosZ()			const	{ return minPosZ; }
-		double						getMaxPosX()			const	{ return maxPosX; }
-		double						getMaxPosY()			const	{ return maxPosY; }
-		double						getMaxPosZ()			const	{ return maxPosZ; }
-		
-		auto begin()												{ return getPathListIntern().begin(); }
-		auto end()													{ return getPathListIntern().end(); }
-		auto first()												{ return getPathListIntern().begin(); }
-		auto last()													{ return getPathListIntern().size() ? getPathListIntern().end() - 1 : getPathListIntern().end(); }
-		
-		auto rbegin()												{ return getPathListIntern().rbegin(); }
-		auto rend()													{ return getPathListIntern().rend(); }
-		auto rfirst()												{ return getPathListIntern().rbegin(); }
-		auto rlast()												{ return getPathListIntern().size() ? getPathListIntern().rend() - 1 : getPathListIntern().rend(); }
+		auto	cFirstPosEntryIterator()							const;
+		auto	crLastPosEntryIterator()							const;
+		bool	hasMovement()										const;
 
-		auto cbegin()										const	{ return getPathList().cbegin(); }
-		auto cend()											const	{ return getPathList().cend(); }
-		auto cfirst()										const	{ return getPathList().cbegin(); }
-		auto clast()										const	{ return getPathList().size() ? getPathList().cend() - 1 : getPathList().cend(); }
-		
-		auto crbegin()										const	{ return getPathList().crbegin(); }
-		auto crend()										const	{ return getPathList().crend(); }
-		auto crfirst()										const	{ return getPathList().cbegin(); }
-		auto crlast()										const	{ return getPathList().size() ? getPathList().crend() - 1 : getPathList().crend(); }
-		
-		auto cFirstPosEntryIterator()						const;
-		auto crLastPosEntryIterator()						const;
+		void	setReferencePos(const CncDoublePosition& p)			{ referencePos = p; }
 
-		void setReferencePos(const CncDoublePosition& p)			{ referencePos = p; }
-		void setPathFirstFlag(bool state) 							{ isFirstPath  = state; }
-
-		void clear();
+		void	clear();
 		
-		void changeToGuideType(GuideType gt = ORIG_PATH);
-		bool processOffset		(double offset, JoinType = jtRound,  EndType = etClosedPolygon);
-		bool processInnerOffset	(double offset);
-		bool processOuterOffset	(double offset);
-		bool roundCorners		(double toolDiameter);
-		bool processPocket		(double toolDiameter);
+		void	changeToGuideType(GuideType gt = ORIG_PATH);
 		
-		void initNextCncPath();
-		void initNextGuidePath(GuideType gt = HELP_PATH);
+		bool	processXYOffset			(double offset, JoinType = jtRound,  EndType = etClosedPolygon);
+		bool	processXYInnerOffset	(double offset);
+		bool	processXYOuterOffset	(double offset);
+		bool	processXYPocket			(double toolDiameter);
+		bool	processXYHelix			(double zCurDepth, double zTotDist, double zFeed360);
 		
-		const CncPathListEntry& addEntryAdm(long clientId);
-		const CncPathListEntry& addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN);
-		const CncPathListEntry& addEntryAbs(const CncDoublePosition& newAbsPos, bool alreadyRendered=false);
-		const CncPathListEntry& addEntryRel(const CncDoublePosition& distance,  bool alreadyRendered=false);
-		const CncPathListEntry& addEntryAbs(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered=false);
-		const CncPathListEntry& addEntryRel(double deltaX,     double deltaY,     double deltaZ,     bool alreadyRendered=false);
+		bool	adjustZOffsetAbs		(double offset);
+		bool	adjustZOffsetRel		(double offset);
+		
+		bool	roundXYCorners			(double toolDiameter);
+		
+		bool	normalizeStartPosDistance();
+		size_t	normalizeLinkedEntry(long clientId, CncSpeedMode mode, double feedSpeed_MM_MIN);
+		
+		bool	ensureDirection(CncDirection d);
+		bool	reversePath();
+		
+		void	initNextCncPath();
+		void	initNextGuidePath(GuideType gt = HELP_PATH);
+		
+		const	CncPathListEntry& addEntryAdm(long clientId);
+		const	CncPathListEntry& addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN);
+		const	CncPathListEntry& addEntryAbs(const CncDoublePosition& newAbsPos, bool alreadyRendered=false);
+		const	CncPathListEntry& addEntryRel(const CncDoublePosition& distance,  bool alreadyRendered=false);
+		const	CncPathListEntry& addEntryAbs(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered=false);
+		const	CncPathListEntry& addEntryRel(double deltaX,     double deltaY,     double deltaZ,     bool alreadyRendered=false);
 		
 		std::ostream& outputOperator(std::ostream &ostr) const;
 		friend std::ostream& operator<<(std::ostream &ostr, const CncPathListManager &a) { return a.outputOperator(ostr); }
-		
-		
-		
-		
-		bool eraseEntryAndRecalcuate(const CncPathList::iterator& itToErase);
-		
-		bool reversePath();
-		
-		void testSomething();
 };
 
 #endif

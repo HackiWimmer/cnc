@@ -13,9 +13,8 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		GCodePathHandlerCnc(CncControl* cnc);
 		virtual ~GCodePathHandlerCnc();
 		
-		virtual const char* getName() { return "GCodePathHandlerCnc"; }
-		
-		virtual bool isPathListUsed() { return true; }
+		virtual const char* getName()						const	{ return "GCodePathHandlerCnc"; }
+		virtual bool isPathListUsed()						const	{ return true; }
 		virtual void initNextClientId(long id);
 		virtual void switchToolState(bool state);
 		
@@ -25,13 +24,12 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		virtual bool processLinearMove(bool alreadyRendered);
 		virtual bool changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value = 0.0);
 		virtual bool initNextPath();
-		virtual void prepareWorkImpl();
-		virtual void finishWorkImpl();
+		virtual bool prepareWorkImpl();
+		virtual bool finishWorkImpl();
 		
 	private:
 		
 		CncLongPosition	phBegPosition;
-	
 };
 
 #endif

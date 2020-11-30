@@ -8,14 +8,20 @@
 #include <wx/font.h>
 #include "ArduinoEnvWrapper.h"
 #include "OSD/CncTimeFunctions.h"
+#include "CncTsTplProcessing.h"
+#include "CncPositionStorage.h"
 #include "CncPosition.h"
 #include "CncAverage.h"
 
-class CncPositionStorageView;
-
+// -----------------------------------------------------------
 typedef std::map<wxString, wxString>	VersionInfoMap;
 typedef std::vector<wxString>			CommandLineParameterMap;
 
+// -----------------------------------------------------------
+class CncBoundarySpace;
+class CncTemplateContext;
+
+// -----------------------------------------------------------
 struct CncContext {
 	
 	public:
@@ -23,69 +29,22 @@ struct CncContext {
 
 	private:
 		
-		OSType os						= OSType::UNDEF;
-		bool probeMode					= true;
-		bool interactiveMoveMode		= false;
-		bool speedMonitor				= false;
-		bool onlineUpdateCoordinates	= true;
-		bool onlineUpdateDrawPane		= true;
-		bool allowEventHandling			= true;
-		bool hardwareFlag				= false;
+		OSType	os							= OSType::UNDEF;
+		bool	probeMode					= true;
+		bool	interactiveMoveMode			= false;
+		bool	speedMonitor				= false;
+		bool	onlineUpdateCoordinates		= true;
+		bool	onlineUpdateDrawPane		= true;
+		bool	allowEventHandling			= true;
+		bool	hardwareFlag				= false;
 		
-		int updateInterval				= 100;
-
+		int		updateInterval				= 100;
+		
+		double	currentToolDiameter			= 0.0;
+		
 	public:
-		
+	
 		wxFont outboundListBookFont		= wxFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-		
-		// ----------------------------------------------------------------
-		struct PositionStorage {
-			
-			static const uint8_t ReservedID					= 0;
-			static const uint8_t TRIGGER_CTL_POS			= POS_STORE_SID_CTL_POS;
-			static const uint8_t TRIGGER_APP_POS			= POS_STORE_SID_APP_POS;
-			static const uint8_t TRIGGER_DRM_POS			= POS_STORE_SID_DIRECT_MOVE;
-			static const uint8_t TRIGGER_RAM_POS			= POS_STORE_SID_RENDER_AND_MOVE;
-			static const uint8_t TRIGGER_STP_POS			= POS_STORE_SID_STEPPING;
-			static const uint8_t TRIGGER_PH_CB_POS			= POS_STORE_SID_PATH_HANDLER_OUTPUT;
-			static const uint8_t TRIGGER_PH_LST_RUN			= POS_STORE_SID_PATH_LIST_RUNNER;
-			static const uint8_t TRIGGER_MOV_SEQ_ADD		= POS_STORE_SID_MOV_SEQ_ADD;
-			static const uint8_t TRIGGER_SERIAL_NULL		= POS_STORE_SID_SERIAL_NULL;
-			
-			static const uint8_t MAX_SIDS					= 16;
-			
-			static CncPositionStorageView*	storage;
-			static bool posStorageIdState[MAX_SIDS];
-			static bool isPosStorageEnabledFor(uint8_t id)		{ return ( id > 0 &&  id < MAX_SIDS - 1 ? posStorageIdState[id] : false ); }
-			static void enablePosStorageFor(uint8_t id, bool s)	{ if ( id > 0 &&  id < MAX_SIDS - 1 ) { posStorageIdState[id] = s; } }
-			
-			static void init	(uint8_t sid, bool state);
-			static void clear	(uint8_t sid);
-			static void addPos	(uint8_t sid, const CncLongPosition& p);
-			static void addPos	(uint8_t sid, const CncDoublePosition& p);
-			static void addPos	(uint8_t sid, int32_t px, int32_t py, int32_t pz);
-			static void addPos	(uint8_t sid, double px, double py, double pz);
-			static void addMove	(uint8_t sid, int32_t dx, int32_t dy, int32_t dz);
-			static void addMove	(uint8_t sid, double dx, double dy, double dz);
-		};
-		
-		// ----------------------------------------------------------------
-		struct HardwareOriginOffset {
-			bool valid = false;
-			
-			// stores the signed ofset origin to Xmin, Ymin and Zmax
-			int32_t dx = 0;
-			int32_t dy = 0;
-			int32_t dz = 0;
-			
-			HardwareOriginOffset() 
-			: dx(0), dy(0), dz(0)
-			{}
-			
-			void reset() {
-				*this = HardwareOriginOffset();
-			}
-		};
 		
 		// ----------------------------------------------------------------
 		struct SecureModeInfo {
@@ -95,170 +54,48 @@ struct CncContext {
 			bool isDeactivatedByUser		= false;
 		};
 		
-		// ----------------------------------------------------------------
-		struct TsTplProcessing {
-			
-			private:
-				
-				CncNanoTimestamp tsTotalStart	= CncTimeFunctions::getNanoTimestamp();
-				CncNanoTimestamp tsTotalEnd	 	= CncTimeFunctions::getNanoTimestamp();
-
-				CncNanoTimestamp tsPreStart	 	= CncTimeFunctions::getNanoTimestamp();
-				CncNanoTimestamp tsPreEnd		= CncTimeFunctions::getNanoTimestamp();
-
-				CncNanoTimestamp tsPostStart	= CncTimeFunctions::getNanoTimestamp();
-				CncNanoTimestamp tsPostEnd	 	= CncTimeFunctions::getNanoTimestamp();
-
-				CncNanoTimestamp tsSerialStart 	= CncTimeFunctions::getNanoTimestamp();
-				CncNanoTimestamp tsSerialEnd	= CncTimeFunctions::getNanoTimestamp();
-
-			public:
-				
-				struct MeasuredDurations {
-					
-					CncAverage<long> md1;
-					CncAverage<long> md2;
-					CncAverage<long> md3;
-					CncAverage<long> md4;
-					CncAverage<long> md5;
-					
-				} measuredDurations;
-				
-				// -------------------------------------------------------
-				void logTotalTimeStart() 	{ tsTotalStart	= CncTimeFunctions::getNanoTimestamp(); }
-				void logTotalTimeEnd() 		{ tsTotalEnd	= CncTimeFunctions::getNanoTimestamp(); }
-
-				void logPreTimeStart() 		{ tsPreStart	= CncTimeFunctions::getNanoTimestamp(); }
-				void logPreTimeEnd() 		{ tsPreEnd		= CncTimeFunctions::getNanoTimestamp(); }
-
-				void logPostTimeStart()		{ tsPostStart	= CncTimeFunctions::getNanoTimestamp(); }
-				void logPostTimeEnd() 		{ tsPostEnd		= CncTimeFunctions::getNanoTimestamp(); }
-
-				void logSerialTimeStart() 	{ tsSerialStart	= CncTimeFunctions::getNanoTimestamp(); }
-				void logSerialTimeEnd() 	{ tsSerialEnd	= CncTimeFunctions::getNanoTimestamp(); }
-
-				// -------------------------------------------------------
-				const wxString& getTimeConsumedFormated(wxString& ret, const CncNanoTimespan duartionNanos) const {
-					int n = (int) ( duartionNanos % std::nano::den );
-					int s = (int) ( duartionNanos / std::nano::den) % 60 ;
-					int m = (int) ((duartionNanos / (std::nano::den * 60)) % 60);
-					int h = (int) ((duartionNanos / (std::nano::den * 60 * 60)) % 24);
-
-					ret.assign(wxString::Format("%02d:%02d:%02d.%06d", h, m, s, n / 1000));
-					return ret;
-				}
-
-				// -------------------------------------------------------
-				const wxString& getTimeConsumedFormated(wxString& ret, CncNanoTimestamp tsStart, CncNanoTimestamp tsEnd) const {
-					const CncNanoTimespan duartionNanos = CncTimeFunctions::getTimeSpan(tsEnd, tsStart);
-					return getTimeConsumedFormated(ret, duartionNanos);
-				}
-
-				long getTotalDurationMillis() 	const { return getTotalDurationMicros()  / 1000; }
-				long getPreDurationMillis()   	const { return getPreDurationMicros()    / 1000; }
-				long getSerialDurationMillis()	const { return getSerialDurationMicros() / 1000; }
-				long getPostDurationMillis()  	const { return getPostDurationMicros()   / 1000; }
-
-				long getTotalDurationMicros() 	const { return getTotalDurationNanos()   / 1000; }
-				long getPreDurationMicros()   	const { return getPreDurationNanos()     / 1000; }
-				long getSerialDurationMicros()	const { return getSerialDurationNanos()  / 1000; }
-				long getPostDurationMicros()  	const { return getPostDurationNanos()    / 1000; }
-
-				CncNanoTimestamp getTotalDurationNanos() 	const { return CncTimeFunctions::getTimeSpan(tsTotalEnd,  tsTotalStart);  }
-				CncNanoTimestamp getPreDurationNanos()   	const { return CncTimeFunctions::getTimeSpan(tsPreEnd,    tsPreStart);    }
-				CncNanoTimestamp getSerialDurationNanos()	const { return CncTimeFunctions::getTimeSpan(tsSerialEnd, tsSerialStart); }
-				CncNanoTimestamp getPostDurationNanos()  	const { return CncTimeFunctions::getTimeSpan(tsPostEnd,   tsPostStart);   }
-
-				const wxString& getTotalTimeConsumedFormated(wxString& ret)  const { return getTimeConsumedFormated(ret, tsTotalStart,  tsTotalEnd);  }
-				const wxString& getPreTimeConsumedFormated(wxString& ret)    const { return getTimeConsumedFormated(ret, tsPreStart,    tsPreEnd);    }
-				const wxString& getSerialTimeConsumedFormated(wxString& ret) const { return getTimeConsumedFormated(ret, tsSerialStart, tsSerialEnd); }
-				const wxString& getPostTimeConsumedFormated(wxString& ret)   const { return getTimeConsumedFormated(ret, tsPostStart,   tsPostEnd);   }
-
-				// -------------------------------------------------------
-				friend std::ostream &operator<< (std::ostream& ostr, const TsTplProcessing& ts) {
-					
-					// ---------------------------------------------------
-					auto formatDuartion = [](wxString& ret, const CncAverage<long>& a) { 
-						const long f = 1000;
-						
-						ret.assign(wxString::Format("[min=% 5ld, avg=% 5ld, max=% 5ld]", 
-													a.getMin() / f,
-													a.getAvg() / f, 
-													a.getMax() / f
-								  ));
-						
-						//ostr << a.getMin() / f << " < " << a.getAvg() / f << " > " << a.getMax() / f << "[us] s = " << a.getSum() / f / 100 << "[ms] c = " << a.count();
-						
-						return ret;
-					};
-					
-					const CncNanoTimestamp rest = ts.getTotalDurationNanos()
-												- ts.getPreDurationNanos()
-												- ts.getSerialDurationNanos()
-												- ts.getPostDurationNanos();
-					
-					wxString value;
-					ostr 	<< "Time consumed:"														<< std::endl
-							<< " * Total  : " << ts.getTotalTimeConsumedFormated	(value)			<< std::endl
-							<< " * Pre    : " << ts.getPreTimeConsumedFormated		(value) 		<< std::endl
-							<< " * Serial : " << ts.getSerialTimeConsumedFormated	(value)			<< std::endl
-							<< " * Post   : " << ts.getPostTimeConsumedFormated		(value)			<< std::endl
-							<< " * Rest   : " << ts.getTimeConsumedFormated			(value, rest)	<< std::endl
-							
-							<< "Durations:"															<< std::endl
-							<< " * m1     : " << formatDuartion(value, ts.measuredDurations.md1)	<< std::endl
-							<< " * m2     : " << formatDuartion(value, ts.measuredDurations.md2)	<< std::endl
-							<< " * m3     : " << formatDuartion(value, ts.measuredDurations.md3)	<< std::endl
-							<< " * m4     : " << formatDuartion(value, ts.measuredDurations.md4)	<< std::endl
-							<< " * m5     : " << formatDuartion(value, ts.measuredDurations.md5)	<< std::endl
-							
-							;
-					return ostr;
-				}
-
-		};
-
-
 		CncContext();
 		~CncContext();
 		
 		TsTplProcessing 			timestamps;
 		SecureModeInfo				secureModeInfo;
 		VersionInfoMap				versionInfoMap;
-		HardwareOriginOffset		hardwareOriginOffset;
-
+		CncBoundarySpace*			boundarySpace;
+		CncTemplateContext*			templateContext;
 		
-		bool isWinOS() { return os == WXMSW; }
-		bool isGtkOS() { return os == WXGTK; }
-		OSType getOSType() { return os; }
+		const std::ostream& traceVersionInfo(std::ostream& os) 			const;
+		const std::ostream& traceCommandLineParameter(std::ostream& os)	const;
+		const wxString& traceCommandLineParameter(wxString& s)			const;
+
+		bool isWinOS()											const	{ return os == WXMSW; }
+		bool isGtkOS()											const	{ return os == WXGTK; }
+		OSType getOSType()										const	{ return os; }
 		const char* getOSTypeAsString();
-
-		const std::ostream& traceVersionInfo(std::ostream& os) const;
-		const std::ostream& traceCommandLineParameter(std::ostream& os) const;
-		const wxString& traceCommandLineParameter(wxString& s) const;
-
+		
+		void setCurrentToolDiameter(double d )							{ currentToolDiameter = fabs(d); }
+		double getCurrentToolDiameter()							const	{ return currentToolDiameter; }
+		
 		void setProbeMode(bool state); 
-		bool isProbeMode() 							{ return probeMode; }
+		bool isProbeMode() 										const	{ return probeMode; }
 		
-		void setInteractiveMoveingMode(bool state) 	{ interactiveMoveMode = state; }
-		bool canInteractiveMoveing()				{ return interactiveMoveMode;  }
+		void setInteractiveMoveingMode(bool state)						{ interactiveMoveMode = state; }
+		bool canInteractiveMoveing()							const	{ return interactiveMoveMode;  }
 		
-		void setSpeedMonitoring(bool state)			{ speedMonitor = state; } 
-		bool canSpeedMonitoring() 					{ return speedMonitor; }
+		void setSpeedMonitoring(bool state)								{ speedMonitor = state; } 
+		bool canSpeedMonitoring() 								const	{ return speedMonitor; }
 		
-		void setHardwareFlag(bool state)			{ hardwareFlag = state; } 
-		bool hasHardware()		 					{ return hardwareFlag; }
+		void setHardwareFlag(bool state)								{ hardwareFlag = state; } 
+		bool hasHardware()		 								const	{ return hardwareFlag; }
 		
-		bool isOnlineUpdateCoordinates() 						{ return onlineUpdateCoordinates; }
-		bool isOnlineUpdateDrawPane() 							{ return onlineUpdateDrawPane; }
-		bool isAllowEventHandling() 							{ return allowEventHandling; }
-		int getUpdateInterval() 								{ return updateInterval; }
+		bool isOnlineUpdateCoordinates() 						const	{ return onlineUpdateCoordinates; }
+		bool isOnlineUpdateDrawPane() 							const	{ return onlineUpdateDrawPane; }
+		bool isAllowEventHandling() 							const	{ return allowEventHandling; }
+		int getUpdateInterval() 								const	{ return updateInterval; }
 		
-		CncContext& setOnlineUpdateCoordinates(bool b) 			{ onlineUpdateCoordinates=b; return *this; }
-		CncContext& setOnlineUpdateDrawPane(bool b) 			{ onlineUpdateDrawPane=b; return *this; }
-		CncContext& setAllowEventHandling(bool b) 				{ allowEventHandling=b; return *this; }
-		CncContext& setUpdateInterval(int i) 					{ updateInterval=i; return *this; }
-
+		CncContext& setOnlineUpdateCoordinates(bool b) 					{ onlineUpdateCoordinates=b; return *this; }
+		CncContext& setOnlineUpdateDrawPane(bool b) 					{ onlineUpdateDrawPane=b; return *this; }
+		CncContext& setAllowEventHandling(bool b) 						{ allowEventHandling=b; return *this; }
+		CncContext& setUpdateInterval(int i) 							{ updateInterval=i; return *this; }
 };
 
 #endif

@@ -254,7 +254,7 @@ bool BinaryFileParser::preprocess() {
 	}
 	
 	// ..........................................................................................
-	// determine cpmpression
+	// determine compression
 	uint32_t compression = 0;
 	if ( read_unit32_t(inputStream, compression) == false) {
 		std::cerr << "BinaryFileParser::preprocess(): Error while reading compression flag" << std::endl;

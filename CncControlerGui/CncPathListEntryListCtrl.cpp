@@ -4,6 +4,7 @@
 #include "GlobalStrings.h"
 #include "CncConfig.h"
 #include "MainFrameProxy.h"
+#include "CncAutoFreezer.h"
 #include "CncPathListEntryListCtrl.h"
 
 extern GlobalConstStringDatabase globalStrings;
@@ -33,7 +34,7 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("Content",	 		wxLIST_FORMAT_LEFT, 	44);
+	AppendColumn("Content",	 		wxLIST_FORMAT_LEFT, 	64);
 	AppendColumn("PathList ID",		wxLIST_FORMAT_LEFT, 	120);
 	AppendColumn("Client ID", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("F [mm/min]",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -113,23 +114,33 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 		
 	const CncPathListEntry& cpe = pathLists.at(item);
 	
-	const bool displaySpeed    = ( cpe.isSpeedChange()    == true || cpe.isNothingChanged() == true );
-	const bool displayPosition = ( cpe.isPositionChange() == true || cpe.isNothingChanged() == true );
+	const bool all             = false;
+	const bool displayRef      = all ? true : ( cpe.pathListReference   >= 0    );
+	const bool displayClientID = all ? true : ( cpe.hasClientIdChange() == true );
+	const bool displaySpeed    = all ? true : ( cpe.hasSpeedChange()    == true );
+	const bool displayPosition = all ? true : ( cpe.hasPositionChange() == true );
+	
+	wxString contStr;
+	if ( cpe.isNothingChanged() )	contStr.append('L');
+	if ( cpe.hasClientIdChange() )	contStr.append('C');
+	if ( cpe.hasSpeedChange() )		contStr.append('S');
+	if ( cpe.hasPositionChange() )	contStr.append('P');
 	
 	switch ( column ) {
-		case CncPathListEntryListCtrl::COL_CONT:			return wxString::Format("%d", 		cpe.content);
-		case CncPathListEntryListCtrl::COL_REF: 			return wxString::Format("%lld", 	cpe.pathListReference);
-		case CncPathListEntryListCtrl::COL_CLD_ID:			return wxString::Format(fmt, 		cpe.clientId);
+		//case CncPathListEntryListCtrl::COL_CONT:			return wxString::Format("%d", 		cpe.content);
+		case CncPathListEntryListCtrl::COL_CONT:			return wxString::Format("%s", 		contStr);
 		
-		case CncPathListEntryListCtrl::COL_F:				return displaySpeed == true ? 		wxString::Format("%4.1lf %c", 	cpe.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(cpe.feedSpeedMode)) : _("");
+		case CncPathListEntryListCtrl::COL_REF: 			return displayRef      == true ?	wxString::Format("%lld",		cpe.pathListReference)		: _("");
+		case CncPathListEntryListCtrl::COL_CLD_ID:			return displayClientID == true ?	wxString::Format(fmt,			cpe.clientId) 				: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_X:		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryDistance.getX())	: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_Y: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryDistance.getY())	: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_Z: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryDistance.getZ())	: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_X: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryTarget.getX())		: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_Y: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryTarget.getY())		: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_Z: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryTarget.getZ())		: _("");
+		case CncPathListEntryListCtrl::COL_TOTAL_DISTANCE: 	return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.totalDistance)			: _("");
 		
-		case CncPathListEntryListCtrl::COL_DISTANCE_X:		return displayPosition == true ?	wxString::Format("%10.3lf", 	cpe.entryDistance.getX()) 	: _("");
-		case CncPathListEntryListCtrl::COL_DISTANCE_Y: 		return displayPosition == true ?	wxString::Format("%10.3lf", 	cpe.entryDistance.getY()) 	: _("");
-		case CncPathListEntryListCtrl::COL_DISTANCE_Z: 		return displayPosition == true ?	wxString::Format("%10.3lf", 	cpe.entryDistance.getZ()) 	: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_X: 		return displayPosition == true ?	wxString::Format("%10.3lf", 	cpe.entryTarget.getX()) 	: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_Y: 		return displayPosition == true ?	wxString::Format("%10.3lf", 	cpe.entryTarget.getY()) 	: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_Z: 		return displayPosition == true ?	wxString::Format("%10.3lf", 	cpe.entryTarget.getZ()) 	: _("");
-		case CncPathListEntryListCtrl::COL_TOTAL_DISTANCE: 	return displayPosition == true ?	wxString::Format("%10.3lf", 	cpe.totalDistance) 			: _("");
+		case CncPathListEntryListCtrl::COL_F:				return displaySpeed    == true ?	wxString::Format("%4.1lf %c",	cpe.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(cpe.feedSpeedMode)) : _("");
 	}
 
 	return _("");
@@ -186,9 +197,9 @@ void CncPathListEntryListCtrl::updateColumnWidth() {
 		return;
 
 	// avoid flicker
-	if ( IsFrozen() == false )
-		Freeze();
-
+	const bool b = IsShownOnScreen() && IsFrozen() == false;
+	CncAutoFreezer caf( b ? this : NULL);
+	
 	int colWidthSum = 0;
 	for ( int i = 0; i < GetColumnCount(); i++ ) {
 		if ( i == COL_STRECH )
@@ -203,9 +214,6 @@ void CncPathListEntryListCtrl::updateColumnWidth() {
 			 - scrollbarWidth;
 
 	SetColumnWidth(COL_STRECH, size);
-
-	if ( IsFrozen() == true )
-		Thaw();
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::onSelectListItem(wxListEvent& event) {
@@ -214,27 +222,15 @@ void CncPathListEntryListCtrl::onSelectListItem(wxListEvent& event) {
 	if ( item == wxNOT_FOUND )
 		return;
 	
+	if ( isItemValid(item) == false )
+		return;
+		
 	setLastSelection(item);
 	
-	long ln;
-	GetItemText(item, COL_SEARCH).ToLong(&ln);
+	const CncPathListEntry& cpe = pathLists.at(item);
 	
 	SelectEventBlocker blocker(this);
-	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_PATH_LIST);
-	
-	
-	#warning
-	
-	
-	if ( isItemValid(item) == true ) {
-		CncPathListEntry& x =  pathLists.at(item);
-		
-		
-		
-	}
-	
-	
-	
+	APP_PROXY::tryToSelectClientId(cpe.clientId, ClientIdSelSource::ID::TSS_PATH_LIST);
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::onActivateListItem(wxListEvent& event) {
@@ -280,7 +276,7 @@ bool CncPathListEntryListCtrl::skipToFirstReference() {
 	// skip forward to the first position change
 	long item = 0;
 	for ( auto it = pathLists.begin(); it != pathLists.end(); ++it ) {
-		if ( it->isPositionChange() )
+		if ( it->hasPositionChange() )
 			break;
 			
 		item++;
@@ -340,9 +336,9 @@ bool CncPathListEntryListCtrl::skipToNextReference() {
 	for ( auto it = pathLists.begin() + item; it != pathLists.end(); ++it ) {
 		if ( it->clientId != refClientID ) {
 			// skip forward to the first position change
-			if ( it->isPositionChange() ) {
+			if ( it->hasPositionChange() ) {
 				// skip backwards to the previous position change
-				if ( it->isPositionChange() )
+				if ( it->hasPositionChange() )
 					break;
 			}
 		}
@@ -367,7 +363,7 @@ bool CncPathListEntryListCtrl::skipToLastReference() {
 	for ( auto it = pathLists.rbegin(); it != pathLists.rend(); ++it ) {
 		if ( it->clientId != refClientID ) {
 			// skip backwards to the previous position change
-			if ( it->isPositionChange() )
+			if ( it->hasPositionChange() )
 				break;
 		}
 		

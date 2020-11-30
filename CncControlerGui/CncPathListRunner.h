@@ -19,14 +19,16 @@ class CncPathListRunner {
 			double vxy;
 			double mz;
 
+			Move(double dx, double dy, double dz);
+			explicit Move(const CncDoubleDistance& d);
 			explicit Move(const CncPathListEntry* e);
 			explicit Move(const Move& m);
 
 			bool	isXYZPitchEqual(const Move& m) const;
 			
-			bool	isZPitchDiffToStrong(const Move& m) const;
-			bool	isXYPitchDiffToStrong(const Move& m) const;
-			bool	isXYZPitchDiffToStrong(const Move& m) const;
+			bool	isZPitchDiffTooStrong(const Move& m) const;
+			bool	isXYPitchDiffTooStrong(const Move& m) const;
+			bool	isXYZPitchDiffTooStrong(const Move& m) const;
 			
 			float	getXYPitchDiffenceAsRadians(const Move& m) const;
 			float	getXYPitchDiffenceAsDegree(const Move& m) const;
@@ -39,6 +41,8 @@ class CncPathListRunner {
 			
 			static	float degree2Radians(float d)	{ return d * PI / 180.0; }
 			static	float radians2Degree(float r)	{ return r * 180.0 / PI; }
+			
+			static	bool test();
 		};
 
 	public:
@@ -91,12 +95,16 @@ class CncPathListRunner {
 		void logMeasurementStart();
 		void logMeasurementEnd();
 		
-		bool publishGuidePath(const CncPathListManager& plm);
+		bool publishGuidePath(const CncPathListManager& plm, double zOffset=0.0);
 		
+		bool onPhysicallyChangeFeedSpeed(CncSpeedMode s);
 		void onPhysicallySwitchToolState(bool state);
+		
 		bool onPhysicallyExecute(const CncPathListManager& plm);
 		
 		void autoSetup(bool trace);
+		
+		static bool test() { return Move::test(); }
 };
 
 #endif

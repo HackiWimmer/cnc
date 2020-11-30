@@ -57,16 +57,33 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 		registerCategory(curCatLabel, parser);
 		{
 			//...............
+			pgParameterMgrArr.Clear();
+			pgParameterMgrIntArr.Clear();
+			pgParameterMgrArr.Add(_("2D")); 
+			pgParameterMgrArr.Add(_("3D"));
+			prop = parser->AppendChild( new wxEnumProperty("Default display view", NEXT_PROP_ID, pgParameterMgrArr, pgParameterMgrIntArr, 0));
+			prop->Enable(true);
+			prop->SetEditor( wxT("ComboBox") );
+			registerProperty(CncSvg_Parser_DEFAULT_VIEW_TYPE, prop);
+			
+			//...............
 			prop = parser->AppendChild( new wxBoolProperty("Convert to right hand coord", NEXT_PROP_ID, true));
 			prop->Enable(true);
-			prop->SetHelpString(_T("Template file reload + new run required"));
+			prop->SetHelpString(_T("new run required"));
 			prop->SetEditor( wxT("CheckBox") );
 			registerProperty(CncSvg_Parser_REVERSE_Y_AXIS, prop);
 			
 			//...............
-			prop = parser->AppendChild( new wxBoolProperty("Using colour scheme", NEXT_PROP_ID, true));
+			prop = parser->AppendChild( new wxBoolProperty("Consider Viewbox", NEXT_PROP_ID, true));
 			prop->Enable(true);
-			prop->SetHelpString(_T("Colour scheme is used to define path handling, like inner- or outer- tool-path-correction."));
+			prop->SetHelpString(_T("new run required"));
+			prop->SetEditor( wxT("CheckBox") );
+			registerProperty(CncSvg_Parser_CONSIDER_VIEWBOX, prop);
+			
+			//...............
+			prop = parser->AppendChild( new wxBoolProperty("Using colour scheme as default", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T("Colour scheme is used to define path handling, like inner- or outer- tool-path-correction, etc.."));
 			prop->SetEditor( wxT("CheckBox") );
 			registerProperty(CncSvg_Parser_USE_COLOUR_SCHEME, prop);
 		}
@@ -79,67 +96,23 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 		{
 			//...............
 			validator.SetPrecision(3); validator.SetRange(0.1, 90.0);
-			prop = wpt->AppendChild( new wxFloatProperty("Max Thickness per crossing [mm]", NEXT_PROP_ID, 2.0));
+			prop = wpt->AppendChild( new wxFloatProperty("Default thickness per crossing [mm]", NEXT_PROP_ID, 2.0));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			CncConfig::registerProperty(CncSvg_Parser_MAX_THICKNESS_CROSS, prop);
-		}
-
-		//...................
-		wxPGProperty* zaxis = NULL;
-		curCatLabel.assign("Calculate Z Axis Values (Workpiece Thickness)");
-		zaxis = root->AppendChild( new wxPropertyCategory(curCatLabel));
-		registerCategory(curCatLabel, zaxis);
-		{
-			//...............
-			prop = zaxis->AppendChild( new CncCfgStaticProperty("Max Durations", NEXT_PROP_ID, ""));
-			prop->SetHelpString("");
-			prop->SetAttribute(Attribute_READONLY, "TRUE");
-			prop->SetAttribute(wxPG_ATTR_UNITS, "#");
-			registerProperty(CncRuntime_Z_MAX_DURATIONS, prop);
-			
-			//...............
-			prop = zaxis->AppendChild( new CncCfgStaticProperty("Durations", NEXT_PROP_ID, ""));
-			prop->SetHelpString("");
-			prop->SetAttribute(Attribute_READONLY, "TRUE");
-			prop->SetAttribute(wxPG_ATTR_UNITS, "#");
-			registerProperty(CncRuntime_Z_CALCULATED_DURATIONS, prop);
-			
-			//...............
-			prop = zaxis->AppendChild( new CncCfgStaticProperty("Max Duration Thickness", NEXT_PROP_ID, ""));
-			prop->SetHelpString("");
-			prop->SetAttribute(Attribute_READONLY, "TRUE");
 			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
-			registerProperty(CncRuntime_Z_MAX_DURATION_THICKNESS, prop);
+			registerProperty(CncSvg_Parser_MAX_THICKNESS_CROSS, prop);
 			
 			//...............
-			prop = zaxis->AppendChild( new CncCfgStaticProperty("Workpiece included", NEXT_PROP_ID, ""));
+			validator.SetPrecision(3); validator.SetRange(0.1, 5.0);
+			prop = wpt->AppendChild( new wxFloatProperty("Default sureface (workpiece) offset", NEXT_PROP_ID, 1.5));
+			prop->Enable(true);
 			prop->SetHelpString("");
-			prop->SetAttribute(Attribute_READONLY, "TRUE");
-			registerProperty(CncRuntime_Z_WORKPIECE_INCLUDED, prop);
-
-			//...............
-			prop = zaxis->AppendChild( new CncCfgStaticProperty("Workpiece offset", NEXT_PROP_ID, ""));
-			prop->SetHelpString("");
-			prop->SetAttribute(Attribute_READONLY, "TRUE");
+			prop->SetValidator(validator);
+			prop->SetEditor( wxT("TextCtrl") );
 			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
-			registerProperty(CncRuntime_Z_WORKPIECE_OFFSET, prop);
-			
-			//...............
-			prop = zaxis->AppendChild( new CncCfgStaticProperty("Current Z Distance", NEXT_PROP_ID, ""));
-			prop->SetHelpString("");
-			prop->SetAttribute(Attribute_READONLY, "TRUE");
-			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
-			registerProperty(CncRuntime_Z_CURRENT_Z_DISTANCE, prop);
-
-			//...............
-			prop = zaxis->AppendChild( new CncCfgStaticProperty("Calculated Duration Array", NEXT_PROP_ID, ""));
-			prop->SetHelpString("");
-			prop->SetAttribute(Attribute_READONLY, "TRUE");
-			prop->SetAttribute(wxPG_ATTR_UNITS, "<List>");
-			registerProperty(CncRuntime_Z_DURATION_THICKNESS, prop);
+			registerProperty(CncSvg_Parser_SUREFACE_Z_OFFSET, prop);
 		}
 	}
 }

@@ -2,6 +2,7 @@
 #include <cfloat>
 #include <wx/dcclient.h>
 #include "CncCommon.h"
+#include "CncBoundarySpace.h"
 #include "CncContext.h"
 #include "CncConfig.h"
 #include "CncZView.h"
@@ -16,31 +17,31 @@ wxEND_EVENT_TABLE()
 /////////////////////////////////////////////////////////////////////
 CncZView::CncZView(wxWindow *parent, wxWindowID id) 
 //////////////////////////////////////////////////////////////////////
-: wxPanel(parent, id)
-, lowWaterMark(0.0)
-, highWaterMark(0.0)
-, gravity(defaultGravity)
-, scale(defaultScale)
-, value(0.0)
-, maxValue(50.0)
-, durationThickness(2.0)
-, workPieceThickness(0)
-, workPieceOffset(0)
-, label(INT_MAX)
-, font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"))
-, valueColour(255,128,128)
-, graduationColour(128,128,128)
-, posColour(0,159,0)
-, negColour(255,32,32)
-, labelColour(*wxWHITE)
-, wptColour(255,217,83)
-, wpoColour(234,181,0)
-, wpsColour(128,64,64)
-, posBrush(posColour)
-, negBrush(negColour)
-, valueBrush(valueColour)
-, wptBrush(wptColour)
-, wpoBrush(wpoColour)
+: wxPanel				(parent, id)
+, lowWaterMark			(0.0)
+, highWaterMark			(0.0)
+, gravity				(defaultGravity)
+, scale					(defaultScale)
+, value					(0.0)
+, maxValue				(50.0)
+, durationThickness		(2.0)
+, workPieceThickness	(0)
+, workPieceOffset		(0)
+, label					(INT_MAX)
+, font					(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"))
+, valueColour			(255,128,128)
+, graduationColour		(128,128,128)
+, posColour				(0,159,0)
+, negColour				(255,32,32)
+, labelColour			(*wxWHITE)
+, wptColour				(255,217,83)
+, wpoColour				(234,181,0)
+, wpsColour				(128,64,64)
+, posBrush				(posColour)
+, negBrush				(negColour)
+, valueBrush			(valueColour)
+, wptBrush				(wptColour)
+, wpoBrush				(wpoColour)
 {
 	SetBackgroundColour(*wxBLACK);
 	SetToolTip("");
@@ -149,26 +150,26 @@ void CncZView::updateView(double val) {
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() == false )
 		return;
 	
-	if ( cnc::dblCompare(maxValue, CncConfig::getGlobalCncConfig()->getMaxDimensionZ() * scale) == false ) {
-		maxValue = CncConfig::getGlobalCncConfig()->getMaxDimensionZ() * scale;
+	if ( cnc::dblCompare(maxValue, THE_CONFIG->getMaxDimensionZ() * scale) == false ) {
+		maxValue = THE_CONFIG->getMaxDimensionZ() * scale;
 		resetWaterMarks();
 		refresh(RT_ALL);
 	}
 	
-	if ( cnc::dblCompare(durationThickness, CncConfig::getGlobalCncConfig()->getMaxDurationThickness()) == false ) {
-		durationThickness = CncConfig::getGlobalCncConfig()->getMaxDurationThickness();
+	if ( cnc::dblCompare(durationThickness, THE_CONFIG->getMaxDurationThickness()) == false ) {
+		durationThickness = THE_CONFIG->getMaxDurationThickness();
 		resetWaterMarks();
 		refresh(RT_ALL);
 	}
 	
-	if ( cnc::dblCompare(workPieceThickness, CncConfig::getGlobalCncConfig()->getWorkpieceThickness()) == false ) {
+	if ( cnc::dblCompare(workPieceThickness, THE_BOUNDS->getWorkpieceThickness()) == false ) {
 		resetWaterMarks();
-		workPieceThickness = CncConfig::getGlobalCncConfig()->getWorkpieceThickness();
+		workPieceThickness = THE_BOUNDS->getWorkpieceThickness();
 		refresh(RT_WORKPIECE);
 	}
 	
-	if ( cnc::dblCompare(workPieceOffset, CncConfig::getGlobalCncConfig()->getWorkpieceOffset()) == false ) {
-		workPieceOffset = CncConfig::getGlobalCncConfig()->getWorkpieceOffset();
+	if ( cnc::dblCompare(workPieceOffset, THE_CONFIG->getWorkpieceOffset()) == false ) {
+		workPieceOffset = THE_CONFIG->getWorkpieceOffset();
 		resetWaterMarks();
 		refresh(RT_WORKPIECE);
 	}

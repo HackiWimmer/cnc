@@ -2,6 +2,7 @@
 #define CNCPREPROCESSOR_H
 
 #include "wxCrafterMotionMonitor.h"
+#include "CncCommon.h"
 #include "CncMoveSequence.h"
 #include "CncPathListEntry.h"
 
@@ -38,6 +39,8 @@ class CncPreprocessor : public CncPreprocessorBase {
 		virtual ~CncPreprocessor();
 		
 		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ wxASSERT(parsingSynopsis != NULL); return parsingSynopsis; }
+		
+		void select(PreProcessorSelection::VAL page);
 		
 		void popProcessMode();
 		void pushUpdateMode();

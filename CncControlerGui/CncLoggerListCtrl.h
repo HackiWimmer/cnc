@@ -56,6 +56,10 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		virtual wxString 		OnGetItemText(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
 		
+	protected:
+		
+		void					tokenAndAdd(const wxString& text, const wxListItemAttr& lia);
+		
 	public:
 		
 		static const int 		COL_LNR 			= 0;
@@ -66,7 +70,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		CncLoggerListCtrl(wxWindow *parent, long style);
 		virtual ~CncLoggerListCtrl();
 		
-		void clearAll();
+		virtual void clearAll();
 		
 		void setJoinTheAppState(bool s)	{ joinTheApp = s; }
 		void setShowOnDemand(bool s) 	{ showOnDemand = s; }
@@ -97,21 +101,40 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 
 class CncExtLoggerListCtrl : public CncLoggerListCtrl {
 	
+	protected:
+		bool bDebugEntries;
+		bool bWarnEntries;
+		bool bErrorEntries;
+	
 	public:
 		
 		CncExtLoggerListCtrl(wxWindow *parent, long style)
 		: CncLoggerListCtrl(parent, style)
+		, bDebugEntries		(false)
+		, bWarnEntries		(false)
+		, bErrorEntries		(false)
 		{}
 		
 		virtual ~CncExtLoggerListCtrl()
 		{}
 		
+		bool hasDebugEntries()	const	{ return bDebugEntries; }
+		bool hasWarnEntries()	const	{ return bWarnEntries;  }
+		bool hasErrorEntries()	const 	{ return bErrorEntries; }
+		
+		virtual void clearAll() {
+			bDebugEntries	=  false;
+			bWarnEntries	=  false;
+			bErrorEntries	=  false;
+			CncLoggerListCtrl::clearAll();
+		}
+		
 		typedef wxListItemAttr LIA;
-		void addSeparator	(const wxString& s) { const LIA lia(wxColour(255, 255, 255), wxColour(185, 122,  87),	GetFont()); add(s, lia); }
+		void addSeparator	(const wxString& s) { const LIA lia(wxColour(255, 255, 255), wxColour(185, 122,  87),	GetFont()); tokenAndAdd(s, lia); }
 		void addInfoEntry	(const wxString& s) { const LIA lia(GetTextColour(),         GetBackgroundColour(),		GetFont()); add(s, lia); }
-		void addDebugEntry	(const wxString& s) { const LIA lia(wxColour(128, 128,   0), GetBackgroundColour(),		GetFont()); add(s, lia); }
-		void addWarnEntry	(const wxString& s) { const LIA lia(wxColour(255, 201,  14), GetBackgroundColour(),		GetFont()); add(s, lia); }
-		void addErrorEntry	(const wxString& s) { const LIA lia(wxColour(255, 128, 128), GetBackgroundColour(),		GetFont()); add(s, lia); }
+		void addDebugEntry	(const wxString& s) { const LIA lia(wxColour(128, 128,   0), GetBackgroundColour(),		GetFont()); add(s, lia); bDebugEntries = true; }
+		void addWarnEntry	(const wxString& s) { const LIA lia(wxColour(255, 201,  14), GetBackgroundColour(),		GetFont()); add(s, lia); bWarnEntries  = true; }
+		void addErrorEntry	(const wxString& s) { const LIA lia(wxColour(255, 128, 128), GetBackgroundColour(),		GetFont()); add(s, lia); bErrorEntries = true; }
 };
 
 #endif

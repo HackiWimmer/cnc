@@ -47,14 +47,17 @@ class SVGFileParser : public SVGParserBase
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();
 		
-		bool processXMLNode(wxXmlNode *child);
-		bool evaluateCncParameters(wxXmlNode *child);
+		bool processXMLNode(wxXmlNode* node);
+		bool resetCncParameters(wxXmlNode* node);
+		bool printCncParameters(wxXmlNode* node);
+		bool evaluateCncParameters(wxXmlNode* node);
 		void evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm);
 		
 		bool spool();
 		
 		void registerXMLNode(wxXmlNode *child);
 		void debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrString);
+		void registerMovementNode();
 		
 		inline bool performPath(const SVGUserAgentInfo& uai);
 		inline bool performPathByIds(const SVGUserAgentInfo& uai);

@@ -20,7 +20,7 @@ CncPositionStorageView::CncPositionStorageView(wxWindow* parent)
 	THE_CONFIG->getVeuszPlotterTool(exportTool);
 	
 	typedef OverviewItemInfo::Format		OFMT;
-	typedef CncContext::PositionStorage		STORE;
+	typedef PositionStorage					STORE;
 	
 	// -------------------------------------------------------------
 	// setup overview content . . . 
@@ -270,7 +270,7 @@ void CncPositionStorageView::onOverviewItemUnChecked(wxListEvent& event) {
 void CncPositionStorageView::onOverviewItemStateChange(long item) {
 ////////////////////////////////////////////////////////////////////
 	const uint8_t sid = item2Sid(item);
-	CncContext::PositionStorage::enablePosStorageFor(sid, m_overview->IsItemChecked(item));
+	PositionStorage::enablePosStorageFor(sid, m_overview->IsItemChecked(item));
 	clear(sid);
 	updateDetails();
 }

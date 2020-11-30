@@ -156,9 +156,11 @@
   const unsigned char PID_XYZ_POS_MAJOR                   =  62;
   const unsigned char PID_XYZ_POS_DETAIL                  =  63;
   const unsigned char PID_XY_POS                          =  64;
-  const unsigned char PID_X_POS                           =  65;
-  const unsigned char PID_Y_POS                           =  66;
-  const unsigned char PID_Z_POS                           =  67;
+  const unsigned char PID_XZ_POS                          =  65;
+  const unsigned char PID_YZ_POS                          =  66;
+  const unsigned char PID_X_POS                           =  67;
+  const unsigned char PID_Y_POS                           =  68;
+  const unsigned char PID_Z_POS                           =  69;
 
   const unsigned char PID_STEP_PIN                        =  70;
   const unsigned char PID_DIR_PIN                         =  71;

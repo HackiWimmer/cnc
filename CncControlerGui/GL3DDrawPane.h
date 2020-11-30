@@ -32,6 +32,9 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		void showFromPerspective4();
 		
 	protected:
+		virtual void onResetView(wxCommandEvent& event);
+		virtual void onShowMillingCutter(wxCommandEvent& event);
+		virtual void onToggleHardwareBox(wxCommandEvent& event);
 		virtual void onClearMonitor(wxCommandEvent& event);
 		virtual void onRefreshMonitor(wxCommandEvent& event);
 		virtual void onToggleGuidePathes(wxCommandEvent& event);

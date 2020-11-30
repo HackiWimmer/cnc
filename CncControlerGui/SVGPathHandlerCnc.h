@@ -16,20 +16,40 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 	private:
 		
 		typedef CncUnitCalculatorBase::Unit Unit;
+		typedef SvgCncContextBase::CLIENT_ID_OFFSET CO;
+		
+		struct MoveParameter {
+			CncSpeedMode 				mode		= CncSpeedWork;
+			CO							idOffset	= CO::MAIN;
+			bool						zToTop		= true;
+			const CncDoublePosition*	pos			= NULL;
+		};
 		
 		CncControl* 			cncControl;
-		bool 					initialized;
-		bool 					debugState;
+		CncPathListManager* 	guidePath;
+		CncDoublePosition		curRunPosition;
+		bool					initialized;
+		bool					debugState;
 
-		// spool path to cnc control
-		bool moveLinearZ  (double z);
-		bool moveLinearXY (double x, double y, bool alreadyRendered);
-		bool moveLinearXYZ(double x, double y, double z, bool alreadyRendered);
+		// 
+		bool			moveZAxisToLogicalTop();
+		bool			moveZAxisToSureface();
+		bool			moveZAxisNextStepDown(double zTarget);
+		bool			moveXYToStartPos(CncSpeedMode m);
+		bool			moveXYToPos(const MoveParameter& mp);
+		
+		bool			hasMoreDurations(double zTarget) const;
 		
 		// path handling
-		bool beginCurrentPath();
-		bool repeatCurrentPath();
-		bool closeCurrentPath();
+		bool			repeatCurrentPath(double zTarget);
+		bool			processHelix(double zTarget);
+		
+		bool			isXYEqual(const CncDoublePosition& p1, const CncDoublePosition& p2) const;
+		void			updateXY (const CncDoublePosition& p1, CncDoublePosition& p2) const;
+		void			updateZ  (const CncDoublePosition& p1, CncDoublePosition& p2) const;
+		
+		void			resetGuidePath();
+		void			registerGuidePath(CncPathListManager* gp);
 		
 	protected:
 	
@@ -39,41 +59,34 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		virtual void appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
 		
 		virtual bool isInitialized() { return initialized; }
-		
-		// z axis management
-		virtual bool isZAxisUp();
-		virtual bool isZAxisDown();
-		virtual bool physicallyMoveZAxisUp();
-		virtual bool physicallyMoveZAxisDown();
-		
-		virtual bool performCorrections();
+		virtual bool performModifications();
 		
 	public:
 		
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
-		virtual const char* getName()		{ return "SVGPathHandlerCnc"; }
+		virtual const char* getName()		const	{ return "SVGPathHandlerCnc"; }
 
-		Unit getUnit() 						{ return svgRootNode.getOutputUnit(); }
-		double getW() 						{ return svgRootNode.getWidth();      }
-		double getH() 						{ return svgRootNode.getHeight();     }
-		const char* getViewBox() 			{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
-		const SVGRootNode& getSvgRootNode()	{ return svgRootNode; }
+		double getW() 								{ return svgRootNode.getWidth();      }
+		double getH() 								{ return svgRootNode.getHeight();     }
+		const char* getViewBox() 					{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
+		const SVGRootNode& getSvgRootNode()			{ return svgRootNode; }
 		
-		void setDebugState(bool state)		{ debugState = state; }
+		void setDebugState(bool state)				{ debugState = state; }
 		
-		virtual void initNextClientId(long id);
+		virtual void initNextClientId(long clientId);
+		virtual bool activateNextPath(long clientId);
 		
 		virtual void setSvgRootNode(const SVGRootNode& srn);
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();
 
 		// path handling
-		virtual void prepareWork();
-		virtual bool initNextPath();
+		virtual bool prepareWork();
+		//virtual bool initNextPath();
 		virtual bool finishCurrentPath();
 		virtual bool runCurrentPath();
-		virtual void finishWork();
+		virtual bool finishWork();
 };
 
 #endif

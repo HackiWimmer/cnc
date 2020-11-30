@@ -9,6 +9,9 @@ enum {
 	STC_PM_UNCOMMENT,
 	STC_PM_SELECT_NODE,
 	STC_PM_SELECT_NODE_BLOCK,
+	STC_PM_CNC_PARAM_RESET,
+	STC_PM_CNC_PARAM_PRINT,
+	STC_PM_CNC_PARAM_HELP,
 	STC_PM_CNC_PARAM_BLOCK,
 	STC_PM_CNC_BREAK_BLOCK,
 	STC_PM_CNC_PAUSE_BLOCK,
@@ -37,13 +40,18 @@ class SvgNodeTemplates {
 		static wxString _ret;
 		 
 	public:
-	
+		
+		static const char* CncParameterResetBlockNodeName;
+		static const char* CncParameterPrintBlockNodeName;
 		static const char* CncParameterBlockNodeName;
 		static const char* CncBreakBlockNodeName;
 		static const char* CncPauseBlockNodeName;
 
 		static const char* getSamplesAsString();
+		static const char* getCncParameterHelp();
 		static const char* getCncParameterBlock();
+		static const char* getCncParameterPrint();
+		static const char* getCncParameterReset();
 		static const char* getCncBreakBlock();
 		static const char* getCncPauseBlock();
 		static const char* getCircleTemplate();

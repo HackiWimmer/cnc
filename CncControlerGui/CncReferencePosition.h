@@ -11,49 +11,57 @@ class CncReferencePosition : public CncReferencePositionBase
 		CncReferencePosition(wxWindow* parent);
 		virtual ~CncReferencePosition();
 		
-		void setMessage(const wxString& msg);
-		void setMeasurePlateThickness(const double mpt);
+		void				setMessage(const wxString& msg);
+		void				setMeasurePlateThickness(const double mpt);
 
-		CncRefPositionMode getReferenceMode();
-		void shiftReferenceMode();
-		double getWorkpieceThickness();
+		void 				shiftReferenceMode();
 		
-		bool shouldZeroX() 	{ return m_btZeroX->GetValue(); }
-		bool shouldZeroY() 	{ return m_btZeroY->GetValue(); }
-		bool shouldZeroZ() 	{ return m_btZeroZ->GetValue(); }
+		CncRefPositionMode	getReferenceMode()		const;
+		double				getWorkpieceThickness()	const;
+		
+		bool				shouldZeroX()			const	{ return m_btZeroX->GetValue(); }
+		bool				shouldZeroY()			const	{ return m_btZeroY->GetValue(); }
+		bool				shouldZeroZ()			const	{ return m_btZeroZ->GetValue(); }
+		
+		bool				isReferenceStateValid()	const	{ return valid; }
+		
+		void				setEnforceFlag(bool s);
+		void				resetTempSetting();
 	
 	protected:
-		virtual void selectStepMode(wxCommandEvent& event);
-		virtual void onInfoTimer(wxTimerEvent& event);
-		virtual void selectInformation(wxMouseEvent& event);
-		virtual void selectStepSensitivity(wxCommandEvent& event);
-		virtual void init(wxInitDialogEvent& event);
-		virtual void show(wxShowEvent& event);
-		virtual void cancel(wxCommandEvent& event);
-		virtual void set(wxCommandEvent& event);
-		virtual void mode1(wxCommandEvent& event);
-		virtual void mode2(wxCommandEvent& event);
-		virtual void mode3(wxCommandEvent& event);
-		virtual void mode4(wxCommandEvent& event);
-		virtual void mode5(wxCommandEvent& event);
-		virtual void mode6(wxCommandEvent& event);
+		virtual void		updateWorkpieceThickness(wxCommandEvent& event);
+		virtual void		selectStepMode(wxCommandEvent& event);
+		virtual void		onInfoTimer(wxTimerEvent& event);
+		virtual void		selectInformation(wxMouseEvent& event);
+		virtual void		selectStepSensitivity(wxCommandEvent& event);
+		virtual void		init(wxInitDialogEvent& event);
+		virtual void		show(wxShowEvent& event);
+		virtual void		cancel(wxCommandEvent& event);
+		virtual void		set(wxCommandEvent& event);
+		virtual void		mode1(wxCommandEvent& event);
+		virtual void		mode2(wxCommandEvent& event);
+		virtual void		mode3(wxCommandEvent& event);
+		virtual void		mode4(wxCommandEvent& event);
+		virtual void		mode5(wxCommandEvent& event);
+		virtual void		mode6(wxCommandEvent& event);
 		
-		virtual void toggleZeroX(wxCommandEvent& event) 	{ determineZeroMode(); }
-		virtual void toggleZeroY(wxCommandEvent& event) 	{ determineZeroMode(); }
-		virtual void toggleZeroZ(wxCommandEvent& event) 	{ determineZeroMode(); }
+		virtual void		toggleZeroX(wxCommandEvent& event) 	{ determineZeroMode(); }
+		virtual void		toggleZeroY(wxCommandEvent& event) 	{ determineZeroMode(); }
+		virtual void		toggleZeroZ(wxCommandEvent& event) 	{ determineZeroMode(); }
 
-		void onNavigatorPanel(CncNavigatorPanelEvent& event);
-		
-		short evaluateMode();
-		void setMode(short mode);
+		void				onNavigatorPanel(CncNavigatorPanelEvent& event);
+		short				evaluateMode() const;
+		void				setMode(short mode);
 		
 	private:
 		
-		CncNavigatorPanel* navigationPanel;
-		wxString infoMessage;
+		bool				valid;
+		CncNavigatorPanel*	navigationPanel;
+		wxString 			infoMessage;
 		
-		bool isWorkpieceThicknessNeeded();
-		void determineZeroMode();
-		void showInformation();
+		bool				isWorkpieceThicknessNeeded() const;
+		void				determineZeroMode();
+		void				showInformation();
+		void				updatePreview();
 };
 #endif // CNCREFERENCEPOSITION_H

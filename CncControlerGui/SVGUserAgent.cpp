@@ -97,7 +97,7 @@ void SVGUserAgent::initalize() {
 bool SVGUserAgent::initNextPath(SvgCncContext& cwp, const wxString& origPath) {
 /////////////////////////////////////////////////////////
 	SVGUserAgentInfo sua;
-	sua.lineNumber 			= cwp.getCurrentLineNumber();
+	sua.lineNumber 			= cwp.getCurrentClientID();
 	sua.nodeName 			= nodeName;
 	sua.elementId			= ( elementId.IsEmpty() == false ? elementId : "");
 	sua.nodeType			= SVGUserAgentInfo::NT_PATH;
@@ -136,7 +136,7 @@ bool SVGUserAgent::initNextCncParameterNode(const SvgCncContext& cwp) {
 bool SVGUserAgent::initNextCncBreakNode(const SvgCncBreak& scb) {
 /////////////////////////////////////////////////////////
 	SVGUserAgentInfo sua;
-	sua.lineNumber 			= scb.currentLineNumber;
+	sua.lineNumber 			= scb.getCurrentLineNumber();
 	sua.nodeName 			= nodeName;
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_BREAK;
@@ -150,7 +150,7 @@ bool SVGUserAgent::initNextCncBreakNode(const SvgCncBreak& scb) {
 bool SVGUserAgent::initNextCncPauseNode(const SvgCncPause& scp) {
 /////////////////////////////////////////////////////////
 	SVGUserAgentInfo sua;
-	sua.lineNumber 			= scp.currentLineNumber;
+	sua.lineNumber 			= scp.getCurrentLineNumber();
 	sua.nodeName 			= nodeName;
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_PAUSE;
@@ -379,7 +379,7 @@ void SVGUserAgent::evaluateTraceInfo(wxXmlNode* tr) {
 		n->SetName("UserAgentInfo");
 		n->SetType( wxXML_ELEMENT_NODE);
 		n->AddAttribute("type", uai.nodeName);
-		n->AddAttribute("line", wxString() << uai.lineNumber);
+		n->AddAttribute("line", wxString() << uai.lineNumber / CLIENT_ID.TPL_FACTOR);
 		
 		tr->AddChild(n);
 	}

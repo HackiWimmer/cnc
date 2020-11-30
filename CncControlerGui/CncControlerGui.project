@@ -234,6 +234,10 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <VirtualDirectory Name="Sound">
+        <File Name="CncMillingSoundController.cpp"/>
+        <File Name="CncMillingSoundController.h"/>
+      </VirtualDirectory>
       <File Name="CncClipperLib.cpp"/>
       <File Name="CncClipperLib.h"/>
       <File Name="CncFlowPositionConverter.cpp"/>
@@ -517,13 +521,23 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Config">
+      <File Name="CncTemplateContext.cpp"/>
+      <File Name="CncTemplateContext.h"/>
+      <VirtualDirectory Name="Utils">
+        <File Name="CncOSDConfigList.cpp"/>
+        <File Name="CncOSDConfigList.h"/>
+        <File Name="CncPositionStorage.cpp"/>
+        <File Name="CncPositionStorage.h"/>
+        <File Name="CncTsTplProcessing.cpp"/>
+        <File Name="CncTsTplProcessing.h"/>
+        <File Name="CncBoundarySpace.cpp"/>
+        <File Name="CncBoundarySpace.h"/>
+      </VirtualDirectory>
       <File Name="CncConfigProperties.cpp"/>
       <File Name="CncConfigProperties.h"/>
       <File Name="CncContext.cpp"/>
       <File Name="CncContext.h"/>
       <File Name="CncConfigCommon.h"/>
-      <File Name="CncOSDConfigList.cpp"/>
-      <File Name="CncOSDConfigList.h"/>
       <File Name="CncConfig.cpp"/>
       <File Name="CncConfig.h"/>
       <VirtualDirectory Name="Pages">

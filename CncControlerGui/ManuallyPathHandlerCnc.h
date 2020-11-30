@@ -24,15 +24,15 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		ManuallyPathHandlerCnc(CncControl* cnc);
 		virtual ~ManuallyPathHandlerCnc();
 		
-		virtual const char* getName() { return "ManuallyPathHandlerCnc"; }
+		virtual const char* getName() const { return "ManuallyPathHandlerCnc"; }
 		
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();
 		
 		virtual void switchToolState(bool state);
 		
-		virtual void prepareWork(); 
-		virtual void finishWork();
+		virtual bool prepareWork(); 
+		virtual bool finishWork();
 		
 		virtual bool processLinearMove(bool alreadyRendered);
 		bool processLinearMove(const MoveDefinition& md);

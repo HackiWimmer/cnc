@@ -121,9 +121,32 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	// wheel
 	const int rot = event.GetWheelRotation();
 	if ( rot != 0 ) {
-		if (rot < 0 ) 	decScale();
-		else 			incScale();
+		if ( event.ControlDown() && event.ShiftDown() ) {
+			
+			if (rot < 0 )	context->getModelRotation().decAngleX();
+			else			context->getModelRotation().incAngleX();
+		}
+		else if ( event.ShiftDown() ) {
+			
+			if (rot < 0 )	context->getModelRotation().decAngleY();
+			else			context->getModelRotation().incAngleY();
+		}
+		else if ( event.ControlDown() ) {
+			
+			if (rot < 0 )	context->getModelRotation().decAngleZ();
+			else			context->getModelRotation().incAngleZ();
+		}
+		else if ( event.AltDown() ) {
+			
+			context->getModelRotation().restore3DDefaults();
+		}
+		else {
+			if (rot < 0 ) 	decScale();
+			else 			incScale();
+		}
+		
 		update();
+		return;
 	}
 	
 	// move origin

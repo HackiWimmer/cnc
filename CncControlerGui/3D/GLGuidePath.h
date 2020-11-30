@@ -10,7 +10,7 @@ class GLGuidePath : public std::vector<CncDoublePosition> {
 	
 	public:
 		
-		explicit GLGuidePath(const CncPathListManager& plm);
+		explicit GLGuidePath(const CncPathListManager& plm, double zOffset = 0.0);
 		~GLGuidePath();
 		
 		const bool			isValid()		const	{ return guideStyle != wxPENSTYLE_INVALID; } 

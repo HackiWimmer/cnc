@@ -78,6 +78,15 @@ protected:
     wxTextCtrl* m_measurePlateThickness;
     wxStaticText* m_staticText5499;
     wxStaticLine* m_staticLine5350;
+    wxStaticText* m_staticText132;
+    wxStaticText* m_staticText137;
+    wxTextCtrl* m_previewX;
+    wxStaticText* m_staticText1371;
+    wxTextCtrl* m_previewY;
+    wxStaticText* m_staticText13712;
+    wxTextCtrl* m_previewZ;
+    wxStaticText* m_staticText137123;
+    wxStaticLine* m_staticLine74514;
     wxStaticBitmap* m_infoBitmap;
     wxStaticLine* m_staticLine74384;
     wxStaticText* m_staticText7442;
@@ -103,6 +112,7 @@ protected:
     virtual void mode4(wxCommandEvent& event) { event.Skip(); }
     virtual void mode5(wxCommandEvent& event) { event.Skip(); }
     virtual void mode6(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateWorkpieceThickness(wxCommandEvent& event) { event.Skip(); }
     virtual void selectInformation(wxMouseEvent& event) { event.Skip(); }
     virtual void toggleZeroX(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleZeroY(wxCommandEvent& event) { event.Skip(); }
@@ -146,6 +156,15 @@ public:
     wxTextCtrl* GetMeasurePlateThickness() { return m_measurePlateThickness; }
     wxStaticText* GetStaticText5499() { return m_staticText5499; }
     wxStaticLine* GetStaticLine5350() { return m_staticLine5350; }
+    wxStaticText* GetStaticText132() { return m_staticText132; }
+    wxStaticText* GetStaticText137() { return m_staticText137; }
+    wxTextCtrl* GetPreviewX() { return m_previewX; }
+    wxStaticText* GetStaticText1371() { return m_staticText1371; }
+    wxTextCtrl* GetPreviewY() { return m_previewY; }
+    wxStaticText* GetStaticText13712() { return m_staticText13712; }
+    wxTextCtrl* GetPreviewZ() { return m_previewZ; }
+    wxStaticText* GetStaticText137123() { return m_staticText137123; }
+    wxStaticLine* GetStaticLine74514() { return m_staticLine74514; }
     wxStaticBitmap* GetInfoBitmap() { return m_infoBitmap; }
     wxStaticLine* GetStaticLine74384() { return m_staticLine74384; }
     wxStaticText* GetStaticText7442() { return m_staticText7442; }

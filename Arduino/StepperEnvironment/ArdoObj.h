@@ -297,8 +297,19 @@ namespace ArdoObj {
   
       void set(unsigned char t) { type = t; }
   
+      bool isXYZ()  const { return hasX() && hasY() && hasZ(); }
+      bool isXY()   const { return hasX() && hasY() && notZ(); }
+      bool isXZ()   const { return hasX() && notY() && hasZ(); }
+      bool isYZ()   const { return notX() && hasY() && hasZ(); }
+
+      bool isX()    const { return hasX() && notY() && notZ(); }
+      bool isY()    const { return notX() && hasY() && notZ(); }
+      bool isZ()    const { return notX() && notY() && hasZ(); }
+
       bool hasXYZ() const { return hasX() && hasY() && hasZ(); }
       bool hasXY()  const { return hasX() && hasY(); }
+      bool hasXZ()  const { return hasX() && hasZ(); }
+      bool hasYZ()  const { return hasY() && hasZ(); }
       
       bool hasX()   const { return getBit(Byte::X); }
       bool hasY()   const { return getBit(Byte::Y); }
@@ -311,11 +322,13 @@ namespace ArdoObj {
       unsigned char getType() const { return type; }
       
       unsigned char getTypeAsPositionPid() const { 
-        if      ( hasXYZ() )                    return PID_XYZ_POS;
-        else if ( hasXY() && notZ())            return PID_XY_POS;
-        else if ( hasX()  && notY() && notZ())  return PID_X_POS;
-        else if ( hasY()  && notX() && notZ())  return PID_Y_POS;
-        else if ( hasZ()  && notX() && notY())  return PID_Z_POS;
+        if      ( isXYZ() )  return PID_XYZ_POS;
+        else if ( isXY()  )  return PID_XY_POS;
+        else if ( isXZ()  )  return PID_XZ_POS;
+        else if ( isYZ()  )  return PID_YZ_POS;
+        else if ( isX()   )  return PID_X_POS;
+        else if ( isY()   )  return PID_Y_POS;
+        else if ( isZ()   )  return PID_Z_POS;
         
         return 0; 
       }

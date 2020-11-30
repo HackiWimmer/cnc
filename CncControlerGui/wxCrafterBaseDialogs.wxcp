@@ -10294,7 +10294,7 @@
                   }, {
                    "type": "multi-string",
                    "m_label": "Tooltip:",
-                   "m_value": "Exprot to Veusz"
+                   "m_value": "Export to Veusz"
                   }, {
                    "type": "colour",
                    "m_label": "Bg Colour:",

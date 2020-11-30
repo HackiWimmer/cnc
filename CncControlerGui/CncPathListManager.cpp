@@ -2,16 +2,6 @@
 #include "CncClipperLib.h"
 #include "CncPathListManager.h"
 
-//////////////////////////////////////////////////////////////
-#define ASSERT_CHECK_PLML_SIZE_NOT_NULL \
-	if ( getPathList().size() == 0 ) { \
-		std::cerr	<< CNC_LOG_FUNCT \
-					<< ": Cant be the first entry. Use initNext[Cnc|Guide]Path() before!" \
-					<< " Nothing will be added!" \
-					<< std::endl; \
-		return defaultEntry; \
-	}
- 
 //////////////////////////////////////////////////////////////////
 CncPathListManager* CncPathListManager::clone(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
@@ -70,23 +60,22 @@ CncPathListManager::EndType CncPathListManager::transform(ClipperLib::EndType et
 
 //////////////////////////////////////////////////////////////
 CncPathListManager::CncPathListManager()
-: pathList				()
-, guideList				()
-, clipperPath			()
-, pathType				(PT_CNC_PATH)
-, guideType 			(NO_GUIDE_PATH)
-, defaultEntry			()
-, prevCncStartEntry		(NULL)
-, isFirstPath			(false)
-, isCorrected			(false)
-, referencePos			(0.0, 0.0, 0.0)
-, minPosX				(0.0)
-, minPosY				(0.0)
-, minPosZ				(0.0)
-, maxPosX				(0.0)
-, maxPosY				(0.0)
-, maxPosZ				(0.0)
-, totalDistance			(0.0)
+: pathList					()
+, guideList					()
+, clipperPath				()
+, pathType					(PT_CNC_PATH)
+, guideType 				(NO_GUIDE_PATH)
+, defaultEntry				()
+, executionRecommend		(ER_STAIRS)
+, notNormalizeStartDistance	(0.0, 0.0, 0.0)
+, referencePos				(0.0, 0.0, 0.0)
+, minPosX					(0.0)
+, minPosY					(0.0)
+, minPosZ					(0.0)
+, maxPosX					(0.0)
+, maxPosY					(0.0)
+, maxPosZ					(0.0)
+, totalDistance				(0.0)
 //////////////////////////////////////////////////////////////////
 {
 	// reservate memory
@@ -94,49 +83,73 @@ CncPathListManager::CncPathListManager()
 	guideList.reserve(THE_CONFIG->getConstReserveCapacity());
 	
 	// create initial entry
-	initNextPath();
+	initNextPath(false);
+}
+//////////////////////////////////////////////////////////////////
+CncPathListManager::CncPathListManager(const CncPathListEntry& initialEntry)
+: pathList					()
+, guideList					()
+, clipperPath				()
+, pathType					(PT_CNC_PATH)
+, guideType 				(NO_GUIDE_PATH)
+, defaultEntry				()
+, executionRecommend		(ER_STAIRS)
+, notNormalizeStartDistance	(0.0, 0.0, 0.0)
+, referencePos				(0.0, 0.0, 0.0)
+, minPosX					(0.0)
+, minPosY					(0.0)
+, minPosZ					(0.0)
+, maxPosX					(0.0)
+, maxPosY					(0.0)
+, maxPosZ					(0.0)
+, totalDistance				(0.0)
+//////////////////////////////////////////////////////////////////
+{
+	// reservate memory
+	pathList .reserve(THE_CONFIG->getConstReserveCapacity());
+	guideList.reserve(THE_CONFIG->getConstReserveCapacity());
+	
+	// create initial entry
+	initNextPath(initialEntry);
 }
 //////////////////////////////////////////////////////////////////
 CncPathListManager::CncPathListManager(const CncPathListManager& plm) 
-: pathList				(plm.getProtectedPathList())
-, guideList				(plm.getProtectedGuideList())
-, clipperPath			(plm.getProtectedClipperPath())
-, pathType				(plm.getPathType())
-, guideType 			(plm.getGuideType())
-, defaultEntry			(plm.getDefaultEntry())
-, prevCncStartEntry		(new CncPathListEntry(*plm.getPrevCncStartEntry()))
-, isFirstPath			(plm.isPathFlaggedAsFirst())
-, isCorrected			(plm.isPathCorrected())
-, referencePos			(plm.getReferencePos())
-, minPosX				(plm.getMinPosX())
-, minPosY				(plm.getMinPosY())
-, minPosZ				(plm.getMinPosZ())
-, maxPosX				(plm.getMaxPosX())
-, maxPosY				(plm.getMaxPosY())
-, maxPosZ				(plm.getMaxPosZ())
-, totalDistance			(plm.getTotalDistance())
+: pathList					(plm.getProtectedPathList())
+, guideList					(plm.getProtectedGuideList())
+, clipperPath				(plm.getProtectedClipperPath())
+, pathType					(plm.getPathType())
+, guideType 				(plm.getGuideType())
+, defaultEntry				(plm.getDefaultEntry())
+, executionRecommend		(plm.getExecRecommendation())
+, notNormalizeStartDistance	(plm.getNorNormalizedStartDist())
+, minPosX					(plm.getMinPosX())
+, minPosY					(plm.getMinPosY())
+, minPosZ					(plm.getMinPosZ())
+, maxPosX					(plm.getMaxPosX())
+, maxPosY					(plm.getMaxPosY())
+, maxPosZ					(plm.getMaxPosZ())
+, totalDistance				(plm.getTotalDistance())
 //////////////////////////////////////////////////////////////////
 {
 }
 //////////////////////////////////////////////////////////////////
 CncPathListManager::CncPathListManager(CncPathListManager& plm) 
-: pathList				(plm.getProtectedPathList())
-, guideList				(plm.getProtectedGuideList())
-, clipperPath			(plm.getProtectedClipperPath())
-, pathType				(plm.getPathType())
-, guideType 			(plm.getGuideType())
-, defaultEntry			(plm.getDefaultEntry())
-, prevCncStartEntry		(new CncPathListEntry(*plm.getPrevCncStartEntry()))
-, isFirstPath			(plm.isPathFlaggedAsFirst())
-, isCorrected			(plm.isPathCorrected())
-, referencePos			(plm.getReferencePos())
-, minPosX				(plm.getMinPosX())
-, minPosY				(plm.getMinPosY())
-, minPosZ				(plm.getMinPosZ())
-, maxPosX				(plm.getMaxPosX())
-, maxPosY				(plm.getMaxPosY())
-, maxPosZ				(plm.getMaxPosZ())
-, totalDistance			(plm.getTotalDistance())
+: pathList					(plm.getProtectedPathList())
+, guideList					(plm.getProtectedGuideList())
+, clipperPath				(plm.getProtectedClipperPath())
+, pathType					(plm.getPathType())
+, guideType 				(plm.getGuideType())
+, defaultEntry				(plm.getDefaultEntry())
+, executionRecommend		(plm.getExecRecommendation())
+, notNormalizeStartDistance	(plm.getNorNormalizedStartDist())
+, referencePos				(plm.getReferencePos())
+, minPosX					(plm.getMinPosX())
+, minPosY					(plm.getMinPosY())
+, minPosZ					(plm.getMinPosZ())
+, maxPosX					(plm.getMaxPosX())
+, maxPosY					(plm.getMaxPosY())
+, maxPosZ					(plm.getMaxPosZ())
+, totalDistance				(plm.getTotalDistance())
 //////////////////////////////////////////////////////////////////
 {
 }
@@ -146,23 +159,21 @@ CncPathListManager& CncPathListManager::operator=(const CncPathListManager& plm)
 	// self-assignment check
 	if ( this != &plm ) {
 		
-		pathList			= plm.getProtectedPathList();
-		guideList			= plm.getProtectedGuideList();
-		clipperPath			= plm.getProtectedClipperPath();
- 		pathType			= plm.getPathType();
-		guideType 			= plm.getGuideType();
-		defaultEntry		= plm.getDefaultEntry();
-		prevCncStartEntry	= new CncPathListEntry(*plm.getPrevCncStartEntry());
-		isFirstPath			= plm.isPathFlaggedAsFirst();
-		isCorrected			= plm.isPathCorrected();
-		referencePos		= plm.getReferencePos();
-		minPosX				= plm.getMinPosX();
-		minPosY				= plm.getMinPosY();
-		minPosZ				= plm.getMinPosZ();
-		maxPosX				= plm.getMaxPosX();
-		maxPosY				= plm.getMaxPosY();
-		maxPosZ				= plm.getMaxPosZ();
-		totalDistance		= plm.getTotalDistance();
+		pathList				= plm.getProtectedPathList();
+		guideList				= plm.getProtectedGuideList();
+		clipperPath				= plm.getProtectedClipperPath();
+ 		pathType				= plm.getPathType();
+		guideType 				= plm.getGuideType();
+		defaultEntry			= plm.getDefaultEntry();
+		executionRecommend		= plm.getExecRecommendation();
+		referencePos			= plm.getReferencePos();
+		minPosX					= plm.getMinPosX();
+		minPosY					= plm.getMinPosY();
+		minPosZ					= plm.getMinPosZ();
+		maxPosX					= plm.getMaxPosX();
+		maxPosY					= plm.getMaxPosY();
+		maxPosZ					= plm.getMaxPosZ();
+		totalDistance			= plm.getTotalDistance();
 	}
 	
 	return *this;
@@ -175,8 +186,20 @@ CncPathListManager& CncPathListManager::operator= (CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
 CncPathListManager::~CncPathListManager() {
 //////////////////////////////////////////////////////////////////
-	wxDELETE(prevCncStartEntry);
 	clear();
+}
+//////////////////////////////////////////////////////////////////
+auto CncPathListManager::firstPosEntryIterator() {
+//////////////////////////////////////////////////////////////////
+	auto it = begin();
+	while ( it != end() ) {
+		if ( it->isPositionChange() )
+			break;
+			
+		it++;
+	}
+	
+	return it;
 }
 //////////////////////////////////////////////////////////////////
 auto CncPathListManager::cFirstPosEntryIterator() const {
@@ -203,6 +226,11 @@ auto CncPathListManager::crLastPosEntryIterator() const {
 	}
 	
 	return it;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::hasMovement() const { 
+//////////////////////////////////////////////////////////////////
+	return cFirstPosEntryIterator() != cend(); 
 }
 //////////////////////////////////////////////////////////////////
 const char* CncPathListManager::getPathTypeAsStr() const {
@@ -234,44 +262,56 @@ void CncPathListManager::initNextGuidePath(GuideType gt) {
 //////////////////////////////////////////////////////////////////
 	pathType  = PT_GUIDE_PATH;
 	guideType = gt == NO_GUIDE_PATH ? HELP_PATH : gt;
-	initNextPath();
+	initNextPath(true);
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::initNextCncPath() {
 //////////////////////////////////////////////////////////////////
 	pathType  = PT_CNC_PATH;
 	guideType = NO_GUIDE_PATH;
-	initNextPath();
+	initNextPath(true);
 }
 //////////////////////////////////////////////////////////////////
-void CncPathListManager::initNextPath() {
+void CncPathListManager::initNextPath(const CncPathListEntry& initialEntry) {
 //////////////////////////////////////////////////////////////////
-	isFirstPath   			= false;
-	isCorrected 			= false;
 	referencePos			= CncPathListEntry::ZeroTarget;
 	totalDistance			= 0.0;
 	
-	const bool b = pathType == PT_CNC_PATH && prevCncStartEntry != NULL;
-
+	clear();
+	
+	CncPathListEntry cpe(initialEntry);
+	appendEntry(cpe);
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::initNextPath(bool linked) {
+//////////////////////////////////////////////////////////////////
+	referencePos			= CncPathListEntry::ZeroTarget;
+	totalDistance			= 0.0;
+	
 	CncPathListEntry cpe;
 	cpe.setNothingChanged();
 
 	cpe.entryDistance		= CncPathListEntry::NoDistance;
 	cpe.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 	
-	cpe.clientId			= b ? prevCncStartEntry->clientId         : CncPathListEntry::DefaultClientID;
-	cpe.feedSpeedMode		= b ? prevCncStartEntry->feedSpeedMode    : CncPathListEntry::DefaultSpeedMode;
-	cpe.feedSpeed_MM_MIN	= b ? prevCncStartEntry->feedSpeed_MM_MIN : CncPathListEntry::DefaultSpeedValue;
-	cpe.entryTarget			= b ? prevCncStartEntry->entryTarget      : CncPathListEntry::ZeroTarget;
-	
+	auto itLast = crLastPosEntryIterator();
+	const bool b = (pathType == PT_CNC_PATH && itLast != crend());
+
+	cpe.clientId			= b ? itLast->clientId         : CncPathListEntry::DefaultClientID;
+	cpe.feedSpeedMode		= b ? itLast->feedSpeedMode    : CncPathListEntry::DefaultSpeedMode;
+	cpe.feedSpeed_MM_MIN	= b ? itLast->feedSpeed_MM_MIN : CncPathListEntry::DefaultSpeedValue;
+	cpe.entryTarget			= b ? itLast->entryTarget      : CncPathListEntry::ZeroTarget;
+
 	clear();
-	appendEntry(cpe);
+	
+	if ( linked == true )
+		appendEntry(cpe);
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 	// additionally calculate length and distance
-	if ( pathList.size() > 0 ) {
+	if ( cpe.hasPositionChange() ) {
 		totalDistance += sqrt(  pow(cpe.entryDistance.getX(), 2)
 							  + pow(cpe.entryDistance.getY(), 2)
 							  + pow(cpe.entryDistance.getZ(), 2)
@@ -295,12 +335,6 @@ void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 	// store
 	switch ( pathType ) {
 		case PT_CNC_PATH: 		pathList.push_back(std::move(cpe));
-								
-								// prevCncStartEntry contains the start entry of the previous cnc path.
-								// it isn't part of the clear method an it must be a deep copy 
-								// . . .
-								wxDELETE(prevCncStartEntry);
-								prevCncStartEntry = new CncPathListEntry(pathList.back());
 								break;
 								
 		case PT_GUIDE_PATH: 	guideList.push_back(std::move(cpe)); 
@@ -310,10 +344,8 @@ void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryAdm(long clientId) {
 //////////////////////////////////////////////////////////////////
-	ASSERT_CHECK_PLML_SIZE_NOT_NULL // will return the defaultEntry on failure
-
 	CncPathListEntry cpe;
-	CncPathListEntry& prevEntry	= getPathListIntern().back();
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
 
 	cpe.setClientIdChange();
 	cpe.entryDistance			= CncPathListEntry::NoDistance;
@@ -331,10 +363,8 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(long clientId) {
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN) {
 //////////////////////////////////////////////////////////////////
-	ASSERT_CHECK_PLML_SIZE_NOT_NULL // will return the defaultEntry on failure
-
 	CncPathListEntry cpe;
-	CncPathListEntry& prevEntry	= getPathListIntern().back();
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
 
 	cpe.setSpeedChange();
 	cpe.entryDistance			= CncPathListEntry::NoDistance;
@@ -352,10 +382,8 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, doubl
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryAbs(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
-	ASSERT_CHECK_PLML_SIZE_NOT_NULL // will return the defaultEntry on failure
-
 	CncPathListEntry cpe(CncPathListEntry::TYPE_POSITION);
-	CncPathListEntry& prevEntry	= getPathListIntern().back();
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
 
 	const double distanceX	= newAbsPosX - prevEntry.entryTarget.getX();
 	const double distanceY	= newAbsPosY - prevEntry.entryTarget.getY();
@@ -380,10 +408,8 @@ const CncPathListEntry& CncPathListManager::addEntryAbs(double newAbsPosX, doubl
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryRel(double deltaX, double deltaY, double deltaZ, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
-	ASSERT_CHECK_PLML_SIZE_NOT_NULL // will return the defaultEntry on failure
-
 	CncPathListEntry cpe(CncPathListEntry::TYPE_POSITION);
-	CncPathListEntry& prevEntry	= getPathListIntern().back();
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
 	
 	const double targetX		= prevEntry.entryTarget.getX() + deltaX;
 	const double targetY		= prevEntry.entryTarget.getY() + deltaY;
@@ -426,28 +452,27 @@ const CncPathListEntry& CncPathListManager::addEntryRel(const CncDoublePosition&
 					  );
 }
 //////////////////////////////////////////////////////////////////
-std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {
+size_t CncPathListManager::normalizeLinkedEntry(long clientId, CncSpeedMode mode, double feedSpeed_MM_MIN) {
 //////////////////////////////////////////////////////////////////
-	const CncDoublePosition& rp = getReferencePos();
-	const CncDoublePosition& sp = getStartPos();
+	if ( getPathListSize() == 0 )
+		return 0;
+		
+	CncPathListEntry& firstEntry = *(getPathListIntern().begin());
+	if ( firstEntry.isNothingChanged() == false )
+		;//return 0;
 	
-	ostr 	<< "CncPathListInfo entries : " << getPathList().size()											<< std::endl
-			<< " Path Type              : " << getPathTypeAsStr()											<< std::endl
-			<< " Is closed              : " << isPathClosed()												<< std::endl
-			<< " Is corrected           : " << isPathCorrected()											<< std::endl
-			<< " Is first Path          : " << isPathFlaggedAsFirst()										<< std::endl
-			<< " Total Distance         : " << cnc::dblFormat1(getTotalDistance()) 							<< std::endl
-			<< " Min Pos (x, y, z)      : " << cnc::dblFormat3(getMinPosX(), getMinPosY(), getMinPosZ())	<< std::endl
-			<< " Max Pos (x, y, z)      : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ())	<< std::endl
-			<< " Reference Pos          : " << cnc::dblFormat3(rp.getX(),    rp.getY(),    rp.getZ())		<< std::endl
-			<< " Start Pos              : " << cnc::dblFormat3(sp.getX(),    sp.getY(),    sp.getZ())		<< std::endl
-			<< " Entries                : " << std::endl
-			;
+	for ( auto it = begin(); it != end(); ++it ) {
+		CncPathListEntry& ple 	 = *it;
+		
+		ple.clientId			 = clientId;
+		ple.feedSpeedMode		 = mode;
+		ple.feedSpeed_MM_MIN	 = feedSpeed_MM_MIN;
+		
+		if ( std::distance(begin(), it) == 0 )
+			ple.content |= CncPathListEntry::CONT_CLIENTID | CncPathListEntry::CONT_SPEED;
+	}
 	
-	for ( auto it = getPathList().begin(); it != getPathList().end(); ++it )
-		it->traceEntry(ostr);
-	
-	return ostr;
+	return getPathListSize();
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::clear() {
@@ -462,7 +487,7 @@ void CncPathListManager::resetStatistics() {
 	minPosX = minPosY = minPosZ = DBL_MAX;
 	maxPosX = maxPosY = maxPosZ = DBL_MIN;
 	
-	totalDistance = 0.0;
+	totalDistance				= 0.0;
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition& CncPathListManager::getStartPos() const {
@@ -470,7 +495,7 @@ const CncDoublePosition& CncPathListManager::getStartPos() const {
 	static CncDoublePosition p(0.0, 0.0, 0.0);
 	
 	if ( getPathList().size() > 0 )
-		return cbegin()->entryTarget;
+		return cFirstPosEntryIterator()->entryTarget;
 	
 	return p; 
 }
@@ -491,7 +516,18 @@ bool CncPathListManager::isPathClosed() const {
 	const CncDoublePosition& p1 = itFirst->entryTarget;
 	const CncDoublePosition& p2 = itLast->entryTarget;
 	
-	return p1 == p2;
+	return p1.isFloatingEqual(p2, 0.001);
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::getTargetPos(CncDoublePosition& ret) const {
+//////////////////////////////////////////////////////////////////
+	auto itLast = crLastPosEntryIterator();
+	if ( itLast == crend() )
+		return false;
+		
+	ret = itLast->entryTarget;
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::changeToGuideType(GuideType gt) {
@@ -503,37 +539,231 @@ void CncPathListManager::changeToGuideType(GuideType gt) {
 	guideType = gt;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListManager::roundCorners(double toolDiameter) {
+CncDirection CncPathListManager::getOrientation(ClipperLib::Path& path) const {
+//////////////////////////////////////////////////////////////////
+	// On Y-axis positive upward displays,   Orientation will return true if the polygon's orientation is counter-clockwise.
+	// On Y-axis positive downward displays, Orientation will return true if the polygon's orientation is clockwise.
+	const bool orientation = ClipperLib::Orientation(path);
+	
+	CncDirection curDirection = CncUndefDir;
+	if ( THE_CONFIG->getSvgConvertToRightHandFlag() )	curDirection = (orientation ? CncCounterClockwise : CncClockwise);
+	else												curDirection = (orientation ? CncClockwise        : CncCounterClockwise);
+	
+	return curDirection;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::ensureDirection(CncDirection d, ClipperLib::Path& path) const {
+//////////////////////////////////////////////////////////////////
+	if ( d == CncUndefDir )
+		return false;
+	
+	if ( getOrientation(path) != d )
+		ClipperLib::ReversePath(path);
+		
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::ensureDirection(CncDirection d) {
+//////////////////////////////////////////////////////////////////
+	// empty or single point, nothing should happen
+	if ( std::distance(cFirstPosEntryIterator(), cend()) < 2 )
+		return true;
+	
+	// nothig to do
+	if ( getOrientation(clipperPath) == d )
+		return true;
+	
+	return reversePath();
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::reversePath() {
+//////////////////////////////////////////////////////////////////
+	// empty or single point, nothing should happen
+	if ( std::distance(cFirstPosEntryIterator(), cend()) < 2 )
+		return true;
+	
+	// entry point: reverse
+	ClipperLib::Path reversedPath = clipperPath;
+	ClipperLib::ReversePath(reversedPath);
+	
+	getPathListIntern().erase(cFirstPosEntryIterator(), cend());
+	clipperPath.clear();
+	resetStatistics();
+	
+	for (auto it=reversedPath.begin(); it != reversedPath.end(); ++it)
+		addEntryAbs(ClipperLib::asCncDoublePosition(*it), false);
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::adjustZOffsetAbs(double offset) {
+//////////////////////////////////////////////////////////////////
+	return adjustZOffset(offset, false);
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::adjustZOffsetRel(double offset) {
+//////////////////////////////////////////////////////////////////
+	return adjustZOffset(offset, true);
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::adjustZOffset(double offset, bool relative) {
+//////////////////////////////////////////////////////////////////
+	// This method only adjusts the Z target value. It also expects that the given Z value 
+	// is already reached outside thi method. Therefore, the total distance leaves unchanged, 
+	// only the min/max values have to be adjusted. 
+	minPosX			= 0.0;
+	minPosY			= 0.0;
+	minPosZ			= 0.0;
+	maxPosX			= 0.0;
+	maxPosY			= 0.0;
+	maxPosZ			= 0.0;
+	
+	for ( auto it = begin(); it != end(); ++it) {
+		CncPathListEntry& pe1 = *it;
+		
+		if ( pe1.hasPositionChange() == true ) {
+			
+			if ( relative == true ) 	pe1.entryTarget.incZ(offset);
+			else						pe1.entryTarget.setZ(offset);
+			
+			minPosX = std::min(minPosX, pe1.entryTarget.getX());
+			minPosY = std::min(minPosY, pe1.entryTarget.getY());
+			minPosZ = std::min(minPosZ, pe1.entryTarget.getZ());
+			
+			maxPosX = std::max(maxPosX, pe1.entryTarget.getX());
+			maxPosY = std::max(maxPosY, pe1.entryTarget.getY());
+			maxPosZ = std::max(maxPosZ, pe1.entryTarget.getZ());
+		}
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::processXYHelix(double zBegDepth, double zTotDepth, double zFeed360) {
+//////////////////////////////////////////////////////////////////
+	if ( cnc::dblCmp::le(zFeed360, 0.0) ) {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Invalid z feed parameter: %.3lf", zFeed360));
+		return false;
+	}
+	
+	// ----------------------------------------------------------
+	auto getPositionCount = [&]() {
+		if ( true ) {
+			return getPathListSize();
+		}
+		
+		unsigned int c = 0;
+		for ( auto it = begin(); it != end(); ++it) {
+			CncPathListEntry& pe = *it;
+			
+			if ( pe.hasPositionChange() == true ) {
+				c++;
+			}
+		}
+		return c;
+	};
+	
+	// ----------------------------------------------------------
+	// entry point
+	const long pathSteps360	= getPositionCount();
+	const double stepSize	= -(zFeed360 / pathSteps360);
+	
+	CncPathListManager source(*this);
+	
+	double zCurDepth		= zBegDepth;
+	unsigned int duration	= 1;
+	
+	do
+	{
+		double zCurStop = std::max(zBegDepth - (zFeed360 * duration), zTotDepth );
+		
+		// modify the exiting path to go the first helix step down
+		if ( duration == 1 ) {
+			
+			for ( auto it = begin(); it != end(); ++it) {
+				CncPathListEntry& pe = *it;
+				
+				if ( pe.hasPositionChange() == true ) {
+					zCurDepth += stepSize;
+					
+					if ( cnc::dblCmp::lt(zCurDepth, zCurStop) ) {
+						pe.entryDistance.setZ(stepSize - abs(zCurStop - zCurDepth) );
+						pe.entryTarget.setZ(zCurStop);
+					}
+					else {
+						pe.entryDistance.setZ(stepSize);
+						pe.entryTarget.setZ(zCurDepth);
+					}
+				}
+			}
+		}
+		// append further helix steps down to reach the final depth
+		else {
+			
+			for ( auto it = source.begin() + 1; it != source.end(); ++it) {
+				const CncPathListEntry& pe = *it;
+				
+				if ( cnc::dblCmp::nu(pe.entryDistance.getX()) && cnc::dblCmp::nu(pe.entryDistance.getY()) )
+					continue;
+				
+				if ( pe.hasPositionChange() == true ) {
+					
+					zCurDepth += stepSize;
+					
+					if ( cnc::dblCmp::lt(zCurDepth, zCurStop) )	addEntryAbs(pe.entryTarget.getX(), pe.entryTarget.getY(), zCurStop);
+					else										addEntryAbs(pe.entryTarget.getX(), pe.entryTarget.getY(), zCurDepth);
+				}
+			}
+		}
+		
+		duration++;
+		
+	} while ( cnc::dblCmp::gt(zCurDepth, zTotDepth) );
+	
+	// last try to step minimal to a inner radius before finalize 
+	// and moving up again (outside this method)
+	source.processXYOffset(-0.5);
+	if ( source.getPathListSize() > 1 ) {
+		const CncPathListEntry& pe = *(source.begin() + 1);
+		addEntryAbs(pe.entryTarget.getX(), pe.entryTarget.getY(), zTotDepth);
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::roundXYCorners(double toolDiameter) {
 //////////////////////////////////////////////////////////////////
 	if ( cnc::dblCompareNull(toolDiameter) )
 		return true;
 		
 	const double offset = toolDiameter / 2.0;
 	
-	bool ret = processOffset(-offset, jtRound, etClosedPolygon);
+	bool ret = processXYOffset(-offset, jtRound, etClosedPolygon);
 	if ( ret == false )
 		return false;
 	 
-	return processOffset(+offset , jtRound, etClosedPolygon);
+	return processXYOffset(+offset , jtRound, etClosedPolygon);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListManager::processInnerOffset(double offset) {
+bool CncPathListManager::processXYInnerOffset(double offset) {
 //////////////////////////////////////////////////////////////////
 	// to be always negative
 	const double o = -abs(offset);
-	return processOffset(o, jtRound, etClosedPolygon);
+	return processXYOffset(o, jtRound, etClosedPolygon);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListManager::processOuterOffset(double offset) {
+bool CncPathListManager::processXYOuterOffset(double offset) {
 //////////////////////////////////////////////////////////////////
 	// to be always positive
 	const double o = abs(offset);
-	return processOffset(o, jtMiter, etClosedPolygon);
+	return processXYOffset(o, jtMiter, etClosedPolygon);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListManager::processOffset(double offset, JoinType jt, EndType et) {
+bool CncPathListManager::processXYOffset(double offset, JoinType jt, EndType et) {
 //////////////////////////////////////////////////////////////////
-	
+	if ( hasMovement() == false )
+		return true;
+		
 	// -----------------------------------------------------------
 	// perform some checks
 	if ( isPathClosed() == false ) {
@@ -542,10 +772,19 @@ bool CncPathListManager::processOffset(double offset, JoinType jt, EndType et) {
 	}
 	
 	// offset has to be given in the same unit as the path itself
-	if ( abs(offset) > 50 ) {
-		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Can't process. Offset(%ld) is to great\n", offset));
+	if ( cnc::dblCompareNull(offset) )  {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Can't process. A offset of %.3lf is not sufficient!\n", fabs(offset)));
 		return false;
 	}
+	
+	// offset has to be given in the same unit as the path itself
+	if ( fabs(offset) > 20.0 ) {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Can't process. A offset of %.3lf is to great\n", fabs(offset)));
+		return false;
+	}
+	
+	// entry point
+	const CncDirection finalDirection = offset < 0.0 ? CncCounterClockwise : CncClockwise;
 	
 	ClipperLib::ClipperOffset co;
 	ClipperLib::Paths result;
@@ -560,93 +799,73 @@ bool CncPathListManager::processOffset(double offset, JoinType jt, EndType et) {
 		
 		ClipperLib::Path& path = *it;
 		closePath(path);
+		ensureDirection(finalDirection, path);
 		
-		for (auto itP=path.begin(); itP != path.end(); ++itP) {
+		for (auto itP=path.begin(); itP != path.end(); ++itP)
 			addEntryAbs(ClipperLib::asCncDoublePosition(*itP), false);
-			
-			#warning 4242.42
-			if ( std::distance(path.begin(), itP) == 0 )
-				addEntryAdm(CncSpeedWork, 4242.42);
-		}
 	}
 	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListManager::reversePath() {
+bool CncPathListManager::processXYPocket(double toolDiameter) {
 //////////////////////////////////////////////////////////////////
-	// empty or single point, nothing should happen
-	if ( std::distance(cFirstPosEntryIterator(), cend()) < 2 )
-		return true;
-	
-	// reverse
-	ClipperLib::ReversePath(clipperPath);
-	
-	getPathListIntern().erase(cFirstPosEntryIterator(), cend());
-	clipperPath.clear();
-	resetStatistics();
-	
-	for (auto it=clipperPath.begin(); it != clipperPath.end(); ++it) {
-		
-		addEntryAbs(ClipperLib::asCncDoublePosition(*it), false);
-		
-		#warning 4242.42
-		if ( std::distance(clipperPath.begin(), it) == 0 )
-			addEntryAdm(CncSpeedWork, 4242.42);
-		
-	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool CncPathListManager::processPocket(double toolDiameter) {
-//////////////////////////////////////////////////////////////////
-	
-	#warning 4242.42
-	const double	workSpeed				= 4242.42;
 	const double	firstOffset				= - ( abs(toolDiameter) / 2.0 );		// CncCT_Inner (shrinking)-> value has to negative!
 	const double	nextOffset				= - ( abs(toolDiameter) / 2.0 * 0.3 );	// CncCT_Inner (shrinking)-> value has to negative!
-	const double 	maxOffset				= 0.01;
+	const double 	maxOffset				= - 0.01;
 	
 	const unsigned	maxRecursionDeep		= 128;
 	unsigned int	callCounter				= 0;
 	
 	// -----------------------------------------------------------
 	// perform some checks
-	if ( abs(toolDiameter) > 25.0 )  {
-		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Tool diameter=%ld to great. The pocket whole creation is stopped here!\n", abs(toolDiameter)));
+	if ( cnc::dblCompareNull(toolDiameter) )  {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Tool diameter=%.3lf not sufficient. The pocket hole creation is stopped here!\n", abs(toolDiameter)));
+		return false;
+	}
+	
+	if ( fabs(toolDiameter) > 30.0 )  {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Tool diameter=%.3lf to great. The pocket hole creation is stopped here!\n", abs(toolDiameter)));
 		return false;
 	}
 	
 	if ( firstOffset > maxOffset ) {
-		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Invalid first offset=%ld. The pocket whole creation is stopped here!\n", firstOffset));
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Invalid first offset=%.3lf. The pocket hole creation is stopped here!\n", firstOffset));
 		return false;
 	}
 	
 	if ( nextOffset > maxOffset ) {
-		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Invalid next offset=%ld. The pocket whole creation is stopped here!\n", nextOffset));
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Invalid next offset=%.3lf. The pocket hole creation is stopped here!\n", nextOffset));
 		return false;
 	}
 	
 	if ( isPathClosed() == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(" Path isn't closed. The pocket whole creation is stopped here!\n");
+		std::cerr << CNC_LOG_FUNCT_A(" Path isn't closed. The pocket hole creation is stopped here!\n");
 		return false;
 	}
+	
+	const CncDirection finalDirection = CncCounterClockwise;
+	
+	// -----------------------------------------------------------
+	auto isOffsetPossible = [] (ClipperLib::Path& path, double offset) {
+		
+		ClipperLib::ClipperOffset co;
+		ClipperLib::Paths result;
+		co.AddPath(path, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+		co.Execute(result, ClipperLib::convert(offset));
+		
+		return result.size() > 0;
+	};
 	
 	// -----------------------------------------------------------
 	// add the given path information
 	auto addPath = [&](ClipperLib::Path& path, bool first) {
 		
 		ClipperLib::closePath(path);
+		ensureDirection(finalDirection, path);
 		
-		for (auto it = path.begin(); it != path.end(); ++it) {
-			// add position entry
+		for (auto it = path.begin(); it != path.end(); ++it)
 			addEntryAbs(ClipperLib::asCncDoublePosition(*it), false);
-			
-			// add speed entry
-			if ( first && std::distance(path.begin(), it) == 0 )
-				addEntryAdm(CncSpeedWork, workSpeed);
-		}
 	};
 	
 	// -----------------------------------------------------------
@@ -660,7 +879,14 @@ bool CncPathListManager::processPocket(double toolDiameter) {
 		
 		// final safty - breaks the recursion
 		if ( ++callCounter > maxRecursionDeep ) {
-			std::cerr << CNC_LOG_FUNCT_A(" Max recursion deep reached. The pocket whole creation is stopped here!\n");
+			std::cerr << CNC_LOG_FUNCT_A(" Max recursion deep reached. The pocket hole creation is stopped here!\n");
+			return;
+		}
+		
+		// in this condition the pocket hole layer it's already cleared 
+		// nothing more has to be done.
+		// remember: nextOffset is always less as firstOffset
+		if ( isOffsetPossible(path, firstOffset) == false ) {
 			return;
 		}
 		
@@ -691,7 +917,7 @@ bool CncPathListManager::processPocket(double toolDiameter) {
 	co.Execute(result, ClipperLib::convert(firstOffset));
 	
 	if ( result.size() == 0 ) {
-		std::cerr << CNC_LOG_FUNCT_A(" The first step don't deliver a result. The pocket whole creation is stopped here!\n");
+		std::cerr << CNC_LOG_FUNCT_A(" The first step don't deliver a result. The pocket hole creation is stopped here!\n");
 		return false;
 	}
 	
@@ -704,124 +930,48 @@ bool CncPathListManager::processPocket(double toolDiameter) {
 	for (auto it=result.begin(); it != result.end(); ++it) {
 		ClipperLib::Path& path = *it;
 		
+		if ( isOffsetPossible(path, firstOffset) == false ) {
+			
+			if ( ClipperLib::isHelix(path, toolDiameter) )
+				executionRecommend = ER_HELIX;
+		}
+		
 		// start the recursion . . .
 		nextRound(path, true);
 	}
 	
 	return true;
 }
-
-
-
-
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////
-bool CncPathListManager::eraseEntryAndRecalcuate(const CncPathList::iterator& itToErase) {
+bool CncPathListManager::normalizeStartPosDistance() {
 //////////////////////////////////////////////////////////////////
-	/*
-	if ( itToErase < begin() )
+	auto it = firstPosEntryIterator();
+	if ( it == end() )
 		return false;
 
-	if ( itToErase >= end() )
-		return false;
-		
-	// store entry 
-	CncPathListEntry entry = *itToErase;
-	
-	// check first position
-	bool first = itToErase == begin() ? true : false;
-	
-	// remove entry
-	if ( getPathListIntern().erase(itToErase) == end() )
-		return false;
-		
-	// nothing further to do if the pathList is now empty
-	if ( getPathList().size() == 0 )
-		return true;
-	
-	// redetermine additional values
-	if ( first == true ) {
-		begin()->entryDistance		= begin()->entryTarget - referencePos;
-		begin()->alreadyRendered 	= true;
-	}
-	
-	// set recalculateMinMax flag
-	bool recalculateMinMax = false;
-	if ( cnc::dblCompare(entry.entryTarget.getX(), minPosX) ||
-		 cnc::dblCompare(entry.entryTarget.getY(), minPosY) ||
-		 cnc::dblCompare(entry.entryTarget.getZ(), minPosZ) ||
-
-		 cnc::dblCompare(entry.entryTarget.getY(), maxPosX) ||
-		 cnc::dblCompare(entry.entryTarget.getY(), maxPosY) ||
-	     cnc::dblCompare(entry.entryTarget.getZ(), maxPosZ)) {
-		
-		recalculateMinMax = true;
-		resetMinMax();
-	}
-
-	// recalculate length and min or max on demand
-	totalDistance = 0.0;
-	unsigned int cnt = 0;
-	for ( auto it=begin(); it !=end(); ++it ) {
-		
-		if ( cnt > 0 ) {
-			totalDistance += sqrt(  pow(it->entryDistance.getX(), 2)
-					              + pow(it->entryDistance.getY(), 2)
-								  + pow(it->entryDistance.getZ(), 2)
-							 );
-
-
-
-			it->totalDistance = totalDistance;
-		}
-		else {
-
-			it->totalDistance = 0.0;
-		}
-		
-		if ( recalculateMinMax == true ) {
-			minPosX = std::min(minPosX, it->entryTarget.getX());
-			minPosY = std::min(minPosY, it->entryTarget.getY());
-			minPosZ = std::min(minPosZ, it->entryTarget.getZ());
-
-			maxPosX = std::max(maxPosX, it->entryTarget.getX());
-			maxPosY = std::max(maxPosY, it->entryTarget.getY());
-			maxPosZ = std::max(maxPosZ, it->entryTarget.getZ());
-		}
-		
-		cnt++;
-	}
-	*/
+	notNormalizeStartDistance = it->entryDistance;
+	it->entryDistance.setXYZ(0.0, 0.0, 0.0);
 	return true;
 }
-
-
-
-void CncPathListManager::testSomething() {
+//////////////////////////////////////////////////////////////////
+std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {
+//////////////////////////////////////////////////////////////////
+	const CncDoublePosition& rp = getReferencePos();
+	const CncDoublePosition& sp = getStartPos();
 	
+	ostr 	<< "CncPathListInfo entries : " << getPathList().size()											<< std::endl
+			<< " Path Type              : " << getPathTypeAsStr()											<< std::endl
+			<< " Is closed              : " << isPathClosed()												<< std::endl
+			<< " Total Distance         : " << cnc::dblFormat1(getTotalDistance()) 							<< std::endl
+			<< " Min Pos (x, y, z)      : " << cnc::dblFormat3(getMinPosX(), getMinPosY(), getMinPosZ())	<< std::endl
+			<< " Max Pos (x, y, z)      : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ())	<< std::endl
+			<< " Reference Pos          : " << cnc::dblFormat3(rp.getX(),    rp.getY(),    rp.getZ())		<< std::endl
+			<< " Start Pos              : " << cnc::dblFormat3(sp.getX(),    sp.getY(),    sp.getZ())		<< std::endl
+			<< " Entries                : " << std::endl
+			;
 	
-	ClipperLib::ClipperOffset co;
-	ClipperLib::Paths solution;
-	co.AddPath(clipperPath, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
-	co.Execute(solution, ClipperLib::convert(-10.0));
+	for ( auto it = getPathList().begin(); it != getPathList().end(); ++it )
+		it->traceEntry(ostr);
 	
-	
-	for (auto it=solution.begin(); it != solution.end(); ++it) {
-		std::cout << "CL solution: " << std::distance(solution.begin(), it) << std::endl;
-		
-		const ClipperLib::Path& path = *it;
-		
-		for (auto itP=path.begin(); itP != path.end(); ++itP) {
-			std::cout	<< *itP
-						<< " --> "
-						<< ClipperLib::asCncDoublePosition(*itP)
-						<< std::endl
-						;
-		}
-	}
+	return ostr;
 }
