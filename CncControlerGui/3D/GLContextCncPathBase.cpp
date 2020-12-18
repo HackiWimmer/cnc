@@ -600,11 +600,19 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 		return;
 
 	GLOpenGLPathBufferStore* store = cncPath.getOpenGLBufferStore();
-	//const long entry = store->findFirstEntryForClientId(currentClientId);
-	const long entry = store->findLastEntryForClientId(currentClientId);
+	
+	long entry = store->findLastEntryForClientId(currentClientId);
+	
+	if ( entry < 0 )
+		entry = store->findFirstEntryForClientId(currentClientId);
+
+	std::cout << "4711 entry: "<< entry << std::endl;
+
 
 	if ( entry < 0 )
 		return;
+		
+		
 
 	cncPath.setVirtualEnd(entry);
 }

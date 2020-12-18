@@ -822,6 +822,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(fileView);
 	registerGuiControl(lruFileView);
 	
+	registerGuiControl(m_btSvgToggleTryToSelectClientId);
 	registerGuiControl(m_btSvgToggleAutoSaveTplOnProcess);
 	registerGuiControl(m_defaultSpeedSlider);
 	registerGuiControl(m_searchConnections);
@@ -6466,8 +6467,8 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	else						isRunning = true;
 	
 	// debugging only
-	if ( true )
-		cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld)\n", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
+	if ( false )
+		cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
 	
 	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {
 		if ( positionSpy != NULL )

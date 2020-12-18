@@ -306,7 +306,11 @@ long GLOpenGLPathBuffer::getFirstEntryForClientId(long clientId) const {
 /////////////////////////////////////////////////////////////
 	long ret = CLIENT_ID.INVALID;
 	
-	auto cldIt = clientIdIndex.find(clientId);
+	// auto cldIt = clientIdIndex.find(clientId);
+	// use upper bound instead of find here to get all sub ids also.
+	// 182 --> 18 * 10 = 180
+	const long firstClientId = ( (clientId / CLIENT_ID.TPL_FACTOR) ) * CLIENT_ID.TPL_FACTOR;
+	auto cldIt = clientIdIndex.upper_bound(firstClientId);
 	if ( cldIt != clientIdIndex.end() ) {
 		const IndexList& index = cldIt->second;
 		
@@ -323,7 +327,12 @@ long GLOpenGLPathBuffer::getLastEntryForClientId(long clientId) const {
 /////////////////////////////////////////////////////////////
 	long ret = CLIENT_ID.INVALID;
 	
-	auto cldIt = clientIdIndex.find(clientId);
+	// auto cldIt = clientIdIndex.find(clientId);
+	// use lower bound instead of find here to get all sub ids also.
+	// 182 --> 18 + 1 = 19 * 10 = 190
+	const long nextClientId = ( (clientId / CLIENT_ID.TPL_FACTOR) + 1 ) * CLIENT_ID.TPL_FACTOR;
+	auto cldIt = clientIdIndex.lower_bound(nextClientId);
+	
 	if ( cldIt != clientIdIndex.end() ) {
 		const IndexList& index = cldIt->second;
 		
@@ -656,8 +665,9 @@ long GLOpenGLPathBufferStore::findFirstIndexForClientId(long cliendId) {
 	unsigned long count = 0;
 	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
 		
-		if ( it->hasClientID(cliendId) == true )
-			return count + it->getFirstIndexForClientId(cliendId);
+		const long firstEntry = it->getFirstIndexForClientId(cliendId);
+		if ( firstEntry >= 0 )
+			return count + firstEntry;
 			
 		count += it->getClientIdCount();
 	}
@@ -669,9 +679,10 @@ long GLOpenGLPathBufferStore::findLastEntryForClientId(long cliendId) {
 /////////////////////////////////////////////////////////////
 	unsigned long count = 0;
 	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
-
-		if ( it->hasClientID(cliendId) == true )
-			return count + it->getLastEntryForClientId(cliendId);
+		
+		const long lastEntry = it->getLastEntryForClientId(cliendId);
+		if ( lastEntry >= 0 )
+			return count + lastEntry;
 		
 		count += it->getNumVerties();
 	}
