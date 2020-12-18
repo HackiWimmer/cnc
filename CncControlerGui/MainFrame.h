@@ -469,7 +469,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void selectMainBookTestPanel();
 		
 		void selectMonitorBookCncPanel();
-		void selectMonitorBookTemplatePanel(bool force = false);
+		void selectMonitorBookTemplatePanel();
 		
 		void selectParsingSynopsisTrace();
 		

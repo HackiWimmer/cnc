@@ -4260,6 +4260,9 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 		return;
 	}
 	
+	#warning
+	//wxMessageBox(tfn);
+	
 	// create a copy to avoid a modification of sourceEditor
 	wxTextFile file(tfn);
 	if ( !file.Exists() )
@@ -4992,11 +4995,12 @@ void MainFrame::selectMonitorBookCncPanel() {
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::selectMonitorBookTemplatePanel(bool force) {
+void MainFrame::selectMonitorBookTemplatePanel() {
 ///////////////////////////////////////////////////////////////////
 	if ( m_externFileManagerPreview->IsChecked() == false ) {
-		prepareAndShowMonitorTemplatePreview(sourceEditor->IsModified() || force);
+		
 		m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+		
 	} else {
 		
 		selectMonitorBookCncPanel();
@@ -6201,6 +6205,7 @@ void MainFrame::onSelectCncMonitor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onSelectTemplatePreview(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	prepareAndShowMonitorTemplatePreview(sourceEditor->IsModified());
 	selectMonitorBookTemplatePanel();
 }
 /////////////////////////////////////////////////////////////////////

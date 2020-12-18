@@ -218,8 +218,7 @@ void CncTemplateObserver::performActions() {
 			
 			case ACTION_PREVIEW:
 			{
-				const bool force = true;
-				THE_APP->selectMonitorBookTemplatePanel(force);
+				THE_APP->selectMonitorBookTemplatePanel();
 				logInformation(wxString::Format(" --> Action: '%s' performed\n", "Update Preview"), styles.taAction);
 				break;
 			}
