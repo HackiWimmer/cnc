@@ -239,6 +239,14 @@ class CncPosition {
 		} 
 		
 		////////////////////////////////////////////////////////////////
+		const CncPosition<T>& setXY(T x, T y) {
+			xPos = x;
+			yPos = y;
+			evaluateWatermarks();
+			return *this;
+		} 
+		
+		////////////////////////////////////////////////////////////////
 		const CncPosition<T>& set(const CncPosition<T>& p) {
 			xPos = p.getX();
 			yPos = p.getY();
@@ -265,6 +273,13 @@ class CncPosition {
 		const CncPosition<T>& incY(T y) { yPos = yPos + y; evaluateWatermarks(); return *this; }
 		const CncPosition<T>& incZ(T z) { zPos = zPos + z; evaluateWatermarks(); return *this; }
 		
+		const CncPosition<T>& incXY(T x, T y) {
+			xPos = xPos + x;
+			yPos = yPos + y;
+			evaluateWatermarks(); 
+			return *this; 
+		}
+
 		const CncPosition<T>& inc(T x, T y, T z) {
 			xPos = xPos + x;
 			yPos = yPos + y;
@@ -278,6 +293,13 @@ class CncPosition {
 		const CncPosition<T>& decY(T y) { yPos = yPos - y; evaluateWatermarks(); return *this; }
 		const CncPosition<T>& decZ(T z) { zPos = zPos - z; evaluateWatermarks(); return *this; }
 		
+		const CncPosition<T>& decXY(T x, T y) {
+			xPos = xPos - x;
+			yPos = yPos - y;
+			evaluateWatermarks(); 
+			return *this; 
+		}
+
 		const CncPosition<T>& dec(T x, T y, T z) {
 			xPos = xPos - x;
 			yPos = yPos - y;

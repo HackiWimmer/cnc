@@ -725,6 +725,9 @@ void SvgCncContext::setToolList(const wxString& list) {
 		const wxString& token = tools.GetNextToken();
 		addTool(token);
 	}
+	
+	if ( checkToolExists(ID_DEFAULT_TOOL_ID) == false )
+		addTool(wxString::Format("%s={0.00}",	ID_DEFAULT_TOOL_ID));
 }
 //////////////////////////////////////////////////////////////////
 bool SvgCncContext::checkToolExists(const wxString& id) const {

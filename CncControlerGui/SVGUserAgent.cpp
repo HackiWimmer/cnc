@@ -178,6 +178,9 @@ bool SVGUserAgent::addID(const wxString& id, const char* nodeName) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::addTransform(const wxString& cmd) {
 /////////////////////////////////////////////////////////
+	
+	std::cout << CNC_LOG_FUNCT_A(" ") << cmd << std::endl;
+	
 	if ( cmd.IsEmpty() == false ) {
 		collectedTransforms.push_back(cmd);
 		return true;

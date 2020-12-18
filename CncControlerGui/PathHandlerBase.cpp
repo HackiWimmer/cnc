@@ -25,7 +25,6 @@ PathHandlerBase::PathHandlerBase()
 : CncCurveLib::Caller()
 , pathListMgr				()
 , fileParser				(NULL)
-, firstPath					(true)
 , nextPath					(false)
 , startPos					({0.0, 0.0, 0.0})
 , currentPos				({0.0, 0.0, 0.0})
@@ -141,24 +140,38 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 	
 	appendDebugValueDetail("Move", c);
 	
+	// Start a new sub-path at the given (x,y) coordinate. M (uppercase) indicates that absolute coordinates will follow; 
+	// m (lowercase) indicates that relative coordinates will follow. If a moveto is followed by multiple pairs of coordinates, 
+	// the subsequent pairs are treated as implicit lineto commands. Hence, implicit lineto commands will be relative 
+	// if the moveto is relative, and absolute if the moveto is absolute. 
+	// If a relative moveto (m) appears as the first element of the path, then it is treated as a pair of absolute coordinates. 
+	// In this case, subsequent pairs of coordinates are treated as relative even though the initial moveto is interpreted as an 
+	// absolute moveto.
+	
 	bool ret = false;
 	
 	if ( nextPath == true ) {
 		// Move to the path start
 		
+std::cout << "C: " << c <<  ", (" << values[0] << ", " << values[1] << ")" << std::endl;
+std::cout << "  SP: " << cnc::dblFormat(startPos) << std::endl;
+std::cout << "  CP: " << cnc::dblFormat(currentPos) << std::endl;
+
+
 		// first register start pos
-		startPos.setX(values[0]);
-		startPos.setY(values[1]);
+		startPos.setXY(values[0], values[1]); //}
+		//else			{ startPos = currentPos; startPos.incXY(values[0], values[1]); }
+
+		//startPos.setX(values[0]);
+		//startPos.setY(values[1]);
 		
 		// than give the path list manager the reference from where we are coming 
 		pathListMgr.setReferencePos(currentPos);
-#warning
-//pathListMgr.setPathFirstFlag(firstPath);
-		firstPath = false;
 		
-		// the first move is always absolute!
-		currentPos.setX(startPos.getX());
-		currentPos.setY(startPos.getY());
+// the first move is always absolute!
+
+		
+		currentPos.setXY(startPos.getX(), startPos.getY());
 		
 		// drive to first path
 		ret = processLinearMove(false);
@@ -166,23 +179,12 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 	}
 	else {
 		// Moving the path
-		double moveX = 0.0, moveY = 0.0;
-
-		if ( c == 'M' ) {
-			moveX = values[0] - currentPos.getX();
-			moveY = values[1] - currentPos.getY();
-		}
-		else {
-			moveX = values[0];
-			moveY = values[1];
-		}
-
-		currentPos.incX(moveX);
-		currentPos.incY(moveY);
-
-		startPos.setX(currentPos.getX());
-		startPos.setY(currentPos.getY());
-
+		const double moveX = ( c == 'M' ? values[0] - currentPos.getX() : values[0] );
+		const double moveY = ( c == 'M' ? values[1] - currentPos.getY() : values[1] );
+		
+		currentPos.incXY(moveX, moveY);
+		startPos.setXY(currentPos.getX(), currentPos.getY());
+		
 		if ( cnc::dblCompareNull(moveX) == false || cnc::dblCompareNull(moveY) == false )
 			return true;
 

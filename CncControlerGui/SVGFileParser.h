@@ -48,6 +48,7 @@ class SVGFileParser : public SVGParserBase
 		virtual void logMeasurementEnd();
 		
 		bool processXMLNode(wxXmlNode* node);
+		bool processCncParameter(wxXmlNode* node);
 		bool resetCncParameters(wxXmlNode* node);
 		bool printCncParameters(wxXmlNode* node);
 		bool evaluateCncParameters(wxXmlNode* node);

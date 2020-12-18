@@ -44,7 +44,6 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		CncPathListManager 				pathListMgr;
 
 		FileParser*						fileParser;
-		bool 							firstPath;
 		bool 							nextPath;
 
 		CncDoublePosition				startPos;
@@ -132,7 +131,6 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		// processing
 		bool processCommand_2DXY(char c, unsigned int count, const double values[]);
 		
-		bool isFirstPath() { return firstPath; }
 		bool isNextPath()  { return nextPath;  }
 
 		virtual bool prepareWork();

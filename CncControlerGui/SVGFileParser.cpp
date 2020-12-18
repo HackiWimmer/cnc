@@ -613,6 +613,46 @@ bool SVGFileParser::postprocess() {
 bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
 	
+	// -----------------------------------------------------------
+	#define ADD_ATTR_ID \
+	{ \
+		const char * attrName = "id"; \
+		if ( child->HasAttribute(attrName) ) \
+			svgUserAgent.addID(child->GetAttribute("id", ""), child->GetName().c_str()); \
+	}
+	
+	// -----------------------------------------------------------
+	#define ADD_ATTR_TRANSFORM \
+	{ \
+		const char * attrName = "transform"; \
+		if ( child->HasAttribute(attrName) ) \
+			svgUserAgent.addTransform(child->GetAttribute(attrName)); \
+	}
+	// -----------------------------------------------------------
+	#define ADD_ATTR_STYLE \
+	{ \
+		const char * attrName = "style"; \
+		if ( child->HasAttribute(attrName) )  \
+			svgUserAgent.addStyle(child->GetAttribute(attrName)); \
+	}
+
+	// -----------------------------------------------------------
+	#define ADD_BASIC_SHAPE(function) \
+	{ \
+		registerMovementNode(); \
+		registerNextDebugNode(currentNodeName); \
+		\
+		ADD_ATTR_TRANSFORM \
+		\
+		wxString ret; \
+		if ( SVGElementConverter::function(child, ret) ) \
+			if ( evaluatePath(ret) == false ) \
+				return false; \
+	}
+	
+	
+	// -----------------------------------------------------------
+	// entry point
 	while ( child ) {
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overloaded functions
@@ -625,89 +665,30 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
 			
+			ADD_ATTR_TRANSFORM
+			
 			const wxString data(child->GetAttribute("d", ""));
 			if ( evaluatePath(data)  == false )
 				return false;
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("SYMBOL", false) ) {
-			wxString a(child->GetAttribute("id", ""));
-			svgUserAgent.addID(a, child->GetName().c_str());
-			
-			a.assign(child->GetAttribute("transform", ""));
-			svgUserAgent.addTransform(a);
+			ADD_ATTR_ID
+			ADD_ATTR_TRANSFORM
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("G", false) ) {
-			wxString a(child->GetAttribute("id", ""));
-			svgUserAgent.addID(a, child->GetName().c_str());
-			
-			a.assign(child->GetAttribute("transform", ""));
-			svgUserAgent.addTransform(a);
-			
-			a.assign(child->GetAttribute("style", ""));
-			svgUserAgent.addStyle(a);
+			ADD_ATTR_ID
+			ADD_ATTR_TRANSFORM
+			ADD_ATTR_STYLE
 		}
 		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("CIRCLE", false) ) {
-			registerMovementNode();
-			registerNextDebugNode(currentNodeName);
-			
-			wxString ret; 
-			if ( SVGElementConverter::convertCircleToPathData(child, ret) )
-				if ( evaluatePath(ret) == false )
-					return false;
-		}
-		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("ELLIPSE", false) ) {
-			registerMovementNode();
-			registerNextDebugNode(currentNodeName);
-			
-			wxString ret; 
-			if ( SVGElementConverter::convertEllipseToPathData(child, ret) )
-				if ( evaluatePath(ret) == false )
-					return false;
-		}
-		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("LINE", false) ) {
-			registerMovementNode();
-			registerNextDebugNode(currentNodeName);
-			
-			wxString ret; 
-			if ( SVGElementConverter::convertLineToPathData(child, ret) )
-				if ( evaluatePath(ret) == false )
-					return false;
-		}
-		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("POLYGON", false ) ) {
-			registerMovementNode();
-			registerNextDebugNode(currentNodeName);
-			
-			wxString ret; 
-			if ( SVGElementConverter::convertPolygonToPathData(child, ret) )
-				if ( evaluatePath(ret) == false )
-					return false;
-		}
-		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("POLYLINE", false) ) {
-			registerMovementNode();
-			registerNextDebugNode(currentNodeName);
-			
-			wxString ret; 
-			if ( SVGElementConverter::convertPolylineToPathData(child, ret) )
-				if ( evaluatePath(ret) == false )
-					return false;
-		}
-		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("RECT", false) ) {
-			registerMovementNode();
-			registerNextDebugNode(currentNodeName);
-			
-			wxString ret; 
-			if ( SVGElementConverter::convertRectToPathData(child, ret) )
-				if ( evaluatePath(ret) == false )
-					return false;
-		}
+		else if ( currentNodeName.IsSameAs("CIRCLE",	false) )	{ ADD_BASIC_SHAPE(convertCircleToPathData)   }
+		else if ( currentNodeName.IsSameAs("ELLIPSE",	false) )	{ ADD_BASIC_SHAPE(convertEllipseToPathData)  }
+		else if ( currentNodeName.IsSameAs("LINE",		false) )	{ ADD_BASIC_SHAPE(convertLineToPathData)     }
+		else if ( currentNodeName.IsSameAs("POLYGON",	false) )	{ ADD_BASIC_SHAPE(convertPolygonToPathData)  }
+		else if ( currentNodeName.IsSameAs("POLYLINE",	false) )	{ ADD_BASIC_SHAPE(convertPolylineToPathData) }
+		else if ( currentNodeName.IsSameAs("RECT",		false) )	{ ADD_BASIC_SHAPE(convertRectToPathData)     }
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("USE", false) ) {
 			registerNextDebugNode(currentNodeName);
@@ -718,55 +699,9 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			udv.push_back(svgUserAgent.evaluateUseDirective(ud));
 		}
 		// ----------------------------------------------------------
-		else if ( currentNodeName.StartsWith("Cnc") ) {
-			
-			// ------------------------------------------------------
-			if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) ) {
-				if ( resetCncParameters(child) == false )
-					return false;
-					
-				registerNextDebugNode(currentNodeName);
-				
-				svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
-			}
-			// ------------------------------------------------------
-			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) ) {
-				if ( evaluateCncParameters(child) == false )
-					return false;
-					
-				registerNextDebugNode(currentNodeName);
-				svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
-			}
-			// ------------------------------------------------------
-			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) ) {
-				registerNextDebugNode(currentNodeName);
-				
-				SvgCncBreak scb; scb.setCurrentLineNumber(getCurrentLineNumber());
-				svgUserAgent.initNextCncBreakNode(scb);
-			}
-			// ------------------------------------------------------
-			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) ) {
-				registerNextDebugNode(currentNodeName);
-			
-				SvgCncPause scp; scp.setCurrentLineNumber(getCurrentLineNumber());
-				double p = 0.0;
-				if ( child->GetAttribute("p", "0.0").ToDouble(&p) )
-					scp.microseconds = (int64_t)(p * 1000 * 1000);
-				
-				svgUserAgent.initNextCncPauseNode(scp);
-			}
-			// ------------------------------------------------------
-			else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterPrintBlockNodeName) ) {
-				if ( printCncParameters(child) == false )
-					return false;
-					
-				registerNextDebugNode(currentNodeName);
-				svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
-			}
-			// ------------------------------------------------------
-			else if ( currentNodeName.IsSameAs("CNC", false) ) {
-				cnc::cex1 << "Obsolete Node. <CNC> isn't longer supported. Line number: " << child->GetLineNumber() << std::endl;
-			}
+		else if ( currentNodeName.StartsWith("Cnc") ) { 
+			if ( processCncParameter(child) == false )
+				return false; 
 		}
 		
 		// check the debug state before the next node
@@ -777,36 +712,88 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		wxXmlNode* last = child;
 		
 		// GetChildren() returns the first child of this node
-		if ( processXMLNode(child->GetChildren()) == false ) {
+		if ( processXMLNode(child->GetChildren()) == false )
 			return false;
-		}
 		
 		// close the id, transform and style attribute (on demand)
 		if ( last != NULL ) {
-			wxString a(last->GetAttribute("id", ""));
-			if ( a.IsEmpty() == false )
-				svgUserAgent.removeId(a);
-				
-			a.assign(last->GetAttribute("transform", ""));
-			if ( a.IsEmpty() == false )
-				svgUserAgent.removeLastTransform();
+			
+			if ( last->HasAttribute("id") )			svgUserAgent.removeId(last->GetAttribute("id"));
+			if ( last->HasAttribute("transform") )	svgUserAgent.removeLastTransform();
 			
 			// only style attributes from <g> are colleted before
-			if ( last->GetName().Upper() == "G" ) {
-				a.assign(last->GetAttribute("style", ""));
-				if ( a.IsEmpty() == false )
-					svgUserAgent.removeLastStyle();
-			}
+			if ( last->GetName().IsSameAs("g", false) )
+				if ( last->HasAttribute("style") )	svgUserAgent.removeLastStyle();
 		}
 		
 		if ( cncControl->isInterrupted() == true )
 			return false;
 		
+		//swap
 		child = child->GetNext();
 		
 		// check the debug state before the next node
 		if ( evaluateDebugState() == false )
 			return false;
+	}
+	
+	return true;
+	
+	// -----------------------------------------------------------
+	#undef ADD_ATTR_ID
+	#undef ADD_ATTR_TRANSFORM
+	#undef ADD_ATTR_STYLE
+	#undef ADD_BASIC_SHAPE
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::processCncParameter(wxXmlNode* child) {
+//////////////////////////////////////////////////////////////////
+	// ------------------------------------------------------
+	if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) ) {
+		if ( resetCncParameters(child) == false )
+			return false;
+			
+		registerNextDebugNode(currentNodeName);
+		
+		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
+	}
+	// ------------------------------------------------------
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) ) {
+		if ( evaluateCncParameters(child) == false )
+			return false;
+			
+		registerNextDebugNode(currentNodeName);
+		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
+	}
+	// ------------------------------------------------------
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) ) {
+		registerNextDebugNode(currentNodeName);
+		
+		SvgCncBreak scb; scb.setCurrentLineNumber(getCurrentLineNumber());
+		svgUserAgent.initNextCncBreakNode(scb);
+	}
+	// ------------------------------------------------------
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) ) {
+		registerNextDebugNode(currentNodeName);
+	
+		SvgCncPause scp; scp.setCurrentLineNumber(getCurrentLineNumber());
+		double p = 0.0;
+		if ( child->GetAttribute("p", "0.0").ToDouble(&p) )
+			scp.microseconds = (int64_t)(p * 1000 * 1000);
+		
+		svgUserAgent.initNextCncPauseNode(scp);
+	}
+	// ------------------------------------------------------
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterPrintBlockNodeName) ) {
+		if ( printCncParameters(child) == false )
+			return false;
+			
+		registerNextDebugNode(currentNodeName);
+		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
+	}
+	// ------------------------------------------------------
+	else if ( currentNodeName.IsSameAs("CNC", false) ) {
+		cnc::cex1 << "Obsolete Node. <CNC> isn't longer supported. Line number: " << child->GetLineNumber() << std::endl;
 	}
 	
 	return true;
