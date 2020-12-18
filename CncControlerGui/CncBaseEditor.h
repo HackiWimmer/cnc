@@ -77,6 +77,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		bool saveFileAs(const wxString& fileName);
 		
 		void changeBinaryViewType(const BinaryFileParser::ViewType bvt);
+		void setTryToSelectFlag(bool flag)				{ tryToSelectFlag = flag; }
 		
 		const CncDimensions getModelViewType()			{ return fileInfo.modelViewType; }
 		const GLContextBase::ModelType getModelType() 	{ return fileInfo.modelType; }
@@ -125,8 +126,9 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		wxStaticText* 	ctlColunmPostion;
 		wxTextCtrl*		ctlStatus;
 		
-		bool blockSelectEvent;
-		bool fileLoadingActive;
+		bool			tryToSelectFlag;
+		bool			blockSelectEvent;
+		bool			fileLoadingActive;
 		
 		virtual void initialize() = 0;
 		virtual bool hasEditMode() { return true; }

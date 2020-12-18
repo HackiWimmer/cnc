@@ -34,15 +34,16 @@ wxEND_EVENT_TABLE()
 ///////////////////////////////////////////////////////////////////
 CncBaseEditor::CncBaseEditor(wxWindow *parent) 
 : wxStyledTextCtrl(parent)
-, styles()
-, flags()
-, fileInfo()
-, svgPopupMenu(NULL)
-, ctlEditMode(NULL)
-, ctlColunmPostion(NULL)
-, ctlStatus(NULL)
-, blockSelectEvent(false)
-, fileLoadingActive(false)
+, styles				()
+, flags					()
+, fileInfo				()
+, svgPopupMenu			(NULL)
+, ctlEditMode			(NULL)
+, ctlColunmPostion		(NULL)
+, ctlStatus				(NULL)
+, tryToSelectFlag		(false)
+, blockSelectEvent		(false)
+, fileLoadingActive		(false)
 ///////////////////////////////////////////////////////////////////
 {
 	setupStyle();
@@ -259,8 +260,11 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 	if ( publishSelection == true ) {
 		// ------------------------------------------------------------
 		auto tryToSelectClientId = [&](long cid) {
+			if ( tryToSelectFlag == false )
+				return;
+				
 			SelectEventBlocker blocker(this);
-			APP_PROXY::tryToSelectClientId(cid, ClientIdSelSource::ID::TSS_EDITOR);
+			APP_PROXY::tryToSelectClientId(cid * CLIENT_ID.TPL_FACTOR, ClientIdSelSource::ID::TSS_EDITOR);
 		};
 		
 		// ------------------------------------------------------------

@@ -417,6 +417,20 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1368->Add(m_btSvgToggleWordWrap, 0, wxALL, WXC_FROM_DIP(1));
     m_btSvgToggleWordWrap->SetMinSize(wxSize(26,26));
+    
+    m_btSvgToggleTryToSelectClientId = new wxBitmapToggleButton(m_editorPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-find")), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
+    m_btSvgToggleTryToSelectClientId->SetToolTip(_("Toggle Try to select ClientId"));
+    m_btSvgToggleTryToSelectClientId->SetValue(false);
+    
+    flexGridSizer1368->Add(m_btSvgToggleTryToSelectClientId, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSvgToggleTryToSelectClientId->SetMinSize(wxSize(26,26));
+    
+    m_btSvgToggleAutoSaveTplOnProcess = new wxBitmapToggleButton(m_editorPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-build")), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
+    m_btSvgToggleAutoSaveTplOnProcess->SetToolTip(_("Auto save on process"));
+    m_btSvgToggleAutoSaveTplOnProcess->SetValue(false);
+    
+    flexGridSizer1368->Add(m_btSvgToggleAutoSaveTplOnProcess, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSvgToggleAutoSaveTplOnProcess->SetMinSize(wxSize(26,26));
     flexGridSizer1368->SetMinSize(wxSize(28,-1));
     
     m_templateNotebook = new wxNotebook(m_editorPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(-1,-1)), wxNB_NOPAGETHEME|wxBK_TOP|wxBK_DEFAULT);
@@ -5785,6 +5799,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_renameTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::renameTemplateFromButton), NULL, this);
     m_removeTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::removeTemplateFromButton), NULL, this);
     m_btSvgToggleWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
+    m_btSvgToggleTryToSelectClientId->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTryToSelectClientIdFromEditor), NULL, this);
+    m_btSvgToggleAutoSaveTplOnProcess->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleAutoSaveTplOnProcess), NULL, this);
     m_tbCaseSensitive->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbRegEx->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbHighLight->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
@@ -6024,6 +6040,8 @@ MainFrameBClass::~MainFrameBClass()
     m_renameTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::renameTemplateFromButton), NULL, this);
     m_removeTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::removeTemplateFromButton), NULL, this);
     m_btSvgToggleWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
+    m_btSvgToggleTryToSelectClientId->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTryToSelectClientIdFromEditor), NULL, this);
+    m_btSvgToggleAutoSaveTplOnProcess->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleAutoSaveTplOnProcess), NULL, this);
     m_tbCaseSensitive->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbRegEx->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbHighLight->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);

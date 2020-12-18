@@ -1743,7 +1743,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     m_btnRefresh->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_reload")), wxLEFT);
     m_btnRefresh->SetBitmapMargins(2,2);
     #endif
-    m_btnRefresh->SetToolTip(_("Toggle: Show Fly Path"));
+    m_btnRefresh->SetToolTip(_("Refresh Monitor"));
     
     flexGridSizer363->Add(m_btnRefresh, 0, wxALL, WXC_FROM_DIP(1));
     m_btnRefresh->SetMinSize(wxSize(26,26));

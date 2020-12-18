@@ -198,8 +198,12 @@ if ( false ) {
 	// display guide pathes on demand
 	if ( guidePath ) {
 		publishGuidePath(*guidePath, zSureface);
-		publishGuidePath(*guidePath, zTarget);
 		
+		if ( guidePath->getGuideType() == CncPathListManager::GuideType::ORIG_PATH )
+			publishGuidePath(*guidePath, zTarget);
+			
+		if ( guidePath->getGuideType() != CncPathListManager::GuideType::ORIG_PATH )
+			return true;
 	}
 	
 	// perform some checks

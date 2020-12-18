@@ -152,25 +152,14 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 	
 	if ( nextPath == true ) {
 		// Move to the path start
-		
-std::cout << "C: " << c <<  ", (" << values[0] << ", " << values[1] << ")" << std::endl;
-std::cout << "  SP: " << cnc::dblFormat(startPos) << std::endl;
-std::cout << "  CP: " << cnc::dblFormat(currentPos) << std::endl;
-
-
 		// first register start pos
-		startPos.setXY(values[0], values[1]); //}
-		//else			{ startPos = currentPos; startPos.incXY(values[0], values[1]); }
-
-		//startPos.setX(values[0]);
-		//startPos.setY(values[1]);
+		// the first move is always absolute - see comment above!
+		startPos.setXY(values[0], values[1]); 
 		
 		// than give the path list manager the reference from where we are coming 
 		pathListMgr.setReferencePos(currentPos);
 		
-// the first move is always absolute!
-
-		
+		// the first move is always absolute - see comment above!
 		currentPos.setXY(startPos.getX(), startPos.getY());
 		
 		// drive to first path
@@ -178,7 +167,7 @@ std::cout << "  CP: " << cnc::dblFormat(currentPos) << std::endl;
 		nextPath = false;
 	}
 	else {
-		// Moving the path
+		// Moving the path forward
 		const double moveX = ( c == 'M' ? values[0] - currentPos.getX() : values[0] );
 		const double moveY = ( c == 'M' ? values[1] - currentPos.getY() : values[1] );
 		

@@ -5,6 +5,8 @@
   <object class="wxBitmap" name="16-ToolPin@2x">bitmaps\16-ToolPin@2x.png</object>
   <object class="wxBitmap" name="16-archive">bitmaps\16-archive.png</object>
   <object class="wxBitmap" name="16-archive@2x">bitmaps\16-archive@2x.png</object>
+  <object class="wxBitmap" name="16-build">bitmaps\CodeLite\16-build.png</object>
+  <object class="wxBitmap" name="16-build@2x">bitmaps\CodeLite\16-build@2x.png</object>
   <object class="wxBitmap" name="16-case-sensitive">bitmaps\16-case-sensitive.png</object>
   <object class="wxBitmap" name="16-case-sensitive@2x">bitmaps\16-case-sensitive@2x.png</object>
   <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
@@ -32,6 +34,8 @@
   <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>
   <object class="wxBitmap" name="16-file_save@2x">bitmaps\16-file_save@2x.png</object>
   <object class="wxBitmap" name="16-file_save.1">bitmaps\CodeLite\16-file_save.1.png</object>
+  <object class="wxBitmap" name="16-find">bitmaps\CodeLite\16-find.png</object>
+  <object class="wxBitmap" name="16-find@2x">bitmaps\CodeLite\16-find@2x.png</object>
   <object class="wxBitmap" name="16-fold">bitmaps\16-fold.png</object>
   <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
   <object class="wxBitmap" name="16-globals">bitmaps\16-globals.png</object>

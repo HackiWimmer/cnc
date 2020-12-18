@@ -822,6 +822,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(fileView);
 	registerGuiControl(lruFileView);
 	
+	registerGuiControl(m_btSvgToggleAutoSaveTplOnProcess);
 	registerGuiControl(m_defaultSpeedSlider);
 	registerGuiControl(m_searchConnections);
 	registerGuiControl(m_btToggleOutboundEditorWordWrap);
@@ -1622,7 +1623,7 @@ bool MainFrame::readSerialThreadData(AE::TransferData& td) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( saveTemplateOnDemand() == false )
+	if ( saveTemplateOnDemand(false) == false )
 		return;
 		
 	if ( canClose == false) {
@@ -3018,7 +3019,7 @@ void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::newTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( saveTemplateOnDemand() == false )
+	if ( saveTemplateOnDemand(false) == false )
 		return;
 		
 	const wxString templateName("..\\Templates\\");
@@ -4084,11 +4085,13 @@ bool MainFrame::processTemplateIntern() {
 	resetMinMaxPositions();
 	notifyConfigUpdate();
 	
+	const bool forceSave = m_btSvgToggleAutoSaveTplOnProcess->GetValue();
+	
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
 		
 		case TplBinary:
-			if ( saveTemplateOnDemand() == false )
+			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
 			clearMotionMonitor();
 			// measurement handling will be done by the corespondinf file parser
@@ -4096,7 +4099,7 @@ bool MainFrame::processTemplateIntern() {
 			break;
 			
 		case TplSvg:
-			if ( saveTemplateOnDemand() == false )
+			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
 			clearMotionMonitor();
 			// measurement handling will be done by the corespondinf file parser
@@ -4104,7 +4107,7 @@ bool MainFrame::processTemplateIntern() {
 			break;
 			
 		case TplGcode:
-			if ( saveTemplateOnDemand() == false )
+			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
 			clearMotionMonitor();
 			// measurement handling will be done by the corespondinf file parser
@@ -4187,18 +4190,19 @@ void MainFrame::resetMinMaxPositions() {
 	cnc->resetWatermarks();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::saveTemplateOnDemand() {
+bool MainFrame::saveTemplateOnDemand(bool force) {
 ///////////////////////////////////////////////////////////////////
-	const wxString msg(wxString::Format("Save Template?\n\n '%s'", getCurrentTemplatePathFileName()));
-	
 	if ( sourceEditor->IsModified() == true ) {
+		
+		const wxString msg(wxString::Format("Save Template?\n\n '%s'", getCurrentTemplatePathFileName()));
 		wxRichMessageDialog dlg(this, msg, _T("File Observer . . . "), 
 		                    wxYES|wxNO|wxCANCEL|wxCENTRE);
 		
 		dlg.SetFooterText("The current template was modified.");
 		dlg.SetFooterIcon(wxICON_WARNING);
 		
-		int ret = dlg.ShowModal();
+		int ret = force ? wxID_YES : dlg.ShowModal();
+		
 		if ( ret == wxID_YES ) {
 			saveFile();
 			selectMonitorBookCncPanel();
@@ -4871,7 +4875,7 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 	selectMainBookSourcePanel();
 	selectMonitorBookTemplatePanel();
 	
-	if ( saveTemplateOnDemand() == false ) {
+	if ( saveTemplateOnDemand(false) == false ) {
 		prepareAndShowMonitorTemplatePreview();
 		return;
 	}
@@ -5673,6 +5677,18 @@ void MainFrame::toggleTemplateWordWrapMode(wxCommandEvent& event) {
 	sourceEditor->SetWrapMode(!m_btSvgToggleWordWrap->GetValue());
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::toggleAutoSaveTplOnProcess(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::toggleTryToSelectClientIdFromEditor(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( sourceEditor == NULL ) 
+		return;
+	
+	sourceEditor->setTryToSelectFlag(m_btSvgToggleTryToSelectClientId->GetValue());
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::toggleOutboundEditorWordWrap(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	outboundEditor->SetWrapMode(!m_btToggleOutboundEditorWordWrap->GetValue());
@@ -6450,7 +6466,8 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	else						isRunning = true;
 	
 	// debugging only
-	// cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
+	if ( true )
+		cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld)\n", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
 	
 	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {
 		if ( positionSpy != NULL )
@@ -7778,7 +7795,3 @@ void MainFrame::onIdle(wxIdleEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	//CNC_PRINT_LOCATION
 }
-
-
-
-

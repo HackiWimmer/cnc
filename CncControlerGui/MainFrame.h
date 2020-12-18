@@ -169,6 +169,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void toggleTryToSelectClientIdFromEditor(wxCommandEvent& event);
+		virtual void toggleAutoSaveTplOnProcess(wxCommandEvent& event);
 		virtual void onSelectTemplatePanel(wxListbookEvent& event);
 		virtual void detachControllerMessages(wxCommandEvent& event);
 		virtual void detachSetterList(wxCommandEvent& event);
@@ -763,7 +765,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void updateHardwareReference();
 		void updateHardwareDimensions();
 		
-		bool saveTemplateOnDemand();
+		bool saveTemplateOnDemand(bool force);
 
 		BinaryFileParser::ViewType getCurrentBinaryViewMode();
 		

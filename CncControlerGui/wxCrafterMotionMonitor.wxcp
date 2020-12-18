@@ -16366,7 +16366,7 @@
           }, {
            "type": "multi-string",
            "m_label": "Tooltip:",
-           "m_value": "Toggle: Show Fly Path"
+           "m_value": "Refresh Monitor"
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
