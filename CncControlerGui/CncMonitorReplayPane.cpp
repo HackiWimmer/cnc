@@ -49,6 +49,19 @@ CncMonitorReplayPane::~CncMonitorReplayPane() {
 	abort = true;
 }
 ///////////////////////////////////////////////////////////////////
+void CncMonitorReplayPane::enable(bool state) {
+///////////////////////////////////////////////////////////////////
+	GetReplayStart()->Enable(state);
+	GetReplayPrev()->Enable(state);
+	GetReplayNext()->Enable(state);
+	GetReplayEnd()->Enable(state);
+	GetReplayPlayAll()->Enable(state);
+	GetReplayPlayCurrentId()->Enable(state);
+	GetReplayPause()->Enable(state);
+	GetReplayStop()->Enable(state);
+	GetCbStepUnit()->Enable(state);
+}
+///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::updateControls() {
 ///////////////////////////////////////////////////////////////////
 	if ( motionMonitor == NULL )

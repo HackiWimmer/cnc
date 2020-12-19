@@ -527,7 +527,13 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void toggleMotionMonitorOptionPane(bool forceHide);
 		void toggleMotionMonitorStatisticPane(bool forceHide);
+		void toggleMotionMonitorReplayPane(bool forceHide);
 		
+		void showMotionMonitorStatisticPane(bool show=true);
+		void showMotionMonitorReplayPane(bool show=true);
+		void hideMotionMonitorStatisticPane()			{ showMotionMonitorStatisticPane(false); }
+		void hideMotionMonitorReplayPane()				{ showMotionMonitorReplayPane(false);    }
+
 		void clearMotionMonitor();
 		
 	protected:

@@ -558,40 +558,10 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7624->Add(m_staticLine219, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_pathListDetails = new wxSplitterWindow(m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), wxSP_3D);
-    m_pathListDetails->SetSashGravity(0.95);
-    m_pathListDetails->SetMinimumPaneSize(10);
-    
-    flexGridSizer7624->Add(m_pathListDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_splitterPage387 = new wxPanel(m_pathListDetails, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_pathListDetails, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    
-    wxFlexGridSizer* flexGridSizer391 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer391->SetFlexibleDirection( wxBOTH );
-    flexGridSizer391->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer391->AddGrowableCol(0);
-    flexGridSizer391->AddGrowableRow(0);
-    m_splitterPage387->SetSizer(flexGridSizer391);
-    
-    m_pathListEntriesPlaceholder = new wxListCtrl(m_splitterPage387, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage387, wxSize(-1,-1)), wxLC_REPORT);
+    m_pathListEntriesPlaceholder = new wxListCtrl(m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1,-1)), wxLC_REPORT);
     m_pathListEntriesPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer391->Add(m_pathListEntriesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_splitterPage383 = new wxPanel(m_pathListDetails, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_pathListDetails, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_pathListDetails->SplitHorizontally(m_splitterPage387, m_splitterPage383, 0);
-    
-    wxFlexGridSizer* flexGridSizer393 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer393->SetFlexibleDirection( wxBOTH );
-    flexGridSizer393->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer393->AddGrowableCol(0);
-    flexGridSizer393->AddGrowableRow(0);
-    m_splitterPage383->SetSizer(flexGridSizer393);
-    
-    m_textCtrl395 = new wxTextCtrl(m_splitterPage383, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPage383, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE);
-    m_textCtrl395->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    
-    flexGridSizer393->Add(m_textCtrl395, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer7624->Add(m_pathListEntriesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panelMoveSequences = new wxPanel(m_listbookPreProcessor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbookPreProcessor, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelMoveSequencesImgIndex;

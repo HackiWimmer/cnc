@@ -14,6 +14,8 @@ class CncStatisticsPane : public CncStatisticsPaneBase {
 		CncStatisticsPane(wxWindow* parent);
 		virtual ~CncStatisticsPane();
 		
+		void enable(bool state);
+		
 		void setCncControl(CncControl* c);
 		void setMotionMonitor(CncMotionMonitor* mm);
 		

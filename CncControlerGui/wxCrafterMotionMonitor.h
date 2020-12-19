@@ -23,8 +23,8 @@
 #include <wx/imaglist.h>
 #include <wx/bmpbuttn.h>
 #include <wx/tglbtn.h>
-#include <wx/splitter.h>
 #include <wx/listctrl.h>
+#include <wx/splitter.h>
 #include <wx/simplebook.h>
 #include <wx/checkbox.h>
 #include <wx/choicebk.h>
@@ -151,11 +151,7 @@ protected:
     wxBitmapButton* m_btPathListEntryNext;
     wxBitmapButton* m_btPathListEntryLast;
     wxStaticLine* m_staticLine219;
-    wxSplitterWindow* m_pathListDetails;
-    wxPanel* m_splitterPage387;
     wxListCtrl* m_pathListEntriesPlaceholder;
-    wxPanel* m_splitterPage383;
-    wxTextCtrl* m_textCtrl395;
     wxPanel* m_panelMoveSequences;
     wxPanel* m_plMoveSequences;
     wxBitmapButton* m_bmpButton304;
@@ -243,10 +239,6 @@ public:
     wxBitmapButton* GetBtPathListEntryLast() { return m_btPathListEntryLast; }
     wxStaticLine* GetStaticLine219() { return m_staticLine219; }
     wxListCtrl* GetPathListEntriesPlaceholder() { return m_pathListEntriesPlaceholder; }
-    wxPanel* GetSplitterPage387() { return m_splitterPage387; }
-    wxTextCtrl* GetTextCtrl395() { return m_textCtrl395; }
-    wxPanel* GetSplitterPage383() { return m_splitterPage383; }
-    wxSplitterWindow* GetPathListDetails() { return m_pathListDetails; }
     wxPanel* GetPlPathListView() { return m_plPathListView; }
     wxPanel* GetPanelPathListEntries() { return m_panelPathListEntries; }
     wxBitmapButton* GetBmpButton304() { return m_bmpButton304; }

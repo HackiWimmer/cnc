@@ -952,11 +952,13 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
+	showMotionMonitorReplayPane();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
+	showMotionMonitorStatisticPane();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -2042,7 +2044,7 @@ bool MainFrame::Show(bool show) {
 
 	if ( show == true )  {
 		toggleMotionMonitorOptionPane(true);
-		toggleMotionMonitorStatisticPane(true);
+		showMotionMonitorReplayPane(true);
 
 		auto startTimer = [](wxTimer* timer, unsigned int value, const char* name) {
 
@@ -2469,7 +2471,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	}
 	
 	#warning
-	const bool sound = true;//( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() && setup.speedMonitor == true );
+	const bool sound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() && setup.speedMonitor == true );
 	CncMillingSound::activate(sound);
 	
 	// config setup
@@ -2621,6 +2623,7 @@ void MainFrame::enableControls(bool state) {
 	enableRunControls(state);
 	
 	drawPane3D->enable(state);
+	statisticsPane->enable(state);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
@@ -7186,59 +7189,74 @@ void MainFrame::toggleMotionMonitorOptionPane(wxCommandEvent& event) {
 	toggleMotionMonitorOptionPane(false);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::toggleMotionMonitorStatisticPane(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	toggleMotionMonitorStatisticPane(false);
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMotionMonitorOptionPane(bool forceHide) {
 /////////////////////////////////////////////////////////////////////
 	if ( cnc3DVSplitterWindow != NULL )
 		forceHide == true ? cnc3DVSplitterWindow->hideRightWindow() : cnc3DVSplitterWindow->toggleRightWindow();
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMotionMonitorStatisticPane(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	toggleMotionMonitorStatisticPane(false);
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMotionMonitorStatisticPane(bool forceHide) {
 /////////////////////////////////////////////////////////////////////
-	if ( cnc3DHSplitterWindow != NULL ) {
+	const int nc	= MontiorBottomContextSelection::VAL::STATISTIC_PANEL;
+	const int cc	= cnc3DHSplitterWindow->getCurrentButtomContext();
+	
+	const bool show	=	( forceHide ? false : 
+						( nc != cc  ? true  : !cnc3DHSplitterWindow->isBottomWindowShown() ) 
+						);
+						
+	showMotionMonitorStatisticPane(show);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::showMotionMonitorStatisticPane(bool show) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc3DHSplitterWindow == NULL )
+		return;
 		
-		const int nc = MontiorBottomContextSelection::VAL::STATISTIC_PANEL;
-		const int cc = cnc3DHSplitterWindow->getCurrentButtomContext();
-		
-		cnc3DHSplitterWindow->selectBottomContext(nc);
-		
-		if ( cnc3DHSplitterWindow->isBottomWindowShown() ) {
-			cnc3DHSplitterWindow->hideBottomWindow();
-			
-			if ( nc != cc )
-				forceHide == true ? cnc3DHSplitterWindow->hideBottomWindow() : cnc3DHSplitterWindow->showBottomWindow();
-				
-		} else {
-			forceHide == true ? cnc3DHSplitterWindow->hideBottomWindow() : cnc3DHSplitterWindow->toggleBottomWindow();
-			
-		}
-	}
+	const int nc = MontiorBottomContextSelection::VAL::STATISTIC_PANEL;
+	const int cc = cnc3DHSplitterWindow->getCurrentButtomContext();
+	
+	cnc3DHSplitterWindow->selectBottomContext(nc);
+	
+	if ( show == true )	cnc3DHSplitterWindow->showBottomWindow();
+	else				cnc3DHSplitterWindow->hideBottomWindow();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMotionMonitorReplayPane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( cnc3DHSplitterWindow != NULL ) {
+	toggleMotionMonitorReplayPane(false);
+}
+
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMotionMonitorReplayPane(bool forceHide) {
+/////////////////////////////////////////////////////////////////////
+	const int nc	= MontiorBottomContextSelection::VAL::REPLAY_PANEL;
+	const int cc	= cnc3DHSplitterWindow->getCurrentButtomContext();
+	
+	const bool show	=	( forceHide ? false : 
+						( nc != cc  ? true  : !cnc3DHSplitterWindow->isBottomWindowShown() ) 
+						);
+						
+	showMotionMonitorReplayPane(show);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::showMotionMonitorReplayPane(bool show) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc3DHSplitterWindow == NULL )
+		return;
 		
-		const int nc = MontiorBottomContextSelection::VAL::REPLAY_PANEL;
-		const int cc = cnc3DHSplitterWindow->getCurrentButtomContext();
-		
-		cnc3DHSplitterWindow->selectBottomContext(nc);
-		
-		if ( cnc3DHSplitterWindow->isBottomWindowShown() ) {
-			cnc3DHSplitterWindow->hideBottomWindow();
-			
-			if ( nc != cc)
-				cnc3DHSplitterWindow->showBottomWindow();
-				
-		} else {
-			cnc3DHSplitterWindow->toggleBottomWindow();
-			
-		}
-	}
+	const int nc = MontiorBottomContextSelection::VAL::REPLAY_PANEL;
+	const int cc = cnc3DHSplitterWindow->getCurrentButtomContext();
+	
+	cnc3DHSplitterWindow->selectBottomContext(nc);
+	
+	if ( show == true )	cnc3DHSplitterWindow->showBottomWindow();
+	else				cnc3DHSplitterWindow->hideBottomWindow();
+
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectMetricUnitFrom(wxCommandEvent& event) {

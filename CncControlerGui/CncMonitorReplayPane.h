@@ -13,6 +13,8 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 		explicit CncMonitorReplayPane(wxWindow* parent);
 		virtual ~CncMonitorReplayPane();
 		
+		void enable(bool state);
+		
 		void setMotionMonitor(CncMotionMonitor* mm);
 		bool isProcessing() { return processing; }
 		

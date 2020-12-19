@@ -567,14 +567,19 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	auto skipToNextEntry = [&]() { 
+		
 		++itCurr; 
 		c = n; 
 		n = getNextEntry(itCurr); 
 		
-		APP_PROXY::getCncPreProcessor()->addPathListEntry(*c);
+		if ( c != NULL )
+			APP_PROXY::getCncPreProcessor()->addPathListEntry(*c);
+			
+		#warning
+		return (c != NULL && n != NULL);
 	};
 	
-	while ( n != NULL ) {
+	while ( c != NULL && n != NULL ) {
 		
 		// check common break conditions
 		if ( isCncInterrupted() == true  )	return false;
@@ -597,7 +602,9 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 			if ( onPhysicallyClientIdChange(*c) == false )
 				return false;
 			
-			skipToNextEntry();
+			if ( skipToNextEntry() == false )
+				break;
+				
 			//continue;
 		}
 		
@@ -606,7 +613,9 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		const bool empty = isEmptyMove(c->entryDistance.getX(), c->entryDistance.getY(), c->entryDistance.getZ());
 		if ( setup.optSkipEmptyMoves == true && empty ) {
 			
-			skipToNextEntry();
+			if ( skipToNextEntry() == false )
+				break;
+				
 			continue;
 		}
 		
@@ -662,7 +671,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		cy += mNext.dy;
 		cz += mNext.dz;
 		
-		skipToNextEntry();
+		if ( skipToNextEntry() == false )
+			break;
 		
 	} // while a next entry is available
 	
