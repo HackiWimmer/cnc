@@ -629,7 +629,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/goto (2).png"
+       "m_path": "bitmaps/RunCtrl/CncDebug.png"
       }],
      "m_events": [],
      "m_children": []

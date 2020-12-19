@@ -605,14 +605,10 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 	
 	if ( entry < 0 )
 		entry = store->findFirstEntryForClientId(currentClientId);
-
-	std::cout << "4711 entry: "<< entry << std::endl;
-
-
+	
 	if ( entry < 0 )
 		return;
 		
 		
-
 	cncPath.setVirtualEnd(entry);
 }

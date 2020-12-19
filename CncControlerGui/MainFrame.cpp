@@ -2468,7 +2468,8 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		m_menuItemUpdCoors->Check(false);
 	}
 	
-	const bool sound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() && setup.speedMonitor == true );
+	#warning
+	const bool sound = true;//( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() && setup.speedMonitor == true );
 	CncMillingSound::activate(sound);
 	
 	// config setup
@@ -5684,10 +5685,15 @@ void MainFrame::toggleAutoSaveTplOnProcess(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleTryToSelectClientIdFromEditor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( sourceEditor == NULL ) 
-		return;
+	const bool flag = m_btSvgToggleTryToSelectClientId->GetValue();
 	
-	sourceEditor->setTryToSelectFlag(m_btSvgToggleTryToSelectClientId->GetValue());
+	if ( sourceEditor != NULL ) 
+		sourceEditor->setTryToSelectFlag(flag);
+	
+	if ( motionMonitor != NULL && flag == false) {
+		motionMonitor->setVirtualEndToLast();
+		motionMonitor->update(true);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleOutboundEditorWordWrap(wxCommandEvent& event) {

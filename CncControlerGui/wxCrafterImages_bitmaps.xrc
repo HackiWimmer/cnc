@@ -131,7 +131,7 @@
   <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\RunCtrl\iconmonstr-window-21-16.png</object>
-  <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\goto (2).png</object>
+  <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\RunCtrl\CncDebug.png</object>
   <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\arrow-right-3.png</object>
   <object class="wxBitmap" name="BMP_SECURE_DLG_NO">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-close-inactive.png</object>
   <object class="wxBitmap" name="BMP_SECURE_DLG_YES">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\RunCtrl\iconmonstr-lock-10-16.png</object>
