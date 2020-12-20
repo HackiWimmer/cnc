@@ -19,8 +19,10 @@ wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
 CncGCodeSequenceListCtrl::CncGCodeSequenceListCtrl(wxWindow *parent, long style)
-: CncLargeScaledListCtrl(parent, style)
-, defaultItemAttr()
+: CncLargeScaledListCtrl	(parent, style)
+, defaultItemAttr			()
+, defaultItemAttrSelected	()
+, gcodes					()
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -46,10 +48,50 @@ CncGCodeSequenceListCtrl::CncGCodeSequenceListCtrl(wxWindow *parent, long style)
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
 	defaultItemAttr.SetTextColour(GetTextColour());
+	
+	defaultItemAttrSelected		= defaultItemAttr;
+	defaultItemAttrSelected.SetTextColour(*wxYELLOW);
+	defaultItemAttrSelected.SetFont(defaultItemAttrSelected.GetFont().Bold());
 }
 /////////////////////////////////////////////////////////////
 CncGCodeSequenceListCtrl::~CncGCodeSequenceListCtrl() {
 /////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////
+void CncGCodeSequenceListCtrl::clearAll() {
+/////////////////////////////////////////////////////////////
+	gcodes.clear();
+	clear();
+}
+/////////////////////////////////////////////////////////////
+bool CncGCodeSequenceListCtrl::isItemValid(long item) const {
+/////////////////////////////////////////////////////////////
+	return item >= 0 && item < (long)(gcodes.size());
+}
+/////////////////////////////////////////////////////////////
+wxString CncGCodeSequenceListCtrl::OnGetItemText(long item, long column) const {
+/////////////////////////////////////////////////////////////
+	static wxString value;
+	
+	if ( isItemValid(item) == false )
+		return _("");
+		
+	const GCodeBlock& gcb = gcodes.at(item);
+	
+	switch ( column ) {
+		
+		case CncGCodeSequenceListCtrl::COL_ID: 		return wxString::Format(globalStrings.gcodeSeqRefFormat, gcb.clientID);
+		case CncGCodeSequenceListCtrl::COL_CMD: 	return gcb.getCmdAsString(value);
+		
+		case CncGCodeSequenceListCtrl::COL_X:		return (gcb.hasX() ? wxString::Format("% 8.3f", gcb.x) : "");
+		case CncGCodeSequenceListCtrl::COL_Y:		return (gcb.hasY() ? wxString::Format("% 8.3f", gcb.y) : "");
+		case CncGCodeSequenceListCtrl::COL_Z:		return (gcb.hasZ() ? wxString::Format("% 8.3f", gcb.z) : "");
+		case CncGCodeSequenceListCtrl::COL_F:		return (gcb.hasF() ? wxString::Format("% 8.3f", gcb.f) : "");
+		
+		case CncGCodeSequenceListCtrl::COL_MORE:	return gcb.traceMore(value);
+	}
+	
+	return _("");
 }
 /////////////////////////////////////////////////////////////
 int CncGCodeSequenceListCtrl::OnGetItemColumnImage(long item, long column) const {
@@ -59,8 +101,10 @@ int CncGCodeSequenceListCtrl::OnGetItemColumnImage(long item, long column) const
 /////////////////////////////////////////////////////////////
 wxListItemAttr* CncGCodeSequenceListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
+	const bool b = (item == getLastSelection());
+
 	// this indicates to use the default style
-	return (wxListItemAttr*)(&defaultItemAttr);
+	return (wxListItemAttr*)( b ? (&defaultItemAttrSelected)  : (&defaultItemAttr) );
 }
 /////////////////////////////////////////////////////////////
 void CncGCodeSequenceListCtrl::onSelectListItem(wxListEvent& event) {
@@ -69,13 +113,15 @@ void CncGCodeSequenceListCtrl::onSelectListItem(wxListEvent& event) {
 	if ( item == wxNOT_FOUND )
 		return;
 		
+	if ( isItemValid(item) == false )
+		return;
+		
 	setLastSelection(item);
 	
-	long ln;
-	getRow(item).getItem(COL_SEARCH).ToLong(&ln);
+	const GCodeBlock& gcb = gcodes.at(item);
 	
 	SelectEventBlocker blocker(this);
-	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_GCODE_SEQ);
+	APP_PROXY::tryToSelectClientId(gcb.clientID, ClientIdSelSource::ID::TSS_GCODE_SEQ);
 }
 /////////////////////////////////////////////////////////////
 void CncGCodeSequenceListCtrl::onActivateListItem(wxListEvent& event) {
@@ -84,35 +130,31 @@ void CncGCodeSequenceListCtrl::onActivateListItem(wxListEvent& event) {
 }
 /////////////////////////////////////////////////////////////
 void CncGCodeSequenceListCtrl::addBlock(const GCodeBlock& gcb) {
-/////////////////////////////////////////////////////////////
-	static wxString value;
-	static CncColumContainer cc(CncGCodeSequenceListCtrl::TOTAL_COL_COUNT);
-	
-	cc.updateItem(CncGCodeSequenceListCtrl::COL_ID, 	wxString::Format(globalStrings.gcodeSeqRefFormat, gcb.clientID));
-	cc.updateItem(CncGCodeSequenceListCtrl::COL_CMD, 	gcb.getCmdAsString(value));
-	
-	cc.updateItem(CncGCodeSequenceListCtrl::COL_X, 		(gcb.hasX() ? wxString::Format("% 8.3f", gcb.x) : ""));
-	cc.updateItem(CncGCodeSequenceListCtrl::COL_Y, 		(gcb.hasY() ? wxString::Format("% 8.3f", gcb.y) : ""));
-	cc.updateItem(CncGCodeSequenceListCtrl::COL_Z, 		(gcb.hasZ() ? wxString::Format("% 8.3f", gcb.z) : ""));
-	cc.updateItem(CncGCodeSequenceListCtrl::COL_F, 		(gcb.hasF() ? wxString::Format("% 8.3f", gcb.f) : ""));
-	
-	cc.updateItem(CncGCodeSequenceListCtrl::COL_MORE, 	gcb.traceMore(value));
-	
-	appendItem(cc);
+	gcodes.push_back(gcb);
+	SetItemCount(gcodes.size());
 }
 /////////////////////////////////////////////////////////////
 bool CncGCodeSequenceListCtrl::searchReference(const wxString& what) {
 /////////////////////////////////////////////////////////////
-	long ret = searchRow(what, COL_SEARCH);
+	long ln;
+	what.ToLong(&ln);
 	
-	if ( ret >= 0 )
-		selectItem(ret);
-	
-	return (ret >= 0 );
+	return searchReferenceById(ln);
 }
 /////////////////////////////////////////////////////////////
 bool CncGCodeSequenceListCtrl::searchReferenceById(const long id) {
 /////////////////////////////////////////////////////////////
-	wxString what(wxString::Format(globalStrings.gcodeSeqRefFormat, id));
-	return searchReference(what);
+	long item = -1;
+	
+	for ( auto it = gcodes.begin(); it != gcodes.end(); ++it ) {
+		// skip all items which should be hidden
+		item++;
+		
+		if ( it->clientID == id ) {
+			selectItem(item, true);
+			return true;
+		}
+	}
+	
+	return false;
 }

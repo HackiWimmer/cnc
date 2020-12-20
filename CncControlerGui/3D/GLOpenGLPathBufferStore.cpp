@@ -308,6 +308,7 @@ long GLOpenGLPathBuffer::getFirstEntryForClientId(long clientId) const {
 	
 	// auto cldIt = clientIdIndex.find(clientId);
 	// use upper bound instead of find here to get all sub ids also.
+	// 180 --> 18 * 10 = 180
 	// 182 --> 18 * 10 = 180
 	const long firstClientId = ( (clientId / CLIENT_ID.TPL_FACTOR) ) * CLIENT_ID.TPL_FACTOR;
 	auto cldIt = clientIdIndex.upper_bound(firstClientId);
@@ -329,6 +330,7 @@ long GLOpenGLPathBuffer::getLastEntryForClientId(long clientId) const {
 	
 	// auto cldIt = clientIdIndex.find(clientId);
 	// use lower bound instead of find here to get all sub ids also.
+	// 180 --> 18 + 1 = 19 * 10 = 190
 	// 182 --> 18 + 1 = 19 * 10 = 190
 	const long nextClientId = ( (clientId / CLIENT_ID.TPL_FACTOR) + 1 ) * CLIENT_ID.TPL_FACTOR;
 	auto cldIt = clientIdIndex.lower_bound(nextClientId);

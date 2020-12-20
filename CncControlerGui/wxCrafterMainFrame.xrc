@@ -5101,7 +5101,7 @@ Interval [ms]:</label>
                                                                   <rows>1</rows>
                                                                   <vgap>0</vgap>
                                                                   <hgap>0</hgap>
-                                                                  <growablecols>3,5</growablecols>
+                                                                  <growablecols>2</growablecols>
                                                                   <growablerows>0</growablerows>
                                                                   <object class="sizeritem" name="flexGridSizer4902">
                                                                     <flag>wxALL</flag>
@@ -5251,188 +5251,271 @@ Interval [ms]:</label>
                                                                       </object>
                                                                     </object>
                                                                   </object>
-                                                                  <object class="sizeritem" name="flexGridSizer2803">
-                                                                    <flag>wxALL|wxEXPAND</flag>
+                                                                  <object class="sizeritem" name="flexGridSizer9744">
+                                                                    <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
                                                                     <option>1</option>
                                                                     <object class="wxFlexGridSizer">
-                                                                      <cols>5</cols>
+                                                                      <cols>2</cols>
                                                                       <rows>1</rows>
                                                                       <vgap>0</vgap>
                                                                       <hgap>0</hgap>
-                                                                      <growablecols>0</growablecols>
-                                                                      <growablerows>0</growablerows>
-                                                                      <object class="sizeritem">
-                                                                        <flag>wxALL</flag>
-                                                                        <border>2</border>
-                                                                        <object class="wxStaticLine" name="m_staticLine5008">
-                                                                          <style>wxLI_VERTICAL</style>
-                                                                        </object>
-                                                                      </object>
-                                                                      <object class="sizeritem">
-                                                                        <flag>wxALL</flag>
-                                                                        <border>5</border>
-                                                                        <object class="wxStaticText" name="m_staticText1128">
-                                                                          <label>Crossing:</label>
-                                                                          <style/>
-                                                                          <font>
-                                                                            <size>8</size>
-                                                                            <style>normal</style>
-                                                                            <weight>bold</weight>
-                                                                            <family>swiss</family>
-                                                                            <underlined>0</underlined>
-                                                                            <face>Segoe UI</face>
-                                                                          </font>
-                                                                        </object>
-                                                                      </object>
-                                                                      <object class="sizeritem">
+                                                                      <growablecols/>
+                                                                      <growablerows/>
+                                                                      <object class="sizeritem" name="flexGridSizer9743">
                                                                         <flag>wxALL|wxEXPAND</flag>
-                                                                        <border>1</border>
-                                                                        <minsize>25,-1</minsize>
-                                                                        <object class="wxTextCtrl" name="m_crossings">
-                                                                          <style>wxTE_RIGHT|wxTE_READONLY</style>
-                                                                          <size>25,-1</size>
-                                                                          <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                                                          <font>
-                                                                            <size>8</size>
-                                                                            <style>normal</style>
-                                                                            <weight>normal</weight>
-                                                                            <family>swiss</family>
-                                                                            <underlined>0</underlined>
-                                                                            <face>Segoe UI</face>
-                                                                          </font>
-                                                                          <value>1</value>
+                                                                        <option>1</option>
+                                                                        <object class="wxFlexGridSizer">
+                                                                          <cols>2</cols>
+                                                                          <rows>0</rows>
+                                                                          <vgap>0</vgap>
+                                                                          <hgap>0</hgap>
+                                                                          <growablecols/>
+                                                                          <growablerows/>
+                                                                          <object class="sizeritem" name="flexGridSizer2803">
+                                                                            <flag>wxALL|wxEXPAND</flag>
+                                                                            <option>1</option>
+                                                                            <object class="wxFlexGridSizer">
+                                                                              <cols>5</cols>
+                                                                              <rows>1</rows>
+                                                                              <vgap>0</vgap>
+                                                                              <hgap>0</hgap>
+                                                                              <growablecols>0</growablecols>
+                                                                              <growablerows>0</growablerows>
+                                                                              <object class="sizeritem">
+                                                                                <flag>wxALL</flag>
+                                                                                <border>2</border>
+                                                                                <object class="wxStaticLine" name="m_staticLine5008">
+                                                                                  <style>wxLI_VERTICAL</style>
+                                                                                </object>
+                                                                              </object>
+                                                                              <object class="sizeritem">
+                                                                                <flag>wxALL</flag>
+                                                                                <border>5</border>
+                                                                                <object class="wxStaticText" name="m_staticText1128">
+                                                                                  <label>Crossing:</label>
+                                                                                  <style/>
+                                                                                  <font>
+                                                                                    <size>8</size>
+                                                                                    <style>normal</style>
+                                                                                    <weight>bold</weight>
+                                                                                    <family>swiss</family>
+                                                                                    <underlined>0</underlined>
+                                                                                    <face>Segoe UI</face>
+                                                                                  </font>
+                                                                                </object>
+                                                                              </object>
+                                                                              <object class="sizeritem">
+                                                                                <flag>wxALL|wxEXPAND</flag>
+                                                                                <border>1</border>
+                                                                                <minsize>25,-1</minsize>
+                                                                                <object class="wxTextCtrl" name="m_crossings">
+                                                                                  <style>wxTE_RIGHT|wxTE_READONLY</style>
+                                                                                  <size>25,-1</size>
+                                                                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                                                                  <font>
+                                                                                    <size>8</size>
+                                                                                    <style>normal</style>
+                                                                                    <weight>normal</weight>
+                                                                                    <family>swiss</family>
+                                                                                    <underlined>0</underlined>
+                                                                                    <face>Segoe UI</face>
+                                                                                  </font>
+                                                                                  <value>1</value>
+                                                                                </object>
+                                                                              </object>
+                                                                              <object class="sizeritem">
+                                                                                <flag>wxALL</flag>
+                                                                                <border>5</border>
+                                                                                <object class="wxStaticText" name="m_staticText1966">
+                                                                                  <label>from</label>
+                                                                                  <style/>
+                                                                                  <font>
+                                                                                    <size>8</size>
+                                                                                    <style>normal</style>
+                                                                                    <weight>bold</weight>
+                                                                                    <family>swiss</family>
+                                                                                    <underlined>0</underlined>
+                                                                                    <face>Segoe UI</face>
+                                                                                  </font>
+                                                                                </object>
+                                                                              </object>
+                                                                              <object class="sizeritem">
+                                                                                <flag>wxALL|wxEXPAND</flag>
+                                                                                <border>1</border>
+                                                                                <minsize>25,-1</minsize>
+                                                                                <object class="wxTextCtrl" name="m_passingCount">
+                                                                                  <style>wxTE_RIGHT|wxTE_READONLY</style>
+                                                                                  <size>25,-1</size>
+                                                                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                                                                  <font>
+                                                                                    <size>8</size>
+                                                                                    <style>normal</style>
+                                                                                    <weight>normal</weight>
+                                                                                    <family>swiss</family>
+                                                                                    <underlined>0</underlined>
+                                                                                    <face>Segoe UI</face>
+                                                                                  </font>
+                                                                                  <tooltip>
+                                                                                    <![CDATA[Crossings]]>
+                                                                                  </tooltip>
+                                                                                  <value>1</value>
+                                                                                </object>
+                                                                              </object>
+                                                                            </object>
+                                                                          </object>
+                                                                          <object class="sizeritem" name="flexGridSizer8008">
+                                                                            <flag>wxALL|wxEXPAND</flag>
+                                                                            <option>1</option>
+                                                                            <object class="wxFlexGridSizer">
+                                                                              <cols>3</cols>
+                                                                              <rows>1</rows>
+                                                                              <vgap>0</vgap>
+                                                                              <hgap>0</hgap>
+                                                                              <growablecols>2</growablecols>
+                                                                              <growablerows>0</growablerows>
+                                                                              <object class="sizeritem">
+                                                                                <flag>wxALL|wxEXPAND</flag>
+                                                                                <border>2</border>
+                                                                                <object class="wxStaticLine" name="m_staticLine50084">
+                                                                                  <style>wxLI_VERTICAL</style>
+                                                                                </object>
+                                                                              </object>
+                                                                              <object class="sizeritem">
+                                                                                <flag>wxALL</flag>
+                                                                                <border>5</border>
+                                                                                <object class="wxStaticText" name="m_staticText11283">
+                                                                                  <label>Mouse Coord (X,Y,Z)[mm]:</label>
+                                                                                  <style/>
+                                                                                  <font>
+                                                                                    <size>8</size>
+                                                                                    <style>normal</style>
+                                                                                    <weight>bold</weight>
+                                                                                    <family>swiss</family>
+                                                                                    <underlined>0</underlined>
+                                                                                    <face>Segoe UI</face>
+                                                                                  </font>
+                                                                                </object>
+                                                                              </object>
+                                                                              <object class="sizeritem" name="flexGridSizer8017">
+                                                                                <flag>wxALL|wxEXPAND</flag>
+                                                                                <object class="wxFlexGridSizer">
+                                                                                  <cols>3</cols>
+                                                                                  <rows>1</rows>
+                                                                                  <vgap>0</vgap>
+                                                                                  <hgap>0</hgap>
+                                                                                  <growablecols>0,1,2</growablecols>
+                                                                                  <growablerows>0</growablerows>
+                                                                                  <object class="sizeritem">
+                                                                                    <flag>wxALL|wxEXPAND</flag>
+                                                                                    <minsize>50,-1</minsize>
+                                                                                    <object class="wxTextCtrl" name="m_mouseCoordX">
+                                                                                      <style>wxTE_RIGHT|wxTE_READONLY</style>
+                                                                                      <size>50,-1</size>
+                                                                                      <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                                                                      <font>
+                                                                                        <size>8</size>
+                                                                                        <style>normal</style>
+                                                                                        <weight>normal</weight>
+                                                                                        <family>swiss</family>
+                                                                                        <underlined>0</underlined>
+                                                                                        <face>Segoe UI</face>
+                                                                                      </font>
+                                                                                      <tooltip>
+                                                                                        <![CDATA[Coordinate\n(Strg + Mouse)]]>
+                                                                                      </tooltip>
+                                                                                      <value>300.000</value>
+                                                                                    </object>
+                                                                                  </object>
+                                                                                  <object class="sizeritem">
+                                                                                    <flag>wxALL|wxEXPAND</flag>
+                                                                                    <minsize>50,-1</minsize>
+                                                                                    <object class="wxTextCtrl" name="m_mouseCoordY">
+                                                                                      <style>wxTE_RIGHT|wxTE_READONLY</style>
+                                                                                      <size>50,-1</size>
+                                                                                      <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                                                                      <font>
+                                                                                        <size>8</size>
+                                                                                        <style>normal</style>
+                                                                                        <weight>normal</weight>
+                                                                                        <family>swiss</family>
+                                                                                        <underlined>0</underlined>
+                                                                                        <face>Segoe UI</face>
+                                                                                      </font>
+                                                                                      <tooltip>
+                                                                                        <![CDATA[Coordinate\n(Strg + Mouse)]]>
+                                                                                      </tooltip>
+                                                                                      <value>123.456</value>
+                                                                                    </object>
+                                                                                  </object>
+                                                                                  <object class="sizeritem">
+                                                                                    <flag>wxALL|wxEXPAND</flag>
+                                                                                    <minsize>50,-1</minsize>
+                                                                                    <object class="wxTextCtrl" name="m_mouseCoordZ">
+                                                                                      <style>wxTE_RIGHT|wxTE_READONLY</style>
+                                                                                      <size>50,-1</size>
+                                                                                      <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                                                                      <font>
+                                                                                        <size>8</size>
+                                                                                        <style>normal</style>
+                                                                                        <weight>normal</weight>
+                                                                                        <family>swiss</family>
+                                                                                        <underlined>0</underlined>
+                                                                                        <face>Segoe UI</face>
+                                                                                      </font>
+                                                                                      <tooltip>
+                                                                                        <![CDATA[Coordinate\n(Strg + Mouse)]]>
+                                                                                      </tooltip>
+                                                                                      <value>897.666</value>
+                                                                                    </object>
+                                                                                  </object>
+                                                                                </object>
+                                                                              </object>
+                                                                            </object>
+                                                                          </object>
                                                                         </object>
                                                                       </object>
-                                                                      <object class="sizeritem">
-                                                                        <flag>wxALL</flag>
-                                                                        <border>5</border>
-                                                                        <object class="wxStaticText" name="m_staticText1966">
-                                                                          <label>from</label>
-                                                                          <style/>
-                                                                          <font>
-                                                                            <size>8</size>
-                                                                            <style>normal</style>
-                                                                            <weight>bold</weight>
-                                                                            <family>swiss</family>
-                                                                            <underlined>0</underlined>
-                                                                            <face>Segoe UI</face>
-                                                                          </font>
-                                                                        </object>
-                                                                      </object>
-                                                                      <object class="sizeritem">
+                                                                      <object class="sizeritem" name="flexGridSizer7243">
                                                                         <flag>wxALL|wxEXPAND</flag>
-                                                                        <border>1</border>
-                                                                        <minsize>25,-1</minsize>
-                                                                        <object class="wxTextCtrl" name="m_passingCount">
-                                                                          <style>wxTE_RIGHT|wxTE_READONLY</style>
-                                                                          <size>25,-1</size>
-                                                                          <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                                                          <font>
-                                                                            <size>8</size>
-                                                                            <style>normal</style>
-                                                                            <weight>normal</weight>
-                                                                            <family>swiss</family>
-                                                                            <underlined>0</underlined>
-                                                                            <face>Segoe UI</face>
-                                                                          </font>
-                                                                          <tooltip>
-                                                                            <![CDATA[Crossings]]>
-                                                                          </tooltip>
-                                                                          <value>1</value>
-                                                                        </object>
-                                                                      </object>
-                                                                    </object>
-                                                                  </object>
-                                                                  <object class="sizeritem" name="flexGridSizer8008">
-                                                                    <flag>wxALL|wxEXPAND</flag>
-                                                                    <option>1</option>
-                                                                    <object class="wxFlexGridSizer">
-                                                                      <cols>3</cols>
-                                                                      <rows>1</rows>
-                                                                      <vgap>0</vgap>
-                                                                      <hgap>0</hgap>
-                                                                      <growablecols>2</growablecols>
-                                                                      <growablerows>0</growablerows>
-                                                                      <object class="sizeritem">
-                                                                        <flag>wxALL|wxEXPAND</flag>
-                                                                        <border>2</border>
-                                                                        <object class="wxStaticLine" name="m_staticLine50084">
-                                                                          <style>wxLI_VERTICAL</style>
-                                                                        </object>
-                                                                      </object>
-                                                                      <object class="sizeritem">
-                                                                        <flag>wxALL</flag>
-                                                                        <border>5</border>
-                                                                        <object class="wxStaticText" name="m_staticText11283">
-                                                                          <label>Mouse Coord (X,Y,Z)[mm]:</label>
-                                                                          <style/>
-                                                                          <font>
-                                                                            <size>8</size>
-                                                                            <style>normal</style>
-                                                                            <weight>bold</weight>
-                                                                            <family>swiss</family>
-                                                                            <underlined>0</underlined>
-                                                                            <face>Segoe UI</face>
-                                                                          </font>
-                                                                        </object>
-                                                                      </object>
-                                                                      <object class="sizeritem" name="flexGridSizer8017">
-                                                                        <flag>wxALL|wxEXPAND</flag>
+                                                                        <option>1</option>
                                                                         <object class="wxFlexGridSizer">
                                                                           <cols>3</cols>
                                                                           <rows>1</rows>
                                                                           <vgap>0</vgap>
                                                                           <hgap>0</hgap>
-                                                                          <growablecols>0,1,2</growablecols>
+                                                                          <growablecols>2</growablecols>
                                                                           <growablerows>0</growablerows>
                                                                           <object class="sizeritem">
                                                                             <flag>wxALL|wxEXPAND</flag>
-                                                                            <minsize>50,-1</minsize>
-                                                                            <object class="wxTextCtrl" name="m_mouseCoordX">
-                                                                              <style>wxTE_RIGHT|wxTE_READONLY</style>
-                                                                              <size>50,-1</size>
-                                                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                                                              <font>
-                                                                                <size>8</size>
-                                                                                <style>normal</style>
-                                                                                <weight>normal</weight>
-                                                                                <family>swiss</family>
-                                                                                <underlined>0</underlined>
-                                                                                <face>Segoe UI</face>
-                                                                              </font>
-                                                                              <tooltip>
-                                                                                <![CDATA[Coordinate\n(Strg + Mouse)]]>
-                                                                              </tooltip>
-                                                                              <value>300.000</value>
+                                                                            <border>2</border>
+                                                                            <object class="wxStaticLine" name="m_staticLine50083">
+                                                                              <style>wxLI_VERTICAL</style>
                                                                             </object>
                                                                           </object>
                                                                           <object class="sizeritem">
-                                                                            <flag>wxALL|wxEXPAND</flag>
-                                                                            <minsize>50,-1</minsize>
-                                                                            <object class="wxTextCtrl" name="m_mouseCoordY">
-                                                                              <style>wxTE_RIGHT|wxTE_READONLY</style>
-                                                                              <size>50,-1</size>
-                                                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                                                            <flag>wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <minsize>-1,18</minsize>
+                                                                            <object class="wxStaticText" name="m_staticText395">
+                                                                              <label>Time consumed:</label>
+                                                                              <style/>
+                                                                              <size>-1,18</size>
                                                                               <font>
                                                                                 <size>8</size>
                                                                                 <style>normal</style>
-                                                                                <weight>normal</weight>
+                                                                                <weight>bold</weight>
                                                                                 <family>swiss</family>
                                                                                 <underlined>0</underlined>
                                                                                 <face>Segoe UI</face>
                                                                               </font>
-                                                                              <tooltip>
-                                                                                <![CDATA[Coordinate\n(Strg + Mouse)]]>
-                                                                              </tooltip>
-                                                                              <value>123.456</value>
                                                                             </object>
                                                                           </object>
                                                                           <object class="sizeritem">
-                                                                            <flag>wxALL|wxEXPAND</flag>
-                                                                            <minsize>50,-1</minsize>
-                                                                            <object class="wxTextCtrl" name="m_mouseCoordZ">
+                                                                            <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+                                                                            <border>1</border>
+                                                                            <minsize>96,-1</minsize>
+                                                                            <object class="wxTextCtrl" name="m_cmdDuration">
                                                                               <style>wxTE_RIGHT|wxTE_READONLY</style>
-                                                                              <size>50,-1</size>
+                                                                              <size>96,-1</size>
                                                                               <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                                                               <font>
                                                                                 <size>8</size>
@@ -5443,70 +5526,11 @@ Interval [ms]:</label>
                                                                                 <face>Segoe UI</face>
                                                                               </font>
                                                                               <tooltip>
-                                                                                <![CDATA[Coordinate\n(Strg + Mouse)]]>
+                                                                                <![CDATA[Total time consumed]]>
                                                                               </tooltip>
-                                                                              <value>897.666</value>
+                                                                              <value>00:00:00.123456</value>
                                                                             </object>
                                                                           </object>
-                                                                        </object>
-                                                                      </object>
-                                                                    </object>
-                                                                  </object>
-                                                                  <object class="sizeritem" name="flexGridSizer7243">
-                                                                    <flag>wxALL|wxEXPAND</flag>
-                                                                    <option>1</option>
-                                                                    <object class="wxFlexGridSizer">
-                                                                      <cols>3</cols>
-                                                                      <rows>1</rows>
-                                                                      <vgap>0</vgap>
-                                                                      <hgap>0</hgap>
-                                                                      <growablecols>2</growablecols>
-                                                                      <growablerows>0</growablerows>
-                                                                      <object class="sizeritem">
-                                                                        <flag>wxALL|wxEXPAND</flag>
-                                                                        <border>2</border>
-                                                                        <object class="wxStaticLine" name="m_staticLine50083">
-                                                                          <style>wxLI_VERTICAL</style>
-                                                                        </object>
-                                                                      </object>
-                                                                      <object class="sizeritem">
-                                                                        <flag>wxALL</flag>
-                                                                        <border>5</border>
-                                                                        <minsize>-1,18</minsize>
-                                                                        <object class="wxStaticText" name="m_staticText395">
-                                                                          <label>Time consumed:</label>
-                                                                          <style/>
-                                                                          <size>-1,18</size>
-                                                                          <font>
-                                                                            <size>8</size>
-                                                                            <style>normal</style>
-                                                                            <weight>bold</weight>
-                                                                            <family>swiss</family>
-                                                                            <underlined>0</underlined>
-                                                                            <face>Segoe UI</face>
-                                                                          </font>
-                                                                        </object>
-                                                                      </object>
-                                                                      <object class="sizeritem">
-                                                                        <flag>wxALL|wxEXPAND</flag>
-                                                                        <border>1</border>
-                                                                        <minsize>96,-1</minsize>
-                                                                        <object class="wxTextCtrl" name="m_cmdDuration">
-                                                                          <style>wxTE_RIGHT|wxTE_READONLY</style>
-                                                                          <size>96,-1</size>
-                                                                          <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                                                          <font>
-                                                                            <size>8</size>
-                                                                            <style>normal</style>
-                                                                            <weight>normal</weight>
-                                                                            <family>swiss</family>
-                                                                            <underlined>0</underlined>
-                                                                            <face>Segoe UI</face>
-                                                                          </font>
-                                                                          <tooltip>
-                                                                            <![CDATA[Total time consumed]]>
-                                                                          </tooltip>
-                                                                          <value>00:00:00.123456</value>
                                                                         </object>
                                                                       </object>
                                                                     </object>

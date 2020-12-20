@@ -123,7 +123,7 @@ bool GCodeFileParser::preprocess() {
 	GCodeBlock gcb;
 	
 	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
-	ctrl->clear();
+	ctrl->clearAll();
 	
 	if ( input.IsOk() ) {
 		while( input.IsOk() && !input.Eof() ) {
@@ -134,8 +134,7 @@ bool GCodeFileParser::preprocess() {
 			
 			if ( line.IsEmpty() == false ) {
 				if ( processBlock(line, gcb) == false ) {
-					std::cerr << "GCodeFileParser::preprocess(): Failed " <<std::endl;
-					std::cerr << " Line number: " << getCurrentLineNumber() << std::endl;
+					std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": Failed! Line number: %ld\n", getCurrentLineNumber()));
 					return false;
 				}
 				
@@ -273,7 +272,7 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::prepareBlock(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
-	gcb.clientID = getCurrentLineNumber();
+	gcb.clientID = getCurrentLineNumber() * CLIENT_ID.TPL_FACTOR;
 	
 	if ( gcb.isValid() == false && gcb.hasMoveCmd() == true ) {
 		gcb.copyPrevCmdToCmd();
@@ -290,11 +289,16 @@ bool GCodeFileParser::prepareBlock(GCodeBlock& gcb) {
 		return true;
 	}
 	
+	// work with intermediate step on demand
 	if ( pathHandler->isPathListUsed() ) {
 		gCodeSequence.push_back(gcb);
+		
+		// in this case stop here 
 		return true;
 	}
 	
+	// this is only done withou a path list - see above
+	// Normaly for previews etc.
 	if ( THE_APP->isDisplayParserDetails() == true ) {
 		CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
 		ctrl->addBlock(gcb);
@@ -313,7 +317,7 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	if ( gcb.cmdCode == 'G' && gcb.cmdNumber == 0 )
 		pathHandler->initNextPath();
 	
-	initNextClientId(gcb.clientID * CLIENT_ID.TPL_FACTOR);
+	initNextClientId(gcb.clientID);
 	
 	switch ( gcb.cmdCode ) {
 		case 'G':	ret = processG(gcb);	break;

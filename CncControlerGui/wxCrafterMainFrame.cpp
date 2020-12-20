@@ -3055,8 +3055,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     wxFlexGridSizer* flexGridSizer4901 = new wxFlexGridSizer(1, 6, 0, 0);
     flexGridSizer4901->SetFlexibleDirection( wxBOTH );
     flexGridSizer4901->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4901->AddGrowableCol(3);
-    flexGridSizer4901->AddGrowableCol(5);
+    flexGridSizer4901->AddGrowableCol(2);
     flexGridSizer4901->AddGrowableRow(0);
     
     flexGridSizer7089->Add(flexGridSizer4901, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
@@ -3138,13 +3137,25 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer3520->Add(m_staticLine5005, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
+    wxFlexGridSizer* flexGridSizer9744 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer9744->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9744->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer4901->Add(flexGridSizer9744, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer9743 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer9743->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9743->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer9744->Add(flexGridSizer9743, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     wxFlexGridSizer* flexGridSizer2803 = new wxFlexGridSizer(1, 5, 0, 0);
     flexGridSizer2803->SetFlexibleDirection( wxBOTH );
     flexGridSizer2803->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2803->AddGrowableCol(0);
     flexGridSizer2803->AddGrowableRow(0);
     
-    flexGridSizer4901->Add(flexGridSizer2803, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9743->Add(flexGridSizer2803, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticLine5008 = new wxStaticLine(m_3DOutboundStatistics, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_3DOutboundStatistics, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -3191,7 +3202,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8008->AddGrowableCol(2);
     flexGridSizer8008->AddGrowableRow(0);
     
-    flexGridSizer4901->Add(flexGridSizer8008, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9743->Add(flexGridSizer8008, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticLine50084 = new wxStaticLine(m_3DOutboundStatistics, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_3DOutboundStatistics, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -3255,7 +3266,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer7243->AddGrowableCol(2);
     flexGridSizer7243->AddGrowableRow(0);
     
-    flexGridSizer4901->Add(flexGridSizer7243, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9744->Add(flexGridSizer7243, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticLine50083 = new wxStaticLine(m_3DOutboundStatistics, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_3DOutboundStatistics, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -3277,7 +3288,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cmdDuration->SetHint(wxT(""));
     #endif
     
-    flexGridSizer7243->Add(m_cmdDuration, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer7243->Add(m_cmdDuration, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     m_cmdDuration->SetMinSize(wxSize(96,-1));
     m_3DOutboundStatistics->SetMinSize(wxSize(-1,30));
     

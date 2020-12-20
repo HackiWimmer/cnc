@@ -7,8 +7,15 @@
 class CncGCodeSequenceListCtrl : public CncLargeScaledListCtrl {
 	
 	private:
-		wxListItemAttr defaultItemAttr;
+		wxListItemAttr	defaultItemAttr;
+		wxListItemAttr	defaultItemAttrSelected;
 		
+		typedef std::vector<GCodeBlock> GCodes;
+		GCodes			gcodes;
+		
+		virtual bool isItemValid(long item) const;
+		
+		virtual wxString OnGetItemText(long item, long column) const;
 		virtual int OnGetItemColumnImage(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
 		
@@ -26,6 +33,8 @@ class CncGCodeSequenceListCtrl : public CncLargeScaledListCtrl {
 		
 		CncGCodeSequenceListCtrl(wxWindow *parent, long style);
 		virtual ~CncGCodeSequenceListCtrl();
+		
+		void clearAll();
 		
 		void addBlock(const GCodeBlock& gcb);
 		

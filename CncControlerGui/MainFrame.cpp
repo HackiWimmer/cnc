@@ -6476,7 +6476,7 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	else						isRunning = true;
 	
 	// debugging only
-	if ( false )
+	if ( true )
 		cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
 	
 	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {
@@ -7218,8 +7218,6 @@ void MainFrame::showMotionMonitorStatisticPane(bool show) {
 		return;
 		
 	const int nc = MontiorBottomContextSelection::VAL::STATISTIC_PANEL;
-	const int cc = cnc3DHSplitterWindow->getCurrentButtomContext();
-	
 	cnc3DHSplitterWindow->selectBottomContext(nc);
 	
 	if ( show == true )	cnc3DHSplitterWindow->showBottomWindow();
@@ -7250,8 +7248,6 @@ void MainFrame::showMotionMonitorReplayPane(bool show) {
 		return;
 		
 	const int nc = MontiorBottomContextSelection::VAL::REPLAY_PANEL;
-	const int cc = cnc3DHSplitterWindow->getCurrentButtomContext();
-	
 	cnc3DHSplitterWindow->selectBottomContext(nc);
 	
 	if ( show == true )	cnc3DHSplitterWindow->showBottomWindow();
