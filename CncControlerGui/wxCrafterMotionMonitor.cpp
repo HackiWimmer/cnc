@@ -520,6 +520,13 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer7678->Add(m_btConnectPathListEntries, 0, wxALL, WXC_FROM_DIP(1));
     m_btConnectPathListEntries->SetMinSize(wxSize(26,26));
     
+    m_btFormatPathList = new wxBitmapToggleButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("format-text-columns")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), 0);
+    m_btFormatPathList->SetToolTip(_("Format List"));
+    m_btFormatPathList->SetValue(true);
+    
+    flexGridSizer7678->Add(m_btFormatPathList, 0, wxALL, WXC_FROM_DIP(1));
+    m_btFormatPathList->SetMinSize(wxSize(26,26));
+    
     m_btClearPathListEntries = new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearPathListEntries->SetToolTip(_("Clear"));
     
@@ -804,6 +811,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     m_btClearOperatingTrace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearOperatingTrace), NULL, this);
     m_bmpButton3049->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachPathListEntriesView), NULL, this);
     m_btConnectPathListEntries->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectPathListEntries), NULL, this);
+    m_btFormatPathList->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::formatPathListEntries), NULL, this);
     m_btClearPathListEntries->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearPathListEntries), NULL, this);
     m_btPathListEntryFirst->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryFirst), NULL, this);
     m_btPathListEntryPrev->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryPrev), NULL, this);
@@ -833,6 +841,7 @@ CncPreprocessorBase::~CncPreprocessorBase()
     m_btClearOperatingTrace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearOperatingTrace), NULL, this);
     m_bmpButton3049->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onDetachPathListEntriesView), NULL, this);
     m_btConnectPathListEntries->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectPathListEntries), NULL, this);
+    m_btFormatPathList->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::formatPathListEntries), NULL, this);
     m_btClearPathListEntries->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearPathListEntries), NULL, this);
     m_btPathListEntryFirst->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryFirst), NULL, this);
     m_btPathListEntryPrev->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::onPathListEntryPrev), NULL, this);

@@ -2810,7 +2810,7 @@ void MainFrame::updateMonitoring() {
 		m_dvListCtrlSvgUAUseDirective->Update();
 		m_dvListCtrlSvgUADetailInfo->Update();
 		
-		getGCodeSequenceList()->clear();
+		getGCodeSequenceList()->clearAll();
 	}
 }
 ///////////////////////////////////////////////////////////////////

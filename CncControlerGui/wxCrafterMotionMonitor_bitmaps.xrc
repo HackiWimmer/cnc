@@ -35,6 +35,7 @@
   <object class="wxBitmap" name="database-link">bitmaps\database-link.png</object>
   <object class="wxBitmap" name="database-table">bitmaps\database-table.png</object>
   <object class="wxBitmap" name="edit-guides">bitmaps\edit-guides.png</object>
+  <object class="wxBitmap" name="format-text-columns">bitmaps\format-text-columns.png</object>
   <object class="wxBitmap" name="git-reset-repo">bitmaps\git-reset-repo.png</object>
   <object class="wxBitmap" name="hardwarebox">bitmaps\hardwarebox.png</object>
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>

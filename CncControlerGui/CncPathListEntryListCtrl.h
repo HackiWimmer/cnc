@@ -20,6 +20,8 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		
 		typedef std::vector<CncPathListEntry> PathLists;
 		PathLists pathLists;
+		
+		bool showAllFlag;
 
 		void updateColumnWidth();
 		
@@ -60,6 +62,8 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 
 		bool searchReference(const wxString& what);
 		bool searchReferenceById(const long id);
+		
+		void setFormatFlag(bool flag);
 		
 		bool skipToFirstReference();
 		bool skipToPrevReference();

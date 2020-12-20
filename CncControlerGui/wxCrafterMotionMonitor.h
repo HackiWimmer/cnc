@@ -144,6 +144,7 @@ protected:
     wxTextCtrl* m_pathListRowCount;
     wxStaticLine* m_staticLine7903;
     wxBitmapToggleButton* m_btConnectPathListEntries;
+    wxBitmapToggleButton* m_btFormatPathList;
     wxBitmapButton* m_btClearPathListEntries;
     wxStaticLine* m_staticLine285;
     wxBitmapButton* m_btPathListEntryFirst;
@@ -191,6 +192,7 @@ protected:
     virtual void clearOperatingTrace(wxCommandEvent& event) { event.Skip(); }
     virtual void onDetachPathListEntriesView(wxCommandEvent& event) { event.Skip(); }
     virtual void connectPathListEntries(wxCommandEvent& event) { event.Skip(); }
+    virtual void formatPathListEntries(wxCommandEvent& event) { event.Skip(); }
     virtual void clearPathListEntries(wxCommandEvent& event) { event.Skip(); }
     virtual void onPathListEntryFirst(wxCommandEvent& event) { event.Skip(); }
     virtual void onPathListEntryPrev(wxCommandEvent& event) { event.Skip(); }
@@ -231,6 +233,7 @@ public:
     wxTextCtrl* GetPathListRowCount() { return m_pathListRowCount; }
     wxStaticLine* GetStaticLine7903() { return m_staticLine7903; }
     wxBitmapToggleButton* GetBtConnectPathListEntries() { return m_btConnectPathListEntries; }
+    wxBitmapToggleButton* GetBtFormatPathList() { return m_btFormatPathList; }
     wxBitmapButton* GetBtClearPathListEntries() { return m_btClearPathListEntries; }
     wxStaticLine* GetStaticLine285() { return m_staticLine285; }
     wxBitmapButton* GetBtPathListEntryFirst() { return m_btPathListEntryFirst; }

@@ -6,7 +6,6 @@
 GCodePathHandlerCnc::GCodePathHandlerCnc(CncControl* cnc) 
 : GCodePathHandlerBase	()
 , CncPathListRunner		(cnc)
-, phBegPosition			(0, 0, 0)
 {
 //////////////////////////////////////////////////////////////////
 	changeInputUnit(Unit::mm);
@@ -23,26 +22,18 @@ GCodePathHandlerCnc::~GCodePathHandlerCnc() {
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::prepareWorkImpl() {
 //////////////////////////////////////////////////////////////////
-	// log current position
-	phBegPosition = getSetup().cnc->getCurCtlPos();
 	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::finishWorkImpl() {
 //////////////////////////////////////////////////////////////////
-	// controller handling#
-	#warning switchToolOff();
-	getSetup().cnc->switchToolOff();
-	getSetup().cnc->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
-	
-	getSetup().cnc->moveToPos(phBegPosition);
-	currentPos.set(getSetup().cnc->getCurCtlPosMetric());
-	return true;
+	// execute the the last movement
+	return initNextPath();
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::initNextPath() {
 //////////////////////////////////////////////////////////////////
-	// execute path list
+	// execute already existing path list
 	if ( onPhysicallyExecute(pathListMgr) == false )
 		return false;
 

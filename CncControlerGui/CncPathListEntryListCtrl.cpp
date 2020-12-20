@@ -31,6 +31,7 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 , clientIdItemAttrSelected	()
 , speedItemAttrSelected		()
 , pathLists					()
+, showAllFlag				(false)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -105,6 +106,12 @@ CncPathListEntryListCtrl::~CncPathListEntryListCtrl() {
 /////////////////////////////////////////////////////////////
 }
 /////////////////////////////////////////////////////////////
+void CncPathListEntryListCtrl::setFormatFlag(bool flag) { 
+/////////////////////////////////////////////////////////////
+	showAllFlag = !flag;
+	Refresh();
+}
+/////////////////////////////////////////////////////////////
 wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	static const wxString fmt(globalStrings.pathListRefFormat);
@@ -114,11 +121,10 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 		
 	const CncPathListEntry& cpe = pathLists.at(item);
 	
-	const bool all             = true;
-	const bool displayRef      = all ? true : ( cpe.pathListReference   >= 0    );
-	const bool displayClientID = all ? true : ( cpe.hasClientIdChange() == true );
-	const bool displaySpeed    = all ? true : ( cpe.hasSpeedChange()    == true );
-	const bool displayPosition = all ? true : ( cpe.hasPositionChange() == true );
+	const bool displayRef      = showAllFlag ? true : ( cpe.pathListReference   >= 0    );
+	const bool displayClientID = showAllFlag ? true : ( cpe.hasClientIdChange() == true );
+	const bool displaySpeed    = showAllFlag ? true : ( cpe.hasSpeedChange()    == true );
+	const bool displayPosition = showAllFlag ? true : ( cpe.hasPositionChange() == true );
 	
 	wxString contStr;
 	if ( cpe.isNothingChanged() )	contStr.append('L');

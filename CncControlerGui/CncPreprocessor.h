@@ -72,7 +72,8 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void updateContent();
 
 	protected:
-
+		
+		virtual void formatPathListEntries(wxCommandEvent& event);
 		virtual void onDetachOperatingTraceView(wxCommandEvent& event);
 		virtual void onDetachParsingSynopsisView(wxCommandEvent& event);
 		virtual void onDetachMoveSequenceView(wxCommandEvent& event);
