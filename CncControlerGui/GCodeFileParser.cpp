@@ -499,7 +499,6 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case 3: 	// GC_M_SpindleOnClockwise
 		{
-			#warning switchToolState
 			pathHandler->switchToolState(true);
 			return true;
 		}
@@ -509,8 +508,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		}
 		case 5:		// GC_M_SpindleOff
 		{
-			#warning switchToolState
-			//pathHandler->switchToolState(false);
+			pathHandler->switchToolState(false);
 			return true;
 		}
 		case 6:		// GC_M_ToolChange
