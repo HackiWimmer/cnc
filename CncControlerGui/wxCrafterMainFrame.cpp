@@ -326,112 +326,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer9610->Add(m_staticText513767, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    wxFlexGridSizer* flexGridSizer706 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer706 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer706->SetFlexibleDirection( wxBOTH );
     flexGridSizer706->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer706->AddGrowableCol(1);
+    flexGridSizer706->AddGrowableCol(0);
     flexGridSizer706->AddGrowableRow(0);
     
     flexGridSizer9537->Add(flexGridSizer706, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer1368 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer1368->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1368->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer1368->SetMinSize(28,-1);
-    
-    flexGridSizer706->Add(flexGridSizer1368, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_openSourceExtern = new wxButton(m_editorPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_openSourceExtern->SetBitmap(wxArtProvider::GetBitmap(wxART_FILE_OPEN, wxART_BUTTON, wxDefaultSize), wxLEFT);
-    m_openSourceExtern->SetBitmapMargins(2,2);
-    #endif
-    m_openSourceExtern->SetToolTip(_("Open Source extern as Text"));
-    
-    flexGridSizer1368->Add(m_openSourceExtern, 0, wxALL, WXC_FROM_DIP(1));
-    m_openSourceExtern->SetMinSize(wxSize(26,26));
-    
-    m_openSvgExtern = new wxButton(m_editorPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_openSvgExtern->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")), wxLEFT);
-    m_openSvgExtern->SetBitmapMargins(2,2);
-    #endif
-    m_openSvgExtern->SetToolTip(_("Open Source extern with configured tool"));
-    
-    flexGridSizer1368->Add(m_openSvgExtern, 0, wxALL, WXC_FROM_DIP(1));
-    m_openSvgExtern->SetMinSize(wxSize(26,26));
-    
-    m_staticLine44728 = new wxStaticLine(m_editorPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer1368->Add(m_staticLine44728, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_saveTemplate = new wxButton(m_editorPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_saveTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_save")), wxLEFT);
-    m_saveTemplate->SetBitmapMargins(2,2);
-    #endif
-    m_saveTemplate->SetToolTip(_("Save Source"));
-    
-    flexGridSizer1368->Add(m_saveTemplate, 0, wxALL, WXC_FROM_DIP(1));
-    m_saveTemplate->SetMinSize(wxSize(26,26));
-    
-    m_reloadTemplate = new wxButton(m_editorPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_reloadTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_reload")), wxLEFT);
-    m_reloadTemplate->SetBitmapMargins(2,2);
-    #endif
-    m_reloadTemplate->SetToolTip(_("Reload current Template"));
-    
-    flexGridSizer1368->Add(m_reloadTemplate, 0, wxALL, WXC_FROM_DIP(1));
-    m_reloadTemplate->SetMinSize(wxSize(26,26));
-    
-    m_renameTemplate = new wxButton(m_editorPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_renameTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("edit-rename")), wxLEFT);
-    m_renameTemplate->SetBitmapMargins(2,2);
-    #endif
-    m_renameTemplate->SetToolTip(_("Rename current Template"));
-    
-    flexGridSizer1368->Add(m_renameTemplate, 0, wxALL, WXC_FROM_DIP(1));
-    m_renameTemplate->SetMinSize(wxSize(26,26));
-    
-    m_removeTemplate = new wxButton(m_editorPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_removeTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
-    m_removeTemplate->SetBitmapMargins(2,2);
-    #endif
-    m_removeTemplate->SetToolTip(_("Remove current Template"));
-    
-    flexGridSizer1368->Add(m_removeTemplate, 0, wxALL, WXC_FROM_DIP(1));
-    m_removeTemplate->SetMinSize(wxSize(26,26));
-    
-    flexGridSizer1368->Add(0, 20, 1, wxALL, WXC_FROM_DIP(5));
-    
-    m_staticLine4472 = new wxStaticLine(m_editorPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer1368->Add(m_staticLine4472, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_btSvgToggleWordWrap = new wxBitmapToggleButton(m_editorPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-word_wrap")), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    m_btSvgToggleWordWrap->SetToolTip(_("Toggle Word Wrap Mode"));
-    m_btSvgToggleWordWrap->SetValue(true);
-    
-    flexGridSizer1368->Add(m_btSvgToggleWordWrap, 0, wxALL, WXC_FROM_DIP(1));
-    m_btSvgToggleWordWrap->SetMinSize(wxSize(26,26));
-    
-    m_btSvgToggleTryToSelectClientId = new wxBitmapToggleButton(m_editorPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-find")), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    m_btSvgToggleTryToSelectClientId->SetToolTip(_("Toggle Try to select ClientId"));
-    m_btSvgToggleTryToSelectClientId->SetValue(false);
-    
-    flexGridSizer1368->Add(m_btSvgToggleTryToSelectClientId, 0, wxALL, WXC_FROM_DIP(1));
-    m_btSvgToggleTryToSelectClientId->SetMinSize(wxSize(26,26));
-    
-    m_btSvgToggleAutoSaveTplOnProcess = new wxBitmapToggleButton(m_editorPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-build")), wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(26,26)), 0);
-    m_btSvgToggleAutoSaveTplOnProcess->SetToolTip(_("Auto save on process"));
-    m_btSvgToggleAutoSaveTplOnProcess->SetValue(false);
-    
-    flexGridSizer1368->Add(m_btSvgToggleAutoSaveTplOnProcess, 0, wxALL, WXC_FROM_DIP(1));
-    m_btSvgToggleAutoSaveTplOnProcess->SetMinSize(wxSize(26,26));
-    flexGridSizer1368->SetMinSize(wxSize(28,-1));
     
     m_templateNotebook = new wxNotebook(m_editorPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_editorPanel, wxSize(-1,-1)), wxNB_NOPAGETHEME|wxBK_TOP|wxBK_DEFAULT);
     m_templateNotebook->SetName(wxT("m_templateNotebook"));
@@ -445,89 +346,119 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panelTplEditImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("book_blue")));
     m_templateNotebook->AddPage(m_panelTplEdit, _("Source"), false, m_panelTplEditImgIndex);
     
-    wxFlexGridSizer* flexGridSizer1294 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer1294->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1294->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer1294->AddGrowableCol(0);
-    flexGridSizer1294->AddGrowableRow(1);
-    m_panelTplEdit->SetSizer(flexGridSizer1294);
+    wxFlexGridSizer* flexGridSizer9745 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer9745->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9745->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9745->AddGrowableCol(1);
+    flexGridSizer9745->AddGrowableRow(0);
+    m_panelTplEdit->SetSizer(flexGridSizer9745);
     
-    wxFlexGridSizer* flexGridSizer1809 = new wxFlexGridSizer(0, 8, 0, 0);
-    flexGridSizer1809->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1809->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer1809->AddGrowableCol(5);
+    wxFlexGridSizer* flexGridSizer1368 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer1368->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1368->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1368->SetMinSize(28,-1);
     
-    flexGridSizer1294->Add(flexGridSizer1809, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9745->Add(flexGridSizer1368, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_tbCaseSensitive = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-case-sensitive")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
-    m_tbCaseSensitive->SetToolTip(_("Match case"));
-    m_tbCaseSensitive->SetValue(false);
-    
-    flexGridSizer1809->Add(m_tbCaseSensitive, 0, wxALL, WXC_FROM_DIP(1));
-    m_tbCaseSensitive->SetMinSize(wxSize(26,26));
-    
-    m_tbWholeWord = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-whole-word")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
-    m_tbWholeWord->SetToolTip(_("Match whole word"));
-    m_tbWholeWord->SetValue(false);
-    
-    flexGridSizer1809->Add(m_tbWholeWord, 0, wxALL, WXC_FROM_DIP(1));
-    m_tbWholeWord->SetMinSize(wxSize(26,26));
-    
-    m_tbRegEx = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-regular-expression")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
-    m_tbRegEx->SetToolTip(_("Match regular expresion"));
-    m_tbRegEx->SetValue(false);
-    
-    flexGridSizer1809->Add(m_tbRegEx, 0, wxALL, WXC_FROM_DIP(1));
-    m_tbRegEx->SetMinSize(wxSize(26,26));
-    
-    m_tbHighLight = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-marker")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
-    m_tbHighLight->SetToolTip(_("Highlight all occurences"));
-    m_tbHighLight->Enable(false);
-    m_tbHighLight->SetValue(false);
-    
-    flexGridSizer1809->Add(m_tbHighLight, 0, wxALL, WXC_FROM_DIP(1));
-    m_tbHighLight->SetMinSize(wxSize(26,26));
-    
-    m_sourceEditSearchState = new wxStaticBitmap(m_panelTplEdit, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(20,-1)), 0 );
-    
-    flexGridSizer1809->Add(m_sourceEditSearchState, 0, wxALL, WXC_FROM_DIP(5));
-    m_sourceEditSearchState->SetMinSize(wxSize(20,-1));
-    
-    wxArrayString m_sourceEditSearchArr;
-    m_sourceEditSearch = new wxComboBox(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), m_sourceEditSearchArr, 0);
-    m_sourceEditSearch->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
-    m_sourceEditSearch->SetToolTip(_("Search pattern"));
-    #if wxVERSION_NUMBER >= 3000
-    m_sourceEditSearch->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer1809->Add(m_sourceEditSearch, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_svgEditFind = new wxButton(m_panelTplEdit, wxID_ANY, _("Find"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,26)), 0);
+    m_openSourceExtern = new wxButton(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_svgEditFind->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("system-search-2")), wxLEFT);
-    m_svgEditFind->SetBitmapMargins(2,2);
+    m_openSourceExtern->SetBitmap(wxArtProvider::GetBitmap(wxART_FILE_OPEN, wxART_BUTTON, wxDefaultSize), wxLEFT);
+    m_openSourceExtern->SetBitmapMargins(2,2);
     #endif
+    m_openSourceExtern->SetToolTip(_("Open Source extern as Text"));
     
-    flexGridSizer1809->Add(m_svgEditFind, 0, wxALL, WXC_FROM_DIP(1));
-    m_svgEditFind->SetMinSize(wxSize(-1,26));
+    flexGridSizer1368->Add(m_openSourceExtern, 0, wxALL, WXC_FROM_DIP(1));
+    m_openSourceExtern->SetMinSize(wxSize(26,26));
     
-    m_svgEditFindPrev = new wxButton(m_panelTplEdit, wxID_ANY, _("Find Prev"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,26)), 0);
+    m_openSvgExtern = new wxButton(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_svgEditFindPrev->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("go-up-search")), wxLEFT);
-    m_svgEditFindPrev->SetBitmapMargins(2,2);
+    m_openSvgExtern->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")), wxLEFT);
+    m_openSvgExtern->SetBitmapMargins(2,2);
     #endif
+    m_openSvgExtern->SetToolTip(_("Open Source extern with configured tool"));
     
-    flexGridSizer1809->Add(m_svgEditFindPrev, 0, wxALL, WXC_FROM_DIP(1));
-    m_svgEditFindPrev->SetMinSize(wxSize(-1,26));
+    flexGridSizer1368->Add(m_openSvgExtern, 0, wxALL, WXC_FROM_DIP(1));
+    m_openSvgExtern->SetMinSize(wxSize(26,26));
     
-    wxFlexGridSizer* editorToolBoxSizer = new wxFlexGridSizer(2, 1, 0, 0);
+    m_staticLine44728 = new wxStaticLine(m_panelTplEdit, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer1368->Add(m_staticLine44728, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_saveTemplate = new wxButton(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_saveTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_save")), wxLEFT);
+    m_saveTemplate->SetBitmapMargins(2,2);
+    #endif
+    m_saveTemplate->SetToolTip(_("Save Source"));
+    
+    flexGridSizer1368->Add(m_saveTemplate, 0, wxALL, WXC_FROM_DIP(1));
+    m_saveTemplate->SetMinSize(wxSize(26,26));
+    
+    m_reloadTemplate = new wxButton(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_reloadTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_reload")), wxLEFT);
+    m_reloadTemplate->SetBitmapMargins(2,2);
+    #endif
+    m_reloadTemplate->SetToolTip(_("Reload current Template"));
+    
+    flexGridSizer1368->Add(m_reloadTemplate, 0, wxALL, WXC_FROM_DIP(1));
+    m_reloadTemplate->SetMinSize(wxSize(26,26));
+    
+    m_renameTemplate = new wxButton(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_renameTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("edit-rename")), wxLEFT);
+    m_renameTemplate->SetBitmapMargins(2,2);
+    #endif
+    m_renameTemplate->SetToolTip(_("Rename current Template"));
+    
+    flexGridSizer1368->Add(m_renameTemplate, 0, wxALL, WXC_FROM_DIP(1));
+    m_renameTemplate->SetMinSize(wxSize(26,26));
+    
+    m_removeTemplate = new wxButton(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_removeTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
+    m_removeTemplate->SetBitmapMargins(2,2);
+    #endif
+    m_removeTemplate->SetToolTip(_("Remove current Template"));
+    
+    flexGridSizer1368->Add(m_removeTemplate, 0, wxALL, WXC_FROM_DIP(1));
+    m_removeTemplate->SetMinSize(wxSize(26,26));
+    
+    flexGridSizer1368->Add(0, 20, 1, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticLine4472 = new wxStaticLine(m_panelTplEdit, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer1368->Add(m_staticLine4472, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_btSvgToggleWordWrap = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-word_wrap")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_btSvgToggleWordWrap->SetToolTip(_("Toggle Word Wrap Mode"));
+    m_btSvgToggleWordWrap->SetValue(true);
+    
+    flexGridSizer1368->Add(m_btSvgToggleWordWrap, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSvgToggleWordWrap->SetMinSize(wxSize(26,26));
+    
+    m_btSvgToggleTryToSelectClientId = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-find")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_btSvgToggleTryToSelectClientId->SetToolTip(_("Toggle Try to select ClientId"));
+    m_btSvgToggleTryToSelectClientId->SetValue(false);
+    
+    flexGridSizer1368->Add(m_btSvgToggleTryToSelectClientId, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSvgToggleTryToSelectClientId->SetMinSize(wxSize(26,26));
+    
+    m_btSvgToggleAutoSaveTplOnProcess = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-build")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_btSvgToggleAutoSaveTplOnProcess->SetToolTip(_("Auto save on process"));
+    m_btSvgToggleAutoSaveTplOnProcess->SetValue(false);
+    
+    flexGridSizer1368->Add(m_btSvgToggleAutoSaveTplOnProcess, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSvgToggleAutoSaveTplOnProcess->SetMinSize(wxSize(26,26));
+    flexGridSizer1368->SetMinSize(wxSize(28,-1));
+    
+    wxFlexGridSizer* editorToolBoxSizer = new wxFlexGridSizer(4, 1, 0, 0);
     editorToolBoxSizer->SetFlexibleDirection( wxBOTH );
     editorToolBoxSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     editorToolBoxSizer->AddGrowableCol(0);
     editorToolBoxSizer->AddGrowableRow(1);
     
-    flexGridSizer1294->Add(editorToolBoxSizer, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9745->Add(editorToolBoxSizer, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_editorToolBox = new wxSimplebook(m_panelTplEdit, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), 0);
     m_editorToolBox->SetName(wxT("m_editorToolBox"));
@@ -537,6 +468,95 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelToolBoxSvg = new wxPanel(m_editorToolBox, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_editorToolBox, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_editorToolBox->AddPage(m_panelToolBoxSvg, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer9786 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer9786->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9786->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9786->AddGrowableCol(0);
+    flexGridSizer9786->AddGrowableRow(0);
+    m_panelToolBoxSvg->SetSizer(flexGridSizer9786);
+    
+    wxFlexGridSizer* flexGridSizer9789 = new wxFlexGridSizer(1, 20, 0, 0);
+    flexGridSizer9789->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9789->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer9786->Add(flexGridSizer9789, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    m_staticLine97942 = new wxStaticLine(m_panelToolBoxSvg, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer9789->Add(m_staticLine97942, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText9802 = new wxStaticText(m_panelToolBoxSvg, wxID_ANY, _("Format:"), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1,-1)), 0);
+    wxFont m_staticText9802Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, true, wxT("Segoe UI"));
+    m_staticText9802->SetFont(m_staticText9802Font);
+    
+    flexGridSizer9789->Add(m_staticText9802, 0, wxALL, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer97954 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer97954->SetFlexibleDirection( wxBOTH );
+    flexGridSizer97954->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer9789->Add(flexGridSizer97954, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_cbSvgFormatPretty = new wxCheckBox(m_panelToolBoxSvg, wxID_ANY, _("Pretty"), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1,-1)), 0);
+    m_cbSvgFormatPretty->SetValue(true);
+    m_cbSvgFormatPretty->SetToolTip(_("Format pretty [else compact]"));
+    
+    flexGridSizer97954->Add(m_cbSvgFormatPretty, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_cbSvgFormatPrettyOverride = new wxCheckBox(m_panelToolBoxSvg, wxID_ANY, _("Override"), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1,-1)), 0);
+    m_cbSvgFormatPrettyOverride->SetValue(true);
+    m_cbSvgFormatPrettyOverride->SetToolTip(_("Override loaded file"));
+    
+    flexGridSizer97954->Add(m_cbSvgFormatPrettyOverride, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_btFormatPretty = new wxButton(m_panelToolBoxSvg, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btFormatPretty->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-format")), wxLEFT);
+    m_btFormatPretty->SetBitmapMargins(2,2);
+    #endif
+    m_btFormatPretty->SetToolTip(_("Format pretty"));
+    
+    flexGridSizer9789->Add(m_btFormatPretty, 0, wxALL, WXC_FROM_DIP(0));
+    m_btFormatPretty->SetMinSize(wxSize(26,26));
+    
+    m_staticLine9794 = new wxStaticLine(m_panelToolBoxSvg, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer9789->Add(m_staticLine9794, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText98027 = new wxStaticText(m_panelToolBoxSvg, wxID_ANY, _("Export:"), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1,-1)), 0);
+    wxFont m_staticText98027Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, true, wxT("Segoe UI"));
+    m_staticText98027->SetFont(m_staticText98027Font);
+    
+    flexGridSizer9789->Add(m_staticText98027, 0, wxALL, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer9795 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer9795->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9795->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer9789->Add(flexGridSizer9795, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_cbSvgExportCompact = new wxCheckBox(m_panelToolBoxSvg, wxID_ANY, _("Compact"), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1,-1)), 0);
+    m_cbSvgExportCompact->SetValue(false);
+    m_cbSvgExportCompact->SetToolTip(_("Compact SVG Export"));
+    
+    flexGridSizer9795->Add(m_cbSvgExportCompact, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_cbSvgExportKeepCncNodes = new wxCheckBox(m_panelToolBoxSvg, wxID_ANY, _("Keep Cnc"), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1,-1)), 0);
+    m_cbSvgExportKeepCncNodes->SetValue(true);
+    m_cbSvgExportKeepCncNodes->SetToolTip(_("Keep Cnc parameter nodes"));
+    
+    flexGridSizer9795->Add(m_cbSvgExportKeepCncNodes, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_btSvgExport = new wxButton(m_panelToolBoxSvg, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btSvgExport->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-export-4")), wxLEFT);
+    m_btSvgExport->SetBitmapMargins(2,2);
+    #endif
+    m_btSvgExport->SetToolTip(_("Export"));
+    
+    flexGridSizer9789->Add(m_btSvgExport, 0, wxALL, WXC_FROM_DIP(0));
+    m_btSvgExport->SetMinSize(wxSize(26,26));
     
     m_panelToolBoxGcode = new wxPanel(m_editorToolBox, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_editorToolBox, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_editorToolBox->AddPage(m_panelToolBoxGcode, _("Page"), false);
@@ -624,14 +644,86 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_stcFileContent->SetKeyWords(3, wxT(""));
     m_stcFileContent->SetKeyWords(4, wxT(""));
     
-    editorToolBoxSizer->Add(m_stcFileContent, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    editorToolBoxSizer->Add(m_stcFileContent, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer1809 = new wxFlexGridSizer(0, 8, 0, 0);
+    flexGridSizer1809->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1809->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1809->AddGrowableCol(5);
+    
+    editorToolBoxSizer->Add(flexGridSizer1809, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_tbCaseSensitive = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-case-sensitive")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_tbCaseSensitive->SetToolTip(_("Match case"));
+    m_tbCaseSensitive->SetValue(false);
+    
+    flexGridSizer1809->Add(m_tbCaseSensitive, 0, wxALL, WXC_FROM_DIP(0));
+    m_tbCaseSensitive->SetMinSize(wxSize(26,26));
+    
+    m_tbWholeWord = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-whole-word")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_tbWholeWord->SetToolTip(_("Match whole word"));
+    m_tbWholeWord->SetValue(false);
+    
+    flexGridSizer1809->Add(m_tbWholeWord, 0, wxALL, WXC_FROM_DIP(0));
+    m_tbWholeWord->SetMinSize(wxSize(26,26));
+    
+    m_tbRegEx = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-regular-expression")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_tbRegEx->SetToolTip(_("Match regular expresion"));
+    m_tbRegEx->SetValue(false);
+    
+    flexGridSizer1809->Add(m_tbRegEx, 0, wxALL, WXC_FROM_DIP(0));
+    m_tbRegEx->SetMinSize(wxSize(26,26));
+    
+    m_tbHighLight = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-marker")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_tbHighLight->SetToolTip(_("Highlight all occurences"));
+    m_tbHighLight->Enable(false);
+    m_tbHighLight->SetValue(false);
+    
+    flexGridSizer1809->Add(m_tbHighLight, 0, wxALL, WXC_FROM_DIP(0));
+    m_tbHighLight->SetMinSize(wxSize(26,26));
+    
+    m_sourceEditSearchState = new wxStaticBitmap(m_panelTplEdit, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(20,-1)), 0 );
+    
+    flexGridSizer1809->Add(m_sourceEditSearchState, 0, wxALL, WXC_FROM_DIP(5));
+    m_sourceEditSearchState->SetMinSize(wxSize(20,-1));
+    
+    wxArrayString m_sourceEditSearchArr;
+    m_sourceEditSearch = new wxComboBox(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), m_sourceEditSearchArr, 0);
+    m_sourceEditSearch->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_sourceEditSearch->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_sourceEditSearch->SetToolTip(_("Search pattern"));
+    #if wxVERSION_NUMBER >= 3000
+    m_sourceEditSearch->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer1809->Add(m_sourceEditSearch, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_svgEditFind = new wxButton(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_svgEditFind->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("go-down-search")), wxLEFT);
+    m_svgEditFind->SetBitmapMargins(2,2);
+    #endif
+    m_svgEditFind->SetToolTip(_("Search next"));
+    
+    flexGridSizer1809->Add(m_svgEditFind, 0, wxALL, WXC_FROM_DIP(0));
+    m_svgEditFind->SetMinSize(wxSize(26,26));
+    
+    m_svgEditFindPrev = new wxButton(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_svgEditFindPrev->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("go-up-search")), wxLEFT);
+    m_svgEditFindPrev->SetBitmapMargins(2,2);
+    #endif
+    m_svgEditFindPrev->SetToolTip(_("Search previous"));
+    
+    flexGridSizer1809->Add(m_svgEditFindPrev, 0, wxALL, WXC_FROM_DIP(0));
+    m_svgEditFindPrev->SetMinSize(wxSize(26,26));
     
     wxFlexGridSizer* flexGridSizer713 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer713->SetFlexibleDirection( wxBOTH );
     flexGridSizer713->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer713->AddGrowableCol(1);
     
-    flexGridSizer1294->Add(flexGridSizer713, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    editorToolBoxSizer->Add(flexGridSizer713, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_filePosition = new wxStaticText(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(100,-1)), 0);
     m_filePosition->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
@@ -5812,6 +5904,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btSvgToggleWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
     m_btSvgToggleTryToSelectClientId->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTryToSelectClientIdFromEditor), NULL, this);
     m_btSvgToggleAutoSaveTplOnProcess->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleAutoSaveTplOnProcess), NULL, this);
+    m_btFormatPretty->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSvgFormatPretty), NULL, this);
+    m_btSvgExport->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSvgExport), NULL, this);
+    m_cbBinaryViewMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectBinaryEditorViewMode), NULL, this);
+    m_btExtractSourceAsNewTpl->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::extractSourceAsNewTpl), NULL, this);
     m_tbCaseSensitive->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbRegEx->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbHighLight->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
@@ -5819,8 +5915,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_sourceEditSearch->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::svgEditSelected), NULL, this);
     m_svgEditFind->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEditFind), NULL, this);
     m_svgEditFindPrev->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEditFindPrev), NULL, this);
-    m_cbBinaryViewMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectBinaryEditorViewMode), NULL, this);
-    m_btExtractSourceAsNewTpl->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::extractSourceAsNewTpl), NULL, this);
     m_dvListCtrlSvgUAInboundPathList->Connect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUAInboundPathList), NULL, this);
     m_dvListCtrlSvgUAUseDirective->Connect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUAUseDirectiveList), NULL, this);
     m_dvListCtrlSvgUADetailInfo->Connect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUADetailInfo), NULL, this);
@@ -5892,6 +5986,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btToggleOutboundEditorWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
     m_bmpButton9297->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onReloadMonitorPreview), NULL, this);
     m_externFileManagerPreview->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
+    m_inputFileName->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::onLeftDClickTemplateName), NULL, this);
     m_heartbeatState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
     m_cbUCUnitFrom->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
@@ -6053,6 +6148,10 @@ MainFrameBClass::~MainFrameBClass()
     m_btSvgToggleWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
     m_btSvgToggleTryToSelectClientId->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTryToSelectClientIdFromEditor), NULL, this);
     m_btSvgToggleAutoSaveTplOnProcess->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleAutoSaveTplOnProcess), NULL, this);
+    m_btFormatPretty->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSvgFormatPretty), NULL, this);
+    m_btSvgExport->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSvgExport), NULL, this);
+    m_cbBinaryViewMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectBinaryEditorViewMode), NULL, this);
+    m_btExtractSourceAsNewTpl->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::extractSourceAsNewTpl), NULL, this);
     m_tbCaseSensitive->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbRegEx->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbHighLight->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
@@ -6060,8 +6159,6 @@ MainFrameBClass::~MainFrameBClass()
     m_sourceEditSearch->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::svgEditSelected), NULL, this);
     m_svgEditFind->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEditFind), NULL, this);
     m_svgEditFindPrev->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEditFindPrev), NULL, this);
-    m_cbBinaryViewMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectBinaryEditorViewMode), NULL, this);
-    m_btExtractSourceAsNewTpl->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::extractSourceAsNewTpl), NULL, this);
     m_dvListCtrlSvgUAInboundPathList->Disconnect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUAInboundPathList), NULL, this);
     m_dvListCtrlSvgUAUseDirective->Disconnect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUAUseDirectiveList), NULL, this);
     m_dvListCtrlSvgUADetailInfo->Disconnect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUADetailInfo), NULL, this);
@@ -6133,6 +6230,7 @@ MainFrameBClass::~MainFrameBClass()
     m_btToggleOutboundEditorWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
     m_bmpButton9297->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onReloadMonitorPreview), NULL, this);
     m_externFileManagerPreview->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
+    m_inputFileName->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::onLeftDClickTemplateName), NULL, this);
     m_heartbeatState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
     m_cbUCUnitFrom->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);

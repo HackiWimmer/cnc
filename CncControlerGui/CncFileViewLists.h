@@ -37,6 +37,7 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		void onSelectListItem(wxListEvent& event);
 		void onActivateListItem(wxListEvent& event);
 		
+		void copySelectedItemName();
 		void removeSelectedItem();
 		void updateListControl();
 		
@@ -47,7 +48,8 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 	public:
 		
 		static const int miSaveLruListEntry			= 8000;
-		static const int miRemoveLruListEntry		= 8001;
+		static const int miCopyLruListEntry			= 8001;
+		static const int miRemoveLruListEntry		= 8002;
 		
 		static const int COL_FILE 					= 0;
 		static const int TOTAL_COL_COUNT			= 1;

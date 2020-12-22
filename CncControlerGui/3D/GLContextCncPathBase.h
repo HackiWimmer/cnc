@@ -95,6 +95,9 @@ class GLContextCncPathBase : public GLContextBase {
 		void reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt);
 		
 		void setCurrentClientId(long id);
+		void highlightClientId(long id);
+		void highlightClientIds(cnc::LongValues ids);
+		
 		const GLI::GLCncPath& getPathData() 				{ return cncPath; }
 		GLContextCncPathBase::DrawType getDrawType() 		{ return drawType; }
 		void setDrawType(GLContextCncPathBase::DrawType t) 	{ drawType = t; }

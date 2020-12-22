@@ -2,6 +2,7 @@
 #include <wx/imaglist.h>
 #include <wx/fileconf.h>
 #include <wx/menu.h>
+#include <wx/clipbrd.h>
 #include "OSD/CncAsyncKeyboardState.h"
 #include "MainFrameProxy.h"
 #include "GlobalFunctions.h"
@@ -70,7 +71,9 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	popupMenu = new wxMenu("");
-	popupMenu->Append(miSaveLruListEntry, wxT("Save LRU List [ctrl + S]"));
+	popupMenu->Append(miSaveLruListEntry,	wxT("Save LRU List [ctrl + S]"));
+	popupMenu->AppendSeparator();
+	popupMenu->Append(miCopyLruListEntry,	wxT("Copy selected LRU List Entry"));
 	popupMenu->Append(miRemoveLruListEntry, wxT("Remove selected LRU List Entry"));
 	
 	//............................................
@@ -78,6 +81,12 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 	 [&](wxCommandEvent& event) {
 		this->save();
 	 }, miSaveLruListEntry, miSaveLruListEntry);
+	 
+	//............................................
+	popupMenu->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [&](wxCommandEvent& event) {
+		this->copySelectedItemName();
+	 }, miCopyLruListEntry, miCopyLruListEntry);
 	 
 	//............................................
 	popupMenu->Bind(wxEVT_COMMAND_MENU_SELECTED,
@@ -134,6 +143,19 @@ bool CncLruFileViewListCtrl::Enable(bool enable) {
 	GblFunc::freeze(this, !enable);
 	Refresh();
 	return CncLargeScaledListCtrl::Enable(enable); 
+}
+////////////////////////////////////////////////////////////////
+void CncLruFileViewListCtrl::copySelectedItemName() {
+////////////////////////////////////////////////////////////////
+	const long ls = getLastSelection();
+	
+	if ( isItemValid(ls) == false )
+		return;
+		
+	if ( wxTheClipboard->Open() ) {
+		wxTheClipboard->SetData(new wxTextDataObject(lruList.at(ls).GetFullPath()) );
+		wxTheClipboard->Close();
+	}
 }
 ////////////////////////////////////////////////////////////////
 void CncLruFileViewListCtrl::removeSelectedItem() {
@@ -336,15 +358,23 @@ void CncLruFileViewListCtrl::onRightDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	isLeaveEventActive = false;
 	
-		wxMenuItem* mi = popupMenu->FindChildItem(miRemoveLruListEntry);
 		const long ls = getLastSelection();
-		
-		if ( isItemValid(ls) && mi != NULL ) {
-			const wxString fn(GetItemText(getLastSelection(), COL_FILE));
-			
-			mi->SetItemLabel(wxString::Format("Remove LRU Item '%s'", fn));
-			PopupMenu(popupMenu);
+		{
+			wxMenuItem* mi = popupMenu->FindChildItem(miRemoveLruListEntry);
+			if ( isItemValid(ls) && mi != NULL ) {
+				const wxString fn(GetItemText(getLastSelection(), COL_FILE));
+				mi->SetItemLabel(wxString::Format("Remove LRU Item '%s'", fn));
+			}
 		}
+		{
+			wxMenuItem* mi = popupMenu->FindChildItem(miCopyLruListEntry);
+			if ( isItemValid(ls) && mi != NULL ) {
+				const wxString fn(GetItemText(getLastSelection(), COL_FILE));
+				mi->SetItemLabel(wxString::Format("Copy LRU Item Name '%s'", fn));
+			}
+		}
+		
+		PopupMenu(popupMenu);
 		
 	isLeaveEventActive = true;
 }

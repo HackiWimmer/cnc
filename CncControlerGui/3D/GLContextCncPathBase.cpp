@@ -594,6 +594,10 @@ void GLContextCncPathBase::drawRuler() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::setCurrentClientId(long id) { 
 /////////////////////////////////////////////////////////////////
+	#warning
+	//highlightClientId(id);
+	//return;
+	
 	currentClientId = id; 
 	
 	if ( currentClientId < 0 )
@@ -608,7 +612,33 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 	
 	if ( entry < 0 )
 		return;
-		
-		
+	
 	cncPath.setVirtualEnd(entry);
 }
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::highlightClientId(long id) { 
+/////////////////////////////////////////////////////////////////
+	cnc::LongValues ids;
+	ids.push_back(id);
+	highlightClientIds(ids);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::highlightClientIds(cnc::LongValues ids)  {
+/////////////////////////////////////////////////////////////////
+	if ( ids.size() == 0 )
+		return;
+		
+	GLOpenGLPathBufferStore* store = cncPath.getOpenGLBufferStore();
+	GLOpenGLPathBuffer::dimDownColours();
+	GLOpenGLPathBuffer::ReconstructOptions opt;
+	store->reconstruct(opt);
+	
+	cncPath.setVirtualEndToLast();
+	for ( auto it = ids.begin(); it != ids.end(); ++it) {
+		long & id = *it;
+		
+		if ( id >= 0 )
+			store->highlightClientID(id);
+	}
+}
+

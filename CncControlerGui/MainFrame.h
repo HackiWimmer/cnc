@@ -169,6 +169,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onLeftDClickTemplateName(wxMouseEvent& event);
+    virtual void onSvgExport(wxCommandEvent& event);
+    virtual void onSvgFormatPretty(wxCommandEvent& event);
 		virtual void toggleTryToSelectClientIdFromEditor(wxCommandEvent& event);
 		virtual void toggleAutoSaveTplOnProcess(wxCommandEvent& event);
 		virtual void onSelectTemplatePanel(wxListbookEvent& event);

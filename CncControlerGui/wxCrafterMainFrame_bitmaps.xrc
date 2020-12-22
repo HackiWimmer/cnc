@@ -38,6 +38,8 @@
   <object class="wxBitmap" name="16-find@2x">bitmaps\CodeLite\16-find@2x.png</object>
   <object class="wxBitmap" name="16-fold">bitmaps\16-fold.png</object>
   <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
+  <object class="wxBitmap" name="16-format">bitmaps\CodeLite\16-format.png</object>
+  <object class="wxBitmap" name="16-format@2x">bitmaps\CodeLite\16-format@2x.png</object>
   <object class="wxBitmap" name="16-globals">bitmaps\16-globals.png</object>
   <object class="wxBitmap" name="16-globals@2x">bitmaps\16-globals@2x.png</object>
   <object class="wxBitmap" name="16-gtk">bitmaps\16-gtk.png</object>
@@ -112,6 +114,7 @@
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
+  <object class="wxBitmap" name="document-export-4">bitmaps\document-export-4.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
   <object class="wxBitmap" name="document-open-5">bitmaps\document-open-5.png</object>
   <object class="wxBitmap" name="document-preview">bitmaps\document-preview.png</object>
@@ -130,6 +133,7 @@
   <object class="wxBitmap" name="gamepad-active">bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="git-reset">bitmaps\git-reset.png</object>
   <object class="wxBitmap" name="go-down-7">bitmaps\go-down-7.png</object>
+  <object class="wxBitmap" name="go-down-search">bitmaps\go-down-search.png</object>
   <object class="wxBitmap" name="go-first-view">bitmaps\go-first-view.png</object>
   <object class="wxBitmap" name="go-last-view">bitmaps\go-last-view.png</object>
   <object class="wxBitmap" name="go-next-context">bitmaps\go-next-context.png</object>

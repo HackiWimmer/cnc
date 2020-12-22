@@ -32,30 +32,54 @@ class GLOpenGLPathBuffer {
 
 		enum DisplayType { DT_DOTS = GL_POINTS, DT_STRIPS = GL_LINE_STRIP};
 		
-		static const unsigned int 	CncVertexAxisValueCount 		= 3;
-		static const unsigned int 		CncVertexAxisX 				= 0;
-		static const unsigned int 		CncVertexAxisY 				= 1;
-		static const unsigned int 		CncVertexAxisZ 				= 2;
+		static const unsigned int	CncVertexAxisValueCount 		= 3;
+		static const unsigned int		CncVertexAxisX 				= 0;
+		static const unsigned int		CncVertexAxisY 				= 1;
+		static const unsigned int		CncVertexAxisZ 				= 2;
 		
-		static const unsigned int 	CncVertexColourValueCount		= 4;
-		static const unsigned int 		CncVertexColourR			= 0;
-		static const unsigned int 		CncVertexColourG			= 1;
-		static const unsigned int 		CncVertexColourB			= 2;
-		static const unsigned int 		CncVertexColourA			= 3;
+		static const unsigned int	CncVertexColourValueCount		= 4;
+		static const unsigned int		CncVertexColourR			= 0;
+		static const unsigned int		CncVertexColourG			= 1;
+		static const unsigned int		CncVertexColourB			= 2;
+		static const unsigned int		CncVertexColourA			= 3;
+		
+		static const unsigned int		defRapidAlpha				=  80;
+		static const unsigned int		defWorkAlpha				= 100;
+		static const unsigned int		defMaxAlpha					= 100;
+		static const unsigned int		defUserAlpha				= 100;
+		static const unsigned int		defHighlightAlpha			= 100;
 		
 		// --------------------------------------------------------------
 		struct VertexColours {
-			unsigned int rapidAlpha	= 80;
+			
+			unsigned int rapidAlpha	=  defRapidAlpha;
 			
 			wxColour	rapid		= wxColour(255, 128,  64, rapidAlpha);
-			wxColour	work		= wxColour(255, 255, 255, 255);
-			wxColour	max			= wxColour(255,   0,   0, 255);
-			wxColour	user		= wxColour(  0,   0, 255, 255);
-			wxColour	highlight	= wxColour(255, 255,   0, 255);
+			wxColour	work		= wxColour(255, 255, 255, GLOpenGLPathBuffer::defWorkAlpha);
+			wxColour	max			= wxColour(255,   0,   0, GLOpenGLPathBuffer::defMaxAlpha);
+			wxColour	user		= wxColour(  0,   0, 255, GLOpenGLPathBuffer::defUserAlpha);
+			
+			wxColour	highlight	= wxColour(255, 255,   0, GLOpenGLPathBuffer::defHighlightAlpha);
 			
 			// ----------------------------------------------------------
 			void showRapidPathes(bool state) {
 				rapid.Set(rapid.Red(), rapid.Green(), rapid.Blue(), state == true ? rapid.Alpha() : 0);
+			}
+			
+			// ----------------------------------------------------------
+			void restoreLightness() {
+				changeLightness(1.0);
+			}
+			
+			// ----------------------------------------------------------
+			void changeLightness(float lightness = 1.0) {
+				if ( lightness < 0.0 || lightness > 2.0 )
+					lightness = 1.0;
+					
+				rapid = rapid.	ChangeLightness(lightness * rapidAlpha);
+				work  = work.	ChangeLightness(lightness * GLOpenGLPathBuffer::defWorkAlpha);
+				max   = max.	ChangeLightness(lightness * GLOpenGLPathBuffer::defMaxAlpha);
+				user  = user.	ChangeLightness(lightness * GLOpenGLPathBuffer::defUserAlpha);
 			}
 		};
 		
@@ -64,8 +88,11 @@ class GLOpenGLPathBuffer {
 			bool showRapidPathes = true;
 		};
 
-		static const VertexColours& getColours() { return GLOpenGLPathBuffer::vertexColours; }
+		static const VertexColours& getColours()					{ return GLOpenGLPathBuffer::vertexColours; }
+		static void resetColoursLightness()							{ setColoursLightness(1.0); }
 		static void setColours(const VertexColours& colours);
+		static void setColoursLightness(double lightness = 1.0);
+		static void dimDownColours();
 		
 		//-----------------------------------------------------
 		struct CncVertex {

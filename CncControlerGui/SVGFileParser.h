@@ -18,6 +18,34 @@ class wxMenuItem;
 
 typedef CncUnitCalculatorBase::Unit Unit;
 
+// -------------------------------------------------
+class SVGFileFormatter 
+{
+	private:
+		wxString	inboundFileName;
+		
+		bool removeCncTags(wxXmlNode* child);
+		bool removeCncTags(wxXmlDocument& doc);
+		
+	public:
+		enum Mode {
+			CNV_PRETTY_WITH_CNC, 
+			CNV_PRETTY_WITHOUT_CNC, 
+			CNV_COMPACT_WITH_CNC, 
+			CNV_COMPACT_WITHOUT_CNC 
+		};
+		
+		SVGFileFormatter(const wxString& ifn);
+		
+		bool convert(SVGFileFormatter::Mode m, const wxString& ofn);
+		
+		bool format(const wxString& ofn);
+		bool compact(const wxString& ofn, bool rmvCncTags = false);
+		
+		bool removeCncTags(const wxString& ofn);
+};
+
+// -------------------------------------------------
 class SVGFileParser : public SVGParserBase
                     , public FileParser 
 {

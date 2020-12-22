@@ -25,7 +25,6 @@ class CncFileNameService {
 		static wxString		_session;
 		static wxString		_configFileName;
 		static wxString		_lruFileName;
-		static wxString		_preconfiguredSpeedConfigFileName;
 		
 		static void deleteFile(wxString fn);
 	
@@ -34,10 +33,11 @@ class CncFileNameService {
 		static void init();
 		static void sessionHousekeeping();
 		
+		static bool ensureEndWithPathSep(wxString& str);
+		
 		static void trace(std::ostream& os);
 		static const wxString& getConfigFileName()						{ _ret = _configDirectory + _configFileName; return _ret; }
 		static const wxString& getLruFileName()							{ _ret = _configDirectory + _lruFileName; return _ret; }
-		static const wxString& getSpeedConfigFileName()					{ _ret = _configDirectory + _preconfiguredSpeedConfigFileName; return _ret; }
 		
 		static const wxString& getExecutableDir()						{ return _executablePath; }
 		static const wxString& getHomeDir()								{ return _homeDirectory; }

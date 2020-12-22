@@ -210,7 +210,7 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onKeyUp(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	onUpdateFilePosition(false);
+	onUpdateFilePosition(true);
 	
 	// update tab label - on demand
 	decorateParentTabName(IsModified());
@@ -257,7 +257,7 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 		getCtlColumnPos()->SetLabel(label);
 	
 	// try to select current line as client id
-	if ( publishSelection == true ) {
+	if ( IsModified() == false && publishSelection == true ) {
 		// ------------------------------------------------------------
 		auto tryToSelectClientId = [&](long cid) {
 			if ( tryToSelectFlag == false )
@@ -432,8 +432,8 @@ bool CncBaseEditor::selectLinesSvg(unsigned long firstLine, unsigned long lastLi
 		ep = SearchNext(0, ">");
 		
 		if ( ep != wxNOT_FOUND ) {
-			// make the end visible
-			GotoPos(ep);
+			// make the start visible
+			GotoPos(sp);
 			// select
 			SetSelection(sp - 0, ep + 1);
 			ok = true;

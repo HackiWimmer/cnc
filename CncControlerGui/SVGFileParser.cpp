@@ -19,6 +19,135 @@
 #include "SvgColourScheme.h"
 #include "SVGFileParser.h"
 
+//////////////////////////////////////////////////////////////////
+SVGFileFormatter::SVGFileFormatter(const wxString& ifn)
+: inboundFileName	(ifn)
+//////////////////////////////////////////////////////////////////
+{
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::removeCncTags(wxXmlNode* child) {
+//////////////////////////////////////////////////////////////////
+	// -----------------------------------------------------------
+	auto isCncTag = [&](const wxString& name) {
+		
+		if      ( name.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) )	return true;
+		else if ( name.IsSameAs(SvgNodeTemplates::CncParameterPrintBlockNodeName) )	return true;
+		else if ( name.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) )		return true;
+		else if ( name.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) )			return true;
+		else if ( name.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) )			return true;
+		
+		return false;
+	};
+	
+	// -----------------------------------------------------------
+	while ( child ) {
+		
+		if ( removeCncTags(child->GetChildren()) == false )
+			return false;
+			
+		wxXmlNode* next = child->GetNext();
+		
+		const wxString& name = child->GetName();
+		if ( name.StartsWith("Cnc") && isCncTag(name) )  {
+			const int ln = child->GetLineNumber();
+			
+			if ( child->GetParent()->RemoveChild(child) == false ) {
+				std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": RemoveChild() failed! [%d] [%s]\n", ln, name));
+				return false;
+			}
+		}
+		
+		child = next;
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::removeCncTags(wxXmlDocument& doc) {
+//////////////////////////////////////////////////////////////////
+	if ( doc.IsOk() == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": wxXmlDocument::isOk() failed\n"));
+		return false;
+	}
+	
+	wxXmlNode* child = doc.GetRoot()->GetChildren();
+	return removeCncTags(child);
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::removeCncTags(const wxString& ofn) {
+//////////////////////////////////////////////////////////////////
+	return convert(CNV_PRETTY_WITHOUT_CNC, ofn);
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::format(const wxString& ofn) {
+//////////////////////////////////////////////////////////////////
+	return convert(CNV_PRETTY_WITH_CNC, ofn);
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::compact(const wxString& ofn, bool rmvCncTags) {
+//////////////////////////////////////////////////////////////////
+	return convert(rmvCncTags ? CNV_COMPACT_WITHOUT_CNC : CNV_PRETTY_WITH_CNC, ofn);
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::convert(SVGFileFormatter::Mode m, const wxString& ofn) {
+//////////////////////////////////////////////////////////////////
+	if ( wxFileName(inboundFileName).Exists() == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": Inbound file '%s' didn't exist!\n", inboundFileName));
+		return false;
+	}
+	
+	wxXmlDocument doc;
+	{
+		wxLogNull dummyToSuppressXmlDocErrorMessages;
+		if ( doc.Load(inboundFileName) == false ) {
+			std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": wxXmlDocument::Load('%s') failed!\n", inboundFileName));
+			return false;
+		}
+	}
+	
+	int indent		= 2;
+	bool rmvCncTags	= false;
+	
+	switch ( m ) {
+		case CNV_PRETTY_WITHOUT_CNC:
+			rmvCncTags	= true;
+			indent		= 2;
+			break;
+		case CNV_PRETTY_WITH_CNC:
+			rmvCncTags	= false;
+			indent		= 2;
+			break;
+		case CNV_COMPACT_WITHOUT_CNC:
+			rmvCncTags	= true;
+			indent		= wxXML_NO_INDENTATION;
+			break;
+		case CNV_COMPACT_WITH_CNC:
+			rmvCncTags	= false;
+			indent		= wxXML_NO_INDENTATION;
+			break;
+	}
+	
+	if ( rmvCncTags == true ) {
+		if ( removeCncTags(doc) == false ) {
+			std::cerr << CNC_LOG_FUNCT_A(wxString::Format(":removeCncTags('%s') failed!\n", inboundFileName));
+			return false;
+		}
+	}
+	
+	if ( doc.Save(ofn, indent) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": wxXmlDocument::Save('%s') failed!\n", ofn));
+		return false;
+	}
+	
+	return true;
+}
+
+
+
+
+
+//////////////////////////////////////////////////////////////////
 #define SFP_ADD_SEP(msg)	APP_PROXY::parsingSynopsisTraceAddSeparator(wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
 #define SFP_LOG_INF(msg)	APP_PROXY::parsingSynopsisTraceAddInfo     (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
 #define SFP_LOG_WAR(msg)	APP_PROXY::parsingSynopsisTraceAddWarning  (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));

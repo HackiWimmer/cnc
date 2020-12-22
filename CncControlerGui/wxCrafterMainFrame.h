@@ -33,8 +33,9 @@
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/listbook.h>
-#include <wx/statline.h>
 #include <wx/notebook.h>
+#include <wx/statline.h>
+#include <wx/checkbox.h>
 #include <wx/combobox.h>
 #include <wx/arrstr.h>
 #include <wx/stc/stc.h>
@@ -44,7 +45,6 @@
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
 #include <wx/scrolwin.h>
-#include <wx/checkbox.h>
 #include <wx/radiobox.h>
 #include <wx/spinctrl.h>
 #include <wx/listctrl.h>
@@ -116,6 +116,8 @@ protected:
     wxPanel* m_editorPanel;
     wxButton* m_btDetachTemplateSource;
     wxStaticText* m_staticText513767;
+    wxNotebook* m_templateNotebook;
+    wxPanel* m_panelTplEdit;
     wxButton* m_openSourceExtern;
     wxButton* m_openSvgExtern;
     wxStaticLine* m_staticLine44728;
@@ -127,8 +129,24 @@ protected:
     wxBitmapToggleButton* m_btSvgToggleWordWrap;
     wxBitmapToggleButton* m_btSvgToggleTryToSelectClientId;
     wxBitmapToggleButton* m_btSvgToggleAutoSaveTplOnProcess;
-    wxNotebook* m_templateNotebook;
-    wxPanel* m_panelTplEdit;
+    wxSimplebook* m_editorToolBox;
+    wxPanel* m_panelToolBoxSvg;
+    wxStaticLine* m_staticLine97942;
+    wxStaticText* m_staticText9802;
+    wxCheckBox* m_cbSvgFormatPretty;
+    wxCheckBox* m_cbSvgFormatPrettyOverride;
+    wxButton* m_btFormatPretty;
+    wxStaticLine* m_staticLine9794;
+    wxStaticText* m_staticText98027;
+    wxCheckBox* m_cbSvgExportCompact;
+    wxCheckBox* m_cbSvgExportKeepCncNodes;
+    wxButton* m_btSvgExport;
+    wxPanel* m_panelToolBoxGcode;
+    wxPanel* m_panelToolBoxBinary;
+    wxStaticText* m_staticText6074;
+    wxComboBox* m_cbBinaryViewMode;
+    wxButton* m_btExtractSourceAsNewTpl;
+    wxStyledTextCtrl* m_stcFileContent;
     wxBitmapToggleButton* m_tbCaseSensitive;
     wxBitmapToggleButton* m_tbWholeWord;
     wxBitmapToggleButton* m_tbRegEx;
@@ -137,14 +155,6 @@ protected:
     wxComboBox* m_sourceEditSearch;
     wxButton* m_svgEditFind;
     wxButton* m_svgEditFindPrev;
-    wxSimplebook* m_editorToolBox;
-    wxPanel* m_panelToolBoxSvg;
-    wxPanel* m_panelToolBoxGcode;
-    wxPanel* m_panelToolBoxBinary;
-    wxStaticText* m_staticText6074;
-    wxComboBox* m_cbBinaryViewMode;
-    wxButton* m_btExtractSourceAsNewTpl;
-    wxStyledTextCtrl* m_stcFileContent;
     wxStaticText* m_filePosition;
     wxTextCtrl* m_sourceEditStatus;
     wxStaticText* m_editMode;
@@ -759,13 +769,15 @@ protected:
     virtual void toggleTemplateWordWrapMode(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleTryToSelectClientIdFromEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleAutoSaveTplOnProcess(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSvgFormatPretty(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSvgExport(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectBinaryEditorViewMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void extractSourceAsNewTpl(wxCommandEvent& event) { event.Skip(); }
     virtual void toogleSvgEditSearchFlag(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEditSearchTextChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEditSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEditFind(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEditFindPrev(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectBinaryEditorViewMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void extractSourceAsNewTpl(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUAInboundPathList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUAUseDirectiveList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUADetailInfo(wxDataViewEvent& event) { event.Skip(); }
@@ -833,6 +845,7 @@ protected:
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
     virtual void onReloadMonitorPreview(wxCommandEvent& event) { event.Skip(); }
     virtual void onChangePreviewMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void onLeftDClickTemplateName(wxMouseEvent& event) { event.Skip(); }
     virtual void dclickHeartbeatState(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
@@ -982,14 +995,16 @@ public:
     wxBitmapToggleButton* GetBtSvgToggleWordWrap() { return m_btSvgToggleWordWrap; }
     wxBitmapToggleButton* GetBtSvgToggleTryToSelectClientId() { return m_btSvgToggleTryToSelectClientId; }
     wxBitmapToggleButton* GetBtSvgToggleAutoSaveTplOnProcess() { return m_btSvgToggleAutoSaveTplOnProcess; }
-    wxBitmapToggleButton* GetTbCaseSensitive() { return m_tbCaseSensitive; }
-    wxBitmapToggleButton* GetTbWholeWord() { return m_tbWholeWord; }
-    wxBitmapToggleButton* GetTbRegEx() { return m_tbRegEx; }
-    wxBitmapToggleButton* GetTbHighLight() { return m_tbHighLight; }
-    wxStaticBitmap* GetSourceEditSearchState() { return m_sourceEditSearchState; }
-    wxComboBox* GetSourceEditSearch() { return m_sourceEditSearch; }
-    wxButton* GetSvgEditFind() { return m_svgEditFind; }
-    wxButton* GetSvgEditFindPrev() { return m_svgEditFindPrev; }
+    wxStaticLine* GetStaticLine97942() { return m_staticLine97942; }
+    wxStaticText* GetStaticText9802() { return m_staticText9802; }
+    wxCheckBox* GetCbSvgFormatPretty() { return m_cbSvgFormatPretty; }
+    wxCheckBox* GetCbSvgFormatPrettyOverride() { return m_cbSvgFormatPrettyOverride; }
+    wxButton* GetBtFormatPretty() { return m_btFormatPretty; }
+    wxStaticLine* GetStaticLine9794() { return m_staticLine9794; }
+    wxStaticText* GetStaticText98027() { return m_staticText98027; }
+    wxCheckBox* GetCbSvgExportCompact() { return m_cbSvgExportCompact; }
+    wxCheckBox* GetCbSvgExportKeepCncNodes() { return m_cbSvgExportKeepCncNodes; }
+    wxButton* GetBtSvgExport() { return m_btSvgExport; }
     wxPanel* GetPanelToolBoxSvg() { return m_panelToolBoxSvg; }
     wxPanel* GetPanelToolBoxGcode() { return m_panelToolBoxGcode; }
     wxStaticText* GetStaticText6074() { return m_staticText6074; }
@@ -998,6 +1013,14 @@ public:
     wxPanel* GetPanelToolBoxBinary() { return m_panelToolBoxBinary; }
     wxSimplebook* GetEditorToolBox() { return m_editorToolBox; }
     wxStyledTextCtrl* GetStcFileContent() { return m_stcFileContent; }
+    wxBitmapToggleButton* GetTbCaseSensitive() { return m_tbCaseSensitive; }
+    wxBitmapToggleButton* GetTbWholeWord() { return m_tbWholeWord; }
+    wxBitmapToggleButton* GetTbRegEx() { return m_tbRegEx; }
+    wxBitmapToggleButton* GetTbHighLight() { return m_tbHighLight; }
+    wxStaticBitmap* GetSourceEditSearchState() { return m_sourceEditSearchState; }
+    wxComboBox* GetSourceEditSearch() { return m_sourceEditSearch; }
+    wxButton* GetSvgEditFind() { return m_svgEditFind; }
+    wxButton* GetSvgEditFindPrev() { return m_svgEditFindPrev; }
     wxStaticText* GetFilePosition() { return m_filePosition; }
     wxTextCtrl* GetSourceEditStatus() { return m_sourceEditStatus; }
     wxStaticText* GetEditMode() { return m_editMode; }

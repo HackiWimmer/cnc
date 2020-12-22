@@ -34,6 +34,14 @@ static const float 	PI 									=  3.14159265;
 static const int 	MAX_PARAMETER_VALUES 				=  10;
 static const int 	UNDEFINED_LINE_NUMBER 				= -1;
 
+namespace cnc {
+	
+	typedef std::vector<long>	LongValues;
+	typedef std::vector<float>	FloatValues;
+	typedef std::vector<double>	DoubleValues;
+	
+};
+
 static struct ClientIds {
 	const long	TPL_FACTOR				=    10L;
 	const long	INVALID					=    -1L;

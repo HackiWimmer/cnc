@@ -79,7 +79,16 @@ void GLOpenGLPathBuffer::setColours(const VertexColours& colours) {
 	GLOpenGLPathBuffer::vertexColours.rapid = wxColour(colours.rapid.Red(), 
 													   colours.rapid.Green(), 
 													   colours.rapid.Blue(), 
-													   colours.rapidAlpha);
+													   GLOpenGLPathBuffer::defRapidAlpha);
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::setColoursLightness(double lightness) {
+/////////////////////////////////////////////////////////////
+	GLOpenGLPathBuffer::vertexColours.changeLightness(lightness);
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::dimDownColours() {
+	GLOpenGLPathBuffer::vertexColours.changeLightness(0.2);
 }
 /////////////////////////////////////////////////////////////
 const wxString& GLOpenGLPathBuffer::getStoreInstanceName() const {

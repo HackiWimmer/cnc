@@ -28,7 +28,9 @@
 #include <wx/textdlg.h>
 #include <wx/clipbrd.h>
 #include <wx/version.h> 
+#include <wx/gdicmn.h>
 #include <wx/richmsgdlg.h>
+#include <wx/richtooltip.h>
 #include <boost/version.hpp>
 #include "Codelite/cl_aui_dock_art.h"
 #include "OSD/CncUsbPortScanner.h"
@@ -952,13 +954,11 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	showMotionMonitorReplayPane();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	showMotionMonitorStatisticPane();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -2932,7 +2932,7 @@ void MainFrame::selectEditorToolBox(bool fileLoaded) {
 	} else {
 		switch ( getCurrentTemplateFormat() ) {
 			case TplSvg:		m_editorToolBox->SetSelection(0);
-								show = false;
+								show = true;
 								break;
 								
 			case TplGcode:		m_editorToolBox->SetSelection(1);
@@ -3027,13 +3027,18 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 	if ( saveTemplateOnDemand(false) == false )
 		return;
 		
-	const wxString templateName("..\\Templates\\");
-    wxFileDialog newFileDialog(this, 
-								_("New Template File"), 
-								templateName,
-								"",
+	wxString defaultTplDir;
+	THE_CONFIG->getDefaultTplDir(defaultTplDir);
+	CncFileNameService::ensureEndWithPathSep(defaultTplDir);
+	
+	defaultTplDir.append("NewCncTemplate");
+	
+	wxFileDialog newFileDialog(this, 
+								"New Template File", 
+								wxEmptyString,
+								defaultTplDir, 
                                 "SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode", 
-								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+								wxFD_SAVE/*|wxFD_OVERWRITE_PROMPT*/);
 
 	if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
 		return; 
@@ -3209,7 +3214,10 @@ void MainFrame::renameTemplateFromButton(wxCommandEvent& event) {
 	fileView->update();
 	
 	m_inputFileName->SetValue(newTplFile.GetFullName());
-	m_inputFileName->SetHint(tplFile.GetPathWithSep());
+	m_inputFileName->SetHint(newTplFile.GetFullPath());
+	
+	if ( sourceEditor != NULL )
+		sourceEditor->setNewTemplateFileName(getCurrentTemplatePathFileName());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplateSourceExtern(wxCommandEvent& event) {
@@ -3391,7 +3399,7 @@ bool MainFrame::processSVGTemplate() {
 		delete inboundFileParser;
 		
 	CncGampadDeactivator cpd(this);
-		
+	
 	inboundFileParser = new SVGFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
 	return processVirtualTemplate();
 }
@@ -7806,6 +7814,108 @@ void MainFrame::onSelectTemplatePanel(wxListbookEvent& event) {
 			THE_TPL_CTX->updateGui(true);
 	}
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onSvgExport(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxString outboundFileName(getCurrentTemplatePathFileName() + ".export.svg");
+	
+	wxFileDialog newFileDialog(this, 
+								"Export current SVG to . . . ", 
+								wxEmptyString, 
+								wxFileName(outboundFileName).GetFullPath(),
+								"SVG Files (*.svg)|*.svg", 
+								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+
+	if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
+		return; 
+		
+	outboundFileName.assign(newFileDialog.GetPath());
+	
+	const SVGFileFormatter::Mode m = m_cbSvgExportCompact->GetValue() ? ( m_cbSvgExportKeepCncNodes ? SVGFileFormatter::Mode::CNV_PRETTY_WITH_CNC 
+																									: SVGFileFormatter::Mode::CNV_PRETTY_WITHOUT_CNC 
+																		) 
+																	  : ( m_cbSvgExportKeepCncNodes ? SVGFileFormatter::Mode::CNV_COMPACT_WITH_CNC
+																									: SVGFileFormatter::Mode::CNV_COMPACT_WITHOUT_CNC
+																		);
+																		
+	SVGFileFormatter f(getCurrentTemplatePathFileName());
+	if ( f.convert(m, outboundFileName) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" SVGFileFormatter::convert('%s' -> '%s') failed!\n", 
+														getCurrentTemplatePathFileName(), 
+														outboundFileName
+													 ));
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onSvgFormatPretty(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxString outboundFileName(getCurrentTemplatePathFileName());
+	
+	// determie a new file name of overriden == false
+	if ( m_cbSvgFormatPrettyOverride->GetValue() == false ) {
+		const wxString templateName(outboundFileName + ( m_cbSvgFormatPretty->GetValue() ? ".pretty.svg" : ".compact.svg") );
+		
+		wxFileDialog newFileDialog(this, 
+									"Format current SVG pretty to . . . ", 
+									wxEmptyString, 
+									wxFileName(templateName).GetFullPath(),
+									"SVG Files (*.svg)|*.svg", 
+									wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+
+		if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
+			return; 
+			
+		outboundFileName.assign(newFileDialog.GetPath());
+	}
+	
+	// generate new format
+	const SVGFileFormatter::Mode m = m_cbSvgFormatPretty->GetValue() ? SVGFileFormatter::Mode::CNV_PRETTY_WITH_CNC 
+																	 : SVGFileFormatter::Mode::CNV_COMPACT_WITH_CNC; 
+	SVGFileFormatter f(getCurrentTemplatePathFileName());
+	if ( f.convert(m, outboundFileName) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" SVGFileFormatter::convert('%s' -> '%s') failed!\n", 
+														getCurrentTemplatePathFileName(), 
+														outboundFileName
+													 ));
+		return;
+	}
+	
+	// in case a new file was created, ask to open it
+	if ( outboundFileName.IsSameAs(getCurrentTemplatePathFileName()) == false ) {
+		wxMessageDialog dlg(this, 
+							outboundFileName,
+							"Open . . .  ", 
+							wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
+							
+		int ret = dlg.ShowModal();
+		if ( ret == wxID_YES ) {
+			
+			wxFileName fn(outboundFileName);
+			m_inputFileName->SetValue(fn.GetFullName());
+			m_inputFileName->SetHint(fn.GetFullPath());
+			
+			if ( openFile() == false ) {
+				std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" openFile('%s') failed!\n", fn.GetFullPath()));
+				return;
+			}
+		}
+		
+	}
+	// else reload to make the overriden content visible
+	else {
+		reloadTemplate();
+	}
+	
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onLeftDClickTemplateName(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxRichToolTip tip("Full Template file name:", wxString::Format("%s", m_inputFileName->GetHint()));
+	tip.SetIcon(wxICON_INFORMATION);
+	//tip.SetTipKind(wxTipKind_BottomLeft);
+	tip.ShowFor(m_inputFileName);
+}
+
 
 
 
@@ -7816,3 +7926,4 @@ void MainFrame::onIdle(wxIdleEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	//CNC_PRINT_LOCATION
 }
+

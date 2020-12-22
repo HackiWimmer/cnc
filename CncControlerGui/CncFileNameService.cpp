@@ -12,8 +12,6 @@ wxPathList	CncFileNameService::_pathList;
 
 wxString	CncFileNameService::_configFileName("CncController.ini");
 wxString	CncFileNameService::_lruFileName("CncControllerLruStore.ini");
-
-wxString	CncFileNameService::_preconfiguredSpeedConfigFileName(wxString("Database") + wxFileName::GetPathSeparator() + "PreconfiguredSpeedSetups.ini");
 wxString	CncFileNameService::_appTempDir("CncGuiController-TempFiles");
 
 wxString	CncFileNameService::_ret(wxT(""));
@@ -225,13 +223,24 @@ void CncFileNameService::trace(std::ostream& os) {
 	os << "Template Default Preview Filename : " << CncFileNameService::getCncTemplatePreviewFileName(TplUnknown) 	<< std::endl;
 	os << "Draw Pane Trace Filename          : " << CncFileNameService::getCncDrawPaneTraceFileName() 				<< std::endl;
 	os << "LRU Filename                      : " << CncFileNameService::getLruFileName() 							<< std::endl;
-	os << "Speed Config Filename             : " << CncFileNameService::getSpeedConfigFileName() 					<< std::endl;
 	os << "Stack Trace Filename              : " << CncFileNameService::getStackTraceFileName() 					<< std::endl;
 	
 	os << "Search Path Entries               : " << ""											 					<< std::endl;
 	for ( size_t i=0; i< _pathList.GetCount(); i++ ) {
 		os << wxString::Format(" - Path(%00ld): ", (long)i) << _pathList.Item(i)				 					<< std::endl;
 	}
+}
+///////////////////////////////////////////////////////////////////
+bool CncFileNameService::ensureEndWithPathSep(wxString& str) {
+///////////////////////////////////////////////////////////////////
+	str.Trim();
+	
+	if ( str.EndsWith(wxFileName::GetPathSeparator()) == false) {
+		str.append(wxFileName::GetPathSeparator());
+		return true;
+	}
+	
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 void CncFileNameService::deleteFile(wxString fn) {
