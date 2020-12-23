@@ -1,3 +1,4 @@
+#include "wxCrafterImages.h"
 #include "GlobalFunctions.h"
 #include "CncUserEvents.h"
 #include "CncExternalViewBox.h"
@@ -54,7 +55,7 @@ CncExternalViewBox* CncExternalViewBoxCluster::getNode(Node n) const {
 	return NULL;
 }
 //////////////////////////////////////////////////////////////////
-bool CncExternalViewBoxCluster::detachNode(Node n) {
+bool CncExternalViewBoxCluster::detachNode(Node n, wxButton* btn) {
 //////////////////////////////////////////////////////////////////
 	CncExternalViewBox* evb = getNode(n);
 	if ( evb == NULL )
@@ -63,6 +64,7 @@ bool CncExternalViewBoxCluster::detachNode(Node n) {
 	const bool isExtViewActive = !evb->IsShown();
 	
 	// prepare extern preview
+	evb->setupSwapButton(CncExternalViewBox::Default::VIEW1, btn);
 	evb->selectView(CncExternalViewBox::Default::VIEW1);
 	evb->Show(isExtViewActive);
 	
@@ -107,11 +109,14 @@ CncExternalViewBox::CncExternalViewBox(wxWindow* parent, long style)
 	
 	for (unsigned int i=0; i<MAX_VIEWS; i++) {
 		sourceCtrl[i] = NULL;
+		swapButton[i] = NULL;
 		swapState[i]  = SS_DEFAULT;
-		title[i] 	  = "";
+		title[i]      = "";
 	}
 	
 	m_viewBook->SetSelection(0);
+	
+	CenterOnParent();
 }
 //////////////////////////////////////////////////////////////////
 CncExternalViewBox::~CncExternalViewBox() {
@@ -165,6 +170,15 @@ bool CncExternalViewBox::setupView(unsigned int idx, wxWindow* source, const wxS
 	return true;
 }
 //////////////////////////////////////////////////////////////////
+bool CncExternalViewBox::setupSwapButton(unsigned int idx, wxButton* btn) {
+//////////////////////////////////////////////////////////////////
+	if ( idx > MAX_VIEWS - 1 )
+		return false;
+		
+	swapButton[idx] = btn;
+	return true;
+}
+//////////////////////////////////////////////////////////////////
 void CncExternalViewBox::swapControls() {
 //////////////////////////////////////////////////////////////////
 	for (unsigned int i=0; i<MAX_VIEWS; i++)
@@ -186,6 +200,11 @@ void CncExternalViewBox::swapControls(unsigned int idx) {
 	} else {
 		GblFunc::swapControls(sourceCtrl[idx], targetCtrl[idx]);
 		swapState[idx] = SS_DEFAULT;
+	}
+	
+	if ( swapButton[idx] != NULL ) {
+		swapButton[idx]->SetBitmap(ImageLibAui().Bitmap(swapState[idx] == SS_DEFAULT ? "BMP_DETACH"  : "BMP_ATTACH"));
+		swapButton[idx]->SetToolTip(                    swapState[idx] == SS_DEFAULT ? "Detach View" : "Attach View");
 	}
 	
 	Update();

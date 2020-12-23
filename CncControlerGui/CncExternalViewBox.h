@@ -23,6 +23,7 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 		
 		const SwapState getSwapState(unsigned int idx) const;
 		bool setupView(unsigned int idx, wxWindow* source, const wxString& title);
+		bool setupSwapButton(unsigned int idx, wxButton* btn);
 		bool selectView(unsigned int idx);
 		
 		void setStatusTextLeft(const wxString& text) 	{ m_statusTextLeft-> ChangeValue(text); }
@@ -48,10 +49,11 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 
 		static const unsigned int MAX_VIEWS = 4;
 		bool		guiSensitivity;
-		wxWindow* 	sourceCtrl	[MAX_VIEWS];
-		wxWindow* 	targetCtrl	[MAX_VIEWS];
+		wxWindow*	sourceCtrl	[MAX_VIEWS];
+		wxWindow*	targetCtrl	[MAX_VIEWS];
+		wxButton*	swapButton	[MAX_VIEWS];
 		wxString	title		[MAX_VIEWS];
-		SwapState 	swapState	[MAX_VIEWS];
+		SwapState	swapState	[MAX_VIEWS];
 		
 		wxPoint 	moveDelta;
 };
@@ -67,7 +69,7 @@ public:
 		~CncExternalViewBoxCluster();
 		
 		CncExternalViewBox*		getNode(Node n) const;
-		bool					detachNode(Node n);
+		bool					detachNode(Node n, wxButton* bnt = NULL);
 		bool					setupView1(Node n, wxWindow* wnd, const wxString& title);
 		bool 					hideNode(Node n);
 		bool 					hideAll();

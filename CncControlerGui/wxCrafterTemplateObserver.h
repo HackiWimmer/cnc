@@ -14,9 +14,10 @@
 #include <wx/artprov.h>
 #include <wx/sizer.h>
 #include <wx/checkbox.h>
-#include <wx/bmpbuttn.h>
 #include <wx/stattext.h>
 #include <wx/radiobox.h>
+#include <wx/bmpbuttn.h>
+#include <wx/statline.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
 #include <wx/timer.h>
@@ -41,9 +42,10 @@ class CncTemplateObserverBase : public wxPanel
 {
 protected:
     wxCheckBox* m_observationMode;
-    wxBitmapButton* m_btOpenExtern;
     wxStaticText* m_staticText6553;
     wxRadioBox* m_actionSelection;
+    wxBitmapButton* m_btOpenExtern;
+    wxStaticLine* m_staticLine28;
     wxStaticText* m_staticText7386;
     wxTextCtrl* m_curTemplateTimestamp;
     wxStaticText* m_staticText6527;
@@ -62,9 +64,10 @@ protected:
 
 public:
     wxCheckBox* GetObservationMode() { return m_observationMode; }
-    wxBitmapButton* GetBtOpenExtern() { return m_btOpenExtern; }
     wxStaticText* GetStaticText6553() { return m_staticText6553; }
     wxRadioBox* GetActionSelection() { return m_actionSelection; }
+    wxBitmapButton* GetBtOpenExtern() { return m_btOpenExtern; }
+    wxStaticLine* GetStaticLine28() { return m_staticLine28; }
     wxStaticText* GetStaticText7386() { return m_staticText7386; }
     wxTextCtrl* GetCurTemplateTimestamp() { return m_curTemplateTimestamp; }
     wxStaticText* GetStaticText6527() { return m_staticText6527; }

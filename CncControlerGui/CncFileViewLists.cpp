@@ -53,7 +53,7 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(0, 0, 0));
+	SetBackgroundColour(wxColour(32, 32, 32));
 	SetTextColour(wxColour(255, 255, 255));
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
@@ -500,7 +500,7 @@ CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(0, 0, 0));
+	SetBackgroundColour(wxColour(32, 32, 32));
 	SetTextColour(wxColour(255, 255, 255));
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());

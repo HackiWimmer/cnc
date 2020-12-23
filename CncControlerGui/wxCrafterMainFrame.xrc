@@ -1276,6 +1276,8 @@ Editor</label>
                                                                     <border>5</border>
                                                                     <object class="wxTextCtrl" name="m_svgRootNode">
                                                                       <style>wxTE_READONLY</style>
+                                                                      <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                                                                      <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                                                       <tooltip>
                                                                         <![CDATA[SVG Root Node (interpreted)]]>
                                                                       </tooltip>
@@ -1321,8 +1323,8 @@ Editor</label>
                                                                             <flag>wxALL|wxEXPAND</flag>
                                                                             <border>2</border>
                                                                             <object class="unknown" name="m_dvListCtrlSvgUAInboundPathList">
-                                                                              <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                                                              <fg>wxSYS_COLOUR_3DLIGHT</fg>
+                                                                              <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                                                                              <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                                                             </object>
                                                                           </object>
                                                                           <object class="sizeritem">
@@ -1344,8 +1346,8 @@ Editor</label>
                                                                             <flag>wxALL|wxEXPAND</flag>
                                                                             <border>2</border>
                                                                             <object class="unknown" name="m_dvListCtrlSvgUAUseDirective">
-                                                                              <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                                                              <fg>wxSYS_COLOUR_3DLIGHT</fg>
+                                                                              <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                                                                              <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                                                             </object>
                                                                           </object>
                                                                         </object>
@@ -1380,8 +1382,8 @@ Editor</label>
                                                                             <flag>wxALL|wxEXPAND</flag>
                                                                             <border>2</border>
                                                                             <object class="unknown" name="m_dvListCtrlSvgUADetailInfo">
-                                                                              <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                                                              <fg>wxSYS_COLOUR_3DLIGHT</fg>
+                                                                              <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                                                                              <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                                                             </object>
                                                                           </object>
                                                                         </object>
@@ -1395,8 +1397,8 @@ Editor</label>
                                                                 <border>2</border>
                                                                 <object class="wxTextCtrl" name="m_selectedUAInfo">
                                                                   <style>wxTE_READONLY</style>
-                                                                  <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                                                  <fg>wxSYS_COLOUR_3DLIGHT</fg>
+                                                                  <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                                                                  <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                                                 </object>
                                                               </object>
                                                             </object>
@@ -1609,7 +1611,7 @@ Context</label>
                                         <flag>wxALL|wxEXPAND</flag>
                                         <object class="wxTextCtrl" name="m_templateContext">
                                           <style>wxTE_READONLY|wxTE_MULTILINE</style>
-                                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                          <bg>#202020</bg>
                                           <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                           <font>
                                             <size>9</size>

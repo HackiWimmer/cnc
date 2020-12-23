@@ -809,6 +809,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1506->Add(flexGridSizer5933, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_svgRootNode = new wxTextCtrl(m_panelTplUserAgent, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxTE_READONLY);
+    m_svgRootNode->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_svgRootNode->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_svgRootNode->SetToolTip(_("SVG Root Node (interpreted)"));
     #if wxVERSION_NUMBER >= 3000
     m_svgRootNode->SetHint(wxT(""));
@@ -845,8 +847,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1490->Add(m_staticText1498, 0, wxALL, WXC_FROM_DIP(2));
     
     m_dvListCtrlSvgUAInboundPathList = new wxDataViewListCtrl(m_panelTplUserAgent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
-    m_dvListCtrlSvgUAInboundPathList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_dvListCtrlSvgUAInboundPathList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    m_dvListCtrlSvgUAInboundPathList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_dvListCtrlSvgUAInboundPathList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     
     flexGridSizer1490->Add(m_dvListCtrlSvgUAInboundPathList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
@@ -862,8 +864,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1490->Add(m_staticText14983, 0, wxALL, WXC_FROM_DIP(2));
     
     m_dvListCtrlSvgUAUseDirective = new wxDataViewListCtrl(m_panelTplUserAgent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
-    m_dvListCtrlSvgUAUseDirective->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_dvListCtrlSvgUAUseDirective->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    m_dvListCtrlSvgUAUseDirective->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_dvListCtrlSvgUAUseDirective->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     
     flexGridSizer1490->Add(m_dvListCtrlSvgUAUseDirective, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
@@ -886,16 +888,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1492->Add(m_staticText1500, 0, wxALL, WXC_FROM_DIP(2));
     
     m_dvListCtrlSvgUADetailInfo = new wxDataViewListCtrl(m_panelTplUserAgent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
-    m_dvListCtrlSvgUADetailInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_dvListCtrlSvgUADetailInfo->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    m_dvListCtrlSvgUADetailInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_dvListCtrlSvgUADetailInfo->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     
     flexGridSizer1492->Add(m_dvListCtrlSvgUADetailInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     m_dvListCtrlSvgUADetailInfo->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_dvListCtrlSvgUADetailInfo->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
     m_selectedUAInfo = new wxTextCtrl(m_panelTplUserAgent, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxTE_READONLY);
-    m_selectedUAInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_selectedUAInfo->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    m_selectedUAInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_selectedUAInfo->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     #if wxVERSION_NUMBER >= 3000
     m_selectedUAInfo->SetHint(wxT(""));
     #endif
@@ -1023,7 +1025,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer96101->Add(m_staticText5137673, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_templateContext = new wxTextCtrl(m_contextPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_contextPanel, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE);
-    m_templateContext->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_templateContext->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
     m_templateContext->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_templateContextFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_templateContext->SetFont(m_templateContextFont);

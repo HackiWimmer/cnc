@@ -59,16 +59,13 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer6554->Add(12, 0, 1, wxALL, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer24 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer24 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer24->SetFlexibleDirection( wxBOTH );
     flexGridSizer24->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer24->AddGrowableCol(0);
+    flexGridSizer24->AddGrowableRow(0);
     
     flexGridSizer6554->Add(flexGridSizer24, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_btOpenExtern = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_btOpenExtern->SetToolTip(_("Open Source extern with configured tool"));
-    
-    flexGridSizer24->Add(m_btOpenExtern, 0, wxALL, WXC_FROM_DIP(5));
     
     m_staticText6553 = new wxStaticText(this, wxID_ANY, _("This will setup the source editor\nas readonly"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText6553Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
@@ -104,15 +101,24 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer6519->Add(flexGridSizer6530, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer6525 = new wxFlexGridSizer(1, 5, 0, 0);
+    wxFlexGridSizer* flexGridSizer6525 = new wxFlexGridSizer(1, 6, 0, 0);
     flexGridSizer6525->SetFlexibleDirection( wxBOTH );
     flexGridSizer6525->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer6525->AddGrowableCol(2);
+    flexGridSizer6525->AddGrowableCol(3);
     flexGridSizer6525->AddGrowableRow(0);
     
     flexGridSizer6530->Add(flexGridSizer6525, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
-    m_staticText7386 = new wxStaticText(this, wxID_ANY, _("Template Timestamp / Last Observation:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_btOpenExtern = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btOpenExtern->SetToolTip(_("Open Source extern with configured tool"));
+    
+    flexGridSizer6525->Add(m_btOpenExtern, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticLine28 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer6525->Add(m_staticLine28, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText7386 = new wxStaticText(this, wxID_ANY, _("Timestamps:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText7386Font(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText7386->SetFont(m_staticText7386Font);
     
@@ -121,6 +127,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     m_curTemplateTimestamp = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_READONLY);
     wxFont m_curTemplateTimestampFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_curTemplateTimestamp->SetFont(m_curTemplateTimestampFont);
+    m_curTemplateTimestamp->SetToolTip(_("Template Timestamp"));
     #if wxVERSION_NUMBER >= 3000
     m_curTemplateTimestamp->SetHint(wxT(""));
     #endif
@@ -136,6 +143,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     m_lastTimestamp = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
     wxFont m_lastTimestampFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_lastTimestamp->SetFont(m_lastTimestampFont);
+    m_lastTimestamp->SetToolTip(_("Last Observation"));
     #if wxVERSION_NUMBER >= 3000
     m_lastTimestamp->SetHint(wxT(""));
     #endif
@@ -153,7 +161,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     m_button6532->SetMinSize(wxSize(24,24));
     
     m_observerTrace = new wxTextCtrl(this, wxID_ANY, wxT("test text"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL);
-    m_observerTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_observerTrace->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
     wxFont m_observerTraceFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_observerTrace->SetFont(m_observerTraceFont);
     
@@ -168,7 +176,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     flexGridSizer6519->Add(flexGridSizer7394, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_curTemplateName = new wxTextCtrl(this, wxID_ANY, wxT("name"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_READONLY);
-    m_curTemplateName->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_curTemplateName->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
     m_curTemplateName->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_curTemplateNameFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_curTemplateName->SetFont(m_curTemplateNameFont);
@@ -179,7 +187,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     flexGridSizer7394->Add(m_curTemplateName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_curTemplateSize = new wxTextCtrl(this, wxID_ANY, wxT("size"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(76,-1)), wxTE_READONLY);
-    m_curTemplateSize->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_curTemplateSize->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
     m_curTemplateSize->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_curTemplateSizeFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_curTemplateSize->SetFont(m_curTemplateSizeFont);

@@ -9194,11 +9194,11 @@
                                             }, {
                                              "type": "colour",
                                              "m_label": "Bg Colour:",
-                                             "colour": "<Default>"
+                                             "colour": "ControlDark"
                                             }, {
                                              "type": "colour",
                                              "m_label": "Fg Colour:",
-                                             "colour": "<Default>"
+                                             "colour": "ButtonHighlight"
                                             }, {
                                              "type": "font",
                                              "m_label": "Font:",
@@ -9448,11 +9448,11 @@
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Bg Colour:",
-                                                 "colour": "ButtonText"
+                                                 "colour": "ControlDark"
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Fg Colour:",
-                                                 "colour": "ControlLight"
+                                                 "colour": "ButtonHighlight"
                                                 }, {
                                                  "type": "font",
                                                  "m_label": "Font:",
@@ -9723,11 +9723,11 @@
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Bg Colour:",
-                                                 "colour": "ButtonText"
+                                                 "colour": "ControlDark"
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Fg Colour:",
-                                                 "colour": "ControlLight"
+                                                 "colour": "ButtonHighlight"
                                                 }, {
                                                  "type": "font",
                                                  "m_label": "Font:",
@@ -10003,11 +10003,11 @@
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Bg Colour:",
-                                                 "colour": "ButtonText"
+                                                 "colour": "ControlDark"
                                                 }, {
                                                  "type": "colour",
                                                  "m_label": "Fg Colour:",
-                                                 "colour": "ControlLight"
+                                                 "colour": "ButtonHighlight"
                                                 }, {
                                                  "type": "font",
                                                  "m_label": "Font:",
@@ -10164,11 +10164,11 @@
                                           }, {
                                            "type": "colour",
                                            "m_label": "Bg Colour:",
-                                           "colour": "ButtonText"
+                                           "colour": "ControlDark"
                                           }, {
                                            "type": "colour",
                                            "m_label": "Fg Colour:",
-                                           "colour": "ControlLight"
+                                           "colour": "ButtonHighlight"
                                           }, {
                                            "type": "font",
                                            "m_label": "Font:",
@@ -11540,7 +11540,7 @@
                             }, {
                              "type": "colour",
                              "m_label": "Bg Colour:",
-                             "colour": "ButtonText"
+                             "colour": "(32,32,32)"
                             }, {
                              "type": "colour",
                              "m_label": "Fg Colour:",

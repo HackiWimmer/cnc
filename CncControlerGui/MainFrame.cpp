@@ -824,6 +824,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(fileView);
 	registerGuiControl(lruFileView);
 	
+	registerGuiControl(m_editorToolBox);
 	registerGuiControl(m_btSvgToggleTryToSelectClientId);
 	registerGuiControl(m_btSvgToggleAutoSaveTplOnProcess);
 	registerGuiControl(m_defaultSpeedSlider);
@@ -7767,42 +7768,42 @@ CncParsingSynopsisTrace* MainFrame::getParsingSynopsisTrace() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachMotionMonitor(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Monitor);
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Monitor, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachConfiguration(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Config);
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Config, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachManuallyTemplate(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Manually);
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Manually, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Reference);
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Reference, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachTemplateSource(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Source);
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Source, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachTest(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Test);
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Test, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachControllerMessages(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_CtrlMsg);
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_CtrlMsg, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachSetterList(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_SetterList);
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_SetterList, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onSelectTemplatePanel(wxListbookEvent& event) {
