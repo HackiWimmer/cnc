@@ -116,9 +116,7 @@ class SVGFileParser : public SVGParserBase
 		virtual void selectSourceControl(unsigned long pos);
 		virtual void enableUserAgentControls(bool state);
 		
-		virtual void displayUserAgentDetailInfo(unsigned int pos) {
-			svgUserAgent.displayDetailInfo(pos);
-		}
+		virtual void displayUserAgentDetailInfo(unsigned int pos) { svgUserAgent.displayDetailInfo(pos); }
 		
 };
 

@@ -59,7 +59,7 @@ long SvgCncContextBase::getCurrentClientID(CLIENT_ID_OFFSET o) const {
 	return b ? CLIENT_ID.INVALID : (currentLineNumber * CLIENT_ID.TPL_FACTOR) + o;
 }
 //////////////////////////////////////////////////////////////////
-void SvgCncContextBase::traceTo(std::ostream& o, unsigned int indent) {
+void SvgCncContextBase::traceTo(std::ostream& o, unsigned int indent) const {
 //////////////////////////////////////////////////////////////////
 	const wxString prefix(' ', (int)indent);
 	
@@ -232,7 +232,7 @@ void SvgCncContext::reconstruct() {
 	SvgCncContextBase::reconstruct();
 }
 //////////////////////////////////////////////////////////////////
-void SvgCncContext::traceTo(std::ostream& o, unsigned int indent) {
+void SvgCncContext::traceTo(std::ostream& o, unsigned int indent) const {
 //////////////////////////////////////////////////////////////////
 	const wxString prefix(' ', (int)indent);
 	
@@ -964,7 +964,7 @@ wxString SvgCncContextSummary::getToolTotList() const {
 }
 
 //////////////////////////////////////////////////////////////////
-void SvgCncContextSummary::traceTo(std::ostream& o, unsigned int indent) {
+void SvgCncContextSummary::traceTo(std::ostream& o, unsigned int indent) const {
 //////////////////////////////////////////////////////////////////
 	const wxString prefix(' ', indent);
 	

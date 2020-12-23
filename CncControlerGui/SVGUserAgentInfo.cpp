@@ -92,36 +92,75 @@ void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
 /////////////////////////////////////////////////////////
 	wxString value;
 	
-	if ( nodeType == NT_PATH ) {
-		cncParameters.getParameterList(rows);
+	// --------------------------------------------------
+	auto addCncStr = [&](const char* str) {
 		
-		value.clear();
-		for (auto it=attributes.begin(); it!=attributes.end(); ++it) {
-			value += it->first;
-			value += "=";
-			value += it->second;
-			value += " ";
+		if ( str != NULL ) {
+			wxStringTokenizer lines(str, "\n" );
+			while ( lines.HasMoreTokens() ) {
+				wxString token(lines.GetNextToken());
+				wxString key(token.BeforeFirst('=').Trim().Trim(false));
+				wxString val(token.AfterFirst ('=').Trim().Trim(false));
+				
+				DataControlModel::addKeyValueRow(rows, key, val);
+			}
 		}
-		DataControlModel::addKeyValueRow(rows, "Attributes", value);
+	};
+	
+	switch ( nodeType) {
+		
+		case NT_PATH:
+		{
+			cncParameters.getParameterList(rows);
+			
+			value.clear();
+			for (auto it=attributes.begin(); it!=attributes.end(); ++it) {
+				value += it->first;
+				value += "=";
+				value += it->second;
+				value += " ";
+			}
+			DataControlModel::addKeyValueRow(rows, "Attributes", value);
 
-		value.clear();
-		DataControlModel::addKeyValueRow(rows, "IDs", (int)ids.size());
-		for (auto it=ids.begin(); it!=ids.end(); ++it) {
-			value  = it->second;
-			value += "(";
-			value += it->first;
-			value += ")   ";
-			DataControlModel::addKeyValueRow(rows, "  id", value);
+			value.clear();
+			DataControlModel::addKeyValueRow(rows, "IDs", (int)ids.size());
+			for (auto it=ids.begin(); it!=ids.end(); ++it) {
+				value  = it->second;
+				value += "(";
+				value += it->first;
+				value += ")   ";
+				DataControlModel::addKeyValueRow(rows, "  id", value);
+			}
+			
+			DataControlModel::addKeyValueRow(rows, "transform", (int)transformList.size());
+			for (auto it=transformList.begin(); it!=transformList.end(); ++it) {
+				DataControlModel::addKeyValueRow(rows, "  cmd", *it);
+			}
+			
+			DataControlModel::addKeyValueRow(rows, "style", (int)styleList.size());
+			for (auto it=styleList.begin(); it!=styleList.end(); ++it) {
+				DataControlModel::addKeyValueRow(rows, "  style", *it);
+			}
+			
+			break;
 		}
-		
-		DataControlModel::addKeyValueRow(rows, "transform", (int)transformList.size());
-		for (auto it=transformList.begin(); it!=transformList.end(); ++it) {
-			DataControlModel::addKeyValueRow(rows, "  cmd", *it);
+		case NT_CNC_PARAM:
+		{
+			std::stringstream ss; cncParameters.traceTo(ss);
+			addCncStr(ss.str().c_str());
+			break;
 		}
-		
-		DataControlModel::addKeyValueRow(rows, "style", (int)styleList.size());
-		for (auto it=styleList.begin(); it!=styleList.end(); ++it) {
-			DataControlModel::addKeyValueRow(rows, "  style", *it);
+		case NT_CNC_BREAK:
+		{
+			std::stringstream ss; cncBreak.traceTo(ss);
+			addCncStr(ss.str().c_str());
+			break;
+		}
+		case NT_CNC_PAUSE:
+		{
+			std::stringstream ss; cncPause.traceTo(ss);
+			addCncStr(ss.str().c_str());
+			break;
 		}
 	}
 }

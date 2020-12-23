@@ -2,6 +2,7 @@
 #define CncWorkingParameters_H
 
 #include <map>
+#include <inttypes.h>
 #include <wx/xml/xml.h>
 #include "CncCommon.h"
 #include "SvgColourScheme.h"
@@ -78,7 +79,7 @@ class SvgCncContextBase {
 		double			getParameterAsDouble(const wxString& key, const char* def = NULL)	const	{ return getParameter(key).GetDouble(); }
 		const wxString	getParameterAsString(const wxString& key, const char* def = NULL)	const	{ return getParameterValue(key); }
 		
-		virtual void traceTo(std::ostream& o, unsigned int indent=0);
+		virtual void traceTo(std::ostream& o, unsigned int indent=0) const;
 };
 
 //////////////////////////////////////////////////////////////////
@@ -130,6 +131,15 @@ class SvgCncPause : public SvgCncContextBase {
 			
 			microseconds = scp.microseconds;
 			return *this;
+		}
+		
+		virtual void traceTo(std::ostream& o, unsigned int indent=0) const {
+			const wxString prefix(' ', (int)indent);
+			const unsigned int fillTo = 21;
+			wxString name;
+				
+			name.assign("Delay");
+			o << wxString::Format("%s  --> %s%s = %lld\n", prefix, name, wxString(' ', fillTo - name.length()), (long long)microseconds);
 		}
 		
 		int64_t microseconds = 0LL;
@@ -244,7 +254,7 @@ class SvgCncContext : public SvgCncContextBase {
 		void					setStrokeColour(const wxColour & col);
 		void					determineColourEffects();
 		
-		virtual void			traceTo(std::ostream& o, unsigned int indent=0);
+		virtual void			traceTo(std::ostream& o, unsigned int indent=0) const;
 		
 		static 
 		const std::ostream&		provideUsage(std::ostream& o, unsigned int indent=0);
@@ -275,7 +285,7 @@ class SvgCncContextSummary  : public SvgCncContext {
 		const wxString&			getToolSelList()			const	{ return toolSelectionList; }
 		wxString				getToolTotList()			const;
 		
-		void traceTo(std::ostream& o, unsigned int indent);
+		void traceTo(std::ostream& o, unsigned int indent) const;
 };
 
 #endif
