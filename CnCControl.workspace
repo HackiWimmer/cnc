@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Workspace Name="CnCControl" Database="" Version="10.0.0">
+<CodeLite_Workspace Name="CnCControl" Database="" Version="10.0.0" SWTLW="Yes">
+  <WorkspaceParserMacros/>
+  <WorkspaceParserPaths/>
   <Project Name="CncControllerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
   <Project Name="CncControllerTest" Path="CncControllerTest/CncControllerTest.project" Active="No"/>
   <BuildMatrix>

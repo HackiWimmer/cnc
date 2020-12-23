@@ -463,6 +463,13 @@ class MainApp : public wxApp {
 			int ret = wxApp::OnExit();
 			
 			APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Result = %d", ret));
+			
+			
+			
+			#warning
+			abort();
+
+			
 			return ret;
 		}
 		
