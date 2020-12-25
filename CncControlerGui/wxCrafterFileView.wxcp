@@ -3164,7 +3164,7 @@
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
-           "colour": "ButtonText"
+           "colour": "(32,32,32)"
           }, {
            "type": "colour",
            "m_label": "Fg Colour:",

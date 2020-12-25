@@ -164,6 +164,7 @@ namespace ClientIdSelSource {
 	};
 
 	const char* getTemplateSelSourceAsString(const ID ts);
+	const char* getTemplateSelSourceAsLongString(const ID ts);
 };
 
 //-----------------------------------------------------------------

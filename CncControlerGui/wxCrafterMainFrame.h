@@ -389,7 +389,7 @@ protected:
     wxPanel* m_motionMonitor;
     wxPanel* m_panelMotionMonitor;
     wxButton* m_btDetachMonitor;
-    wxStaticText* m_staticText114811;
+    wxStaticText* m_staticTextMotionMoinitor;
     wxStaticLine* m_staticLine50163;
     wxBitmapToggleButton* m_switchMonitoing;
     wxStaticLine* m_staticLine3525;
@@ -1255,7 +1255,7 @@ public:
     wxPanel* GetPreprocessorPlaceholder() { return m_preprocessorPlaceholder; }
     wxPanel* GetCncPrePorcessor() { return m_cncPrePorcessor; }
     wxButton* GetBtDetachMonitor() { return m_btDetachMonitor; }
-    wxStaticText* GetStaticText114811() { return m_staticText114811; }
+    wxStaticText* GetStaticTextMotionMoinitor() { return m_staticTextMotionMoinitor; }
     wxStaticLine* GetStaticLine50163() { return m_staticLine50163; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }

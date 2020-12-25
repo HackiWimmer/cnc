@@ -7,7 +7,100 @@
 #include "3D/GLContextCncPathBase.h"
 #include "3D/GLOpenGLPathBufferStore.h"
 
-GLOpenGLPathBuffer::VertexColours GLOpenGLPathBuffer::vertexColours ;
+/////////////////////////////////////////////////////////////
+GLOpenGLPathBuffer::VertexColours GLOpenGLPathBuffer::vertexColours;
+
+
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::VertexColours::showRapidPathes(bool state) {
+/////////////////////////////////////////////////////////////
+	rapid.Set(rapid.Red(), rapid.Green(), rapid.Blue(), state == true ? rapid.Alpha() : 0);
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::VertexColours::restoreLightness() {
+/////////////////////////////////////////////////////////////
+	changeLightness(GLOpenGLPathBuffer::dimUpFact);
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::VertexColours::changeLightness(float lightness) {
+/////////////////////////////////////////////////////////////
+	if ( lightness < 0.0 || lightness > 2.0 )
+		lightness = 1.0;
+		
+	rapid = rapid.	ChangeLightness(lightness * rapidAlpha);
+	work  = work.	ChangeLightness(lightness * GLOpenGLPathBuffer::defWorkAlpha);
+	max   = max.	ChangeLightness(lightness * GLOpenGLPathBuffer::defMaxAlpha);
+	user  = user.	ChangeLightness(lightness * GLOpenGLPathBuffer::defUserAlpha);
+}
+
+
+
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::CncVertex::updateColour(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
+/////////////////////////////////////////////////////////////
+	colour[CncVertexColourR] = r;
+	colour[CncVertexColourG] = g;
+	colour[CncVertexColourB] = b;
+	colour[CncVertexColourA] = a;
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::CncVertex::changeLightness(float lightness) {
+/////////////////////////////////////////////////////////////
+	if ( lightness < 0.0 || lightness > 2.0 )
+		lightness = 1.0;
+	
+	const VertexColours& vc = GLOpenGLPathBuffer::vertexColours;
+	unsigned char alpha = 0;
+	
+	switch ( getType() ) {
+		case cnc::RAPID_SPEED_CHAR:			alpha =  vc.rapidAlpha;						break;
+		case cnc::WORK_SPEED_CHAR:			alpha =  GLOpenGLPathBuffer::defWorkAlpha;	break;
+		case cnc::MAX_SPEED_CHAR:			alpha =  GLOpenGLPathBuffer::defMaxAlpha;	break;
+		case cnc::USER_DEFIND_SPEED_CHAR:	alpha =  GLOpenGLPathBuffer::defUserAlpha;	break;
+	}
+	
+	#warning
+	std::cout << (int)colour[CncVertexColourA] << ", "<<  (int)(alpha * 2 * lightness) << std::endl;
+	
+	colour[CncVertexColourA] = alpha * 2 * lightness;
+}
+
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::CncVertex::changeLightness(unsigned char a) {
+/////////////////////////////////////////////////////////////
+	colour[CncVertexColourA] = a;
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::CncVertex::normalizeVertexColour() {
+/////////////////////////////////////////////////////////////
+	const VertexColours& vc = GLOpenGLPathBuffer::vertexColours;
+	
+	switch ( getType() ) {
+		case cnc::RAPID_SPEED_CHAR:
+					updateColour(vc.rapid.Red(),vc.rapid.Green(),	vc.rapid.Blue(),	vc.rapid.Alpha()); 
+					break;
+					
+		case cnc::WORK_SPEED_CHAR:
+					updateColour(vc.work.Red(),	vc.work.Green(),	vc.work.Blue(),		vc.work.Alpha()); 
+					break;
+					
+		case cnc::MAX_SPEED_CHAR:
+					updateColour(vc.max.Red(),	vc.max.Green(),		vc.max.Blue(),		vc.max.Alpha()); 
+					break;
+					
+		case cnc::USER_DEFIND_SPEED_CHAR:
+					updateColour(vc.user.Red(),	vc.user.Green(),	vc.user.Blue(),		vc.user.Alpha()); 
+					break;
+					
+		default:	updateColour(vc.user.Red(),	vc.user.Green(),	vc.user.Blue(),		vc.user.Alpha()); 
+					break;
+	}
+}
+
+
+
+
+
 
 /////////////////////////////////////////////////////////////
 GLOpenGLPathBuffer::GLOpenGLPathBuffer(GLOpenGLPathBufferStore* s, GLOpenGLPathBuffer::CncVertex* firstVertex)
@@ -82,13 +175,19 @@ void GLOpenGLPathBuffer::setColours(const VertexColours& colours) {
 													   GLOpenGLPathBuffer::defRapidAlpha);
 }
 /////////////////////////////////////////////////////////////
-void GLOpenGLPathBuffer::setColoursLightness(double lightness) {
+void GLOpenGLPathBuffer::setColoursLightness(float lightness) {
 /////////////////////////////////////////////////////////////
 	GLOpenGLPathBuffer::vertexColours.changeLightness(lightness);
 }
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBuffer::dimDownColours() {
-	GLOpenGLPathBuffer::vertexColours.changeLightness(0.2);
+/////////////////////////////////////////////////////////////
+	GLOpenGLPathBuffer::vertexColours.changeLightness(GLOpenGLPathBuffer::dimDownFact);
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::dimUpColours() {
+/////////////////////////////////////////////////////////////
+	GLOpenGLPathBuffer::vertexColours.restoreLightness();
 }
 /////////////////////////////////////////////////////////////
 const wxString& GLOpenGLPathBuffer::getStoreInstanceName() const {
@@ -406,6 +505,62 @@ const wxString& GLOpenGLPathBuffer::getIndexForClientIdAsString(long clientId, w
 	
 	return ret;
 }
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::updateIndex(long clientID) {
+/////////////////////////////////////////////////////////////
+	const int idx = numVertices - 1;
+	if ( idx < 0 )
+		return;
+
+	auto it = clientIdIndex.find(clientID);
+	if ( it != clientIdIndex.end() ) {
+		IndexList& index = it->second;
+		index[idx] = true;
+		clientIdIndex[clientID] = index;
+	}
+	else {
+		IndexList index;
+		index[idx] = true;
+		clientIdIndex[clientID] = index;
+	}
+}
+///////////////////////////////////////////////////////////
+bool GLOpenGLPathBuffer::changeColourForClientID(long clientId, const char type) {
+/////////////////////////////////////////////////////////////
+	auto cldIt = clientIdIndex.find(clientId);
+
+	if ( cldIt == clientIdIndex.end() )
+		return false;
+
+	CncVertex vertex;
+	bool ret = false;
+	
+	for ( auto idxIt = cldIt->second.begin(); idxIt != cldIt->second.end(); ++idxIt) {
+		if ( getVertex(vertex, idxIt->first) == true ) {
+		
+			switch ( type ) {
+				case 'H':		vertex.updateColour(vertexColours.highlight.Red(), vertexColours.highlight.Green(), vertexColours.highlight.Blue(), vertexColours.highlight.Alpha()); 
+								break;
+								
+				case 'D':		//vertex.normalizeVertexColour(); 
+								vertex.changeLightness(GLOpenGLPathBuffer::dimDownFact);
+								break;
+								
+				case 'U':		//vertex.normalizeVertexColour();
+								vertex.changeLightness(GLOpenGLPathBuffer::dimUpFact);
+								break;
+								
+				default:		vertex.normalizeVertexColour();
+			}
+			
+			updateVertex(vertex, idxIt->first);
+			
+			ret = true;
+		}
+	}
+	
+	return ret;
+}
 
 
 
@@ -631,12 +786,36 @@ unsigned long GLOpenGLPathBufferStore::appendVertex(const GLOpenGLPathBuffer::Cn
 bool GLOpenGLPathBufferStore::highlightClientID(long clientId) {
 /////////////////////////////////////////////////////////////
 	bool ret = false;
-
+	
 	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
 		if ( it->highlightClientID(clientId) == true )
 			ret = true;
 	}
-
+	
+	return ret;
+}
+/////////////////////////////////////////////////////////////
+bool GLOpenGLPathBufferStore::dimDownClientID(long clientId) {
+/////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
+		if ( it->dimDownClientID(clientId) == true )
+			ret = true;
+	}
+	
+	return ret;
+}
+/////////////////////////////////////////////////////////////
+bool GLOpenGLPathBufferStore::dimUpClientID(long clientId) {
+/////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
+		if ( it->dimUpClientID(clientId) == true )
+			ret = true;
+	}
+	
 	return ret;
 }
 /////////////////////////////////////////////////////////////

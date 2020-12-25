@@ -594,10 +594,6 @@ void GLContextCncPathBase::drawRuler() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::setCurrentClientId(long id) { 
 /////////////////////////////////////////////////////////////////
-	#warning
-	//highlightClientId(id);
-	//return;
-	
 	currentClientId = id; 
 	
 	if ( currentClientId < 0 )
@@ -616,10 +612,21 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 	cncPath.setVirtualEnd(entry);
 }
 /////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::highlightClientId(long id) { 
+void GLContextCncPathBase::highlightClientId(long firstClientId, long lastClientId) { 
 /////////////////////////////////////////////////////////////////
+	if ( firstClientId < 0 && lastClientId < 0 )
+		return;
+	
+	if ( firstClientId < 0 && lastClientId >= 0 )
+		firstClientId = lastClientId;
+		
+	if ( firstClientId >= 0 && lastClientId < 0 )
+		lastClientId = firstClientId;
+	
 	cnc::LongValues ids;
-	ids.push_back(id);
+	for (long id=firstClientId; id <= lastClientId; id++)
+		ids.push_back(id);
+		
 	highlightClientIds(ids);
 }
 /////////////////////////////////////////////////////////////////
@@ -637,8 +644,11 @@ void GLContextCncPathBase::highlightClientIds(cnc::LongValues ids)  {
 	for ( auto it = ids.begin(); it != ids.end(); ++it) {
 		long & id = *it;
 		
-		if ( id >= 0 )
+		if ( id >= 0 ) {
+			#warning
 			store->highlightClientID(id);
+			//store->dimUpClientID(id);
+		}
 	}
 }
 

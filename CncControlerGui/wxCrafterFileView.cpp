@@ -399,7 +399,7 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer3841->Add(flexGridSizer3852, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_currentDirectory = new wxTextCtrl(this, wxID_ANY, wxT("c:\\xxx"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,19)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_currentDirectory->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_currentDirectory->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
     m_currentDirectory->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     #if wxVERSION_NUMBER >= 3000
     m_currentDirectory->SetHint(wxT(""));

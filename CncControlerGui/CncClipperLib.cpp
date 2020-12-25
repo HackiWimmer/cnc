@@ -123,8 +123,6 @@ bool ClipperLib::isHelix(const Path& path, double diameter) {
 		// concatinate the current path length
 		length += sqrt( pow(p2.X - p1.X, 2) + pow(p2.Y - p1.Y, 2) );
 		
-		std::cout << "L:  "<< length / ClipperLib::floatFactor << " > " << refScope << std::endl;
-		
 		// stop if path legth > the scope of the given diameter
 		// convert length to compare metric with metric
 		if ( length / ClipperLib::floatFactor > refScope )

@@ -259,12 +259,12 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 	// try to select current line as client id
 	if ( IsModified() == false && publishSelection == true ) {
 		// ------------------------------------------------------------
-		auto tryToSelectClientId = [&](long cid) {
+		auto tryToSelectClientId = [&](long fcid, long lcid) {
 			if ( tryToSelectFlag == false )
 				return;
 				
 			SelectEventBlocker blocker(this);
-			APP_PROXY::tryToSelectClientId(cid * CLIENT_ID.TPL_FACTOR, ClientIdSelSource::ID::TSS_EDITOR);
+			APP_PROXY::tryToSelectClientIds(fcid * CLIENT_ID.TPL_FACTOR, lcid * CLIENT_ID.TPL_FACTOR, ClientIdSelSource::ID::TSS_EDITOR);
 		};
 		
 		// ------------------------------------------------------------
@@ -275,8 +275,8 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 			const long prevPos		= GetCurrentPos();			// Store position
 			const long sp			= SearchPrev(0, "<");		// Find start
 			
-			if ( sp != wxNOT_FOUND )	tryToSelectClientId(LineFromPosition(sp) + 1);
-			else						tryToSelectClientId(                   y + 1);
+			if ( sp != wxNOT_FOUND )	tryToSelectClientId(LineFromPosition(sp) + 1,           LineFromPosition(prevSelEnd) + 1);
+			else						tryToSelectClientId(LineFromPosition(prevSelStart) + 1, LineFromPosition(prevSelEnd) + 1);
 			
 			if ( CncAsyncKeyboardState::isControlPressed() ) {
 				// Currently nothing to do
@@ -288,8 +288,10 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 			}
 		}
 		else {
+			const long prevSelStart	= GetSelectionStart();		// Store selection
+			const long prevSelEnd	= GetSelectionEnd();		// Store selection
 			
-			tryToSelectClientId(y + 1);
+			tryToSelectClientId(LineFromPosition(prevSelStart) + 1, LineFromPosition(prevSelEnd) + 1);
 		}
 	}
 	

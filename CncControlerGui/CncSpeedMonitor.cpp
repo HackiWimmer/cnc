@@ -26,14 +26,15 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 	m_topAxisV		->SetBackgroundStyle(wxBG_STYLE_PAINT);
 	m_darwingAreaV	->SetBackgroundStyle(wxBG_STYLE_PAINT);
 	m_bottomAxisV	->SetBackgroundStyle(wxBG_STYLE_PAINT);
-
-	m_leftAxisH		->SetBackgroundColour(*wxBLACK);
-	m_darwingAreaH	->SetBackgroundColour(*wxBLACK);
-	m_rightAxisH	->SetBackgroundColour(*wxBLACK);
 	
-	m_topAxisV		->SetBackgroundColour(*wxBLACK);
-	m_darwingAreaV	->SetBackgroundColour(*wxBLACK);
-	m_bottomAxisV	->SetBackgroundColour(*wxBLACK);
+	const wxColour bgc(32, 32, 32);
+	m_leftAxisH		->SetBackgroundColour(bgc);
+	m_darwingAreaH	->SetBackgroundColour(bgc);
+	m_rightAxisH	->SetBackgroundColour(bgc);
+	
+	m_topAxisV		->SetBackgroundColour(bgc);
+	m_darwingAreaV	->SetBackgroundColour(bgc);
+	m_bottomAxisV	->SetBackgroundColour(bgc);
 	
 	init();
 }

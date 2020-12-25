@@ -816,7 +816,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_svgRootNode->SetHint(wxT(""));
     #endif
     
-    flexGridSizer5933->Add(m_svgRootNode, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5933->Add(m_svgRootNode, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     wxFlexGridSizer* flexGridSizer1488 = new wxFlexGridSizer(2, 3, 0, 0);
     flexGridSizer1488->SetFlexibleDirection( wxBOTH );
@@ -3055,11 +3055,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8005->Add(m_btDetachMonitor, 0, wxALL, WXC_FROM_DIP(1));
     m_btDetachMonitor->SetMinSize(wxSize(26,26));
     
-    m_staticText114811 = new wxStaticText(m_panelMotionMonitor, wxID_ANY, _("Motion Monitor:"), wxDefaultPosition, wxDLG_UNIT(m_panelMotionMonitor, wxSize(-1,-1)), 0);
-    wxFont m_staticText114811Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText114811->SetFont(m_staticText114811Font);
+    m_staticTextMotionMoinitor = new wxStaticText(m_panelMotionMonitor, wxID_ANY, _("Motion Monitor:"), wxDefaultPosition, wxDLG_UNIT(m_panelMotionMonitor, wxSize(-1,-1)), 0);
+    wxFont m_staticTextMotionMoinitorFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticTextMotionMoinitor->SetFont(m_staticTextMotionMoinitorFont);
     
-    flexGridSizer8005->Add(m_staticText114811, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer8005->Add(m_staticTextMotionMoinitor, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     wxFlexGridSizer* flexGridSizer6853 = new wxFlexGridSizer(0, 14, 0, 0);
     flexGridSizer6853->SetFlexibleDirection( wxBOTH );

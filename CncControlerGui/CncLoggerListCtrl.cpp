@@ -77,7 +77,7 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 	wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(0, 0, 0));
+	SetBackgroundColour(wxColour(32, 32, 32));
 	SetTextColour(wxColour(255, 255, 255));
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());

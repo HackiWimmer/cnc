@@ -95,7 +95,7 @@ class GLContextCncPathBase : public GLContextBase {
 		void reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt);
 		
 		void setCurrentClientId(long id);
-		void highlightClientId(long id);
+		void highlightClientId(long firstClientId, long lastClientId = -1L);
 		void highlightClientIds(cnc::LongValues ids);
 		
 		const GLI::GLCncPath& getPathData() 				{ return cncPath; }

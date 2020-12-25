@@ -9166,7 +9166,7 @@
                                          "m_children": [{
                                            "m_type": 4406,
                                            "proportion": 0,
-                                           "border": 5,
+                                           "border": 2,
                                            "gbSpan": "1,1",
                                            "gbPosition": "0,0",
                                            "m_styles": ["wxTE_READONLY"],
@@ -32900,7 +32900,7 @@
                                       }, {
                                        "type": "string",
                                        "m_label": "Name:",
-                                       "m_value": "m_staticText114811"
+                                       "m_value": "m_staticTextMotionMoinitor"
                                       }, {
                                        "type": "multi-string",
                                        "m_label": "Tooltip:",

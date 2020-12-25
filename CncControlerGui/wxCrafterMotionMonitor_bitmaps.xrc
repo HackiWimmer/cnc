@@ -9,8 +9,6 @@
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
-  <object class="wxBitmap" name="16-debugger_restart">bitmaps\CodeLite\16-debugger_restart.png</object>
-  <object class="wxBitmap" name="16-debugger_restart@2x">bitmaps\CodeLite\16-debugger_restart@2x.png</object>
   <object class="wxBitmap" name="16-file_reload">bitmaps\CodeLite\16-file_reload.png</object>
   <object class="wxBitmap" name="16-file_reload@2x">bitmaps\CodeLite\16-file_reload@2x.png</object>
   <object class="wxBitmap" name="16-file_save_all">bitmaps\CodeLite\16-file_save_all.png</object>

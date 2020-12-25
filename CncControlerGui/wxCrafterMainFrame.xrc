@@ -1273,7 +1273,7 @@ Editor</label>
                                                                   <growablerows>1</growablerows>
                                                                   <object class="sizeritem">
                                                                     <flag>wxALL|wxEXPAND</flag>
-                                                                    <border>5</border>
+                                                                    <border>2</border>
                                                                     <object class="wxTextCtrl" name="m_svgRootNode">
                                                                       <style>wxTE_READONLY</style>
                                                                       <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
@@ -5100,7 +5100,7 @@ Monitor</label>
                                                         <object class="sizeritem">
                                                           <flag>wxALL|wxEXPAND</flag>
                                                           <border>5</border>
-                                                          <object class="wxStaticText" name="m_staticText114811">
+                                                          <object class="wxStaticText" name="m_staticTextMotionMoinitor">
                                                             <label>Motion Monitor:</label>
                                                             <style/>
                                                             <font>

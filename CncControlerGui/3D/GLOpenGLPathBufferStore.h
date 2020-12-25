@@ -49,6 +49,9 @@ class GLOpenGLPathBuffer {
 		static const unsigned int		defUserAlpha				= 100;
 		static const unsigned int		defHighlightAlpha			= 100;
 		
+		static constexpr  float			dimDownFact					= 0.2;
+		static constexpr  float			dimUpFact					= 1.0;
+		
 		// --------------------------------------------------------------
 		struct VertexColours {
 			
@@ -61,26 +64,9 @@ class GLOpenGLPathBuffer {
 			
 			wxColour	highlight	= wxColour(255, 255,   0, GLOpenGLPathBuffer::defHighlightAlpha);
 			
-			// ----------------------------------------------------------
-			void showRapidPathes(bool state) {
-				rapid.Set(rapid.Red(), rapid.Green(), rapid.Blue(), state == true ? rapid.Alpha() : 0);
-			}
-			
-			// ----------------------------------------------------------
-			void restoreLightness() {
-				changeLightness(1.0);
-			}
-			
-			// ----------------------------------------------------------
-			void changeLightness(float lightness = 1.0) {
-				if ( lightness < 0.0 || lightness > 2.0 )
-					lightness = 1.0;
-					
-				rapid = rapid.	ChangeLightness(lightness * rapidAlpha);
-				work  = work.	ChangeLightness(lightness * GLOpenGLPathBuffer::defWorkAlpha);
-				max   = max.	ChangeLightness(lightness * GLOpenGLPathBuffer::defMaxAlpha);
-				user  = user.	ChangeLightness(lightness * GLOpenGLPathBuffer::defUserAlpha);
-			}
+			void showRapidPathes(bool state);
+			void restoreLightness();
+			void changeLightness(float lightness = GLOpenGLPathBuffer::dimUpFact);
 		};
 		
 		// --------------------------------------------------------------
@@ -89,10 +75,11 @@ class GLOpenGLPathBuffer {
 		};
 
 		static const VertexColours& getColours()					{ return GLOpenGLPathBuffer::vertexColours; }
-		static void resetColoursLightness()							{ setColoursLightness(1.0); }
+		static void resetColoursLightness()							{ setColoursLightness(GLOpenGLPathBuffer::dimUpFact); }
 		static void setColours(const VertexColours& colours);
-		static void setColoursLightness(double lightness = 1.0);
+		static void setColoursLightness(float lightness = GLOpenGLPathBuffer::dimUpFact);
 		static void dimDownColours();
+		static void dimUpColours();
 		
 		//-----------------------------------------------------
 		struct CncVertex {
@@ -106,41 +93,13 @@ class GLOpenGLPathBuffer {
 				//clientID as wells as type isn't edible after creation!
 				char type 		= 'R';
 				long clientID 	= -1;
-
-			protected:
-			
-				//-------------------------------------------------
-				inline void updateColour(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-					colour[CncVertexColourR] = r;
-					colour[CncVertexColourG] = g;
-					colour[CncVertexColourB] = b;
-					colour[CncVertexColourA] = a;
-				}
 				
-				// --------------------------------------------------------------
-				inline void normalizeVertexColour() {
-					const VertexColours& vc = GLOpenGLPathBuffer::vertexColours;
-					switch ( getType() ) {
-						case cnc::RAPID_SPEED_CHAR:
-									updateColour(vc.rapid.Red(),vc.rapid.Green(),	vc.rapid.Blue(),	vc.rapid.Alpha()); 
-									break;
-									
-						case cnc::WORK_SPEED_CHAR:
-									updateColour(vc.work.Red(),	vc.work.Green(),	vc.work.Blue(),		vc.work.Alpha()); 
-									break;
-									
-						case cnc::MAX_SPEED_CHAR:
-									updateColour(vc.max.Red(),	vc.max.Green(),		vc.max.Blue(),		vc.max.Alpha()); 
-									break;
-									
-						case cnc::USER_DEFIND_SPEED_CHAR:
-									updateColour(vc.user.Red(),	vc.user.Green(),	vc.user.Blue(),		vc.user.Alpha()); 
-									break;
-									
-						default:	updateColour(vc.user.Red(),	vc.user.Green(),	vc.user.Blue(),		vc.user.Alpha()); 
-									break;
-					}
-				}
+			protected:
+				
+				void updateColour(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+				void changeLightness(unsigned char a);
+				void changeLightness(float lightness);
+				void normalizeVertexColour();
 				
 				friend GLOpenGLPathBuffer;
 				
@@ -254,56 +213,9 @@ class GLOpenGLPathBuffer {
 		unsigned int 		numVertices; 
 		ClientIdIndex		clientIdIndex;
 		
-		// --------------------------------------------------------------
 		void generateBuffer();
-		
-		// --------------------------------------------------------------
-		void updateIndex(long clientID) {
-			const int idx = numVertices - 1;
-			if ( idx < 0 )
-				return;
-
-			auto it = clientIdIndex.find(clientID);
-			if ( it != clientIdIndex.end() ) {
-				IndexList& index = it->second;
-				index[idx] = true;
-				clientIdIndex[clientID] = index;
-			}
-			else {
-				IndexList index;
-				index[idx] = true;
-				clientIdIndex[clientID] = index;
-			}
-		}
-		
-		// --------------------------------------------------------------
-		bool changeColourForClientID(long clientId, const char type) {
-			auto cldIt = clientIdIndex.find(clientId);
-
-			if ( cldIt == clientIdIndex.end() )
-				return false;
-
-			CncVertex vertex;
-			bool ret = false;
-			
-			for ( auto idxIt = cldIt->second.begin(); idxIt != cldIt->second.end(); ++idxIt) {
-				if ( getVertex(vertex, idxIt->first) == true ) {
-				
-					switch ( type ) {
-						case 'H':		vertex.updateColour(vertexColours.highlight.Red(), vertexColours.highlight.Green(), vertexColours.highlight.Blue(), vertexColours.highlight.Alpha()); 
-										break;
-										
-						default:		vertex.normalizeVertexColour();
-					}
-					
-					updateVertex(vertex, idxIt->first);
-					
-					ret = true;
-				}
-			}
-			
-			return ret;
-		}
+		void updateIndex(long clientID);
+		bool changeColourForClientID(long clientId, const char type);
 		
 	public:
 		
@@ -333,6 +245,8 @@ class GLOpenGLPathBuffer {
 		// --------------------------------------------------------------
 		bool normalizeClientID(long clientId) 					{ return changeColourForClientID(clientId, '\0'); }
 		bool highlightClientID(long clientId) 					{ return changeColourForClientID(clientId,  'H'); }
+		bool dimDownClientID(long clientId)						{ return changeColourForClientID(clientId,  'D'); }
+		bool dimUpClientID(long clientId)						{ return changeColourForClientID(clientId,  'U'); }
 		
 		void traceParameters(std::ostream& o, bool indent = true, bool oneLine=true) const;
 		void traceIdentifier(std::ostream& o, const char* prepend = NULL) const;
@@ -446,7 +360,11 @@ class GLOpenGLPathBufferStore {
 		bool normalizeClientID(long clientId);
 		bool updateVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx);
 		unsigned long appendVertex(const GLOpenGLPathBuffer::CncVertex& vertex);
+		
 		bool highlightClientID(long clientId);
+		bool dimDownClientID(long clientId);
+		bool dimUpClientID(long clientId);
+		
 		void display(GLOpenGLPathBuffer::DisplayType dt, long vertices = -1);
 		long findFirstEntryForClientId(long cliendId);
 		long findFirstIndexForClientId(long cliendId);

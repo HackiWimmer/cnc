@@ -204,6 +204,30 @@ void CncMotionMonitor::setCurrentClientId(long id) {
 		monitor->setCurrentClientId(id); 
 }
 //////////////////////////////////////////////////
+void CncMotionMonitor::highlightClientId(long firstClientId, long lastClientId) {
+//////////////////////////////////////////////////
+	if ( IsShownOnScreen() == false )
+		return;
+		
+	monitor->highlightClientId(firstClientId, lastClientId);
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::dimAllVectiesDown() {
+//////////////////////////////////////////////////
+	GLOpenGLPathBuffer::dimDownColours();
+	
+	GLOpenGLPathBuffer::ReconstructOptions opt;
+	monitor->reconstruct(opt);
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::normalizeAllSelectionEffects() {
+//////////////////////////////////////////////////
+	GLOpenGLPathBuffer::dimUpColours();
+
+	GLOpenGLPathBuffer::ReconstructOptions opt;
+	monitor->reconstruct(opt);
+}
+//////////////////////////////////////////////////
 void CncMotionMonitor::appendGuidPath(const CncPathListManager& plm, double zOffset) {
 //////////////////////////////////////////////////
 	GLGuidePath gp(plm, zOffset);

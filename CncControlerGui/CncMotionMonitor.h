@@ -129,7 +129,10 @@ class CncMotionMonitor : public CncGlCanvas
 		long getCurrentClientId() 			{ return currentClientID; }
 		void setCurrentClientId(long id);
 		void resetCurrentClientId() 		{ setCurrentClientId(-1L); }
-		
+		void highlightClientId(long firstClientId, long lastClientId = -1L);
+		void dimAllVectiesDown();
+		void normalizeAllSelectionEffects();
+
 		void updateMonitorAndOptions();
 		
 		long getPathItemCount()				{ return monitor->getPathItemCount(); }

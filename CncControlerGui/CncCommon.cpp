@@ -313,4 +313,22 @@ const char* ClientIdSelSource::getTemplateSelSourceAsString(const ID ts) {
 
 	return "Unknown TemplateSelSource";
 }
+//////////////////////////////////////////////////////////////
+const char* ClientIdSelSource::getTemplateSelSourceAsLongString(const ID ts) {
+//////////////////////////////////////////////////////////////
+	switch ( ts ) {
+		case TSS_POS_SPY:				return "Position Spy";
+		case TSS_REPLAY:				return "Replay Control";
+		case TSS_PATH_LIST:				return "PathList ";
+		case TSS_EDITOR: 				return "Template Editor";
+		case TSS_MONITOR:				return "Motion Monitor";
+		case TSS_GCODE_SEQ:				return "Parsed GCodes";
+		case TSS_MOVE_SEQ_OVW:			return "Move Sequence Overview";
+		case TSS_MOVE_SEQ:				return "Move Sequence";
+		case TSS_VERTEX_DATA_TRACE:		return "Vertex trace";
+		case TSS_VERTEX_INDEX_TRACE:	return "Vertex Index trace";
+	}
+
+	return "Unknown TemplateSelSource";
+}
 

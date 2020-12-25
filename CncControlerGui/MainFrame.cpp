@@ -5702,8 +5702,11 @@ void MainFrame::toggleTryToSelectClientIdFromEditor(wxCommandEvent& event) {
 	if ( sourceEditor != NULL ) 
 		sourceEditor->setTryToSelectFlag(flag);
 	
-	if ( motionMonitor != NULL && flag == false) {
-		motionMonitor->setVirtualEndToLast();
+	if ( motionMonitor != NULL ) {
+		
+		if ( flag == true )			motionMonitor->dimAllVectiesDown();
+		else 						motionMonitor->normalizeAllSelectionEffects();
+		
 		motionMonitor->update(true);
 	}
 }
@@ -6487,6 +6490,17 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	// debugging only
 	if ( false )
 		cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
+		
+		
+	if ( motionMonitor && motionMonitor->IsShownOnScreen() ) {
+		if ( tss != ClientIdSelSource::TSS_REPLAY ) {
+			wxRichToolTip tip("Path selection triggered:", wxString::Format("Source: %s Selection(%ld --> %ld)", ClientIdSelSource::getTemplateSelSourceAsLongString(tss), firstClientId, lastClientId));
+			
+			tip.SetIcon(wxICON_INFORMATION);
+			tip.SetTipKind(wxTipKind_TopLeft);
+			tip.ShowFor(m_staticTextMotionMoinitor);
+		}
+	}
 	
 	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {
 		if ( positionSpy != NULL )
@@ -6495,8 +6509,11 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	
 	if ( tss != ClientIdSelSource::TSS_MONITOR ) {
 		if ( motionMonitor != NULL ) {
-			// the monitor uses lastClientId to display all ids to lastClientId (incl.)
-			motionMonitor->setCurrentClientId(lastClientId);
+			
+			// uses lastClientId for setCurrentClientId)= to display all ids up to lastClientId (incl.)
+			if ( tss == ClientIdSelSource::TSS_REPLAY )	motionMonitor->setCurrentClientId(lastClientId);
+			else 										motionMonitor->highlightClientId(firstClientId, lastClientId);
+			
 			motionMonitor->Refresh();
 		}
 	}
