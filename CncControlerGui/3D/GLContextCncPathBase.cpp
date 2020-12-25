@@ -645,7 +645,7 @@ void GLContextCncPathBase::highlightClientIds(cnc::LongValues ids)  {
 		long & id = *it;
 		
 		if ( id >= 0 ) {
-			#warning
+			#warning activate dimUpClientID again
 			store->highlightClientID(id);
 			//store->dimUpClientID(id);
 		}

@@ -7,19 +7,26 @@
 class CncInfoBar : public wxInfoBar {
 	
 	private:
+		
 		bool			addTimeStampPrefix;
 		wxTimer			displayTimer;
-
+		
 		void			onDisplayTimer(wxTimerEvent& event);
 		
 	protected:
+		
 		wxString		appendix;
+		wxString		currentTimeStr;
+		
 		virtual void	traceFurther(const char type, const wxString& msg) = 0;
+		virtual void	notifyDisplayTimer() = 0;
 		virtual void	onLeftDClick(wxMouseEvent& event) = 0;
 
 	public:
 		CncInfoBar(wxWindow *parent);
 		virtual ~CncInfoBar();
+		
+		const wxString& getCurrentTimeStr() const { return currentTimeStr; }
 		
 		void doAddTimeStampPrefix(bool state)		{ addTimeStampPrefix = state; }
 		void setAppendix(const wxString& a)			{ appendix = a; }
@@ -28,7 +35,7 @@ class CncInfoBar : public wxInfoBar {
 		void showWaraning(const wxString& msg)		{ showMessage('W', msg); }
 		void showError(const wxString& msg)			{ showMessage('E', msg); }
 		
-		void showMessage(const char type, const wxString& msg);
+		virtual void showMessage(const char type, const wxString& msg);
 		virtual void ShowMessage(const wxString& msg, int flags = wxICON_INFORMATION) wxOVERRIDE;
 		
 		wxDECLARE_NO_COPY_CLASS(CncInfoBar);
@@ -39,6 +46,7 @@ class CncMainInfoBar : public CncInfoBar {
 
 	protected:
 		virtual void	traceFurther(const char type, const wxString& msg);
+		virtual void	notifyDisplayTimer() {};
 		virtual void	onLeftDClick(wxMouseEvent& event);
 
 	public:

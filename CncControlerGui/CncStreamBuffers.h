@@ -142,41 +142,14 @@ class CncBasicLogStream : public std::stringstream {
 		}
 		
 		//////////////////////////////////////////////////////////
-		void ungregisterTextControl() {
-			if ( logStreamBuffer != NULL )
-				logStreamBuffer->ungregisterTextControl();
-		}
-		
-		//////////////////////////////////////////////////////////
-		void setLogStreamBuffer(LoggerStreamBuf* lsb) {
-			logStreamBuffer = lsb;
-		}
-		
-		//////////////////////////////////////////////////////////
-		void resetTextAttr() {
-			setTextAttr(LoggerStreamBuf::defaultAttr); 
-		}
-		
-		//////////////////////////////////////////////////////////
-		void setTextAttr(const wxTextAttr& ta) {
-			if ( logStreamBuffer != NULL )
-				logStreamBuffer->setTextAttr(ta);
-		}
-		
-		//////////////////////////////////////////////////////////
-		void setTextColour(const wxColour& c) {
-			if ( logStreamBuffer != NULL )
-				logStreamBuffer->setTextAttr(c);
-		}
-		
-		//////////////////////////////////////////////////////////
-		const wxColour& getTextColour() const { 
-			if ( logStreamBuffer != NULL )
-				logStreamBuffer->getTextAttr().GetTextColour();
-				
-			return LoggerStreamBuf::defaultAttr.GetTextColour();
-		}
-		
+		void ungregisterTextControl();
+		void setLogStreamBuffer(LoggerStreamBuf* lsb);
+		void resetTextAttr();
+		void setTextAttr(const wxTextAttr& ta);
+		void setTextColour(const wxColour& c);
+		const wxTextAttr& getTextAttr() const;
+		const wxColour& getTextColour() const;
+			
 		//////////////////////////////////////////////////////////
 		void red() 		{ setTextColour(wxColour(255, 128, 128)); }
 		void black() 	{ setTextColour(*wxBLACK);                }
@@ -199,14 +172,6 @@ class CncTraceLogStream : public CncBasicLogStream {
 		
 		///////////////////////////////////////////////////////////
 		virtual void logMessage(const char* m);
-		
-		///////////////////////////////////////////////////////////
-		CncTextCtrl* getTextControl() const {
-			if ( logStreamBuffer != NULL )
-				return logStreamBuffer->getTextControl();
-				
-			return NULL;
-		}
 		
 	public:
 		///////////////////////////////////////////////////////////
@@ -232,6 +197,22 @@ class CncTraceLogStream : public CncBasicLogStream {
 		{}
 
 		///////////////////////////////////////////////////////////
+		CncTextCtrl* getTextControl() const {
+			if ( logStreamBuffer != NULL )
+				return logStreamBuffer->getTextControl();
+				
+			return NULL;
+		}
+		
+		///////////////////////////////////////////////////////////
+		const wxColour getInfoColour()    const { return infoColour;    }
+		const wxColour getWarningColour() const { return warningColour; }
+		const wxColour getErrorColour()   const { return errorColour;   }
+		const wxColour getDebugColour()   const { return debugColour;   }
+		
+		const char getCurrentDesignAsChar();
+		
+		///////////////////////////////////////////////////////////
 		void clear();
 		void logInfoMessage		(const char* m);
 		void logWarningMessage	(const char* m);
@@ -239,27 +220,27 @@ class CncTraceLogStream : public CncBasicLogStream {
 		void logDebugMessage	(const char* m);
 
 		///////////////////////////////////////////////////////////
-		void setInfoColour		(const wxColour& c) 	{ infoColour 	= c; }
-		void setWarningColour	(const wxColour& c) 	{ warningColour = c; }
-		void setErrorColour		(const wxColour& c) 	{ errorColour 	= c; }
-		void setDebugColour		(const wxColour& c) 	{ debugColour 	= c; }
+		void setInfoColour		(const wxColour& c)				{ infoColour 	= c; }
+		void setWarningColour	(const wxColour& c)				{ warningColour = c; }
+		void setErrorColour		(const wxColour& c)				{ errorColour 	= c; }
+		void setDebugColour		(const wxColour& c)				{ debugColour 	= c; }
 		
 		///////////////////////////////////////////////////////////
-		void logInfo	(const char* m) 	{ logInfoMessage(m);    }
-		void logWarning	(const char* m) 	{ logWarningMessage(m); }
-		void logError	(const char* m) 	{ logErrorMessage(m);   }
-		void logDebug	(const char* m) 	{ logDebugMessage(m);   }
+		void logInfo			(const char* m)					{ logInfoMessage(m);    }
+		void logWarning			(const char* m)					{ logWarningMessage(m); }
+		void logError			(const char* m)					{ logErrorMessage(m);   }
+		void logDebug			(const char* m)					{ logDebugMessage(m);   }
 		
 		///////////////////////////////////////////////////////////
-		void logInfoMessage		(const std::stringstream& ss) 	{ logInfoMessage(ss.str().c_str()); }
+		void logInfoMessage		(const std::stringstream& ss)	{ logInfoMessage(ss.str().c_str()); }
 		void logWarningMessage	(const std::stringstream& ss)	{ logWarningMessage(ss.str().c_str()); }
-		void logErrorMessage	(const std::stringstream& ss) 	{ logErrorMessage(ss.str().c_str()); }
-		void logDebugMessage	(const std::stringstream& ss) 	{ logDebugMessage(ss.str().c_str()); }
+		void logErrorMessage	(const std::stringstream& ss)	{ logErrorMessage(ss.str().c_str()); }
+		void logDebugMessage	(const std::stringstream& ss)	{ logDebugMessage(ss.str().c_str()); }
 		
-		void logInfo	(const std::stringstream& ss) 			{ logInfoMessage(ss.str().c_str()); }
-		void logWarning	(const std::stringstream& ss)			{ logWarningMessage(ss.str().c_str()); }
-		void logError	(const std::stringstream& ss) 			{ logErrorMessage(ss.str().c_str()); }
-		void logDebug	(const std::stringstream& ss) 			{ logDebugMessage(ss.str().c_str()); }
+		void logInfo			(const std::stringstream& ss)	{ logInfoMessage(ss.str().c_str()); }
+		void logWarning			(const std::stringstream& ss)	{ logWarningMessage(ss.str().c_str()); }
+		void logError			(const std::stringstream& ss)	{ logErrorMessage(ss.str().c_str()); }
+		void logDebug			(const std::stringstream& ss)	{ logDebugMessage(ss.str().c_str()); }
 		
 		const char* getCurrentMessage() const;
 };
@@ -331,6 +312,37 @@ class CncSerialSpyStream : public CncTraceLogStream {
 		void finalizeRET_HALT		(const char* msg = NULL );
 		void finalizeRET_QUIT		(const char* msg = NULL );
 
+};
+
+template <class T> 
+class CncTempTextAttr {
+	
+	private:
+		T*			stream;
+		wxTextAttr	prvAttr;
+		
+	public:
+		CncTempTextAttr(T* s, const wxTextAttr& tmpAttr) 
+		: stream	(s)
+		, prvAttr	(s ? s->getTextAttr() : tmpAttr)
+		{
+			if  ( stream ) {
+				stream->setTextAttr(tmpAttr);
+				
+				if ( stream->getTextControl() != NULL )
+					stream->getTextControl()->SetDefaultStyle(tmpAttr);
+			}
+		}
+		
+		~CncTempTextAttr() 
+		{
+			if  ( stream ) {
+				stream->setTextAttr(prvAttr);
+				
+				if ( stream->getTextControl() != NULL )
+					stream->getTextControl()->SetDefaultStyle(prvAttr);
+			}
+		}
 };
 
 #endif

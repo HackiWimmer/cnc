@@ -6,6 +6,8 @@
 
 class CncTraceCtrl;
 class CncLoggerListCtrl;
+class CncTraceInfoBar;
+
 class CncLoggerView : public CncLoggerViewBase {
 	
 	public:
@@ -65,7 +67,7 @@ class CncLoggerView : public CncLoggerViewBase {
 		typedef std::vector<CncLoggerListCtrl*> LoggerLists;
 		LoggerLists loggerLists;
 		
-		CncTextCtrl*	timeCtrl;
-		CncTraceCtrl*	traceCtrl;
+		CncTraceInfoBar*	traceInfoBar;
+		CncTraceCtrl*		traceCtrl;
 };
 #endif // CNCLOGGERVIEW_H

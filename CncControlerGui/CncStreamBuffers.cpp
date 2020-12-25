@@ -81,7 +81,7 @@ LoggerStreamBuf::LoggerStreamBuf(char t, CncTextCtrl* c, const wxTextAttr& ta)
 ///////////////////////////////////////////////////////////
 void LoggerStreamBuf::setTextAttr(const wxTextAttr& ta) {
 ///////////////////////////////////////////////////////////
-	textAttr = ta;
+	textAttr.Apply(ta);
 }
 ///////////////////////////////////////////////////////////
 void LoggerStreamBuf::setTextControl(CncTextCtrl* c) {
@@ -291,6 +291,54 @@ void CncSerialSpyStream::logTime() {
 	wxDateTime now = wxDateTime::UNow();
 	c->addLine(now.Format("Time: %H:%M:%S.%l: "), CncSerialSpyListCtrl::LineType::LT_Time);
 }
+
+
+//////////////////////////////////////////////////////////
+void CncBasicLogStream::ungregisterTextControl() {
+//////////////////////////////////////////////////////////
+	if ( logStreamBuffer != NULL )
+		logStreamBuffer->ungregisterTextControl();
+}
+//////////////////////////////////////////////////////////
+void CncBasicLogStream::setLogStreamBuffer(LoggerStreamBuf* lsb) {
+//////////////////////////////////////////////////////////
+	logStreamBuffer = lsb;
+}
+//////////////////////////////////////////////////////////
+void CncBasicLogStream::resetTextAttr() {
+//////////////////////////////////////////////////////////
+	setTextAttr(LoggerStreamBuf::defaultAttr); 
+}
+//////////////////////////////////////////////////////////
+void CncBasicLogStream::setTextAttr(const wxTextAttr& ta) {
+//////////////////////////////////////////////////////////
+	if ( logStreamBuffer != NULL )
+		logStreamBuffer->setTextAttr(ta);
+}
+//////////////////////////////////////////////////////////
+void CncBasicLogStream::setTextColour(const wxColour& c) {
+//////////////////////////////////////////////////////////
+	if ( logStreamBuffer != NULL )
+		logStreamBuffer->setTextAttr(wxTextAttr(c));
+}
+//////////////////////////////////////////////////////////
+const wxTextAttr& CncBasicLogStream::getTextAttr() const {
+//////////////////////////////////////////////////////////
+	if ( logStreamBuffer != NULL )
+		return logStreamBuffer->getTextAttr();
+		
+	return LoggerStreamBuf::defaultAttr;
+}
+//////////////////////////////////////////////////////////
+const wxColour& CncBasicLogStream::getTextColour() const { 
+//////////////////////////////////////////////////////////
+	if ( logStreamBuffer != NULL )
+		return logStreamBuffer->getTextAttr().GetTextColour();
+		
+	return LoggerStreamBuf::defaultAttr.GetTextColour();
+}
+
+
 ///////////////////////////////////////////////////////////
 void CncTraceLogStream::logMessage(const char* m) {
 ///////////////////////////////////////////////////////////
@@ -316,34 +364,37 @@ void CncTraceLogStream::clear() {
 ///////////////////////////////////////////////////////////
 void CncTraceLogStream::logInfoMessage(const char* m) {
 ///////////////////////////////////////////////////////////
-	if ( getTextControl() != NULL ) {
-		getTextControl()->SetDefaultStyle(wxTextAttr(infoColour));
-		logMessage(m);
-	}
+	CncTempTextAttr<CncTraceLogStream> ta(this, wxTextAttr(infoColour));
+	logMessage(m);
 }
 ///////////////////////////////////////////////////////////
 void CncTraceLogStream::logWarningMessage(const char* m) {
 ///////////////////////////////////////////////////////////
-	if ( getTextControl() != NULL ) {
-		getTextControl()->SetDefaultStyle(wxTextAttr(warningColour));
-		logMessage(m);
-	}
+	CncTempTextAttr<CncTraceLogStream> ta(this, wxTextAttr(warningColour));
+	logMessage(m);
 }
 ///////////////////////////////////////////////////////////
 void CncTraceLogStream::logErrorMessage(const char* m) {
 ///////////////////////////////////////////////////////////
-	if ( getTextControl() != NULL ) {
-		getTextControl()->SetDefaultStyle(wxTextAttr(errorColour));
-		logMessage(m);
-	}
+	CncTempTextAttr<LoggerStreamBuf> x(logStreamBuffer, wxTextAttr(errorColour));
+	logMessage(m);
 }
 ///////////////////////////////////////////////////////////
 void CncTraceLogStream::logDebugMessage(const char* m) {
 ///////////////////////////////////////////////////////////
-	if ( getTextControl() != NULL ) {
-		getTextControl()->SetDefaultStyle(wxTextAttr(debugColour));
-		logMessage(m);
-	}
+	CncTempTextAttr<CncTraceLogStream> ta(this, wxTextAttr(debugColour));
+	logMessage(m);
+}
+///////////////////////////////////////////////////////////
+const char CncTraceLogStream::getCurrentDesignAsChar() {
+///////////////////////////////////////////////////////////
+	const wxColour& c = getTextColour();
+	
+	if      ( c == warningColour )	return 'W';
+	else if ( c == errorColour )	return 'E';
+	else if ( c == debugColour )	return 'D';
+	
+	return 'I';
 }
 ///////////////////////////////////////////////////////////
 const char* CncTraceLogStream::getCurrentMessage() const {

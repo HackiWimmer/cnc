@@ -7,7 +7,6 @@
   <object class="wxBitmap" name="16-file_save_all">bitmaps\CodeLite\16-file_save_all.png</object>
   <object class="wxBitmap" name="16-file_save_all@2x">bitmaps\CodeLite\16-file_save_all@2x.png</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
-  <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
   <object class="wxBitmap" name="edit-copy-7">bitmaps\edit-copy-7.png</object>
   <object class="wxBitmap" name="go-jump-today">bitmaps\go-jump-today.png</object>
   <object class="wxBitmap" name="lightbulb-off">bitmaps\lightbulb-off.png</object>

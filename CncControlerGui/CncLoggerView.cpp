@@ -10,7 +10,7 @@ CncLoggerView::CncLoggerView(wxWindow* parent)
 : CncLoggerViewBase		(parent)
 , currentLoggerIndex	(LoggerSelection::VAL::STARTUP)
 , loggerLists			()
-, timeCtrl				(NULL)
+, traceInfoBar			(NULL)
 , traceCtrl				(NULL)
 /////////////////////////////////////////////////////////////////////{
 {
@@ -26,13 +26,10 @@ CncLoggerView::~CncLoggerView() {
 	// without any change to read it in the gui.
 	saveAll(false);
 	
-	for (auto it = loggerLists.begin(); it != loggerLists.end(); ++it ) {
-		// delete containing pointers
-		delete (*it);
-	}
-	
 	loggerLists.clear();
+	
 	wxDELETE( traceCtrl );
+	wxDELETE( traceInfoBar );
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::select(LoggerSelection::VAL id) {
@@ -69,21 +66,19 @@ void CncLoggerView::enable(bool state) {
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::initialize() {
 /////////////////////////////////////////////////////////////////////
-	if ( timeCtrl == NULL ) {
-		wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-		//timeCtrl = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RICH | wxTE_CENTRE | wxTE_READONLY | wxTE_MULTILINE | wxTE_DONTWRAP);
-		timeCtrl = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RICH | wxTE_CENTRE | wxTE_READONLY );
-		timeCtrl->SetFont(font);
-		timeCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-		timeCtrl->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-		
-		GblFunc::replaceControl(m_timePlaceholder, timeCtrl);
-	}
-	
 	if ( traceCtrl == NULL ) {
 		traceCtrl = new CncTraceCtrl(this);
 		GblFunc::replaceControl(m_tracePlaceholder, traceCtrl);
 	}
+	
+	// trace ctr is only a background control 
+	// its content will be displayed with traceInfoBar
+	traceCtrl->Show(false);
+	
+	traceInfoBar = new CncTraceInfoBar(this);
+	GblFunc::replaceControl(m_traceViewInfobarPlaceholder, traceInfoBar);
+	
+	traceInfoBar->SetShowHideEffects(wxSHOW_EFFECT_ROLL_TO_TOP, wxSHOW_EFFECT_ROLL_TO_BOTTOM);
 	
 	if ( loggerLists.size() == 0 ) {
 		
@@ -102,39 +97,29 @@ void CncLoggerView::initialize() {
 void CncLoggerView::clearTrace() {
 /////////////////////////////////////////////////////////////////////
 	if ( traceCtrl )
-		traceCtrl->clearTrace(timeCtrl->GetValue());
-		
-	if ( timeCtrl )
-		timeCtrl->Clear();
+		traceCtrl->clearTrace(traceInfoBar->getCurrentTimeStr());
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::changeTextAttr(const wxTextAttr& ta) {
 /////////////////////////////////////////////////////////////////////
-	if ( timeCtrl ) {
-		timeCtrl->SetDefaultStyle(ta);
-		timeCtrl->SetStyle(0, timeCtrl->GetLineLength(0) - 1, ta);
-	}
-	
 	if ( traceCtrl )
 		traceCtrl->SetDefaultStyle(ta);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::trace(const char c) {
 /////////////////////////////////////////////////////////////////////
-	if ( timeCtrl )
-		timeCtrl->AppendText(wxDateTime::Now().FormatISOTime());
-	
 	if ( traceCtrl )
 		traceCtrl->AppendChar(c);
+	
+	traceInfoBar->showMessage(cnc::trc.getCurrentDesignAsChar(), traceCtrl->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::trace(const wxString& text) {
 /////////////////////////////////////////////////////////////////////
-	if ( timeCtrl )
-		timeCtrl->AppendText(wxDateTime::Now().FormatISOTime());
-	
 	if ( traceCtrl )
 		traceCtrl->AppendText(text);
+	
+	traceInfoBar->showMessage(cnc::trc.getCurrentDesignAsChar(), traceCtrl->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::openTraceHistory() {
@@ -165,9 +150,6 @@ void CncLoggerView::onClearTraceHistory(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( traceCtrl )
 		traceCtrl->clearTraceHistory();
-		
-	if ( timeCtrl )
-		timeCtrl->Clear();
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::onViewTraceHistory(wxCommandEvent& event) {

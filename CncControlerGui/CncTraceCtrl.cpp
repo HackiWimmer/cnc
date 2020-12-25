@@ -4,13 +4,39 @@
 #include "CncMessageDialog.h"
 #include "CncTraceCtrl.h"
 
+
+//////////////////////////////////////////////////
+void CncTraceInfoBar::onLeftDClick(wxMouseEvent& event) {
+//////////////////////////////////////////////////
+	THE_APP->getLoggerView()->openTraceHistory();
+}
+//////////////////////////////////////////////////
+void CncTraceInfoBar::notifyDisplayTimer() {
+//////////////////////////////////////////////////
+	
+}
+//////////////////////////////////////////////////
+void CncTraceInfoBar::showMessage(const char type, const wxString& msg) {
+//////////////////////////////////////////////////
+	if ( IsShownOnScreen() == false )
+		wxBell();
+		
+	CncInfoBar::showMessage(type, msg);
+	
+	// if a new trace with a different design (colour) appears until the 
+	// infobar is already shown a call of Refresh ensures the correct coloring . . . 
+	if ( IsShownOnScreen() == true )
+		Refresh();
+}
+
+
 // ----------------------------------------------------------------------------
 // CncSetterListCtrl Event Table
 // ----------------------------------------------------------------------------
-wxDEFINE_EVENT(wxEVT_CNC_TRACE_DISPLAY_TIMER,  wxTimerEvent);
+wxDEFINE_EVENT(wxEVT_CNC_TRACE_CLEAR_TIMER,  wxTimerEvent);
 
 wxBEGIN_EVENT_TABLE(CncTraceCtrl, wxTextCtrl)
-	EVT_TIMER	(wxEVT_CNC_TRACE_DISPLAY_TIMER,	CncTraceCtrl::onDisplayTimer)
+	EVT_TIMER	(wxEVT_CNC_TRACE_CLEAR_TIMER,	CncTraceCtrl::onClearTimer)
 wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////////////////
@@ -18,7 +44,7 @@ CncTraceCtrl::CncTraceCtrl(wxWindow *parent, wxWindowID id, const wxString &valu
 						     long style, const wxValidator &validator, const wxString &name)
 : CncTextCtrl	(parent, wxID_ANY, value, pos, size, style | wxTE_RICH | wxTE_READONLY | wxTE_MULTILINE | wxTE_DONTWRAP, validator, name)
 , entries		()
-, displayTimer	(this, wxEVT_CNC_TRACE_DISPLAY_TIMER)
+, clearTimer	(this, wxEVT_CNC_TRACE_CLEAR_TIMER)
 //////////////////////////////////////////////////////////////
 {
 	wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
@@ -28,14 +54,12 @@ CncTraceCtrl::CncTraceCtrl(wxWindow *parent, wxWindowID id, const wxString &valu
 	SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
 	
 	SetToolTip(_("Trace Information"));
-	//Enable(false);
-	
-	displayTimer.Start(timerInterval);
+	clearTimer.Start(timerInterval);
 }
 //////////////////////////////////////////////////////////////
 CncTraceCtrl::~CncTraceCtrl() {
 //////////////////////////////////////////////////////////////
-	displayTimer.Stop();
+	clearTimer.Stop();
 }
 //////////////////////////////////////////////////////////////
 void CncTraceCtrl::clearTraceHistory() {
@@ -43,17 +67,18 @@ void CncTraceCtrl::clearTraceHistory() {
 	entries.clear();
 	CncTextCtrl::Clear();
 	
-	displayTimer.Start(timerInterval);
+	clearTimer.Start(timerInterval);
 }
 //////////////////////////////////////////////////////////////
 void CncTraceCtrl::clearTrace(const wxString& timeStamp) {
 //////////////////////////////////////////////////////////////
 	const wxString line(GetValue());
+	
 	if ( line.IsEmpty() == false ) {
 		entries.push_back(std::move(TraceEntry(timeStamp, line)));
 		CncTextCtrl::Clear();
 		
-		displayTimer.Start(timerInterval);
+		clearTimer.Start(timerInterval);
 	}
 }
 //////////////////////////////////////////////////////////////
@@ -66,14 +91,14 @@ void CncTraceCtrl::AppendChar(char c) {
 //////////////////////////////////////////////////////////////
 	CncTextCtrl::AppendChar(c);
 	
-	displayTimer.Start(timerInterval);
+	clearTimer.Start(timerInterval);
 }
 //////////////////////////////////////////////////////////////
 void CncTraceCtrl::AppendText(const wxString &text) {
 //////////////////////////////////////////////////////////////
 	CncTextCtrl::AppendText(text);
 	
-	displayTimer.Start(timerInterval);
+	clearTimer.Start(timerInterval);
 }
 //////////////////////////////////////////////////////////////
 void CncTraceCtrl::openHistroyView() {
@@ -94,7 +119,7 @@ void CncTraceCtrl::openHistroyView() {
 	dlg.ShowModal();
 }
 //////////////////////////////////////////////////////////////
-void CncTraceCtrl::onDisplayTimer(wxTimerEvent& event) {
+void CncTraceCtrl::onClearTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////////////////
 	THE_APP->getLoggerView()->clearTrace();
 }

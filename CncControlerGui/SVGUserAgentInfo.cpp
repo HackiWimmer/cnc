@@ -162,6 +162,9 @@ void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
 			addCncStr(ss.str().c_str());
 			break;
 		}
+		default: 
+		{
+		}
 	}
 }
 /////////////////////////////////////////////////////////

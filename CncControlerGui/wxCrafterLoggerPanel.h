@@ -18,7 +18,7 @@
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/statline.h>
-#include <wx/statbmp.h>
+#include <wx/infobar.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -58,12 +58,12 @@ protected:
     wxButton* m_btViewAll;
     wxStaticLine* m_staticLine35;
     wxBitmapToggleButton* m_btLoggerOnDemand;
-    wxStaticLine* m_staticLine64;
-    wxStaticBitmap* m_staticBitmap57;
-    wxPanel* m_timePlaceholder;
-    wxPanel* m_tracePlaceholder;
+    wxStaticLine* m_staticLine351;
     wxButton* m_btClearTraceHistory;
     wxButton* m_btShowTraceHistory;
+    wxStaticLine* m_staticLine64;
+    wxPanel* m_tracePlaceholder;
+    wxInfoBar* m_traceViewInfobarPlaceholder;
 
 protected:
     virtual void onSelectStartupLogger(wxCommandEvent& event) { event.Skip(); }
@@ -99,12 +99,12 @@ public:
     wxButton* GetBtViewAll() { return m_btViewAll; }
     wxStaticLine* GetStaticLine35() { return m_staticLine35; }
     wxBitmapToggleButton* GetBtLoggerOnDemand() { return m_btLoggerOnDemand; }
-    wxStaticLine* GetStaticLine64() { return m_staticLine64; }
-    wxStaticBitmap* GetStaticBitmap57() { return m_staticBitmap57; }
-    wxPanel* GetTimePlaceholder() { return m_timePlaceholder; }
-    wxPanel* GetTracePlaceholder() { return m_tracePlaceholder; }
+    wxStaticLine* GetStaticLine351() { return m_staticLine351; }
     wxButton* GetBtClearTraceHistory() { return m_btClearTraceHistory; }
     wxButton* GetBtShowTraceHistory() { return m_btShowTraceHistory; }
+    wxStaticLine* GetStaticLine64() { return m_staticLine64; }
+    wxPanel* GetTracePlaceholder() { return m_tracePlaceholder; }
+    wxInfoBar* GetTraceViewInfobarPlaceholder() { return m_traceViewInfobarPlaceholder; }
     CncLoggerViewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncLoggerViewBase();
 };

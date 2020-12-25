@@ -4,6 +4,27 @@
 #include <vector>
 #include <wx/timer.h>
 #include "CncTextCtrl.h"
+#include "CncInfoBar.h"
+
+class CncTraceInfoBar : public CncInfoBar {
+
+	protected:
+		
+		virtual void	traceFurther(const char type, const wxString& msg) {}
+		virtual void	notifyDisplayTimer();
+		virtual void	onLeftDClick(wxMouseEvent& event);
+
+	public:
+		CncTraceInfoBar(wxWindow *parent)
+		: CncInfoBar	(parent)
+		{}
+		
+		virtual ~CncTraceInfoBar()
+		{}
+		
+		virtual void showMessage(const char type, const wxString& msg);
+};
+
 
 class CncTraceCtrl : public CncTextCtrl  {
 	
@@ -19,13 +40,13 @@ class CncTraceCtrl : public CncTextCtrl  {
 			{}
 		};
 		
-		static const int timerInterval = 3000;
+		static const int timerInterval = 1000;
 		
 		typedef std::vector<TraceEntry> Entries;
 		Entries			entries;
-		wxTimer 		displayTimer;
+		wxTimer 		clearTimer;
 		
-		void 			onDisplayTimer(wxTimerEvent& event);
+		void 			onClearTimer(wxTimerEvent& event);
 		
 	public:
 		CncTraceCtrl(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 

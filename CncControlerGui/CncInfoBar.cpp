@@ -20,6 +20,7 @@ CncInfoBar::CncInfoBar(wxWindow *parent)
 , addTimeStampPrefix	(true)
 , displayTimer			(this, wxEVT_INFO_BAR_DISPLAY_TIMER)
 , appendix				()
+, currentTimeStr		(wxDateTime::Now().FormatISOTime())
 //////////////////////////////////////////////////
 {
 	// ... changing the efault colours and/or fonts
@@ -60,7 +61,6 @@ void CncInfoBar::showMessage(const char type, const wxString& msg) {
 	int timeout  = -1;
 	int flags    = 0;
 	
-	wxString m(msg);
 	switch ( type ) {
 		case 'E':	flags	= wxICON_ERROR;
 					timeout = 8000;
@@ -78,11 +78,14 @@ void CncInfoBar::showMessage(const char type, const wxString& msg) {
 					break;
 	}
 	
+	wxString m(msg);
 	traceFurther(type, m);
+	
+	currentTimeStr.assign(wxDateTime::Now().FormatISOTime());
 	
 	// msg: prepend time stamp
 	if ( addTimeStampPrefix == true )
-		m = wxString::Format("%s: %s", wxDateTime::Now().FormatISOTime(), m);
+		m = wxString::Format("%s: %s", currentTimeStr, m);
 	
 	// msg: appendix
 	if ( appendix.IsEmpty() == false )

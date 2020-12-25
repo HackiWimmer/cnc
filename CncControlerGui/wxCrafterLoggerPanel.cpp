@@ -24,7 +24,7 @@ CncLoggerViewBase::CncLoggerViewBase(wxWindow* parent, wxWindowID id, const wxPo
     }
     this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     
-    wxFlexGridSizer* flexGridSizer52 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer52 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer52->SetFlexibleDirection( wxBOTH );
     flexGridSizer52->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer52->AddGrowableCol(0);
@@ -95,9 +95,11 @@ CncLoggerViewBase::CncLoggerViewBase(wxWindow* parent, wxWindowID id, const wxPo
     
     flexGridSizer3->Add(m_standardLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer7 = new wxFlexGridSizer(10, 1, 0, 0);
     flexGridSizer7->SetFlexibleDirection( wxBOTH );
     flexGridSizer7->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7->AddGrowableCol(0);
+    flexGridSizer7->AddGrowableRow(9);
     
     flexGridSizer42->Add(flexGridSizer7, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -228,40 +230,21 @@ CncLoggerViewBase::CncLoggerViewBase(wxWindow* parent, wxWindowID id, const wxPo
     flexGridSizer33->Add(m_btLoggerOnDemand, 0, wxALL, WXC_FROM_DIP(1));
     m_btLoggerOnDemand->SetMinSize(wxSize(26,26));
     
-    m_staticLine64 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    wxFlexGridSizer* flexGridSizer81 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer81->SetFlexibleDirection( wxBOTH );
+    flexGridSizer81->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer52->Add(m_staticLine64, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer7->Add(flexGridSizer81, 0, wxALL|wxEXPAND|wxALIGN_BOTTOM, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer55 = new wxFlexGridSizer(1, 4, 0, 0);
-    flexGridSizer55->SetFlexibleDirection( wxBOTH );
-    flexGridSizer55->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer55->AddGrowableCol(2);
-    flexGridSizer55->AddGrowableRow(0);
+    m_staticLine351 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
-    flexGridSizer52->Add(flexGridSizer55, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticBitmap57 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dialog-information (2)")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
-    m_staticBitmap57->SetToolTip(_("Trace Information"));
-    
-    flexGridSizer55->Add(m_staticBitmap57, 0, wxALL, WXC_FROM_DIP(6));
-    
-    m_timePlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(70,24)), wxTAB_TRAVERSAL);
-    m_timePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer55->Add(m_timePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_timePlaceholder->SetMinSize(wxSize(70,24));
-    
-    m_tracePlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,24)), wxTAB_TRAVERSAL);
-    m_tracePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer55->Add(m_tracePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_tracePlaceholder->SetMinSize(wxSize(-1,24));
+    flexGridSizer81->Add(m_staticLine351, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer60 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer60->SetFlexibleDirection( wxBOTH );
     flexGridSizer60->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer55->Add(flexGridSizer60, 0, wxALL, WXC_FROM_DIP(1));
+    flexGridSizer81->Add(flexGridSizer60, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(1));
     
     m_btClearTraceHistory = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -282,6 +265,29 @@ CncLoggerViewBase::CncLoggerViewBase(wxWindow* parent, wxWindowID id, const wxPo
     
     flexGridSizer60->Add(m_btShowTraceHistory, 0, wxALL, WXC_FROM_DIP(1));
     m_btShowTraceHistory->SetMinSize(wxSize(26,26));
+    
+    m_staticLine64 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer52->Add(m_staticLine64, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer55 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer55->SetFlexibleDirection( wxBOTH );
+    flexGridSizer55->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer55->AddGrowableCol(0);
+    flexGridSizer55->AddGrowableRow(0);
+    
+    flexGridSizer52->Add(flexGridSizer55, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_tracePlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,24)), wxTAB_TRAVERSAL);
+    m_tracePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer55->Add(m_tracePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_tracePlaceholder->SetMinSize(wxSize(-1,24));
+    
+    m_traceViewInfobarPlaceholder = new wxInfoBar(this, wxID_ANY);
+    m_traceViewInfobarPlaceholder->SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
+    
+    flexGridSizer52->Add(m_traceViewInfobarPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     SetName(wxT("CncLoggerViewBase"));

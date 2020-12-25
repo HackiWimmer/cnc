@@ -954,17 +954,17 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	cnc::trc.logInfoMessage("Test function 2");
+	cnc::trc.logDebugMessage("Test function 2");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	cnc::trc.logInfoMessage("Test function 3");
+	cnc::trc.logWarningMessage("Test function 3");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	cnc::trc.logInfoMessage("Test function 4");
+	cnc::trc.logErrorMessage("Test function 4");
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -6488,7 +6488,7 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	else						isRunning = true;
 	
 	// debugging only
-	if ( false )
+	if ( true )
 		cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
 		
 		
