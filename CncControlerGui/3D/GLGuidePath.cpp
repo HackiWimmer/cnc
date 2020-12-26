@@ -7,6 +7,7 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
 : std::vector<CncDoublePosition>	()
 , guideColour						(wxNullColour)
 , guideStyle						(wxPENSTYLE_INVALID)
+, clientIds							()
 ///////////////////////////////////////////////////////////////////
 {
 	if ( plm.getPathType() == CncPathListManager::PathType::PT_GUIDE_PATH ) {
@@ -15,13 +16,13 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
 		switch ( plm.getGuideType() ) {
 			case CncPathListManager::GuideType::HELP_PATH:
 			{
-				guideColour	= wxColour(  0, 162, 232);
+				guideColour	= wxColour(  0, 162, 232, defAlphaDimmedUp);
 				guideStyle	= wxPENSTYLE_SHORT_DASH;
 				break;
 			}
 			case CncPathListManager::GuideType::ORIG_PATH:
 			{
-				guideColour	= wxColour(  0, 162, 232);
+				guideColour	= wxColour(  0, 162, 232, defAlphaDimmedUp);
 				guideStyle	= wxPENSTYLE_DOT;
 				break;
 			}
@@ -50,6 +51,7 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
 				const double z  = (                       zv * THE_CONFIG->getCalculationFactZ() ) / THE_CONFIG->getDispFactZ3D(); 
 				
 				push_back(std::move(CncDoublePosition(x, y, z)));
+				clientIds.insert(entry.clientId);
 			}
 		}
 	}
@@ -59,3 +61,25 @@ GLGuidePath::~GLGuidePath() {
 ///////////////////////////////////////////////////////////////////
 	clear();
 }
+///////////////////////////////////////////////////////////////////
+const bool GLGuidePath::hasClientId(long cid) const {
+///////////////////////////////////////////////////////////////////
+	return clientIds.find(cid) != clientIds.end();
+}
+///////////////////////////////////////////////////////////////////
+void GLGuidePath::dimDownClientId(long cid) {
+///////////////////////////////////////////////////////////////////
+	if ( hasClientId(cid) )
+		dimDown();
+}
+///////////////////////////////////////////////////////////////////
+void GLGuidePath::dimDown() {
+///////////////////////////////////////////////////////////////////
+	guideColour.Set(guideColour.Red(), guideColour.Green(), guideColour.Blue(), defAlphaDimmedDown);
+}
+///////////////////////////////////////////////////////////////////
+void GLGuidePath::dimUp() {
+///////////////////////////////////////////////////////////////////
+	guideColour.Set(guideColour.Red(), guideColour.Green(), guideColour.Blue(), defAlphaDimmedUp);
+}
+

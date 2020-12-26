@@ -18,9 +18,14 @@ void CncTraceInfoBar::notifyDisplayTimer() {
 //////////////////////////////////////////////////
 void CncTraceInfoBar::showMessage(const char type, const wxString& msg) {
 //////////////////////////////////////////////////
-	if ( IsShownOnScreen() == false )
-		wxBell();
-		
+	if ( IsShownOnScreen() == false ) {
+		switch ( type ) {
+			case 'W':
+			case 'E':	wxBell();
+						break;
+		}
+	}
+	
 	CncInfoBar::showMessage(type, msg);
 	
 	// if a new trace with a different design (colour) appears until the 

@@ -216,6 +216,8 @@ void CncMotionMonitor::dimAllVectiesDown() {
 //////////////////////////////////////////////////
 	GLOpenGLPathBuffer::dimDownColours();
 	
+	monitor->dimDownGudePathes();
+	
 	GLOpenGLPathBuffer::ReconstructOptions opt;
 	monitor->reconstruct(opt);
 }
@@ -223,7 +225,9 @@ void CncMotionMonitor::dimAllVectiesDown() {
 void CncMotionMonitor::normalizeAllSelectionEffects() {
 //////////////////////////////////////////////////
 	GLOpenGLPathBuffer::dimUpColours();
-
+	
+	monitor->dimUpGudePathes();
+	
 	GLOpenGLPathBuffer::ReconstructOptions opt;
 	monitor->reconstruct(opt);
 }

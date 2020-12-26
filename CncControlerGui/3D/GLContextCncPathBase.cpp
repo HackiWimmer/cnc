@@ -333,7 +333,7 @@ void GLContextCncPathBase::drawGuidePathes() {
 				}
 			}
 			
-			glColor4ub(gp.getColour().Red(), gp.getColour().Green(), gp.getColour().Blue(), 255);
+			glColor4ub(gp.getColour().Red(), gp.getColour().Green(), gp.getColour().Blue(), gp.getColour().Alpha());
 			glLineWidth(1);
 			
 			glBegin(GL_LINE_LOOP);
@@ -640,15 +640,43 @@ void GLContextCncPathBase::highlightClientIds(cnc::LongValues ids)  {
 	GLOpenGLPathBuffer::ReconstructOptions opt;
 	store->reconstruct(opt);
 	
+	dimDownGudePathes();
+	
 	cncPath.setVirtualEndToLast();
 	for ( auto it = ids.begin(); it != ids.end(); ++it) {
 		long & id = *it;
 		
 		if ( id >= 0 ) {
-			#warning activate dimUpClientID again
-			store->highlightClientID(id);
-			//store->dimUpClientID(id);
+			store->dimUpClientID(id);
+			highlightGudePathes(id);
 		}
 	}
 }
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::highlightGudePathes(long cid) {
+/////////////////////////////////////////////////////////////////
+	for ( auto it = guidePathes.begin(); it != guidePathes.end(); ++it ) {
+		GLGuidePath& gp = *it;
+		
+		if ( gp.hasClientId(cid) )
+			gp.dimUp();
+	}
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::dimUpGudePathes() {
+/////////////////////////////////////////////////////////////////
+	for ( auto it = guidePathes.begin(); it != guidePathes.end(); ++it ) {
+		GLGuidePath& gp = *it;
+		gp.dimUp();
+	}
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::dimDownGudePathes() {
+/////////////////////////////////////////////////////////////////
+	for ( auto it = guidePathes.begin(); it != guidePathes.end(); ++it ) {
+		GLGuidePath& gp = *it;
+		gp.dimDown();
+	}
+}
+
 

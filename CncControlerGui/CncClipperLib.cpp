@@ -97,10 +97,6 @@ bool ClipperLib::hasZAxisMovement(const Path& path) {
 //////////////////////////////////////////////////////////////////
 bool ClipperLib::isHelix(const Path& path, double diameter) {
 //////////////////////////////////////////////////////////////////
-	#warning helix - may be
-	std::clog << CNC_LOG_FUNCT_A("may be an helix\n");
-
-	
 	if ( cnc::dblCmp::le(diameter, 0.0) )
 		return false;
 	

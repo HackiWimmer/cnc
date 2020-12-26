@@ -25,6 +25,7 @@
 // common ostream operators
 std::ostream& operator<<(std::ostream& os, const wxPoint& p);
 std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
+std::ostream& operator<<(std::ostream& os, const wxColour& c);
 
 // make std globally available
 //using namespace std;

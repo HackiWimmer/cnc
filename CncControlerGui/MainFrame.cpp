@@ -6487,19 +6487,9 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	if ( isRunning == true )	return;
 	else						isRunning = true;
 	
-	// debugging only
-	if ( true )
-		cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
-		
-		
 	if ( motionMonitor && motionMonitor->IsShownOnScreen() ) {
-		if ( tss != ClientIdSelSource::TSS_REPLAY ) {
-			wxRichToolTip tip("Path selection triggered:", wxString::Format("Source: %s Selection(%ld --> %ld)", ClientIdSelSource::getTemplateSelSourceAsLongString(tss), firstClientId, lastClientId));
-			
-			tip.SetIcon(wxICON_INFORMATION);
-			tip.SetTipKind(wxTipKind_TopLeft);
-			tip.ShowFor(m_staticTextMotionMoinitor);
-		}
+		if ( tss != ClientIdSelSource::TSS_REPLAY )
+			cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsLongString(tss), firstClientId, lastClientId);
 	}
 	
 	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {

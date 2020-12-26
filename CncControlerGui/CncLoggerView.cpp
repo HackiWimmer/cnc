@@ -79,6 +79,7 @@ void CncLoggerView::initialize() {
 	GblFunc::replaceControl(m_traceViewInfobarPlaceholder, traceInfoBar);
 	
 	traceInfoBar->SetShowHideEffects(wxSHOW_EFFECT_ROLL_TO_TOP, wxSHOW_EFFECT_ROLL_TO_BOTTOM);
+	traceInfoBar->SetEffectDuration(10);
 	
 	if ( loggerLists.size() == 0 ) {
 		

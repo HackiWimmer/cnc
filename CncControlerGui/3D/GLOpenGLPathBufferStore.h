@@ -43,30 +43,44 @@ class GLOpenGLPathBuffer {
 		static const unsigned int		CncVertexColourB			= 2;
 		static const unsigned int		CncVertexColourA			= 3;
 		
-		static const unsigned int		defRapidAlpha				=  80;
-		static const unsigned int		defWorkAlpha				= 100;
-		static const unsigned int		defMaxAlpha					= 100;
-		static const unsigned int		defUserAlpha				= 100;
-		static const unsigned int		defHighlightAlpha			= 100;
+		static const unsigned char		defRapidAlpha				=  80;
+		static const unsigned char		defWorkAlpha				= 100;
+		static const unsigned char		defMaxAlpha					= 100;
+		static const unsigned char		defUserAlpha				= 100;
+		static const unsigned char		defHighlightAlpha			= 100;
 		
-		static constexpr  float			dimDownFact					= 0.2;
-		static constexpr  float			dimUpFact					= 1.0;
+		static constexpr  float			dimDownFact					= 0.25;
+		static constexpr  float			dimUpFact					= 1.00;
 		
 		// --------------------------------------------------------------
 		struct VertexColours {
 			
-			unsigned int rapidAlpha	=  defRapidAlpha;
+			unsigned int	rapidAlpha;
 			
-			wxColour	rapid		= wxColour(255, 128,  64, rapidAlpha);
-			wxColour	work		= wxColour(255, 255, 255, GLOpenGLPathBuffer::defWorkAlpha);
-			wxColour	max			= wxColour(255,   0,   0, GLOpenGLPathBuffer::defMaxAlpha);
-			wxColour	user		= wxColour(  0,   0, 255, GLOpenGLPathBuffer::defUserAlpha);
+			wxColour		rapid;
+			wxColour		work;
+			wxColour		max;
+			wxColour		user;
 			
-			wxColour	highlight	= wxColour(255, 255,   0, GLOpenGLPathBuffer::defHighlightAlpha);
+			wxColour		highlight;
+			
+			VertexColours();
 			
 			void showRapidPathes(bool state);
 			void restoreLightness();
 			void changeLightness(float lightness = GLOpenGLPathBuffer::dimUpFact);
+			
+			//-------------------------------------------------
+			friend std::ostream& operator<< (std::ostream &o, const VertexColours& c) {
+				o << "rapid     : (" << c.rapid		<< ")\n"
+				  << "work      : (" << c.work		<< ")\n"
+				  << "max       : (" << c.max		<< ")\n"
+				  << "user      : (" << c.user		<< ")\n"
+				  << "highlight : (" << c.highlight	<< ")\n"
+				;
+				
+				return o;
+			}
 		};
 		
 		// --------------------------------------------------------------
@@ -75,9 +89,10 @@ class GLOpenGLPathBuffer {
 		};
 
 		static const VertexColours& getColours()					{ return GLOpenGLPathBuffer::vertexColours; }
-		static void resetColoursLightness()							{ setColoursLightness(GLOpenGLPathBuffer::dimUpFact); }
+		static void resetLightness()								{ setLightness(GLOpenGLPathBuffer::dimUpFact); }
 		static void setColours(const VertexColours& colours);
-		static void setColoursLightness(float lightness = GLOpenGLPathBuffer::dimUpFact);
+		
+		static void setLightness(float lightness = GLOpenGLPathBuffer::dimUpFact);
 		static void dimDownColours();
 		static void dimUpColours();
 		
@@ -99,6 +114,7 @@ class GLOpenGLPathBuffer {
 				void updateColour(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 				void changeLightness(unsigned char a);
 				void changeLightness(float lightness);
+				void initializeVertexColour();
 				void normalizeVertexColour();
 				
 				friend GLOpenGLPathBuffer;
@@ -124,7 +140,7 @@ class GLOpenGLPathBuffer {
 				, clientID(-1)
 				{
 					memset(vertex,  0, CncVertexAxisValueCount   * sizeof(vertex_type));
-					normalizeVertexColour();
+					initializeVertexColour();
 				}
 
 				//-------------------------------------------------
@@ -133,7 +149,7 @@ class GLOpenGLPathBuffer {
 				, clientID(clientID)
 				{
 					memset(vertex,  0, CncVertexAxisValueCount   * sizeof(vertex_type));
-					normalizeVertexColour();
+					initializeVertexColour();
 				}
 
 				//-------------------------------------------------
@@ -150,7 +166,7 @@ class GLOpenGLPathBuffer {
 					vertex[CncVertexAxisY] = y;
 					vertex[CncVertexAxisZ] = z;
 					
-					normalizeVertexColour();
+					initializeVertexColour();
 				}
 				
 				//-------------------------------------------------
@@ -162,7 +178,7 @@ class GLOpenGLPathBuffer {
 					vertex[CncVertexAxisY] 	= y;
 					vertex[CncVertexAxisZ] 	= z;
 					
-					normalizeVertexColour();
+					initializeVertexColour();
 					
 					return *this;
 				}
