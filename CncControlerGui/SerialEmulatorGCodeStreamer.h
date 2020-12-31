@@ -14,10 +14,10 @@ class SerialEmulatorGCodeStreamer : public SerialEmulatorTextStreamer
 		virtual bool writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		virtual bool writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		virtual bool writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
-
-		virtual void initializeFile(const Serial::Trigger::BeginRun& tr);
-		virtual void finalizeFile(const Serial::Trigger::EndRun& tr);
-		virtual void initializePath(const Serial::Trigger::NextPath& tr);
+		
+		virtual void initializeFile(const Trigger::BeginRun& tr);
+		virtual void initializePath(const Trigger::NextPath& tr);
+		virtual void finalizeFile(const Trigger::EndRun& tr);
 		
 	public:
 	

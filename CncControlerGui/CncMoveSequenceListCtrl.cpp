@@ -269,18 +269,18 @@ wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
 	static const wxString fmt(globalStrings.moveSeqRefFormat);
 
 	if ( moveSequence == NULL )
-		return _("a");
+		return _("");
 	
 	if ( moveSequence->getCount() == 0 ) {
 		switch ( column ) {
 			case CncMoveSequenceListCtrl::COL_TYPE:		return wxString::Format("%d",		2); 
 		}
 		
-		return _("b");
+		return _("");
 	}
 
 	if ( item < 0 || item > (long)(moveSequence->getCount() - 1) )
-		return _("c");
+		return _("");
 
 	auto it = moveSequence->const_begin() + item;
 	const CncMoveSequence::SequencePoint& sp = *it;
@@ -293,7 +293,7 @@ wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
 		case CncMoveSequenceListCtrl::COL_DISTANCE_Z:	return wxString::Format("%10ld", 	(long)sp.z);
 	}
 	
-	return _("d");
+	return _("");
 }
 
 

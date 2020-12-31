@@ -19,6 +19,7 @@
 
 //////////////////////////////////////////////////////////////////
 class CncPathListEntry;
+
 SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc) 
 : SVGPathHandlerBase	()
 , CncPathListRunner		(cnc)
@@ -147,9 +148,8 @@ bool SVGPathHandlerCnc::activateNextPath(long clientID) {
 	
 	pathListMgr.normalizeLinkedEntry(clientID, CncSpeedWork, currentCncContext.getCurrentWorkSpeed_MM_MIN());
 	
-	wxASSERT(cncControl);
-	Serial::Trigger::NextPath tr;
-	cncControl->processTrigger(tr);
+	const Trigger::NextPath tr;
+	processTrigger(tr);
 	
 	return true;
 }

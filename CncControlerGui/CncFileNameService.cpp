@@ -14,7 +14,6 @@ wxString	CncFileNameService::_configFileName("CncController.ini");
 wxString	CncFileNameService::_lruFileName("CncControllerLruStore.ini");
 wxString	CncFileNameService::_appTempDir("CncGuiController-TempFiles");
 
-wxString	CncFileNameService::_ret(wxT(""));
 wxString	CncFileNameService::_executablePath(wxT(""));
 wxString	CncFileNameService::_homeDirectory(wxT(""));
 wxString	CncFileNameService::_tempDirectoryOS(wxT(""));
@@ -252,28 +251,24 @@ void CncFileNameService::deleteFile(wxString fn) {
 ///////////////////////////////////////////////////////////////////
 const char* CncFileNameService::getTempFileName(const wxString& extention) {
 ///////////////////////////////////////////////////////////////////
-	_ret = wxFileName::CreateTempFileName(_tempDirectorySession);
-	_ret.append(".");
-	_ret.append(extention);
+	wxString ret = wxFileName::CreateTempFileName(_tempDirectorySession);
+	ret.append(".");
+	ret.append(extention);
 	
-	return _ret;
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 const char* CncFileNameService::getTempFileName(CncTemplateFormat f) {
 ///////////////////////////////////////////////////////////////////
 	
 	switch ( f ) {
-		case TplBinary:		_ret = wxFileName::CreateTempFileName(_tempDirectorySession + "BIN"); 
-							break;
-		case TplSvg:		_ret = wxFileName::CreateTempFileName(_tempDirectorySession + "SVG");
-							break;
-		case TplGcode:		_ret = wxFileName::CreateTempFileName(_tempDirectorySession + "GCODE");
-							break;
-							
-		default:			_ret = wxFileName::CreateTempFileName(_tempDirectorySession + "CTF");
+		case TplBinary:		return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "BIN")); 
+		case TplSvg:		return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "SVG"));
+		case TplGcode:		return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "GCODE"));
+		default:			return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "CTF"));
 	}
 	
-	return _ret;
+	return "";
 }
 ///////////////////////////////////////////////////////////////////
 const char* CncFileNameService::getCncTemplatePreviewFileName(CncTemplateFormat f) { 

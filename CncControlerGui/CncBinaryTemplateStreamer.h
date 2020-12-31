@@ -4,6 +4,7 @@
 #include <cstring>
 #include <fstream>
 #include <stdint.h>
+#include "CncCommon.h"
 
 #define XMLSourceNodeName			"source"
 #define XMLSourceNode_AttribFile		"FILE"
@@ -25,60 +26,38 @@ class CncBinaryTemplateStreamer {
 	
 	protected:
 
-		//                                		   1       2       3       4       5       6       7       8 
-		//                                		   0123456701234567012345670123456701234567012345670123456701234567
-		const char* fileSignatureRef  			= "CncBinaryTemplateFile...........................................";
-		const unsigned short lenFileSignature 	= 64;
-		const unsigned short lenBuffSize 		= sizeof(uint32_t);
-		const uint32_t version					= 1001;
+		//											   1       2       3       4       5       6       7       8 
+		//											   0123456701234567012345670123456701234567012345670123456701234567
+		const char*				fileSignatureRef	= "CncBinaryTemplateFile...........................................";
+		const unsigned short	lenFileSignature 	= 64;
+		const unsigned short	 lenBuffSize 		= sizeof(uint32_t);
+		const uint32_t			version				= 1001;
 		
 		bool fileExists(const char*);
 
 	public:
 		
-		struct ParameterSet {
-			
-			std::string fullFileName;
-			
-			struct Source {
-				wxString fileName;
-				wxString fileType;
-			} SRC;
-
-			struct Setup {
-				float hardwareResX	= 0.0;
-				float hardwareResY	= 0.0;
-				float hardwareResZ	= 0.0;
-				 
-			} SET;
-			
-			struct Process {
-				std::string user;
-				 
-			} PRC;
-		};
-		
 		CncBinaryTemplateStreamer();
 		virtual ~CncBinaryTemplateStreamer();
 		
-		bool initNextSourceTemplateFileName(const ParameterSet& para);
-		bool appendDataBlock(unsigned char* buffer, uint32_t nbByte);
-		bool finalize();
-		bool isReadyToStream() { return readyToStream; }
+		bool					initNextSourceTemplateFileName(const Trigger::ParameterSet& para);
+		bool					appendDataBlock(unsigned char* buffer, uint32_t nbByte);
+		bool					finalize();
+		bool					isReadyToStream() { return readyToStream; }
 		
-		const char* getOutboundFileName() { return parameter.fullFileName.c_str(); }
+		const char*				getOutboundFileName() { return parameter.fullFileName.c_str(); }
 		
-		static bool uncompress(char* buf, int32_t size, wxString& content);
+		static bool				uncompress(char* buf, int32_t size, wxString& content);
 	
 	private:
 	
-		bool readyToStream;
-		bool compress;
-		ParameterSet parameter;
-		std::string tmpFileNameDataBody;
+		bool					readyToStream;
+		bool					compress;
+		Trigger::ParameterSet	parameter;
+		std::string				tmpFileNameDataBody;
 		
-		OutputStream fileStream;
-		OutputStream dataBodyStream;
+		OutputStream			fileStream;
+		OutputStream			dataBodyStream;
 		
 		struct DataContainer {
 			

@@ -206,49 +206,8 @@ struct SvgOutputParameters  {
 };
 
 class Serial : public SerialOSD {
+	
 	public:
-		
-		struct Trigger {
-			struct BeginRun {
-				const CncBinaryTemplateStreamer::ParameterSet parameter;
-				
-				BeginRun(const CncBinaryTemplateStreamer::ParameterSet& ps)
-				: parameter(ps)
-				{}
-			};
-			
-			struct EndRun {
-				const bool succcess = false;
-				
-				explicit EndRun(bool s)
-				: succcess(s)
-				{}
-			};
-			
-			struct NextPath {
-				NextPath()
-				{}
-			};
-			
-			struct SpeedChange {
-				const CncSpeedMode	currentSpeedMode;
-				const double		currentSpeedValue;
-				
-				SpeedChange(CncSpeedMode sm = CncSpeedUserDefined, double sv = 0.0)
-				: currentSpeedMode (sm)
-				, currentSpeedValue(sv)
-				{}
-				
-			};
-			
-			struct GuidePath {
-				const CncPathListManager* plm;
-				
-				GuidePath(const CncPathListManager* m)
-				: plm(m)
-				{}
-			};
-		};
 		
 		// SerialSyPort parameter
 		enum SypMode { SM_NONE = 0, SM_READ = 1, SM_WRITE = 2, SM_ALL = 3 };
@@ -415,15 +374,15 @@ class Serial : public SerialOSD {
 		virtual bool clearRemainingBytes(bool trace=false);
 		
 		virtual bool dataAvailable();
-		virtual const char* getPortName() 						{ return portName.c_str(); }
-		virtual void onPeriodicallyAppEvent(bool interrupted) 	{}
-		virtual bool canProcessIdle() 							{ return true; }
-		virtual bool isOutputAsTemplateAvailable()				{ return false; }
+		virtual const char* getPortName() 						const	{ return portName.c_str(); }
+		virtual void onPeriodicallyAppEvent(bool interrupted)			{}
+		virtual bool canProcessIdle() 									{ return true; }
+		virtual bool isOutputAsTemplateAvailable()						{ return false; }
 		virtual void setSpyMode(Serial::SypMode sm);
 
-		void enableSpyOutput(bool show=true) 					{ traceSpyInfo = show;}
-		bool isSpyOutputOn() 									{ return traceSpyInfo; }
-		Serial::SypMode getSpyMode() 							{ return spyMode; };
+		void enableSpyOutput(bool show=true) 							{ traceSpyInfo = show;}
+		bool isSpyOutputOn() 											{ return traceSpyInfo; }
+		Serial::SypMode getSpyMode() 									{ return spyMode; };
 		
 		const LastSerialResult& getLastFetchResult() { return lastFetchResult; }
 		
@@ -468,11 +427,11 @@ class Serial : public SerialOSD {
 		bool sendSoftwareReset()	{ return sendSignal(SIG_SOFTWARE_RESET); }
 		
 		// trigger
-		virtual void processTrigger(const Serial::Trigger::BeginRun& tr)	{}
-		virtual void processTrigger(const Serial::Trigger::EndRun& tr)		{}
-		virtual void processTrigger(const Serial::Trigger::NextPath& tr)	{}
-		virtual void processTrigger(const Serial::Trigger::SpeedChange& tr)	{}
-		virtual void processTrigger(const Serial::Trigger::GuidePath& tr)	{}
+		virtual void processTrigger(const Trigger::BeginRun& tr)	{}
+		virtual void processTrigger(const Trigger::EndRun& tr)		{}
+		virtual void processTrigger(const Trigger::NextPath& tr)	{}
+		virtual void processTrigger(const Trigger::SpeedChange& tr)	{}
+		virtual void processTrigger(const Trigger::GuidePath& tr)	{}
 		
 		size_t getTotalDistanceStepsX() { return totalDistanceSteps[0]; }
 		size_t getTotalDistanceStepsY() { return totalDistanceSteps[1]; }

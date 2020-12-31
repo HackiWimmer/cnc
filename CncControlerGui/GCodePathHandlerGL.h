@@ -11,26 +11,27 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		GCodePathHandlerGL(CncGCodePreview* gl);
 		virtual ~GCodePathHandlerGL();
 		
-		virtual const char* getName() 					const	{ return "GCodePathHandlerGL"; }
+		virtual const char*		getName() 							const	{ return "GCodePathHandlerGL"; }
 		
-		virtual bool isPathListUsed() 					const	{ return false; }
-		virtual bool shouldAToolChangeProcessed()				{ return false; }
+		virtual bool			isPathListUsed() 					const	{ return false; }
+		virtual bool			shouldAToolChangeProcessed()				{ return false; }
 		
-		virtual void switchToolState(bool state)				{}
-		virtual void logMeasurementStart()						{}
-		virtual void logMeasurementEnd()						{}
+		virtual void			switchToolState(bool state)					{}
+		virtual void			logMeasurementStart()						{}
+		virtual void			logMeasurementEnd()							{}
 
 	protected:
 		
-		virtual bool processLinearMove(bool alreadyRendered);
-		virtual bool changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value = 0.0);
-		virtual bool initNextPath();
-		virtual bool prepareWorkImpl();
-		virtual bool finishWorkImpl();
+		virtual bool			processLinearMove(bool alreadyRendered);
+		virtual bool			changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value = 0.0);
+		virtual bool			initNextPath();
+		virtual bool			prepareWorkImpl();
+		virtual bool			finishWorkImpl();
 		
 	private:
-		CncGCodePreview* glControl;
-		CncSpeedMode currentSpeed;
+		
+		CncGCodePreview*		glControl;
+		CncSpeedMode			currentSpeed;
 };
 
 #endif

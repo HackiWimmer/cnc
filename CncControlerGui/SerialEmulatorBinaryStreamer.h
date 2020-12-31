@@ -33,10 +33,10 @@ class SerialEmulatorBinaryStreamer : public SerialEmulatorNULL
 		virtual bool isOutputAsTemplateAvailable();
 		
 		// trigger
-		virtual void processTrigger(const Serial::Trigger::BeginRun& tr);
-		virtual void processTrigger(const Serial::Trigger::EndRun& tr);
-		virtual void processTrigger(const Serial::Trigger::NextPath& tr);
-		virtual void processTrigger(const Serial::Trigger::GuidePath& tr);
+		virtual void processTrigger(const Trigger::BeginRun& tr);
+		virtual void processTrigger(const Trigger::EndRun& tr);
+		virtual void processTrigger(const Trigger::NextPath& tr);
+		virtual void processTrigger(const Trigger::GuidePath& tr);
 };
 
 #endif

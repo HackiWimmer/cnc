@@ -68,6 +68,10 @@ class GCodeFileParser : public FileParser {
 		GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph);
 		virtual ~GCodeFileParser();
 		
+		virtual void deligateTrigger(const Trigger::BeginRun& tr)				{ pathHandler->deligateTrigger(tr); }
+		virtual void deligateTrigger(const Trigger::EndRun& tr)					{ pathHandler->deligateTrigger(tr); }
+		virtual void changePathListRunnerInterface(const wxString& portName)	{ pathHandler->changePathListRunnerInterface(portName); }
+
 		void setDisplayWarnings(bool state) { displayWarnings = state; }
 };
 

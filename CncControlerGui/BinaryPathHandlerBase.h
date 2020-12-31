@@ -13,24 +13,26 @@ typedef cnc::LineNumberTranslater LineNumberTranslater;
 class BinaryPathHandlerBase : public PathHandlerBase {
 	
 	private:
-		LineNumberTranslater lineNumberTranslater;
-		unsigned long totalLineNumberOffset;
-		unsigned long lineNumberCounter;
+		
+		LineNumberTranslater	lineNumberTranslater;
+		unsigned long			totalLineNumberOffset;
+		unsigned long			lineNumberCounter;
 		
 	protected:
-		virtual bool processLinearMove(bool alreadyRendered) { return true; }
-		void resetLineNumberTranslation();
-		void translateLineNumber(unsigned long offset);
+		
+		virtual bool			processLinearMove(bool alreadyRendered) { return true; }
+		void					resetLineNumberTranslation();
+		void					translateLineNumber(unsigned long offset);
 		
 	public:
 		BinaryPathHandlerBase();
 		virtual ~BinaryPathHandlerBase();
 		
-		virtual const char* getName() const { return "BinaryPathHandlerBase"; }
+		virtual const char*		getName() const { return "BinaryPathHandlerBase"; }
 		
 		// common interface
-		virtual bool processCommand(const unsigned char* buffer, int nbBytes) { return true; };
-
+		virtual bool			processCommand(const unsigned char* buffer, int nbBytes) { return true; };
+		
 		// view interface
 		virtual const wxString& getViewContent(wxString& content) 		{ return content; }
 		const cnc::LineNumberTranslater& getLineNumberTranslater() 		{ return lineNumberTranslater; }

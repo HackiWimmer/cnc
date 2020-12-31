@@ -94,7 +94,7 @@ class SVGFileParser : public SVGParserBase
 		inline bool performUse(const SVGUserAgentInfo& uai, UseDirective& ud);
 		inline bool spoolPath(const SVGUserAgentInfo& uai, const wxString& transform = "");
 		
-		virtual bool shouldAToolChangeProcessed() { return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
+		virtual bool shouldAToolChangeProcessed()								{ return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
 
 	public:
 		SVGFileParser(const wxString& fn, CncControl* cnc);
@@ -102,7 +102,10 @@ class SVGFileParser : public SVGParserBase
 		
 		virtual void setPathHandler(PathHandlerBase* ph);
 		
-		
+		virtual void deligateTrigger(const Trigger::BeginRun& tr)				{ pathHandler->deligateTrigger(tr); }
+		virtual void deligateTrigger(const Trigger::EndRun& tr)					{ pathHandler->deligateTrigger(tr); }
+		virtual void changePathListRunnerInterface(const wxString& portName)	{ pathHandler->changePathListRunnerInterface(portName); }
+
 		SVGPathHandlerCnc* getPathHandler() {
 			
 			SVGPathHandlerCnc* ret = static_cast<SVGPathHandlerCnc*>(pathHandler);
@@ -116,7 +119,7 @@ class SVGFileParser : public SVGParserBase
 		virtual void selectSourceControl(unsigned long pos);
 		virtual void enableUserAgentControls(bool state);
 		
-		virtual void displayUserAgentDetailInfo(unsigned int pos) { svgUserAgent.displayDetailInfo(pos); }
+		virtual void displayUserAgentDetailInfo(unsigned int pos)				{ svgUserAgent.displayDetailInfo(pos); }
 		
 };
 

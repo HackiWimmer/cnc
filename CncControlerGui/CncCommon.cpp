@@ -298,7 +298,7 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p) {
 //////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream& os, const wxColour& c) {
 //////////////////////////////////////////////////////////////
-	os << wxString::Format("%3d, %3d, %3d, %3d", (int)c.Red(), (int)c.Green(), (int)c.Blue(), (int)c.Alpha());
+	os << wxString::Format("%3d, %3d, %3d, % 3d", (int)c.Red(), (int)c.Green(), (int)c.Blue(), (int)c.Alpha());
 	return os;
 }
 //////////////////////////////////////////////////////////////

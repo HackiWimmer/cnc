@@ -955,6 +955,7 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -1914,7 +1915,16 @@ void MainFrame::decoratePortSelector(bool list) {
 		m_portSelectorSec->Append(item,  bitmap);
 	};
 	
-	// add default ports
+	// add default preprocessor ports ports
+	if ( lastPortName == _portPreProcMonitor )	appendItem(_portPreProcMonitor,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portPreProcMonitor,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	
+	if ( lastPortName == _portPreProcFile )		appendItem(_portPreProcFile,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portPreProcFile,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	
+	appendItem(_portSeparator, wxNullBitmap);
+	
+	// add default cnc ports
 	if ( lastPortName == _portEmulatorNULL )	appendItem(_portEmulatorNULL,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										appendItem(_portEmulatorNULL,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
@@ -1933,28 +1943,37 @@ void MainFrame::decoratePortSelector(bool list) {
 	if ( lastPortName == _portEmulatorArduino )	appendItem(_portEmulatorArduino,	ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										appendItem(_portEmulatorArduino, 	ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	 
-	// add com ports
-	int pStart = list == true ?  1 :  0;
-	int pEnd   = list == true ? 11 : 32;//256;
+	// add com cnc ports
+	int  pStart		= list == true ?  1 :  0;
+	int  pEnd		= list == true ? 11 : 32;//256;
+	bool available	= false;
 	
-	for (int i=pStart; i<pEnd; i++) {
-		int ret = CncUsbPortScanner::isComPortAvailable(i);
-		wxString pn(wxString::Format("COM%d", i));
+	//------------------------------------------------------------
+	auto appendCOMItem = [&](const wxString& item, const wxBitmap& bitmap = wxNullBitmap) {
+		
+		if ( available == false ) {
+			appendItem(_portSeparator, wxNullBitmap);
+			available = true;
+		}
+		
+		appendItem(item, bitmap);
+	};
+	
+	for (int i = pStart; i < pEnd; i++) {
+		
+		const wxString pn(wxString::Format("COM%d", i));
+		const bool b  = cnc && cnc->isConnected() && lastPortName == pn;
+		const int ret = CncUsbPortScanner::isComPortAvailable(i);
 		
 		switch ( ret ) {
-			case 0:		if ( cnc && cnc->isConnected() && lastPortName == pn ) 
-							appendItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-						else 
-							appendItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_ACCESS_DENIED"));
-							
+			case 0:		appendCOMItem(pn, ImageLibPortSelector().Bitmap(b ? "BMP_PS_CONNECTED" : "BMP_PS_ACCESS_DENIED"));
 						break;
 						
-			case 1:		appendItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+			case 1:		appendCOMItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 						break;
 						
 			default: 	if ( list == true ) 
-							appendItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_UNKNOWN"));
+							appendCOMItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_UNKNOWN"));
 		}
 	}
 	
@@ -2257,6 +2276,11 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectPort(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( m_portSelector->GetStringSelection().IsSameAs(_portSeparator) ) {
+		m_portSelector->SetStringSelection(lastPortName);
+		return;
+	}
+	
 	if ( lastPortName != m_portSelector->GetStringSelection() ) {
 		connectSerialPortDialog();
 		
@@ -2375,6 +2399,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	cnc = NULL;
 	
 	struct InitialSetup {
+		
 		wxString serialFileName		= "";
 		bool probeMode				= false;
 		bool interactiveMoving		= false;
@@ -2388,10 +2413,34 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 
 	} setup;
 	
+	
+	#warning
+	m_portSelector->SetToolTip("Add a description here");
+	
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
 		
 		setup.serialFileName.assign("dev/null");
+		setup.probeMode			= true;
+		setup.interactiveMoving	= true;
+		setup.secureDlg			= false;
+		setup.speedMonitor		= false;
+		setup.hasHardware		= false;
+	} 
+	else if ( sel == _portPreProcFile ) {
+		cnc = new CncControl(CncEMU_NULL);
+		
+		setup.serialFileName.assign("PreprocessorOnly/File");
+		setup.probeMode			= true;
+		setup.interactiveMoving	= true;
+		setup.secureDlg			= false;
+		setup.speedMonitor		= false;
+		setup.hasHardware		= false;
+	} 
+	else if ( sel == _portPreProcMonitor ) {
+		cnc = new CncControl(CncEMU_NULL);
+		
+		setup.serialFileName.assign("PreprocessorOnly/Monitor/");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2471,7 +2520,10 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		m_menuItemUpdCoors->Check(false);
 	}
 	
-	#warning
+	if ( inboundFileParser != NULL )
+		inboundFileParser->changePathListRunnerInterface(sel);
+	
+	#warning CncMillingSound
 	const bool sound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() && setup.speedMonitor == true );
 	CncMillingSound::activate(sound);
 	
@@ -3391,6 +3443,7 @@ bool MainFrame::processBinaryTemplate() {
 	CncGampadDeactivator cpd(this);
 		
 	inboundFileParser = new BinaryFileParser(getCurrentTemplatePathFileName().c_str(), new BinaryPathHandlerCnc(cnc));
+	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3402,6 +3455,8 @@ bool MainFrame::processSVGTemplate() {
 	CncGampadDeactivator cpd(this);
 	
 	inboundFileParser = new SVGFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
+	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
+
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3413,6 +3468,7 @@ bool MainFrame::processGCodeTemplate() {
 	CncGampadDeactivator cpd(this);
 	
 	inboundFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), new GCodePathHandlerCnc(cnc));
+	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3426,6 +3482,7 @@ bool MainFrame::processManualTemplate() {
 		
 	ManuallyParser* p = new ManuallyParser(new ManuallyPathHandlerCnc(cnc));
 	inboundFileParser = p;
+	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
 
 	ManuallyPathHandlerCnc::MoveDefinition move;
 	move.speedMode 		= CncSpeedUserDefined;
@@ -4036,11 +4093,13 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		bounds.setMaxBound(cnc->getMaxPositionsMetric());
 		THE_TPL_CTX->registerBounderies(bounds);
 		
-		const Serial::Trigger::EndRun endRun(ret);
-		cnc->processTrigger(endRun);
-
+		if ( inboundFileParser ) {
+			const Trigger::EndRun endRun(ret);
+			inboundFileParser->deligateTrigger(endRun);
+		}
+		
 		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
-
+		
 		return ret;
 	}
 	catch (const CncInterruption& ex) {
@@ -4060,17 +4119,20 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 bool MainFrame::processTemplateIntern() {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
-
-	CncBinaryTemplateStreamer::ParameterSet ps;
-	ps.SRC.fileName		= getCurrentTemplatePathFileName();
-	ps.SRC.fileType		= getCurrentTemplateFormatName();
-	ps.SET.hardwareResX	= THE_CONFIG->getDisplayFactX();
-	ps.SET.hardwareResY	= THE_CONFIG->getDisplayFactY();
-	ps.SET.hardwareResZ	= THE_CONFIG->getDisplayFactZ();
-	ps.PRC.user			= "Hacki Wimmer";
-
-	const Serial::Trigger::BeginRun begRun(ps);
-	cnc->processTrigger(begRun);
+	
+	if ( inboundFileParser ) {
+		Trigger::ParameterSet ps;
+		ps.SRC.fileName		= getCurrentTemplatePathFileName();
+		ps.SRC.fileType		= getCurrentTemplateFormatName();
+		ps.SET.hardwareResX	= THE_CONFIG->getDisplayFactX();
+		ps.SET.hardwareResY	= THE_CONFIG->getDisplayFactY();
+		ps.SET.hardwareResZ	= THE_CONFIG->getDisplayFactZ();
+		ps.PRC.user			= "Hacki Wimmer";
+		
+		const Trigger::BeginRun begRun(ps);
+		inboundFileParser->deligateTrigger(begRun);
+		std::cerr << CNC_LOG_FUNCT_A("\n");
+	}
 	
 	clearPositionSpy();
 	
@@ -4277,9 +4339,6 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 		std::cerr << CNC_LOG_FUNCT << ": Invalid file name!" << std::endl;
 		return;
 	}
-	
-	#warning
-	//wxMessageBox(tfn);
 	
 	// create a copy to avoid a modification of sourceEditor
 	wxTextFile file(tfn);

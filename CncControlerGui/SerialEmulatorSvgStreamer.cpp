@@ -77,11 +77,11 @@ bool SerialEmulatorSvgStreamer::writeEncodedSetterCallback(const SetterInfo& si)
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorSvgStreamer::initializeFile(const Serial::Trigger::BeginRun& tr) {
+void SerialEmulatorSvgStreamer::initializeFile(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorSvgStreamer::finalizeFile(const Serial::Trigger::EndRun& tr) {
+void SerialEmulatorSvgStreamer::finalizeFile(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	const double width  = metricBoundbox.distanceX;
 	const double height = metricBoundbox.distanceY;
@@ -103,7 +103,7 @@ void SerialEmulatorSvgStreamer::finalizeFile(const Serial::Trigger::EndRun& tr) 
 	footerStream << "</svg>\n";
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorSvgStreamer::initializePath(const Serial::Trigger::NextPath& tr) {
+void SerialEmulatorSvgStreamer::initializePath(const Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
 	bodyStream << "<!-- Next Path-->\n";
 }

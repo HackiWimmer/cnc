@@ -13,7 +13,7 @@ GCodePathHandlerCnc::GCodePathHandlerCnc(CncControl* cnc)
 	// add the file parser to the runner setup
 	// the rest is already set by CncPathListRunner(cnc)
 	CncPathListRunner::Setup& setup = getSetup();
-	setup.fileParser		= fileParser;
+	setup.fileParser				= fileParser;
 }
 //////////////////////////////////////////////////////////////////
 GCodePathHandlerCnc::~GCodePathHandlerCnc() {
@@ -41,8 +41,8 @@ bool GCodePathHandlerCnc::initNextPath() {
 	if ( PathHandlerBase::initNextPath() == false )
 		return false;
 
-	Serial::Trigger::NextPath tr;
-	getSetup().cnc->processTrigger(tr);
+	const Trigger::NextPath tr;
+	processTrigger(tr);
 	
 	return true;
 }

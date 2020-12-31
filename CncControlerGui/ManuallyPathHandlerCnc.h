@@ -10,6 +10,7 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 	public:
 		
 		struct MoveDefinition {
+			
 			CncSpeedMode speedMode	= CncSpeedMode::CncSpeedRapid;
 			bool absoluteMove 		= false;
 			bool toolState 			= false;
@@ -24,27 +25,27 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		ManuallyPathHandlerCnc(CncControl* cnc);
 		virtual ~ManuallyPathHandlerCnc();
 		
-		virtual const char* getName() const { return "ManuallyPathHandlerCnc"; }
+		virtual const char*		getName() const { return "ManuallyPathHandlerCnc"; }
 		
-		virtual void logMeasurementStart();
-		virtual void logMeasurementEnd();
+		virtual void 			logMeasurementStart();
+		virtual void			logMeasurementEnd();
 		
-		virtual void switchToolState(bool state);
+		virtual void			switchToolState(bool state);
 		
-		virtual bool prepareWork(); 
-		virtual bool finishWork();
+		virtual bool			prepareWork(); 
+		virtual bool			finishWork();
 		
-		virtual bool processLinearMove(bool alreadyRendered);
-		bool processLinearMove(const MoveDefinition& md);
+		virtual bool			processLinearMove(bool alreadyRendered);
+		bool					processLinearMove(const MoveDefinition& md);
 		
-		void swichtToolOn()  { switchToolState(true); }
-		void swichtToolOff() { switchToolState(false); }
+		void					swichtToolOn()  { switchToolState(true); }
+		void					swichtToolOff() { switchToolState(false); }
 		
 	private:
-		CncControl* cncControl;
 		
-		CncSpeedMode lastSpeedMode; 
-		double lastSpeedValue;
+		CncControl*				cncControl;
+		CncSpeedMode			lastSpeedMode; 
+		double					lastSpeedValue;
 };
 
 #endif

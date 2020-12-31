@@ -61,9 +61,9 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		virtual bool writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		virtual bool writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		
-		virtual void initializeFile(const Serial::Trigger::BeginRun& tr);
-		virtual void finalizeFile(const Serial::Trigger::EndRun& tr);
-		virtual void initializePath(const Serial::Trigger::NextPath& tr);
+		virtual void initializeFile(const Trigger::BeginRun& tr);
+		virtual void initializePath(const Trigger::NextPath& tr);
+		virtual void finalizeFile(const Trigger::EndRun& tr);
 		
 		virtual const wxString& formatPosition(const int32_t value)          const;
 		virtual const wxString& formatPosition(const double value)           const;
@@ -93,11 +93,11 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		virtual void disconnect(void);
 		
 		// trigger
-		virtual void processTrigger(const Serial::Trigger::BeginRun& tr);
-		virtual void processTrigger(const Serial::Trigger::EndRun&   tr);
-		virtual void processTrigger(const Serial::Trigger::NextPath& tr);
-		virtual void processTrigger(const Serial::Trigger::SpeedChange& tr);
-		virtual void processTrigger(const Serial::Trigger::GuidePath& tr);
+		virtual void processTrigger(const Trigger::BeginRun& tr);
+		virtual void processTrigger(const Trigger::EndRun&   tr);
+		virtual void processTrigger(const Trigger::NextPath& tr);
+		virtual void processTrigger(const Trigger::SpeedChange& tr);
+		virtual void processTrigger(const Trigger::GuidePath& tr);
 };
 
 #endif

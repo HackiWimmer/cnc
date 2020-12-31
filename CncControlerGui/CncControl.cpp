@@ -27,6 +27,7 @@
 #include "CncFileNameService.h"
 #include "CncLoggerView.h"
 #include "CncLoggerProxy.h"
+#include "CncPathListManager.h"
 #include "CncMillingSoundController.h"
 #include "wxCrafterImages.h"
 #include "MainFrame.h"
@@ -401,7 +402,7 @@ bool CncControl::connect(const char * portName) {
 	wxFileName fn(portName);
 	std::clog << "Try to connect to: " << serialPort->getClassName() 
 	                                   << "("
-									   << fn.GetFullName() 
+									   << (fn.DirExists() ? fn.GetFullName() : wxString(portName) )
 									   << ")" 
 									   << " - " 
 									   << CncFileNameService::getSession()
@@ -746,7 +747,7 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 		configuredSpeedMode	= s;
 		somethingChanged	= true;
 		
-		const Serial::Trigger::SpeedChange tr(configuredSpeedMode, configuredFeedSpeed_MM_MIN);
+		const Trigger::SpeedChange tr(configuredSpeedMode, configuredFeedSpeed_MM_MIN);
 		processTrigger(tr);
 	}
 	
@@ -1455,10 +1456,20 @@ void CncControl::setToolState(bool defaultStyle) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::switchToolOn() {
+bool CncControl::switchTool(bool on) {
+///////////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	if ( on == true )	ret = switchToolOn();
+	else				ret = switchToolOff();
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::switchToolOn() {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
-		return;
+		return false;
 
 	if ( toolPowerState == TOOL_STATE_OFF ) { 
 		if ( processSetter(PID_TOOL_SWITCH, TOOL_STATE_ON) ) {
@@ -1467,14 +1478,18 @@ void CncControl::switchToolOn() {
 			
 			toolPowerState = TOOL_STATE_ON;
 			displayToolState(toolPowerState);
+			
+			return true;
 		}
 	}
+	
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::switchToolOff(bool force) {
+bool CncControl::switchToolOff(bool force) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
-		return;
+		return false;
 
 	if ( toolPowerState == TOOL_STATE_ON || force == true ) {
 		if ( processSetter(PID_TOOL_SWITCH, TOOL_STATE_OFF) ) {
@@ -1483,8 +1498,11 @@ void CncControl::switchToolOff(bool force) {
 			
 			toolPowerState = TOOL_STATE_OFF;
 			displayToolState(toolPowerState);
+			return true;
 		}
 	}
+	
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::displayToolState(const bool state) {
@@ -2330,7 +2348,7 @@ void CncControl::sendIdleMessage() {
 void CncControl::addGuidePath(const CncPathListManager& plm, double zOffset) {
 ///////////////////////////////////////////////////////////////////
 	// first release the trigger
-	const Serial::Trigger::GuidePath tr(&plm);
+	const Trigger::GuidePath tr(&plm);
 	processTrigger(tr);
 	
 	// do this last because appendGuidPath and follows use std::move(plm)

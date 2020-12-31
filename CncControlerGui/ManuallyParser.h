@@ -15,6 +15,10 @@ class ManuallyParser : public FileParser {
 		ManuallyParser(ManuallyPathHandlerCnc* ph);
 		virtual ~ManuallyParser();
 		
+		virtual void deligateTrigger(const Trigger::BeginRun& tr)				{ pathHandler->deligateTrigger(tr); }
+		virtual void deligateTrigger(const Trigger::EndRun& tr)					{ pathHandler->deligateTrigger(tr); }
+		virtual void changePathListRunnerInterface(const wxString& portName)	{ pathHandler->changePathListRunnerInterface(portName); }
+		
 		void reset();
 		void reset(const CncDoublePosition& pos);
 		void setupToolId(int id);

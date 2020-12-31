@@ -58,12 +58,12 @@ bool SerialEmulatorBinaryStreamer::writeMoveSequenceRawCallback(unsigned char* b
 	return appendDataBlock(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::BeginRun& tr) {
+void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	if ( isReadyToStream() )
 		CncBinaryTemplateStreamer::finalize();
 	
-	CncBinaryTemplateStreamer::ParameterSet ps = tr.parameter;
+	Trigger::ParameterSet ps = tr.parameter;
 	ps.fullFileName = fileName;
 	
 	inboundFormat = cnc::getTemplateFormatFromExtention(ps.SRC.fileType);
@@ -74,19 +74,19 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::BeginRu
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::EndRun& tr) {
+void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	if ( CncBinaryTemplateStreamer::finalize() == false ) {
 		std::cerr << "SerialEmulatorStreamer::processTrigger(TrEndRun): finalize() failed" << std::endl;
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::NextPath& tr) {
+void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
 	//std::clog << "SerialEmulatorStreamer::processTrigger(TrNextPath)" << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::GuidePath& tr) {
+void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::GuidePath& tr) {
 ///////////////////////////////////////////////////////////////////
-	#warning processTrigger(const Serial::Trigger::GuidePath& tr) impl. missing 
+	#warning processTrigger(const Trigger::GuidePath& tr) impl. missing 
 }

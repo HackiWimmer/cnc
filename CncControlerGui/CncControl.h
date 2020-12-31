@@ -83,42 +83,38 @@ class CncControl {
 		
 	protected:
 		// internal port object
-		Serial* serialPort;
+		Serial* 				serialPort;
 		// Defines the absolute zero pos as a reference pos 
-		CncLongPosition zeroAppPos;
+		CncLongPosition 		zeroAppPos;
 		// Defines the start postion of an object in relation to zeroPos 
-		CncLongPosition startAppPos;
+		CncLongPosition 		startAppPos;
 		// Defines the current pos
-		CncLongPosition curAppPos;
+		CncLongPosition 		curAppPos;
 		// Stores the lateset requested control positions
-		CncLongPosition curCtlPos;
-		// speed values
+		CncLongPosition 		curCtlPos;
 		// actual rte (measured) speed value
-		float realtimeFeedSpeed_MM_MIN;
-		
+		float 					realtimeFeedSpeed_MM_MIN;
 		// default values for work and rapid
-		float defaultFeedSpeedRapid_MM_MIN;
-		float defaultFeedSpeedWork_MM_MIN;
-
+		float 					defaultFeedSpeedRapid_MM_MIN;
+		float 					defaultFeedSpeedWork_MM_MIN;
 		// actual configured speed type and value
-		CncSpeedMemory	speedMemory_MM_MIN;
-		CncSpeedMode	configuredSpeedMode;
-		float			configuredFeedSpeed_MM_MIN;
-
+		CncSpeedMemory			speedMemory_MM_MIN;
+		CncSpeedMode			configuredSpeedMode;
+		float					configuredFeedSpeed_MM_MIN;
 		// Duration counter
-		unsigned int durationCounter;
+		unsigned int			durationCounter;
 		// Interrupt state
-		bool interruptState;
+		bool					interruptState;
 		// position flf
-		bool positionOutOfRangeFlag;
+		bool					positionOutOfRangeFlag;
 		// power state
-		bool toolPowerState;
+		bool					toolPowerState;
 		// Artificially Step Delay
-		unsigned int stepDelay;
+		unsigned int			stepDelay;
 		// heartbeat value
-		int32_t lastCncHeartbeatValue;
+		int32_t					lastCncHeartbeatValue;
 		
-		Serial* getSerial() { wxASSERT(serialPort); return serialPort; }
+		Serial* getSerial() const { wxASSERT(serialPort); return serialPort; }
 		
 		// Tool state handling
 		CncToolStateControl toolState;
@@ -300,8 +296,9 @@ class CncControl {
 		bool isLastDuration();
 		
 		// Tool management
-		void switchToolOn();
-		void switchToolOff(bool force = false);
+		bool switchTool(bool on);
+		bool switchToolOn();
+		bool switchToolOff(bool force = false);
 		bool getToolState() { return toolPowerState; }
 		// Updates the config trace control
 		void notifyConfigUpdate();
@@ -405,49 +402,44 @@ class CncControl {
 		void setStepDelay(unsigned int d) { stepDelay = d; }
 		unsigned int getStepDelay() { return stepDelay; }
 		
-		void startSerialMeasurement() 									{ getSerial()->startMeasurement(); }
-		void stopSerialMeasurement()  									{ getSerial()->stopMeasurement(); }
-		const CncNanoTimespan getMeasurementNanoTimeSpanTotal()			{ return getSerial()->getMeasurementNanoTimeSpanTotal(); }
-		double getTotalDistanceMetricX()								{ return getSerial()->getTotalDistanceMetricX(); }
-		double getTotalDistanceMetricY()								{ return getSerial()->getTotalDistanceMetricY(); }
-		double getTotalDistanceMetricZ()								{ return getSerial()->getTotalDistanceMetricZ(); }
-		double getTotalDistanceMetric() 								{ return getSerial()->getTotalDistanceMetric();  }
-		size_t getTotalDistanceStepsX()									{ return getSerial()->getTotalDistanceStepsX(); }
-		size_t getTotalDistanceStepsY()									{ return getSerial()->getTotalDistanceStepsY(); }
-		size_t getTotalDistanceStepsZ()									{ return getSerial()->getTotalDistanceStepsZ(); }
-		size_t getTotalDistanceSteps() 									{ return getSerial()->getTotalDistanceSteps();  }
-		double getMeasuredFeedSpeed_MM_MIN() 							{ return getSerial()->getMeasuredFeedSpeed_MM_MIN(); }
-		double getMeasuredFeedSpeed_MM_SEC() 							{ return getSerial()->getMeasuredFeedSpeed_MM_SEC(); }
+		void				startSerialMeasurement() 									{ getSerial()->startMeasurement(); }
+		void				stopSerialMeasurement()  									{ getSerial()->stopMeasurement(); }
+		const				CncNanoTimespan getMeasurementNanoTimeSpanTotal()	const	{ return getSerial()->getMeasurementNanoTimeSpanTotal(); }
+		double				getTotalDistanceMetricX()							const	{ return getSerial()->getTotalDistanceMetricX(); }
+		double				getTotalDistanceMetricY()							const	{ return getSerial()->getTotalDistanceMetricY(); }
+		double				getTotalDistanceMetricZ()							const	{ return getSerial()->getTotalDistanceMetricZ(); }
+		double				getTotalDistanceMetric() 							const	{ return getSerial()->getTotalDistanceMetric();  }
+		size_t				getTotalDistanceStepsX()							const	{ return getSerial()->getTotalDistanceStepsX(); }
+		size_t				getTotalDistanceStepsY()							const	{ return getSerial()->getTotalDistanceStepsY(); }
+		size_t				getTotalDistanceStepsZ()							const	{ return getSerial()->getTotalDistanceStepsZ(); }
+		size_t				getTotalDistanceSteps() 							const	{ return getSerial()->getTotalDistanceSteps();  }
+		double				getMeasuredFeedSpeed_MM_MIN() 								{ return getSerial()->getMeasuredFeedSpeed_MM_MIN(); }
+		double				getMeasuredFeedSpeed_MM_SEC() 								{ return getSerial()->getMeasuredFeedSpeed_MM_SEC(); }
 		
-		void enableSpyOutput(bool show=true) 							{ getSerial()->enableSpyOutput(show); }
-		const char* getPortName() 										{ return getSerial()->getPortName(); }
-		const char* getClassName() 										{ return getSerial()->getClassName(); }
-		const CncPortType getPortType() 								{ return getSerial()->getPortType(); }
-		bool isSpyOutputOn()											{ return getSerial()->isSpyOutputOn(); }
-		bool isCommandActive() 											{ return getSerial()->isCommandActive(); }
-		bool isOutputAsTemplateAvailable()								{ return getSerial()->isOutputAsTemplateAvailable(); }
-		bool isEmulator() 												{ return getSerial()->isEmulator(); }
-		bool canProcessIdle() 											{ return getSerial()->canProcessIdle(); }
-		bool isIdleActive()    											{ return getSerial()->isIdleActive(); }
-		bool serialDataAvailable()										{ return getSerial()->dataAvailable(); }
-		
-		void setSpyMode(Serial::SypMode sm)								{ getSerial()->setSpyMode(sm); }
-		void processTrigger(const Serial::Trigger::BeginRun& tr)		{ getSerial()->processTrigger(tr); }
-		void processTrigger(const Serial::Trigger::EndRun& tr)			{ getSerial()->processTrigger(tr); }
-		void processTrigger(const Serial::Trigger::NextPath& tr)		{ getSerial()->processTrigger(tr); }
-		void processTrigger(const Serial::Trigger::SpeedChange& tr)		{ getSerial()->processTrigger(tr); }
-		void processTrigger(const Serial::Trigger::GuidePath& tr)		{ getSerial()->processTrigger(tr); }
-		
-		void addGuidePath(const CncPathListManager& plm, double zOffset);
-		
-		// 3D control
-		void updatePreview3D();
-		
-		// idle handling
-		void sendIdleMessage();
+		void 				enableSpyOutput(bool show=true) 							{ getSerial()->enableSpyOutput(show); }
+		const char* 		getPortName() 										const	{ return getSerial()->getPortName(); }
+		const char*			getClassName() 										const	{ return getSerial()->getClassName(); }
+		const CncPortType	getPortType() 										const	{ return getSerial()->getPortType(); }
+		bool				isSpyOutputOn()										const	{ return getSerial()->isSpyOutputOn(); }
+		bool				isCommandActive() 									const	{ return getSerial()->isCommandActive(); }
+		bool				isOutputAsTemplateAvailable()						const	{ return getSerial()->isOutputAsTemplateAvailable(); }
+		bool				isEmulator() 										const	{ return getSerial()->isEmulator(); }
+		bool				canProcessIdle() 									const 	{ return getSerial()->canProcessIdle(); }
+		bool				isIdleActive()    									const	{ return getSerial()->isIdleActive(); }
+		bool				serialDataAvailable()								const	{ return getSerial()->dataAvailable(); }
+		void				setSpyMode(Serial::SypMode sm)								{ getSerial()->setSpyMode(sm); }
+		void				addGuidePath(const CncPathListManager& plm, double zOffset);
+		void				updatePreview3D();
+		void 				sendIdleMessage();
 		
 		// for testing only
-		Serial* getSerialExtern() { wxASSERT(serialPort); return serialPort; }
+		Serial* getSerialExtern() const { wxASSERT(serialPort); return serialPort; }
+		
+		void				processTrigger(const Trigger::BeginRun& tr)					{ getSerial()->processTrigger(tr); }
+		void				processTrigger(const Trigger::EndRun& tr)					{ getSerial()->processTrigger(tr); }
+		void				processTrigger(const Trigger::NextPath& tr)					{ getSerial()->processTrigger(tr); }
+		void				processTrigger(const Trigger::SpeedChange& tr)				{ getSerial()->processTrigger(tr); }
+		void				processTrigger(const Trigger::GuidePath& tr)				{ getSerial()->processTrigger(tr); }
 		
 };
 

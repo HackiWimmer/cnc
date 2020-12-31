@@ -13,20 +13,23 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		GCodePathHandlerCnc(CncControl* cnc);
 		virtual ~GCodePathHandlerCnc();
 		
-		virtual const char* getName()						const	{ return "GCodePathHandlerCnc"; }
-		virtual bool isPathListUsed()						const	{ return true; }
-		virtual void initNextClientId(long id);
-		virtual void switchToolState(bool state);
+		virtual void			deligateTrigger(const Trigger::BeginRun& tr)				{ processTrigger(tr); }
+		virtual void			deligateTrigger(const Trigger::EndRun& tr)					{ processTrigger(tr); }
+		virtual void			changePathListRunnerInterface(const wxString& portName)		{ changePathListRunnerInterfaceImpl(portName); }
+								
+		virtual const char*		getName()						const	{ return "GCodePathHandlerCnc"; }
+		virtual bool			isPathListUsed()				const	{ return true; }
+		virtual void			initNextClientId(long id);
+		virtual void			switchToolState(bool state);
 		
 	protected:
 		
-		virtual bool processDwellIntern(int64_t microseconds);
-		virtual bool processLinearMove(bool alreadyRendered);
-		virtual bool changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value = 0.0);
-		virtual bool initNextPath();
-		virtual bool prepareWorkImpl();
-		virtual bool finishWorkImpl();
-		
+		virtual bool			processDwellIntern(int64_t microseconds);
+		virtual bool			processLinearMove(bool alreadyRendered);
+		virtual bool			changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value = 0.0);
+		virtual bool			initNextPath();
+		virtual bool			prepareWorkImpl();
+		virtual bool			finishWorkImpl();
 };
 
 #endif

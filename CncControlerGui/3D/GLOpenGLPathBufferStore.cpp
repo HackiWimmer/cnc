@@ -21,9 +21,11 @@ GLOpenGLPathBuffer::VertexColours::VertexColours()
 , highlight		(wxColour(255, 255,   0, GLOpenGLPathBuffer::defHighlightAlpha))
 /////////////////////////////////////////////////////////////
 {
-	std::cout	<< "VertexColours():"	<< std::endl
-				<< (*this)				<< std::endl
-	;
+	if ( false ) {
+		std::cout	<< "VertexColours():"	<< std::endl
+					<< (*this)				<< std::endl
+		;
+	}
 }
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBuffer::VertexColours::changeLightness(float lightness) {

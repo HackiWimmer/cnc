@@ -336,7 +336,7 @@ class SerialEmulatorNULL  : public wxEvtHandler,
 		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence);
 
 		// returns the class name
-		virtual const char* getClassName() { return "SerialEmulator(dev/null)"; }
+		virtual const char* getClassName() { return "SerialEmulator"; }
 		// returns the emulator type
 		virtual bool isEmulator() const { return true; }
 		// return the port type

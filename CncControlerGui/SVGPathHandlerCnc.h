@@ -32,61 +32,65 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		bool					debugState;
 
 		// 
-		bool			moveZAxisToLogicalTop();
-		bool			moveZAxisToSureface();
-		bool			moveZAxisNextStepDown(double zTarget);
-		bool			moveXYToStartPos(CncSpeedMode m);
-		bool			moveXYToPos(const MoveParameter& mp);
+		bool					moveZAxisToLogicalTop();
+		bool					moveZAxisToSureface();
+		bool					moveZAxisNextStepDown(double zTarget);
+		bool					moveXYToStartPos(CncSpeedMode m);
+		bool					moveXYToPos(const MoveParameter& mp);
 		
-		bool			hasMoreDurations(double zTarget) const;
+		bool					hasMoreDurations(double zTarget) const;
 		
 		// path handling
-		bool			repeatCurrentPath(double zTarget);
-		bool			processHelix(double zTarget);
+		bool					repeatCurrentPath(double zTarget);
+		bool					processHelix(double zTarget);
 		
-		bool			isXYEqual(const CncDoublePosition& p1, const CncDoublePosition& p2) const;
-		void			updateXY (const CncDoublePosition& p1, CncDoublePosition& p2) const;
-		void			updateZ  (const CncDoublePosition& p1, CncDoublePosition& p2) const;
+		bool					isXYEqual(const CncDoublePosition& p1, const CncDoublePosition& p2) const;
+		void					updateXY (const CncDoublePosition& p1, CncDoublePosition& p2) const;
+		void					updateZ  (const CncDoublePosition& p1, CncDoublePosition& p2) const;
 		
-		void			resetGuidePath();
-		void			registerGuidePath(CncPathListManager* gp);
+		void					resetGuidePath();
+		void					registerGuidePath(CncPathListManager* gp);
 		
 	protected:
 	
 		// debug functions
-		virtual void appendDebugValueDetail(const char* key, wxVariant value);
-		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
-		virtual void appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
+		virtual void			appendDebugValueDetail(const char* key, wxVariant value);
+		virtual void			appendDebugValueDetail(const CncPathListEntry& cpe);
+		virtual void			appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
 		
-		virtual bool isInitialized() { return initialized; }
-		virtual bool performModifications();
+		virtual bool			isInitialized() 			const 	{ return initialized; }
+		virtual bool			performModifications();
 		
 	public:
 		
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
-		virtual const char* getName()		const	{ return "SVGPathHandlerCnc"; }
-
-		double getW() 								{ return svgRootNode.getWidth();      }
-		double getH() 								{ return svgRootNode.getHeight();     }
-		const char* getViewBox() 					{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
-		const SVGRootNode& getSvgRootNode()			{ return svgRootNode; }
 		
-		void setDebugState(bool state)				{ debugState = state; }
+		virtual void			deligateTrigger(const Trigger::BeginRun& tr)			{ processTrigger(tr); }
+		virtual void			deligateTrigger(const Trigger::EndRun& tr)				{ processTrigger(tr); }
+		virtual void			changePathListRunnerInterface(const wxString& portName)	{ changePathListRunnerInterfaceImpl(portName); }
 		
-		virtual void initNextClientId(long clientId);
-		virtual bool activateNextPath(long clientId);
+		virtual const char*		getName()					const	{ return "SVGPathHandlerCnc"; }
+			
+		double					getW() 								{ return svgRootNode.getWidth();      }
+		double					getH() 								{ return svgRootNode.getHeight();     }
+		const char*				getViewBox() 						{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
+		const SVGRootNode&		getSvgRootNode()					{ return svgRootNode; }
 		
-		virtual void setSvgRootNode(const SVGRootNode& srn);
-		virtual void logMeasurementStart();
-		virtual void logMeasurementEnd();
+		void					setDebugState(bool state)			{ debugState = state; }
+		
+		virtual void			initNextClientId(long clientId);
+		virtual bool			activateNextPath(long clientId);
+		
+		virtual void			setSvgRootNode(const SVGRootNode& srn);
+		virtual void			logMeasurementStart();
+		virtual void			logMeasurementEnd();
 
 		// path handling
-		virtual bool prepareWork();
-		//virtual bool initNextPath();
-		virtual bool finishCurrentPath();
-		virtual bool runCurrentPath();
-		virtual bool finishWork();
+		virtual bool			prepareWork();
+		virtual bool			finishCurrentPath();
+		virtual bool			runCurrentPath();
+		virtual bool			finishWork();
 };
 
 #endif

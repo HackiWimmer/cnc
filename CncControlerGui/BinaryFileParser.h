@@ -31,6 +31,10 @@ class BinaryFileParser : protected CncBinaryTemplateStreamer
 		BinaryFileParser(const char* fullFileName, BinaryPathHandlerBase* ph = NULL);
 		virtual ~BinaryFileParser();
 		
+		virtual void deligateTrigger(const Trigger::BeginRun& tr)				{ pathHandler->deligateTrigger(tr); }
+		virtual void deligateTrigger(const Trigger::EndRun& tr)					{ pathHandler->deligateTrigger(tr); }
+		virtual void changePathListRunnerInterface(const wxString& portName)	{ pathHandler->changePathListRunnerInterface(portName); }
+		
 		bool preface() { return preprocess(); }
 		
 		const wxString& getSourceContent(wxString& content);

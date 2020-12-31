@@ -65,7 +65,7 @@ bool SerialEmulatorGCodeStreamer::writeEncodedSetterCallback(const SetterInfo& s
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::initializeFile(const Serial::Trigger::BeginRun& tr) {
+void SerialEmulatorGCodeStreamer::initializeFile(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	headerStream << "(<File start>)\n";
 	
@@ -92,14 +92,14 @@ void SerialEmulatorGCodeStreamer::initializeFile(const Serial::Trigger::BeginRun
 		headerStream << "G91\n\n";
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::finalizeFile(const Serial::Trigger::EndRun& tr) {
+void SerialEmulatorGCodeStreamer::finalizeFile(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	footerStream << "(<Spooling end)\n";
 	footerStream << "M2\n";
 	footerStream << "(<File end>)\n";
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::initializePath(const Serial::Trigger::NextPath& tr) {
+void SerialEmulatorGCodeStreamer::initializePath(const Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
 	bodyStream << "\n(<Next Path>)\n";
 }

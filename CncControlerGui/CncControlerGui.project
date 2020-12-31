@@ -467,6 +467,8 @@
       <File Name="HexDecoder.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Inbound - Base">
+      <File Name="CncPathListInterface.cpp"/>
+      <File Name="CncPathListInterface.h"/>
       <File Name="CncPathListManager.h"/>
       <File Name="CncPathListManager.cpp"/>
       <File Name="CncPathListEntry.h"/>

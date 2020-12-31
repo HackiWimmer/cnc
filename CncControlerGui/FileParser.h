@@ -58,6 +58,10 @@ class FileParser {
 		bool isPause() { return runInfo.getPauseFlag(); }
 		bool isProcessing() { return runInfo.isProcessing(); }
 		
+		virtual void deligateTrigger(const Trigger::BeginRun& tr)				= 0;
+		virtual void deligateTrigger(const Trigger::EndRun& tr)					= 0;
+		virtual void changePathListRunnerInterface(const wxString& portName)	= 0;
+		
 		virtual bool processDebug();
 		virtual bool processRelease();
 		
@@ -98,6 +102,7 @@ class FileParser {
 		virtual void selectSourceControl(unsigned long pos);
 
 	protected:
+		
 		wxString fileName;
 		FileParserRunInfo runInfo;
 		bool waitingForUserEvents;

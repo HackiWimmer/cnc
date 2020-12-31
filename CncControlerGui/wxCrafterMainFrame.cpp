@@ -51,7 +51,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_searchConnections->SetToolTip(_("Update COM ports"));
     m_auibarMain->AddControl(m_searchConnections);
     
-    m_portSelector = new wxBitmapComboBox(m_auibarMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(120,-1)), wxArrayString(), wxCB_READONLY);
+    m_portSelector = new wxBitmapComboBox(m_auibarMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(125,-1)), wxArrayString(), wxCB_READONLY);
     m_auibarMain->AddControl(m_portSelector);
     
     m_connect = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);

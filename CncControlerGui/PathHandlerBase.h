@@ -119,6 +119,10 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		PathHandlerBase();
 		virtual ~PathHandlerBase();
 		
+		virtual void deligateTrigger(const Trigger::BeginRun& tr)				{}
+		virtual void deligateTrigger(const Trigger::EndRun& tr)					{}
+		virtual void changePathListRunnerInterface(const wxString& portName)	{}
+		
 		virtual const char* getName() const { return "PathHandlerBase"; }
 		virtual void initNextClientId(long id) {}
 		

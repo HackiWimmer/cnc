@@ -54,7 +54,7 @@ bool CncBinaryTemplateStreamer::fileExists(const char* fullFileName) {
 	return wxFile::Exists(fullFileName);
 }
 //////////////////////////////////////////////////////////////////
-bool CncBinaryTemplateStreamer::initNextSourceTemplateFileName(const ParameterSet& para) {
+bool CncBinaryTemplateStreamer::initNextSourceTemplateFileName(const Trigger::ParameterSet& para) {
 //////////////////////////////////////////////////////////////////
 	// copy the parameters
 	parameter = para;

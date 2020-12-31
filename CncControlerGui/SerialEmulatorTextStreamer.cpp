@@ -247,7 +247,7 @@ bool SerialEmulatorTextStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::BeginRun& tr) {
+void SerialEmulatorTextStreamer::processTrigger(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	headerStream.str("");
 	bodyStream.str("");
@@ -255,7 +255,7 @@ void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::BeginRun&
 	initializeFile(tr);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::EndRun& tr) {
+void SerialEmulatorTextStreamer::processTrigger(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	CncDoublePosition dPos;
 	THE_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
@@ -294,17 +294,17 @@ void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::EndRun& t
 	out.close();
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::NextPath& tr) {
+void SerialEmulatorTextStreamer::processTrigger(const Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
 	initializePath(tr);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::SpeedChange& tr) {
+void SerialEmulatorTextStreamer::processTrigger(const Trigger::SpeedChange& tr) {
 ///////////////////////////////////////////////////////////////////
 	currentSpeedMode = tr.currentSpeedMode;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::initializeFile(const Serial::Trigger::BeginRun& tr) {
+void SerialEmulatorTextStreamer::initializeFile(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	headerStream << "<File>\n";
 	
@@ -313,12 +313,12 @@ void SerialEmulatorTextStreamer::initializeFile(const Serial::Trigger::BeginRun&
 	startPos.set(dPos);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::initializePath(const Serial::Trigger::NextPath& tr) {
+void SerialEmulatorTextStreamer::initializePath(const Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
 	bodyStream << Streamer::indent1 << wxString::Format("<Next Path />\n");
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::finalizeFile(const Serial::Trigger::EndRun& tr) {
+void SerialEmulatorTextStreamer::finalizeFile(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	headerStream << Streamer::indent1 << "<Boundbox unit=\"mm\"\n";
 	headerStream << Streamer::indent2 << wxString::Format("minX=\"%.3lf\" ",  metricBoundbox.minX) 
@@ -344,8 +344,8 @@ void SerialEmulatorTextStreamer::finalizeFile(const Serial::Trigger::EndRun& tr)
 	footerStream << "<File/>\n";
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::GuidePath& tr) {
+void SerialEmulatorTextStreamer::processTrigger(const Trigger::GuidePath& tr) {
 ///////////////////////////////////////////////////////////////////
-	#warning processTrigger(const Serial::Trigger::GuidePath& tr) impl. missing 
+	#warning processTrigger(const Trigger::GuidePath& tr) impl. missing 
 }
 

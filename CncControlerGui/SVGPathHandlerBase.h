@@ -14,23 +14,23 @@ class SVGPathHandlerBase : public PathHandlerBase {
 		SVGPathHandlerBase();
 		virtual ~SVGPathHandlerBase();
 		
-		virtual const char* getName()  							const	{ return "SVGPathHandlerBase"; }
-		SVGTransformMatrix& getSvgTransformMatrix() 					{ return currentSvgTransformMatrix; }
-		virtual bool activateNextPath(long clientId)					{ return true; }
-		virtual void setSvgRootNode(const SVGRootNode& srn);
+		virtual const char*		getName()  								const	{ return "SVGPathHandlerBase"; }
+		SVGTransformMatrix&		getSvgTransformMatrix() 						{ return currentSvgTransformMatrix; }
+		virtual bool			activateNextPath(long clientId)					{ return true; }
+		virtual void			setSvgRootNode(const SVGRootNode& srn);
 		
-		SvgCncContext& getSvgCncContext();
-		void setSvgCncContext(const SvgCncContext& cwp);
+		SvgCncContext&			getSvgCncContext();
+		void					setSvgCncContext(const SvgCncContext& cwp);
 		
 	protected:
 		
-		SVGRootNode			svgRootNode;
-		SVGTransformMatrix 	currentSvgTransformMatrix;
-		SvgCncContext		currentCncContext;
+		SVGRootNode				svgRootNode;
+		SVGTransformMatrix 		currentSvgTransformMatrix;
+		SvgCncContext			currentCncContext;
 		
-		virtual void transform(double& xAbs, double& yAbs)  { currentSvgTransformMatrix.transform(xAbs, yAbs); }
-		virtual bool callback(const CncCurveLib::Point& p);
-		virtual bool processLinearMove(bool alreadyRendered);
+		virtual void 			transform(double& xAbs, double& yAbs)			{ currentSvgTransformMatrix.transform(xAbs, yAbs); }
+		virtual bool 			callback(const CncCurveLib::Point& p);
+		virtual bool 			processLinearMove(bool alreadyRendered);
 		
 	private:
 		
@@ -43,7 +43,7 @@ class SVGPathHandlerBase : public PathHandlerBase {
 			double absZ = 0.0;
 		};
 		
-		inline bool processLinearMove(const LinearMoveParam& p);
+		inline bool 			processLinearMove(const LinearMoveParam& p);
 };
 
 #endif
