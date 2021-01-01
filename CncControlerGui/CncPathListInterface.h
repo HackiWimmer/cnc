@@ -62,6 +62,7 @@ class CncPathListFileStore : public CncPathListMonitor {
 		std::stringstream	headerStream;
 		std::stringstream	bodyStream;
 		std::stringstream	footerStream;
+		const char			delimiter;
 		
 		virtual void notifyNextPostion();
 		

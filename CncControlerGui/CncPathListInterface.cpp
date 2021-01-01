@@ -2,7 +2,7 @@
 #include "CncConfig.h"
 #include "CncFileNameService.h"
 #include "CncMotionMonitor.h"
-#include "CncPathListIntrface.h"
+#include "CncPathListInterface.h"
 
 ////////////////////////////////////////////////////////////////////
 CncPathListMonitor::CncPathListMonitor()
@@ -78,44 +78,68 @@ CncPathListFileStore::CncPathListFileStore()
 , headerStream		()
 , bodyStream		()
 , footerStream		()
+, delimiter			(';')
 ////////////////////////////////////////////////////////////////////
 {
-	headerStream << "" << std::endl;
+	headerStream << wxString::Format(	"%s%c" 
+										"%s%c"
+										
+										"%s%c"
+										"%s%c"
+										
+										"%s%c"
+										"%s%c"
+										"%s%c"
+										
+										,
+										
+										"ClientId",		delimiter,
+										"ToolState",	delimiter,
+										
+										"F-Mode",		delimiter,
+										"F-Value",		delimiter,
+										
+										"PosX",			delimiter,
+										"PosY",			delimiter,
+										"PosZ",			delimiter
+									)
+				 << std::endl
+	;
+	
 	footerStream << std::endl;
 }
 ////////////////////////////////////////////////////////////////////
 CncPathListFileStore::~CncPathListFileStore() {
 ////////////////////////////////////////////////////////////////////
-
 }
 ////////////////////////////////////////////////////////////////////
 void CncPathListFileStore::notifyNextPostion() {
 ////////////////////////////////////////////////////////////////////
+	wxString tmp;
 	
-	auto cnv = [&](CncSpeedMode sm) { return cnc::getCncSpeedTypeAsCharacter(sm); };
-	
-	const char delimiter = ';';
+	auto cnv1 = [&](CncSpeedMode sm)	{ return cnc::getCncSpeedTypeAsCharacter(sm); };
+	auto cnv2 = [&](double v)			{ tmp.assign(wxString::Format("%lf", v)); tmp.Replace(".",","); return tmp; };
 	
 	bodyStream	<< wxString::Format	(	"%ld%c" 
 										"%d%c" 
 										
 										"%c%c" 
-										"%lf%c"
+										"%s%c"
 										
-										"%lf%c"
-										"%lf%c"
-										"%lf%c"
+										"%s%c"
+										"%s%c"
+										"%s%c"
 										,
 										
 										current.clientId,					delimiter,
 										current.toolState,					delimiter,
 										
-										cnv(current.speedMode),				delimiter,
-										current.speedValue_MM_MIN,			delimiter,
+										cnv1(current.speedMode),			delimiter,
+										cnv2(current.speedValue_MM_MIN),	delimiter,
 										
-										current.monitorPos.getX(),			delimiter,
-										current.monitorPos.getY(),			delimiter,
-										current.monitorPos.getZ(),			delimiter
+										cnv2(current.monitorPos.getX()),	delimiter,
+										cnv2(current.monitorPos.getY()),	delimiter,
+										cnv2(current.monitorPos.getZ()),	delimiter
 									)
 				<< std::endl;
 	;
@@ -123,7 +147,6 @@ void CncPathListFileStore::notifyNextPostion() {
 ////////////////////////////////////////////////////////////////////
 bool CncPathListFileStore::save(const wxString& fileName) {
 ////////////////////////////////////////////////////////////////////
-	
 	wxFileName fn(fileName);
 	
 	if ( fn.DirExists() == false ) {
@@ -160,8 +183,6 @@ void CncPathListFileStore::processTrigger(const Trigger::BeginRun& tr) {
 ////////////////////////////////////////////////////////////////////
 void CncPathListFileStore::processTrigger(const Trigger::EndRun& tr) {
 ////////////////////////////////////////////////////////////////////
-	CNC_LOG_FUNCT_A("CncFileNameService::getCncPathListFileStoreDefFileName()\n");
-	
 	save(CncFileNameService::getCncPathListFileStoreDefFileName());
 }
 

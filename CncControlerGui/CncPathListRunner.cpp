@@ -8,7 +8,7 @@
 #include "CncAutoFreezer.h"
 #include "CncPreprocessor.h"
 #include "CncMoveSequence.h"
-#include "CncPathListMonitor.h"
+#include "CncPathListInterface.h"
 #include "CncPathListRunner.h"
 
 ////////////////////////////////////////////////////////////////////
