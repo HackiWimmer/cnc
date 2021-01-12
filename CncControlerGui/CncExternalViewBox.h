@@ -26,6 +26,11 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 		bool setupSwapButton(unsigned int idx, wxButton* btn);
 		bool selectView(unsigned int idx);
 		
+		void bringViewOnTop();
+		
+		bool isViewAttached(unsigned int idx) const;
+		bool isViewDetached(unsigned int idx) const;
+		
 		void setStatusTextLeft(const wxString& text) 	{ m_statusTextLeft-> ChangeValue(text); }
 		void setStatusTextMid(const wxString& text)		{ m_statusTextMid->  ChangeValue(text); }
 		void setStatusTextRight(const wxString& text)	{ m_statusTextRight->ChangeValue(text); }
@@ -60,7 +65,7 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 
 class CncExternalViewBoxCluster {
 	
-public:
+	public:
 		
 		enum Node { EVB_Config, EVB_Source, EVB_Reference, EVB_Manually, EVB_Test, EVB_Monitor, EVB_SetterList, EVB_CtrlMsg, EVB_ENUM_COUNT };
 		typedef std::map<Node, CncExternalViewBox*> Cluster;
@@ -73,6 +78,11 @@ public:
 		bool					setupView1(Node n, wxWindow* wnd, const wxString& title);
 		bool 					hideNode(Node n);
 		bool 					hideAll();
+		
+		bool isViewAttached(Node n)	const	{ return getNode(n)->isViewAttached(CncExternalViewBox::Default::VIEW1); }
+		bool isViewDetached(Node n)	const	{ return getNode(n)->isViewDetached(CncExternalViewBox::Default::VIEW1); }
+		
+		void bringViewOnTop(Node n)			{ getNode(n)->bringViewOnTop(); }
 		
 	private:
 		Cluster cluster;

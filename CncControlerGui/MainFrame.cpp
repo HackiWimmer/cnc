@@ -4141,8 +4141,7 @@ bool MainFrame::processTemplateIntern() {
 		selectMonitorBookCncPanel();
 		
 		// select draw pane
-		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
-		m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
+		selectMonitorBookCncPanel();
 	}
 	
 	// select template Page
@@ -5068,8 +5067,13 @@ void MainFrame::selectMainBookTestPanel() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookCncPanel() {
 ///////////////////////////////////////////////////////////////////
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+	if ( cncExtViewBoxCluster->isViewDetached(CncExternalViewBoxCluster::Node::EVB_Monitor) == true ) {
+		cncExtViewBoxCluster->bringViewOnTop(CncExternalViewBoxCluster::Node::EVB_Monitor);
+	}
+	else {
+		m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookTemplatePanel() {

@@ -102,24 +102,24 @@
     const unsigned char PIN_IR_2                            =   3;
 
     const unsigned char PIN_X_STP                           =   4;
-    const unsigned char PIN_Y_STP                           =   5;
-    const unsigned char PIN_Z_STP                           =   6;
-    const unsigned char PIN_X_DIR                           =   7;
-    const unsigned char PIN_Y_DIR                           =   8;
+    const unsigned char PIN_X_DIR                           =   5;
+    const unsigned char PIN_Y_STP                           =   6;
+    const unsigned char PIN_Y_DIR                           =   7;
+    const unsigned char PIN_Z_STP                           =   8;
     const unsigned char PIN_Z_DIR                           =   9;
-    
+
     const unsigned char PIN_ENABLE_STEPPER                  =  10;
     const unsigned char PIN_ENABLE_TOOL                     =  11;
 
     // PINA
+    //const unsigned char PIN_                              =  29;
+    //const unsigned char PIN_                              =  28;
+    //const unsigned char PIN_                              =  27;
+    //const unsigned char PIN_                              =  26;
+    //const unsigned char PIN_                              =  25;
+    //const unsigned char PIN_                              =  24;
+    //const unsigned char PIN_                              =  23;
     const unsigned char PIN_IS_TOOL_POWERED                 =  22;
-    //const unsigned char PIN_                     =  23;
-    //const unsigned char PIN_                     =  24;
-    //const unsigned char PIN_                     =  25;
-    //const unsigned char PIN_                     =  26;
-    //const unsigned char PIN_                     =  27;
-    //const unsigned char PIN_                     =  28;
-    //const unsigned char PIN_                     =  29;
     
     // PINC
     const unsigned char PIN_X_MIN_LIMIT                     =  37;
@@ -129,6 +129,17 @@
     const unsigned char PIN_Z_MIN_LIMIT                     =  33;
     const unsigned char PIN_Z_MAX_LIMIT                     =  32;
     const unsigned char PIN_EXTERNAL_INTERRUPT              =  31;
+    //const unsigned char PIN_                              =  30;
+
+    // PIN
+    //const unsigned char PIN_                              =  45;
+    //const unsigned char PIN_                              =  44;
+    //const unsigned char PIN_                              =  43;
+    //const unsigned char PIN_                              =  42;
+    //const unsigned char PIN_                              =  41;
+    //const unsigned char PIN_                              =  40;
+    const unsigned char PIN_H_MIN_LIMIT                     =  39;
+    const unsigned char PIN_H_MAX_LIMIT                     =  38;
 
     #define PIN_INTERRUPT                                AE::PN_A0   
     const unsigned char PIN_INTERRUPT_ID                    =   0;
@@ -160,7 +171,7 @@
       #define READ_ENABLE_STEPPER_PIN                       ( PINB & B00010000 ) // 10
       #define READ_ENABLE_TOOL_PIN                          ( PINB & B00100000 ) // 11
       #define READ_IS_TOOL_POWERED_PIN                      ( PINA & B00000001 ) // 22
-      
+/*      
       #define WRITE_DIR_PIN_X(value)                        if ( value ) { PORTH |=  (1 << PH4); } else { PORTH &= ~(1 << PH4); }
       #define WRITE_DIR_PIN_Y(value)                        if ( value ) { PORTH |=  (1 << PH5); } else { PORTH &= ~(1 << PH5); }
       #define WRITE_DIR_PIN_Z(value)                        if ( value ) { PORTH |=  (1 << PH6); } else { PORTH &= ~(1 << PH6); }
@@ -168,6 +179,15 @@
       #define WRITE_STP_PIN_X(value)                        if ( value ) { PORTG |=  (1 << PG5); } else { PORTG &= ~(1 << PG5); }
       #define WRITE_STP_PIN_Y(value)                        if ( value ) { PORTE |=  (1 << PE3); } else { PORTE &= ~(1 << PE3); }
       #define WRITE_STP_PIN_Z(value)                        if ( value ) { PORTH |=  (1 << PH3); } else { PORTH &= ~(1 << PH3); }
+*/
+      #define WRITE_STP_PIN_X(value)                        if ( value ) { PORTG |=  (1 << PG5); } else { PORTG &= ~(1 << PG5); }
+      #define WRITE_DIR_PIN_X(value)                        if ( value ) { PORTE |=  (1 << PE3); } else { PORTE &= ~(1 << PE3); }
+      
+      #define WRITE_STP_PIN_Y(value)                        if ( value ) { PORTH |=  (1 << PH3); } else { PORTH &= ~(1 << PH3); }
+      #define WRITE_DIR_PIN_Y(value)                        if ( value ) { PORTH |=  (1 << PH4); } else { PORTH &= ~(1 << PH4); }
+
+      #define WRITE_STP_PIN_Z(value)                        if ( value ) { PORTH |=  (1 << PH5); } else { PORTH &= ~(1 << PH5); }
+      #define WRITE_DIR_PIN_Z(value)                        if ( value ) { PORTH |=  (1 << PH6); } else { PORTH &= ~(1 << PH6); }
       
     #else
     

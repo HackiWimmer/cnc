@@ -90,7 +90,6 @@ bool CncExternalViewBoxCluster::hideAll() {
 
 
 
-
 //////////////////////////////////////////////////////////////////
 CncExternalViewBox::CncExternalViewBox(wxWindow* parent, long style)
 : CncExternalViewBoxBase(parent, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(500, 300), wxSTAY_ON_TOP | style)
@@ -123,6 +122,22 @@ CncExternalViewBox::~CncExternalViewBox() {
 				swapControls(i);
 		}
 	}
+}
+//////////////////////////////////////////////////////////////////
+bool CncExternalViewBox::isViewAttached(unsigned int idx) const {
+//////////////////////////////////////////////////////////////////
+	if ( idx > MAX_VIEWS - 1 )
+		return false;
+		
+	return swapState[idx] == SS_DEFAULT;
+}
+//////////////////////////////////////////////////////////////////
+bool CncExternalViewBox::isViewDetached(unsigned int idx) const {
+//////////////////////////////////////////////////////////////////
+	if ( idx > MAX_VIEWS - 1 )
+		return false;
+		
+	return swapState[idx] == SS_SWAPED;
 }
 //////////////////////////////////////////////////////////////////
 const CncExternalViewBox::SwapState CncExternalViewBox::getSwapState(unsigned int idx) const {
@@ -301,4 +316,9 @@ void CncExternalViewBox::onAttachPage4(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 	swapControls();
 	Show(false);
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::bringViewOnTop() {
+//////////////////////////////////////////////////////////////////
+	Raise();
 }
