@@ -6135,7 +6135,7 @@ Trace</label>
 Source</label>
                                       <bitmap>bitmaps/view-process-all.png</bitmap>
                                       <selected>0</selected>
-                                      <object class="wxPanel" name="m_panel7697">
+                                      <object class="wxPanel" name="m_panelOutboundSource">
                                         <style>wxTAB_TRAVERSAL</style>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
@@ -6227,10 +6227,11 @@ Source</label>
                                                 <object class="wxSimplebook" name="m_simpleBookOutBoundEditor">
                                                   <style/>
                                                   <effect>wxSHOW_EFFECT_NONE</effect>
+                                                  <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                                   <object class="simplebookpage">
                                                     <label>Page</label>
                                                     <selected>0</selected>
-                                                    <object class="wxPanel" name="m_panel6208">
+                                                    <object class="wxPanel" name="m_panelSourceView">
                                                       <style>wxTAB_TRAVERSAL</style>
                                                       <object class="wxFlexGridSizer">
                                                         <cols>1</cols>
@@ -6252,7 +6253,7 @@ Source</label>
                                                   <object class="simplebookpage">
                                                     <label>Page</label>
                                                     <selected>0</selected>
-                                                    <object class="wxPanel" name="m_panel6210">
+                                                    <object class="wxPanel" name="m_panelDefaultSvgView">
                                                       <style>wxTAB_TRAVERSAL</style>
                                                       <object class="wxFlexGridSizer">
                                                         <cols>1</cols>
@@ -6263,24 +6264,9 @@ Source</label>
                                                         <growablerows>0</growablerows>
                                                         <object class="sizeritem">
                                                           <flag>wxALL|wxEXPAND</flag>
-                                                          <object class="wxScrolledWindow" name="m_scrollWin7361">
-                                                            <style>wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
-                                                            <scrollrate>5,5</scrollrate>
-                                                            <object class="wxFlexGridSizer">
-                                                              <cols>1</cols>
-                                                              <rows>1</rows>
-                                                              <vgap>0</vgap>
-                                                              <hgap>0</hgap>
-                                                              <growablecols>0</growablecols>
-                                                              <growablerows>0</growablerows>
-                                                              <object class="sizeritem">
-                                                                <flag>wxALL|wxEXPAND</flag>
-                                                                <object class="wxPanel" name="m_outboundEditorSvgViewPlaceholder">
-                                                                  <style>wxTAB_TRAVERSAL</style>
-                                                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                                                </object>
-                                                              </object>
-                                                            </object>
+                                                          <object class="wxPanel" name="m_outboundEditorSvgViewPlaceholder">
+                                                            <style>wxTAB_TRAVERSAL</style>
+                                                            <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                                           </object>
                                                         </object>
                                                       </object>
@@ -6359,9 +6345,8 @@ Source</label>
 Preview</label>
                                       <bitmap>bitmaps/view-process-system.png</bitmap>
                                       <selected>0</selected>
-                                      <object class="wxPanel" name="m_panel7699">
+                                      <object class="wxPanel" name="m_panelOutboundPreview">
                                         <style>wxTAB_TRAVERSAL</style>
-                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
                                           <rows>1</rows>

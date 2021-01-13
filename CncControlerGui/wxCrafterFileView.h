@@ -18,7 +18,7 @@
 #include <wx/panel.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
-#include <wx/scrolwin.h>
+#include <wx/stattext.h>
 #include <wx/button.h>
 #include <wx/statline.h>
 #include <wx/bmpbuttn.h>
@@ -65,7 +65,8 @@ class CncFilePreviewBase : public wxPanel
 protected:
     wxSimplebook* m_previewBook;
     wxPanel* m_panel3764;
-    wxScrolledWindow* m_scrollWin7365;
+    wxPanel* m_panel52;
+    wxStaticText* m_staticText47;
     wxPanel* m_svgPreviewPlaceholder;
     wxPanel* m_panel3766;
     wxPanel* m_gcodePreviewPlaceholder;
@@ -93,8 +94,9 @@ protected:
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText47() { return m_staticText47; }
+    wxPanel* GetPanel52() { return m_panel52; }
     wxPanel* GetSvgPreviewPlaceholder() { return m_svgPreviewPlaceholder; }
-    wxScrolledWindow* GetScrollWin7365() { return m_scrollWin7365; }
     wxPanel* GetPanel3764() { return m_panel3764; }
     wxPanel* GetGcodePreviewPlaceholder() { return m_gcodePreviewPlaceholder; }
     wxButton* Get3D_Top() { return m_3D_Top; }

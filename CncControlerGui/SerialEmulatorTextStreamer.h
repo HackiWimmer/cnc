@@ -84,8 +84,8 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		virtual bool isOutputAsTemplateAvailable();
 		
 		// returns the class name
-		virtual const char* getClassName() { return "SerialEmulatorTextStreamer"; }
-		virtual const char* getPortName()  { return fileName; }
+		virtual const char* getClassName()			{ return "SerialEmulatorTextStreamer"; }
+		virtual const char* getPortName()	const	{ return fileName; }
 		
 		//Open file
 		virtual bool connect(const char* fileName);

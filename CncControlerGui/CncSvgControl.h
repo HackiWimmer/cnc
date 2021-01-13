@@ -7,6 +7,8 @@
 
 	#ifdef WX_SVG_SUPPORT
 		#include <wxSVG/svgctrl.h>
+		#include <wxSVG/SVGDocument.h>
+		#include <wxSVG/SVGCanvas.h>
 		#define SVG_VIEWER_CLASS_PARENT 		wxSVGCtrl
 	#else
 		#ifdef WX_WEBVIEW_SUPPORT
@@ -22,7 +24,8 @@ class CncSvgViewer : public SVG_VIEWER_CLASS_PARENT {
 	
 	public:
 		CncSvgViewer(wxWindow* parent) 
-		: SVG_VIEWER_CLASS_PARENT(parent)
+		: SVG_VIEWER_CLASS_PARENT	(parent)
+		, canSize					(true)
 		{ 
 			init();
 		}
@@ -30,13 +33,26 @@ class CncSvgViewer : public SVG_VIEWER_CLASS_PARENT {
 		~CncSvgViewer() {
 		}
 		
+		void setContentSizable(bool state) { canSize = state; }
+		
 		void clear();
 		bool loadFile(const wxString& filename);
 		
 	protected:
+		
 		void OnMouse(wxMouseEvent& event);
 		
+	#ifdef WX_SVG_SUPPORT
+		virtual void Init();
+		virtual void OnPaint(wxPaintEvent& event);
+		virtual void OnResize(wxSizeEvent& event);
+		virtual void OnEraseBackground(wxEraseEvent &event);
+		virtual void RepaintBuffer();
+	#endif
+	
 	private:
+		
+		bool canSize;
 		void init();
 		
 	wxDECLARE_EVENT_TABLE();

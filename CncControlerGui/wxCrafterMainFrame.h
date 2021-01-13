@@ -448,20 +448,19 @@ protected:
     wxPanel* m_motionVertexPlaceholder;
     wxPanel* m_cncPostProcessor;
     wxListbook* m_listbookPostProcessor;
-    wxPanel* m_panel7697;
+    wxPanel* m_panelOutboundSource;
     wxStaticText* m_staticText6138;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate2;
     wxBitmapToggleButton* m_btToggleOutboundEditorWordWrap;
     wxSimplebook* m_simpleBookOutBoundEditor;
-    wxPanel* m_panel6208;
+    wxPanel* m_panelSourceView;
     wxStyledTextCtrl* m_outboundFileSource;
-    wxPanel* m_panel6210;
-    wxScrolledWindow* m_scrollWin7361;
+    wxPanel* m_panelDefaultSvgView;
     wxPanel* m_outboundEditorSvgViewPlaceholder;
     wxStaticText* m_outboundPosition;
     wxTextCtrl* m_outboundEditStatus;
     wxStaticText* m_outboundEditMode;
-    wxPanel* m_panel7699;
+    wxPanel* m_panelOutboundPreview;
     wxPanel* m_outboundPreviewPlaceholder;
     wxPanel* m_monitorTemplatePanel;
     wxPanel* m_monitorTemplatePreviewPlaceHolder;
@@ -1323,17 +1322,16 @@ public:
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate2() { return m_btSaveOutboundAsTemplate2; }
     wxBitmapToggleButton* GetBtToggleOutboundEditorWordWrap() { return m_btToggleOutboundEditorWordWrap; }
     wxStyledTextCtrl* GetOutboundFileSource() { return m_outboundFileSource; }
-    wxPanel* GetPanel6208() { return m_panel6208; }
+    wxPanel* GetPanelSourceView() { return m_panelSourceView; }
     wxPanel* GetOutboundEditorSvgViewPlaceholder() { return m_outboundEditorSvgViewPlaceholder; }
-    wxScrolledWindow* GetScrollWin7361() { return m_scrollWin7361; }
-    wxPanel* GetPanel6210() { return m_panel6210; }
+    wxPanel* GetPanelDefaultSvgView() { return m_panelDefaultSvgView; }
     wxSimplebook* GetSimpleBookOutBoundEditor() { return m_simpleBookOutBoundEditor; }
     wxStaticText* GetOutboundPosition() { return m_outboundPosition; }
     wxTextCtrl* GetOutboundEditStatus() { return m_outboundEditStatus; }
     wxStaticText* GetOutboundEditMode() { return m_outboundEditMode; }
-    wxPanel* GetPanel7697() { return m_panel7697; }
+    wxPanel* GetPanelOutboundSource() { return m_panelOutboundSource; }
     wxPanel* GetOutboundPreviewPlaceholder() { return m_outboundPreviewPlaceholder; }
-    wxPanel* GetPanel7699() { return m_panel7699; }
+    wxPanel* GetPanelOutboundPreview() { return m_panelOutboundPreview; }
     wxListbook* GetListbookPostProcessor() { return m_listbookPostProcessor; }
     wxPanel* GetCncPostProcessor() { return m_cncPostProcessor; }
     wxNotebook* GetOutboundNotebook() { return m_outboundNotebook; }

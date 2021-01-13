@@ -29,6 +29,7 @@ class CncFilePreview : public CncFilePreviewBase
 		
 		bool loadFile();
 		
+		bool selectEmptyPreviewIntern();
 		bool selectSVGPreview();
 		bool selectGCodePreview();
 		bool selectBinaryPreview(const wxString& fileName);

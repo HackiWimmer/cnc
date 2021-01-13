@@ -19,6 +19,7 @@ CncFilePreview::CncFilePreview(wxWindow* parent, wxString name)
 	GblFunc::replaceControl(m_gcodePreviewPlaceholder, gcodePreview);
 	
 	svgPreview = new CncSvgViewer(this);
+	svgPreview->SetBackgroundColour(*wxBLACK);
 	GblFunc::replaceControl(m_svgPreviewPlaceholder, svgPreview);
 }
 ///////////////////////////////////////////////////////////////////
@@ -28,17 +29,15 @@ CncFilePreview::~CncFilePreview() {
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectEmptyPreview() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( m_previewBook->GetPageCount() > 0 );
-	m_previewBook->SetSelection(0);
+	return selectPreview("Only_the_extention_is_relevant_here_to_get_an_empty_preview.txt");
+}
+///////////////////////////////////////////////////////////////////
+bool CncFilePreview::selectEmptyPreviewIntern() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( m_previewBook->GetPageCount() > SVG_TAB_PAGE );
+	m_previewBook->SetSelection(SVG_TAB_PAGE);
 	
-	lastFileName.clear();
-	
-	wxString fileName(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
-	if ( wxFileName::Exists(fileName) == false )
-		fileName.assign("about:blank");
-	
-	svgPreview->loadFile(fileName);
-	svgPreview->Update();
+	svgPreview->setContentSizable(false);
 	
 	return true;
 }
@@ -60,6 +59,8 @@ bool CncFilePreview::selectSVGPreview() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( m_previewBook->GetPageCount() > SVG_TAB_PAGE );
 	m_previewBook->SetSelection(SVG_TAB_PAGE);
+	
+	svgPreview->setContentSizable(true);
 	
 	return true;
 }
@@ -104,9 +105,8 @@ bool CncFilePreview::loadFile() {
 		
 	} else if ( m_previewBook->GetSelection() == (int)SVG_TAB_PAGE ) {
 		
-		svgPreview->loadFile(lastFileName);
+		ret = svgPreview->loadFile(lastFileName);
 		svgPreview->Update();
-		ret = true;
 	}
 	
 	return ret;
@@ -114,7 +114,8 @@ bool CncFilePreview::loadFile() {
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectPreview(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
-	CncTemplateFormat tf = cnc::getTemplateFormatFromFileName(fileName);
+	const CncTemplateFormat tf = cnc::getTemplateFormatFromFileName(fileName);
+	wxString fn(fileName);
 	
 	switch ( tf ) {
 		case TplSvg:		selectSVGPreview();
@@ -125,9 +126,10 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 							
 		case TplBinary:		// with respect to the recursive character of selectBinaryPreview
 							// directly return here 
-							return selectBinaryPreview(fileName);
+							return selectBinaryPreview(fn);
 							
-		case TplText:		selectEmptyPreview();
+		case TplText:		selectEmptyPreviewIntern();
+							fn.assign(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
 							break;
 							
 		default:			std::cerr << "CncFilePreview::selectPreview(): No preview registered for: " 
@@ -135,7 +137,7 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 									  << std::endl;
 	}
 	
-	lastFileName.assign(fileName);
+	lastFileName.assign(fn);
 	return loadFile();
 }
 ///////////////////////////////////////////////////////////////////

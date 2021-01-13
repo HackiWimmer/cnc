@@ -407,7 +407,7 @@ bool CncControl::connect(const char * portName) {
 									   << " - " 
 									   << CncFileNameService::getSession()
 									   << std::endl;
-									   
+									  
 	bool ret = serialPort->connect(portName);
 	if ( ret == true ) {
 		

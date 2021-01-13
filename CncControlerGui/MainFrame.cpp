@@ -786,7 +786,9 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_serialSpyPlaceholder, serialSpyPanel);
 	
 	// Outbound editor svg viewer
-	outboundEditorSvgView = new CncSvgViewer(this); 
+	outboundEditorSvgView = new CncSvgViewer(this);
+	outboundEditorSvgView->SetBackgroundColour(*wxBLACK);
+	outboundEditorSvgView->setContentSizable(false);
 	GblFunc::replaceControl(m_outboundEditorSvgViewPlaceholder, outboundEditorSvgView);
 	
 	// GCode Sequence control
@@ -2333,6 +2335,7 @@ bool MainFrame::connectSerialPort() {
 	
 	wxString serialFileName;
 	createCncControl(sel, serialFileName);
+	
 	if ( cnc == NULL )
 		return false;
 		
@@ -2414,7 +2417,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	} setup;
 	
 	
-	#warning
+	#warning Add a description here
 	m_portSelector->SetToolTip("Add a description here");
 	
 	if ( sel == _portEmulatorNULL ) {
@@ -4131,7 +4134,6 @@ bool MainFrame::processTemplateIntern() {
 		
 		const Trigger::BeginRun begRun(ps);
 		inboundFileParser->deligateTrigger(begRun);
-		std::cerr << CNC_LOG_FUNCT_A("\n");
 	}
 	
 	clearPositionSpy();

@@ -22,8 +22,8 @@ class SerialEmulatorBinaryStreamer : public SerialEmulatorNULL
 		virtual ~SerialEmulatorBinaryStreamer();
 		
 		// returns the class name
-		virtual const char* getClassName() { return "SerialEmulatorBinaryStreamer"; }
-		virtual const char* getPortName()  { return getOutboundFileName(); }
+		virtual const char* getClassName()	const	{ return "SerialEmulatorBinaryStreamer"; }
+		virtual const char* getPortName()	const	{ return getOutboundFileName(); }
 		
 		//Open file
 		virtual bool connect(const char* fileName);

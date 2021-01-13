@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="24" height="24" viewBox="0 0 24 24" version="1.1" id="svg4" sodipodi:docname="ArdoPowerSwitch.svg" inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
+  <metadata id="metadata10">
+    <rdf:RDF>
+      <cc:Work rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs id="defs8" />
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="2560" inkscape:window-height="1387" id="namedview6" showgrid="false" inkscape:zoom="11.711595" inkscape:cx="70.770392" inkscape:cy="23.313827" inkscape:window-x="4152" inkscape:window-y="-8" inkscape:window-maximized="1" inkscape:current-layer="svg4" />
+  <path d="M 37.333333,-8 H 26.666667 V -40 H 37.333333 Z M 48.568,-35.322667 l -3.234667,4.264 C 53.290667,-26.44 58.666667,-17.845333 58.666667,-8 58.666667,6.704 46.704,18.666667 32,18.666667 17.296,18.666667 5.3333333,6.704 5.3333333,-8 c 0,-9.845333 5.3759997,-18.44 13.3333337,-23.058667 l -3.234667,-4.264 C 6.192,-29.714667 0,-19.597333 0,-8 0,9.672 14.328,24 32,24 49.672,24 64,9.672 64,-8 64,-19.597333 57.808,-29.714667 48.568,-35.322667 Z" id="path2" style="stroke-width:2.66665;fill:#ceb900;fill-opacity:1" inkscape:export-xdpi="91" inkscape:export-ydpi="91" />
+  <circle style="fill:#ceb900;fill-opacity:1;stroke:#d08700;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:round;paint-order:stroke fill markers" id="path835" cx="32" cy="-8" r="16.071878" inkscape:export-xdpi="91" inkscape:export-ydpi="91" />
+  <text xml:space="preserve" style="font-size:26.6667px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';letter-spacing:0px;word-spacing:0px" x="24.669262" y="1.4205848" id="text839" inkscape:export-xdpi="91" inkscape:export-ydpi="91"><tspan sodipodi:role="line" id="tspan837" x="24.669262" y="1.4205848">0</tspan></text>
+  <path d="M 107.33633,26.634448 99.461893,19.439242 121.0475,-4.1840791 128.92195,3.011127 Z m 26.72427,-12.592028 -5.2642,0.965861 c 2.7588,8.777251 0.92998,18.748465 -5.71115,26.016582 C 113.16666,51.879778 96.266055,52.641545 85.411142,42.722956 74.556185,32.804355 73.794422,15.903748 83.713012,5.0488326 90.354186,-2.2192752 100.12044,-4.937723 109.11029,-2.9797335 l 0.48837,-5.3297528 C 98.994543,-10.402345 87.598779,-7.1102541 79.775792,1.4512305 67.855137,14.497209 68.767519,34.73951 81.813502,46.660168 94.859479,58.580823 115.10178,57.66844 127.02243,44.622461 134.84542,36.060977 137.09896,24.415254 134.0606,14.04242 Z" id="path2-9" style="fill:#cef400;fill-opacity:1;stroke-width:2.66665" inkscape:export-xdpi="91" inkscape:export-ydpi="91" />
+  <circle style="fill:#cef400;fill-opacity:1;stroke:#d08700;stroke-width:0.1;stroke-linecap:square;stroke-linejoin:round;paint-order:stroke fill markers" id="path835-9" cx="91.871704" cy="-52.741459" r="16.071878" transform="rotate(42.41925)" />
+  <text xml:space="preserve" style="font-size:26.6667px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial, Normal';letter-spacing:0px;word-spacing:0px" x="96.040558" y="32.620182" id="text839-1"><tspan sodipodi:role="line" id="tspan837-2" x="96.040558" y="32.620182">1</tspan></text>
+</svg>

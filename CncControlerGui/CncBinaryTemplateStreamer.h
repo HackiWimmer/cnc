@@ -43,9 +43,9 @@ class CncBinaryTemplateStreamer {
 		bool					initNextSourceTemplateFileName(const Trigger::ParameterSet& para);
 		bool					appendDataBlock(unsigned char* buffer, uint32_t nbByte);
 		bool					finalize();
-		bool					isReadyToStream() { return readyToStream; }
+		bool					isReadyToStream()		const	{ return readyToStream; }
 		
-		const char*				getOutboundFileName() { return parameter.fullFileName.c_str(); }
+		const char*				getOutboundFileName()	const	{ return parameter.fullFileName.c_str(); }
 		
 		static bool				uncompress(char* buf, int32_t size, wxString& content);
 	
