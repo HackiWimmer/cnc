@@ -144,6 +144,10 @@ protected:
     wxStaticLine* m_staticLine201;
     wxStaticText* m_emergencyLabel;
     wxBitmapToggleButton* m_btEmergency;
+    wxStaticLine* m_staticLine371;
+    wxStaticText* m_PowerLabel;
+    wxBitmapToggleButton* m_btPowerSwitch;
+    wxStaticLine* m_staticLine3713;
     wxStaticBitmap* m_staticBitmap203;
     wxPanel* m_splitterPageBottom;
     wxPanel* m_loggerPlaceholder;
@@ -178,6 +182,7 @@ protected:
     virtual void onConfigChanged(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void onConfigChanging(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void onEmergencyButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPowerButton(wxCommandEvent& event) { event.Skip(); }
     virtual void onLoggerUpdateInterval(wxScrollEvent& event) { event.Skip(); }
     virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
     virtual void onContinuousTimer(wxTimerEvent& event) { event.Skip(); }
@@ -267,6 +272,10 @@ public:
     wxStaticLine* GetStaticLine201() { return m_staticLine201; }
     wxStaticText* GetEmergencyLabel() { return m_emergencyLabel; }
     wxBitmapToggleButton* GetBtEmergency() { return m_btEmergency; }
+    wxStaticLine* GetStaticLine371() { return m_staticLine371; }
+    wxStaticText* GetPowerLabel() { return m_PowerLabel; }
+    wxBitmapToggleButton* GetBtPowerSwitch() { return m_btPowerSwitch; }
+    wxStaticLine* GetStaticLine3713() { return m_staticLine3713; }
     wxStaticBitmap* GetStaticBitmap203() { return m_staticBitmap203; }
     wxPanel* GetSplitterPageTop() { return m_splitterPageTop; }
     wxPanel* GetLoggerPlaceholder() { return m_loggerPlaceholder; }
@@ -352,6 +361,35 @@ public:
     }
 
     virtual ~ImageLibStepper();
+};
+
+
+class ImageLibArdoPower : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibArdoPower();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibArdoPower();
 };
 
 #endif

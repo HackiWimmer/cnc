@@ -222,6 +222,8 @@ bool ArduinoMainLoop::convertLongToFloat(const int32_t val, float& ret) {
 /////////////////////////////////////////////////////////////////////////////////////
 void ArduinoMainLoop::sendHeartbeat(unsigned char limitState, unsigned char supportState) {
 /////////////////////////////////////////////////////////////////////////////////////
+  const unsigned char healtyState = READ_IS_CTRL_POWERED_PIN ? 1 : 0;
+   
   SWB.init();
   SWB.put(RET_SOH);
   SWB.put(PID_HEARTBEAT);
@@ -229,7 +231,7 @@ void ArduinoMainLoop::sendHeartbeat(unsigned char limitState, unsigned char supp
   
   SWB.put(limitState);
   SWB.put(supportState);
-  SWB.put((unsigned char)255); // reserved
+  SWB.put(healtyState);
   SWB.put((unsigned char)255); // reserved
   
   SWB.write();
@@ -703,10 +705,15 @@ void ArduinoMainLoop::setup() {
   AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   
   AE::pinMode(READ_EXT_INNTERRUPT_PIN,  PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_IS_TOOL_POWERED,      PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  TOOL_STATE_OFF);
 
   AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,   ENABLE_STATE_OFF);
   AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,      TOOL_STATE_OFF);
+
+  if ( PIN_IS_CTRL_POWERED > 0 )  
+     { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  TOOL_STATE_OFF); }
+     
+  if ( PIN_IS_TOOL_POWERED > 0 )
+    { AE::pinMode(PIN_IS_TOOL_POWERED,  PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  POWER_STATE_OFF); }
 
   // analog pins
   AE::pinMode(PIN_INTERRUPT_LED,        PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,   ANALOG_LOW);

@@ -538,7 +538,10 @@ protected:
     wxPanel* m_cableConnectedState;
     wxPanel* m_toolPowerObserverState;
     wxStaticLine* m_staticLine6023412;
+    wxStaticBitmap* m_ctrlPowerStateBmp;
+    wxStaticLine* m_staticLine60234121;
     wxStaticBitmap* m_gamepadThreadHeartbeat;
+    wxStaticLine* m_staticLine602341212;
     wxStaticBitmap* m_serialThreadHeartbeat;
     wxPanel* m_svgUnitCalulator;
     wxStaticText* m_staticText3261;
@@ -1411,7 +1414,10 @@ public:
     wxPanel* GetCableConnectedState() { return m_cableConnectedState; }
     wxPanel* GetToolPowerObserverState() { return m_toolPowerObserverState; }
     wxStaticLine* GetStaticLine6023412() { return m_staticLine6023412; }
+    wxStaticBitmap* GetCtrlPowerStateBmp() { return m_ctrlPowerStateBmp; }
+    wxStaticLine* GetStaticLine60234121() { return m_staticLine60234121; }
     wxStaticBitmap* GetGamepadThreadHeartbeat() { return m_gamepadThreadHeartbeat; }
+    wxStaticLine* GetStaticLine602341212() { return m_staticLine602341212; }
     wxStaticBitmap* GetSerialThreadHeartbeat() { return m_serialThreadHeartbeat; }
     wxPanel* GetStatusBar() { return m_statusBar; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }

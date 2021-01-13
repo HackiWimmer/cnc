@@ -166,8 +166,10 @@ struct ContollerInfo {
 	int32_t heartbeatValue				= 0;
 	bool limitState						= false;
 	bool supportState					= false;
+	bool healtyState					= false;
 	unsigned char limitStateValue		= 0;
 	unsigned char supportStateValue		= 0;
+	unsigned char healtyStateValue		= 0;
 	
 	unsigned char posType				= '\0';
 	bool synchronizeAppPos				= false;

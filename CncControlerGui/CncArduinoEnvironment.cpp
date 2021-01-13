@@ -60,8 +60,16 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 	
 	lsOn  = new wxBitmap(bmp.GetSubBitmap(rectOn));
 	lsOff = new wxBitmap(bmp.GetSubBitmap(rectOff));
+	
+	pwOn  = new wxBitmap(ImageLibArdoPower().Bitmap("BMP_ARDO_ON"));
+	pwOff = new wxBitmap(ImageLibArdoPower().Bitmap("BMP_ARDO_OFF"));
+	
 	irOn  = new wxBitmap(m_btEmergency->GetBitmap().ConvertToImage().Rotate90());
 	irOff = new wxBitmap(m_btEmergency->GetBitmap().ConvertToImage());
+	
+	m_btPowerSwitch->SetValue(true);
+	decoratePowerSwitch(); 
+	onPowerButton();
 	
 	m_btEmergency->SetValue(LimitSwitch::EMERGENCY_SWITCH_OFF); 
 	decorateEmergencySwitch();
@@ -387,6 +395,12 @@ CncArduinoEnvironment::LimitSwitchInfo* CncArduinoEnvironment::findLimitSwichInf
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::decoratePowerSwitch() {
+///////////////////////////////////////////////////////////////////
+	m_btPowerSwitch->SetBitmap(m_btPowerSwitch->GetValue() ? *pwOn  : *pwOff);
+	m_btPowerSwitch->Refresh();
+}
+///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::decorateEmergencySwitch() {
 ///////////////////////////////////////////////////////////////////
 	m_btEmergency->SetBitmap(				m_btEmergency->GetValue() == LimitSwitch::EMERGENCY_SWITCH_ON ? *irOn  : *irOff);
@@ -531,6 +545,42 @@ void CncArduinoEnvironment::publishForceUpdate() {
 	SerialAdminMessage forceData;
 	forceData.setMid(MID::FORCE_DATA_NOTIFICATION);
 	ss->getAdminChannelSenderEndPoint()->write(forceData);
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::onPowerButton(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	decoratePowerSwitch();
+	onPowerButton();
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::onPowerButton() {
+///////////////////////////////////////////////////////////////////
+	SerialThread* ss = SerialThread::theSerialThread();
+	if ( ss == NULL )
+		return;
+	
+	typedef SerialAdminMessage::Mid 			MID;
+	typedef SerialAdminMessage::ValueName 		VN;
+
+	SerialAdminMessage pinUpdate;
+	pinUpdate.setMid(MID::SET_DIGITAL_PIN);
+	pinUpdate.setValue<unsigned int>(VN::VAL1, PIN_IS_CTRL_POWERED);
+	pinUpdate.setValue<bool        >(VN::VAL2, m_btPowerSwitch->GetValue() ? true : false);
+	
+	if ( ss->IsRunning() == false )
+		ss->Resume();
+		
+	if ( ss->IsRunning() == false ) {
+		appendError("Can't resume the serial thread!", CNC_LOG_FUNCT);
+		return;
+	}
+	
+	if ( m_btPowerSwitch->GetValue() == false ) {
+		// nothing to do here has to be managed by the cnc application
+	}
+	
+	ss->getAdminChannelSenderEndPoint()->write(pinUpdate);
+	publishForceUpdate();
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::onEmergencyButton(wxCommandEvent& event) {

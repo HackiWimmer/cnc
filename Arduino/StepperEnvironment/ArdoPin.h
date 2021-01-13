@@ -4,6 +4,9 @@
 // -------------------------------------------------------------------------------
 // Default Pin Setup - has to be overriden by dedicated setups on demand below
 // -------------------------------------------------------------------------------
+  #define POWER_STATE_OFF                                   PL_LOW
+  #define POWER_STATE_ON                                    PL_HIGH
+
   #define TOOL_STATE_OFF                                    PL_HIGH
   #define TOOL_STATE_ON                                     PL_LOW
 
@@ -118,8 +121,8 @@
     //const unsigned char PIN_                              =  26;
     //const unsigned char PIN_                              =  25;
     //const unsigned char PIN_                              =  24;
-    //const unsigned char PIN_                              =  23;
-    const unsigned char PIN_IS_TOOL_POWERED                 =  22;
+    const unsigned char PIN_IS_TOOL_POWERED                 =  23;
+    const unsigned char PIN_IS_CTRL_POWERED                 =  22;
     
     // PINC
     const unsigned char PIN_X_MIN_LIMIT                     =  37;
@@ -170,16 +173,9 @@
       
       #define READ_ENABLE_STEPPER_PIN                       ( PINB & B00010000 ) // 10
       #define READ_ENABLE_TOOL_PIN                          ( PINB & B00100000 ) // 11
-      #define READ_IS_TOOL_POWERED_PIN                      ( PINA & B00000001 ) // 22
-/*      
-      #define WRITE_DIR_PIN_X(value)                        if ( value ) { PORTH |=  (1 << PH4); } else { PORTH &= ~(1 << PH4); }
-      #define WRITE_DIR_PIN_Y(value)                        if ( value ) { PORTH |=  (1 << PH5); } else { PORTH &= ~(1 << PH5); }
-      #define WRITE_DIR_PIN_Z(value)                        if ( value ) { PORTH |=  (1 << PH6); } else { PORTH &= ~(1 << PH6); }
+      #define READ_IS_CTRL_POWERED_PIN                      ( PINA & B00000001 ) // 22
+      #define READ_IS_TOOL_POWERED_PIN                      ( PINA & B00000010 ) // 23
       
-      #define WRITE_STP_PIN_X(value)                        if ( value ) { PORTG |=  (1 << PG5); } else { PORTG &= ~(1 << PG5); }
-      #define WRITE_STP_PIN_Y(value)                        if ( value ) { PORTE |=  (1 << PE3); } else { PORTE &= ~(1 << PE3); }
-      #define WRITE_STP_PIN_Z(value)                        if ( value ) { PORTH |=  (1 << PH3); } else { PORTH &= ~(1 << PH3); }
-*/
       #define WRITE_STP_PIN_X(value)                        if ( value ) { PORTG |=  (1 << PG5); } else { PORTG &= ~(1 << PG5); }
       #define WRITE_DIR_PIN_X(value)                        if ( value ) { PORTE |=  (1 << PE3); } else { PORTE &= ~(1 << PE3); }
       
@@ -209,10 +205,7 @@
 
       #define READ_ENABLE_STEPPER_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)
       #define READ_ENABLE_TOOL_PIN                          AE::digitalRead(PIN_ENABLE_TOOL)
-      #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
-
-      #define READ_STEPPER_ENABLE_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)
-      #define READ_TOOL_ENABLE_PIN                          AE::digitalRead(PIN_ENABLE_TOOL)
+      #define READ_IS_CTRL_POWERED_PIN                      AE::digitalRead(PIN_IS_CTRL_POWERED)
       #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
       
       #define WRITE_DIR_PIN_X(value)                        AE::digitalWrite(PIN_X_DIR, value); 
@@ -264,6 +257,8 @@
   
     const unsigned char PIN_ENABLE_TOOL                     =  12;
     const unsigned char PIN_EXTERNAL_INTERRUPT              =  13;
+    
+    const unsigned char PIN_IS_CTRL_POWERED                 =   0;
     const unsigned char PIN_IS_TOOL_POWERED                 =   0;
     
   
@@ -296,10 +291,7 @@
 
     #define READ_ENABLE_STEPPER_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)
     #define READ_ENABLE_TOOL_PIN                          AE::digitalRead(PIN_ENABLE_TOOL)
-    #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
-
-    #define READ_STEPPER_ENABLE_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)
-    #define READ_TOOL_ENABLE_PIN                          AE::digitalRead(PIN_ENABLE_TOOL)
+    #define READ_IS_CTRL_POWERED_PIN                      true
     #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
     
     #define WRITE_DIR_PIN_X(value)                        AE::digitalWrite(PIN_X_DIR, value); 

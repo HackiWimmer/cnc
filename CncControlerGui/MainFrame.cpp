@@ -7986,7 +7986,12 @@ void MainFrame::onLeftDClickTemplateName(wxMouseEvent& event) {
 	//tip.SetTipKind(wxTipKind_BottomLeft);
 	tip.ShowFor(m_inputFileName);
 }
-
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setControllerPowerStateBmp(bool state) {
+/////////////////////////////////////////////////////////////////////
+	m_ctrlPowerStateBmp->SetBitmap(ImageLibPower().Bitmap(state ? "BMP_ON": "BMP_OFF"));
+	m_ctrlPowerStateBmp->Refresh();
+}
 
 
 

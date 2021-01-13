@@ -4598,17 +4598,28 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer436->Add(m_staticLine6023412, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_gamepadThreadHeartbeat = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("bookmark-toolbar")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(17,17)), 0 );
+    m_ctrlPowerStateBmp = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("power-off")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
+    m_ctrlPowerStateBmp->SetToolTip(_("Controller Power State"));
+    
+    flexGridSizer436->Add(m_ctrlPowerStateBmp, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticLine60234121 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer436->Add(m_staticLine60234121, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_gamepadThreadHeartbeat = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("thread-active")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
     m_gamepadThreadHeartbeat->SetToolTip(_("Gamepad Thread Heartbeat"));
     
-    flexGridSizer436->Add(m_gamepadThreadHeartbeat, 0, wxALL, WXC_FROM_DIP(4));
-    m_gamepadThreadHeartbeat->SetMinSize(wxSize(17,17));
+    flexGridSizer436->Add(m_gamepadThreadHeartbeat, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_serialThreadHeartbeat = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("bookmark-toolbar")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(17,17)), 0 );
+    m_staticLine602341212 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer436->Add(m_staticLine602341212, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_serialThreadHeartbeat = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("thread-active")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
     m_serialThreadHeartbeat->SetToolTip(_("Serial Thread Heartbeat"));
     
-    flexGridSizer436->Add(m_serialThreadHeartbeat, 0, wxALL, WXC_FROM_DIP(4));
-    m_serialThreadHeartbeat->SetMinSize(wxSize(17,17));
+    flexGridSizer436->Add(m_serialThreadHeartbeat, 0, wxALL, WXC_FROM_DIP(5));
     
     m_svgUnitCalulator = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     wxFont m_svgUnitCalulatorFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));

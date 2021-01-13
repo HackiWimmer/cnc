@@ -16,6 +16,8 @@
   <object class="wxBitmap" name="24-undo">bitmaps\CodeLite\24-undo.png</object>
   <object class="wxBitmap" name="24-undo@2x">bitmaps\CodeLite\24-undo@2x.png</object>
   <object class="wxBitmap" name="BMP_ANALOG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\user-extended-away (2).png</object>
+  <object class="wxBitmap" name="BMP_ARDO_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\ardo_power_off.png</object>
+  <object class="wxBitmap" name="BMP_ARDO_ON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\ardo_power_on.png</object>
   <object class="wxBitmap" name="BMP_DIR_CCW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-undo.png</object>
   <object class="wxBitmap" name="BMP_DIR_CCW@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-undo@2x.png</object>
   <object class="wxBitmap" name="BMP_DIR_CCW@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\24-undo@2x.png</object>
@@ -37,6 +39,7 @@
   <object class="wxBitmap" name="BMP_OUTPUT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\CodeLite\16-undo@2x.png</object>
   <object class="wxBitmap" name="ToggelSwitch">bitmaps\Switch\ToggelSwitch.png</object>
   <object class="wxBitmap" name="application-view-tile">bitmaps\application-view-tile.png</object>
+  <object class="wxBitmap" name="ardo_power_off">bitmaps\ardo_power_off.png</object>
   <object class="wxBitmap" name="arduino_logo">bitmaps\Arduino\arduino_logo.png</object>
   <object class="wxBitmap" name="bug (2)">bitmaps\bug (2).png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>

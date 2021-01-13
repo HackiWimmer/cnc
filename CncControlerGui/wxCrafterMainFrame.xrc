@@ -7823,23 +7823,43 @@ State</label>
             </object>
             <object class="sizeritem">
               <flag>wxALL</flag>
-              <border>4</border>
-              <minsize>17,17</minsize>
+              <border>5</border>
+              <object class="wxStaticBitmap" name="m_ctrlPowerStateBmp">
+                <bitmap>bitmaps/power-off.png</bitmap>
+                <tooltip>
+                  <![CDATA[Controller Power State]]>
+                </tooltip>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxStaticLine" name="m_staticLine60234121">
+                <style>wxLI_VERTICAL</style>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>5</border>
               <object class="wxStaticBitmap" name="m_gamepadThreadHeartbeat">
-                <bitmap>bitmaps/bookmark-toolbar.png</bitmap>
-                <size>17,17</size>
+                <bitmap>bitmaps/thread-active.png</bitmap>
                 <tooltip>
                   <![CDATA[Gamepad Thread Heartbeat]]>
                 </tooltip>
               </object>
             </object>
             <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxStaticLine" name="m_staticLine602341212">
+                <style>wxLI_VERTICAL</style>
+              </object>
+            </object>
+            <object class="sizeritem">
               <flag>wxALL</flag>
-              <border>4</border>
-              <minsize>17,17</minsize>
+              <border>5</border>
               <object class="wxStaticBitmap" name="m_serialThreadHeartbeat">
-                <bitmap>bitmaps/bookmark-toolbar.png</bitmap>
-                <size>17,17</size>
+                <bitmap>bitmaps/thread-active.png</bitmap>
                 <tooltip>
                   <![CDATA[Serial Thread Heartbeat]]>
                 </tooltip>

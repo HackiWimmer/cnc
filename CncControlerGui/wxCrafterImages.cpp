@@ -2444,6 +2444,18 @@ ImageLibAui::ImageLibAui()
             m_bitmaps.insert(std::make_pair(wxT("BMP_AUI_EXPAND"), bmp));
         }
     }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_AUI_EXPAND@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_AUI_EXPAND@2x"), bmp));
+        }
+    }
     
     {
         wxBitmap bmp;
@@ -2458,34 +2470,52 @@ ImageLibAui::ImageLibAui()
         }
     }
     
+}
+
+ImageLibAui::~ImageLibAui()
+{
+}
+
+ImageLibPower::ImageLibPower()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxXXXXC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
     {
         wxBitmap bmp;
         wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_ATTACH"));
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_ON"));
         if(bmp.IsOk()) {
             if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
                 icn.CopyFromBitmap(bmp);
                 this->Add(icn);
             }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_ATTACH"), bmp));
+            m_bitmaps.insert(std::make_pair(wxT("BMP_ON"), bmp));
         }
     }
     
     {
         wxBitmap bmp;
         wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_DETACH"));
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_OFF"));
         if(bmp.IsOk()) {
             if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
                 icn.CopyFromBitmap(bmp);
                 this->Add(icn);
             }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_DETACH"), bmp));
+            m_bitmaps.insert(std::make_pair(wxT("BMP_OFF"), bmp));
         }
     }
     
 }
 
-ImageLibAui::~ImageLibAui()
+ImageLibPower::~ImageLibPower()
 {
 }

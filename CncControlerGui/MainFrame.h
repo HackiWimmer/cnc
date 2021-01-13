@@ -478,6 +478,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void selectParsingSynopsisTrace();
 		
+		void setControllerPowerStateBmp(bool state);
+		
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
 		void installCustControls();

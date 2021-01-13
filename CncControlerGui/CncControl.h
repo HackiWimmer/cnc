@@ -137,6 +137,7 @@ class CncControl {
 		void displayLimitStates(const CncInterface::ILS::States& ls);
 		void displayUnknownSupportStates();
 		void displaySupportStates(const CncInterface::ISP::States& sp);
+		void displayHealtyStates(unsigned char state);
 		
 		// simple move
 		bool prepareSimpleMove(bool enaleEventHandling = true);

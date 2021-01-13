@@ -100,7 +100,6 @@
   <object class="wxBitmap" name="arrow-right-3">bitmaps\arrow-right-3.png</object>
   <object class="wxBitmap" name="basket-3">bitmaps\basket-3.png</object>
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
-  <object class="wxBitmap" name="bookmark-toolbar">bitmaps\bookmark-toolbar.png</object>
   <object class="wxBitmap" name="brick">bitmaps\brick.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
@@ -163,6 +162,7 @@
   <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
   <object class="wxBitmap" name="playstation-cross-dark-icon16">bitmaps\gamepad\playstation-cross-dark-icon16.png</object>
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
+  <object class="wxBitmap" name="power-off">bitmaps\power-off.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="script-gear">bitmaps\script-gear.png</object>
   <object class="wxBitmap" name="security-low-2">bitmaps\security-low-2.png</object>
@@ -178,6 +178,7 @@
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
   <object class="wxBitmap" name="table-edit">bitmaps\table-edit.png</object>
+  <object class="wxBitmap" name="thread-active">bitmaps\thread-active.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>
   <object class="wxBitmap" name="view-calendar-month">bitmaps\view-calendar-month.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>

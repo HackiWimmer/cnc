@@ -839,26 +839,59 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     
     flexGridSizer92->Add(m_staticLine201, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer1231 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1231 = new wxFlexGridSizer(5, 1, 0, 0);
     flexGridSizer1231->SetFlexibleDirection( wxBOTH );
     flexGridSizer1231->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1231->AddGrowableCol(0);
-    flexGridSizer1231->AddGrowableRow(2);
+    flexGridSizer1231->AddGrowableRow(4);
     
     flexGridSizer92->Add(flexGridSizer1231, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer369 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer369->SetFlexibleDirection( wxBOTH );
+    flexGridSizer369->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer1231->Add(flexGridSizer369, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
     
     m_emergencyLabel = new wxStaticText(m_splitterPageTop, wxID_ANY, _("Emergency"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageTop, wxSize(-1,-1)), 0);
     m_emergencyLabel->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_emergencyLabelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_emergencyLabel->SetFont(m_emergencyLabelFont);
     
-    flexGridSizer1231->Add(m_emergencyLabel, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    flexGridSizer369->Add(m_emergencyLabel, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
     
     m_btEmergency = new wxBitmapToggleButton(m_splitterPageTop, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("emergency-button-klein")), wxDefaultPosition, wxDLG_UNIT(m_splitterPageTop, wxSize(-1,-1)), wxBORDER_NONE);
     m_btEmergency->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_CAPTIONTEXT));
     m_btEmergency->SetValue(false);
     
-    flexGridSizer1231->Add(m_btEmergency, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    flexGridSizer369->Add(m_btEmergency, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    
+    m_staticLine371 = new wxStaticLine(m_splitterPageTop, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageTop, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer1231->Add(m_staticLine371, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer368 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer368->SetFlexibleDirection( wxBOTH );
+    flexGridSizer368->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer1231->Add(flexGridSizer368, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    
+    m_PowerLabel = new wxStaticText(m_splitterPageTop, wxID_ANY, _("Power:"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageTop, wxSize(-1,-1)), 0);
+    m_PowerLabel->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_PowerLabelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_PowerLabel->SetFont(m_PowerLabelFont);
+    
+    flexGridSizer368->Add(m_PowerLabel, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    
+    m_btPowerSwitch = new wxBitmapToggleButton(m_splitterPageTop, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ardo_power_off")), wxDefaultPosition, wxDLG_UNIT(m_splitterPageTop, wxSize(-1,-1)), wxBORDER_NONE);
+    m_btPowerSwitch->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_btPowerSwitch->SetValue(false);
+    
+    flexGridSizer368->Add(m_btPowerSwitch, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    
+    m_staticLine3713 = new wxStaticLine(m_splitterPageTop, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageTop, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer1231->Add(m_staticLine3713, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_staticBitmap203 = new wxStaticBitmap(m_splitterPageTop, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arduino_logo")), wxDefaultPosition, wxDLG_UNIT(m_splitterPageTop, wxSize(-1,-1)), 0 );
     
@@ -1044,6 +1077,7 @@ CncArduinoEnvironmentBase::CncArduinoEnvironmentBase(wxWindow* parent, wxWindowI
     m_pgMgrConfig->Connect(wxEVT_PG_CHANGED, wxPropertyGridEventHandler(CncArduinoEnvironmentBase::onConfigChanged), NULL, this);
     m_pgMgrConfig->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(CncArduinoEnvironmentBase::onConfigChanging), NULL, this);
     m_btEmergency->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onEmergencyButton), NULL, this);
+    m_btPowerSwitch->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onPowerButton), NULL, this);
     m_loggerUpdateInterval->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
     m_loggerUpdateInterval->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
     m_loggerUpdateInterval->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
@@ -1067,6 +1101,7 @@ CncArduinoEnvironmentBase::~CncArduinoEnvironmentBase()
     m_pgMgrConfig->Disconnect(wxEVT_PG_CHANGED, wxPropertyGridEventHandler(CncArduinoEnvironmentBase::onConfigChanged), NULL, this);
     m_pgMgrConfig->Disconnect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(CncArduinoEnvironmentBase::onConfigChanging), NULL, this);
     m_btEmergency->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onEmergencyButton), NULL, this);
+    m_btPowerSwitch->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncArduinoEnvironmentBase::onPowerButton), NULL, this);
     m_loggerUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
     m_loggerUpdateInterval->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
     m_loggerUpdateInterval->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncArduinoEnvironmentBase::onLoggerUpdateInterval), NULL, this);
@@ -1290,5 +1325,49 @@ ImageLibStepper::ImageLibStepper()
 }
 
 ImageLibStepper::~ImageLibStepper()
+{
+}
+
+ImageLibArdoPower::ImageLibArdoPower()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxCBC33InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_ARDO_ON"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_ARDO_ON"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_ARDO_OFF"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_ARDO_OFF"), bmp));
+        }
+    }
+    
+}
+
+ImageLibArdoPower::~ImageLibArdoPower()
 {
 }

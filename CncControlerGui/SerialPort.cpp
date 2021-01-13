@@ -1792,9 +1792,9 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 		memcpy(&sfi.Sc.value, sfi.Sc.p, 1);
 		
 		switch ( b ) {
-			case 0:		ci.limitState   = true; ci.limitStateValue   = sfi.Sc.value; break;
-			case 1:		ci.supportState = true; ci.supportStateValue = sfi.Sc.value; break;
-			case 2:		break;
+			case 0:		ci.limitState	= true; ci.limitStateValue		= sfi.Sc.value; break;
+			case 1:		ci.supportState	= true; ci.supportStateValue	= sfi.Sc.value; break;
+			case 2:		ci.healtyState	= true; ci.healtyStateValue		= sfi.Sc.value; break;
 			case 3:		break;
 			
 			default: std::cerr << "ERROR while reading state info values. Currently only 4 bytes (int32) possible" << std::endl;

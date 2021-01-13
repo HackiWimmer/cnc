@@ -350,7 +350,10 @@ void ArduinoDigitalPins::init() {
 	pins[PIN_Z_MAX_LIMIT]           = "LIMIT PIN Z Max";
 	
 	pins[PIN_ENABLE_TOOL]           = "TOOL ENABLE PIN";
+	
+	pins[PIN_IS_CTRL_POWERED]       = "IS CTRL POWERED PIN";
 	pins[PIN_IS_TOOL_POWERED]       = "IS TOOL POWERED PIN";
+	
 	pins[PIN_EXTERNAL_INTERRUPT]    = "EXTERNAL INTERRUPT PIN";
 }
 /////////////////////////////////////////////////////////////////////////

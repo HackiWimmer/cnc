@@ -1007,6 +1007,11 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				displayUnknownSupportStates();
 			}
 			
+			if ( ci.healtyState == true ) {
+				displayHealtyStates(ci.healtyStateValue);
+				ss << " : " << int(ci.healtyStateValue);
+			}
+			
 			//cnc::trc.logInfoMessage(ss);
 			break;
 		}
@@ -1729,6 +1734,12 @@ void CncControl::displayUnknownSupportStates() {
 		THE_APP->GetCableConnectedState()->SetBackgroundColour(wxColour(128,128,128));
 		THE_APP->GetToolPowerObserverState()->SetBackgroundColour(wxColour(128,128,128));
 	}
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::displayHealtyStates(unsigned char state) {
+///////////////////////////////////////////////////////////////////
+	if ( THE_APP != NULL )
+		THE_APP->setControllerPowerStateBmp(state > 0);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMinLimit() {

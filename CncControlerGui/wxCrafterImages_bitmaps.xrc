@@ -49,9 +49,10 @@
   <object class="wxBitmap" name="BMP_APP_R64">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo.png</object>
   <object class="wxBitmap" name="BMP_APP_R64@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo@2x.png</object>
   <object class="wxBitmap" name="BMP_APP_R64@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo@2x.png</object>
-  <object class="wxBitmap" name="BMP_ATTACH">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\abb-import.png</object>
   <object class="wxBitmap" name="BMP_AUI_CLOSE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-close-inactive.png</object>
-  <object class="wxBitmap" name="BMP_AUI_EXPAND">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-expand2.png</object>
+  <object class="wxBitmap" name="BMP_AUI_EXPAND">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-expand.png</object>
+  <object class="wxBitmap" name="BMP_AUI_EXPAND@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-expand@2x.png</object>
+  <object class="wxBitmap" name="BMP_AUI_EXPAND@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-expand@2x.png</object>
   <object class="wxBitmap" name="BMP_AUI_MINIMIZE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-minimize.png</object>
   <object class="wxBitmap" name="BMP_AUI_MINIMIZE@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-minimize@2x.png</object>
   <object class="wxBitmap" name="BMP_AUI_MINIMIZE@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-minimize@2x.png</object>
@@ -72,7 +73,6 @@
   <object class="wxBitmap" name="BMP_DB_PREPROCESSING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-orange.png</object>
   <object class="wxBitmap" name="BMP_DB_SPOOLING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-blue.png</object>
   <object class="wxBitmap" name="BMP_DEACTIVATED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad-inactive.png</object>
-  <object class="wxBitmap" name="BMP_DETACH">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\abb-export.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
@@ -106,9 +106,11 @@
   <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-full.png</object>
   <object class="wxBitmap" name="BMP_NO_CHG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bug-link.png</object>
   <object class="wxBitmap" name="BMP_NO_WPT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\distribute-vertical-equal.png</object>
+  <object class="wxBitmap" name="BMP_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\power-off.png</object>
   <object class="wxBitmap" name="BMP_OK16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok.png</object>
   <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
   <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
+  <object class="wxBitmap" name="BMP_ON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\power-on.png</object>
   <object class="wxBitmap" name="BMP_PID_DETAIL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="BMP_PID_MAJOR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-password (2).png</object>
   <object class="wxBitmap" name="BMP_PLAY_3D">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-executable.png</object>

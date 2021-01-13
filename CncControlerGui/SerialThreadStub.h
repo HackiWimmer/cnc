@@ -29,7 +29,7 @@ class SerialThreadStub : public SerialSpyPort {
 		// return the port type
 		virtual const CncPortType getPortType() const { return CncPORT_EMU_ARDUINO; }
 		// indicates if idle message can be requested
-		virtual bool canProcessIdle() { return false; }
+		virtual bool canProcessIdle() { return true; }
 		// will be released periodically be the main thread
 		virtual void onPeriodicallyAppEvent(bool interrupted);
 		// simulate connection

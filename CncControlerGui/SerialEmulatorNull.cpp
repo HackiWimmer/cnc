@@ -572,13 +572,18 @@ bool SerialEmulatorNULL::writeHeartbeat(unsigned char *buffer, unsigned int nbBy
 ///////////////////////////////////////////////////////////////////
 	static int32_t counter = 0;
 	
+	const unsigned char limitState	= '\0';
+	const unsigned char buttonState	= '\0';
+	const unsigned char healtyState	=    1;
+	const unsigned char reserved	=  255;
+	
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_HEARTBEAT);
 	lastCommand.Serial.write(counter++ % INT32_MAX);
-	lastCommand.Serial.write((unsigned char)'\0');
-	lastCommand.Serial.write((unsigned char)'\0');
-	lastCommand.Serial.write((unsigned char)255);
-	lastCommand.Serial.write((unsigned char)255);
+	lastCommand.Serial.write(limitState);
+	lastCommand.Serial.write(buttonState);
+	lastCommand.Serial.write(healtyState);
+	lastCommand.Serial.write(reserved);
 	lastCommand.Serial.write(RET_OK);
 	
 	return true;

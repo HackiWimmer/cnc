@@ -33,6 +33,7 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		void activateOnClose(bool state) { canClose = state; }
 		
 	protected:
+		virtual void onPowerButton(wxCommandEvent& event);
 		virtual void onValuesUpdateInterval(wxScrollEvent& event);
 		virtual void onLoggerUpdateInterval(wxScrollEvent& event);
 		virtual void onSortPins(wxCommandEvent& event);
@@ -115,6 +116,8 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		
 		wxBitmap*				lsOn;
 		wxBitmap*				lsOff;
+		wxBitmap*				pwOn;
+		wxBitmap*				pwOff;
 		wxBitmap*				irOn;
 		wxBitmap*				irOff;
 		
@@ -140,8 +143,11 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		unsigned char			supportStates;
 		
 		CncArduinoEnvironment::LimitSwitchInfo* findLimitSwichInfo(wxButton* bt);
+		void decoratePowerSwitch();
 		void decorateEmergencySwitch();
 		void decorateSwitch(wxButton* bt, bool state);
+		
+		void onPowerButton();
 		
 		bool publishStatesUpdate();
 		bool publishLimitSwitchUpdate(int name, bool state);
