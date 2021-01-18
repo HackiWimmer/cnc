@@ -53,6 +53,7 @@ CncControl::CncControl(CncPortType pt)
 , durationCounter				(0)
 , interruptState				(false)
 , positionOutOfRangeFlag		(false)
+, ctrlPowerState				(POWER_STATE_OFF)
 , toolPowerState				(TOOL_STATE_OFF)
 , stepDelay						(0)
 , lastCncHeartbeatValue			(0)
@@ -575,18 +576,32 @@ void CncControl::interrupt(const char* why) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::isReadyToRun() {
 ///////////////////////////////////////////////////////////////////
+	MainFrame::Notification notification;
+	notification.location	= MainFrame::Notification::NL_MonitorView;
+	notification.type		= 'E';
+	notification.title		= CNC_LOG_FUNCT_B("");
+	
 	if ( isConnected() == false ) {
-		std::cerr << "CncControl::isReadyToRun: The controller isn't connected!" << std::endl;
+		notification.message	= "The controller isn't connected!";
+		THE_APP->displayNotification(notification);
 		return false;
 	}
 	
 	if ( isInterrupted() == true ) {
-		std::cerr << "CncControl::isReadyToRun: The controller is interrupted. A reset is required!" << std::endl;
+		notification.message	= "The controller is interrupted. A reset is required!";
+		THE_APP->displayNotification(notification);
 		return false;
 	}
 	
 	if ( isCommandActive() == true ) {
-		std::cerr << "CncControl::isReadyToRun: The controller is bussy!" << std::endl;
+		notification.message	= "The controller is bussy!";
+		THE_APP->displayNotification(notification);
+		return false;
+	}
+	
+	if ( THE_CONTEXT->hasHardware() && ctrlPowerState == POWER_STATE_OFF ) {
+		notification.message	= "The power state is off";
+		THE_APP->displayNotification(notification);
 		return false;
 	}
 	
@@ -1007,10 +1022,14 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				displayUnknownSupportStates();
 			}
 			
+			ctrlPowerState = false;
+			
 			if ( ci.healtyState == true ) {
-				displayHealtyStates(ci.healtyStateValue);
+				ctrlPowerState = ci.healtyStateValue > 0;
 				ss << " : " << int(ci.healtyStateValue);
 			}
+			
+			displayHealtyStates();
 			
 			//cnc::trc.logInfoMessage(ss);
 			break;
@@ -1736,10 +1755,10 @@ void CncControl::displayUnknownSupportStates() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::displayHealtyStates(unsigned char state) {
+void CncControl::displayHealtyStates() {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_APP != NULL )
-		THE_APP->setControllerPowerStateBmp(state > 0);
+		THE_APP->setControllerPowerStateBmp(ctrlPowerState);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMinLimit() {

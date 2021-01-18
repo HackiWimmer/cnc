@@ -486,10 +486,6 @@ protected:
     wxStaticLine* m_staticLine6801;
     wxTextCtrl* m_inputFileName;
     wxStaticLine* m_staticLine602;
-    wxStaticBitmap* m_gamepadState;
-    wxStaticLine* m_staticLine6021333;
-    wxStaticBitmap* m_heartbeatState;
-    wxStaticLine* m_staticLine60214444;
     wxStaticBitmap* m_staticBitmap7262;
     wxTextCtrl* m_lastConfigNotification;
     wxStaticLine* m_staticLine6021;
@@ -540,7 +536,9 @@ protected:
     wxStaticBitmap* m_ctrlPowerStateBmp;
     wxStaticLine* m_staticLine60234121;
     wxStaticBitmap* m_gamepadThreadHeartbeat;
+    wxStaticBitmap* m_gamepadState;
     wxStaticLine* m_staticLine602341212;
+    wxStaticBitmap* m_heartbeatState;
     wxStaticBitmap* m_serialThreadHeartbeat;
     wxPanel* m_svgUnitCalulator;
     wxStaticText* m_staticText3261;
@@ -848,8 +846,8 @@ protected:
     virtual void onReloadMonitorPreview(wxCommandEvent& event) { event.Skip(); }
     virtual void onChangePreviewMode(wxCommandEvent& event) { event.Skip(); }
     virtual void onLeftDClickTemplateName(wxMouseEvent& event) { event.Skip(); }
-    virtual void dclickHeartbeatState(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
+    virtual void dclickHeartbeatState(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCUnitTo(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCChangeFrom(wxCommandEvent& event) { event.Skip(); }
@@ -1361,10 +1359,6 @@ public:
     wxStaticLine* GetStaticLine6801() { return m_staticLine6801; }
     wxTextCtrl* GetInputFileName() { return m_inputFileName; }
     wxStaticLine* GetStaticLine602() { return m_staticLine602; }
-    wxStaticBitmap* GetGamepadState() { return m_gamepadState; }
-    wxStaticLine* GetStaticLine6021333() { return m_staticLine6021333; }
-    wxStaticBitmap* GetHeartbeatState() { return m_heartbeatState; }
-    wxStaticLine* GetStaticLine60214444() { return m_staticLine60214444; }
     wxStaticBitmap* GetStaticBitmap7262() { return m_staticBitmap7262; }
     wxTextCtrl* GetLastConfigNotification() { return m_lastConfigNotification; }
     wxStaticLine* GetStaticLine6021() { return m_staticLine6021; }
@@ -1415,7 +1409,9 @@ public:
     wxStaticBitmap* GetCtrlPowerStateBmp() { return m_ctrlPowerStateBmp; }
     wxStaticLine* GetStaticLine60234121() { return m_staticLine60234121; }
     wxStaticBitmap* GetGamepadThreadHeartbeat() { return m_gamepadThreadHeartbeat; }
+    wxStaticBitmap* GetGamepadState() { return m_gamepadState; }
     wxStaticLine* GetStaticLine602341212() { return m_staticLine602341212; }
+    wxStaticBitmap* GetHeartbeatState() { return m_heartbeatState; }
     wxStaticBitmap* GetSerialThreadHeartbeat() { return m_serialThreadHeartbeat; }
     wxPanel* GetStatusBar() { return m_statusBar; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }

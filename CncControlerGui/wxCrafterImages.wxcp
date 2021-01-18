@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 8159,
+  "m_objCounter": 8160,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxXXXXC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxCrafterImages_bitmaps.cpp",
@@ -2357,7 +2357,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/heart-2.png"
+       "m_path": "bitmaps/HBNormal.png"
       }],
      "m_events": [],
      "m_children": []
@@ -2376,26 +2376,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/heart-add.png"
-      }],
-     "m_events": [],
-     "m_children": []
-    }, {
-     "m_type": 4482,
-     "proportion": 0,
-     "border": 5,
-     "gbSpan": "1,1",
-     "gbPosition": "0,0",
-     "m_styles": [],
-     "m_sizerFlags": [],
-     "m_properties": [{
-       "type": "string",
-       "m_label": "Name:",
-       "m_value": "BMP_HEART_MINUS"
-      }, {
-       "type": "filePicker",
-       "m_label": "Bitmap File:",
-       "m_path": "bitmaps/heart-delete.png"
+       "m_path": "bitmaps/HBPlus.png"
       }],
      "m_events": [],
      "m_children": []
@@ -2414,7 +2395,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/heart-deactivated.png"
+       "m_path": "bitmaps/HbInactive.png"
       }],
      "m_events": [],
      "m_children": []

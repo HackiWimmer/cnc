@@ -188,11 +188,38 @@ class string
 		auto operator=(string&& rhs) & noexcept -> string&;
 };
 
+//#include <sdkddkver.h>
+
+//#include <stdio.h>
+//#include <tchar.h>
+//#include <atlbase.h>
+//#include <Windows.h>
+#include <sapi.h>
 
 ////////////////////////////////////////////////////
 void Implementation::run() {
 ////////////////////////////////////////////////////
 	std::cout << "Start . . ." << std::endl;
+	
+	
+	
+    ISpVoice * pVoice = NULL;
+
+    if (FAILED(::CoInitialize(NULL)))
+        return;
+
+    HRESULT hr = CoCreateInstance(CLSID_SpVoice, NULL, CLSCTX_ALL, IID_ISpVoice, (void **)&pVoice);
+    if( SUCCEEDED( hr ) )
+    {
+        hr = pVoice->Speak(L"Geschwindigkeit 1500 Millimeter pro Minute. fastest ", 0, NULL);
+        pVoice->Release();
+        pVoice = NULL;
+    }
+
+    ::CoUninitialize();
+	
+	
+	return;
 	
 	
 	MyInt a(5);

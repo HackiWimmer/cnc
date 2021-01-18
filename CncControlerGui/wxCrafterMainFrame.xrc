@@ -6800,40 +6800,6 @@ Preview</label>
                 <style>wxLI_VERTICAL</style>
               </object>
             </object>
-            <object class="sizeritem">
-              <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
-              <border>3</border>
-              <object class="wxStaticBitmap" name="m_gamepadState">
-                <bitmap>bitmaps/gamepad-active.png</bitmap>
-                <tooltip>
-                  <![CDATA[Gamepad Thread State]]>
-                </tooltip>
-              </object>
-            </object>
-            <object class="sizeritem">
-              <flag>wxALL|wxEXPAND</flag>
-              <border>1</border>
-              <object class="wxStaticLine" name="m_staticLine6021333">
-                <style>wxLI_VERTICAL</style>
-              </object>
-            </object>
-            <object class="sizeritem">
-              <flag>wxALL</flag>
-              <border>6</border>
-              <object class="wxStaticBitmap" name="m_heartbeatState">
-                <bitmap>bitmaps/heart-2.png</bitmap>
-                <tooltip>
-                  <![CDATA[Controller Heartbeat State]]>
-                </tooltip>
-              </object>
-            </object>
-            <object class="sizeritem">
-              <flag>wxALL|wxEXPAND</flag>
-              <border>1</border>
-              <object class="wxStaticLine" name="m_staticLine60214444">
-                <style>wxLI_VERTICAL</style>
-              </object>
-            </object>
             <object class="sizeritem" name="flexGridSizer7266">
               <flag>wxALL</flag>
               <object class="wxFlexGridSizer">
@@ -7834,10 +7800,30 @@ State</label>
               </object>
             </object>
             <object class="sizeritem">
+              <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+              <border>3</border>
+              <object class="wxStaticBitmap" name="m_gamepadState">
+                <bitmap>bitmaps/gamepad-active.png</bitmap>
+                <tooltip>
+                  <![CDATA[Gamepad Thread State]]>
+                </tooltip>
+              </object>
+            </object>
+            <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
               <object class="wxStaticLine" name="m_staticLine602341212">
                 <style>wxLI_VERTICAL</style>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>6</border>
+              <object class="wxStaticBitmap" name="m_heartbeatState">
+                <bitmap>bitmaps/HbInactive.png</bitmap>
+                <tooltip>
+                  <![CDATA[Controller Heartbeat State]]>
+                </tooltip>
               </object>
             </object>
             <object class="sizeritem">

@@ -107,7 +107,9 @@ class CncControl {
 		bool					interruptState;
 		// position flf
 		bool					positionOutOfRangeFlag;
-		// power state
+		// ctrl power state
+		bool					ctrlPowerState;
+		// tool power state
 		bool					toolPowerState;
 		// Artificially Step Delay
 		unsigned int			stepDelay;
@@ -117,7 +119,10 @@ class CncControl {
 		Serial* getSerial() const { wxASSERT(serialPort); return serialPort; }
 		
 		// Tool state handling
-		CncToolStateControl toolState;
+		CncToolStateControl	toolState;
+		CncLimitStates		limitStates;
+		
+		
 		//measurements variables
 		//struct timeb endTime, startTime;
 		// Flag to indicatate if a positions check aplies
@@ -126,18 +131,18 @@ class CncControl {
 		void setValue(wxTextCtrl *ctl, int32_t val);
 		void setValue(wxTextCtrl *ctl, double val);
 		void setValue(wxTextCtrl *ctl, const char* t);
-
+		
+		
 		// Tool management
 		void setToolState(bool defaultStyle = false);
 		
 		// Limit management
-		CncLimitStates limitStates;
 		void displayLimitState(wxWindow* ctl, bool value);
 		void displayLimitStates(const int32_t x, const int32_t y, const int32_t z);
 		void displayLimitStates(const CncInterface::ILS::States& ls);
 		void displayUnknownSupportStates();
 		void displaySupportStates(const CncInterface::ISP::States& sp);
-		void displayHealtyStates(unsigned char state);
+		void displayHealtyStates();
 		
 		// simple move
 		bool prepareSimpleMove(bool enaleEventHandling = true);

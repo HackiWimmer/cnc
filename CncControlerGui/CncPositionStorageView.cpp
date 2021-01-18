@@ -407,12 +407,12 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 	
 	// -------------------------------------------------------------
 	// setup export
-	double minX = DBL_MAX;
-	double maxX = DBL_MIN;
-	double minY = DBL_MAX;
-	double maxY = DBL_MIN;
-	double minZ = DBL_MAX;
-	double maxZ = DBL_MIN;
+	double minX = cnc::dbl::MAX;
+	double maxX = cnc::dbl::MIN;
+	double minY = cnc::dbl::MAX;
+	double maxY = cnc::dbl::MIN;
+	double minZ = cnc::dbl::MAX;
+	double maxZ = cnc::dbl::MIN;
 	
 	const char delCSV = ',';
 	

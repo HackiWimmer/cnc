@@ -4071,24 +4071,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer436->Add(m_staticLine602, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_gamepadState = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
-    m_gamepadState->SetToolTip(_("Gamepad Thread State"));
-    
-    flexGridSizer436->Add(m_gamepadState, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(3));
-    
-    m_staticLine6021333 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
-    
-    flexGridSizer436->Add(m_staticLine6021333, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_heartbeatState = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("heart-2")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
-    m_heartbeatState->SetToolTip(_("Controller Heartbeat State"));
-    
-    flexGridSizer436->Add(m_heartbeatState, 0, wxALL, WXC_FROM_DIP(6));
-    
-    m_staticLine60214444 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
-    
-    flexGridSizer436->Add(m_staticLine60214444, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
     wxFlexGridSizer* flexGridSizer7266 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer7266->SetFlexibleDirection( wxBOTH );
     flexGridSizer7266->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -4600,9 +4582,19 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer436->Add(m_gamepadThreadHeartbeat, 0, wxALL, WXC_FROM_DIP(5));
     
+    m_gamepadState = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
+    m_gamepadState->SetToolTip(_("Gamepad Thread State"));
+    
+    flexGridSizer436->Add(m_gamepadState, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(3));
+    
     m_staticLine602341212 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer436->Add(m_staticLine602341212, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_heartbeatState = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("HbInactive")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
+    m_heartbeatState->SetToolTip(_("Controller Heartbeat State"));
+    
+    flexGridSizer436->Add(m_heartbeatState, 0, wxALL, WXC_FROM_DIP(6));
     
     m_serialThreadHeartbeat = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("thread-active")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
     m_serialThreadHeartbeat->SetToolTip(_("Serial Thread Heartbeat"));
@@ -5988,8 +5980,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_bmpButton9297->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onReloadMonitorPreview), NULL, this);
     m_externFileManagerPreview->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
     m_inputFileName->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::onLeftDClickTemplateName), NULL, this);
-    m_heartbeatState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
+    m_heartbeatState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_cbUCUnitFrom->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
     m_cbUCUnitTo->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
     m_cbUCValueFrom->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectUCChangeFrom), NULL, this);
@@ -6232,8 +6224,8 @@ MainFrameBClass::~MainFrameBClass()
     m_bmpButton9297->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onReloadMonitorPreview), NULL, this);
     m_externFileManagerPreview->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
     m_inputFileName->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::onLeftDClickTemplateName), NULL, this);
-    m_heartbeatState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
+    m_heartbeatState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_cbUCUnitFrom->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
     m_cbUCUnitTo->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
     m_cbUCValueFrom->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectUCChangeFrom), NULL, this);

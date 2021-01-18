@@ -134,6 +134,11 @@ namespace cnc {
 	bool						dblCompare(const double a, const double b, const double eps = 0.000001 /*std::numeric_limits<double>::epsilon()*/);
 	bool						dblCompareNull(const double a, const double eps = std::numeric_limits<double>::epsilon());
 	
+	namespace dbl {
+								const double MIN = -DBL_MAX;
+								const double MAX = +DBL_MAX;
+	};
+	
 	namespace dblCmp {
 								const double epsilon = 0.000001;
 								

@@ -484,8 +484,8 @@ void CncPathListManager::clear() {
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::resetStatistics() {
 //////////////////////////////////////////////////////////////////
-	minPosX = minPosY = minPosZ = DBL_MAX;
-	maxPosX = maxPosY = maxPosZ = DBL_MIN;
+	minPosX = minPosY = minPosZ = cnc::dbl::MAX;
+	maxPosX = maxPosY = maxPosZ = cnc::dbl::MIN;
 	
 	totalDistance				= 0.0;
 }

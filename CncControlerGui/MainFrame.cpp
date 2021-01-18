@@ -946,12 +946,14 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
+#include <cmath>
+#include <cfloat>
+#include <limits>
+
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	CncPathListRunner::test();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -2699,9 +2701,18 @@ void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, doub
 	
 	cnc->resetClientId();
 	
-	if ( cnc::dblCmp::gt(x, DBL_MIN) ) cnc->setZeroPosX(THE_CONFIG->convertMetricToStepsX(x));
-	if ( cnc::dblCmp::gt(y, DBL_MIN) ) cnc->setZeroPosY(THE_CONFIG->convertMetricToStepsY(y));
-	if ( cnc::dblCmp::gt(z, DBL_MIN) ) cnc->setZeroPosZ(THE_CONFIG->convertMetricToStepsZ(z));
+	std::cout << x << std::endl;
+	std::cout << y << std::endl;
+	std::cout << z << std::endl;
+	
+	
+	std::cout << cnc::dblCmp::gt(x, cnc::dbl::MIN) << std::endl;
+	std::cout << cnc::dblCmp::gt(y, cnc::dbl::MIN) << std::endl;
+	std::cout << cnc::dblCmp::gt(z, cnc::dbl::MIN) << std::endl;
+	
+	if ( cnc::dblCmp::gt(x, cnc::dbl::MIN) ) cnc->setZeroPosX(THE_CONFIG->convertMetricToStepsX(x));
+	if ( cnc::dblCmp::gt(y, cnc::dbl::MIN) ) cnc->setZeroPosY(THE_CONFIG->convertMetricToStepsY(y));
+	if ( cnc::dblCmp::gt(z, cnc::dbl::MIN) ) cnc->setZeroPosZ(THE_CONFIG->convertMetricToStepsZ(z));
 	
 	refPositionDlg->resetTempSetting();
 	refPositionDlg->setEnforceFlag(false);
@@ -2740,11 +2751,13 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 		
 		motionMonitor->clear();
 		
+ 	 	std::clog <<  THE_BOUNDS->getCalculatedRefPositionMetric() << std::endl;
+      		
 		CncTransactionLock ctl(this);
 		setControllerZero(refPositionDlg->getReferenceMode(),
-						  refPositionDlg->shouldZeroX() ? THE_BOUNDS->getCalculatedRefPositionMetric().getX() : DBL_MIN, 
-						  refPositionDlg->shouldZeroY() ? THE_BOUNDS->getCalculatedRefPositionMetric().getY() : DBL_MIN, 
-						  refPositionDlg->shouldZeroZ() ? THE_BOUNDS->getCalculatedRefPositionMetric().getZ() : DBL_MIN 
+						  refPositionDlg->shouldZeroX() ? THE_BOUNDS->getCalculatedRefPositionMetric().getX() : cnc::dbl::MIN, 
+						  refPositionDlg->shouldZeroY() ? THE_BOUNDS->getCalculatedRefPositionMetric().getY() : cnc::dbl::MIN, 
+						  refPositionDlg->shouldZeroZ() ? THE_BOUNDS->getCalculatedRefPositionMetric().getZ() : cnc::dbl::MIN 
 						 );
 						 
 		motionMonitor->Refresh();
