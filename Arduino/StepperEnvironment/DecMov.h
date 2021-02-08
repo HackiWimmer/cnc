@@ -110,4 +110,88 @@ class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
     }
 };
 
+// ------------------------------------------------------------------------
+class ArduinoCmdDecoderMovePodest : public ArduinoCmdDecoderBase {
+
+  public:
+    static const uint8_t MAX_MOVE_VALUES = 1;
+    
+    struct Result {
+      byte     cmd = CMD_INVALID;
+      int32_t  dh  = 0L;
+
+      void reset() {
+        cmd        = CMD_INVALID;
+        dh         = 0L;
+      }
+    };
+    
+    ArduinoCmdDecoderMovePodest()
+    : ArduinoCmdDecoderBase()
+    , result  ()
+    {}
+    
+    virtual ~ArduinoCmdDecoderMovePodest() 
+    {}
+
+  protected:
+    virtual byte process(const ArduinoCmdDecoderMovePodest::Result& mv) = 0;
+
+  private:
+  
+    Result          result;  
+
+    // ----------------------------------------------------------------------
+    void reset() {
+      result.reset();
+    }
+
+  public:
+
+    // ----------------------------------------------------------------------
+    byte decodeMovePodest(byte cmd) {
+      typedef ArduinoMainLoop AML;
+
+      reset();
+      result.cmd = cmd;  
+
+      AML::waitForSerialData();
+
+      const uint8_t valueCount = (uint8_t)AML::readSerialByteWithTimeout();
+      if ( valueCount < 1 || valueCount > MAX_MOVE_VALUES ) {
+        AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
+        return RET_ERROR;        
+      }
+
+      byte b[sizeof(int32_t)];
+      for (uint8_t i=0; i<ArdoObj::minimum(valueCount, MAX_MOVE_VALUES); i++) {
+        
+        const uint8_t size = AML::readSerialBytesWithTimeout(b, sizeof(int32_t));
+        if ( size != sizeof(int32_t) ) {
+          AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
+          return RET_ERROR;
+        }
+
+        // order the received bytes the an int32_t value
+        int32_t value = 0L;
+        if ( convertBytesToInt32(b, value) == false ) {
+          AML::pushMessage(MT_ERROR, E_INVALID_MOVE_CMD);
+          return RET_ERROR;
+        }
+
+        // delegate values
+        switch ( valueCount ) {
+          // axis Z Only
+          case 1: {
+            result.dh = value; 
+            break;
+          }
+        }
+      }
+
+      // process . . .
+      return process(result);
+    }
+};
+
 #endif

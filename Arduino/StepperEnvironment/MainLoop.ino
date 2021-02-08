@@ -19,11 +19,12 @@ ByteBuffer SWB;
 #endif
 
 CncArduinoController* THE_CONTROLLER = NULL;
+uint32_t              tsLastSerial   = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////
 ArduinoMainLoop::ArduinoMainLoop() 
-/////////////////////////////////////////////////////////////////////////////////////
 : controller( new CncArduinoController() )
+/////////////////////////////////////////////////////////////////////////////////////
 {
   THE_CONTROLLER = controller;
 }
@@ -697,17 +698,28 @@ void ArduinoMainLoop::setup() {
   AE::pinMode(PIN_Y_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,            PL_LOW);
   AE::pinMode(PIN_Z_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,            PL_LOW);
 
+  AE::pinMode(PIN_H_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_H_STP,            PL_LOW);
+  AE::pinMode(PIN_H_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_H_DIR,            PL_LOW);
+
+  AE::pinMode(PIN_H_MOVE_UP,            PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_UP,        PL_LOW);
+  AE::pinMode(PIN_H_MOVE_DOWN,          PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,      PL_LOW);
+  
   AE::pinMode(PIN_X_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_X_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Y_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Y_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Z_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+
+  AE::pinMode(PIN_H_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_H_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_H_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_H_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   
   AE::pinMode(READ_EXT_INNTERRUPT_PIN,  PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
 
+  AE::pinMode(PIN_ENABLE_PODEST,        PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODEST,    PL_LOW);
   AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,   ENABLE_STATE_OFF);
   AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,      TOOL_STATE_OFF);
+
 
   if ( PIN_IS_CTRL_POWERED > 0 )  
      { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  TOOL_STATE_OFF); }
@@ -750,6 +762,9 @@ void ArduinoMainLoop::functorIR2() {
 ///////////////////////////////////////////////////////
 void ArduinoMainLoop::loop() {
 ///////////////////////////////////////////////////////
+  
+  controller->evaluatePodestSwitch();
+
   if ( Serial.available() <= 0 ) {
     controller->evaluateI2CData();
     return;
@@ -766,6 +781,8 @@ void ArduinoMainLoop::loop() {
     return;
   }
 
+  tsLastSerial = ArdoTs::now();
+
   // --------------------------------------------------------------------------
   // Commands
   // --------------------------------------------------------------------------
@@ -781,6 +798,12 @@ void ArduinoMainLoop::loop() {
     // SB command -  Reset
     case CMD_RESET_CONTROLLER:
           r = reset();
+          break;
+
+    // SB command -  Push/Pop Transaction
+    case CMD_PUSH_TRANSACTION:
+    case CMD_POP_TRANSACTION:
+          r = controller->acceptTransaction(c);
           break;
 
     // SB command - Heartbeat handling
@@ -815,6 +838,16 @@ void ArduinoMainLoop::loop() {
     case CMD_MOVE_SEQUENCE:
     case CMD_RENDER_AND_MOVE_SEQUENCE:
           r = controller->acceptMoveSequence(c);
+          break;
+
+    // MB command - Podest Movement
+    case CMD_MOVE_PODEST:
+          r = controller->acceptPodestMove(c);
+          break;
+          
+    case CMD_ACTIVATE_PODEST_HW:
+    case CMD_DEACTIVATE_PODEST_HW:
+          r = controller->activatePodestHardware(c);
           break;
 
     // --------------------------------------------------------------------------

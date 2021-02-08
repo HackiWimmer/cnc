@@ -186,7 +186,7 @@ class ArduinoAccelManager {
     void        activate(bool s)                          { active = s; }
     bool        isAccelInitialized()                const { return initialized; }
     bool        isInteractiveMoveType()             const { return curType == T_INTERACTIVE; }
-    uint32_t    getDefalutDelay()                   const { return cnvSpeedToDelay(fA.fctValue1000(0), 5000); }
+    uint32_t    getDefaultDelay()                   const { return cnvSpeedToDelay(fA.fctValue1000(0), 5000); }
     uint32_t    getARampWidth()                     const { return fA.getRelRampWidth(); }
     uint32_t    getDRampWidth()                     const { return fD.getRelRampWidth(); }    
     uint32_t    getCurrentTargetSpeedDelay_US()     const { return curSpeedDelay;}

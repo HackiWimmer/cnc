@@ -234,6 +234,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncPodestManagement.h"/>
+      <File Name="CncPodestManagement.cpp"/>
       <VirtualDirectory Name="Sound">
         <File Name="CncMillingSoundController.cpp"/>
         <File Name="CncMillingSoundController.h"/>
@@ -381,6 +383,9 @@
       <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Debug;release2;Gprof;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterPodestManagement_bitmaps.cpp"/>
+      <File Name="wxCrafterPodestManagement.h"/>
+      <File Name="wxCrafterPodestManagement.cpp"/>
       <File Name="wxCrafterSerialSpy.cpp"/>
       <File Name="wxCrafterSerialSpy.h"/>
       <File Name="wxCrafterSerialSpy_bitmaps.cpp"/>
@@ -594,6 +599,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
+    <File Name="wxCrafterPodestManagement.wxcp"/>
     <File Name="wxCrafterSerialSpy.wxcp"/>
     <File Name="wxCrafterLoggerPanel.wxcp"/>
     <File Name="wxCrafterLCDPanel.wxcp"/>

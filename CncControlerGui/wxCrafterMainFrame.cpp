@@ -3900,7 +3900,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_winFileView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_winFileView, wxAuiPaneInfo().Name(wxT("TemplateManager")).Caption(_("Cnc File Manager")).Direction(wxAUI_DOCK_LEFT).Layer(0).Row(0).Position(0).BestSize(220,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_winFileView, wxAuiPaneInfo().Name(wxT("TemplateManager")).Caption(_("CNC File Manager")).Direction(wxAUI_DOCK_LEFT).Layer(0).Row(0).Position(0).BestSize(220,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     wxFlexGridSizer* flexGridSizer8375 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer8375->SetFlexibleDirection( wxBOTH );
@@ -3954,37 +3954,45 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1628->Add(m_staticLine4345, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_splitter6478 = new wxSplitterWindow(m_fileViews, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_fileViews, wxSize(-1,-1)), wxSP_3D);
-    m_splitter6478->SetSashGravity(0.5);
-    m_splitter6478->SetMinimumPaneSize(10);
+    m_notebookFileView = new wxNotebook(m_fileViews, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_fileViews, wxSize(-1,-1)), wxBK_BOTTOM);
+    wxFont m_notebookFileViewFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_notebookFileView->SetFont(m_notebookFileViewFont);
+    m_notebookFileView->SetName(wxT("m_notebookFileView"));
+    wxImageList* m_notebookFileView_il = new wxImageList(16, 16);
+    m_notebookFileView->AssignImageList(m_notebookFileView_il);
     
-    flexGridSizer1628->Add(m_splitter6478, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer1628->Add(m_notebookFileView, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_splitterPage6482 = new wxPanel(m_splitter6478, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter6478, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel9828 = new wxPanel(m_notebookFileView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookFileView, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_panel9828ImgIndex;
+    m_panel9828ImgIndex = m_notebookFileView_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("view-list-text")));
+    m_notebookFileView->AddPage(m_panel9828, _("LRU"), false, m_panel9828ImgIndex);
     
     wxFlexGridSizer* flexGridSizer6494 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer6494->SetFlexibleDirection( wxBOTH );
     flexGridSizer6494->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer6494->AddGrowableCol(0);
     flexGridSizer6494->AddGrowableRow(0);
-    m_splitterPage6482->SetSizer(flexGridSizer6494);
+    m_panel9828->SetSizer(flexGridSizer6494);
     
-    m_lruListPlaceholder = new wxPanel(m_splitterPage6482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage6482, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_lruListPlaceholder = new wxPanel(m_panel9828, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel9828, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_lruListPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
-    flexGridSizer6494->Add(m_lruListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer6494->Add(m_lruListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_splitterPage6490 = new wxPanel(m_splitter6478, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter6478, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_splitter6478->SplitHorizontally(m_splitterPage6482, m_splitterPage6490, 0);
+    m_panel9830 = new wxPanel(m_notebookFileView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookFileView, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_panel9830ImgIndex;
+    m_panel9830ImgIndex = m_notebookFileView_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("view-file-columns")));
+    m_notebookFileView->AddPage(m_panel9830, _("Explorer"), false, m_panel9830ImgIndex);
     
     wxFlexGridSizer* flexGridSizer6492 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer6492->SetFlexibleDirection( wxBOTH );
     flexGridSizer6492->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer6492->AddGrowableCol(0);
     flexGridSizer6492->AddGrowableRow(0);
-    m_splitterPage6490->SetSizer(flexGridSizer6492);
+    m_panel9830->SetSizer(flexGridSizer6492);
     
-    m_mainFileViewPlaceholder = new wxPanel(m_splitterPage6490, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage6490, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_mainFileViewPlaceholder = new wxPanel(m_panel9830, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel9830, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_mainFileViewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     m_mainFileViewPlaceholder->SetToolTip(_("Only a placeholder"));
     
@@ -4972,7 +4980,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_secureRunPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
     m_auimgrMain->AddPane(m_secureRunPanel, wxAuiPaneInfo().Name(wxT("SecureRunPanel")).Caption(_("CNC Secure")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
-    m_auimgrMain->Update();
     
     wxFlexGridSizer* flexGridSizer8248 = new wxFlexGridSizer(5, 1, 0, 0);
     flexGridSizer8248->SetFlexibleDirection( wxBOTH );
@@ -5131,10 +5138,57 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8370->AddGrowableRow(0);
     m_splitterPageLeft->SetSizer(flexGridSizer8370);
     
-    m_fileViewsPlaceholder = new wxPanel(m_splitterPageLeft, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLeft, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter9833 = new wxSplitterWindow(m_splitterPageLeft, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLeft, wxSize(-1,-1)), wxSP_3D);
+    m_splitter9833->SetSashGravity(0.8);
+    m_splitter9833->SetMinimumPaneSize(10);
+    
+    flexGridSizer8370->Add(m_splitter9833, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPage9837 = new wxPanel(m_splitter9833, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter9833, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    wxFlexGridSizer* flexGridSizer9843 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer9843->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9843->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9843->AddGrowableCol(0);
+    flexGridSizer9843->AddGrowableRow(0);
+    m_splitterPage9837->SetSizer(flexGridSizer9843);
+    
+    m_fileViewsPlaceholder = new wxPanel(m_splitterPage9837, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage9837, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_fileViewsPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
-    flexGridSizer8370->Add(m_fileViewsPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer9843->Add(m_fileViewsPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_splitterPage9841 = new wxPanel(m_splitter9833, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter9833, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter9833->SplitHorizontally(m_splitterPage9837, m_splitterPage9841, 0);
+    
+    wxFlexGridSizer* flexGridSizer9845 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer9845->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9845->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9845->AddGrowableCol(0);
+    flexGridSizer9845->AddGrowableRow(1);
+    m_splitterPage9841->SetSizer(flexGridSizer9845);
+    
+    m_staticLine9847 = new wxStaticLine(m_splitterPage9841, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage9841, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer9845->Add(m_staticLine9847, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer9848 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer9848->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9848->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9848->AddGrowableCol(0);
+    flexGridSizer9848->AddGrowableRow(0);
+    
+    flexGridSizer9845->Add(flexGridSizer9848, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_cncOverviewsPlaceholder = new wxPanel(m_splitterPage9841, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage9841, wxSize(-1,120)), wxTAB_TRAVERSAL);
+    m_cncOverviewsPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer9848->Add(m_cncOverviewsPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_cncOverviewsPlaceholder->SetMinSize(wxSize(-1,120));
+    
+    m_staticLine9850 = new wxStaticLine(m_splitterPage9841, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage9841, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer9848->Add(m_staticLine9850, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_splitterPageRight = new wxPanel(m_secureSplitterMainV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMainV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_secureSplitterMainV->SplitVertically(m_splitterPageLeft, m_splitterPageRight, 0);
@@ -5322,7 +5376,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_splitterPageLogger = new wxPanel(m_secureSplitterMainH, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMainH, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_secureSplitterMainH->SplitHorizontally(m_splitterPageMonitor, m_splitterPageLogger, 0);
     
-    wxFlexGridSizer* flexGridSizer8265 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer8265 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer8265->SetFlexibleDirection( wxBOTH );
     flexGridSizer8265->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer8265->AddGrowableCol(0);
@@ -5334,15 +5388,22 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer8265->Add(m_secLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticLine9501 = new wxStaticLine(m_splitterPageLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLogger, wxSize(-1,-1)), wxLI_VERTICAL);
+    m_cncCoordinateView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    flexGridSizer8265->Add(m_staticLine9501, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_auimgrMain->AddPane(m_cncCoordinateView, wxAuiPaneInfo().Name(wxT("CncCoordinates")).Caption(_("CNC Coordinates")).Direction(wxAUI_DOCK_LEFT).Layer(0).Row(0).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->Update();
     
-    m_lcdPositionPlaceholder = new wxPanel(m_splitterPageLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLogger, wxSize(280,-1)), wxTAB_TRAVERSAL);
+    wxFlexGridSizer* flexGridSizer9820 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer9820->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9820->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9820->AddGrowableCol(0);
+    flexGridSizer9820->AddGrowableRow(0);
+    m_cncCoordinateView->SetSizer(flexGridSizer9820);
+    
+    m_lcdPositionPlaceholder = new wxPanel(m_cncCoordinateView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_cncCoordinateView, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_lcdPositionPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
-    flexGridSizer8265->Add(m_lcdPositionPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_lcdPositionPlaceholder->SetMinSize(wxSize(280,-1));
+    flexGridSizer9820->Add(m_lcdPositionPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_menuBar = new wxMenuBar(wxMB_DOCKABLE);
     this->SetMenuBar(m_menuBar);
@@ -5397,6 +5458,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_miViewMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Motion Monitor"), wxT(""), wxITEM_CHECK);
     m_menuView->Append(m_miViewMonitor);
+    
+    m_miViewCoordinates = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Coordinates"), wxT(""), wxITEM_CHECK);
+    m_menuView->Append(m_miViewCoordinates);
     
     m_miViewAccelMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Acceleration Monitor"), wxT(""), wxITEM_CHECK);
     m_menuView->Append(m_miViewAccelMonitor);
@@ -5549,6 +5613,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_miResolveLimitState = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Resolve Limit States"), wxT(""), wxITEM_NORMAL);
     m_miResolveLimitState->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-warning")));
     m_menuRequestor->Append(m_miResolveLimitState);
+    
+    m_miPodestManagement = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Podest Management"), wxT(""), wxITEM_NORMAL);
+    m_miPodestManagement->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-sort")));
+    m_menuRequestor->Append(m_miPodestManagement);
     
     m_menuRequestor->AppendSeparator();
     
@@ -5826,6 +5894,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     #if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(m_notebookFileView)){
+        wxPersistenceManager::Get().RegisterAndRestore(m_notebookFileView);
+    } else {
+        wxPersistenceManager::Get().Restore(m_notebookFileView);
+    }
+    #endif
+    
+    #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(m_notebookSpeedMonitor)){
         wxPersistenceManager::Get().RegisterAndRestore(m_notebookSpeedMonitor);
     } else {
@@ -6030,6 +6106,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miViewTemplateManager->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewTemplateManager), NULL, this);
     this->Connect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Connect(m_miViewMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMonitor), NULL, this);
+    this->Connect(m_miViewCoordinates->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewCoordinates), NULL, this);
     this->Connect(m_miViewAccelMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAccelerationMonitor), NULL, this);
     this->Connect(m_miViewDebugger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewDebugger), NULL, this);
     this->Connect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
@@ -6064,6 +6141,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Connect(m_miPerformToolTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestToolTest), NULL, this);
     this->Connect(m_miResolveLimitState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResolveLimitStates), NULL, this);
+    this->Connect(m_miPodestManagement->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::onPodestManagement), NULL, this);
     this->Connect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Connect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Connect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
@@ -6274,6 +6352,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miViewTemplateManager->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewTemplateManager), NULL, this);
     this->Disconnect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Disconnect(m_miViewMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMonitor), NULL, this);
+    this->Disconnect(m_miViewCoordinates->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewCoordinates), NULL, this);
     this->Disconnect(m_miViewAccelMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAccelerationMonitor), NULL, this);
     this->Disconnect(m_miViewDebugger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewDebugger), NULL, this);
     this->Disconnect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
@@ -6308,6 +6387,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Disconnect(m_miPerformToolTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestToolTest), NULL, this);
     this->Disconnect(m_miResolveLimitState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResolveLimitStates), NULL, this);
+    this->Disconnect(m_miPodestManagement->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::onPodestManagement), NULL, this);
     this->Disconnect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Disconnect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Disconnect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);

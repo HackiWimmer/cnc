@@ -6,14 +6,14 @@
 ///////////////////////////////////////////////////////////////////
 CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 : CncLCDPositionPanelBase(parent)
-, lcdW(NULL)
+, lcdF(NULL)
 , lcdX(NULL)
 , lcdY(NULL)
 , lcdZ(NULL)
 ///////////////////////////////////////////////////////////////////
 {
-	lcdW = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
-	GblFunc::replaceControl(m_lcdPlaceholderW, lcdW);
+	lcdF = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
+	GblFunc::replaceControl(m_lcdPlaceholderF, lcdF);
 	
 	lcdX = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
 	GblFunc::replaceControl(m_lcdPlaceholderX, lcdX);
@@ -24,12 +24,12 @@ CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 	lcdZ = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
 	GblFunc::replaceControl(m_lcdPlaceholderZ, lcdZ);
 	
-	lcdW->SetNumberDigits(8);
+	lcdF->SetNumberDigits(8);
 	lcdX->SetNumberDigits(8);
 	lcdY->SetNumberDigits(8);
 	lcdZ->SetNumberDigits(8);
 	
-	lcdW->SetValue(   "0.0" ); 
+	lcdF->SetValue(   "0.0" ); 
 	lcdX->SetValue( "0.000" ); 
 	lcdY->SetValue( "0.000" ); 
 	lcdZ->SetValue( "0.000" ); 
@@ -37,7 +37,7 @@ CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 ///////////////////////////////////////////////////////////////////
 CncLCDPositionPanel::~CncLCDPositionPanel() {
 ///////////////////////////////////////////////////////////////////
-	delete lcdW;
+	delete lcdF;
 	delete lcdX;
 	delete lcdY;
 	delete lcdZ;
@@ -53,7 +53,7 @@ void CncLCDPositionPanel::onPaint(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	event.Skip();
 	
-	lcdW->Refresh();
+	lcdF->Refresh();
 	lcdX->Refresh();
 	lcdY->Refresh();
 	lcdZ->Refresh();
@@ -63,7 +63,7 @@ void CncLCDPositionPanel::onSize(wxSizeEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	event.Skip();
 	
-	lcdW->Refresh();
+	lcdF->Refresh();
 	lcdX->Refresh();
 	lcdY->Refresh();
 	lcdZ->Refresh();
@@ -82,9 +82,13 @@ void CncLCDPositionPanel::updateUnit() {
 ///////////////////////////////////////////////////////////////////
 void CncLCDPositionPanel::updateValues() {
 ///////////////////////////////////////////////////////////////////
-	lcdW->SetValue(THE_APP->GetConfiguredFeedSpeed()->GetValue());
+	lcdF->SetValue(THE_APP->GetConfiguredFeedSpeed()->GetValue());
 	
 	lcdX->SetValue(THE_APP->GetXAxisCtl()->GetValue());
 	lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());
 	lcdZ->SetValue(THE_APP->GetZAxisCtl()->GetValue());
+}
+///////////////////////////////////////////////////////////////////
+void CncLCDPositionPanel::onUpdateTimer(wxTimerEvent& event) {
+///////////////////////////////////////////////////////////////////
 }

@@ -169,6 +169,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onPodestManagement(wxCommandEvent& event);
+    virtual void viewCoordinates(wxCommandEvent& event);
     virtual void onLeftDClickTemplateName(wxMouseEvent& event);
     virtual void onSvgExport(wxCommandEvent& event);
     virtual void onSvgFormatPretty(wxCommandEvent& event);

@@ -230,4 +230,33 @@ class CncAxisZ : public CncArduinoStepper<OPTIMISTIC> {
     {}
 };
 
+// ----------------------------------------------------------------
+class CncAxisH : public CncArduinoStepper<PESIMISTIC> {
+
+  private:
+    CncAxisH(const CncAxisH&);
+
+  protected:
+   
+    static bool readLmtPins()                                    { return READ_LMT_PIN_H;     }  
+    static bool readMinLmtPin()                                  { return READ_LMT_PIN_H_MIN; }  
+    static bool readMaxLmtPin()                                  { return READ_LMT_PIN_H_MAX; }  
+    static void writeDirPin(bool value)                          { WRITE_DIR_PIN_H(value)     }      
+    static void writeStpPin(bool value)                          { WRITE_STP_PIN_H(value)     }  
+
+  public:
+    CncAxisH(const StepperSetup& ss) 
+    : CncArduinoStepper
+    (
+        ss,
+        'H',
+        &CncAxisH::readLmtPins,
+        &CncAxisH::readMinLmtPin,
+        &CncAxisH::readMaxLmtPin,
+        &CncAxisH::writeDirPin,
+        &CncAxisH::writeStpPin
+    )                                       
+    {}
+};
+
 #endif

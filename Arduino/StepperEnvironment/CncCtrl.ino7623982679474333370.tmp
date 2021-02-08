@@ -45,7 +45,6 @@ CncArduinoController::CncArduinoController()
 , impulseCalculator             ()
 , lastI2CData                   ()
 , transactionState              (OFF)
-, podestHardwareState           (OFF)
 , posReplyState                 (OFF)
 , probeMode                     (OFF)
 , pause                         (OFF)
@@ -118,22 +117,6 @@ bool CncArduinoController::evaluateI2CData() {
   
   // request data
   return ArduinoMainLoop::readI2CSlave(lastI2CData);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::evaluatePodestSwitch() {
-/////////////////////////////////////////////////////////////////////////////////////
-  if ( podestHardwareState == OFF )
-    return true;
-
-  const bool btUp   = AE::digitalRead(PIN_H_MOVE_UP);
-  const bool btDown = AE::digitalRead(PIN_H_MOVE_DOWN);
-  
-  if ( btUp == PL_HIGH || btDown == PL_HIGH ) { 
-    byte b = movePodest(btUp ? +1 : -1, CncArduinoController::stopMovePodestBySwitch);  
-    return b == RET_OK;
-  }
-
-  return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::reset() {
@@ -412,16 +395,6 @@ byte CncArduinoController::acceptTransaction(byte cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
   transactionState = ( cmd == CMD_PUSH_TRANSACTION ? ON : OFF );
   ARDO_DEBUG_MESSAGE('S', transactionState == ON ? "Push Transaction" : "Pop Transaction")
-  
-  return RET_OK;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::activatePodestHardware(byte cmd) {
-/////////////////////////////////////////////////////////////////////////////////////
-  podestHardwareState = ( cmd == CMD_ACTIVATE_PODEST_HW ? ON : OFF );
-  ARDO_DEBUG_MESSAGE('S', podestHardwareState == ON ? "Switch Podest Harware 'ON'" : "Switch Podest Harware 'OFF'")
-  #warning activate a led pin
-   
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -442,80 +415,29 @@ byte CncArduinoController::acceptPodestMove(byte cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::process(const ArduinoCmdDecoderMovePodest::Result& mv) {
 /////////////////////////////////////////////////////////////////////////////////////
-  return movePodest(mv.dh, CncArduinoController::stopMovePodestBySignal);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct stopFunct) {
-/////////////////////////////////////////////////////////////////////////////////////
-  if ( stopFunct == NULL )
-    return RET_ERROR;
-
-  if ( H->setDirection(stepDir) == false ) {
-    ArduinoMainLoop::pushMessage(MT_ERROR, E_PODEST_DIR_CHANGE_FAILED, CMD_MOVE_PODEST);
+  if ( transactionState == ON ) {
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_INVALID_TRANSACTION_STATE, mv.cmd);
     return RET_ERROR;
   }
 
-  // Create this instance to enable the podest stepper pin and release the brake.
-  // The corresponding dtor will inverse this again
-  PodestEnabler pe;
+  if ( H->setDirection(mv.dh) == false ) {
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_PODEST_DIR_CHANGE_FAILED, mv.cmd);
+    return RET_ERROR;
+  }
 
-  while ( stopFunct(this) == false ) {
+  // move the podest
+  for (int32_t i=0; i<ArdoObj::absolute(mv.dh); i++) {
     const byte b = H->performStep();
 
-    // slow down th podest movement
-    AE::delayMicroseconds(1000 * 1);
+    adasds
     
     if ( b != RET_OK ) {
-      ArduinoMainLoop::pushMessage(MT_ERROR, E_PODEST_MOVE_FAILED, CMD_MOVE_PODEST);
+      ArduinoMainLoop::pushMessage(MT_ERROR, E_PODEST_MOVE_FAILED, mv.cmd);
       return b;
     }
   }
 
   return RET_OK;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::stopMovePodestBySignal(CncArduinoController* ctrl){
-/////////////////////////////////////////////////////////////////////////////////////
-  byte serialFrontByte = CMD_INVALID;
-  if ( ArduinoMainLoop::peakSerial(serialFrontByte) == true ) {
-
-    if ( serialFrontByte == SIG_QUIT_MOVE) {
-      
-      // read signal from serial
-      Serial.read();
-      return true;
-    }
-    
-    if ( serialFrontByte == CMD_DEACTIVATE_PODEST_HW) {
-      ctrl->activatePodestHardware(serialFrontByte);
-
-      // read command from serial
-      Serial.read();
-
-      // handshake
-      Serial.write(RET_OK);
-      return true;
-    }
-   }
-
-  return false;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::stopMovePodestBySwitch(CncArduinoController* ctrl) {
-/////////////////////////////////////////////////////////////////////////////////////
-  if ( CncArduinoController::stopMovePodestBySignal(ctrl) == true )
-    return true;
-  
-  if ( ctrl->podestHardwareState == OFF )
-    return true;
-  
-  if ( AE::digitalRead(PIN_H_MOVE_UP)   == PL_HIGH )
-    return false;
-    
-  if ( AE::digitalRead(PIN_H_MOVE_DOWN) == PL_HIGH )
-    return false;
-
-  return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::initInteractiveSpeed() {

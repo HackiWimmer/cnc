@@ -27,6 +27,7 @@ wxLCDWindow::wxLCDWindow( wxWindow *parent, wxPoint pos, wxSize size )
 	
 	mLightColour				= mLightColourBeforeDecimal;
 	mGrayColour					= wxColour(  0,  64,   0);
+	mGrayColour					= mGrayColour.ChangeLightness(25);
 }
 /////////////////////////////////////////////////////////////////////////////
 wxLCDWindow::~wxLCDWindow(){

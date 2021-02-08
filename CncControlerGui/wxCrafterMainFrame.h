@@ -474,10 +474,10 @@ protected:
     wxCheckBox* m_keepFileManagerPreview;
     wxCheckBox* m_externFileManagerPreview;
     wxStaticLine* m_staticLine4345;
-    wxSplitterWindow* m_splitter6478;
-    wxPanel* m_splitterPage6482;
+    wxNotebook* m_notebookFileView;
+    wxPanel* m_panel9828;
     wxPanel* m_lruListPlaceholder;
-    wxPanel* m_splitterPage6490;
+    wxPanel* m_panel9830;
     wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_winLoggerView;
     wxPanel* m_loggerViewPlaceholder;
@@ -598,7 +598,13 @@ protected:
     wxStaticLine* m_staticLine9185;
     wxSplitterWindow* m_secureSplitterMainV;
     wxPanel* m_splitterPageLeft;
+    wxSplitterWindow* m_splitter9833;
+    wxPanel* m_splitterPage9837;
     wxPanel* m_fileViewsPlaceholder;
+    wxPanel* m_splitterPage9841;
+    wxStaticLine* m_staticLine9847;
+    wxPanel* m_cncOverviewsPlaceholder;
+    wxStaticLine* m_staticLine9850;
     wxPanel* m_splitterPageRight;
     wxSplitterWindow* m_secureSplitterMainH;
     wxPanel* m_splitterPageMonitor;
@@ -621,7 +627,7 @@ protected:
     wxPanel* m_secSpeedMonitorPlaceholder;
     wxPanel* m_splitterPageLogger;
     wxPanel* m_secLoggerPlaceholder;
-    wxStaticLine* m_staticLine9501;
+    wxPanel* m_cncCoordinateView;
     wxPanel* m_lcdPositionPlaceholder;
     wxMenuBar* m_menuBar;
     wxMenu* m_menuFile;
@@ -639,6 +645,7 @@ protected:
     wxMenuItem* m_miViewTemplateManager;
     wxMenuItem* m_miViewMainView;
     wxMenuItem* m_miViewMonitor;
+    wxMenuItem* m_miViewCoordinates;
     wxMenuItem* m_miViewAccelMonitor;
     wxMenuItem* m_miViewDebugger;
     wxMenuItem* m_miViewSpy;
@@ -683,6 +690,7 @@ protected:
     wxMenuItem* m_miMotorEnableState;
     wxMenuItem* m_miPerformToolTest;
     wxMenuItem* m_miResolveLimitState;
+    wxMenuItem* m_miPodestManagement;
     wxMenuItem* m_menuItem881;
     wxMenuItem* m_miRqtCurPos;
     wxMenuItem* m_miRqtLimit;
@@ -888,6 +896,7 @@ protected:
     virtual void viewTemplateManager(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMainView(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewCoordinates(wxCommandEvent& event) { event.Skip(); }
     virtual void viewAccelerationMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void viewDebugger(wxCommandEvent& event) { event.Skip(); }
     virtual void viewSpy(wxCommandEvent& event) { event.Skip(); }
@@ -916,6 +925,7 @@ protected:
     virtual void requestEnableStepperMotors(wxCommandEvent& event) { event.Skip(); }
     virtual void requestToolTest(wxCommandEvent& event) { event.Skip(); }
     virtual void requestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPodestManagement(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentPos(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitState(wxCommandEvent& event) { event.Skip(); }
     virtual void requestReset(wxCommandEvent& event) { event.Skip(); }
@@ -1347,10 +1357,10 @@ public:
     wxCheckBox* GetExternFileManagerPreview() { return m_externFileManagerPreview; }
     wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
     wxPanel* GetLruListPlaceholder() { return m_lruListPlaceholder; }
-    wxPanel* GetSplitterPage6482() { return m_splitterPage6482; }
+    wxPanel* GetPanel9828() { return m_panel9828; }
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
-    wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
-    wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
+    wxPanel* GetPanel9830() { return m_panel9830; }
+    wxNotebook* GetNotebookFileView() { return m_notebookFileView; }
     wxPanel* GetFileViews() { return m_fileViews; }
     wxPanel* GetWinFileView() { return m_winFileView; }
     wxPanel* GetLoggerViewPlaceholder() { return m_loggerViewPlaceholder; }
@@ -1470,6 +1480,12 @@ public:
     wxPanel* GetSecToolbar() { return m_secToolbar; }
     wxStaticLine* GetStaticLine9185() { return m_staticLine9185; }
     wxPanel* GetFileViewsPlaceholder() { return m_fileViewsPlaceholder; }
+    wxPanel* GetSplitterPage9837() { return m_splitterPage9837; }
+    wxStaticLine* GetStaticLine9847() { return m_staticLine9847; }
+    wxPanel* GetCncOverviewsPlaceholder() { return m_cncOverviewsPlaceholder; }
+    wxStaticLine* GetStaticLine9850() { return m_staticLine9850; }
+    wxPanel* GetSplitterPage9841() { return m_splitterPage9841; }
+    wxSplitterWindow* GetSplitter9833() { return m_splitter9833; }
     wxPanel* GetSplitterPageLeft() { return m_splitterPageLeft; }
     wxPanel* GetSecMonitorPlaceholder() { return m_secMonitorPlaceholder; }
     wxButton* Get3D_TopSec() { return m_3D_TopSec; }
@@ -1490,13 +1506,13 @@ public:
     wxSplitterWindow* GetSecureSplitterDrawingH() { return m_secureSplitterDrawingH; }
     wxPanel* GetSplitterPageMonitor() { return m_splitterPageMonitor; }
     wxPanel* GetSecLoggerPlaceholder() { return m_secLoggerPlaceholder; }
-    wxStaticLine* GetStaticLine9501() { return m_staticLine9501; }
-    wxPanel* GetLcdPositionPlaceholder() { return m_lcdPositionPlaceholder; }
     wxPanel* GetSplitterPageLogger() { return m_splitterPageLogger; }
     wxSplitterWindow* GetSecureSplitterMainH() { return m_secureSplitterMainH; }
     wxPanel* GetSplitterPageRight() { return m_splitterPageRight; }
     wxSplitterWindow* GetSecureSplitterMainV() { return m_secureSplitterMainV; }
     wxPanel* GetSecureRunPanel() { return m_secureRunPanel; }
+    wxPanel* GetLcdPositionPlaceholder() { return m_lcdPositionPlaceholder; }
+    wxPanel* GetCncCoordinateView() { return m_cncCoordinateView; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }

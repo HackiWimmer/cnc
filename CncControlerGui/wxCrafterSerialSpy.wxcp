@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 9539,
+  "m_objCounter": 9564,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9XInitBitmapResources",
   "m_bitmapsFile": "wxCrafterSerialSpy_bitmaps.cpp",
@@ -36,7 +36,7 @@
     }, {
      "type": "multi-string",
      "m_label": "Tooltip:",
-     "m_value": ""
+     "m_value": "rewre"
     }, {
      "type": "colour",
      "m_label": "Bg Colour:",

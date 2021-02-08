@@ -227,14 +227,16 @@ class CncControl {
 		bool changeCurrentFeedSpeedXYZ_MM_MIN(float value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
 		
 		// signal wrapper
-		bool sendInterrupt() 		{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
-		bool sendHalt() 			{ wxASSERT(serialPort); return serialPort->sendHalt(); }
-		bool sendPause() 			{ wxASSERT(serialPort); return serialPort->sendPause(); }
-		bool sendResume() 			{ wxASSERT(serialPort); return serialPort->sendResume(); }
+		bool sendInterrupt()		{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
+		bool sendHalt()				{ wxASSERT(serialPort); return serialPort->sendHalt(); }
+		bool sendPause()			{ wxASSERT(serialPort); return serialPort->sendPause(); }
+		bool sendResume()			{ wxASSERT(serialPort); return serialPort->sendResume(); }
+		bool sendQuitMove()			{ wxASSERT(serialPort); return serialPort->sendQuitMove(); }
 		bool sendSoftwareReset() 	{ wxASSERT(serialPort); return serialPort->sendSignal(SIG_SOFTWARE_RESET); }
 		
 		// comand wrapper
-		bool processCommand(const unsigned char c, std::ostream& txtCtl);
+		bool pushCommand(const unsigned char cmd);
+		bool processCommand(const unsigned char cmd, std::ostream& txtCtl);
 		
 		// getter list wrapper
 		bool displayGetterList(const PidList& pidlist);
@@ -437,6 +439,8 @@ class CncControl {
 		void				addGuidePath(const CncPathListManager& plm, double zOffset);
 		void				updatePreview3D();
 		void 				sendIdleMessage();
+		
+		bool				processMovePodest(int32_t steps)							{ return getSerial()->processMovePodest(steps); }
 		
 		// for testing only
 		Serial* getSerialExtern() const { wxASSERT(serialPort); return serialPort; }

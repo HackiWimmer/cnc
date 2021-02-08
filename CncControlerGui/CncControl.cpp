@@ -343,10 +343,12 @@ bool CncControl::setup(bool doReset) {
 	const int32_t dirValueX = THE_CONFIG->getInverseCtrlDirectionXFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
 	const int32_t dirValueY = THE_CONFIG->getInverseCtrlDirectionYFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
 	const int32_t dirValueZ = THE_CONFIG->getInverseCtrlDirectionZFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
+	const int32_t dirValueH = NORMALIZED_INCREMENT_DIRECTION_VALUE;
 
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_X, dirValueX));
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Y, dirValueY));
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Z, dirValueZ));
+	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_H, dirValueH));
 	
 	if ( processSetterList(setup) == false) {
 		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "Error");
@@ -446,13 +448,22 @@ bool CncControl::popSerial() {
 	return serialPort->popSerial();
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::processCommand(const unsigned char c, std::ostream& txtCtl) {
+bool CncControl::pushCommand(const unsigned char cmd) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() == true )
 		return false;
 	
 	wxASSERT(serialPort);
-	return serialPort->processCommand(c, txtCtl);
+	return serialPort->pushCommand(cmd);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::processCommand(const unsigned char cmd, std::ostream& txtCtl) {
+///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() == true )
+		return false;
+	
+	wxASSERT(serialPort);
+	return serialPort->processCommand(cmd, txtCtl);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {

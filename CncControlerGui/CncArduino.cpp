@@ -24,6 +24,9 @@ void ArduinoCMDs::init() {
 	
 	cmds[CMD_INVALID]                          = "Invalid Command";
 	
+	cmds[CMD_PUSH_TRANSACTION]                 = "Push Transaction";
+	cmds[CMD_POP_TRANSACTION]                  = "Pop Transaction";
+	
 	cmds[SIG_INTERRUPPT]                       = "Push Signal Interrupt";
 	cmds[SIG_HALT]                             = "Push Signal Pause";
 	cmds[SIG_PAUSE]                            = "Push Signal Pause";
@@ -47,6 +50,8 @@ void ArduinoCMDs::init() {
 
 	cmds[CMD_MOVE_SEQUENCE]                    = "Push Move Sequence";
 	cmds[CMD_RENDER_AND_MOVE_SEQUENCE]         = "Push Render and Move Sequence";
+	
+	cmds[CMD_MOVE_PODEST]                      = "Move Podest";
 	
 	cmds[CMD_PRINT_CONFIG]                     = "Pull Configuration";
 	cmds[CMD_PRINT_VERSION]                    = "Pull Version";
@@ -183,6 +188,7 @@ void ArduinoPIDs::init() {
 	pids[PID_INC_DIRECTION_VALUE_X]           .setup("Invert Dircetion X", "bool");
 	pids[PID_INC_DIRECTION_VALUE_Y]           .setup("Invert Dircetion Y", "bool");
 	pids[PID_INC_DIRECTION_VALUE_Z]           .setup("Invert Dircetion Z", "bool");
+	pids[PID_INC_DIRECTION_VALUE_H]           .setup("Invert Dircetion H", "bool");
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int pid) {
@@ -272,6 +278,11 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_OTHER_MOVE_CMD_ACTIVE]              = "Arduino::decodeMove(): Move rejected because a other move statement is currently active";
 	errorCodes[E_INVALID_MOVE_SEQUENCE]              = "Arduino::decodeMoveSequence(): Invalid byte chain";
 	errorCodes[E_INVALID_PARAM_SIZE]                 = "Arduino::decodeMoveSequence(): Can't read size (int32_t) from Serial: invalid size: ";
+	errorCodes[E_AVOID_READY_TO_RUN]                 = "Arduino::avoidReadyToRun == true";
+	
+	errorCodes[E_INVALID_TRANSACTION_STATE]          = "Arduino::processPodest: Invalid Transaction state";
+	errorCodes[E_PODEST_DIR_CHANGE_FAILED]           = "Arduino::processPodest: Direction change failed";
+	errorCodes[E_PODEST_MOVE_FAILED]                 = "Arduino::processPodest: Move failed";
 	
 	errorCodes[E_STEPPER_NOT_ENABLED]                = "Arduino::stepAxisXYZ: Stepper not enabled";
 	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::stepAxisXYZ: Stepper not initialized";

@@ -43,6 +43,9 @@
   
   const unsigned char CMD_RESET_CONTROLLER                =  'R'; //  82 0x52
     
+  const unsigned char CMD_PUSH_TRANSACTION                =  '('; //  40 0x28
+  const unsigned char CMD_POP_TRANSACTION                 =  ')'; //  41 0x29
+  
   const unsigned char CMD_SETTER                          =  'S'; //  83 0x53
   const unsigned char CMD_GETTER                          =  'G'; //  71 0x47
   
@@ -55,7 +58,11 @@
   const unsigned char CMD_MOVE_UNIT_LIMIT_IS_FREE         =  '>'; //  62 0x3E
 
   const unsigned char CMD_MOVE_INTERACTIVE                =  '%'; //  37 0x25
-  
+
+  const unsigned char CMD_ACTIVATE_PODEST_HW              =  '['; //  91 0x5B
+  const unsigned char CMD_DEACTIVATE_PODEST_HW            =  ']'; //  93 0x5E
+  const unsigned char CMD_MOVE_PODEST                     =  '$'; //  36 0x24
+ 
   const unsigned char CMD_PRINT_CONFIG                    =  'c'; //  99 0x63
   const unsigned char CMD_PRINT_TIMESTAMP                 =  'T'; //  84 0x54
   const unsigned char CMD_PRINT_VERSION                   =  'V'; //  86 0x56
@@ -169,6 +176,7 @@
   const unsigned char PID_INC_DIRECTION_VALUE_X           =  80;
   const unsigned char PID_INC_DIRECTION_VALUE_Y           =  81;
   const unsigned char PID_INC_DIRECTION_VALUE_Z           =  82;
+  const unsigned char PID_INC_DIRECTION_VALUE_H           =  83;
 
   const unsigned char PID_PULSE_WIDTH_HIGH                = 100;
   const unsigned char PID_PROBE_MODE                      = 101;
@@ -237,6 +245,10 @@
   const unsigned char E_OTHER_MOVE_CMD_ACTIVE             =   9;
   const unsigned char E_INVALID_MOVE_SEQUENCE             =  10;
   const unsigned char E_INVALID_PARAM_SIZE                =  11;
+  const unsigned char E_INVALID_TRANSACTION_STATE         =  12;
+  const unsigned char E_PODEST_DIR_CHANGE_FAILED          =  13;
+  const unsigned char E_PODEST_MOVE_FAILED                =  14;
+  const unsigned char E_AVOID_READY_TO_RUN                =  15;
 
   const unsigned char E_STEPPER_NOT_ENABLED               =  20;
   const unsigned char E_STEPPER_NOT_INITIALIZED           =  21;

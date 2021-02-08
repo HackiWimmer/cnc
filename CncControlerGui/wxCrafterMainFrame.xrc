@@ -6466,7 +6466,7 @@ Preview</label>
         </object>
       </object>
       <object class="wxAuiPaneInfo" name="TemplateManager">
-        <caption>Cnc File Manager</caption>
+        <caption>CNC File Manager</caption>
         <caption_visible>1</caption_visible>
         <top_dockable>1</top_dockable>
         <left_dockable>1</left_dockable>
@@ -6584,48 +6584,61 @@ Preview</label>
                   </object>
                   <object class="sizeritem">
                     <flag>wxALL|wxEXPAND</flag>
-                    <object class="wxSplitterWindow" name="m_splitter6478">
-                      <style>wxSP_3D</style>
-                      <gravity>0.5</gravity>
-                      <minsize>10</minsize>
-                      <sashpos>0</sashpos>
-                      <orientation>horizontal</orientation>
-                      <object class="wxPanel" name="m_splitterPage6482">
-                        <style>wxTAB_TRAVERSAL</style>
-                        <object class="wxFlexGridSizer">
-                          <cols>1</cols>
-                          <rows>2</rows>
-                          <vgap>0</vgap>
-                          <hgap>0</hgap>
-                          <growablecols>0</growablecols>
-                          <growablerows>0</growablerows>
-                          <object class="sizeritem">
-                            <flag>wxALL|wxEXPAND</flag>
-                            <border>1</border>
-                            <object class="wxPanel" name="m_lruListPlaceholder">
-                              <style>wxTAB_TRAVERSAL</style>
-                              <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                    <object class="wxNotebook" name="m_notebookFileView">
+                      <style>wxBK_BOTTOM</style>
+                      <font>
+                        <size>8</size>
+                        <style>normal</style>
+                        <weight>normal</weight>
+                        <family>swiss</family>
+                        <underlined>0</underlined>
+                        <face>Segoe UI</face>
+                      </font>
+                      <object class="notebookpage">
+                        <label>LRU</label>
+                        <bitmap>bitmaps/view-list-text.png</bitmap>
+                        <selected>0</selected>
+                        <object class="wxPanel" name="m_panel9828">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0</growablecols>
+                            <growablerows>0</growablerows>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <object class="wxPanel" name="m_lruListPlaceholder">
+                                <style>wxTAB_TRAVERSAL</style>
+                                <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                              </object>
                             </object>
                           </object>
                         </object>
                       </object>
-                      <object class="wxPanel" name="m_splitterPage6490">
-                        <style>wxTAB_TRAVERSAL</style>
-                        <object class="wxFlexGridSizer">
-                          <cols>1</cols>
-                          <rows>1</rows>
-                          <vgap>0</vgap>
-                          <hgap>0</hgap>
-                          <growablecols>0</growablecols>
-                          <growablerows>0</growablerows>
-                          <object class="sizeritem">
-                            <flag>wxALL|wxEXPAND</flag>
-                            <object class="wxPanel" name="m_mainFileViewPlaceholder">
-                              <style>wxTAB_TRAVERSAL</style>
-                              <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                              <tooltip>
-                                <![CDATA[Only a placeholder]]>
-                              </tooltip>
+                      <object class="notebookpage">
+                        <label>Explorer</label>
+                        <bitmap>bitmaps/view-file-columns.png</bitmap>
+                        <selected>0</selected>
+                        <object class="wxPanel" name="m_panel9830">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>1</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0</growablecols>
+                            <growablerows>0</growablerows>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <object class="wxPanel" name="m_mainFileViewPlaceholder">
+                                <style>wxTAB_TRAVERSAL</style>
+                                <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                                <tooltip>
+                                  <![CDATA[Only a placeholder]]>
+                                </tooltip>
+                              </object>
                             </object>
                           </object>
                         </object>
@@ -8906,10 +8919,75 @@ State</label>
                     <growablerows>0</growablerows>
                     <object class="sizeritem">
                       <flag>wxALL|wxEXPAND</flag>
-                      <border>1</border>
-                      <object class="wxPanel" name="m_fileViewsPlaceholder">
-                        <style>wxTAB_TRAVERSAL</style>
-                        <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                      <object class="wxSplitterWindow" name="m_splitter9833">
+                        <style>wxSP_3D</style>
+                        <gravity>0.8</gravity>
+                        <minsize>10</minsize>
+                        <sashpos>0</sashpos>
+                        <orientation>horizontal</orientation>
+                        <object class="wxPanel" name="m_splitterPage9837">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>1</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0</growablecols>
+                            <growablerows>0</growablerows>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <border>1</border>
+                              <object class="wxPanel" name="m_fileViewsPlaceholder">
+                                <style>wxTAB_TRAVERSAL</style>
+                                <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                        <object class="wxPanel" name="m_splitterPage9841">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0</growablecols>
+                            <growablerows>1</growablerows>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <object class="wxStaticLine" name="m_staticLine9847">
+                                <style>wxLI_HORIZONTAL</style>
+                              </object>
+                            </object>
+                            <object class="sizeritem" name="flexGridSizer9848">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <object class="wxFlexGridSizer">
+                                <cols>2</cols>
+                                <rows>1</rows>
+                                <vgap>0</vgap>
+                                <hgap>0</hgap>
+                                <growablecols>0</growablecols>
+                                <growablerows>0</growablerows>
+                                <object class="sizeritem">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <border>1</border>
+                                  <minsize>-1,120</minsize>
+                                  <object class="wxPanel" name="m_cncOverviewsPlaceholder">
+                                    <style>wxTAB_TRAVERSAL</style>
+                                    <size>-1,120</size>
+                                    <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                                  </object>
+                                </object>
+                                <object class="sizeritem">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <object class="wxStaticLine" name="m_staticLine9850">
+                                    <style>wxLI_VERTICAL</style>
+                                  </object>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
                       </object>
                     </object>
                   </object>
@@ -9179,7 +9257,7 @@ State</label>
                         <object class="wxPanel" name="m_splitterPageLogger">
                           <style>wxTAB_TRAVERSAL</style>
                           <object class="wxFlexGridSizer">
-                            <cols>3</cols>
+                            <cols>1</cols>
                             <rows>1</rows>
                             <vgap>0</vgap>
                             <hgap>0</hgap>
@@ -9192,29 +9270,53 @@ State</label>
                                 <bg>wxSYS_COLOUR_INFOBK</bg>
                               </object>
                             </object>
-                            <object class="sizeritem">
-                              <flag>wxALL|wxEXPAND</flag>
-                              <border>1</border>
-                              <object class="wxStaticLine" name="m_staticLine9501">
-                                <style>wxLI_VERTICAL</style>
-                              </object>
-                            </object>
-                            <object class="sizeritem">
-                              <flag>wxALL|wxEXPAND</flag>
-                              <border>1</border>
-                              <minsize>280,-1</minsize>
-                              <object class="wxPanel" name="m_lcdPositionPlaceholder">
-                                <style>wxTAB_TRAVERSAL</style>
-                                <size>280,-1</size>
-                                <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                              </object>
-                            </object>
                           </object>
                         </object>
                       </object>
                     </object>
                   </object>
                 </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="wxAuiPaneInfo" name="CncCoordinates">
+        <caption>CNC Coordinates</caption>
+        <caption_visible>1</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
+        <resizable>1</resizable>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>100,100</best_size>
+        <max_size>100,100</max_size>
+        <min_size>100,100</min_size>
+        <left>1</left>
+        <layer>0</layer>
+        <row>0</row>
+        <position>0</position>
+        <close_button>1</close_button>
+        <minimize_button>1</minimize_button>
+        <maximize_button>1</maximize_button>
+        <pin_button>1</pin_button>
+        <object class="wxPanel" name="m_cncCoordinateView">
+          <style>wxTAB_TRAVERSAL</style>
+          <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>1</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>0</growablecols>
+            <growablerows>0</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxPanel" name="m_lcdPositionPlaceholder">
+                <style>wxTAB_TRAVERSAL</style>
+                <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
               </object>
             </object>
           </object>
@@ -9344,6 +9446,16 @@ State</label>
         <object class="wxMenuItem" name="m_miViewMonitor">
           <checkable>1</checkable>
           <label>CNC Motion Monitor</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
+        </object>
+        <object class="wxMenuItem" name="m_miViewCoordinates">
+          <checkable>1</checkable>
+          <label>CNC Coordinates</label>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -9708,6 +9820,16 @@ State</label>
         <object class="wxMenuItem" name="m_miResolveLimitState">
           <label>Resolve Limit States</label>
           <bitmap>bitmaps/16-warning.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+          <help>
+            <![CDATA[]]>
+          </help>
+        </object>
+        <object class="wxMenuItem" name="m_miPodestManagement">
+          <label>Podest Management</label>
+          <bitmap>bitmaps/CodeLite/16-sort.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-info@2x">bitmaps\CodeLite\16-info@2x.png</object>
+  <object class="wxBitmap" name="16-sort">bitmaps\CodeLite\16-sort.png</object>
+  <object class="wxBitmap" name="16-sort@2x">bitmaps\CodeLite\16-sort@2x.png</object>
+  <object class="wxBitmap" name="24-down@2x">bitmaps\24-down@2x.png</object>
+  <object class="wxBitmap" name="24-up@2x">bitmaps\24-up@2x.png</object>
+  <object class="wxBitmap" name="window-close-3">bitmaps\window-close-3.png</object>
+</resource>

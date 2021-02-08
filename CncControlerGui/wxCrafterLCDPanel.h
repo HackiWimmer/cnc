@@ -13,7 +13,6 @@
 #include <wx/panel.h>
 #include <wx/artprov.h>
 #include <wx/sizer.h>
-#include <wx/statline.h>
 #include <wx/stattext.h>
 #include <wx/timer.h>
 #if wxVERSION_NUMBER >= 2900
@@ -36,20 +35,25 @@
 class CncLCDPositionPanelBase : public wxPanel
 {
 protected:
-    wxStaticLine* m_staticLine5110;
-    wxStaticText* m_staticText49;
-    wxStaticLine* m_staticLine51;
+    wxPanel* m_panel58;
     wxStaticText* m_staticText7;
-    wxPanel* m_lcdPlaceholderW;
+    wxPanel* m_lcdPlaceholderF;
+    wxPanel* m_panel70;
     wxStaticText* m_unitW;
+    wxPanel* m_panel54;
     wxStaticText* m_staticText72;
     wxPanel* m_lcdPlaceholderX;
+    wxPanel* m_panel72;
     wxStaticText* m_unitX;
+    wxPanel* m_panel62;
     wxStaticText* m_staticText725;
     wxPanel* m_lcdPlaceholderY;
+    wxPanel* m_panel74;
     wxStaticText* m_unitY;
+    wxPanel* m_panel66;
     wxStaticText* m_staticText7258;
     wxPanel* m_lcdPlaceholderZ;
+    wxPanel* m_panel76;
     wxStaticText* m_unitZ;
     wxTimer* m_updateTimer;
     wxTimer* m_startupTimer;
@@ -61,21 +65,26 @@ protected:
     virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
-    wxStaticLine* GetStaticLine5110() { return m_staticLine5110; }
-    wxStaticText* GetStaticText49() { return m_staticText49; }
-    wxStaticLine* GetStaticLine51() { return m_staticLine51; }
     wxStaticText* GetStaticText7() { return m_staticText7; }
-    wxPanel* GetLcdPlaceholderW() { return m_lcdPlaceholderW; }
+    wxPanel* GetPanel58() { return m_panel58; }
+    wxPanel* GetLcdPlaceholderF() { return m_lcdPlaceholderF; }
     wxStaticText* GetUnitW() { return m_unitW; }
+    wxPanel* GetPanel70() { return m_panel70; }
     wxStaticText* GetStaticText72() { return m_staticText72; }
+    wxPanel* GetPanel54() { return m_panel54; }
     wxPanel* GetLcdPlaceholderX() { return m_lcdPlaceholderX; }
     wxStaticText* GetUnitX() { return m_unitX; }
+    wxPanel* GetPanel72() { return m_panel72; }
     wxStaticText* GetStaticText725() { return m_staticText725; }
+    wxPanel* GetPanel62() { return m_panel62; }
     wxPanel* GetLcdPlaceholderY() { return m_lcdPlaceholderY; }
     wxStaticText* GetUnitY() { return m_unitY; }
+    wxPanel* GetPanel74() { return m_panel74; }
     wxStaticText* GetStaticText7258() { return m_staticText7258; }
+    wxPanel* GetPanel66() { return m_panel66; }
     wxPanel* GetLcdPlaceholderZ() { return m_lcdPlaceholderZ; }
     wxStaticText* GetUnitZ() { return m_unitZ; }
+    wxPanel* GetPanel76() { return m_panel76; }
     wxTimer* GetUpdateTimer() { return m_updateTimer; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }
     CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,260), long style = wxTAB_TRAVERSAL);

@@ -11,7 +11,7 @@
   #define TOOL_STATE_ON                                     PL_LOW
 
   #define ENABLE_STATE_OFF                                  PL_HIGH
-  #define ENABLE_STATE_ON                                   PL_LOW 
+  #define ENABLE_STATE_ON                                   PL_LOW
 
   #ifndef SKETCH_COMPILE
 
@@ -111,6 +111,12 @@
     const unsigned char PIN_Z_STP                           =   8;
     const unsigned char PIN_Z_DIR                           =   9;
 
+    const unsigned char PIN_H_STP                           =  50;
+    const unsigned char PIN_H_DIR                           =  49;
+    const unsigned char PIN_H_MOVE_UP                       =  48;
+    const unsigned char PIN_H_MOVE_DOWN                     =  47;
+    const unsigned char PIN_ENABLE_PODEST                   =  46;
+
     const unsigned char PIN_ENABLE_STEPPER                  =  10;
     const unsigned char PIN_ENABLE_TOOL                     =  11;
 
@@ -150,6 +156,14 @@
     #define PIN_INTERRUPT_LED                            AE::PN_A3   
     const unsigned char PIN_INTERRUPT_LED_ID                 =  3;
 
+    #define READ_LMT_PIN_H_MIN                            ( AE::digitalRead(PIN_H_MIN_LIMIT) )
+    #define READ_LMT_PIN_H_MAX                            ( AE::digitalRead(PIN_H_MAX_LIMIT) )
+    #define READ_LMT_PIN_H                                ( AE::digitalRead(PIN_H_MIN_LIMIT) && AE::digitalRead(PIN_H_MAX_LIMIT) )
+    
+    #define WRITE_STP_PIN_H(value)                        AE::digitalWrite(PIN_H_STP, value); 
+    #define WRITE_DIR_PIN_H(value)                        AE::digitalWrite(PIN_H_DIR, value); 
+   
+
     // Direct port (pin) manipulation
     #ifdef SKETCH_COMPILE
       // Attention: the following read and write macros have to be aligned 
@@ -184,7 +198,7 @@
 
       #define WRITE_STP_PIN_Z(value)                        if ( value ) { PORTH |=  (1 << PH5); } else { PORTH &= ~(1 << PH5); }
       #define WRITE_DIR_PIN_Z(value)                        if ( value ) { PORTH |=  (1 << PH6); } else { PORTH &= ~(1 << PH6); }
-      
+
     #else
     
       #define READ_LMT_PIN_X_MIN                            ( AE::digitalRead(PIN_X_MIN_LIMIT) )
@@ -208,13 +222,14 @@
       #define READ_IS_CTRL_POWERED_PIN                      AE::digitalRead(PIN_IS_CTRL_POWERED)
       #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
       
-      #define WRITE_DIR_PIN_X(value)                        AE::digitalWrite(PIN_X_DIR, value); 
-      #define WRITE_DIR_PIN_Y(value)                        AE::digitalWrite(PIN_Y_DIR, value); 
-      #define WRITE_DIR_PIN_Z(value)                        AE::digitalWrite(PIN_Z_DIR, value); 
-      
       #define WRITE_STP_PIN_X(value)                        AE::digitalWrite(PIN_X_STP, value); 
+      #define WRITE_DIR_PIN_X(value)                        AE::digitalWrite(PIN_X_DIR, value); 
+      
       #define WRITE_STP_PIN_Y(value)                        AE::digitalWrite(PIN_Y_STP, value); 
+      #define WRITE_DIR_PIN_Y(value)                        AE::digitalWrite(PIN_Y_DIR, value); 
+
       #define WRITE_STP_PIN_Z(value)                        AE::digitalWrite(PIN_Z_STP, value); 
+      #define WRITE_DIR_PIN_Z(value)                        AE::digitalWrite(PIN_Z_DIR, value); 
     
     #endif // SKETCH_COMPILE
         

@@ -14,7 +14,7 @@ class ArduinoMainLoop {
 
   private:
 
-    CncArduinoController*  controller;
+    CncArduinoController*   controller;
 
     ArduinoMainLoop(const ArduinoMainLoop&);
     

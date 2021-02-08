@@ -80,6 +80,7 @@
 #include "CncMotionVertexTrace.h"
 #include "CncTemplateObserver.h"
 #include "CncFileViewLists.h"
+#include "CncPodestManagement.h"
 #include "CncExternalViewBox.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
@@ -946,20 +947,24 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
-#include <cmath>
-#include <cfloat>
-#include <limits>
-
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	m_miRqtIdleMessages->Check(false);
+		cnc->processMovePodest(1000);
+	m_miRqtIdleMessages->Check(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
 	
+	m_miRqtIdleMessages->Check(false);
+		cnc->processMovePodest(-1000);
+	m_miRqtIdleMessages->Check(true);
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -1011,8 +1016,8 @@ void MainFrame::activateSecureMode(bool state) {
 		if ( IsFullScreen() == false )
 			ShowFullScreen(true);
 		
-		showAuiPane("SecureRunPanel", 	false);
-		showAuiPane("StatusBar", 		false);
+		showAuiPane("SecureRunPanel",	false);
+		showAuiPane("StatusBar",		false);
 		
 		if ( cncExtMainPreview->IsShownOnScreen() )
 			cncExtMainPreview->Show(false);
@@ -1023,6 +1028,7 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(m_secLoggerPlaceholder, 				getLoggerView());
 		GblFunc::swapControls(m_secSpeedMonitorPlaceholder,			speedMonitor->GetDrawingAreaBook());
 		GblFunc::swapControls(m_fileViewsPlaceholder,				m_fileViews);
+		GblFunc::swapControls(m_cncOverviewsPlaceholder,			cncLCDPositionPanel);
 		
 		getLoggerView()->setShowOnDemandState(false);
 		
@@ -1038,6 +1044,7 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(getLoggerView(),						m_secLoggerPlaceholder);
 		GblFunc::swapControls(speedMonitor->GetDrawingAreaBook(),	m_secSpeedMonitorPlaceholder);
 		GblFunc::swapControls(m_fileViews,							m_fileViewsPlaceholder);
+		GblFunc::swapControls(cncLCDPositionPanel,					m_cncOverviewsPlaceholder);
 		
 		getLoggerView()->setShowOnDemandState(getLoggerView()->doShowLoggerOnCommand());
 	}
@@ -2700,15 +2707,6 @@ void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, doub
 	wxASSERT( refPositionDlg );
 	
 	cnc->resetClientId();
-	
-	std::cout << x << std::endl;
-	std::cout << y << std::endl;
-	std::cout << z << std::endl;
-	
-	
-	std::cout << cnc::dblCmp::gt(x, cnc::dbl::MIN) << std::endl;
-	std::cout << cnc::dblCmp::gt(y, cnc::dbl::MIN) << std::endl;
-	std::cout << cnc::dblCmp::gt(z, cnc::dbl::MIN) << std::endl;
 	
 	if ( cnc::dblCmp::gt(x, cnc::dbl::MIN) ) cnc->setZeroPosX(THE_CONFIG->convertMetricToStepsX(x));
 	if ( cnc::dblCmp::gt(y, cnc::dbl::MIN) ) cnc->setZeroPosY(THE_CONFIG->convertMetricToStepsY(y));
@@ -5174,6 +5172,7 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	else if ( name == "UnitCalculator")			return m_svgUnitCalulator;
 	else if ( name == "Debugger")				return m_debuggerView;
 	else if ( name == "AccelerationMonitor")	return m_accelaerationMonitorView;
+	else if ( name == "CncCoordinates")			return m_cncCoordinateView;
 	else if ( name == "SecureRunPanel")			return m_secureRunPanel;
 	
 	return NULL;
@@ -5191,6 +5190,7 @@ wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 	else if ( name == "UnitCalculator")			return m_miViewUnitCalculator;
 	else if ( name == "Debugger")				return m_miViewDebugger;
 	else if ( name == "AccelerationMonitor")	return m_miViewAccelMonitor;
+	else if ( name == "CncCoordinates")			return m_miViewCoordinates;
 	
 	return NULL;
 }
@@ -5281,6 +5281,11 @@ void MainFrame::viewLogger(wxCommandEvent& event) {
 void MainFrame::viewMonitor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	toggleAuiPane("Outbound");
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::viewCoordinates(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	toggleAuiPane("CncCoordinates");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewSpy(wxCommandEvent& event) {
@@ -7796,11 +7801,14 @@ void MainFrame::cncTransactionLockCallback() {
 				std::cerr << "MainFrame::cncTransactionLockCallback(): Idle still active!" << std::endl;
 				break;
 			}
-		}
-	}
+		} 
+		
+		if ( cnc->isSpyOutputOn() )
+			cnc::spy.addMarker("Transaction initiated . . . ");
 	
-	if ( cnc && cnc->isSpyOutputOn() )
-		cnc::spy.addMarker("Transaction initiated . . . ");
+		if ( cnc->isConnected() )
+			cnc->processCommand(CMD_PUSH_TRANSACTION, std::cerr);
+	}
 	
 	getLoggerView()->popProcessMode(LoggerSelection::VAL::CNC);
 	getCncPreProcessor()->popProcessMode();
@@ -7815,8 +7823,15 @@ void MainFrame::cncTransactionReleaseCallback() {
 	getCncPreProcessor()->pushUpdateMode();
 	getLoggerView()->pushUpdateMode(LoggerSelection::VAL::CNC);
 	
-	if ( cnc && cnc->isSpyOutputOn() )
-		cnc::spy.addMarker("Transaction released . . . ");
+	if ( cnc != NULL ) {
+		
+		#warning
+		if ( cnc->isConnected() )
+			cnc->processCommand(CMD_POP_TRANSACTION, std::cerr);
+		
+		if ( cnc->isSpyOutputOn() )
+			cnc::spy.addMarker("Transaction released . . . ");
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clickWorkingParameters(wxCommandEvent& event) {
@@ -8006,6 +8021,16 @@ void MainFrame::setControllerPowerStateBmp(bool state) {
 /////////////////////////////////////////////////////////////////////
 	m_ctrlPowerStateBmp->SetBitmap(ImageLibPower().Bitmap(state ? "BMP_ON": "BMP_OFF"));
 	m_ctrlPowerStateBmp->Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onPodestManagement(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_miRqtIdleMessages->Check(false);
+	
+		CncPodestManagement dlg(this);
+		dlg.ShowModal();
+	
+	m_miRqtIdleMessages->Check(true);
 }
 
 

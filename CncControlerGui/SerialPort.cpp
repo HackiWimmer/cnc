@@ -1053,6 +1053,24 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+bool Serial::pushCommand(const unsigned char c) {
+///////////////////////////////////////////////////////////////////
+	if ( isConnected() == false ) {
+		std::cout << "SERIAL::processUpdateInteractiveMove()::ERROR: Not connected\n";
+		return false;
+	}
+	
+	const unsigned int LEN = 1;
+	unsigned char cmd[LEN];
+	cmd[0] = c;
+	
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
+
+	lastFetchResult.init(cmd[0]);
+	return writeData(cmd, LEN);
+}
+///////////////////////////////////////////////////////////////////
 bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
@@ -1187,11 +1205,11 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 		return false;
 	}
 	
-	SerialCommandLocker scl(moveCommand[0]);
+	SerialCommandLocker scl(cmdType);
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "Serial::processMove: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		std::clog << " Running Command : '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
-		std::clog << " This Command    : '" << ArduinoCMDs::getCMDLabel(moveCommand[0]) << "'\n";
+		std::clog << " This Command    : '" << ArduinoCMDs::getCMDLabel(cmdType) << "'\n";
 		std::clog << "  Values: ";
 		for ( unsigned int i=0; i<size; i++ )
 			std::clog << values[i] << ", ";
@@ -1229,6 +1247,64 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	sfi.Mc.value1		= values[0];
 	sfi.Mc.value2		= values[1];
 	sfi.Mc.value3		= values[2];
+	
+	if ( serializeMove(sfi, moveCommand, idx) == false ) {
+		cncControl->SerialCallback();
+		return false;
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::processMovePodest(int32_t steps) {
+///////////////////////////////////////////////////////////////////
+	if ( steps == 0 )
+		return true;
+	
+	if ( isConnected() == false ) {
+		std::cerr << "SERIAL::processMoveXY()::ERROR: Not connected\n";
+		return false;
+	}
+	
+	const unsigned char cmd = CMD_MOVE_PODEST;
+	
+	SerialCommandLocker scl(cmd);
+	if ( scl.lock(cncControl) == false ) {
+		std::clog << "Serial::processMovePodest: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		std::clog << " Running Command : '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
+		std::clog << " This Command    : '" << ArduinoCMDs::getCMDLabel(cmd) << "'\n";
+		std::clog << "  Steps: " << steps;
+		std::clog << std::endl;
+		return true;
+	}
+
+	// Always log the start postion
+	if ( cncControl->SerialCallback() == false )
+		return false;
+	
+	unsigned char* p = moveCommand;
+	unsigned int idx = 0;
+	
+	moveCommand[idx++] = cmd;
+	p++;
+	
+	unsigned char size = 1;
+	moveCommand[idx++] = size;
+	p++;
+
+	memcpy(p, &steps, LONG_BUF_SIZE);
+	idx += LONG_BUF_SIZE; 
+	p   += LONG_BUF_SIZE;
+	
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", moveCommand[0], ArduinoCMDs::getCMDLabel(moveCommand[0])));
+	
+	SerialFetchInfo sfi(moveCommand[0]);
+	sfi.fetchTimeout 	= 0;
+	sfi.Mc.size 		= size;
+	sfi.Mc.value1		= steps;
+	sfi.Mc.value2		= 0;
+	sfi.Mc.value3		= 0;
 	
 	if ( serializeMove(sfi, moveCommand, idx) == false ) {
 		cncControl->SerialCallback();
@@ -2084,7 +2160,10 @@ bool Serial::serializeMove(SerialFetchInfo& sfi, const unsigned char* buffer, un
 		return false;
 	}
 	
-	bool ret = evaluateResultWrapper(sfi, std::cout);
+	bool ret = true;
+	if ( sfi.fetchTimeout > 0 )
+		ret = evaluateResultWrapper(sfi, std::cout);
+		
 	logMeasurementLastTs();
 	
 	return ret;

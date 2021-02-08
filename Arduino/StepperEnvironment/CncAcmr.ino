@@ -202,6 +202,8 @@ bool ArduinoAccelManager::initMove(uint32_t mD_IMPL) {
     curImplCnt  = 0;
     
     if ( fA.stdRampWidth_IMPL > 0 ) {
+        fA.relRampWidth_IMPL = fA.stdRampWidth_IMPL;
+        fD.relRampWidth_IMPL = fD.stdRampWidth_IMPL;
         changeState(P_ACCEL);
     }
     else {
@@ -209,6 +211,14 @@ bool ArduinoAccelManager::initMove(uint32_t mD_IMPL) {
       fD.relRampWidth_IMPL = 0;
       changeState(P_CONST);
     }
+
+    #ifndef SKETCH_COMPILE 
+      if ( false ) {
+        ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::initMove: fA.stdRampWidth_IMPL = %ld", fA.stdRampWidth_IMPL));
+        ARDO_DEBUG_MESSAGE('D', wxString::Format("ArduinoAccelManager::initMove: fA.relRampWidth_IMPL = %ld", fA.relRampWidth_IMPL));
+      }
+    #endif  
+  
   }
   // --------------------------------------------------------------------------------
 
@@ -299,7 +309,7 @@ uint32_t ArduinoAccelManager::initNextImpulse(AxisSignatureIndex axisSignatureId
     case P_UNDEF:
     default:
     {
-      ret = getDefalutDelay();
+      ret = getDefaultDelay();
     }
   }
 

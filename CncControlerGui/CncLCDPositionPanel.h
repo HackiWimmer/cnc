@@ -7,7 +7,7 @@
 class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 	
 	private:
-		wxLCDWindow* lcdW;
+		wxLCDWindow* lcdF;
 		wxLCDWindow* lcdX;
 		wxLCDWindow* lcdY;
 		wxLCDWindow* lcdZ;
@@ -23,6 +23,7 @@ class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 		virtual void onPaint(wxPaintEvent& event);
 		virtual void onSize(wxSizeEvent& event);
 		virtual void onStartupTimer(wxTimerEvent& event);
+		virtual void onUpdateTimer(wxTimerEvent& event);
 };
 
 #endif // CNCLCDPOSITIONPANEL_H

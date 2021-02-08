@@ -185,6 +185,8 @@
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>
+  <object class="wxBitmap" name="view-file-columns">bitmaps\view-file-columns.png</object>
+  <object class="wxBitmap" name="view-list-text">bitmaps\view-list-text.png</object>
   <object class="wxBitmap" name="view-orientation">bitmaps\view-orientation.png</object>
   <object class="wxBitmap" name="view-process-all">bitmaps\view-process-all.png</object>
   <object class="wxBitmap" name="view-process-system">bitmaps\view-process-system.png</object>

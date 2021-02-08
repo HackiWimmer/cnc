@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <object class="wxDialog" name="CncPodestManagementBase">
+    <title>Cnc Podest Management</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE</style>
+    <size>250,250</size>
+    <object class="wxFlexGridSizer">
+      <minsize>250,250</minsize>
+      <cols>1</cols>
+      <rows>1</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <object class="wxPanel" name="m_basePanel">
+          <style>wxTAB_TRAVERSAL</style>
+          <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>3</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>0</growablecols>
+            <growablerows>0</growablerows>
+            <object class="sizeritem" name="flexGridSizer9543">
+              <flag>wxALL|wxEXPAND</flag>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>3</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <growablerows>0,1</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>2</border>
+                  <object class="wxBitmapButton" name="m_btUp">
+                    <bitmap>bitmaps/24-up@2x.png</bitmap>
+                    <style>wxBU_AUTODRAW</style>
+                    <tooltip>
+                      <![CDATA[Move Podest Up]]>
+                    </tooltip>
+                    <default>0</default>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>2</border>
+                  <object class="wxBitmapButton" name="m_btDown">
+                    <bitmap>bitmaps/24-down@2x.png</bitmap>
+                    <style>wxBU_AUTODRAW</style>
+                    <tooltip>
+                      <![CDATA[Move Podest Down]]>
+                    </tooltip>
+                    <default>0</default>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>2</border>
+              <object class="wxStaticLine" name="m_staticLine9554">
+                <style>wxLI_HORIZONTAL</style>
+              </object>
+            </object>
+            <object class="sizeritem" name="flexGridSizer9562">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>2</border>
+              <object class="wxFlexGridSizer">
+                <cols>2</cols>
+                <rows>1</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>1</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <object class="wxStaticBitmap" name="m_info">
+                    <bitmap>bitmaps/CodeLite/16-info@2x.png</bitmap>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxALIGN_RIGHT</flag>
+                  <border>2</border>
+                  <object class="wxButton" name="m_button9552">
+                    <label>Close</label>
+                    <style/>
+                    <font>
+                      <size>9</size>
+                      <style>normal</style>
+                      <weight>bold</weight>
+                      <family>swiss</family>
+                      <underlined>0</underlined>
+                      <face>Segoe UI</face>
+                    </font>
+                    <bitmap>bitmaps/window-close-3.png</bitmap>
+                    <bitmapposition>wxLEFT</bitmapposition>
+                    <default>0</default>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

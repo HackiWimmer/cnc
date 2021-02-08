@@ -13,21 +13,47 @@
 class CncAxisX;
 class CncAxisY;
 class CncAxisZ;
+class CncAxisH;
 
 class CncArduinoController : public ArduinoCmdDecoderGetter, 
                              public ArduinoCmdDecoderSetter,
                              public ArduinoCmdDecoderMove,
+                             public ArduinoCmdDecoderMovePodest,
                              public ArduinoCmdDecoderMoveSequence,
                              public ArduinoPositionRenderer,
                              public ArduinoAccelManager
 {                                    
   private:
 
-   typedef ArduinoImpulseCalculator ImpulseCalculator;
+    class PodestEnabler {
+      public:
+        PodestEnabler()  { PodestEnabler::enable();  }
+        ~PodestEnabler() { PodestEnabler::disable(); }
+
+        static void enable(bool state = true) { AE::digitalWrite(PIN_ENABLE_PODEST, state); AE::delayMicroseconds(10); }
+        static void disable()                 { PodestEnabler::enable(false); }
+        static bool isEnabled()               { return AE::digitalRead(PIN_ENABLE_PODEST); }
+    };
+
+    struct InteractiveMove {
+      bool      active  = false;
+      int8_t    valueX  = 0;
+      int8_t    valueY  = 0;
+      int8_t    valueZ  = 0;
+
+      void reset() {
+       *this = InteractiveMove();
+      }
+    
+    };
+
+    typedef bool  (*stopPodestHardware_funct)  (CncArduinoController* ctrl);
+    typedef ArduinoImpulseCalculator ImpulseCalculator;
 
     CncAxisX*           X;
     CncAxisY*           Y;
     CncAxisZ*           Z;
+    CncAxisH*           H;
     
     ArduinoTestManager* testManager;
 
@@ -35,11 +61,12 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     
     ArdoObj::I2CData    lastI2CData;
 
+    bool                transactionState;
+    bool                podestHardwareState;
     bool                posReplyState;
     bool                probeMode;
     bool                pause;
     bool                I2CAvailable;
-    bool                interactiveMoveActive;
 
     uint32_t            cfgF1000_MMSEC   = 0;
     uint32_t            cmsF1000_MMMin   = 0;
@@ -50,11 +77,11 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     uint32_t            tsMoveStart;
     uint32_t            tsMoveLast;
 
-    int8_t              interactiveValueX;
-    int8_t              interactiveValueY;
-    int8_t              interactiveValueZ;
-
+    InteractiveMove     interactiveMove;  
+    
     CncArduinoController(const CncArduinoController&);
+
+    byte                initInteractiveSpeed();
 
     void                setProbeMode(bool state = true)                     { probeMode = state; }
     void                enableProbeMode()                                   { setProbeMode(true); }
@@ -84,6 +111,10 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     byte                movePosition        (int32_t dx, int32_t dy, int32_t dz);
     byte                moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz);
 
+    byte                movePodest(int32_t stepDir, stopPodestHardware_funct stopFunct);
+    static bool         stopMovePodestBySignal(CncArduinoController* ctrl);
+    static bool         stopMovePodestBySwitch(CncArduinoController* ctrl);
+
   protected:
 
     template<bool IMPL>
@@ -93,12 +124,14 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     friend class        CncAxisX;
     friend class        CncAxisY;
     friend class        CncAxisZ;
+    friend class        CncAxisH;
 
     // decoder interface
     virtual byte        process(const ArduinoCmdDecoderGetter::Result& gt);
     virtual byte        process(const ArduinoCmdDecoderSetter::Result& st);
     virtual byte        process(const ArduinoCmdDecoderMove::Result& mv);
     virtual byte        process(const ArduinoCmdDecoderMoveSequence::Result& seq);
+    virtual byte        process(const ArduinoCmdDecoderMovePodest::Result& mv);
 
     virtual byte        initialize(const ArduinoCmdDecoderMoveSequence::Result& seq);
     virtual byte        finalize  (const ArduinoCmdDecoderMoveSequence::Result& seq);
@@ -140,20 +173,27 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     void                reset();
 
     void                turnOff();
-    
+
+    bool                isTransactionActive()               const  { return transactionState == ON; }
     bool                isProbeMode()                       const  { return probeMode; }
     bool                isI2CAvailable()                    const  { return I2CAvailable; }
     
     bool                evaluateI2CData();
     bool                evaluateI2CAvailable();
+    bool                evaluatePodestSwitch();
 
     bool                processSignal(byte sig);
     bool                processHeartbeat();
+
+    byte                acceptTransaction(byte c);
+    byte                activatePodestHardware(byte c);
     
     byte                acceptGetter();
     byte                acceptSetter();
     byte                acceptMove(byte cmd);
     byte                acceptMoveSequence(byte cmd);
+
+    byte                acceptPodestMove(byte cmd);
     
     byte                acceptInteractiveMove(byte cmd);
     byte                cancelInteractiveMove(byte cmd);
@@ -162,5 +202,6 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     byte                performTest();
     
 };
+
 
 #endif

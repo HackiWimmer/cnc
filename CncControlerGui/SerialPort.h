@@ -402,6 +402,7 @@ class Serial : public SerialOSD {
 		bool processSetter(unsigned char pid, int32_t value);
 		bool processSetter(unsigned char pid, const cnc::SetterValueList& values);
 		
+		bool pushCommand(const unsigned char cmd);
 		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream);
 		
 		bool processStartInteractiveMove();
@@ -411,6 +412,8 @@ class Serial : public SerialOSD {
 		
 		bool resolveLimits(unsigned int size, const int32_t (&values)[3]);
 		
+		bool processMovePodest(int32_t steps);
+
 		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered);
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered);
