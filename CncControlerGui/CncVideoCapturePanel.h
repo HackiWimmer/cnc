@@ -35,6 +35,7 @@ class CncVideoCapturePanel : public wxPanel {
 		void showRect(bool b);
 		
 		void setCaller(CallbackInterface* c) { caller = c; }
+		void setErrowMessage(const wxString& em) { errorMessage = em; }
 		
 	private:
 		
@@ -44,6 +45,7 @@ class CncVideoCapturePanel : public wxPanel {
 		bool				hvCrossFlag;
 		bool				ddCrossFlag;
 		bool				rectFlag;
+		wxString			errorMessage;
 		wxTimer				cameraTimer;
 		wxBitmap*			cameraBitmap;
 		cv::Mat*			cameraFrame;

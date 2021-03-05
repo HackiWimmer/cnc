@@ -9,6 +9,7 @@
 #include "OSD/CncCameraHelper.h"
 #include "CncCommon.h"
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "CncVideoCapturePanel.h"
 
 // ----------------------------------------------------------------------------
@@ -39,9 +40,10 @@ CncVideoCapturePanel::CncVideoCapturePanel(wxWindow* parent)
 , hvCrossFlag		(true)
 , ddCrossFlag		(true)
 , rectFlag			(true)
+, errorMessage		()
 , cameraTimer		(this, wxID_ANY)
 , cameraBitmap		(NULL)
-, cameraFrame		(new cv::Mat(1024, 628, CV_64FC4))
+, cameraFrame		(new cv::Mat())
 , cameraCapture		(new cv::VideoCapture())
 , caller			(NULL)
 {
@@ -89,23 +91,37 @@ void CncVideoCapturePanel::notifyError(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
 bool CncVideoCapturePanel::start() {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_CONFIG->getCameraSupportFlag() == false )
+	if ( THE_CONFIG->getCameraSupportFlag() == false ) {
+		setErrowMessage("Camera support isn't configured.");
 		return false;
+	}
+	
+	if ( THE_CONTEXT->hasHardware() == false ) {
+		setErrowMessage("The current connected Serial Port has no hardware.\nTherefore, no camera available.");
+		return false;
+	}
 		
-	if ( THE_CONFIG->getCameraSupportFlag() == true ) {
-		// open the default camera using default API
+	if ( !cameraCapture->isOpened() ) {
+		// open the defined default camera using default API
 		// cap.open(0);
 		// OR advance usage: select any API backend
 		int deviceID	= THE_CONFIG->getCameraDeviceId();
-		int apiID		= cv::CAP_ANY; // autodetect default API
+		int apiID		= cv::CAP_DSHOW;
 		
 		// open selected camera using selected API
+		// Don't use cv::CAP_ANY direct first here because it generates a GStreamer warning
 		cameraCapture->open(deviceID, apiID);
+		
+		if ( !cameraCapture->isOpened() ) 
+			cameraCapture->open(deviceID, cv::CAP_ANY); // autodetect default API
 		
 		// check if we succeeded
 		if ( !cameraCapture->isOpened() ) {
 			notifyError("ERROR! Unable to open camera");
 			return false;
+		}
+		else {
+			//std::cout << "Using the following camera back end: " << cameraCapture->getBackendName() <<std::endl;
 		}
 	}
 	
@@ -118,7 +134,13 @@ bool CncVideoCapturePanel::stop() {
 	if ( cameraTimer.IsRunning() )
 		cameraTimer.Stop();
 		
-	if ( THE_CONFIG->getCameraSupportFlag() == true )
+	if ( THE_CONFIG->getCameraSupportFlag() == false )
+		return false;
+		
+	if ( THE_CONTEXT->hasHardware() == false )
+		return false;
+
+	if ( cameraCapture->isOpened() )
 		cameraCapture->release();
 	
 	return true;
@@ -171,12 +193,15 @@ void CncVideoCapturePanel::onPaint(wxPaintEvent& event) {
 	wxPaintDC dc(this);
 	dc.Clear();
 	
-	if ( cameraTimer.IsRunning() == false )
+	if ( cameraTimer.IsRunning() == false ) {
+		dc.SetTextForeground(*wxRED);
+		dc.DrawText(errorMessage, wxPoint(dc.GetSize().x / 4, dc.GetSize().y / 2 - 10 ));
 		return;
+	}
 		
 	if ( cameraBitmap == NULL )
 		return;
-		
+	
 	if ( cameraBitmap->IsOk() == false )
 		return;
 	

@@ -289,6 +289,7 @@ void CncReferencePosition::init(wxInitDialogEvent& event) {
 	m_btZeroY->SetValue(true);
 	m_btZeroZ->SetValue(true);
 	determineZeroMode();
+	selectEvaluationMode();
 	
 	m_infobar->Dismiss();
 }
@@ -298,12 +299,15 @@ void CncReferencePosition::show(wxShowEvent& event) {
 	m_rbStepSensitivity->SetSelection(APP_PROXY::GetRbStepSensitivity()->GetSelection());
 	m_rbStepMode->SetSelection(APP_PROXY::GetRbStepMode()->GetSelection());
 	
-	if ( event.IsShown() ) 
+	if ( event.IsShown() )
 		m_infoTimer->Start(200);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::cancel(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( cameraCapture != NULL ) 
+		cameraCapture->stop();
+
 	EndModal(wxID_CANCEL);
 }
 ///////////////////////////////////////////////////////////////////
@@ -320,6 +324,9 @@ void CncReferencePosition::set(wxCommandEvent& event) {
 		}
 	}
 	
+	if ( cameraCapture != NULL ) 
+		cameraCapture->stop();
+
 	valid = true;
 	EndModal(wxID_OK);
 }
