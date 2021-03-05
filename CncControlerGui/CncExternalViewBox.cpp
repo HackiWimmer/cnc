@@ -248,6 +248,8 @@ void CncExternalViewBox::onShow(wxShowEvent& event) {
 		else if ( event.IsShown() == true  && swapState[i] == SS_SWAPED )	; // do nothing
 		else if ( event.IsShown() == false && swapState[i] == SS_SWAPED )	swapControls(i);
 	}
+	
+	decorateMinMaxButton();
 }
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::onCloseFromButton(wxCommandEvent& event) {
@@ -266,7 +268,14 @@ void CncExternalViewBox::onMinMax(wxCommandEvent& event) {
 	if ( IsMaximized() == false )	Maximize();
 	else							Restore();
 	
+	decorateMinMaxButton();
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::decorateMinMaxButton() {
+//////////////////////////////////////////////////////////////////
 	m_btMinMax->SetToolTip( IsMaximized() ? "Minimize" : "Maximize" );
+	m_btMinMax->SetBitmap(ImageLibAui().Bitmap(IsMaximized() ? "BMP_AUI_MINIMIZE"  : "BMP_AUI_EXPAND"));
+	m_btMinMax->Refresh();
 }
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::onStartMove(wxMouseEvent& event) {

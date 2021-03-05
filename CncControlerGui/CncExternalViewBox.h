@@ -66,6 +66,7 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 		
 		void onNavigatorPanel(CncNavigatorPanelEvent& event);
 		void onAttachPage();
+		void decorateMinMaxButton();
 
 };
 
