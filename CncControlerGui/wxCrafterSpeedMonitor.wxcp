@@ -2853,7 +2853,7 @@
                 }, {
                  "type": "string",
                  "m_label": "Name:",
-                 "m_value": "m_btSave923"
+                 "m_value": "m_btSaveV"
                 }, {
                  "type": "multi-string",
                  "m_label": "Tooltip:",
@@ -4197,6 +4197,13 @@
      "m_eventHandler": "wxActivateEventHandler",
      "m_functionNameAndSignature": "onActivate(wxActivateEvent& event)",
      "m_description": "Process a wxEVT_ACTIVATE event",
+     "m_noBody": false
+    }, {
+     "m_eventName": "wxEVT_CLOSE_WINDOW",
+     "m_eventClass": "wxCloseEvent",
+     "m_eventHandler": "wxCloseEventHandler",
+     "m_functionNameAndSignature": "onCloseWindow(wxCloseEvent& event)",
+     "m_description": "Process a close event. This event applies to wxFrame and wxDialog classes",
      "m_noBody": false
     }],
    "m_children": [{

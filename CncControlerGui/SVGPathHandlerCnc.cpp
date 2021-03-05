@@ -557,12 +557,16 @@ bool SVGPathHandlerCnc::performModifications() {
 			// first create a guide path based on the current path
 			registerGuidePath(new CncPathListManager(pathListMgr));
 			guidePath->changeToGuideType();
-			guidePath->roundXYCorners(toolDiameter);
 			
+			// if this did not work the further code also fails. 
+			// To avoid double error messages stop already here
+			if ( guidePath->roundXYCorners(toolDiameter)  == false )
+				return false;
+				
 			// then create the pocket
 			if ( pathListMgr.processXYPocket(toolDiameter) == false )
 				return false;
-				
+			
 			break;
 		}
 		// --------------------------------------------------------
@@ -570,8 +574,12 @@ bool SVGPathHandlerCnc::performModifications() {
 		{
 			// first create a guide path based on the current path
 			registerGuidePath(new CncPathListManager(pathListMgr));
-			guidePath->roundXYCorners(toolDiameter);
 			guidePath->changeToGuideType();
+			
+			// if this did not work the further code also fails. 
+			// To avoid double error messages stop already here
+			if ( guidePath->roundXYCorners(toolDiameter)  == false )
+				return false;
 			
 			// then correct the current path
 			const double offset = toolDiameter / 2.0;

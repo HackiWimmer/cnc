@@ -30,8 +30,9 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
         PodestEnabler()  { PodestEnabler::enable();  }
         ~PodestEnabler() { PodestEnabler::disable(); }
 
-        static void enable(bool state = true) { AE::digitalWrite(PIN_ENABLE_PODEST, state); AE::delayMicroseconds(10); }
+        static void enable(bool state = true) { AE::digitalWrite(PIN_ENABLE_PODEST, state); AE::delayMicroseconds(100); }
         static void disable()                 { PodestEnabler::enable(false); }
+        
         static bool isEnabled()               { return AE::digitalRead(PIN_ENABLE_PODEST); }
     };
 
@@ -40,6 +41,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
       int8_t    valueX  = 0;
       int8_t    valueY  = 0;
       int8_t    valueZ  = 0;
+      uint32_t  tsLast  = 0;
 
       void reset() {
        *this = InteractiveMove();
@@ -109,6 +111,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     void                sendCurrentPositions(unsigned char pid, bool force);
 
     byte                movePosition        (int32_t dx, int32_t dy, int32_t dz);
+    byte                moveUntilContact    (int32_t dx, int32_t dy, int32_t dz);
     byte                moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz);
 
     byte                movePodest(int32_t stepDir, stopPodestHardware_funct stopFunct);
@@ -161,6 +164,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     void                broadcastInterrupt();
 
     void                updateInteractiveMoveValues(int8_t dx, int8_t dy, int8_t dz);
+    void                updateInteractiveMove();
 
   public:
     

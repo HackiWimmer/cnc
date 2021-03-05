@@ -11,6 +11,12 @@
 #include "CncPathListInterface.h"
 #include "CncPathListRunner.h"
 
+// debug only
+namespace DebugPLR {
+	bool trace		= false;
+	bool tracePitch = false;
+};
+
 ////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::maxXYPitchRadians	= CncPathListRunner::Move::degree2Radians(15);
 float CncPathListRunner::Move::maxZPitchRadians		= CncPathListRunner::Move::degree2Radians(15);
@@ -57,9 +63,18 @@ bool CncPathListRunner::Move::isXYZPitchEqual(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
 bool CncPathListRunner::Move::isXYPitchDiffTooStrong(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
-	const double absDiff = std::abs(getXYPitchDiffenceAsRadians(mNext));
+	DebugPLR::tracePitch = DebugPLR::trace;
 	
-	return ( absDiff > PI ? ( 2 * PI - absDiff ) : absDiff ) > maxXYPitchRadians;
+	const double absDiff = std::fabs(getXYPitchDiffenceAsRadians(mNext));
+	const bool ret = ( absDiff > PI ? ( 2 * PI - absDiff ) : absDiff ) > maxXYPitchRadians;
+
+	if ( DebugPLR::trace ) {
+		std::cout	<< wxString::Format(" --> {%10.3lf, %d, [%d]}", ( absDiff > PI ? ( 2 * PI - absDiff ) : absDiff ) * 180/PI, (int)(absDiff > PI), (int)ret )
+					<< std::endl;
+	}
+	
+	DebugPLR::tracePitch = false;
+	return ret;
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListRunner::Move::isZPitchDiffTooStrong(const Move& mNext) const {
@@ -74,20 +89,22 @@ bool CncPathListRunner::Move::isXYZPitchDiffTooStrong(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::getXYPitchDiffenceAsRadians(const Move& mNext) const {
 ////////////////////////////////////////////////////////////////////
-	if ( cnc::dblCompareNull(dx) && cnc::dblCompareNull(dx) )
+	if ( cnc::dblCompareNull(dx) && cnc::dblCompareNull(dy) )
 		return 0.0;
 	
-	if ( cnc::dblCompareNull(mNext.dx) && cnc::dblCompareNull(mNext.dx) )
+	if ( cnc::dblCompareNull(mNext.dx) && cnc::dblCompareNull(mNext.dy) )
 		return 0.0;
 
 	const float a1 = atan2(dx,       dy);
 	const float a2 = atan2(mNext.dx, mNext.dy);
 
-	/*
-	std::cout	<< "(" << dx << ", " << dy << "), (" << mNext.dx << ", " << mNext.dy << "), " 
-				<< (a1 - a2) *180/PI << ", " << a1 << ", " << a2 
-				<< " ----- " << maxXYPitchRadians <<  std::endl;
-	*/
+	if ( DebugPLR::tracePitch == true ) {
+		std::cout	<< wxString::Format("(%10.3lf, %10.3lf) , ", dx, dy )
+					<< wxString::Format("(%10.3lf, %10.3lf) , ", mNext.dx, mNext.dy )
+					<< wxString::Format("(%10.3lf, %10.3lf --> %10.3lf) , ", a1  * 180/PI, a2  * 180/PI, (a1 - a2) * 180/PI )
+					<< wxString::Format("[%10.3lf]", maxXYPitchRadians * 180/PI)
+					;
+	}
 	
 	return (a1 - a2);
 }
@@ -102,7 +119,6 @@ float CncPathListRunner::Move::getZPitchDiffenceAsRadians(const Move& mNext) con
 
 	if ( cnc::dblCompareNull(vxy) )
 		return dz > 0.0 ? +( PI / 2.0) : -( PI / 2.0 );
-		
 		
 	const float a1 = atan2(dz,       vxy);
 	const float a2 = atan2(mNext.dz, mNext.vxy);

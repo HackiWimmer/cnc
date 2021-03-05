@@ -13,6 +13,9 @@
   #define ENABLE_STATE_OFF                                  PL_HIGH
   #define ENABLE_STATE_ON                                   PL_LOW
 
+  #define PODEST_SWITCH_OFF                                 PL_HIGH
+  #define PODEST_SWITCH_ON                                  PL_LOW
+
   #ifndef SKETCH_COMPILE
 
     //#define ARDUINO_AVR_UNO
@@ -111,17 +114,19 @@
     const unsigned char PIN_Z_STP                           =   8;
     const unsigned char PIN_Z_DIR                           =   9;
 
-    const unsigned char PIN_H_STP                           =  50;
+    const unsigned char PIN_H_MOVE_UP                       =  51;
+    const unsigned char PIN_H_MOVE_DOWN                     =  50;
+    
     const unsigned char PIN_H_DIR                           =  49;
-    const unsigned char PIN_H_MOVE_UP                       =  48;
-    const unsigned char PIN_H_MOVE_DOWN                     =  47;
+    const unsigned char PIN_H_STP                           =  48;
+    const unsigned char PIN_LED_PODEST                      =  47;
     const unsigned char PIN_ENABLE_PODEST                   =  46;
 
     const unsigned char PIN_ENABLE_STEPPER                  =  10;
     const unsigned char PIN_ENABLE_TOOL                     =  11;
 
     // PINA
-    //const unsigned char PIN_                              =  29;
+    const unsigned char PIN_TOUCH_CONTACT                   =  29;
     //const unsigned char PIN_                              =  28;
     //const unsigned char PIN_                              =  27;
     //const unsigned char PIN_                              =  26;
@@ -156,7 +161,7 @@
     #define PIN_INTERRUPT_LED                            AE::PN_A3   
     const unsigned char PIN_INTERRUPT_LED_ID                 =  3;
 
-    #define READ_LMT_PIN_H_MIN                            ( AE::digitalRead(PIN_H_MIN_LIMIT) )
+    #define READ_LMT_PIN_H_MIN                            ( AE::digitalRead(PIN_H_MIN_LIMIT) ) 
     #define READ_LMT_PIN_H_MAX                            ( AE::digitalRead(PIN_H_MAX_LIMIT) )
     #define READ_LMT_PIN_H                                ( AE::digitalRead(PIN_H_MIN_LIMIT) && AE::digitalRead(PIN_H_MAX_LIMIT) )
     

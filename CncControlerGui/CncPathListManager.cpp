@@ -569,7 +569,7 @@ bool CncPathListManager::ensureDirection(CncDirection d) {
 	if ( std::distance(cFirstPosEntryIterator(), cend()) < 2 )
 		return true;
 	
-	// nothig to do
+	// nothing to do
 	if ( getOrientation(clipperPath) == d )
 		return true;
 	
@@ -586,6 +586,11 @@ bool CncPathListManager::reversePath() {
 	ClipperLib::Path reversedPath = clipperPath;
 	ClipperLib::ReversePath(reversedPath);
 	
+#warning reverse path
+/*
+for ( auto it = reversedPath.begin(); it != reversedPath.end(); ++it )
+	std::cout << "R: " << (*it).X << ", " << (*it).Y  << ", " <<  (*it).Z << std::endl;
+*/
 	getPathListIntern().erase(cFirstPosEntryIterator(), cend());
 	clipperPath.clear();
 	resetStatistics();
@@ -738,10 +743,12 @@ bool CncPathListManager::roundXYCorners(double toolDiameter) {
 		
 	const double offset = toolDiameter / 2.0;
 	
+	// this is a two step process, first step to inner and 
+	// the the same distance outer again
 	bool ret = processXYOffset(-offset, jtRound, etClosedPolygon);
 	if ( ret == false )
 		return false;
-	 
+	
 	return processXYOffset(+offset , jtRound, etClosedPolygon);
 }
 //////////////////////////////////////////////////////////////////
@@ -795,17 +802,26 @@ bool CncPathListManager::processXYOffset(double offset, JoinType jt, EndType et)
 	clipperPath.clear();
 	resetStatistics();
 	
+	size_t points = 0;
+	
 	for (auto it=result.begin(); it != result.end(); ++it) {
 		
 		ClipperLib::Path& path = *it;
 		closePath(path);
 		ensureDirection(finalDirection, path);
 		
-		for (auto itP=path.begin(); itP != path.end(); ++itP)
+		points += path.size();
+		
+		for (auto itP=path.begin(); itP != path.end(); ++itP) {
 			addEntryAbs(ClipperLib::asCncDoublePosition(*itP), false);
+		}
 	}
 	
-	return true;
+	if ( points == 0 ) {
+		std::cerr << CNC_LOG_FUNCT_A("Too much (inner) offset for the underlying path, therefore the resulted path is empty!\n");
+	}
+	
+	return points != 0;
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListManager::processXYPocket(double toolDiameter) {

@@ -2,7 +2,6 @@
 #include "MainFrame.h"
 #include "GamepadThread.h"
 
-
 ///////////////////////////////////////////////////////////////////
 GamepadThread::GamepadThread(MainFrame *handler)
 : wxThread(wxTHREAD_DETACHED)
@@ -10,6 +9,9 @@ GamepadThread::GamepadThread(MainFrame *handler)
 , exit						(false)
 , prevButtonLeftStick		(false)
 , prevButtonRightStick		(false)
+, prevBackButton			(false)
+, avoidSwitchBouncingFact	(1)
+, prevUsageMode				(GamepadEvent::UM_NAV_GUI)
 , prevPosCtrlMode			(GamepadEvent::PCM_STICKS)
 ///////////////////////////////////////////////////////////////////
 {
@@ -36,6 +38,8 @@ wxThread::ExitCode GamepadThread::Entry() {
 	
 	CncGamepad gamepad(0.9f, 0.9f);
 	GamepadEvent refState(wxEVT_GAMEPAD_THREAD, MainFrame::EventId::GAMEPAD_STATE);
+	
+	wxDateTime tsLast = wxDateTime::Now();
 	
 	while ( !TestDestroy() ) {
 		
@@ -70,13 +74,32 @@ wxThread::ExitCode GamepadThread::Entry() {
 		
 		curState.isSomethingChanged	= ( memcmp(&(refState.data), &(curState.data), sizeof(GamepadEvent::Data)) != 0 );
 		
-		// send a notification message - on demand only
+		if ( curState.isSomethingChanged )
+			tsLast = wxDateTime::Now();
+
+		// fall back to GUI mode
+		if ( curState.data.connected == true ) {
+			if ( curState.data.usageMode == GamepadEvent::UM_NAV_CNC ) {
+				if ( (wxDateTime::Now() - tsLast).Abs().GetSeconds() > 10 ) {
+					curState.data.buttonBack	= true;
+					curState.data.usageMode		= GamepadEvent::UM_NAV_GUI;
+					
+					prevBackButton				= true;
+					prevUsageMode				= curState.data.usageMode;
+				}
+			}
+		}
+
+		// send a notification message 
 		wxQueueEvent(pHandler, new GamepadEvent(curState));
 		
 		// swap buffers
 		refState.data = curState.data;
 		
-		this->Sleep(100);
+		this->Sleep(100 * avoidSwitchBouncingFact );
+		if ( avoidSwitchBouncingFact != 1 )
+			avoidSwitchBouncingFact = 1;
+			
 	} // while
 	
 	// post complete event
@@ -95,108 +118,161 @@ void GamepadThread::sendMessage(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
 void GamepadThread::evaluateNotifications(const CncGamepad& gamepad, GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	state.data.buttonA					= gamepad.stateButtonA();
-	state.data.buttonB 					= gamepad.stateButtonB();
-	state.data.buttonX 					= gamepad.stateButtonX();
-	state.data.buttonY 					= gamepad.stateButtonY();
-	state.data.buttonLeft 				= gamepad.stateButtonLeft();
-	state.data.buttonRight 				= gamepad.stateButtonRight();
-	state.data.buttonUp 				= gamepad.stateButtonUp();
-	state.data.buttonDown 				= gamepad.stateButtonDown();
-	state.data.buttonStart				= gamepad.stateButtonStart();
-	state.data.buttonBack				= gamepad.stateButtonBack();
-	state.data.buttonLeftStick			= gamepad.stateButtonLeftStick();
-	state.data.buttonRightStick			= gamepad.stateButtonRightStick();
-	state.data.buttonLeftShoulder		= gamepad.stateButtonLeftShoulder();
-	state.data.buttonRightShoulder		= gamepad.stateButtonRightShoulder();
+	state.data.buttonA						= gamepad.stateButtonA();
+	state.data.buttonB 						= gamepad.stateButtonB();
+	state.data.buttonX 						= gamepad.stateButtonX();
+	state.data.buttonY 						= gamepad.stateButtonY();
+	state.data.buttonLeft 					= gamepad.stateButtonLeft();
+	state.data.buttonRight 					= gamepad.stateButtonRight();
+	state.data.buttonUp 					= gamepad.stateButtonUp();
+	state.data.buttonDown 					= gamepad.stateButtonDown();
+	state.data.buttonStart					= gamepad.stateButtonStart();
+	state.data.buttonBack					= gamepad.stateButtonBack();
+	state.data.buttonLeftStick				= gamepad.stateButtonLeftStick();
+	state.data.buttonRightStick				= gamepad.stateButtonRightStick();
+	state.data.buttonLeftShoulder			= gamepad.stateButtonLeftShoulder();
+	state.data.buttonRightShoulder			= gamepad.stateButtonRightShoulder();
 	
-	state.data.leftTrigger				= gamepad.getLeftTrigger();
-	state.data.rightTrigger				= gamepad.getRightTrigger();
+	state.data.leftTrigger					= gamepad.getLeftTrigger();
+	state.data.rightTrigger					= gamepad.getRightTrigger();
 	
-	state.data.stickResolutionFactor	= gamepad.getStickResolutionFactor();
+	state.data.stickResolutionFactor		= gamepad.getStickResolutionFactor();
 	
-	state.data.leftStickX				= gamepad.getLeftStickX();
-	state.data.leftStickY				= gamepad.getLeftStickY();
-	state.data.rightStickX				= gamepad.getRightStickX();
-	state.data.rightStickY				= gamepad.getRightStickY();
+	state.data.leftStickX					= gamepad.getLeftStickX();
+	state.data.leftStickY					= gamepad.getLeftStickY();
+	state.data.rightStickX					= gamepad.getRightStickX();
+	state.data.rightStickY					= gamepad.getRightStickY();
 	
-	// -----------------------------------------------------------
-	if ( prevButtonRightStick == false && state.data.buttonRightStick == true ) { 
-		const bool b = prevPosCtrlMode == GamepadEvent::PCM_STICKS || prevPosCtrlMode == GamepadEvent::PCM_NAV_XY;
-		if ( b )	state.data.posCtrlMode = GamepadEvent::PCM_NAV_Z;
-		else		state.data.posCtrlMode = GamepadEvent::PCM_STICKS;
+	state.data.isChangedLeftStickX			= gamepad.isChangedLeftStickX();
+	state.data.isChangedLeftStickY			= gamepad.isChangedLeftStickY();
+	state.data.isChangedRightStickX			= gamepad.isChangedRightStickX();
+	state.data.isChangedRightStickY			= gamepad.isChangedRightStickY();
+	state.data.isChangedLeftTrigger			= gamepad.isChangedLeftTrigger();
+	state.data.isChangedRightTrigger		= gamepad.isChangedRightTrigger();
+	state.data.isChangedButtonA				= gamepad.isChangedButtonA();
+	state.data.isChangedButtonB				= gamepad.isChangedButtonB();
+	state.data.isChangedButtonX				= gamepad.isChangedButtonX();
+	state.data.isChangedButtonY				= gamepad.isChangedButtonY();
+	state.data.isChangedButtonLeft			= gamepad.isChangedButtonLeft();
+	state.data.isChangedButtonRight			= gamepad.isChangedButtonRight();
+	state.data.isChangedButtonUp			= gamepad.isChangedButtonUp();
+	state.data.isChangedButtonDown			= gamepad.isChangedButtonDown();
+	state.data.isChangedButtonStart			= gamepad.isChangedButtonStart();
+	state.data.isChangedButtonBack			= gamepad.isChangedButtonBack();
+	state.data.isChangedButtonLeftStick		= gamepad.isChangedButtonLeftStick();
+	state.data.isChangedButtonRightStick	= gamepad.isChangedButtonRightStick();
+	state.data.isChangedButtonLeftShoulder	= gamepad.isChangedButtonLeftShoulder();
+	state.data.isChangedButtonRightShoulder	= gamepad.isChangedButtonRightShoulder();
+	
+	
+	const int bouncingFact = 3;
+	
+	
+	// first of all determine the additional usage mode
+	if ( prevBackButton == false && state.data.buttonBack == true ) {
+		const bool b = prevUsageMode == GamepadEvent::UM_NAV_CNC;
 		
-		prevButtonRightStick	= true;
-		prevPosCtrlMode 		= state.data.posCtrlMode;
+		if ( b )	state.data.usageMode = GamepadEvent::UM_NAV_GUI;
+		else		state.data.usageMode = GamepadEvent::UM_NAV_CNC;
+		
+		prevBackButton			= true;
+		prevUsageMode			= state.data.usageMode;
+		
+		avoidSwitchBouncingFact = bouncingFact;
 	}
 	else {
-		prevButtonRightStick	= false;
-		state.data.posCtrlMode 	= prevPosCtrlMode;
+		prevBackButton			= false;
+		state.data.usageMode	= prevUsageMode;
 	}
 	
-	if ( prevButtonLeftStick == false && state.data.buttonLeftStick == true ) { 
-		const bool b = prevPosCtrlMode == GamepadEvent::PCM_STICKS || prevPosCtrlMode == GamepadEvent::PCM_NAV_Z;
-		if ( b  )	state.data.posCtrlMode = GamepadEvent::PCM_NAV_XY; 
-		else		state.data.posCtrlMode = GamepadEvent::PCM_STICKS;
-		
-		prevButtonLeftStick		= true;
-		prevPosCtrlMode 		= state.data.posCtrlMode;
+	if ( state.data.usageMode == GamepadEvent::UM_NAV_GUI ) {
+		state.data.hasEmptyMovement = true;
+		// nothing more to do
 	}
 	else {
-		prevButtonLeftStick		= false;
-		state.data.posCtrlMode 	= prevPosCtrlMode;
-	}
+		// -----------------------------------------------------------
+		if ( prevButtonRightStick == false && state.data.buttonRightStick == true ) { 
+			const bool b = prevPosCtrlMode == GamepadEvent::PCM_STICKS || prevPosCtrlMode == GamepadEvent::PCM_NAV_XY;
+			if ( b )	state.data.posCtrlMode = GamepadEvent::PCM_NAV_Z;
+			else		state.data.posCtrlMode = GamepadEvent::PCM_STICKS;
+			
+			prevButtonRightStick	= true;
+			prevPosCtrlMode 		= state.data.posCtrlMode;
+			
+			avoidSwitchBouncingFact = bouncingFact;
+		}
+		else {
+			prevButtonRightStick	= false;
+			state.data.posCtrlMode 	= prevPosCtrlMode;
+		}
+		
+		if ( prevButtonLeftStick == false && state.data.buttonLeftStick == true ) { 
+			const bool b = prevPosCtrlMode == GamepadEvent::PCM_STICKS || prevPosCtrlMode == GamepadEvent::PCM_NAV_Z;
+			if ( b )	state.data.posCtrlMode = GamepadEvent::PCM_NAV_XY; 
+			else		state.data.posCtrlMode = GamepadEvent::PCM_STICKS;
+			
+			prevButtonLeftStick		= true;
+			prevPosCtrlMode 		= state.data.posCtrlMode;
+			
+			avoidSwitchBouncingFact = bouncingFact;
 
-	typedef CncLinearDirection CLD;
-	
-	auto isValueInRange = [&](float value) {
-		const float threshold = (float)state.data.stickResolutionFactor / 4;
-		return (abs(value) >= abs(threshold)); 
-	};
-	
-	state.data.dx 		= CLD::CncNoneDir;
-	state.data.dy 		= CLD::CncNoneDir;
-	state.data.dz 		= CLD::CncNoneDir;
-	
-	const bool left		= state.data.buttonLeft; 
-	const bool right	= state.data.buttonRight;
-	const bool up		= state.data.buttonUp;
-	const bool down		= state.data.buttonDown;
-	
-	switch ( state.data.posCtrlMode ) {
-		case GamepadEvent::PCM_STICKS: {
+		}
+		else {
+			prevButtonLeftStick		= false;
+			state.data.posCtrlMode 	= prevPosCtrlMode;
+		}
 		
-			if ( isValueInRange(state.data.leftStickX) )
-				state.data.dx = state.data.leftStickX  >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
-								
-			if ( isValueInRange(state.data.leftStickY) )
-				state.data.dy = state.data.leftStickY  >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
-				
-			if ( isValueInRange(state.data.rightStickY) )
-				state.data.dz = state.data.rightStickY >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
-				
-			break;
-		}
-		case GamepadEvent::PCM_NAV_XY: {
-			if ( left  == true ) 	state.data.dx = CLD::CncNegDir; 
-			if ( right == true ) 	state.data.dx = CLD::CncPosDir; 
-			if ( up    == true ) 	state.data.dy = CLD::CncPosDir;
-			if ( down  == true ) 	state.data.dy = CLD::CncNegDir;
+		typedef CncLinearDirection CLD;
+		
+		auto isValueInRange = [&](float value) {
+			const float threshold = (float)state.data.stickResolutionFactor / 4;
+			return (abs(value) >= abs(threshold)); 
+		};
+		
+		state.data.dx 		= CLD::CncNoneDir;
+		state.data.dy 		= CLD::CncNoneDir;
+		state.data.dz 		= CLD::CncNoneDir;
+		
+		const bool left		= state.data.buttonLeft; 
+		const bool right	= state.data.buttonRight;
+		const bool up		= state.data.buttonUp;
+		const bool down		= state.data.buttonDown;
+		
+		switch ( state.data.posCtrlMode ) {
+			case GamepadEvent::PCM_STICKS: {
 			
-			break;
+				if ( isValueInRange(state.data.leftStickX) )
+					state.data.dx = state.data.leftStickX  >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
+									
+				if ( isValueInRange(state.data.leftStickY) )
+					state.data.dy = state.data.leftStickY  >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
+					
+				if ( isValueInRange(state.data.rightStickY) )
+					state.data.dz = state.data.rightStickY >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
+					
+				break;
+			}
+			case GamepadEvent::PCM_NAV_XY: {
+				if ( left  == true ) 	state.data.dx = CLD::CncNegDir; 
+				if ( right == true ) 	state.data.dx = CLD::CncPosDir; 
+				if ( up    == true ) 	state.data.dy = CLD::CncPosDir;
+				if ( down  == true ) 	state.data.dy = CLD::CncNegDir;
+				
+				break;
+			}
+			case GamepadEvent::PCM_NAV_Z: {
+				if ( up    == true ) 	state.data.dz = CLD::CncPosDir;
+				if ( down  == true ) 	state.data.dz = CLD::CncNegDir;
+				
+				break;
+			}
 		}
-		case GamepadEvent::PCM_NAV_Z: {
-			if ( up    == true ) 	state.data.dz = CLD::CncPosDir;
-			if ( down  == true ) 	state.data.dz = CLD::CncNegDir;
-			
-			break;
-		}
+		
+		state.data.hasEmptyMovement		= gamepad.hasEmptyMovement();
+		state.data.isAnyStickActive		= gamepad.isAnyStickActive();
+		state.data.isLeftStickActive	= gamepad.isLeftStickActive();
+		state.data.isRightStickActive	= gamepad.isRightStickActive();
+		state.data.isNaviButtonActive	= gamepad.isNaviButtonActive();
 	}
-	
-	state.data.hasEmptyMovement		= gamepad.hasEmptyMovement();
-	state.data.isAnyStickActive		= gamepad.isAnyStickActive();
-	state.data.isLeftStickActive	= gamepad.isLeftStickActive();
-	state.data.isRightStickActive	= gamepad.isRightStickActive();
-	state.data.isNaviButtonActive	= gamepad.isNaviButtonActive();
 }
 

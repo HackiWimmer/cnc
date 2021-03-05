@@ -18,6 +18,9 @@ class GamepadThread : public wxThread {
 		bool 						exit;
 		bool 						prevButtonLeftStick;
 		bool 						prevButtonRightStick;
+		bool 						prevBackButton;
+		int							avoidSwitchBouncingFact; 
+		GamepadEvent::UsageMode 	prevUsageMode;
 		GamepadEvent::PosCtrlMode 	prevPosCtrlMode;
 		
 		virtual ExitCode Entry();

@@ -70,6 +70,7 @@
     <VirtualDirectory Name="GamePad">
       <File Name="CncGamePad.cpp"/>
       <VirtualDirectory Name="OSD">
+        <File Name="CncGamepadGtk.cpp"/>
         <File Name="CncGamePadGtk.h"/>
         <File Name="CncGamePadOSD.h"/>
         <File Name="CncGamePadMsw.cpp"/>
@@ -234,6 +235,16 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncVector.cpp"/>
+      <File Name="CncVector.h"/>
+      <File Name="CncGamepadSpy.h"/>
+      <File Name="CncGamepadSpy.cpp"/>
+      <File Name="CncGamepadDirectionPanel.cpp"/>
+      <File Name="CncGamepadDirectionPanel.h"/>
+      <File Name="CncVideoCapturePanel.cpp"/>
+      <File Name="CncVideoCapturePanel.h"/>
+      <File Name="CncTouchBlockDetector.cpp"/>
+      <File Name="CncTouchBlockDetector.h"/>
       <File Name="CncPodestManagement.h"/>
       <File Name="CncPodestManagement.cpp"/>
       <VirtualDirectory Name="Sound">
@@ -264,8 +275,6 @@
       <File Name="CncAverage.h"/>
       <File Name="CncSpeedSlider.h"/>
       <File Name="CncSpeedSlider.cpp"/>
-      <File Name="CncGamepadControllerSpy.h"/>
-      <File Name="CncGamepadControllerSpy.cpp"/>
       <File Name="CncManuallyMoveCoordinates.h"/>
       <File Name="CncManuallyMoveCoordinates.cpp"/>
       <File Name="CncLCDPositionPanel.h"/>
@@ -343,6 +352,8 @@
       <File Name="CncPerspective.h"/>
       <File Name="CncZView.h"/>
       <VirtualDirectory Name="OSD">
+        <File Name="OSD/CncCameraHelper.cpp"/>
+        <File Name="OSD/CncCameraHelper.h"/>
         <File Name="OSD/webviewDummy.h"/>
         <File Name="OSD/webviewOSD.h"/>
         <File Name="OSD/CncUsbPortScanner.h"/>
@@ -800,12 +811,13 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
-    <Configuration Name="Release" CompilerType="gcc.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Release" CompilerType="MinGW ( C:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin\ )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g1;-fpic;-O3;-std=c++17;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:/@Development/boost_1_71_0"/>
         <IncludePath Value="C:/msys64/mingw64/include"/>
         <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
+        <IncludePath Value="C:/@Development/opencv/build/include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
@@ -813,6 +825,7 @@
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="C:/msys64/mingw64/lib"/>
+        <LibraryPath Value="C:/opencv/mingwbuild/lib"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
@@ -831,10 +844,15 @@
         <Library Value="libdl"/>
         <Library Value="dbgeng"/>
         <Library Value="opengl32"/>
+        <Library Value="strmiids"/>
         <Library Value="glu32"/>
         <Library Value="glew32"/>
         <Library Value="freeglut"/>
         <Library Value="Xinput9_1_0"/>
+        <Library Value="libopencv_core451"/>
+        <Library Value="libopencv_video451"/>
+        <Library Value="libopencv_videoio451"/>
+        <Library Value="libopencv_highgui451"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D NDEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="$(ConfigurationName)" Command="$(OutputFile)" CommandArguments="" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -875,7 +893,8 @@
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
-        <SearchPaths/>
+        <SearchPaths>C:\@Development\@Projekte\c++\CNCGuiController&#xD;
+C:\@Development\wxWidgets-3.1.3\include\wx</SearchPaths>
       </Completion>
     </Configuration>
   </Settings>

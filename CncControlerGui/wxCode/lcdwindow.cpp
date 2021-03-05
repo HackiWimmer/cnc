@@ -1,7 +1,9 @@
 #include "lcdwindow.h"
+#include <iostream>
+#include <wx/dcbuffer.h>
+#include <wx/dcgraph.h>
 
 #define LCD_NUMBER_SEGMENTS 8
-
 
 BEGIN_EVENT_TABLE( wxLCDWindow, wxWindow )
 	EVT_PAINT( wxLCDWindow::OnPaint )
@@ -10,7 +12,7 @@ END_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////////////////////
 wxLCDWindow::wxLCDWindow( wxWindow *parent, wxPoint pos, wxSize size ) 
-: wxWindow( parent, -1, pos, size, wxSUNKEN_BORDER )
+: wxWindow( parent, -1, pos, size )
 , mSegmentLen		(40)
 , mSegmentWidth		(10)
 , mSpace			(5)
@@ -18,10 +20,12 @@ wxLCDWindow::wxLCDWindow( wxWindow *parent, wxPoint pos, wxSize size )
 , mValue			("")
 /////////////////////////////////////////////////////////////////////////////
 {
-	mLightColourBeforeDecimal	= wxColour(  0, 255,   0);
+	// This has to be done to use wxAutoBufferedPaintDC 
+	// on EVT_PAINT events correctly
+	SetBackgroundStyle(wxBG_STYLE_PAINT);
 	
-	mLightColourDecimalPlaces	= wxColour(255, 128, 128); 
-	mLightColourDecimalPlaces 	= mLightColourDecimalPlaces.ChangeLightness(75);
+	mLightColourBeforeDecimal	= *wxWHITE;
+	mLightColourDecimalPlaces	= *wxWHITE;
 	
 	SetBackgroundColour( wxColour( 0, 0, 0 ) );
 	
@@ -42,8 +46,11 @@ void wxLCDWindow::OnSize( wxSizeEvent &event ) {
 /////////////////////////////////////////////////////////////////////////////
 void wxLCDWindow::OnPaint( wxPaintEvent &event ) {
 /////////////////////////////////////////////////////////////////////////////
-	wxPaintDC dc( this );
-
+	wxAutoBufferedPaintDC paintDC(this);
+	paintDC.Clear();
+	
+	wxGCDC dc(paintDC);
+	
 	const int dw = GetClientSize().GetWidth();
 	const int dh = GetClientSize().GetHeight();
 
@@ -302,8 +309,22 @@ void wxLCDWindow::SetNumberDigits( int ndigits )
 
 void wxLCDWindow::SetValue(const wxString& value)
 {
+	static const wxColour negCol(255, 128, 128);
+	static const wxColour posCol(  0, 255,   0);
+	
 	mValue.assign(value);
+	mValue.Replace(",", ".");
+	
+	double d;
+	if ( mValue.ToDouble(&d) == false )
+		mValue.assign("0");
+	
+	if ( mValue.Contains("-") ) mLightColourBeforeDecimal = negCol;
+	else						mLightColourBeforeDecimal = posCol;
+	
+	mLightColourDecimalPlaces = mLightColourBeforeDecimal.ChangeLightness(50);
 	Refresh( false );
+	
 	return ;
 }
 
@@ -443,3 +464,4 @@ unsigned char wxLCDWindow::Decode( char c )
 
 	return ret;
 }
+

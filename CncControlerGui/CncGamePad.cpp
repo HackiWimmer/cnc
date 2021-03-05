@@ -19,7 +19,7 @@ bool CncGamepad::isLeftStickActive() const {
 bool CncGamepad::isRightStickActive() const {
 /////////////////////////////////////////////////////////////
 	return     !cnc::dblCompareNull(getRightStickX())
-			|| !cnc::dblCompareNull(getRightStickX())
+			|| !cnc::dblCompareNull(getRightStickY())
 			;
 }
 /////////////////////////////////////////////////////////////

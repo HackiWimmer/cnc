@@ -125,6 +125,8 @@ void ArduinoMainLoop::printPinReport() {
                    
     printAnalogPin(PIN_INTERRUPT_LED_ID,      I);
 
+    #warning add more pins
+
   Serial.write(MBYTE_CLOSE);  
 }
 //////////////////////////////////////////////////////////////
@@ -698,12 +700,6 @@ void ArduinoMainLoop::setup() {
   AE::pinMode(PIN_Y_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,            PL_LOW);
   AE::pinMode(PIN_Z_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,            PL_LOW);
 
-  AE::pinMode(PIN_H_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_H_STP,            PL_LOW);
-  AE::pinMode(PIN_H_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_H_DIR,            PL_LOW);
-
-  AE::pinMode(PIN_H_MOVE_UP,            PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_UP,        PL_LOW);
-  AE::pinMode(PIN_H_MOVE_DOWN,          PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,      PL_LOW);
-  
   AE::pinMode(PIN_X_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_X_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Y_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
@@ -711,15 +707,31 @@ void ArduinoMainLoop::setup() {
   AE::pinMode(PIN_Z_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
   AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
 
-  AE::pinMode(PIN_H_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_H_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_H_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_H_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
-  
   AE::pinMode(READ_EXT_INNTERRUPT_PIN,  PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
 
   AE::pinMode(PIN_ENABLE_PODEST,        PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODEST,    PL_LOW);
   AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,   ENABLE_STATE_OFF);
   AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,      TOOL_STATE_OFF);
 
+  AE::pinMode(PIN_LED_PODEST,           PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODEST,       PL_LOW);
+
+  if ( PIN_H_MIN_LIMIT != 0 ) 
+    { AE::pinMode(PIN_H_MIN_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF); }
+    
+  if ( PIN_H_MAX_LIMIT != 0 ) 
+    { AE::pinMode(PIN_H_MAX_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF); }
+
+  if ( PIN_H_STP != 0 ) 
+    { AE::pinMode(PIN_H_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_H_STP,            PL_LOW); }
+    
+  if ( PIN_H_DIR != 0 ) 
+    { AE::pinMode(PIN_H_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_H_DIR,            PL_LOW); }
+
+  if ( PIN_H_MOVE_UP != 0 ) 
+    { AE::pinMode(PIN_H_MOVE_UP,        PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_UP,        PODEST_SWITCH_OFF); }
+    
+  if ( PIN_H_MOVE_DOWN != 0 ) 
+    { AE::pinMode(PIN_H_MOVE_DOWN,      PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,      PODEST_SWITCH_OFF); }
 
   if ( PIN_IS_CTRL_POWERED > 0 )  
      { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  TOOL_STATE_OFF); }
@@ -727,8 +739,12 @@ void ArduinoMainLoop::setup() {
   if ( PIN_IS_TOOL_POWERED > 0 )
     { AE::pinMode(PIN_IS_TOOL_POWERED,  PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  POWER_STATE_OFF); }
 
+  if ( PIN_TOUCH_CONTACT > 0 )
+    { AE::pinMode(PIN_TOUCH_CONTACT,    PM_INPUT);   AE::digitalWrite(PIN_TOUCH_CONTACT,    PL_HIGH); }
+    
+
   // analog pins
-  AE::pinMode(PIN_INTERRUPT_LED,        PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,   ANALOG_LOW);
+  AE::pinMode(PIN_INTERRUPT_LED,        PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,     ANALOG_LOW);
 
   reset();
   controller->evaluateI2CAvailable();
@@ -762,14 +778,16 @@ void ArduinoMainLoop::functorIR2() {
 ///////////////////////////////////////////////////////
 void ArduinoMainLoop::loop() {
 ///////////////////////////////////////////////////////
-  
+  // always do this, in cases the hardware isn_t 'free' ist will return immediately
   controller->evaluatePodestSwitch();
 
+  // if there is nothing else to do , check I2C and return . . . 
   if ( Serial.available() <= 0 ) {
     controller->evaluateI2CData();
     return;
   }    
-  
+
+  // work on serial input . . . 
   byte       r  = RET_NULL;
   const byte c  = Serial.read();
 
@@ -831,7 +849,8 @@ void ArduinoMainLoop::loop() {
     // MB command - Movement
     case CMD_MOVE: // obsolete command
     case CMD_RENDER_AND_MOVE:
-    case CMD_MOVE_UNIT_LIMIT_IS_FREE:
+    case CMD_MOVE_UNTIL_CONTACT:
+    case CMD_MOVE_UNTIL_LIMIT_IS_FREE:
           r = controller->acceptMove(c);
           break;
           

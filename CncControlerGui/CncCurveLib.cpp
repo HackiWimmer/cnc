@@ -122,7 +122,7 @@ bool CncCurveLib::render(CncCurveLib::ParameterSet& ps) {
 	}
 	
 	// ----------------------------------------------------------
-	// step 1: pepare parameters
+	// step 1: prepare parameters
 		ps.prepare();
 
 	// ----------------------------------------------------------

@@ -17,7 +17,7 @@ class IndividualCommandEvent : public wxCommandEvent {
 		// define here individual event ids
 		// Important! this ids have to be without any overlapping
 		enum EvtPreprocessor 	{ UpdateSelectedClientIds 		= 100 };
-		enum EvtMainFrame		{ WaitActive					= 150, DispatchAll, DistpatchNext, EnableControls, ExtViewBoxChange };
+		enum EvtMainFrame		{ WaitActive					= 150, DispatchAll, DistpatchNext, EnableControls, ExtViewBoxChange, ExtViewBoxAttach, ExtViewBoxDetach };
 		enum EvtSerialStub		{ NotifyPauseBefore 			= 200, NotifyPauseAfter, NotifyResumeBefore, NotifyResumeAfter, NotifyConneting, NotifyConneted, NotifyDisconnected, NotifyFatalError };
 
 	public:

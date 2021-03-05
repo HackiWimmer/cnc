@@ -59,7 +59,7 @@ bool CncExternalViewBoxCluster::detachNode(Node n, wxButton* btn) {
 		
 	const bool isExtViewActive = !evb->IsShown();
 	
-	// prepare extern preview
+	// prepare and show external preview
 	evb->setupSwapButton(CncExternalViewBox::Default::VIEW1, btn);
 	evb->selectView(CncExternalViewBox::Default::VIEW1);
 	evb->Show(isExtViewActive);
@@ -112,10 +112,13 @@ CncExternalViewBox::CncExternalViewBox(wxWindow* parent, long style)
 	m_viewBook->SetSelection(0);
 	
 	CenterOnParent();
+	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 	&CncExternalViewBox::onNavigatorPanel, this);
 }
 //////////////////////////////////////////////////////////////////
 CncExternalViewBox::~CncExternalViewBox() {
 //////////////////////////////////////////////////////////////////
+	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, &CncExternalViewBox::onNavigatorPanel, this);
+
 	for (unsigned int i=0; i<MAX_VIEWS; i++) {
 		if ( sourceCtrl[i] != NULL ) {
 			if ( swapState[i] == SS_SWAPED )
@@ -198,6 +201,9 @@ void CncExternalViewBox::swapControls() {
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::swapControls(unsigned int idx) {
 //////////////////////////////////////////////////////////////////
+	typedef IndividualCommandEvent::EvtMainFrame ID;
+	typedef IndividualCommandEvent::ValueName VN;
+
 	if ( idx > MAX_VIEWS - 1 )
 		return;
 		
@@ -208,9 +214,22 @@ void CncExternalViewBox::swapControls(unsigned int idx) {
 		GblFunc::swapControls(targetCtrl[idx], sourceCtrl[idx]);
 		swapState[idx] = SS_SWAPED;
 		
+		IndividualCommandEvent evt(ID::ExtViewBoxDetach);
+		evt.setValue(VN::VAL1, this);
+		evt.setValue(VN::VAL2, idx);
+		
+		wxPostEvent(THE_FRAME, evt);
+		
 	} else {
 		GblFunc::swapControls(sourceCtrl[idx], targetCtrl[idx]);
 		swapState[idx] = SS_DEFAULT;
+		
+		IndividualCommandEvent evt(ID::ExtViewBoxAttach);
+		evt.setValue(VN::VAL1, this);
+		evt.setValue(VN::VAL2, idx);
+		
+		wxPostEvent(THE_FRAME, evt);
+
 	}
 	
 	if ( swapButton[idx] != NULL ) {
@@ -294,31 +313,43 @@ void CncExternalViewBox::onViewBookChanged(wxNotebookEvent& event) {
 	wxPostEvent(THE_FRAME, evt);
 }
 //////////////////////////////////////////////////////////////////
-void CncExternalViewBox::onAttachPage1(wxCommandEvent& event) {
+void CncExternalViewBox::onAttachPage() {
 //////////////////////////////////////////////////////////////////
 	swapControls();
 	Show(false);
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::onAttachPage1(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	onAttachPage();
 }
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::onAttachPage2(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
-	swapControls();
-	Show(false);
+	onAttachPage();
 }
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::onAttachPage3(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
-	swapControls();
-	Show(false);
+	onAttachPage();
 }
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::onAttachPage4(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
-	swapControls();
-	Show(false);
+	onAttachPage();
 }
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::bringViewOnTop() {
 //////////////////////////////////////////////////////////////////
-	Raise();
+	// Attention: This raises the window on top, no problem, 
+	// but the interactive move did not work correctly if the motion 
+	// monitor as detached, for whatever reason!
+	
+	//Raise();
+}
+///////////////////////////////////////////////////////////////////
+void CncExternalViewBox::onNavigatorPanel(CncNavigatorPanelEvent& event) {
+///////////////////////////////////////////////////////////////////
+	// redirect to main frame . . .
+	wxPostEvent(THE_FRAME, event);
 }

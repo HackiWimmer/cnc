@@ -17,16 +17,11 @@
 #include <wx/imaglist.h>
 #include <wx/splitter.h>
 #include <wx/textctrl.h>
-#include <wx/tglbtn.h>
-#include <wx/button.h>
 #include <wx/stattext.h>
+#include <wx/button.h>
 #include <wx/statline.h>
-#include <wx/dialog.h>
-#include <wx/iconbndl.h>
+#include <wx/simplebook.h>
 #include <wx/statbmp.h>
-#include <wx/choice.h>
-#include <wx/arrstr.h>
-#include <wx/timer.h>
 #include <wx/bitmap.h>
 #include <map>
 #include <wx/icon.h>
@@ -55,31 +50,45 @@ protected:
     wxSplitterWindow* m_splitter190;
     wxPanel* m_spTrace;
     wxTextCtrl* m_gamepadTrace;
-    wxBitmapToggleButton* m_btConnect;
     wxPanel* m_spHistory;
     wxStaticText* m_staticText204;
     wxPanel* m_gamepadCmdHistoryPlaceholder;
     wxButton* m_btClearHistory;
     wxPanel* m_panel7482;
+    wxStaticText* m_staticText234;
+    wxStaticText* m_staticText236;
+    wxStaticLine* m_staticLine271;
     wxTextCtrl* m_gamepadServiceTrace;
     wxButton* m_btQueryGamepadService;
+    wxStaticText* m_staticText23889;
     wxStaticLine* m_staticLine60512;
     wxButton* m_btStartGamepadService;
-    wxButton* m_btStopGamepadService;
+    wxStaticText* m_staticText2388910;
+    wxButton* m_btStopGamepadService1;
+    wxStaticText* m_staticText2388;
+    wxStaticLine* m_staticLine60514;
+    wxButton* m_btSCPDriverInstaller;
+    wxStaticText* m_staticText238;
+    wxButton* m_btSCPSettings;
+    wxStaticText* m_staticText2385;
+    wxButton* m_btSCPMonitor;
+    wxStaticText* m_staticText2386;
     wxStaticLine* m_staticLine6051;
     wxButton* m_btClearGamepadServiceTrace;
+    wxStaticText* m_staticText23867;
 
 protected:
-    virtual void onConnectGamepad(wxCommandEvent& event) { event.Skip(); }
     virtual void onClearHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void queryGamepadService(wxCommandEvent& event) { event.Skip(); }
     virtual void startGamepadService(wxCommandEvent& event) { event.Skip(); }
     virtual void stopGamepadService(wxCommandEvent& event) { event.Skip(); }
+    virtual void scpDriverInstaller(wxCommandEvent& event) { event.Skip(); }
+    virtual void scpSettings(wxCommandEvent& event) { event.Skip(); }
+    virtual void scpMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void clearGamepadServiceTrace(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxTextCtrl* GetGamepadTrace() { return m_gamepadTrace; }
-    wxBitmapToggleButton* GetBtConnect() { return m_btConnect; }
     wxPanel* GetSpTrace() { return m_spTrace; }
     wxStaticText* GetStaticText204() { return m_staticText204; }
     wxPanel* GetGamepadCmdHistoryPlaceholder() { return m_gamepadCmdHistoryPlaceholder; }
@@ -87,96 +96,85 @@ public:
     wxPanel* GetSpHistory() { return m_spHistory; }
     wxSplitterWindow* GetSplitter190() { return m_splitter190; }
     wxPanel* GetPanel7480() { return m_panel7480; }
+    wxStaticText* GetStaticText234() { return m_staticText234; }
+    wxStaticText* GetStaticText236() { return m_staticText236; }
+    wxStaticLine* GetStaticLine271() { return m_staticLine271; }
     wxTextCtrl* GetGamepadServiceTrace() { return m_gamepadServiceTrace; }
     wxButton* GetBtQueryGamepadService() { return m_btQueryGamepadService; }
+    wxStaticText* GetStaticText23889() { return m_staticText23889; }
     wxStaticLine* GetStaticLine60512() { return m_staticLine60512; }
     wxButton* GetBtStartGamepadService() { return m_btStartGamepadService; }
-    wxButton* GetBtStopGamepadService() { return m_btStopGamepadService; }
+    wxStaticText* GetStaticText2388910() { return m_staticText2388910; }
+    wxButton* GetBtStopGamepadService1() { return m_btStopGamepadService1; }
+    wxStaticText* GetStaticText2388() { return m_staticText2388; }
+    wxStaticLine* GetStaticLine60514() { return m_staticLine60514; }
+    wxButton* GetBtSCPDriverInstaller() { return m_btSCPDriverInstaller; }
+    wxStaticText* GetStaticText238() { return m_staticText238; }
+    wxButton* GetBtSCPSettings() { return m_btSCPSettings; }
+    wxStaticText* GetStaticText2385() { return m_staticText2385; }
+    wxButton* GetBtSCPMonitor() { return m_btSCPMonitor; }
+    wxStaticText* GetStaticText2386() { return m_staticText2386; }
     wxStaticLine* GetStaticLine6051() { return m_staticLine6051; }
     wxButton* GetBtClearGamepadServiceTrace() { return m_btClearGamepadServiceTrace; }
+    wxStaticText* GetStaticText23867() { return m_staticText23867; }
     wxPanel* GetPanel7482() { return m_panel7482; }
     wxListbook* GetListbook7478() { return m_listbook7478; }
-    CncGamepadControllerStateBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    CncGamepadControllerStateBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~CncGamepadControllerStateBase();
 };
 
 
-class CncGamepadControllerSpyBase : public wxDialog
+class CncGamepadSpyBase : public wxPanel
 {
 protected:
-    wxStaticText* m_staticText65;
-    wxStaticBitmap* m_staticBitmap1681;
-    wxStaticBitmap* m_staticBitmap168;
-    wxStaticText* m_staticText651;
-    wxStaticBitmap* m_staticBitmap122;
-    wxStaticText* m_staticText58;
-    wxStaticText* m_staticText131;
-    wxStaticText* m_staticText133;
-    wxStaticLine* m_staticLine73;
-    wxStaticLine* m_staticLine163;
-    wxStaticBitmap* m_gamepadState;
-    wxStaticLine* m_staticLine60;
+    wxSimplebook* m_modeBook;
+    wxPanel* m_panelInactive;
+    wxPanel* m_panel320;
+    wxStaticBitmap* m_staticBitmap317;
+    wxPanel* m_panelGUI;
+    wxStaticBitmap* m_staticBitmap326;
+    wxStaticText* m_staticText300;
+    wxStaticLine* m_staticLine312;
+    wxStaticText* m_mouseState;
+    wxStaticBitmap* m_staticBitmap329;
+    wxStaticText* m_staticText302;
+    wxStaticLine* m_staticLine304;
+    wxStaticText* m_keyState;
+    wxPanel* m_panelCNC;
     wxStaticBitmap* m_gpBmp1;
     wxStaticBitmap* m_gpBmp2;
     wxStaticBitmap* m_gpBmp3;
     wxStaticBitmap* m_gpBmp4;
-    wxStaticLine* m_staticLine71;
-    wxStaticBitmap* m_gpBmpStepMode;
-    wxChoice* m_chStepsSensitivity;
-    wxStaticLine* m_staticLine716;
-    wxStaticBitmap* m_bmpCompassXY;
-    wxStaticBitmap* m_bmpCompassZ;
-    wxStaticLine* m_staticLine161;
-    wxStaticLine* m_staticLine733;
-    wxStaticBitmap* m_staticBitmap56;
-    wxStaticText* m_staticText97;
-    wxStaticLine* m_staticLine171;
-    wxStaticBitmap* m_staticBitmap562;
-    wxStaticText* m_staticText174;
-    wxTimer* m_continuesTimer;
+    wxPanel* m_dirXYPlaceholder;
+    wxPanel* m_dirZPlaceholder;
+    wxStaticText* m_modeText;
 
 protected:
-    virtual void show(wxShowEvent& event) { event.Skip(); }
-    virtual void dclickNaviXY(wxMouseEvent& event) { event.Skip(); }
-    virtual void dclickNaviZ(wxMouseEvent& event) { event.Skip(); }
-    virtual void dclickLeftStick(wxMouseEvent& event) { event.Skip(); }
-    virtual void dclickRightStick(wxMouseEvent& event) { event.Skip(); }
-    virtual void selectSensitivity(wxCommandEvent& event) { event.Skip(); }
-    virtual void onContinuesTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
-    wxStaticText* GetStaticText65() { return m_staticText65; }
-    wxStaticBitmap* GetStaticBitmap1681() { return m_staticBitmap1681; }
-    wxStaticBitmap* GetStaticBitmap168() { return m_staticBitmap168; }
-    wxStaticText* GetStaticText651() { return m_staticText651; }
-    wxStaticBitmap* GetStaticBitmap122() { return m_staticBitmap122; }
-    wxStaticText* GetStaticText58() { return m_staticText58; }
-    wxStaticText* GetStaticText131() { return m_staticText131; }
-    wxStaticText* GetStaticText133() { return m_staticText133; }
-    wxStaticLine* GetStaticLine73() { return m_staticLine73; }
-    wxStaticLine* GetStaticLine163() { return m_staticLine163; }
-    wxStaticBitmap* GetGamepadState() { return m_gamepadState; }
-    wxStaticLine* GetStaticLine60() { return m_staticLine60; }
+    wxStaticBitmap* GetStaticBitmap317() { return m_staticBitmap317; }
+    wxPanel* GetPanel320() { return m_panel320; }
+    wxPanel* GetPanelInactive() { return m_panelInactive; }
+    wxStaticBitmap* GetStaticBitmap326() { return m_staticBitmap326; }
+    wxStaticText* GetStaticText300() { return m_staticText300; }
+    wxStaticLine* GetStaticLine312() { return m_staticLine312; }
+    wxStaticText* GetMouseState() { return m_mouseState; }
+    wxStaticBitmap* GetStaticBitmap329() { return m_staticBitmap329; }
+    wxStaticText* GetStaticText302() { return m_staticText302; }
+    wxStaticLine* GetStaticLine304() { return m_staticLine304; }
+    wxStaticText* GetKeyState() { return m_keyState; }
+    wxPanel* GetPanelGUI() { return m_panelGUI; }
     wxStaticBitmap* GetGpBmp1() { return m_gpBmp1; }
     wxStaticBitmap* GetGpBmp2() { return m_gpBmp2; }
     wxStaticBitmap* GetGpBmp3() { return m_gpBmp3; }
     wxStaticBitmap* GetGpBmp4() { return m_gpBmp4; }
-    wxStaticLine* GetStaticLine71() { return m_staticLine71; }
-    wxStaticBitmap* GetGpBmpStepMode() { return m_gpBmpStepMode; }
-    wxChoice* GetChStepsSensitivity() { return m_chStepsSensitivity; }
-    wxStaticLine* GetStaticLine716() { return m_staticLine716; }
-    wxStaticBitmap* GetBmpCompassXY() { return m_bmpCompassXY; }
-    wxStaticBitmap* GetBmpCompassZ() { return m_bmpCompassZ; }
-    wxStaticLine* GetStaticLine161() { return m_staticLine161; }
-    wxStaticLine* GetStaticLine733() { return m_staticLine733; }
-    wxStaticBitmap* GetStaticBitmap56() { return m_staticBitmap56; }
-    wxStaticText* GetStaticText97() { return m_staticText97; }
-    wxStaticLine* GetStaticLine171() { return m_staticLine171; }
-    wxStaticBitmap* GetStaticBitmap562() { return m_staticBitmap562; }
-    wxStaticText* GetStaticText174() { return m_staticText174; }
-    wxTimer* GetContinuesTimer() { return m_continuesTimer; }
-    CncGamepadControllerSpyBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Gamepad Spy"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP);
-    virtual ~CncGamepadControllerSpyBase();
+    wxPanel* GetDirXYPlaceholder() { return m_dirXYPlaceholder; }
+    wxPanel* GetDirZPlaceholder() { return m_dirZPlaceholder; }
+    wxPanel* GetPanelCNC() { return m_panelCNC; }
+    wxSimplebook* GetModeBook() { return m_modeBook; }
+    wxStaticText* GetModeText() { return m_modeText; }
+    CncGamepadSpyBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    virtual ~CncGamepadSpyBase();
 };
 
 
@@ -235,35 +233,6 @@ public:
     }
 
     virtual ~ImageLibGamepadCommand();
-};
-
-
-class ImageLibGamepadStepMode : public wxImageList
-{
-protected:
-    // Maintain a map of all bitmaps representd by their name
-    std::map<wxString, wxBitmap> m_bitmaps;
-    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
-    wxString m_resolution;
-    int m_imagesWidth;
-    int m_imagesHeight;
-
-
-protected:
-
-public:
-    ImageLibGamepadStepMode();
-    const wxBitmap& Bitmap(const wxString &name) const {
-        if ( !m_bitmaps.count(name + m_resolution) )
-            return wxNullBitmap;
-        return m_bitmaps.find(name + m_resolution)->second;
-    }
-
-    void SetBitmapResolution(const wxString &res = wxEmptyString) {
-        m_resolution = res;
-    }
-
-    virtual ~ImageLibGamepadStepMode();
 };
 
 #endif

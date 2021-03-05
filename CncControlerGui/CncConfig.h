@@ -314,8 +314,7 @@ class CncConfig {
 		const bool getPreProcessorCntPathListEntries();
 		const bool getPreProcessorCntMoveSequneces();
 		const bool getSimulateMillingWithSoundFlag();
-		
-		const double getMeasurePlateThickness()					{ return 1.2; } //TODO
+		const bool getCameraSupportFlag();
 		
 		const double getMaxSpeedXYZ_MM_MIN();
 		
@@ -329,6 +328,15 @@ class CncConfig {
 		const double getMaxXYPitchToKeep();
 		const double getMaxZPitchToKeep();
 		
+		const double getTouchblockZThickness();
+		const double getTouchblockXCheckThickness();
+		const double getTouchblockYCheckThickness();
+		
+		const double getCameraOffsetX();
+		const double getCameraOffsetY();
+		const double getCameraOffsetZ();
+		
+		const unsigned int getCameraDeviceId();
 		const unsigned int getArtificallyStepDelay();
 		const unsigned int getStepsX();
 		const unsigned int getStepsY();

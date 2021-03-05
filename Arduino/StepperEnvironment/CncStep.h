@@ -147,13 +147,14 @@ template<> byte CncArduinoStepper<OPTIMISTIC>::finalizeStep();
 class CncAxisX : public CncArduinoStepper<OPTIMISTIC> {
 
   private:
+    static bool considerLimitPins;
     CncAxisX(const CncAxisX&);
-
+    
   protected:
   
-    static bool readLmtPins()                                    { return READ_LMT_PIN_X;     }  
-    static bool readMinLmtPin()                                  { return READ_LMT_PIN_X_MIN; }  
-    static bool readMaxLmtPin()                                  { return READ_LMT_PIN_X_MAX; }  
+    static bool readLmtPins()                                    { return considerLimitPins ? READ_LMT_PIN_X      : LimitSwitch::LIMIT_SWITCH_OFF;     }  
+    static bool readMinLmtPin()                                  { return considerLimitPins ? READ_LMT_PIN_X_MIN  : LimitSwitch::LIMIT_SWITCH_OFF;     }  
+    static bool readMaxLmtPin()                                  { return considerLimitPins ? READ_LMT_PIN_X_MAX  : LimitSwitch::LIMIT_SWITCH_OFF;     }  
     static void writeDirPin(bool value)                          { WRITE_DIR_PIN_X(value)     }
     static void writeStpPin(bool value)                          { WRITE_STP_PIN_X(value)     }  
 
@@ -170,19 +171,22 @@ class CncAxisX : public CncArduinoStepper<OPTIMISTIC> {
         &CncAxisX::writeStpPin
     )                                   
     {}
+    
+    static void doConsiderLimitPins(bool state)                  { considerLimitPins = state; }
 };
 
 // ----------------------------------------------------------------
 class CncAxisY : public CncArduinoStepper<OPTIMISTIC> {
 
   private:
+    static bool considerLimitPins;
     CncAxisY(const CncAxisY&);
 
   protected:
   
-    static bool readLmtPins()                                    { return READ_LMT_PIN_Y;     }  
-    static bool readMinLmtPin()                                  { return READ_LMT_PIN_Y_MIN; }  
-    static bool readMaxLmtPin()                                  { return READ_LMT_PIN_Y_MAX; }  
+    static bool readLmtPins()                                    { return considerLimitPins ? READ_LMT_PIN_Y      : LimitSwitch::LIMIT_SWITCH_OFF;     }  
+    static bool readMinLmtPin()                                  { return considerLimitPins ? READ_LMT_PIN_Y_MIN  : LimitSwitch::LIMIT_SWITCH_OFF;     }  
+    static bool readMaxLmtPin()                                  { return considerLimitPins ? READ_LMT_PIN_Y_MAX  : LimitSwitch::LIMIT_SWITCH_OFF;     }  
     static void writeDirPin(bool value)                          { WRITE_DIR_PIN_Y(value)     }
     static void writeStpPin(bool value)                          { WRITE_STP_PIN_Y(value)     }  
     
@@ -199,19 +203,22 @@ class CncAxisY : public CncArduinoStepper<OPTIMISTIC> {
         &CncAxisY::writeStpPin
     )                                       
     {}
+    
+    static void doConsiderLimitPins(bool state)                  { considerLimitPins = state; }
 };
 
 // ----------------------------------------------------------------
 class CncAxisZ : public CncArduinoStepper<OPTIMISTIC> {
 
   private:
+    static bool considerLimitPins;
     CncAxisZ(const CncAxisZ&);
 
   protected:
    
-    static bool readLmtPins()                                    { return READ_LMT_PIN_Z;     }  
-    static bool readMinLmtPin()                                  { return READ_LMT_PIN_Z_MIN; }  
-    static bool readMaxLmtPin()                                  { return READ_LMT_PIN_Z_MAX; }  
+    static bool readLmtPins()                                    { return considerLimitPins ? READ_LMT_PIN_Z      : LimitSwitch::LIMIT_SWITCH_OFF;     }  
+    static bool readMinLmtPin()                                  { return considerLimitPins ? READ_LMT_PIN_Z_MIN  : LimitSwitch::LIMIT_SWITCH_OFF;     }  
+    static bool readMaxLmtPin()                                  { return considerLimitPins ? READ_LMT_PIN_Z_MAX  : LimitSwitch::LIMIT_SWITCH_OFF;     }  
     static void writeDirPin(bool value)                          { WRITE_DIR_PIN_Z(value)     }      
     static void writeStpPin(bool value)                          { WRITE_STP_PIN_Z(value)     }  
 
@@ -228,19 +235,22 @@ class CncAxisZ : public CncArduinoStepper<OPTIMISTIC> {
         &CncAxisZ::writeStpPin
     )                                       
     {}
+    
+    static void doConsiderLimitPins(bool state)                  { considerLimitPins = state; }
 };
 
 // ----------------------------------------------------------------
 class CncAxisH : public CncArduinoStepper<PESIMISTIC> {
 
   private:
+    static bool considerLimitPins;
     CncAxisH(const CncAxisH&);
 
   protected:
    
-    static bool readLmtPins()                                    { return READ_LMT_PIN_H;     }  
-    static bool readMinLmtPin()                                  { return READ_LMT_PIN_H_MIN; }  
-    static bool readMaxLmtPin()                                  { return READ_LMT_PIN_H_MAX; }  
+    static bool readLmtPins()                                    { return considerLimitPins ? READ_LMT_PIN_H      : LimitSwitch::LIMIT_SWITCH_OFF;     }  
+    static bool readMinLmtPin()                                  { return considerLimitPins ? READ_LMT_PIN_H_MIN  : LimitSwitch::LIMIT_SWITCH_OFF;     }  
+    static bool readMaxLmtPin()                                  { return considerLimitPins ? READ_LMT_PIN_H_MAX  : LimitSwitch::LIMIT_SWITCH_OFF;     }  
     static void writeDirPin(bool value)                          { WRITE_DIR_PIN_H(value)     }      
     static void writeStpPin(bool value)                          { WRITE_STP_PIN_H(value)     }  
 
@@ -257,6 +267,8 @@ class CncAxisH : public CncArduinoStepper<PESIMISTIC> {
         &CncAxisH::writeStpPin
     )                                       
     {}
+    
+    static void doConsiderLimitPins(bool state)                  { considerLimitPins = state; }
 };
 
 #endif

@@ -275,6 +275,7 @@ protected:
 
 protected:
     virtual void onActivate(wxActivateEvent& event) { event.Skip(); }
+    virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
     virtual void onRun(wxCommandEvent& event) { event.Skip(); }
     virtual void onClearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void updateValueF(wxCommandEvent& event) { event.Skip(); }

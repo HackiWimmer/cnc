@@ -1,4 +1,5 @@
 #include <wx/dcclient.h>
+#include <wx/dcclient.h>
 
 #include "OSD/CncAsyncKeyboardState.h"
 #include "3D/GLContextCncPath.h"
@@ -562,13 +563,13 @@ void CncMotionMonitor::pushProcessMode() {
 	resetCurrentClientId();
 	
 	processMode = true;
-	monitor->deactivateNotifications();
+	monitor->pushProcessMode();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::popProcessMode() {
 //////////////////////////////////////////////////
 	processMode = false;
-	monitor->activateNotifications();
+	monitor->popProcessMode();
 }
 
 

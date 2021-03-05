@@ -41,14 +41,26 @@ uint32_t ArduinoAccelManager::Setup::feedRate_Master1000  = 0;
 void ArduinoAccelManager::Function::initMinSpeedDelay() { 
 /////////////////////////////////////////////////////////////////////////////////////  
   minSpeedDelay_US  = ( C_1000 > 0 ? 1000L * 1000 * Setup::feedRate_Master1000 / C_1000 : 0 );
+  
+  // this indicates a const speed and no acceleration
   stdRampWidth_IMPL = 0;
   relRampWidth_IMPL = 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////  
 void ArduinoAccelManager::Function::initTrgSpeedDelay(const uint32_t trgF1000_MMSEC) {
 /////////////////////////////////////////////////////////////////////////////////////  
-  stdRampWidth_IMPL = ( minSpeedDelay_US == 0 ? 0 : rampWidth(trgF1000_MMSEC) );
+  // this indicates a const speed and no acceleration
+  stdRampWidth_IMPL = 0;
   relRampWidth_IMPL = 0;
+  
+  if ( trgF1000_MMSEC > 0 ) {
+    const uint32_t trgSpeedDelay_US = 1000L * 1000 * Setup::feedRate_Master1000 / trgF1000_MMSEC;
+    if ( trgSpeedDelay_US < minSpeedDelay_US ) {
+      // this indicates acceleration ( if minSpeedDelay_US != 0 )
+      stdRampWidth_IMPL = ( minSpeedDelay_US == 0 ? 0 : rampWidth(trgF1000_MMSEC) );
+      relRampWidth_IMPL = 0;
+    }
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////  
 uint32_t ArduinoAccelManager::Function::rampWidth(uint32_t trgF1000_MMSEC) {
@@ -157,8 +169,9 @@ bool ArduinoAccelManager::initSpeed(uint32_t mF1000_MMSec) {
 /////////////////////////////////////////////////////////////////////////////////////  
   fA.initTrgSpeedDelay(mF1000_MMSec);
   fD.initTrgSpeedDelay(mF1000_MMSec);
-  
+
   cfgSpeedDelay = cnvSpeedToDelay(mF1000_MMSec);
+ 
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////  

@@ -18,6 +18,7 @@ class CncLoggerView : public CncLoggerViewBase {
 		void setShowOnDemandState(bool s)	{ m_btLoggerOnDemand->SetValue(s); }
 		
 		void enable(bool state);
+		void enableListCtrlsOnly(bool state);
 		
 		void initialize();
 		

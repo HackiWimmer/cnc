@@ -4,6 +4,10 @@
 ///////////////////////////////////////////////////////////////////
 std::ostream& GamepadEvent::Data::trace(std::ostream &ostr, const GamepadEvent::Data &data) {
 ///////////////////////////////////////////////////////////////////
+	ostr << "Current usage mode             : " << ( data.usageMode == UM_NAV_GUI? "GUI" : "CNC" ) 
+		 << std::endl
+		 << std::endl;
+	
 	ostr << "Button      state(A;B;X;Y)     : " 
 		 << data.buttonA 				<< "; " 
 		 << data.buttonB 				<< "; " 

@@ -1,9 +1,10 @@
--IC:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\lib\gcc\x86_64-w64-mingw32\8.1.0\include\c++
--IC:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\lib\gcc\x86_64-w64-mingw32\8.1.0\include\c++\x86_64-w64-mingw32
--IC:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\lib\gcc\x86_64-w64-mingw32\8.1.0\include\c++\backward
--IC:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\lib\gcc\x86_64-w64-mingw32\8.1.0\include
--IC:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\lib\gcc\x86_64-w64-mingw32\8.1.0\include-fixed
--IC:\@Development\Compilers\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\x86_64-w64-mingw32\include
+-IC:\msys64\mingw64\include\c++\9.2.0
+-IC:\msys64\mingw64\include\c++\9.2.0\x86_64-w64-mingw32
+-IC:\msys64\mingw64\include\c++\9.2.0\backward
+-IC:\msys64\mingw64\lib\gcc\x86_64-w64-mingw32\9.2.0\include
+-IC:\msys64\mingw64\include
+-IC:\msys64\mingw64\lib\gcc\x86_64-w64-mingw32\9.2.0\include-fixed
+-IC:\msys64\mingw64\x86_64-w64-mingw32\include
 -IC:\@Development\@Projekte\c++\CNCGuiController\CncControllerTest
 -IC:\@Development\wxWidgets-3.1.3\lib\gcc_dll\mswu
 -IC:\@Development\wxWidgets-3.1.3\include

@@ -311,5 +311,83 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			}
 			
 		}
+		
+		//...................
+		curCatLabel.assign("Touch-block Parameter:");
+		wxPGProperty* mTchBlk = root->AppendChild( new wxPropertyCategory(curCatLabel) );
+		registerCategory(curCatLabel, mTchBlk);
+		{
+			//...................
+			const double begTkns = 1.0, endTkns = 30.0, sizThks = CncCfgSliderProperty::calcSteps(begTkns, endTkns, 0.01);
+			
+			prop = mTchBlk->AppendChild(new CncCfgSliderProperty("Z Thickness", NEXT_PROP_ID, 8.0, begTkns, endTkns, sizThks));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
+			prop->SetHelpString(_T("Touch-block thickness in Z direction."));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(3);
+			registerProperty(CncWork_Ctl_TOUCHBLOCK_Z_THICKNESS, prop);
+			
+			//...................
+			prop = mTchBlk->AppendChild(new CncCfgSliderProperty("X Cheek Thickness", NEXT_PROP_ID, 10.0, begTkns, endTkns, sizThks));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
+			prop->SetHelpString(_T("Touch-block X Cheek thickness."));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(3);
+			registerProperty(CncWork_Ctl_TOUCHBLOCK_X_CHEEK_THICKNESS, prop);
+			
+			//...................
+			prop = mTchBlk->AppendChild(new CncCfgSliderProperty("Y Cheek Thickness", NEXT_PROP_ID, 10.0, begTkns, endTkns, sizThks));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
+			prop->SetHelpString(_T("Touch-block Y Cheek thickness."));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(3);
+			registerProperty(CncWork_Ctl_TOUCHBLOCK_Y_CHEEK_THICKNESS, prop);
+		}
+		
+		//...................
+		curCatLabel.assign("Camera Parameter:");
+		wxPGProperty* mCamera = root->AppendChild( new wxPropertyCategory(curCatLabel) );
+		registerCategory(curCatLabel, mCamera);
+		{
+			//...............
+			prop = mCamera->AppendChild( new wxBoolProperty("Support", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_CAMERA_SUPPORT, prop);
+			
+			//...................
+			prop = mCamera->AppendChild(new CncCfgSliderProperty("Device ID", NEXT_PROP_ID, 0, 0, 32, 1));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "#");
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
+			registerProperty(CncWork_Ctl_CAMERA_DEVICE_ID, prop);
+			
+			//...................
+			const double begTkns = 1.0, endTkns = 30.0, sizThks = CncCfgSliderProperty::calcSteps(begTkns, endTkns, 0.01);
+			prop = mCamera->AppendChild(new CncCfgSliderProperty("X Offset", NEXT_PROP_ID, 10.0, begTkns, endTkns, sizThks));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
+			prop->SetHelpString(_T("Camera centre offset X."));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(3);
+			registerProperty(CncWork_Ctl_CAMERA_OFFSET_X, prop);
+			
+			//...................
+			prop = mCamera->AppendChild(new CncCfgSliderProperty("Y Offset", NEXT_PROP_ID, 10.0, begTkns, endTkns, sizThks));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
+			prop->SetHelpString(_T("Camera centre offset Y."));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(3);
+			registerProperty(CncWork_Ctl_CAMERA_OFFSET_Y, prop);
+			
+			//...................
+			prop = mCamera->AppendChild(new CncCfgSliderProperty("Z Offset", NEXT_PROP_ID, 0.0, begTkns, endTkns, sizThks));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
+			prop->SetHelpString(_T("Camera centre offset Z."));
+			prop->Enable(false);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(false);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(3);
+			registerProperty(CncWork_Ctl_CAMERA_OFFSET_Z, prop);
+		}
 	}
 }

@@ -170,6 +170,12 @@ class GLOpenGLPathBuffer {
 				}
 				
 				//-------------------------------------------------
+				const CncVertex& set(const CncVertex& v) {
+					*this = v;
+					return *this;
+				}
+				
+				//-------------------------------------------------
 				const CncVertex& set(char type, long clientID, float x, float y, float z)
 				{
 					this->type 				= type;
@@ -253,7 +259,7 @@ class GLOpenGLPathBuffer {
 		unsigned int			remainingVertiesCount()			const { return vertexCountMax - numVertices; }
 		
 		bool         			more()							const { return remainingVertiesCount() > 0; }
-		bool 					hasClientID(long clientID)		const { return clientIdIndex.find(clientID) != clientIdIndex.end(); }
+		bool 					hasClientID(long cID, bool exact=false)	const;
 		
 		const ClientIdIndex& 	getClientIdIndex()				const { return clientIdIndex; }
 		unsigned int 			getClientIdCount()				const { return clientIdIndex.size(); }
@@ -275,7 +281,7 @@ class GLOpenGLPathBuffer {
 
 		// --------------------------------------------------------------
 		const wxString& getIndexForClientIdAsString(long clientId, wxString& ret, bool summerize);
-		bool getVertex(CncVertex& ret, unsigned int idx) const;
+		bool getPosVertex(CncVertex& ret, unsigned int idx) const;
 		bool updateVertex(const CncVertex& vertex, unsigned int idx);
 		bool appendVertex(const CncVertex& vertex);
 		void resetBuffer();
@@ -310,7 +316,7 @@ class GLOpenGLPathBuffer {
 			if ( false ) {
 				for ( unsigned int i = 0; i < b.numVertices; i++ ) {
 					CncVertex vertex;
-					b.getVertex(vertex, i);
+					b.getPosVertex(vertex, i);
 
 					ostr << indend
 						 << "DAT"
@@ -363,7 +369,8 @@ class GLOpenGLPathBufferStore {
 		unsigned long getVertexCount() 											const;
 		
 		const GLOpenGLPathBuffer::CncVertex& getLastVertex() 					const;
-		bool getVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx) 	const;
+		bool getPosVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx)const;
+		bool getDirVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx)const;
 		long getBufferId(unsigned long idx) 									const;
 		
 		unsigned long getClientIdCount() 										const;

@@ -111,6 +111,16 @@
 	#define CncWork_Ctl_PRE_PROSSOR_USE_OPERATING_TRACE		"CncWork_Controller|PRE_PROSSOR_USE_OPERATING_TRACE"
 	#define CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES	"CncWork_Controller|PRE_PROSSOR_CNT_PATH_LIST_ENTRIES"
 	#define CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES		"CncWork_Controller|PRE_PROSSOR_CNT_SEQUENCE_MOVES"
+	
+	#define CncWork_Ctl_TOUCHBLOCK_Z_THICKNESS				"CncWork_Controller|TOUCHBLOCK_Z_THICKNESS"
+	#define CncWork_Ctl_TOUCHBLOCK_X_CHEEK_THICKNESS		"CncWork_Controller|TOUCHBLOCK_X_CHEEK_THICKNESS"
+	#define CncWork_Ctl_TOUCHBLOCK_Y_CHEEK_THICKNESS		"CncWork_Controller|TOUCHBLOCK_Y_CHEEK_THICKNESS"
+	
+	#define CncWork_Ctl_CAMERA_SUPPORT						"CncWork_Controller|CAMERA_SUPPORT"
+	#define CncWork_Ctl_CAMERA_DEVICE_ID					"CncWork_Controller|CAMERA_DEVICE_ID"
+	#define CncWork_Ctl_CAMERA_OFFSET_X						"CncWork_Controller|CAMERA_OFFSET_X"
+	#define CncWork_Ctl_CAMERA_OFFSET_Y						"CncWork_Controller|CAMERA_OFFSET_Y"
+	#define CncWork_Ctl_CAMERA_OFFSET_Z						"CncWork_Controller|CAMERA_OFFSET_Z"
 
 	#define CncTEST_TEST									"CncTest_Test|DUMMY"
 

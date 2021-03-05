@@ -68,9 +68,12 @@ class CncSpeedSliderInterface {
 		
 		void autoConfigure();
 		
-		int getValueMM_MIN();
-		int getValueMM_SEC();
+		int getValueMM_MIN() const;
+		int getValueMM_SEC() const;
 		
+		int getMinValueMM_MIN() const;
+		int getMaxValueMM_MIN() const;
+
 		void setToolTipWindow(wxWindow* wnd) { toolTipWindow = wnd; }
 };
 

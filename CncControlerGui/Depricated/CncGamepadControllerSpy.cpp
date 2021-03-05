@@ -46,9 +46,15 @@ void CncGamepadControllerSpy::update(const GamepadEvent& state) {
 		selectStepMode(APP_PROXY::GetRbStepMode()->GetSelection());
 		return;
 	}
-		
+	
+	#warning
+	return;
+	
 	if ( IsShownOnScreen() == false )
 		Show(true);
+	
+	#warning
+	//SetFocus();
 	
 	tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
 

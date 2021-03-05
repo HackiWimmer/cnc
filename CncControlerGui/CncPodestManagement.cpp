@@ -10,19 +10,13 @@ CncPodestManagement::CncPodestManagement(wxWindow* parent)
 , direction					(CncNoneDir)
 ///////////////////////////////////////////////////////////////////
 {
+	// othwerwise this negative effects the leave window callback
+	m_btUp	->SetToolTip("");
+	m_btDown->SetToolTip("");
 }
 ///////////////////////////////////////////////////////////////////
 CncPodestManagement::~CncPodestManagement() {
 ///////////////////////////////////////////////////////////////////
-	CncControl* cnc = APP_PROXY::getCncControl();
-	if ( cnc == NULL ) {
-		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
-	}
-	else {
-		if ( cnc->processCommand(CMD_DEACTIVATE_PODEST_HW, std::cout) == false ) {
-			std::cerr << CNC_LOG_FUNCT_A(": Can't deactivate podest hardware!") << std::endl;
-		}
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodestManagement::showInfo() {
@@ -41,7 +35,11 @@ void CncPodestManagement::onLefDownInfo(wxMouseEvent& event) {
 	showInfo();
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::onStartupTimer(wxTimerEvent& event) {
+void CncPodestManagement::onShow(wxShowEvent& event) {
+///////////////////////////////////////////////////////////////////
+}
+///////////////////////////////////////////////////////////////////
+void CncPodestManagement::onInit(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	CncControl* cnc = APP_PROXY::getCncControl();
 	if ( cnc == NULL ) {
@@ -63,6 +61,16 @@ void CncPodestManagement::onStartupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncPodestManagement::onClose(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	CncControl* cnc = APP_PROXY::getCncControl();
+	if ( cnc == NULL ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
+	}
+	else {
+		if ( cnc->processCommand(CMD_DEACTIVATE_PODEST_HW, std::cout) == false ) {
+			std::cerr << CNC_LOG_FUNCT_A(": Can't deactivate podest hardware!") << std::endl;
+		}
+	}
+	
 	Show(false);
 }
 ///////////////////////////////////////////////////////////////////
@@ -70,24 +78,42 @@ void CncPodestManagement::onPodestUpLeftDown(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	direction = CncPosDir;
 	process();
+	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodestManagement::onPodestDownLeftDown(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	direction = CncNegDir;
 	process();
+	event.Skip();
 }
+
 ///////////////////////////////////////////////////////////////////
 void CncPodestManagement::onPodestUpLeftUp(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( direction == CncNoneDir )
-		return;
-		
-	direction = CncNoneDir;
-	process();
+	reset();
+	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodestManagement::onPodestDownLeftUp(wxMouseEvent& event) {
+///////////////////////////////////////////////////////////////////
+	reset();
+	event.Skip();
+}
+///////////////////////////////////////////////////////////////////
+void CncPodestManagement::onPodestDownLeave(wxMouseEvent& event) {
+///////////////////////////////////////////////////////////////////
+	reset();
+	event.Skip();
+}
+///////////////////////////////////////////////////////////////////
+void CncPodestManagement::onPodestUpLeave(wxMouseEvent& event) {
+///////////////////////////////////////////////////////////////////
+	reset();
+	event.Skip();
+}
+///////////////////////////////////////////////////////////////////
+void CncPodestManagement::reset() {
 ///////////////////////////////////////////////////////////////////
 	if ( direction == CncNoneDir )
 		return;
@@ -104,6 +130,8 @@ void CncPodestManagement::process() {
 		return;
 	}
 	
+	//std::cout << direction<< std::endl;
+	
 	bool ret = true;
 	
 	switch ( direction ) {
@@ -118,4 +146,5 @@ void CncPodestManagement::process() {
 	if ( ret == false ) 
 		std::cerr << CNC_LOG_FUNCT_A(": Cnc processing failed! Direction = %d", (int)direction) << std::endl;
 }
+
 

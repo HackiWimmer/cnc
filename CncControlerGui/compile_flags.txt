@@ -8,6 +8,7 @@
 -IC:\@Development\boost_1_71_0
 -IC:\msys64\mingw64\include
 -IC:\@Development\wxsvg-1.5.20\include
+-IC:\@Development\opencv\build\include
 -IC:\@Development\wxWidgets-3.1.3\lib\gcc_dll\mswu
 -IC:\@Development\wxWidgets-3.1.3\include
 -DWXUSINGDLL

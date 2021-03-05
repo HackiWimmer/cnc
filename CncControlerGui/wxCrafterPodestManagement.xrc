@@ -4,9 +4,9 @@
     <title>Cnc Podest Management</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE</style>
-    <size>250,250</size>
+    <size>500,340</size>
     <object class="wxFlexGridSizer">
-      <minsize>250,250</minsize>
+      <minsize>500,340</minsize>
       <cols>1</cols>
       <rows>1</rows>
       <vgap>0</vgap>
@@ -24,38 +24,59 @@
             <hgap>0</hgap>
             <growablecols>0</growablecols>
             <growablerows>0</growablerows>
-            <object class="sizeritem" name="flexGridSizer9543">
+            <object class="sizeritem" name="flexGridSizer9567">
               <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
               <option>1</option>
               <object class="wxFlexGridSizer">
-                <cols>1</cols>
-                <rows>3</rows>
+                <cols>3</cols>
+                <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
-                <growablecols>0</growablecols>
-                <growablerows>0,1</growablerows>
+                <growablecols>2</growablecols>
+                <growablerows>0</growablerows>
                 <object class="sizeritem">
-                  <flag>wxALL|wxEXPAND</flag>
-                  <border>2</border>
-                  <object class="wxBitmapButton" name="m_btUp">
-                    <bitmap>bitmaps/24-up@2x.png</bitmap>
-                    <style>wxBU_AUTODRAW</style>
-                    <tooltip>
-                      <![CDATA[Move Podest Up]]>
-                    </tooltip>
-                    <default>0</default>
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxStaticBitmap" name="m_staticBitmap9569">
+                    <bitmap>bitmaps/lift-240.png</bitmap>
                   </object>
                 </object>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND</flag>
-                  <border>2</border>
-                  <object class="wxBitmapButton" name="m_btDown">
-                    <bitmap>bitmaps/24-down@2x.png</bitmap>
-                    <style>wxBU_AUTODRAW</style>
-                    <tooltip>
-                      <![CDATA[Move Podest Down]]>
-                    </tooltip>
-                    <default>0</default>
+                  <border>5</border>
+                  <object class="wxStaticLine" name="m_staticLine9571">
+                    <style>wxLI_VERTICAL</style>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer9543">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>1</cols>
+                    <rows>2</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>0</growablecols>
+                    <growablerows>0,1</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxBitmapButton" name="m_btUp">
+                        <bitmap>bitmaps/24-up@2x.png</bitmap>
+                        <style>wxBU_AUTODRAW</style>
+                        <default>0</default>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxBitmapButton" name="m_btDown">
+                        <bitmap>bitmaps/24-down@2x.png</bitmap>
+                        <style>wxBU_AUTODRAW</style>
+                        <default>0</default>
+                      </object>
+                    </object>
                   </object>
                 </object>
               </object>

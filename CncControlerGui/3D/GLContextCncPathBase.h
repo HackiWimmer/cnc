@@ -141,8 +141,8 @@ class GLContextCncPathBase : public GLContextBase {
 		const long getVirtualEnd() 		{ return cncPath.getVirtualEnd(); }
 		const long getVirtualEndAsId()	{ return cncPath.getVirtualEndAsId(); }
 		
-		void activateNotifications() 	{ cncPath.activateNotifications(); }
-		void deactivateNotifications() 	{ cncPath.deactivateNotifications(); }
+		void pushProcessMode();
+		void popProcessMode();
 		
 		void registerCallback(GLI::GLCncPath::Callback* cb) 			{ cncPath.registerCallback(cb);   }
 		
@@ -152,8 +152,10 @@ class GLContextCncPathBase : public GLContextBase {
 	protected:
 		
 		GLI::GLCncPath		cncPath;
+		cnc::LongValues		highlightedClientIds;
 		GLI::GLXYZRuler		ruler;
 		DrawType 			drawType;
+		bool				continiousDirConeFlag;
 		
 		long 				currentClientId;
 		
@@ -168,10 +170,14 @@ class GLContextCncPathBase : public GLContextBase {
 		virtual void determineModel();
 		virtual void markCurrentPosition();
 		
+		
 		void drawGuidePathes();
 		void drawHardwareBox();
 		void drawBoundBox();
 		void drawRuler();
+		void drawHighlightEffects();
+		void drawDirectionCone();
+		void drawDirectionCone(unsigned int idx);
 		
 		friend class CncMotionMonitor;
 		friend class CncGLContextObserver;

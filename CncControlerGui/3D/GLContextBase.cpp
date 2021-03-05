@@ -364,7 +364,7 @@ void GLContextBase::drawCoordinateOrigin() {
 	// ensure the right matrix
 	glMatrixMode(GL_MODELVIEW);
 	
-	// recsale due to the viewport enlargement, so we alwys have  
+	// rescale due to the viewport enlargement, so we always have  
 	// a constant sizing for the coordinate origin 
 	glScalef(viewPort->getDisplayFactor(), viewPort->getDisplayFactor(), viewPort->getDisplayFactor()); 
 	
@@ -640,7 +640,7 @@ void GLContextBase::reshapeViewMode(int w, int h) {
 		return;
 		
 	int x = 0, y = 0;
-	// evaluate the corrsponding origin coordinates
+	// evaluate the corresponding origin coordinates
 	viewPort->getPreDefCoordinatesXY(convertViewMode(viewMode), w, h, x, y);
 	reshape(w, h, x, y);
 }

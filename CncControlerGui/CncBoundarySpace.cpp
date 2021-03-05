@@ -65,8 +65,8 @@ void CncBoundarySpace::HardwareOriginOffset::set(const CncLongPosition& o) {
 ///////////////////////////////////////////////////////////////////
 void CncBoundarySpace::HardwareOriginOffset::set(const CncDoublePosition& o) {
 ///////////////////////////////////////////////////////////////////	
-	if ( CncConfig::available() )	THE_CONFIG->convertMetricToSteps(offset, o);
-	else							offset.zeroXYZ();
+	if ( THE_CONFIG )	THE_CONFIG->convertMetricToSteps(offset, o);
+	else				offset.zeroXYZ();
 }
 
 
@@ -75,11 +75,11 @@ void CncBoundarySpace::HardwareOriginOffset::set(const CncDoublePosition& o) {
 CncBoundarySpace::CncBoundarySpace()
 : hardwareOffset				()
 , calculateRefPosition			({0.0, 0.0, 0.0})
-, boundLocically				()
+, boundLogically				()
 , boundPhysically				()
 , refPostionMode				(CncRM_Mode1)
+, measurementOffset				({0.0, 0.0, 0.0})
 , workpieceThickness			(0.0)
-, measurePlateThickness			(0.0)
 ///////////////////////////////////////////////////////////////////
 {
 	calculate();
@@ -133,55 +133,87 @@ void CncBoundarySpace::calculate() {
 	if ( CncConfig::available() == false )
 		return;
 	
-	const double mdX = THE_CONFIG->getMaxDimensionX();
-	const double mdY = THE_CONFIG->getMaxDimensionY();
-	const double mdZ = THE_CONFIG->getMaxDimensionZ();
+	const double mdX = fabs(THE_CONFIG->getMaxDimensionX());
+	const double mdY = fabs(THE_CONFIG->getMaxDimensionY());
+	const double mdZ = fabs(THE_CONFIG->getMaxDimensionZ());
 	
-	measurePlateThickness = THE_CONFIG->getMeasurePlateThickness();
+	const double wpt = workpieceThickness;
+	const double moX = measurementOffset.getX();
+	const double moY = measurementOffset.getY();
+	const double moZ = measurementOffset.getZ();
 	
 	switch ( refPostionMode ) {
-		case CncRM_Unknown:	// only a placeholder, nothing to do . . 
-							break;
-							
-		case CncRM_Mode1:	calculateRefPosition	 = { 0.0, 0.0, 0.0 };
-							boundLocically.setMinBound({ 0.0, 0.0, 0.0 });
-							boundLocically.setMaxBound({ mdX, mdY, mdZ });
-							break;
-							
-		case CncRM_Mode2:	calculateRefPosition	 = { 0.0, 0.0, 0.0 + fabs(measurePlateThickness) };
-							boundLocically.setMinBound({ 0.0, 0.0, 0.0 });
-							boundLocically.setMaxBound({ mdX, mdY, mdZ });
-							break;
-							
-		case CncRM_Mode3:	calculateRefPosition	 = { 0.0, 0.0, 0.0 + fabs(workpieceThickness) };
-							boundLocically.setMinBound({ 0.0, 0.0, 0.0 });
-							boundLocically.setMaxBound({ mdX, mdY, mdZ });
-							break;
-							
-		case CncRM_Mode4:	calculateRefPosition	 = { 0.0, 0.0, 0.0 + fabs(workpieceThickness) + fabs(measurePlateThickness) };
-							boundLocically.setMinBound({ 0.0, 0.0, 0.0 });
-							boundLocically.setMaxBound({ mdX, mdY, mdZ });
-							break;
-							
-		case CncRM_Mode5:	calculateRefPosition	 = { 0.0, 0.0, 0.0 };
-							boundLocically.setMinBound({ 0.0, 0.0, 0.0 - fabs(workpieceThickness) });
-							boundLocically.setMaxBound({ mdX, mdY, mdZ - fabs(workpieceThickness) });
-							break;
-							
-		case CncRM_Mode6:	calculateRefPosition	 = { 0.0, 0.0, 0.0 + fabs(measurePlateThickness)};
-							boundLocically.setMinBound({ 0.0, 0.0, 0.0 - ( fabs(workpieceThickness) + fabs(measurePlateThickness) ) });
-							boundLocically.setMaxBound({ mdX, mdY, mdZ - ( fabs(workpieceThickness) + fabs(measurePlateThickness) ) });
-							break;
+		case CncRM_Unknown:		// only a place holder, nothing to do . . 
+								break;
+								
+		case CncRM_Mode1:		calculateRefPosition	 = { 0.0, 0.0, 0.0 };
+								boundLogically.setMinBound({ 0.0, 0.0, 0.0 });
+								boundLogically.setMaxBound({ mdX, mdY, mdZ });
+								break;
+								
+		case CncRM_Mode2:		calculateRefPosition	 = { 0.0, 0.0, 0.0 + fabs(moZ) };
+								boundLogically.setMinBound({ 0.0, 0.0, 0.0 });
+								boundLogically.setMaxBound({ mdX, mdY, mdZ });
+								break;
+								
+		case CncRM_Mode3:		calculateRefPosition	 = { 0.0, 0.0, 0.0 + fabs(wpt) };
+								boundLogically.setMinBound({ 0.0, 0.0, 0.0 });
+								boundLogically.setMaxBound({ mdX, mdY, mdZ });
+								break;
+								
+		case CncRM_Mode4:		calculateRefPosition	 = { 0.0, 0.0, 0.0 + fabs(wpt) + fabs(moZ) };
+								boundLogically.setMinBound({ 0.0, 0.0, 0.0 });
+								boundLogically.setMaxBound({ mdX, mdY, mdZ });
+								break;
+								
+		case CncRM_Mode5:		calculateRefPosition	 = { 0.0, 0.0, 0.0 };
+								boundLogically.setMinBound({ 0.0, 0.0, 0.0 - fabs(wpt) });
+								boundLogically.setMaxBound({ mdX, mdY, mdZ - fabs(wpt) });
+								break;
+								
+		case CncRM_Mode6:		calculateRefPosition	 = { 0.0, 0.0, 0.0 + fabs(moZ) };
+								boundLogically.setMinBound({ 0.0, 0.0, 0.0 - ( fabs(wpt) + fabs(moZ) ) });
+								boundLogically.setMaxBound({ mdX, mdY, mdZ - ( fabs(wpt) + fabs(moZ) ) });
+								break;
+								
+		case CncRM_Touchblock:	calculateRefPosition	 = { 0.0 + moX, 
+															 0.0 + moY, 
+															 0.0 + moZ 
+															};
+								boundLogically.setMinBound({ 0.0 - ( fabs(wpt) + moX ), 
+															 0.0 - ( fabs(wpt) + moY ), 
+															 0.0 - ( fabs(wpt) + moZ ) 
+															});
+								boundLogically.setMaxBound({ mdX - ( fabs(wpt) + moX ),
+															 mdY - ( fabs(wpt) + moY ), 
+															 mdZ - ( fabs(wpt) + moZ ) 
+															 });
+								break;
+		
+		case CncRM_Camera:		calculateRefPosition	 = { 0.0 + moX, 
+															 0.0 + moY, 
+															 0.0 + moZ 
+															};
+								boundLogically.setMinBound({ 0.0 - ( fabs(wpt) + moX ), 
+															 0.0 - ( fabs(wpt) + moY ), 
+															 0.0 - ( fabs(wpt) + moZ ) 
+															});
+								boundLogically.setMaxBound({ mdX - ( fabs(wpt) + moX ),
+															 mdY - ( fabs(wpt) + moY ), 
+															 mdZ - ( fabs(wpt) + moZ ) 
+															 });
+								break;
+		
 	}
 	
 	if ( isValid() == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(" Invalid state!\n");
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid state!\n");
 		return;
 	}
 	
 	// normalize physically values
 	CncDoublePosition hwo(hardwareOffset.getAsMetric());
-	boundPhysically = boundLocically;
+	boundPhysically = boundLogically;
 	boundPhysically.shift(hwo);
 	
 	if ( THE_APP != NULL ) {
@@ -200,8 +232,8 @@ void CncBoundarySpace::traceTo(std::ostream& o, unsigned int indent) const{
 		<< prefix << "Reference Pos. Mode            : " << (int)refPostionMode								<< std::endl
 		<< prefix << "Reference Pos.            [mm] : " << cnc::dblFormat(calculateRefPosition)			<< std::endl
 		<< prefix << "Hardware Origin Offset    [mm] : " << cnc::dblFormat(hardwareOffset.getAsMetric())	<< std::endl
-		<< prefix << "Bounderies min locally    [mm] : " << cnc::dblFormat(boundLocically.getMinBound())	<< std::endl
-		<< prefix << "Bounderies max locally    [mm] : " << cnc::dblFormat(boundLocically.getMaxBound())	<< std::endl
+		<< prefix << "Bounderies min locally    [mm] : " << cnc::dblFormat(boundLogically.getMinBound())	<< std::endl
+		<< prefix << "Bounderies max locally    [mm] : " << cnc::dblFormat(boundLogically.getMaxBound())	<< std::endl
 		<< prefix << "Bounderies min physically [mm] : " << cnc::dblFormat(boundPhysically.getMinBound())	<< std::endl
 		<< prefix << "Bounderies max physically [mm] : " << cnc::dblFormat(boundPhysically.getMaxBound())	<< std::endl
 	;

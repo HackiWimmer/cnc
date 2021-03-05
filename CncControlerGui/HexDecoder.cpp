@@ -353,7 +353,7 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 		}
 		case CMD_MOVE:
 		case CMD_RENDER_AND_MOVE:
-		case CMD_MOVE_UNIT_LIMIT_IS_FREE:
+		case CMD_MOVE_UNTIL_LIMIT_IS_FREE:
 		{
 			if ( readNextHexBytes(restToken, 1, value) == false ) 
 				break;

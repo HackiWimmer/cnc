@@ -2,6 +2,7 @@
 #define CNCSPEEDMONITOR_H
 
 #include <wx/dcbuffer.h>
+#include <wx/dcgraph.h>
 #include "OSD/CncTimeFunctions.h"
 #include "CncAverage.h"
 #include "CncCircularBuffer.h"
@@ -195,9 +196,9 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 			}
 			
 			//----------------------------------------------------
-			inline void plotBtLf(wxAutoBufferedPaintDC& dc, const wxRect& rect);
-			inline void plotToRt(wxAutoBufferedPaintDC& dc, const wxRect& rect);
-			inline void plotMain(wxAutoBufferedPaintDC& dc, const wxRect& rect);
+			inline void plotBtLf(wxGCDC& dc, const wxRect& rect);
+			inline void plotToRt(wxGCDC& dc, const wxRect& rect);
+			inline void plotMain(wxGCDC& dc, const wxRect& rect);
 			
 			inline int  getFAsPx(double value);
 		}; //struct Diagram 

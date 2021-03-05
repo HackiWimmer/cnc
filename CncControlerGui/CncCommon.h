@@ -69,6 +69,7 @@ static struct ClientIds {
 // -------------------------------------------------------------------
 // global enumartions
 	enum CncUnit 					{ CncSteps, CncMetric };
+	enum CncAxis					{ Axis_X, Axis_Y, Axis_Z, Axis_H };
 	enum CncInteractiveMoveDriver	{ IMD_NONE, IMD_GAMEPAD, IMD_NAVIGATOR };
 	enum CncDirection 				{ CncUndefDir, CncClockwise, CncCounterClockwise };
 	enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};
@@ -82,7 +83,7 @@ static struct ClientIds {
 	enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4 };
 	enum CncTemplateFormat 			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
 	enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
-	enum CncRefPositionMode 		{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6 };
+	enum CncRefPositionMode 		{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6, CncRM_Touchblock = 7, CncRM_Camera = 8 };
 
 // -------------------------------------------------------------------
 namespace cnc {
@@ -119,6 +120,9 @@ namespace cnc {
 	const char*					getCncSpeedTypeAsString(CncSpeedMode s);
 	CncSpeedMode				getCncSpeedType(char m);
 	float						getSpeedValue(CncStepSensitivity s);
+	float						getSpeedValue(float amplitude);
+	int							getSpeedStepSensitivityIndex(float amplitude);
+	const std::vector<float>&	getSpeedStepSensitivityFactors(std::vector<float>& ret);
 	bool						isCncSpeedType(char m);
 	
 	const CncTemplateFormat		getTemplateFormatFromFileName(const char* fileName);
@@ -322,6 +326,15 @@ class MontiorBottomContextSelection {
 		enum VAL {
 			STATISTIC_PANEL				= 0,
 			REPLAY_PANEL				= 1
+		};
+};
+
+//-----------------------------------------------------------------
+class SecureLeftBookSelection {
+	public:
+		enum VAL {
+			FILE_PANEL				= 0,
+			PROCESS_PANEL			= 1
 		};
 };
 

@@ -360,7 +360,7 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     m_drawingAreaBook->SetMinSize(wxSize(320,-1));
     
     SetName(wxT("CncSpeedMonitorBase"));
-    SetSize(600,300);
+    SetSize(wxDLG_UNIT(this, wxSize(600,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -1442,7 +1442,7 @@ CncSpeedPlaygroundBase::CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer207->Add(m_listCtrlTestData, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_listCtrlTestData->InsertColumn(m_listCtrlTestData->GetColumnCount(), _("Parameter"), wxLIST_FORMAT_LEFT, -1);
+    m_listCtrlTestData->InsertColumn(m_listCtrlTestData->GetColumnCount(), _("Parameter"), wxLIST_FORMAT_LEFT, 150);
     m_panelAxes = new wxPanel(m_nbCalculations, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_nbCalculations, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_panelAxes->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     int m_panelAxesImgIndex;
@@ -1481,7 +1481,7 @@ CncSpeedPlaygroundBase::CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizerLX->Add(m_listCtrlAxisX, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_listCtrlAxisX->InsertColumn(m_listCtrlAxisX->GetColumnCount(), _("Parameter"), wxLIST_FORMAT_LEFT, -1);
+    m_listCtrlAxisX->InsertColumn(m_listCtrlAxisX->GetColumnCount(), _("Parameter"), wxLIST_FORMAT_LEFT, 150);
     wxFlexGridSizer* flexGridSizerLY = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizerLY->SetFlexibleDirection( wxBOTH );
     flexGridSizerLY->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -1505,7 +1505,7 @@ CncSpeedPlaygroundBase::CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizerLY->Add(m_listCtrlAxisY, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_listCtrlAxisY->InsertColumn(m_listCtrlAxisY->GetColumnCount(), _("Parameter"), wxLIST_FORMAT_LEFT, -1);
+    m_listCtrlAxisY->InsertColumn(m_listCtrlAxisY->GetColumnCount(), _("Parameter"), wxLIST_FORMAT_LEFT, 150);
     wxFlexGridSizer* flexGridSizerLZ = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizerLZ->SetFlexibleDirection( wxBOTH );
     flexGridSizerLZ->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -1529,7 +1529,7 @@ CncSpeedPlaygroundBase::CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizerLZ->Add(m_listCtrlAxisZ, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_listCtrlAxisZ->InsertColumn(m_listCtrlAxisZ->GetColumnCount(), _("Parameter"), wxLIST_FORMAT_LEFT, -1);
+    m_listCtrlAxisZ->InsertColumn(m_listCtrlAxisZ->GetColumnCount(), _("Parameter"), wxLIST_FORMAT_LEFT, 150);
     m_statusPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,28)), wxTAB_TRAVERSAL);
     
     flexGridSizer31->Add(m_statusPanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
@@ -1580,7 +1580,7 @@ CncSpeedPlaygroundBase::CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id, 
     #endif
     
     SetName(wxT("CncSpeedPlaygroundBase"));
-    SetSize(1000,1200);
+    SetSize(wxDLG_UNIT(this, wxSize(1000,1200)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -1598,6 +1598,7 @@ CncSpeedPlaygroundBase::CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id, 
 #endif
     // Connect events
     this->Connect(wxEVT_ACTIVATE, wxActivateEventHandler(CncSpeedPlaygroundBase::onActivate), NULL, this);
+    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncSpeedPlaygroundBase::onCloseWindow), NULL, this);
     m_button2618->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedPlaygroundBase::onRun), NULL, this);
     m_button261->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedPlaygroundBase::onClearLogger), NULL, this);
     m_valF->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(CncSpeedPlaygroundBase::updateValueF), NULL, this);
@@ -1654,6 +1655,7 @@ CncSpeedPlaygroundBase::CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id, 
 CncSpeedPlaygroundBase::~CncSpeedPlaygroundBase()
 {
     this->Disconnect(wxEVT_ACTIVATE, wxActivateEventHandler(CncSpeedPlaygroundBase::onActivate), NULL, this);
+    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncSpeedPlaygroundBase::onCloseWindow), NULL, this);
     m_button2618->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedPlaygroundBase::onRun), NULL, this);
     m_button261->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedPlaygroundBase::onClearLogger), NULL, this);
     m_valF->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(CncSpeedPlaygroundBase::updateValueF), NULL, this);

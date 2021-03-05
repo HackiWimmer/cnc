@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 9566,
+  "m_objCounter": 9592,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9XXInitBitmapResources",
   "m_bitmapsFile": "wxCrafterPodestManagement_bitmaps.cpp",
@@ -24,11 +24,11 @@
    "m_properties": [{
      "type": "string",
      "m_label": "Size:",
-     "m_value": "250,250"
+     "m_value": "500,340"
     }, {
      "type": "string",
      "m_label": "Minimum Size:",
-     "m_value": "250,250"
+     "m_value": "500,340"
     }, {
      "type": "string",
      "m_label": "Name:",
@@ -123,7 +123,21 @@
      "m_label": "Bitmap File (256x256):",
      "m_path": ""
     }],
-   "m_events": [],
+   "m_events": [{
+     "m_eventName": "wxEVT_SHOW",
+     "m_eventClass": "wxShowEvent",
+     "m_eventHandler": "wxShowEventHandler",
+     "m_functionNameAndSignature": "onShow(wxShowEvent& event)",
+     "m_description": "Process a wxEVT_SHOW event",
+     "m_noBody": false
+    }, {
+     "m_eventName": "wxEVT_INIT_DIALOG",
+     "m_eventClass": "wxInitDialogEvent",
+     "m_eventHandler": "wxInitDialogEventHandler",
+     "m_functionNameAndSignature": "onInit(wxInitDialogEvent& event)",
+     "m_description": "A wxInitDialogEvent is sent as a dialog or panel is being initialised. Handlers for this event can transfer data to the window.\nThe default handler calls wxWindow::TransferDataToWindow",
+     "m_noBody": false
+    }],
    "m_children": [{
      "m_type": 4403,
      "proportion": 1,
@@ -135,7 +149,7 @@
      "m_properties": [{
        "type": "string",
        "m_label": "Minimum Size:",
-       "m_value": "250,250"
+       "m_value": "500,340"
       }, {
        "type": "string",
        "m_label": "Name:",
@@ -251,7 +265,7 @@
           }, {
            "type": "string",
            "m_label": "Name:",
-           "m_value": "flexGridSizer9561"
+           "m_value": "flexGridSizer9572"
           }, {
            "type": "string",
            "m_label": "Style:",
@@ -285,7 +299,7 @@
          "m_children": [{
            "m_type": 4403,
            "proportion": 1,
-           "border": 0,
+           "border": 5,
            "gbSpan": "1,1",
            "gbPosition": "0,0",
            "m_styles": [],
@@ -297,7 +311,7 @@
             }, {
              "type": "string",
              "m_label": "Name:",
-             "m_value": "flexGridSizer9543"
+             "m_value": "flexGridSizer9567"
             }, {
              "type": "string",
              "m_label": "Style:",
@@ -305,19 +319,19 @@
             }, {
              "type": "string",
              "m_label": "# Columns:",
-             "m_value": "1"
-            }, {
-             "type": "string",
-             "m_label": "# Rows:",
              "m_value": "3"
             }, {
              "type": "string",
+             "m_label": "# Rows:",
+             "m_value": "1"
+            }, {
+             "type": "string",
              "m_label": "Growable columns:",
-             "m_value": "0"
+             "m_value": "2"
             }, {
              "type": "string",
              "m_label": "Growable rows:",
-             "m_value": "0,1"
+             "m_value": "0"
             }, {
              "type": "string",
              "m_label": "Horizontal gap:",
@@ -329,13 +343,13 @@
             }],
            "m_events": [],
            "m_children": [{
-             "m_type": 4404,
+             "m_type": 4409,
              "proportion": 0,
-             "border": 2,
+             "border": 5,
              "gbSpan": "1,1",
              "gbPosition": "0,0",
-             "m_styles": ["wxBU_AUTODRAW"],
-             "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+             "m_styles": [],
+             "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
              "m_properties": [{
                "type": "winid",
                "m_label": "ID:",
@@ -351,11 +365,11 @@
               }, {
                "type": "string",
                "m_label": "Name:",
-               "m_value": "m_btUp"
+               "m_value": "m_staticBitmap9569"
               }, {
                "type": "multi-string",
                "m_label": "Tooltip:",
-               "m_value": "Move Podest Up"
+               "m_value": ""
               }, {
                "type": "colour",
                "m_label": "Bg Colour:",
@@ -395,35 +409,17 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/24-up@2x.png"
-              }, {
-               "type": "bool",
-               "m_label": "Default Button",
-               "m_value": false
+               "m_path": "bitmaps/lift-240.png"
               }],
-             "m_events": [{
-               "m_eventName": "wxEVT_LEFT_DOWN",
-               "m_eventClass": "wxMouseEvent",
-               "m_eventHandler": "wxMouseEventHandler",
-               "m_functionNameAndSignature": "onPodestUpLeftDown(wxMouseEvent& event)",
-               "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
-               "m_noBody": false
-              }, {
-               "m_eventName": "wxEVT_LEFT_UP",
-               "m_eventClass": "wxMouseEvent",
-               "m_eventHandler": "wxMouseEventHandler",
-               "m_functionNameAndSignature": "onPodestUpLeftUp(wxMouseEvent& event)",
-               "m_description": "Process a wxEVT_LEFT_UP event.",
-               "m_noBody": false
-              }],
+             "m_events": [],
              "m_children": []
             }, {
-             "m_type": 4404,
+             "m_type": 4418,
              "proportion": 0,
-             "border": 2,
+             "border": 5,
              "gbSpan": "1,1",
              "gbPosition": "0,0",
-             "m_styles": ["wxBU_AUTODRAW"],
+             "m_styles": ["wxLI_VERTICAL"],
              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
              "m_properties": [{
                "type": "winid",
@@ -440,11 +436,11 @@
               }, {
                "type": "string",
                "m_label": "Name:",
-               "m_value": "m_btDown"
+               "m_value": "m_staticLine9571"
               }, {
                "type": "multi-string",
                "m_label": "Tooltip:",
-               "m_value": "Move Podest Down"
+               "m_value": ""
               }, {
                "type": "colour",
                "m_label": "Bg Colour:",
@@ -481,31 +477,248 @@
                "type": "string",
                "m_label": "Style:",
                "m_value": ""
-              }, {
-               "type": "bitmapPicker",
-               "m_label": "Bitmap File:",
-               "m_path": "bitmaps/24-down@2x.png"
-              }, {
-               "type": "bool",
-               "m_label": "Default Button",
-               "m_value": false
               }],
-             "m_events": [{
-               "m_eventName": "wxEVT_LEFT_DOWN",
-               "m_eventClass": "wxMouseEvent",
-               "m_eventHandler": "wxMouseEventHandler",
-               "m_functionNameAndSignature": "onPodestDownLeftDown(wxMouseEvent& event)",
-               "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
-               "m_noBody": false
-              }, {
-               "m_eventName": "wxEVT_LEFT_UP",
-               "m_eventClass": "wxMouseEvent",
-               "m_eventHandler": "wxMouseEventHandler",
-               "m_functionNameAndSignature": "onPodestDownLeftUp(wxMouseEvent& event)",
-               "m_description": "Process a wxEVT_LEFT_UP event.",
-               "m_noBody": false
-              }],
+             "m_events": [],
              "m_children": []
+            }, {
+             "m_type": 4403,
+             "proportion": 1,
+             "border": 0,
+             "gbSpan": "1,1",
+             "gbPosition": "0,0",
+             "m_styles": [],
+             "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+             "m_properties": [{
+               "type": "string",
+               "m_label": "Minimum Size:",
+               "m_value": "-1,-1"
+              }, {
+               "type": "string",
+               "m_label": "Name:",
+               "m_value": "flexGridSizer9543"
+              }, {
+               "type": "string",
+               "m_label": "Style:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "# Columns:",
+               "m_value": "1"
+              }, {
+               "type": "string",
+               "m_label": "# Rows:",
+               "m_value": "2"
+              }, {
+               "type": "string",
+               "m_label": "Growable columns:",
+               "m_value": "0"
+              }, {
+               "type": "string",
+               "m_label": "Growable rows:",
+               "m_value": "0,1"
+              }, {
+               "type": "string",
+               "m_label": "Horizontal gap:",
+               "m_value": "0"
+              }, {
+               "type": "string",
+               "m_label": "Vertical gap:",
+               "m_value": "0"
+              }],
+             "m_events": [],
+             "m_children": [{
+               "m_type": 4404,
+               "proportion": 0,
+               "border": 2,
+               "gbSpan": "1,1",
+               "gbPosition": "0,0",
+               "m_styles": ["wxBU_AUTODRAW"],
+               "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+               "m_properties": [{
+                 "type": "winid",
+                 "m_label": "ID:",
+                 "m_winid": "wxID_ANY"
+                }, {
+                 "type": "string",
+                 "m_label": "Size:",
+                 "m_value": "-1,-1"
+                }, {
+                 "type": "string",
+                 "m_label": "Minimum Size:",
+                 "m_value": "-1,-1"
+                }, {
+                 "type": "string",
+                 "m_label": "Name:",
+                 "m_value": "m_btUp"
+                }, {
+                 "type": "multi-string",
+                 "m_label": "Tooltip:",
+                 "m_value": ""
+                }, {
+                 "type": "colour",
+                 "m_label": "Bg Colour:",
+                 "colour": "<Default>"
+                }, {
+                 "type": "colour",
+                 "m_label": "Fg Colour:",
+                 "colour": "<Default>"
+                }, {
+                 "type": "font",
+                 "m_label": "Font:",
+                 "m_value": ""
+                }, {
+                 "type": "bool",
+                 "m_label": "Hidden",
+                 "m_value": false
+                }, {
+                 "type": "bool",
+                 "m_label": "Disabled",
+                 "m_value": false
+                }, {
+                 "type": "bool",
+                 "m_label": "Focused",
+                 "m_value": false
+                }, {
+                 "type": "string",
+                 "m_label": "Class Name:",
+                 "m_value": ""
+                }, {
+                 "type": "string",
+                 "m_label": "Include File:",
+                 "m_value": ""
+                }, {
+                 "type": "string",
+                 "m_label": "Style:",
+                 "m_value": ""
+                }, {
+                 "type": "bitmapPicker",
+                 "m_label": "Bitmap File:",
+                 "m_path": "bitmaps/24-up@2x.png"
+                }, {
+                 "type": "bool",
+                 "m_label": "Default Button",
+                 "m_value": false
+                }],
+               "m_events": [{
+                 "m_eventName": "wxEVT_LEFT_DOWN",
+                 "m_eventClass": "wxMouseEvent",
+                 "m_eventHandler": "wxMouseEventHandler",
+                 "m_functionNameAndSignature": "onPodestUpLeftDown(wxMouseEvent& event)",
+                 "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
+                 "m_noBody": false
+                }, {
+                 "m_eventName": "wxEVT_LEFT_UP",
+                 "m_eventClass": "wxMouseEvent",
+                 "m_eventHandler": "wxMouseEventHandler",
+                 "m_functionNameAndSignature": "onPodestUpLeftUp(wxMouseEvent& event)",
+                 "m_description": "Process a wxEVT_LEFT_UP event.",
+                 "m_noBody": false
+                }, {
+                 "m_eventName": "wxEVT_LEAVE_WINDOW",
+                 "m_eventClass": "wxMouseEvent",
+                 "m_eventHandler": "wxMouseEventHandler",
+                 "m_functionNameAndSignature": "onPodestUpLeave(wxMouseEvent& event)",
+                 "m_description": "Process a wxEVT_LEAVE_WINDOW event.",
+                 "m_noBody": false
+                }],
+               "m_children": []
+              }, {
+               "m_type": 4404,
+               "proportion": 0,
+               "border": 2,
+               "gbSpan": "1,1",
+               "gbPosition": "0,0",
+               "m_styles": ["wxBU_AUTODRAW"],
+               "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+               "m_properties": [{
+                 "type": "winid",
+                 "m_label": "ID:",
+                 "m_winid": "wxID_ANY"
+                }, {
+                 "type": "string",
+                 "m_label": "Size:",
+                 "m_value": "-1,-1"
+                }, {
+                 "type": "string",
+                 "m_label": "Minimum Size:",
+                 "m_value": "-1,-1"
+                }, {
+                 "type": "string",
+                 "m_label": "Name:",
+                 "m_value": "m_btDown"
+                }, {
+                 "type": "multi-string",
+                 "m_label": "Tooltip:",
+                 "m_value": ""
+                }, {
+                 "type": "colour",
+                 "m_label": "Bg Colour:",
+                 "colour": "<Default>"
+                }, {
+                 "type": "colour",
+                 "m_label": "Fg Colour:",
+                 "colour": "<Default>"
+                }, {
+                 "type": "font",
+                 "m_label": "Font:",
+                 "m_value": ""
+                }, {
+                 "type": "bool",
+                 "m_label": "Hidden",
+                 "m_value": false
+                }, {
+                 "type": "bool",
+                 "m_label": "Disabled",
+                 "m_value": false
+                }, {
+                 "type": "bool",
+                 "m_label": "Focused",
+                 "m_value": false
+                }, {
+                 "type": "string",
+                 "m_label": "Class Name:",
+                 "m_value": ""
+                }, {
+                 "type": "string",
+                 "m_label": "Include File:",
+                 "m_value": ""
+                }, {
+                 "type": "string",
+                 "m_label": "Style:",
+                 "m_value": ""
+                }, {
+                 "type": "bitmapPicker",
+                 "m_label": "Bitmap File:",
+                 "m_path": "bitmaps/24-down@2x.png"
+                }, {
+                 "type": "bool",
+                 "m_label": "Default Button",
+                 "m_value": false
+                }],
+               "m_events": [{
+                 "m_eventName": "wxEVT_LEFT_DOWN",
+                 "m_eventClass": "wxMouseEvent",
+                 "m_eventHandler": "wxMouseEventHandler",
+                 "m_functionNameAndSignature": "onPodestDownLeftDown(wxMouseEvent& event)",
+                 "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
+                 "m_noBody": false
+                }, {
+                 "m_eventName": "wxEVT_LEFT_UP",
+                 "m_eventClass": "wxMouseEvent",
+                 "m_eventHandler": "wxMouseEventHandler",
+                 "m_functionNameAndSignature": "onPodestDownLeftUp(wxMouseEvent& event)",
+                 "m_description": "Process a wxEVT_LEFT_UP event.",
+                 "m_noBody": false
+                }, {
+                 "m_eventName": "wxEVT_LEAVE_WINDOW",
+                 "m_eventClass": "wxMouseEvent",
+                 "m_eventHandler": "wxMouseEventHandler",
+                 "m_functionNameAndSignature": "onPodestDownLeave(wxMouseEvent& event)",
+                 "m_description": "Process a wxEVT_LEAVE_WINDOW event.",
+                 "m_noBody": false
+                }],
+               "m_children": []
+              }]
             }]
           }, {
            "m_type": 4418,
@@ -797,40 +1010,6 @@
           }]
         }]
       }]
-    }, {
-     "m_type": 4483,
-     "proportion": 0,
-     "border": 5,
-     "gbSpan": "1,1",
-     "gbPosition": "0,0",
-     "m_styles": [],
-     "m_sizerFlags": [],
-     "m_properties": [{
-       "type": "string",
-       "m_label": "Name:",
-       "m_value": "m_startupTimer"
-      }, {
-       "type": "integer",
-       "m_label": "Interval",
-       "m_value": 500
-      }, {
-       "type": "bool",
-       "m_label": "Start the timer",
-       "m_value": true
-      }, {
-       "type": "bool",
-       "m_label": "One Shot Timer",
-       "m_value": true
-      }],
-     "m_events": [{
-       "m_eventName": "wxEVT_TIMER",
-       "m_eventClass": "wxTimerEvent",
-       "m_eventHandler": "wxTimerEventHandler",
-       "m_functionNameAndSignature": "onStartupTimer(wxTimerEvent& event)",
-       "m_description": "Process a timer event",
-       "m_noBody": false
-      }],
-     "m_children": []
     }]
   }]
 }

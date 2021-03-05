@@ -238,7 +238,7 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 			
 			case CMD_MOVE:
 			case CMD_RENDER_AND_MOVE:
-			case CMD_MOVE_UNIT_LIMIT_IS_FREE:		ret = performMajorMove((unsigned char*)(buffer), nbByte);
+			case CMD_MOVE_UNTIL_LIMIT_IS_FREE:		ret = performMajorMove((unsigned char*)(buffer), nbByte);
 													break;
 													
 			case CMD_MOVE_INTERACTIVE:				ret = performInteractiveMove((unsigned char*)(buffer), nbByte);
@@ -529,7 +529,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		
 		case CMD_MOVE:
 		case CMD_RENDER_AND_MOVE:
-		case CMD_MOVE_UNIT_LIMIT_IS_FREE:	lastCommand.cmd = cmd;
+		case CMD_MOVE_UNTIL_LIMIT_IS_FREE:	lastCommand.cmd = cmd;
 											return writeMoveCmdIntern(buffer, nbByte);
 		
 		case CMD_MOVE_INTERACTIVE:			lastCommand.cmd = cmd;
@@ -841,7 +841,7 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 	if ( CncCommandDecoder::decodeMove(buffer, nbByte, x, y, z) == false ) 
 		return false;
 		
-	if ( lastCommand.cmd == CMD_MOVE_UNIT_LIMIT_IS_FREE ) {
+	if ( lastCommand.cmd == CMD_MOVE_UNTIL_LIMIT_IS_FREE ) {
 		if ( x != 0 ) limitStates.setLimitX(LimitSwitch::LIMIT_UNSET);
 		if ( y != 0 ) limitStates.setLimitY(LimitSwitch::LIMIT_UNSET);
 		if ( z != 0 ) limitStates.setLimitZ(LimitSwitch::LIMIT_UNSET);

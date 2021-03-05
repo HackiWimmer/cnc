@@ -1,15 +1,14 @@
 #include "CncConfig.h"
 #include "SvgViewBox.h"
 
-#define FormatViewBoxString(inputUnit) \
- wxString::Format("0 0 %lf %lf", CncUnitCalculator<float>(inputUnit, Unit::px).convert(width), \
-								 CncUnitCalculator<float>(inputUnit, Unit::px).convert(height))
+#define FORMAT_VIEWBOX_STRING \
+ wxString::Format("0 0 %lf %lf", width, height)
 
 //////////////////////////////////////////////////////////////////
 SVGRootNode::SVGRootNode() 
 : width(1000)
 , height(1000)
-, viewBox(FormatViewBoxString(Unit::px))
+, viewBox(FORMAT_VIEWBOX_STRING)
 , scaleX(1.0f)
 , scaleY(1.0f)
 , unitCalculator(Unit::px, Unit::mm)
@@ -21,7 +20,7 @@ SVGRootNode::SVGRootNode()
 SVGRootNode::SVGRootNode(double svgWidth, double svgHeight, Unit unit) 
 : width(svgWidth)
 , height(svgHeight)
-, viewBox(FormatViewBoxString(unit))
+, viewBox(FORMAT_VIEWBOX_STRING)
 , scaleX(1.0f)
 , scaleY(1.0f)
 , unitCalculator(unit, unit)
@@ -33,7 +32,7 @@ SVGRootNode::SVGRootNode(double svgWidth, double svgHeight, Unit unit)
 SVGRootNode::SVGRootNode(double svgWidth, double svgHeight, Unit unit, const wxString& vb) 
 : width(svgWidth)
 , height(svgHeight)
-, viewBox(vb.IsEmpty() ? FormatViewBoxString(unit) : vb)
+, viewBox(vb.IsEmpty() ? FORMAT_VIEWBOX_STRING : vb)
 , scaleX(1.0f)
 , scaleY(1.0f)
 , unitCalculator(unit, unit)

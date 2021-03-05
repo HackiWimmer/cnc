@@ -120,13 +120,13 @@ public:
 class CncFileViewBase : public wxPanel
 {
 protected:
+    wxPanel* m_fileListPlaceholder;
     wxBitmapButton* m_btDirUp;
     wxBitmapButton* m_btRefresh;
     wxBitmapButton* m_btDefaultPath;
     wxStaticLine* m_staticLine5035;
     wxBitmapButton* m_btNewTemplate;
     wxBitmapButton* m_btOpenTemplate;
-    wxPanel* m_fileListPlaceholder;
     wxComboBox* m_filterExtention;
     wxTextCtrl* m_currentDirectory;
 
@@ -139,13 +139,13 @@ protected:
     virtual void selectFilter(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxPanel* GetFileListPlaceholder() { return m_fileListPlaceholder; }
     wxBitmapButton* GetBtDirUp() { return m_btDirUp; }
     wxBitmapButton* GetBtRefresh() { return m_btRefresh; }
     wxBitmapButton* GetBtDefaultPath() { return m_btDefaultPath; }
     wxStaticLine* GetStaticLine5035() { return m_staticLine5035; }
     wxBitmapButton* GetBtNewTemplate() { return m_btNewTemplate; }
     wxBitmapButton* GetBtOpenTemplate() { return m_btOpenTemplate; }
-    wxPanel* GetFileListPlaceholder() { return m_fileListPlaceholder; }
     wxComboBox* GetFilterExtention() { return m_filterExtention; }
     wxTextCtrl* GetCurrentDirectory() { return m_currentDirectory; }
     CncFileViewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);

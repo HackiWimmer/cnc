@@ -1,5 +1,6 @@
 #include <iostream>
 #include "CncSpeedAccelerationDiagram.h"
+#include <wx/dcgraph.h>
 #include <wx/dcclient.h>
 
 wxBEGIN_EVENT_TABLE(CncSpeedAccelerationDiagram, wxPanel) 
@@ -149,7 +150,10 @@ wxPoint CncSpeedAccelerationDiagram::cnvHV2Graph(double x, double y) {
 //////////////////////////////////////////////////
 void CncSpeedAccelerationDiagram::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
-	wxPaintDC dc(this);
+	wxPaintDC paintDC(this);
+	paintDC.Clear();
+	wxGCDC dc(paintDC);
+	
 	const wxSize cs = GetClientSize();
 	
 	const int32_t w = cs.GetWidth()  - 2 * BORDER;

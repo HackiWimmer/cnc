@@ -44,13 +44,15 @@ void ArduinoCMDs::init() {
 	
 	cmds[CMD_MOVE]                             = "Push Move";
 	cmds[CMD_RENDER_AND_MOVE]                  = "Push Render and Move";
-	cmds[CMD_MOVE_UNIT_LIMIT_IS_FREE]          = "Push Move until limit switches are free";
+	cmds[CMD_MOVE_UNTIL_CONTACT]               = "Push Move until contact reached";
+	cmds[CMD_MOVE_UNTIL_LIMIT_IS_FREE]         = "Push Move until limit switches are free";
 	
 	cmds[CMD_MOVE_INTERACTIVE]                 = "Push Move Interactive";
 
 	cmds[CMD_MOVE_SEQUENCE]                    = "Push Move Sequence";
 	cmds[CMD_RENDER_AND_MOVE_SEQUENCE]         = "Push Render and Move Sequence";
 	
+	cmds[CMD_ACTIVATE_PODEST_HW]               = "Activate Podest Hardware";
 	cmds[CMD_MOVE_PODEST]                      = "Move Podest";
 	
 	cmds[CMD_PRINT_CONFIG]                     = "Pull Configuration";
@@ -155,6 +157,8 @@ void ArduinoPIDs::init() {
 	pids[PID_TOOL_SWITCH]                     .setup("Tool Enabled State", "bool");
 	pids[PID_POS_REPLY_THRESHOLD]             .setup("Position Reply Threshold", "impulses");
 	pids[PID_PROBE_MODE]                      .setup("Probe Mode State", "bool");
+	
+	pids[PID_TOUCH_CONTACT_STATE]             .setup("Touch Contact State", "bool");
 
 	pids[PID_XYZ_INTERACTIVE_POS]             .setup("XYZ Interactive Pos", "steps");
 	pids[PID_XYZ_POS_MAJOR]                   .setup("XYZ Pos - Type Major", "steps");
@@ -366,6 +370,15 @@ void ArduinoDigitalPins::init() {
 	pins[PIN_IS_TOOL_POWERED]       = "IS TOOL POWERED PIN";
 	
 	pins[PIN_EXTERNAL_INTERRUPT]    = "EXTERNAL INTERRUPT PIN";
+	
+	pins[PIN_H_MOVE_UP]             = "MOVE PODEST UP PIN";
+	pins[PIN_H_MOVE_DOWN]           = "MOVE PODEST DOWN PIN";
+
+	pins[PIN_H_DIR]                 = "MOVE PODEST DIR PIN";
+	pins[PIN_H_STP]                 = "MOVE PODEST STEP PIN";
+	pins[PIN_LED_PODEST]            = "PODEST LED PIN";
+	pins[PIN_ENABLE_PODEST]         = "PODEST ENABLE PIN";
+
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoDigitalPins::getPinLabel(unsigned int id) {

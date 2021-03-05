@@ -21,6 +21,7 @@ class CncNavigatorPanel : public wxPanel {
 		struct Config {
 			bool innerCircle 			= false;
 			bool shortFormat			= false;
+			bool speedByAmplitude		= true;
 			
 			bool showToolTip			= false;
 			bool showRegionInfo			= true;
@@ -87,7 +88,8 @@ class CncNavigatorPanel : public wxPanel {
 		const unsigned int stepwiseTimeout = 1000;
 		
 		struct Current {
-			Direction 	direction	= UD;
+			Direction	direction	= UD;
+			double		amplitude	= 0.0;
 			bool		acitvated	= false;
 		};
 		
@@ -109,6 +111,7 @@ class CncNavigatorPanel : public wxPanel {
 		
 		CncNavigatorPanelEvent*	navEvent;
 		CncNavigatorPanelEvent*	continuousEvent;
+		wxMenu*					popupMenu;
 		CncStepMode				stepMode;
 		wxTimer					continuousTimer;
 		wxRect 					navRectangle;
@@ -123,10 +126,13 @@ class CncNavigatorPanel : public wxPanel {
 		double adjustAngle(double angle, double dx, double dy);
 		void onMouse(const MouseInfo& mi);
 		void postEvent(const CncNavigatorPanelEvent& event);
-		void drawToolTip(const Direction direction);
+		void drawToolTip();
 		
 		void startContinuousEvent(int id);
 		void stopContinuousEvent();
+		
+		void displayContextMenu();
+		void precreateSegmentAngles();
 		
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
@@ -149,11 +155,14 @@ class CncNavigatorPanel : public wxPanel {
 		virtual void setFocus(const CncNavigatorPanelEvent& event)			{ postEvent(event); }
 		virtual void killFocus(const CncNavigatorPanelEvent& event)			{ postEvent(event); }
 		virtual void enterRegion(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
+		virtual void changeSpeedIndex(const CncNavigatorPanelEvent& event)	{ postEvent(event); }
 		virtual void leaveRegion(const CncNavigatorPanelEvent& event)		{ postEvent(event); }
 		virtual void activateRegion(const CncNavigatorPanelEvent& event)	{ postEvent(event); }
 		virtual void deactivateRegion(const CncNavigatorPanelEvent& event)	{ postEvent(event); }
 		virtual void leftDownRegion(const CncNavigatorPanelEvent& event);
 		virtual void leftUpRegion(const CncNavigatorPanelEvent& event);
+		virtual void rightDownRegion(const CncNavigatorPanelEvent& event);
+		virtual void rightUpRegion(const CncNavigatorPanelEvent& event);
 		
 };
 
@@ -168,6 +177,7 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 			CNP_LEAVE_PANEL			= 201,
 			CNP_SET_FOCUS			= 202, 
 			CNP_KILL_FOCUS			= 203,
+			CNP_CHANGE_SPEED_INDEX	= 204,
 			CNP_ENTER_REGION		= 300, 
 			CNP_LEAVE_REGION		= 301,
 			CNP_LEFT_DOWN_REGION	= 400,
@@ -185,6 +195,7 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 				case CNP_LEAVE_PANEL:				return "CNP_LEAVE_PANEL";
 				case CNP_SET_FOCUS:					return "CNP_SET_FOCUS";
 				case CNP_KILL_FOCUS:				return "CNP_KILL_FOCUS";
+				case CNP_CHANGE_SPEED_INDEX:		return "CNP_CHANGE_SPEED_INDEX";
 				case CNP_ENTER_REGION:				return "CNP_ENTER_REGION";
 				case CNP_LEAVE_REGION:				return "CNP_LEAVE_REGION";
 				case CNP_LEFT_DOWN_REGION:			return "CNP_LEFT_DOWN_REGION";
@@ -199,22 +210,26 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 		
 		CncNavigatorPanelEvent(wxEventType eventType = wxEVT_CNC_NAVIGATOR_PANEL, int id = 0) 
 		: wxCommandEvent(eventType, id)
-		, radius(0.0)
-		, angle(0.0)
-		, mouseX(0)
-		, mouseY(0)
-		, direction(CncNavigatorPanel::Direction::UD)
-		, activated(false)
+		, radius		(0.0)
+		, amplitude		(0.0)
+		, angle			(0.0)
+		, speedIndex	(0.0)
+		, mouseX		(0)
+		, mouseY		(0)
+		, direction		(CncNavigatorPanel::Direction::UD)
+		, activated		(false)
 		{}
 		
 		explicit CncNavigatorPanelEvent(const CncNavigatorPanelEvent& event) 
 		: wxCommandEvent(event)
-		, radius(event.radius)
-		, angle(event.angle)
-		, mouseX(event.mouseX)
-		, mouseY(event.mouseY)
-		, direction(event.direction)
-		, activated(event.activated)
+		, radius		(event.radius)
+		, amplitude		(event.amplitude)
+		, angle			(event.angle)
+		, speedIndex	(event.speedIndex)
+		, mouseX		(event.mouseX)
+		, mouseY		(event.mouseY)
+		, direction		(event.direction)
+		, activated		(event.activated)
 		{}
 		
 		virtual ~CncNavigatorPanelEvent() {
@@ -226,7 +241,9 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 		
 		void reset() {
 			radius		= 0.0;
+			amplitude	= 0.0;
 			angle		= 0.0;
+			speedIndex	= 0;
 			mouseX		= 0;
 			mouseY		= 0;
 			direction	= CncNavigatorPanel::Direction::UD;
@@ -236,8 +253,10 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 		const CncNavigatorPanelEvent* getNavigatorPanel() const { return static_cast<CncNavigatorPanelEvent*>(GetEventObject()); }
 		
 		double 							radius;
+		double							amplitude;
 		double 							angle;
 		
+		int								speedIndex;
 		int 							mouseX;
 		int 							mouseY;
 		
@@ -245,7 +264,5 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 		bool							activated;
 		
 };
-
-
 
 #endif

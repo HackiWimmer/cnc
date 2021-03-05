@@ -58,7 +58,7 @@ const long GLI::GLCncPath::getVirtualEndAsId() {
 		return -1;
 		
 	GLOpenGLPathBuffer::CncVertex vertex;
-	vectiesBuffer.getVertex(vertex, virtualEnd);
+	vectiesBuffer.getPosVertex(vertex, virtualEnd);
 		
 	return vertex.getClientId();
 }
@@ -79,7 +79,7 @@ long GLI::GLCncPath::previewNextVertexId() {
 		return -1;
 		
 	GLOpenGLPathBuffer::CncVertex vertex;
-	vectiesBuffer.getVertex(vertex, virtualEnd + 1);
+	vectiesBuffer.getPosVertex(vertex, virtualEnd + 1);
 	return vertex.getClientId();
 }
 ////////////////////////////////////////////
@@ -89,7 +89,7 @@ long GLI::GLCncPath::previewPreviousVertexId() {
 		return -1;
 		
 	GLOpenGLPathBuffer::CncVertex vertex;
-	vectiesBuffer.getVertex(vertex, virtualEnd - 1);
+	vectiesBuffer.getPosVertex(vertex, virtualEnd - 1);
 	return vertex.getClientId();
 }
 ////////////////////////////////////////////

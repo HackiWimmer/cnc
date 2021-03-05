@@ -39,6 +39,11 @@ namespace StepperParameter {
   }
 };
 
+bool CncAxisX::considerLimitPins = true;
+bool CncAxisY::considerLimitPins = true;
+bool CncAxisZ::considerLimitPins = true;
+bool CncAxisH::considerLimitPins = true;
+
 /////////////////////////////////////////////////////////////////////////////////////
 template<bool IMPL>
 CncArduinoStepper<IMPL>::CncArduinoStepper(

@@ -53,17 +53,19 @@ void GL3DDrawPane::setMotionMonitor(CncMotionMonitor* m) {
 /////////////////////////////////////////////////////////////////
 void GL3DDrawPane::enable(bool state) {
 /////////////////////////////////////////////////////////////////
-	m_btnOrigin->Enable(state);
-	m_btnRuler->Enable(state);
-	m_btnGuidePathes->Enable(state);
-	m_btnHelpLines->Enable(state);
-	m_btnPosMarker->Enable(state);
-	m_btnHardwareBox->Enable(state);
-	m_btnBoundBox->Enable(state);
-	m_btnFlyPath->Enable(state);
-	m_btnRefresh->Enable(state);
+
+//	m_btnOrigin->Enable(state);
+//	m_btnRuler->Enable(state);
+//	m_btnGuidePathes->Enable(state);
+//	m_btnHelpLines->Enable(state);
+//	m_btnPosMarker->Enable(state);
+//	m_btnHardwareBox->Enable(state);
+//	m_btnBoundBox->Enable(state);
+//	m_btnFlyPath->Enable(state);
+//	m_btnRefresh->Enable(state);
+//	m_btnMillingCutter->Enable(state);
+
 	m_btnClear->Enable(state);
-	m_btnMillingCutter->Enable(state);
 	
 	// at least update motion monitor
 	if ( state == true )

@@ -319,9 +319,9 @@ void Serial::clearReadBuffer() {
 ///////////////////////////////////////////////////////////////////
 bool Serial::isMoveCommand(unsigned char cmd) {
 ///////////////////////////////////////////////////////////////////
-	if ( cmd == CMD_MOVE					|| 
-		 cmd == CMD_MOVE_UNIT_LIMIT_IS_FREE	||
-		 cmd == CMD_RENDER_AND_MOVE			||
+	if ( cmd == CMD_MOVE						|| 
+		 cmd == CMD_MOVE_UNTIL_LIMIT_IS_FREE	||
+		 cmd == CMD_RENDER_AND_MOVE				||
 		 cmd == CMD_MOVE_INTERACTIVE   
 	   ) {
 			return true;   
@@ -330,15 +330,52 @@ bool Serial::isMoveCommand(unsigned char cmd) {
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
+int Serial::traceReadBuffer(std::ostream& ostr) const {
+///////////////////////////////////////////////////////////////////
+	ostr << "******************" << std::endl;
+	ostr << "Serial: ReadBuffer Size: " << readBuffer.size() << std::endl;
+	
+		for ( auto it = readBuffer.cbegin(); it != readBuffer.cend(); ++it ) {
+			const unsigned char c = *it;
+			ostr << wxString::Format("%02d, 0x%02X\n", (int)c, (int)c);
+		}
+	
+	ostr << "******************" << std::endl;
+	return readBuffer.size();
+}
+///////////////////////////////////////////////////////////////////
+int Serial::peekAndTraceReadBuffer(std::ostream& ostr) {
+///////////////////////////////////////////////////////////////////
+	const unsigned int size = 256;
+	unsigned char buffer[size];
+	
+	int bytesRead		= 0;
+	int totBytesRead	= 0;
+	
+	while ( (bytesRead = peekData(buffer, size)) > 0 ) {
+		totBytesRead += bytesRead;
+	}
+	
+	return traceReadBuffer(ostr);
+}
+///////////////////////////////////////////////////////////////////
 bool Serial::dataAvailable() {
 ///////////////////////////////////////////////////////////////////
 	unsigned char buffer[1];
-	return peekData(buffer, 1) > 0;
+	const bool ret = peekData(buffer, 1) > 0;
+	
+	if ( false ) {
+		if ( ret == true ) {
+			traceReadBuffer(std::cout);
+		}
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 int Serial::peekData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	//Peek data in a buffer, if nbByte is greater than the
+	//Peeks data into a buffer, if nbByte is greater than the
 	//maximum number of bytes available, it will return only the
 	//bytes available. The function return -1 when nothing could
 	//be read, the number of bytes actually read.
@@ -350,7 +387,7 @@ int Serial::peekData(void *buffer, unsigned int nbByte) {
 	unsigned char *p = (unsigned char*)buffer;
 	
 	for ( int i=0; i<bytesRead ; i++ ) {
-		readBuffer.push(*p);
+		readBuffer.push_back(*p);
 		p++;
 	}
 	
@@ -371,14 +408,14 @@ int Serial::readBufferedData(void *buffer, unsigned int nbByte) {
 	
 	while ( readBuffer.empty() == false ) {
 		*p = readBuffer.front();
-		readBuffer.pop();
+		readBuffer.pop_front();
 		p++;
 		
 		if ( --bytesToRead == 0 )
 			break;
 	}
 	
-	// prefill buffer
+	// pre fill buffer
 	buffer = p;
 	
 	// return the byte count are already read
@@ -388,7 +425,7 @@ int Serial::readBufferedData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 int Serial::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	//Read data in a buffer, if nbByte is greater than the
+	//Reads data in a buffer, if nbByte is greater than the
 	//maximum number of bytes available, it will return only the
 	//bytes available. The function return -1 when nothing could
 	//be read, the number of bytes actually read.
@@ -730,6 +767,9 @@ bool Serial::popSerial() {
 		return false;
 	}
 	
+	if ( false )
+		std::clog << CNC_LOG_FUNCT_A("\n");
+	
 	const unsigned char cmd = CMD_POP_SERIAL;
 	
 	SerialCommandLocker scl(cmd);
@@ -748,10 +788,10 @@ bool Serial::popSerial() {
 	
 	lastFetchResult.init(cmd);
 	
-	bool ret = true;
-	if ( dataAvailable() ) {
+	unsigned int counter = 0;
+	while ( dataAvailable() ) {
 		
-		ret = evaluateResultWrapper(sfi, std::cout);
+		const bool ret = evaluateResultWrapper(sfi, std::cout);
 		if ( ret == false ) {
 			std::cerr   << "Error while processing 'Serial::popSerial()': "											<< std::endl
 						<< " Serial CMD = " << ArduinoCMDs::getCMDLabel((const unsigned char)lastFetchResult.cmd)	<< std::endl
@@ -760,6 +800,17 @@ bool Serial::popSerial() {
 			
 			return false;
 		}
+		
+		if ( counter++ > 64 ) {
+			std::cerr   << "Error while processing 'Serial::popSerial()': "											<< std::endl
+						<< "Max count of fetch durations reached!"													<< std::endl
+			;
+			
+			return false;
+		}
+		
+		// give the micro controller some time to flush (more) data
+		sleepMilliseconds(10);
 	}
 	
 	return cncControl->SerialCallback();
@@ -1173,7 +1224,7 @@ bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncL
 	const unsigned int LEN = 6;
 	unsigned char cmd[LEN];
 	cmd[0] = SIG_UPDATE;
-	cmd[1] = (unsigned char)LEN;
+	cmd[1] = (unsigned char)3;
 	cmd[2] = PID_XYZ_INTERACTIVE_POS;
 	cmd[3] = (unsigned char)x;
 	cmd[4] = (unsigned char)y;
@@ -1186,9 +1237,35 @@ bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncL
 	return writeData(cmd, LEN);
 }
 ///////////////////////////////////////////////////////////////////
+bool Serial::processUpdateInteractiveMove() {
+///////////////////////////////////////////////////////////////////
+	if ( isConnected() == false ) {
+		std::cout << "SERIAL::processUpdateInteractiveMove()::ERROR: Not connected\n";
+		return false;
+	}
+	
+	const unsigned int LEN = 3;
+	unsigned char cmd[LEN];
+	cmd[0] = SIG_UPDATE;
+	cmd[1] = (unsigned char)0;
+	cmd[2] = PID_HEARTBEAT;
+	
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
+		
+	lastFetchResult.init(cmd[0]);
+	return writeData(cmd, LEN);
+}
+///////////////////////////////////////////////////////////////////
 bool Serial::resolveLimits(unsigned int size, const int32_t (&values)[3]) {
 ///////////////////////////////////////////////////////////////////
-	unsigned char cmdType = CMD_MOVE_UNIT_LIMIT_IS_FREE;
+	unsigned char cmdType = CMD_MOVE_UNTIL_LIMIT_IS_FREE;
+	return processMoveInternal(size, values, cmdType);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::processMoveUntilContact(unsigned int size, const int32_t (&values)[3]) {
+///////////////////////////////////////////////////////////////////
+	unsigned char cmdType = CMD_MOVE_UNTIL_CONTACT;
 	return processMoveInternal(size, values, cmdType);
 }
 ///////////////////////////////////////////////////////////////////
@@ -2165,6 +2242,5 @@ bool Serial::serializeMove(SerialFetchInfo& sfi, const unsigned char* buffer, un
 		ret = evaluateResultWrapper(sfi, std::cout);
 		
 	logMeasurementLastTs();
-	
 	return ret;
 }

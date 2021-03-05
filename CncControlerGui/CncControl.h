@@ -22,11 +22,26 @@
 #include "CncLimitStates.h"
 #include "CncPosition.h"
 
+class CncTouchBlockDetector;
+
 ///////////////////////////////////////////////////////////////////
 class CncControl {
+	
 	public:
 		enum DimensionMode			{ DM_2D, DM_3D };
-
+		enum CtrlPowerState			{ CPS_ON = POWER_STATE_ON, CPS_OFF = POWER_STATE_OFF, CPS_NOT_INITIALIZED = -1, CPS_UNKNOWN = -2  };
+		
+		static const char* getCtrlPowerStateAsStr(const CtrlPowerState cps) {
+			switch ( cps ) {
+				case CPS_ON:				return "ON";
+				case CPS_OFF:				return "OFF";
+				case CPS_UNKNOWN:			return "Unknown";
+				case CPS_NOT_INITIALIZED:	return "Not Initialized";
+			}
+			
+			return "???";
+		}
+		
 	private:
 		
 		struct CncSpeedMemory : public std::map<CncSpeedMode, float> {
@@ -101,6 +116,7 @@ class CncControl {
 		CncSpeedMemory			speedMemory_MM_MIN;
 		CncSpeedMode			configuredSpeedMode;
 		float					configuredFeedSpeed_MM_MIN;
+		bool					configuredSpeedModePreviewFlag;
 		// Duration counter
 		unsigned int			durationCounter;
 		// Interrupt state
@@ -108,7 +124,7 @@ class CncControl {
 		// position flf
 		bool					positionOutOfRangeFlag;
 		// ctrl power state
-		bool					ctrlPowerState;
+		CtrlPowerState			ctrlPowerState;
 		// tool power state
 		bool					toolPowerState;
 		// Artificially Step Delay
@@ -205,6 +221,8 @@ class CncControl {
 		
 		void onPeriodicallyAppEvent();
 		
+		void previewConfiguredFeedSpeed_MM_MIN(CncSpeedMode m, float v);
+
 		// Get the current speed parameter
 		CncSpeedMode getConfiguredSpeedMode() 		{ return configuredSpeedMode; }
 		float getRealtimeFeedSpeed_MM_SEC()			{ return realtimeFeedSpeed_MM_MIN / 60.0; }
@@ -247,6 +265,9 @@ class CncControl {
 		
 		bool processMoveSequence(CncMoveSequence& moveSequence);
 		
+		bool processGetter(unsigned char pid, GetterValues& ret);
+		bool processMovePodest(int32_t steps);
+		
 		// Zero positioning
 		void setZeroPosX(int32_t v);
 		void setZeroPosY(int32_t v);
@@ -261,6 +282,8 @@ class CncControl {
 		bool moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered);
 		bool moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
 		
+		bool moveAbsLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
+
 		bool moveRelMetricZ(double z);
 		bool moveRelLinearMetricXY(double x1, double y1, bool alreadyRendered);
 		bool moveRelLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
@@ -311,11 +334,11 @@ class CncControl {
 		// Updates the config trace control
 		void notifyConfigUpdate();
 		
-		CncLongPosition& 					getCurAppPosAsReference()	{ return curAppPos;   }
-		const CncLongPosition 				getCurAppPos()				{ return curAppPos;   }
-		const CncLongPosition 				getCurCtlPos() 				{ return curCtlPos;   }
-		const CncLongPosition 				getAppStartPos() 			{ return startAppPos; }
-		const CncLongPosition 				getAppZeroPos() 			{ return zeroAppPos;  }
+		CncLongPosition& 					getCurAppPosAsReference()			{ return curAppPos;   }
+		const CncLongPosition 				getCurAppPos()				const	{ return curAppPos;   }
+		const CncLongPosition 				getCurCtlPos() 				const	{ return curCtlPos;   }
+		const CncLongPosition 				getAppStartPos() 			const	{ return startAppPos; }
+		const CncLongPosition 				getAppZeroPos() 			const	{ return zeroAppPos;  }
 		
 		const CncDoublePosition 			getStartPosMetric();
 		const CncDoublePosition 			getCurAppPosMetric();
@@ -374,6 +397,7 @@ class CncControl {
 		
 		bool startInteractiveMove(CncStepSensitivity s, CncInteractiveMoveDriver imd);
 		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		bool updateInteractiveMove();
 		bool stopInteractiveMove();
 		bool isInteractiveMoveActive() { return currentInteractiveMoveInfo.active(); }
 		
@@ -440,7 +464,8 @@ class CncControl {
 		void				updatePreview3D();
 		void 				sendIdleMessage();
 		
-		bool				processMovePodest(int32_t steps)							{ return getSerial()->processMovePodest(steps); }
+		int					traceReadBuffer(std::ostream& ostr)					const	{ return getSerial()->traceReadBuffer(ostr); }
+		int					peekAndTraceReadBuffer(std::ostream& ostr)					{ return getSerial()->peekAndTraceReadBuffer(ostr); }
 		
 		// for testing only
 		Serial* getSerialExtern() const { wxASSERT(serialPort); return serialPort; }
@@ -450,6 +475,9 @@ class CncControl {
 		void				processTrigger(const Trigger::NextPath& tr)					{ getSerial()->processTrigger(tr); }
 		void				processTrigger(const Trigger::SpeedChange& tr)				{ getSerial()->processTrigger(tr); }
 		void				processTrigger(const Trigger::GuidePath& tr)				{ getSerial()->processTrigger(tr); }
+		
+		
+		friend class CncTouchBlockDetector;
 		
 };
 

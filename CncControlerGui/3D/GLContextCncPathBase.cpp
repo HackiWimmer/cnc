@@ -1,8 +1,10 @@
+#include <iomanip>
 #include <iostream>
 #include "3D/GLContextCncPathBase.h"
 #include "3D/GLLabelCluster.h"
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "CncVector.h"
 #include "CncBoundarySpace.h"
 #include "3D/GLInclude.h"
 #include "3D/CncGLCanvas.h"
@@ -177,13 +179,15 @@ const wxString& CncGLContextObserver::getRegisteredContextItemText(long row, lon
 /////////////////////////////////////////////////////////////////
 GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas, const wxString& name)
 : GLContextBase(canvas, name)
-, cncPath(getContextName())
-, ruler()
-, drawType(DT_LINE_STRIP)
-, currentClientId(-1L)
-, rulerColourX(coordOriginInfo.colours.x)
-, rulerColourY(coordOriginInfo.colours.y)
-, rulerColourZ(coordOriginInfo.colours.z)
+, cncPath					(getContextName())
+, highlightedClientIds		()
+, ruler						()
+, drawType					(DT_LINE_STRIP)
+, continiousDirConeFlag		(false)
+, currentClientId			(-1L)
+, rulerColourX				(coordOriginInfo.colours.x)
+, rulerColourY				(coordOriginInfo.colours.y)
+, rulerColourZ				(coordOriginInfo.colours.z)
 /////////////////////////////////////////////////////////////////
 {
 }
@@ -231,64 +235,93 @@ void GLContextCncPathBase::activateOpenGlContext(bool state) {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::markCurrentPosition() {
 /////////////////////////////////////////////////////////////////
-	// ensure cncPath.end() - 1 is valid
 	if ( cncPath.size() == 0 )
 		return;
 		
-	// get the last/current vecties - it must be valid
+	if ( cncPath.getOpenGLBufferStore() == NULL )
+		return;
+
+	// get the last/current vertices - it must be valid
 	GLOpenGLPathBuffer::CncVertex vertex;
-	
-	if ( cncPath.getOpenGLBufferStore() != NULL )
-		cncPath.getOpenGLBufferStore()->getVertex(vertex, cncPath.getVirtualEnd() - 1);
-	
+	cncPath.getOpenGLBufferStore()->getPosVertex(vertex, cncPath.getVirtualEnd() - 1);
 	drawMovePosition(vertex.getX(), vertex.getY(), vertex.getZ());
 }
 /////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::clearPathData() {
+void GLContextCncPathBase::drawDirectionCone() {
 /////////////////////////////////////////////////////////////////
-	cncPath.clear();
-}
-/////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex) {
-/////////////////////////////////////////////////////////////////
-	cncPath.appendPathData(vertex);
-}
-/////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt) {
-/////////////////////////////////////////////////////////////////
-	cncPath.reconstruct(opt);
-}
-/////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::determineModel() {
-/////////////////////////////////////////////////////////////////
-	if ( isEnabled() == false ) {
-		
-		//std::cout  << " GLContextCncPathBase::determineModel(); false"<< std::endl;
-		
-		//drawTeapot();
-		
-		/*
-		glPushMatrix();
-			glEnable(GL_TEXTURE_2D);
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-				glBindTexture(GL_TEXTURE_2D, theTexture);
-				drawBox(0.05, GL_QUADS);
-			glDisable(GL_TEXTURE_2D);
-		glPopMatrix();
-		*/
+	if ( continiousDirConeFlag == false )
 		return;
+
+	if ( cncPath.getVirtualEnd() > 0 )
+		drawDirectionCone(cncPath.getVirtualEnd() - 1);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawDirectionCone(unsigned int idx) {
+/////////////////////////////////////////////////////////////////
+	static const float croneDiameter	= 0.0010f;
+	static const float croneHight		= 0.0035f;
+	
+	static const CncFloatVector ux(1.0f, 0.0f, 0.0f);
+	static const CncFloatVector uy(0.0f, 1.0f, 0.0f);
+	static const CncFloatVector uz(0.0f, 0.0f, 1.0f);
+	
+	if ( cncPath.size() < 2 )
+		return;
+		
+	if ( cncPath.getOpenGLBufferStore() == NULL )
+		return;
+	
+	// evaluate vector at [idx] and [idx -1]
+	GLOpenGLPathBuffer::CncVertex cv0, cv1;
+	if ( cncPath.getOpenGLBufferStore()->getPosVertex(cv0, idx - 1 ) == false )
+		return;
+		
+	if ( cncPath.getOpenGLBufferStore()->getPosVertex(cv1, idx) == false )
+		return;
+	
+	CncFloatVector v0(cv0.getX(), cv0.getY(), cv0.getZ());
+	CncFloatVector v1(cv1.getX(), cv1.getY(), cv1.getZ());
+	
+	// evaluate direction vector
+	v1.sub(v0);
+	
+	/*
+	std::cout	<< std::showpos << std::fixed << std::setw( 11 ) << std::setprecision( 6 )
+				<< "v1: " << v1 << std::endl;
+	*/
+	
+	// evaluate direction angel of each axis
+	const float ax = CncFloatVector::radias2Degree(v1.getAlphaTo(ux));
+	const float ay = CncFloatVector::radias2Degree(v1.getAlphaTo(uy));
+	const float az = CncFloatVector::radias2Degree(v1.getAlphaTo(uz));
+	
+	// translate, rotate and draw cone
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	
+		glColor4ub(128, 128, 128, 100);
+		glTranslatef(cv1.getX(), cv1.getY(), cv1.getZ());
+		
+		if ( cnc::dblCmp::nu(v1.getX()) == false ) glRotatef(  90 + ax, 0.0f, 1.0f, 0.0f );
+		if ( cnc::dblCmp::nu(v1.getY()) == false ) glRotatef( 270 + ay, 1.0f, 0.0f, 0.0f );
+		if ( cnc::dblCmp::nu(v1.getZ()) == false ) glRotatef(   0 + az, 1.0f, 0.0f, 0.0f );
+		
+		drawSolidCone(croneDiameter, croneHight, 30, 30);
+		
+	glPopMatrix();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawHighlightEffects() {
+/////////////////////////////////////////////////////////////////
+	for ( auto it = highlightedClientIds.begin(); it != highlightedClientIds.end(); ++it ) {
+		const long clientID	= *it;
+		const long pathPos	= cncPath.getOpenGLBufferStore()->findFirstEntryForClientId(clientID);
+		
+		//CNC_PRINT_FUNCT_A(": %ld    %ld     %ld\n", clientID, pathPos, getVirtualEnd() -1 )
+		
+		if ( pathPos >= 0 )
+			drawDirectionCone(pathPos);
 	}
-	
-	drawGuidePathes();
-	drawRuler();
-	
-	switch ( drawType ) {
-		case DT_POINTS:		cncPath.display(GLOpenGLPathBuffer::DT_DOTS); 		break;
-		case DT_LINE_STRIP:	cncPath.display(GLOpenGLPathBuffer::DT_STRIPS); 	break;
-	}
-	
-	drawBoundBox();
-	drawHardwareBox();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawGuidePathes() {
@@ -362,11 +395,15 @@ void GLContextCncPathBase::drawHardwareBox() {
 	float originX = THE_BOUNDS->getHardwareOffset().getAsStepsX() / THE_CONFIG->getDispFactX3D();
 	float originY = THE_BOUNDS->getHardwareOffset().getAsStepsY() / THE_CONFIG->getDispFactY3D();
 	float originZ = THE_BOUNDS->getHardwareOffset().getAsStepsZ() / THE_CONFIG->getDispFactZ3D();
-		
+	
 	// evaluate hardware dimensions as vertex
 	float maxX    = THE_CONFIG->getMaxDimensionStepsX()  / THE_CONFIG->getDispFactX3D();
 	float maxY    = THE_CONFIG->getMaxDimensionStepsY()  / THE_CONFIG->getDispFactY3D();
 	float maxZ    = THE_CONFIG->getMaxDimensionStepsZ()  / THE_CONFIG->getDispFactZ3D();
+
+	// The Z origin has to be corrected from max to min because 
+	// the hardware reference is located at min(x), min(y) and max(z)
+	originZ -= maxZ;
 
 	// ensure the right model
 	glMatrixMode(GL_MODELVIEW);
@@ -623,11 +660,11 @@ void GLContextCncPathBase::highlightClientId(long firstClientId, long lastClient
 	if ( firstClientId >= 0 && lastClientId < 0 )
 		lastClientId = firstClientId;
 	
-	cnc::LongValues ids;
+	highlightedClientIds.clear();
 	for (long id=firstClientId; id <= lastClientId; id++)
-		ids.push_back(id);
+		highlightedClientIds.push_back(id);
 		
-	highlightClientIds(ids);
+	highlightClientIds(highlightedClientIds);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::highlightClientIds(cnc::LongValues ids)  {
@@ -678,5 +715,67 @@ void GLContextCncPathBase::dimDownGudePathes() {
 		gp.dimDown();
 	}
 }
-
-
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::pushProcessMode() {
+/////////////////////////////////////////////////////////////////
+	cncPath.deactivateNotifications();
+	continiousDirConeFlag = true;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::popProcessMode() {
+/////////////////////////////////////////////////////////////////
+	continiousDirConeFlag = false;
+	cncPath.activateNotifications();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::clearPathData() {
+/////////////////////////////////////////////////////////////////
+	cncPath.clear();
+	highlightedClientIds.clear();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex) {
+/////////////////////////////////////////////////////////////////
+	cncPath.appendPathData(vertex);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt) {
+/////////////////////////////////////////////////////////////////
+	cncPath.reconstruct(opt);
+	highlightedClientIds.clear();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::determineModel() {
+/////////////////////////////////////////////////////////////////
+	if ( isEnabled() == false ) {
+		
+		//std::cout  << " GLContextCncPathBase::determineModel(); false"<< std::endl;
+		
+		//drawTeapot();
+		
+		/*
+		glPushMatrix();
+			glEnable(GL_TEXTURE_2D);
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				glBindTexture(GL_TEXTURE_2D, theTexture);
+				drawBox(0.05, GL_QUADS);
+			glDisable(GL_TEXTURE_2D);
+		glPopMatrix();
+		*/
+		return;
+	}
+	
+	drawGuidePathes();
+	drawRuler();
+	
+	switch ( drawType ) {
+		case DT_POINTS:		cncPath.display(GLOpenGLPathBuffer::DT_DOTS);		break;
+		case DT_LINE_STRIP:	cncPath.display(GLOpenGLPathBuffer::DT_STRIPS);		break;
+	}
+	
+	drawDirectionCone();
+	drawHighlightEffects();
+	
+	drawBoundBox();
+	drawHardwareBox();
+}

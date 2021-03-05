@@ -1,5 +1,7 @@
 #ifndef CNCEXTERNALVIEWBOX_H
 #define CNCEXTERNALVIEWBOX_H
+
+#include "CncNavigatorPanel.h"
 #include "wxCrafterBaseDialogs.h"
 
 //////////////////////////////////////////////////////////////////
@@ -61,6 +63,10 @@ class CncExternalViewBox : public CncExternalViewBoxBase {
 		SwapState	swapState	[MAX_VIEWS];
 		
 		wxPoint 	moveDelta;
+		
+		void onNavigatorPanel(CncNavigatorPanelEvent& event);
+		void onAttachPage();
+
 };
 
 class CncExternalViewBoxCluster {

@@ -15,11 +15,10 @@
 #include <wx/artprov.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
-#include <wx/bmpbuttn.h>
-#include <wx/statline.h>
 #include <wx/statbmp.h>
+#include <wx/statline.h>
+#include <wx/bmpbuttn.h>
 #include <wx/button.h>
-#include <wx/timer.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -41,31 +40,36 @@ class CncPodestManagementBase : public wxDialog
 {
 protected:
     wxPanel* m_basePanel;
+    wxStaticBitmap* m_staticBitmap9569;
+    wxStaticLine* m_staticLine9571;
     wxBitmapButton* m_btUp;
     wxBitmapButton* m_btDown;
     wxStaticLine* m_staticLine9554;
     wxStaticBitmap* m_info;
     wxButton* m_button9552;
-    wxTimer* m_startupTimer;
 
 protected:
+    virtual void onShow(wxShowEvent& event) { event.Skip(); }
+    virtual void onInit(wxInitDialogEvent& event) { event.Skip(); }
     virtual void onPodestUpLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void onPodestUpLeftUp(wxMouseEvent& event) { event.Skip(); }
+    virtual void onPodestUpLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void onPodestDownLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void onPodestDownLeftUp(wxMouseEvent& event) { event.Skip(); }
+    virtual void onPodestDownLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void onLefDownInfo(wxMouseEvent& event) { event.Skip(); }
     virtual void onClose(wxCommandEvent& event) { event.Skip(); }
-    virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
+    wxStaticBitmap* GetStaticBitmap9569() { return m_staticBitmap9569; }
+    wxStaticLine* GetStaticLine9571() { return m_staticLine9571; }
     wxBitmapButton* GetBtUp() { return m_btUp; }
     wxBitmapButton* GetBtDown() { return m_btDown; }
     wxStaticLine* GetStaticLine9554() { return m_staticLine9554; }
     wxStaticBitmap* GetInfo() { return m_info; }
     wxButton* GetButton9552() { return m_button9552; }
     wxPanel* GetBasePanel() { return m_basePanel; }
-    wxTimer* GetStartupTimer() { return m_startupTimer; }
-    CncPodestManagementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Podest Management"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(250,250), long style = wxDEFAULT_DIALOG_STYLE);
+    CncPodestManagementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Podest Management"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,340), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncPodestManagementBase();
 };
 

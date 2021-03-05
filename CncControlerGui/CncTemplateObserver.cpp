@@ -169,7 +169,7 @@ bool CncTemplateObserver::isCurrentTemplateChanged() {
 	wxFileName tplFile(fn);
 	
 	if ( tplFile.Exists() == false ) {
-		logWarning("The template file didn'i exists!\n");
+		logWarning("The template file did not exists!\n");
 		return false;
 	}
 	
@@ -177,7 +177,7 @@ bool CncTemplateObserver::isCurrentTemplateChanged() {
 	
 	bool ret = false;
 	if ( dt != lastTemplateModification ) {
-		logInformation("An externally template change is detectedn . . .\n", styles.taDetected);
+		logInformation("An externally template change was detected . . .\n", styles.taDetected);
 		logFileName();
 		
 		lastTemplateModification = dt;
@@ -218,6 +218,7 @@ void CncTemplateObserver::performActions() {
 			
 			case ACTION_PREVIEW:
 			{
+				THE_APP->prepareAndShowMonitorTemplatePreview(true);
 				THE_APP->selectMonitorBookTemplatePanel();
 				logInformation(wxString::Format(" --> Action: '%s' performed\n", "Update Preview"), styles.taAction);
 				break;

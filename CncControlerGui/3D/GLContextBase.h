@@ -292,6 +292,9 @@ class GLContextBase : public wxGLContext {
 		GLuint LoadBMP(const wxImage& img);
 		void drawBox(GLfloat size, GLenum type);
 		 
+		void drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
+		void drawSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
+
 	private:
 		
 		static const wxGLCanvas* currentCanvas;
@@ -304,8 +307,6 @@ class GLContextBase : public wxGLContext {
 		GLuint theTexture;
 		
 		void determineViewPortBounderies();
-		void drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
-		void drawSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
 		void drawMillingCutter(CncDimensions d, float x, float y, float z);
 
 };

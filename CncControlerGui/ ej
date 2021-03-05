@@ -1,1 +1,1 @@
-11:27:30.387: virtual void* GamepadThread::Entry(): TID=[8008]
+10:23:09.323: virtual void* SerialThread::Entry(): TID=[7864]

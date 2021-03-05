@@ -498,25 +498,32 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 //////////////////////////////////////////////////////////////////
 bool SvgCncContext::isCurrentZFeedStepToStrong() const {
 //////////////////////////////////////////////////////////////////
+	const double dpt = getCurrentZDepth();
 	const double nfs = getCurrentZMaxFeedStep();
 	const double ctd = getCurrentToolDiameter();
+	const double val = std::min(fabs(getCurrentZDepth()), fabs(getCurrentZMaxFeedStep()));
 	
-	if ( ctd > 0.0 ) {
-		if ( nfs > ctd / 2.0 ) {
-			std::cerr << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is to strong for tool diameter %.2lf. The Processing stops here!\n", nfs, ctd));
-			return true;
+	// only if something in Z direction has to be done
+	if ( cnc::dblCmp::nu(dpt) == false ) {
+		
+		// only if the tool diameter is well known
+		if ( ctd > 0.0 ) {
+			if ( val > ctd / 2.0 ) {
+				std::cerr << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is to strong for tool diameter %.2lf. The Processing stops here!\n", nfs, ctd));
+				return true;
+			}
+			
+			// generate a warning 
+			if ( val * 0.8 > ctd / 2.0 ) 
+				cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is may be to strong for tool diameter %.2lf.\n", nfs, ctd));
 		}
-		
-		// generate a warning 
-		if ( nfs > (ctd / 2.0) * 0.8 ) 
-			cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is may be to strong for tool diameter %.2lf.", nfs, ctd));
-	}
-	else {
-		
-		// generate a warning 
-		const double ctdStatic = 4.0;
-		if ( nfs > ctdStatic ) 
-			cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is may be to strong for tool diameter %.2lf.", nfs, ctdStatic));
+		else {
+			
+			// generate a warning 
+			const double ctdStatic = 4.0;
+			if ( val > ctdStatic ) 
+				cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is may be to strong for tool diameter %.2lf.\n", nfs, ctdStatic));
+		}
 	}
 	
 	return false;

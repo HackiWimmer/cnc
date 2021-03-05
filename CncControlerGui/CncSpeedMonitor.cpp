@@ -65,6 +65,9 @@ void CncSpeedMonitor::activate(bool enable) {
 	m_sliderRecordResolutionH->Enable(enable);
 	m_sliderRecordResolutionV->Enable(enable);
 	
+	m_sliderTimeCompressionV->Enable(enable);
+	m_sliderTimeCompressionV->Enable(enable);
+	
 	m_scrollBarH->Enable(enable);
 	m_scrollBarV->Enable(enable);
 }
@@ -175,8 +178,11 @@ void CncSpeedMonitor::onPaint(wxPaintEvent& event) {
 	if ( da->IsShownOnScreen() == false )
 		return;
 	
-	wxAutoBufferedPaintDC dc(da);
-	dc.Clear();
+	wxAutoBufferedPaintDC paintDC(da);
+	paintDC.Clear();
+	wxGCDC dc(paintDC);
+	
+	dc.SetBackground(*wxBLACK_BRUSH);
 	diagram.plotMain(dc, da->GetRect());
 }
 ////////////////////////////////////////////////////////////////
@@ -186,8 +192,11 @@ void CncSpeedMonitor::onPaintLeftAxis(wxPaintEvent& event) {
 	if ( da->IsShownOnScreen() == false )
 		return;
 	
-	wxAutoBufferedPaintDC dc(da);
-	dc.Clear();
+	wxAutoBufferedPaintDC paintDC(da);
+	paintDC.Clear();
+	wxGCDC dc(paintDC);
+	
+	dc.SetBackground(*wxBLACK_BRUSH);
 	diagram.plotBtLf(dc, da->GetRect());
 }
 ////////////////////////////////////////////////////////////////
@@ -197,8 +206,11 @@ void CncSpeedMonitor::onPaintRightAxis(wxPaintEvent& event) {
 	if ( da->IsShownOnScreen() == false )
 		return;
 	
-	wxAutoBufferedPaintDC dc(da);
-	dc.Clear();
+	wxAutoBufferedPaintDC paintDC(da);
+	paintDC.Clear();
+	wxGCDC dc(paintDC);
+	
+	dc.SetBackground(*wxBLACK_BRUSH);
 	diagram.plotToRt(dc, da->GetRect());
 }
 ////////////////////////////////////////////////////////////////
@@ -465,7 +477,7 @@ int CncSpeedMonitor::Diagram::getFAsPx(double value) {
 	return offsetAxisF + value / getVirtualMaxF() * plotFRange;
 }
 ////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::Diagram::plotBtLf(wxAutoBufferedPaintDC& dc, const wxRect& rect) {
+void CncSpeedMonitor::Diagram::plotBtLf(wxGCDC& dc, const wxRect& rect) {
 ////////////////////////////////////////////////////////////////
 	if ( showCfgSpeed == false ) 
 		return;
@@ -494,7 +506,7 @@ void CncSpeedMonitor::Diagram::plotBtLf(wxAutoBufferedPaintDC& dc, const wxRect&
 	}
 }
 ////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::Diagram::plotToRt(wxAutoBufferedPaintDC& dc, const wxRect& rect) {
+void CncSpeedMonitor::Diagram::plotToRt(wxGCDC& dc, const wxRect& rect) {
 ////////////////////////////////////////////////////////////////
 	if ( showRltSpeed == false ) 
 		return;
@@ -523,7 +535,7 @@ void CncSpeedMonitor::Diagram::plotToRt(wxAutoBufferedPaintDC& dc, const wxRect&
 	}
 }
 ////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::Diagram::plotMain(wxAutoBufferedPaintDC& dc, const wxRect& rect) {
+void CncSpeedMonitor::Diagram::plotMain(wxGCDC& dc, const wxRect& rect) {
 ////////////////////////////////////////////////////////////////
 	dc.SetBrush(*wxTRANSPARENT_BRUSH);
 	

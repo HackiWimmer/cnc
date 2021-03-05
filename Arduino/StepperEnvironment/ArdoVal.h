@@ -55,7 +55,8 @@
   const unsigned char CMD_MOVE_SEQUENCE                   =  '.'; //  46 0x2E
   const unsigned char CMD_RENDER_AND_MOVE_SEQUENCE        =  ':'; //  58 0x3A
 
-  const unsigned char CMD_MOVE_UNIT_LIMIT_IS_FREE         =  '>'; //  62 0x3E
+  const unsigned char CMD_MOVE_UNTIL_CONTACT              =  '+'; //  43 0x2B
+  const unsigned char CMD_MOVE_UNTIL_LIMIT_IS_FREE        =  '>'; //  62 0x3E
 
   const unsigned char CMD_MOVE_INTERACTIVE                =  '%'; //  37 0x25
 
@@ -157,6 +158,7 @@
   const unsigned char PID_MAX_DIMENSION_X                 =  52;
   const unsigned char PID_MAX_DIMENSION_Y                 =  53;
   const unsigned char PID_MAX_DIMENSION_Z                 =  54;
+  const unsigned char PID_TOUCH_CONTACT_STATE             =  55;
 
   const unsigned char PID_XYZ_INTERACTIVE_POS             =  60;
   const unsigned char PID_XYZ_POS                         =  61;

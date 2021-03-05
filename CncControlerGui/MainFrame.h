@@ -20,8 +20,8 @@
 #include "CncSerialSpyPanel.h"
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
-#include "CncGamepadControllerState.h"
 #include "CncMotionMonitorVertexTrace.h"
+#include "CncTouchBlockDetector.h"
 #include "CncSummaryListCtrl.h"
 #include "Codelite/wxPNGAnimation.h"
 #include "CncNavigatorPanel.h"
@@ -38,7 +38,10 @@ class GL3DOptionPane;
 class GL3DDrawPane;
 
 class CncMainInfoBar;
+
+class CncTransactionLockBase;
 class CncTransactionLock;
+class CncGamepadTransactionLock;
 
 class GamepadThread;
 
@@ -76,9 +79,12 @@ class CncArduinoEnvironment;
 class CncLCDPositionPanel;
 class CncManuallyMoveCoordinates;
 class CncSpeedPlayground;
-class CncGamepadControllerSpy;
+class CncGamepadSpy;
 class CncGamepadControllerState;
 class CncPositionStorageView;
+class CncPodestManagement;
+
+class CncTouchBlockDetector;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -169,11 +175,16 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void onPodestManagement(wxCommandEvent& event);
-    virtual void viewCoordinates(wxCommandEvent& event);
-    virtual void onLeftDClickTemplateName(wxMouseEvent& event);
-    virtual void onSvgExport(wxCommandEvent& event);
-    virtual void onSvgFormatPretty(wxCommandEvent& event);
+		virtual void onSwitchSecLeftBook(wxCommandEvent& event);
+		virtual void traceAllCameraDevices(wxCommandEvent& event);
+		virtual void onDClickSpeedSliderValue(wxMouseEvent& event);
+		virtual void onToggleSecMainView(wxCommandEvent& event);
+		virtual void onPodestManagement(wxCommandEvent& event);
+		virtual void viewCoordinates(wxCommandEvent& event);
+		virtual void viewGamepadSpy(wxCommandEvent& event);
+		virtual void onLeftDClickTemplateName(wxMouseEvent& event);
+		virtual void onSvgExport(wxCommandEvent& event);
+		virtual void onSvgFormatPretty(wxCommandEvent& event);
 		virtual void toggleTryToSelectClientIdFromEditor(wxCommandEvent& event);
 		virtual void toggleAutoSaveTplOnProcess(wxCommandEvent& event);
 		virtual void onSelectTemplatePanel(wxListbookEvent& event);
@@ -468,6 +479,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		wxMenuItem*			GetMiMotorEnableState()		{ return m_miMotorEnableState; }
 		
 		//////////////////////////////////////////////////////////////////////////////////
+		void startAnimationControl();
+		void stopAnimationControl();
+		
 		void selectMainBookSourcePanel(int sourcePageToSelect = SourceBookSelection::VAL::EDITOR);
 		void selectMainBookPreviewPanel();
 		void selectMainBookSetupPanel();
@@ -481,6 +495,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void selectParsingSynopsisTrace();
 		
 		void setControllerPowerStateBmp(bool state);
+		
+		void selectSecureMonitorView();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
@@ -543,6 +559,10 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 		void clearMotionMonitor();
 		
+		CncTouchBlockDetector::Result processTouchTest(const CncTouchBlockDetector::Parameters& para);
+		CncTouchBlockDetector::Result processZTouch(const CncTouchBlockDetector::Parameters& para);
+		CncTouchBlockDetector::Result processXYZTouch(const CncTouchBlockDetector::Parameters& para);
+		
 	protected:
 	
 		void tryToSelectClientId(long clientId, ClientIdSelSource::ID tss);
@@ -553,6 +573,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		// will be bind to this frame
 		void onGlobalKeyDownHook(wxKeyEvent& event);
 		void onIdle(wxIdleEvent& event);
+
+		void selectStepSensitivity(int sel);
+		void shiftStepSensitivity();
  
 		// Interrupt thread handling
 		//UpdateManagerThread* updateManagerThread;
@@ -594,16 +617,13 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void enableSourceEditorMenuItems(bool enable);
 		
-		void startAnimationControl();
-		void stopAnimationControl();
-		
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 		
 		SerialThread* getSerialThread(SerialThreadStub* sts);
 		
-		void cncTransactionLockCallback();
-		void cncTransactionReleaseCallback();
+		void cncTransactionLockCallback(CncTransactionLockBase* tal);
+		void cncTransactionReleaseCallback(CncTransactionLockBase* tal);
 		
 		void motionMonitorViewTop();
 		void motionMonitorViewBottom();
@@ -627,7 +647,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncConfig;
 		friend class CncContext;
 		friend class CncGampadDeactivator;
+		friend class CncTransactionLockBase;
 		friend class CncTransactionLock;
+		friend class CncGamepadTransactionLock;
 		friend class CncSerialSpyPanel;
 
 		friend class GamepadThread;
@@ -653,7 +675,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool 							ignoreDirControlEvents;
 		
 		RunConfirmationInfo  			runConfirmationInfo;
-		CncTransactionLock*				interactiveTransactionLock;
+		CncGamepadTransactionLock*		interactiveTransactionLock;
 		
 		int 							startTimerTimeout;
 		int 							serialTimerTimeout;
@@ -698,7 +720,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncArduinoEnvironment*			cncArduinoEnvironment;
 		CncLCDPositionPanel*			cncLCDPositionPanel;
 		CncManuallyMoveCoordinates*		cncManuallyMoveCoordPanel;
-		CncGamepadControllerSpy* 		gamepadControllerSpy;
+		CncGamepadSpy* 					gamepadSpy;
 		CncGamepadControllerState*		gamepadStatusCtl; 
 		CncLoggerListCtrl* 				controllersMsgHistoryList;
 		CncMainInfoBar*					mainViewInfobar;
@@ -726,6 +748,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncApp::MenuItems	menuItems;
 		
 		CncReferencePosition* refPositionDlg;
+		CncPodestManagement*  podestManagementDlg; 
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
 		
@@ -740,7 +763,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void traceWxSvgVersion(std::ostream& out);
 		void traceBoostVersion(std::ostream& out);
 		void traceWoodworkingCncVersion(std::ostream& out);
-		
+		void traceOpenCvVersion(std::ostream& out);
 		
 		void displayReport(int id);
 		
@@ -924,48 +947,43 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 };
 
 ////////////////////////////////////////////////////////////////////
-class CncTransactionLock {
+class CncTransactionLockBase {
 	
-	private:
-		static unsigned int referenceCounter;
+	protected:
+		static unsigned int	referenceCounter;
 		
-		MainFrame* parent;
-		bool prevCheckState;
-		bool prevEnableState;
-		bool errorMode;
+		MainFrame*			parent;
+		bool				state;
+		bool				errorMode;
+	
+		explicit CncTransactionLockBase(MainFrame* p);
+		virtual ~CncTransactionLockBase();
+		
+		bool waitUntilCncIsAvailable();
 		
 	public:
-		explicit CncTransactionLock(MainFrame* p) 
-		: parent(p)
-		, prevCheckState(false)
-		, prevEnableState(false)
-		, errorMode(false)
-		{
-			wxASSERT(parent);
-			referenceCounter++;
-			
-			prevCheckState  = parent->m_miRqtIdleMessages->IsChecked();
-			prevEnableState = parent->m_miRqtIdleMessages->IsEnabled();
-			parent->m_miRqtIdleMessages->Check(false);
-			parent->m_miRqtIdleMessages->Enable(false);
-			
-			parent->cncTransactionLockCallback();
-			parent->decorateIdleState(false);
-		}
 		
-		~CncTransactionLock() {
-			parent->m_miRqtIdleMessages->Check(errorMode == true ? false : prevCheckState);
-			parent->m_miRqtIdleMessages->Enable(prevEnableState);
-			parent->cncTransactionReleaseCallback();
-			
-			wxASSERT( referenceCounter != 0 );
-			referenceCounter--;
-		}
+		bool					isOk()				const	{ return state; }
+		void 					setErrorMode() 				{ errorMode = true;	}
 		
-		void 					setErrorMode() 			{ errorMode = true;	}
-		
-		static bool 			isLocked() 				{ return referenceCounter != 0; }
-		static unsigned int 	getReferenceCount()		{ return referenceCounter; }
+		static bool 			isLocked() 					{ return referenceCounter != 0; }
+		static unsigned int 	getReferenceCount()			{ return referenceCounter; }
+};
+
+////////////////////////////////////////////////////////////////////
+class CncTransactionLock : public CncTransactionLockBase {
+	
+	public:
+		explicit CncTransactionLock(MainFrame* p);
+		virtual ~CncTransactionLock();
+};
+
+////////////////////////////////////////////////////////////////////
+class CncGamepadTransactionLock : public CncTransactionLockBase {
+	
+	public:
+		explicit CncGamepadTransactionLock(MainFrame* p);
+		virtual ~CncGamepadTransactionLock();
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -974,32 +992,33 @@ class CncGampadDeactivator {
 	private:
 		static unsigned int referenceCounter;
 		
-		MainFrame* parent;
-		bool reconstructPrevState;
-		bool prevState;
-		bool stateDialogShown;
+		MainFrame*	parent;
+		bool		reconstructPrevState;
+		bool		prevState;
+		bool		stateDialogShown;
 		
 	public:
-		explicit CncGampadDeactivator(MainFrame* p, bool rps = false)
-		: parent(p)
-		, reconstructPrevState(rps)
-		, prevState(false)
-		, stateDialogShown(false)
-		{
-			wxASSERT(parent);
-			referenceCounter++;
-			
-			prevState = parent->isGamepadNotificationActive();
-			parent->activateGamepadNotifications(false);
-		}
-		
-		~CncGampadDeactivator() {
-			parent->activateGamepadNotifications(reconstructPrevState == true ? prevState : true);
-			
-			referenceCounter--;
-		}
+		explicit CncGampadDeactivator(MainFrame* p, bool rps = false);
+		~CncGampadDeactivator();
 		
 		static bool gamepadNotificationsAllowed() { return referenceCounter == 0; }
+};
+
+////////////////////////////////////////////////////////////////////
+class CncRunAnimationControl {
+	
+	private:
+		
+		MainFrame*	parent;
+		
+	public:
+	
+		explicit CncRunAnimationControl(MainFrame* p)
+		: parent(p)
+		{ if ( parent ) parent->startAnimationControl(); }
+		
+		~CncRunAnimationControl()
+		{ if ( parent ) parent->stopAnimationControl(); }
 };
 
 #endif // MAINFRAME_H

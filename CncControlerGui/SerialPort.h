@@ -3,7 +3,7 @@
 
 #include <vector> 
 #include <map>
-#include <queue> 
+#include <list> 
 #include <wx/string.h>
 #include "OSD/CncTimeFunctions.h"
 #include "OSD/SerialOSD.h"
@@ -220,7 +220,7 @@ class Serial : public SerialOSD {
 	private:
 		
 		// Readbuffer, primary filled by peekData
-		typedef std::queue<unsigned char> ReadBuffer;
+		typedef std::list<unsigned char> ReadBuffer;
 		ReadBuffer readBuffer; 
 		
 		// total distance
@@ -375,6 +375,9 @@ class Serial : public SerialOSD {
 		// read all remaining bytes from serial to /dev/null
 		virtual bool clearRemainingBytes(bool trace=false);
 		
+		virtual int peekAndTraceReadBuffer(std::ostream& ostr);
+		virtual int traceReadBuffer(std::ostream& ostr) const;
+		
 		virtual bool dataAvailable();
 		virtual const char* getPortName() 						const	{ return portName.c_str(); }
 		virtual void onPeriodicallyAppEvent(bool interrupted)			{}
@@ -406,11 +409,14 @@ class Serial : public SerialOSD {
 		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream);
 		
 		bool processStartInteractiveMove();
+		bool processUpdateInteractiveMove();
 		bool processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		
 		bool processMoveSequence(CncMoveSequence& moveSequence);
 		
 		bool resolveLimits(unsigned int size, const int32_t (&values)[3]);
+		
+		bool processMoveUntilContact(unsigned int size, const int32_t (&values)[3]);
 		
 		bool processMovePodest(int32_t steps);
 

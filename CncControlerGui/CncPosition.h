@@ -37,8 +37,9 @@ class CncXYDimension {
 		
 };
 
-typedef CncXYDimension<int32_t> CncXYLongDimension;
-typedef CncXYDimension<double> CncXYDoubleDimension;
+typedef CncXYDimension<int32_t>	CncXYLongDimension;
+typedef CncXYDimension<double>	CncXYDoubleDimension;
+typedef CncXYDimension<float>	CncXYFloatDimension;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <typename T> 
@@ -65,9 +66,9 @@ class CncZDimension {
 		
 };
 
-typedef CncZDimension<int32_t> CncZLongDimension;
-typedef CncZDimension<double> CncZDoubleDimension;
-
+typedef CncZDimension<int32_t>	CncZLongDimension;
+typedef CncZDimension<double>	CncZDoubleDimension;
+typedef CncZDimension<float>	CncZFloatDimension;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <class T>
@@ -309,6 +310,12 @@ class CncPosition {
 		}
 		
 		////////////////////////////////////////////////////////////////
+		const CncPosition<T>& invertX() { xPos *= -1; evaluateWatermarks(); return *this; }
+		const CncPosition<T>& invertY() { yPos *= -1; evaluateWatermarks(); return *this; }
+		const CncPosition<T>& invertZ() { zPos *= -1; evaluateWatermarks(); return *this; }
+		const CncPosition<T>& invert()  { invertX(); invertY(); invertZ();  return *this; }
+		
+		////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const CncPosition<T> &a) {
 			ostr << a.getX() << ", " << a.getY() << ", " << a.getZ();
 			return ostr;
@@ -337,6 +344,15 @@ class CncPosition {
 			return ( xc && yc && zc ); 
 		}
 		
+		////////////////////////////////////////////////////////////////
+		bool isFloatingEqual(const CncPosition<float> &a, const float epsilon = -1.0) const {
+			const bool xc = std::fabs(a.getX() - getX()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
+			const bool yc = std::fabs(a.getY() - getY()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
+			const bool zc = std::fabs(a.getZ() - getZ()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
+			
+			return ( xc && yc && zc ); 
+		}
+
 		////////////////////////////////////////////////////////////////
 		bool operator== (const CncPosition<T> &a) const {
 			return (    (a.getX() == getX())
@@ -430,11 +446,18 @@ class CncPosition {
 // ----------------------------------------------------------------------
 typedef CncPosition<int32_t> 	CncLongPosition;
 typedef CncPosition<double> 	CncDoublePosition;
+typedef CncPosition<float> 		CncFloatPosition;
 
 #define CncDistance				CncPosition
 typedef CncPosition<int32_t> 	CncLongDistance;
 typedef CncPosition<double> 	CncDoubleDistance;
+typedef CncPosition<float> 		CncFloatPosition;
 
+
+#define CncOffset				CncPosition
+typedef CncPosition<int32_t> 	CncLongOffset;
+typedef CncPosition<double> 	CncDoubleOffset;
+typedef CncPosition<float> 		CncFloatOffset;
 
 // ----------------------------------------------------------------------
 template <class T>
@@ -487,5 +510,6 @@ class CncBounderies : public CncPosition<T>::Watermarks {
 // ----------------------------------------------------------------------
 typedef CncBounderies<int32_t> 	CncLongBounderies;
 typedef CncBounderies<double> 	CncDoubleBounderies;
+typedef CncBounderies<float> 	CncFloatBounderies;
 
 #endif

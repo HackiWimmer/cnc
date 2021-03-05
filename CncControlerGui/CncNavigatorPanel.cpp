@@ -1,6 +1,8 @@
 #include <iostream>
 #include <wx/dcclient.h>
 #include <wx/dcbuffer.h>
+#include <wx/dcgraph.h>
+#include <wx/menu.h>
 #include "CncCommon.h"
 #include "CncNavigatorPanel.h"
 
@@ -28,6 +30,7 @@ CncNavigatorPanel::CncNavigatorPanel(wxWindow *parent, const Config& cfg)
 : wxPanel					(parent)
 , navEvent					(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
 , continuousEvent			(new CncNavigatorPanelEvent(wxEVT_CNC_NAVIGATOR_PANEL))
+, popupMenu					(new wxMenu(""))
 , stepMode					(SM_INTERACTIVE)
 , continuousTimer			(this, wxEVT_CNC_NAVIGATOR_PANEL_TIMER)
 , navRectangle				()
@@ -43,6 +46,44 @@ CncNavigatorPanel::CncNavigatorPanel(wxWindow *parent, const Config& cfg)
 	// This has to be done to use wxAutoBufferedPaintDC 
 	// on EVT_PAINT events correctly
 	SetBackgroundStyle(wxBG_STYLE_PAINT);
+	
+	precreateSegmentAngles();
+	
+	static const int miLongFormat	= 8000;
+	static const int miLockSpeed	= 8001;
+
+	popupMenu->AppendCheckItem (miLongFormat,	"Display as long Format");
+	popupMenu->AppendCheckItem (miLockSpeed,	"Deactivate Speed Adjustment");
+	
+	popupMenu->Check(miLongFormat,	true);
+	popupMenu->Check(miLockSpeed,	false);
+	
+	//............................................
+	popupMenu->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [&](wxCommandEvent& event) {
+		this->config.shortFormat = (event.IsChecked() == false);
+		this->precreateSegmentAngles();
+	 }, miLongFormat, miLongFormat);
+
+	//............................................
+	popupMenu->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [&](wxCommandEvent& event) {
+		this->config.speedByAmplitude = (event.IsChecked() == false);
+	 }, miLockSpeed, miLockSpeed);
+}
+///////////////////////////////////////////////////////////////////
+CncNavigatorPanel::~CncNavigatorPanel() {
+///////////////////////////////////////////////////////////////////
+	continuousTimer.Stop();
+	
+	wxDELETE ( popupMenu );
+	wxDELETE ( navEvent );
+	wxDELETE ( continuousEvent );
+}
+///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::precreateSegmentAngles() {
+///////////////////////////////////////////////////////////////////
+	outerRegions.clear();
 	
 	// Precreate the segment angles
 	if ( config.shortFormat == false ) {
@@ -95,14 +136,7 @@ CncNavigatorPanel::CncNavigatorPanel(wxWindow *parent, const Config& cfg)
 			idx++;
 		}
 	}
-}
-///////////////////////////////////////////////////////////////////
-CncNavigatorPanel::~CncNavigatorPanel() {
-///////////////////////////////////////////////////////////////////
-	continuousTimer.Stop();
-	
-	wxDELETE ( navEvent );
-	wxDELETE ( continuousEvent );
+
 }
 ///////////////////////////////////////////////////////////////////
 const char* CncNavigatorPanel::getDirectionAsString(const Direction d) {
@@ -149,6 +183,7 @@ bool CncNavigatorPanel::Enable(bool enable) {
 //////////////////////////////////////////////////
 void CncNavigatorPanel::onEraseBackground(wxEraseEvent& event) {
 //////////////////////////////////////////////////
+	Refresh();
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
@@ -187,19 +222,24 @@ void CncNavigatorPanel::onKillFocus(wxFocusEvent& event) {
 	killFocus(prepareEvent(EID::CNP_KILL_FOCUS));
 	
 	event.Skip();
+	Refresh();
 }
 ///////////////////////////////////////////////////////////////////
-void CncNavigatorPanel::drawToolTip(const Direction direction) {
+void CncNavigatorPanel::drawToolTip() {
 ///////////////////////////////////////////////////////////////////
 	if ( config.showToolTip == true )
-		SetToolTip(config.toolTipMap[current.direction]);
+		SetToolTip(wxString::Format("Amplitude: %.1lf\n%s", current.amplitude, config.toolTipMap[current.direction]));
 }
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxAutoBufferedPaintDC dc(this);
-	dc.Clear();
-	dc.SetBrush(*wxTRANSPARENT_BRUSH);
+	//wxAutoBufferedPaintDC dc(this);
+	//dc.Clear();
+	//dc.SetBrush(*wxTRANSPARENT_BRUSH);
+
+	wxAutoBufferedPaintDC paintDC(this);
+	paintDC.Clear();
+	wxGCDC dc(paintDC);
 	
 	// common parameters
 	const double 		midRadius 	= ( outerRadius + innerRadius ) / 2;
@@ -208,6 +248,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	const int 			A 			= 0;
 	const int 			B 			= 1;
 	const int 			C 			= 2;
+	const int 			hlLightness	= config.speedByAmplitude ? 135 - 100 * current.amplitude : 100;
 	
 	// draw bounderies
 	auto drawBounderies = [&](bool draw) {
@@ -242,10 +283,10 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 			if ( IsEnabled() == false )
 				fill = false;
 			
-			if ( ocr.direction == current.direction ) {
+			if ( ocr.direction == current.direction && HasFocus() ) {
 				dc.SetPen(highlightPen);
 				if ( fill == true ) 
-					dc.SetBrush(wxBrush(highlightPen.GetColour()));
+					dc.SetBrush(wxBrush(highlightPen.GetColour().ChangeLightness(hlLightness)));
 			} else {
 				dc.SetPen(defaultPen);
 				if ( fill == true ) 
@@ -290,10 +331,10 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 				fill = false;
 				
 			// top region
-			if ( current.direction == CP ) {
+			if ( current.direction == CP && HasFocus() ) {
 				dc.SetPen(highlightPen);
 				if ( fill == true ) 
-					dc.SetBrush(wxBrush(highlightPen.GetColour()));
+					dc.SetBrush(wxBrush(highlightPen.GetColour().ChangeLightness(hlLightness)));
 			} else {
 				dc.SetPen(defaultPen);
 				if ( fill == true ) 
@@ -304,10 +345,10 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 			dc.DrawLine(-radius, -offset, +radius, -offset);
 			
 			// bottom region
-			if ( current.direction == CN ) {
+			if ( current.direction == CN  && HasFocus() ) {
 				dc.SetPen(highlightPen);
 				if ( fill == true ) 
-					dc.SetBrush(wxBrush(highlightPen.GetColour()));
+					dc.SetBrush(wxBrush(highlightPen.GetColour().ChangeLightness(hlLightness)));
 			} else {
 				dc.SetPen(defaultPen);
 				if ( fill == true ) 
@@ -321,6 +362,48 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 				dc.SetBrush(wxBrush(GetBackgroundColour()));
 				dc.DrawRectangle(wxRect(-radius, -offset, 2 * radius, 2 * offset));
 			}
+		}
+	};
+	
+	auto drawAmplitude = [&]() {
+		
+		if ( IsEnabled() == false )
+			return;
+			
+		dc.SetPen(wxColour(127, 127, 127));
+		dc.SetBrush(*wxTRANSPARENT_BRUSH);
+		
+		std::vector<float> sFactors;
+		cnc::getSpeedStepSensitivityFactors(sFactors);
+		
+		// outer circle 
+		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
+			OuterCircleRegion& ocr = *it;
+			
+			for (auto it = sFactors.begin(); it != sFactors.end(); ++it ) {
+				const double aRadius = innerRadius + (outerRadius - innerRadius ) * (*it);
+				
+				const int xa1 = round(cos(ocr.startAngle * PI / 180) * +aRadius);
+				const int ya1 = round(sin(ocr.startAngle * PI / 180) * -aRadius);
+				
+				const int xa2 = round(cos(ocr.stopAngle  * PI / 180) * +aRadius);
+				const int ya2 = round(sin(ocr.stopAngle  * PI / 180) * -aRadius);
+				
+				dc.DrawArc(xa1, ya1, xa2, ya2, 0, 0);
+			}
+		}
+		
+		// inner circle 
+		for (auto it = sFactors.begin(); it != sFactors.end(); ++it ) {
+			const int offset = 3;
+			const double aRadius = offset + (innerRadius * 0.85 - offset) * (*it);
+			
+			//top
+			dc.DrawArc (+aRadius, -offset, -aRadius, -offset, 0.0, 0.0);
+			
+			//bottom
+			dc.DrawArc (-aRadius, +offset, +aRadius, +offset, 0.0, 0.0);
+			
 		}
 	};
 	
@@ -489,6 +572,9 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	drawOuterCircleBorders(penH, penD, true);
 	drawInnerCircleBorders(penH, penD, true);
 	
+	if ( config.speedByAmplitude == true )
+		drawAmplitude();
+		
 	drawArrows();
 	
 	if ( IsEnabled() == true ) {
@@ -524,8 +610,13 @@ void CncNavigatorPanel::onMouse(wxMouseEvent& event) {
 	
 	if ( IsEnabled() == false )
 		return;
+		
+	if ( event.RightDown() ) {
+		displayContextMenu();
+		return;
+	}
 	
-	// normalize to a centered right hand coord-system
+	// normalize to a centred right hand coord-system
 	MouseInfo mi;
 	mi.normalizedX	= x - navRectangle.GetWidth() / 2 - navRectangle.GetX();
 	mi.normalizedY	= navRectangle.GetHeight() - y - navRectangle.GetHeight() / 2 + navRectangle.GetY();
@@ -599,41 +690,52 @@ void CncNavigatorPanel::onMouse(const MouseInfo& mi) {
 	typedef CncNavigatorPanelEvent::Id EID;
 	
 	CncNavigatorPanelEvent& evt = prepareEvent();
-	evt.radius 	= radius;
-	evt.angle	= angle;
-	evt.mouseX 	= mi.normalizedX;
-	evt.mouseY 	= mi.normalizedY;
+	evt.radius		= radius;
+	evt.angle		= angle;
+	evt.mouseX		= mi.normalizedX;
+	evt.mouseY		= mi.normalizedY;
 	
 	// Distribute coordinates
 	evt.SetId(EID::CNP_COORDINATES);
 	postEvent(evt);
 	
 	// reset the current direction
-	Direction prevDirection = current.direction;
-	current.direction = UD;
+	Direction	prevDirection	= current.direction;
+	int			prevSpeedIndex	= cnc::getSpeedStepSensitivityIndex(current.amplitude);
+	current.direction			= UD;
 	
 	// determine if a region is selected
-	if ( radius < innerRadius * 0.85 ) {
+	const float rFact = 0.85;
+	if ( radius < innerRadius * rFact ) {
 		
 		// handle inner regions
 		if ( config.innerCircle == true ) {
 			
-			if ( abs( mi.normalizedY ) >= 5 ) {
+			const int offset = 5;
+			
+			if ( abs( mi.normalizedY ) >= offset ) {
 				// detect the region
 				if ( angle >= 0.0 && angle <= 180.0 )	current.direction = CP;
 				else									current.direction = CN;
+				
+				const double radiusDist	= (innerRadius * rFact) - offset;
+				current.amplitude		= (radius - offset ) / radiusDist;
 			}
 		}
 		
 	} else {
 		
 		// handle outer regions
-		if (  radius >= innerRadius && radius <= outerRadius ) {
+		if ( radius >= innerRadius && radius <= outerRadius ) {
 			
+			const double radiusDist	= outerRadius - innerRadius;
+			current.amplitude		= (radius - innerRadius ) / radiusDist;
+			
+			// over all outer regions
 			for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
 				OuterCircleRegion& ocr = *it;
 				
-				// Determine reagions angle boundings:
+				// Determine regions angle bounding:
 				//  In this case the start- or stop- angel can defined greater as 360°
 				//  which has to be considered here.
 				const bool greaterAsMin = ocr.stopAngle > 360.0 && angle < ocr.stopAngle - 360.0 ? angle >= 0.0                   : angle >= ocr.startAngle;
@@ -649,14 +751,24 @@ void CncNavigatorPanel::onMouse(const MouseInfo& mi) {
 		}
 	}
 	
-	evt.direction = current.direction;
-	drawToolTip(current.direction);
+	evt.amplitude	= current.amplitude;
+	evt.speedIndex	= cnc::getSpeedStepSensitivityIndex(current.amplitude);
+	evt.direction	= current.direction;
+	
+	drawToolTip();
 	
 	if ( current.direction != UD ) {
 		
 		if ( current.direction != prevDirection ) {
 			evt.SetId(EID::CNP_ENTER_REGION);
 			enterRegion(evt);
+		}
+		
+		if ( config.speedByAmplitude == true ) {
+			if ( evt.speedIndex != prevSpeedIndex ) {
+				evt.SetId(EID::CNP_CHANGE_SPEED_INDEX);
+				changeSpeedIndex(evt);
+			}
 		}
 		
 		if ( mi.leftDown == true ) {
@@ -710,6 +822,16 @@ void CncNavigatorPanel::leftUpRegion(const CncNavigatorPanelEvent& event) {
 	stopContinuousEvent();  
 }
 ///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::rightDownRegion(const CncNavigatorPanelEvent& event) {
+///////////////////////////////////////////////////////////////////
+	postEvent(event); 
+}
+///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::rightUpRegion(const CncNavigatorPanelEvent& event) {
+///////////////////////////////////////////////////////////////////
+	postEvent(event); 
+}
+///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::onContinuousTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( continuousEvent );
@@ -743,4 +865,10 @@ void CncNavigatorPanel::stopContinuousEvent() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( continuousEvent );
 	continuousTimer.Stop();
+}
+///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::displayContextMenu() {
+///////////////////////////////////////////////////////////////////
+	if ( popupMenu ) 
+		PopupMenu(popupMenu);
 }

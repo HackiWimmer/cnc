@@ -49,14 +49,14 @@ class CncBoundarySpace {
 		CncDoubleDistance		calculateRefPosition;
 		
 		// without harware reference
-		CncDoubleBounderies		boundLocically;
+		CncDoubleBounderies		boundLogically;
 		
 		// harware normalized
 		CncDoubleBounderies		boundPhysically;
 		
 		CncRefPositionMode		refPostionMode;
+		CncDoubleOffset 		measurementOffset;
 		double					workpieceThickness;
-		double					measurePlateThickness;
 		
 		void					calculate();
 		
@@ -84,14 +84,14 @@ class CncBoundarySpace {
 		CncRefPositionMode		getReferencePositionMode()						const	{ return refPostionMode; }
 		double					getWorkpieceThickness()							const	{ return workpieceThickness; }
 		double					getSurfaceOffset()								const	{ return workpieceThickness; }
-		double					getMeasurePlateThickness()						const	{ return measurePlateThickness; }
+		const CncDoubleOffset	getMeasurementOffset()							const	{ return measurementOffset; }
 
 		const CncLongPosition	getCalculatedRefPositionSteps()					const;
 		const CncDoublePosition	getCalculatedRefPositionMetric()				const;
 
-		void					setRefPositionMode(CncRefPositionMode rpm)				{ refPostionMode		= rpm;	calculate(); }
-		void					setWorkpieceThickness(double wpt)						{ workpieceThickness	= wpt;	calculate(); }
-		void					setMeasurePlateThickness(double mpt)					{ measurePlateThickness	= mpt;	calculate(); }
+		void					setRefPositionMode(CncRefPositionMode rpm)				{ refPostionMode		= rpm;		calculate(); }
+		void					setWorkpieceThickness(double wpt)						{ workpieceThickness	= wpt;		calculate(); }
+		void					setMeasurementOffset(CncDoubleOffset ofs)				{ measurementOffset		= ofs;		calculate(); }
 		
 		void					resetHardwareOffset()									{ hardwareOffset.reset(); 			calculate(); }
 		void					setHardwareOffsetValid(bool s)							{ hardwareOffset.setValid(s); 		calculate(); }

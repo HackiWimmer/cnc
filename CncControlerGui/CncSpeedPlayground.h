@@ -26,6 +26,7 @@ class CncSpeedPlayground 	: public CncSpeedPlaygroundBase
 		void appendArdoMessage(char type, const wxString& msg, const wxString& context=wxEmptyString);
 		
 	protected:
+		virtual void onCloseWindow(wxCloseEvent& event);
 		virtual void enableSpecialSpeedDisplayHeight(wxCommandEvent& event);
 		virtual void updateSpecialSpeedDisplayHeightValue(wxCommandEvent& event);
 		virtual void updateTriggerF1(wxCommandEvent& event);

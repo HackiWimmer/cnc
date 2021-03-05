@@ -73,11 +73,14 @@ void CncLCDPositionPanel::updateUnit() {
 ///////////////////////////////////////////////////////////////////
 	const wxString unit(THE_APP->GetUnit()->GetValue());
 	
-	if ( m_unitX->GetLabel() != unit) {
+	if ( m_unitX->GetLabel() != unit)
 		m_unitX->SetLabel(unit);
+		
+	if ( m_unitY->GetLabel() != unit)
 		m_unitY->SetLabel(unit);
+		
+	if ( m_unitZ->GetLabel() != unit)
 		m_unitZ->SetLabel(unit);
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncLCDPositionPanel::updateValues() {

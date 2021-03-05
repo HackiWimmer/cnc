@@ -31,19 +31,72 @@ CncStepSensitivity cnc::getStepSensitivityOfIndex(unsigned int index) {
 //////////////////////////////////////////////////////////////
 float cnc::getSpeedValue(CncStepSensitivity s) {
 //////////////////////////////////////////////////////////////
-	// any default value . . .
-	double			newSpeed =    1.0;
-	const double	maxSpeed = 9000.0;
+	double newSpeed = 1.0;
 	
 	switch ( s ) {
-		case FINEST:	newSpeed = 60.0;				break;
-		case FINE:		newSpeed = maxSpeed * 0.2;		break;
-		case MEDIUM:	newSpeed = maxSpeed * 0.5;		break;
-		case ROUGH:		newSpeed = maxSpeed * 0.8;		break;
-		case ROUGHEST:	newSpeed = maxSpeed * 1.0;		break;
+		case FINEST:	newSpeed = cnc::getSpeedValue(0.1);	break;
+		case FINE:		newSpeed = cnc::getSpeedValue(0.2);	break;
+		case MEDIUM:	newSpeed = cnc::getSpeedValue(0.5);	break;
+		case ROUGH:		newSpeed = cnc::getSpeedValue(0.8);	break;
+		case ROUGHEST:	newSpeed = cnc::getSpeedValue(1.0);	break;
 	}
 	
 	return newSpeed;
+}
+//////////////////////////////////////////////////////////////
+float cnc::getSpeedValue(float amplitude) {
+//////////////////////////////////////////////////////////////
+	amplitude = std::max(0.0f, amplitude);
+	amplitude = std::min(1.0f, amplitude);
+	
+	// Any default value . . .
+	// Don't increase the max speed to much high, because there's 
+	// no de-acceleration phase at the end of a move and higher speeds
+	//  hare not much hardware friendly
+	double			newSpeed =    1.0;
+	const double	maxSpeed = 4500.0;
+	
+	std::vector<float> factors;
+	cnc::getSpeedStepSensitivityFactors(factors);
+	
+	if		( amplitude <= factors.at(0) )	newSpeed = 60.0;
+	else if	( amplitude <= factors.at(1) )	newSpeed = maxSpeed * 0.2;
+	else if ( amplitude <= factors.at(2) )	newSpeed = maxSpeed * 0.5;
+	else if ( amplitude <= factors.at(3) )	newSpeed = maxSpeed * 0.8;
+	else									newSpeed = maxSpeed * 1.0;
+	
+	return newSpeed;
+}
+//////////////////////////////////////////////////////////////
+int cnc::getSpeedStepSensitivityIndex(float amplitude) {
+//////////////////////////////////////////////////////////////
+	amplitude = std::max(0.0f, amplitude);
+	amplitude = std::min(1.0f, amplitude);
+	
+	std::vector<float> factors;
+	cnc::getSpeedStepSensitivityFactors(factors);
+	
+	if		( amplitude <= factors.at(0) )	return 0;
+	else if	( amplitude <= factors.at(1) )	return 1;
+	else if ( amplitude <= factors.at(2) )	return 2;
+	else if ( amplitude <= factors.at(3) )	return 3;
+	else									return 4;
+	
+	return -1;
+}
+//////////////////////////////////////////////////////////////
+const std::vector<float>& cnc::getSpeedStepSensitivityFactors(std::vector<float>& ret) {
+//////////////////////////////////////////////////////////////
+	ret.clear();
+	ret.push_back(0.10);
+	ret.push_back(0.25);
+	ret.push_back(0.50);
+	ret.push_back(0.90);
+	ret.push_back(1.00);
+	
+	wxASSERT( ret.size() == 5 );
+	
+	return ret;
 }
 //////////////////////////////////////////////////////////////
 const wxString& cnc::lformat(wxString& str, unsigned int len, char c) {

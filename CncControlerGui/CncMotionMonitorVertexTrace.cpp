@@ -85,7 +85,7 @@ int CncVertexTrace::DataListCtrl::OnGetItemColumnImage(long item, long column) c
 		
 		case COL_COLOUR:	// create the colour image on the fly . . .
 							GLOpenGLPathBuffer::CncVertex v;
-							vertexBufferStore->getVertex(v, (unsigned long)item);
+							vertexBufferStore->getPosVertex(v, (unsigned long)item);
 							
 							wxImage img(16, 16);
 							img.SetRGB({0, 0, img.GetWidth(), img.GetHeight()}, v.getR(), v.getG(), v.getB());
@@ -114,7 +114,7 @@ wxString CncVertexTrace::DataListCtrl::OnGetItemText(long item, long column) con
 		return _("");
 
 	GLOpenGLPathBuffer::CncVertex v;
-	vertexBufferStore->getVertex(v, (unsigned long)item);
+	vertexBufferStore->getPosVertex(v, (unsigned long)item);
 	
 	const long bufferId = vertexBufferStore->getBufferId((unsigned long)item);
 	

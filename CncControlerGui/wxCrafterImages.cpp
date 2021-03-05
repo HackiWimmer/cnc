@@ -2397,6 +2397,19 @@ ImageLibAui::ImageLibAui()
     {
         wxBitmap bmp;
         wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_AUI_EXPAND"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_AUI_EXPAND"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
         bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_AUI_MORE"));
         if(bmp.IsOk()) {
             if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
@@ -2422,31 +2435,6 @@ ImageLibAui::ImageLibAui()
     {
         wxBitmap bmp;
         wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_AUI_EXPAND"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_AUI_EXPAND"), bmp));
-        }
-    }
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_AUI_EXPAND@2x"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_AUI_EXPAND@2x"), bmp));
-        }
-    }
-    
-    {
-        wxBitmap bmp;
-        wxIcon icn;
         bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_AUI_CLOSE"));
         if(bmp.IsOk()) {
             if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
@@ -2454,6 +2442,32 @@ ImageLibAui::ImageLibAui()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_AUI_CLOSE"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_ATTACH"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_ATTACH"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_DETACH"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_DETACH"), bmp));
         }
     }
     

@@ -342,16 +342,24 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer3841 = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3841 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer3841->SetFlexibleDirection( wxBOTH );
     flexGridSizer3841->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3841->AddGrowableCol(0);
-    flexGridSizer3841->AddGrowableRow(1);
+    flexGridSizer3841->AddGrowableRow(0);
     this->SetSizer(flexGridSizer3841);
     
-    wxFlexGridSizer* flexGridSizer3847 = new wxFlexGridSizer(0, 8, 0, 0);
+    m_fileListPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,100)), wxTAB_TRAVERSAL);
+    m_fileListPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer3841->Add(m_fileListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_fileListPlaceholder->SetMinSize(wxSize(-1,100));
+    
+    wxFlexGridSizer* flexGridSizer3847 = new wxFlexGridSizer(0, 7, 0, 0);
     flexGridSizer3847->SetFlexibleDirection( wxBOTH );
     flexGridSizer3847->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3847->AddGrowableCol(6);
+    flexGridSizer3847->AddGrowableRow(0);
     
     flexGridSizer3841->Add(flexGridSizer3847, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -389,18 +397,12 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer3847->Add(m_btOpenTemplate, 0, wxALL, WXC_FROM_DIP(0));
     m_btOpenTemplate->SetMinSize(wxSize(24,24));
     
-    m_fileListPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,100)), wxTAB_TRAVERSAL);
-    m_fileListPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    
-    flexGridSizer3841->Add(m_fileListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_fileListPlaceholder->SetMinSize(wxSize(-1,100));
-    
     wxArrayString m_filterExtentionArr;
     m_filterExtention = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_filterExtentionArr, wxCB_READONLY|wxBORDER_NONE);
     wxFont m_filterExtentionFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_filterExtention->SetFont(m_filterExtentionFont);
     
-    flexGridSizer3841->Add(m_filterExtention, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer3847->Add(m_filterExtention, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer3852 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3852->SetFlexibleDirection( wxBOTH );

@@ -59,6 +59,9 @@ CncArduinoController::CncArduinoController()
 , interactiveMove               ()
 {  
   ArduinoPositionRenderer::setupSteppers(X, Y, Z);
+
+  #warning - remove this again if the podest limit switches for H are installed
+  CncAxisH::doConsiderLimitPins(false);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 CncArduinoController::~CncArduinoController() {
@@ -125,8 +128,12 @@ bool CncArduinoController::evaluatePodestSwitch() {
   if ( podestHardwareState == OFF )
     return true;
 
-  const bool btUp   = AE::digitalRead(PIN_H_MOVE_UP);
-  const bool btDown = AE::digitalRead(PIN_H_MOVE_DOWN);
+  // these pins are optionally
+  if ( PIN_H_MOVE_UP == 0 || PIN_H_MOVE_DOWN == 0 )
+    return true;
+
+  const bool btUp   = ( AE::digitalRead(PIN_H_MOVE_UP)    == PODEST_SWITCH_ON );
+  const bool btDown = ( AE::digitalRead(PIN_H_MOVE_DOWN)  == PODEST_SWITCH_ON );
   
   if ( btUp == PL_HIGH || btDown == PL_HIGH ) { 
     byte b = movePodest(btUp ? +1 : -1, CncArduinoController::stopMovePodestBySwitch);  
@@ -420,7 +427,8 @@ byte CncArduinoController::activatePodestHardware(byte cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
   podestHardwareState = ( cmd == CMD_ACTIVATE_PODEST_HW ? ON : OFF );
   ARDO_DEBUG_MESSAGE('S', podestHardwareState == ON ? "Switch Podest Harware 'ON'" : "Switch Podest Harware 'OFF'")
-  #warning activate a led pin
+
+  AE::digitalWrite(PIN_LED_PODEST, podestHardwareState ? PL_HIGH : PL_LOW);
    
   return RET_OK;
 }
@@ -455,15 +463,21 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
     return RET_ERROR;
   }
 
+  H->setHighPulseWidth(125);
+
   // Create this instance to enable the podest stepper pin and release the brake.
   // The corresponding dtor will inverse this again
   PodestEnabler pe;
 
+  uint32_t curSpeedDelay = 500;
   while ( stopFunct(this) == false ) {
     const byte b = H->performStep();
 
     // slow down th podest movement
-    AE::delayMicroseconds(1000 * 1);
+    if ( curSpeedDelay > 0 ) {
+      AE::delayMicroseconds(curSpeedDelay);
+      curSpeedDelay--;
+    }
     
     if ( b != RET_OK ) {
       ArduinoMainLoop::pushMessage(MT_ERROR, E_PODEST_MOVE_FAILED, CMD_MOVE_PODEST);
@@ -508,11 +522,15 @@ bool CncArduinoController::stopMovePodestBySwitch(CncArduinoController* ctrl) {
   
   if ( ctrl->podestHardwareState == OFF )
     return true;
-  
-  if ( AE::digitalRead(PIN_H_MOVE_UP)   == PL_HIGH )
+
+  // these pins are optionally  
+  if ( PIN_H_MOVE_UP == 0 || PIN_H_MOVE_DOWN == 0 )
+    return false;
+
+  if ( AE::digitalRead(PIN_H_MOVE_UP)   == PODEST_SWITCH_ON )
     return false;
     
-  if ( AE::digitalRead(PIN_H_MOVE_DOWN) == PL_HIGH )
+  if ( AE::digitalRead(PIN_H_MOVE_DOWN) == PODEST_SWITCH_ON )
     return false;
 
   return true;
@@ -542,9 +560,15 @@ void CncArduinoController::updateInteractiveMoveValues(int8_t dx, int8_t dy, int
   if ( ( bx && by && bz ) != true )
     initInteractiveSpeed();
   
-  interactiveMove.valueX = dx;
-  interactiveMove.valueY = dy;
-  interactiveMove.valueZ = dz;
+  interactiveMove.valueX  = dx;
+  interactiveMove.valueY  = dy;
+  interactiveMove.valueZ  = dz;
+  interactiveMove.tsLast  = ArdoTs::now();
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void CncArduinoController::updateInteractiveMove() {
+/////////////////////////////////////////////////////////////////////////////////////
+  interactiveMove.tsLast  = ArdoTs::now();
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::cancelInteractiveMove(byte) {
@@ -552,7 +576,9 @@ byte CncArduinoController::cancelInteractiveMove(byte) {
   cmsF1000_MMMin = FLT_FACT;
   ArduinoAccelManager::finalize();
 
-  interactiveMove.active = false;
+  interactiveMove.active  = false;
+  interactiveMove.tsLast  = 0;
+  
   updateInteractiveMoveValues(0, 0, 0);
   
   return RET_OK;  
@@ -560,9 +586,14 @@ byte CncArduinoController::cancelInteractiveMove(byte) {
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::acceptInteractiveMove(byte) {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( ArduinoAccelManager::isInteractiveMoveType() == true ) {
-    ArduinoMainLoop::pushMessage(MT_ERROR, E_OTHER_MOVE_CMD_ACTIVE);
-    return RET_ERROR;
+  if ( ArduinoAccelManager::isInteractiveMoveType() == true ) {    
+    // this appears from time to time due to the totally asynchron gui usage,
+    // but this isn't really a problem. Therefore, return positive in this case  . . . 
+    
+    //ArduinoMainLoop::pushMessage(MT_ERROR, E_OTHER_MOVE_CMD_ACTIVE);
+    //return RET_ERROR;
+
+    return RET_OK;
   }
 
   byte ret = RET_OK;
@@ -582,12 +613,21 @@ byte CncArduinoController::acceptInteractiveMove(byte) {
   setProbeMode(OFF);
   enableStepperPin(ENABLE_STATE_ON);
 
+  const uint32_t maxMicrosWithoutUpdate = 1000L * 1000L; // 1s
+  
+  interactiveMove.tsLast  = ArdoTs::now();
   interactiveMove.active = true;
+  
   while ( interactiveMove.active == true ) {
     ret = directMove(interactiveMove.valueX, interactiveMove.valueY, interactiveMove.valueZ);
     
     if ( ret != RET_OK )
       break;
+
+    if ( ArdoTs::timespan(interactiveMove.tsLast) > maxMicrosWithoutUpdate ) {
+      ret = RET_HALT;
+      break;
+    }
   }
 
   cancelInteractiveMove(0);
@@ -755,6 +795,12 @@ bool CncArduinoController::processSignalUpdate(byte& retValue) {
       
       break;
     }
+    case PID_HEARTBEAT:
+    {
+      // this updates the interaction timestamp only
+      updateInteractiveMove();
+      break;  
+    }
     
     default: {
       
@@ -875,10 +921,10 @@ void CncArduinoController::notifyMovePartAfter() {
   // speed management
   const bool bReply = isReplyDue();
   if ( cfgF1000_MMSEC > 0 ) {
-    const int32_t curDistV_UM      = ArduinoAccelManager::Setup::feedRate_UM[RS::stepSignatureIndex];
+    const int32_t curDistV_UM = ArduinoAccelManager::Setup::feedRate_UM[RS::stepSignatureIndex];
     
     // determine the time deviation between the measured and configured sight
-    const int32_t currentTimeDistance_US   = getCurrentTargetSpeedDelay_US();
+    const int32_t currentTimeDistance_US = getCurrentTargetSpeedDelay_US();
 
     // don't put anything between the lines of the section below
     {
@@ -1029,6 +1075,8 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
     case PID_XYZ_POS:                     writeGetterValue3(PID_XYZ_POS,                      X->getPosition(), Y->getPosition(), Z->getPosition()); break;
 
     case PID_LIMIT:                       writeLimitGetter(); break;
+
+    case PID_TOUCH_CONTACT_STATE:         writeGetterValue1(PID_TOUCH_CONTACT_STATE,          (int32_t)(AE::digitalRead(PIN_TOUCH_CONTACT) == PL_LOW)); break;
     
     default:                              writeGetterValue1(PID_UNKNOWN, 0);
                                       
@@ -1093,8 +1141,9 @@ byte CncArduinoController::process(const ArduinoCmdDecoderMove::Result& mv) {
 /////////////////////////////////////////////////////////////////////////////////////
   // select underlying mechanism 
   switch ( mv.cmd ) {
-    case CMD_MOVE_UNIT_LIMIT_IS_FREE: return moveUntilLimitIsFree (mv.dx, mv.dy, mv.dz);
-    default:                          return movePosition         (mv.dx, mv.dy, mv.dz);
+    case CMD_MOVE_UNTIL_CONTACT:        return moveUntilContact     (mv.dx, mv.dy, mv.dz);
+    case CMD_MOVE_UNTIL_LIMIT_IS_FREE:  return moveUntilLimitIsFree (mv.dx, mv.dy, mv.dz);
+    default:                            return movePosition         (mv.dx, mv.dy, mv.dz);
   }
 
   return RET_ERROR;
@@ -1158,8 +1207,51 @@ byte CncArduinoController::finalize(const ArduinoCmdDecoderMoveSequence::Result&
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
+byte CncArduinoController::moveUntilContact(int32_t dx, int32_t dy, int32_t dz) {
+/////////////////////////////////////////////////////////////////////////////////////
+  ARDO_DEBUG_MESSAGE('S', "Move until contact")
+
+  const int8_t x = dx ? (dx / ArdoObj::absolute(dx)) : 0;
+  const int8_t y = dy ? (dy / ArdoObj::absolute(dy)) : 0;
+  const int8_t z = dz ? (dz / ArdoObj::absolute(dz)) : 0;
+
+  int32_t     cx = 0;
+  int32_t     cy = 0;
+  int32_t     cz = 0;
+
+  byte ret = RET_OK;
+  
+  tsMoveStart = ArdoTs::now();
+  tsMoveLast  = tsMoveStart;
+
+  setPosReplyState(true);
+  setPosReplyThreshold(posReplyThreshold);
+  setProbeMode(OFF);
+  enableStepperPin(ENABLE_STATE_ON);
+  
+  while ( AE::digitalRead(PIN_TOUCH_CONTACT) == PL_HIGH ) {
+    ret = directMove(x, y, z);
+
+    cx += ArdoObj::absolute(x);  
+    cy += ArdoObj::absolute(y);
+    cz += ArdoObj::absolute(z);
+
+    if ( ret != RET_OK )               break;
+    if ( cx > ArdoObj::absolute(dx) )  break;
+    if ( cy > ArdoObj::absolute(dy) )  break;
+    if ( cz > ArdoObj::absolute(dz) )  break;
+  }
+
+  sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
+  setPosReplyState(false);
+  
+  return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
+  ARDO_DEBUG_MESSAGE('S', "Move until Limit is free")
+
   bool retX = true;
   bool retY = true;
   bool retZ = true;

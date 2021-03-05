@@ -303,7 +303,7 @@ void GLOpenGLPathBuffer::destroyVertexArray() {
 	}
 }
 /////////////////////////////////////////////////////////////
-bool GLOpenGLPathBuffer::getVertex(CncVertex& ret, unsigned int idx) const {
+bool GLOpenGLPathBuffer::getPosVertex(CncVertex& ret, unsigned int idx) const {
 /////////////////////////////////////////////////////////////
 	if ( idx < numVertices ) {
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
@@ -412,6 +412,22 @@ void GLOpenGLPathBuffer::reconstruct(const ReconstructOptions& opt) {
 		
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	GL_COMMON_CHECK_ERROR;
+}
+/////////////////////////////////////////////////////////////
+bool GLOpenGLPathBuffer::hasClientID(long clientId, bool exact) const { 
+/////////////////////////////////////////////////////////////
+	const bool ret = clientIdIndex.find(clientId) != clientIdIndex.end(); 
+	if ( ret == true )
+		return ret;
+	
+	if ( exact == true)
+		return ret;
+		
+	// use upper bound instead of find here to get all sub ids also.
+	// 180 --> 18 * 10 = 180
+	// 182 --> 18 * 10 = 180
+	const long firstClientId = ( (clientId / CLIENT_ID.TPL_FACTOR) ) * CLIENT_ID.TPL_FACTOR;
+	return clientIdIndex.upper_bound(firstClientId) != clientIdIndex.end(); 
 }
 /////////////////////////////////////////////////////////////
 long GLOpenGLPathBuffer::getFirstIndexForClientId(long clientId) const {
@@ -551,7 +567,7 @@ bool GLOpenGLPathBuffer::changeColourForClientID(long clientId, const char type)
 	bool ret = false;
 	
 	for ( auto idxIt = cldIt->second.begin(); idxIt != cldIt->second.end(); ++idxIt) {
-		if ( getVertex(vertex, idxIt->first) == true ) {
+		if ( getPosVertex(vertex, idxIt->first) == true ) {
 		
 			switch ( type ) {
 				case 'H':		vertex.updateColour(vertexColours.highlight.Red(), vertexColours.highlight.Green(), vertexColours.highlight.Blue(), vertexColours.highlight.Alpha()); 
@@ -733,7 +749,36 @@ const GLOpenGLPathBuffer::CncVertex& GLOpenGLPathBufferStore::getLastVertex() co
 	return lastVertex; 
 }
 /////////////////////////////////////////////////////////////
-bool GLOpenGLPathBufferStore::getVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx) const {
+bool GLOpenGLPathBufferStore::getDirVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx) const {
+/////////////////////////////////////////////////////////////
+	if ( initialized == false )
+		return false;
+	
+	GLOpenGLPathBuffer::CncVertex v0('R', CLIENT_ID.INVALID, 0.0, 0.0, 0.0);
+	
+	if ( idx > 0 && idx < getVertexCount() ) {
+		
+		if ( idx > 1 ) {
+			if ( getPosVertex(v0, idx - 1 ) == false )
+				return false;
+		}
+		
+		GLOpenGLPathBuffer::CncVertex v1;
+		if ( getPosVertex(v1, idx ) == false )
+			return false;
+			
+		// ret = v1 - v0;
+		ret.set(v1.getType(), v1.getClientId(), (v1.getX() - v0.getX()), (v1.getY() - v0.getY()), (v1.getZ() - v0.getZ()) );
+		
+	}
+	else {
+		ret.set(v0);
+	}
+	
+	return true;
+}
+/////////////////////////////////////////////////////////////
+bool GLOpenGLPathBufferStore::getPosVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx) const {
 /////////////////////////////////////////////////////////////
 	if ( initialized == false )
 		return false;
@@ -745,7 +790,7 @@ bool GLOpenGLPathBufferStore::getVertex(GLOpenGLPathBuffer::CncVertex& ret, unsi
 		if ( offset <= idx ) {
 			const unsigned int rest	  = idx - offset;
 			
-			bufferStore[bufferIdx].getVertex(ret, rest);
+			bufferStore[bufferIdx].getPosVertex(ret, rest);
 			return true;
 		}
 	}

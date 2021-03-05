@@ -104,6 +104,7 @@
   <object class="wxBitmap" name="brick">bitmaps\brick.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
+  <object class="wxBitmap" name="camera16">bitmaps\camera16.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="clear">bitmaps\clear.png</object>
   <object class="wxBitmap" name="close">bitmaps\close.png</object>
@@ -157,11 +158,9 @@
   <object class="wxBitmap" name="network-wireless-full (2)">bitmaps\network-wireless-full (2).png</object>
   <object class="wxBitmap" name="network-wireless-low (2)">bitmaps\network-wireless-low (2).png</object>
   <object class="wxBitmap" name="office-chart-polar">bitmaps\office-chart-polar.png</object>
-  <object class="wxBitmap" name="options16">bitmaps\gamepad\options16.png</object>
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
   <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
-  <object class="wxBitmap" name="playstation-cross-dark-icon16">bitmaps\gamepad\playstation-cross-dark-icon16.png</object>
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
   <object class="wxBitmap" name="power-off">bitmaps\power-off.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
