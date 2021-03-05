@@ -8,6 +8,7 @@ class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 	
 	private:
 		wxLCDWindow* lcdF;
+		wxLCDWindow* lcdS;
 		wxLCDWindow* lcdX;
 		wxLCDWindow* lcdY;
 		wxLCDWindow* lcdZ;

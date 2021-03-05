@@ -15,6 +15,9 @@ CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 	lcdF = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
 	GblFunc::replaceControl(m_lcdPlaceholderF, lcdF);
 	
+	lcdS = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
+	GblFunc::replaceControl(m_lcdPlaceholderS, lcdS);
+
 	lcdX = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
 	GblFunc::replaceControl(m_lcdPlaceholderX, lcdX);
 	
@@ -25,11 +28,13 @@ CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 	GblFunc::replaceControl(m_lcdPlaceholderZ, lcdZ);
 	
 	lcdF->SetNumberDigits(8);
+	lcdS->SetNumberDigits(8);
 	lcdX->SetNumberDigits(8);
 	lcdY->SetNumberDigits(8);
 	lcdZ->SetNumberDigits(8);
 	
 	lcdF->SetValue(   "0.0" ); 
+	lcdS->SetValue(   "0.0" ); 
 	lcdX->SetValue( "0.000" ); 
 	lcdY->SetValue( "0.000" ); 
 	lcdZ->SetValue( "0.000" ); 
@@ -38,6 +43,7 @@ CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 CncLCDPositionPanel::~CncLCDPositionPanel() {
 ///////////////////////////////////////////////////////////////////
 	delete lcdF;
+	delete lcdS;
 	delete lcdX;
 	delete lcdY;
 	delete lcdZ;
@@ -54,6 +60,7 @@ void CncLCDPositionPanel::onPaint(wxPaintEvent& event) {
 	event.Skip();
 	
 	lcdF->Refresh();
+	lcdS->Refresh();
 	lcdX->Refresh();
 	lcdY->Refresh();
 	lcdZ->Refresh();
@@ -64,6 +71,7 @@ void CncLCDPositionPanel::onSize(wxSizeEvent& event) {
 	event.Skip();
 	
 	lcdF->Refresh();
+	lcdS->Refresh();
 	lcdX->Refresh();
 	lcdY->Refresh();
 	lcdZ->Refresh();
@@ -86,6 +94,7 @@ void CncLCDPositionPanel::updateUnit() {
 void CncLCDPositionPanel::updateValues() {
 ///////////////////////////////////////////////////////////////////
 	lcdF->SetValue(THE_APP->GetConfiguredFeedSpeed()->GetValue());
+	lcdS->SetValue("0.0");
 	
 	lcdX->SetValue(THE_APP->GetXAxisCtl()->GetValue());
 	lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());

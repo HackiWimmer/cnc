@@ -40,6 +40,11 @@ protected:
     wxPanel* m_lcdPlaceholderF;
     wxPanel* m_panel70;
     wxStaticText* m_unitW;
+    wxPanel* m_panel582;
+    wxStaticText* m_staticText74;
+    wxPanel* m_lcdPlaceholderS;
+    wxPanel* m_panel706;
+    wxStaticText* m_unitW8;
     wxPanel* m_panel54;
     wxStaticText* m_staticText72;
     wxPanel* m_lcdPlaceholderX;
@@ -70,6 +75,11 @@ public:
     wxPanel* GetLcdPlaceholderF() { return m_lcdPlaceholderF; }
     wxStaticText* GetUnitW() { return m_unitW; }
     wxPanel* GetPanel70() { return m_panel70; }
+    wxStaticText* GetStaticText74() { return m_staticText74; }
+    wxPanel* GetPanel582() { return m_panel582; }
+    wxPanel* GetLcdPlaceholderS() { return m_lcdPlaceholderS; }
+    wxStaticText* GetUnitW8() { return m_unitW8; }
+    wxPanel* GetPanel706() { return m_panel706; }
     wxStaticText* GetStaticText72() { return m_staticText72; }
     wxPanel* GetPanel54() { return m_panel54; }
     wxPanel* GetLcdPlaceholderX() { return m_lcdPlaceholderX; }
