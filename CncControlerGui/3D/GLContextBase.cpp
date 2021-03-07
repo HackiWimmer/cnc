@@ -127,12 +127,15 @@ bool GLContextBase::isSmoothingEnabled() {
 	return (bool)glIsEnabled(GL_LINE_SMOOTH);
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks) {
+void GLContextBase::drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp) {
 /////////////////////////////////////////////////////////////////
 	GLUquadricObj* quadric = gluNewQuadric();
 	gluQuadricTexture(quadric, GL_TRUE);
 	gluQuadricDrawStyle(quadric, GLU_FILL);
-	gluCylinder(quadric, radius, 0.0, height, slices, stacks);
+	
+	if ( bottomUp == true )		gluCylinder(quadric, radius, 0.0, height, slices, stacks);
+	else						gluCylinder(quadric, 0.0, radius, height, slices, stacks);
+	
 	gluDeleteQuadric(quadric);
 }
 /////////////////////////////////////////////////////////////////
@@ -369,9 +372,9 @@ void GLContextBase::drawCoordinateOrigin() {
 	glScalef(viewPort->getDisplayFactor(), viewPort->getDisplayFactor(), viewPort->getDisplayFactor()); 
 	
 	// rotate
-	glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
-	glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
 	glRotatef(modelRotate.angleZ(), 0.0f, 0.0f, 1.0f);
+	glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
+	glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
 	
 		// x axis
 		glBegin(GL_LINES);
@@ -421,15 +424,6 @@ void GLContextBase::drawCoordinateOrigin() {
 			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
 			drawSolidCone(croneDiameter, croneHight, 30, 30);
 			
-			/*
-			glColor3ub(255, 255, 255);
-			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
-			drawSolidCone(croneDiameter * 0.8f, 0.0001f, 30, 30);
-			
-			glColor3ub(255, 242, 0);
-			glTranslatef(0.0f, 0.0f, croneHight);
-			drawSolidCone(croneDiameter * 0.5f, 0.0001f, 30, 30);
-			*/
 		glPopMatrix();
 }
 /////////////////////////////////////////////////////////////////

@@ -292,7 +292,7 @@ class GLContextBase : public wxGLContext {
 		GLuint LoadBMP(const wxImage& img);
 		void drawBox(GLfloat size, GLenum type);
 		 
-		void drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
+		void drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp=true);
 		void drawSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
 
 	private:

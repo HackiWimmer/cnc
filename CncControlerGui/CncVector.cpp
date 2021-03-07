@@ -17,6 +17,15 @@ namespace TEST {
 			std::cout << CncFloatVector::radias2Degree(v1.getAlphaTo(uy)) << std::endl;
 			std::cout << CncFloatVector::radias2Degree(v1.getAlphaTo(uz)) << std::endl;
 			
+			
+			CncFloatMatrix4x4 mat;
+			//mat.set(CncFloatMatrix4x4::V11, 0.0);
+			mat.set(CncFloatMatrix4x4::V1, v1);
+			
+			std::cout << mat << std::endl;
+			
+			
+			//abort();
 		}
 		
 	} XXX;

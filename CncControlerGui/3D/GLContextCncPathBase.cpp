@@ -249,8 +249,9 @@ void GLContextCncPathBase::markCurrentPosition() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawDirectionCone() {
 /////////////////////////////////////////////////////////////////
+	#warning
 	if ( continiousDirConeFlag == false )
-		return;
+		;//return;
 
 	if ( cncPath.getVirtualEnd() > 0 )
 		drawDirectionCone(cncPath.getVirtualEnd() - 1);
@@ -279,21 +280,26 @@ void GLContextCncPathBase::drawDirectionCone(unsigned int idx) {
 	if ( cncPath.getOpenGLBufferStore()->getPosVertex(cv1, idx) == false )
 		return;
 	
-	CncFloatVector v0(cv0.getX(), cv0.getY(), cv0.getZ());
-	CncFloatVector v1(cv1.getX(), cv1.getY(), cv1.getZ());
+	// create position vectors
+	const CncFloatVector p0(cv0.getX(), cv0.getY(), cv0.getZ());
+	CncFloatVector p1(cv1.getX(), cv1.getY(), cv1.getZ());
 	
 	// evaluate direction vector
-	v1.sub(v0);
+	CncFloatVector n(p1.sub(p0).normalize());
 	
-	/*
-	std::cout	<< std::showpos << std::fixed << std::setw( 11 ) << std::setprecision( 6 )
-				<< "v1: " << v1 << std::endl;
-	*/
+	// evaluate v and w as the both other parts of the new local coordinate system
+	// together with n
+	const CncFloatVector v(n.getNormale().normalize());
+	const CncFloatVector w(v.getVectorProduct(n).normalize());
 	
-	// evaluate direction angel of each axis
-	const float ax = CncFloatVector::radias2Degree(v1.getAlphaTo(ux));
-	const float ay = CncFloatVector::radias2Degree(v1.getAlphaTo(uy));
-	const float az = CncFloatVector::radias2Degree(v1.getAlphaTo(uz));
+	// create the rotation matrix
+	CncFloatMatrix4x4 rotMatrix;
+	rotMatrix.set(CncFloatMatrix4x4::V1, v);
+	rotMatrix.set(CncFloatMatrix4x4::V2, w);
+	rotMatrix.set(CncFloatMatrix4x4::V3, n.mul(-1));
+	
+	//std::cout << n << std::endl;
+	//std::cout << rotMatrix << std::endl;
 	
 	// translate, rotate and draw cone
 	glMatrixMode(GL_MODELVIEW);
@@ -301,12 +307,9 @@ void GLContextCncPathBase::drawDirectionCone(unsigned int idx) {
 	
 		glColor4ub(128, 128, 128, 100);
 		glTranslatef(cv1.getX(), cv1.getY(), cv1.getZ());
+		glMultMatrixf(rotMatrix.get());
 		
-		if ( cnc::dblCmp::nu(v1.getX()) == false ) glRotatef(  90 + ax, 0.0f, 1.0f, 0.0f );
-		if ( cnc::dblCmp::nu(v1.getY()) == false ) glRotatef( 270 + ay, 1.0f, 0.0f, 0.0f );
-		if ( cnc::dblCmp::nu(v1.getZ()) == false ) glRotatef(   0 + az, 1.0f, 0.0f, 0.0f );
-		
-		drawSolidCone(croneDiameter, croneHight, 30, 30);
+		drawSolidCone(croneDiameter, croneHight, 30, 30, false);
 		
 	glPopMatrix();
 }
