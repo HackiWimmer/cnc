@@ -2603,7 +2603,7 @@ void MainFrame::updateUnit() {
 	
 	cncManuallyMoveCoordPanel->updateUnit();
 	
-	if ( cncLCDPositionPanel && cncLCDPositionPanel->IsShownOnScreen() )
+	if ( cncLCDPositionPanel )
 		cncLCDPositionPanel->updateUnit();
 
 }

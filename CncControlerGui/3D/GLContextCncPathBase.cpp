@@ -249,9 +249,8 @@ void GLContextCncPathBase::markCurrentPosition() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawDirectionCone() {
 /////////////////////////////////////////////////////////////////
-	#warning
 	if ( continiousDirConeFlag == false )
-		;//return;
+		return;
 
 	if ( cncPath.getVirtualEnd() > 0 )
 		drawDirectionCone(cncPath.getVirtualEnd() - 1);
@@ -319,8 +318,6 @@ void GLContextCncPathBase::drawHighlightEffects() {
 	for ( auto it = highlightedClientIds.begin(); it != highlightedClientIds.end(); ++it ) {
 		const long clientID	= *it;
 		const long pathPos	= cncPath.getOpenGLBufferStore()->findFirstEntryForClientId(clientID);
-		
-		//CNC_PRINT_FUNCT_A(": %ld    %ld     %ld\n", clientID, pathPos, getVirtualEnd() -1 )
 		
 		if ( pathPos >= 0 )
 			drawDirectionCone(pathPos);
