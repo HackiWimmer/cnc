@@ -94,6 +94,7 @@ class CncReferencePosition	: public CncReferencePositionBase
 		
 		void					updateCameraParameter();
 		
+		bool					isWorkpieceThicknessAvailable()									const;
 		bool					isWorkpieceThicknessNeeded()									const;
 		void					determineZeroMode();
 		void					showInformation();

@@ -64,7 +64,7 @@ CncReferencePosition::CncReferencePosition(wxWindow* parent)
 	m_cbPrevTest		->SetValue(false);
 	m_touchDiameter		->SetValidator(val);
 	m_touchDiameter		->SetValue(wxString::Format("%.3lf", 3.25));
-	m_workpiceThickness	->SetValue(wxString::Format("%.3lf", 0.001));
+	m_workpiceThickness	->SetValue(wxString::Format("%.3lf", 0.00));
 	
 	setTouchCorner(TM_A);
 	m_rbStepSensitivity->SetFocusFromKbd();
@@ -98,7 +98,7 @@ void CncReferencePosition::selectEvaluationMode() {
 	
 	m_measuremetOffsetX->Enable(false);
 	m_measuremetOffsetY->Enable(false);
-	m_workpiceThickness->Enable(isWorkpieceThicknessNeeded());
+	m_workpiceThickness->Enable(isWorkpieceThicknessAvailable());
 	
 	if ( cameraCapture != NULL ) 
 		cameraCapture->stop();
@@ -141,8 +141,36 @@ void CncReferencePosition::selectEvaluationMode() {
 ///////////////////////////////////////////////////////////////////
 bool CncReferencePosition::isWorkpieceThicknessNeeded() const {
 ///////////////////////////////////////////////////////////////////
-	short mode = evaluateMode();
-	return ( mode > CncRefPositionMode::CncRM_Mode2 );
+	const short mode = evaluateMode();
+	switch ( mode ) {
+		case CncRM_Mode1:			return false;
+		case CncRM_Mode2:			return false;
+		case CncRM_Mode3:			return true;
+		case CncRM_Mode4:			return true;
+		case CncRM_Mode5:			return false;
+		case CncRM_Mode6:			return false;
+		case CncRM_Touchblock:		return false;
+		case CncRM_Camera:			return false;
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncReferencePosition::isWorkpieceThicknessAvailable() const {
+///////////////////////////////////////////////////////////////////
+	const short mode = evaluateMode();
+	switch ( mode ) {
+		case CncRM_Mode1:			return false;
+		case CncRM_Mode2:			return false;
+		case CncRM_Mode3:			return true;
+		case CncRM_Mode4:			return true;
+		case CncRM_Mode5:			return true;
+		case CncRM_Mode6:			return true;
+		case CncRM_Touchblock:		return true;
+		case CncRM_Camera:			return true;
+	}
+	
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::setMessage(const wxString& msg) {
@@ -160,7 +188,7 @@ double CncReferencePosition::getWorkpieceThickness() const {
 	const wxString wpt = m_workpiceThickness->GetValue();
 	double ret = 0.0;
 	
-	if ( isWorkpieceThicknessNeeded() )
+	if ( isWorkpieceThicknessAvailable() )
 		wpt.ToDouble(&ret);
 	
 	return ret;

@@ -158,7 +158,7 @@ bool SVGPathHandlerCnc::runCurrentPath() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL(CNC_LOG_FUNCT);
 	
-	// the guide path has always to be reseted here, otherwise a depricated one will be used bewlow.
+	// the guide path has always to be reset here, otherwise a deprecated one will be used below.
 	// performModifications() will generate a new one on demand.
 	resetGuidePath();
 	
@@ -393,6 +393,11 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop() {
 ///////////////////////////////////////////////////////////////////
 	const double zTopRefValue = THE_BOUNDS->getSurfaceOffset() + THE_CONFIG->getSurefaceOffset();
 	
+	
+	#warning
+	std::cout << THE_BOUNDS->getSurfaceOffset() <<", " << THE_CONFIG->getSurefaceOffset() << std::endl;
+	
+	
 	if ( cnc::dblCompare(curRunPosition.getZ(), zTopRefValue) == false ) {
 		const double zDist	= zTopRefValue - curRunPosition.getZ();
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_LOGICAL_TOP);
@@ -506,6 +511,9 @@ bool SVGPathHandlerCnc::prepareWork() {
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();
+	
+	#warning
+	std::cerr << CNC_LOG_FUNCT_A(":\n");
 	
 	// align again
 	curRunPosition.set(cncControl->getCurCtlPosMetric());

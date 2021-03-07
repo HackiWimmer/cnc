@@ -1781,7 +1781,7 @@ void MainFrame::updateCtlPositionControls() {
 	if ( drawPane3D && drawPane3D->GetZView() )
 		drawPane3D->GetZView()->updateView(pos.getZ() * THE_CONFIG->getDisplayFactZ(unit));
 	
-	// lcd z view
+	// lcd view
 	if ( cncLCDPositionPanel && cncLCDPositionPanel->IsShownOnScreen() )
 		cncLCDPositionPanel->updateValues();
 }
@@ -2602,10 +2602,7 @@ void MainFrame::updateUnit() {
 	}
 	
 	cncManuallyMoveCoordPanel->updateUnit();
-	
-	if ( cncLCDPositionPanel )
-		cncLCDPositionPanel->updateUnit();
-
+	cncLCDPositionPanel->updateUnit();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::OnExit(wxCommandEvent& event) {
