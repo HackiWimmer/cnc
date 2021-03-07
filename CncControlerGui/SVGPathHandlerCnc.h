@@ -33,7 +33,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 
 		// 
 		bool					moveZAxisToLogicalTop();
-		bool					moveZAxisToSureface();
+		bool					moveZAxisToSurface();
 		bool					moveZAxisNextStepDown(double zTarget);
 		bool					moveXYToStartPos(CncSpeedMode m);
 		bool					moveXYToPos(const MoveParameter& mp);

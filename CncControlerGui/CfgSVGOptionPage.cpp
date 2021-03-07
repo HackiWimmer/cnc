@@ -106,7 +106,7 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 			
 			//...............
 			validator.SetPrecision(3); validator.SetRange(0.1, 5.0);
-			prop = wpt->AppendChild( new wxFloatProperty("Default sureface (workpiece) offset", NEXT_PROP_ID, 1.5));
+			prop = wpt->AppendChild( new wxFloatProperty("Default surface (workpiece) offset", NEXT_PROP_ID, 1.5));
 			prop->Enable(true);
 			prop->SetHelpString("");
 			prop->SetValidator(validator);

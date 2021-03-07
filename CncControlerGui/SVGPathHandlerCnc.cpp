@@ -274,8 +274,8 @@ bool SVGPathHandlerCnc::processHelix(double zTarget) {
 	if ( moveXYToStartPos(CncSpeedRapid) == false )
 		return false;
 		
-	// move down to sureface
-	if ( moveZAxisToSureface() == false )
+	// move down to surface
+	if ( moveZAxisToSurface() == false )
 		return false;
 	
 	// modify path to a helix
@@ -393,11 +393,6 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop() {
 ///////////////////////////////////////////////////////////////////
 	const double zTopRefValue = THE_BOUNDS->getSurfaceOffset() + THE_CONFIG->getSurefaceOffset();
 	
-	
-	#warning
-	std::cout << THE_BOUNDS->getSurfaceOffset() <<", " << THE_CONFIG->getSurefaceOffset() << std::endl;
-	
-	
 	if ( cnc::dblCompare(curRunPosition.getZ(), zTopRefValue) == false ) {
 		const double zDist	= zTopRefValue - curRunPosition.getZ();
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_LOGICAL_TOP);
@@ -421,15 +416,11 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::moveZAxisToSureface() {
+bool SVGPathHandlerCnc::moveZAxisToSurface() {
 ///////////////////////////////////////////////////////////////////
 	const double zSureface = THE_BOUNDS->getSurfaceOffset();
 	
-	// sureface already reached
-	if ( curRunPosition.getZ() == zSureface )
-		return true;
-		
-	// second, perfom the move
+	// perform the move - on demand
 	if ( cnc::dblCompare(curRunPosition.getZ(), zSureface) == false ) {
 		const double zDist	= (-1) * fabs(curRunPosition.getZ() - zSureface);
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_SUREFACE);
@@ -455,8 +446,22 @@ bool SVGPathHandlerCnc::moveZAxisToSureface() {
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveZAxisNextStepDown(double zTarget) {
 ///////////////////////////////////////////////////////////////////
+	const double zSureface		= THE_BOUNDS->getSurfaceOffset();
 	const double zDistRefValue	= currentCncContext.getCurrentZMaxFeedStep();
-	const double zMin			= curRunPosition.getZMin();
+	double zMin					= curRunPosition.getZMin();
+	
+	
+	
+	// to avoid cycles as "air-numbers" above the surface
+	if ( zMin > zSureface ) {
+	#warning
+	std::cout << THE_BOUNDS->getSurfaceOffset() <<", " << zMin << std::endl;
+		if ( moveZAxisToSurface() == false )
+			return false;
+			
+		zMin = curRunPosition.getZMin();
+	}
+	
 	
 	// target already reached
 	if ( zMin <= zTarget )
@@ -511,9 +516,6 @@ bool SVGPathHandlerCnc::prepareWork() {
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();
-	
-	#warning
-	std::cerr << CNC_LOG_FUNCT_A(":\n");
 	
 	// align again
 	curRunPosition.set(cncControl->getCurCtlPosMetric());
