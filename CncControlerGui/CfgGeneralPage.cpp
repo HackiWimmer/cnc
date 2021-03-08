@@ -162,6 +162,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 				registerProperty(CncConfig_DEACCEL_FUNC_PARA_C, prop);
 			}
 		}
+		collapse(speed);
 		
 		//...................
 		wxPGProperty* hardware = NULL;
@@ -306,5 +307,6 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 				
 			}
 		}
+		collapse(hardware);
 	}
 }

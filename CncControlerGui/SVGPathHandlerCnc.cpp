@@ -450,18 +450,13 @@ bool SVGPathHandlerCnc::moveZAxisNextStepDown(double zTarget) {
 	const double zDistRefValue	= currentCncContext.getCurrentZMaxFeedStep();
 	double zMin					= curRunPosition.getZMin();
 	
-	
-	
 	// to avoid cycles as "air-numbers" above the surface
 	if ( zMin > zSureface ) {
-	#warning
-	std::cout << THE_BOUNDS->getSurfaceOffset() <<", " << zMin << std::endl;
 		if ( moveZAxisToSurface() == false )
 			return false;
 			
 		zMin = curRunPosition.getZMin();
 	}
-	
 	
 	// target already reached
 	if ( zMin <= zTarget )

@@ -28,5 +28,5 @@ namespace TEST {
 			//abort();
 		}
 		
-	} XXX;
+	} ;//XXX;
 };

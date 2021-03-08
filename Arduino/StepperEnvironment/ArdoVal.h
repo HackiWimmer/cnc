@@ -159,6 +159,7 @@
   const unsigned char PID_MAX_DIMENSION_Y                 =  53;
   const unsigned char PID_MAX_DIMENSION_Z                 =  54;
   const unsigned char PID_TOUCH_CONTACT_STATE             =  55;
+  const unsigned char PID_SPINDLE_SPEED                   =  56;
 
   const unsigned char PID_XYZ_INTERACTIVE_POS             =  60;
   const unsigned char PID_XYZ_POS                         =  61;
@@ -199,10 +200,10 @@
 // .....................................................................
 
   const unsigned char PID_FEEDRATE                        = 200;
-  const unsigned char PID_SPEED_MM_MIN                    = 204;
-  const unsigned char PID_SPEED_MM_SEC                    = 205;
-  const unsigned char PID_ACCEL_PROFILE                   = 206;
-
+  const unsigned char PID_SPEED_MM_MIN                    = 201;
+  const unsigned char PID_SPEED_MM_SEC                    = 202;
+  const unsigned char PID_ACCEL_PROFILE                   = 203;
+  
 
 // .....................................................................
 // end float pid range

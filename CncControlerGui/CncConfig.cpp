@@ -418,6 +418,30 @@ void CncConfig::initZAxisValues() {
 	}
 }
 ////////////////////////////////////////////////////////////////////////
+void CncConfig::collapse(wxPGProperty* prop) {
+////////////////////////////////////////////////////////////////////////
+	if ( prop == NULL )
+		return;
+		
+	wxPropertyGrid * grid = prop->GetGrid();
+	if ( grid == NULL )
+		return;
+	
+	grid->Collapse(prop);
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::expand(wxPGProperty* prop) {
+////////////////////////////////////////////////////////////////////////
+	if ( prop == NULL )
+		return;
+		
+	wxPropertyGrid * grid = prop->GetGrid();
+	if ( grid == NULL )
+		return;
+	
+	grid->Expand(prop);
+}
+////////////////////////////////////////////////////////////////////////
 void CncConfig::registerPageRoot(wxPGProperty* prop, PGFuncPtrStore& fps) {
 ////////////////////////////////////////////////////////////////////////
 	if ( prop == NULL ) {
@@ -1078,15 +1102,17 @@ const bool CncConfig::getPreProcessorCntPathListEntries()			{ PROPERTY(CncWork_C
 const bool CncConfig::getPreProcessorCntMoveSequneces()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES)		return p->GetValue().GetBool(); }
 const bool CncConfig::getSimulateMillingWithSoundFlag()				{ PROPERTY(CncWork_Ctl_SIMULATE_MILLING_WITH_SOUND)			return p->GetValue().GetBool(); }
 const bool CncConfig::getCameraSupportFlag()						{ PROPERTY(CncWork_Ctl_CAMERA_SUPPORT)						return p->GetValue().GetBool(); }
+const bool CncConfig::getSpindleSpeedSupportFlag()					{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_SUPPORT)				return p->GetValue().GetBool(); }
 
-const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getStepsZ() 							{ PROPERTY(CncConfig_STEPS_Z) 							return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthX() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_X) 			 	return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthY() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Y) 			 	return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthZ() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Z) 				return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getArtificallyStepDelay()				{ PROPERTY(CncWork_Ctl_ARTIFICIALLY_STEP_DELAY) 		return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getCameraDeviceId()					{ PROPERTY(CncWork_Ctl_CAMERA_DEVICE_ID) 				return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 								return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 								return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getStepsZ() 							{ PROPERTY(CncConfig_STEPS_Z) 								return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthX() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_X) 				 	return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthY() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Y) 				 	return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthZ() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Z) 					return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getArtificallyStepDelay()				{ PROPERTY(CncWork_Ctl_ARTIFICIALLY_STEP_DELAY) 			return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getCameraDeviceId()					{ PROPERTY(CncWork_Ctl_CAMERA_DEVICE_ID) 					return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getSpindleSpeedStepRange()			{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_STEP_RANGE)			return p->GetValue().GetInteger(); }
 
 const double CncConfig::getMaxDimension() 							{ return std::max(std::max(getMaxDimensionX(), getMaxDimensionY()), getMaxDimensionZ()); }
 const double CncConfig::getMaxDimensionX() 							{ PROPERTY(CncConfig_MAX_DIMENSION_X)					return p->GetValue().GetDouble(); } 
@@ -1120,6 +1146,9 @@ const double CncConfig::getTouchblockYCheckThickness()				{ PROPERTY(CncWork_Ctl
 const double CncConfig::getCameraOffsetX()							{ PROPERTY(CncWork_Ctl_CAMERA_OFFSET_X)					return p->GetValue().GetDouble(); }
 const double CncConfig::getCameraOffsetY()							{ PROPERTY(CncWork_Ctl_CAMERA_OFFSET_Y)					return p->GetValue().GetDouble(); }
 const double CncConfig::getCameraOffsetZ()							{ PROPERTY(CncWork_Ctl_CAMERA_OFFSET_Z)					return p->GetValue().GetDouble(); }
+
+const double CncConfig::getSpindleSpeedMin()						{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_MIN)				return p->GetValue().GetDouble(); }
+const double CncConfig::getSpindleSpeedMax()						{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_MAX)				return p->GetValue().GetDouble(); }
 
 const CncUnit CncConfig::getDisplayUnit() 							{ return currentUnit; }
 const CncUnit CncConfig::getDefaultDisplayUnit()					{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? CncMetric : CncSteps ); }

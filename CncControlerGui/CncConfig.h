@@ -127,6 +127,9 @@ class CncConfig {
 		static void registerProperty(const wxString& name, wxPGProperty* prop);
 		static wxPGProperty* getProperty(const wxString& name, bool silent=false);
 		static wxPGProperty* getPageRoot(wxPGProperty* prop);
+
+		static void collapse(wxPGProperty* prop);
+		static void expand(wxPGProperty* prop);
 		
 		static void setupWorkingCfgPage(wxConfigBase& config);
 		static void setupGeneralCfgPage(wxConfigBase& config);
@@ -315,6 +318,7 @@ class CncConfig {
 		const bool getPreProcessorCntMoveSequneces();
 		const bool getSimulateMillingWithSoundFlag();
 		const bool getCameraSupportFlag();
+		const bool getSpindleSpeedSupportFlag();
 		
 		const double getMaxSpeedXYZ_MM_MIN();
 		
@@ -336,6 +340,9 @@ class CncConfig {
 		const double getCameraOffsetY();
 		const double getCameraOffsetZ();
 		
+		const double getSpindleSpeedMin();
+		const double getSpindleSpeedMax();
+		
 		const unsigned int getCameraDeviceId();
 		const unsigned int getArtificallyStepDelay();
 		const unsigned int getStepsX();
@@ -345,6 +352,7 @@ class CncConfig {
 		const unsigned int getHighPulsWidthX();
 		const unsigned int getHighPulsWidthY();
 		const unsigned int getHighPulsWidthZ();
+		const unsigned int getSpindleSpeedStepRange();
 		const unsigned int getMaxDurations() 					{ return maxDurations; }
 		const unsigned int getDurationCount() 					{ return durationCount; }
 		

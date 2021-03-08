@@ -563,6 +563,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncTouchBlockDetector::Result processZTouch(const CncTouchBlockDetector::Parameters& para);
 		CncTouchBlockDetector::Result processXYZTouch(const CncTouchBlockDetector::Parameters& para);
 		
+		double getConfiguredSpindleSpeed();
+		
 	protected:
 	
 		void tryToSelectClientId(long clientId, ClientIdSelSource::ID tss);

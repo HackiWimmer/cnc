@@ -94,7 +94,7 @@ void CncLCDPositionPanel::updateUnit() {
 void CncLCDPositionPanel::updateValues() {
 ///////////////////////////////////////////////////////////////////
 	lcdF->SetValue(THE_APP->GetConfiguredFeedSpeed()->GetValue());
-	lcdS->SetValue("0.0");
+	lcdS->SetValue(wxString::Format("%.1lf", THE_APP->getConfiguredSpindleSpeed()));
 	
 	lcdX->SetValue(THE_APP->GetXAxisCtl()->GetValue());
 	lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());

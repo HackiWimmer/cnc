@@ -53,6 +53,7 @@ CncControl::CncControl(CncPortType pt)
 , configuredSpeedMode				(CncSpeedRapid)
 , configuredFeedSpeed_MM_MIN		(0.0)
 , configuredSpeedModePreviewFlag	(false)
+, configuredSpindleSpeed			(THE_CONFIG->getSpindleSpeedMax())
 , durationCounter					(0)
 , interruptState					(false)
 , positionOutOfRangeFlag			(false)
@@ -768,6 +769,43 @@ bool CncControl::moveZToTop() {
 	
 	reconfigureSimpleMove(false);
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value ) {
+///////////////////////////////////////////////////////////////////
+	int16_t val =  -1;
+	int16_t rng = 255;
+	
+	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == true ) {
+	
+		if ( cnc::dblCmp::le(value, 0.0) )
+			return false;
+		
+		const double		min = std::min(THE_CONFIG->getSpindleSpeedMin(), THE_CONFIG->getSpindleSpeedMax());
+		const double		max = THE_CONFIG->getSpindleSpeedMax();
+		const unsigned int	stp = THE_CONFIG->getSpindleSpeedStepRange();
+		
+		// range validation/correction
+		value = std::max(min, value);
+		value = std::min(max, value);
+		
+		// Spindle speed range is defined as: 0 ... stp (linear)
+		//   0 -> min
+		// stp -> max
+		val = std::min((unsigned int)((value - min) * stp / (max - min)), stp);
+		rng = stp;
+		
+		#warning
+		std::cout << CNC_LOG_FUNCT << ": " << value << " -> " << val << std::endl;
+	}
+	
+	if ( processSetter(PID_SPINDLE_SPEED, ArdoObj::SpindleTuple::encode(val, rng)) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(": failed\n");
+		return false;
+	}
+	
+	configuredSpindleSpeed = value;
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(float value, CncSpeedMode s) {

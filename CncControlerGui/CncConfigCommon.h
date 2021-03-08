@@ -121,7 +121,12 @@
 	#define CncWork_Ctl_CAMERA_OFFSET_X						"CncWork_Controller|CAMERA_OFFSET_X"
 	#define CncWork_Ctl_CAMERA_OFFSET_Y						"CncWork_Controller|CAMERA_OFFSET_Y"
 	#define CncWork_Ctl_CAMERA_OFFSET_Z						"CncWork_Controller|CAMERA_OFFSET_Z"
-
+	
+	#define CncWork_Ctl_SPINDLE_SPEED_SUPPORT				"CncWork_Controller|SPINDLE_SPEED_SUPPORT"
+	#define CncWork_Ctl_SPINDLE_SPEED_STEP_RANGE			"CncWork_Controller|SPINDLE_SPEED_STEP_RANGE"
+	#define CncWork_Ctl_SPINDLE_SPEED_MIN					"CncWork_Controller|SPINDLE_SPEED_MIN"
+	#define CncWork_Ctl_SPINDLE_SPEED_MAX					"CncWork_Controller|SPINDLE_SPEED_MAX"
+	
 	#define CncTEST_TEST									"CncTest_Test|DUMMY"
 
 #endif

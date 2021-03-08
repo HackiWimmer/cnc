@@ -214,6 +214,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetEditor( wxT("CheckBox") );
 			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES, prop);
 		}
+		collapse(prep);
 		
 		//...................
 		wxPGProperty* cCtl = NULL;
@@ -257,6 +258,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetEditor( wxT("CheckBox") );
 			CncConfig::registerProperty(CncWork_Ctl_SIMULATE_MILLING_WITH_SOUND, prop);
 		}
+		collapse(cCtl);
 		
 		//...................
 		wxPGProperty* mCtl = NULL;
@@ -311,7 +313,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			}
 			
 		}
-		
+		collapse(mCtl);
 		//...................
 		curCatLabel.assign("Touch-block Parameter:");
 		wxPGProperty* mTchBlk = root->AppendChild( new wxPropertyCategory(curCatLabel) );
@@ -343,6 +345,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(3);
 			registerProperty(CncWork_Ctl_TOUCHBLOCK_Y_CHEEK_THICKNESS, prop);
 		}
+		collapse(mTchBlk);
 		
 		//...................
 		curCatLabel.assign("Camera Parameter:");
@@ -389,5 +392,45 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(3);
 			registerProperty(CncWork_Ctl_CAMERA_OFFSET_Z, prop);
 		}
+		collapse(mCamera);
+		
+		//...................
+		curCatLabel.assign("Spindle Speed Parameter:");
+		wxPGProperty* mSpindel = root->AppendChild( new wxPropertyCategory(curCatLabel) );
+		registerCategory(curCatLabel, mSpindel);
+		{
+			//...............
+			prop = mSpindel->AppendChild( new wxBoolProperty("Support", NEXT_PROP_ID, false));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_SPINDLE_SPEED_SUPPORT, prop);
+			
+			//...................
+			prop = mSpindel->AppendChild(new CncCfgSliderProperty("Spindle Speed Step Range", NEXT_PROP_ID, 255, 1, 1, 255));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "");
+			prop->SetHelpString(_T("Spindle Speed Step Range"));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(false);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
+			registerProperty(CncWork_Ctl_SPINDLE_SPEED_STEP_RANGE, prop);
+			
+			//...................
+			const double begSS = 100.0, endSS = 30000.0, sizSS = CncCfgSliderProperty::calcSteps(begSS, endSS, 50.0);
+			prop = mSpindel->AppendChild(new CncCfgSliderProperty("Spindle Speed min", NEXT_PROP_ID, 100.0, begSS, endSS, sizSS));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "U/mm");
+			prop->SetHelpString(_T("Spindle Speed min"));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
+			registerProperty(CncWork_Ctl_SPINDLE_SPEED_MIN, prop);
+			
+			//...................
+			prop = mSpindel->AppendChild(new CncCfgSliderProperty("Spindle Speed max", NEXT_PROP_ID, 20000.0, begSS, endSS, sizSS));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "U/mm");
+			prop->SetHelpString(_T("Spindle Speed max"));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
+			registerProperty(CncWork_Ctl_SPINDLE_SPEED_MAX, prop);
+		}
+		collapse(mSpindel);
 	}
 }

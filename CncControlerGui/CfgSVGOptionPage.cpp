@@ -87,6 +87,7 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 			prop->SetEditor( wxT("CheckBox") );
 			registerProperty(CncSvg_Parser_USE_COLOUR_SCHEME, prop);
 		}
+		collapse(parser);
 		
 		//...................
 		wxPGProperty* wpt = NULL;
@@ -114,5 +115,6 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 			prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
 			registerProperty(CncSvg_Parser_SUREFACE_Z_OFFSET, prop);
 		}
+		collapse(wpt);
 	}
 }

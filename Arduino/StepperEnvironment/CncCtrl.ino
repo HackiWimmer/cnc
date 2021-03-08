@@ -54,6 +54,8 @@ CncArduinoController::CncArduinoController()
 , cmsF1000_MMMin                (0)
 , posReplyCounter               (0)
 , posReplyThreshold             (100)
+, spindelSpeedRange             (255)
+, spindelSpeedValue             (255)
 , tsMoveStart                   (0L)
 , tsMoveLast                    (0L)
 , interactiveMove               ()
@@ -625,6 +627,7 @@ byte CncArduinoController::acceptInteractiveMove(byte) {
       break;
 
     if ( ArdoTs::timespan(interactiveMove.tsLast) > maxMicrosWithoutUpdate ) {
+      interactiveMove.reset();
       ret = RET_HALT;
       break;
     }
@@ -874,7 +877,7 @@ byte CncArduinoController::checkRuntimeEnv() {
   */
 
   if ( isProbeMode() == OFF ) {
-    #warning reactivate this again if the corresponding info is available
+    #warning reactivate this again if the corresponding pin info is available
     /*
     if ( READ_ENABLE_TOOL_PIN != READ_IS_TOOL_POWERED_PIN ) {
       ArduinoMainLoop::pushMessage(MT_ERROR, E_TOOL_NOT_ENALED); 
@@ -1122,6 +1125,8 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     
     case PID_SPEED_MM_SEC:            setSpeedValue_MMSec1000(st.values[0].l);        break;
 
+    case PID_SPINDLE_SPEED:           setSpindleSpeedFactor(st.values[0].l);          break;
+
     case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].asBool());        break;
 
     case PID_PROBE_MODE:              setProbeMode(st.values[0].asBool());            break;
@@ -1260,9 +1265,27 @@ byte CncArduinoController::moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t 
   if ( dy != 0 ) { retY = Y->resolveLimit(); }
   if ( dz != 0 ) { retZ = Z->resolveLimit(); }
 
-  //PRINT_DEBUG_VALUE("retX", retX);
-  //PRINT_DEBUG_VALUE("retY", retY);
-  //PRINT_DEBUG_VALUE("retZ", retZ);
-  
   return (retX == true && retY == true && retZ == true) ? RET_OK : RET_LIMIT;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void CncArduinoController::setSpindleSpeedFactor(int32_t ssf) { 
+/////////////////////////////////////////////////////////////////////////////////////
+  spindelSpeedRange = ArdoObj::SpindleTuple::decodeRange(ssf); 
+  spindelSpeedValue = ArdoObj::SpindleTuple::decodeValue(ssf);
+
+  #warning write S speed value
+  PRINT_DEBUG_VALUE2("Spindle speed range", spindelSpeedRange, spindelSpeedValue);
+  
+  if ( spindelSpeedValue < 0 ) {
+    // deactivate spindle speed support    
+    
+    //AE::analogWrite(PIN?????, spindelSpeedFactor);
+    
+  }
+  else {
+    const int ardoRange = 255;
+    const float fact = (float)(spindelSpeedRange) / ardoRange;
+
+    //AE::analogWrite(PIN?????, spindelSpeedValue * fact);
+  }
 }

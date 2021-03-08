@@ -176,6 +176,7 @@ void ArduinoPIDs::init() {
 	pids[PID_STEP_PIN]                        .setup("Step Pin", "");
 	pids[PID_DIR_PIN]                         .setup("Direction Pin", "");
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");
+	pids[PID_SPINDLE_SPEED]                   .setup("Spindle Speed", "U/mm");
 
 	pids[PID_PULSE_WIDTH_HIGH]                .setup("Step Pulse Width High", "us");
 	pids[PID_ACCEL_PROFILE]                   .setup("Accel Profile", "<mixed>");

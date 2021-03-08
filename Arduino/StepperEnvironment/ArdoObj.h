@@ -165,7 +165,16 @@ namespace ArdoObj {
       static int32_t decodeValue_MMSec    (int32_t encodedValue);
       static int32_t decodeValue_MMMin    (int32_t encodedValue);
   };
- 
+
+  // --------------------------------------------------------------
+  struct SpindleTuple {
+    
+      static int32_t encode(int16_t value, int16_t range);
+      
+      static int16_t decodeValue(int32_t encodedValue);
+      static int16_t decodeRange(int32_t encodedValue);
+  };
+  
   // --------------------------------------------------------------
   // I2C data structure: Stores information about the received 
   // Wire communication 

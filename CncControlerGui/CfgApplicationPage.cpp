@@ -136,6 +136,7 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			prop->SetHelpString("");
 			registerProperty(CncApplication_Com_DEFALT_PORT, prop);
 		}
+		collapse(port);
 		
 		//...................
 		wxPGProperty* tpl = NULL;
@@ -155,6 +156,7 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			prop->SetHelpString("");
 			registerProperty(CncApplication_Tpl_DEFALT_FILE, prop);
 		}
+		collapse(tpl);
 
 		//...................
 		wxPGProperty* tools = NULL;
@@ -222,5 +224,6 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			prop->SetHelpString("");
 			registerProperty(CncApplication_Tool_PY_CAM, prop);
 		}
+		collapse(tools);
 	}
 }

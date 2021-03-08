@@ -96,6 +96,7 @@ void CncConfig::setupEnvironmentCfgPage(wxConfigBase& config) {
 			prop->SetAttribute(Attribute_READONLY, "TRUE");
 			registerProperty(CncRuntime_CALCULATION_FACT_Z, prop);
 		}
+		collapse(factors);
 		
 		//...................
 		wxPGProperty* unitCalc = NULL;
@@ -125,6 +126,7 @@ void CncConfig::setupEnvironmentCfgPage(wxConfigBase& config) {
 				}
 			}
 		}
+		collapse(unitCalc);
 		
 		//...................
 		wxPGProperty* fileNames = NULL;
@@ -154,6 +156,7 @@ void CncConfig::setupEnvironmentCfgPage(wxConfigBase& config) {
 				}
 			}
 		}
+		collapse(fileNames);
 	}
 }
 ////////////////////////////////////////////////////////////////////////

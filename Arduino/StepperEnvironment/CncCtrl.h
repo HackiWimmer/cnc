@@ -76,6 +76,9 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     uint16_t            posReplyCounter;
     uint16_t            posReplyThreshold;
 
+    uint16_t            spindelSpeedRange;
+    uint16_t            spindelSpeedValue;
+
     uint32_t            tsMoveStart;
     uint32_t            tsMoveLast;
 
@@ -100,6 +103,8 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 
     void                setPosReplyThreshold(uint16_t t)           { posReplyThreshold = t; }
     uint16_t            getPosReplyThreshold()              const  { return posReplyThreshold; }
+
+    void                setSpindleSpeedFactor(int32_t ssf);
 
     bool                enableStepperPin(bool state = ENABLE_STATE_ON);
     bool                disableStepperPin()                        { return enableStepperPin(ENABLE_STATE_OFF); }

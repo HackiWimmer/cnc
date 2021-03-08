@@ -117,6 +117,9 @@ class CncControl {
 		CncSpeedMode			configuredSpeedMode;
 		float					configuredFeedSpeed_MM_MIN;
 		bool					configuredSpeedModePreviewFlag;
+		
+		double 					configuredSpindleSpeed;
+		
 		// Duration counter
 		unsigned int			durationCounter;
 		// Interrupt state
@@ -243,6 +246,9 @@ class CncControl {
 		
 		bool changeCurrentFeedSpeedXYZ_MM_SEC(float value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
 		bool changeCurrentFeedSpeedXYZ_MM_MIN(float value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
+		
+		bool changeCurrentSpindleSpeed_U_MIN(double value );
+		double getConfiguredSpindleSpeed() const { return configuredSpindleSpeed; }
 		
 		// signal wrapper
 		bool sendInterrupt()		{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }

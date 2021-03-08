@@ -59,5 +59,23 @@ namespace ArdoObj {
   int32_t SpeedTuple::decodeValue_MMMin(int32_t encodedValue) {
     return SpeedTuple::decodeValue_MMSec(encodedValue) * 60;
   }
+
+  // --------------------------------------------------------------
+  int32_t SpindleTuple::encode(int16_t value, int16_t range) {
+    int32_t ret = range;
+    ret = (ret << 16);
+    
+    return ret | value;      
+  }
+  
+  // --------------------------------------------------------------
+  int16_t SpindleTuple::decodeValue(int32_t encodedValue) {
+    return ((encodedValue << 16) >> 16);
+  }
+
+  // --------------------------------------------------------------
+  int16_t SpindleTuple::decodeRange(int32_t encodedValue) {
+    return (encodedValue >> 16);
+  }
   
 }; // namespace ArdoObj

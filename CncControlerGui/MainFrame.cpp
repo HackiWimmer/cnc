@@ -1277,7 +1277,13 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
 	
-	speedMonitor->activate(false);
+	cnc->changeCurrentSpindleSpeed_U_MIN(1.0);
+	cnc->changeCurrentSpindleSpeed_U_MIN(4000.0);
+	cnc->changeCurrentSpindleSpeed_U_MIN(4080.0);
+	cnc->changeCurrentSpindleSpeed_U_MIN(4100.0);
+	cnc->changeCurrentSpindleSpeed_U_MIN(8080.0);
+	cnc->changeCurrentSpindleSpeed_U_MIN(24900.0);
+	cnc->changeCurrentSpindleSpeed_U_MIN(100000.0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -8561,6 +8567,14 @@ void MainFrame::onSwitchSecLeftBook(wxCommandEvent& event) {
 	
 	if ( m_secLeftBook->GetSelection() == SecureLeftBookSelection::VAL::PROCESS_PANEL )
 		selectSecureMonitorView();
+}
+/////////////////////////////////////////////////////////////////////
+double MainFrame::getConfiguredSpindleSpeed() {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc )
+		return cnc->getConfiguredSpindleSpeed();
+	
+	return 0.0;
 }
 
 
