@@ -139,8 +139,6 @@ class GLContextCncPathBase : public GLContextBase {
 		void incVirtualEndById()					{ cncPath.incVirtualEndById(); }
 		void decVirtualEndById()					{ cncPath.decVirtualEndById(); }
 		
-		void spoolVertiesForCurrentId()				{ cncPath.spoolVertiesForCurrentId(); }
-		
 		const long getVirtualEnd()					{ return cncPath.getVirtualEnd(); }
 		const long getVirtualEndAsId()				{ return cncPath.getVirtualEndAsId(); }
 		const long getVirtualEndAsNormalizedId()	{ return cncPath.getVirtualEndAsNormalizedId(); }

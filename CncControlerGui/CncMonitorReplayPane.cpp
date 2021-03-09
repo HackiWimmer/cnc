@@ -93,7 +93,8 @@ void CncMonitorReplayPane::display() {
 	if ( motionMonitor == NULL )
 		return;
 		
-	motionMonitor->clearHighlightEffects();
+	motionMonitor->normalizeAllSelectionEffects();
+	motionMonitor->update(true);
 	
 	APP_PROXY::tryToSelectClientId(motionMonitor->getVirtualEndAsNormalizedId(), ClientIdSelSource::ID::TSS_REPLAY);
 }

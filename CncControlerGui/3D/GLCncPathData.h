@@ -233,8 +233,6 @@ namespace GLI {
 			void incVirtualEndById();
 			void decVirtualEndById();
 			
-			void spoolVertiesForCurrentId();
-			
 			void setVirtualEnd(long val);
 			
 			const long getVirtualEnd() const { return virtualEnd; }

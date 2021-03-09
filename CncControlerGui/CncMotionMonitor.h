@@ -151,8 +151,6 @@ class CncMotionMonitor : public CncGlCanvas
 		void incVirtualEndById() 					{ monitor->incVirtualEndById(); }
 		void decVirtualEndById() 					{ monitor->decVirtualEndById(); }
 		
-		void spoolVertiesForCurrentId()				{ monitor->spoolVertiesForCurrentId(); }
-		
 		const long getVirtualEnd()					{ return monitor->getVirtualEnd(); }
 		const long getVirtualEndAsId()				{ return monitor->getVirtualEndAsId(); }
 		const long getVirtualEndAsNormalizedId()	{ return monitor->getVirtualEndAsNormalizedId(); }

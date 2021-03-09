@@ -120,9 +120,6 @@ void GLI::GLCncPath::incVirtualEndById() {
 			if ( virtualEnd >= (long)(vectiesBuffer.getVertexCount() - 1) )
 				break;
 		
-			CNC_PRINT_FUNCT_A("%ld -> %ld\n", id, getVirtualEndAsNormalizedId());
-		
-		
 		} while ( id == getVirtualEndAsNormalizedId() );
 		
 	publishNotifications = true;
@@ -145,22 +142,6 @@ void GLI::GLCncPath::decVirtualEndById() {
 	
 	publishNotifications = true;
 	notifyCncPathChanged();
-}
-////////////////////////////////////////////
-void GLI::GLCncPath::spoolVertiesForCurrentId() {
-////////////////////////////////////////////
-	long id = getVirtualEndAsNormalizedId();
-	
-	while ( id == previewNextVertexNormalizedId() ) {
-		
-		
-		CNC_PRINT_FUNCT_A("%ld .... %ld", id, previewNextVertexNormalizedId());
-		
-		incVirtualEnd();
-		
-		if ( virtualEnd >= (long)(vectiesBuffer.getVertexCount() - 1) )
-			break;
-	}
 }
 ////////////////////////////////////////////
 const float GLI::GLCncPath::getMinScaleFact() const {
