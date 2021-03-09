@@ -6989,9 +6989,9 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	if ( tss != ClientIdSelSource::TSS_MONITOR ) {
 		if ( motionMonitor != NULL ) {
 			
-			// uses lastClientId for setCurrentClientId)= to display all ids up to lastClientId (incl.)
-			if ( tss == ClientIdSelSource::TSS_REPLAY )	motionMonitor->setCurrentClientId(lastClientId);
-			else 										motionMonitor->highlightClientId(firstClientId, lastClientId);
+			// replay is a special mode which creates the highlighting by itself
+			if ( tss != ClientIdSelSource::TSS_REPLAY )
+				motionMonitor->highlightClientId(firstClientId, lastClientId);
 			
 			motionMonitor->Refresh();
 		}

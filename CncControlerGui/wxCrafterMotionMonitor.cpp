@@ -35,12 +35,12 @@ CncMonitorReplayPaneBase::CncMonitorReplayPaneBase(wxWindow* parent, wxWindowID 
     flexGridSizer6845->Add(m_staticText8079, 0, wxALL, WXC_FROM_DIP(5));
     
     wxArrayString m_cbStepUnitArr;
-    m_cbStepUnitArr.Add(wxT("ID"));
+    m_cbStepUnitArr.Add(wxT("ClientID"));
     m_cbStepUnitArr.Add(wxT("Vertex"));
     m_cbStepUnit = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_cbStepUnitArr, wxCB_READONLY);
     wxFont m_cbStepUnitFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_cbStepUnit->SetFont(m_cbStepUnitFont);
-    m_cbStepUnit->SetToolTip(_("Replay Unit"));
+    m_cbStepUnit->SetToolTip(_("Replay Step Unit"));
     m_cbStepUnit->SetSelection(0);
     
     flexGridSizer6845->Add(m_cbStepUnit, 0, wxALL, WXC_FROM_DIP(1));
@@ -139,7 +139,7 @@ CncMonitorReplayPaneBase::CncMonitorReplayPaneBase(wxWindow* parent, wxWindowID 
     m_currentVertexId->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     wxFont m_currentVertexIdFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
     m_currentVertexId->SetFont(m_currentVertexIdFont);
-    m_currentVertexId->SetToolTip(_("Current ID"));
+    m_currentVertexId->SetToolTip(_("Current ClientID"));
     #if wxVERSION_NUMBER >= 3000
     m_currentVertexId->SetHint(wxT(""));
     #endif

@@ -254,7 +254,7 @@
         }, {
          "type": "multi-string",
          "m_label": "Tooltip:",
-         "m_value": "Replay Unit "
+         "m_value": "Replay Step Unit "
         }, {
          "type": "colour",
          "m_label": "Bg Colour:",
@@ -294,7 +294,7 @@
         }, {
          "type": "multi-string",
          "m_label": "ComboBox Choices:",
-         "m_value": "ID\\nVertex"
+         "m_value": "ClientID\\nVertex"
         }, {
          "type": "string",
          "m_label": "Text Hint",
@@ -1299,7 +1299,7 @@
         }, {
          "type": "multi-string",
          "m_label": "Tooltip:",
-         "m_value": "Current ID"
+         "m_value": "Current ClientID"
         }, {
          "type": "colour",
          "m_label": "Bg Colour:",

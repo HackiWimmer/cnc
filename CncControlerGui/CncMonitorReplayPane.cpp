@@ -35,9 +35,9 @@ CncMonitorReplayPane::Decorate::~Decorate() {
 ///////////////////////////////////////////////////////////////////
 CncMonitorReplayPane::CncMonitorReplayPane(wxWindow* parent)
 : CncMonitorReplayPaneBase(parent)
-, abort(false)
-, processing(false)
-, motionMonitor(NULL)
+, abort				(false)
+, processing		(false)
+, motionMonitor		(NULL)
 ///////////////////////////////////////////////////////////////////
 {
 	m_cbStepUnit->SetSelection(Unit_Id);
@@ -67,7 +67,7 @@ void CncMonitorReplayPane::updateControls() {
 	if ( motionMonitor == NULL )
 		return;
 	
-	GetCurrentVertexId()->ChangeValue(wxString::Format("%ld", motionMonitor->getVirtualEndAsId()));
+	GetCurrentVertexId()->ChangeValue(wxString::Format("%ld", motionMonitor->getVirtualEndAsNormalizedId()));
 	GetCurrentVertex()->ChangeValue(wxString::Format("%ld", motionMonitor->getVirtualEnd()));
 	GetTotalVerties()->ChangeValue(wxString::Format("%ld", motionMonitor->getPathItemCount()));
 }
@@ -93,7 +93,9 @@ void CncMonitorReplayPane::display() {
 	if ( motionMonitor == NULL )
 		return;
 		
-	APP_PROXY::tryToSelectClientId(motionMonitor->getVirtualEndAsId(), ClientIdSelSource::ID::TSS_REPLAY);
+	motionMonitor->clearHighlightEffects();
+	
+	APP_PROXY::tryToSelectClientId(motionMonitor->getVirtualEndAsNormalizedId(), ClientIdSelSource::ID::TSS_REPLAY);
 }
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {
@@ -115,23 +117,32 @@ void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {
 	motionMonitor->setVirtualEnd(start);
 	
 	// define start id
-	long id = motionMonitor->getVirtualEndAsId();
-	if ( id != motionMonitor->previewNextVertexId() )
-		id = motionMonitor->previewNextVertexId();
+	long id = motionMonitor->getVirtualEndAsNormalizedId();
+	if ( id != motionMonitor->previewNextVertexNormalizedId() )
+		id = motionMonitor->previewNextVertexNormalizedId();
 	
 	// spool
 	while ( motionMonitor->getVirtualEnd() < motionMonitor->getPathItemCount() - 1 ) {
 		
 		const bool fine = GetCbStepUnit()->GetSelection() != Unit_Id;
-		if ( fine )	motionMonitor->incVirtualEnd();
-		else		motionMonitor->incVirtualEndById();
+		
+		if ( fine ) {
+			// is slow enough
+			motionMonitor->incVirtualEnd();
+		}
+		else {
+			motionMonitor->incVirtualEndById();
+			// slow down this mode a little bit
+			Sleep(600);
+		}
 		
 		display();
-			
+		
+		// to keep the app online
 		APP_PROXY::dispatchAll();
 		
 		if ( stopByIdChange == true )
-			if ( id != motionMonitor->previewNextVertexId() )
+			if ( id != motionMonitor->previewNextVertexNormalizedId() )
 				break;
 		
 		if ( abort == true )
@@ -142,9 +153,12 @@ void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {
 void CncMonitorReplayPane::replayPlayAll(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	replayPlay(false);
+	motionMonitor->setVirtualEndToLast();
+	display();
 }
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::replayPlayCurrentId(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
 	replayPlay(true);
 }
 ///////////////////////////////////////////////////////////////////
@@ -160,9 +174,9 @@ void CncMonitorReplayPane::replayStop(wxCommandEvent& event) {
 	if ( motionMonitor == NULL )
 		return;
 		
-	if ( m_cbStepUnit->GetSelection() == Unit_Id ) 	motionMonitor->setVirtualEndToLast();
-	else											motionMonitor->spoolVertiesForCurrentId();
-	
+	if ( m_cbStepUnit->GetSelection() == Unit_Id ) 
+		motionMonitor->setVirtualEndToLast();
+		
 	display();
 }
 ///////////////////////////////////////////////////////////////////
@@ -172,11 +186,6 @@ void CncMonitorReplayPane::replayStart(wxCommandEvent& event) {
 		return;
 	
 	motionMonitor->setVirtualEndToFirst();
-	
-	const bool fine = GetCbStepUnit()->GetSelection() != Unit_Id;
-	if ( fine == false )
-		motionMonitor->spoolVertiesForCurrentId();
-	
 	display();
 }
 ///////////////////////////////////////////////////////////////////
@@ -249,12 +258,8 @@ bool CncMonitorReplayPane::increment(bool fine) {
 		motionMonitor->setVirtualEnd(1);
 		
 	// increment
-	if ( fine == true ) {
-		motionMonitor->incVirtualEnd();
-	} else {
-		motionMonitor->incVirtualEndById();
-		motionMonitor->spoolVertiesForCurrentId();
-	}
+	if ( fine == true )	motionMonitor->incVirtualEnd();
+	else				motionMonitor->incVirtualEndById();
 	
 	display();
 	

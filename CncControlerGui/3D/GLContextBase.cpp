@@ -165,7 +165,7 @@ void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z
 	{
 		glPushMatrix();
 		
-			glColor3ub (255, 233, 157);
+			glColor4ub (255, 233, 157, 32);
 			glTranslatef(x, y, z); 
 			
 			GLUquadricObj* quadric = gluNewQuadric();
@@ -196,13 +196,13 @@ void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z
 	{
 		glPushMatrix();
 		
-			glColor3ub (255, 201, 14);
+			glColor4ub (255, 201, 14, 100);
 			glTranslatef(x, y, z + (totalLength - shaftLength) );
 			
 			GLUquadricObj* quadric = gluNewQuadric();
 			gluQuadricTexture(quadric, GL_TRUE);
 			gluQuadricDrawStyle(quadric, GLU_LINE);
-			gluCylinder(quadric, shaftRadius, shaftRadius, totalLength - shaftLength, slices, stacks);
+			gluCylinder(quadric, shaftRadius, shaftRadius, totalLength - shaftLength, slices * 2, stacks * 2);
 			gluDeleteQuadric(quadric);
 			
 		glPopMatrix();

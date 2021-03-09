@@ -225,6 +225,9 @@ namespace GLI {
 			long previewNextVertexId();
 			long previewPreviousVertexId();
 			
+			long previewNextVertexNormalizedId();
+			long previewPreviousVertexNormalizedId();
+
 			void incVirtualEnd()			{ setVirtualEnd(getVirtualEnd() + 1 ); }
 			void decVirtualEnd() 			{ setVirtualEnd(getVirtualEnd() - 1 ); }
 			void incVirtualEndById();
@@ -236,6 +239,7 @@ namespace GLI {
 			
 			const long getVirtualEnd() const { return virtualEnd; }
 			const long getVirtualEndAsId();
+			const long getVirtualEndAsNormalizedId();
 			
 			void activateNotifications(bool state = true) { publishNotifications = state; }
 			void deactivateNotifications() { activateNotifications(false); }

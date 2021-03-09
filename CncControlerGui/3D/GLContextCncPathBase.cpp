@@ -635,6 +635,8 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 	
 	if ( currentClientId < 0 )
 		return;
+		
+	CNC_PRINT_FUNCT
 
 	GLOpenGLPathBufferStore* store = cncPath.getOpenGLBufferStore();
 	
@@ -743,6 +745,14 @@ void GLContextCncPathBase::reconstruct(const GLOpenGLPathBuffer::ReconstructOpti
 /////////////////////////////////////////////////////////////////
 	cncPath.reconstruct(opt);
 	highlightedClientIds.clear();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::clearHighlightEffects() {
+/////////////////////////////////////////////////////////////////
+	GLOpenGLPathBuffer::ReconstructOptions opt;
+	
+	if ( highlightedClientIds.size() )
+		reconstruct(opt);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::determineModel() {

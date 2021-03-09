@@ -97,6 +97,7 @@ class GLContextCncPathBase : public GLContextBase {
 		void setCurrentClientId(long cid);
 		void highlightClientId(long firstClientId, long lastClientId = -1L);
 		void highlightClientIds(cnc::LongValues ids);
+		void clearHighlightEffects();
 		
 		void highlightGudePathes(long cid);
 		void dimUpGudePathes();
@@ -122,24 +123,27 @@ class GLContextCncPathBase : public GLContextBase {
 		int getOriginX() { return ( viewPort != NULL ? viewPort->getX() : 0 ); }
 		int getOriginY() { return ( viewPort != NULL ? viewPort->getY() : 0 ); }
 		
-		long getPathItemCount()			{ return cncPath.size(); }
+		long getPathItemCount()						{ return cncPath.size(); }
 		
-		void setVirtualEnd(long val) 	{ cncPath.setVirtualEnd(val); }
-		void setVirtualEndToFirst() 	{ cncPath.setVirtualEndToFirst(); }
-		void setVirtualEndToLast() 		{ cncPath.setVirtualEndToLast(); }
+		void setVirtualEnd(long val) 				{ cncPath.setVirtualEnd(val); }
+		void setVirtualEndToFirst()					{ cncPath.setVirtualEndToFirst(); }
+		void setVirtualEndToLast()					{ cncPath.setVirtualEndToLast(); }
 		
-		long previewNextVertexId()		{ return cncPath.previewNextVertexId(); }
-		long previewPreviousVertexId()	{ return cncPath.previewPreviousVertexId(); }
+		long previewNextVertexId()					{ return cncPath.previewNextVertexId(); }
+		long previewPreviousVertexId()				{ return cncPath.previewPreviousVertexId(); }
+		long previewNextVertexNormalizedId()		{ return cncPath.previewNextVertexNormalizedId(); }
+		long previewPreviousVertexNormalizedId()	{ return cncPath.previewPreviousVertexNormalizedId(); }
 		
-		void incVirtualEnd() 			{ cncPath.incVirtualEnd(); } 
-		void decVirtualEnd() 			{ cncPath.decVirtualEnd(); }
-		void incVirtualEndById() 		{ cncPath.incVirtualEndById(); }
-		void decVirtualEndById() 		{ cncPath.decVirtualEndById(); }
+		void incVirtualEnd()						{ cncPath.incVirtualEnd(); } 
+		void decVirtualEnd()			 			{ cncPath.decVirtualEnd(); }
+		void incVirtualEndById()					{ cncPath.incVirtualEndById(); }
+		void decVirtualEndById()					{ cncPath.decVirtualEndById(); }
 		
-		void spoolVertiesForCurrentId() { cncPath.spoolVertiesForCurrentId(); }
+		void spoolVertiesForCurrentId()				{ cncPath.spoolVertiesForCurrentId(); }
 		
-		const long getVirtualEnd() 		{ return cncPath.getVirtualEnd(); }
-		const long getVirtualEndAsId()	{ return cncPath.getVirtualEndAsId(); }
+		const long getVirtualEnd()					{ return cncPath.getVirtualEnd(); }
+		const long getVirtualEndAsId()				{ return cncPath.getVirtualEndAsId(); }
+		const long getVirtualEndAsNormalizedId()	{ return cncPath.getVirtualEndAsNormalizedId(); }
 		
 		void pushProcessMode();
 		void popProcessMode();

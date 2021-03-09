@@ -59,10 +59,17 @@
 // -------------------------------------------------------------------
 static struct ClientIds {
 	
-	const long	TPL_FACTOR				=    10L;
+	#define ClientIds_FACTOR 10L
+	
+	const long	TPL_FACTOR				= ClientIds_FACTOR;
 	const long	INVALID					=    -1L;
 	const long	SVG_Z_UP				= -1000L;
 	const long	SVG_Z_DOWN				= -2000L;
+	
+	static const long normalize(long id)	{ return ( ( id / ClientIds_FACTOR ) * ClientIds_FACTOR ); }
+	static const long lineNumber(long id)	{ return ( id / ClientIds_FACTOR ); }
+	
+	#undef FACTOR
 	
 } CLIENT_ID;
 
