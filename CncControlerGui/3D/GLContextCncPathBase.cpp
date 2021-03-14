@@ -185,6 +185,8 @@ GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas, const wxString& n
 , drawType					(DT_LINE_STRIP)
 , continiousDirConeFlag		(false)
 , currentClientId			(-1L)
+, processContext			()
+, replayContext				()
 , rulerColourX				(coordOriginInfo.colours.x)
 , rulerColourY				(coordOriginInfo.colours.y)
 , rulerColourZ				(coordOriginInfo.colours.z)
@@ -233,6 +235,27 @@ void GLContextCncPathBase::activateOpenGlContext(bool state) {
 	else					cncPath.destroyVertexArray();
 }
 /////////////////////////////////////////////////////////////////
+long GLContextCncPathBase::getPositionWithinBuffer(float x, float y, float z) {
+/////////////////////////////////////////////////////////////////
+	GLOpenGLPathBuffer::CncVertex vertex;
+	const long p = cncPath.getOpenGLBufferStore()->findfirstVertexWithPos(x, y, z, vertex);
+	
+	if ( p >= 0 )	return p;
+	else			return -1;
+}
+/////////////////////////////////////////////////////////////////
+wxString GLContextCncPathBase::getNormalizedClientIdOfPos(float x, float y, float z) {
+/////////////////////////////////////////////////////////////////
+	GLOpenGLPathBuffer::CncVertex vertex;
+	const long p = cncPath.getOpenGLBufferStore()->findfirstVertexWithPos(x, y, z, vertex);
+	
+	if ( p >= 0 ) {
+		return _(wxString::Format("%ld", ClientIds::normalize(vertex.getClientId())));
+	}
+	
+	return _("");
+}
+/////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::markCurrentPosition() {
 /////////////////////////////////////////////////////////////////
 	if ( cncPath.size() == 0 )
@@ -243,8 +266,13 @@ void GLContextCncPathBase::markCurrentPosition() {
 
 	// get the last/current vertices - it must be valid
 	GLOpenGLPathBuffer::CncVertex vertex;
-	cncPath.getOpenGLBufferStore()->getPosVertex(vertex, cncPath.getVirtualEnd() - 1);
-	drawMovePosition(vertex.getX(), vertex.getY(), vertex.getZ());
+	if ( cncPath.getOpenGLBufferStore()->getPosVertex(vertex, cncPath.getVirtualEnd() - 1) ) {
+		drawMovePosition(vertex.getX(), vertex.getY(), vertex.getZ());
+		
+		#warning
+		if ( continiousDirConeFlag == true )
+			keepVisible(vertex.getX(), vertex.getY(), vertex.getZ());
+	}
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawDirectionCone() {
@@ -720,7 +748,9 @@ void GLContextCncPathBase::dimDownGudePathes() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::pushProcessMode() {
 /////////////////////////////////////////////////////////////////
-	cncPath.deactivateNotifications();
+	processContext.scaleFactor	= getCurrentScaleFactor();
+	processContext.wndOrgin		= viewPort? wxPoint(viewPort->getCurrentOriginX(), viewPort->getCurrentOriginY()) : wxPoint(0, 0);
+
 	continiousDirConeFlag = true;
 }
 /////////////////////////////////////////////////////////////////
@@ -728,6 +758,27 @@ void GLContextCncPathBase::popProcessMode() {
 /////////////////////////////////////////////////////////////////
 	continiousDirConeFlag = false;
 	cncPath.activateNotifications();
+	
+	setFrontCatchingMode(FCM_KEEP_IN_FRAME);
+	
+	reshapeAbsolute(processContext.wndOrgin.x, processContext.wndOrgin.y);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::pushReplayMode() {
+/////////////////////////////////////////////////////////////////
+	replayContext.scaleFactor	= getCurrentScaleFactor();
+	replayContext.wndOrgin		= viewPort? wxPoint(viewPort->getCurrentOriginX(), viewPort->getCurrentOriginY()) : wxPoint(0, 0);
+	
+	cncPath.deactivateNotifications();
+	continiousDirConeFlag = true;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::popReplayMode() {
+/////////////////////////////////////////////////////////////////
+	continiousDirConeFlag = false;
+	cncPath.activateNotifications();
+	
+	reshapeAbsolute(replayContext.wndOrgin.x, replayContext.wndOrgin.y);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::clearPathData() {

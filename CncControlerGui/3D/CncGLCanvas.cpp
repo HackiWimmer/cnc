@@ -4,13 +4,13 @@
 
 //////////////////////////////////////////////////
 CncGlCanvas::CncGlCanvas(wxWindow *parent, int *attribList) 
-//////////////////////////////////////////////////
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
-, context(NULL)
-, lastReshape()
-, alreadyPainted(false)
-, lastSetCurrent(false)
-, mouseMoveMode(false)
+, context			(NULL)
+, lastReshape		()
+, alreadyPainted	(false)
+, lastSetCurrent	(false)
+, mouseMoveMode		(false)
+//////////////////////////////////////////////////
 {
 }
 //////////////////////////////////////////////////
@@ -69,8 +69,7 @@ void CncGlCanvas::view(GLContextBase::ViewMode fm) {
 		
 	context->setViewMode(fm);
 	
-	const wxSize cs = GetClientSize();
-	context->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
+	context->reshapeViewMode();
 	update();
 }
 //////////////////////////////////////////////////
@@ -90,23 +89,6 @@ void CncGlCanvas::decScale() {
 	context->getModelScale().incScale();
 }
 //////////////////////////////////////////////////
-void CncGlCanvas::initReshape() {
-//////////////////////////////////////////////////
-	const wxSize cs = GetClientSize();
-	lastReshape.x = context->getLastReshapeX();
-	lastReshape.y = cs.GetHeight() - context->getLastReshapeY();
-}
-//////////////////////////////////////////////////
-void CncGlCanvas::reshapeRelative(int dx, int dy) {
-//////////////////////////////////////////////////
-	const wxSize cs = GetClientSize();
-	const int nx 	= lastReshape.x + dx;
-	const int ny 	= cs.GetHeight() - lastReshape.y - dy;
-	
-	context->reshape(cs.GetWidth(), cs.GetHeight(), nx, ny);
-	update();
-}
-//////////////////////////////////////////////////
 void CncGlCanvas::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 	if ( context == NULL )
@@ -118,7 +100,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	if ( event.LeftDown() )
 		this->SetFocusFromKbd();
 		
-	// wheel
+	// wheel - rotate and scale
 	const int rot = event.GetWheelRotation();
 	if ( rot != 0 ) {
 		if ( event.ControlDown() && event.ShiftDown() ) {
@@ -138,7 +120,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 		}
 		else if ( event.AltDown() ) {
 			
-			context->getModelRotation().restore3DDefaults();
+			context->getModelRotation().reset();
 		}
 		else {
 			if (rot < 0 ) 	decScale();
@@ -146,16 +128,23 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 		}
 		
 		update();
+		event.Skip();
 		return;
 	}
 	
+	// always do this here! form a first point of view it looks a little bit crazy
+	// because we are within a callback which contains a wxMouseEvent event,
+	// but if the the underlying window was leaved during the move and enter again
+	// the previous event.LeftDown() isn't further present, therefore this . . 
+	if ( wxGetMouseState().LeftIsDown() == false )
+		mouseMoveMode = false;
+
 	// move origin
 	if ( event.ControlDown() == false ) {
+		
 		static int mx = 0, my = 0;
 		
 		if ( event.LeftDown() == true && mouseMoveMode == false ) {
-			initReshape();
-			
 			mx = event.GetX();
 			my = event.GetY();
 			
@@ -164,28 +153,34 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 		
 		// calculate new origin
 		if ( mouseMoveMode == true ) {
-			const int dx = event.GetX() - mx;
-			const int dy = event.GetY() - my;
+			const int	 dx = (event.GetX() - mx);
+			const int	 dy = (event.GetY() - my) * -1;
 			
-			reshapeRelative(dx, dy);
+			// re-initialize to be further relative 
+			mx = event.GetX();
+			my = event.GetY();
+			
+			context->reshapeRelative(dx, dy);
 		}
 		
 		// reset move mode
 		if ( event.LeftUp() == true ) {
 			mouseMoveMode = false;
 		}
-
-	// set origin
+		
+	// set origin absolute
 	} else {
 		
 		// left button
 		if ( event.LeftIsDown() == true ) {
 			// reverse y because the opengl viewport origin (0,0) is at left/bottom
-			const int x = event.GetX();
-			const int y = cs.GetHeight() - event.GetY();
+			const int px = event.GetX();
+			const int py = cs.GetHeight() - event.GetY();
 			
-			context->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
+			context->reshapeAbsolute(px, py);
 			update();
 		}
 	}
+	
+	event.Skip();
 }

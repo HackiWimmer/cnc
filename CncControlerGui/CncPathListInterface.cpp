@@ -1,5 +1,6 @@
 #include "MainFrameProxy.h"
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "CncFileNameService.h"
 #include "CncMotionMonitor.h"
 #include "CncPathListInterface.h"
@@ -18,6 +19,24 @@ CncPathListMonitor::~CncPathListMonitor() {
 ////////////////////////////////////////////////////////////////////
 }
 ////////////////////////////////////////////////////////////////////
+bool CncPathListMonitor::dispatchEventQueue() {
+////////////////////////////////////////////////////////////////////
+	// Event handling, enables the interrupt functionallity
+	static       CncMilliTimestamp tsLastDispatch   = 0;
+
+	if ( THE_CONTEXT->isAllowEventHandling() ) {
+		const CncMilliTimespan timespanEvent   = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getMilliTimestamp(), tsLastDispatch);
+		
+		if ( timespanEvent >= THE_CONTEXT->getUpdateInterval() ) {
+			APP_PROXY::getMotionMonitor()->update(true);
+			APP_PROXY::dispatchAll();
+			tsLastDispatch = CncTimeFunctions::getMilliTimestamp();
+		}
+	}
+	
+	return true;
+}
+////////////////////////////////////////////////////////////////////
 CncLongPosition CncPathListMonitor::getPositionSteps() const {
 ////////////////////////////////////////////////////////////////////
 	CncLongPosition ret;
@@ -27,14 +46,13 @@ CncLongPosition CncPathListMonitor::getPositionSteps() const {
 void CncPathListMonitor::publishGuidePath(const CncPathListManager& plm, double zOffset) {
 ////////////////////////////////////////////////////////////////////
 	APP_PROXY::getMotionMonitor()->appendGuidPath(plm, zOffset);
-	APP_PROXY::getMotionMonitor()->update(true);
+	dispatchEventQueue();
 }
 ////////////////////////////////////////////////////////////////////
 void CncPathListMonitor::processClientIDChange(long cid) { 
 ////////////////////////////////////////////////////////////////////
 	current.clientId = cid;
-	
-	APP_PROXY::getMotionMonitor()->update(true);
+	dispatchEventQueue();
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListMonitor::processSpeedChange(double value_MM_MIN, CncSpeedMode m) { 
@@ -58,6 +76,7 @@ bool CncPathListMonitor::processMoveSequence(CncMoveSequence& msq) {
 		
 		APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, ps);
 		notifyNextPostion();
+		dispatchEventQueue();
 	}
 	
 	return true;
@@ -68,6 +87,7 @@ bool CncPathListMonitor::processPathListEntry(const CncPathListEntry& ple) {
 	current.monitorPos = ple.entryTarget;
 	APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, getPositionSteps());
 	notifyNextPostion();
+	dispatchEventQueue();
 	
 	return true;
 }

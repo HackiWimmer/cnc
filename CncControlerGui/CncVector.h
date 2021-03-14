@@ -206,7 +206,26 @@ class CncMatrix4x4 {
 			
 			return ostr;
 		}
+		
+		static void traceRawMatrix(std::ostream &ostr, T m[]) {
+			if ( m == NULL )
+				return;
+				
+			for (int r = 0; r < 4; r++ ) {
+				ostr << "| ";
+				
+				for (int c = 0; c < 4; c++ ) {
+					unsigned short mi = r + (c * 4);
+					
+					ostr << std::showpos << std::fixed << std::setw( 11 ) << std::setprecision( 6 )
+						 << m[mi] << " " ;
+				}
+				
+				ostr << " |"<< std::endl;
+			}
+		}
 };
+
 
 typedef CncMatrix4x4<int32_t>	CncLongMatrix4x4;
 typedef CncMatrix4x4<double>	CncDoubleMatrix4x4;

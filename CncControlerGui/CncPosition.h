@@ -444,20 +444,19 @@ class CncPosition {
 };
 
 // ----------------------------------------------------------------------
-typedef CncPosition<int32_t> 	CncLongPosition;
-typedef CncPosition<double> 	CncDoublePosition;
-typedef CncPosition<float> 		CncFloatPosition;
+typedef CncPosition<int32_t>	CncLongPosition;
+typedef CncPosition<double>		CncDoublePosition;
+typedef CncPosition<float>		CncFloatPosition;
 
 #define CncDistance				CncPosition
-typedef CncPosition<int32_t> 	CncLongDistance;
-typedef CncPosition<double> 	CncDoubleDistance;
-typedef CncPosition<float> 		CncFloatPosition;
-
+typedef CncPosition<int32_t>	CncLongDistance;
+typedef CncPosition<double>		CncDoubleDistance;
+typedef CncPosition<float>		CncFloatPosition;
 
 #define CncOffset				CncPosition
-typedef CncPosition<int32_t> 	CncLongOffset;
-typedef CncPosition<double> 	CncDoubleOffset;
-typedef CncPosition<float> 		CncFloatOffset;
+typedef CncPosition<int32_t>	CncLongOffset;
+typedef CncPosition<double>		CncDoubleOffset;
+typedef CncPosition<float>		CncFloatOffset;
 
 // ----------------------------------------------------------------------
 template <class T>

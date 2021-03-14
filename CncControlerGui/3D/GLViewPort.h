@@ -7,7 +7,7 @@
 class GLViewPort {
 
 	public:
-		enum DistortType {VPT_Distored, VPT_Undistored};
+		enum DistortType {VPT_Distorted, VPT_Undistorted};
 		enum OrigPosType {VPOP_Center, VPOP_Custom};
 		enum PreDefPos   {VPDP_TopLeft, 
 		                  VPDP_TopRight, 
@@ -20,119 +20,62 @@ class GLViewPort {
 						  VPDP_Center
 						};
 		
-		////////////////////////////////////////////////////
-		GLViewPort(GLViewPort::DistortType type)
-		: x(0), y(0), w(0), h(0), n(0)
-		, windowWidth(0), windowHeigth(0)
-		, scissorX(x), scissorY(y)
-		, factor(8)
-		, distortType(type)
-		, origPosType(OrigPosType::VPOP_Center)
-		{}
-
-		////////////////////////////////////////////////////
-		~GLViewPort() {
-		}
+		GLViewPort(GLViewPort::DistortType type, int factor = 8);
+		~GLViewPort();
 		
-		/////////////////////////////////////////////////////////
-		void trace(std::ostream& out) {
-			out << wxString::Format("Window Size w, h   : %d, %d", windowWidth, windowHeigth) << std::endl;
-			out << wxString::Format("Viewport:") << std::endl;
-			out << wxString::Format(" x, y, w, h, n     : %d, %d, %d, %d, %d", x, y, w, h, n) << std::endl;
-			out << wxString::Format(" Destort Type      : %s", getDistortTypeAsString()) << std::endl;
-			out << wxString::Format(" Origin Pos        : %s", getOriginPosTypeAsString()) << std::endl;
-			out << wxString::Format(" Aspect            : %f", getAspect()) << std::endl;
-			out << wxString::Format(" Factor            : %d", getFactor()) << std::endl;
-			out << wxString::Format(" Scissor x, y, w, h: %d, %d, %d, %d", getScissorX(), getScissorY(), getScissorW(), getScissorH()) << std::endl;
-		}
-
-		////////////////////////////////////////////////////
-		int getX() { return x; }
-		int getY() { return y; }
-		int getW() { return w; }
-		int getH() { return h; }
+		void trace(std::ostream& out);
 		
-		////////////////////////////////////////////////////
-		int getScissorX() { return scissorX; }
-		int getScissorY() { return scissorY; }
-		int getScissorW() { return windowWidth; }
-		int getScissorH() { return windowHeigth; }
+		int getX()					const	{ return x; }
+		int getY()					const	{ return y; }
+		int getW()					const	{ return w; }
+		int getH()					const	{ return h; }
 		
-		////////////////////////////////////////////////////
-		int getFactor() { return factor; }
-		float getDisplayFactor() { return 1.0/factor; }
+		int getScissorX()			const	{ return currScissor.GetX(); }
+		int getScissorY()			const	{ return currScissor.GetX(); }
+		int getScissorW()			const	{ return currScissor.GetWidth(); }
+		int getScissorH()			const	{ return currScissor.GetHeight(); }
 		
-		////////////////////////////////////////////////////
-		float getAspect() { return 1.0f * getNormalizedSizeW()/getNormalizedSizeH(); }
-
-		////////////////////////////////////////////////////
-		int getCurrentWindowWidth() { return windowWidth; }
-		int getCurrentWindowHeigth() { return windowHeigth; }
+		int getFactor()				const	{ return factor; }
+		float getDisplayFactor()			{ return 1.0/factor; }
 		
-		////////////////////////////////////////////////////
-		int getNormalizedSizeW() {
-			if ( distortType == GLViewPort::VPT_Undistored )
-				return n;
-			return w;
-		}
-
-		////////////////////////////////////////////////////
-		int getNormalizedSizeH() {
-			if ( distortType == GLViewPort::VPT_Undistored )
-				return n;
-			return h;
-		}
-
-		////////////////////////////////////////////////////
-		GLViewPort::DistortType getDistortType() { return distortType; }
-		const char* getDistortTypeAsString() {
-			switch ( distortType ) {
-				case VPT_Distored: 		return "Distored";
-				case VPT_Undistored: 	return "Undistored";
-			}
-			return "???";
-		}
+		float getAspect()			const	{ return 1.0f * getNormalizedSizeW()/getNormalizedSizeH(); }
 		
-		void centerViewport() { origPosType = VPOP_Center; }
+		int getCurrentOriginX()		const	{ return curWndOrigin.x; }
+		int getCurrentOriginY()		const	{ return curWndOrigin.y; }
+		int getCurrentWindowWidth()	const	{ return curWndSize.GetWidth(); }
+		int getCurrentWindowHeight()const	{ return curWndSize.GetHeight(); }
 		
-		////////////////////////////////////////////////////
-		GLViewPort::OrigPosType getOriginPosType() { return origPosType; }
-		const char* getOriginPosTypeAsString() {
-			switch ( origPosType ) {
-				case VPOP_Custom: 	return "Custom";
-				case VPOP_Center: 	return "Center";
-			}
-			return "???";
-		}
+		int getNormalizedSizeW()	const	{ return distortType == GLViewPort::VPT_Undistorted ? n : w; }
+		int getNormalizedSizeH()	const	{ return distortType == GLViewPort::VPT_Undistorted ? n : h; }
 		
-		void resetCustomOrigPosType() { origPosType = VPOP_Center; }
+		GLViewPort::DistortType getDistortType() const { return distortType; }
+		const char* getDistortTypeAsString() const ;
 		
-		////////////////////////////////////////////////////
-		void getPreDefCoordinatesXY(GLViewPort::PreDefPos pdp,
-									int wndSizeW,
-									int wndSizeH,
-									int& x, 
-									int& y);
+		GLViewPort::OrigPosType getOriginPosType() const { return origPosType; }
+		const char* getOriginPosTypeAsString() const;
 		
-		////////////////////////////////////////////////////
-		void evaluate(int wndSizeW,
-					  int wndSizeH,
-					  int custPosX=0,
-					  int custPosY=0);
-
+		void centreViewport();
+		
+		const wxPoint evaluatePreDefPositions(GLViewPort::PreDefPos pdp, int wndSizeW, int wndSizeH);
+		void evaluate(int wndSizeW, int wndSizeH, int custPosX, int custPosY);
+		void evaluate(int wndSizeW, int wndSizeH);
+		
+		bool process();
+		static bool processDefault(int wndSizeW, int wndSizeH);
+	
 	private:
-
+		
 		static const unsigned int margin = 100;
-
-		int x, y, w, h, n;
-		int windowWidth, windowHeigth;
-		int scissorX, scissorY;
-		int factor;
+		
+		int						x, y, w, h, n;
+		int						factor;
+		wxSize					curWndSize;
+		wxPoint					curWndOrigin;
+		wxRect					currScissor;
 		GLViewPort::DistortType distortType;
 		GLViewPort::OrigPosType origPosType;
 		
-		void setOrigPosType(GLViewPort::OrigPosType opt) { origPosType = opt; }
-
+		void setOrigPosType(GLViewPort::OrigPosType opt);
 };
 
 #endif

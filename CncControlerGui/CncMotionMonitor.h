@@ -78,7 +78,7 @@ class CncMotionMonitor : public CncGlCanvas
 		void appendVertex(long clientId, CncSpeedMode sm, const CncLongPosition& pos);
 		void appendGuidPath(const CncPathListManager& plm, double zOffset);
 		
-		void centerViewport();
+		void centreViewport();
 		void resetRotation();
 		
 		void setModelType(const GLContextBase::ModelType mt);
@@ -98,9 +98,13 @@ class CncMotionMonitor : public CncGlCanvas
 		void initVertexListCtr();
 		
 		void normalizeMonitor();
+		void reconstruct();
+		
 		void pushProcessMode();
 		void popProcessMode();
-		void reconstruct();
+		
+		void pushReplayMode();
+		void popReplayMode();
 		
 		// camera handling
 		enum CameraMode{ CM_OFF, CM_CLOCKWISE, CM_COUNTER_CLOCKWISE};

@@ -56,7 +56,35 @@ void GLOpenGLPathBuffer::VertexColours::restoreLightness() {
 }
 
 
+/////////////////////////////////////////////////////////////
+struct VertexComparePara {
+	static constexpr float epsilon = 0.001;
+};
+typedef cnc::FloatingCompare<float,  VertexComparePara>	vecCmp;
 
+/////////////////////////////////////////////////////////////
+bool GLOpenGLPathBuffer::CncVertex::hasExactThisPos(float x, float y, float z ) {
+/////////////////////////////////////////////////////////////
+	return	   cnc::fltCmp::eq(x, vertex[CncVertexAxisX])
+			&& cnc::fltCmp::eq(y, vertex[CncVertexAxisY])
+			&& cnc::fltCmp::eq(z, vertex[CncVertexAxisZ])
+	;
+}
+/////////////////////////////////////////////////////////////
+bool GLOpenGLPathBuffer::CncVertex::hasRoughlyThisPos(float x, float y) {
+/////////////////////////////////////////////////////////////
+	return	   vecCmp::eq(x, vertex[CncVertexAxisX])
+			&& vecCmp::eq(y, vertex[CncVertexAxisY])
+	;
+}
+/////////////////////////////////////////////////////////////
+bool GLOpenGLPathBuffer::CncVertex::hasRoughlyThisPos(float x, float y, float z) {
+/////////////////////////////////////////////////////////////
+	return	   vecCmp::eq(x, vertex[CncVertexAxisX])
+			&& vecCmp::eq(y, vertex[CncVertexAxisY])
+			&& vecCmp::eq(z, vertex[CncVertexAxisZ])
+	;
+}
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBuffer::CncVertex::updateColour(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
 /////////////////////////////////////////////////////////////
@@ -232,11 +260,14 @@ void GLOpenGLPathBuffer::traceIdentifierEndl(std::ostream& os, const char* prepe
 void GLOpenGLPathBuffer::generateBuffer() {
 /////////////////////////////////////////////////////////////
 	glGenBuffers(1, &vertexBufferID);
-	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't create a new buffer VBO!"));
+	if ( GL_COMMON_CHECK_ERROR > 0 ) 
+		traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't create a new buffer VBO!"));
 	
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, NULL, GL_DYNAMIC_DRAW);
-	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't define buffer VBO!"));
+	
+	if ( GL_COMMON_CHECK_ERROR > 0 ) 
+		traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't define buffer VBO!"));
 }
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBuffer::resetBuffer() {
@@ -303,23 +334,27 @@ void GLOpenGLPathBuffer::destroyVertexArray() {
 	}
 }
 /////////////////////////////////////////////////////////////
-bool GLOpenGLPathBuffer::getPosVertex(CncVertex& ret, unsigned int idx) const {
+bool GLOpenGLPathBuffer::getPosVertex(CncVertex& vertex, unsigned int idx) const {
 /////////////////////////////////////////////////////////////
+	bool ret = false;
+	
 	if ( idx < numVertices ) {
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	
 			const GLintptr vertexOffset = (idx) * sizeof(CncVertex);
-			glGetBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(CncVertex), &ret);
+			glGetBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(CncVertex), &vertex);
 			
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		return true;
+		ret = true;
 	}
 	
-	return false;
+	return ret && GL_COMMON_CHECK_ERROR == 0;
 }
 /////////////////////////////////////////////////////////////
 bool GLOpenGLPathBuffer::updateVertex(const CncVertex& vertex, unsigned int idx) {
 /////////////////////////////////////////////////////////////
+	bool ret = false;
+	
 	if ( idx < numVertices ) {
 		
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
@@ -328,10 +363,10 @@ bool GLOpenGLPathBuffer::updateVertex(const CncVertex& vertex, unsigned int idx)
 			glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(CncVertex), &vertex);
 			
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		return true;
+		ret = true;
 	}
 	
-	return false;
+	return ret && GL_COMMON_CHECK_ERROR == 0;
 }
 /////////////////////////////////////////////////////////////
 bool GLOpenGLPathBuffer::appendVertex(const CncVertex& vertex) {
@@ -350,25 +385,11 @@ bool GLOpenGLPathBuffer::appendVertex(const CncVertex& vertex) {
 	++numVertices;
 	updateIndex(vertex.getClientId());
 
-	return true;
+	return GL_COMMON_CHECK_ERROR == 0;
 }
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBuffer::display(DisplayType dt, int vertices) {
 /////////////////////////////////////////////////////////////
-	/*
-	if ( numVertices < 2 )
-		return;
-	
-	if ( GL_COMMON_CHECK_ERROR > 0 ) {
-		traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Previous Error"));
-		return;
-	}
-	
-	if ( vertexArrayID == 0 || vertexBufferID == 0 ) {
-		traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Invalid IDs"));
-		return;
-	}
-	*/
 	
 	if ( vertexArrayID == 0 )
 		createVertexArray();
@@ -391,6 +412,7 @@ void GLOpenGLPathBuffer::display(DisplayType dt, int vertices) {
 		glDrawArrays(dt, displayOffset, displayCount);
 		
 	glBindVertexArray(0);
+	GL_COMMON_CHECK_ERROR;
 }
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBuffer::reconstruct(const ReconstructOptions& opt) {
@@ -398,7 +420,7 @@ void GLOpenGLPathBuffer::reconstruct(const ReconstructOptions& opt) {
 	// perform options
 	GLOpenGLPathBuffer::vertexColours.showRapidPathes(opt.showRapidPathes);
 	
-	// over all verties
+	// over all vertices
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	
 		CncVertex vertex;
@@ -411,6 +433,7 @@ void GLOpenGLPathBuffer::reconstruct(const ReconstructOptions& opt) {
 		}
 		
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
 	GL_COMMON_CHECK_ERROR;
 }
 /////////////////////////////////////////////////////////////
@@ -554,6 +577,32 @@ void GLOpenGLPathBuffer::updateIndex(long clientID) {
 		index[idx] = true;
 		clientIdIndex[clientID] = index;
 	}
+}
+///////////////////////////////////////////////////////////
+long GLOpenGLPathBuffer::findfirstVertexWithPos(float vx, float vy, float vz, GLOpenGLPathBuffer::CncVertex& vertex) {
+///////////////////////////////////////////////////////////
+	// over all vertices
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
+	
+	long ret = -1;
+	for ( unsigned int i = 0; i < numVertices; i++ ) {
+		const GLintptr vertexOffset = i * sizeof(CncVertex);
+		
+		glGetBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(CncVertex), &vertex);
+		
+		#warning
+		//std::cout << wxString::Format(":::::: v(%f,%f,%f)  p(%f,%f,%f) id(%ld)\n", vertex.getX(), vertex.getY(), vertex.getZ(), vx, vy, vz, vertex.getClientId());
+		
+		if ( vertex.hasRoughlyThisPos(vx, vy) ) {
+			ret = (long)i;
+			break;
+		}
+	}
+	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	GL_COMMON_CHECK_ERROR;
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////
 bool GLOpenGLPathBuffer::changeColourForClientID(long clientId, const char type) {
@@ -1068,4 +1117,16 @@ long GLOpenGLPathBufferStore::getClientIdForIdx(unsigned long idx) const {
 	}
 	
 	return CLIENT_ID.INVALID;
+}
+/////////////////////////////////////////////////////////////
+long GLOpenGLPathBufferStore::findfirstVertexWithPos(float vx, float vy, float vz, GLOpenGLPathBuffer::CncVertex& vertex) {
+/////////////////////////////////////////////////////////////
+	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
+		
+		const long p = it->findfirstVertexWithPos(vx, vy, vz, vertex);
+		if ( p >= 0 )
+			return p;
+	}
+	
+	return -1;
 }

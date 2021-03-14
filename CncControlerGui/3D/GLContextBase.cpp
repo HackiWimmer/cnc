@@ -4,13 +4,14 @@
 #include "wxCrafterImages.h"
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "CncVector.h"
 #include "3D/GLCommon.h"
 #include "3D/GLContextBase.h"
 
 /////////////////////////////////////////////////////////////////
-int32_t GLContextBase::MouseVertexInfo::getAsStepsX (float scaleFactor) { return x / scaleFactor * THE_CONFIG->getDispFactX3D(); }
-int32_t GLContextBase::MouseVertexInfo::getAsStepsY (float scaleFactor) { return y / scaleFactor * THE_CONFIG->getDispFactY3D(); }
-int32_t GLContextBase::MouseVertexInfo::getAsStepsZ (float scaleFactor) { return z / scaleFactor * THE_CONFIG->getDispFactZ3D(); }
+int32_t GLContextBase::MouseVertexInfo::getAsStepsX (float scaleFactor) { return vecX / 1 * THE_CONFIG->getDispFactX3D(); }
+int32_t GLContextBase::MouseVertexInfo::getAsStepsY (float scaleFactor) { return vecY / 1 * THE_CONFIG->getDispFactY3D(); }
+int32_t GLContextBase::MouseVertexInfo::getAsStepsZ (float scaleFactor) { return vecZ / 1 * THE_CONFIG->getDispFactZ3D(); }
 double  GLContextBase::MouseVertexInfo::getAsMetricX(float scaleFactor) { return THE_CONFIG->convertStepsToMetricX(getAsStepsX(scaleFactor)); }
 double  GLContextBase::MouseVertexInfo::getAsMetricY(float scaleFactor) { return THE_CONFIG->convertStepsToMetricY(getAsStepsY(scaleFactor)); }
 double  GLContextBase::MouseVertexInfo::getAsMetricZ(float scaleFactor) { return THE_CONFIG->convertStepsToMetricZ(getAsStepsZ(scaleFactor)); }
@@ -24,6 +25,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name)
 , contextName				(name)
 , enabled					(true)
 , initialized				(false)
+, frontCatchingMode			(FCM_KEEP_IN_FRAME)
 , guidePathes				()
 , currentMouseVertexInfo	()
 , options					()
@@ -35,10 +37,6 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name)
 , modelScale				()
 , modelRotate				()
 , cameraPos					()
-, lastReshapeX				(0)
-, lastReshapeY				(0)
-, lastReshapeW				(0)
-, lastReshapeH				(0)
 , theTexture				(0)
 {
 /////////////////////////////////////////////////////////////////
@@ -80,9 +78,9 @@ void GLContextBase::globalInit() {
 		return;
 	
 	// this is a static function and should be called one time
-	// normallly before creating the first context
-	// So, the initalization here is globally. 
-	// If context sensetive initializion is needed use init() instead
+	// normally before creating the first context
+	// So, the initialization here is globally. 
+	// If context sensitive initialize is needed use init() instead
 	
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_FLAT);
@@ -93,8 +91,11 @@ void GLContextBase::globalInit() {
 	
 	glEnable(GL_LINE_SMOOTH);
 	
+	glEnable(GL_DEPTH_TEST);
+	
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); 
+	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 }
 /////////////////////////////////////////////////////////////////
 bool GLContextBase::init() {
@@ -167,27 +168,27 @@ void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z
 		
 			glColor4ub (255, 233, 157, 32);
 			glTranslatef(x, y, z); 
-			
-			GLUquadricObj* quadric = gluNewQuadric();
-			gluQuadricTexture(quadric, GL_TRUE);
-			gluQuadricDrawStyle(quadric, GLU_LINE);
+
+			GLUquadricObj* tool = gluNewQuadric();
+			gluQuadricTexture(tool, GL_TRUE);
+			gluQuadricDrawStyle(tool, GLU_LINE);
 			
 			switch ( d ) {
 				case CncDimension3D: 
 				{
-					if ( toolRadius > refRadius )	gluCylinder(quadric, toolRadius, toolRadius,  totalLength - shaftLength, slices, stacks);
-					else							gluCylinder(quadric, toolRadius, shaftRadius, totalLength - shaftLength, slices, stacks);
+					if ( toolRadius > refRadius )	gluCylinder(tool, toolRadius, toolRadius,  totalLength - shaftLength, slices, stacks);
+					else							gluCylinder(tool, toolRadius, shaftRadius, totalLength - shaftLength, slices, stacks);
 					
 					break;
 				}
 				
 				default: 
 				{
-					gluCylinder(quadric, toolRadius, toolRadius,  totalLength - shaftLength, slices, stacks);
+					gluCylinder(tool, toolRadius, toolRadius,  totalLength - shaftLength, slices, stacks);
 				}
 			}
 			
-			gluDeleteQuadric(quadric);
+			gluDeleteQuadric(tool);
 			
 		glPopMatrix();
 	}
@@ -199,11 +200,11 @@ void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z
 			glColor4ub (255, 201, 14, 100);
 			glTranslatef(x, y, z + (totalLength - shaftLength) );
 			
-			GLUquadricObj* quadric = gluNewQuadric();
-			gluQuadricTexture(quadric, GL_TRUE);
-			gluQuadricDrawStyle(quadric, GLU_LINE);
-			gluCylinder(quadric, shaftRadius, shaftRadius, totalLength - shaftLength, slices * 2, stacks * 2);
-			gluDeleteQuadric(quadric);
+			GLUquadricObj* shaft = gluNewQuadric();
+			gluQuadricTexture(shaft, GL_TRUE);
+			gluQuadricDrawStyle(shaft, GLU_LINE);
+			gluCylinder(shaft, shaftRadius, shaftRadius, totalLength - shaftLength, slices * 2, stacks * 2);
+			gluDeleteQuadric(shaft);
 			
 		glPopMatrix();
 	}
@@ -274,11 +275,8 @@ void GLContextBase::setViewMode(GLContextBase::ViewMode newMode, bool force) {
 	if ( viewMode == newMode && force == false )
 		return;
 	
-	// is the current origin position customized?
-	if ( viewPort != NULL && viewPort->getOriginPosType() == GLViewPort::VPOP_Custom ) {
-		// switch to the center mode
-		viewPort->resetCustomOrigPosType();
-	}
+	/*
+	centreViewport();
 	
 	// is this a change from 2d to 3d or vs.
 	if ( getViewType() != getViewType(newMode) ) {
@@ -287,21 +285,28 @@ void GLContextBase::setViewMode(GLContextBase::ViewMode newMode, bool force) {
 		if ( isViewMode2D(newMode) == true )	modelRotate.restore2DDefaults();
 		else									modelRotate.restore3DDefaults();
 	}
+	*/
+	
 	
 	viewMode = newMode;
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::centerViewport() {
+void GLContextBase::centreViewport() {
 /////////////////////////////////////////////////////////////////
-	if ( viewPort != NULL )
-		viewPort->centerViewport();
-	
-	reshape(lastReshapeW, lastReshapeH, 0, 0);
+	if ( associatedCanvas == NULL )
+		return;
+		
+	if ( viewPort == NULL )
+		return;
+		
+	viewPort->centreViewport();
+	reshape();
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::keyboardHandler(unsigned char c) {
+void GLContextBase::resetViewport() {
 /////////////////////////////////////////////////////////////////
-	// the base class has nothing to do here
+	modelRotate.reset();
+	reshapeViewMode();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::determineViewPortBounderies() {
@@ -371,60 +376,55 @@ void GLContextBase::drawCoordinateOrigin() {
 	// a constant sizing for the coordinate origin 
 	glScalef(viewPort->getDisplayFactor(), viewPort->getDisplayFactor(), viewPort->getDisplayFactor()); 
 	
-	// rotate
-	glRotatef(modelRotate.angleZ(), 0.0f, 0.0f, 1.0f);
-	glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
-	glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
+	// x axis
+	glBegin(GL_LINES);
+		
+		glColor3ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue());
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(coordOriginInfo.length, 0.0f, 0.0f);
+		
+	glEnd();
+	renderBitmapString(coordOriginInfo.length + croneHight + charOffset, charOffset, charOffset, GLUT_BITMAP_8_BY_13, "X");
 	
-		// x axis
-		glBegin(GL_LINES);
-			
-			glColor3ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue());
-			glVertex3f(0.0f, 0.0f, 0.0f);
-			glVertex3f(coordOriginInfo.length, 0.0f, 0.0f);
-			
-		glEnd();
-		renderBitmapString(coordOriginInfo.length + croneHight + charOffset, charOffset, charOffset, GLUT_BITMAP_8_BY_13, "X");
+	glPushMatrix();
+		glTranslatef(coordOriginInfo.length, 0.0f, 0.0f);
+		glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+		drawSolidCone(croneDiameter, croneHight, 30, 30);
+	glPopMatrix();
+	
+	// y axis
+	glBegin(GL_LINES);
 		
-		glPushMatrix();
-			glTranslatef(coordOriginInfo.length, 0.0f, 0.0f);
-			glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-			drawSolidCone(croneDiameter, croneHight, 30, 30);
-		glPopMatrix();
+		glColor3ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue());
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, coordOriginInfo.length, 0.0f);
+	
+	glEnd();
+	renderBitmapString(charOffset, coordOriginInfo.length + croneHight-charOffset, charOffset, GLUT_BITMAP_8_BY_13, "Y");
 		
-		// y axis
-		glBegin(GL_LINES);
-			
-			glColor3ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue());
-			glVertex3f(0.0f, 0.0f, 0.0f);
-			glVertex3f(0.0f, coordOriginInfo.length, 0.0f);
+	glPushMatrix();
+		glTranslatef(0.0f, coordOriginInfo.length, 0.0f);
+		glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
+		drawSolidCone(croneDiameter, croneHight, 30, 30);
+	glPopMatrix();
+	
+	// z axis
+	glBegin(GL_LINES);
 		
-		glEnd();
-		renderBitmapString(charOffset, coordOriginInfo.length + croneHight-charOffset, charOffset, GLUT_BITMAP_8_BY_13, "Y");
-			
-		glPushMatrix();
-			glTranslatef(0.0f, coordOriginInfo.length, 0.0f);
-			glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
-			drawSolidCone(croneDiameter, croneHight, 30, 30);
-		glPopMatrix();
+		glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, 0.0f, coordOriginInfo.length);
+	
+	glEnd();
+	renderBitmapString(charOffset, charOffset, coordOriginInfo.length + croneHight + charOffset, GLUT_BITMAP_8_BY_13, "Z");
+	
+	glPushMatrix();
 		
-		// z axis
-		glBegin(GL_LINES);
-			
-			glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
-			glVertex3f(0.0f, 0.0f, 0.0f);
-			glVertex3f(0.0f, 0.0f, coordOriginInfo.length);
+		glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
+		glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
+		drawSolidCone(croneDiameter, croneHight, 30, 30);
 		
-		glEnd();
-		renderBitmapString(charOffset, charOffset, coordOriginInfo.length + croneHight + charOffset, GLUT_BITMAP_8_BY_13, "Z");
-		
-		glPushMatrix();
-			
-			glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
-			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
-			drawSolidCone(croneDiameter, croneHight, 30, 30);
-			
-		glPopMatrix();
+	glPopMatrix();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawCrossHair(float x, float y, float z) {
@@ -494,8 +494,8 @@ void GLContextBase::drawCrossHair(float x, float y, float z) {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawMousePosition() {
 /////////////////////////////////////////////////////////////////
-	if ( isViewMode2D() )
-		drawCrossHair(currentMouseVertexInfo.x, currentMouseVertexInfo.y, currentMouseVertexInfo.z);
+	if ( isViewMode2D() ) 
+		drawCrossHair(currentMouseVertexInfo.vecX, currentMouseVertexInfo.vecY, currentMouseVertexInfo.vecZ);
 		
 	currentMouseVertexInfo.reset();
 }
@@ -508,37 +508,6 @@ void GLContextBase::drawMovePosition(float x, float y, float z) {
 	if ( options.showMillingCutter )  
 		drawMillingCutter(dim, x, y, z);
 }
-/////////////////////////////////////////////////////////////////
-void GLContextBase::determineViewPort(int w, int h, int x, int y) {
-/////////////////////////////////////////////////////////////////
-	if ( viewPort == NULL ) {
-		// default handling
-		std::cerr << "No viewport defined, using default view port" << std::endl;
-		glViewport (0, 0, (GLsizei)w, (GLsizei)h);
-		return;
-	}
-	
-	viewPort->evaluate(w, h, x, y);
-	//viewPort->trace(std::clog);
-	
-	glViewport(viewPort->getX(),  viewPort->getY(),
-			   (GLsizei)viewPort->getNormalizedSizeW(), 
-			   (GLsizei)viewPort->getNormalizedSizeH());
-	/*
-	glScissor(viewPort->getScissorX(), viewPort->getScissorY(),
-			  viewPort->getScissorW(), viewPort->getScissorH());
-	*/
-}
-/////////////////////////////////////////////////////////////////
-void GLContextBase::determineProjection(int w, int h) {
-/////////////////////////////////////////////////////////////////
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	
-	if ( isViewMode2D() )	glOrtho(  -1.0, 1.0, -1.0, 1.0, 0.1, 200.0);
-	else					glFrustum(-1.0, 1.0, -1.0, 1.0, 3.0, 100.0);
-}
-
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawTeapot(void) {
 /////////////////////////////////////////////////////////////////
@@ -569,82 +538,171 @@ void GLContextBase::determineModel() {
 	drawTeapot();
 }
 /////////////////////////////////////////////////////////////////
+void GLContextBase::determineViewPort(int w, int h) {
+/////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL ) {
+		GLViewPort::processDefault(w, h);
+		return;
+	}
+	
+	viewPort->evaluate(w, h);
+	viewPort->process();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::determineViewPort(int w, int h, int x, int y) {
+/////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL ) {
+		GLViewPort::processDefault(w, h);
+		return;
+	}
+	
+	viewPort->evaluate(w, h, x, y);
+	viewPort->process();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::determineProjection(int w, int h) {
+/////////////////////////////////////////////////////////////////
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	
+		if ( isViewMode2D() )	glOrtho  (-1.0, 1.0, -1.0, 1.0, 0.1, 200.0);
+		else					glOrtho  (-1.0, 1.0, -1.0, 1.0, 0.1, 200.0);//glFrustum(-1.0, 1.0, -1.0, 1.0, 3.0, 100.0);
+		
+		if ( GL_COMMON_CHECK_ERROR > 0 )
+			std::cerr << CNC_LOG_FUNCT_A(": Change perspective failed\n");
+
+	glMatrixMode(GL_MODELVIEW);
+}
+/////////////////////////////////////////////////////////////////
 void GLContextBase::determineCameraPosition() {
 /////////////////////////////////////////////////////////////////
-	glMatrixMode(GL_MODELVIEW);
+	const float eye2DX = 5.0;
+	const float eye2DY = 5.0;
+	const float eye2DZ = 5.0;
 	
-	float eye2DX = 5.0;
-	float eye2DY = 5.0;
-	float eye2DZ = 5.0;
-	
-	float eye3DX = 3.0;
-	float eye3DY = 3.0;
-	float eye3DZ = 2.0;
+	const float eye3DX = 5.0;
+	const float eye3DY = 5.0;
+	const float eye3DZ = 5.0;
 	
 	switch( viewMode ) {
 		
 		// 2D views - static eye positions
-		case V2D_TOP:			cameraPos.setEyePos(    0.0,     0.0,  eye2DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_YTOP); break;
+		case V2D_TOP:			cameraPos.setEyePos(    0.0,     0.0, +eye2DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_YTOP); break;
 		case V2D_BOTTOM:		cameraPos.setEyePos(    0.0,     0.0, -eye2DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_YTOP); break;
 		case V2D_LEFT:			cameraPos.setEyePos(-eye2DX,     0.0,     0.0); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
 		case V2D_RIGHT:			cameraPos.setEyePos( eye2DX,     0.0,     0.0); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
 		case V2D_FRONT:			cameraPos.setEyePos(    0.0, -eye2DY,     0.0); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
-		case V2D_REAR:			cameraPos.setEyePos(    0.0,  eye2DY,     0.0); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
+		case V2D_REAR:			cameraPos.setEyePos(    0.0, +eye2DY,     0.0); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
 		
 		// 3D views - static eye positions
-		case V3D_ISO1:			cameraPos.setEyePos( eye3DX,  eye3DY,  eye3DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
-		case V3D_ISO2: 			cameraPos.setEyePos( eye3DX, -eye3DY,  eye3DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
-		case V3D_ISO3:			cameraPos.setEyePos(-eye3DX, -eye3DY,  eye3DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break; 
-		case V3D_ISO4:			cameraPos.setEyePos(-eye3DX,  eye3DY,  eye3DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
+		case V3D_ISO1:			cameraPos.setEyePos(+eye3DX, -eye3DY, +eye3DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
+		case V3D_ISO2: 			cameraPos.setEyePos(-eye3DX, -eye3DY, +eye3DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
+		case V3D_ISO3:			cameraPos.setEyePos(-eye3DX, +eye3DY, +eye3DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break; 
+		case V3D_ISO4:			cameraPos.setEyePos(+eye3DX, +eye3DY, +eye3DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_ZTOP); break;
 		
 		// 3D views - dynamic eye positions
-		case V2D_CAM_ROT_XY_ZTOP:	break; // nothing to do here the camera postion will be configured externally
+		case V2D_CAM_ROT_XY_ZTOP:	break; // nothing to do here the camera position will be configured externally
 	}
 	
-	gluLookAt (cameraPos.getEyeX(),    cameraPos.getEyeY(),    cameraPos.getEyeZ(),  
-			   cameraPos.getCenterX(), cameraPos.getCenterY(), cameraPos.getCenterZ(),
-			   cameraPos.getUpX(),     cameraPos.getUpY(),     cameraPos.getUpZ());
-}
-/////////////////////////////////////////////////////////////////
-void GLContextBase::reshape(int w, int h) {
-/////////////////////////////////////////////////////////////////
-	if ( lastReshapeX == 0 && lastReshapeY == 0 ) {
-		lastReshapeX = w/2;
-		lastReshapeY = h/2;
-	}
-
-	determineViewPort(w, h, lastReshapeX, lastReshapeY);
-	determineProjection(w, h);
-}
-/////////////////////////////////////////////////////////////////
-void GLContextBase::reshape(int w, int h, int x, int y) {
-/////////////////////////////////////////////////////////////////
-	lastReshapeX = x;
-	lastReshapeY = y;
-	lastReshapeW = w;
-	lastReshapeH = h;
+	glMatrixMode(GL_PROJECTION);
 	
-	determineViewPort(w, h, x, y);
-	determineProjection(w, h);
+		gluLookAt (cameraPos.getEyeX(),    cameraPos.getEyeY(),    cameraPos.getEyeZ(),  
+				   cameraPos.getCenterX(), cameraPos.getCenterY(), cameraPos.getCenterZ(),
+				   cameraPos.getUpX(),     cameraPos.getUpY(),     cameraPos.getUpZ());
+				   
+		if ( GL_COMMON_CHECK_ERROR > 0 )
+			std::cerr << CNC_LOG_FUNCT_A(": gluLookAt failed\n");
+	
+	glMatrixMode(GL_MODELVIEW);
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::reshapeViewMode(int w, int h) {
+int GLContextBase::getLastReshapeX() { 
 /////////////////////////////////////////////////////////////////
 	if ( viewPort == NULL )
+		return 0;
+		
+	return viewPort->getCurrentOriginX(); 
+}
+/////////////////////////////////////////////////////////////////
+int GLContextBase::getLastReshapeY() { 
+/////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL )
+		return 0;
+		
+	return viewPort->getCurrentOriginY(); 
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::reshape() {
+/////////////////////////////////////////////////////////////////
+	if ( associatedCanvas == NULL )
 		return;
 		
-	int x = 0, y = 0;
-	// evaluate the corresponding origin coordinates
-	viewPort->getPreDefCoordinatesXY(convertViewMode(viewMode), w, h, x, y);
-	reshape(w, h, x, y);
+	const wxSize cs = associatedCanvas->GetClientSize();
+
+	determineViewPort(cs.GetWidth(), cs.GetHeight());
+	determineProjection(cs.GetWidth(), cs.GetHeight());
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::reshapeAbsolute(int px, int py) {
+/////////////////////////////////////////////////////////////////
+	if ( associatedCanvas == NULL )
+		return;
+		
+	const wxSize cs = associatedCanvas->GetClientSize();
+	determineViewPort(cs.GetWidth(), cs.GetHeight(), px, py);
+	determineProjection(cs.GetWidth(), cs.GetHeight());
+}
+//////////////////////////////////////////////////
+void GLContextBase::reshapeRelative(int dx, int dy) {
+//////////////////////////////////////////////////
+	const int px 	= getLastReshapeX() + dx;
+	const int py 	= getLastReshapeY() + dy;
+	
+	reshapeAbsolute(px, py);
+}
+//////////////////////////////////////////////////
+void GLContextBase::reshapePosToCenter(int px, int py) {
+//////////////////////////////////////////////////
+	if ( associatedCanvas == NULL )
+		return;
+		
+	const wxSize cs = associatedCanvas->GetClientSize();
+	const int dx 	= cs.GetWidth()  / 2 - px;
+	const int dy 	= cs.GetHeight() / 2 - py;
+	
+	reshapeRelative(dx, dy);
+}
+//////////////////////////////////////////////////
+void GLContextBase::reshapePosToCenterIfOutOfFocus(int px, int py) {
+//////////////////////////////////////////////////
+	if ( associatedCanvas == NULL )
+		return;
+
+	const wxSize wSize = associatedCanvas->GetClientSize();
+	const int brd = std::max(wSize.GetWidth(), wSize.GetHeight()) * 0.1;
+	
+	const bool bx = px > brd && px < wSize.GetWidth()  - brd;
+	const bool by = py > brd && py < wSize.GetHeight() - brd;
+	
+	if ( !bx || !by )
+		reshapePosToCenter(px, py);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::reshapeViewMode() {
 /////////////////////////////////////////////////////////////////
-	if ( viewPort == NULL )
+	if ( associatedCanvas == NULL )
 		return;
 
-	reshapeViewMode(viewPort->getCurrentWindowWidth(), viewPort->getCurrentWindowHeigth());
+	if ( viewPort == NULL )
+		return;
+		
+	const wxSize cs = associatedCanvas->GetClientSize();
+
+	// evaluate the corresponding origin coordinates
+	const wxPoint origin = viewPort->evaluatePreDefPositions(convertViewMode(viewMode), cs.GetWidth(), cs.GetHeight());
+	
+	determineViewPort(cs.GetWidth(), cs.GetHeight(), origin.x, origin.y);
+	determineProjection(cs.GetWidth(), cs.GetHeight());
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::setAutoScaling(bool as) {
@@ -661,8 +719,7 @@ void GLContextBase::normalizeScaling() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::normalizeRotation() {
 /////////////////////////////////////////////////////////////////
-	if ( isViewMode2D() )	modelRotate.reset2DDefaults();
-	else 					modelRotate.reset3DDefaults();
+	resetViewport();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::normalizeCamera() {
@@ -692,30 +749,38 @@ void GLContextBase::decorateProbeMode(bool state) {
 	options.probeMode = state;
 }
 /////////////////////////////////////////////////////////////////
+void GLContextBase::traceOpenGLMatrix(std::ostream &ostr, int id) {
+/////////////////////////////////////////////////////////////////
+	GLfloat	matrix[16];
+	glGetFloatv(id, matrix);
+	
+	if ( GL_COMMON_CHECK_ERROR == 0 )
+		CncFloatMatrix4x4::traceRawMatrix(std::cout, matrix);
+}
+/////////////////////////////////////////////////////////////////
 void GLContextBase::display() {
 /////////////////////////////////////////////////////////////////
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	wxASSERT ( viewPort != NULL );
-
+	
+	// first determine camera
+	determineCameraPosition();
+	
 	// initialize model matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity(); 
 	
-	//first position the camera
-	determineCameraPosition();
-
-	// main model
-	glPushMatrix();
 		// scale
 		float sf = getCurrentScaleFactor();
 		glScalef(sf, sf, sf);
 		if ( GL_COMMON_CHECK_ERROR > 0 )
 			return;
-				 
+		
 		// rotate
-		glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
-		glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
 		glRotatef(modelRotate.angleZ(), 0.0f, 0.0f, 1.0f);
+		glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
+		glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
+		
 		if ( GL_COMMON_CHECK_ERROR > 0 )
 			return;
 		
@@ -723,49 +788,75 @@ void GLContextBase::display() {
 		determineModel();
 		if ( GL_COMMON_CHECK_ERROR > 0 ) 
 			return;
-		
+			
 		// draw the crosshair or whatever defined
 		if ( options.showPosMarker ) {
 			markCurrentPosition();
 			if ( GL_COMMON_CHECK_ERROR > 0 )
 				return;
 		}
-		
-	glPopMatrix();
 	
-	// draw additional things
-	glPushMatrix();
 	
-		if ( options.showViewPortBounderies == true ) {
-			determineViewPortBounderies();
-			if ( GL_COMMON_CHECK_ERROR > 0 )
-				return;
-		}
+		// draw coordinate origin
+		glPushMatrix();
 			
-	glPopMatrix();
+			if ( options.showOrigin == true ) {
+				drawCoordinateOrigin();
+				if ( GL_COMMON_CHECK_ERROR > 0 )
+					return;
+			}
+			
+		glPopMatrix();
 	
-	// draw coordinate origin
-	glPushMatrix();
-		
- 		if ( options.showOrigin == true ) {
-			drawCoordinateOrigin();
-			if ( GL_COMMON_CHECK_ERROR > 0 )
-				return;
-		}
-		
-	glPopMatrix();
-	
-	// draw crosshair
-	glPushMatrix();
-	
-		if ( currentMouseVertexInfo.showCrossHair == true )
+		// draw mouse crosshair
+		if ( currentMouseVertexInfo.valid == true )
 			drawMousePosition();
 
-	glPopMatrix();
-
+		// draw additional things
+		/*
+		glPushMatrix();
+		
+			if ( options.showViewPortBounderies == true ) {
+				determineViewPortBounderies();
+				if ( GL_COMMON_CHECK_ERROR > 0 )
+					return;
+			}
+				
+		glPopMatrix();
+		*/
+	
 	glFlush();
 	GL_COMMON_CHECK_ERROR;
+}
+/////////////////////////////////////////////////////////////////
+long GLContextBase::getPositionWithinBuffer(float x, float y, float z) {
+/////////////////////////////////////////////////////////////////
+	// have to be overridden by derived classes
+	return -1;
+}
+/////////////////////////////////////////////////////////////////
+wxString GLContextBase::getNormalizedClientIdOfPos(float x, float y, float z) {
+/////////////////////////////////////////////////////////////////
+	return _("");
+}
+////////////////////////////////////////////////////////////////
+void GLContextBase::setFrontCatchingMode(FrontCatchingMode mode) {
+////////////////////////////////////////////////////////////////
+	frontCatchingMode = mode;
 	
+	cnc::trc.logInfoMessage(wxString::Format("Motion monitor: Front catching mode changed to: '%s'", 
+												getFrontCatchingModeAsStr(frontCatchingMode)));
+}
+////////////////////////////////////////////////////////////////
+const char* GLContextBase::getFrontCatchingModeAsStr(FrontCatchingMode mode) {
+////////////////////////////////////////////////////////////////
+	switch ( mode ) {
+		case FCM_OFF:				return "Off";
+		case FCM_KEEP_IN_FRAME:		return "Keep always in frame";
+		case FCM_ALWAYS_CENTRED:	return "Keep always centred";
+	}
+	
+	return "???";
 }
 ////////////////////////////////////////////////////////////////
 void GLContextBase::delWinCoordsToVertex() {
@@ -775,35 +866,116 @@ void GLContextBase::delWinCoordsToVertex() {
 ////////////////////////////////////////////////////////////////
 bool GLContextBase::logWinCoordsToVertex(int winX, int winY) {
 ////////////////////////////////////////////////////////////////
-	currentMouseVertexInfo.showCrossHair = convertWinCoordsToVertex(winX, 
-																	winY, 
-																	currentMouseVertexInfo.x, 
-																	currentMouseVertexInfo.y, 
-																	currentMouseVertexInfo.z
-																    );
-	//std::cout << wxString::Format(" logWinCoordsToVertex(%d): %9.6lf, %9.6lf, %9.6lf", currentMouseVertexInfo.showCrossHair, currentMouseVertexInfo.x, currentMouseVertexInfo.y, currentMouseVertexInfo.z) << std::endl;
-	return currentMouseVertexInfo.showCrossHair;
+	currentMouseVertexInfo.winX = winX;
+	currentMouseVertexInfo.winY = winY;
+	currentMouseVertexInfo.winZ = 0;
+	
+	currentMouseVertexInfo.valid = 
+			convertWinCoordsToVertex
+			(	currentMouseVertexInfo.winX, 
+				currentMouseVertexInfo.winY, 
+				currentMouseVertexInfo.vecX, 
+				currentMouseVertexInfo.vecY, 
+				currentMouseVertexInfo.vecZ
+			);
+	
+	if ( currentMouseVertexInfo.valid == true ) {
+		currentMouseVertexInfo.bufPos = getPositionWithinBuffer(
+											currentMouseVertexInfo.vecX, 
+											currentMouseVertexInfo.vecY, 
+											currentMouseVertexInfo.vecZ
+										);
+	}
+	
+	return currentMouseVertexInfo.valid;
 }
 ////////////////////////////////////////////////////////////////
-bool GLContextBase::convertWinCoordsToVertex(int winX, int winY, GLdouble & vX, GLdouble & vY, GLdouble & vZ) {
+bool GLContextBase::convertWinCoordsToVertex(int winX, int winY, GLdouble& vecX, GLdouble& vecY, GLdouble& vecZ) {
 /////////////////////////////////////////////////////////////////
-	GLint 	 glViewport[4];
-	GLdouble glModelview[16];
-	GLdouble glProjection[16];
-
 	if ( viewPort == NULL )
 		return false;
 
-	glGetDoublev( GL_MODELVIEW_MATRIX, 	glModelview );
-	glGetDoublev( GL_PROJECTION_MATRIX, glProjection );
-	glGetIntegerv( GL_VIEWPORT, 		glViewport );
-
-	GLfloat x = (float)winX;
-	GLfloat y = (float)viewPort->getCurrentWindowHeigth() - (float)winY;
-	GLfloat z;
+	GLint		curGlViewport  [ 4];
+	GLdouble	curGlModelview [16];
+	GLdouble	curGlProjection[16];
 	
-	glReadPixels(winX, (int)y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
-	return gluUnProject(x, y, z, glModelview, glProjection, glViewport, &vX, &vY, &vZ) == GLU_TRUE;
+	glGetDoublev ( GL_MODELVIEW_MATRIX,		curGlModelview  );
+	glGetDoublev ( GL_PROJECTION_MATRIX,	curGlProjection );
+	glGetIntegerv( GL_VIEWPORT,				curGlViewport   );
+	
+	GLfloat x = (float)winX;
+	GLfloat y = (float)(viewPort->getCurrentWindowHeight() - winY);
+	GLfloat z = 0;
+	
+	// try to evaluate the z part on demand if possible;
+	GLboolean dt; glGetBooleanv(GL_DEPTH_TEST, &dt);
+	if ( dt == GL_TRUE ) {
+		glReadPixels(winX, (int)y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
+		GL_COMMON_CHECK_ERROR;
+	}
+	
+	const bool ret = gluUnProject(x, y, z, curGlModelview, curGlProjection, curGlViewport, &vecX, &vecY, &vecZ) == GLU_TRUE;
+	vecZ *= -1;
+	return ret;
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::isVertexVisible(GLdouble px, GLdouble py, GLdouble pz) {
+/////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL )
+		return false;
+		
+	if ( associatedCanvas == NULL )
+		return false;
+		
+	GLint		curGlViewport	[ 4];
+	GLdouble	curGlModelview	[16];
+	GLdouble	curGlProjection	[16];
+	
+	glGetDoublev ( GL_MODELVIEW_MATRIX,		curGlModelview  );
+	glGetDoublev ( GL_PROJECTION_MATRIX,	curGlProjection );
+	glGetIntegerv( GL_VIEWPORT,				curGlViewport   );
+	
+	GLdouble winX, winY, winZ;
+	gluProject(px, py, pz, curGlModelview, curGlProjection, curGlViewport, &winX, &winY, &winZ);
+	
+	const wxSize wSize = associatedCanvas->GetClientSize();
+	const int brd = 0;
+	const bool bx = px > brd && px < wSize.GetWidth()  - brd;
+	const bool by = py > brd && py < wSize.GetHeight() - brd;
+	
+	return bx && by;
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::keepVisible(GLdouble px, GLdouble py, GLdouble pz) {
+/////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL )
+		return false;
+		
+	if ( associatedCanvas == NULL )
+		return false;
+		
+	if ( frontCatchingMode < 1 )
+		return true;
+		
+	GLint		curGlViewport	[ 4];
+	GLdouble	curGlModelview	[16];
+	GLdouble	curGlProjection	[16];
+	
+	glGetDoublev ( GL_MODELVIEW_MATRIX,		curGlModelview  );
+	glGetDoublev ( GL_PROJECTION_MATRIX,	curGlProjection );
+	glGetIntegerv( GL_VIEWPORT,				curGlViewport   );
+	
+	GLdouble winX, winY, winZ;
+	gluProject(px, py, pz, curGlModelview, curGlProjection, curGlViewport, &winX, &winY, &winZ);
+	
+	switch ( frontCatchingMode ) {
+		case 2: 	reshapePosToCenter(winX, winY);
+					break;
+					
+		default:	reshapePosToCenterIfOutOfFocus(winX, winY);
+	}
+	
+	return true;
 }
 /////////////////////////////////////////////////////////////////
 GLuint GLContextBase::LoadBMP(const wxImage& img) {

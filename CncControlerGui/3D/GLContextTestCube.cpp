@@ -18,7 +18,7 @@ GLContextTestCube::~GLContextTestCube() {
 GLViewPort* GLContextTestCube::createViewPort() {
 /////////////////////////////////////////////////////////////////
 	// determine the destort type
-	return new GLViewPort(GLViewPort::VPT_Distored);
+	return new GLViewPort(GLViewPort::VPT_Distorted);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextTestCube::initContext() {

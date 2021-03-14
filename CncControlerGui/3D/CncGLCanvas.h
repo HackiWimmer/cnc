@@ -31,9 +31,6 @@ class CncGlCanvas : public wxGLCanvas {
 		void incScale();
 		void decScale();
 		
-		void initReshape();
-		void reshapeRelative(int dx, int dy);
-		
 		bool isContextValid() 	const { return lastSetCurrent; }
 		bool isAlreadyPainted() const { return alreadyPainted; }
 		

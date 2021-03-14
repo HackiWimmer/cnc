@@ -59,18 +59,16 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 	// as SwapBuffers() isn't possible valid before
 	if ( IsShownOnScreen() == false )
 		return;
-
+	
 	const bool contextOk = activateContext(preview);
 	if ( contextOk == false )
 		return;
-
+	
 	if ( preview->init() == false )
 		return;
-
-	const wxSize cs = GetClientSize();
 	
-	if ( alreadyPainted )	preview->reshape(cs.GetWidth(), cs.GetHeight());
-	else 					preview->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
+	if ( alreadyPainted )	preview->reshape();
+	else 					preview->reshapeViewMode();
 	
 	preview->display();
 	
@@ -100,7 +98,12 @@ void CncGCodePreview::onMouse(wxMouseEvent& event) {
 void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 //////////////////////////////////////////////////
 	switch ( event.GetKeyCode() ) {
-		case 'C':	preview->centerViewport();
+		
+		case 'C':	preview->centreViewport();
+					Refresh(false);
+					break;
+					
+		case 'R':	preview->resetViewport();
 					Refresh(false);
 					break;
 	}

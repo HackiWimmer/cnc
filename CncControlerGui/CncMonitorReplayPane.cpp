@@ -123,6 +123,7 @@ void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {
 		id = motionMonitor->previewNextVertexNormalizedId();
 	
 	// spool
+	motionMonitor->pushReplayMode();
 	while ( motionMonitor->getVirtualEnd() < motionMonitor->getPathItemCount() - 1 ) {
 		
 		const bool fine = GetCbStepUnit()->GetSelection() != Unit_Id;
@@ -149,6 +150,8 @@ void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {
 		if ( abort == true )
 			break;
 	}
+	
+	motionMonitor->popReplayMode();
 }
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::replayPlayAll(wxCommandEvent& event) {

@@ -277,15 +277,15 @@ void CncMotionMonitor::appendVertex(long id, CncSpeedMode sm, float x, float y, 
 	}
 }
 /////////////////////////////////////////////////////////////////
-void CncMotionMonitor::centerViewport() {
+void CncMotionMonitor::centreViewport() {
 /////////////////////////////////////////////////////////////////
-	monitor->centerViewport();
+	monitor->centreViewport();
 	onPaint();
 }
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::resetRotation() {
 /////////////////////////////////////////////////////////////////
-	monitor->getModelRotation().reset2DDefaults();
+	monitor->getModelRotation().reset();
 	onPaint();
 }
 /////////////////////////////////////////////////////////////////
@@ -303,10 +303,8 @@ void CncMotionMonitor::onPaint() {
 	if ( monitor->init() == false )
 		return;
 
-	const wxSize cs = GetClientSize();
-	
-	if ( alreadyPainted )	monitor->reshape(cs.GetWidth(), cs.GetHeight());
-	else 					monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
+	if ( alreadyPainted )	monitor->reshape();
+	else 					monitor->reshapeViewMode();
 	
 	monitor->display();
 	
@@ -335,9 +333,7 @@ void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 void CncMotionMonitor::onSize(wxSizeEvent& event) {
 //////////////////////////////////////////////////
-	const wxSize cs = GetClientSize();
-	
-	monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
+	monitor->reshapeViewMode();
 	event.Skip();
 }
 //////////////////////////////////////////////////
@@ -348,68 +344,40 @@ void CncMotionMonitor::onEraseBackground(wxEraseEvent& event) {
 //////////////////////////////////////////////////
 void CncMotionMonitor::onLeave(wxMouseEvent& event) {
 //////////////////////////////////////////////////
-	mouseMoveMode = false;
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::performMouseCoordAndToolTip() {
 //////////////////////////////////////////////////
-	typedef GLContextBase::ViewMode VT;
+	GLContextBase::MouseVertexInfo mvi = context->getCurrentMouseVertexInfo();
 	
-	wxString tt;
-	switch ( context->getViewMode() ) {
-		// xy plane
-		case VT::V2D_TOP:
-		case VT::V2D_BOTTOM:	tt.assign(wxString::Format("(X,Y) = %8.3lf, %8.3lf", 
-															context->getMouseVertexAsMetricX(), 
-															context->getMouseVertexAsMetricY()
-														  )
-								);
-								THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricX()));
-								THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricY()));
-								THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", 0.0));
-								break;
-		// yz plane
-		case VT::V2D_LEFT:
-		case VT::V2D_RIGHT:		tt.assign(wxString::Format("(Y,Z) = %8.3lf, %8.3lf", 
-															context->getMouseVertexAsMetricY(), 
-															context->getMouseVertexAsMetricZ()
-														  )
-								);
-								THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", 0.0));
-								THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricY()));
-								THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricZ()));
-								break;
-		// xz plane
-		case VT::V2D_FRONT:
-		case VT::V2D_REAR:		tt.assign(wxString::Format("(X,Z) = %8.3lf, %8.3lf", 
-															context->getMouseVertexAsMetricX(), 
-															context->getMouseVertexAsMetricZ()
-														  )
-								);
-								THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricX()));
-								THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", 0.0));
-								THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricZ()));
-								break;
-								
-		case VT::V3D_ISO1:
-		case VT::V3D_ISO2:
-		case VT::V3D_ISO3:
-		case VT::V3D_ISO4:		tt.assign(wxString::Format("(X,Y,Z) = %8.3lf, %8.3lf", 
-															context->getMouseVertexAsMetricX(), 
-															context->getMouseVertexAsMetricY(), 
-															context->getMouseVertexAsMetricZ()
-														  )
-								);
-								//THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricX()));
-								//THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricY()));
-								//THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricZ()));
-								//break;
+	const double maxDim = THE_CONFIG->getMaxDimension();
+	
+	const double tx		= mvi.getAsMetricX(1.0);
+	const double ty		= mvi.getAsMetricY(1.0);
+	const double tz		= mvi.getAsMetricZ(1.0);
+	
+	THE_APP->GetMouseCoordX()->Clear();
+	THE_APP->GetMouseCoordY()->Clear();
+	THE_APP->GetMouseCoordZ()->Clear();
+	
+	if ( cnc::between(tx, -maxDim, +maxDim) )
+		THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", tx));
 		
-		default:				tt.clear();
+	if ( cnc::between(ty, -maxDim, +maxDim) )
+		THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", ty));
+		
+	if ( cnc::between(tz, -maxDim, +maxDim) )
+		THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", tz));
+
+	if ( CncAsyncKeyboardState::isShiftPressed() == true ) {
+		
+		const wxString sx( cnc::between(tx, -maxDim, +maxDim) ? wxString::Format("%8.3lf", tx) : "----.---" );
+		const wxString sy( cnc::between(ty, -maxDim, +maxDim) ? wxString::Format("%8.3lf", ty) : "----.---" );
+		const wxString sz( cnc::between(tz, -maxDim, +maxDim) ? wxString::Format("%8.3lf", tz) : "----.---" );
+		const wxString id( context->getNormalizedClientIdOfPos(mvi.vecX, mvi.vecY, mvi.vecZ) );
+		
+		SetToolTip(wxString::Format("(X,Y,Z): %s, %s, %s (Client ID: ): %s", sx, sy, sz, id));
 	}
-	
-	if ( CncAsyncKeyboardState::isShiftPressed() == true ) 
-		SetToolTip(tt);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onMouse(wxMouseEvent& event) {
@@ -449,34 +417,42 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 void CncMotionMonitor::onKeyDown(int keyCode) {
 //////////////////////////////////////////////////
 	static const int delta = 10;
-	const wxSize cs = GetClientSize();
-	
-	int ox = monitor->getLastReshapeX();
-	int oy = monitor->getLastReshapeY();
-	if ( ox == 0 )	ox = cs.GetWidth()/2;
-	if ( oy == 0 )	oy = cs.GetHeight()/2;
 	
 	switch ( keyCode ) {
 		
-		case 'C':			monitor->centerViewport();
+		case 'C':			monitor->centreViewport();
 							onPaint();
 							break;
 					
-		case WXK_UP:		oy += delta; monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+		case 'R':			monitor->resetViewport();
 							onPaint();
 							break;
 							
-		case WXK_DOWN:		oy -= delta; monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+		case '0':			monitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_OFF);
+							onPaint();
+							break;
+							
+		case '1':			monitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_KEEP_IN_FRAME);
+							onPaint();
+							break;
+							
+		case '2':			monitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_ALWAYS_CENTRED);
+							onPaint();
+							break;
+							
+		case WXK_UP:		monitor->reshapeRelative(0, +delta);
+							onPaint();
+							break;
+							
+		case WXK_DOWN:		monitor->reshapeRelative(0, -delta);
 							onPaint();
 							break;
 		
-		case WXK_LEFT:		ox -= delta; 
-							monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+		case WXK_LEFT:		monitor->reshapeRelative(-delta, 0);
 							onPaint();
 							break;
 							
-		case WXK_RIGHT:		ox += delta; 
-							monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+		case WXK_RIGHT:		monitor->reshapeRelative(+delta, 0);
 							onPaint();
 							break;
 	}
@@ -554,6 +530,16 @@ void CncMotionMonitor::normalizeMonitor() {
 	monitor->normalizeCamera();
 	
 	Refresh();
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::pushReplayMode() {
+//////////////////////////////////////////////////
+	monitor->pushReplayMode();
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::popReplayMode() {
+//////////////////////////////////////////////////
+	monitor->popReplayMode();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::pushProcessMode() {

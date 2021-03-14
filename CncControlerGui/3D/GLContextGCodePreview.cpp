@@ -17,7 +17,7 @@ GLContextGCodePreview::~GLContextGCodePreview() {
 GLViewPort* GLContextGCodePreview::createViewPort() {
 /////////////////////////////////////////////////////////////////
 	// determine the destort type
-	return new GLViewPort(GLViewPort::VPT_Undistored);
+	return new GLViewPort(GLViewPort::VPT_Undistorted);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextGCodePreview::initColours() {

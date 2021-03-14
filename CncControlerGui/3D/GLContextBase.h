@@ -102,15 +102,45 @@ class GLContextBase : public wxGLContext {
 							
 							V2D_CAM_ROT_XY_ZTOP
 						};
+						
+		enum FrontCatchingMode { FCM_OFF = 0, FCM_KEEP_IN_FRAME = 1, FCM_ALWAYS_CENTRED = 2 };
 		
 		typedef std::vector<GLGuidePath> GuidePathes;
 		
+		// structure to capture the vertex parameter of the a mouse focus. 
+		struct MouseVertexInfo {
+			
+			bool		valid		= false;
+			
+			long		bufPos		= -1;
+			
+			int			winX		= 0;
+			int			winY		= 0;
+			int			winZ		= 0;
+			
+			GLdouble	vecX 		= 0.0;
+			GLdouble	vecY 		= 0.0;
+			GLdouble	vecZ 		= 0.0;
+			
+			void reset() { *this = MouseVertexInfo(); }
+			
+			int32_t getAsStepsX(float scaleFactor);
+			int32_t getAsStepsY(float scaleFactor);
+			int32_t getAsStepsZ(float scaleFactor);
+			
+			double getAsMetricX(float scaleFactor);
+			double getAsMetricY(float scaleFactor);
+			double getAsMetricZ(float scaleFactor);
+		};
+
 		// common 
 		void clearGuidePathes();
 		void addGuidePath(const GLGuidePath& gp);
 		
 		const char* getContextName() const { return contextName; }
-		virtual void keyboardHandler(unsigned char c);
+		
+		virtual wxString getNormalizedClientIdOfPos(float x, float y, float z);
+		virtual long getPositionWithinBuffer(float x, float y, float z);
 		
 		static void setCurrentCanvas(const wxGLCanvas* canvas) 		{ currentCanvas = canvas; }
 		static const wxGLCanvas* getCurrentCanvas()					{ return currentCanvas; }
@@ -129,15 +159,19 @@ class GLContextBase : public wxGLContext {
 		
 		bool init();
 		void display();
-		void reshape(int w, int h);
-		void reshape(int w, int h, int x, int y);
-		void reshapeViewMode(int w, int h);
-		void reshapeViewMode();
 		
-		int getLastReshapeX() { return lastReshapeX; }
-		int getLastReshapeY() { return lastReshapeY; }
-		int getLastReshapeW() { return lastReshapeW; }
-		int getLastReshapeH() { return lastReshapeH; }
+		void reshapeAbsolute(int px, int py);
+		void reshapeRelative(int dx, int dy);
+		void reshape();
+		void reshapeViewMode();
+		void reshapePosToCenter(int px, int py);
+		void reshapePosToCenterIfOutOfFocus(int px, int py);
+		
+		int getLastReshapeX();
+		int getLastReshapeY();
+		
+		void setFrontCatchingMode(FrontCatchingMode mode);
+		const char* getFrontCatchingModeAsStr(FrontCatchingMode mode);
 		
 		void setAutoScaling(bool as);
 		void normalizeScaling();
@@ -152,7 +186,8 @@ class GLContextBase : public wxGLContext {
 		bool isSmoothingEnabled();
 		
 		// viewPort
-		void centerViewport();
+		void centreViewport();
+		void resetViewport();
 		
 		virtual float getMaxScaleFactor();
 		virtual float getCurrentScaleFactor();
@@ -196,13 +231,22 @@ class GLContextBase : public wxGLContext {
 		bool logWinCoordsToVertex(int winX, int winY);
 		void delWinCoordsToVertex();
 		
-		int32_t getMouseVertexAsStepsX() { return currentMouseVertexInfo.getAsStepsX(getCurrentScaleFactor()); }
-		int32_t getMouseVertexAsStepsY() { return currentMouseVertexInfo.getAsStepsY(getCurrentScaleFactor()); }
-		int32_t getMouseVertexAsStepsZ() { return currentMouseVertexInfo.getAsStepsZ(getCurrentScaleFactor()); }
+		bool isVertexVisible(GLdouble px, GLdouble py, GLdouble pz);
+		bool keepVisible(GLdouble px, GLdouble py, GLdouble pz);
 		
-		double getMouseVertexAsMetricX() { return currentMouseVertexInfo.getAsMetricX(getCurrentScaleFactor()); }
-		double getMouseVertexAsMetricY() { return currentMouseVertexInfo.getAsMetricY(getCurrentScaleFactor()); }
-		double getMouseVertexAsMetricZ() { return currentMouseVertexInfo.getAsMetricZ(getCurrentScaleFactor()); }
+		const MouseVertexInfo& getCurrentMouseVertexInfo() { return currentMouseVertexInfo; }
+		
+		float getMouseVertexX()				{ return currentMouseVertexInfo.vecX; }
+		float getMouseVertexY()				{ return currentMouseVertexInfo.vecY; }
+		float getMouseVertexZ()				{ return currentMouseVertexInfo.vecZ; }
+		
+		int32_t getMouseVertexAsStepsX()	{ return currentMouseVertexInfo.getAsStepsX(getCurrentScaleFactor()); }
+		int32_t getMouseVertexAsStepsY()	{ return currentMouseVertexInfo.getAsStepsY(getCurrentScaleFactor()); }
+		int32_t getMouseVertexAsStepsZ()	{ return currentMouseVertexInfo.getAsStepsZ(getCurrentScaleFactor()); }
+		
+		double getMouseVertexAsMetricX()	{ return currentMouseVertexInfo.getAsMetricX(getCurrentScaleFactor()); }
+		double getMouseVertexAsMetricY()	{ return currentMouseVertexInfo.getAsMetricY(getCurrentScaleFactor()); }
+		double getMouseVertexAsMetricZ()	{ return currentMouseVertexInfo.getAsMetricZ(getCurrentScaleFactor()); }
 
 	protected:
 		
@@ -225,32 +269,13 @@ class GLContextBase : public wxGLContext {
 				{}
 		};
 		
-		////////////////////////////////////////////////////
-		struct MouseVertexInfo {
-			bool showCrossHair 	= false;
-			GLdouble x 			= 0.0;
-			GLdouble y 			= 0.0;
-			GLdouble z 			= 0.0;
-			
-			void reset() {
-				showCrossHair 	= false;
-				x = y = z		= 0.0;
-			}
-			
-			int32_t getAsStepsX(float scaleFactor);
-			int32_t getAsStepsY(float scaleFactor);
-			int32_t getAsStepsZ(float scaleFactor);
-			
-			double getAsMetricX(float scaleFactor);
-			double getAsMetricY(float scaleFactor);
-			double getAsMetricZ(float scaleFactor);
-		};
-
 		wxGLCanvas*			associatedCanvas;
 		wxString 			contextName;
-
+		
 		bool				enabled;
 		bool 				initialized;
+		
+		FrontCatchingMode	frontCatchingMode;
 		
 		GuidePathes			guidePathes;
 		
@@ -274,7 +299,8 @@ class GLContextBase : public wxGLContext {
 		virtual void drawCrossHair(float x, float y, float z);
 		virtual void drawCoordinateOrigin();
 		
-		virtual void determineViewPort(int w, int h, int x=0, int y=0);
+		void determineViewPort(int w, int h);
+		void determineViewPort(int w, int h, int x, int y=0);
 		
 		// protected context interface
 		virtual void initContext() = 0;
@@ -294,15 +320,11 @@ class GLContextBase : public wxGLContext {
 		 
 		void drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp=true);
 		void drawSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
-
+		void traceOpenGLMatrix(std::ostream &ostr, int id);
+		
 	private:
 		
 		static const wxGLCanvas* currentCanvas;
-		
-		int lastReshapeX;
-		int lastReshapeY;
-		int lastReshapeW;
-		int lastReshapeH;
 		
 		GLuint theTexture;
 		

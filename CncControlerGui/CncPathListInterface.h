@@ -23,6 +23,7 @@ class CncPathListMonitor : public CncPathListRunner::Interface {
 		CncNanoTimestamp	tsMeasurementStart;
 		CncNanoTimestamp	tsMeasurementLast;
 		
+		virtual bool dispatchEventQueue();
 		virtual void notifyNextPostion()												{}
 		
 	public:

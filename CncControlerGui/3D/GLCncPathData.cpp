@@ -1,4 +1,6 @@
 #include <iostream>
+#include "CncConfig.h"
+#include "CncContext.h"
 #include "GLCncPathData.h"
 
 ////////////////////////////////////////////

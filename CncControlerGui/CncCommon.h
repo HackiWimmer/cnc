@@ -150,17 +150,25 @@ namespace cnc {
 								const double MAX = +DBL_MAX;
 	};
 	
-	namespace dblCmp {
-								const double epsilon = 0.000001;
-								
-								inline bool eq(const double &a, const double &b)	{ return std::fabs(a - b) <= epsilon; }
-								inline bool nu(const double &a)						{ return eq(a, 0.0); }
-								
-								inline bool lt(const double &a, const double &b)	{ return eq(a, b) ? false : a < b; }
-								inline bool gt(const double &a, const double &b)	{ return eq(a, b) ? false : a > b; }
-								inline bool le(const double &a, const double &b)	{ return eq(a, b) ? true  : a < b; } 
-								inline bool ge(const double &a, const double &b)	{ return eq(a, b) ? true  : a > b; }
+	struct FloatingComparePara {
+		static constexpr float epsilon = 0.000001;
 	};
+	
+	template <typename T, typename P>
+	struct FloatingCompare {
+								static constexpr T epsilon = P::epsilon;
+								
+								static bool eq(const T &a, const T &b)	{ return std::fabs(a - b) <= epsilon; }
+								static bool nu(const T &a)				{ return eq(a, 0.0); }
+								
+								static bool lt(const T &a, const T &b)	{ return eq(a, b) ? false : a < b; }
+								static bool gt(const T &a, const T &b)	{ return eq(a, b) ? false : a > b; }
+								static bool le(const T &a, const T &b)	{ return eq(a, b) ? true  : a < b; } 
+								static bool ge(const T &a, const T &b)	{ return eq(a, b) ? true  : a > b; }
+	};
+	
+	typedef FloatingCompare<float,  FloatingComparePara>	fltCmp;
+	typedef FloatingCompare<double, FloatingComparePara>	dblCmp;
 	
 	template <class T, class Compare>
 	bool between(T val, T lo, T hi, Compare comp) 	{ return comp(lo, val) && comp(val, hi); }

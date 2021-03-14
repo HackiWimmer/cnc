@@ -120,7 +120,7 @@ class GLOpenGLPathBuffer {
 				friend GLOpenGLPathBuffer;
 				
 			public:
-
+				
 				//-------------------------------------------------
 				long getClientId()	const { return clientID; }
 				char getType()		const { return type; }
@@ -133,6 +133,12 @@ class GLOpenGLPathBuffer {
 				float getG()		const { return colour[CncVertexColourG]; }
 				float getB()		const { return colour[CncVertexColourB]; }
 				float getA()		const { return colour[CncVertexColourA]; }
+				
+				//-------------------------------------------------
+				bool hasRoughlyThisPos(float x, float y);
+				bool hasRoughlyThisPos(float x, float y, float z);
+				
+				bool hasExactThisPos(float x, float y, float z);
 				
 				//-------------------------------------------------
 				CncVertex()
@@ -278,6 +284,8 @@ class GLOpenGLPathBuffer {
 		long getFirstIndexForClientId(long clientId) const;
 		
 		long getLastEntryForClientId(long clientId) const;
+		
+		long findfirstVertexWithPos(float vx, float vy, float vz, GLOpenGLPathBuffer::CncVertex& vertex);
 
 		// --------------------------------------------------------------
 		const wxString& getIndexForClientIdAsString(long clientId, wxString& ret, bool summerize);
@@ -389,15 +397,19 @@ class GLOpenGLPathBufferStore {
 		bool dimUpClientID(long clientId);
 		
 		void display(GLOpenGLPathBuffer::DisplayType dt, long vertices = -1);
+
 		long findFirstEntryForClientId(long cliendId);
 		long findFirstIndexForClientId(long cliendId);
 		long findLastEntryForClientId(long cliendId);
 		void setColours(const GLOpenGLPathBuffer::VertexColours& colours);
+
+		long findfirstVertexWithPos(float vx, float vy, float vz, GLOpenGLPathBuffer::CncVertex& vertex);
 		
 		const wxString& getIndexForClientIdAsString(long clientId, wxString& ret, bool summerize);
 		const wxString& getIndexForIdxAsString(unsigned long idx, wxString& ret, bool summerize);
 		
 		const wxString& getVaoAndVboSummary();
+		
 		
 		//-------------------------------------------------
 		friend std::ostream &operator<< (std::ostream &ostr, const GLOpenGLPathBufferStore& s) {

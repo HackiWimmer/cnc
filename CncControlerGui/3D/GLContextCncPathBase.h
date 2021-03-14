@@ -90,6 +90,9 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		virtual bool SetCurrent(const wxGLCanvas &win) const; 
 		
+		virtual wxString getNormalizedClientIdOfPos(float x, float y, float z);
+		virtual long getPositionWithinBuffer(float x, float y, float z);
+		
 		void clearPathData();
 		void appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex);
 		void reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt);
@@ -146,6 +149,9 @@ class GLContextCncPathBase : public GLContextBase {
 		void pushProcessMode();
 		void popProcessMode();
 		
+		void pushReplayMode();
+		void popReplayMode();
+
 		void registerCallback(GLI::GLCncPath::Callback* cb) 			{ cncPath.registerCallback(cb);   }
 		
 		void activateOpenGlContext(bool state = true);
@@ -153,6 +159,24 @@ class GLContextCncPathBase : public GLContextBase {
 
 	protected:
 		
+		struct Context {
+			
+			wxPoint wndOrgin	= wxPoint(0,0);
+			float scaleFactor	= 1.0;
+			
+			protected:
+				Context()  {}
+				~Context() {}
+		};
+		
+		struct ProcessContext : public Context {
+			void reset() { *this = ProcessContext(); }
+		};
+		
+		struct ReplayContext : public Context {
+			void reset() { *this = ReplayContext(); }
+		};
+
 		GLI::GLCncPath		cncPath;
 		cnc::LongValues		highlightedClientIds;
 		GLI::GLXYZRuler		ruler;
@@ -160,6 +184,9 @@ class GLContextCncPathBase : public GLContextBase {
 		bool				continiousDirConeFlag;
 		
 		long 				currentClientId;
+		
+		ProcessContext		processContext;
+		ReplayContext		replayContext;
 		
 		wxColour			rulerColourX;
 		wxColour			rulerColourY;
@@ -171,7 +198,6 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		virtual void determineModel();
 		virtual void markCurrentPosition();
-		
 		
 		void drawGuidePathes();
 		void drawHardwareBox();

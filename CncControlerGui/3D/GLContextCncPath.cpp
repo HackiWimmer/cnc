@@ -18,8 +18,8 @@ GLContextCncPath::~GLContextCncPath() {
 /////////////////////////////////////////////////////////////////
 GLViewPort* GLContextCncPath::createViewPort() {
 /////////////////////////////////////////////////////////////////
-	// determine the destort type
-	return new GLViewPort(GLViewPort::VPT_Undistored);
+	// determine the distort type
+	return new GLViewPort(GLViewPort::VPT_Undistorted);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPath::initContext() {
@@ -31,6 +31,8 @@ void GLContextCncPath::initContext() {
 	glShadeModel(GL_FLAT);
 	
 	glEnable(GL_LINE_SMOOTH);
+	
+	glEnable(GL_DEPTH_TEST);
 
 	if ( options.blending ) {
 		glEnable(GL_BLEND);
