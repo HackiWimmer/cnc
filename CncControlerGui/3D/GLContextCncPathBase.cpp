@@ -175,7 +175,6 @@ const wxString& CncGLContextObserver::getRegisteredContextItemText(long row, lon
 	return retVal;
 }
 
-
 /////////////////////////////////////////////////////////////////
 GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas, const wxString& name)
 : GLContextBase(canvas, name)

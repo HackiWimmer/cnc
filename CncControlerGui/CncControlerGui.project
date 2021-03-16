@@ -235,6 +235,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncMillingTrack.cpp" ExcludeProjConfig="Release;"/>
+      <File Name="CncMillingTrack.h" ExcludeProjConfig="Release;"/>
       <File Name="CncVector.cpp"/>
       <File Name="CncVector.h"/>
       <File Name="CncGamepadSpy.h"/>
@@ -818,6 +820,7 @@
         <IncludePath Value="C:/msys64/mingw64/include"/>
         <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
         <IncludePath Value="C:/@Development/opencv/build/include"/>
+        <IncludePath Value="C:/@Development/openvg"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
@@ -825,7 +828,7 @@
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="C:/msys64/mingw64/lib"/>
-        <LibraryPath Value="C:/opencv/mingwbuild/lib"/>
+        <LibraryPath Value="C:/@Development/opencv/mingwbuild/lib"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>

@@ -48,9 +48,11 @@ class CncVector {
 		const T getW() const { return (T)0; }
 		
 		//--------------------------------------------------------
-		CncVector<T> &  add(const CncVector<T>& v)	{ x += v.x; y += v.y; z += v.z; return *this; }
-		CncVector<T> &  sub(const CncVector<T>& v)	{ x -= v.x; y -= v.y; z -= v.z; return *this;  }
-		CncVector<T> &  mul(T r) 					{ x *= r; y *= r; z *= r; return *this;  }
+		CncVector<T> & set(T px, T py, T pz)		{ x = px; y = py; z = pz;			return *this; }
+		CncVector<T> & set(const CncVector<T>& v)	{ x = v.x; y = v.y; z = v.z;		return *this; }
+		CncVector<T> & add(const CncVector<T>& v)	{ x += v.x; y += v.y; z += v.z;		return *this; }
+		CncVector<T> & sub(const CncVector<T>& v)	{ x -= v.x; y -= v.y; z -= v.z;		return *this; }
+		CncVector<T> & mul(T r) 					{ x *= r; y *= r; z *= r;			return *this; }
 		
 		CncVector<T> & normalize() {
 			const T l = getLength();

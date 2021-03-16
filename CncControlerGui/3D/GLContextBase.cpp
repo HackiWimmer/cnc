@@ -540,6 +540,12 @@ void GLContextBase::determineModel() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::determineViewPort(int w, int h) {
 /////////////////////////////////////////////////////////////////
+	if ( associatedCanvas == NULL )
+		return;
+		
+	if ( associatedCanvas->IsShownOnScreen() == false )
+		return;
+
 	if ( viewPort == NULL ) {
 		GLViewPort::processDefault(w, h);
 		return;
@@ -551,6 +557,12 @@ void GLContextBase::determineViewPort(int w, int h) {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::determineViewPort(int w, int h, int x, int y) {
 /////////////////////////////////////////////////////////////////
+	if ( associatedCanvas == NULL )
+		return;
+	
+	if ( associatedCanvas->IsShownOnScreen() == false )
+		return;
+
 	if ( viewPort == NULL ) {
 		GLViewPort::processDefault(w, h);
 		return;
@@ -568,9 +580,11 @@ void GLContextBase::determineProjection(int w, int h) {
 		if ( isViewMode2D() )	glOrtho  (-1.0, 1.0, -1.0, 1.0, 0.1, 200.0);
 		else					glOrtho  (-1.0, 1.0, -1.0, 1.0, 0.1, 200.0);//glFrustum(-1.0, 1.0, -1.0, 1.0, 3.0, 100.0);
 		
-		if ( GL_COMMON_CHECK_ERROR > 0 )
-			std::cerr << CNC_LOG_FUNCT_A(": Change perspective failed\n");
-
+		if ( associatedCanvas != NULL && associatedCanvas->IsShownOnScreen() ) {
+			if ( GL_COMMON_CHECK_ERROR > 0 )
+				std::cerr << CNC_LOG_FUNCT_A(": Change perspective failed\n");
+		}
+		
 	glMatrixMode(GL_MODELVIEW);
 }
 /////////////////////////////////////////////////////////////////
@@ -610,9 +624,11 @@ void GLContextBase::determineCameraPosition() {
 				   cameraPos.getCenterX(), cameraPos.getCenterY(), cameraPos.getCenterZ(),
 				   cameraPos.getUpX(),     cameraPos.getUpY(),     cameraPos.getUpZ());
 				   
-		if ( GL_COMMON_CHECK_ERROR > 0 )
-			std::cerr << CNC_LOG_FUNCT_A(": gluLookAt failed\n");
-	
+		if ( associatedCanvas != NULL && associatedCanvas->IsShownOnScreen() ) {
+			if ( GL_COMMON_CHECK_ERROR > 0 )
+				std::cerr << CNC_LOG_FUNCT_A(": gluLookAt failed\n");
+		}
+		
 	glMatrixMode(GL_MODELVIEW);
 }
 /////////////////////////////////////////////////////////////////
