@@ -29,6 +29,7 @@ wxBEGIN_EVENT_TABLE(CncBaseEditor, wxStyledTextCtrl)
 	EVT_LEFT_UP			(CncBaseEditor::onLeftUp)
 	EVT_LEFT_DCLICK		(CncBaseEditor::onLeftDClick)
 	EVT_RIGHT_DOWN		(CncBaseEditor::onRightDown)
+	EVT_TIMER			(wxID_ANY, CncBaseEditor::onClientIDTimer)
 wxEND_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////
@@ -41,17 +42,22 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 , ctlEditMode			(NULL)
 , ctlColunmPostion		(NULL)
 , ctlStatus				(NULL)
+, clientIDTimer			(this, wxID_ANY)
+, firstClientIdToSel	(CLIENT_ID.INVALID)
+, lastClientIdToSel		(CLIENT_ID.INVALID)
 , tryToSelectFlag		(false)
 , blockSelectEvent		(false)
 , fileLoadingActive		(false)
 ///////////////////////////////////////////////////////////////////
 {
+	clientIDTimer.Stop();
 	setupStyle();
 	Enable(hasEditMode());
 }
 ///////////////////////////////////////////////////////////////////
 CncBaseEditor::~CncBaseEditor() {
 ///////////////////////////////////////////////////////////////////
+	clientIDTimer.Stop();
 	wxDELETE( svgPopupMenu );
 }
 ///////////////////////////////////////////////////////////////////
@@ -247,6 +253,32 @@ void CncBaseEditor::onRightDown(wxMouseEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void CncBaseEditor::onClientIDTimer(wxTimerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( firstClientIdToSel == CLIENT_ID.INVALID || lastClientIdToSel == CLIENT_ID.INVALID ) {
+		clientIDTimer.Stop();
+		return;
+	}
+	
+	SelectEventBlocker blocker(this);
+	APP_PROXY::tryToSelectClientIds(firstClientIdToSel * CLIENT_ID.TPL_FACTOR, 
+									lastClientIdToSel  * CLIENT_ID.TPL_FACTOR, 
+									ClientIdSelSource::ID::TSS_EDITOR);
+	
+	clientIDTimer.Stop();
+}
+///////////////////////////////////////////////////////////////////
+void CncBaseEditor::registerClientIdsToSelect(long firstCID, long lastCID) {
+///////////////////////////////////////////////////////////////////
+	firstClientIdToSel	= firstCID;
+	lastClientIdToSel	= lastCID;
+	
+	// (re)starts a timer. This has to be done to improve the performance 
+	// because it decouples the gui activities. If the user changes the editor selection 
+	// in a fast manner, then only the last editor selection will be used so.
+	clientIDTimer.Start(300);
+}
+///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 ///////////////////////////////////////////////////////////////////
 	long x, y;
@@ -257,44 +289,38 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 		getCtlColumnPos()->SetLabel(label);
 	
 	// try to select current line as client id
-	if ( IsModified() == false && publishSelection == true ) {
-		// ------------------------------------------------------------
-		auto tryToSelectClientId = [&](long fcid, long lcid) {
-			if ( tryToSelectFlag == false )
-				return;
-				
-			SelectEventBlocker blocker(this);
-			APP_PROXY::tryToSelectClientIds(fcid * CLIENT_ID.TPL_FACTOR, lcid * CLIENT_ID.TPL_FACTOR, ClientIdSelSource::ID::TSS_EDITOR);
-		};
+	const bool evalSelection =
+			IsModified()								== false
+		&&	tryToSelectFlag								== true
+		&&	publishSelection							== true
+		&& CncAsyncKeyboardState::isShiftPressed()		== false
+	;
+	
+	if ( evalSelection == true ) {
 		
 		// ------------------------------------------------------------
 		if ( fileInfo.format == TplSvg ) {
+			
 			SearchAnchor();										// Set an anchor for the next search
 			const long prevSelStart	= GetSelectionStart();		// Store selection
 			const long prevSelEnd	= GetSelectionEnd();		// Store selection
 			const long prevPos		= GetCurrentPos();			// Store position
 			const long sp			= SearchPrev(0, "<");		// Find start
 			
-			if ( sp != wxNOT_FOUND )	tryToSelectClientId(LineFromPosition(sp) + 1,           LineFromPosition(prevSelEnd) + 1);
-			else						tryToSelectClientId(LineFromPosition(prevSelStart) + 1, LineFromPosition(prevSelEnd) + 1);
+			if ( sp != wxNOT_FOUND )	registerClientIdsToSelect(LineFromPosition(sp) + 1,           LineFromPosition(prevSelEnd) + 1);
+			else						registerClientIdsToSelect(LineFromPosition(prevSelStart) + 1, LineFromPosition(prevSelEnd) + 1);
 			
-			if ( CncAsyncKeyboardState::isControlPressed() ) {
-				// Currently nothing to do
-				// Streaches the selection to the command start automatically
-			}
-			else {
-				SetCurrentPos(prevPos);					// Restore position
-				SetSelection(prevSelStart, prevSelEnd);	// Restore selection
-			}
+			SetCurrentPos(prevPos);					// Restore position
+			SetSelection(prevSelStart, prevSelEnd);	// Restore selection
 		}
 		else {
 			const long prevSelStart	= GetSelectionStart();		// Store selection
 			const long prevSelEnd	= GetSelectionEnd();		// Store selection
 			
-			tryToSelectClientId(LineFromPosition(prevSelStart) + 1, LineFromPosition(prevSelEnd) + 1);
+			registerClientIdsToSelect(LineFromPosition(prevSelStart) + 1, LineFromPosition(prevSelEnd) + 1);
 		}
 	}
-	
+
 	// display gcode help hint
 	if ( getCtlStatus() != NULL )
 		getCtlStatus()->SetValue("");

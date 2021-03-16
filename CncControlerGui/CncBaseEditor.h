@@ -4,6 +4,7 @@
 #include <wx/stc/stc.h>
 #include <wx/filename.h>
 #include <wx/settings.h>
+#include <wx/timer.h>
 #include "3D/GLContextBase.h"
 #include "BinaryFileParser.h"
 #include "CncCommon.h"
@@ -125,6 +126,9 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		wxStaticText* 	ctlEditMode;
 		wxStaticText* 	ctlColunmPostion;
 		wxTextCtrl*		ctlStatus;
+		wxTimer			clientIDTimer;
+		long			firstClientIdToSel;
+		long			lastClientIdToSel;
 		
 		bool			tryToSelectFlag;
 		bool			blockSelectEvent;
@@ -132,6 +136,8 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		virtual void initialize() = 0;
 		virtual bool hasEditMode() { return true; }
+		
+		virtual void registerClientIdsToSelect(long firstCID, long lastCID);
 		
 		void setupDefaultStyle();
 		void setupStyle();
@@ -164,7 +170,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		virtual void onLeftUp(wxMouseEvent& event);
 		virtual void onLeftDClick(wxMouseEvent& event);
 		virtual void onRightDown(wxMouseEvent& event);
-		
+		virtual void onClientIDTimer(wxTimerEvent& event);
 		
 		wxStaticText* 	getCtlEditMode() 	{ return ctlEditMode; }
 		wxStaticText* 	getCtlColumnPos() 	{ return ctlColunmPostion; }
