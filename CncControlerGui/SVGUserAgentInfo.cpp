@@ -144,6 +144,7 @@ void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
 			
 			break;
 		}
+		case NT_CNC_VAR:
 		case NT_CNC_PARAM:
 		{
 			std::stringstream ss; cncParameters.traceTo(ss);
@@ -188,14 +189,21 @@ const char* SVGUserAgentInfo::getStyleInfoAsString() const {
 /////////////////////////////////////////////////////////
 bool SVGUserAgentInfo::shouldProceed() const {
 /////////////////////////////////////////////////////////
-	if ( nodeType == NT_CNC_PARAM )
-		return false;
-		
-	// if 'display:none' is configured don't spool this path
-	// != wxNOT_FOUND ==> means FOUND
-	if ( wxString(getStyleInfoAsString()).Find("display:none") != wxNOT_FOUND )
-		return false;
-		
+	switch ( nodeType ) {
+		case NT_CNC_VAR:
+		case NT_CNC_PARAM:
+		{
+			return false;
+		}
+		default:
+		{
+			// if 'display:none' is configured don't spool this path
+			// != wxNOT_FOUND ==> means FOUND
+			if ( wxString(getStyleInfoAsString()).Find("display:none") != wxNOT_FOUND )
+				return false;
+		}
+	}
+	
 	return true;
 }
 /////////////////////////////////////////////////////////

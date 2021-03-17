@@ -49,7 +49,7 @@ struct SVGUserAgentInfo {
 		bool isMemberOf(const wxString& id, const char* type)	const;
 		
 	public:
-		enum NodeType { NT_UNDEFINED, NT_PATH, NT_CNC_PARAM, NT_CNC_BREAK, NT_CNC_PAUSE };
+		enum NodeType { NT_UNDEFINED, NT_PATH, NT_CNC_PARAM, NT_CNC_VAR, NT_CNC_BREAK, NT_CNC_PAUSE };
 		
 		unsigned int			lineNumber;
 		NodeType 				nodeType;

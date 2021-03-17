@@ -133,6 +133,23 @@ bool SVGUserAgent::initNextCncParameterNode(const SvgCncContext& cwp) {
 	return true;
 }
 /////////////////////////////////////////////////////////
+bool SVGUserAgent::initNextCncVaribalesNode(const SvgCncContext& cwp) {
+/////////////////////////////////////////////////////////
+	SVGUserAgentInfo sua;
+	sua.lineNumber 			= cwp.getCurrentLineNumber();
+	sua.nodeName 			= nodeName;
+	sua.elementId			= "";
+	sua.nodeType			= SVGUserAgentInfo::NT_CNC_VAR;
+	sua.originalPath		= "";
+	sua.cncParameters 		= cwp;
+	
+	// copy the following lists - why ????
+	sua.styleList		= collectedStyles;
+	
+	userAgent.push_back(std::move(sua));
+	return true;
+}
+/////////////////////////////////////////////////////////
 bool SVGUserAgent::initNextCncBreakNode(const SvgCncBreak& scb) {
 /////////////////////////////////////////////////////////
 	SVGUserAgentInfo sua;

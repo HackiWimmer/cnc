@@ -34,6 +34,7 @@ bool SVGFileFormatter::removeCncTags(wxXmlNode* child) {
 		if      ( name.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) )	return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncParameterPrintBlockNodeName) )	return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) )		return true;
+		else if ( name.IsSameAs(SvgNodeTemplates::CncVariablesBlockNodeName) )		return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) )			return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) )			return true;
 		
@@ -895,6 +896,14 @@ bool SVGFileParser::processCncParameter(wxXmlNode* child) {
 		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncVariablesBlockNodeName) ) {
+		if ( evaluateCncVaribales(child) == false )
+			return false;
+			
+		registerNextDebugNode(currentNodeName);
+		svgUserAgent.initNextCncVaribalesNode(pathHandler->getSvgCncContext());
+	}
+	// ------------------------------------------------------
 	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) ) {
 		registerNextDebugNode(currentNodeName);
 		
@@ -954,6 +963,12 @@ bool SVGFileParser::printCncParameters(wxXmlNode* node) {
 	SvgCncContext& cwp = pathHandler->getSvgCncContext();
 	cwp.traceTo(std::cout, 1);
 	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::evaluateCncVaribales(wxXmlNode* node) {
+//////////////////////////////////////////////////////////////////
+	SvgCncContext& cwp = pathHandler->getSvgCncContext();
+	return cwp.provideVariables(node);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::evaluateCncParameters(wxXmlNode* node) {

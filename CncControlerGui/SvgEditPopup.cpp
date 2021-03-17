@@ -11,6 +11,7 @@ wxString SvgNodeTemplates::_ret									= _T("");
 const char* SvgNodeTemplates::CncParameterResetBlockNodeName	= "CncParameterReset";
 const char* SvgNodeTemplates::CncParameterPrintBlockNodeName	= "CncParameterPrint";
 const char* SvgNodeTemplates::CncParameterBlockNodeName			= "CncParameterBlock";
+const char* SvgNodeTemplates::CncVariablesBlockNodeName			= "CncVaribalesBock";
 const char* SvgNodeTemplates::CncBreakBlockNodeName				= "CncBreak";
 const char* SvgNodeTemplates::CncPauseBlockNodeName				= "CncPause";
 

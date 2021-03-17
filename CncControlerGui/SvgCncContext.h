@@ -36,6 +36,7 @@ class SvgCncContextBase {
 	protected:
 		
 		typedef std::map<wxString, wxString> ParameterMap;
+		typedef std::map<wxString, wxString> VariablesMap;
 		
 		const char*		RESET_Modifyer			= "${RESET}";
 		const char*		DEL_Modifyer			= "${DELETE}";
@@ -52,6 +53,7 @@ class SvgCncContextBase {
 		
 		virtual void		reconstruct();
 		virtual void		manageParameter(const Mode mode, const wxString& name, const wxString& value) = 0;
+		virtual bool		replaceVariables(const wxString& in, wxString& out);
 		
 		const ParameterMap&	getParameterMap() const { return parameterMap; }
 		
@@ -63,6 +65,10 @@ class SvgCncContextBase {
 		void			setCurrentLineNumber(long ln);
 		long			getCurrentLineNumber()												const	{ return currentLineNumber; }
 		long			getCurrentClientID(CLIENT_ID_OFFSET o = CLIENT_ID_OFFSET::MAIN)		const;
+		
+		bool			provideVariables(const wxString& name, const wxString& value);
+		bool			provideVariables(const wxXmlAttribute* attribute);
+		bool			provideVariables(const wxXmlNode *child);
 		
 		bool			provide(const wxString& name, const wxString& value);
 		bool			provide(const wxXmlAttribute* attribute);
@@ -153,11 +159,12 @@ class SvgCncContext : public SvgCncContextBase {
 			double diameter		= 0.0;
 			
 			wxString trace() const {
-				return wxString::Format("{%.3lf}", diameter);
+				return wxString::Format("[%.3lf]", diameter);
 			}
 		};
 		
 		typedef std::map<wxString, Tool> ToolList;
+		
 		
 	protected:
 		

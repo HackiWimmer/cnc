@@ -125,6 +125,7 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 	svgBlockTypes.add(wxString::Format("%s p=\"1.0\"/>",	SvgNodeTemplates::CncPauseBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncBreakBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterPrintBlockNodeName));
+	svgBlockTypes.add(wxString::Format("%s x=\"1.0\"/>",	SvgNodeTemplates::CncVariablesBlockNodeName));
 	
 	const SvgCncContext ctx;
 	cncBlockParameters.add(wxString::Format("%s=\"T_300={3.00};T_600={6.0}\"",	ctx.ID_TOOL_LIST));

@@ -662,9 +662,7 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 	
 	if ( currentClientId < 0 )
 		return;
-		
-	CNC_PRINT_FUNCT
-
+	
 	GLOpenGLPathBufferStore* store = cncPath.getOpenGLBufferStore();
 	
 	long entry = store->findLastEntryForClientId(currentClientId);

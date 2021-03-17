@@ -54,6 +54,7 @@ class SVGUserAgent{
 		
 		bool initNextPath(SvgCncContext& cwp, const wxString& origPath);
 		bool initNextCncParameterNode(const SvgCncContext& cwp);
+		bool initNextCncVaribalesNode(const SvgCncContext& cwp);
 		bool initNextCncBreakNode(const SvgCncBreak& scb);
 		bool initNextCncPauseNode(const SvgCncPause& scp);
 		bool setNodeType(const wxString& t);

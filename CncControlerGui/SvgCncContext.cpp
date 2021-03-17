@@ -18,7 +18,7 @@ SvgCncContextBase::SvgCncContextBase()
 //////////////////////////////////////////////////////////////////
 SvgCncContextBase::SvgCncContextBase(const SvgCncContextBase& scc)
 : currentLineNumber		(scc.getCurrentLineNumber())
-, parameterMap			(scc.getParameterMap())
+, parameterMap			(scc.parameterMap)
 //////////////////////////////////////////////////////////////////
 {
 }
@@ -26,7 +26,8 @@ SvgCncContextBase::SvgCncContextBase(const SvgCncContextBase& scc)
 SvgCncContextBase& SvgCncContextBase::operator= (const SvgCncContextBase& scc) {
 //////////////////////////////////////////////////////////////////
 	currentLineNumber	= scc.getCurrentLineNumber();
-	parameterMap		= scc.getParameterMap();
+	parameterMap		= scc.parameterMap;
+	
 	return *this;
 }
 //////////////////////////////////////////////////////////////////
@@ -84,16 +85,21 @@ bool SvgCncContextBase::provide(const wxString& name, const wxString& value) {
 	if ( n.IsEmpty() )
 		return false;
 	
+	bool ret = true;
+	
 	if ( value.IsSameAs(DEL_Modifyer) ) {
 		deleteParameter(n);
 		manageParameter(Delete, n, value);
 	}
 	else {
-		parameterMap[n] = value;
-		manageParameter(Update, n, value);
+		wxString v;
+		ret = replaceVariables(value, v);
+		// always do this
+		parameterMap[n] = v;
+		manageParameter(Update, n, v);
 	}
 	
-	return true;
+	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool SvgCncContextBase::provide(const wxXmlAttribute* attribute) {
@@ -113,6 +119,36 @@ bool SvgCncContextBase::provide(const wxXmlNode* node) {
 	while ( a != NULL ) {
 		if ( provide(a) == false )
 			std::cerr << CNC_LOG_FUNCT_A(" Invalid attribute name, storage failed\n");
+			
+		a = a->GetNext();
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool SvgCncContextBase::provideVariables(const wxString& name, const wxString& value) {
+//////////////////////////////////////////////////////////////////
+	wxString varName(wxString::Format("{%s}", name));
+	return provide(varName, value);
+}
+//////////////////////////////////////////////////////////////////
+bool SvgCncContextBase::provideVariables(const wxXmlAttribute* attribute) {
+//////////////////////////////////////////////////////////////////
+	if ( attribute == NULL )
+		return false;
+	
+	return provideVariables(attribute->GetName(), attribute->GetValue());
+}
+//////////////////////////////////////////////////////////////////
+bool SvgCncContextBase::provideVariables(const wxXmlNode *node) {
+//////////////////////////////////////////////////////////////////
+	if ( node == NULL )
+		return false;
+		
+	wxXmlAttribute* a = node->GetAttributes();
+	while ( a != NULL ) {
+		if ( provideVariables(a) == false )
+			std::cerr << CNC_LOG_FUNCT_A(" Invalid variables name, storage failed\n");
 			
 		a = a->GetNext();
 	}
@@ -164,7 +200,42 @@ const wxString SvgCncContextBase::getParameterValue(const wxString& key) const {
 	
 	return it->second;
 }
-
+//////////////////////////////////////////////////////////////////
+bool SvgCncContextBase::replaceVariables(const wxString& in, wxString& out) {
+//////////////////////////////////////////////////////////////////
+	
+	// -----------------------------------------------------------
+	auto check = [](const wxString& s) {
+		bool b1 = false;
+		
+		for ( auto it = s.begin(); it != s.end(); ++it ) {
+			
+			if ( *it == '{' )
+				b1 = true;
+				
+			if ( b1 && *it == '}' )
+				return true;
+		}
+		
+		return false;
+	};
+	
+	out.assign(in);
+	unsigned int errCount = 0;
+	while ( check(out) ) {
+		const wxString var(out.AfterFirst('{').BeforeFirst('}'));
+		const wxString name(wxString::Format("{%s}", var));
+		
+		auto it = parameterMap.find(name);
+		
+		errCount += (unsigned int)(it == parameterMap.end());
+		
+		if ( it != parameterMap.end() ) out.Replace(wxString::Format("{%s}", var), it->second);
+		else							out.Replace(wxString::Format("{%s}", var), wxString::Format("!Not initialized variable '%s'!", var));
+	}
+	
+	return check(out) == false && errCount == 0;
+}
 
 //////////////////////////////////////////////////////////////////
 SvgCncContext::SvgCncContext()
@@ -185,7 +256,7 @@ SvgCncContext::SvgCncContext()
 {
 	// defaults
 	provide(ID_COLOUR_SCHEME,	THE_CONFIG->getSvgUseColourScheme() ? "YES" : "NO" );
-	provide(ID_TOOL_LIST,		wxString::Format("%s={0.00}",	ID_DEFAULT_TOOL_ID));
+	provide(ID_TOOL_LIST,		wxString::Format("%s=[0.00]",	ID_DEFAULT_TOOL_ID));
 	provide(ID_TOOL_SEL,		wxString::Format("%s",			ID_DEFAULT_TOOL_ID));
 	provide(ID_DEPT,			"Z-0.0");
 	provide(ID_MAX_FEED_STEP,	wxString::Format("Z%+.1lf",		THE_CONFIG->getMaxDurationThickness()));
@@ -237,7 +308,8 @@ void SvgCncContext::traceTo(std::ostream& o, unsigned int indent) const {
 	const wxString prefix(' ', (int)indent);
 	
 	o	<< prefix
-		<< "Current Cnc Parameter:" 
+		<< "Current Cnc Parameter, line: " 
+		<< ClientIds::lineNumber(getCurrentClientID())
 		<< std::endl
 		<< prefix
 		<< "{"
@@ -492,7 +564,8 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 	// ----------------------------------------------------------
 	// final checks
 	if ( commandExists == false ) {
-		CTX_LOG_WAR(wxString::Format(" Unknown CncParameter '%s' = '%s'\n", name, value));
+		if ( name.StartsWith("{") == false )
+			CTX_LOG_WAR(wxString::Format(" Unknown CncParameter '%s' = '%s'\n", name, value));
 	}
 }
 //////////////////////////////////////////////////////////////////
@@ -695,8 +768,8 @@ void SvgCncContext::addTool(const wxString& toolString) {
 //////////////////////////////////////////////////////////////////
 	const wxString id(toolString.BeforeFirst('='));
 	wxString val(toolString.AfterFirst('='));
-	val.Replace("{","");
-	val.Replace("}","");
+	val.Replace("[","");
+	val.Replace("]","");
 	val.Replace(";","");
 	
 	// over all tool parameters
@@ -734,7 +807,7 @@ void SvgCncContext::setToolList(const wxString& list) {
 	}
 	
 	if ( checkToolExists(ID_DEFAULT_TOOL_ID) == false )
-		addTool(wxString::Format("%s={0.00}",	ID_DEFAULT_TOOL_ID));
+		addTool(wxString::Format("%s=[0.00]",	ID_DEFAULT_TOOL_ID));
 }
 //////////////////////////////////////////////////////////////////
 bool SvgCncContext::checkToolExists(const wxString& id) const {
@@ -982,3 +1055,4 @@ void SvgCncContextSummary::traceTo(std::ostream& o, unsigned int indent) const {
 		<< prefix	<< "Tool Tot. List           : " << getToolTotList()			<< std::endl
 	;
 }
+
