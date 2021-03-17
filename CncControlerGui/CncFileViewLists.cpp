@@ -181,16 +181,14 @@ unsigned int CncLruFileViewListCtrl::getFileCount() const {
 	return lruList.size();
 }
 ////////////////////////////////////////////////////////////////
-const char* CncLruFileViewListCtrl::getFileName(unsigned int pos) {
+wxString CncLruFileViewListCtrl::getFileName(unsigned int pos) {
 ////////////////////////////////////////////////////////////////
-	static wxString ret;
+	wxString ret;
 	
-	if ( pos < lruList.size() ) {
+	if ( pos < lruList.size() )
 		ret.assign(lruList.at(pos).GetFullPath());
-		return ret.c_str();
-	}
 	
-	return "";
+	return ret;
 }
 ////////////////////////////////////////////////////////////////
 bool CncLruFileViewListCtrl::addFile(const wxString& f) {
@@ -424,6 +422,7 @@ void CncLruFileViewListCtrl::onEventTimer(wxTimerEvent& event) {
 	const wxString fn(getFileName(getLastSelection()));
 	if ( fn.IsEmpty() == true )
 		return; 
+		
 		
 	switch ( lastEventType ) {
 		case EventType::PREVIEW:	APP_PROXY::openMainPreview(fn);

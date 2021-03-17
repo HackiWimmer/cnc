@@ -64,7 +64,7 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		void selectFirstItem();
 		
 		unsigned int getFileCount() const ;
-		const char* getFileName(unsigned int pos);
+		wxString getFileName(unsigned int pos);
 		
 		bool addFile(const wxString& f);
 		bool removeFile(unsigned int idx);
