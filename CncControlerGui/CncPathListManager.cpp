@@ -586,11 +586,6 @@ bool CncPathListManager::reversePath() {
 	ClipperLib::Path reversedPath = clipperPath;
 	ClipperLib::ReversePath(reversedPath);
 	
-#warning reverse path
-/*
-for ( auto it = reversedPath.begin(); it != reversedPath.end(); ++it )
-	std::cout << "R: " << (*it).X << ", " << (*it).Y  << ", " <<  (*it).Z << std::endl;
-*/
 	getPathListIntern().erase(cFirstPosEntryIterator(), cend());
 	clipperPath.clear();
 	resetStatistics();
@@ -613,14 +608,14 @@ bool CncPathListManager::adjustZOffsetRel(double offset) {
 //////////////////////////////////////////////////////////////////
 bool CncPathListManager::adjustZOffset(double offset, bool relative) {
 //////////////////////////////////////////////////////////////////
+	// optimization
+	if ( relative == true && cnc::dblCmp::nu(offset) == true )
+		return true;
+		
 	// This method only adjusts the Z target value. It also expects that the given Z value 
 	// is already reached outside thi method. Therefore, the total distance leaves unchanged, 
-	// only the min/max values have to be adjusted. 
-	minPosX			= 0.0;
-	minPosY			= 0.0;
+	// only the z related min/max values have to be adjusted. 
 	minPosZ			= 0.0;
-	maxPosX			= 0.0;
-	maxPosY			= 0.0;
 	maxPosZ			= 0.0;
 	
 	for ( auto it = begin(); it != end(); ++it) {
@@ -628,15 +623,18 @@ bool CncPathListManager::adjustZOffset(double offset, bool relative) {
 		
 		if ( pe1.hasPositionChange() == true ) {
 			
-			if ( relative == true ) 	pe1.entryTarget.incZ(offset);
-			else						pe1.entryTarget.setZ(offset);
+			if ( relative == true ) {
+				pe1.entryTarget.incZ(offset);
+			}
+			else {
+				// optimization
+				if ( pe1.entryTarget.getZ() == offset )
+					continue;
+					
+				pe1.entryTarget.setZ(offset);
+			}
 			
-			minPosX = std::min(minPosX, pe1.entryTarget.getX());
-			minPosY = std::min(minPosY, pe1.entryTarget.getY());
 			minPosZ = std::min(minPosZ, pe1.entryTarget.getZ());
-			
-			maxPosX = std::max(maxPosX, pe1.entryTarget.getX());
-			maxPosY = std::max(maxPosY, pe1.entryTarget.getY());
 			maxPosZ = std::max(maxPosZ, pe1.entryTarget.getZ());
 		}
 	}
