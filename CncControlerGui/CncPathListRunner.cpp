@@ -720,8 +720,9 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		traceSetup();
 	}
 	
-	// freeze to speed up performace
-	CncAutoFreezer caf(cpp);
+	// freeze only if shown to speed up performance - significantly!
+	if ( cpp->IsShownOnScreen() )
+		CncAutoFreezer caf(cpp);
 	
 	// Main loop over all path list manager cnc entries
 	auto beg = plm.cbegin();
