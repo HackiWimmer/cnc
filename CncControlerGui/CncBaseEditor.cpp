@@ -12,24 +12,88 @@
 #include "CncConfig.h"
 #include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
+#include "SvgCncContext.h"
 #include "CncBaseEditor.h"
 
 #include <wx/frame.h>
 extern wxFrame* THE_FRAME;
 
+///////////////////////////////////////////////////////////////////
+CncAutoCompleteList::CncAutoCompleteList(wxStyledTextCtrl* c, char s) 
+: list			()
+, separator		(s)
+, stc			(c)
+///////////////////////////////////////////////////////////////////
+{
+}
+///////////////////////////////////////////////////////////////////
+CncAutoCompleteList::~CncAutoCompleteList() {
+///////////////////////////////////////////////////////////////////
+	list.clear();
+}
+///////////////////////////////////////////////////////////////////
+void CncAutoCompleteList::add(const wxString& token) {
+///////////////////////////////////////////////////////////////////
+	list.insert(std::move(std::string(token)));
+}
+///////////////////////////////////////////////////////////////////
+bool CncAutoCompleteList::suggest(const wxString& prefix) {
+///////////////////////////////////////////////////////////////////
+	if ( stc == NULL )
+		return false;
+		
+	auto pos = prefix.length() > 0 ? list.lower_bound(std::string(prefix)) : list.begin();
+	if ( pos != list.end() ) {
+		wxString suggestions;
+		
+		// the underlying set is sorted alphanumeric and the lower_bound search above 
+		// is implemented case insensitive by the underlying comparison object.
+		// therefore, we find the first entry which starts with prefix
+		// or we start at begin() if prefix is empty
+		for ( auto it = pos; it != list.end(); it++) {
+			const wxString t(*it);
+			
+			// the following if try to find the end of entries which starts with prefix.
+			// this works also for all entries if prefix is empty.
+			if ( t.Upper().StartsWith(prefix.Upper()) ) {
+				suggestions.append(wxString::Format("%s%c", *it, separator));
+			}
+			else {
+				// . . . regarding the list is sorted we can break here
+				break;
+			}
+		}
+		
+		if ( suggestions.IsEmpty() == false ) {
+			
+			stc->AutoCompSetMaxHeight(10);
+			stc->AutoCompSetIgnoreCase(true);
+			stc->AutoCompSetSeparator((int)separator);
+			stc->AutoCompShow(prefix.length(), suggestions);
+			
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+
 // ----------------------------------------------------------------------------
 // CncBaseEditor Event Table
 // ----------------------------------------------------------------------------
 wxBEGIN_EVENT_TABLE(CncBaseEditor, wxStyledTextCtrl)
-	EVT_STC_MARGINCLICK	(wxID_ANY, CncBaseEditor::onMarginClick)
-	EVT_STC_CHANGE		(wxID_ANY, CncBaseEditor::onChange)
-	EVT_KEY_DOWN		(CncBaseEditor::onKeyDown)
-	EVT_KEY_UP			(CncBaseEditor::onKeyUp)
-	EVT_LEFT_DOWN		(CncBaseEditor::onLeftDown)
-	EVT_LEFT_UP			(CncBaseEditor::onLeftUp)
-	EVT_LEFT_DCLICK		(CncBaseEditor::onLeftDClick)
-	EVT_RIGHT_DOWN		(CncBaseEditor::onRightDown)
-	EVT_TIMER			(wxID_ANY, CncBaseEditor::onClientIDTimer)
+	EVT_STC_MARGINCLICK	(wxID_ANY,	CncBaseEditor::onMarginClick)
+	EVT_STC_CHANGE		(wxID_ANY,	CncBaseEditor::onChange)
+	EVT_KEY_DOWN		(			CncBaseEditor::onKeyDown)
+	EVT_KEY_UP			(			CncBaseEditor::onKeyUp)
+	EVT_LEFT_DOWN		(			CncBaseEditor::onLeftDown)
+	EVT_LEFT_UP			(			CncBaseEditor::onLeftUp)
+	EVT_LEFT_DCLICK		(			CncBaseEditor::onLeftDClick)
+	EVT_RIGHT_DOWN		(			CncBaseEditor::onRightDown)
+	EVT_TIMER			(wxID_ANY,	CncBaseEditor::onClientIDTimer)
+	
+	EVT_STC_CHARADDED	(wxID_ANY,	CncBaseEditor::onCharAdded)
 wxEND_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////
@@ -48,11 +112,35 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 , tryToSelectFlag		(false)
 , blockSelectEvent		(false)
 , fileLoadingActive		(false)
+, svgBlockTypes			(this, '|')
+, cncBlockParameters	(this, '|')
 ///////////////////////////////////////////////////////////////////
 {
 	clientIDTimer.Stop();
 	setupStyle();
 	Enable(hasEditMode());
+	
+	svgBlockTypes.add(wxString::Format("%s  />",			SvgNodeTemplates::CncParameterBlockNodeName));
+	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterResetBlockNodeName));
+	svgBlockTypes.add(wxString::Format("%s p=\"1.0\"/>",	SvgNodeTemplates::CncPauseBlockNodeName));
+	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncBreakBlockNodeName));
+	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterPrintBlockNodeName));
+	
+	const SvgCncContext ctx;
+	cncBlockParameters.add(wxString::Format("%s=\"T_300={3.00};T_600={6.0}\"",	ctx.ID_TOOL_LIST));
+	cncBlockParameters.add(wxString::Format("%s=\"T_300\"",						ctx.ID_TOOL_SEL));
+	cncBlockParameters.add(wxString::Format("%s=\"Yes/No\"",					ctx.ID_COLOUR_SCHEME));
+	cncBlockParameters.add(wxString::Format("%s=\"Z-0\"",						ctx.ID_DEPT));
+	cncBlockParameters.add(wxString::Format("%s=\"Z+2.0\"",						ctx.ID_MAX_FEED_STEP));
+	cncBlockParameters.add(wxString::Format("%s=\"R+1500\"",					ctx.ID_RAPID_SPEED));
+	cncBlockParameters.add(wxString::Format("%s=\"W+1500\"",					ctx.ID_WORK_SPEED));
+	cncBlockParameters.add(wxString::Format("%s=\"EnsureClockwise\"",			ctx.ID_PATH_RULE));
+	cncBlockParameters.add(wxString::Format("%s=\"EnsureCounterClockwise\"",	ctx.ID_PATH_RULE));
+	cncBlockParameters.add(wxString::Format("%s=\"ReversePath\"",				ctx.ID_PATH_RULE));
+	cncBlockParameters.add(wxString::Format("%s=\"Inner\"",						ctx.ID_PATH_MODE));
+	cncBlockParameters.add(wxString::Format("%s=\"Outer\"",						ctx.ID_PATH_MODE));
+	cncBlockParameters.add(wxString::Format("%s=\"Center\"",					ctx.ID_PATH_MODE));
+	cncBlockParameters.add(wxString::Format("%s=\"Pocket\"",					ctx.ID_PATH_MODE));
 }
 ///////////////////////////////////////////////////////////////////
 CncBaseEditor::~CncBaseEditor() {
@@ -130,20 +218,27 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 	int c		= event.GetUnicodeKey();
 	bool skip	= true;
 	
+	
 	// run
 	if      ( c == 'R' && ctlKey == true && shtKey == true) {
 		wxCommandEvent dummy;
 		THE_APP->rcRun(dummy);
 		skip = false;
 
+	} 
 	// debug
-	} if      ( c == 'D' && ctlKey == true && shtKey == true) {
+	else if ( c == 'D' && ctlKey == true && shtKey == true) {
 		wxCommandEvent dummy;
 		THE_APP->rcDebug(dummy);
 		skip = false;
-
+	}
+	// auto complete list
+	else if ( c == WXK_RETURN && ctlKey == true ) {
+		cncBlockParameters.suggest("");
+		
+	} 
 	// find
-	} else if ( c == 'F' && ctlKey == true ) {
+	else if ( c == 'F' && ctlKey == true ) {
 		event.Skip(false);
 		
 		wxString find(GetSelectedText());
@@ -153,8 +248,9 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 		THE_APP->GetSourceEditSearch()->SetFocus();
 		return;
 		
+	} 
 	// goto line
-	} else if ( c == 'G' && ctlKey == true ) {
+	else if ( c == 'G' && ctlKey == true ) {
 		
 		wxTextEntryDialog dlg(this, "Line Number:", "Go to line . . .", "");
 		dlg.SetMaxLength(8);
@@ -173,40 +269,47 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 		}
 		skip = false;
 		
+	} 
 	// Undo
-	} else if ( c == 'Z' && ctlKey == true ) {
+	else if ( c == 'Z' && ctlKey == true ) {
 		Undo();
 		skip = false;
 	
+	} 
 	// Redo
-	} else if ( c == 'Y' && ctlKey == true ) {
+	else if ( c == 'Y' && ctlKey == true ) {
 		Redo();
 		skip = false;
 		
+	} 
 	// save
-	} else if ( c == 'S' && ctlKey == true ) {
+	else if ( c == 'S' && ctlKey == true ) {
 		THE_APP->saveFile();
 		skip = false;
 		
+	} 
 	// goto home
-	} else if ( c == WXK_HOME && ctlKey == true ) {
+	else if ( c == WXK_HOME && ctlKey == true ) {
 		GotoLine(0);
 		Home();
 		skip = false;
 		
+	} 
 	// goto end
-	} else if ( c == WXK_END && ctlKey == true ) {
+	else if ( c == WXK_END && ctlKey == true ) {
 		GotoLine(GetLineCount() - 1);
 		LineEnd();
 		skip = false;
 		
+	} 
 	// select cur pos to home
-	} else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
+	else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
 		SetSelection(GetCurrentPos(), 0);
 		skip = false;
 		
+	} 
 	// select cur pos to end
-	} else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
+	else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
 		SetSelection(GetCurrentPos(), GetLastPosition());
 		skip = false;
 	}
@@ -982,4 +1085,24 @@ bool CncBaseEditor::saveFileAs(const wxString& fileName) {
 	
 	fileInfo.fileName.Assign(fileName);
 	return save();
+}
+///////////////////////////////////////////////////////////////////
+void CncBaseEditor::onCharAdded(wxStyledTextEvent &event) {
+///////////////////////////////////////////////////////////////////
+	// get char
+	const char chr			= (char)event.GetKey();
+	// Find the word start
+	const int currentPos	= GetCurrentPos();
+	const int wordStartPos	= WordStartPosition(currentPos, true);
+	const int lenEntered	= currentPos - wordStartPos;
+
+	// Display the auto completion list
+	if ( lenEntered > 2 ) {
+		cncBlockParameters.suggest(GetTextRange(wordStartPos, currentPos));
+	}
+	else {
+		if (chr == '<')
+			svgBlockTypes.suggest("");
+	}
+
 }

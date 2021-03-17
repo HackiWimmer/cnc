@@ -1,6 +1,8 @@
 #ifndef CNC_BASE_EDITOR_H
 #define CNC_BASE_EDITOR_H
 
+#include <string>
+#include <set>
 #include <wx/stc/stc.h>
 #include <wx/filename.h>
 #include <wx/settings.h>
@@ -25,6 +27,32 @@ enum {
 		TE_LINE_SAVED_STYLE
 };
 
+////////////////////////////////////////////////////////////////////
+class CncAutoCompleteList {
+	
+	private:
+		
+		struct InsensitiveCompare { 
+			bool operator() (const std::string& a, const std::string& b) const {
+				return strcasecmp(a.c_str(), b.c_str()) < 0;
+			}
+		};
+		
+		typedef std::set<std::string, InsensitiveCompare> List; 
+		
+		List				list;
+		char				separator;
+		wxStyledTextCtrl*	stc;
+	
+	public:
+		CncAutoCompleteList(wxStyledTextCtrl* stc, char separator);
+		~CncAutoCompleteList();
+		
+		bool suggest(const wxString& prefix);
+		void add(const wxString& token);
+};
+
+////////////////////////////////////////////////////////////////////
 class CncBaseEditor : public wxStyledTextCtrl {
 	
 	public:
@@ -119,20 +147,23 @@ class CncBaseEditor : public wxStyledTextCtrl {
 				~SelectEventBlocker()							 { if ( editor != NULL) editor->blockSelectEvent = false; }
 		};
 		
-		Styles 			styles;
-		Flags			flags;
-		FileInfo 		fileInfo;
-		wxMenu* 		svgPopupMenu;
-		wxStaticText* 	ctlEditMode;
-		wxStaticText* 	ctlColunmPostion;
-		wxTextCtrl*		ctlStatus;
-		wxTimer			clientIDTimer;
-		long			firstClientIdToSel;
-		long			lastClientIdToSel;
+		Styles				styles;
+		Flags				flags;
+		FileInfo			fileInfo;
+		wxMenu*				svgPopupMenu;
+		wxStaticText*		ctlEditMode;
+		wxStaticText*		ctlColunmPostion;
+		wxTextCtrl*			ctlStatus;
+		wxTimer				clientIDTimer;
+		long				firstClientIdToSel;
+		long				lastClientIdToSel;
 		
-		bool			tryToSelectFlag;
-		bool			blockSelectEvent;
-		bool			fileLoadingActive;
+		bool				tryToSelectFlag;
+		bool				blockSelectEvent;
+		bool				fileLoadingActive;
+		
+		CncAutoCompleteList	svgBlockTypes;
+		CncAutoCompleteList	cncBlockParameters;
 		
 		virtual void initialize() = 0;
 		virtual bool hasEditMode() { return true; }
@@ -171,6 +202,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		virtual void onLeftDClick(wxMouseEvent& event);
 		virtual void onRightDown(wxMouseEvent& event);
 		virtual void onClientIDTimer(wxTimerEvent& event);
+		virtual void onCharAdded(wxStyledTextEvent &event);
 		
 		wxStaticText* 	getCtlEditMode() 	{ return ctlEditMode; }
 		wxStaticText* 	getCtlColumnPos() 	{ return ctlColunmPostion; }
