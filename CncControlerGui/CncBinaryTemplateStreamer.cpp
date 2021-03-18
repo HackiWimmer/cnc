@@ -11,19 +11,18 @@
 
 //////////////////////////////////////////////////////////////////
 CncBinaryTemplateStreamer::CncBinaryTemplateStreamer()
-: readyToStream(false)
-, compress(true)
-, parameter()
-, tmpFileNameDataBody("")
+: readyToStream			(false)
+, compress				(true)
+, parameter				()
+, tmpFileNameDataBody	("")
 //////////////////////////////////////////////////////////////////
 {
 }
 //////////////////////////////////////////////////////////////////
 CncBinaryTemplateStreamer::~CncBinaryTemplateStreamer() {
 //////////////////////////////////////////////////////////////////
-	if ( readyToStream == true ) {
-		std::cerr << "CncBinaryTemplateStreamer::~CncBinaryTemplateStreamer(): Is still ready to stream" << std::endl;
-	}
+	if ( readyToStream == true )
+		std::cerr << CNC_LOG_FUNCT_A(": Is still ready to stream\n");
 
 	destroyLastDataBodyStream();
 }
@@ -65,9 +64,10 @@ bool CncBinaryTemplateStreamer::initNextSourceTemplateFileName(const Trigger::Pa
 	
 	fileStream.open(para.fullFileName.c_str(), std::ifstream::out | std::ifstream::binary);
 	if ( !fileStream.is_open() ) {
-		std::cerr << "CncBinaryTemplateStreamer::initNextSourceTemplateFileName(): Can't create file: '"
-				  << para.fullFileName.c_str()
-				  << "'" << std::endl;
+		std::cerr	<< CNC_LOG_FUNCT 
+					<< ": Can't create file: '"
+					<< para.fullFileName.c_str()
+					<< "'" << std::endl;
 		return false;
 	}
 

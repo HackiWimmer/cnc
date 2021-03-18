@@ -3,9 +3,9 @@
 
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorBinaryStreamer::SerialEmulatorBinaryStreamer(CncControl* cnc)
-: SerialEmulatorNULL(cnc)
-, CncBinaryTemplateStreamer()
-, fileName("")
+: SerialEmulatorNULL			(cnc)
+, CncBinaryTemplateStreamer		()
+, fileName						("")
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -16,8 +16,7 @@ SerialEmulatorBinaryStreamer::~SerialEmulatorBinaryStreamer() {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorBinaryStreamer::isOutputAsTemplateAvailable() {
 ///////////////////////////////////////////////////////////////////
-
-	std::cout << getPortName() << " = "<< wxFile::Exists(getPortName()) << std::endl;
+	//std::cout << CNC_LOG_FUNCT_A("\n %s\n exists == %d\n", getPortName(), wxFile::Exists(getPortName()));
 
 	switch ( inboundFormat ) {
 		case TplBinary:
@@ -69,21 +68,20 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::BeginRun& tr) {
 	inboundFormat = cnc::getTemplateFormatFromExtention(ps.SRC.fileType);
 	
 	if ( initNextSourceTemplateFileName(ps) == false) {
-		std::cerr << "SerialEmulatorStreamer::processTrigger(BeginRun): initNextSourceTemplateFileName failed" << std::endl;
+		std::cerr << CNC_LOG_FUNCT_A(": initNextSourceTemplateFileName failed\n");
 		disconnect();
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
-	if ( CncBinaryTemplateStreamer::finalize() == false ) {
-		std::cerr << "SerialEmulatorStreamer::processTrigger(TrEndRun): finalize() failed" << std::endl;
-	}
+	if ( CncBinaryTemplateStreamer::finalize() == false )
+		std::cerr << CNC_LOG_FUNCT_A(": finalize() failed\n");
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
-	//std::clog << "SerialEmulatorStreamer::processTrigger(TrNextPath)" << std::endl;
+	//std::clog << CNC_LOG_FUNCT_A("\n");
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::GuidePath& tr) {

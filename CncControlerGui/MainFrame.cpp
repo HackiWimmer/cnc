@@ -3781,11 +3781,22 @@ void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processVirtualTemplate() {
 ///////////////////////////////////////////////////////////////////
-	bool ret;
+	Trigger::ParameterSet ps;
+	ps.SRC.fileName		= getCurrentTemplatePathFileName();
+	ps.SRC.fileType		= getCurrentTemplateFormatName();
+	ps.SET.hardwareResX	= THE_CONFIG->getDisplayFactX();
+	ps.SET.hardwareResY	= THE_CONFIG->getDisplayFactY();
+	ps.SET.hardwareResZ	= THE_CONFIG->getDisplayFactZ();
+	ps.PRC.user			= "Hacki Wimmer";
+	const Trigger::BeginRun begRun(ps);
 	
+	wxASSERT( inboundFileParser );
+	
+	inboundFileParser->deligateTrigger(begRun);
 	inboundFileParser->enableUserAgentControls(isDisplayParserDetails());
 	inboundFileParser->setInboundSourceControl(sourceEditor);
 	
+	bool ret;
 	if ( isDebugMode == true ) 	ret = inboundFileParser->processDebug();
 	else 						ret = inboundFileParser->processRelease();
 	
@@ -4513,19 +4524,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 bool MainFrame::processTemplateIntern() {
 ///////////////////////////////////////////////////////////////////
 	CncRunAnimationControl rac(this);
-	
-	if ( inboundFileParser ) {
-		Trigger::ParameterSet ps;
-		ps.SRC.fileName		= getCurrentTemplatePathFileName();
-		ps.SRC.fileType		= getCurrentTemplateFormatName();
-		ps.SET.hardwareResX	= THE_CONFIG->getDisplayFactX();
-		ps.SET.hardwareResY	= THE_CONFIG->getDisplayFactY();
-		ps.SET.hardwareResZ	= THE_CONFIG->getDisplayFactZ();
-		ps.PRC.user			= "Hacki Wimmer";
-		
-		const Trigger::BeginRun begRun(ps);
-		inboundFileParser->deligateTrigger(begRun);
-	}
 	
 	clearPositionSpy();
 	
