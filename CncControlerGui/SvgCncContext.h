@@ -212,8 +212,8 @@ class SvgCncContext : public SvgCncContextBase {
 		
 		const char * 			ID_TOOL_SEL			= "ToolSelect";
 		
-		const char * 			ID_RAPID_SPEED		= "RapidSpeed";
-		const char * 			ID_WORK_SPEED		= "WorkSpeed";
+		const char * 			ID_RAPID_SPEED		= "SpeedRapid";
+		const char * 			ID_WORK_SPEED		= "SpeedWork";
 		
 		const char * 			ID_DEPT				= "ZDepth";
 		const char * 			ID_MAX_FEED_STEP	= "ZMaxFeedStep";

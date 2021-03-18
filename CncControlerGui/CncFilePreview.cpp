@@ -105,8 +105,9 @@ bool CncFilePreview::loadFile() {
 		
 	} else if ( m_previewBook->GetSelection() == (int)SVG_TAB_PAGE ) {
 		
-		ret = svgPreview->loadFile(lastFileName);
-		svgPreview->Update();
+		ret = svgPreview->loadFile(lastFileName, "Cnc File Preview:" );
+		if ( ret == true )	svgPreview->update();
+		else				svgPreview->clear();
 	}
 	
 	return ret;

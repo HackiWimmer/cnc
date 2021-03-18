@@ -423,6 +423,8 @@ class MainApp : public wxApp {
 			SetTopWindow(mainFrame);
 			int ret = GetTopWindow()->Show();
 			
+			wxLog::SetActiveTarget(NULL);
+			
 			APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Result = %d", ret));
 			return ret;
 		}

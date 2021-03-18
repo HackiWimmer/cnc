@@ -14,6 +14,7 @@
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "CncControl.h"
+#include "CncStringLogger.h"
 #include "CncTemplateContext.h"
 #include "SVGPathHandlerCnc.h"
 #include "SvgColourScheme.h"
@@ -629,6 +630,7 @@ bool SVGFileParser::spoolPath(const SVGUserAgentInfo& uai, const wxString& trans
 		
 	return true;
 }
+#include <wx/log.h>
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
@@ -638,9 +640,14 @@ bool SVGFileParser::preprocess() {
 	SFP_LOG_INF(wxString::Format("File name: '%s'", fileName))
 	
 	wxXmlDocument doc;
-	if ( !doc.Load(fileName) )
-		return false;
-		
+	{
+		CncStringLogger tmpLogger;
+		if ( !doc.Load(fileName) ) {
+			wxMessageBox(tmpLogger.GetBuffer(), CNC_LOG_FUNCT, wxICON_ERROR);
+			return false;
+		}
+	}
+	
 	// Start processing the XML file.
 	if ( doc.GetRoot()->GetName().Upper() != "SVG") {
 		std::cerr << CNC_LOG_FUNCT << ": Can't evaluate svg tag\n";

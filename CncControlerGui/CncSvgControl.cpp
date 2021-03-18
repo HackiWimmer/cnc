@@ -1,7 +1,10 @@
 #include <iostream>
-#include <wx/filename.h>
+#include <wx/log.h>
 #include <wx/scrolwin.h>
 #include <wx/dcclient.h>
+#include <wx/filename.h>
+#include <wx/dcmemory.h>
+#include "CncStringLogger.h"
 #include "CncSvgControl.h"
 
 BEGIN_EVENT_TABLE(CncSvgViewer, wxSVGCtrl)
@@ -19,21 +22,23 @@ END_EVENT_TABLE()
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::OnPaint(wxPaintEvent& event) {
 	/////////////////////////////////////////////////////////////////////
-		// this overrides the default behaviour to get access to adjust the background colour
-		if (!m_doc)				m_buffer = wxBitmap();
-		else if (m_repaint)		RepaintBuffer();
-		
-		wxPaintDC dc(this);
-		
-		int w = GetClientSize().GetWidth();
-		int h = GetClientSize().GetHeight();
-		dc.SetPen(wxPen(GetBackgroundColour()));
-		dc.SetBrush(wxBrush(GetBackgroundColour()));
-		dc.DrawRectangle(m_buffer.GetWidth(), 0, w - m_buffer.GetWidth(), h);
-		dc.DrawRectangle(0, m_buffer.GetHeight(), m_buffer.GetWidth(), h - m_buffer.GetHeight());
-		
-		if (m_buffer.IsOk())
-			dc.DrawBitmap(m_buffer, 0, 0);
+		if ( IsShownOnScreen() ) {
+			// this overrides the default behaviour to get access to adjust the background colour
+			if (!m_doc)				m_buffer = wxBitmap();
+			else if (m_repaint)		RepaintBuffer();
+			
+			wxPaintDC dc(this);
+			
+			int w = GetClientSize().GetWidth();
+			int h = GetClientSize().GetHeight();
+			dc.SetPen(wxPen(GetBackgroundColour()));
+			dc.SetBrush(wxBrush(GetBackgroundColour()));
+			dc.DrawRectangle(m_buffer.GetWidth(), 0, w - m_buffer.GetWidth(), h);
+			dc.DrawRectangle(0, m_buffer.GetHeight(), m_buffer.GetWidth(), h - m_buffer.GetHeight());
+			
+			if (m_buffer.IsOk())
+				dc.DrawBitmap(m_buffer, 0, 0);
+		}
 	}
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::OnResize(wxSizeEvent& event) {
@@ -49,7 +54,33 @@ END_EVENT_TABLE()
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::RepaintBuffer() {
 	/////////////////////////////////////////////////////////////////////
-		wxSVGCtrl::RepaintBuffer();
+		if ( IsShownOnScreen() ) {
+			
+			int w = -1, h = -1;
+			if (m_fitToFrame)
+				GetClientSize(&w, &h);
+
+			if (m_repaintRect.width > 0 && m_repaintRect.height > 0
+					&& (m_repaintRect.width < 2 * m_buffer.GetWidth() / 3
+							|| m_repaintRect.height < 2 * m_buffer.GetHeight() / 3)) {
+				m_repaintRect.x = wxMax(m_repaintRect.x, 0);
+				m_repaintRect.y = wxMax(m_repaintRect.y, 0);
+				wxSVGRect rect(m_repaintRect.x / GetScaleX(), m_repaintRect.y / GetScaleY(),
+						m_repaintRect.width / GetScaleX(), m_repaintRect.height / GetScaleY());
+				wxBitmap bitmap = m_doc->Render(w, h, &rect);
+				wxMemoryDC dc;
+				dc.SelectObject(m_buffer);
+				dc.DrawBitmap(bitmap, m_repaintRect.x, m_repaintRect.y);
+			} 
+			else {
+				const wxImage img(m_doc->Render(w, h));
+				
+				if ( img.IsOk() )	m_buffer = wxBitmap(img);
+				else				m_buffer = wxBitmap();
+			}
+			
+			m_repaintRect = wxRect();
+		}
 	}
 	
 #endif
@@ -96,15 +127,42 @@ void CncSvgViewer::clear() {
 		#endif
 	#endif
 }
+/////////////////////////////////////////////////////////////////////
+void CncSvgViewer::update() {
+/////////////////////////////////////////////////////////////////////
+	#ifdef WX_SVG_SUPPORT
+		 Update();
+	#else
+		#ifdef WX_WEBVIEW_SUPPORT
+			LoadURL("about:blank");
+		#else
+			SetToolTip(""));
+		#endif
+	#endif
+}
 //////////////////////////////////////////////////////////////////////////////
-bool CncSvgViewer::loadFile(const wxString& filename) {
+bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 //////////////////////////////////////////////////////////////////////////////
 	wxFileName svgFile(filename);
 	if ( svgFile.Exists() == false )
 		return false;
 		
 	#ifdef WX_SVG_SUPPORT
-		return Load(filename);
+		{
+			CncStringLogger tmpLogger;
+			const bool ret = Load(filename);
+			if ( ret == false ) {
+				
+				if ( contextInfo != NULL )
+					std::cerr << contextInfo << std::endl;
+					
+				std::cerr	<< filename << "\n" 
+							<< tmpLogger.GetBuffer()
+							<< std::endl;
+			}
+				
+			return ret;
+		}
 	#else
 		#ifdef WX_WEBVIEW_SUPPORT
 			return LoadURL(filename);

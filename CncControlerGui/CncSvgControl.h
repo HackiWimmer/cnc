@@ -36,7 +36,8 @@ class CncSvgViewer : public SVG_VIEWER_CLASS_PARENT {
 		void setContentSizable(bool state) { canSize = state; }
 		
 		void clear();
-		bool loadFile(const wxString& filename);
+		void update();
+		bool loadFile(const wxString& filename, const char* contextInfo = NULL);
 		
 	protected:
 		
