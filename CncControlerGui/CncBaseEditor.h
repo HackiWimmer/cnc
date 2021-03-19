@@ -114,6 +114,15 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 	protected:
 		
+		struct AutoCompleteInfo {
+			enum Type { ACT_NONE, ACT_SVG_TOKEN, ACT_CNC_TOKEN };
+			
+			wxString	token		= "";
+			Type		type		= ACT_NONE;
+			
+			void reset() { *this = AutoCompleteInfo(); }
+		};
+		
 		struct Styles {
 			// Define used fonts
 			wxFont defaultFont		= wxFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
@@ -149,12 +158,14 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		Styles				styles;
 		Flags				flags;
+		AutoCompleteInfo	lastAutoCompleteInfo;
 		FileInfo			fileInfo;
 		wxMenu*				svgPopupMenu;
 		wxStaticText*		ctlEditMode;
 		wxStaticText*		ctlColunmPostion;
 		wxTextCtrl*			ctlStatus;
 		wxTimer				clientIDTimer;
+		wxTimer				suggestionTimer;
 		long				firstClientIdToSel;
 		long				lastClientIdToSel;
 		
@@ -177,6 +188,8 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		void setupGcodeStyle();
 		void setupBinaryStyle();
 		void setupModelType();
+		
+		void suggest(AutoCompleteInfo::Type t, const wxString& token);
 		
 		bool selectLinesDefault(unsigned long firstLine, unsigned long lastLine);
 		bool selectLinesBinary(unsigned long firstLine, unsigned long lastLine);
@@ -202,7 +215,9 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		virtual void onLeftDClick(wxMouseEvent& event);
 		virtual void onRightDown(wxMouseEvent& event);
 		virtual void onClientIDTimer(wxTimerEvent& event);
+		virtual void onSuggestionTimer(wxTimerEvent& event);
 		virtual void onCharAdded(wxStyledTextEvent &event);
+		virtual void onAutoCompleteSelected(wxStyledTextEvent &event);
 		
 		wxStaticText* 	getCtlEditMode() 	{ return ctlEditMode; }
 		wxStaticText* 	getCtlColumnPos() 	{ return ctlColunmPostion; }

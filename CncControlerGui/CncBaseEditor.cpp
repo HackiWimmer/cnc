@@ -82,18 +82,22 @@ bool CncAutoCompleteList::suggest(const wxString& prefix) {
 // ----------------------------------------------------------------------------
 // CncBaseEditor Event Table
 // ----------------------------------------------------------------------------
+wxDEFINE_EVENT(wxEVT_EDITOR_CLIENT_ID_TIMER,	wxTimerEvent);
+wxDEFINE_EVENT(wxEVT_EDITOR_SUGGEST_TIMER,		wxTimerEvent);
+
 wxBEGIN_EVENT_TABLE(CncBaseEditor, wxStyledTextCtrl)
-	EVT_STC_MARGINCLICK	(wxID_ANY,	CncBaseEditor::onMarginClick)
-	EVT_STC_CHANGE		(wxID_ANY,	CncBaseEditor::onChange)
-	EVT_KEY_DOWN		(			CncBaseEditor::onKeyDown)
-	EVT_KEY_UP			(			CncBaseEditor::onKeyUp)
-	EVT_LEFT_DOWN		(			CncBaseEditor::onLeftDown)
-	EVT_LEFT_UP			(			CncBaseEditor::onLeftUp)
-	EVT_LEFT_DCLICK		(			CncBaseEditor::onLeftDClick)
-	EVT_RIGHT_DOWN		(			CncBaseEditor::onRightDown)
-	EVT_TIMER			(wxID_ANY,	CncBaseEditor::onClientIDTimer)
-	
-	EVT_STC_CHARADDED	(wxID_ANY,	CncBaseEditor::onCharAdded)
+	EVT_STC_MARGINCLICK			(wxID_ANY,						CncBaseEditor::onMarginClick)
+	EVT_STC_CHANGE				(wxID_ANY,						CncBaseEditor::onChange)
+	EVT_KEY_DOWN				(								CncBaseEditor::onKeyDown)
+	EVT_KEY_UP					(								CncBaseEditor::onKeyUp)
+	EVT_LEFT_DOWN				(								CncBaseEditor::onLeftDown)
+	EVT_LEFT_UP					(								CncBaseEditor::onLeftUp)
+	EVT_LEFT_DCLICK				(								CncBaseEditor::onLeftDClick)
+	EVT_RIGHT_DOWN				(								CncBaseEditor::onRightDown)
+	EVT_TIMER					(wxEVT_EDITOR_CLIENT_ID_TIMER,	CncBaseEditor::onClientIDTimer)
+	EVT_TIMER					(wxEVT_EDITOR_SUGGEST_TIMER,	CncBaseEditor::onSuggestionTimer)
+	EVT_STC_CHARADDED			(wxID_ANY,						CncBaseEditor::onCharAdded)
+	EVT_STC_AUTOCOMP_SELECTION	(wxID_ANY,						CncBaseEditor::onAutoCompleteSelected)
 wxEND_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////
@@ -101,12 +105,14 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 : wxStyledTextCtrl(parent)
 , styles				()
 , flags					()
+, lastAutoCompleteInfo	()
 , fileInfo				()
 , svgPopupMenu			(NULL)
 , ctlEditMode			(NULL)
 , ctlColunmPostion		(NULL)
 , ctlStatus				(NULL)
-, clientIDTimer			(this, wxID_ANY)
+, clientIDTimer			(this, wxEVT_EDITOR_CLIENT_ID_TIMER)
+, suggestionTimer		(this, wxEVT_EDITOR_SUGGEST_TIMER)
 , firstClientIdToSel	(CLIENT_ID.INVALID)
 , lastClientIdToSel		(CLIENT_ID.INVALID)
 , tryToSelectFlag		(false)
@@ -120,7 +126,7 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 	setupStyle();
 	Enable(hasEditMode());
 	
-	svgBlockTypes.add(wxString::Format("%s  />",			SvgNodeTemplates::CncParameterBlockNodeName));
+	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterResetBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s p=\"1.0\"/>",	SvgNodeTemplates::CncPauseBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncBreakBlockNodeName));
@@ -235,7 +241,7 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 	}
 	// auto complete list
 	else if ( c == WXK_RETURN && ctlKey == true ) {
-		cncBlockParameters.suggest("");
+		suggest(AutoCompleteInfo::Type::ACT_CNC_TOKEN, "");
 		
 	} 
 	// find
@@ -380,7 +386,7 @@ void CncBaseEditor::registerClientIdsToSelect(long firstCID, long lastCID) {
 	// (re)starts a timer. This has to be done to improve the performance 
 	// because it decouples the gui activities. If the user changes the editor selection 
 	// in a fast manner, then only the last editor selection will be used so.
-	clientIDTimer.Start(300);
+	clientIDTimer.Start(250);
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
@@ -797,6 +803,11 @@ void CncBaseEditor::setupSvgStyle() {
 	
 	SetFoldFlags(wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED | wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED | 16);
 	
+	
+	// only a test
+	//StyleSetForeground(wxSTC_HJ_KEYWORD,			*wxYELLOW);
+	//SetKeyWords(0, "CncParameterBlock");
+	//std::cout << DescribeKeyWordSets();
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::setupGcodeStyle() {
@@ -1088,6 +1099,32 @@ bool CncBaseEditor::saveFileAs(const wxString& fileName) {
 	return save();
 }
 ///////////////////////////////////////////////////////////////////
+void CncBaseEditor::suggest(AutoCompleteInfo::Type type, const wxString& token) {
+///////////////////////////////////////////////////////////////////
+	lastAutoCompleteInfo.type  = type;
+	
+	//only reset this here, it will be filled by the 
+	//onSuggestionTimer(wxTimerEvent) callback
+	lastAutoCompleteInfo.token = "";
+	
+	switch ( type ) {
+		case AutoCompleteInfo::Type::ACT_NONE:
+		{
+			break;
+		}
+		case AutoCompleteInfo::Type::ACT_SVG_TOKEN:
+		{
+			svgBlockTypes.suggest(token);
+			break;
+		}
+		case AutoCompleteInfo::Type::ACT_CNC_TOKEN:
+		{
+			cncBlockParameters.suggest(token);
+			break;
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onCharAdded(wxStyledTextEvent &event) {
 ///////////////////////////////////////////////////////////////////
 	// get char
@@ -1097,13 +1134,59 @@ void CncBaseEditor::onCharAdded(wxStyledTextEvent &event) {
 	const int wordStartPos	= WordStartPosition(currentPos, true);
 	const int lenEntered	= currentPos - wordStartPos;
 
-	// Display the auto completion list
+	// Display the auto completion lists
 	if ( lenEntered > 2 ) {
-		cncBlockParameters.suggest(GetTextRange(wordStartPos, currentPos));
+		suggest(AutoCompleteInfo::Type::ACT_CNC_TOKEN, GetTextRange(wordStartPos, currentPos));
 	}
 	else {
-		if (chr == '<')
-			svgBlockTypes.suggest("");
+		if (chr == '<') {
+			suggest(AutoCompleteInfo::Type::ACT_SVG_TOKEN, "");
+		}
 	}
-
+}
+///////////////////////////////////////////////////////////////////
+void CncBaseEditor::onAutoCompleteSelected(wxStyledTextEvent &event) {
+///////////////////////////////////////////////////////////////////
+	lastAutoCompleteInfo.token = event.GetText();
+	
+	// to decouple
+	suggestionTimer.Start(50, true);
+}
+///////////////////////////////////////////////////////////////////
+void CncBaseEditor::onSuggestionTimer(wxTimerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	suggestionTimer.Stop();
+	
+	switch ( lastAutoCompleteInfo.type ) {
+		case AutoCompleteInfo::Type::ACT_NONE:
+		{
+			return;
+		}
+		case AutoCompleteInfo::Type::ACT_CNC_TOKEN:
+		{
+			break;
+		}
+		case AutoCompleteInfo::Type::ACT_SVG_TOKEN:
+		{
+			const wxString test(lastAutoCompleteInfo.token);
+			const bool goBack = (
+				   test.Contains(SvgNodeTemplates::CncParameterBlockNodeName)
+				|| test.Contains(SvgNodeTemplates::CncVariablesBlockNodeName)
+			);
+			
+			//std::cout << test<< std::endl;
+			//std::cout << SvgNodeTemplates::CncParameterBlockNodeName << std::endl;
+			
+			if ( goBack == true ) {
+				
+				SetCurrentPos(GetCurrentPos() - 2);
+				InsertTextRaw(GetCurrentPos(), " ");
+				SetCurrentPos(GetCurrentPos() + 1);
+				
+				suggest(AutoCompleteInfo::Type::ACT_CNC_TOKEN, "");
+			}
+			
+			break;
+		}
+	}
 }

@@ -224,7 +224,7 @@ CncPathListRunner::~CncPathListRunner() {
 //////////////////////////////////////////////////////////////////
 void CncPathListRunner::changePathListRunnerInterfaceImpl(const wxString& portName) {
 //////////////////////////////////////////////////////////////////
-	std::cout << CNC_LOG_FUNCT_A(wxString::Format("%s\n", portName));
+	//std::cout << CNC_LOG_FUNCT_A(wxString::Format("%s\n", portName));
 	
 	if		( portName.IsSameAs(_portPreProcMonitor) )	installInterface(new CncPathListMonitor());
 	else if	( portName.IsSameAs(_portPreProcFile) )		installInterface(new CncPathListFileStore());
