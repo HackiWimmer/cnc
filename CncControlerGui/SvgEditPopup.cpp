@@ -12,6 +12,7 @@ const char* SvgNodeTemplates::CncParameterResetBlockNodeName	= "CncParameterRese
 const char* SvgNodeTemplates::CncParameterPrintBlockNodeName	= "CncParameterPrint";
 const char* SvgNodeTemplates::CncParameterBlockNodeName			= "CncParameterBlock";
 const char* SvgNodeTemplates::CncVariablesBlockNodeName			= "CncVaribalesBock";
+const char* SvgNodeTemplates::CncMacroBlockNodeName				= "CncMacroBock";
 const char* SvgNodeTemplates::CncBreakBlockNodeName				= "CncBreak";
 const char* SvgNodeTemplates::CncPauseBlockNodeName				= "CncPause";
 

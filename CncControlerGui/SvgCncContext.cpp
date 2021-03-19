@@ -36,6 +36,21 @@ SvgCncContextBase::~SvgCncContextBase() {
 	parameterMap.clear();
 }
 //////////////////////////////////////////////////////////////////
+void SvgCncContextBase::addExternInfo(const wxString& msg) {
+//////////////////////////////////////////////////////////////////
+	CTX_LOG_INF(msg)
+}
+//////////////////////////////////////////////////////////////////
+void SvgCncContextBase::addExternWarning(const wxString& msg) {
+//////////////////////////////////////////////////////////////////
+	CTX_LOG_WAR(msg)
+}
+//////////////////////////////////////////////////////////////////
+void SvgCncContextBase::addExternError(const wxString& msg) {
+//////////////////////////////////////////////////////////////////
+	CTX_LOG_ERR(msg)
+}
+//////////////////////////////////////////////////////////////////
 void SvgCncContextBase::reconstruct() {
 //////////////////////////////////////////////////////////////////
 	for( auto it=parameterMap.begin(); it != parameterMap.end(); ++it )
@@ -44,14 +59,13 @@ void SvgCncContextBase::reconstruct() {
 //////////////////////////////////////////////////////////////////
 void SvgCncContextBase::reset() {
 //////////////////////////////////////////////////////////////////
-	currentLineNumber	= UNDEFINED_LINE_NUMBER;
-	
+	currentLineNumber = UNDEFINED_LINE_NUMBER;
 	parameterMap.clear();
 }
 //////////////////////////////////////////////////////////////////
 void SvgCncContextBase::setCurrentLineNumber(long ln) {
 //////////////////////////////////////////////////////////////////
-	currentLineNumber	= ln < 0 ? UNDEFINED_LINE_NUMBER	: (ln);
+	currentLineNumber = ln < 0 ? UNDEFINED_LINE_NUMBER	: (ln);
 }
 //////////////////////////////////////////////////////////////////
 long SvgCncContextBase::getCurrentClientID(CLIENT_ID_OFFSET o) const { 
@@ -348,6 +362,15 @@ void SvgCncContext::traceTo(std::ostream& o, unsigned int indent) const {
 		<< "}" 
 		<< std::endl
 		;
+}
+//////////////////////////////////////////////////////////////////
+void SvgCncContext::traceVariablesOnlyTo(std::ostream& o, unsigned int indent) const {
+//////////////////////////////////////////////////////////////////
+	const wxString prefix(' ', (int)indent +2);
+	for ( auto it = parameterMap.begin(); it != parameterMap.end(); ++it ) {
+		if ( it->first.StartsWith("{") )
+			o << wxString::Format("%s%s%s = %s\n", prefix, it->first, wxString(' ', 25 - it->first.length()), it->second);
+	}
 }
 //////////////////////////////////////////////////////////////////
 void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const wxString& value) {
@@ -942,6 +965,23 @@ void SvgCncContext::determineColourEffects() {
 				guidePath			= true;
 		}
 	}
+}
+//////////////////////////////////////////////////////////////////
+bool SvgCncContext::expand(const SvgCncContextMacro& macro) {
+//////////////////////////////////////////////////////////////////
+	const ParameterMap& mpm = macro.getParameterMap();
+
+	for ( auto it = mpm.begin(); it != mpm.end(); ++it ) {
+		if ( it->first.IsSameAs(macro.MACRO_IDENTIFIER) == true )
+			continue;
+		
+		if ( provide(it->first, it->second) == false ) {
+			std::cerr << CNC_LOG_FUNCT_A(": provide %s = '%s' failed\n", it->first, it->second);
+			return false;
+		}
+	}
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 const std::ostream& SvgCncContext::provideUsage(std::ostream& o, unsigned int indent) {

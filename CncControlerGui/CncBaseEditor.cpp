@@ -127,13 +127,16 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 	Enable(hasEditMode());
 	
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterBlockNodeName));
+	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncMacroBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterResetBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s p=\"1.0\"/>",	SvgNodeTemplates::CncPauseBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncBreakBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterPrintBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s x=\"1.0\"/>",	SvgNodeTemplates::CncVariablesBlockNodeName));
 	
-	const SvgCncContext ctx;
+	const SvgCncContext			ctx;
+	const SvgCncContextMacro	mac;
+	cncBlockParameters.add(wxString::Format("%s=\"MacroName\"",					mac.MACRO_IDENTIFIER));
 	cncBlockParameters.add(wxString::Format("%s=\"T_300={3.00};T_600={6.0}\"",	ctx.ID_TOOL_LIST));
 	cncBlockParameters.add(wxString::Format("%s=\"T_300\"",						ctx.ID_TOOL_SEL));
 	cncBlockParameters.add(wxString::Format("%s=\"Yes/No\"",					ctx.ID_COLOUR_SCHEME));
@@ -1172,10 +1175,13 @@ void CncBaseEditor::onSuggestionTimer(wxTimerEvent& event) {
 			const bool goBack = (
 				   test.Contains(SvgNodeTemplates::CncParameterBlockNodeName)
 				|| test.Contains(SvgNodeTemplates::CncVariablesBlockNodeName)
+				|| test.Contains(SvgNodeTemplates::CncMacroBlockNodeName)
 			);
 			
-			//std::cout << test<< std::endl;
+			//std::cout << test << std::endl;
 			//std::cout << SvgNodeTemplates::CncParameterBlockNodeName << std::endl;
+			//std::cout << SvgNodeTemplates::CncVariablesBlockNodeName << std::endl;
+			//std::cout << SvgNodeTemplates::CncMacroBlockNodeName << std::endl;
 			
 			if ( goBack == true ) {
 				

@@ -23,7 +23,6 @@ typedef std::vector<SVGUserAgentInfo> UserAgentVector;
 ////////////////////////////////////////////////////////////////
 class SVGUserAgent{
 ////////////////////////////////////////////////////////////////
-
 	private:
 		wxString					nodeName;
 		wxString					elementId;
@@ -35,6 +34,7 @@ class SVGUserAgent{
 		DoubleStringMap				collectedIds;
 		TransformVector				collectedTransforms;
 		StyleVector					collectedStyles;
+		CncContextMacroMap			collectedMacros;
 		
 		UseDirectiveVector			useInfo;
 		SvgUserAgentOutputControls	oCtl;
@@ -55,6 +55,7 @@ class SVGUserAgent{
 		bool initNextPath(SvgCncContext& cwp, const wxString& origPath);
 		bool initNextCncParameterNode(const SvgCncContext& cwp);
 		bool initNextCncVaribalesNode(const SvgCncContext& cwp);
+		bool initNextCncMacroNode(const SvgCncContextMacro& cwp);
 		bool initNextCncBreakNode(const SvgCncBreak& scb);
 		bool initNextCncPauseNode(const SvgCncPause& scp);
 		bool setNodeType(const wxString& t);
@@ -70,13 +71,14 @@ class SVGUserAgent{
 		bool hasCurrentAttribute(const wxString& key);
 		bool expand();
 		
-		SVGUserAgentInfo&		getCurentUserAgent();
-		UseDirectiveVector&		getUseInfoVector();
-		const UserAgentVector&	getList();
-		UseDirective&			evaluateUseDirective(UseDirective& ud);
+		SVGUserAgentInfo&			getCurentUserAgent();
+		UseDirectiveVector&			getUseInfoVector();
+		const UserAgentVector&		getList();
+		UseDirective&				evaluateUseDirective(UseDirective& ud);
 		
-		const wxString&			getCurrentAttribute(const wxString& key, const wxString& defValue = _(""));
+		const wxString&				getCurrentAttribute(const wxString& key, const wxString& defValue = _(""));
 		
+		const SvgCncContextMacro*	getMarcoWithId(const wxString& id);
 };
 
 #endif

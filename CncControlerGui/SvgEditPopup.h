@@ -45,6 +45,7 @@ class SvgNodeTemplates {
 		static const char* CncParameterPrintBlockNodeName;
 		static const char* CncParameterBlockNodeName;
 		static const char* CncVariablesBlockNodeName;
+		static const char* CncMacroBlockNodeName;
 		static const char* CncBreakBlockNodeName;
 		static const char* CncPauseBlockNodeName;
 

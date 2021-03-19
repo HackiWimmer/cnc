@@ -55,12 +55,16 @@ class SvgCncContextBase {
 		virtual void		manageParameter(const Mode mode, const wxString& name, const wxString& value) = 0;
 		virtual bool		replaceVariables(const wxString& in, wxString& out);
 		
-		const ParameterMap&	getParameterMap() const { return parameterMap; }
-		
 	public:
 		virtual ~SvgCncContextBase();
 		
 		void reset();
+		
+		const ParameterMap&	getParameterMap() const { return parameterMap; }
+		
+		void			addExternInfo(const wxString& msg);
+		void			addExternWarning(const wxString& msg);
+		void			addExternError(const wxString& msg);
 		
 		void			setCurrentLineNumber(long ln);
 		long			getCurrentLineNumber()												const	{ return currentLineNumber; }
@@ -126,7 +130,6 @@ class SvgCncPause : public SvgCncContextBase {
 		
 		explicit SvgCncPause(const SvgCncPause& scp) 
 		: SvgCncContextBase	(scp) 
-		, microseconds		(scp.microseconds)
 		{}
 		
 		virtual ~SvgCncPause()
@@ -134,21 +137,40 @@ class SvgCncPause : public SvgCncContextBase {
 		
 		SvgCncPause& operator= (const SvgCncPause& scp) {
 			SvgCncContextBase::operator= (scp);
-			
-			microseconds = scp.microseconds;
 			return *this;
 		}
 		
 		virtual void traceTo(std::ostream& o, unsigned int indent=0) const {
-			const wxString prefix(' ', (int)indent);
-			const unsigned int fillTo = 21;
-			wxString name;
-				
-			name.assign("Delay");
-			o << wxString::Format("%s  --> %s%s = %lld\n", prefix, name, wxString(' ', fillTo - name.length()), (long long)microseconds);
+			SvgCncContextBase::traceTo(o, indent);
 		}
 		
-		int64_t microseconds = 0LL;
+		double getMicroSeconds() const { return getParameterAsDouble("p", "0.0"); }
+};
+
+//////////////////////////////////////////////////////////////////
+class SvgCncContextMacro : public SvgCncContextBase {
+	
+	protected:
+		virtual void manageParameter(const Mode mode, const wxString& name, const wxString& value) {}
+		
+	public:
+		const char * MACRO_IDENTIFIER	= "Macro";
+
+		SvgCncContextMacro() 
+		: SvgCncContextBase() 
+		{}
+		
+		virtual ~SvgCncContextMacro()
+		{}
+		
+		SvgCncContextMacro& operator= (const SvgCncContextMacro& scm) {
+			SvgCncContextBase::operator= (scm);
+			return *this;
+		}
+		
+		virtual void traceTo(std::ostream& o, unsigned int indent=0) const {
+			SvgCncContextBase::traceTo(o, indent);
+		}
 };
 
 //////////////////////////////////////////////////////////////////
@@ -164,7 +186,6 @@ class SvgCncContext : public SvgCncContextBase {
 		};
 		
 		typedef std::map<wxString, Tool> ToolList;
-		
 		
 	protected:
 		
@@ -194,6 +215,7 @@ class SvgCncContext : public SvgCncContextBase {
 		void					setCurrentZDepth(const wxString& parameter);
 		
 		bool					checkToolExists(const wxString& id) const;
+		
 		virtual void			reconstruct();
 		virtual void			manageParameter(const Mode mode, const wxString& name, const wxString& value);
 		
@@ -262,11 +284,13 @@ class SvgCncContext : public SvgCncContextBase {
 		void					determineColourEffects();
 		
 		virtual void			traceTo(std::ostream& o, unsigned int indent=0) const;
+		virtual void			traceVariablesOnlyTo(std::ostream& o, unsigned int indent=0) const;
 		
 		static 
 		const std::ostream&		provideUsage(std::ostream& o, unsigned int indent=0);
+		
+		bool					expand(const SvgCncContextMacro& macro);
 };
-
 
 //////////////////////////////////////////////////////////////////
 class SvgCncContextSummary  : public SvgCncContext {
@@ -294,5 +318,8 @@ class SvgCncContextSummary  : public SvgCncContext {
 		
 		void traceTo(std::ostream& o, unsigned int indent) const;
 };
+
+
+typedef std::map<wxString, SvgCncContextMacro> CncContextMacroMap;
 
 #endif

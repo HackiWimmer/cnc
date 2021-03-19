@@ -77,10 +77,6 @@ class SVGFileParser : public SVGParserBase
 		
 		bool processXMLNode(wxXmlNode* node);
 		bool processCncParameter(wxXmlNode* node);
-		bool resetCncParameters(wxXmlNode* node);
-		bool printCncParameters(wxXmlNode* node);
-		bool evaluateCncParameters(wxXmlNode* node);
-		bool evaluateCncVaribales(wxXmlNode* node);
 		void evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm);
 		
 		bool spool();

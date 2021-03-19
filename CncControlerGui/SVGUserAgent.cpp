@@ -11,6 +11,7 @@ SVGUserAgent::SVGUserAgent()
 , collectedIds					()
 , collectedTransforms			()
 , collectedStyles				()
+, collectedMacros				()
 , useInfo						()
 , oCtl							()
 /////////////////////////////////////////////////////////
@@ -29,6 +30,16 @@ SVGUserAgent::~SVGUserAgent() {
 	collectedIds.clear();
 	collectedAttributes.clear();
 	collectedStyles.clear();
+	collectedMacros.clear();
+}
+/////////////////////////////////////////////////////////
+const SvgCncContextMacro* SVGUserAgent::getMarcoWithId(const wxString& id) {
+/////////////////////////////////////////////////////////
+	auto it = collectedMacros.find(id);
+	if ( it == collectedMacros.end() )
+		return NULL;
+		
+	return &(it->second);
 }
 /////////////////////////////////////////////////////////
 SVGUserAgentInfo& SVGUserAgent::getCurentUserAgent() {
@@ -124,7 +135,7 @@ bool SVGUserAgent::initNextCncParameterNode(const SvgCncContext& cwp) {
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_PARAM;
 	sua.originalPath		= "";
-	sua.cncParameters 		= cwp;
+	sua.cncParameters		= cwp;
 	
 	// copy the following lists - why ????
 	sua.styleList		= collectedStyles;
@@ -141,13 +152,41 @@ bool SVGUserAgent::initNextCncVaribalesNode(const SvgCncContext& cwp) {
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_VAR;
 	sua.originalPath		= "";
-	sua.cncParameters 		= cwp;
+	sua.cncParameters		= cwp;
 	
 	// copy the following lists - why ????
 	sua.styleList		= collectedStyles;
 	
 	userAgent.push_back(std::move(sua));
 	return true;
+}
+/////////////////////////////////////////////////////////
+bool SVGUserAgent::initNextCncMacroNode(const SvgCncContextMacro& cwm) {
+/////////////////////////////////////////////////////////
+	SVGUserAgentInfo sua;
+	sua.lineNumber 			= cwm.getCurrentLineNumber();
+	sua.nodeName 			= nodeName;
+	sua.elementId			= "";
+	sua.nodeType			= SVGUserAgentInfo::NT_CNC_MACRO;
+	sua.originalPath		= "";
+	sua.cncMacro			= cwm;
+	
+	bool ret = false;
+	
+	// collect this macro;
+	if ( cwm.hasParameter(cwm.MACRO_IDENTIFIER) == true ) {
+		const wxString& id(cwm.getParameterAsString(cwm.MACRO_IDENTIFIER, ""));
+		if ( id.IsEmpty() == false ) {
+			collectedMacros[id] = cwm;
+			ret = true;
+		}
+	}
+	
+	// copy the following lists - why ????
+	sua.styleList		= collectedStyles;
+	
+	userAgent.push_back(std::move(sua));
+	return ret;
 }
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::initNextCncBreakNode(const SvgCncBreak& scb) {

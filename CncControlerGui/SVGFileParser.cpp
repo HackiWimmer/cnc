@@ -36,6 +36,7 @@ bool SVGFileFormatter::removeCncTags(wxXmlNode* child) {
 		else if ( name.IsSameAs(SvgNodeTemplates::CncParameterPrintBlockNodeName) )	return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) )		return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncVariablesBlockNodeName) )		return true;
+		else if ( name.IsSameAs(SvgNodeTemplates::CncMacroBlockNodeName) )			return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) )			return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) )			return true;
 		
@@ -440,7 +441,13 @@ bool SVGFileParser::spool() {
 		
 		// ----------------------------------------------------------------------
 		if ( uai.nodeName == SvgNodeTemplates::CncPauseBlockNodeName ) {
-			pathHandler->processWait(uai.cncPause.microseconds);
+			pathHandler->processWait(uai.cncPause.getMicroSeconds());
+		}
+		
+		// ----------------------------------------------------------------------
+		if ( uai.nodeName == SvgNodeTemplates::CncMacroBlockNodeName ) {
+			// is already processed to the current cnc parameter
+			continue;
 		}
 		
 		// ----------------------------------------------------------------------
@@ -882,62 +889,90 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 	#undef ADD_BASIC_SHAPE
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::processCncParameter(wxXmlNode* child) {
+bool SVGFileParser::processCncParameter(wxXmlNode* node) {
 //////////////////////////////////////////////////////////////////
+	if ( node == NULL )
+		return false;
+		
+	SvgCncContext& cwp = pathHandler->getSvgCncContext();
+	
 	// ------------------------------------------------------
 	if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) ) {
-		if ( resetCncParameters(child) == false )
-			return false;
-			
-		registerNextDebugNode(currentNodeName);
+		cwp.reset();
 		
+		registerNextDebugNode(currentNodeName);
 		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
 	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) ) {
-		if ( evaluateCncParameters(child) == false )
+		registerNextDebugNode(currentNodeName);
+		
+		// replace cnc macros on demand
+		const wxString macroKey(SvgCncContextMacro().MACRO_IDENTIFIER);
+		wxString macroId;
+		if ( node->GetAttribute(macroKey, &macroId) ) {
+			node->DeleteAttribute(macroKey);
+			
+			const SvgCncContextMacro* macro = svgUserAgent.getMarcoWithId(macroId);
+			if ( macro != NULL )	cwp.expand(*macro);
+			else					cwp.addExternWarning(wxString::Format("Can't find macro '%s'", macroId));
+		}
+		
+		if ( cwp.provide(node) == false )
 			return false;
 			
-		registerNextDebugNode(currentNodeName);
 		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
 	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncVariablesBlockNodeName) ) {
-		if ( evaluateCncVaribales(child) == false )
+		registerNextDebugNode(currentNodeName);
+		
+		if ( cwp.provideVariables(node) == false )
 			return false;
 			
-		registerNextDebugNode(currentNodeName);
 		svgUserAgent.initNextCncVaribalesNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
-	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) ) {
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncMacroBlockNodeName) ) {
 		registerNextDebugNode(currentNodeName);
+	
+		SvgCncContextMacro scm; 
+		scm.setCurrentLineNumber(getCurrentLineNumber());
+		if ( scm.provide(node) == false )
+			return false;
 		
-		SvgCncBreak scb; scb.setCurrentLineNumber(getCurrentLineNumber());
-		svgUserAgent.initNextCncBreakNode(scb);
+		svgUserAgent.initNextCncMacroNode(scm);
 	}
 	// ------------------------------------------------------
 	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) ) {
 		registerNextDebugNode(currentNodeName);
 	
-		SvgCncPause scp; scp.setCurrentLineNumber(getCurrentLineNumber());
-		double p = 0.0;
-		if ( child->GetAttribute("p", "0.0").ToDouble(&p) )
-			scp.microseconds = (int64_t)(p * 1000 * 1000);
+		SvgCncPause scp; 
+		scp.setCurrentLineNumber(getCurrentLineNumber());
+		if ( scp.provide(node) == false )
+			return false;
 		
 		svgUserAgent.initNextCncPauseNode(scp);
 	}
 	// ------------------------------------------------------
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) ) {
+		registerNextDebugNode(currentNodeName);
+		
+		SvgCncBreak scb; 
+		scb.setCurrentLineNumber(getCurrentLineNumber());
+		
+		svgUserAgent.initNextCncBreakNode(scb);
+	}
+	// ------------------------------------------------------
 	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterPrintBlockNodeName) ) {
-		if ( printCncParameters(child) == false )
-			return false;
+		cwp.traceTo(std::cout, 1);
 			
 		registerNextDebugNode(currentNodeName);
 		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
 	else if ( currentNodeName.IsSameAs("CNC", false) ) {
-		cnc::cex1 << "Obsolete Node. <CNC> isn't longer supported. Line number: " << child->GetLineNumber() << std::endl;
+		cnc::cex1 << "Obsolete Node. <CNC> isn't longer supported. Line number: " << node->GetLineNumber() << std::endl;
 	}
 	
 	return true;
@@ -955,30 +990,4 @@ void SVGFileParser::evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm)
 void SVGFileParser::initNextPath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
 	svgUserAgent.initNextPath(pathHandler->getSvgCncContext(), data);
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::resetCncParameters(wxXmlNode* node) {
-//////////////////////////////////////////////////////////////////
-	SvgCncContext& cwp = pathHandler->getSvgCncContext();
-	cwp.reset();
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::printCncParameters(wxXmlNode* node) {
-//////////////////////////////////////////////////////////////////
-	SvgCncContext& cwp = pathHandler->getSvgCncContext();
-	cwp.traceTo(std::cout, 1);
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::evaluateCncVaribales(wxXmlNode* node) {
-//////////////////////////////////////////////////////////////////
-	SvgCncContext& cwp = pathHandler->getSvgCncContext();
-	return cwp.provideVariables(node);
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::evaluateCncParameters(wxXmlNode* node) {
-//////////////////////////////////////////////////////////////////
-	SvgCncContext& cwp = pathHandler->getSvgCncContext();
-	return cwp.provide(node);
 }

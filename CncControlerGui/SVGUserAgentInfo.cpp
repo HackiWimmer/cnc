@@ -145,9 +145,20 @@ void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
 			break;
 		}
 		case NT_CNC_VAR:
+		{
+			std::stringstream ss; cncParameters.traceVariablesOnlyTo(ss);
+			addCncStr(ss.str().c_str());
+			break;
+		}
 		case NT_CNC_PARAM:
 		{
 			std::stringstream ss; cncParameters.traceTo(ss);
+			addCncStr(ss.str().c_str());
+			break;
+		}
+		case NT_CNC_MACRO:
+		{
+			std::stringstream ss; cncMacro.traceTo(ss);
 			addCncStr(ss.str().c_str());
 			break;
 		}
@@ -191,6 +202,7 @@ bool SVGUserAgentInfo::shouldProceed() const {
 /////////////////////////////////////////////////////////
 	switch ( nodeType ) {
 		case NT_CNC_VAR:
+		case NT_CNC_MACRO:
 		case NT_CNC_PARAM:
 		{
 			return false;
