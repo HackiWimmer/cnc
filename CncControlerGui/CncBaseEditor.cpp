@@ -686,7 +686,7 @@ void CncBaseEditor::setupDefaultStyle() {
 		else						StyleSetBackground (i, styles.clDisabledBck);
 	}
 	
-	// setup gray foreground as default
+	// setup grey foreground as default
 	for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++) {
 		StyleSetForeground (i, styles.clDefaultFgd);
 	}
@@ -704,7 +704,7 @@ void CncBaseEditor::setupDefaultStyle() {
 	SetProperty(wxT("fold.compact"), 				wxT("0"));
 	SetProperty(wxT("fold.preprocessor"), 			wxT("0"));
 	SetProperty(wxT("fold.html"), 					wxT("0"));
-	SetProperty(wxT("fold.html.preprocessor"), 	wxT("0"));
+	SetProperty(wxT("fold.html.preprocessor"),		wxT("0"));
 	
 	SetMarginMask(MARGIN_FOLD, 			wxSTC_MASK_FOLDERS);
 	SetMarginWidth(MARGIN_FOLD, 		0);
@@ -746,7 +746,7 @@ void CncBaseEditor::setupDefaultStyle() {
 	
 	// Configure selection colours
 	//ctl->SetSelForeground(true, wxColour(255,201,14));
-	SetSelBackground(true, 						wxColour(83,83,83));
+	SetSelBackground(true, 						wxColour(83, 83, 83));
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::setupStyle() {
@@ -773,24 +773,45 @@ void CncBaseEditor::setupSvgStyle() {
 	SetLexer(wxSTC_LEX_HTML);
 	
 	// setup highlight colours
-	StyleSetForeground(wxSTC_H_DOUBLESTRING,		wxColour(255, 	205, 	139));
-	StyleSetForeground(wxSTC_H_SINGLESTRING,		wxColour(255,	205, 	139));
-	StyleSetForeground(wxSTC_H_ENTITY,				wxColour(255,	0, 		0));
-	StyleSetForeground(wxSTC_H_TAGUNKNOWN,			wxColour(0,		150, 	0));
-	StyleSetForeground(wxSTC_H_ATTRIBUTEUNKNOWN,	wxColour(0,		0, 		150));
+	StyleSetForeground(wxSTC_H_DEFAULT,				wxColour(200, 	200,	200));
+	StyleSetForeground(wxSTC_H_DOUBLESTRING,		wxColour(255, 	205,	139));
+	StyleSetForeground(wxSTC_H_SINGLESTRING,		wxColour(255,	205,	139));
+	StyleSetForeground(wxSTC_H_ENTITY,				wxColour(255,	  0,	  0));
+	StyleSetForeground(wxSTC_H_TAGUNKNOWN,			wxColour(150,	150,	  0));
+	StyleSetForeground(wxSTC_H_ATTRIBUTEUNKNOWN,	wxColour( 66,	 66,	150));
 	StyleSetForeground(wxSTC_H_ATTRIBUTE,			styles.clAttribute);
 	StyleSetForeground(wxSTC_H_TAG,					styles.clIdentifier);
 	StyleSetForeground(wxSTC_H_COMMENT,				styles.clComment);
 	
+	// wxSTC_HPHP_WORD works together with the patched HTML lexer to extra 
+	// highlight the Cnc... tags.
+	//  - further: "html.tags.case.sensitive" = "1" must be set, otherwise 
+	//    the Cnc... tags could not be found
+	StyleSetForeground(wxSTC_HPHP_WORD,			wxColour(84, 167, 167));
+	
+	//  More html style options 
+	//	StyleSetForeground(wxSTC_H_QUESTION,		*wxRED);
+	//	StyleSetForeground(wxSTC_H_OTHER,			*wxRED);
+	//	StyleSetForeground(wxSTC_H_XMLSTART,		*wxRED);
+	//	StyleSetForeground(wxSTC_H_XMLEND,			*wxRED);
+	//	StyleSetForeground(wxSTC_H_SCRIPT,			*wxRED);
+	//
+	//	StyleSetForeground(wxSTC_H_ASP,				*wxRED);
+	//	StyleSetForeground(wxSTC_H_ASPAT,			*wxRED);
+	//	StyleSetForeground(wxSTC_H_CDATA,			*wxRED);
+	//	StyleSetForeground(wxSTC_H_VALUE,			*wxRED);
+
 	// setup folding
 	SetProperty(wxT("xml.auto.close.tags"), 		wxT("1"));
+	SetProperty(wxT("html.tags.case.sensitive"),	wxT("1"));
 	SetProperty(wxT("lexer.xml.allow.scripts"), 	wxT("1"));
+	
 	SetProperty(wxT("fold"), 						wxT("1"));
 	SetProperty(wxT("fold.comment"),				wxT("1"));
 	SetProperty(wxT("fold.compact"), 				wxT("1"));
 	SetProperty(wxT("fold.preprocessor"), 			wxT("1"));
 	SetProperty(wxT("fold.html"), 					wxT("1"));
-	SetProperty(wxT("fold.html.preprocessor"), 	wxT("1"));
+	SetProperty(wxT("fold.html.preprocessor"),	 	wxT("1"));
 	
 	MarkerDefine(wxSTC_MARKNUM_FOLDER,        		wxSTC_MARK_BOXPLUS, 			styles.clDefaultBck, styles.clDefaultFgd);
 	MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN,    		wxSTC_MARK_BOXMINUS, 			styles.clDefaultBck, styles.clDefaultFgd);
@@ -805,12 +826,6 @@ void CncBaseEditor::setupSvgStyle() {
 	SetMarginSensitive(MARGIN_FOLD, 				true);
 	
 	SetFoldFlags(wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED | wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED | 16);
-	
-	
-	// only a test
-	//StyleSetForeground(wxSTC_HJ_KEYWORD,			*wxYELLOW);
-	//SetKeyWords(0, "CncParameterBlock");
-	//std::cout << DescribeKeyWordSets();
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::setupGcodeStyle() {

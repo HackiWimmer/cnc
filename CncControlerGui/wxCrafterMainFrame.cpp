@@ -430,22 +430,36 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1368->Add(m_staticLine4472, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
+    m_btSvgToggleShowWS = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("bullet-purple")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_btSvgToggleShowWS->SetToolTip(_("Toggle: Show Whitespaces"));
+    m_btSvgToggleShowWS->SetValue(true);
+    
+    flexGridSizer1368->Add(m_btSvgToggleShowWS, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSvgToggleShowWS->SetMinSize(wxSize(26,26));
+    
+    m_btSvgToggleShowEOL = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("bullet-blue")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
+    m_btSvgToggleShowEOL->SetToolTip(_("Toggle: Show EOL"));
+    m_btSvgToggleShowEOL->SetValue(true);
+    
+    flexGridSizer1368->Add(m_btSvgToggleShowEOL, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSvgToggleShowEOL->SetMinSize(wxSize(26,26));
+    
     m_btSvgToggleWordWrap = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-word_wrap")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
-    m_btSvgToggleWordWrap->SetToolTip(_("Toggle Word Wrap Mode"));
+    m_btSvgToggleWordWrap->SetToolTip(_("Toggle: Word Wrap"));
     m_btSvgToggleWordWrap->SetValue(true);
     
     flexGridSizer1368->Add(m_btSvgToggleWordWrap, 0, wxALL, WXC_FROM_DIP(1));
     m_btSvgToggleWordWrap->SetMinSize(wxSize(26,26));
     
     m_btSvgToggleTryToSelectClientId = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-find")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
-    m_btSvgToggleTryToSelectClientId->SetToolTip(_("Toggle Try to select ClientId"));
+    m_btSvgToggleTryToSelectClientId->SetToolTip(_("Toggle: Try to select ClientId"));
     m_btSvgToggleTryToSelectClientId->SetValue(false);
     
     flexGridSizer1368->Add(m_btSvgToggleTryToSelectClientId, 0, wxALL, WXC_FROM_DIP(1));
     m_btSvgToggleTryToSelectClientId->SetMinSize(wxSize(26,26));
     
     m_btSvgToggleAutoSaveTplOnProcess = new wxBitmapToggleButton(m_panelTplEdit, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-build")), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(26,26)), 0);
-    m_btSvgToggleAutoSaveTplOnProcess->SetToolTip(_("Auto save on process"));
+    m_btSvgToggleAutoSaveTplOnProcess->SetToolTip(_("Toggle: Auto save on process"));
     m_btSvgToggleAutoSaveTplOnProcess->SetValue(false);
     
     flexGridSizer1368->Add(m_btSvgToggleAutoSaveTplOnProcess, 0, wxALL, WXC_FROM_DIP(1));
@@ -6032,6 +6046,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_reloadTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::reloadTemplateFromButton), NULL, this);
     m_renameTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::renameTemplateFromButton), NULL, this);
     m_removeTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::removeTemplateFromButton), NULL, this);
+    m_btSvgToggleShowWS->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateShowWs), NULL, this);
+    m_btSvgToggleShowEOL->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateShowEOL), NULL, this);
     m_btSvgToggleWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
     m_btSvgToggleTryToSelectClientId->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTryToSelectClientIdFromEditor), NULL, this);
     m_btSvgToggleAutoSaveTplOnProcess->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleAutoSaveTplOnProcess), NULL, this);
@@ -6284,6 +6300,8 @@ MainFrameBClass::~MainFrameBClass()
     m_reloadTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::reloadTemplateFromButton), NULL, this);
     m_renameTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::renameTemplateFromButton), NULL, this);
     m_removeTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::removeTemplateFromButton), NULL, this);
+    m_btSvgToggleShowWS->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateShowWs), NULL, this);
+    m_btSvgToggleShowEOL->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateShowEOL), NULL, this);
     m_btSvgToggleWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
     m_btSvgToggleTryToSelectClientId->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTryToSelectClientIdFromEditor), NULL, this);
     m_btSvgToggleAutoSaveTplOnProcess->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleAutoSaveTplOnProcess), NULL, this);

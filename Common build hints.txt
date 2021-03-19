@@ -1,0 +1,76 @@
+# --------------------------------------------------------------------------------
+# This file try collects some build info around this project and its dependencies 
+#  - no guarantee of completeness.
+# Furthermore, this file is continuous under construction
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# windows: building wx with mingw
+ # open a cmd batch window or a Git Batch window
+
+ # may be try this before
+ which g++
+ g++ -v
+ 
+ # modify Scintilla lexer on demand
+
+ # build ...
+ cd <wxDir>/build/msw
+ mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release clean
+ mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release 
+ 
+ # Important environment variables:
+ # - in particular WXWIN controls the used (build env) version
+ WXCFG		gcc_dll\mswu
+ WXWIN		<wxDir>
+ PATH		... <wx DLL Dir> ...
+
+
+# --------------------------------------------------------------------------------
+# msys2: building wx 
+ # open MSys2 gui/env
+ 
+ #may be try this before
+ which g++
+ g++ -v
+
+ # modify Scintilla lexer on demand
+ 
+ # build ...
+ mkdir <wxDir>/build/mysy2
+ cd <wxDir>/build/mysy2
+ ../../configure
+ make clean
+ make -j4
+ make install
+ 
+# --------------------------------------------------------------------------------
+# windows: building wx samples with mingw
+ 
+ # same as descibed for the wx lib above, but with the samples dir
+ 
+ cd <wxDir>/build/samples
+ mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release clean
+ mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release 
+  
+# --------------------------------------------------------------------------------
+# windows: building opencv
+ mkdir <opencvDir>/mingwbuild
+ 
+ # Open a CMake Gui
+ #  source dir = <opencvDir>/source
+ #  build dir <opencvDir>/mingwbuild
+ 
+ cd <opencvDir>/mingwbuild
+ cmake .
+ 
+ 
+# --------------------------------------------------------------------------------
+# windows: building wxsvg
+
+ # As I remember this was very hard with a lot of dependencies 
+ # - unfortunately currently no more infoas available
+ #
+ # TODO repeat and describe
+ 
+ 

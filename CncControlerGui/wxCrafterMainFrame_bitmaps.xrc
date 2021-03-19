@@ -103,6 +103,8 @@
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
   <object class="wxBitmap" name="brick">bitmaps\brick.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
+  <object class="wxBitmap" name="bullet-blue">bitmaps\bullet-blue.png</object>
+  <object class="wxBitmap" name="bullet-purple">bitmaps\bullet-purple.png</object>
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
   <object class="wxBitmap" name="camera16">bitmaps\camera16.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>

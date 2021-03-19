@@ -175,6 +175,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void toggleTemplateShowEOL(wxCommandEvent& event);
+		virtual void toggleTemplateShowWs(wxCommandEvent& event);
 		virtual void onSwitchSecLeftBook(wxCommandEvent& event);
 		virtual void traceAllCameraDevices(wxCommandEvent& event);
 		virtual void onDClickSpeedSliderValue(wxMouseEvent& event);

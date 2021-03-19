@@ -52,7 +52,7 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/msys64/mi
 AR       := C:/msys64/mingw64/bin/ar.exe rcu
 CXX      := C:/msys64/mingw64/bin/g++.exe
 CC       := C:/msys64/mingw64/bin/gcc.exe
-CXXFLAGS := -Wno-deprecated-declarations -g1 -fpic -O3 -std=c++17 -Wall $(shell wx-config --cflags) $(Preprocessors)
+CXXFLAGS := -Wno-deprecated-declarations -g1 -fpic -O3 -std=c++2a -Wall $(shell wx-config --cflags) $(Preprocessors)
 CFLAGS   :=  -O3 -Wall $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/msys64/mingw64/bin/as.exe

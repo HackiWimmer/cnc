@@ -126,6 +126,8 @@ protected:
     wxButton* m_renameTemplate;
     wxButton* m_removeTemplate;
     wxStaticLine* m_staticLine4472;
+    wxBitmapToggleButton* m_btSvgToggleShowWS;
+    wxBitmapToggleButton* m_btSvgToggleShowEOL;
     wxBitmapToggleButton* m_btSvgToggleWordWrap;
     wxBitmapToggleButton* m_btSvgToggleTryToSelectClientId;
     wxBitmapToggleButton* m_btSvgToggleAutoSaveTplOnProcess;
@@ -783,6 +785,8 @@ protected:
     virtual void reloadTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void renameTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void removeTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleTemplateShowWs(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleTemplateShowEOL(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleTemplateWordWrapMode(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleTryToSelectClientIdFromEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleAutoSaveTplOnProcess(wxCommandEvent& event) { event.Skip(); }
@@ -1015,6 +1019,8 @@ public:
     wxButton* GetRenameTemplate() { return m_renameTemplate; }
     wxButton* GetRemoveTemplate() { return m_removeTemplate; }
     wxStaticLine* GetStaticLine4472() { return m_staticLine4472; }
+    wxBitmapToggleButton* GetBtSvgToggleShowWS() { return m_btSvgToggleShowWS; }
+    wxBitmapToggleButton* GetBtSvgToggleShowEOL() { return m_btSvgToggleShowEOL; }
     wxBitmapToggleButton* GetBtSvgToggleWordWrap() { return m_btSvgToggleWordWrap; }
     wxBitmapToggleButton* GetBtSvgToggleTryToSelectClientId() { return m_btSvgToggleTryToSelectClientId; }
     wxBitmapToggleButton* GetBtSvgToggleAutoSaveTplOnProcess() { return m_btSvgToggleAutoSaveTplOnProcess; }

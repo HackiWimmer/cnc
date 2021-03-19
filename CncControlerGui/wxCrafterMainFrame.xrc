@@ -685,12 +685,40 @@ Editor</label>
                                                           <flag>wxALL</flag>
                                                           <border>1</border>
                                                           <minsize>26,26</minsize>
+                                                          <object class="wxBitmapToggleButton" name="m_btSvgToggleShowWS">
+                                                            <style/>
+                                                            <size>26,26</size>
+                                                            <bitmap>bitmaps/bullet-purple.png</bitmap>
+                                                            <tooltip>
+                                                              <![CDATA[Toggle: Show Whitespaces]]>
+                                                            </tooltip>
+                                                            <checked>1</checked>
+                                                          </object>
+                                                        </object>
+                                                        <object class="sizeritem">
+                                                          <flag>wxALL</flag>
+                                                          <border>1</border>
+                                                          <minsize>26,26</minsize>
+                                                          <object class="wxBitmapToggleButton" name="m_btSvgToggleShowEOL">
+                                                            <style/>
+                                                            <size>26,26</size>
+                                                            <bitmap>bitmaps/bullet-blue.png</bitmap>
+                                                            <tooltip>
+                                                              <![CDATA[Toggle: Show EOL]]>
+                                                            </tooltip>
+                                                            <checked>1</checked>
+                                                          </object>
+                                                        </object>
+                                                        <object class="sizeritem">
+                                                          <flag>wxALL</flag>
+                                                          <border>1</border>
+                                                          <minsize>26,26</minsize>
                                                           <object class="wxBitmapToggleButton" name="m_btSvgToggleWordWrap">
                                                             <style/>
                                                             <size>26,26</size>
                                                             <bitmap>bitmaps/16-word_wrap.png</bitmap>
                                                             <tooltip>
-                                                              <![CDATA[Toggle Word Wrap Mode]]>
+                                                              <![CDATA[Toggle: Word Wrap]]>
                                                             </tooltip>
                                                             <checked>1</checked>
                                                           </object>
@@ -704,7 +732,7 @@ Editor</label>
                                                             <size>26,26</size>
                                                             <bitmap>bitmaps/CodeLite/16-find.png</bitmap>
                                                             <tooltip>
-                                                              <![CDATA[Toggle Try to select ClientId]]>
+                                                              <![CDATA[Toggle: Try to select ClientId]]>
                                                             </tooltip>
                                                             <checked>0</checked>
                                                           </object>
@@ -718,7 +746,7 @@ Editor</label>
                                                             <size>26,26</size>
                                                             <bitmap>bitmaps/CodeLite/16-build.png</bitmap>
                                                             <tooltip>
-                                                              <![CDATA[Auto save on process]]>
+                                                              <![CDATA[Toggle: Auto save on process]]>
                                                             </tooltip>
                                                             <checked>0</checked>
                                                           </object>
