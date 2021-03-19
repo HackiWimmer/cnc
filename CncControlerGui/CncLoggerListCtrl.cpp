@@ -466,7 +466,7 @@ bool CncLoggerListCtrl::writeToFile(const wxFileName& fn, bool allRows) {
 		return false;
 	}
 	
-	std::ofstream out(fn.GetFullPath(), std::ofstream::out);
+	std::ofstream out(fn.GetFullPath().c_str().AsChar(), std::ofstream::out);
 	if ( !out.good() ) {
 		std::cerr << "CncLoggerListCtrl::writeToFile(): Can't create file: " << fn.GetFullPath() << std::endl;
 		return false;

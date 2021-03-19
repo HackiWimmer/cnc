@@ -368,7 +368,7 @@ void CncPositionStorageView::onSaveDetails(wxCommandEvent& event) {
 	}
 	
 	wxFileName fnCSV(CncFileNameService::getTempFileName("csv"));
-	std::ofstream outCSV(fnCSV.GetFullPath(), std::ofstream::out);
+	std::ofstream outCSV(fnCSV.GetFullPath().c_str().AsChar(), std::ofstream::out);
 	if ( !outCSV.good() ) {
 		std::cerr	<< CNC_LOG_FUNCT << " Can't create file: '" 
 					<< fnCSV.GetFullPath()
@@ -422,7 +422,7 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 	// -------------------------------------------------------------
 	// perform csv an bounderies
 	{
-		std::ofstream outCSV(fnCSV.GetFullPath(), std::ofstream::out);
+		std::ofstream outCSV(fnCSV.GetFullPath().c_str().AsChar(), std::ofstream::out);
 		if ( !outCSV.good() ) {
 			std::cerr	<< CNC_LOG_FUNCT << " Can't create file: '" 
 						<< fnCSV.GetFullPath()
@@ -556,7 +556,7 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 		vt.append("To('..')\n");
 		vt.append("To('..')\n");
 		
-		std::ofstream outVSZ(fnVSZ.GetFullPath(), std::ofstream::out);
+		std::ofstream outVSZ(fnVSZ.GetFullPath().c_str().AsChar(), std::ofstream::out);
 		if ( !outVSZ.good() ) {
 			std::cerr	<< CNC_LOG_FUNCT << " Can't create file: '" 
 						<< fnVSZ.GetFullPath()

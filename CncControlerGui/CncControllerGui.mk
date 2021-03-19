@@ -15,8 +15,8 @@ CurrentFileFullPath    :=
 User                   :=Hacki
 Date                   :=19/03/2021
 CodeLitePath           :="C:/Program Files/CodeLite"
-LinkerName             :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe
-SharedObjectLinkerName :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe -shared -fPIC
+LinkerName             :=C:/msys64/mingw64/bin/g++.exe
+SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
@@ -36,7 +36,7 @@ ObjectsFileList        :="CncControllerGui.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := $(shell wx-config --rcflags) -D NDEBUG 
-RcCompilerName         :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/windres.exe
+RcCompilerName         :=C:/msys64/mingw64/bin/windres.exe
 LinkOptions            :=  $(shell wx-config --libs) -mwindows
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/@Development/boost_1_71_0 $(IncludeSwitch)C:/msys64/mingw64/include $(IncludeSwitch)C:/@Development/wxsvg-1.5.20/include $(IncludeSwitch)C:/@Development/opencv/build/include $(IncludeSwitch)C:/@Development/openvg 
 IncludePCH             := 
@@ -49,13 +49,13 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/msys64/mi
 ## Common variables
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
-AR       := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/ar.exe rcu
-CXX      := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe
-CC       := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/gcc.exe
+AR       := C:/msys64/mingw64/bin/ar.exe rcu
+CXX      := C:/msys64/mingw64/bin/g++.exe
+CC       := C:/msys64/mingw64/bin/gcc.exe
 CXXFLAGS := -Wno-deprecated-declarations -g1 -fpic -O3 -std=c++17 -Wall $(shell wx-config --cflags) $(Preprocessors)
 CFLAGS   :=  -O3 -Wall $(Preprocessors)
 ASFLAGS  := 
-AS       := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/as.exe
+AS       := C:/msys64/mingw64/bin/as.exe
 
 
 ##
