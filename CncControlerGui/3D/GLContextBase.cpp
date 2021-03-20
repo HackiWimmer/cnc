@@ -372,8 +372,12 @@ void GLContextBase::drawCoordinateOrigin() {
 	// ensure the right matrix
 	glMatrixMode(GL_MODELVIEW);
 	
-	// rescale due to the viewport enlargement, so we always have  
-	// a constant sizing for the coordinate origin 
+	// rescale/ remove the main model scale factor
+	const float sf = 1 / getCurrentScaleFactor();
+	glScalef(sf, sf, sf);
+	
+	// and then rescale to the viewport enlargement, 
+	// so we always have a constant sizing for the coordinate origin 
 	glScalef(viewPort->getDisplayFactor(), viewPort->getDisplayFactor(), viewPort->getDisplayFactor()); 
 	
 	// x axis
@@ -787,8 +791,9 @@ void GLContextBase::display() {
 	glLoadIdentity(); 
 	
 		// scale
-		float sf = getCurrentScaleFactor();
+		const float sf = getCurrentScaleFactor();
 		glScalef(sf, sf, sf);
+		
 		if ( GL_COMMON_CHECK_ERROR > 0 )
 			return;
 		
@@ -811,8 +816,7 @@ void GLContextBase::display() {
 			if ( GL_COMMON_CHECK_ERROR > 0 )
 				return;
 		}
-	
-	
+		
 		// draw coordinate origin
 		glPushMatrix();
 			
@@ -828,12 +832,16 @@ void GLContextBase::display() {
 		if ( currentMouseVertexInfo.valid == true )
 			drawMousePosition();
 
+		if ( GL_COMMON_CHECK_ERROR > 0 )
+			return;
+			
 		// draw additional things
 		/*
 		glPushMatrix();
 		
 			if ( options.showViewPortBounderies == true ) {
 				determineViewPortBounderies();
+				
 				if ( GL_COMMON_CHECK_ERROR > 0 )
 					return;
 			}
