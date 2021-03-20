@@ -23,8 +23,10 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
       bool     isFloat  = false;
       int32_t  l        =   0;
 
-      bool  asBool()  const { return l != 0; }
-      float asFloat() const { return (float)(l) / FLT_FACT; }
+      int32_t asInt32() const { return l; }
+      bool    asBool()  const { return l != 0; }
+      float   asFloat() const { return (float)(l) / FLT_FACT; }
+      
       void  reset()         { *this = Values();  }
     };
 

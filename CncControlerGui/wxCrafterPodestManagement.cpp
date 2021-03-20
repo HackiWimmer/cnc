@@ -38,10 +38,11 @@ CncPodestManagementBase::CncPodestManagementBase(wxWindow* parent, wxWindowID id
     flexGridSizer9548->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9548->AddGrowableCol(0);
     flexGridSizer9548->AddGrowableRow(0);
-    flexGridSizer9548->SetMinSize(500,340);
+    flexGridSizer9548->SetMinSize(540,300);
     this->SetSizer(flexGridSizer9548);
     
     m_basePanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_basePanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     
     flexGridSizer9548->Add(m_basePanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -52,38 +53,103 @@ CncPodestManagementBase::CncPodestManagementBase(wxWindow* parent, wxWindowID id
     flexGridSizer9572->AddGrowableRow(0);
     m_basePanel->SetSizer(flexGridSizer9572);
     
-    wxFlexGridSizer* flexGridSizer9567 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer9567 = new wxFlexGridSizer(1, 5, 0, 0);
     flexGridSizer9567->SetFlexibleDirection( wxBOTH );
     flexGridSizer9567->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9567->AddGrowableCol(0);
     flexGridSizer9567->AddGrowableCol(2);
+    flexGridSizer9567->AddGrowableCol(4);
     flexGridSizer9567->AddGrowableRow(0);
     
     flexGridSizer9572->Add(flexGridSizer9567, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticBitmap9569 = new wxStaticBitmap(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lift-240")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), 0 );
+    m_staticBitmap9569 = new wxStaticBitmap(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lift")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), 0 );
     
-    flexGridSizer9567->Add(m_staticBitmap9569, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer9567->Add(m_staticBitmap9569, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
     
     m_staticLine9571 = new wxStaticLine(m_basePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer9567->Add(m_staticLine9571, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    wxFlexGridSizer* flexGridSizer9543 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer95431 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer95431->SetFlexibleDirection( wxBOTH );
+    flexGridSizer95431->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer95431->AddGrowableCol(0);
+    flexGridSizer95431->AddGrowableRow(1);
+    flexGridSizer95431->AddGrowableRow(2);
+    
+    flexGridSizer9567->Add(flexGridSizer95431, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer9600 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer9600->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9600->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9600->AddGrowableCol(0);
+    
+    flexGridSizer95431->Add(flexGridSizer9600, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_moveRelative = new wxTextCtrl(m_basePanel, wxID_ANY, wxT("99.999"), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(64,-1)), wxTE_RIGHT);
+    #if wxVERSION_NUMBER >= 3000
+    m_moveRelative->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer9600->Add(m_moveRelative, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
+    m_moveRelative->SetMinSize(wxSize(64,-1));
+    
+    m_staticText9611 = new wxStaticText(m_basePanel, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), 0);
+    wxFont m_staticText9611Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText9611->SetFont(m_staticText9611Font);
+    
+    flexGridSizer9600->Add(m_staticText9611, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_btRelativeUp = new wxBitmapButton(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("podestRelativeUp")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btRelativeUp->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    
+    flexGridSizer95431->Add(m_btRelativeUp, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_btRelativeDown = new wxBitmapButton(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("podestRelativeDown")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btRelativeDown->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    
+    flexGridSizer95431->Add(m_btRelativeDown, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticLine95714 = new wxStaticLine(m_basePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer9567->Add(m_staticLine95714, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer9543 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer9543->SetFlexibleDirection( wxBOTH );
     flexGridSizer9543->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9543->AddGrowableCol(0);
-    flexGridSizer9543->AddGrowableRow(0);
     flexGridSizer9543->AddGrowableRow(1);
+    flexGridSizer9543->AddGrowableRow(2);
     
     flexGridSizer9567->Add(flexGridSizer9543, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_btUp = new wxBitmapButton(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("24-up@2x")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxBU_AUTODRAW);
+    wxFlexGridSizer* flexGridSizer9609 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer9609->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9609->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9609->AddGrowableCol(0);
+    flexGridSizer9609->AddGrowableRow(0);
     
-    flexGridSizer9543->Add(m_btUp, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    flexGridSizer9543->Add(flexGridSizer9609, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
-    m_btDown = new wxBitmapButton(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("24-down@2x")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_textCtrl9604 = new wxTextCtrl(m_basePanel, wxID_ANY, wxT("Freehand"), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxTE_READONLY|wxTE_CENTRE);
+    wxFont m_textCtrl9604Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_textCtrl9604->SetFont(m_textCtrl9604Font);
+    #if wxVERSION_NUMBER >= 3000
+    m_textCtrl9604->SetHint(wxT(""));
+    #endif
     
-    flexGridSizer9543->Add(m_btDown, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    flexGridSizer9609->Add(m_textCtrl9604, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_btManuallyUp = new wxBitmapButton(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("podestManuallyUp")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btManuallyUp->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+    
+    flexGridSizer9543->Add(m_btManuallyUp, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_btManuallyDown = new wxBitmapButton(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("podestManuallyDown")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btManuallyDown->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+    
+    flexGridSizer9543->Add(m_btManuallyDown, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     m_staticLine9554 = new wxStaticLine(m_basePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -101,19 +167,19 @@ CncPodestManagementBase::CncPodestManagementBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer9562->Add(m_info, 0, wxALL, WXC_FROM_DIP(0));
     
-    m_button9552 = new wxButton(m_basePanel, wxID_ANY, _("Close"), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), 0);
+    m_btClose = new wxButton(m_basePanel, wxID_ANY, _("Close"), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_button9552->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("window-close-3")), wxLEFT);
-    m_button9552->SetBitmapMargins(2,2);
+    m_btClose->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("window-close-3")), wxLEFT);
+    m_btClose->SetBitmapMargins(2,2);
     #endif
-    wxFont m_button9552Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_button9552->SetFont(m_button9552Font);
+    wxFont m_btCloseFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btClose->SetFont(m_btCloseFont);
     
-    flexGridSizer9562->Add(m_button9552, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
+    flexGridSizer9562->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
     SetName(wxT("CncPodestManagementBase"));
-    SetMinClientSize(wxSize(500,340));
-    SetSize(wxDLG_UNIT(this, wxSize(500,340)));
+    SetMinClientSize(wxSize(540,300));
+    SetSize(wxDLG_UNIT(this, wxSize(540,300)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -125,14 +191,16 @@ CncPodestManagementBase::CncPodestManagementBase(wxWindow* parent, wxWindowID id
     // Connect events
     this->Connect(wxEVT_SHOW, wxShowEventHandler(CncPodestManagementBase::onShow), NULL, this);
     this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncPodestManagementBase::onInit), NULL, this);
-    m_btUp->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeftDown), NULL, this);
-    m_btUp->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeftUp), NULL, this);
-    m_btUp->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeave), NULL, this);
-    m_btDown->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeftDown), NULL, this);
-    m_btDown->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeftUp), NULL, this);
-    m_btDown->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeave), NULL, this);
+    m_btRelativeUp->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestManagementBase::onPodestRelativeUp), NULL, this);
+    m_btRelativeDown->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestManagementBase::onPodestRelativeDown), NULL, this);
+    m_btManuallyUp->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeftDown), NULL, this);
+    m_btManuallyUp->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeftUp), NULL, this);
+    m_btManuallyUp->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeave), NULL, this);
+    m_btManuallyDown->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeftDown), NULL, this);
+    m_btManuallyDown->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeftUp), NULL, this);
+    m_btManuallyDown->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeave), NULL, this);
     m_info->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onLefDownInfo), NULL, this);
-    m_button9552->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestManagementBase::onClose), NULL, this);
+    m_btClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestManagementBase::onClose), NULL, this);
     
 }
 
@@ -140,13 +208,15 @@ CncPodestManagementBase::~CncPodestManagementBase()
 {
     this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncPodestManagementBase::onShow), NULL, this);
     this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncPodestManagementBase::onInit), NULL, this);
-    m_btUp->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeftDown), NULL, this);
-    m_btUp->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeftUp), NULL, this);
-    m_btUp->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeave), NULL, this);
-    m_btDown->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeftDown), NULL, this);
-    m_btDown->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeftUp), NULL, this);
-    m_btDown->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeave), NULL, this);
+    m_btRelativeUp->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestManagementBase::onPodestRelativeUp), NULL, this);
+    m_btRelativeDown->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestManagementBase::onPodestRelativeDown), NULL, this);
+    m_btManuallyUp->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeftDown), NULL, this);
+    m_btManuallyUp->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeftUp), NULL, this);
+    m_btManuallyUp->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestManagementBase::onPodestUpLeave), NULL, this);
+    m_btManuallyDown->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeftDown), NULL, this);
+    m_btManuallyDown->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeftUp), NULL, this);
+    m_btManuallyDown->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestManagementBase::onPodestDownLeave), NULL, this);
     m_info->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestManagementBase::onLefDownInfo), NULL, this);
-    m_button9552->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestManagementBase::onClose), NULL, this);
+    m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestManagementBase::onClose), NULL, this);
     
 }

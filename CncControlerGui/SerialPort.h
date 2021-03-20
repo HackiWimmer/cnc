@@ -264,8 +264,6 @@ class Serial : public SerialOSD {
 		CncControl* cncControl;
 		// Measurement status
 		bool measurementActive;
-		// for com porst this should always false
-		bool writeOnlyMoveCommands;
 		// Port name
 		std::string portName;
 		// last fetch result
@@ -418,7 +416,7 @@ class Serial : public SerialOSD {
 		
 		bool processMoveUntilContact(unsigned int size, const int32_t (&values)[3]);
 		
-		bool processMovePodest(int32_t steps);
+		bool processMovePodest(int32_t steps, bool exact);
 
 		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered);
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);

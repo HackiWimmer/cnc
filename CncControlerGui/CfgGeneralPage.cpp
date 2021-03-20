@@ -24,16 +24,19 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 	if (    Cnc::Config::compare(*p, CncConfig_STEPS_X)
 	     || Cnc::Config::compare(*p, CncConfig_STEPS_Y)
 	     || Cnc::Config::compare(*p, CncConfig_STEPS_Z)
+	     || Cnc::Config::compare(*p, CncConfig_STEPS_H)
 	
 	     || Cnc::Config::compare(*p, CncConfig_PITCH_X)
 	     || Cnc::Config::compare(*p, CncConfig_PITCH_Y)
 	     || Cnc::Config::compare(*p, CncConfig_PITCH_Z)
+	     || Cnc::Config::compare(*p, CncConfig_PITCH_H)
 	
 	     || Cnc::Config::compare(*p, CncConfig_MAX_SPEED_XYZ_MM_MIN) 
 	
 	     || Cnc::Config::compare(*p, CncConfig_PULSE_WIDTH_HIGH_X)
 	     || Cnc::Config::compare(*p, CncConfig_PULSE_WIDTH_HIGH_Y)
 	     || Cnc::Config::compare(*p, CncConfig_PULSE_WIDTH_HIGH_Z)
+	     || Cnc::Config::compare(*p, CncConfig_PULSE_WIDTH_HIGH_H)
 	   )
 	{
 		THE_CONFIG->calculateSpeedValues();
@@ -305,6 +308,49 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 				prop->SetAttribute(wxPG_ATTR_UNITS, "us");
 				registerProperty(CncConfig_PULSE_WIDTH_HIGH_Z, prop);
 				
+			}
+			//...................
+			wxPGProperty* hAxis = NULL;
+			curCatLabel.assign("H-Axis - Podest");
+			hAxis = hardware->AppendChild( new wxPropertyCategory(curCatLabel));
+			registerCategory(curCatLabel, hAxis);
+			{
+				//...............
+				validator.SetPrecision(1); validator.SetRange(1, 600);
+				prop = hAxis->AppendChild( new wxFloatProperty("Max dimension", NEXT_PROP_ID, 100.0));
+				prop->Enable(true);
+				prop->SetHelpString(hsDimension);
+				prop->SetEditor( wxT("TextCtrl") );
+				prop->SetValidator(validator);
+				prop->SetAttribute(wxPG_ATTR_UNITS, "mm");
+				registerProperty(CncConfig_MAX_DIMENSION_H, prop);
+				
+				//...............
+				validator.SetPrecision(0); validator.SetRange(1, 10000);
+				prop = hAxis->AppendChild( new wxIntProperty("Steps", NEXT_PROP_ID, 200));
+				prop->SetHelpString(hsStepCount);
+				prop->SetValidator(validator);
+				prop->SetEditor( wxT("TextCtrl") );
+				prop->SetAttribute(wxPG_ATTR_UNITS, "1/360'");
+				registerProperty(CncConfig_STEPS_H, prop);
+				
+				//...............
+				validator.SetPrecision(3); validator.SetRange(0.1, 50.0);
+				prop = hAxis->AppendChild( new wxFloatProperty("Pitch", NEXT_PROP_ID, 1.0));
+				prop->SetHelpString(hsPitch);
+				prop->SetValidator(validator);
+				prop->SetEditor( wxT("TextCtrl") );
+				prop->SetAttribute(wxPG_ATTR_UNITS, "mm/360'");
+				registerProperty(CncConfig_PITCH_H, prop);
+				
+				//...............
+				validator.SetPrecision(0); validator.SetRange(0, 1000);
+				prop = hAxis->AppendChild( new wxIntProperty("High Pulse Width", NEXT_PROP_ID, 100));
+				prop->SetHelpString(hsPulseWidth);
+				prop->SetValidator(validator);
+				prop->SetEditor( wxT("TextCtrl") );
+				prop->SetAttribute(wxPG_ATTR_UNITS, "us");
+				registerProperty(CncConfig_PULSE_WIDTH_HIGH_H, prop);
 			}
 		}
 		collapse(hardware);

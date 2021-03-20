@@ -63,6 +63,7 @@
   const unsigned char CMD_ACTIVATE_PODEST_HW              =  '['; //  91 0x5B
   const unsigned char CMD_DEACTIVATE_PODEST_HW            =  ']'; //  93 0x5E
   const unsigned char CMD_MOVE_PODEST                     =  '$'; //  36 0x24
+  const unsigned char CMD_MOVE_PODEST_EXACT               =  '&'; //  38 0x26
  
   const unsigned char CMD_PRINT_CONFIG                    =  'c'; //  99 0x63
   const unsigned char CMD_PRINT_TIMESTAMP                 =  'T'; //  84 0x54
@@ -175,6 +176,7 @@
   const unsigned char PID_STEP_PIN                        =  70;
   const unsigned char PID_DIR_PIN                         =  71;
   const unsigned char PID_ENABLE_STEPPERS                 =  72;
+  const unsigned char PID_PODEST_POS                      =  73;
 
   const unsigned char PID_INC_DIRECTION_VALUE_X           =  80;
   const unsigned char PID_INC_DIRECTION_VALUE_Y           =  81;
@@ -182,7 +184,8 @@
   const unsigned char PID_INC_DIRECTION_VALUE_H           =  83;
 
   const unsigned char PID_PULSE_WIDTH_HIGH                = 100;
-  const unsigned char PID_PROBE_MODE                      = 101;
+  const unsigned char PID_PULSE_WIDTH_HIGH_H              = 101;
+  const unsigned char PID_PROBE_MODE                      = 102;
   
 // .....................................................................
 // end long pid range [PID_FLOAT_RANG_END] 
@@ -200,11 +203,11 @@
 // .....................................................................
 
   const unsigned char PID_FEEDRATE                        = 200;
-  const unsigned char PID_SPEED_MM_MIN                    = 201;
-  const unsigned char PID_SPEED_MM_SEC                    = 202;
-  const unsigned char PID_ACCEL_PROFILE                   = 203;
+  const unsigned char PID_FEEDRATE_H                      = 201;
+  const unsigned char PID_SPEED_MM_MIN                    = 202;
+  const unsigned char PID_SPEED_MM_SEC                    = 203;
+  const unsigned char PID_ACCEL_PROFILE                   = 204;
   
-
 // .....................................................................
 // end float pid range
 // .....................................................................
@@ -306,9 +309,11 @@
   // Don't modify the values above because it has to coresponde with RS::A and RS::B
   enum AxisId
   { 
-      IDX_X = 0,
-      IDX_Y = 1,
-      IDX_Z = 2 
+      IDX_X =  0,
+      IDX_Y =  1,
+      IDX_Z =  2,
+      
+      IDX_H = 10
   };
 
   // ------------------------------------------------------------------------------

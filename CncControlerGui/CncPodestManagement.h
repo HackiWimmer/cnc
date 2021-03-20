@@ -11,6 +11,8 @@ class CncPodestManagement : public CncPodestManagementBase {
 		virtual ~CncPodestManagement();
 		
 	protected:
+		virtual void onPodestRelativeDown(wxCommandEvent& event);
+		virtual void onPodestRelativeUp(wxCommandEvent& event);
 		virtual void onPodestDownLeave(wxMouseEvent& event);
 		virtual void onPodestUpLeave(wxMouseEvent& event);
 		virtual void onPodestUpLeftDown(wxMouseEvent& event);
@@ -28,6 +30,11 @@ class CncPodestManagement : public CncPodestManagementBase {
 		void reset();
 		void process();
 		void showInfo();
+		
+		void enable(bool state);
+		
+		double  evaluateMillimeterToMove();
+		int32_t evaluateStepsToMove();
 		
 };
 

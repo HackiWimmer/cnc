@@ -170,6 +170,11 @@ void cnc::traceSetterValueList(std::ostream& s, unsigned char pid, const cnc::Se
 				trace(val, "%.3lf");
 				break;
 			}
+			case PID_FEEDRATE_H:
+			{
+				trace(val, "%.4lf");
+				break;
+			}
 			default:
 			{
 				trace(val);

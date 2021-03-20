@@ -476,36 +476,22 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 			putOneByte(sp.x, sp.y, sp.z);
 		}
 		else if ( vi.getByteCount() == 1 ) {
-			
-			#warning
-			/*
-			if 		( vi.hasXYZ() ) { putInt8(sp.x); putInt8(sp.y); putInt8(sp.z); }
-			else if ( vi.hasXY()  ) { putInt8(sp.x); putInt8(sp.y); }
-			*/
 			if ( vi.hasX() ) { putInt8(sp.x); }
 			if ( vi.hasY() ) { putInt8(sp.y); }
 			if ( vi.hasZ() ) { putInt8(sp.z); }
 		}
 		else if ( vi.getByteCount() == 2 ) {
-			/*
-			if 		( vi.hasXYZ() ) { putInt16(sp.x); putInt16(sp.y); putInt16(sp.z); }
-			else if ( vi.hasXY()  ) { putInt16(sp.x); putInt16(sp.y); }
-			*/
 			if ( vi.hasX() ) { putInt16(sp.x); }
 			if ( vi.hasY() ) { putInt16(sp.y); }
 			if ( vi.hasZ() ) { putInt16(sp.z); }
 		}
 		else if ( vi.getByteCount() == 4 ) {
-			/*
-			if 		( vi.hasXYZ() ) { putInt32(sp.x); putInt32(sp.y); putInt32(sp.z); }
-			else if ( vi.hasXY()  ) { putInt32(sp.x); putInt32(sp.y); }
-			*/ 
 			if ( vi.hasX() ) { putInt32(sp.x); }
 			if ( vi.hasY() ) { putInt32(sp.y); }
 			if ( vi.hasZ() ) { putInt32(sp.z); }
 		}
 		else {
-			std::cerr << "CncMoveSequence::flushPoint::flushPoint_RENDER_AND_MOVE_SEQUENCE: Invalid ByteCount: " << vi.getByteCount() << std::endl;
+			std::cerr << CNC_LOG_FUNCT_A(": Invalid Byte Count: %d", (int)vi.getByteCount() );
 		}
 	};
 

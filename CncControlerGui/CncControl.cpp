@@ -354,6 +354,11 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Z, dirValueZ));
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_H, dirValueH));
 	
+	std::cout << "THE_CONFIG->getHighPulsWidthH(): " << THE_CONFIG->getHighPulsWidthH() << std::endl;
+	
+	setup.push_back(SetterTuple(PID_FEEDRATE_H,			FLT_FACT * (THE_CONFIG->getPitchH() / THE_CONFIG->getStepsH())));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_H,	THE_CONFIG->getHighPulsWidthH()));
+	
 	if ( processSetterList(setup) == false) {
 		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "Error");
 		std::cerr << " CncControl::setup: Calling processSetterList() failed!\n";
@@ -644,9 +649,9 @@ bool CncControl::processGetter(unsigned char pid, GetterValues& ret) {
 	return getSerial()->processGetter(pid, ret); 
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::processMovePodest(int32_t steps) {
+bool CncControl::processMovePodest(int32_t steps, bool exact) {
 ///////////////////////////////////////////////////////////////////
-	return getSerial()->processMovePodest(steps); 
+	return getSerial()->processMovePodest(steps, exact); 
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::isInterrupted() {
@@ -2512,4 +2517,32 @@ void CncControl::addGuidePath(const CncPathListManager& plm, double zOffset) {
 	// do this last because appendGuidPath and follows use std::move(plm)
 	if ( THE_APP->getMotionMonitor() )
 		THE_APP->getMotionMonitor()->appendGuidPath(plm, zOffset);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::resetPodestDistance() {
+///////////////////////////////////////////////////////////////////
+	if ( getSerial()->processSetter(PID_PODEST_POS, 0) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Can't reset podest position\n");
+		return false;
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+double CncControl::getPodestDistanceMetric() {
+///////////////////////////////////////////////////////////////////
+	GetterValues list;
+	
+	if ( getSerial()->processGetter(PID_PODEST_POS, list) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Can't request podest position\n");
+		return 0.0;
+	}
+	
+	if ( list.size() != 1 ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid response while request podest position, size = %ld\n", (long)list.size());
+		return 0.0;
+	}
+	
+	const int32_t dist = list.at(0);
+	return THE_CONFIG->convertStepsToMetricH(dist);
 }

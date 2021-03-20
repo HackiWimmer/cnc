@@ -272,7 +272,10 @@ class CncControl {
 		bool processMoveSequence(CncMoveSequence& moveSequence);
 		
 		bool processGetter(unsigned char pid, GetterValues& ret);
-		bool processMovePodest(int32_t steps);
+		bool processMovePodest(int32_t steps, bool exact);
+		
+		bool resetPodestDistance();
+		double getPodestDistanceMetric();
 		
 		// Zero positioning
 		void setZeroPosX(int32_t v);

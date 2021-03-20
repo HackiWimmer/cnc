@@ -66,9 +66,8 @@ bool SerialMsw::connect(const char* portName) {
 			FILE_ATTRIBUTE_NORMAL,
 			NULL);
 	
-	//Check if the connection was successfull
-	if( hSerial==INVALID_HANDLE_VALUE )
-	{
+	//Check if the connection was successful
+	if( hSerial == INVALID_HANDLE_VALUE ) {
 		DWORD lastError = GetLastError();
 		if( lastError == ERROR_FILE_NOT_FOUND ){
 			std::cerr << " Serial::ERROR: Handle was not attached. Reason: " << portName << " not available.\n";
@@ -76,7 +75,7 @@ bool SerialMsw::connect(const char* portName) {
 			std::cerr << " Serial::ERROR: Errno: " << lastError << "\n";
 			displayErrorInfo(lastError, _T("CreateFileA"));
 		}
-	
+		
 		return false;
 	} 
 	
@@ -95,7 +94,6 @@ bool SerialMsw::connect(const char* portName) {
 		traceDCB(dcbSerialParams);
 	}
 	
-
 	//Define serial connection parameters for the arduino board
 	dcbSerialParams.BaudRate      	= BAUD_RATE;
 	dcbSerialParams.fBinary       	= TRUE;

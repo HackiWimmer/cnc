@@ -159,7 +159,7 @@ int CncPathListEntryListCtrl::OnGetItemColumnImage(long item, long column) const
 		if ( isItemValid(item) == false )
 			return -1;
 		
-		#warning
+		#warning - can be removed incl dependencies
 		/*
 		const CncPathListEntry& cpe = pathLists.at(item);
 		switch ( cpe.type ) {

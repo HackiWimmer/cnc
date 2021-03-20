@@ -102,7 +102,7 @@ class CncArduinoStepper {
     bool                            isStepPhase()                 const  { return stepPhase;  }
     
     uint16_t                        getHighPulseWidth()           const  { return highPulsWidth; }
-    void                            setHighPulseWidth(int hpw)           { highPulsWidth = hpw;  }
+    void                            setHighPulseWidth(int32_t hpw)       { highPulsWidth = (uint16_t)hpw;  }
     
     float                           getFeedrate()                  const { return feedrate; }
     void                            setFeedrate(float f)                 { feedrate = f;    }

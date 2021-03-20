@@ -101,9 +101,9 @@ class CncConfig {
 		RegisteredWindows 			registeredWindows;
 		ContainerMemoryAllocation	contMemAllocation;
 		
-		double dispFactX, dispFactY, dispFactZ;
-		double calcFactX, calcFactY, calcFactZ;
-		float dispFactX3D, dispFactY3D, dispFactZ3D;
+		double						dispFactX, dispFactY, dispFactZ, dispFactH;
+		double						calcFactX, calcFactY, calcFactZ, calcFactH;
+		float						dispFactX3D, dispFactY3D, dispFactZ3D;
 		
 		unsigned int replyThreshold;
 		
@@ -249,11 +249,13 @@ class CncConfig {
 		const double			 convertStepsToMetricX(int32_t val);
 		const double			 convertStepsToMetricY(int32_t val);
 		const double			 convertStepsToMetricZ(int32_t val);
+		const double			 convertStepsToMetricH(int32_t val);
 		
 		const CncLongPosition&   convertMetricToSteps(CncLongPosition& ret,   const CncDoublePosition& pos);
 		const int32_t			 convertMetricToStepsX(double val);
 		const int32_t			 convertMetricToStepsY(double val);
 		const int32_t			 convertMetricToStepsZ(double val);
+		const int32_t			 convertMetricToStepsH(double val);
 		
 		int32_t connvert_MM_SEC_TO_STP_SEC(double speed, unsigned int steps, double pitch);
 		int32_t connvert_MM_MIN_TO_STP_SEC(double speed, unsigned int steps, double pitch);
@@ -348,10 +350,12 @@ class CncConfig {
 		const unsigned int getStepsX();
 		const unsigned int getStepsY();
 		const unsigned int getStepsZ();
+		const unsigned int getStepsH();
 		const unsigned int getStepsXYZ();
 		const unsigned int getHighPulsWidthX();
 		const unsigned int getHighPulsWidthY();
 		const unsigned int getHighPulsWidthZ();
+		const unsigned int getHighPulsWidthH();
 		const unsigned int getSpindleSpeedStepRange();
 		const unsigned int getMaxDurations() 					{ return maxDurations; }
 		const unsigned int getDurationCount() 					{ return durationCount; }
@@ -360,15 +364,18 @@ class CncConfig {
 		const double getMaxDimensionX();
 		const double getMaxDimensionY();
 		const double getMaxDimensionZ();
+		const double getMaxDimensionH();
 		
 		const int32_t getMaxDimensionSteps()					{ return getMaxDimension()  * getCalculationFactX(); }
 		const int32_t getMaxDimensionStepsX()					{ return getMaxDimensionX() * getCalculationFactX(); }
 		const int32_t getMaxDimensionStepsY()					{ return getMaxDimensionY() * getCalculationFactY(); }
 		const int32_t getMaxDimensionStepsZ()					{ return getMaxDimensionZ() * getCalculationFactZ(); }
+		const int32_t getMaxDimensionStepsH()					{ return getMaxDimensionH() * getCalculationFactH(); }
 	
 		const double getPitchX();
 		const double getPitchY();
 		const double getPitchZ();
+		const double getPitchH();
 		const double getMaxDurationThickness();
 		const double getSurefaceOffset();
 		const double getReplyThresholdMetric();
@@ -377,22 +384,27 @@ class CncConfig {
 		const double getDisplayFactX(CncUnit cu=CncMetric) 		{ return ( cu == CncMetric ? dispFactX : 1.0 ); }
 		const double getDisplayFactY(CncUnit cu=CncMetric)		{ return ( cu == CncMetric ? dispFactY : 1.0 ); }
 		const double getDisplayFactZ(CncUnit cu=CncMetric) 		{ return ( cu == CncMetric ? dispFactZ : 1.0 ); }
+		const double getDisplayFactH(CncUnit cu=CncMetric) 		{ return ( cu == CncMetric ? dispFactH : 1.0 ); }
 		const double getCalculationFactX(CncUnit cu=CncMetric) 	{ return ( cu == CncMetric ? calcFactX : 1.0 ); }
 		const double getCalculationFactY(CncUnit cu=CncMetric) 	{ return ( cu == CncMetric ? calcFactY : 1.0 ); }
 		const double getCalculationFactZ(CncUnit cu=CncMetric) 	{ return ( cu == CncMetric ? calcFactZ : 1.0 ); }
+		const double getCalculationFactH(CncUnit cu=CncMetric) 	{ return ( cu == CncMetric ? calcFactH : 1.0 ); }
 		const double getFeedrateX()							 	{ return getDisplayFactX(); }
 		const double getFeedrateY()								{ return getDisplayFactY(); }
 		const double getFeedrateZ()								{ return getDisplayFactZ(); }
+		const double getFeedrateH()								{ return getDisplayFactH(); }
 		
 		const double getDispFactX3D() 							{ return dispFactX3D; }
 		const double getDispFactY3D() 							{ return dispFactY3D; }
 		const double getDispFactZ3D()							{ return dispFactZ3D; }
 		
 		const double getWorkpieceOffset()						{ return workpieceOffset; }
+
+// to remove
 const double getCurrentZDepth()							{ return currentZDepth; }
 const double getMaxZDistance()							{ return maxZDistance; }
 const double getCurZDistance() 							{ return 0.0 /*getWorkpieceThickness()*/ + workpieceOffset; }
-		
+
 		const wxString& getFileBrowser(wxString& ret);
 		const wxString& getSVGFileViewer(wxString& ret);
 		const wxString& getBINFileViewer(wxString& ret);

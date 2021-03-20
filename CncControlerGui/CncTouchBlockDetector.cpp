@@ -582,7 +582,7 @@ bool CncTouchBlockDetector::checkResult() {
 	std::cout << "newCurrentPos : " << cnc::longFormat(newCurrentPos)		<< " --> " << cnc::dblFormat(THE_CONFIG->convertStepsToMetric(p, newCurrentPos))	<< std::endl;
 	*/
 
-	#warning
+	#warning - Cant the check below always correct ? may be it is not necessary - check this again
 	return true;
 	
 	if ( hasError() )
@@ -599,9 +599,6 @@ bool CncTouchBlockDetector::checkResult() {
 		}
 	};
 	
-	
-	
-
 	if ( parameters.touchMode == Parameters::TouchMode::TM_TOUCH_TEST ) {
 		return hasError() == false;
 	}

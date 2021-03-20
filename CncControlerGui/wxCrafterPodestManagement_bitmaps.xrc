@@ -4,8 +4,10 @@
   <object class="wxBitmap" name="16-info@2x">bitmaps\CodeLite\16-info@2x.png</object>
   <object class="wxBitmap" name="16-sort">bitmaps\CodeLite\16-sort.png</object>
   <object class="wxBitmap" name="16-sort@2x">bitmaps\CodeLite\16-sort@2x.png</object>
-  <object class="wxBitmap" name="24-down@2x">bitmaps\24-down@2x.png</object>
-  <object class="wxBitmap" name="24-up@2x">bitmaps\24-up@2x.png</object>
-  <object class="wxBitmap" name="lift-240">bitmaps\lift-240.png</object>
+  <object class="wxBitmap" name="lift">bitmaps\lift.png</object>
+  <object class="wxBitmap" name="podestManuallyDown">bitmaps\podestManuallyDown.png</object>
+  <object class="wxBitmap" name="podestManuallyUp">bitmaps\podestManuallyUp.png</object>
+  <object class="wxBitmap" name="podestRelativeDown">bitmaps\podestRelativeDown.png</object>
+  <object class="wxBitmap" name="podestRelativeUp">bitmaps\podestRelativeUp.png</object>
   <object class="wxBitmap" name="window-close-3">bitmaps\window-close-3.png</object>
 </resource>

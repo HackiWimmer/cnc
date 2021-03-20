@@ -10,13 +10,31 @@ CncPodestManagement::CncPodestManagement(wxWindow* parent)
 , direction					(CncNoneDir)
 ///////////////////////////////////////////////////////////////////
 {
-	// othwerwise this negative effects the leave window callback
-	m_btUp	->SetToolTip("");
-	m_btDown->SetToolTip("");
+	// otherwise this negative effects the leave window callback
+	m_btManuallyUp	->SetToolTip("");
+	m_btManuallyDown->SetToolTip("");
+	
+	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	val.SetRange(0.0, THE_CONFIG->getMaxDimensionH());
+	val.SetPrecision(3);
+	m_moveRelative->SetValidator(val);
+	
+	m_moveRelative->ChangeValue("0.000");
 }
 ///////////////////////////////////////////////////////////////////
 CncPodestManagement::~CncPodestManagement() {
 ///////////////////////////////////////////////////////////////////
+}
+///////////////////////////////////////////////////////////////////
+void CncPodestManagement::enable(bool state) {
+///////////////////////////////////////////////////////////////////
+	m_btManuallyUp	->Enable(state);
+	m_btManuallyDown->Enable(state);
+	
+	m_btRelativeUp	->Enable(state);
+	m_btRelativeDown->Enable(state);
+	
+	m_btClose		->Enable(state);
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodestManagement::showInfo() {
@@ -66,9 +84,14 @@ void CncPodestManagement::onClose(wxCommandEvent& event) {
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
 	}
 	else {
-		if ( cnc->processCommand(CMD_DEACTIVATE_PODEST_HW, std::cout) == false ) {
+		
+		// remove the remains form the asysnc move commands
+		if ( cnc->popSerial() == false )
+			std::cerr << CNC_LOG_FUNCT_A(": Call popSerial() failed!") << std::endl;
+		
+		// deactivate the hardware again
+		if ( cnc->processCommand(CMD_DEACTIVATE_PODEST_HW, std::cout) == false )
 			std::cerr << CNC_LOG_FUNCT_A(": Can't deactivate podest hardware!") << std::endl;
-		}
 	}
 	
 	Show(false);
@@ -113,6 +136,22 @@ void CncPodestManagement::onPodestUpLeave(wxMouseEvent& event) {
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
+double CncPodestManagement::evaluateMillimeterToMove() {
+///////////////////////////////////////////////////////////////////
+	double dh;
+	if ( m_moveRelative->GetValue().ToDouble(&dh) )
+		return dh;
+	
+	std::cerr << CNC_LOG_FUNCT_A(" conversion to double failed\n");
+	return 0.0;
+}
+///////////////////////////////////////////////////////////////////
+int32_t CncPodestManagement::evaluateStepsToMove() {
+///////////////////////////////////////////////////////////////////
+	const double mmtm = evaluateMillimeterToMove();
+	return THE_CONFIG->convertMetricToStepsH(mmtm);
+}
+///////////////////////////////////////////////////////////////////
 void CncPodestManagement::reset() {
 ///////////////////////////////////////////////////////////////////
 	if ( direction == CncNoneDir )
@@ -136,7 +175,7 @@ void CncPodestManagement::process() {
 	
 	switch ( direction ) {
 		case CncNegDir:
-		case CncPosDir:		ret = cnc->processMovePodest((int32_t)direction);
+		case CncPosDir:		ret = cnc->processMovePodest((int32_t)direction, false);
 							break;
 							
 		case CncNoneDir:	ret = cnc->sendQuitMove();
@@ -146,5 +185,35 @@ void CncPodestManagement::process() {
 	if ( ret == false ) 
 		std::cerr << CNC_LOG_FUNCT_A(": Cnc processing failed! Direction = %d", (int)direction) << std::endl;
 }
-
-
+///////////////////////////////////////////////////////////////////
+void CncPodestManagement::onPodestRelativeUp(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	CncControl* cnc = APP_PROXY::getCncControl();
+	if ( cnc == NULL ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
+		return;
+	}
+	
+	enable(false);
+	
+		if ( cnc->processMovePodest(evaluateStepsToMove() * (+1), true) == false )
+			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodest() failed !") << std::endl;
+	
+	enable(true);
+}
+///////////////////////////////////////////////////////////////////
+void CncPodestManagement::onPodestRelativeDown(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	CncControl* cnc = APP_PROXY::getCncControl();
+	if ( cnc == NULL ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
+		return;
+	}
+	
+	enable(false);
+	
+		if ( cnc->processMovePodest(evaluateStepsToMove() * (-1), true) == false )
+			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodest() failed !") << std::endl;
+	
+	enable(true);
+}

@@ -279,7 +279,6 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		unsigned int portionSize = buffer[idx] + 1;
 		
 		// debug
-		#warning
 		if ( false ) {
 			std::clog << " idx               : " << idx << std::endl;
 			std::clog << " portionSize       : " << portionSize << std::endl;

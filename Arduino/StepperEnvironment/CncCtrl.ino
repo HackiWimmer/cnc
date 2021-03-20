@@ -58,6 +58,7 @@ CncArduinoController::CncArduinoController()
 , spindelSpeedValue             (255)
 , tsMoveStart                   (0L)
 , tsMoveLast                    (0L)
+, podestStillOpenSteps          (0L)
 , interactiveMove               ()
 {  
   ArduinoPositionRenderer::setupSteppers(X, Y, Z);
@@ -97,6 +98,7 @@ void CncArduinoController::printConfig() {
     X->printConfig();
     Y->printConfig();
     Z->printConfig();
+    H->printConfig();
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncArduinoController::evaluateI2CAvailable() {
@@ -161,10 +163,12 @@ void CncArduinoController::reset() {
     X->reset();
     Y->reset();
     Z->reset();
+    H->reset();
     
     X->resetPosition();
     Y->resetPosition();
     Z->resetPosition();
+    H->resetPosition();
     
     ArduinoAccelManager::reset();
 }
@@ -452,7 +456,22 @@ byte CncArduinoController::acceptPodestMove(byte cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::process(const ArduinoCmdDecoderMovePodest::Result& mv) {
 /////////////////////////////////////////////////////////////////////////////////////
-  return movePodest(mv.dh, CncArduinoController::stopMovePodestBySignal);
+  byte ret = RET_ERROR;
+
+  // first set generally 
+  podestStillOpenSteps = ArdoObj::absolute(mv.dh);
+  
+  switch ( mv.cmd ) {
+    case CMD_MOVE_PODEST_EXACT:
+          ret = movePodest(mv.dh, CncArduinoController::stopMovePodestExact);
+          break;
+          
+    case CMD_MOVE_PODEST:
+          ret = movePodest(mv.dh, CncArduinoController::stopMovePodestBySignal);
+          break;
+  }
+
+  return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct stopFunct) {
@@ -465,8 +484,6 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
     return RET_ERROR;
   }
 
-  H->setHighPulseWidth(125);
-
   // Create this instance to enable the podest stepper pin and release the brake.
   // The corresponding dtor will inverse this again
   PodestEnabler pe;
@@ -474,8 +491,10 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
   uint32_t curSpeedDelay = 500;
   while ( stopFunct(this) == false ) {
     const byte b = H->performStep();
+    
+    podestStillOpenSteps--;
 
-    // slow down th podest movement
+    // slow down the podest movement
     if ( curSpeedDelay > 0 ) {
       AE::delayMicroseconds(curSpeedDelay);
       curSpeedDelay--;
@@ -488,6 +507,11 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
   }
 
   return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+bool CncArduinoController::stopMovePodestExact(CncArduinoController* ctrl) {
+/////////////////////////////////////////////////////////////////////////////////////
+  return ctrl->podestStillOpenSteps <= 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncArduinoController::stopMovePodestBySignal(CncArduinoController* ctrl){
@@ -968,6 +992,7 @@ byte CncArduinoController::setHighPulseWidth(AxisId aid, int32_t width) {
     case IDX_X: X->setHighPulseWidth(width); break;
     case IDX_Y: Y->setHighPulseWidth(width); break;
     case IDX_Z: Z->setHighPulseWidth(width); break;
+    case IDX_H: H->setHighPulseWidth(width); break;
   }
 
   return RET_OK;
@@ -979,6 +1004,7 @@ byte CncArduinoController::setDirection(AxisId aid, int32_t steps) {
     case IDX_X: return X->setDirection(steps);
     case IDX_Y: return Y->setDirection(steps);
     case IDX_Z: return Z->setDirection(steps);
+    case IDX_H: return H->setDirection(steps);
   }
 
   return RET_ERROR;
@@ -990,6 +1016,7 @@ byte CncArduinoController::performStep(AxisId aid) {
     case IDX_X: return X->performStep();
     case IDX_Y: return Y->performStep();
     case IDX_Z: return Z->performStep();
+    case IDX_H: return H->performStep();
   }
 
   return RET_ERROR;
@@ -1001,6 +1028,7 @@ byte CncArduinoController::initiateStep(AxisId aid) {
     case IDX_X: return X->initiateStep();
     case IDX_Y: return Y->initiateStep();
     case IDX_Z: return Z->initiateStep();
+    case IDX_H: return H->initiateStep();
   }
 
   return RET_ERROR;
@@ -1012,6 +1040,7 @@ byte CncArduinoController::finalizeStep(AxisId aid) {
     case IDX_X: return X->finalizeStep();
     case IDX_Y: return Y->finalizeStep();
     case IDX_Z: return Z->finalizeStep();
+    case IDX_H: return H->finalizeStep();
   }
 
   return RET_ERROR;
@@ -1081,6 +1110,8 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
 
     case PID_TOUCH_CONTACT_STATE:         writeGetterValue1(PID_TOUCH_CONTACT_STATE,          (int32_t)(AE::digitalRead(PIN_TOUCH_CONTACT) == PL_LOW)); break;
     
+    case PID_PODEST_POS:                  writeGetterValue1(PID_PODEST_POS,                   H->getPosition()); break;
+    
     default:                              writeGetterValue1(PID_UNKNOWN, 0);
                                       
                                           AML::pushMessage(MT_ERROR, E_INVALID_GETTER_ID, gt.pid);
@@ -1112,28 +1143,33 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
   typedef ArduinoMainLoop AML;
   //---------------------------------------------------------------------------------
   switch ( st.pid ) {
-    case PID_X_POS:                   X->setPosition(st.values[0].l); break;
-    case PID_Y_POS:                   Y->setPosition(st.values[0].l); break;
-    case PID_Z_POS:                   Z->setPosition(st.values[0].l); break;
+    case PID_X_POS:                   X->setPosition(st.values[0].asInt32());                 break;
+    case PID_Y_POS:                   Y->setPosition(st.values[0].asInt32());                 break;
+    case PID_Z_POS:                   Z->setPosition(st.values[0].asInt32());                 break;
 
-    case PID_INC_DIRECTION_VALUE_X:   X->setIncrementDirectionValue(st.values[0].l);  break;
-    case PID_INC_DIRECTION_VALUE_Y:   Y->setIncrementDirectionValue(st.values[0].l);  break;
-    case PID_INC_DIRECTION_VALUE_Z:   Z->setIncrementDirectionValue(st.values[0].l);  break;
-    case PID_INC_DIRECTION_VALUE_H:   H->setIncrementDirectionValue(st.values[0].l);  break;
+    case PID_INC_DIRECTION_VALUE_X:   X->setIncrementDirectionValue(st.values[0].asInt32());  break;
+    case PID_INC_DIRECTION_VALUE_Y:   Y->setIncrementDirectionValue(st.values[0].asInt32());  break;
+    case PID_INC_DIRECTION_VALUE_Z:   Z->setIncrementDirectionValue(st.values[0].asInt32());  break;
+    case PID_INC_DIRECTION_VALUE_H:   H->setIncrementDirectionValue(st.values[0].asInt32());  break;
     
-    case PID_POS_REPLY_THRESHOLD:     setPosReplyThreshold(st.values[0].l);           break;
+    case PID_POS_REPLY_THRESHOLD:     setPosReplyThreshold(st.values[0].asInt32());           break;
     
-    case PID_SPEED_MM_SEC:            setSpeedValue_MMSec1000(st.values[0].l);        break;
+    case PID_SPEED_MM_SEC:            setSpeedValue_MMSec1000(st.values[0].asInt32());        break;
 
-    case PID_SPINDLE_SPEED:           setSpindleSpeedFactor(st.values[0].l);          break;
+    case PID_SPINDLE_SPEED:           setSpindleSpeedFactor(st.values[0].asInt32());          break;
 
-    case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].asBool());        break;
+    case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].asBool());                break;
 
-    case PID_PROBE_MODE:              setProbeMode(st.values[0].asBool());            break;
-    case PID_TOOL_SWITCH:             switchToolState(st.values[0].asBool());         break;
+    case PID_PROBE_MODE:              setProbeMode(st.values[0].asBool());                    break;
+    case PID_TOOL_SWITCH:             switchToolState(st.values[0].asBool());                 break;
     
     case PID_ACCEL_PROFILE:           setupAccelProfile(st); 
                                       break;
+                                      
+    case PID_PODEST_POS:              H->setPosition(st.values[0].asInt32());                 break;
+
+    case PID_PULSE_WIDTH_HIGH_H:      H->setHighPulseWidth(st.values[0].asInt32());           break;
+    case PID_FEEDRATE_H:              H->setFeedrate(st.values[0].asFloat());                 break;
 
     default:                          AML::pushMessage(MT_ERROR, E_INVALID_PARAM_ID, st.pid);
                                       return RET_ERROR;

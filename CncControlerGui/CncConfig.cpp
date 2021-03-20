@@ -147,26 +147,34 @@ bool CncConfig::ToolMagazineEntry::deserialize(const wxString& input) {
 }
 ////////////////////////////////////////////////////////////////////////
 CncConfig::CncConfig(MainFrame* app) 
-: loadTrace()
-, saveTrace()
-, obsoleteTrace()
-, changed(true)
-, notificationActivated(true)
-, osdConfigList()
-, currentUnit(CncSteps)
-, theApp(app)
-, context(new CncContext())
-, toolMagazine()
-, registeredWindows()
-, contMemAllocation(4)
-, dispFactX(1.0), dispFactY(1.0), dispFactZ(1.0)
-, calcFactX(1.0), calcFactY(1.0), calcFactZ(1.0)
-, dispFactX3D(1.0), dispFactY3D(1.0), dispFactZ3D(1.0)
-, replyThreshold(1)
-, currentToolId(-1)
-, currentZDepth(0.0)
-, maxZDistance(50.0)
-, renderResolutionMM(0.1)
+: loadTrace						()
+, saveTrace						()
+, obsoleteTrace					()
+, changed						(true)
+, notificationActivated			(true)
+, osdConfigList					()
+, currentUnit					(CncSteps)
+, theApp						(app)
+, context						(new CncContext())
+, toolMagazine					()
+, registeredWindows				()
+, contMemAllocation				(4)
+, dispFactX						(1.0)
+, dispFactY						(1.0)
+, dispFactZ						(1.0)
+, dispFactH						(1.0)
+, calcFactX						(1.0) 
+, calcFactY						(1.0)
+, calcFactZ						(1.0)
+, calcFactH						(1.0)
+, dispFactX3D					(1.0) 
+, dispFactY3D					(1.0)
+, dispFactZ3D					(1.0)
+, replyThreshold				(1)
+, currentToolId					(-1)
+, currentZDepth					(0.0)
+, maxZDistance					(50.0)
+, renderResolutionMM			(0.1)
 ////////////////////////////////////////////////////////////////////////
 {
 	registerWindowForConfigNotification(app);
@@ -265,6 +273,11 @@ const double CncConfig::convertStepsToMetricZ(int32_t val) {
 	return (double)val * dispFactZ;
 }
 ////////////////////////////////////////////////////////////////////////
+const double CncConfig::convertStepsToMetricH(int32_t val) {
+////////////////////////////////////////////////////////////////////////
+	return (double)val * dispFactH;
+}
+////////////////////////////////////////////////////////////////////////
 const CncLongPosition& CncConfig::convertMetricToSteps(CncLongPosition& ret, const CncDoublePosition& pos) {
 ////////////////////////////////////////////////////////////////////////
 	ret.setXYZ(convertMetricToStepsX(pos.getX()), convertMetricToStepsY(pos.getY()), convertMetricToStepsZ(pos.getZ()));
@@ -284,6 +297,11 @@ const int32_t CncConfig::convertMetricToStepsY(double val) {
 const int32_t CncConfig::convertMetricToStepsZ(double val) {
 ////////////////////////////////////////////////////////////////////////
 	return round(val * calcFactZ);
+}
+////////////////////////////////////////////////////////////////////////
+const int32_t CncConfig::convertMetricToStepsH(double val) {
+////////////////////////////////////////////////////////////////////////
+	return round(val * calcFactH);
 }
 ////////////////////////////////////////////////////////////////////////
 int32_t CncConfig::connvert_MM_SEC_TO_STP_SEC(double speed, unsigned int steps, double pitch) {
@@ -327,10 +345,12 @@ void CncConfig::calculateFactors() {
 	dispFactX = 0.0 + (getPitchX()/getStepsX());
 	dispFactY = 0.0 + (getPitchY()/getStepsY());
 	dispFactZ = 0.0 + (getPitchZ()/getStepsZ());
+	dispFactH = 0.0 + (getPitchH()/getStepsH());
 	
 	calcFactX = 0.0 + (getStepsX()/getPitchX());
 	calcFactY = 0.0 + (getStepsY()/getPitchY());
 	calcFactZ = 0.0 + (getStepsZ()/getPitchZ());
+	calcFactH = 0.0 + (getStepsH()/getPitchH());
 	
 	double maxDim = std::max(getMaxDimensionX(), getMaxDimensionY());
 	maxDim        = std::max(getMaxDimensionZ(), maxDim);
@@ -1104,23 +1124,27 @@ const bool CncConfig::getSimulateMillingWithSoundFlag()				{ PROPERTY(CncWork_Ct
 const bool CncConfig::getCameraSupportFlag()						{ PROPERTY(CncWork_Ctl_CAMERA_SUPPORT)						return p->GetValue().GetBool(); }
 const bool CncConfig::getSpindleSpeedSupportFlag()					{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_SUPPORT)				return p->GetValue().GetBool(); }
 
-const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 								return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 								return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getStepsZ() 							{ PROPERTY(CncConfig_STEPS_Z) 								return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthX() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_X) 				 	return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthY() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Y) 				 	return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getHighPulsWidthZ() 					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Z) 					return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getStepsX()							{ PROPERTY(CncConfig_STEPS_X) 								return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getStepsY()							{ PROPERTY(CncConfig_STEPS_Y) 								return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getStepsZ()							{ PROPERTY(CncConfig_STEPS_Z) 								return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getStepsH()							{ PROPERTY(CncConfig_STEPS_H) 								return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthX()					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_X) 				 	return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthY()					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Y) 				 	return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthZ()					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_Z) 					return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthH()					{ PROPERTY(CncConfig_PULSE_WIDTH_HIGH_H) 					return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getArtificallyStepDelay()				{ PROPERTY(CncWork_Ctl_ARTIFICIALLY_STEP_DELAY) 			return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getCameraDeviceId()					{ PROPERTY(CncWork_Ctl_CAMERA_DEVICE_ID) 					return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getSpindleSpeedStepRange()			{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_STEP_RANGE)			return p->GetValue().GetInteger(); }
 
-const double CncConfig::getMaxDimension() 							{ return std::max(std::max(getMaxDimensionX(), getMaxDimensionY()), getMaxDimensionZ()); }
-const double CncConfig::getMaxDimensionX() 							{ PROPERTY(CncConfig_MAX_DIMENSION_X)					return p->GetValue().GetDouble(); } 
-const double CncConfig::getMaxDimensionY() 							{ PROPERTY(CncConfig_MAX_DIMENSION_Y) 				 	return p->GetValue().GetDouble(); } 
-const double CncConfig::getMaxDimensionZ() 							{ PROPERTY(CncConfig_MAX_DIMENSION_Z) 					return p->GetValue().GetDouble(); } 
+const double CncConfig::getMaxDimension()							{ return std::max(std::max(getMaxDimensionX(), getMaxDimensionY()), getMaxDimensionZ()); }
+const double CncConfig::getMaxDimensionX()							{ PROPERTY(CncConfig_MAX_DIMENSION_X)					return p->GetValue().GetDouble(); } 
+const double CncConfig::getMaxDimensionY()							{ PROPERTY(CncConfig_MAX_DIMENSION_Y) 				 	return p->GetValue().GetDouble(); } 
+const double CncConfig::getMaxDimensionZ()							{ PROPERTY(CncConfig_MAX_DIMENSION_Z) 					return p->GetValue().GetDouble(); } 
+const double CncConfig::getMaxDimensionH()							{ PROPERTY(CncConfig_MAX_DIMENSION_H) 					return p->GetValue().GetDouble(); } 
 const double CncConfig::getPitchX() 								{ PROPERTY(CncConfig_PITCH_X) 						 	return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchY() 								{ PROPERTY(CncConfig_PITCH_Y)							return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchZ() 								{ PROPERTY(CncConfig_PITCH_Z) 						 	return p->GetValue().GetDouble(); }
+const double CncConfig::getPitchH() 								{ PROPERTY(CncConfig_PITCH_H) 						 	return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxDurationThickness()					{ PROPERTY(CncSvg_Parser_MAX_THICKNESS_CROSS)			return p->GetValue().GetDouble(); }
 const double CncConfig::getSurefaceOffset()							{ PROPERTY(CncSvg_Parser_SUREFACE_Z_OFFSET)				return p->GetValue().GetDouble(); }
 const double CncConfig::getReplyThresholdMetric()					{ PROPERTY(CncWork_Ctl_REPLY_THRESHOLD_METRIC)			double ret; p->GetValueAsString().ToDouble(&ret); return ret; }

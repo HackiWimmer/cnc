@@ -53,7 +53,9 @@ void ArduinoCMDs::init() {
 	cmds[CMD_RENDER_AND_MOVE_SEQUENCE]         = "Push Render and Move Sequence";
 	
 	cmds[CMD_ACTIVATE_PODEST_HW]               = "Activate Podest Hardware";
+	cmds[CMD_DEACTIVATE_PODEST_HW]             = "Deactivate Podest Hardware";
 	cmds[CMD_MOVE_PODEST]                      = "Move Podest";
+	cmds[CMD_MOVE_PODEST_EXACT]                = "Move Podest Exact";
 	
 	cmds[CMD_PRINT_CONFIG]                     = "Pull Configuration";
 	cmds[CMD_PRINT_VERSION]                    = "Pull Version";
@@ -140,6 +142,8 @@ void ArduinoPIDs::init() {
 	pids[PID_QUERY_READY_TO_RUN]              .setup("Ready to run", "bool");
 	
 	pids[PID_FEEDRATE]                        .setup("Feedrate", "mm/step");
+	pids[PID_FEEDRATE_H]                      .setup("Feedrate h Axis", "mm/step");
+
 	
 	pids[PID_MIN_SWITCH]                      .setup("Min Switch", "bool");  
 	pids[PID_MAX_SWITCH]                      .setup("Max Switch", "bool");
@@ -177,8 +181,11 @@ void ArduinoPIDs::init() {
 	pids[PID_DIR_PIN]                         .setup("Direction Pin", "");
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");
 	pids[PID_SPINDLE_SPEED]                   .setup("Spindle Speed", "U/mm");
-
+	
+	pids[PID_PODEST_POS]                      .setup("Podest Position", "steps");
+	
 	pids[PID_PULSE_WIDTH_HIGH]                .setup("Step Pulse Width High", "us");
+	pids[PID_PULSE_WIDTH_HIGH_H]              .setup("Step Pulse Width High H-Axis", "us");
 	pids[PID_ACCEL_PROFILE]                   .setup("Accel Profile", "<mixed>");
 	pids[PID_ACCEL_START_SPEED]               .setup("Accel start speed", "mm/min");
 	pids[PID_ACCEL_STOP_SPEED]                .setup("Accel stop speed", "mm/min");

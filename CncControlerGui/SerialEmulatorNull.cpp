@@ -476,10 +476,6 @@ int SerialEmulatorNULL::performInteractiveMove(unsigned char *buffer, unsigned i
 ///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::performPopSerial(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	
-	CNC_PRINT_LOCATION
-	
-	
 	return performMajorMove(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
@@ -635,6 +631,8 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 		case PID_LIMIT:						evaluateLimitStates();
 											writerGetterValues(pid, limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
 											break;
+											
+		case PID_PODEST_POS: 				writerGetterValues(pid, 0.0); break;
 		
 		default:							auto it = setterMap.find((int)pid);
 											if ( it != setterMap.end() ) {
@@ -1094,7 +1092,7 @@ void SerialEmulatorNULL::notifyMovePartAfter() {
 	#undef INC_AXIS
 	
 	// speed management
-	#warning no speed
+	#warning - speed management deactivated - this can may be removed
 	/*
 	if ( getFeedSpeed_MMSec() > 0.0 ) {
 		
@@ -1134,6 +1132,7 @@ byte SerialEmulatorNULL::initiateStep(AxisId aid) {
 		case IDX_X: return RET_OK;
 		case IDX_Y: return RET_OK;
 		case IDX_Z: return RET_OK;
+		case IDX_H: return RET_OK;
 	}
 	
 	return RET_ERROR;
@@ -1145,6 +1144,7 @@ byte SerialEmulatorNULL::finalizeStep(AxisId aid) {
 		case IDX_X: return RET_OK;
 		case IDX_Y: return RET_OK;
 		case IDX_Z: return RET_OK;
+		case IDX_H: return RET_OK;
 	}
 	
 	return RET_ERROR;

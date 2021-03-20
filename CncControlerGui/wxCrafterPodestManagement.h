@@ -17,6 +17,8 @@
 #include <wx/panel.h>
 #include <wx/statbmp.h>
 #include <wx/statline.h>
+#include <wx/textctrl.h>
+#include <wx/stattext.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #if wxVERSION_NUMBER >= 2900
@@ -42,15 +44,23 @@ protected:
     wxPanel* m_basePanel;
     wxStaticBitmap* m_staticBitmap9569;
     wxStaticLine* m_staticLine9571;
-    wxBitmapButton* m_btUp;
-    wxBitmapButton* m_btDown;
+    wxTextCtrl* m_moveRelative;
+    wxStaticText* m_staticText9611;
+    wxBitmapButton* m_btRelativeUp;
+    wxBitmapButton* m_btRelativeDown;
+    wxStaticLine* m_staticLine95714;
+    wxTextCtrl* m_textCtrl9604;
+    wxBitmapButton* m_btManuallyUp;
+    wxBitmapButton* m_btManuallyDown;
     wxStaticLine* m_staticLine9554;
     wxStaticBitmap* m_info;
-    wxButton* m_button9552;
+    wxButton* m_btClose;
 
 protected:
     virtual void onShow(wxShowEvent& event) { event.Skip(); }
     virtual void onInit(wxInitDialogEvent& event) { event.Skip(); }
+    virtual void onPodestRelativeUp(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPodestRelativeDown(wxCommandEvent& event) { event.Skip(); }
     virtual void onPodestUpLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void onPodestUpLeftUp(wxMouseEvent& event) { event.Skip(); }
     virtual void onPodestUpLeave(wxMouseEvent& event) { event.Skip(); }
@@ -63,13 +73,19 @@ protected:
 public:
     wxStaticBitmap* GetStaticBitmap9569() { return m_staticBitmap9569; }
     wxStaticLine* GetStaticLine9571() { return m_staticLine9571; }
-    wxBitmapButton* GetBtUp() { return m_btUp; }
-    wxBitmapButton* GetBtDown() { return m_btDown; }
+    wxTextCtrl* GetMoveRelative() { return m_moveRelative; }
+    wxStaticText* GetStaticText9611() { return m_staticText9611; }
+    wxBitmapButton* GetBtRelativeUp() { return m_btRelativeUp; }
+    wxBitmapButton* GetBtRelativeDown() { return m_btRelativeDown; }
+    wxStaticLine* GetStaticLine95714() { return m_staticLine95714; }
+    wxTextCtrl* GetTextCtrl9604() { return m_textCtrl9604; }
+    wxBitmapButton* GetBtManuallyUp() { return m_btManuallyUp; }
+    wxBitmapButton* GetBtManuallyDown() { return m_btManuallyDown; }
     wxStaticLine* GetStaticLine9554() { return m_staticLine9554; }
     wxStaticBitmap* GetInfo() { return m_info; }
-    wxButton* GetButton9552() { return m_button9552; }
+    wxButton* GetBtClose() { return m_btClose; }
     wxPanel* GetBasePanel() { return m_basePanel; }
-    CncPodestManagementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Podest Management"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,340), long style = wxDEFAULT_DIALOG_STYLE);
+    CncPodestManagementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Podest Management"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(540,300), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncPodestManagementBase();
 };
 

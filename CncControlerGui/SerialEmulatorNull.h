@@ -325,7 +325,7 @@ class SerialEmulatorNULL  : public wxEvtHandler,
 		
 	public:
 		
-		//Initialize Serial communication without an acitiv connection 
+		//Initialize Serial communication without an active connection 
 		SerialEmulatorNULL(CncControl* cnc);
 		virtual ~SerialEmulatorNULL();
 		

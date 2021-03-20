@@ -1290,6 +1290,8 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logWarningMessage("Test function 3");
 	
+	cnc->processCommand(CMD_ACTIVATE_PODEST_HW, std::cout);
+	cnc->getPodestDistanceMetric();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -3093,6 +3095,44 @@ void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, doub
 		
 		cnc::trc.logInfoMessage("The hardware offset was realigned to the new origin . . .");
 	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onPodestManagement(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( podestManagementDlg == NULL )
+		return;
+		
+	if ( cnc->resetPodestDistance() == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Can't reset podest position\n");
+		return;
+	}
+	
+	const bool prev = m_miRqtIdleMessages->IsChecked();
+	m_miRqtIdleMessages->Check(false);
+	
+		podestManagementDlg->ShowModal();
+		waitActive(500);
+		
+		CNC_TRANSACTION_LOCK
+		const double dbl = cnc->getPodestDistanceMetric() * (-1);
+		
+		// log the current position before the correction operation below applies
+		const CncLongPosition prevPos = cnc->requestControllerPos();
+		
+		// correct the z position by the podest movement
+		cnc->setZeroPosZ(prevPos.getZ() + THE_CONFIG->convertMetricToStepsZ(dbl) );
+		
+		// align the hardware offset ith the new logical software origin
+		if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
+			CncLongPosition offset(THE_BOUNDS->getHardwareOffset().getAsSteps());
+			offset -= prevPos;
+			THE_BOUNDS->setHardwareOffset(offset);
+			
+			cnc::trc.logInfoMessage("The hardware offset was realigned to the new origin . . .");
+		}
+
+	
+	m_miRqtIdleMessages->Check(prev);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectUnit(wxCommandEvent& event) {
@@ -8502,19 +8542,6 @@ void MainFrame::setControllerPowerStateBmp(bool state) {
 /////////////////////////////////////////////////////////////////////
 	m_ctrlPowerStateBmp->SetBitmap(ImageLibPower().Bitmap(state ? "BMP_ON": "BMP_OFF"));
 	m_ctrlPowerStateBmp->Refresh();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::onPodestManagement(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( podestManagementDlg == NULL )
-		return;
-		
-	m_miRqtIdleMessages->Check(false);
-	
-	podestManagementDlg->ShowModal();
-	waitActive(500);
-	
-	m_miRqtIdleMessages->Check(true);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onToggleSecMainView(wxCommandEvent& event) {

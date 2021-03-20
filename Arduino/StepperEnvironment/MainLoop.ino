@@ -861,6 +861,7 @@ void ArduinoMainLoop::loop() {
 
     // MB command - Podest Movement
     case CMD_MOVE_PODEST:
+    case CMD_MOVE_PODEST_EXACT:
           r = controller->acceptPodestMove(c);
           break;
           

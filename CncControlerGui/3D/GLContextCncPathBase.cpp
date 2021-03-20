@@ -268,7 +268,6 @@ void GLContextCncPathBase::markCurrentPosition() {
 	if ( cncPath.getOpenGLBufferStore()->getPosVertex(vertex, cncPath.getVirtualEnd() - 1) ) {
 		drawMovePosition(vertex.getX(), vertex.getY(), vertex.getZ());
 		
-		#warning
 		if ( continiousDirConeFlag == true )
 			keepVisible(vertex.getX(), vertex.getY(), vertex.getZ());
 	}

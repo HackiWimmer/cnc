@@ -55,30 +55,29 @@ bool SerialCommandLocker::lock(CncControl* cnc) {
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
 : SerialOSD()
-, readBuffer()
-, totalDistanceSteps{0L, 0L, 0L, 0L}
-, totalDistanceMetric{0.0, 0.0, 0.0, 0.0}
-, totalDistanceMetricRef(0.0)
-, measuredFeedSpeed_MM_SEC(0.0)
-, measurementRefPos(0, 0, 0)
-, tsMeasurementStart(0LL)
-, tsMeasurementRef(0LL)
-, tsMeasurementLast(0LL)
-, cncControl(cnc)
-, measurementActive(false)
-, writeOnlyMoveCommands(false)
-, portName()
-, lastFetchResult()
-, traceSpyInfo(true)
-, spyMode(Serial::SypMode::SM_NONE)
-, spyRead(false)
-, spyWrite(false)
-, shouldCallbackSynchronizeAppPosition(false)
-, factorX(THE_CONFIG->getDisplayFactX())
-, factorY(THE_CONFIG->getDisplayFactY())
-, factorZ(THE_CONFIG->getDisplayFactZ())
-{
+, readBuffer							()
+, totalDistanceSteps					{0L, 0L, 0L, 0L}
+, totalDistanceMetric					{0.0, 0.0, 0.0, 0.0}
+, totalDistanceMetricRef				(0.0)
+, measuredFeedSpeed_MM_SEC				(0.0)
+, measurementRefPos						(0, 0, 0)
+, tsMeasurementStart					(0LL)
+, tsMeasurementRef						(0LL)
+, tsMeasurementLast						(0LL)
+, cncControl							(cnc)
+, measurementActive						(false)
+, portName								()
+, lastFetchResult						()
+, traceSpyInfo							(true)
+, spyMode								(Serial::SypMode::SM_NONE)
+, spyRead								(false)
+, spyWrite								(false)
+, shouldCallbackSynchronizeAppPosition	(false)
+, factorX								(THE_CONFIG->getDisplayFactX())
+, factorY								(THE_CONFIG->getDisplayFactY())
+, factorZ								(THE_CONFIG->getDisplayFactZ())
 ///////////////////////////////////////////////////////////////////
+{
 	resetTotalDistance();
 }
 ///////////////////////////////////////////////////////////////////
@@ -776,9 +775,6 @@ bool Serial::popSerial() {
 	if ( scl.lock(cncControl) == false )
 		return true;
 	
-	if ( writeOnlyMoveCommands == true )
-		return true;
-	
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%s'", ArduinoCMDs::getCMDLabel(cmd)));
 	
@@ -828,9 +824,6 @@ bool Serial::processIdle() {
 	SerialCommandLocker scl(cmd);
 	if ( scl.lock(NULL) == false )
 		return true;
-		
-	if ( writeOnlyMoveCommands == true )
-		return true;
 	
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%s'", ArduinoCMDs::getCMDLabel(cmd)));
@@ -871,11 +864,8 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 		return false;
 	}
 	
-	// this shouldn't published to the controller
+	// this should not published to the controller
 	if ( pid == PID_SEPARATOR )
-		return true;
-		
-	if ( writeOnlyMoveCommands == true )
 		return true;
 	
 	unsigned char cmd[3 * sizeof(unsigned char) + MAX_SETTER_VALUES * LONG_BUF_SIZE];
@@ -954,9 +944,6 @@ bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 		std::cerr << "SERIAL::processGetter()::ERROR: Not connected\n";
 		return false;
 	}
-	
-	if ( writeOnlyMoveCommands == true )
-		return true;
 	
 	unsigned char cmd[2];
 	cmd[0] = CMD_GETTER;
@@ -1143,9 +1130,6 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 		return false;
 	
 	bool ret = false;
-
-	if ( writeOnlyMoveCommands == true && isMoveCommand((unsigned char)cmd) == false )
-		return true;
 	
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd, ArduinoCMDs::getCMDLabel(cmd)));
@@ -1334,7 +1318,7 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMovePodest(int32_t steps) {
+bool Serial::processMovePodest(int32_t steps, bool exact) {
 ///////////////////////////////////////////////////////////////////
 	if ( steps == 0 )
 		return true;
@@ -1344,7 +1328,7 @@ bool Serial::processMovePodest(int32_t steps) {
 		return false;
 	}
 	
-	const unsigned char cmd = CMD_MOVE_PODEST;
+	const unsigned char cmd = exact == true ? CMD_MOVE_PODEST_EXACT : CMD_MOVE_PODEST;
 	
 	SerialCommandLocker scl(cmd);
 	if ( scl.lock(cncControl) == false ) {
@@ -1378,7 +1362,7 @@ bool Serial::processMovePodest(int32_t steps) {
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", moveCommand[0], ArduinoCMDs::getCMDLabel(moveCommand[0])));
 	
 	SerialFetchInfo sfi(moveCommand[0]);
-	sfi.fetchTimeout 	= 0;
+	sfi.fetchTimeout 	= exact == true ? 3000 : 0;
 	sfi.Mc.size 		= size;
 	sfi.Mc.value1		= steps;
 	sfi.Mc.value2		= 0;

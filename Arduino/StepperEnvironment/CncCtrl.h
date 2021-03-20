@@ -82,6 +82,8 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     uint32_t            tsMoveStart;
     uint32_t            tsMoveLast;
 
+    int32_t             podestStillOpenSteps;
+    
     InteractiveMove     interactiveMove;  
     
     CncArduinoController(const CncArduinoController&);
@@ -120,6 +122,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     byte                moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz);
 
     byte                movePodest(int32_t stepDir, stopPodestHardware_funct stopFunct);
+    static bool         stopMovePodestExact(CncArduinoController* ctrl);
     static bool         stopMovePodestBySignal(CncArduinoController* ctrl);
     static bool         stopMovePodestBySwitch(CncArduinoController* ctrl);
 
