@@ -6,21 +6,22 @@
 #include "CncFileNameService.h"
 #include "BinaryFileParser.h"
 
-//BinaryFileParser/////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 BinaryFileParser::BinaryFileParser(const char* fullFileName, BinaryPathHandlerBase* ph)
+//////////////////////////////////////////////////////////////////
 : CncBinaryTemplateStreamer()
-, FileParser(fullFileName)
-, pathHandler(ph)
-, reportHardwareDifference(true)
-, parameterMap()
-, xmlParameter(NULL)
-, outputFileName(fullFileName)
-, sourceContent("")
-, dataHeaderContent("")
-, totalFileLength(0)
-, sourceContentOffset(0)
-, dataHeaderOffset(0)
-, dataBodyOffset(0)
+, FileParser				(fullFileName)
+, pathHandler				(ph)
+, reportHardwareDifference	(true)
+, parameterMap				()
+, xmlParameter				(NULL)
+, outputFileName			(fullFileName)
+, sourceContent				("")
+, dataHeaderContent			("")
+, totalFileLength			(0)
+, sourceContentOffset		(0)
+, dataHeaderOffset			(0)
+, dataBodyOffset			(0)
 //////////////////////////////////////////////////////////////////
 {
 }

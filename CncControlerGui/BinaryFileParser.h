@@ -9,7 +9,6 @@
 class BinaryFileParser : protected CncBinaryTemplateStreamer 
                        , public FileParser
 {
-	
 	typedef std::ifstream InputStream;
 	
 	public:

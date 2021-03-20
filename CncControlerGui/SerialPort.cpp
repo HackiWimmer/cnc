@@ -1034,8 +1034,9 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 	if ( nbByte <=0 || buffer == NULL )
 		return true;
 		
+	#warning is no longer necessary (20.03.2021), remove this after a while
 	// activate this during the execute command
-	ControllerCallbackShouldSynchronizeAppPosition instance(this);
+	//ControllerCallbackShouldSynchronizeAppPosition instance(this);
 
 	const unsigned char cmd = buffer[0];
 	bool ret = false;

@@ -564,7 +564,6 @@ void CncControl::setZeroPosZ(int32_t v) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos(bool x, bool y, bool z) {
 ///////////////////////////////////////////////////////////////////
-	#warning ... ref pos
 	int32_t zVal = 0L;
 	if ( THE_BOUNDS->includesWpt() == true )
 		zVal = (long)round(THE_BOUNDS->getWorkpieceThickness() * THE_CONFIG->getCalculationFactZ());
@@ -795,7 +794,7 @@ bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value ) {
 		val = std::min((unsigned int)((value - min) * stp / (max - min)), stp);
 		rng = stp;
 		
-		#warning
+		#warning log PID_SPINDLE_SPEED
 		std::cout << CNC_LOG_FUNCT << ": " << value << " -> " << val << std::endl;
 	}
 	
@@ -1134,22 +1133,22 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		// --------------------------------------------------------
 		case CITPosition:
 		{
-			bool postAppPosToo = ci.synchronizeAppPos == true;
+			bool syncAndPostAppPosToo = ci.synchronizeAppPos == true;
 			
 			// update controller position
 			switch ( ci.posType ) {
 				case PID_X_POS: 		curCtlPos.setX(ci.xCtrlPos); 
-										if ( postAppPosToo ) 
+										if ( syncAndPostAppPosToo ) 
 											curAppPos.setX(ci.xCtrlPos);
 										break;
 										
 				case PID_Y_POS: 		curCtlPos.setY(ci.yCtrlPos); 
-										if ( postAppPosToo ) 
+										if ( syncAndPostAppPosToo ) 
 											curAppPos.setY(ci.yCtrlPos);
 										break;
 				
 				case PID_Z_POS: 		curCtlPos.setZ(ci.zCtrlPos); 
-										if ( postAppPosToo ) 
+										if ( syncAndPostAppPosToo ) 
 											curAppPos.setZ(ci.zCtrlPos);
 										break;
 				
@@ -1160,7 +1159,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 										if ( ci.hasSpeedInformation() )
 											realtimeFeedSpeed_MM_MIN = ci.feedSpeed;
 										
-										if ( postAppPosToo ) 
+										if ( syncAndPostAppPosToo ) 
 											curAppPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 										
 										if ( false )
@@ -1170,7 +1169,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			// display controller coordinates
 			postCtlPosition(ci.posType);
 			
-			if ( postAppPosToo ) 
+			if ( syncAndPostAppPosToo ) 
 				postAppPosition(ci.posType);
 				
 			// motion monitor
@@ -1956,7 +1955,7 @@ bool CncControl::moveZToMaxLimit() {
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(distance);
 		
-		#warning
+		#warning log limitStates
 		std::clog << CNC_LOG_FUNCT_A("ret %d, lim %d\n", (int)ret, (int)limitStates.hasLimit());
 		
 		
