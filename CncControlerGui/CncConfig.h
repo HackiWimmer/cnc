@@ -344,6 +344,7 @@ class CncConfig {
 		
 		const double getSpindleSpeedMin();
 		const double getSpindleSpeedMax();
+		const double getSpindleSpeedDefault();
 		
 		const unsigned int getCameraDeviceId();
 		const unsigned int getArtificallyStepDelay();

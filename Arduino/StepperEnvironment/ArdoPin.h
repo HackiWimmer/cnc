@@ -127,7 +127,7 @@
 
     // PINA
     const unsigned char PIN_TOUCH_CONTACT                   =  29;
-    //const unsigned char PIN_                              =  28;
+    const unsigned char PIN_INTERRUPT_LED                   =  28;
     //const unsigned char PIN_                              =  27;
     //const unsigned char PIN_                              =  26;
     //const unsigned char PIN_                              =  25;
@@ -146,8 +146,8 @@
     //const unsigned char PIN_                              =  30;
 
     // PIN
-    //const unsigned char PIN_                              =  45;
-    //const unsigned char PIN_                              =  44;
+    const unsigned char PIN_SPINDEL_SUPPORT                 =  45;
+    const unsigned char PIN_SPINDEL_SPEED_INF               =  44;
     //const unsigned char PIN_                              =  43;
     //const unsigned char PIN_                              =  42;
     //const unsigned char PIN_                              =  41;
@@ -155,12 +155,9 @@
     const unsigned char PIN_H_MIN_LIMIT                     =  39;
     const unsigned char PIN_H_MAX_LIMIT                     =  38;
 
-    #define PIN_INTERRUPT                                AE::PN_A0   
-    const unsigned char PIN_INTERRUPT_ID                    =   0;
-  
-    #define PIN_INTERRUPT_LED                            AE::PN_A3   
-    const unsigned char PIN_INTERRUPT_LED_ID                 =  3;
-
+    #define PIN_IS_SPINDEL_OVRLD                         AE::PN_A1   
+    const unsigned char PIN_IS_SPINDEL_OVRLD_ID              =  1;
+    
     #define READ_LMT_PIN_H_MIN                            ( AE::digitalRead(PIN_H_MIN_LIMIT) ) 
     #define READ_LMT_PIN_H_MAX                            ( AE::digitalRead(PIN_H_MAX_LIMIT) )
     #define READ_LMT_PIN_H                                ( AE::digitalRead(PIN_H_MIN_LIMIT) && AE::digitalRead(PIN_H_MAX_LIMIT) )
@@ -280,7 +277,11 @@
     
     const unsigned char PIN_IS_CTRL_POWERED                 =   0;
     const unsigned char PIN_IS_TOOL_POWERED                 =   0;
-    
+    const unsigned char PIN_INTERRUPT_LED                   =   0;
+    const unsigned char PIN_SPINDEL_SUPPORT                 =   0;
+    const unsigned char PIN_SPINDEL_SPEED_INF               =   0;
+    const unsigned char PIN_H_MIN_LIMIT                     =   0;
+    const unsigned char PIN_H_MAX_LIMIT                     =   0;
   
     // A0 CNC Shield: Reset/Abort
     // A1 CNC Shield: Feed Hold
@@ -292,8 +293,8 @@
     #define PIN_INTERRUPT                                AE::PN_A0   
     const unsigned char PIN_INTERRUPT_ID                    =   0;
   
-    #define PIN_INTERRUPT_LED                            AE::PN_A3   
-    const unsigned char PIN_INTERRUPT_LED_ID                 =  3;
+    #define PIN_IS_SPINDEL_OVRLD                                 0
+    const unsigned char PIN_IS_SPINDEL_OVRLD_ID              =  0;
 
     #define READ_LMT_PIN_X_MIN                            ( AE::digitalRead(PIN_X_MIN_LIMIT) )
     #define READ_LMT_PIN_X_MAX                            ( AE::digitalRead(PIN_X_MAX_LIMIT) )

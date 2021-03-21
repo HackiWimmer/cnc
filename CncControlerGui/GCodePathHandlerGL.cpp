@@ -4,7 +4,7 @@
 GCodePathHandlerGL::GCodePathHandlerGL(CncGCodePreview* gl) 
 : GCodePathHandlerBase()
 , glControl(gl)
-, currentSpeed(CncSpeedMode::CncSpeedRapid)
+, currentSpeedMode(CncSpeedMode::CncSpeedRapid)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(glControl);
@@ -34,7 +34,7 @@ bool GCodePathHandlerGL::processLinearMove(bool alreadyRendered) {
 	wxASSERT(glControl);
 	static GLI::VerticeDoubleData vd;
 	
-	vd.setVertice(0L, currentSpeed, currentPos);
+	vd.setVertice(0L, currentSpeedMode, currentPos);
 	glControl->appendVertice(vd);
 	
 	return true; 
@@ -42,7 +42,12 @@ bool GCodePathHandlerGL::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerGL::changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value) {
 //////////////////////////////////////////////////////////////////
-	currentSpeed = sm;
+	currentSpeedMode = sm;
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool GCodePathHandlerGL::changeCurrentSpindleSpeed(double value) {
+//////////////////////////////////////////////////////////////////
 	return true;
 }
 //////////////////////////////////////////////////////////////////

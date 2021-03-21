@@ -371,6 +371,8 @@ void ArduinoDigitalPins::init() {
 	pins[PIN_Y_MAX_LIMIT]           = "LIMIT PIN Y Max";
 	pins[PIN_Z_MIN_LIMIT]           = "LIMIT PIN Z Min";
 	pins[PIN_Z_MAX_LIMIT]           = "LIMIT PIN Z Max";
+	pins[PIN_H_MIN_LIMIT]           = "LIMIT PIN H Min";
+	pins[PIN_H_MAX_LIMIT]           = "LIMIT PIN H Max";
 	
 	pins[PIN_ENABLE_TOOL]           = "TOOL ENABLE PIN";
 	
@@ -386,6 +388,12 @@ void ArduinoDigitalPins::init() {
 	pins[PIN_H_STP]                 = "MOVE PODEST STEP PIN";
 	pins[PIN_LED_PODEST]            = "PODEST LED PIN";
 	pins[PIN_ENABLE_PODEST]         = "PODEST ENABLE PIN";
+	
+	pins[PIN_SPINDEL_SUPPORT]       = "SPINDLE SUPPORT PIN";
+	pins[PIN_SPINDEL_SPEED_INF]     = "SPINDLE SPEED PIN";
+	
+	pins[PIN_IS_SPINDEL_OVRLD_ID]   = "SPINDLE OVERLOAD PIN";
+
 
 }
 /////////////////////////////////////////////////////////////////////////
@@ -420,8 +428,7 @@ void ArduinoAnalogPins::init() {
 	pins[0]   = "Abort/Reset";
 	pins[0]   = "Abort/Reset";
 
-	pins[PIN_INTERRUPT_ID]   		= "INTERRUPT PIN";
-	pins[PIN_INTERRUPT_LED_ID]		= "INTERRUPT LED PIN";
+	pins[PIN_IS_SPINDEL_OVRLD_ID]	= "SPINDLE OVERLOAD PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoAnalogPins::getPinLabel(unsigned int id) {

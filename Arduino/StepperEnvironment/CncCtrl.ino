@@ -26,6 +26,94 @@ namespace CtrlParameter {
     Serial.print(value); Serial.write(TEXT_CLOSE);
   }
 };
+/////////////////////////////////////////////////////////////////////////////////////
+CncArduinoController::SpindelInterface::SpindelInterface(byte pp, byte sp, byte op)
+: pwrPin      (pp)
+, splPin      (sp)
+, ovlPin      (op)
+, enabled     (false)
+, speedRange  (255)
+, speedValue  (255)
+/////////////////////////////////////////////////////////////////////////////////////
+{
+}
+/////////////////////////////////////////////////////////////////////////////////////
+CncArduinoController::SpindelInterface::~SpindelInterface() {
+/////////////////////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void CncArduinoController::SpindelInterface::reset() {
+/////////////////////////////////////////////////////////////////////////////////////
+  *this = CncArduinoController::SpindelInterface(pwrPin, splPin, ovlPin);  
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void CncArduinoController::SpindelInterface::enable(bool state ) {
+/////////////////////////////////////////////////////////////////////////////////////
+  enabled = state;
+  AE::digitalWrite(pwrPin, state ? PL_HIGH : PL_LOW);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+bool CncArduinoController::SpindelInterface::isOverloaded() const {
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( enabled == false )
+    return false;
+
+  // for more details see getRemainingSeconds()
+  return getRemainingSeconds() > 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+int CncArduinoController::SpindelInterface::getRemainingSeconds() const {
+// a negative return value represents infinity 
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( enabled == false )
+    return -1;
+
+  // 0 - 1023
+  const int max = 1023;
+  const int lv0 = 0.5/5.0 * max;
+  const int lv1 = 1.5/5.0 * max;
+  const int lv2 = 2.5/5.0 * max;
+  const int lv3 = 3.0/5.0 * max;
+  const int lv4 = 4.0/5.0 * max;
+  const int lv5 = 4.5/5.0 * max;
+  
+  const int val = AE::analogRead(ovlPin);
+  int ret = -1;
+
+  // Following block is a Mafel FM 1000 specific implementation
+  if      ( val <  lv0 ) ret =  -1;
+  else if ( val <= lv1 ) ret = 160;
+  else if ( val <= lv2 ) ret =  80;
+  else if ( val <= lv3 ) ret =  40;
+  else if ( val <= lv4 ) ret =  20;
+  else if ( val <= lv5 ) ret =  10;
+  else                   ret =   5;
+
+  return ret;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void CncArduinoController::SpindelInterface::setSpeedFactor(int32_t ssf) { 
+/////////////////////////////////////////////////////////////////////////////////////
+  speedRange = ArdoObj::SpindleTuple::decodeRange(ssf); 
+  speedValue = ArdoObj::SpindleTuple::decodeValue(ssf);
+  
+  PRINT_DEBUG_VALUE2("Spindle speed range", speedRange, speedValue);
+  ARDO_DEBUG_VALUE("Spindle speed range", wxString::Format("%d, %d", speedRange, speedValue))
+
+  enable(speedRange != 0 ? true : false);
+
+  if ( enabled == false )
+    return;
+
+  const int ardoRange = 255;
+  const float fact    = (float)(speedRange) / (float)ardoRange;
+
+  PRINT_DEBUG_VALUE2("Spindle speed to write [PWM, V]", round(speedValue * fact), ((speedValue * fact)/255.0 * 10));
+  ARDO_DEBUG_VALUE("Spindle speed to write [PWM, V]", wxString::Format("%d, %lf", round(speedValue * fact), ((speedValue * fact)/255.0 * 10)));
+  
+  AE::analogWrite(splPin, round(speedValue * fact));
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 CncArduinoController::CncArduinoController()
@@ -43,6 +131,7 @@ CncArduinoController::CncArduinoController()
 , H                             ( new CncAxisH(StepperSetup( this, PIN_H_STP, PIN_H_DIR, PIN_H_MIN_LIMIT, PIN_H_MAX_LIMIT, PID_INC_DIRECTION_VALUE_H )) )
 , testManager                   (NULL)
 , impulseCalculator             ()
+, spindelInterface              (PIN_SPINDEL_SUPPORT, PIN_SPINDEL_SPEED_INF, PIN_IS_SPINDEL_OVRLD)
 , lastI2CData                   ()
 , transactionState              (OFF)
 , podestHardwareState           (OFF)
@@ -54,8 +143,6 @@ CncArduinoController::CncArduinoController()
 , cmsF1000_MMMin                (0)
 , posReplyCounter               (0)
 , posReplyThreshold             (100)
-, spindelSpeedRange             (255)
-, spindelSpeedValue             (255)
 , tsMoveStart                   (0L)
 , tsMoveLast                    (0L)
 , podestStillOpenSteps          (0L)
@@ -159,6 +246,7 @@ void CncArduinoController::reset() {
     probeMode           = OFF;
 
     interactiveMove.reset();
+    spindelInterface.reset();
     
     X->reset();
     Y->reset();
@@ -1156,7 +1244,8 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     
     case PID_SPEED_MM_SEC:            setSpeedValue_MMSec1000(st.values[0].asInt32());        break;
 
-    case PID_SPINDLE_SPEED:           setSpindleSpeedFactor(st.values[0].asInt32());          break;
+    case PID_SPINDLE_SPEED:           spindelInterface.setSpeedFactor(st.values[0].asInt32());
+                                      break;
 
     case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].asBool());                break;
 
@@ -1302,26 +1391,4 @@ byte CncArduinoController::moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t 
   if ( dz != 0 ) { retZ = Z->resolveLimit(); }
 
   return (retX == true && retY == true && retZ == true) ? RET_OK : RET_LIMIT;
-}
-/////////////////////////////////////////////////////////////////////////////////////
-void CncArduinoController::setSpindleSpeedFactor(int32_t ssf) { 
-/////////////////////////////////////////////////////////////////////////////////////
-  spindelSpeedRange = ArdoObj::SpindleTuple::decodeRange(ssf); 
-  spindelSpeedValue = ArdoObj::SpindleTuple::decodeValue(ssf);
-
-  #warning write S speed value
-  PRINT_DEBUG_VALUE2("Spindle speed range", spindelSpeedRange, spindelSpeedValue);
-  
-  if ( spindelSpeedValue < 0 ) {
-    // deactivate spindle speed support    
-    
-    //AE::analogWrite(PIN?????, spindelSpeedFactor);
-    
-  }
-  else {
-    const int ardoRange = 255;
-    const float fact = (float)(spindelSpeedRange) / ardoRange;
-
-    //AE::analogWrite(PIN?????, spindelSpeedValue * fact);
-  }
 }

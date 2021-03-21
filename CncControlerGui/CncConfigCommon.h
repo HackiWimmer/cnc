@@ -130,6 +130,7 @@
 	#define CncWork_Ctl_SPINDLE_SPEED_STEP_RANGE			"CncWork_Controller|SPINDLE_SPEED_STEP_RANGE"
 	#define CncWork_Ctl_SPINDLE_SPEED_MIN					"CncWork_Controller|SPINDLE_SPEED_MIN"
 	#define CncWork_Ctl_SPINDLE_SPEED_MAX					"CncWork_Controller|SPINDLE_SPEED_MAX"
+	#define CncWork_Ctl_SPINDLE_SPEED_DEFAULT				"CncWork_Controller|SPINDLE_SPEED_DEFAULT"
 	
 	#define CncTEST_TEST									"CncTest_Test|DUMMY"
 

@@ -1173,6 +1173,7 @@ const double CncConfig::getCameraOffsetZ()							{ PROPERTY(CncWork_Ctl_CAMERA_O
 
 const double CncConfig::getSpindleSpeedMin()						{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_MIN)				return p->GetValue().GetDouble(); }
 const double CncConfig::getSpindleSpeedMax()						{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_MAX)				return p->GetValue().GetDouble(); }
+const double CncConfig::getSpindleSpeedDefault()					{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_DEFAULT)			return p->GetValue().GetDouble(); }
 
 const CncUnit CncConfig::getDisplayUnit() 							{ return currentUnit; }
 const CncUnit CncConfig::getDefaultDisplayUnit()					{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? CncMetric : CncSteps ); }

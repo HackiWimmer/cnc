@@ -144,6 +144,7 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 	cncBlockParameters.add(wxString::Format("%s=\"Z+2.0\"",						ctx.ID_MAX_FEED_STEP));
 	cncBlockParameters.add(wxString::Format("%s=\"R+1500\"",					ctx.ID_RAPID_SPEED));
 	cncBlockParameters.add(wxString::Format("%s=\"W+1500\"",					ctx.ID_WORK_SPEED));
+	cncBlockParameters.add(wxString::Format("%s=\"S+15000\"",					ctx.ID_SPINDLE_SPEED));
 	cncBlockParameters.add(wxString::Format("%s=\"EnsureClockwise\"",			ctx.ID_PATH_RULE));
 	cncBlockParameters.add(wxString::Format("%s=\"EnsureCounterClockwise\"",	ctx.ID_PATH_RULE));
 	cncBlockParameters.add(wxString::Format("%s=\"ReversePath\"",				ctx.ID_PATH_RULE));

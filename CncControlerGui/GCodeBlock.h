@@ -166,6 +166,14 @@ class GCodeBlock {
 		}
 		
 		//////////////////////////////////////////////////////////////////
+		const double getCurrentSpindleSpeed() {
+			if ( hasS() )
+				return s;
+				
+			return 0.0;
+		}
+		
+		//////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const GCodeBlock &a);
 		
 		const wxString getCmdAsString(wxString& ret) const;

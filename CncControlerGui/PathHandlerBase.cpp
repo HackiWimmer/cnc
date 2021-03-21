@@ -128,9 +128,15 @@ void PathHandlerBase::processClientId(long id) {
 	pathListMgr.addEntryAdm(id);
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::processSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN) {
+void PathHandlerBase::processFeedSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN) {
 //////////////////////////////////////////////////////////////////
 	pathListMgr.addEntryAdm(mode, feedSpeed_MM_MIN);
+}
+//////////////////////////////////////////////////////////////////
+void PathHandlerBase::processSpindleSpeed(double feedSpeed_U_MIN) {
+//////////////////////////////////////////////////////////////////
+	#warning processSpindleSpeed(double feedSpeed_U_MIN)
+	//pathListMgr.addEntryAdm(mode, feedSpeed_MM_MIN);
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double values[]) {

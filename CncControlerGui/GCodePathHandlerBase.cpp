@@ -64,6 +64,9 @@ bool GCodePathHandlerBase::processLinearMove(GCodeBlock& gcb) {
 	if ( gcb.hasF() )
 		changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());
 	
+	if ( gcb.hasS() )
+		changeCurrentSpindleSpeed(gcb.getCurrentSpindleSpeed());
+	
 	updateCurrentPosition(gcb);
 	return processLinearMove(false);
 }

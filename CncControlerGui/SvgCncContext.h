@@ -198,6 +198,7 @@ class SvgCncContext : public SvgCncContextBase {
 		
 		double					currentRapidSpeed_MM_MIN; 
 		double					currentWorkSpeed_MM_MIN; 
+		double		 			currentSpindleSpeed_U_MIN;
 		
 		ToolList				toolList;
 		CncPathModificationType	pathModification;
@@ -211,6 +212,7 @@ class SvgCncContext : public SvgCncContextBase {
 		void					deleteTool(const wxString& id);
 		
 		void					setCurrentSpeed(const char type, const wxString& parameter);
+		void					setCurrentSpindleSpeed(const char type, const wxString& parameter);
 		void					setCurrentZFeedStep(const wxString& parameter);
 		void					setCurrentZDepth(const wxString& parameter);
 		
@@ -236,6 +238,7 @@ class SvgCncContext : public SvgCncContextBase {
 		
 		const char * 			ID_RAPID_SPEED		= "SpeedRapid";
 		const char * 			ID_WORK_SPEED		= "SpeedWork";
+		const char * 			ID_SPINDLE_SPEED	= "SpeedSpindle";
 		
 		const char * 			ID_DEPT				= "ZDepth";
 		const char * 			ID_MAX_FEED_STEP	= "ZMaxFeedStep";
@@ -272,6 +275,7 @@ class SvgCncContext : public SvgCncContextBase {
 		double					getCurrentSpeed_MM_MIN(CncSpeedMode m)		const;
 		double					getCurrentRapidSpeed_MM_MIN()				const	{ return currentRapidSpeed_MM_MIN; }
 		double					getCurrentWorkSpeed_MM_MIN()				const	{ return currentWorkSpeed_MM_MIN; }
+		double					getCurrentSpindleSpeed_U_MIN()				const	{ return currentSpindleSpeed_U_MIN; }
 		
 		char					getCurrentZDepthMode()						const	{ return currentZDepthMode; }
 		double					getCurrentZDepth() 							const	{ return currentZDepth; }

@@ -597,7 +597,7 @@ void CncArduinoEnvironment::onEmergencyButton(wxCommandEvent& event) {
 
 	SerialAdminMessage pinUpdate;
 	pinUpdate.setMid(MID::SET_ANALOG_PIN);
-	pinUpdate.setValue<unsigned int>(VN::VAL1, PIN_INTERRUPT_ID);
+	pinUpdate.setValue<unsigned int>(VN::VAL1, PIN_EXTERNAL_INTERRUPT);
 	pinUpdate.setValue<int         >(VN::VAL2, m_btEmergency->GetValue() == LimitSwitch::EMERGENCY_SWITCH_ON ? 255 : 0);
 	
 	if ( ss->IsRunning() == false )

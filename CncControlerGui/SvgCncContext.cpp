@@ -261,6 +261,7 @@ SvgCncContext::SvgCncContext()
 , currentZDepthMode			('Z')
 , currentRapidSpeed_MM_MIN	(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , currentWorkSpeed_MM_MIN	(THE_CONFIG->getDefaultWorkSpeed_MM_MIN())
+, currentSpindleSpeed_U_MIN	(0.0)
 , toolList					()
 , pathModification			(CncPM_None)
 , pathRule					(CncPR_None)
@@ -276,6 +277,11 @@ SvgCncContext::SvgCncContext()
 	provide(ID_MAX_FEED_STEP,	wxString::Format("Z%+.1lf",		THE_CONFIG->getMaxDurationThickness()));
 	provide(ID_RAPID_SPEED,		wxString::Format("R%+.1lf",		currentRapidSpeed_MM_MIN));
 	provide(ID_WORK_SPEED,		wxString::Format("W%+.1lf",		currentWorkSpeed_MM_MIN));
+	
+	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == true ) {
+		currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedDefault();
+		provide(ID_SPINDLE_SPEED,	wxString::Format("S%+.1lf",	currentSpindleSpeed_U_MIN));
+	}
 }
 //////////////////////////////////////////////////////////////////
 SvgCncContext::SvgCncContext(const SvgCncContext& scc) 
@@ -583,6 +589,22 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 			}
 		}
 	}
+	// ----------------------------------------------------------
+	else if ( name.IsSameAs(ID_SPINDLE_SPEED) ) {
+		commandExists = true;
+		
+		switch ( mode ) {
+			case Delete:
+			{
+				currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedDefault();
+			}
+			case Update:
+			{
+				setCurrentSpindleSpeed('S', value);
+				break;
+			}
+		}
+	}
 	
 	// ----------------------------------------------------------
 	// final checks
@@ -754,15 +776,58 @@ void SvgCncContext::setCurrentSpeed(const char type, const wxString& parameter) 
 	
 	// errors
 	if ( currentRapidSpeed_MM_MIN > THE_CONFIG->getMaxSpeedXYZ_MM_MIN() ) {
-		CTX_LOG_ERR(wxString::Format("Invalid rapid speed value: %.lf is greater the max speed %.lf. Value will be ressted to its default value.",
+		CTX_LOG_ERR(wxString::Format("Invalid rapid speed value: %.lf is greater the max speed %.lf. Value will be reset to its default value.",
 									  currentRapidSpeed_MM_MIN, THE_CONFIG->getMaxSpeedXYZ_MM_MIN()));
 		currentRapidSpeed_MM_MIN = THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
 	}
 	
 	if ( currentWorkSpeed_MM_MIN > THE_CONFIG->getMaxSpeedXYZ_MM_MIN() ) {
-		CTX_LOG_ERR(wxString::Format("Invalid work speed value: %.lf is greater the max speed %.lf. Value will be ressted to its default value.",
+		CTX_LOG_ERR(wxString::Format("Invalid work speed value: %.lf is greater the max speed %.lf. Value will be reset to its default value.",
 									  currentWorkSpeed_MM_MIN, THE_CONFIG->getMaxSpeedXYZ_MM_MIN()));
 		currentWorkSpeed_MM_MIN  = THE_CONFIG->getDefaultWorkSpeed_MM_MIN();
+	}
+}
+//////////////////////////////////////////////////////////////////
+void SvgCncContext::setCurrentSpindleSpeed(const char type, const wxString& parameter) {
+//////////////////////////////////////////////////////////////////
+	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == false )
+		return;
+	
+	//Speed="S+2345""
+	wxString para(parameter);
+	para.Trim(true).Trim(false);
+	
+	if ( para.IsEmpty() )
+		return;
+		
+	if ( para.IsSameAs(RESET_Modifyer) ) {
+		currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedDefault();
+		return;
+	}
+	
+	const char mode = (char)para[0];
+	if ( mode != type ) {
+		CTX_LOG_ERR(wxString::Format("Invalid mode token: '%s'", para));
+		return;
+	}
+	
+	double speedValue = 0.0;
+	para = para.SubString(1, para.Length() - 1);
+	if ( para.ToDouble(&speedValue) == false ) {
+		CTX_LOG_ERR(wxString::Format("Invalid speed token: '%s'", para));
+		return;
+	}
+	
+	if ( speedValue < THE_CONFIG->getSpindleSpeedMin() ) {
+		currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedMin();
+		CTX_LOG_WAR(wxString::Format("Warning: A Spindle speed of %.lf is to less. It would be adjusted to %.lf.", speedValue, currentSpindleSpeed_U_MIN));
+	}
+	else if ( speedValue > THE_CONFIG->getSpindleSpeedMax() ) {
+		currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedMin();
+		CTX_LOG_WAR(wxString::Format("Warning: A Spindle speed of %.lf is to much. It would be adjusted to %.lf.", speedValue, currentSpindleSpeed_U_MIN));
+	}
+	else {
+		currentSpindleSpeed_U_MIN = speedValue;
 	}
 }
 //////////////////////////////////////////////////////////////////

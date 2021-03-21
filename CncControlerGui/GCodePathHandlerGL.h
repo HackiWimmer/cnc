@@ -24,6 +24,7 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		
 		virtual bool			processLinearMove(bool alreadyRendered);
 		virtual bool			changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value = 0.0);
+		virtual bool			changeCurrentSpindleSpeed(double value = 0.0);
 		virtual bool			initNextPath();
 		virtual bool			prepareWorkImpl();
 		virtual bool			finishWorkImpl();
@@ -31,7 +32,7 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 	private:
 		
 		CncGCodePreview*		glControl;
-		CncSpeedMode			currentSpeed;
+		CncSpeedMode			currentSpeedMode;
 };
 
 #endif

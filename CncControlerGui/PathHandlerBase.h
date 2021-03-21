@@ -78,7 +78,8 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		
 		virtual bool processLinearMove(bool alreadyRendered) = 0;
 		void processClientId(long id);
-		void processSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN);
+		void processFeedSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN);
+		void processSpindleSpeed(double spindleSpeed_U_MIN);
 		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);

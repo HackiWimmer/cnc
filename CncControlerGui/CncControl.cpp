@@ -354,8 +354,6 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Z, dirValueZ));
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_H, dirValueH));
 	
-	std::cout << "THE_CONFIG->getHighPulsWidthH(): " << THE_CONFIG->getHighPulsWidthH() << std::endl;
-	
 	setup.push_back(SetterTuple(PID_FEEDRATE_H,			FLT_FACT * (THE_CONFIG->getPitchH() / THE_CONFIG->getStepsH())));
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_H,	THE_CONFIG->getHighPulsWidthH()));
 	

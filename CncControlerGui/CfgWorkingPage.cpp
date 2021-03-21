@@ -430,6 +430,14 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
 			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
 			registerProperty(CncWork_Ctl_SPINDLE_SPEED_MAX, prop);
+			
+			//...................
+			prop = mSpindel->AppendChild(new CncCfgSliderProperty("Spindle Speed default", NEXT_PROP_ID, 20000.0, begSS, endSS, sizSS));
+			prop->SetAttribute(wxPG_ATTR_UNITS, "U/mm");
+			prop->SetHelpString(_T("Spindle Speed max"));
+			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
+			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
+			registerProperty(CncWork_Ctl_SPINDLE_SPEED_DEFAULT, prop);
 		}
 		collapse(mSpindel);
 	}

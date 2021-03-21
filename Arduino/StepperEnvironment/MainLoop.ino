@@ -78,22 +78,26 @@ void ArduinoMainLoop::printConfig() {
 //////////////////////////////////////////////////////////////
 void ArduinoMainLoop::printDigitalPin(const unsigned char pin, const int mode) {
 //////////////////////////////////////////////////////////////
-  int type = (int)'D'; 
-  Serial.print(pin);  Serial.print(TEXT_SEPARATOR); 
-  Serial.print(type); Serial.print(TEXT_SEPARATOR);
-  Serial.print(mode); Serial.print(TEXT_SEPARATOR);
-  Serial.print(AE::digitalRead(pin));
-  Serial.print(TEXT_CLOSE); 
+  if ( pin > 0 ) {
+    int type = (int)'D'; 
+    Serial.print(pin);  Serial.print(TEXT_SEPARATOR); 
+    Serial.print(type); Serial.print(TEXT_SEPARATOR);
+    Serial.print(mode); Serial.print(TEXT_SEPARATOR);
+    Serial.print(AE::digitalRead(pin));
+    Serial.print(TEXT_CLOSE); 
+  }
 }
 //////////////////////////////////////////////////////////////    
 void ArduinoMainLoop::printAnalogPin(const unsigned char pin, const int mode) {
 //////////////////////////////////////////////////////////////
-  int type = (int)'A'; 
-  Serial.print(pin);  Serial.print(TEXT_SEPARATOR); 
-  Serial.print(type); Serial.print(TEXT_SEPARATOR); 
-  Serial.print(mode); Serial.print(TEXT_SEPARATOR); 
-  Serial.print(AE::analogRead(pin)); 
-  Serial.print(TEXT_CLOSE); 
+  if ( pin > 0 ) {
+    int type = (int)'A'; 
+    Serial.print(pin);  Serial.print(TEXT_SEPARATOR); 
+    Serial.print(type); Serial.print(TEXT_SEPARATOR); 
+    Serial.print(mode); Serial.print(TEXT_SEPARATOR); 
+    Serial.print(AE::analogRead(pin)); 
+    Serial.print(TEXT_CLOSE); 
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void ArduinoMainLoop::printPinReport() {
@@ -103,6 +107,7 @@ void ArduinoMainLoop::printPinReport() {
 
   Serial.write(RET_SOH);
     Serial.write(PID_TEXT);
+    
     printDigitalPin(PIN_X_STP,                O);
     printDigitalPin(PIN_Y_STP,                O);
     printDigitalPin(PIN_Z_STP,                O);
@@ -113,19 +118,26 @@ void ArduinoMainLoop::printPinReport() {
   
     printDigitalPin(PIN_ENABLE_STEPPER,       O);
     printDigitalPin(PIN_ENABLE_TOOL,          O);
-    
+    printDigitalPin(PIN_INTERRUPT_LED,        O);                   
+
+    printDigitalPin(PIN_SPINDEL_SUPPORT,      O);
+    printDigitalPin(PIN_SPINDEL_SPEED_INF,    O);
+
     printDigitalPin(PIN_X_MIN_LIMIT,          I);
     printDigitalPin(PIN_X_MAX_LIMIT,          I);
     printDigitalPin(PIN_Y_MIN_LIMIT,          I);
     printDigitalPin(PIN_Y_MAX_LIMIT,          I);
     printDigitalPin(PIN_Z_MIN_LIMIT,          I);
     printDigitalPin(PIN_Z_MAX_LIMIT,          I);
+    printDigitalPin(PIN_H_MIN_LIMIT,          I);
+    printDigitalPin(PIN_H_MAX_LIMIT,          I);
 
     printDigitalPin(PIN_EXTERNAL_INTERRUPT,   I);
-                   
-    printAnalogPin(PIN_INTERRUPT_LED_ID,      I);
-
-    #warning add more pins
+    printDigitalPin(PIN_IS_TOOL_POWERED,      I);
+    printDigitalPin(PIN_IS_CTRL_POWERED,      I);
+    printDigitalPin(PIN_TOUCH_CONTACT,        I);
+    
+    printAnalogPin(PIN_IS_SPINDEL_OVRLD_ID,   I);
 
   Serial.write(MBYTE_CLOSE);  
 }
@@ -741,10 +753,20 @@ void ArduinoMainLoop::setup() {
 
   if ( PIN_TOUCH_CONTACT > 0 )
     { AE::pinMode(PIN_TOUCH_CONTACT,    PM_INPUT);   AE::digitalWrite(PIN_TOUCH_CONTACT,    PL_HIGH); }
+
+  if ( PIN_SPINDEL_SUPPORT > 0 )
+    { AE::pinMode(PIN_SPINDEL_SUPPORT,  PM_OUTPUT);  AE::digitalWrite(PIN_SPINDEL_SUPPORT,  PL_LOW); }
+
+  if ( PIN_INTERRUPT_LED > 0 )
+    { AE::pinMode(PIN_INTERRUPT_LED,    PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,     ANALOG_LOW); }
+
+  if ( PIN_SPINDEL_SPEED_INF > 0 )
+    { AE::pinMode(PIN_SPINDEL_SPEED_INF,PM_OUTPUT);  AE::analogWrite(PIN_SPINDEL_SPEED_INF, ANALOG_LOW); }
     
+  if ( PIN_IS_SPINDEL_OVRLD > 0 )
+    { AE::pinMode(PIN_IS_SPINDEL_OVRLD, PM_INPUT);   AE::analogWrite(PIN_IS_SPINDEL_OVRLD,  ANALOG_LOW); }
 
   // analog pins
-  AE::pinMode(PIN_INTERRUPT_LED,        PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,     ANALOG_LOW);
 
   reset();
   controller->evaluateI2CAvailable();

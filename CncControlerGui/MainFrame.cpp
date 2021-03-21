@@ -1277,6 +1277,7 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
 	
+	/*
 	cnc->changeCurrentSpindleSpeed_U_MIN(1.0);
 	cnc->changeCurrentSpindleSpeed_U_MIN(4000.0);
 	cnc->changeCurrentSpindleSpeed_U_MIN(4080.0);
@@ -1284,6 +1285,24 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 	cnc->changeCurrentSpindleSpeed_U_MIN(8080.0);
 	cnc->changeCurrentSpindleSpeed_U_MIN(24900.0);
 	cnc->changeCurrentSpindleSpeed_U_MIN(100000.0);
+	*/
+	
+	wxNumberEntryDialog dlg(this, 
+							"Update Value:",
+							"Spindle Speed [U/min]",
+							"Spindle Speed Configuration . . . ", 
+							5000,
+							4000, 
+							25000 
+							);
+	
+	if ( dlg.ShowModal() == wxID_OK ) {
+		dlg.GetValue();
+		
+		cnc->changeCurrentSpindleSpeed_U_MIN((float)dlg.GetValue());
+	}
+	
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {

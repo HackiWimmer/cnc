@@ -124,19 +124,19 @@
 	{ return THE_APP->m_miOpenGLContextObserver; }
 
 	void APP_PROXY::parsingSynopsisTraceAddSeparator(const wxString& entry)
-	{ THE_APP->getParsingSynopsisTrace()->addSeparator(entry); }
+	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addSeparator(entry); }
 
 	void APP_PROXY::parsingSynopsisTraceAddEntry(const char type, const wxString& info)
-	{ THE_APP->getParsingSynopsisTrace()->addEntry(type, info); }
+	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addEntry(type, info); }
 
 	void APP_PROXY::parsingSynopsisTraceAddInfo(const wxString& info)
-	{ THE_APP->getParsingSynopsisTrace()->addInfo(info); }
+	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addInfo(info); }
 
 	void APP_PROXY::parsingSynopsisTraceAddWarning(const wxString& info)
-	{ THE_APP->getParsingSynopsisTrace()->addWarning(info); }
+	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addWarning(info); }
 
 	void APP_PROXY::parsingSynopsisTraceAddError(const wxString& info)
-	{ THE_APP->getParsingSynopsisTrace()->addError(info); }
+	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addError(info); }
 
 	bool APP_PROXY::parsingSynopsisTraceHasDebugEntries() { 
 		CncParsingSynopsisTrace* pst = THE_APP->getParsingSynopsisTrace(); 
