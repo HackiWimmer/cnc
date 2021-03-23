@@ -26,9 +26,10 @@ class CncGCodeSequenceListCtrl : public CncLargeScaledListCtrl {
 		static const int COL_Y				= 3;
 		static const int COL_Z				= 4;
 		static const int COL_F				= 5;
-		static const int COL_MORE			= 6;
+		static const int COL_S				= 6;
+		static const int COL_MORE			= 7;
 		
-		static const int TOTAL_COL_COUNT	= 7;
+		static const int TOTAL_COL_COUNT	= 8;
 		static const int COL_SEARCH			= COL_ID;
 		
 		CncGCodeSequenceListCtrl(wxWindow *parent, long style);

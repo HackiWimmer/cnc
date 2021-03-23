@@ -374,13 +374,15 @@ bool SVGPathHandlerCnc::moveXYToPos(const MoveParameter& mp) {
 	const long clientID	= currentCncContext.getCurrentClientID(mp.idOffset);
 	
 	CncPathListEntry initialEntry;
-	initialEntry.content			= CncPathListEntry::CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_POSITION;
+	initialEntry.content			= CncPathListEntry::ContentAll;
 	initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 	initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 	initialEntry.entryTarget		= curRunPosition;
 	initialEntry.clientId			= clientID;
 	initialEntry.feedSpeedMode		= mp.mode;
 	initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentSpeed_MM_MIN(mp.mode);
+	initialEntry.spindleState		= currentCncContext.getCurrentSpindleState();
+	initialEntry.spindleSpeed_U_MIN	= currentCncContext.getCurrentSpindleSpeed_U_MIN();
 	
 	CncPathListManager plm(initialEntry);
 	plm.addEntryRel(dx, dy, 0.0);
@@ -398,13 +400,15 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop() {
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_LOGICAL_TOP);
 		
 		CncPathListEntry initialEntry;
-		initialEntry.content			= CncPathListEntry::CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_POSITION;
+		initialEntry.content			= CncPathListEntry::ContentAll;
 		initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 		initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 		initialEntry.entryTarget		= curRunPosition;
 		initialEntry.clientId			= clientID;
 		initialEntry.feedSpeedMode		= CncSpeedWork;
 		initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentWorkSpeed_MM_MIN();
+		initialEntry.spindleState		= currentCncContext.getCurrentSpindleState();
+		initialEntry.spindleSpeed_U_MIN	= currentCncContext.getCurrentSpindleSpeed_U_MIN();
 		
 		CncPathListManager plm(initialEntry);
 		plm.addEntryRel(0.0, 0.0, zDist);
@@ -426,13 +430,15 @@ bool SVGPathHandlerCnc::moveZAxisToSurface() {
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_SUREFACE);
 		
 		CncPathListEntry initialEntry;
-		initialEntry.content			= CncPathListEntry::CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_POSITION;
+		initialEntry.content			= CncPathListEntry::ContentAll;
 		initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 		initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 		initialEntry.entryTarget		= curRunPosition;
 		initialEntry.clientId			= clientID;
 		initialEntry.feedSpeedMode		= CncSpeedWork;
 		initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentWorkSpeed_MM_MIN();
+		initialEntry.spindleState		= currentCncContext.getCurrentSpindleState();
+		initialEntry.spindleSpeed_U_MIN	= currentCncContext.getCurrentSpindleSpeed_U_MIN();
 		
 		CncPathListManager plm(initialEntry);
 		plm.addEntryRel(0.0, 0.0, zDist);
@@ -482,13 +488,15 @@ bool SVGPathHandlerCnc::moveZAxisNextStepDown(double zTarget) {
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_NEXT_STEP_DOWN);
 		
 		CncPathListEntry initialEntry;
-		initialEntry.content			= CncPathListEntry::CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_POSITION;
+		initialEntry.content			= CncPathListEntry::ContentAll;
 		initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 		initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 		initialEntry.entryTarget		= curRunPosition;
 		initialEntry.clientId			= clientID;
 		initialEntry.feedSpeedMode		= CncSpeedWork;
 		initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentWorkSpeed_MM_MIN();
+		initialEntry.spindleState		= currentCncContext.getCurrentSpindleState();
+		initialEntry.spindleSpeed_U_MIN	= currentCncContext.getCurrentSpindleSpeed_U_MIN();
 		
 		CncPathListManager plm(initialEntry);
 		plm.addEntryRel(0.0, 0.0, zDist);
@@ -514,7 +522,6 @@ bool SVGPathHandlerCnc::prepareWork() {
 	
 	// align again
 	curRunPosition.set(cncControl->getCurCtlPosMetric());
-	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -524,8 +531,6 @@ bool SVGPathHandlerCnc::finishWork() {
 	
 	if ( PathHandlerBase::finishWork() == false )
 		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::finishWork() failed!\n");
-	
-	onPhysicallySwitchToolState(false);
 	
 	CncDoublePosition p(0.0, 0.0, 0.0);
 	MoveParameter mp;

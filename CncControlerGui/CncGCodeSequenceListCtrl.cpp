@@ -32,6 +32,7 @@ CncGCodeSequenceListCtrl::CncGCodeSequenceListCtrl(wxWindow *parent, long style)
 	AppendColumn("Y", 				wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
 	AppendColumn("Z", 				wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
 	AppendColumn("F", 				wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
+	AppendColumn("S", 				wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
 	AppendColumn("Further ...", 	wxLIST_FORMAT_LEFT,  400);
 	
 	// determine styles
@@ -86,7 +87,8 @@ wxString CncGCodeSequenceListCtrl::OnGetItemText(long item, long column) const {
 		case CncGCodeSequenceListCtrl::COL_X:		return (gcb.hasX() ? wxString::Format("% 8.3f", gcb.x) : "");
 		case CncGCodeSequenceListCtrl::COL_Y:		return (gcb.hasY() ? wxString::Format("% 8.3f", gcb.y) : "");
 		case CncGCodeSequenceListCtrl::COL_Z:		return (gcb.hasZ() ? wxString::Format("% 8.3f", gcb.z) : "");
-		case CncGCodeSequenceListCtrl::COL_F:		return (gcb.hasF() ? wxString::Format("% 8.3f", gcb.f) : "");
+		case CncGCodeSequenceListCtrl::COL_F:		return (gcb.hasF() ? wxString::Format("% 8.1f", gcb.f) : "");
+		case CncGCodeSequenceListCtrl::COL_S:		return (gcb.hasS() ? wxString::Format("% 8.1f", gcb.s) : "");
 		
 		case CncGCodeSequenceListCtrl::COL_MORE:	return gcb.traceMore(value);
 	}

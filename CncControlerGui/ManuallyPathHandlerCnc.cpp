@@ -39,10 +39,9 @@ bool ManuallyPathHandlerCnc::finishWork() {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-void ManuallyPathHandlerCnc::switchToolState(bool state) {
+void ManuallyPathHandlerCnc::switchSpindleState(bool state) {
 //////////////////////////////////////////////////////////////////
-	#warning tool state
-	state == true ? cncControl->switchToolOn() : cncControl->switchToolOff();
+	state == true ? cncControl->switchSpindleOn() : cncControl->switchSpindleOff();
 }
 //////////////////////////////////////////////////////////////////
 bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
@@ -50,7 +49,7 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 	wxASSERT( cncControl != NULL );
 	
 	// tool handling
-	switchToolState(md.toolState);
+	switchSpindleState(md.toolState);
 	
 	// speed handling
 	if ( md.speedMode != lastSpeedMode || md.f != lastSpeedValue ) {
@@ -74,7 +73,7 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 		ret = cncControl->correctLimitPositions();
 	}
 	
-	switchToolState(false);
+	switchSpindleState(false);
 	
 	return ret;
 }

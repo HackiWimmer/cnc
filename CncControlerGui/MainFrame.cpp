@@ -2750,7 +2750,7 @@ bool MainFrame::connectSerialPort() {
 			//refPositionDlg->setEnforceFlag(cnc->isEmulator() == false);
 			
 			notifyConfigUpdate();
-			decorateSwitchToolOnOff(cnc->getToolState());
+			decorateSpindleState(cnc->getSpindleState());
 			
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
@@ -2916,9 +2916,8 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	if ( inboundFileParser != NULL )
 		inboundFileParser->changePathListRunnerInterface(sel);
 	
-	#warning CncMillingSound
 	const bool sound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() && setup.speedMonitor == true );
-	CncMillingSound::activate(sound);
+	CncSpindleSound::activate(sound);
 	
 	// config setup
 	serialFileName.assign(setup.serialFileName);
@@ -6464,19 +6463,19 @@ void MainFrame::rcReset(wxCommandEvent& event) {
 	refPositionDlg->setEnforceFlag(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::decorateSwitchToolOnOff(bool state) {
+void MainFrame::decorateSpindleState(bool state) {
 ///////////////////////////////////////////////////////////////////
-	m_testToolPowerBtn->SetLabel            (state == TOOL_STATE_OFF ? "Switch Tool 'On'"        : "Switch Tool 'Off'");
+	m_testToolPowerBtn->SetLabel             (state == SPINDLE_STATE_OFF ? "Switch Tool 'On'"       : "Switch Tool 'Off'");
 
-	m_testToolPowerState->SetLabel           (state == TOOL_STATE_OFF ? "Tool is switched 'Off'" : "Tool is switched 'On'");
-	m_testToolPowerState->SetBackgroundColour(state == TOOL_STATE_OFF ? wxColour(255,128,128)    : *wxGREEN);
-	m_testToolPowerState->SetForegroundColour(state == TOOL_STATE_OFF ? *wxWHITE                 : *wxBLACK);
+	m_testToolPowerState->SetLabel           (state == SPINDLE_STATE_OFF ? "Tool is switched 'Off'" : "Tool is switched 'On'");
+	m_testToolPowerState->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128)    : *wxGREEN);
+	m_testToolPowerState->SetForegroundColour(state == SPINDLE_STATE_OFF ? *wxWHITE                 : *wxBLACK);
 	
 	m_testToolPowerState->Refresh(true);
 	m_testToolPowerState->Update();
 	
 	if ( m_testToolPowerState->GetParent() ) {
-		m_testToolPowerState->GetParent()->SetBackgroundColour(state == TOOL_STATE_OFF ? wxColour(255,128,128)    : *wxGREEN);
+		m_testToolPowerState->GetParent()->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128) : *wxGREEN);
 		m_testToolPowerState->GetParent()->Refresh(true);
 		m_testToolPowerState->GetParent()->Update();
 	}
@@ -6491,9 +6490,9 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 		return;
 	}
 	
-	bool cncToolState = cnc->getToolState();
+	bool cncToolState = cnc->getSpindleState();
 	
-	if ( cncToolState == TOOL_STATE_OFF ) {
+	if ( cncToolState == SPINDLE_STATE_OFF ) {
 		
 		const wxString hdl("Switch tool on . . . ");
 		const wxString msg("Do you really want to switch the tool power on?");
@@ -6503,17 +6502,17 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 			return;
 	}
 	
-	if ( cncToolState == TOOL_STATE_OFF ) {
-		cnc->switchToolOn();
+	if ( cncToolState == SPINDLE_STATE_OFF ) {
+		cnc->switchSpindleOn();
 		startAnimationControl();
 		
 	} else {
-		cnc->switchToolOff();
+		cnc->switchSpindleOff();
 		stopAnimationControl();
 	}
 	
-	cncToolState = cnc->getToolState();
-	enableControls(cncToolState == TOOL_STATE_OFF);
+	cncToolState = cnc->getSpindleState();
+	enableControls(cncToolState == SPINDLE_STATE_OFF);
 	
 	if ( m_testToolPowerBtn->IsShownOnScreen() )
 		m_testToolPowerBtn->Enable(true);
@@ -6653,7 +6652,7 @@ void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 		case TestBookSelection::VAL::INTERVAL:	break;
 		
 		case TestBookSelection::VAL::TOOL:		if ( cnc != NULL )
-													decorateSwitchToolOnOff(cnc->getToolState());
+													decorateSpindleState(cnc->getSpindleState());
 													
 												break;
 												
@@ -6666,12 +6665,14 @@ void MainFrame::traceTextUpdated(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestControllerPinsFromButton(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
 	m_btRequestControllerPins->Enable(false);
 	requestPins(event);
 	m_btRequestControllerPins->Enable(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestPins(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	cnc->processCommand(CMD_PRINT_PIN_REPORT, std::clog);
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);

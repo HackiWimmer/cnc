@@ -58,7 +58,7 @@ CncControl::CncControl(CncPortType pt)
 , interruptState					(false)
 , positionOutOfRangeFlag			(false)
 , ctrlPowerState					(CPS_NOT_INITIALIZED)
-, toolPowerState					(TOOL_STATE_OFF)
+, spindlePowerState					(SPINDLE_STATE_OFF)
 , stepDelay							(0)
 , lastCncHeartbeatValue				(0)
 , toolState							()
@@ -76,7 +76,7 @@ CncControl::CncControl(CncPortType pt)
 	else 									serialPort = new SerialEmulatorNULL(this);
 	
 	toolState.setControl(THE_APP->GetToolState());
-	setToolState(true);
+	setSpindleState(true);
 	
 	serialPort->enableSpyOutput();
 }
@@ -87,8 +87,8 @@ CncControl::~CncControl() {
 	
 	assert(serialPort);
 	
-	if ( getToolState() == TOOL_STATE_ON )
-		switchToolOff();
+	if ( getSpindleState() == SPINDLE_STATE_ON )
+		switchSpindleOff();
 	
 	// safty
 	disconnect();
@@ -305,7 +305,7 @@ bool CncControl::setup(bool doReset) {
 	}
 	
 	// always switch the tool off - safety - but may be already done by reset();
-	switchToolOff(true);
+	switchSpindleOff(true);
 	
 	// evaluate limit states
 	evaluateLimitState();
@@ -594,7 +594,7 @@ void CncControl::interrupt(const char* why) {
 	std::cerr << wxString::Format("CncControl: Interrupted: %s", why ? why : "") << std::endl;
 	
 	interruptState = true;
-	switchToolOff(true);
+	switchSpindleOff(true);
 	
 	throw CncInterruption(why);
 }
@@ -693,7 +693,7 @@ bool CncControl::reset() {
 	postCtlPosition(PID_XYZ_POS_MAJOR);
 	
 	evaluateLimitState();
-	switchToolOff(true);
+	switchSpindleOff(true);
 	
 	return true;
 }
@@ -775,38 +775,37 @@ bool CncControl::moveZToTop() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value ) {
 ///////////////////////////////////////////////////////////////////
+	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == false )
+		return true;
+
 	int16_t val =  -1;
 	int16_t rng = 255;
 	
-	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == true ) {
+	if ( cnc::dblCmp::le(value, 0.0) )
+		return false;
 	
-		if ( cnc::dblCmp::le(value, 0.0) )
-			return false;
-		
-		const double		min = std::min(THE_CONFIG->getSpindleSpeedMin(), THE_CONFIG->getSpindleSpeedMax());
-		const double		max = THE_CONFIG->getSpindleSpeedMax();
-		const unsigned int	stp = THE_CONFIG->getSpindleSpeedStepRange();
-		
-		// range validation/correction
-		value = std::max(min, value);
-		value = std::min(max, value);
-		
-		// Spindle speed range is defined as: 0 ... stp (linear)
-		//   0 -> min
-		// stp -> max
-		val = std::min((unsigned int)((value - min) * stp / (max - min)), stp);
-		rng = stp;
-		
-		#warning log PID_SPINDLE_SPEED
-		std::cout << CNC_LOG_FUNCT << ": " << value << " -> " << val << std::endl;
-	}
+	const double		min = std::min(THE_CONFIG->getSpindleSpeedMin(), THE_CONFIG->getSpindleSpeedMax());
+	const double		max = THE_CONFIG->getSpindleSpeedMax();
+	const unsigned int	stp = THE_CONFIG->getSpindleSpeedStepRange();
+	
+	// range validation/correction
+	value = std::max(min, value);
+	value = std::min(max, value);
+	
+	// Spindle speed range is defined as: 0 ... stp (linear)
+	//   0 -> min
+	// stp -> max
+	val = std::min((unsigned int)((value - min) * stp / (max - min)), stp);
+	rng = stp;
 	
 	if ( processSetter(PID_SPINDLE_SPEED, ArdoObj::SpindleTuple::encode(val, rng)) == false ) {
 		std::cerr << CNC_LOG_FUNCT_A(": failed\n");
 		return false;
 	}
 	
+	CncSpindleSound::adjust(value);
 	configuredSpindleSpeed = value;
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -849,8 +848,6 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false || force == true ) {
 		configuredFeedSpeed_MM_MIN	= value;
 		somethingChanged			= true;
-		
-		CncMillingSound::adjust(configuredFeedSpeed_MM_MIN);
 		
 		const int32_t val = configuredFeedSpeed_MM_MIN * FLT_FACT / 60;
 		const char mode   = cnc::getCncSpeedTypeAsCharacter(configuredSpeedMode);
@@ -1268,13 +1265,13 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 			size_t size = cei.setterValueList.size();
 			
 			switch ( cei.setterPid ) {
-				case PID_TOOL_SWITCH:
+				case PID_SPINDLE_SWITCH:
 				{
 					if ( checkSetterCount(cei.setterPid, size, 1) == false )
 						return false;
 						
-					toolPowerState = (bool)cei.setterValueList.front();
-					displayToolState(toolPowerState);
+					spindlePowerState = (bool)cei.setterValueList.front();
+					displaySpindleState(spindlePowerState);
 					break;
 				}
 				case PID_SPEED_MM_SEC:
@@ -1568,69 +1565,61 @@ bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool al
 	                             alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::setToolState(bool defaultStyle) {
+void CncControl::setSpindleState(bool state) {
 ///////////////////////////////////////////////////////////////////
-	if ( defaultStyle == true ) {
+	if ( state == true ) {
 		toolState.setState(CncToolStateControl::red);
 	} else {
-		if ( toolPowerState == TOOL_STATE_ON ) 	toolState.setState(CncToolStateControl::green);
-		else 									toolState.setState(CncToolStateControl::red);
+		if ( spindlePowerState == SPINDLE_STATE_ON )	toolState.setState(CncToolStateControl::green);
+		else 											toolState.setState(CncToolStateControl::red);
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::switchTool(bool on) {
+bool CncControl::switchSpindleState(bool on) {
 ///////////////////////////////////////////////////////////////////
-	bool ret = false;
-	
-	if ( on == true )	ret = switchToolOn();
-	else				ret = switchToolOff();
-	
-	return ret;
+	return on ? switchSpindleOn() : switchSpindleOff();
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::switchToolOn() {
+bool CncControl::switchSpindleOn() {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
 		return false;
 
-	if ( toolPowerState == TOOL_STATE_OFF ) { 
-		if ( processSetter(PID_TOOL_SWITCH, TOOL_STATE_ON) ) {
+	if ( spindlePowerState == SPINDLE_STATE_OFF ) { 
+		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_ON) ) {
 			
-			CncMillingSound::play(getConfiguredFeedSpeed_MM_MIN());
+			CncSpindleSound::play(getConfiguredSpindleSpeed());
 			
-			toolPowerState = TOOL_STATE_ON;
-			displayToolState(toolPowerState);
-			
-			return true;
+			spindlePowerState = SPINDLE_STATE_ON;
+			displaySpindleState(spindlePowerState);
 		}
 	}
 	
-	return false;
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::switchToolOff(bool force) {
+bool CncControl::switchSpindleOff(bool force) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
 		return false;
 
-	if ( toolPowerState == TOOL_STATE_ON || force == true ) {
-		if ( processSetter(PID_TOOL_SWITCH, TOOL_STATE_OFF) ) {
+	if ( spindlePowerState == SPINDLE_STATE_ON || force == true ) {
+		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_OFF) ) {
 			
-			CncMillingSound::stop();
+			CncSpindleSound::stop();
 			
-			toolPowerState = TOOL_STATE_OFF;
-			displayToolState(toolPowerState);
-			return true;
+			spindlePowerState = SPINDLE_STATE_OFF;
+			displaySpindleState(spindlePowerState);
 		}
 	}
 	
-	return false;
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::displayToolState(const bool state) {
+void CncControl::displaySpindleState(const bool state) {
 ///////////////////////////////////////////////////////////////////
-	THE_APP->decorateSwitchToolOnOff(state);
-	setToolState();
+	THE_APP->decorateSpindleState(state);
+	setSpindleState(state);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::displayGetterList(const PidList& pidList) {

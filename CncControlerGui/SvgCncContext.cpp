@@ -189,10 +189,11 @@ bool SvgCncContextBase::convertToBool(const wxString& key) const {
 	
 		const wxString& val = it->second;
 		
-		if ( val.IsSameAs("TRUE",	false) )	return true;
-		if ( val.IsSameAs("YES",	false) )	return true;
-		if ( val.IsSameAs("OK",		false) )	return true;
-		if ( val.IsSameAs("JA",		false) )	return true;
+		if		( val.IsSameAs("TRUE",	false) )	return true;
+		else if	( val.IsSameAs("YES",	false) )	return true;
+		else if	( val.IsSameAs("OK",	false) )	return true;
+		else if	( val.IsSameAs("JA",	false) )	return true;
+		else if	( val.IsSameAs("ON",	false) )	return true;
 	}
 	
 	return false;
@@ -261,7 +262,7 @@ SvgCncContext::SvgCncContext()
 , currentZDepthMode			('Z')
 , currentRapidSpeed_MM_MIN	(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , currentWorkSpeed_MM_MIN	(THE_CONFIG->getDefaultWorkSpeed_MM_MIN())
-, currentSpindleSpeed_U_MIN	(0.0)
+, currentSpindleSpeed_U_MIN	(THE_CONFIG->getSpindleSpeedDefault())
 , toolList					()
 , pathModification			(CncPM_None)
 , pathRule					(CncPR_None)
@@ -277,11 +278,7 @@ SvgCncContext::SvgCncContext()
 	provide(ID_MAX_FEED_STEP,	wxString::Format("Z%+.1lf",		THE_CONFIG->getMaxDurationThickness()));
 	provide(ID_RAPID_SPEED,		wxString::Format("R%+.1lf",		currentRapidSpeed_MM_MIN));
 	provide(ID_WORK_SPEED,		wxString::Format("W%+.1lf",		currentWorkSpeed_MM_MIN));
-	
-	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == true ) {
-		currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedDefault();
-		provide(ID_SPINDLE_SPEED,	wxString::Format("S%+.1lf",	currentSpindleSpeed_U_MIN));
-	}
+	provide(ID_SPINDLE_SPEED,	wxString::Format("S%+.1lf",		currentSpindleSpeed_U_MIN));
 }
 //////////////////////////////////////////////////////////////////
 SvgCncContext::SvgCncContext(const SvgCncContext& scc) 
@@ -356,12 +353,14 @@ void SvgCncContext::traceTo(std::ostream& o, unsigned int indent) const {
 		name.assign("ZMAxFeedStep");
 		o	 << wxString::Format("%s  --> %s%s = %.3lf [mm]\n", prefix, name, wxString(' ', fillTo - name.length()), getCurrentZMaxFeedStep());
 		
-		name.assign("Rapid Speed");
+		name.assign("Speed Rapid");
 		o	 << wxString::Format("%s  --> %s%s = %+.1lf [mm/min]\n", prefix, name, wxString(' ', fillTo - name.length()), currentRapidSpeed_MM_MIN);
 		
-		name.assign("Work Speed");
+		name.assign("Speed Work");
 		o	 << wxString::Format("%s  --> %s%s = %+.1lf [mm/min]\n", prefix, name, wxString(' ', fillTo - name.length()), currentWorkSpeed_MM_MIN);
 		
+		name.assign("Speed Spindle");
+		o	 << wxString::Format("%s  --> %s%s = %+.1lf [U/min]\n", prefix, name, wxString(' ', fillTo - name.length()), currentSpindleSpeed_U_MIN);
 		// ...
 	
 	o	<< prefix
@@ -605,7 +604,23 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 			}
 		}
 	}
-	
+	// ----------------------------------------------------------
+	else if ( name.IsSameAs(ID_SPINDLE_STATE) ) {
+		commandExists = true;
+		
+		switch ( mode ) {
+			case Delete:
+			{
+				// handled by the parameter map 
+				break;
+			}
+			case Update:
+			{
+				// handled by the parameter map 
+				break;
+			}
+		}
+	}
 	// ----------------------------------------------------------
 	// final checks
 	if ( commandExists == false ) {
@@ -790,9 +805,6 @@ void SvgCncContext::setCurrentSpeed(const char type, const wxString& parameter) 
 //////////////////////////////////////////////////////////////////
 void SvgCncContext::setCurrentSpindleSpeed(const char type, const wxString& parameter) {
 //////////////////////////////////////////////////////////////////
-	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == false )
-		return;
-	
 	//Speed="S+2345""
 	wxString para(parameter);
 	para.Trim(true).Trim(false);

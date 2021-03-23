@@ -412,11 +412,6 @@ bool CncPathListRunner::publishMoveSequence() {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-void CncPathListRunner::onPhysicallySwitchToolState(bool state) {
-//////////////////////////////////////////////////////////////////
-	currentInterface->processToolSwitch(state);
-}
-//////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
 	if ( curr.hasClientIdChange() == false ) {
@@ -438,7 +433,7 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next) {
+bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next) {
 //////////////////////////////////////////////////////////////////
 	if ( curr.hasSpeedChange() == false ) {
 		std::cerr << CNC_LOG_FUNCT << ": Invalid Type!" << std::endl;
@@ -448,16 +443,46 @@ bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr, co
 	if ( isInterrupted() == true )
 		return false;
 	
-	if ( setup.trace == true )
-		APP_PROXY::getCncPreProcessor()->addOperatingTraceSeparator(wxString::Format("Speed Change (%c - %5.1lf)", cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), curr.feedSpeed_MM_MIN));
+	if ( setup.trace == true ) {
+		const wxString msg(wxString::Format("Feed Speed Change (%c - %5.1lf)", 
+											cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), curr.feedSpeed_MM_MIN));
+											
+		APP_PROXY::getCncPreProcessor()->addOperatingTraceSeparator(msg);
+	}
 		
 	const long nextClientID = next ? next->clientId : CLIENT_ID.INVALID;
+	
 	if ( initializeNextMoveSequence(curr.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), nextClientID) == false ) {
 		std::cerr << CNC_LOG_FUNCT << ": initNextMoveSequence failed!" << std::endl;
 		return false;
 	}
 	
-	return currentInterface->processSpeedChange(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
+	return currentInterface->processFeedSpeedChange(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) {
+//////////////////////////////////////////////////////////////////
+	if ( curr.hasToolChange() == false ) {
+		std::cerr << CNC_LOG_FUNCT << ": Invalid Type!" << std::endl;
+		return false;
+	}
+	
+	if ( isInterrupted() == true )
+		return false;
+	
+	if ( setup.trace == true ) {
+		const wxString msg(wxString::Format("Spindle State, Speed Change (%s, %.1lf)", 
+											curr.spindleState ? "ON" : "OFF", curr.spindleSpeed_U_MIN));
+											
+		APP_PROXY::getCncPreProcessor()->addOperatingTraceSeparator(msg);
+	}
+	
+	if ( currentInterface->processSpindleStateSwitch(curr.spindleState) == false ) {
+		std::cerr << CNC_LOG_FUNCT << ": processSpindleStateSwitch() failed!" << std::endl;
+		return false;
+	}
+	
+	return currentInterface->processSpindleSpeedChange(curr.spindleSpeed_U_MIN);
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
@@ -570,10 +595,9 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		c = n; 
 		n = getNextEntry(itCurr); 
 		
-		if ( c != NULL )
-			APP_PROXY::getCncPreProcessor()->addPathListEntry(*c);
+		if ( c != NULL )	APP_PROXY::getCncPreProcessor()->addPathListEntry(*c);
+		else				std::cerr << CNC_LOG_FUNCT << ": skipToNextEntry() failed!" << std::endl;
 			
-		#warning
 		return (c != NULL && n != NULL);
 	};
 	
@@ -588,22 +612,41 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		// check type: Don't combine entries over a speed change
 		if ( c->hasSpeedChange() == true )  {
 			finalizeCurrentSequence = true;
+			
+			if ( c->isSpeedChange() ) {
+				break;
+			}
+			else {
 			#warning
-			break;
+			
+			}
 		}
 		
 		// check type: Register new client id
-		#warning
-		//if ( c->isClientIdChange() == true ) {
 		if ( c->hasClientIdChange() == true ) {
 			
 			if ( onPhysicallyClientIdChange(*c) == false )
 				return false;
 			
-			if ( skipToNextEntry() == false )
-				break;
+			if ( c->isClientIdChange() ) {
+				if ( skipToNextEntry() == false )
+					break;
+					
+				continue;
+			}
+		}
+		
+		// check type: process spindle update
+		if ( c->hasToolChange() == true ) {
+			if ( onPhysicallySpindleChange(*c) == false )
+				return false;
 				
-			//continue;
+			if ( c->isToolChange() == true ) {
+				if ( skipToNextEntry() == false )
+					break;
+				
+				continue;
+			}
 		}
 		
 		// check content: Skip this entry if it's an empty move
@@ -617,7 +660,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 			continue;
 		}
 		
-		// init move structures
+		// initialize move structures
 		const Move mCurr(c);
 		const Move mNext(getNextPosEntry(itCurr, n));
 		
@@ -756,12 +799,25 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		}
 		
 		// ----------------------------------------------------------
-		// speed change
+		// feed speed change
 		if ( curr.hasSpeedChange() == true ) {
-			if ( onPhysicallySpeedChange(curr, next) == false )
+			if ( onPhysicallyFeedSpeedChange(curr, next) == false )
 				return false;
 			
 			if ( curr.isSpeedChange() == true )
+				continue;
+		}
+		
+		// ----------------------------------------------------------
+		// spindle speed change
+		if ( curr.hasToolChange() == true ) {
+			if ( onPhysicallySpindleChange(curr) == false ) {
+					std::cerr << CNC_LOG_FUNCT_A("\n");
+				
+				return false;
+			}
+			
+			if ( curr.isToolChange() == true )
 				continue;
 		}
 		
@@ -789,10 +845,5 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	} // for
 	
 	const bool ret = finalizeCurrMoveSequence(CLIENT_ID.INVALID);
-	
-	#warning
-	//wxMessageBox("PLR end");
-	
-	
 	return ret;
 }

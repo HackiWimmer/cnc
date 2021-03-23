@@ -158,7 +158,7 @@ void ArduinoPIDs::init() {
 	
 	pids[PID_CONTROLLER]                      .setup("Cnc Controller", "");
 	pids[PID_SETUP_ID]                        .setup("Cnc Controller Setup ID", "");
-	pids[PID_TOOL_SWITCH]                     .setup("Tool Enabled State", "bool");
+	pids[PID_SPINDLE_SWITCH]                  .setup("Spindle Enabled State", "bool");
 	pids[PID_POS_REPLY_THRESHOLD]             .setup("Position Reply Threshold", "impulses");
 	pids[PID_PROBE_MODE]                      .setup("Probe Mode State", "bool");
 	
@@ -298,7 +298,7 @@ void ArduinoErrorCodes::init() {
 	
 	errorCodes[E_STEPPER_NOT_ENABLED]                = "Arduino::stepAxisXYZ: Stepper not enabled";
 	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::stepAxisXYZ: Stepper not initialized";
-	errorCodes[E_TOOL_NOT_ENALED]                    = "Arduino::stepAxisXYZ: Tool not enabled";
+	errorCodes[E_SPINDLE_NOT_ENALED]                 = "Arduino::stepAxisXYZ: Spindle not enabled";
 	
 	errorCodes[E_STEPPER_PULS_WIDTH_TO_LARGE]        = "Arduino::recalcDriverConfig(): Value to large";
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";
@@ -374,10 +374,10 @@ void ArduinoDigitalPins::init() {
 	pins[PIN_H_MIN_LIMIT]           = "LIMIT PIN H Min";
 	pins[PIN_H_MAX_LIMIT]           = "LIMIT PIN H Max";
 	
-	pins[PIN_ENABLE_TOOL]           = "TOOL ENABLE PIN";
+	pins[PIN_ENABLE_SPINDLE]        = "SPINDLE ENABLE PIN";
 	
-	pins[PIN_IS_CTRL_POWERED]       = "IS CTRL POWERED PIN";
-	pins[PIN_IS_TOOL_POWERED]       = "IS TOOL POWERED PIN";
+	pins[PIN_IS_CTRL_POWERED]       = "IS CONTROLLER POWERED PIN";
+	pins[PIN_IS_SPINDLE_POWERED]    = "IS SPINDLE POWERED PIN";
 	
 	pins[PIN_EXTERNAL_INTERRUPT]    = "EXTERNAL INTERRUPT PIN";
 	

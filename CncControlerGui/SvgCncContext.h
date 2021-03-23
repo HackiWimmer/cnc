@@ -240,6 +240,8 @@ class SvgCncContext : public SvgCncContextBase {
 		const char * 			ID_WORK_SPEED		= "SpeedWork";
 		const char * 			ID_SPINDLE_SPEED	= "SpeedSpindle";
 		
+		const char * 			ID_SPINDLE_STATE	= "Spindle";
+
 		const char * 			ID_DEPT				= "ZDepth";
 		const char * 			ID_MAX_FEED_STEP	= "ZMaxFeedStep";
 
@@ -276,6 +278,8 @@ class SvgCncContext : public SvgCncContextBase {
 		double					getCurrentRapidSpeed_MM_MIN()				const	{ return currentRapidSpeed_MM_MIN; }
 		double					getCurrentWorkSpeed_MM_MIN()				const	{ return currentWorkSpeed_MM_MIN; }
 		double					getCurrentSpindleSpeed_U_MIN()				const	{ return currentSpindleSpeed_U_MIN; }
+		
+		bool					getCurrentSpindleState()					const	{ return convertToBool(ID_SPINDLE_STATE); }
 		
 		char					getCurrentZDepthMode()						const	{ return currentZDepthMode; }
 		double					getCurrentZDepth() 							const	{ return currentZDepth; }

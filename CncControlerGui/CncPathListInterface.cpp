@@ -55,7 +55,7 @@ void CncPathListMonitor::processClientIDChange(long cid) {
 	dispatchEventQueue();
 }
 ////////////////////////////////////////////////////////////////////
-bool CncPathListMonitor::processSpeedChange(double value_MM_MIN, CncSpeedMode m) { 
+bool CncPathListMonitor::processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m) { 
 ////////////////////////////////////////////////////////////////////
 	current.speedValue_MM_MIN	= value_MM_MIN;
 	current.speedMode			= m;
@@ -114,7 +114,8 @@ CncPathListFileStore::CncPathListFileStore()
 										,
 										
 										"ClientId",		delimiter,
-										"ToolState",	delimiter,
+										"SpindleState",	delimiter,
+										"SpindleSpeed",	delimiter,
 										
 										"F-Mode",		delimiter,
 										"F-Value",		delimiter,
@@ -152,7 +153,8 @@ void CncPathListFileStore::notifyNextPostion() {
 										,
 										
 										current.clientId,					delimiter,
-										current.toolState,					delimiter,
+										current.spindleState,				delimiter,
+										current.spindleSpeed,				delimiter,
 										
 										cnv1(current.speedMode),			delimiter,
 										cnv2(current.speedValue_MM_MIN),	delimiter,

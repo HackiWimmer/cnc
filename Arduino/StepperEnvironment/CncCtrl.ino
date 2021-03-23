@@ -177,7 +177,7 @@ void CncArduinoController::printConfig() {
     CtrlParameter::print(PID_POS_REPLY_THRESHOLD,              getPosReplyThreshold());
     CtrlParameter::print(PID_PROBE_MODE,                       isProbeMode());
     CtrlParameter::print(PID_ENABLE_STEPPERS,                  AE::digitalRead(PIN_ENABLE_STEPPER));
-    CtrlParameter::print(PID_TOOL_SWITCH,                      AE::digitalRead(PIN_ENABLE_TOOL));
+    CtrlParameter::print(PID_SPINDLE_SWITCH,                   AE::digitalRead(PIN_ENABLE_SPINDLE));
     CtrlParameter::print(PID_I2C_AVAILABEL,                    isI2CAvailable());
     CtrlParameter::print(PID_I2C_LIMIT_VALUE,                  limitState);
     CtrlParameter::print(PID_I2C_SUPPORT_VALUE,                supportState);
@@ -263,7 +263,7 @@ void CncArduinoController::reset() {
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::turnOff() {
 /////////////////////////////////////////////////////////////////////////////////////
-  switchToolState (TOOL_STATE_OFF, FORCE);
+  switchSpindleState (SPINDLE_STATE_OFF, FORCE);
   enableStepperPin(ENABLE_STATE_OFF);
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ bool CncArduinoController::isReadyToRun() {
 void CncArduinoController::broadcastInterrupt() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
-  switchToolState (TOOL_STATE_OFF, FORCE);
+  switchSpindleState (SPINDLE_STATE_OFF, FORCE);
   enableStepperPin(ENABLE_STATE_OFF);
 
   // Show Interrupt LED
@@ -449,20 +449,20 @@ void CncArduinoController::setupAccelProfile(const ArduinoCmdDecoderSetter::Resu
   }
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void CncArduinoController::switchToolState(bool state, bool force) {
+void CncArduinoController::switchSpindleState(bool state, bool force) {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( force == false ) {
     // Don't enable the tool during a probe mode phase
     if ( isProbeMode() == ON ) {
-      AE::digitalWrite(PIN_ENABLE_TOOL, TOOL_STATE_OFF);
+      AE::digitalWrite(PIN_ENABLE_SPINDLE, SPINDLE_STATE_OFF);
       return;
     }
   }
   
-  AE::digitalWrite(PIN_ENABLE_TOOL, state);
+  AE::digitalWrite(PIN_ENABLE_SPINDLE, state);
 
   // give the tool a portion of time to run properly
-  if ( state == TOOL_STATE_ON )
+  if ( state == SPINDLE_STATE_ON )
     AE::delay(1000);
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -812,7 +812,7 @@ bool CncArduinoController::processSignal(byte sig, byte& retValue) {
                 //  - Returning false here signalize an error and the complete run cycle (PC) stopps as a result.
                 //  - Returning true here stopps the current move (while loop), so far so good, but the current run cycle 
                 //    continue with the next existing move command which is not the meaning of HALT.
-                switchToolState(TOOL_STATE_OFF, FORCE);
+                switchSpindleState(SPINDLE_STATE_OFF, FORCE);
                 
                 retValue = RET_HALT;
                 return false;
@@ -847,7 +847,7 @@ bool CncArduinoController::processSignal(byte sig, byte& retValue) {
      static const short PAUSE_WAIT_DELAY = 50;
      static const short HB_MOD           = 1000 / PAUSE_WAIT_DELAY;
      
-     switchToolState( pause == PAUSE_ACTIVE ? TOOL_STATE_OFF : TOOL_STATE_ON, FORCE);
+     switchSpindleState( pause == PAUSE_ACTIVE ? SPINDLE_STATE_OFF : SPINDLE_STATE_ON, FORCE);
 
      // loop
      unsigned short counter = 0;
@@ -861,7 +861,7 @@ bool CncArduinoController::processSignal(byte sig, byte& retValue) {
      }
      
      pause = PAUSE_INACTIVE;
-     switchToolState( pause == PAUSE_ACTIVE ? TOOL_STATE_OFF : TOOL_STATE_ON, FORCE);
+     switchSpindleState( pause == PAUSE_ACTIVE ? SPINDLE_STATE_OFF : SPINDLE_STATE_ON, FORCE);
   }
   
   retValue = RET_OK;
@@ -1250,7 +1250,7 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].asBool());                break;
 
     case PID_PROBE_MODE:              setProbeMode(st.values[0].asBool());                    break;
-    case PID_TOOL_SWITCH:             switchToolState(st.values[0].asBool());                 break;
+    case PID_SPINDLE_SWITCH:          switchSpindleState(st.values[0].asBool());              break;
     
     case PID_ACCEL_PROFILE:           setupAccelProfile(st); 
                                       break;

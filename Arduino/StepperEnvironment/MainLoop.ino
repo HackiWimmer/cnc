@@ -117,7 +117,7 @@ void ArduinoMainLoop::printPinReport() {
     printDigitalPin(PIN_Z_DIR,                O);
   
     printDigitalPin(PIN_ENABLE_STEPPER,       O);
-    printDigitalPin(PIN_ENABLE_TOOL,          O);
+    printDigitalPin(PIN_ENABLE_SPINDLE,       O);
     printDigitalPin(PIN_INTERRUPT_LED,        O);                   
 
     printDigitalPin(PIN_SPINDEL_SUPPORT,      O);
@@ -133,7 +133,7 @@ void ArduinoMainLoop::printPinReport() {
     printDigitalPin(PIN_H_MAX_LIMIT,          I);
 
     printDigitalPin(PIN_EXTERNAL_INTERRUPT,   I);
-    printDigitalPin(PIN_IS_TOOL_POWERED,      I);
+    printDigitalPin(PIN_IS_SPINDLE_POWERED,   I);
     printDigitalPin(PIN_IS_CTRL_POWERED,      I);
     printDigitalPin(PIN_TOUCH_CONTACT,        I);
     
@@ -723,7 +723,7 @@ void ArduinoMainLoop::setup() {
 
   AE::pinMode(PIN_ENABLE_PODEST,        PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODEST,    PL_LOW);
   AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,   ENABLE_STATE_OFF);
-  AE::pinMode(PIN_ENABLE_TOOL,          PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_TOOL,      TOOL_STATE_OFF);
+  AE::pinMode(PIN_ENABLE_SPINDLE,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_SPINDLE,   SPINDLE_STATE_OFF);
 
   AE::pinMode(PIN_LED_PODEST,           PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODEST,       PL_LOW);
 
@@ -746,10 +746,10 @@ void ArduinoMainLoop::setup() {
     { AE::pinMode(PIN_H_MOVE_DOWN,      PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,      PODEST_SWITCH_OFF); }
 
   if ( PIN_IS_CTRL_POWERED > 0 )  
-     { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  TOOL_STATE_OFF); }
+     { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_CTRL_POWERED,  POWER_STATE_OFF); }
      
-  if ( PIN_IS_TOOL_POWERED > 0 )
-    { AE::pinMode(PIN_IS_TOOL_POWERED,  PM_INPUT);   AE::digitalWrite(PIN_IS_TOOL_POWERED,  POWER_STATE_OFF); }
+  if ( PIN_IS_SPINDLE_POWERED > 0 )
+    { AE::pinMode(PIN_IS_SPINDLE_POWERED,  PM_INPUT);   AE::digitalWrite(PIN_IS_SPINDLE_POWERED, SPINDLE_STATE_OFF); }
 
   if ( PIN_TOUCH_CONTACT > 0 )
     { AE::pinMode(PIN_TOUCH_CONTACT,    PM_INPUT);   AE::digitalWrite(PIN_TOUCH_CONTACT,    PL_HIGH); }

@@ -116,7 +116,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     void                enableProbeMode()                                   { setProbeMode(true); }
     void                disableProbeMode()                                  { setProbeMode(false); }
 
-    void                switchToolState(bool state, bool force = false);
+    void                switchSpindleState(bool state, bool force = false);
 
     void                setupAccelProfile(const ArduinoCmdDecoderSetter::Result& st);
     void                setSpeedValue_MMSec1000(int32_t f, bool activateAcceleration=true);

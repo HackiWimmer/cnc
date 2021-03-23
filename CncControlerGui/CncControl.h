@@ -129,7 +129,7 @@ class CncControl {
 		// ctrl power state
 		CtrlPowerState			ctrlPowerState;
 		// tool power state
-		bool					toolPowerState;
+		bool					spindlePowerState;
 		// Artificially Step Delay
 		unsigned int			stepDelay;
 		// heartbeat value
@@ -153,7 +153,7 @@ class CncControl {
 		
 		
 		// Tool management
-		void setToolState(bool defaultStyle = false);
+		void setSpindleState(bool state);
 		
 		// Limit management
 		void displayLimitState(wxWindow* ctl, bool value);
@@ -264,7 +264,7 @@ class CncControl {
 		
 		// getter list wrapper
 		bool displayGetterList(const PidList& pidlist);
-		void displayToolState(const bool state);
+		void displaySpindleState(const bool state);
 		
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
@@ -336,11 +336,11 @@ class CncControl {
 		bool isLastDuration();
 		
 		// Tool management
-		bool switchTool(bool on);
-		bool switchToolOn();
-		bool switchToolOff(bool force = false);
-		bool getToolState() { return toolPowerState; }
-		// Updates the config trace control
+		bool switchSpindleState(bool on);
+		bool switchSpindleOn();
+		bool switchSpindleOff(bool force = false);
+		bool getSpindleState() { return spindlePowerState; }
+		// Updates the configure trace control
 		void notifyConfigUpdate();
 		
 		CncLongPosition& 					getCurAppPosAsReference()			{ return curAppPos;   }

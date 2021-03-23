@@ -7,8 +7,8 @@
   #define POWER_STATE_OFF                                   PL_LOW
   #define POWER_STATE_ON                                    PL_HIGH
 
-  #define TOOL_STATE_OFF                                    PL_HIGH
-  #define TOOL_STATE_ON                                     PL_LOW
+  #define SPINDLE_STATE_OFF                                 PL_HIGH
+  #define SPINDLE_STATE_ON                                  PL_LOW
 
   #define ENABLE_STATE_OFF                                  PL_HIGH
   #define ENABLE_STATE_ON                                   PL_LOW
@@ -123,7 +123,7 @@
     const unsigned char PIN_ENABLE_PODEST                   =  46;
 
     const unsigned char PIN_ENABLE_STEPPER                  =  10;
-    const unsigned char PIN_ENABLE_TOOL                     =  11;
+    const unsigned char PIN_ENABLE_SPINDLE                  =  11;
 
     // PINA
     const unsigned char PIN_TOUCH_CONTACT                   =  29;
@@ -132,7 +132,7 @@
     //const unsigned char PIN_                              =  26;
     //const unsigned char PIN_                              =  25;
     //const unsigned char PIN_                              =  24;
-    const unsigned char PIN_IS_TOOL_POWERED                 =  23;
+    const unsigned char PIN_IS_SPINDLE_POWERED              =  23;
     const unsigned char PIN_IS_CTRL_POWERED                 =  22;
     
     // PINC
@@ -188,9 +188,9 @@
       #define READ_EXT_INNTERRUPT_PIN                       ( PINC & B01000000 ) // 31
       
       #define READ_ENABLE_STEPPER_PIN                       ( PINB & B00010000 ) // 10
-      #define READ_ENABLE_TOOL_PIN                          ( PINB & B00100000 ) // 11
+      #define READ_ENABLE_SPINDLE_PIN                       ( PINB & B00100000 ) // 11
       #define READ_IS_CTRL_POWERED_PIN                      ( PINA & B00000001 ) // 22
-      #define READ_IS_TOOL_POWERED_PIN                      ( PINA & B00000010 ) // 23
+      #define READ_IS_SPINDLE_POWERED_PIN                   ( PINA & B00000010 ) // 23
       
       #define WRITE_STP_PIN_X(value)                        if ( value ) { PORTG |=  (1 << PG5); } else { PORTG &= ~(1 << PG5); }
       #define WRITE_DIR_PIN_X(value)                        if ( value ) { PORTE |=  (1 << PE3); } else { PORTE &= ~(1 << PE3); }
@@ -220,9 +220,9 @@
       #define READ_EXT_INNTERRUPT_PIN                       AE::digitalRead(PIN_EXTERNAL_INTERRUPT)
 
       #define READ_ENABLE_STEPPER_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)
-      #define READ_ENABLE_TOOL_PIN                          AE::digitalRead(PIN_ENABLE_TOOL)
+      #define READ_ENABLE_SPINDLE_PIN                       AE::digitalRead(PIN_ENABLE_SPINDLE)
       #define READ_IS_CTRL_POWERED_PIN                      AE::digitalRead(PIN_IS_CTRL_POWERED)
-      #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
+      #define READ_IS_SPINDLE_POWERED_PIN                   AE::digitalRead(PIN_IS_SPINDLE_POWERED)
       
       #define WRITE_STP_PIN_X(value)                        AE::digitalWrite(PIN_X_STP, value); 
       #define WRITE_DIR_PIN_X(value)                        AE::digitalWrite(PIN_X_DIR, value); 
@@ -272,11 +272,11 @@
     const unsigned char PIN_Z_MIN_LIMIT                     =  11;
     const unsigned char PIN_Z_MAX_LIMIT                     =  11;
   
-    const unsigned char PIN_ENABLE_TOOL                     =  12;
+    const unsigned char PIN_ENABLE_SPINDLE                  =  12;
     const unsigned char PIN_EXTERNAL_INTERRUPT              =  13;
     
     const unsigned char PIN_IS_CTRL_POWERED                 =   0;
-    const unsigned char PIN_IS_TOOL_POWERED                 =   0;
+    const unsigned char PIN_IS_SPINDLE_POWERED                 =   0;
     const unsigned char PIN_INTERRUPT_LED                   =   0;
     const unsigned char PIN_SPINDEL_SUPPORT                 =   0;
     const unsigned char PIN_SPINDEL_SPEED_INF               =   0;
@@ -311,9 +311,9 @@
     #define READ_EXT_INNTERRUPT_PIN                       AE::digitalRead(PIN_EXTERNAL_INTERRUPT)
 
     #define READ_ENABLE_STEPPER_PIN                       AE::digitalRead(PIN_ENABLE_STEPPER)
-    #define READ_ENABLE_TOOL_PIN                          AE::digitalRead(PIN_ENABLE_TOOL)
+    #define READ_ENABLE_SPINDLE_PIN                       AE::digitalRead(PIN_ENABLE_SPINDLE)
     #define READ_IS_CTRL_POWERED_PIN                      true
-    #define READ_IS_TOOL_POWERED_PIN                      AE::digitalRead(PIN_IS_TOOL_POWERED)
+    #define READ_IS_SPINDLE_POWERED_PIN                   AE::digitalRead(PIN_IS_SPINDLE_POWERED)
     
     #define WRITE_DIR_PIN_X(value)                        AE::digitalWrite(PIN_X_DIR, value); 
     #define WRITE_DIR_PIN_Y(value)                        AE::digitalWrite(PIN_Y_DIR, value); 

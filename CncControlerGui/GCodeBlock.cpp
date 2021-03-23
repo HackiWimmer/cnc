@@ -58,6 +58,7 @@ void GCodeBlock::reInit() {
 	y 				= INVALID_GCODE_FIELD_VALUE;
 	z 				= INVALID_GCODE_FIELD_VALUE;
 	f 				= INVALID_GCODE_FIELD_VALUE;
+	s 				= INVALID_GCODE_FIELD_VALUE;
 	i 				= INVALID_GCODE_FIELD_VALUE;
 	j 				= INVALID_GCODE_FIELD_VALUE;
 	//....
@@ -71,6 +72,7 @@ std::ostream& operator<<(std::ostream &ostr, const GCodeBlock& a) {
 	ostr << ", " << "Y=" << (a.hasY() ? wxString::Format("% 8.3f", a.y) : "-");
 	ostr << ", " << "Z=" << (a.hasZ() ? wxString::Format("% 8.3f", a.z) : "-");
 	ostr << ", " << "F=" << (a.hasF() ? wxString::Format("% 8.3f", a.f) : "-");
+	ostr << ", " << "S=" << (a.hasF() ? wxString::Format("% 8.3f", a.s) : "-");
 	ostr << ", " << "I=" << (a.hasI() ? wxString::Format("% 8.3f", a.i) : "-");
 	ostr << ", " << "J=" << (a.hasJ() ? wxString::Format("% 8.3f", a.j) : "-");
 	return ostr;

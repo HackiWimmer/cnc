@@ -319,6 +319,9 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	
 	initNextClientId(gcb.clientID);
 	
+	// always do this
+	pathHandler->processParameterEFS(gcb);
+	
 	switch ( gcb.cmdCode ) {
 		case 'G':	ret = processG(gcb);	break;
 		case 'M':	ret = processM(gcb);	break;
@@ -499,7 +502,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case 3: 	// GC_M_SpindleOnClockwise
 		{
-			pathHandler->switchToolState(true);
+			pathHandler->switchSpindleState(true);
 			return true;
 		}
 		case 4:		// GC_M_SpindleOnCounterClockwise
@@ -508,7 +511,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		}
 		case 5:		// GC_M_SpindleOff
 		{
-			pathHandler->switchToolState(false);
+			pathHandler->switchSpindleState(false);
 			return true;
 		}
 		case 6:		// GC_M_ToolChange

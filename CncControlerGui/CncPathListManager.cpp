@@ -356,6 +356,8 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(long clientId) {
 	cpe.entryTarget				= prevEntry.entryTarget;
 	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
 	cpe.feedSpeed_MM_MIN		= prevEntry.feedSpeed_MM_MIN;
+	cpe.spindleState			= prevEntry.spindleState;
+	cpe.spindleSpeed_U_MIN		= prevEntry.spindleSpeed_U_MIN;
 
 	// append
 	return appendEntry(cpe), getPathList().back();
@@ -365,7 +367,7 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, doubl
 //////////////////////////////////////////////////////////////////
 	CncPathListEntry cpe;
 	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
-
+	
 	cpe.setSpeedChange();
 	cpe.entryDistance			= CncPathListEntry::NoDistance;
 	cpe.feedSpeedMode			= mode;
@@ -375,6 +377,41 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, doubl
 	cpe.clientId				= prevEntry.clientId;
 	cpe.alreadyRendered			= prevEntry.alreadyRendered;
 	cpe.entryTarget				= prevEntry.entryTarget;
+	cpe.spindleState			= prevEntry.spindleState;
+	cpe.spindleSpeed_U_MIN		= prevEntry.spindleSpeed_U_MIN;
+	
+	// append
+	return appendEntry(cpe), getPathList().back();
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntrySpl(bool spindleState) {
+//////////////////////////////////////////////////////////////////
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
+	return addEntrySpl(spindleState, prevEntry.spindleSpeed_U_MIN);
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntrySpl(double spindleSpeed_U_MIN) {
+//////////////////////////////////////////////////////////////////
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
+	return addEntrySpl(prevEntry.spindleState, spindleSpeed_U_MIN);
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntrySpl(bool spindleState, double spindleSpeed_U_MIN) {
+//////////////////////////////////////////////////////////////////
+	CncPathListEntry cpe;
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
+	
+	cpe.setToolChange();
+	cpe.entryDistance			= CncPathListEntry::NoDistance;
+	cpe.spindleState			= spindleState;
+	cpe.spindleSpeed_U_MIN		= spindleSpeed_U_MIN;
+	
+	cpe.pathListReference		= prevEntry.pathListReference;
+	cpe.clientId				= prevEntry.clientId;
+	cpe.alreadyRendered			= prevEntry.alreadyRendered;
+	cpe.entryTarget				= prevEntry.entryTarget;
+	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
+	cpe.feedSpeed_MM_MIN		= prevEntry.feedSpeed_MM_MIN;
 	
 	// append
 	return appendEntry(cpe), getPathList().back();
@@ -401,6 +438,8 @@ const CncPathListEntry& CncPathListManager::addEntryAbs(double newAbsPosX, doubl
 	cpe.clientId				= prevEntry.clientId;
 	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
 	cpe.feedSpeed_MM_MIN		= prevEntry.feedSpeed_MM_MIN;
+	cpe.spindleState			= prevEntry.spindleState;
+	cpe.spindleSpeed_U_MIN		= prevEntry.spindleSpeed_U_MIN;
 	
 	// append
 	return appendEntry(cpe), getPathList().back();
@@ -429,6 +468,8 @@ const CncPathListEntry& CncPathListManager::addEntryRel(double deltaX, double de
 	cpe.clientId				= prevEntry.clientId;
 	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
 	cpe.feedSpeed_MM_MIN		= prevEntry.feedSpeed_MM_MIN;
+	cpe.spindleState			= prevEntry.spindleState;
+	cpe.spindleSpeed_U_MIN		= prevEntry.spindleSpeed_U_MIN;
 	
 	// append
 	return appendEntry(cpe), getPathList().back();

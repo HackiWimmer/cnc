@@ -16,7 +16,7 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		virtual bool			isPathListUsed() 					const	{ return false; }
 		virtual bool			shouldAToolChangeProcessed()				{ return false; }
 		
-		virtual void			switchToolState(bool state)					{}
+		virtual void			switchSpindleState(bool state)				{}
 		virtual void			logMeasurementStart()						{}
 		virtual void			logMeasurementEnd()							{}
 

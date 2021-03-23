@@ -124,7 +124,6 @@ void PathHandlerBase::logNextPathListEntry(const CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::processClientId(long id) {
 //////////////////////////////////////////////////////////////////
-	//std::cout << "PathHandlerBase::processClientId: " << id << std::endl;
 	pathListMgr.addEntryAdm(id);
 }
 //////////////////////////////////////////////////////////////////
@@ -133,10 +132,14 @@ void PathHandlerBase::processFeedSpeed(CncSpeedMode mode, double feedSpeed_MM_MI
 	pathListMgr.addEntryAdm(mode, feedSpeed_MM_MIN);
 }
 //////////////////////////////////////////////////////////////////
+void PathHandlerBase::processSpindleState(bool state) {
+//////////////////////////////////////////////////////////////////
+	pathListMgr.addEntrySpl(state);
+}
+//////////////////////////////////////////////////////////////////
 void PathHandlerBase::processSpindleSpeed(double feedSpeed_U_MIN) {
 //////////////////////////////////////////////////////////////////
-	#warning processSpindleSpeed(double feedSpeed_U_MIN)
-	//pathListMgr.addEntryAdm(mode, feedSpeed_MM_MIN);
+	pathListMgr.addEntrySpl(feedSpeed_U_MIN);
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double values[]) {

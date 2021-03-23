@@ -26,10 +26,12 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 , initialItemAttr			()
 , clientIdItemAttr			()
 , speedItemAttr				()
+, toolItemAttr				()
 , defaultItemAttrSelected	()
 , initialItemAttrSelected	()
 , clientIdItemAttrSelected	()
 , speedItemAttrSelected		()
+, toolItemAttrSelected		()
 , pathLists					()
 , showAllFlag				(false)
 /////////////////////////////////////////////////////////////
@@ -39,6 +41,7 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	AppendColumn("PathList ID",		wxLIST_FORMAT_LEFT, 	120);
 	AppendColumn("Client ID", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("F [mm/min]",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("S [U/min]",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	
 	AppendColumn("X-Distance", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Y-Distance", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -58,15 +61,6 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	
 	SetBackgroundColour(wxColour(  0,   0,   0));
 	SetTextColour(*wxLIGHT_GREY);
-
-	wxImageList* imageList = new wxImageList(16, 16, true);
-	imageList->RemoveAll();
-	imageList->Add(ImageLibPathList().Bitmap("BMP_NO_CHG"));	// 0
-	imageList->Add(ImageLibPathList().Bitmap("BMP_CLIENT_ID"));	// 1
-	imageList->Add(ImageLibPathList().Bitmap("BMP_SPEED"));		// 2
-	imageList->Add(ImageLibPathList().Bitmap("BMP_POSITION"));	// 3
-	
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
@@ -84,10 +78,15 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	speedItemAttr.SetFont(font.Bold());
 	speedItemAttr.SetTextColour(wxColour(125, 133, 221));
 	
+	toolItemAttr.SetBackgroundColour(GetBackgroundColour());
+	toolItemAttr.SetFont(font.Bold());
+	toolItemAttr.SetTextColour(wxColour( 64, 128, 128));
+
 	defaultItemAttrSelected		= defaultItemAttr;
 	initialItemAttrSelected		= initialItemAttr;
 	clientIdItemAttrSelected	= clientIdItemAttr;
 	speedItemAttrSelected		= speedItemAttr;
+	toolItemAttrSelected		= toolItemAttr;
 	
 	defaultItemAttrSelected.SetTextColour(*wxYELLOW);
 	defaultItemAttrSelected.SetFont(defaultItemAttrSelected.GetFont().Bold());
@@ -100,6 +99,9 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	
 	speedItemAttrSelected.SetTextColour(*wxYELLOW);
 	speedItemAttrSelected.SetFont(speedItemAttrSelected.GetFont().Bold());
+	
+	toolItemAttrSelected.SetTextColour(*wxYELLOW);
+	toolItemAttrSelected.SetFont(toolItemAttrSelected.GetFont().Bold());
 }
 /////////////////////////////////////////////////////////////
 CncPathListEntryListCtrl::~CncPathListEntryListCtrl() {
@@ -116,37 +118,47 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	static const wxString fmt(globalStrings.pathListRefFormat);
 	
+	// ------------------------------------------------------
+	auto formatPos = [](double val) {
+		if ( cnc::dblCmp::nu(val) == false )
+			return wxString::Format("%10.3lf", val);
+			
+		return _("");
+	};
+	
 	if ( isItemValid(item) == false )
 		return _("");
 		
 	const CncPathListEntry& cpe = pathLists.at(item);
 	
-	const bool displayRef      = showAllFlag ? true : ( cpe.pathListReference   >= 0    );
-	const bool displayClientID = showAllFlag ? true : ( cpe.hasClientIdChange() == true );
-	const bool displaySpeed    = showAllFlag ? true : ( cpe.hasSpeedChange()    == true );
-	const bool displayPosition = showAllFlag ? true : ( cpe.hasPositionChange() == true );
+	const bool displayRef			= showAllFlag ? true : ( cpe.pathListReference   >= 0    );
+	const bool displayClientID		= showAllFlag ? true : ( cpe.hasClientIdChange() == true );
+	const bool displayFeedSpeed		= showAllFlag ? true : ( cpe.hasSpeedChange()    == true );
+	const bool displaySpindleSpeed	= showAllFlag ? true : ( cpe.hasToolChange()     == true );
+	const bool displayPosition		= showAllFlag ? true : ( cpe.hasPositionChange() == true );
 	
 	wxString contStr;
 	if ( cpe.isNothingChanged() )	contStr.append('L');
 	if ( cpe.hasClientIdChange() )	contStr.append('C');
-	if ( cpe.hasSpeedChange() )		contStr.append('S');
+	if ( cpe.hasSpeedChange() )		contStr.append('F');
+	if ( cpe.hasToolChange() )		contStr.append('S');
 	if ( cpe.hasPositionChange() )	contStr.append('P');
 	
 	switch ( column ) {
-		//case CncPathListEntryListCtrl::COL_CONT:			return wxString::Format("%d", 		cpe.content);
-		case CncPathListEntryListCtrl::COL_CONT:			return wxString::Format("%s", 		contStr);
+		case CncPathListEntryListCtrl::COL_CONT:			return wxString::Format("%s", contStr);
 		
-		case CncPathListEntryListCtrl::COL_REF: 			return displayRef      == true ?	wxString::Format("%lld",		cpe.pathListReference)		: _("");
-		case CncPathListEntryListCtrl::COL_CLD_ID:			return displayClientID == true ?	wxString::Format(fmt,			cpe.clientId) 				: _("");
-		case CncPathListEntryListCtrl::COL_DISTANCE_X:		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryDistance.getX())	: _("");
-		case CncPathListEntryListCtrl::COL_DISTANCE_Y: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryDistance.getY())	: _("");
-		case CncPathListEntryListCtrl::COL_DISTANCE_Z: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryDistance.getZ())	: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_X: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryTarget.getX())		: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_Y: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryTarget.getY())		: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_Z: 		return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.entryTarget.getZ())		: _("");
-		case CncPathListEntryListCtrl::COL_TOTAL_DISTANCE: 	return displayPosition == true ?	wxString::Format("%10.3lf",		cpe.totalDistance)			: _("");
+		case CncPathListEntryListCtrl::COL_REF: 			return displayRef          == true ?	wxString::Format("%lld",		cpe.pathListReference)		: _("");
+		case CncPathListEntryListCtrl::COL_CLD_ID:			return displayClientID     == true ?	wxString::Format(fmt,			cpe.clientId) 				: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_X:		return displayPosition     == true ?	formatPos(cpe.entryDistance.getX())							: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_Y: 		return displayPosition     == true ?	formatPos(cpe.entryDistance.getY())							: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_Z: 		return displayPosition     == true ?	formatPos(cpe.entryDistance.getZ())							: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_X: 		return displayPosition     == true ?	formatPos(cpe.entryTarget.getX())							: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_Y: 		return displayPosition     == true ?	formatPos(cpe.entryTarget.getY())							: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_Z: 		return displayPosition     == true ?	formatPos(cpe.entryTarget.getZ())							: _("");
+		case CncPathListEntryListCtrl::COL_TOTAL_DISTANCE: 	return displayPosition     == true ?	wxString::Format("%10.3lf",		cpe.totalDistance)			: _("");
 		
-		case CncPathListEntryListCtrl::COL_F:				return displaySpeed    == true ?	wxString::Format("%4.1lf %c",	cpe.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(cpe.feedSpeedMode)) : _("");
+		case CncPathListEntryListCtrl::COL_F:				return displayFeedSpeed    == true ?	wxString::Format("%4.1lf %c",	cpe.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(cpe.feedSpeedMode)) : _("");
+		case CncPathListEntryListCtrl::COL_S:				return displaySpindleSpeed == true ?	wxString::Format("%4.1lf %s",	cpe.spindleSpeed_U_MIN, cpe.spindleState ? "ON" : "OFF") : _("");
 	}
 
 	return _("");
@@ -158,17 +170,6 @@ int CncPathListEntryListCtrl::OnGetItemColumnImage(long item, long column) const
 		
 		if ( isItemValid(item) == false )
 			return -1;
-		
-		#warning - can be removed incl dependencies
-		/*
-		const CncPathListEntry& cpe = pathLists.at(item);
-		switch ( cpe.type ) {
-			case CncPathListEntry::Type::CHG_NOTHING:		return 0;
-			case CncPathListEntry::Type::CHG_CLIENTID:		return 1;
-			case CncPathListEntry::Type::CHG_SPEED:			return 2;
-			case CncPathListEntry::Type::CHG_POSITION:		return 3;
-		}
-		 */ 
 	}
 	
 	return -1;
@@ -185,6 +186,7 @@ wxListItemAttr* CncPathListEntryListCtrl::OnGetItemAttr(long item) const {
 	if      ( cpe.hasPositionChange() )		return (wxListItemAttr*)( b ? (&defaultItemAttrSelected)  : (&defaultItemAttr) );
 	else if	( cpe.hasClientIdChange() )		return (wxListItemAttr*)( b ? (&clientIdItemAttrSelected) : (&clientIdItemAttr) );
 	else if ( cpe.hasSpeedChange() )		return (wxListItemAttr*)( b ? (&speedItemAttrSelected)    : (&speedItemAttr) );
+	else if ( cpe.hasToolChange() )			return (wxListItemAttr*)( b ? (&toolItemAttrSelected)     : (&toolItemAttr) );
 	
 	// this indicates to use the default style
 	return (wxListItemAttr*)( b ? (&initialItemAttrSelected)  : (&initialItemAttr) );
@@ -393,3 +395,5 @@ void CncPathListEntryListCtrl::addPathListEntry(const CncPathListEntry& cpe) {
 	pathLists.push_back(cpe);
 	SetItemCount(pathLists.size());
 }
+
+

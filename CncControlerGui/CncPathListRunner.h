@@ -93,9 +93,10 @@ class CncPathListRunner {
 				virtual void publishGuidePath(const CncPathListManager& plm, double zOffset)	= 0;
 				
 				virtual void processClientIDChange(long cid)									= 0;
-				virtual bool processSpeedChange(double value_MM_MIN, CncSpeedMode m)			= 0;
+				virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		= 0;
 				virtual bool processToolChange(double diameter)									= 0;
-				virtual bool processToolSwitch(bool on)											= 0;
+				virtual bool processSpindleStateSwitch(bool on)									= 0;
+				virtual bool processSpindleSpeedChange(double value_U_MIN)						= 0;
 				virtual bool processMoveSequence(CncMoveSequence& msq)							= 0;
 				virtual bool processPathListEntry(const CncPathListEntry& ple)					= 0;
 				
@@ -139,11 +140,12 @@ class CncPathListRunner {
 				virtual void publishGuidePath(const CncPathListManager& plm, double zOffset)	{ cnc->addGuidePath(plm, zOffset); }
 				
 				virtual void processClientIDChange(long cid)									{ cnc->setClientId(cid); }
-				virtual bool processSpeedChange(double value_MM_MIN, CncSpeedMode m)			{ return  cnc->changeCurrentFeedSpeedXYZ_MM_MIN(value_MM_MIN, m); }
-				virtual bool processToolChange(double diameter)									{ return  true; }
-				virtual bool processToolSwitch(bool on)											{ return  cnc->switchTool(on); }
-				virtual bool processMoveSequence(CncMoveSequence& msq)							{ return  cnc->processMoveSequence(msq); }
-				virtual bool processPathListEntry(const CncPathListEntry& ple)					{ return  cnc->moveAbsLinearMetricXYZ(	ple.entryTarget.getX(),
+				virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ return cnc->changeCurrentFeedSpeedXYZ_MM_MIN(value_MM_MIN, m); }
+				virtual bool processToolChange(double diameter)									{ return true; }
+				virtual bool processSpindleStateSwitch(bool on)									{ return cnc->switchSpindleState(on); }
+				virtual bool processSpindleSpeedChange(double value_U_MIN)						{ return cnc->changeCurrentSpindleSpeed_U_MIN(value_U_MIN); }
+				virtual bool processMoveSequence(CncMoveSequence& msq)							{ return cnc->processMoveSequence(msq); }
+				virtual bool processPathListEntry(const CncPathListEntry& ple)					{ return cnc->moveAbsLinearMetricXYZ(	ple.entryTarget.getX(),
 																																		ple.entryTarget.getY(),
 																																		ple.entryTarget.getZ(),
 																																		ple.alreadyRendered); }
@@ -166,7 +168,8 @@ class CncPathListRunner {
 		void traceSetup();
 		
 		bool onPhysicallyClientIdChange(const CncPathListEntry& curr);
-		bool onPhysicallySpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next);
+		bool onPhysicallyFeedSpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next);
+		bool onPhysicallySpindleChange(const CncPathListEntry& curr);
 		bool onPhysicallyMoveRaw(const CncPathListEntry& curr);
 		bool onPhysicallyMoveAnalysed(CncPathList::const_iterator& it, const CncPathList::const_iterator& end);
 		
@@ -192,8 +195,6 @@ class CncPathListRunner {
 		void logMeasurementEnd();
 		
 		bool publishGuidePath(const CncPathListManager& plm, double zOffset=0.0);
-		
-		void onPhysicallySwitchToolState(bool state);
 		bool onPhysicallyExecute(const CncPathListManager& plm);
 		
 		void processTrigger(const Trigger::BeginRun& tr)	{ currentInterface->processTrigger(tr); }

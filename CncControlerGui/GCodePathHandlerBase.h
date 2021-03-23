@@ -23,7 +23,7 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		void				setToolLengthOffsetId(int tloi)										{ toolLengthOffsetId = tloi; }
 		
 		virtual bool		isPathListUsed()				const	= 0;
-		virtual void		switchToolState(bool state)				= 0;
+		virtual void		switchSpindleState(bool state)			= 0;
 		virtual bool		initNextPath()							= 0;
 		virtual bool		prepareWork(); 
 		virtual bool		finishWork();
@@ -33,7 +33,7 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		bool				processArcMove(GCodeBlock& gcb, bool sweep);
 		bool				processDwell(GCodeBlock& gcb);
 		bool				moveToOrigin(GCodeBlock& gcb);
-		
+		bool				processParameterEFS(GCodeBlock& gcb);
 		
 	protected:
 		

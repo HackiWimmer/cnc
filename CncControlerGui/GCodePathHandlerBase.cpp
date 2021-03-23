@@ -44,6 +44,24 @@ void GCodePathHandlerBase::updateCurrentPosition(GCodeBlock& gcb) {
 	if ( gcb.hasZ() ) currentPos.setZ(gcb.getZMoveAbsolute(currentPos));
 }
 //////////////////////////////////////////////////////////////////
+bool GCodePathHandlerBase::processParameterEFS(GCodeBlock& gcb) {
+//////////////////////////////////////////////////////////////////
+	bool e = true;
+	bool f = true;
+	bool s = true;
+	
+	if ( gcb.hasE() )
+		; // to be defined
+	
+	if ( gcb.hasF() )
+		f = changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());
+	
+	if ( gcb.hasS() )
+		s = changeCurrentSpindleSpeed(gcb.getCurrentSpindleSpeed());
+
+	return e && f && s;
+}
+//////////////////////////////////////////////////////////////////
 bool GCodePathHandlerBase::processRapidLinearMove(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( gcb.hasOneOf_XYZ() == false )
@@ -61,11 +79,14 @@ bool GCodePathHandlerBase::processLinearMove(GCodeBlock& gcb) {
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
 	
+	#warning to delete
+	/*
 	if ( gcb.hasF() )
 		changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());
 	
 	if ( gcb.hasS() )
 		changeCurrentSpindleSpeed(gcb.getCurrentSpindleSpeed());
+	*/
 	
 	updateCurrentPosition(gcb);
 	return processLinearMove(false);

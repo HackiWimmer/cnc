@@ -30,7 +30,7 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		virtual void 			logMeasurementStart();
 		virtual void			logMeasurementEnd();
 		
-		virtual void			switchToolState(bool state);
+		virtual void			switchSpindleState(bool state);
 		
 		virtual bool			prepareWork(); 
 		virtual bool			finishWork();
@@ -38,8 +38,8 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		virtual bool			processLinearMove(bool alreadyRendered);
 		bool					processLinearMove(const MoveDefinition& md);
 		
-		void					swichtToolOn()  { switchToolState(true); }
-		void					swichtToolOff() { switchToolState(false); }
+		void					swichtSpindleOn()  { switchSpindleState(true); }
+		void					swichtSpindleOff() { switchSpindleState(false); }
 		
 	private:
 		

@@ -20,7 +20,7 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		virtual const char*		getName()						const	{ return "GCodePathHandlerCnc"; }
 		virtual bool			isPathListUsed()				const	{ return true; }
 		virtual void			initNextClientId(long id);
-		virtual void			switchToolState(bool state);
+		virtual void			switchSpindleState(bool state);
 		
 	protected:
 		

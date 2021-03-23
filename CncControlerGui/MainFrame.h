@@ -520,7 +520,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void releaseControllerSetupFromConfig();
 		void notifyConfigUpdate();
 		void changeCrossingThickness();
-		void decorateSwitchToolOnOff(bool state);
+		void decorateSpindleState(bool state);
 		
 		//////////////////////////////////////////////////////////////////////////////////
 #		ifdef __WXMSW__
