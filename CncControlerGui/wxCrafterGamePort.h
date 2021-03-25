@@ -25,6 +25,8 @@
 #include <wx/bitmap.h>
 #include <map>
 #include <wx/icon.h>
+#include <wx/dialog.h>
+#include <wx/iconbndl.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -233,6 +235,38 @@ public:
     }
 
     virtual ~ImageLibGamepadCommand();
+};
+
+
+class CncGamepadMenuDlgBase : public wxDialog
+{
+protected:
+    wxButton* m_btFunction1;
+    wxButton* m_btFunction2;
+    wxButton* m_btFunction3;
+    wxButton* m_btFunction4;
+    wxButton* m_btFunction15;
+    wxButton* m_btFunction26;
+    wxButton* m_btFunction37;
+    wxButton* m_btFunction48;
+
+protected:
+    virtual void onFunction1(wxCommandEvent& event) { event.Skip(); }
+    virtual void onFunction2(wxCommandEvent& event) { event.Skip(); }
+    virtual void onFunction3(wxCommandEvent& event) { event.Skip(); }
+    virtual void onFunction4(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxButton* GetBtFunction1() { return m_btFunction1; }
+    wxButton* GetBtFunction2() { return m_btFunction2; }
+    wxButton* GetBtFunction3() { return m_btFunction3; }
+    wxButton* GetBtFunction4() { return m_btFunction4; }
+    wxButton* GetBtFunction15() { return m_btFunction15; }
+    wxButton* GetBtFunction26() { return m_btFunction26; }
+    wxButton* GetBtFunction37() { return m_btFunction37; }
+    wxButton* GetBtFunction48() { return m_btFunction48; }
+    CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Gamepad Quick Menu"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,500), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~CncGamepadMenuDlgBase();
 };
 
 #endif

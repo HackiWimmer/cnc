@@ -13,6 +13,7 @@
   <object class="wxBitmap" name="BMP_STOP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\run-build-clean.png</object>
   <object class="wxBitmap" name="BMP_UPDATE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-inactive (2).png</object>
   <object class="wxBitmap" name="BMP_UPDATE_WITH_CONTENT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-available-2 (2).png</object>
+  <object class="wxBitmap" name="applications-debugging">bitmaps\applications-debugging.png</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
   <object class="wxBitmap" name="color-swatch">bitmaps\color-swatch.png</object>
   <object class="wxBitmap" name="dialog-question-2 (2)">bitmaps\dialog-question-2 (2).png</object>
