@@ -184,6 +184,8 @@ class CncPathListRunner {
 		bool destroyMoveSequence();
 		bool publishMoveSequence();
 		
+		bool checkContent(const CncPathListEntry& curr);
+		
 	public:
 		
 		explicit CncPathListRunner(CncControl* cnc);

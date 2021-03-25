@@ -1,6 +1,9 @@
 #include "CncPathListEntry.h"
 
-const int 				CncPathListEntry::ContentAll				= CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_TOOL | CncPathListEntry::CONT_POSITION;
+const int				CncPathListEntry::ContentCFSP				= CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_TOOL | CncPathListEntry::CONT_POSITION;
+const int				CncPathListEntry::ContentCFS				= CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_TOOL;
+const int				CncPathListEntry::ContentFS					=                 CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_TOOL;
+
 const bool 				CncPathListEntry::DefaultAlreadyRendered	= false;
 const long 				CncPathListEntry::DefaultClientID   		= CLIENT_ID.INVALID;
 const CncSpeedMode 		CncPathListEntry::DefaultSpeedMode  		=  CncSpeedUserDefined;

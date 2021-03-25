@@ -8,6 +8,7 @@
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "MainFrame.h"
+#include "GlobalFunctions.h"
 #include "CncAutoFreezer.h"
 #include "CncFileNameService.h"
 #include "CncMessageDialog.h"
@@ -385,10 +386,10 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 	if ( ctlKey == false )
 		return;
 		
-		
 	long lineNumber = -1;
 	
-	wxString line(entries.at(selectedItem).text);
+	const wxString rawLine(entries.at(selectedItem).text);
+	wxString line(rawLine);
 	line.Trim(false);
 	line.MakeUpper();
 	
@@ -416,6 +417,20 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 		
 		line.assign(ln);
 		
+	}
+	// ---------------------------------------------------
+	else if ( line.Contains("FILE:") == true ) {
+		wxStringTokenizer words(rawLine, " \t");
+		while ( words.HasMoreTokens() ) {
+			const wxString token = words.GetNextToken();
+			const wxFileName fn(token);
+			
+			if ( fn.Exists() ) {
+				wxString tool;
+				THE_CONFIG->getEditorTool(tool);
+				GblFunc::executeExternalProgram(tool, token, true);
+			}
+		}
 	}
 	// ---------------------------------------------------
 	else if ( line.Contains("PARSING SYNOPSIS TRACE") == true ) {

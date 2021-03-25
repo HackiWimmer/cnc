@@ -374,7 +374,7 @@ bool SVGPathHandlerCnc::moveXYToPos(const MoveParameter& mp) {
 	const long clientID	= currentCncContext.getCurrentClientID(mp.idOffset);
 	
 	CncPathListEntry initialEntry;
-	initialEntry.content			= CncPathListEntry::ContentAll;
+	initialEntry.content			= CncPathListEntry::ContentCFS;
 	initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 	initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 	initialEntry.entryTarget		= curRunPosition;
@@ -400,7 +400,7 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop() {
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_LOGICAL_TOP);
 		
 		CncPathListEntry initialEntry;
-		initialEntry.content			= CncPathListEntry::ContentAll;
+		initialEntry.content			= CncPathListEntry::ContentCFS;
 		initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 		initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 		initialEntry.entryTarget		= curRunPosition;
@@ -430,7 +430,7 @@ bool SVGPathHandlerCnc::moveZAxisToSurface() {
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_SUREFACE);
 		
 		CncPathListEntry initialEntry;
-		initialEntry.content			= CncPathListEntry::ContentAll;
+		initialEntry.content			= CncPathListEntry::ContentCFS;
 		initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 		initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 		initialEntry.entryTarget		= curRunPosition;
@@ -482,13 +482,13 @@ bool SVGPathHandlerCnc::moveZAxisNextStepDown(double zTarget) {
 		curZTarget = std::max(zMin - zDistRefValue, zTarget);
 	}
 	
-	// second, perfom the move
+	// second, perform the move
 	if ( cnc::dblCompare(curRunPosition.getZ(), curZTarget) == false ) {
 		const double zDist	= (-1) * fabs(curRunPosition.getZ() - curZTarget);
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_NEXT_STEP_DOWN);
 		
 		CncPathListEntry initialEntry;
-		initialEntry.content			= CncPathListEntry::ContentAll;
+		initialEntry.content			= CncPathListEntry::ContentCFS;
 		initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 		initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 		initialEntry.entryTarget		= curRunPosition;

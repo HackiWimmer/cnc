@@ -236,6 +236,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncGamepadMenuDlg.h"/>
+      <File Name="CncGamepadMenuDlg.cpp"/>
       <File Name="CncStringLogger.cpp"/>
       <File Name="CncStringLogger.h"/>
       <File Name="CncMillingTrack.cpp" ExcludeProjConfig="Release;"/>

@@ -102,20 +102,22 @@ CncPathListFileStore::CncPathListFileStore()
 ////////////////////////////////////////////////////////////////////
 {
 	headerStream << wxString::Format(	"%s%c" 
-										"%s%c"
 										
 										"%s%c"
 										"%s%c"
 										
 										"%s%c"
 										"%s%c"
-										"%s%c"
 										
+										"%s%c"
+										"%s%c"
+										"%s%c"
 										,
 										
 										"ClientId",		delimiter,
-										"SpindleState",	delimiter,
-										"SpindleSpeed",	delimiter,
+										
+										"S-State",		delimiter,
+										"S-Value",		delimiter,
 										
 										"F-Mode",		delimiter,
 										"F-Value",		delimiter,
@@ -143,6 +145,7 @@ void CncPathListFileStore::notifyNextPostion() {
 	
 	bodyStream	<< wxString::Format	(	"%ld%c" 
 										"%d%c" 
+										"%s%c" 
 										
 										"%c%c" 
 										"%s%c"
@@ -154,7 +157,7 @@ void CncPathListFileStore::notifyNextPostion() {
 										
 										current.clientId,					delimiter,
 										current.spindleState,				delimiter,
-										current.spindleSpeed,				delimiter,
+										cnv2(current.spindleSpeed),			delimiter,
 										
 										cnv1(current.speedMode),			delimiter,
 										cnv2(current.speedValue_MM_MIN),	delimiter,
@@ -191,6 +194,10 @@ bool CncPathListFileStore::save(const wxString& fileName) {
 			;
 		
 		ofs.close();
+		
+		std::cout << "--------------------------------------------------------------------"	<< std::endl; 
+		std::cout << "Preprocessor(File):  Result is be located at:\n  FILE: " << fileName	<< std::endl; 
+		std::cout << "--------------------------------------------------------------------"	<< std::endl; 
 		
 		return true;
 	}

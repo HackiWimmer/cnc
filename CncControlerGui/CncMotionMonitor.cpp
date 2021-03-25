@@ -80,6 +80,8 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	popProcessMode();
 	
 	createRuler(GLContextBase::ModelType::MT_RIGHT_HAND);
+	
+	EnableTouchEvents(wxTOUCH_ZOOM_GESTURE | wxTOUCH_ROTATE_GESTURE);
 }
 //////////////////////////////////////////////////
 CncMotionMonitor::~CncMotionMonitor() {

@@ -3,8 +3,11 @@
 #include "GlobalFunctions.h"
 #include "GamepadEvent.h"
 #include "MainFrameProxy.h"
+#include "MainFrame.h"
+#include "CncConfig.h"
 #include "CncGamepadDirectionPanel.h"
 #include "CncGamepadCommandHistory.h"
+#include "CncGamepadMenuDlg.h"
 #include "CncGamepadSpy.h"
 
 /////////////////////////////////////////////////////////////////////
@@ -14,6 +17,7 @@ CncGamepadSpy::CncGamepadSpy(wxWindow* parent)
 , dirXY					(NULL)
 , dirZ					(NULL)
 , cmdHistCtrl			(NULL)
+, quickMenu				(new CncGamepadMenuDlg(THE_APP))
 , currentMovementState	(MS_STOPPED)
 , currentMoveInfo		()
 , activated				(false)
@@ -32,6 +36,9 @@ CncGamepadSpy::CncGamepadSpy(wxWindow* parent)
 /////////////////////////////////////////////////////////////////////
 CncGamepadSpy::~CncGamepadSpy() {
 /////////////////////////////////////////////////////////////////////
+	wxDELETE(dirXY);
+	wxDELETE(dirZ);
+	wxDELETE(quickMenu);
 }
 /////////////////////////////////////////////////////////////////////
 void CncGamepadSpy::updateModeText(const wxString& msg) {
@@ -56,11 +63,6 @@ void CncGamepadSpy::releaseCncActions(const GamepadEvent* state) {
 	
 	if ( b )	processInteractiveMovement(*state);
 	else 		processStepwiseMovement(*state);
-	
-	
-	#warning  redirect on demand
-	//if ( APP_PROXY::getRefPositionDlg()->IsShownOnScreen() == false )
-	
 	
 	// select step sensitivity - main frame
 	if ( state->data.buttonA ) { 
@@ -204,6 +206,21 @@ void CncGamepadSpy::update(const GamepadEvent* state) {
 		return;
 	}
 	
+	#warning currently only a test
+	if ( true ) {
+		if ( quickMenu != NULL && m_modeBook->GetSelection() == MODE_GUI ) {
+			if ( quickMenu->IsShownOnScreen() == false ) {
+				
+				if ( state->data.buttonStart == true )
+					quickMenu->ShowModal();
+					
+			}
+			else {
+				quickMenu->update(state);
+			}
+		}
+	}
+	
 	switch ( state->data.usageMode ) {
 		case GamepadEvent::UM_NAV_GUI:	if ( m_modeBook->GetSelection() != MODE_GUI ) {
 											m_modeBook->SetSelection(MODE_GUI);
@@ -221,9 +238,6 @@ void CncGamepadSpy::update(const GamepadEvent* state) {
 										updateCncMode(state);
 										break;
 	}
-	
-	
-	
 }
 /////////////////////////////////////////////////////////////////////
 void CncGamepadSpy::updateGuiMode(const GamepadEvent* state) {
@@ -249,6 +263,9 @@ void CncGamepadSpy::updateCncMode(const GamepadEvent* state) {
 	static wxBitmap dBmpNaviZ       = ImageLibGamepadSpy().Bitmap("BMP_NAVI_Z").ConvertToDisabled();
 	static wxBitmap dBmpStickLeft   = ImageLibGamepadSpy().Bitmap("BMP_STICK_LEFT").ConvertToDisabled();
 	static wxBitmap dBmpStickRight  = ImageLibGamepadSpy().Bitmap("BMP_STICK_RIGHT").ConvertToDisabled();
+	
+	if ( quickMenu && quickMenu->IsShownOnScreen() )
+		quickMenu->Show(false);
 	
 	// Don't check this here to get a continuous user interaction
 	//if ( state.isSomethingChanged == false )

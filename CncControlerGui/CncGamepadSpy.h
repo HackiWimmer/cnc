@@ -6,6 +6,7 @@
 
 class GamepadEvent;
 class CncGamepadCommadHistoryListCtrl;
+class CncGamepadMenuDlg;
 class CncGamepadDirectionPanel;
 
 class CncGamepadSpy : public CncGamepadSpyBase {
@@ -104,6 +105,7 @@ class CncGamepadSpy : public CncGamepadSpyBase {
 		CncGamepadDirectionPanel*			dirXY;
 		CncGamepadDirectionPanel*			dirZ;
 		CncGamepadCommadHistoryListCtrl*	cmdHistCtrl;
+		CncGamepadMenuDlg*					quickMenu;
 		MovementState						currentMovementState;
 		MoveInfo 							currentMoveInfo;
 

@@ -11,7 +11,9 @@ struct CncPathListEntry {
 
 	// -----------------------------------------------------------
 	// Default
-	static const int				ContentAll;
+	static const int				ContentCFSP;
+	static const int				ContentCFS;
+	static const int				ContentFS;
 	static const bool 				DefaultAlreadyRendered;
 	static const long 				DefaultClientID;
 	static const CncNanoTimestamp	NoReference;

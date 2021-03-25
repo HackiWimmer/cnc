@@ -17,6 +17,10 @@
 		
 	#endif
 	
+	
+	#define GLEW_STATIC 
+	#define FREEGLUT_STATIC
+	
 	//#include <GL/gl.h>
 	//#include <GL/glext.h>
 	#include <GL/glut.h>

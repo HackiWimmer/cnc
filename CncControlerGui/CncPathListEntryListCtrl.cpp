@@ -119,11 +119,16 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 	static const wxString fmt(globalStrings.pathListRefFormat);
 	
 	// ------------------------------------------------------
-	auto formatPos = [](double val) {
+	auto formatDistance = [](double val) {
 		if ( cnc::dblCmp::nu(val) == false )
 			return wxString::Format("%10.3lf", val);
 			
 		return _("");
+	};
+	
+	// ------------------------------------------------------
+	auto formatTarget = [](double val) {
+		return wxString::Format("%10.3lf", val);
 	};
 	
 	if ( isItemValid(item) == false )
@@ -149,13 +154,13 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 		
 		case CncPathListEntryListCtrl::COL_REF: 			return displayRef          == true ?	wxString::Format("%lld",		cpe.pathListReference)		: _("");
 		case CncPathListEntryListCtrl::COL_CLD_ID:			return displayClientID     == true ?	wxString::Format(fmt,			cpe.clientId) 				: _("");
-		case CncPathListEntryListCtrl::COL_DISTANCE_X:		return displayPosition     == true ?	formatPos(cpe.entryDistance.getX())							: _("");
-		case CncPathListEntryListCtrl::COL_DISTANCE_Y: 		return displayPosition     == true ?	formatPos(cpe.entryDistance.getY())							: _("");
-		case CncPathListEntryListCtrl::COL_DISTANCE_Z: 		return displayPosition     == true ?	formatPos(cpe.entryDistance.getZ())							: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_X: 		return displayPosition     == true ?	formatPos(cpe.entryTarget.getX())							: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_Y: 		return displayPosition     == true ?	formatPos(cpe.entryTarget.getY())							: _("");
-		case CncPathListEntryListCtrl::COL_TARGET_Z: 		return displayPosition     == true ?	formatPos(cpe.entryTarget.getZ())							: _("");
-		case CncPathListEntryListCtrl::COL_TOTAL_DISTANCE: 	return displayPosition     == true ?	wxString::Format("%10.3lf",		cpe.totalDistance)			: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_X:		return displayPosition     == true ?	formatDistance(cpe.entryDistance.getX())					: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_Y: 		return displayPosition     == true ?	formatDistance(cpe.entryDistance.getY())					: _("");
+		case CncPathListEntryListCtrl::COL_DISTANCE_Z: 		return displayPosition     == true ?	formatDistance(cpe.entryDistance.getZ())					: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_X: 		return displayPosition     == true ?	formatTarget  (cpe.entryTarget.getX())						: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_Y: 		return displayPosition     == true ?	formatTarget  (cpe.entryTarget.getY())						: _("");
+		case CncPathListEntryListCtrl::COL_TARGET_Z: 		return displayPosition     == true ?	formatTarget  (cpe.entryTarget.getZ())						: _("");
+		case CncPathListEntryListCtrl::COL_TOTAL_DISTANCE: 	return displayPosition     == true ?	formatDistance(cpe.totalDistance)							: _("");
 		
 		case CncPathListEntryListCtrl::COL_F:				return displayFeedSpeed    == true ?	wxString::Format("%4.1lf %c",	cpe.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(cpe.feedSpeedMode)) : _("");
 		case CncPathListEntryListCtrl::COL_S:				return displaySpindleSpeed == true ?	wxString::Format("%4.1lf %s",	cpe.spindleSpeed_U_MIN, cpe.spindleState ? "ON" : "OFF") : _("");

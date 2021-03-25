@@ -609,17 +609,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		
 		nextClientID = n->clientId;
 		
-		// check type: Don't combine entries over a speed change
-		if ( c->hasSpeedChange() == true )  {
-			finalizeCurrentSequence = true;
-			
-			if ( c->isSpeedChange() ) {
-				break;
-			}
-			else {
-			#warning
-			
-			}
+		if ( checkContent(*c) == false ) {
+			return false;
 		}
 		
 		// check type: Register new client id
@@ -646,6 +637,19 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 					break;
 				
 				continue;
+			}
+		}
+		
+		// check type: Don't combine entries over a speed change
+		if ( c->hasSpeedChange() == true )  {
+			finalizeCurrentSequence = true;
+			
+			if ( c->isSpeedChange() ) {
+				break;
+			}
+			else {
+				// this has already been checked by if ( checkContent(*c) == false ) above, but
+				std::cerr << CNC_LOG_FUNCT_A(": Don't combine entries over a speed change\n");
 			}
 		}
 		
@@ -730,18 +734,6 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm, double zOffset) {
-//////////////////////////////////////////////////////////////////
-	if ( plm.getPathList().size() == 0 )
-		return true;
-	
-	if ( plm.getPathType() != CncPathListManager::PathType::PT_GUIDE_PATH )
-		return false;
-		
-	currentInterface->publishGuidePath(plm, zOffset);
-	return true;
-}
-//////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
 	if ( plm.getPathList().size() == 0 )
@@ -788,6 +780,9 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 			continue;
 		}
 		
+		if ( checkContent(curr) == false )
+			return false;
+		
 		// ----------------------------------------------------------
 		// client id change
 		if ( curr.hasClientIdChange() == true ) {
@@ -811,11 +806,8 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		// ----------------------------------------------------------
 		// spindle speed change
 		if ( curr.hasToolChange() == true ) {
-			if ( onPhysicallySpindleChange(curr) == false ) {
-					std::cerr << CNC_LOG_FUNCT_A("\n");
-				
+			if ( onPhysicallySpindleChange(curr) == false )
 				return false;
-			}
 			
 			if ( curr.isToolChange() == true )
 				continue;
@@ -846,4 +838,39 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	
 	const bool ret = finalizeCurrMoveSequence(CLIENT_ID.INVALID);
 	return ret;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm, double zOffset) {
+//////////////////////////////////////////////////////////////////
+	if ( plm.getPathList().size() == 0 )
+		return true;
+	
+	if ( plm.getPathType() != CncPathListManager::PathType::PT_GUIDE_PATH )
+		return false;
+		
+	currentInterface->publishGuidePath(plm, zOffset);
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::checkContent(const CncPathListEntry& curr) {
+//////////////////////////////////////////////////////////////////
+	if ( curr.hasPositionChange() ) {
+		if ( cnc::dblCmp::nu(curr.totalDistance) == true)  {
+			std::cout << CNC_LOG_FUNCT_A(": Warning: pos change with distance = 0!");
+			std::cout << curr << std::endl;
+			// warning only check more . . .
+		}
+	}
+	
+	if ( curr.hasSpeedChange() ) {
+		if ( cnc::dblCmp::nu(curr.totalDistance) != true)  {
+			std::cout << CNC_LOG_FUNCT_A(": Error: Feed speed change combined with a pos change!");
+			std::cerr << curr << std::endl;
+			
+			return false;
+		}
+	}
+	
+	// on errors return false
+	return true;
 }
