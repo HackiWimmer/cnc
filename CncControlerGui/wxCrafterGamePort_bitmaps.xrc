@@ -5,6 +5,7 @@
   <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
   <object class="wxBitmap" name="16-x-close">bitmaps\16-x-close.png</object>
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
+  <object class="wxBitmap" name="24-cog@2x">bitmaps\24-cog@2x.png</object>
   <object class="wxBitmap" name="BMP_NAVI_XY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_all-small.png</object>
   <object class="wxBitmap" name="BMP_NAVI_Z">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_updown-small.png</object>
   <object class="wxBitmap" name="BMP_START">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\run-build-2.png</object>
@@ -13,7 +14,6 @@
   <object class="wxBitmap" name="BMP_STOP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\run-build-clean.png</object>
   <object class="wxBitmap" name="BMP_UPDATE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-inactive (2).png</object>
   <object class="wxBitmap" name="BMP_UPDATE_WITH_CONTENT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-available-2 (2).png</object>
-  <object class="wxBitmap" name="applications-debugging">bitmaps\applications-debugging.png</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
   <object class="wxBitmap" name="color-swatch">bitmaps\color-swatch.png</object>
   <object class="wxBitmap" name="dialog-question-2 (2)">bitmaps\dialog-question-2 (2).png</object>

@@ -103,6 +103,9 @@ class CncMotionMonitor : public CncGlCanvas
 		void pushProcessMode();
 		void popProcessMode();
 		
+		void pushInteractiveProcessMode();
+		void popInteractiveProcessMode();
+
 		void pushReplayMode();
 		void popReplayMode();
 		

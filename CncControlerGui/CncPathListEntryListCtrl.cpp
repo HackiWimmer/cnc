@@ -193,7 +193,6 @@ wxListItemAttr* CncPathListEntryListCtrl::OnGetItemAttr(long item) const {
 	else if ( cpe.hasSpeedChange() )		return (wxListItemAttr*)( b ? (&speedItemAttrSelected)    : (&speedItemAttr) );
 	else if ( cpe.hasToolChange() )			return (wxListItemAttr*)( b ? (&toolItemAttrSelected)     : (&toolItemAttr) );
 	
-	// this indicates to use the default style
 	return (wxListItemAttr*)( b ? (&initialItemAttrSelected)  : (&initialItemAttr) );
 }
 /////////////////////////////////////////////////////////////

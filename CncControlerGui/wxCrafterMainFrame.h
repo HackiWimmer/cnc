@@ -77,6 +77,7 @@ protected:
     wxBitmapComboBox* m_portSelector;
     wxBitmapButton* m_connect;
     wxBitmapButton* m_refPosition;
+    wxBitmapButton* m_anchorPosition;
     wxBitmapButton* m_btSelectReferences;
     wxBitmapButton* m_btSelectSetup;
     wxBitmapButton* m_btSelectManuallyMove;
@@ -754,6 +755,7 @@ protected:
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
     virtual void setReferencePosition(wxCommandEvent& event) { event.Skip(); }
+    virtual void setAnchorPosition(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectReferences(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectSetup(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectManuallyMove(wxCommandEvent& event) { event.Skip(); }
@@ -977,6 +979,7 @@ public:
     wxBitmapComboBox* GetPortSelector() { return m_portSelector; }
     wxBitmapButton* GetConnect() { return m_connect; }
     wxBitmapButton* GetRefPosition() { return m_refPosition; }
+    wxBitmapButton* GetAnchorPosition() { return m_anchorPosition; }
     wxBitmapButton* GetBtSelectReferences() { return m_btSelectReferences; }
     wxBitmapButton* GetBtSelectSetup() { return m_btSelectSetup; }
     wxBitmapButton* GetBtSelectManuallyMove() { return m_btSelectManuallyMove; }
@@ -1554,6 +1557,9 @@ protected:
     wxStaticText* m_staticText8386;
     wxRadioBox* m_mmRadioCoordinates;
     wxStaticLine* m_staticLine8390;
+    wxStaticText* m_staticText83963;
+    wxComboBox* m_cbMoveMode;
+    wxStaticLine* m_staticLine83904;
     wxStaticText* m_staticText8388;
     wxCheckBox* m_manuallyCorrectLimitPos;
     wxStaticLine* m_staticLine839012;
@@ -1631,6 +1637,9 @@ public:
     wxStaticText* GetStaticText8386() { return m_staticText8386; }
     wxRadioBox* GetMmRadioCoordinates() { return m_mmRadioCoordinates; }
     wxStaticLine* GetStaticLine8390() { return m_staticLine8390; }
+    wxStaticText* GetStaticText83963() { return m_staticText83963; }
+    wxComboBox* GetCbMoveMode() { return m_cbMoveMode; }
+    wxStaticLine* GetStaticLine83904() { return m_staticLine83904; }
     wxStaticText* GetStaticText8388() { return m_staticText8388; }
     wxCheckBox* GetManuallyCorrectLimitPos() { return m_manuallyCorrectLimitPos; }
     wxStaticLine* GetStaticLine839012() { return m_staticLine839012; }

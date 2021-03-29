@@ -149,6 +149,9 @@ class GLContextCncPathBase : public GLContextBase {
 		void pushProcessMode();
 		void popProcessMode();
 		
+		void pushInteractiveProcessMode();
+		void popInteractiveProcessMode();
+
 		void pushReplayMode();
 		void popReplayMode();
 
@@ -156,7 +159,7 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		void activateOpenGlContext(bool state = true);
 		void deactivateOpenGlContext() { activateOpenGlContext(false); }
-
+		
 	protected:
 		
 		struct Context {
@@ -176,7 +179,7 @@ class GLContextCncPathBase : public GLContextBase {
 		struct ReplayContext : public Context {
 			void reset() { *this = ReplayContext(); }
 		};
-
+		
 		GLI::GLCncPath		cncPath;
 		cnc::LongValues		highlightedClientIds;
 		GLI::GLXYZRuler		ruler;
@@ -206,6 +209,7 @@ class GLContextCncPathBase : public GLContextBase {
 		void drawHighlightEffects();
 		void drawDirectionCone();
 		void drawDirectionCone(unsigned int idx);
+		void drawAnchorPoints();
 		
 		friend class CncMotionMonitor;
 		friend class CncGLContextObserver;

@@ -1,6 +1,7 @@
 #include <wx/app.h>
 #include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
+#include "CncAnchorInfo.h"
 #include "CncTemplateContext.h"
 #include "CncBoundarySpace.h"
 #include "CncContext.h"
@@ -11,6 +12,7 @@ CncContext::CncContext()
 , secureModeInfo			()
 , versionInfoMap			()
 , boundarySpace				(new CncBoundarySpace())
+, anchorMap					(new CncAnchorMap())
 , templateContext			(new CncTemplateContext(boundarySpace))
 ////////////////////////////////////////////////////////////////////////
 {
@@ -25,6 +27,11 @@ CncContext::CncContext()
 ////////////////////////////////////////////////////////////////////////
 CncContext::~CncContext() {
 ////////////////////////////////////////////////////////////////////////
+	
+	wxDELETE( boundarySpace );
+	wxDELETE( anchorMap );
+	wxDELETE( templateContext );
+	
 	APPEND_LOCATION_TO_STACK_TRACE_FILE
 }
 ////////////////////////////////////////////////////////////////////////

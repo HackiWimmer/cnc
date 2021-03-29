@@ -550,6 +550,156 @@ CncGamepadSpyBase::~CncGamepadSpyBase()
 {
 }
 
+CncGamepadMenuDlgBase::CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC81CCInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active"));
+        wxIcon icn;
+        icn.CopyFromBitmap(iconBmp);
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+
+    
+    wxFlexGridSizer* flexGridSizer402 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer402->SetFlexibleDirection( wxBOTH );
+    flexGridSizer402->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer402->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer402);
+    
+    m_panel1 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer402->Add(m_panel1, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxBoxSizer* boxSizer47619 = new wxBoxSizer(wxVERTICAL);
+    m_panel1->SetSizer(boxSizer47619);
+    
+    m_staticText502 = new wxStaticText(m_panel1, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxDLG_UNIT(m_panel1, wxSize(-1,-1)), 0);
+    
+    boxSizer47619->Add(m_staticText502, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_button488202627 = new wxButton(m_panel1, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(m_panel1, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button488202627->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-cog@2x")), wxLEFT);
+    m_button488202627->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_button488202627Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_button488202627->SetFont(m_button488202627Font);
+    
+    boxSizer47619->Add(m_button488202627, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_button4882026 = new wxButton(m_panel1, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(m_panel1, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button4882026->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-cog@2x")), wxLEFT);
+    m_button4882026->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_button4882026Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_button4882026->SetFont(m_button4882026Font);
+    
+    boxSizer47619->Add(m_button4882026, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_button48820 = new wxButton(m_panel1, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(m_panel1, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button48820->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-cog@2x")), wxLEFT);
+    m_button48820->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_button48820Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_button48820->SetFont(m_button48820Font);
+    
+    boxSizer47619->Add(m_button48820, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_panel2 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer402->Add(m_panel2, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxBoxSizer* boxSizer49622 = new wxBoxSizer(wxVERTICAL);
+    m_panel2->SetSizer(boxSizer49622);
+    
+    m_staticText50023 = new wxStaticText(m_panel2, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxDLG_UNIT(m_panel2, wxSize(-1,-1)), 0);
+    
+    boxSizer49622->Add(m_staticText50023, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_button48824 = new wxButton(m_panel2, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(m_panel2, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button48824->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-cog@2x")), wxLEFT);
+    m_button48824->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_button48824Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_button48824->SetFont(m_button48824Font);
+    
+    boxSizer49622->Add(m_button48824, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_panel3 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer402->Add(m_panel3, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxBoxSizer* boxSizer496 = new wxBoxSizer(wxVERTICAL);
+    m_panel3->SetSizer(boxSizer496);
+    
+    m_staticText500 = new wxStaticText(m_panel3, wxID_ANY, _("Static Text Label"), wxDefaultPosition, wxDLG_UNIT(m_panel3, wxSize(-1,-1)), 0);
+    
+    boxSizer496->Add(m_staticText500, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_button48825 = new wxButton(m_panel3, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(m_panel3, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button48825->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-cog@2x")), wxLEFT);
+    m_button48825->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_button48825Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_button48825->SetFont(m_button48825Font);
+    
+    boxSizer496->Add(m_button48825, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_button488 = new wxButton(m_panel3, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(m_panel3, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button488->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("24-cog@2x")), wxLEFT);
+    m_button488->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_button488Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_button488->SetFont(m_button488Font);
+    
+    boxSizer496->Add(m_button488, 0, wxALL, WXC_FROM_DIP(2));
+    
+    SetName(wxT("CncGamepadMenuDlgBase"));
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    m_button488202627->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button4882026->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button48820->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button48824->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button48825->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button488->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    
+}
+
+CncGamepadMenuDlgBase::~CncGamepadMenuDlgBase()
+{
+    m_button488202627->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button4882026->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button48820->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button48824->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button48825->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    m_button488->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
+    
+}
+
 ImageLibGamepadSpy::ImageLibGamepadSpy()
     : wxImageList(16, 16, true)
     , m_imagesWidth(16)
@@ -688,183 +838,4 @@ ImageLibGamepadCommand::ImageLibGamepadCommand()
 
 ImageLibGamepadCommand::~ImageLibGamepadCommand()
 {
-}
-
-CncGamepadMenuDlgBase::CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-    : wxDialog(parent, id, title, pos, size, style)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC81CCInitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    // Set icon(s) to the application/dialog
-    wxIconBundle app_icons;
-    {
-        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active"));
-        wxIcon icn;
-        icn.CopyFromBitmap(iconBmp);
-        app_icons.AddIcon( icn );
-    }
-    SetIcons( app_icons );
-
-    
-    wxFlexGridSizer* flexGridSizer363 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer363->SetFlexibleDirection( wxBOTH );
-    flexGridSizer363->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer363->AddGrowableCol(0);
-    flexGridSizer363->AddGrowableCol(1);
-    flexGridSizer363->AddGrowableRow(0);
-    flexGridSizer363->SetMinSize(400,500);
-    this->SetSizer(flexGridSizer363);
-    
-    wxFlexGridSizer* flexGridSizer345 = new wxFlexGridSizer(10, 1, 0, 0);
-    flexGridSizer345->SetFlexibleDirection( wxBOTH );
-    flexGridSizer345->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer345->AddGrowableCol(0);
-    flexGridSizer345->AddGrowableRow(0);
-    flexGridSizer345->AddGrowableRow(1);
-    flexGridSizer345->AddGrowableRow(2);
-    flexGridSizer345->AddGrowableRow(3);
-    flexGridSizer345->AddGrowableRow(4);
-    flexGridSizer345->AddGrowableRow(5);
-    flexGridSizer345->AddGrowableRow(6);
-    flexGridSizer345->AddGrowableRow(7);
-    flexGridSizer345->AddGrowableRow(8);
-    flexGridSizer345->AddGrowableRow(9);
-    
-    flexGridSizer363->Add(flexGridSizer345, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_btFunction1 = new wxButton(this, wxID_ANY, _("Function 1"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btFunction1->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("applications-debugging")), wxLEFT);
-    m_btFunction1->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btFunction1Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btFunction1->SetFont(m_btFunction1Font);
-    
-    flexGridSizer345->Add(m_btFunction1, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btFunction2 = new wxButton(this, wxID_ANY, _("Function 2"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btFunction2->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("applications-debugging")), wxLEFT);
-    m_btFunction2->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btFunction2Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btFunction2->SetFont(m_btFunction2Font);
-    
-    flexGridSizer345->Add(m_btFunction2, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btFunction3 = new wxButton(this, wxID_ANY, _("Function 3"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btFunction3->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("applications-debugging")), wxLEFT);
-    m_btFunction3->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btFunction3Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btFunction3->SetFont(m_btFunction3Font);
-    
-    flexGridSizer345->Add(m_btFunction3, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btFunction4 = new wxButton(this, wxID_ANY, _("Function 4"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btFunction4->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("applications-debugging")), wxLEFT);
-    m_btFunction4->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btFunction4Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btFunction4->SetFont(m_btFunction4Font);
-    
-    flexGridSizer345->Add(m_btFunction4, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer3454 = new wxFlexGridSizer(10, 1, 0, 0);
-    flexGridSizer3454->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3454->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3454->AddGrowableCol(0);
-    flexGridSizer3454->AddGrowableRow(0);
-    flexGridSizer3454->AddGrowableRow(1);
-    flexGridSizer3454->AddGrowableRow(2);
-    flexGridSizer3454->AddGrowableRow(3);
-    flexGridSizer3454->AddGrowableRow(4);
-    flexGridSizer3454->AddGrowableRow(5);
-    flexGridSizer3454->AddGrowableRow(6);
-    flexGridSizer3454->AddGrowableRow(7);
-    flexGridSizer3454->AddGrowableRow(8);
-    flexGridSizer3454->AddGrowableRow(9);
-    
-    flexGridSizer363->Add(flexGridSizer3454, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_btFunction15 = new wxButton(this, wxID_ANY, _("Function 1"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btFunction15->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("applications-debugging")), wxLEFT);
-    m_btFunction15->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btFunction15Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btFunction15->SetFont(m_btFunction15Font);
-    
-    flexGridSizer3454->Add(m_btFunction15, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btFunction26 = new wxButton(this, wxID_ANY, _("Function 2"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btFunction26->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("applications-debugging")), wxLEFT);
-    m_btFunction26->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btFunction26Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btFunction26->SetFont(m_btFunction26Font);
-    
-    flexGridSizer3454->Add(m_btFunction26, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btFunction37 = new wxButton(this, wxID_ANY, _("Function 3"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btFunction37->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("applications-debugging")), wxLEFT);
-    m_btFunction37->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btFunction37Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btFunction37->SetFont(m_btFunction37Font);
-    
-    flexGridSizer3454->Add(m_btFunction37, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btFunction48 = new wxButton(this, wxID_ANY, _("Function 4"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btFunction48->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("applications-debugging")), wxLEFT);
-    m_btFunction48->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btFunction48Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btFunction48->SetFont(m_btFunction48Font);
-    
-    flexGridSizer3454->Add(m_btFunction48, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    SetName(wxT("CncGamepadMenuDlgBase"));
-    SetMinClientSize(wxSize(400,500));
-    SetSize(wxDLG_UNIT(this, wxSize(400,500)));
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
-    }
-    if(GetParent()) {
-        CentreOnParent(wxBOTH);
-    } else {
-        CentreOnScreen(wxBOTH);
-    }
-    // Connect events
-    m_btFunction1->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction1), NULL, this);
-    m_btFunction2->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction2), NULL, this);
-    m_btFunction3->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction3), NULL, this);
-    m_btFunction4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction4), NULL, this);
-    m_btFunction15->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction1), NULL, this);
-    m_btFunction26->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction2), NULL, this);
-    m_btFunction37->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction3), NULL, this);
-    m_btFunction48->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction4), NULL, this);
-    
-}
-
-CncGamepadMenuDlgBase::~CncGamepadMenuDlgBase()
-{
-    m_btFunction1->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction1), NULL, this);
-    m_btFunction2->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction2), NULL, this);
-    m_btFunction3->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction3), NULL, this);
-    m_btFunction4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction4), NULL, this);
-    m_btFunction15->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction1), NULL, this);
-    m_btFunction26->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction2), NULL, this);
-    m_btFunction37->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction3), NULL, this);
-    m_btFunction48->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction4), NULL, this);
-    
 }

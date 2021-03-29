@@ -9,6 +9,8 @@ class GblFunc {
 	private:
 	
 		static void storeStacktrace(const wxString& st);
+		static bool executeExternalProgram(bool admin, const wxString& tool, const wxString& file, bool checkToolExists);
+
 	
 	public:
 		static void swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl);
@@ -31,6 +33,7 @@ class GblFunc {
 		static void appendToStackTraceFileTS(const wxString& st);
 		
 		static bool executeExternalProgram(const wxString& tool, const wxString& file, bool checkToolExists=true);
+		static bool executeExternalProgramAdmin(const wxString& tool, const wxString& file, bool checkToolExists=true);
 		
 };
 

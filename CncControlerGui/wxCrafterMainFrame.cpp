@@ -60,12 +60,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auibarMain->AddSeparator();
     
-    m_refPosition = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
+    m_refPosition = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("RefPos")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     m_refPosition->SetToolTip(_("Determine Reference Position"));
     m_auibarMain->AddControl(m_refPosition);
     
+    m_anchorPosition = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("Anchor")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
+    m_anchorPosition->SetToolTip(_("Determine Anchor Positions"));
+    m_auibarMain->AddControl(m_anchorPosition);
+    
     m_btSelectReferences = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-orientation")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_btSelectReferences->SetToolTip(_("References"));
+    m_btSelectReferences->SetToolTip(_("More References"));
     m_auibarMain->AddControl(m_btSelectReferences);
     
     m_auibarMain->AddSeparator();
@@ -6014,6 +6018,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_portSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
     m_refPosition->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::setReferencePosition), NULL, this);
+    m_anchorPosition->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::setAnchorPosition), NULL, this);
     m_btSelectReferences->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectReferences), NULL, this);
     m_btSelectSetup->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectSetup), NULL, this);
     m_btSelectManuallyMove->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectManuallyMove), NULL, this);
@@ -6268,6 +6273,7 @@ MainFrameBClass::~MainFrameBClass()
     m_portSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
     m_refPosition->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::setReferencePosition), NULL, this);
+    m_anchorPosition->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::setAnchorPosition), NULL, this);
     m_btSelectReferences->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectReferences), NULL, this);
     m_btSelectSetup->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectSetup), NULL, this);
     m_btSelectManuallyMove->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectManuallyMove), NULL, this);
@@ -6544,7 +6550,7 @@ CncManuallyMoveCoordinatesBase::CncManuallyMoveCoordinatesBase(wxWindow* parent,
     
     flexGridSizer862->Add(flexGridSizer1169, 1, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    wxFlexGridSizer* flexGridSizer1522 = new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* flexGridSizer1522 = new wxFlexGridSizer(1, 9, 0, 0);
     flexGridSizer1522->SetFlexibleDirection( wxBOTH );
     flexGridSizer1522->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1522->AddGrowableCol(6);
@@ -6574,6 +6580,29 @@ CncManuallyMoveCoordinatesBase::CncManuallyMoveCoordinatesBase(wxWindow* parent,
     m_staticLine8390 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer1522->Add(m_staticLine8390, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer9929 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer9929->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9929->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer1522->Add(flexGridSizer9929, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText83963 = new wxStaticText(this, wxID_ANY, _("Move\nMode"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    flexGridSizer9929->Add(m_staticText83963, 0, wxALL, WXC_FROM_DIP(1));
+    
+    wxArrayString m_cbMoveModeArr;
+    m_cbMoveModeArr.Add(wxT("1D"));
+    m_cbMoveModeArr.Add(wxT("2D"));
+    m_cbMoveModeArr.Add(wxT("3D"));
+    m_cbMoveMode = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_cbMoveModeArr, wxCB_READONLY);
+    m_cbMoveMode->SetSelection(1);
+    
+    flexGridSizer9929->Add(m_cbMoveMode, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticLine83904 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer1522->Add(m_staticLine83904, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     wxFlexGridSizer* flexGridSizer5723 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer5723->SetFlexibleDirection( wxBOTH );

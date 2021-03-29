@@ -25,16 +25,16 @@ class CncManuallyMoveCoordinates : public CncManuallyMoveCoordinatesBase {
 		double getValueY();
 		double getValueZ();
 		
-		bool isAbsoluteMove() 		{ return m_mmRadioCoordinates->GetSelection() == 0; }
-		bool switchToolOn() 		{ return m_checkBoxToolEnabled->GetValue(); }
-		bool correctLimitStates() 	{ return m_manuallyCorrectLimitPos->GetValue(); }
-		
 		bool shouldClearMontionMonitor();
 		
+		bool isAbsoluteMove()			{ return m_mmRadioCoordinates->GetSelection() == 0; }
+		bool switchToolOn()				{ return m_checkBoxToolEnabled->GetValue(); }
+		bool correctLimitStates()		{ return m_manuallyCorrectLimitPos->GetValue(); }
+		wxString getMoveMode()			{ return m_cbMoveMode->GetValue(); }
+		
 	protected:
-    virtual void onZeroXYZ(wxCommandEvent& event);
-    virtual void onReverseXYZ(wxCommandEvent& event);
-	
+		virtual void onZeroXYZ(wxCommandEvent& event);
+		virtual void onReverseXYZ(wxCommandEvent& event);
 		virtual void onSetCommonValue(wxCommandEvent& event);
 		virtual void onLBDownMax(wxMouseEvent& event);
 		virtual void changeManuallySliderX(wxScrollEvent& event);

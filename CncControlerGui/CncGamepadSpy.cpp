@@ -208,18 +208,21 @@ void CncGamepadSpy::update(const GamepadEvent* state) {
 	
 	#warning currently only a test
 	if ( true ) {
-		if ( quickMenu != NULL && m_modeBook->GetSelection() == MODE_GUI ) {
+		if ( quickMenu != NULL ) {
 			if ( quickMenu->IsShownOnScreen() == false ) {
 				
-				if ( state->data.buttonStart == true )
+				if ( state->data.buttonStart == true ) {
 					quickMenu->ShowModal();
-					
+					return;
+				}
 			}
 			else {
 				quickMenu->update(state);
+				return;
 			}
 		}
 	}
+	
 	
 	switch ( state->data.usageMode ) {
 		case GamepadEvent::UM_NAV_GUI:	if ( m_modeBook->GetSelection() != MODE_GUI ) {

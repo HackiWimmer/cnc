@@ -31,7 +31,7 @@ class GlutLibInitManager {
 			glutInit(&argc, argv);
 			/*
 			glutInitDisplayMode (GL_DOUBLE | GLUT_DEPTH | GLUT_RGB);
-			 */
+			*/
 		}
 		//////////////////////////////////////////////////////
 		~GlutLibInitManager() {
@@ -558,6 +558,18 @@ void CncMotionMonitor::popProcessMode() {
 //////////////////////////////////////////////////
 	processMode = false;
 	monitor->popProcessMode();
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::pushInteractiveProcessMode() {
+//////////////////////////////////////////////////
+	processMode = true;
+	monitor->pushInteractiveProcessMode();
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::popInteractiveProcessMode() {
+//////////////////////////////////////////////////
+	processMode = false;
+	monitor->popInteractiveProcessMode();
 }
 
 

@@ -74,10 +74,12 @@
   <object class="wxBitmap" name="16-whole-word@2x">bitmaps\16-whole-word@2x.png</object>
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
+  <object class="wxBitmap" name="Anchor">bitmaps\Anchor.png</object>
   <object class="wxBitmap" name="CncDebug">bitmaps\RunCtrl\CncDebug.png</object>
   <object class="wxBitmap" name="CubeHardwareDimensions">bitmaps\CubeHardwareDimensions.png</object>
   <object class="wxBitmap" name="CubeHardwareReference">bitmaps\CubeHardwareReference.png</object>
   <object class="wxBitmap" name="HbInactive">bitmaps\HbInactive.png</object>
+  <object class="wxBitmap" name="RefPos">bitmaps\RefPos.png</object>
   <object class="wxBitmap" name="ToolPin">bitmaps\ToolPin.png</object>
   <object class="wxBitmap" name="ViewButtom">bitmaps\ViewButtom.png</object>
   <object class="wxBitmap" name="ViewDown">bitmaps\ViewDown.png</object>

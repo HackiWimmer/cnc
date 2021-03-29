@@ -100,6 +100,11 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	if ( event.LeftDown() )
 		this->SetFocusFromKbd();
 		
+	if ( event.RightDown() ) {
+		if ( context->isViewMode2D() )
+			CNC_PRINT_FUNCT
+	}
+
 	// wheel - rotate and scale
 	const int rot = event.GetWheelRotation();
 	if ( rot != 0 ) {

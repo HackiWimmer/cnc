@@ -83,6 +83,8 @@ class CncGamepadSpy;
 class CncGamepadControllerState;
 class CncPositionStorageView;
 class CncPodestManagement;
+class CncUsbConnectionObserver;
+class CncAnchorPosition;
 
 class CncTouchBlockDetector;
 
@@ -249,6 +251,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void changeConfigToolbook(wxToolbookEvent& event);
 		virtual void warmStartController(wxCommandEvent& event);
 		virtual void setReferencePosition(wxCommandEvent& event);
+		virtual void setAnchorPosition(wxCommandEvent& event);
 		virtual void testCaseBookChanged(wxListbookEvent& event);
 		virtual void requestInterrupt(wxCommandEvent& event);
 		virtual void requestHeartbeat(wxCommandEvent& event);
@@ -730,6 +733,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMainInfoBar*					mainViewInfobar;
 		CncMainInfoBar*					monitorViewInfobar;
 		CncPositionStorageView*			positionStorage;
+		CncUsbConnectionObserver*		usbConnectionObserver;
+		CncAnchorPosition*				anchorPositionDlg;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;

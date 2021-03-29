@@ -57,24 +57,116 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 			return false;
 	}
 	
-	// move
-	if ( md.absoluteMove == true ) {
-		currentPos.setX(md.x);
-		currentPos.setY(md.y);
-		currentPos.setZ(md.z);
-	} else {
-		currentPos.incX(md.x);
-		currentPos.incY(md.y);
-		currentPos.incZ(md.z);
-	}
+	// -------------------------------------------------------------
+	auto move = [&]() {
+		
+		bool ret = processLinearMove(false);
+		if ( ret == false && md.correctLimit == true ) {
+			ret = cncControl->correctLimitPositions();
+		}
+		
+		return ret;
+	};
 	
-	bool ret = processLinearMove(false);
-	if ( ret == false && md.correctLimit == true ) {
-		ret = cncControl->correctLimitPositions();
+	bool ret = false;
+	
+	switch ( md.moveMode ) {
+		case MoveDefinition::MM_1D:
+		{
+			// define X move
+			if ( md.absoluteMove == true ) {
+				currentPos.setX(md.x);
+				currentPos.setY(currentPos.getY());
+				currentPos.setZ(currentPos.getZ());
+			} else {
+				currentPos.incX(md.x);
+				currentPos.incY(0.0);
+				currentPos.incZ(0.0);
+			}
+			
+			ret = move();
+			if ( ret == false)
+				break;
+			
+			// define Y move
+			if ( md.absoluteMove == true ) {
+				currentPos.setX(currentPos.getX());
+				currentPos.setY(md.y);
+				currentPos.setZ(currentPos.getZ());
+			} else {
+				currentPos.incX(0.0);
+				currentPos.incY(md.y);
+				currentPos.incZ(0.0);
+			}
+			
+			ret = move();
+			if ( ret == false)
+				break;
+
+			// define Z move
+			if ( md.absoluteMove == true ) {
+				currentPos.setX(currentPos.getX());
+				currentPos.setY(currentPos.getY());
+				currentPos.setZ(md.z);
+			} else {
+				currentPos.incX(0.0);
+				currentPos.incY(0.0);
+				currentPos.incZ(md.z);
+			}
+			
+			ret = move();
+			break;
+		}
+		case MoveDefinition::MM_2D:
+		{
+			// define XY move
+			if ( md.absoluteMove == true ) {
+				currentPos.setX(md.x);
+				currentPos.setY(md.y);
+				currentPos.setZ(currentPos.getZ());
+			} else {
+				currentPos.incX(md.x);
+				currentPos.incY(md.y);
+				currentPos.incZ(0.0);
+			}
+			
+			ret = move();
+			if ( ret == false)
+				break;
+			
+			// define Z move
+			if ( md.absoluteMove == true ) {
+				currentPos.setX(currentPos.getX());
+				currentPos.setY(currentPos.getY());
+				currentPos.setZ(md.z);
+			} else {
+				currentPos.incX(0.0);
+				currentPos.incY(0.0);
+				currentPos.incZ(md.z);
+			}
+			
+			ret = move();
+			break;
+		}
+		case MoveDefinition::MM_3D:
+		{
+			// define move
+			if ( md.absoluteMove == true ) {
+				currentPos.setX(md.x);
+				currentPos.setY(md.y);
+				currentPos.setZ(md.z);
+			} else {
+				currentPos.incX(md.x);
+				currentPos.incY(md.y);
+				currentPos.incZ(md.z);
+			}
+			
+			ret = move();
+			break;
+		}
 	}
 	
 	switchSpindleState(false);
-	
 	return ret;
 }
 //////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@ typedef std::vector<wxString>			CommandLineParameterMap;
 
 // -----------------------------------------------------------
 class CncBoundarySpace;
+class CncAnchorMap;
 class CncTemplateContext;
 
 // -----------------------------------------------------------
@@ -61,6 +62,7 @@ struct CncContext {
 		SecureModeInfo				secureModeInfo;
 		VersionInfoMap				versionInfoMap;
 		CncBoundarySpace*			boundarySpace;
+		CncAnchorMap*				anchorMap;
 		CncTemplateContext*			templateContext;
 		
 		const std::ostream& traceVersionInfo(std::ostream& os) 			const;

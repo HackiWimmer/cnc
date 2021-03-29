@@ -275,7 +275,7 @@ const wxString& GblFunc::stacktrace(wxString& ret, int maxLines) {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool GblFunc::executeExternalProgram(const wxString& tool, const wxString& file, bool checkToolExists) {
+bool GblFunc::executeExternalProgram(bool admin, const wxString& tool, const wxString& file, bool checkToolExists) {
 //////////////////////////////////////////////////////////////////
 	if ( checkToolExists == true ) {
 		if ( wxFileName(tool).Exists() == false ) {
@@ -302,7 +302,33 @@ bool GblFunc::executeExternalProgram(const wxString& tool, const wxString& file,
 	}
 	
 	cnc::trc.logInfoMessage(wxString::Format("Open: %s", cmd));
-	wxExecute(cmd, wxEXEC_ASYNC);
 	
+	if ( admin == true ) {
+		#ifdef __WXMSW__
+		
+			wchar_t* wtool = new wchar_t[tool.length() * 2 + 1];
+			wchar_t* wfile = new wchar_t[file.length() * 2 + 1];
+			
+			mbstowcs(wtool, tool.c_str().AsChar(), tool.length() + 1);
+			mbstowcs(wfile, file.c_str().AsChar(), file.length() + 1);
+			
+			ShellExecute(0, L"open", wtool, wfile, 0, SW_SHOW);
+			return true;
+			
+		#endif
+	}
+	
+	wxExecute(cmd, wxEXEC_ASYNC);
 	return true;
+}
+
+//////////////////////////////////////////////////////////////////
+bool GblFunc::executeExternalProgram(const wxString& tool, const wxString& file, bool checkToolExists) {
+//////////////////////////////////////////////////////////////////
+	return executeExternalProgram(false, tool, file, checkToolExists);
+}
+//////////////////////////////////////////////////////////////////
+bool GblFunc::executeExternalProgramAdmin(const wxString& tool, const wxString& file, bool checkToolExists) {
+//////////////////////////////////////////////////////////////////
+	return executeExternalProgram(true, tool, file, checkToolExists);
 }

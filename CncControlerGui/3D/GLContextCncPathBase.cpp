@@ -5,6 +5,7 @@
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "CncVector.h"
+#include "CncAnchorInfo.h"
 #include "CncBoundarySpace.h"
 #include "3D/GLInclude.h"
 #include "3D/CncGLCanvas.h"
@@ -675,6 +676,82 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 	cncPath.setVirtualEnd(entry);
 }
 /////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawAnchorPoints() {
+/////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->anchorMap == NULL )
+		return;
+	
+	// ensure the right model
+	glMatrixMode(GL_MODELVIEW);
+
+	const double factorX( THE_CONFIG->getCalculationFactX() / THE_CONFIG->getDispFactX3D() );
+	const double factorY( THE_CONFIG->getCalculationFactY() / THE_CONFIG->getDispFactY3D() );
+	const double factorZ( THE_CONFIG->getCalculationFactZ() / THE_CONFIG->getDispFactZ3D() );
+	
+	const float offset	= 0.001;
+	const int alpha		= 200;
+	
+	glLineStipple(2, 0x00FF);
+	
+	for ( auto it = THE_CONTEXT->anchorMap->cbegin(); it != THE_CONTEXT->anchorMap->cend(); ++it ) {
+		const CncAnchorInfo& ai = it->second;
+		
+		if ( ai.show == true ) {
+			const float x = ai.pos.getX() * factorX;
+			const float y = ai.pos.getY() * factorY;
+			const float z = ai.pos.getZ() * factorZ;
+			
+			const bool  bx = ai.hasX();
+			const bool  by = ai.hasY();
+			const bool  bz = ai.hasZ();
+			
+			const float ox = bx ? offset : 10.0;
+			const float oy = by ? offset : 10.0;
+			const float oz = bz ? offset : 10.0;
+			
+			{
+				if ( bx == false ) 
+					glEnable(GL_LINE_STIPPLE);
+				
+				glColor4ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue(), alpha * (bx ? 1.0 : 0.5) );
+				glBegin(GL_LINES);
+					glVertex3f(x - ox, y, z);
+					glVertex3f(x + ox, y, z);
+				glEnd();
+					
+				if ( bx == false ) 
+					glDisable(GL_LINE_STIPPLE);
+			}
+			{
+				if ( by == false ) 
+					glEnable(GL_LINE_STIPPLE);
+					
+				glColor4ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue(), alpha * (by ? 1.0 : 0.5) );
+				glBegin(GL_LINES);
+					glVertex3f(x, y - oy, z);
+					glVertex3f(x, y + oy, z);
+				glEnd();
+				
+				if ( by == false ) 
+					glDisable(GL_LINE_STIPPLE);
+			}
+			{
+				if ( bz == false ) 
+					glEnable(GL_LINE_STIPPLE);
+					
+				glColor4ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue(), alpha * (bz ? 1.0 : 0.5) );
+				glBegin(GL_LINES);
+					glVertex3f(x, y, z - oz);
+					glVertex3f(x, y, z + oz);
+				glEnd();
+				
+				if ( bz == false ) 
+					glDisable(GL_LINE_STIPPLE);
+				}
+		}
+	}
+}
+/////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::highlightClientId(long firstClientId, long lastClientId) { 
 /////////////////////////////////////////////////////////////////
 	if ( firstClientId < 0 && lastClientId < 0 )
@@ -747,6 +824,7 @@ void GLContextCncPathBase::pushProcessMode() {
 	processContext.scaleFactor	= getCurrentScaleFactor();
 	processContext.wndOrgin		= viewPort? wxPoint(viewPort->getCurrentOriginX(), viewPort->getCurrentOriginY()) : wxPoint(0, 0);
 
+	setFrontCatchingMode(FCM_KEEP_IN_FRAME);
 	continiousDirConeFlag = true;
 }
 /////////////////////////////////////////////////////////////////
@@ -755,9 +833,18 @@ void GLContextCncPathBase::popProcessMode() {
 	continiousDirConeFlag = false;
 	cncPath.activateNotifications();
 	
-	setFrontCatchingMode(FCM_KEEP_IN_FRAME);
-	
 	reshapeAbsolute(processContext.wndOrgin.x, processContext.wndOrgin.y);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::pushInteractiveProcessMode() {
+/////////////////////////////////////////////////////////////////
+	continiousDirConeFlag = false;
+	setFrontCatchingMode(FCM_KEEP_IN_FRAME);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::popInteractiveProcessMode() {
+/////////////////////////////////////////////////////////////////
+	continiousDirConeFlag = false;
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::pushReplayMode() {
@@ -833,6 +920,7 @@ void GLContextCncPathBase::determineModel() {
 	drawDirectionCone();
 	drawHighlightEffects();
 	
+	drawAnchorPoints();
 	drawBoundBox();
 	drawHardwareBox();
 }

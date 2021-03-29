@@ -14,10 +14,7 @@ class CncGamepadMenuDlg : public CncGamepadMenuDlgBase {
 		void update(const GamepadEvent* state);
 		
 	protected:
-		virtual void onFunction1(wxCommandEvent& event);
-		virtual void onFunction2(wxCommandEvent& event);
-		virtual void onFunction3(wxCommandEvent& event);
-		virtual void onFunction4(wxCommandEvent& event);
+		virtual void onFunction(wxCommandEvent& event);
 		
 	private:
 	

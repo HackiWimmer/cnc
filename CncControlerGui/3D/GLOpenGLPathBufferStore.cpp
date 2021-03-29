@@ -590,9 +590,6 @@ long GLOpenGLPathBuffer::findfirstVertexWithPos(float vx, float vy, float vz, GL
 		
 		glGetBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(CncVertex), &vertex);
 		
-		#warning
-		//std::cout << wxString::Format(":::::: v(%f,%f,%f)  p(%f,%f,%f) id(%ld)\n", vertex.getX(), vertex.getY(), vertex.getZ(), vx, vy, vz, vertex.getClientId());
-		
 		if ( vertex.hasRoughlyThisPos(vx, vy) ) {
 			ret = (long)i;
 			break;

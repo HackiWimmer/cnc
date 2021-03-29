@@ -59,6 +59,7 @@
 #include "SerialThreadStub.h"
 #include "SerialPort.h"
 #include "CncPosition.h"
+#include "CncAnchorPosition.h"
 #include "CncPatternDefinitions.h"
 #include "CncUnitCalculator.h"
 #include "CncStartPositionResolver.h"
@@ -77,7 +78,7 @@
 #include "UnitTestFrame.h"
 #include "CncReferencePosition.h"
 #include "CncSpeedMonitor.h"
-#include "CncUsbConnectionDetected.h"
+#include "CncUsbConnectionObserver.h"
 #include "CncConnectProgress.h"
 #include "CncSha1Wrapper.h"
 #include "CncMonitorSplitterWindow.h"
@@ -527,6 +528,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , mainViewInfobar						(new CncMainInfoBar(this))
 , monitorViewInfobar					(new CncMainInfoBar(this))
 , positionStorage						(new CncPositionStorageView(this))
+, usbConnectionObserver					(new CncUsbConnectionObserver(this))
+, anchorPositionDlg						(new CncAnchorPosition(this))
 , perspectiveHandler					(globalConfig, m_menuPerspective)
 , config								(globalConfig)
 , lruStore								(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -1077,6 +1080,8 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btEvaluateDimensionXYPlane);
 	registerGuiControl(m_btEvaluateDimensionZAxis);
 	registerGuiControl(m_refPosition);
+	registerGuiControl(m_anchorPosition);
+	registerGuiControl(m_zToTop);
 	registerGuiControl(m_zToTop);
 	registerGuiControl(m_zToBottom);
 	registerGuiControl(m_xToMin);
@@ -1308,9 +1313,6 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logWarningMessage("Test function 3");
-	
-	cnc->processCommand(CMD_ACTIVATE_PODEST_HW, std::cout);
-	cnc->getPodestDistanceMetric();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -2223,22 +2225,26 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 		if ( wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE )
 			decoratePortSelector();
 		
-		static CncUsbConnectionDetected* dlg = new CncUsbConnectionDetected(this);
 		switch ( wParam ) {
 			// ask for connect - on demand . . . 
 			case DBT_DEVICEARRIVAL:	{
 				if ( isProcessing() == false ) {
 					
-					if ( dlg->IsShown() ) {
-						dlg->setPortName(portName);
+					if ( usbConnectionObserver->IsShown() ) {
+						usbConnectionObserver->setPortName(portName);
 						return ret;
 					}
 					
-					dlg->setPortName(portName);
-					if ( dlg->ShowModal() == wxID_YES ) {
-						m_portSelector->SetStringSelection(portName);
-						m_portSelectorSec->SetStringSelection(portName);
-						connectSerialPortDialog();
+					if ( usbConnectionObserver->getSensitivity() == true ) {
+						usbConnectionObserver->setPortName(portName);
+						if ( usbConnectionObserver->ShowModal() == wxID_YES ) {
+							m_portSelector->SetStringSelection(portName);
+							m_portSelectorSec->SetStringSelection(portName);
+							connectSerialPortDialog();
+						}
+					}
+					else {
+						cnc::trc.logInfoMessage(wxString::Format("New USB connection available, name: %s", portName));
 					}
 				}
 			}
@@ -2256,8 +2262,8 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 						cnc::trc.logWarning("Connection broken . . .");
 					}
 					
-					if ( dlg->IsShown() ) {
-						dlg->EndModal(wxID_NO);
+					if ( usbConnectionObserver->IsShown() ) {
+						usbConnectionObserver->EndModal(wxID_NO);
 					}
 				}
 				break;
@@ -3162,6 +3168,8 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(refPositionDlg);
 	
+	CncUsbConnectionObserver::Deactivator noUsbPopup(usbConnectionObserver);
+	
 	refPositionDlg->setMessage(msg);
 	
 	activateGamepadNotifications(true);
@@ -3947,11 +3955,14 @@ bool MainFrame::processManualTemplate() {
 	inboundFileParser = p;
 	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
 
-	ManuallyPathHandlerCnc::MoveDefinition move;
+	typedef ManuallyPathHandlerCnc::MoveDefinition MMD;
+
+	MMD move;
 	move.speedMode 		= CncSpeedUserDefined;
 	move.absoluteMove	= cncManuallyMoveCoordPanel->isAbsoluteMove();
 	move.toolState		= cncManuallyMoveCoordPanel->switchToolOn();
-	move.correctLimit   = cncManuallyMoveCoordPanel->correctLimitStates();
+	move.correctLimit	= cncManuallyMoveCoordPanel->correctLimitStates();
+	move.moveMode		= MMD::convert(cncManuallyMoveCoordPanel->getMoveMode(), MMD::MM_2D);
 	
 	move.f = (double)(defaultSpeedSlider->getValueMM_MIN());
 	move.x = cncManuallyMoveCoordPanel->getValueX();
@@ -7320,7 +7331,7 @@ bool MainFrame::startInteractiveMove(CncInteractiveMoveDriver imd) {
 		interactiveTransactionLock = new CncGamepadTransactionLock(this);
 	
 	selectMonitorBookCncPanel();
-	motionMonitor->pushProcessMode();
+	motionMonitor->pushInteractiveProcessMode();
 	
 	// start
 	const bool ret = cnc->startInteractiveMove(stepSensitivity, imd);
@@ -7369,7 +7380,7 @@ bool MainFrame::stopInteractiveMove() {
 	
 	wxDELETE(interactiveTransactionLock);
 	
-	motionMonitor->popProcessMode();
+	motionMonitor->popInteractiveProcessMode();
 	motionMonitor->update(true);
 	updateSpeedControls();
 	
@@ -7523,6 +7534,11 @@ bool MainFrame::startStepwiseMovement(CncLinearDirection x, CncLinearDirection y
 void MainFrame::setReferencePosition(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	showReferencePositionDlg("");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setAnchorPosition(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	anchorPositionDlg->ShowModal();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::warmStartController(wxCommandEvent& event) {

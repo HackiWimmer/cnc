@@ -45,7 +45,7 @@ void CncManuallyMoveCoordinates::enableControls(bool state) {
 	m_btSetYZ->Enable(state);
 	m_btZeroXYZ->Enable(state);
 	m_btReverseXYZ->Enable(state);
-	
+	m_cbMoveMode->Enable(state);
 }
 ///////////////////////////////////////////////////////////////////
 void CncManuallyMoveCoordinates::initialize() {

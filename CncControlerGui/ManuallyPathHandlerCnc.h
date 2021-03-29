@@ -11,7 +11,10 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		
 		struct MoveDefinition {
 			
+			enum MoveMode { MM_1D, MM_2D, MM_3D };
+			
 			CncSpeedMode speedMode	= CncSpeedMode::CncSpeedRapid;
+			MoveMode moveMode		= MM_2D;
 			bool absoluteMove 		= false;
 			bool toolState 			= false;
 			bool correctLimit   	= true;
@@ -20,6 +23,13 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 			double x = 0.0;
 			double y = 0.0;
 			double z = 0.0;
+			
+			static MoveMode convert(const wxString& s, MoveMode defValue) {
+				if      ( s.IsSameAs("1D") )	return MM_1D;
+				else if ( s.IsSameAs("2D") )	return MM_2D;
+				else if ( s.IsSameAs("3D") )	return MM_3D;
+				else							return defValue;
+			}
 		};
 		
 		ManuallyPathHandlerCnc(CncControl* cnc);

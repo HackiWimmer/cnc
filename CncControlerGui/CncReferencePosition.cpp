@@ -63,7 +63,7 @@ CncReferencePosition::CncReferencePosition(wxWindow* parent)
 
 	m_cbPrevTest		->SetValue(false);
 	m_touchDiameter		->SetValidator(val);
-	m_touchDiameter		->SetValue(wxString::Format("%.3lf", 3.25));
+	m_touchDiameter		->SetValue(wxString::Format("%.3lf", 0.00));
 	m_workpiceThickness	->SetValue(wxString::Format("%.3lf", 0.00));
 	
 	setTouchCorner(TM_A);
@@ -84,7 +84,6 @@ CncReferencePosition::~CncReferencePosition() {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::onSelectEvaluationMode(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_simpleBookEvalMode->SetSelection(m_notebookEvalMode->GetSelection());
 	selectEvaluationMode();
 }
 ///////////////////////////////////////////////////////////////////
@@ -344,8 +343,8 @@ void CncReferencePosition::set(wxCommandEvent& event) {
 	if ( isWorkpieceThicknessNeeded() ) {
 		if ( cnc::dblCompareNull(getWorkpieceThickness()) == true ) {
 			wxMessageDialog dlg(this, 
-								_T("For the choosen mode workpiece thickness can't be 0.0"), 
-								_T("Invalid Workpiece Thickess  . . ."), 
+								_T("For the chosen mode workpiece thickness can't be 0.0"), 
+								_T("Invalid Workpiece Thickness  . . ."), 
 								wxOK|wxICON_ERROR|wxCENTRE);
 			dlg.ShowModal();
 			return;

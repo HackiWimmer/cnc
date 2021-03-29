@@ -236,6 +236,11 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncAnchorInfo.h"/>
+      <File Name="CncAnchorPosition.h"/>
+      <File Name="CncAnchorPosition.cpp"/>
+      <File Name="CncUsbConnectionObserver.h"/>
+      <File Name="CncUsbConnectionObserver.cpp"/>
       <File Name="CncGamepadMenuDlg.h"/>
       <File Name="CncGamepadMenuDlg.cpp"/>
       <File Name="CncStringLogger.cpp"/>
@@ -347,8 +352,6 @@
       <File Name="CncCurveLib.h"/>
       <File Name="CncUnitCalculator.cpp"/>
       <File Name="CncUnitCalculator.h"/>
-      <File Name="CncUsbConnectionDetected.h"/>
-      <File Name="CncUsbConnectionDetected.cpp"/>
       <File Name="CncGamepadControllerState.h"/>
       <File Name="CncGamepadControllerState.cpp"/>
       <File Name="CncReferencePosition.h"/>
@@ -580,6 +583,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncAnchorPosListCtrl.cpp"/>
+      <File Name="CncAnchorPosListCtrl.h"/>
       <File Name="CncLoggerListCtrl.cpp"/>
       <File Name="CncLoggerListCtrl.h"/>
       <File Name="CncGamepadCommandHistory.cpp"/>
