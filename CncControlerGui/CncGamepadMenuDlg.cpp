@@ -8,6 +8,10 @@
 ///////////////////////////////////////////////////////////////////
 CncGamepadMenuDlg::CncGamepadMenuDlg(wxWindow* parent)
 : CncGamepadMenuDlgBase(parent)
+, prevUp		(false)
+, prevDown		(false)
+, prevLeft		(false)
+, prevRight		(false)
 ///////////////////////////////////////////////////////////////////
 {
 
@@ -59,24 +63,27 @@ void CncGamepadMenuDlg::update(const GamepadEvent* state) {
 		}
 	};
 	
+	// .............................................................
+	// avoid switch bouncing
+	auto check = [&](bool& prev, bool curr) {
+		
+		if ( prev == false && curr == true )	prev = true;
+		else									prev = false;
+		
+		return prev;
+	};
+	
 	SetFocusFromKbd();
 	
-	/*
-	if ( state->data.buttonStart == true ) {
-		close();
-		return;
-	}
-	*/
-
 	// release corresponding key actions
-	if ( state->data.buttonLeft )			{ switchFocus(-1);				return; }
-	if ( state->data.buttonRight )			{ switchFocus(+1);				return; }
-	if ( state->data.buttonUp )				{ hitKey(WXK_UP);				return; }
-	if ( state->data.buttonDown )			{ hitKey(WXK_DOWN);				return; }
+	if ( check(prevLeft,	state->data.buttonLeft)  )	{ switchFocus(-1);				return; }
+	if ( check(prevRight,	state->data.buttonRight) )	{ switchFocus(+1);				return; }
+	if ( check(prevUp,		state->data.buttonUp)    )	{ hitKey(WXK_UP);				return; }
+	if ( check(prevDown,	state->data.buttonDown)  )	{ hitKey(WXK_DOWN);				return; }
 	
-	if ( state->data.buttonLeftShoulder )	{ hitKey(WXK_TAB, wxMOD_SHIFT);	return; }
-	if ( state->data.buttonRightShoulder )	{ hitKey(WXK_TAB);				return; }
-	if ( state->data.buttonB )				{ hitKey(WXK_SPACE);			return; }
+	if ( state->data.buttonLeftShoulder )				{ hitKey(WXK_TAB, wxMOD_SHIFT);	return; }
+	if ( state->data.buttonRightShoulder )				{ hitKey(WXK_TAB);				return; }
+	if ( state->data.buttonB )							{ hitKey(WXK_SPACE);			return; }
 	
 	// add more necessary events
 	// ....

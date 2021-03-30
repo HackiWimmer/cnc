@@ -14,6 +14,8 @@
 #include <wx/artprov.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
 #include <wx/timer.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
@@ -60,12 +62,14 @@ protected:
     wxPanel* m_lcdPlaceholderZ;
     wxPanel* m_panel76;
     wxStaticText* m_unitZ;
+    wxComboBox* m_cbPosTYpe;
     wxTimer* m_updateTimer;
     wxTimer* m_startupTimer;
 
 protected:
     virtual void onPaint(wxPaintEvent& event) { event.Skip(); }
     virtual void onSize(wxSizeEvent& event) { event.Skip(); }
+    virtual void onChangePositionType(wxCommandEvent& event) { event.Skip(); }
     virtual void onUpdateTimer(wxTimerEvent& event) { event.Skip(); }
     virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
 
@@ -95,9 +99,10 @@ public:
     wxPanel* GetLcdPlaceholderZ() { return m_lcdPlaceholderZ; }
     wxStaticText* GetUnitZ() { return m_unitZ; }
     wxPanel* GetPanel76() { return m_panel76; }
+    wxComboBox* GetCbPosTYpe() { return m_cbPosTYpe; }
     wxTimer* GetUpdateTimer() { return m_updateTimer; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }
-    CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,260), long style = wxTAB_TRAVERSAL);
+    CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,280), long style = wxTAB_TRAVERSAL);
     virtual ~CncLCDPositionPanelBase();
 };
 

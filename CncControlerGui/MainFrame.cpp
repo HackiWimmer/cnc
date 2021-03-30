@@ -1313,6 +1313,10 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logWarningMessage("Test function 3");
+	
+	{ CncDoublePosition p(+30, +20, +10); std::cout << p << " - > " << THE_BOUNDS->getHardwareOffset().transLog2Phy(p) << std::endl; }
+	{ CncDoublePosition p(-30, -20, -10); std::cout << p << " - > " << THE_BOUNDS->getHardwareOffset().transLog2Phy(p) << std::endl; }
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {

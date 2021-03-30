@@ -7,11 +7,17 @@
 class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 	
 	private:
-		wxLCDWindow* lcdF;
-		wxLCDWindow* lcdS;
-		wxLCDWindow* lcdX;
-		wxLCDWindow* lcdY;
-		wxLCDWindow* lcdZ;
+		
+		enum PosType { PT_PHYSICAL, PT_LOGICAL };
+		
+		PosType			posType;
+		wxLCDWindow*	lcdF;
+		wxLCDWindow*	lcdS;
+		wxLCDWindow*	lcdX;
+		wxLCDWindow*	lcdY;
+		wxLCDWindow*	lcdZ;
+		
+		void evaluatePositionType();
 	
 	public:
 		CncLCDPositionPanel(wxWindow* parent);
@@ -21,6 +27,7 @@ class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 		void updateValues();
 		
 	protected:
+		virtual void onChangePositionType(wxCommandEvent& event);
 		virtual void onPaint(wxPaintEvent& event);
 		virtual void onSize(wxSizeEvent& event);
 		virtual void onStartupTimer(wxTimerEvent& event);

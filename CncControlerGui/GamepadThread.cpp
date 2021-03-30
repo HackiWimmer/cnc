@@ -10,6 +10,8 @@ GamepadThread::GamepadThread(MainFrame *handler)
 , prevButtonLeftStick		(false)
 , prevButtonRightStick		(false)
 , prevBackButton			(false)
+, defaultSleepMillis		(100)
+, currentSleepMillis		(defaultSleepMillis)
 , avoidSwitchBouncingFact	(1)
 , prevUsageMode				(GamepadEvent::UM_NAV_GUI)
 , prevPosCtrlMode			(GamepadEvent::PCM_STICKS)
@@ -96,7 +98,7 @@ wxThread::ExitCode GamepadThread::Entry() {
 		// swap buffers
 		refState.data = curState.data;
 		
-		this->Sleep(100 * avoidSwitchBouncingFact );
+		this->Sleep(currentSleepMillis * avoidSwitchBouncingFact );
 		if ( avoidSwitchBouncingFact != 1 )
 			avoidSwitchBouncingFact = 1;
 			
@@ -164,9 +166,7 @@ void GamepadThread::evaluateNotifications(const CncGamepad& gamepad, GamepadEven
 	state.data.isChangedButtonLeftShoulder	= gamepad.isChangedButtonLeftShoulder();
 	state.data.isChangedButtonRightShoulder	= gamepad.isChangedButtonRightShoulder();
 	
-	
 	const int bouncingFact = 3;
-	
 	
 	// first of all determine the additional usage mode
 	if ( prevBackButton == false && state.data.buttonBack == true ) {
@@ -275,4 +275,5 @@ void GamepadThread::evaluateNotifications(const CncGamepad& gamepad, GamepadEven
 		state.data.isNaviButtonActive	= gamepad.isNaviButtonActive();
 	}
 }
+
 

@@ -4,6 +4,7 @@
 #include "3D/GLLabelCluster.h"
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "CncBoundarySpace.h"
 #include "CncVector.h"
 #include "CncAnchorInfo.h"
 #include "CncBoundarySpace.h"
@@ -697,9 +698,16 @@ void GLContextCncPathBase::drawAnchorPoints() {
 		const CncAnchorInfo& ai = it->second;
 		
 		if ( ai.show == true ) {
-			const float x = ai.pos.getX() * factorX;
-			const float y = ai.pos.getY() * factorY;
-			const float z = ai.pos.getZ() * factorZ;
+			
+			// abs position can't shown i this case
+			if ( ai.absolute && THE_BOUNDS->getHardwareOffset().isValid() == false )
+				continue;
+				
+			const CncDoublePosition pos(ai.absolute ? THE_BOUNDS->getHardwareOffset().transPhy2Log(ai.pos) : ai.pos);
+			
+			const float x = pos.getX() * factorX;
+			const float y = pos.getY() * factorY;
+			const float z = pos.getZ() * factorZ;
 			
 			const bool  bx = ai.hasX();
 			const bool  by = ai.hasY();

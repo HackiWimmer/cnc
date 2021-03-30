@@ -68,6 +68,58 @@ void CncBoundarySpace::HardwareOriginOffset::set(const CncDoublePosition& o) {
 	if ( THE_CONFIG )	THE_CONFIG->convertMetricToSteps(offset, o);
 	else				offset.zeroXYZ();
 }
+///////////////////////////////////////////////////////////////////	
+CncLongPosition CncBoundarySpace::HardwareOriginOffset::transLog2Phy(const CncLongPosition& logicPos) const {
+///////////////////////////////////////////////////////////////////	
+	// transforms a logic cnc position into a corresponding physical hardware position
+	CncLongPosition ret;
+	
+	// regarding Xmin, Ymin, Zmax as hardware reference ...
+	ret.setX((getAsStepsX() - logicPos.getX()) * -1);
+	ret.setY((getAsStepsY() - logicPos.getY()) * -1);
+	ret.setZ((getAsStepsZ() - logicPos.getZ()) * -1);
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////	
+CncDoublePosition CncBoundarySpace::HardwareOriginOffset::transLog2Phy(const CncDoublePosition& logicPos) const {
+///////////////////////////////////////////////////////////////////	
+	// transforms a logic cnc position into a corresponding physical hardware position
+	CncDoublePosition ret;
+	
+	// regarding Xmin, Ymin, Zmax as hardware reference ...
+	ret.setX((getAsMetricX() - logicPos.getX()) * -1.0);
+	ret.setY((getAsMetricY() - logicPos.getY()) * -1.0);
+	ret.setZ((getAsMetricZ() - logicPos.getZ()) * -1.0);
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////	
+CncLongPosition CncBoundarySpace::HardwareOriginOffset::transPhy2Log(const CncLongPosition& physicalPos) const {
+///////////////////////////////////////////////////////////////////	
+	// transforms a physical hardware position into a corresponding logic cnc position
+	CncLongPosition ret;
+	
+	// regarding Xmin, Ymin, Zmax as hardware reference ...
+	ret.setX(getAsStepsX() + physicalPos.getX());
+	ret.setY(getAsStepsY() + physicalPos.getY());
+	ret.setZ(getAsStepsZ() + physicalPos.getZ());
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////	
+CncDoublePosition CncBoundarySpace::HardwareOriginOffset::transPhy2Log(const CncDoublePosition& physicalPos) const {
+///////////////////////////////////////////////////////////////////	
+	// transforms a physical hardware position into a corresponding logic cnc position
+	CncDoublePosition ret;
+	
+	// regarding Xmin, Ymin, Zmax as hardware reference ...
+	ret.setX(getAsMetricX() + physicalPos.getX());
+	ret.setY(getAsMetricY() + physicalPos.getY());
+	ret.setZ(getAsMetricZ() + physicalPos.getZ());
+	
+	return ret;
+}
 
 
 

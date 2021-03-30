@@ -40,6 +40,12 @@ class CncBoundarySpace {
 				double					getAsMetricX()		const;
 				double					getAsMetricY()		const;
 				double					getAsMetricZ()		const;
+				
+				CncLongPosition			transLog2Phy(const CncLongPosition& logicPos) const;
+				CncDoublePosition		transLog2Phy(const CncDoublePosition& logicPos) const;
+				
+				CncLongPosition			transPhy2Log(const CncLongPosition& physicalPos) const;
+				CncDoublePosition		transPhy2Log(const CncDoublePosition& physicalPos) const;
 		};
 
 	

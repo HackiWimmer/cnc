@@ -1,13 +1,15 @@
 
 [Anchor_ZTouch_1]
-D=0
+D=1
+C=1
 T=XYZ
-X=0.11
-Y=0.12
-Z=0.13
+X=10.0
+Y=10.0
+Z=0.0
 
 [Anchor_ZTouch_2]
 D=0
+C=1
 T=XYZ
 X=0.21
 Y=0.22

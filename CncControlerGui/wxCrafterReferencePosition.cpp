@@ -1284,7 +1284,7 @@ CncAnchorPositionBase::CncAnchorPositionBase(wxWindow* parent, wxWindowID id, co
     
     flexGridSizer535->Add(m_staticLine577, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizerN = new wxFlexGridSizer(1, 5, 0, 0);
+    wxFlexGridSizer* flexGridSizerN = new wxFlexGridSizer(1, 7, 0, 0);
     flexGridSizerN->SetFlexibleDirection( wxBOTH );
     flexGridSizerN->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizerN->AddGrowableCol(2);
@@ -1306,6 +1306,20 @@ CncAnchorPositionBase::CncAnchorPositionBase(wxWindow* parent, wxWindowID id, co
     #endif
     
     flexGridSizerN->Add(m_valN, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText593 = new wxStaticText(this, wxID_ANY, _("Coord:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText593Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText593->SetFont(m_staticText593Font);
+    
+    flexGridSizerN->Add(m_staticText593, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_valCArr;
+    m_valCArr.Add(wxT("Absolute"));
+    m_valCArr.Add(wxT("Relative"));
+    m_valC = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_valCArr, wxCB_READONLY);
+    m_valC->SetSelection(1);
+    
+    flexGridSizerN->Add(m_valC, 0, wxALL, WXC_FROM_DIP(1));
     
     m_staticText579 = new wxStaticText(this, wxID_ANY, _("Display"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText579Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));

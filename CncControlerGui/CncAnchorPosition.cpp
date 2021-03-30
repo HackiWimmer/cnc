@@ -82,6 +82,7 @@ void CncAnchorPosition::load() {
 		ai.name		= wxString::Format("*%s", anchorNames.Item(i));
 		ai.type		= db.Read("T", "XYZ");
 		ai.fixed	= true;
+		ai.absolute	= db.ReadBool("C", false);
 		ai.show		= db.ReadBool("D", true);
 		ai.pos		= { db.ReadDouble("X", 0.0), db.ReadDouble("Y", 0.0), db.ReadDouble("Z", 0.0) };
 		anchorList->addAnchor(ai);
@@ -103,11 +104,12 @@ void CncAnchorPosition::provide() {
 		const CncAnchorPosListCtrl::AnchorInfo& sai = it->second;
 		CncAnchorInfo nai;
 		
-		nai.show	= sai.show; 
-		nai.fixed	= sai.fixed;
-		nai.name	= sai.name;
-		nai.type	= sai.type;
-		nai.pos		= sai.pos;
+		nai.show		= sai.show; 
+		nai.fixed		= sai.fixed;
+		nai.absolute	= sai.absolute;
+		nai.name		= sai.name;
+		nai.type		= sai.type;
+		nai.pos			= sai.pos;
 		
 		cam[nai.name] = nai;
 	}
@@ -136,6 +138,7 @@ void CncAnchorPosition::notifySelection(const CncAnchorPosListCtrl::AnchorInfo& 
 	m_valN->ChangeValue(ai.name);
 	m_valT->SetValue(ai.type);
 	m_valS->SetValue(ai.show);
+	m_valC->SetValue(ai.absolute ? "Absolute" : "Relative");
 	m_valX->ChangeValue(wxString::Format("%.3lf", ai.pos.getX()));
 	m_valY->ChangeValue(wxString::Format("%.3lf", ai.pos.getY()));
 	m_valZ->ChangeValue(wxString::Format("%.3lf", ai.pos.getZ()));
@@ -161,6 +164,7 @@ void CncAnchorPosition::update() {
 	// let m_valN enabled to provide the add path
 	m_valT->Enable(canMod);
 	m_valS->Enable(canMod);
+	m_valC->Enable(canMod);
 	m_valX->Enable(canMod);
 	m_valY->Enable(canMod);
 	m_valZ->Enable(canMod);
@@ -181,10 +185,11 @@ void CncAnchorPosition::onMod(wxCommandEvent& event) {
 	double z; m_valZ->GetValue().ToDouble(&z);
 	
 	CncAnchorPosListCtrl::AnchorInfo ai;
-	ai.name	= m_valN->GetValue();
-	ai.pos	= { x, y, z };
-	ai.show = m_valS->GetValue();
-	ai.type	= m_valT->GetValue();
+	ai.name		= m_valN->GetValue();
+	ai.pos		= { x, y, z };
+	ai.show 	= m_valS->GetValue();
+	ai.type		= m_valT->GetValue();
+	ai.absolute	= m_valC->GetValue().StartsWith("Abs") ? true: false;
 	
 	ai.name.Replace("*", "");
 	

@@ -23,6 +23,7 @@ CncAnchorPosListCtrl::CncAnchorPosListCtrl(wxWindow *parent, long style)
 	AppendColumn(" ",		wxLIST_FORMAT_LEFT, 	 20);
 	AppendColumn("Name:",	wxLIST_FORMAT_LEFT, 	160);
 	AppendColumn("*",		wxLIST_FORMAT_CENTRE, 	 40);
+	AppendColumn("Coord",	wxLIST_FORMAT_RIGHT,	 80);
 	AppendColumn("Type",	wxLIST_FORMAT_RIGHT,	 80);
 	AppendColumn("X",		wxLIST_FORMAT_RIGHT,	 80);
 	AppendColumn("Y",		wxLIST_FORMAT_RIGHT,	 80);
@@ -87,9 +88,10 @@ wxString CncAnchorPosListCtrl::OnGetItemText(long item, long column) const {
 	const AnchorInfo ai = anchorMap.at(anchorIdx.at(item));
 	
 	switch ( column ) {
-		case COL_MODE:	return _(ai.fixed ? "*" : " ");
+		case COL_MODE:	return _(ai.fixed		? "*"   : " ");
 		case COL_NAME:	return _(ai.name);
-		case COL_SHOW:	return _(ai.show  ? "Y" : "N");
+		case COL_SHOW:	return _(ai.show  		? "Y"   : "N");
+		case COL_COORD:	return _(ai.absolute	? "Abs" : "Rel");
 		case COL_TYPE:	return _(ai.type);
 		case COL_X:		return _(ai.hasX() ? wxString::Format("%.3lf", ai.pos.getX()) : "");
 		case COL_Y:		return _(ai.hasY() ? wxString::Format("%.3lf", ai.pos.getY()) : "");

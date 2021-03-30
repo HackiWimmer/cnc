@@ -1,15 +1,19 @@
 #include "GlobalFunctions.h"
 #include "wxCrafterLCDPanel.h"
 #include "MainFrame.h"
+#include "CncConfig.h"
+#include "CncContext.h"
+#include "CncBoundarySpace.h"
 #include "CncLCDPositionPanel.h"
 
 ///////////////////////////////////////////////////////////////////
 CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 : CncLCDPositionPanelBase(parent)
-, lcdF(NULL)
-, lcdX(NULL)
-, lcdY(NULL)
-, lcdZ(NULL)
+, posType 	(PT_LOGICAL)
+, lcdF		(NULL)
+, lcdX		(NULL)
+, lcdY		(NULL)
+, lcdZ		(NULL)
 ///////////////////////////////////////////////////////////////////
 {
 	lcdF = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
@@ -38,6 +42,8 @@ CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 	lcdX->SetValue( "0.000" ); 
 	lcdY->SetValue( "0.000" ); 
 	lcdZ->SetValue( "0.000" ); 
+	
+	evaluatePositionType();
 }
 ///////////////////////////////////////////////////////////////////
 CncLCDPositionPanel::~CncLCDPositionPanel() {
@@ -96,9 +102,41 @@ void CncLCDPositionPanel::updateValues() {
 	lcdF->SetValue(THE_APP->GetConfiguredFeedSpeed()->GetValue());
 	lcdS->SetValue(wxString::Format("%.1lf", THE_APP->getConfiguredSpindleSpeed()));
 	
-	lcdX->SetValue(THE_APP->GetXAxisCtl()->GetValue());
-	lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());
-	lcdZ->SetValue(THE_APP->GetZAxisCtl()->GetValue());
+	if ( posType == PT_LOGICAL ) {
+		lcdX->SetValue(THE_APP->GetXAxisCtl()->GetValue());
+		lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());
+		lcdZ->SetValue(THE_APP->GetZAxisCtl()->GetValue());
+	}
+	else {
+		double x; THE_APP->GetXAxisCtl()->GetValue().ToDouble(&x);
+		double y; THE_APP->GetYAxisCtl()->GetValue().ToDouble(&y);
+		double z; THE_APP->GetZAxisCtl()->GetValue().ToDouble(&z);
+		
+		CncDoublePosition logPos(x, y, z);
+		CncDoublePosition phyPos = THE_BOUNDS->getHardwareOffset().transLog2Phy(logPos);
+		
+		lcdX->SetValue(wxString::Format("%.3lf", phyPos.getX()));
+		lcdY->SetValue(wxString::Format("%.3lf", phyPos.getY()));
+		lcdZ->SetValue(wxString::Format("%.3lf", phyPos.getZ()));
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncLCDPositionPanel::onChangePositionType(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	evaluatePositionType();
+}
+///////////////////////////////////////////////////////////////////
+void CncLCDPositionPanel::evaluatePositionType() {
+///////////////////////////////////////////////////////////////////
+	const wxString& t = m_cbPosTYpe->GetValue();
+	
+	if ( t.StartsWith("Phy") )	posType = PT_PHYSICAL;
+	else						posType = PT_LOGICAL;
+	
+	if ( THE_CONTEXT->hasHardware() == true ) {
+		if ( THE_BOUNDS->getHardwareOffset().isValid() == false )
+			cnc::trc.logWarning("The hardware offset is not available. Please perform a reference evaluation, otherwise there's no difference between the physical and logical mode.");
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncLCDPositionPanel::onUpdateTimer(wxTimerEvent& event) {

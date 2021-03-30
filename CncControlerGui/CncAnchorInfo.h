@@ -9,6 +9,7 @@ struct CncAnchorInfo {
 	
 	bool				show		= true; 
 	bool				fixed		= false;
+	bool				absolute	= false;
 	wxString			name		= "";
 	wxString			type		= "XYZ";
 	CncDoublePosition	pos			= { 0.0, 0.0, 0.0 };

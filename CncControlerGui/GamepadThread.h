@@ -14,11 +14,13 @@ typedef void (wxEvtHandler::*GamepadEventFunction)(GamepadEvent&);
 class GamepadThread : public wxThread {
 	
 	protected:
-		MainFrame* 					pHandler;
-		bool 						exit;
-		bool 						prevButtonLeftStick;
-		bool 						prevButtonRightStick;
-		bool 						prevBackButton;
+		MainFrame*					pHandler;
+		bool						exit;
+		bool						prevButtonLeftStick;
+		bool						prevButtonRightStick;
+		bool						prevBackButton;
+		int							defaultSleepMillis;
+		int							currentSleepMillis;
 		int							avoidSwitchBouncingFact; 
 		GamepadEvent::UsageMode 	prevUsageMode;
 		GamepadEvent::PosCtrlMode 	prevPosCtrlMode;

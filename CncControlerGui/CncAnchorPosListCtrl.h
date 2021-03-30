@@ -61,11 +61,12 @@ class CncAnchorPosListCtrl : public CncLargeScaledListCtrl {
 		static const int COL_MODE 					=  0;
 		static const int COL_NAME 					=  1;
 		static const int COL_SHOW	 				=  2;
-		static const int COL_TYPE	 				=  3;
-		static const int COL_X						=  4;
-		static const int COL_Y 						=  5;
-		static const int COL_Z	 					=  6;
-		static const int TOTAL_COL_COUNT			=  7;
+		static const int COL_COORD	 				=  3;
+		static const int COL_TYPE	 				=  4;
+		static const int COL_X						=  5;
+		static const int COL_Y 						=  6;
+		static const int COL_Z	 					=  7;
+		static const int TOTAL_COL_COUNT			=  8;
 		
 		CncAnchorPosListCtrl(wxWindow *parent, long style);
 		virtual ~CncAnchorPosListCtrl();

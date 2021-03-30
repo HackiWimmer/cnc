@@ -24,7 +24,7 @@ CncLCDPositionPanelBase::CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id
     }
     this->SetBackgroundColour(wxColour(wxT("rgb(64,64,64)")));
     
-    wxFlexGridSizer* flexGridSizer3 = new wxFlexGridSizer(5, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3 = new wxFlexGridSizer(6, 1, 0, 0);
     flexGridSizer3->SetFlexibleDirection( wxBOTH );
     flexGridSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3->AddGrowableCol(0);
@@ -304,6 +304,21 @@ CncLCDPositionPanelBase::CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id
     flexGridSizer32->Add(m_unitZ, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(0));
     m_unitZ->SetMinSize(wxSize(38,-1));
     
+    wxArrayString m_cbPosTYpeArr;
+    m_cbPosTYpeArr.Add(wxT("Physical hardware positions"));
+    m_cbPosTYpeArr.Add(wxT("Logical CNC positions"));
+    m_cbPosTYpe = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_cbPosTYpeArr, 0);
+    m_cbPosTYpe->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_cbPosTYpe->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    wxFont m_cbPosTYpeFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_cbPosTYpe->SetFont(m_cbPosTYpeFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_cbPosTYpe->SetHint(wxT(""));
+    #endif
+    m_cbPosTYpe->SetSelection(1);
+    
+    flexGridSizer3->Add(m_cbPosTYpe, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
     m_updateTimer = new wxTimer;
     m_updateTimer->Start(300, false);
     
@@ -312,14 +327,15 @@ CncLCDPositionPanelBase::CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id
     
     SetBackgroundColour(wxColour(wxT("rgb(64,64,64)")));
     SetName(wxT("CncLCDPositionPanelBase"));
-    SetMinClientSize(wxSize(500,260));
-    SetSize(wxDLG_UNIT(this, wxSize(500,260)));
+    SetMinClientSize(wxSize(500,280));
+    SetSize(wxDLG_UNIT(this, wxSize(500,280)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
     // Connect events
     this->Connect(wxEVT_PAINT, wxPaintEventHandler(CncLCDPositionPanelBase::onPaint), NULL, this);
     this->Connect(wxEVT_SIZE, wxSizeEventHandler(CncLCDPositionPanelBase::onSize), NULL, this);
+    m_cbPosTYpe->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncLCDPositionPanelBase::onChangePositionType), NULL, this);
     m_updateTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncLCDPositionPanelBase::onUpdateTimer), NULL, this);
     m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncLCDPositionPanelBase::onStartupTimer), NULL, this);
     
@@ -329,6 +345,7 @@ CncLCDPositionPanelBase::~CncLCDPositionPanelBase()
 {
     this->Disconnect(wxEVT_PAINT, wxPaintEventHandler(CncLCDPositionPanelBase::onPaint), NULL, this);
     this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(CncLCDPositionPanelBase::onSize), NULL, this);
+    m_cbPosTYpe->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncLCDPositionPanelBase::onChangePositionType), NULL, this);
     m_updateTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncLCDPositionPanelBase::onUpdateTimer), NULL, this);
     m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncLCDPositionPanelBase::onStartupTimer), NULL, this);
     

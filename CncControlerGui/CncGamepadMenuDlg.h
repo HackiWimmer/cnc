@@ -17,7 +17,12 @@ class CncGamepadMenuDlg : public CncGamepadMenuDlgBase {
 		virtual void onFunction(wxCommandEvent& event);
 		
 	private:
-	
+		
+		bool prevUp;
+		bool prevDown;
+		bool prevLeft;
+		bool prevRight;
+		
 		void close();
 };
 

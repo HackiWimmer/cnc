@@ -319,6 +319,8 @@ protected:
     wxStaticLine* m_staticLine577;
     wxStaticText* m_staticText555;
     wxTextCtrl* m_valN;
+    wxStaticText* m_staticText593;
+    wxComboBox* m_valC;
     wxStaticText* m_staticText579;
     wxCheckBox* m_valS;
     wxStaticText* m_staticText4711;
@@ -352,6 +354,8 @@ public:
     wxStaticLine* GetStaticLine577() { return m_staticLine577; }
     wxStaticText* GetStaticText555() { return m_staticText555; }
     wxTextCtrl* GetValN() { return m_valN; }
+    wxStaticText* GetStaticText593() { return m_staticText593; }
+    wxComboBox* GetValC() { return m_valC; }
     wxStaticText* GetStaticText579() { return m_staticText579; }
     wxCheckBox* GetValS() { return m_valS; }
     wxStaticText* GetStaticText4711() { return m_staticText4711; }
