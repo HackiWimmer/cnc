@@ -3137,6 +3137,8 @@ void MainFrame::onPodestManagement(wxCommandEvent& event) {
 	const bool prev = m_miRqtIdleMessages->IsChecked();
 	m_miRqtIdleMessages->Check(false);
 	
+		CncGampadDeactivator cpd(this);
+	
 		podestManagementDlg->ShowModal();
 		waitActive(500);
 		

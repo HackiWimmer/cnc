@@ -87,22 +87,3 @@ const wxString& CncPathListEntry::traceEntryToString(wxString& ret) const {
 	return ret;
 }
 
-
-
-class xxxxxxxxx {
-	
-	public:
-	xxxxxxxxx() {
-		CncPathListEntry pe;
-		pe.setToolChange();
-		pe.addPositionChange();
-		
-		std::cout << "content : " << pe.content			<< std::endl;
-		std::cout << "hasT    : " << pe.hasToolChange()	<< std::endl;
-		
-		
-		#warning
-		//abort();
-	}
-	
-} XXXXXXX;
