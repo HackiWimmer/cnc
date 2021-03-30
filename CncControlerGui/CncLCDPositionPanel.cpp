@@ -14,6 +14,8 @@ CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 , lcdX		(NULL)
 , lcdY		(NULL)
 , lcdZ		(NULL)
+, defBckCol	()
+, defGryCol	()
 ///////////////////////////////////////////////////////////////////
 {
 	lcdF = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
@@ -31,6 +33,9 @@ CncLCDPositionPanel::CncLCDPositionPanel(wxWindow* parent)
 	lcdZ = new wxLCDWindow(this, wxDefaultPosition, wxDefaultSize);
 	GblFunc::replaceControl(m_lcdPlaceholderZ, lcdZ);
 	
+	defBckCol = lcdZ->GetBackgroundColour();
+	defGryCol = lcdZ->GetGrayColour();
+
 	lcdF->SetNumberDigits(8);
 	lcdS->SetNumberDigits(8);
 	lcdX->SetNumberDigits(8);
@@ -102,6 +107,12 @@ void CncLCDPositionPanel::updateValues() {
 	lcdF->SetValue(THE_APP->GetConfiguredFeedSpeed()->GetValue());
 	lcdS->SetValue(wxString::Format("%.1lf", THE_APP->getConfiguredSpindleSpeed()));
 	
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == false ) {
+		m_cbPosTYpe->Select(PT_LOGICAL);
+		posType = PT_LOGICAL;
+		decoratePosType(posType);
+	}
+	
 	if ( posType == PT_LOGICAL ) {
 		lcdX->SetValue(THE_APP->GetXAxisCtl()->GetValue());
 		lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());
@@ -134,9 +145,34 @@ void CncLCDPositionPanel::evaluatePositionType() {
 	else						posType = PT_LOGICAL;
 	
 	if ( THE_CONTEXT->hasHardware() == true ) {
-		if ( THE_BOUNDS->getHardwareOffset().isValid() == false )
-			cnc::trc.logWarning("The hardware offset is not available. Please perform a reference evaluation, otherwise there's no difference between the physical and logical mode.");
+		if ( posType == PT_PHYSICAL) {
+			if ( THE_BOUNDS->getHardwareOffset().isValid() == false ) {
+				cnc::trc.logWarning("The hardware offset is not available." \
+									"Please perform a reference evaluation," \
+									"otherwise there's no difference between" \
+									"the physical and logical mode.");
+				
+				m_cbPosTYpe->Select(PT_LOGICAL);
+				posType = PT_LOGICAL;
+			}
+		}
 	}
+	
+	decoratePosType(posType);
+}
+///////////////////////////////////////////////////////////////////
+void CncLCDPositionPanel::decoratePosType(PosType pt) {
+///////////////////////////////////////////////////////////////////
+	const wxColour bckCol = (posType == PT_PHYSICAL ? wxColour(40, 40, 40) : defBckCol);
+	const wxColour gryCol = (posType == PT_PHYSICAL ? wxColour(40, 40, 40) : defGryCol);
+	
+	lcdX->SetBackgroundColour(bckCol);
+	lcdY->SetBackgroundColour(bckCol);
+	lcdZ->SetBackgroundColour(bckCol);
+	
+	lcdX->SetGrayColour(gryCol);
+	lcdY->SetGrayColour(gryCol);
+	lcdZ->SetGrayColour(gryCol);
 }
 ///////////////////////////////////////////////////////////////////
 void CncLCDPositionPanel::onUpdateTimer(wxTimerEvent& event) {

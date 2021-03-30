@@ -307,14 +307,11 @@ CncLCDPositionPanelBase::CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id
     wxArrayString m_cbPosTYpeArr;
     m_cbPosTYpeArr.Add(wxT("Physical hardware positions"));
     m_cbPosTYpeArr.Add(wxT("Logical CNC positions"));
-    m_cbPosTYpe = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_cbPosTYpeArr, 0);
+    m_cbPosTYpe = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_cbPosTYpeArr, wxCB_READONLY);
     m_cbPosTYpe->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_cbPosTYpe->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     wxFont m_cbPosTYpeFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_cbPosTYpe->SetFont(m_cbPosTYpeFont);
-    #if wxVERSION_NUMBER >= 3000
-    m_cbPosTYpe->SetHint(wxT(""));
-    #endif
     m_cbPosTYpe->SetSelection(1);
     
     flexGridSizer3->Add(m_cbPosTYpe, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));

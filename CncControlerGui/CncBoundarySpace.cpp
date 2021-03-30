@@ -74,10 +74,14 @@ CncLongPosition CncBoundarySpace::HardwareOriginOffset::transLog2Phy(const CncLo
 	// transforms a logic cnc position into a corresponding physical hardware position
 	CncLongPosition ret;
 	
+	const int32_t x = getAsStepsX() - logicPos.getX();
+	const int32_t y = getAsStepsY() - logicPos.getY();
+	const int32_t z = getAsStepsZ() - logicPos.getZ();
+
 	// regarding Xmin, Ymin, Zmax as hardware reference ...
-	ret.setX((getAsStepsX() - logicPos.getX()) * -1);
-	ret.setY((getAsStepsY() - logicPos.getY()) * -1);
-	ret.setZ((getAsStepsZ() - logicPos.getZ()) * -1);
+	ret.setX(x == 0 ? x : x * -1);
+	ret.setY(y == 0 ? y : y * -1);
+	ret.setZ(z == 0 ? z : z * -1);
 	
 	return ret;
 }
@@ -87,10 +91,14 @@ CncDoublePosition CncBoundarySpace::HardwareOriginOffset::transLog2Phy(const Cnc
 	// transforms a logic cnc position into a corresponding physical hardware position
 	CncDoublePosition ret;
 	
+	const double x = getAsMetricX() - logicPos.getX();
+	const double y = getAsMetricY() - logicPos.getY();
+	const double z = getAsMetricZ() - logicPos.getZ();
+	
 	// regarding Xmin, Ymin, Zmax as hardware reference ...
-	ret.setX((getAsMetricX() - logicPos.getX()) * -1.0);
-	ret.setY((getAsMetricY() - logicPos.getY()) * -1.0);
-	ret.setZ((getAsMetricZ() - logicPos.getZ()) * -1.0);
+	ret.setX(cnc::dblCmp::nu(x) ? x : x * -1.0);
+	ret.setY(cnc::dblCmp::nu(y) ? y : y * -1.0);
+	ret.setZ(cnc::dblCmp::nu(y) ? z : z * -1.0);
 	
 	return ret;
 }

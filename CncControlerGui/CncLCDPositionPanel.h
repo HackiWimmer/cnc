@@ -8,7 +8,7 @@ class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 	
 	private:
 		
-		enum PosType { PT_PHYSICAL, PT_LOGICAL };
+		enum PosType { PT_PHYSICAL = 0, PT_LOGICAL = 1 };
 		
 		PosType			posType;
 		wxLCDWindow*	lcdF;
@@ -17,7 +17,11 @@ class CncLCDPositionPanel : public CncLCDPositionPanelBase {
 		wxLCDWindow*	lcdY;
 		wxLCDWindow*	lcdZ;
 		
+		wxColour		defBckCol;
+		wxColor			defGryCol;
+		
 		void evaluatePositionType();
+		void decoratePosType(PosType pt);
 	
 	public:
 		CncLCDPositionPanel(wxWindow* parent);

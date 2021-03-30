@@ -755,7 +755,7 @@ void GLContextCncPathBase::drawAnchorPoints() {
 				
 				if ( bz == false ) 
 					glDisable(GL_LINE_STIPPLE);
-				}
+			}
 		}
 	}
 }
@@ -846,8 +846,8 @@ void GLContextCncPathBase::popProcessMode() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::pushInteractiveProcessMode() {
 /////////////////////////////////////////////////////////////////
-	continiousDirConeFlag = false;
 	setFrontCatchingMode(FCM_KEEP_IN_FRAME);
+	continiousDirConeFlag = true;
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::popInteractiveProcessMode() {

@@ -1314,8 +1314,7 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logWarningMessage("Test function 3");
 	
-	{ CncDoublePosition p(+30, +20, +10); std::cout << p << " - > " << THE_BOUNDS->getHardwareOffset().transLog2Phy(p) << std::endl; }
-	{ CncDoublePosition p(-30, -20, -10); std::cout << p << " - > " << THE_BOUNDS->getHardwareOffset().transLog2Phy(p) << std::endl; }
+	THE_CONTEXT->anchorMap;
 	
 }
 ///////////////////////////////////////////////////////////////////
@@ -8171,6 +8170,11 @@ void MainFrame::updateHardwareReference() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->hasHardware() == false ) {
+		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
+		return;
+	}
+	
 	wxString msg("Do you really want to evaluate the hardware reference position?\n\n");
 	msg.append("Execution Plan:\n\n");
 	msg.append(" 1. Moves Z axis to maximum position\n");
@@ -8194,12 +8198,14 @@ void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 		disableControls();
 		
 		CNC_TRANSACTION_LOCK
-
+		
+		motionMonitor->pushInteractiveProcessMode();
+		
 		if ( cnc->evaluateHardwareReference() == true )
 			motionMonitor->clear();
 			
+		motionMonitor->popInteractiveProcessMode();
 		updateHardwareReference();
-		
 		enableControls();
 	}
 }
@@ -8219,6 +8225,11 @@ void MainFrame::updateHardwareDimensions() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->hasHardware() == false ) {
+		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
+		return;
+	}
+	
 	wxString msg("Do you really want to evaluate the dimensions of the XY plane?\n");
 	msg.append("Execution Plan:\n\n");
 	msg.append(" 1. Moves Z axis to maximum position\n");
@@ -8247,6 +8258,7 @@ void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {
 		
 		CNC_TRANSACTION_LOCK
 
+		motionMonitor->pushInteractiveProcessMode();
 		CncControl::DimensionXYPlane result;
 		if ( cnc->evaluateHardwareDimensionsXYPlane(result) ) {
 			m_cbHardwareDimensionEvaluatedX->SetValue(true);
@@ -8256,6 +8268,7 @@ void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {
 			m_hardwareDimensionY->ChangeValue(wxString::Format("%.3lf", result.dimensionY));
 		}
 		
+		motionMonitor->popInteractiveProcessMode();
 		enableControls();
 	}
 }
