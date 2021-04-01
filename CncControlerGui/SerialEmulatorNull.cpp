@@ -552,14 +552,24 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeSigUpdate(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	// declare return values for decodeSigUpdate(...)
+	unsigned char pid;
 	int32_t x = 0L, y = 0L, z = 0L;
 	
-	if ( CncCommandDecoder::decodeSigUpdate(buffer, nbByte, x, y, z) == false ) 
+	if ( CncCommandDecoder::decodeSigUpdate(buffer, nbByte, pid, x, y, z) == false ) 
 		return false;
 	
-	interactiveX = x;
-	interactiveY = y;
-	interactiveZ = z;
+	switch ( pid ) {
+		case PID_XYZ_INTERACTIVE_POS:
+				interactiveX = x;
+				interactiveY = y;
+				interactiveZ = z;
+				break;
+				
+		case PID_HEARTBEAT:
+				// nothing to do
+				break;
+	}
 	
 	return true;
 }

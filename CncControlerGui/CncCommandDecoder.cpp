@@ -444,7 +444,8 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncCommandDecoder::decodeSigUpdate(const unsigned char *buffer, unsigned int nbByte, int32_t& x , int32_t& y , int32_t& z) {
+bool CncCommandDecoder::decodeSigUpdate(const unsigned char *buffer, unsigned int nbByte, 
+										unsigned char& pid, int32_t& x , int32_t& y , int32_t& z) {
 ///////////////////////////////////////////////////////////////////
 	x = 0; y = 0; z = 0;
 	
@@ -464,7 +465,7 @@ bool CncCommandDecoder::decodeSigUpdate(const unsigned char *buffer, unsigned in
 		return false; 
 	}
 	
-	const unsigned char pid = buffer[2];
+	pid = buffer[2];
 	switch ( pid ) {
 		case PID_XYZ_INTERACTIVE_POS:
 		{
