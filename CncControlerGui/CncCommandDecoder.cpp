@@ -404,6 +404,7 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 	switch ( buffer[0] ) {
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE:
+		case CMD_MOVE_UNTIL_CONTACT:
 		case CMD_MOVE_UNTIL_LIMIT_IS_FREE:	break;
 		
 		default:							std::cerr << "CncCommandDecoder::decodeMove() Invalid command = " << buffer[0] << std::endl;

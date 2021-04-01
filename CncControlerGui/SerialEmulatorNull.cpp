@@ -869,8 +869,11 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveInteractive(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( writeMoveRawCallback(buffer, nbByte)  == false )
-		return false;
+	// An interactive move is not decodes as a "normal" move,. Therefore, the call below will fail.
+	// If a interactive more should be also handled be the streamer classes a separate callback has 
+	// to be established instead.
+	//if ( writeMoveRawCallback(buffer, nbByte)  == false )
+	//	return false;
 		
 	if ( interactiveMove == true ) 
 		return false;
@@ -880,9 +883,9 @@ bool SerialEmulatorNULL::writeMoveInteractive(unsigned char *buffer, unsigned in
 	interactiveY = 0;
 	interactiveZ = 0;
 	
-	// For intractive moves the impulse count at the move start isn't defined - by concept.
-	// Therefore, to get a fully supported acceleration at the begining a value of 0 is used here,
-	// which initialzes the accel manager to the interactive mode. The deacceleration phase isn't much
+	// For interactive moves the impulse count at the move start isn't defined - by concept.
+	// Therefore, to get a fully supported acceleration at the beginning a value of 0 is used here,
+	// which initializes the accel manager to the interactive mode. The de acceleration phase isn't much
 	// imported here, because we can loose steps . . . 
 	const uint32_t defaultImpulses = 0;
 

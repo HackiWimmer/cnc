@@ -55,6 +55,9 @@ bool SpyHexDecoder::readNextHexBytes(wxString& hexValues, unsigned int count, wx
 	const int totalLen  = hexValues.length();
 	const int neededLen = count * 2 + (count - 1) * 1;
 	
+	if ( totalLen == 0 )
+		return true;
+	
 	if ( totalLen < neededLen ) {
 		std::cerr << "SpyHexDecoder::readNextHexBytes(): totalLen < neededLen" << std::endl;
 		std::cerr << " - totalLen  : " << totalLen  << std::endl;
