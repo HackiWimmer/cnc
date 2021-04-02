@@ -236,6 +236,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncGamepadFilter.h"/>
+      <File Name="CncGamepadFilter.cpp"/>
       <File Name="CncAnchorInfo.h"/>
       <File Name="CncAnchorPosition.h"/>
       <File Name="CncAnchorPosition.cpp"/>

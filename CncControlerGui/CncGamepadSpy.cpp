@@ -5,7 +5,9 @@
 #include "MainFrameProxy.h"
 #include "MainFrame.h"
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "CncGamepadDirectionPanel.h"
+#include "CncGamepadFilter.h"
 #include "CncGamepadCommandHistory.h"
 #include "CncGamepadMenuDlg.h"
 #include "CncGamepadSpy.h"
@@ -206,8 +208,8 @@ void CncGamepadSpy::update(const GamepadEvent* state) {
 		return;
 	}
 	
-	#warning currently only a test
-	if ( true ) {
+	// handle quick menu
+	if ( THE_CONTEXT->gamepadFilterInstance->canActicateQuickMenu() ) {
 		if ( quickMenu != NULL ) {
 			if ( quickMenu->IsShownOnScreen() == false ) {
 				
@@ -223,8 +225,11 @@ void CncGamepadSpy::update(const GamepadEvent* state) {
 		}
 	}
 	
+	// apply the cnc mode filter on demand
+	const bool b = THE_CONTEXT->gamepadFilterInstance->canActicateQuickMenu();
+	const GamepadEvent::UsageMode um = b ? state->data.usageMode : GamepadEvent::UM_NAV_GUI;
 	
-	switch ( state->data.usageMode ) {
+	switch ( um ) {
 		case GamepadEvent::UM_NAV_GUI:	if ( m_modeBook->GetSelection() != MODE_GUI ) {
 											m_modeBook->SetSelection(MODE_GUI);
 											updateModeText("GUI Interface");

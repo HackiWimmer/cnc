@@ -435,6 +435,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool isGamepadNotificationActive();
 		void activateGamepadNotificationsOnDemand(bool state);
 		void activateGamepadNotifications(bool state);
+		
+		
+		
 		bool filePreviewListLeave();
 		
 		wxDECLARE_EVENT_TABLE();
@@ -657,6 +660,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncTransactionLockBase;
 		friend class CncTransactionLock;
 		friend class CncGamepadTransactionLock;
+		friend class CncGamepadMenuDlg;
 		friend class CncSerialSpyPanel;
 
 		friend class GamepadThread;
@@ -1004,10 +1008,9 @@ class CncGampadDeactivator {
 		MainFrame*	parent;
 		bool		reconstructPrevState;
 		bool		prevState;
-		bool		stateDialogShown;
 		
 	public:
-		explicit CncGampadDeactivator(MainFrame* p, bool rps = false);
+		CncGampadDeactivator(MainFrame* p, bool rps = false);
 		~CncGampadDeactivator();
 		
 		static bool gamepadNotificationsAllowed() { return referenceCounter == 0; }

@@ -2,6 +2,7 @@
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "MainFrame.h"
 #include "GamepadEvent.h"
 #include "CncGamepadMenuDlg.h"
 
@@ -12,6 +13,8 @@ CncGamepadMenuDlg::CncGamepadMenuDlg(wxWindow* parent)
 , prevDown		(false)
 , prevLeft		(false)
 , prevRight		(false)
+, prevA			(false)
+, prevB			(false)
 ///////////////////////////////////////////////////////////////////
 {
 
@@ -72,18 +75,31 @@ void CncGamepadMenuDlg::update(const GamepadEvent* state) {
 		
 		return prev;
 	};
+
+	// .............................................................
+	auto ckBtUp = [&](bool& prev, bool curr) {
+		if ( prev == false && curr == false )
+			return false;
+		
+		if      ( prev == true  && curr == false )	prev = false;
+		else										prev = true;
+		
+		return !prev;
+	};
 	
 	SetFocusFromKbd();
 	
 	// release corresponding key actions
-	if ( check(prevLeft,	state->data.buttonLeft)  )	{ switchFocus(-1);				return; }
-	if ( check(prevRight,	state->data.buttonRight) )	{ switchFocus(+1);				return; }
-	if ( check(prevUp,		state->data.buttonUp)    )	{ hitKey(WXK_UP);				return; }
-	if ( check(prevDown,	state->data.buttonDown)  )	{ hitKey(WXK_DOWN);				return; }
+	if ( ckBtUp(prevLeft,	state->data.buttonLeft)  )	{ switchFocus(-1);				return; }
+	if ( ckBtUp(prevRight,	state->data.buttonRight) )	{ switchFocus(+1);				return; }
+	if ( ckBtUp(prevUp,		state->data.buttonUp)    )	{ hitKey(WXK_UP);				return; }
+	if ( ckBtUp(prevDown,	state->data.buttonDown)  )	{ hitKey(WXK_DOWN);				return; }
 	
 	if ( state->data.buttonLeftShoulder )				{ hitKey(WXK_TAB, wxMOD_SHIFT);	return; }
 	if ( state->data.buttonRightShoulder )				{ hitKey(WXK_TAB);				return; }
-	if ( state->data.buttonB )							{ hitKey(WXK_SPACE);			return; }
+	
+	if ( ckBtUp(prevB, state->data.buttonB ))			{ hitKey(WXK_SPACE);			return; }
+	if ( ckBtUp(prevA, state->data.buttonA ))			{ close();						return; }
 	
 	// add more necessary events
 	// ....
@@ -92,5 +108,34 @@ void CncGamepadMenuDlg::update(const GamepadEvent* state) {
 void CncGamepadMenuDlg::onFunction(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	CNC_PRINT_FUNCT
+	close();
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadMenuDlg::onCancel(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	close();
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadMenuDlg::onRunTemplate(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
+	wxPostEvent(THE_APP->GetRcRun(), evt);
+	
+	close();
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadMenuDlg::onReferencePosition(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
+	wxPostEvent(THE_APP->GetRefPosition(), evt);
+	
+	close();
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadMenuDlg::onPodestManagement(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxMenuEvent evt(wxEVT_COMMAND_MENU_SELECTED, THE_APP->m_miPodestManagement->GetId());
+	wxPostEvent(THE_APP, evt);
+	
 	close();
 }

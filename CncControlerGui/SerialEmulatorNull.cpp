@@ -889,9 +889,9 @@ bool SerialEmulatorNULL::writeMoveInteractive(unsigned char *buffer, unsigned in
 		return false;
 	
 	// reset
-	interactiveX = 0;
-	interactiveY = 0;
-	interactiveZ = 0;
+	interactiveX = 0L;
+	interactiveY = 0L;
+	interactiveZ = 0L;
 	
 	// For interactive moves the impulse count at the move start isn't defined - by concept.
 	// Therefore, to get a fully supported acceleration at the beginning a value of 0 is used here,

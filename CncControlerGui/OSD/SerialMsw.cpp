@@ -3,6 +3,7 @@
 #include <iostream>
 #include "strsafe.h"
 #include "CncArduino.h"
+#include "CncCommon.h"
 #include "CncConfig.h"
 #include "MainFrameProxy.h"
 #include "SerialOSD.h"
@@ -46,14 +47,18 @@ SerialMsw::SerialMsw()
 : connected(false)
 ///////////////////////////////////////////////////////////////////
 {
+	CNC_PRINT_LOCATION
 }
 ///////////////////////////////////////////////////////////////////
 SerialMsw::~SerialMsw() {
 ///////////////////////////////////////////////////////////////////
+	CNC_PRINT_LOCATION
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialMsw::connect(const char* portName) {
 ///////////////////////////////////////////////////////////////////
+	CNC_PRINT_LOCATION
+	
 	//We're not yet connected
 	connected = false;
 	
@@ -153,6 +158,8 @@ bool SerialMsw::connect(const char* portName) {
 ///////////////////////////////////////////////////////////////////
 void SerialMsw::disconnect(void) {
 ///////////////////////////////////////////////////////////////////
+	CNC_PRINT_LOCATION
+	
 	if ( connected ) {
 		connected = false;
 		CloseHandle(hSerial);
@@ -161,6 +168,8 @@ void SerialMsw::disconnect(void) {
 ///////////////////////////////////////////////////////////////////
 void SerialMsw::purge(void) {
 ///////////////////////////////////////////////////////////////////
+	CNC_PRINT_LOCATION
+	
 	//Flush any remaining characters in the buffers 
 	PurgeComm(this->hSerial, PURGE_RXCLEAR | PURGE_TXCLEAR);
 	APP_PROXY::waitActive(500);
@@ -168,6 +177,8 @@ void SerialMsw::purge(void) {
 ///////////////////////////////////////////////////////////////////
 int SerialMsw::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	CNC_PRINT_LOCATION
+	
 	//Number of bytes we'll have read
 	DWORD bytesRead 	= 0;
 	//Number of bytes we'll really ask to read
@@ -198,6 +209,8 @@ int SerialMsw::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialMsw::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	CNC_PRINT_LOCATION
+	
 	DWORD bytesSend;
 	
 	COMSTAT status;
@@ -217,6 +230,8 @@ bool SerialMsw::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 void SerialMsw::displayErrorInfo(DWORD lastError, LPCTSTR lpszFunction) {
 ///////////////////////////////////////////////////////////////////
+	CNC_PRINT_LOCATION
+	
 	// Retrieve the system error message for the last-error code
 	LPVOID lpMsgBuf;
 	DWORD dw = lastError;

@@ -21,6 +21,7 @@ typedef std::vector<wxString>			CommandLineParameterMap;
 class CncBoundarySpace;
 class CncAnchorMap;
 class CncTemplateContext;
+class CncGamepadFilterInstance;
 
 // -----------------------------------------------------------
 struct CncContext {
@@ -64,6 +65,7 @@ struct CncContext {
 		CncBoundarySpace*			boundarySpace;
 		CncAnchorMap*				anchorMap;
 		CncTemplateContext*			templateContext;
+		CncGamepadFilterInstance*	gamepadFilterInstance;
 		
 		const std::ostream& traceVersionInfo(std::ostream& os) 			const;
 		const std::ostream& traceCommandLineParameter(std::ostream& os)	const;
@@ -81,7 +83,7 @@ struct CncContext {
 		bool isProbeMode() 										const	{ return probeMode; }
 		
 		void setInteractiveMoveingMode(bool state)						{ interactiveMoveMode = state; }
-		bool canInteractiveMoveing()							const	{ return interactiveMoveMode;  }
+		bool canInteractiveMoving()								const	{ return interactiveMoveMode;  }
 		
 		void setSpeedMonitoring(bool state)								{ speedMonitor = state; } 
 		bool canSpeedMonitoring() 								const	{ return speedMonitor; }

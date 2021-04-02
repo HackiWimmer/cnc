@@ -41,6 +41,7 @@
 #include "OSD/CncCameraHelper.h"
 #include "CncGamepadSpy.h"
 #include "GamepadEvent.h"
+#include "CncGamepadFilter.h"
 #include "CncGamepadControllerState.h"
 #include "SerialThread.h"
 #include "CncMillingSoundController.h"
@@ -294,7 +295,6 @@ CncGampadDeactivator::CncGampadDeactivator(MainFrame* p, bool rps)
 : parent				(p)
 , reconstructPrevState	(rps)
 , prevState				(false)
-, stateDialogShown		(false)
 ////////////////////////////////////////////////////////////////////
 {
 	wxASSERT(parent);
@@ -307,7 +307,6 @@ CncGampadDeactivator::CncGampadDeactivator(MainFrame* p, bool rps)
 CncGampadDeactivator::~CncGampadDeactivator() {
 ////////////////////////////////////////////////////////////////////
 	parent->activateGamepadNotifications(reconstructPrevState == true ? prevState : true);
-	
 	referenceCounter--;
 }
 
@@ -1924,7 +1923,7 @@ void MainFrame::onGamepadThreadUpadte(GamepadEvent& event) {
 	if ( cnc == NULL || cnc->isConnected() == false )
 		return;
 	
-	if ( THE_CONTEXT->canInteractiveMoveing() == false ) {
+	if ( THE_CONTEXT->canInteractiveMoving() == false ) {
 		cnc::trc.logInfo("The gamepad isn't available for this connetion port . . . ");
 		return;
 	}
@@ -3137,8 +3136,10 @@ void MainFrame::onPodestManagement(wxCommandEvent& event) {
 	const bool prev = m_miRqtIdleMessages->IsChecked();
 	m_miRqtIdleMessages->Check(false);
 	
-		CncGampadDeactivator cpd(this);
-	
+		//CncGampadDeactivator cpd(this);
+		const int filter = CncGamepadFilterInstance::FILTER_QUICK_MENU_AVTIVATION | CncGamepadFilterInstance::FILTER_CNC_AVTIVATION;
+		CncGamepadFilter gf(THE_CONTEXT->gamepadFilterInstance, filter);
+		
 		podestManagementDlg->ShowModal();
 		waitActive(500);
 		
@@ -3902,7 +3903,8 @@ void MainFrame::activateGamepadNotifications(bool state) {
 		if ( gamepadThread->IsRunning() ) {
 			gamepadThread->Pause();
 		}
-	} else {
+	}
+	else {
 		if ( gamepadThread->IsPaused() ) {
 			gamepadThread->Resume();
 		}
@@ -7574,7 +7576,7 @@ void MainFrame::decorateGamepadState(bool state) {
 		gamepadSpy->setActivationState(state);
 		
 		if ( gamepadStatusCtl != NULL ) {
-			if ( THE_CONTEXT->canInteractiveMoveing() == false ) {
+			if ( THE_CONTEXT->canInteractiveMoving() == false ) {
 				gamepadStatusCtl->trace("The gamepad isn't available for the current connection port . . . ");
 			}
 			else {

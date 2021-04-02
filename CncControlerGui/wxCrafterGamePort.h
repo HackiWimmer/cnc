@@ -183,6 +183,7 @@ public:
 class CncGamepadMenuDlgBase : public wxDialog
 {
 protected:
+    wxPanel* m_panel518;
     wxPanel* m_panel1;
     wxStaticText* m_staticText502;
     wxButton* m_button488202627;
@@ -195,9 +196,15 @@ protected:
     wxStaticText* m_staticText500;
     wxButton* m_button48825;
     wxButton* m_button488;
+    wxStaticLine* m_staticLine516;
+    wxButton* m_btCancel;
 
 protected:
+    virtual void onReferencePosition(wxCommandEvent& event) { event.Skip(); }
     virtual void onFunction(wxCommandEvent& event) { event.Skip(); }
+    virtual void onRunTemplate(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPodestManagement(wxCommandEvent& event) { event.Skip(); }
+    virtual void onCancel(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText502() { return m_staticText502; }
@@ -212,6 +219,9 @@ public:
     wxButton* GetButton48825() { return m_button48825; }
     wxButton* GetButton488() { return m_button488; }
     wxPanel* GetPanel3() { return m_panel3; }
+    wxStaticLine* GetStaticLine516() { return m_staticLine516; }
+    wxButton* GetBtCancel() { return m_btCancel; }
+    wxPanel* GetPanel518() { return m_panel518; }
     CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Gamepad Quick Menu"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncGamepadMenuDlgBase();
 };

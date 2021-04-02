@@ -5,7 +5,6 @@
   <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
   <object class="wxBitmap" name="16-x-close">bitmaps\16-x-close.png</object>
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
-  <object class="wxBitmap" name="24-cog@2x">bitmaps\24-cog@2x.png</object>
   <object class="wxBitmap" name="BMP_NAVI_XY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_all-small.png</object>
   <object class="wxBitmap" name="BMP_NAVI_Z">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_updown-small.png</object>
   <object class="wxBitmap" name="BMP_START">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\run-build-2.png</object>
@@ -24,6 +23,8 @@
   <object class="wxBitmap" name="keyboard_white">bitmaps\keyboard_white.png</object>
   <object class="wxBitmap" name="lstick_all-small">bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="mouse_white">bitmaps\mouse_white.png</object>
+  <object class="wxBitmap" name="playstation-circle-dark-icon48">bitmaps\gamepad\playstation-circle-dark-icon48.png</object>
+  <object class="wxBitmap" name="playstation-cross-dark-icon48">bitmaps\gamepad\playstation-cross-dark-icon48.png</object>
   <object class="wxBitmap" name="rstick_updown-small">bitmaps\gamepad\navi\rstick_updown-small.png</object>
   <object class="wxBitmap" name="system-run-3">bitmaps\system-run-3.png</object>
 </resource>

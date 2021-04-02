@@ -2,6 +2,7 @@
 #include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
 #include "CncAnchorInfo.h"
+#include "CncGamepadFilter.h"
 #include "CncTemplateContext.h"
 #include "CncBoundarySpace.h"
 #include "CncContext.h"
@@ -14,6 +15,7 @@ CncContext::CncContext()
 , boundarySpace				(new CncBoundarySpace())
 , anchorMap					(new CncAnchorMap())
 , templateContext			(new CncTemplateContext(boundarySpace))
+, gamepadFilterInstance		(new CncGamepadFilterInstance())
 ////////////////////////////////////////////////////////////////////////
 {
 	#ifdef __WXMSW__
@@ -31,6 +33,7 @@ CncContext::~CncContext() {
 	wxDELETE( boundarySpace );
 	wxDELETE( anchorMap );
 	wxDELETE( templateContext );
+	wxDELETE( gamepadFilterInstance );
 	
 	APPEND_LOCATION_TO_STACK_TRACE_FILE
 }

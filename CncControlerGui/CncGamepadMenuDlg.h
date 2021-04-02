@@ -14,6 +14,10 @@ class CncGamepadMenuDlg : public CncGamepadMenuDlgBase {
 		void update(const GamepadEvent* state);
 		
 	protected:
+		virtual void onPodestManagement(wxCommandEvent& event);
+		virtual void onCancel(wxCommandEvent& event);
+		virtual void onReferencePosition(wxCommandEvent& event);
+		virtual void onRunTemplate(wxCommandEvent& event);
 		virtual void onFunction(wxCommandEvent& event);
 		
 	private:
@@ -22,6 +26,8 @@ class CncGamepadMenuDlg : public CncGamepadMenuDlgBase {
 		bool prevDown;
 		bool prevLeft;
 		bool prevRight;
+		bool prevA;
+		bool prevB;
 		
 		void close();
 };
