@@ -6,7 +6,6 @@
 #include <list> 
 #include <wx/string.h>
 #include "OSD/CncTimeFunctions.h"
-#include "OSD/SerialOSD.h"
 #include "CncArduino.h"
 #include "CncCommon.h"
 #include "CncMoveSequence.h"
@@ -14,6 +13,10 @@
 #include "CncBinaryTemplateStreamer.h"
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
+
+
+//------------------------------------------------------------
+#define ARDUINO_WAIT_TIME 2000
 
 //------------------------------------------------------------
 typedef std::map<unsigned char, cnc::SetterValueList> 	SetterMap;
@@ -207,7 +210,7 @@ struct SvgOutputParameters  {
 	bool 				onlyFirstCrossing 	= true;
 };
 
-class Serial : public SerialOSD {
+class Serial { 
 	
 	public:
 		
@@ -221,6 +224,8 @@ class Serial : public SerialOSD {
 		
 		// Readbuffer, primary filled by peekData
 		typedef std::list<unsigned char> ReadBuffer;
+		
+		bool connected;
 		ReadBuffer readBuffer; 
 		
 		// total distance
@@ -257,7 +262,8 @@ class Serial : public SerialOSD {
 				}
 		};
 		
-		// 
+		void setConnected(bool state) { connected = state; }
+		
 		int readBufferedData(void *buffer, unsigned int nbByte);
 		
 		//cnc control object
@@ -356,6 +362,8 @@ class Serial : public SerialOSD {
 		Serial(CncControl* cnc);
 		//Close the connection
 		virtual ~Serial();
+		// get the connection state
+		virtual bool isConnected() { return connected; }
 		// gets a string represntation of ret
 		static const char* decodeContollerResult(int ret);
 		// returns the class name

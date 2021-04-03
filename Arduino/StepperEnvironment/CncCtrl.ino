@@ -109,7 +109,7 @@ void CncArduinoController::SpindelInterface::setSpeedFactor(int32_t ssf) {
   const float fact    = (float)(speedRange) / (float)ardoRange;
 
   PRINT_DEBUG_VALUE2("Spindle speed to write [PWM, V]", round(speedValue * fact), ((speedValue * fact)/255.0 * 10));
-  ARDO_DEBUG_VALUE("Spindle speed to write [PWM, V]", wxString::Format("%d, %lf", round(speedValue * fact), ((speedValue * fact)/255.0 * 10)));
+  ARDO_DEBUG_VALUE("Spindle speed to write [PWM, V]", wxString::Format("%d, %f", round(speedValue * fact), (float)((speedValue * fact)/255.0 * 10)));
   
   AE::analogWrite(splPin, round(speedValue * fact));
 }

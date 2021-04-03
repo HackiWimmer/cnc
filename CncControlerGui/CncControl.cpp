@@ -9,6 +9,7 @@
 #include <wx/propgrid/manager.h>
 #include <wx/evtloop.h>
 #include "OSD/CncAsyncKeyboardState.h"
+#include "OSD/SerialOSD.h"
 #include "GlobalFunctions.h"
 #include "DataControlModel.h"
 #include "SerialPort.h"
@@ -66,7 +67,7 @@ CncControl::CncControl(CncPortType pt)
 {
 //////////////////////////////////////////////////////////////////
 	// Serial factory
-	if      ( pt == CncPORT ) 				serialPort = new SerialSpyPort(this);
+	if      ( pt == CncPORT ) 				serialPort = new SerialOSD(this);
 	else if ( pt == CncEMU_NULL )			serialPort = new SerialEmulatorNULL(this);
 	else if ( pt == CncEMU_TXT )			serialPort = new SerialEmulatorTextStreamer(this);
 	else if ( pt == CncEMU_SVG )			serialPort = new SerialEmulatorSvgStreamer(this);

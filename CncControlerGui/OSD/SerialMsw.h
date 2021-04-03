@@ -2,34 +2,33 @@
 #define SERIAL_MSW_H
 
 	#ifdef __WXMSW__
-	
+		
+		#include "SerialSpyPort.h"
 		#include <windef.h>
 		
-		class SerialMsw {
+		class CncControl;
+		
+		class SerialMsw : public SerialSpyPort {
 			
 			private:
 				//Serial com handler
 				HANDLE hSerial;
-				//Connection status
-				bool connected;
 				
 				//determine OS error message
 				inline void displayErrorInfo(DWORD lastError, LPCTSTR lpszFunction);
 				
-			protected:
+				int readDataNative(void *buffer, unsigned int nbByte);
+				bool writeDataNative(void *buffer, unsigned int nbByte);
 				
-				void setConnected(bool state) { connected = state; }
+			protected:
 				
 				virtual int readData(void *buffer, unsigned int nbByte);
 				virtual bool writeData(void *buffer, unsigned int nbByte);
 				
 			public:
-				SerialMsw();
+				SerialMsw(CncControl* cnc);
 				virtual ~SerialMsw();
 				
-				// get the connection state
-				virtual bool isConnected() { return connected; }
-				//Open the connection
 				virtual bool connect(const char* portName);
 				//Close the connection
 				virtual void disconnect(void);

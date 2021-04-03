@@ -54,7 +54,8 @@ bool SerialCommandLocker::lock(CncControl* cnc) {
 
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
-: SerialOSD()
+//: SerialOSD()
+: connected								(false)
 , readBuffer							()
 , totalDistanceSteps					{0L, 0L, 0L, 0L}
 , totalDistanceMetric					{0.0, 0.0, 0.0, 0.0}
@@ -288,17 +289,16 @@ void Serial::setSpyMode(Serial::SypMode sm) {
 ///////////////////////////////////////////////////////////////////
 bool Serial::connect(const char* portName) {
 ///////////////////////////////////////////////////////////////////
-	bool ret = SerialOSD::connect(portName);
-	ret == true ? this->portName = portName : this->portName = "";
+	this->portName = portName;
+	setConnected(true);
 	
 	clearReadBuffer();
-	return ret;
+	return connected;
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::disconnect(void) {
 ///////////////////////////////////////////////////////////////////
-	if ( isConnected() == true )
-		SerialOSD::disconnect();
+	setConnected(false);
 	
 	clearReadBuffer();
 	this->portName = "";
@@ -307,7 +307,6 @@ void Serial::disconnect(void) {
 void Serial::purge(void) {
 ///////////////////////////////////////////////////////////////////
 	clearReadBuffer();
-	SerialOSD::purge();
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::clearReadBuffer() {
@@ -424,25 +423,14 @@ int Serial::readBufferedData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 int Serial::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	//Reads data in a buffer, if nbByte is greater than the
-	//maximum number of bytes available, it will return only the
-	//bytes available. The function return -1 when nothing could
-	//be read, the number of bytes actually read.
-	
-	if ( nbByte == 0 )
-		return 0;
-		
-	const int bytesRead   = readBufferedData(buffer, nbByte);
-	const int bytesToRead = nbByte - bytesRead;
-	
-	return bytesToRead > 0 ? SerialOSD::readData(buffer, bytesToRead) : bytesRead;
+	// has to be done by inherited classes
+	return 0;
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	//Writes data from a buffer through the Serial connection
-	//return true on success.
-	return SerialOSD::writeData(buffer, nbByte);
+	// has to be done by inherited classes
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::writeData(unsigned char cmd) {

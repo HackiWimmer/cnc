@@ -6,7 +6,7 @@
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "MainFrameProxy.h"
-#include "SerialOSD.h"
+#include "SerialMsw.h"
 
 #include <windows.h>
 
@@ -43,24 +43,20 @@ void traceDCB(const DCB& dcbSerialParams) {
 }
 
 ///////////////////////////////////////////////////////////////////
-SerialMsw::SerialMsw() 
-: connected(false)
+SerialMsw::SerialMsw(CncControl* cnc) 
+: SerialSpyPort(cnc)
 ///////////////////////////////////////////////////////////////////
 {
-	CNC_PRINT_LOCATION
 }
 ///////////////////////////////////////////////////////////////////
 SerialMsw::~SerialMsw() {
 ///////////////////////////////////////////////////////////////////
-	CNC_PRINT_LOCATION
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialMsw::connect(const char* portName) {
 ///////////////////////////////////////////////////////////////////
-	CNC_PRINT_LOCATION
-	
 	//We're not yet connected
-	connected = false;
+	setConnected(false);
 	
 	//Try to connect to the given port throuh CreateFile
 	hSerial = CreateFileA(portName,
@@ -151,34 +147,53 @@ bool SerialMsw::connect(const char* portName) {
 		std::cout.flush();
 	}
 	std::cout << " Ready\n";
-	connected = true;
+	SerialSpyPort::connect(portName);
 	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
 void SerialMsw::disconnect(void) {
 ///////////////////////////////////////////////////////////////////
-	CNC_PRINT_LOCATION
-	
-	if ( connected ) {
-		connected = false;
+	if ( isConnected() ) {
+		setConnected(false);
 		CloseHandle(hSerial);
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void SerialMsw::purge(void) {
 ///////////////////////////////////////////////////////////////////
-	CNC_PRINT_LOCATION
-	
 	//Flush any remaining characters in the buffers 
 	PurgeComm(this->hSerial, PURGE_RXCLEAR | PURGE_TXCLEAR);
 	APP_PROXY::waitActive(500);
+	
+	SerialSpyPort::purge();
 }
 ///////////////////////////////////////////////////////////////////
 int SerialMsw::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	CNC_PRINT_LOCATION
+	//Reads data in a buffer, if nbByte is greater than the
+	//maximum number of bytes available, it will return only the
+	//bytes available. The function return -1 when nothing could
+	//be read, the number of bytes actually read.
 	
+	if ( nbByte == 0 )
+		return 0;
+		
+	const int bytesRead   = readBufferedData(buffer, nbByte);
+	const int bytesToRead = nbByte - bytesRead;
+	
+	return bytesToRead > 0 ? readDataNative(buffer, nbByte) : bytesRead;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialMsw::writeData(void *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	//Writes data from a buffer through the Serial connection
+	//return true on success.
+	return writeDataNative(buffer, nbByte);
+}
+///////////////////////////////////////////////////////////////////
+int SerialMsw::readDataNative(void *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
 	//Number of bytes we'll have read
 	DWORD bytesRead 	= 0;
 	//Number of bytes we'll really ask to read
@@ -207,10 +222,8 @@ int SerialMsw::readData(void *buffer, unsigned int nbByte) {
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialMsw::writeData(void *buffer, unsigned int nbByte) {
+bool SerialMsw::writeDataNative(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	CNC_PRINT_LOCATION
-	
 	DWORD bytesSend;
 	
 	COMSTAT status;
@@ -230,8 +243,6 @@ bool SerialMsw::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 void SerialMsw::displayErrorInfo(DWORD lastError, LPCTSTR lpszFunction) {
 ///////////////////////////////////////////////////////////////////
-	CNC_PRINT_LOCATION
-	
 	// Retrieve the system error message for the last-error code
 	LPVOID lpMsgBuf;
 	DWORD dw = lastError;

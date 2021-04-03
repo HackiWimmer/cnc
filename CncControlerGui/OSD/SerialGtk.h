@@ -2,25 +2,23 @@
 #define SERIAL_GTK_H
 
 	#ifdef __WXGTK__
-		class SerialGtk {
+	
+		#include "SerialSpyPort.h"
+		class CncControl;
+		
+		class SerialGtk : public SerialSpyPort {
 			
 			private:
-				//Connection status
-				bool connected;
 			
 			protected:
-				
-				void setConnected(bool state) { connected = state; }
 				
 				virtual int  readData(void *buffer, unsigned int nbByte);
 				virtual bool writeData(void *buffer, unsigned int nbByte);
 				
 			public:
-				SerialGtk();
+				SerialGtk(CncControl* cnc);
 				virtual ~SerialGtk();
 				
-				// get the connection state
-				virtual bool isConnected() { return connected; }
 				//Open the connection
 				virtual bool connect(const char* portName);
 				//Close the connection
