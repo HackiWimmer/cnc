@@ -10,8 +10,7 @@ class GblFunc {
 	
 		static void storeStacktrace(const wxString& st);
 		static bool executeExternalProgram(bool admin, const wxString& tool, const wxString& file, bool checkToolExists);
-
-	
+		
 	public:
 		static void swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl);
 		static void replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl);
@@ -37,7 +36,7 @@ class GblFunc {
 		
 };
 
-#define APPEND_THREAD_ID_TO_STACK_TRACE_FILE			GblFunc::appendToStackTraceFileTS(wxString::Format("%s: TID=[%ld]",    CNC_LOG_FUNCT, wxThread::GetCurrentId()));
+#define APPEND_THREAD_ID_TO_STACK_TRACE_FILE		GblFunc::appendToStackTraceFileTS(wxString::Format("%s: TID=[%ld]",    CNC_LOG_FUNCT, wxThread::GetCurrentId()));
 #define APPEND_THREAD_IDTO_STACK_TRACE_FILE_A(msg)	GblFunc::appendToStackTraceFileTS(wxString::Format("%s: TID=[%ld] %s", CNC_LOG_FUNCT, wxThread::GetCurrentId(), msg));
 #define APPEND_LOCATION_TO_STACK_TRACE_FILE 		GblFunc::appendToStackTraceFileTS(CNC_LOG_LOCATION);
 #define APPEND_LOCATION_TO_STACK_TRACE_FILE_A(msg) 	GblFunc::appendToStackTraceFileTS(CNC_LOG_LOCATION_A(msg));

@@ -472,24 +472,26 @@ class MainApp : public wxApp {
 		virtual bool OnExceptionInMainLoop() {
 		///////////////////////////////////////////////////////////
 			APPEND_LOCATION_TO_STACK_TRACE_FILE;
-			//return wxApp::OnExceptionInMainLoop();
-			//throw;
+			
+			throw;
 			return true;
 		}
 		
-		/*
 		///////////////////////////////////////////////////////////
 		virtual void OnUnhandledException() {
 		///////////////////////////////////////////////////////////
-			wxApp::OnUnhandledException();
+			APPEND_LOCATION_TO_STACK_TRACE_FILE;
+			
+			throw;
 		}
 		
 		///////////////////////////////////////////////////////////
 		virtual void OnFatalException() {
 		///////////////////////////////////////////////////////////
-			wxApp::OnFatalException();
+			APPEND_LOCATION_TO_STACK_TRACE_FILE;
+			
+			throw;
 		}
-		 */
 };
 
 DECLARE_APP(MainApp)

@@ -77,5 +77,20 @@ namespace ArdoObj {
   int16_t SpindleTuple::decodeRange(int32_t encodedValue) {
     return (encodedValue >> 16);
   }
+
+  // --------------------------------------------------------------
+  float SpindleTuple::getPwmFact(int16_t speedRange) {
+    return (float)(speedRange) / (float)ardoRange;
+  }
+  
+  // --------------------------------------------------------------
+  int16_t SpindleTuple::getPwmValue(int32_t value) {
+    const int16_t speedRange = decodeRange(value); 
+    const int16_t speedValue = decodeValue(value);
+    const float fact    = (float)(speedRange) / (float)ardoRange;
+
+    return round(speedValue * fact);
+  }
+
   
 }; // namespace ArdoObj

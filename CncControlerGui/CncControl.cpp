@@ -368,6 +368,7 @@ bool CncControl::setup(bool doReset) {
 	
 	// speed setup
 	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
+	changeCurrentSpindleSpeed_U_MIN(THE_CONFIG->getSpindleSpeedDefault());
 	
 	THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "OK");
 	serialPort->notifySetupSuccesfullyFinsihed();
@@ -780,7 +781,7 @@ bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value ) {
 		return true;
 
 	int16_t val =  -1;
-	int16_t rng = 255;
+	int16_t rng = THE_CONFIG->getSpindleSpeedStepRange();
 	
 	if ( cnc::dblCmp::le(value, 0.0) )
 		return false;
@@ -1947,10 +1948,6 @@ bool CncControl::moveZToMaxLimit() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(distance);
-		
-		#warning log limitStates
-		std::clog << CNC_LOG_FUNCT_A("ret %d, lim %d\n", (int)ret, (int)limitStates.hasLimit());
-		
 		
 		if ( ret == false && limitStates.hasLimit() ) {
 			ret = resolveLimits(false, false, true);

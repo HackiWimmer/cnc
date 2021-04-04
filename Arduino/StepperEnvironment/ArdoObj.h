@@ -168,11 +168,16 @@ namespace ArdoObj {
 
   // --------------------------------------------------------------
   struct SpindleTuple {
+
+      static const int ardoRange = 255;
     
       static int32_t encode(int16_t value, int16_t range);
       
       static int16_t decodeValue(int32_t encodedValue);
       static int16_t decodeRange(int32_t encodedValue);
+
+      static float   getPwmFact(int16_t range);
+      static int16_t getPwmValue(int32_t value);
   };
   
   // --------------------------------------------------------------

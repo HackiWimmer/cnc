@@ -1,6 +1,7 @@
 #include <functional>
 #include <wx/filename.h>
 #include "ArduinoEnvWrapper.h"
+#include "CncConfig.h"
 #include "CncCommon.h"
 
 namespace cnc {
@@ -173,6 +174,22 @@ void cnc::traceSetterValueList(std::ostream& s, unsigned char pid, const cnc::Se
 			case PID_FEEDRATE_H:
 			{
 				trace(val, "%.4lf");
+				break;
+			}
+			case PID_SPINDLE_SPEED:
+			{
+				const double		min = THE_CONFIG->getSpindleSpeedMin();
+				const double		max = THE_CONFIG->getSpindleSpeedMax();
+				const unsigned int	stp = THE_CONFIG->getSpindleSpeedStepRange();
+				
+				const int16_t range	= ArdoObj::SpindleTuple::decodeRange(val); 
+				const int16_t value	= ArdoObj::SpindleTuple::decodeValue(val);
+				const float arng	= (float)ArdoObj::SpindleTuple::ardoRange;
+				const float fact	= (float)(range) / arng;
+				const int maxVolt	= 10;
+				const float rpm		= ( value * ( max - min ) / stp ) + min;
+				
+				s << wxString::Format("%d, %.2f, ~%.1f", (int)round(value * fact), (float)((value * fact)/arng * maxVolt), rpm);
 				break;
 			}
 			default:

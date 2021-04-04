@@ -25,7 +25,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 {                                    
   private:
 
-    class SpindelInterface {
+    class SpindleInterface {
 
         byte        pwrPin;
         byte        splPin;
@@ -36,8 +36,8 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
         uint16_t    speedValue;
         
       public:
-        SpindelInterface(byte pp, byte sp, byte op);
-        ~SpindelInterface();
+        SpindleInterface(byte pp, byte sp, byte op);
+        ~SpindleInterface();
 
         bool isEnabled() const { return enabled; }
         void enable(bool state );
@@ -85,7 +85,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     ArduinoTestManager* testManager;
 
     ImpulseCalculator   impulseCalculator;
-    SpindelInterface    spindelInterface;
+    SpindleInterface    spindleInterface;
     ArdoObj::I2CData    lastI2CData;
 
     bool                transactionState;

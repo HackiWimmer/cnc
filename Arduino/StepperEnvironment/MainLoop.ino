@@ -754,6 +754,9 @@ void ArduinoMainLoop::setup() {
   if ( PIN_TOUCH_CONTACT > 0 )
     { AE::pinMode(PIN_TOUCH_CONTACT,    PM_INPUT);   AE::digitalWrite(PIN_TOUCH_CONTACT,    PL_HIGH); }
 
+  if ( PIN_IS_SPINDEL_OVRLD > 0 )
+    { AE::pinMode(PIN_IS_SPINDEL_OVRLD, PM_INPUT);   AE::analogWrite(PIN_IS_SPINDEL_OVRLD,  ANALOG_LOW); }
+
   if ( PIN_SPINDEL_SUPPORT > 0 )
     { AE::pinMode(PIN_SPINDEL_SUPPORT,  PM_OUTPUT);  AE::digitalWrite(PIN_SPINDEL_SUPPORT,  PL_LOW); }
 
@@ -763,8 +766,6 @@ void ArduinoMainLoop::setup() {
   if ( PIN_SPINDEL_SPEED_INF > 0 )
     { AE::pinMode(PIN_SPINDEL_SPEED_INF,PM_OUTPUT);  AE::analogWrite(PIN_SPINDEL_SPEED_INF, ANALOG_LOW); }
     
-  if ( PIN_IS_SPINDEL_OVRLD > 0 )
-    { AE::pinMode(PIN_IS_SPINDEL_OVRLD, PM_INPUT);   AE::analogWrite(PIN_IS_SPINDEL_OVRLD,  ANALOG_LOW); }
 
   // analog pins
 

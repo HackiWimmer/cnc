@@ -417,7 +417,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			//...................
 			const double begSS = 100.0, endSS = 30000.0, sizSS = CncCfgSliderProperty::calcSteps(begSS, endSS, 50.0);
 			prop = mSpindel->AppendChild(new CncCfgSliderProperty("Spindle Speed min", NEXT_PROP_ID, 100.0, begSS, endSS, sizSS));
-			prop->SetAttribute(wxPG_ATTR_UNITS, "U/mm");
+			prop->SetAttribute(wxPG_ATTR_UNITS, "U/min");
 			prop->SetHelpString(_T("Spindle Speed min"));
 			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
 			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
@@ -425,7 +425,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			
 			//...................
 			prop = mSpindel->AppendChild(new CncCfgSliderProperty("Spindle Speed max", NEXT_PROP_ID, 20000.0, begSS, endSS, sizSS));
-			prop->SetAttribute(wxPG_ATTR_UNITS, "U/mm");
+			prop->SetAttribute(wxPG_ATTR_UNITS, "U/min");
 			prop->SetHelpString(_T("Spindle Speed max"));
 			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
 			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
@@ -433,7 +433,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			
 			//...................
 			prop = mSpindel->AppendChild(new CncCfgSliderProperty("Spindle Speed default", NEXT_PROP_ID, 20000.0, begSS, endSS, sizSS));
-			prop->SetAttribute(wxPG_ATTR_UNITS, "U/mm");
+			prop->SetAttribute(wxPG_ATTR_UNITS, "U/min");
 			prop->SetHelpString(_T("Spindle Speed max"));
 			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(true);
 			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);

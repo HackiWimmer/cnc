@@ -114,14 +114,6 @@
     const unsigned char PIN_Z_STP                           =   8;
     const unsigned char PIN_Z_DIR                           =   9;
 
-    const unsigned char PIN_H_MOVE_UP                       =  51;
-    const unsigned char PIN_H_MOVE_DOWN                     =  50;
-    
-    const unsigned char PIN_H_DIR                           =  49;
-    const unsigned char PIN_H_STP                           =  48;
-    const unsigned char PIN_LED_PODEST                      =  47;
-    const unsigned char PIN_ENABLE_PODEST                   =  46;
-
     const unsigned char PIN_ENABLE_STEPPER                  =  10;
     const unsigned char PIN_ENABLE_SPINDLE                  =  11;
 
@@ -154,6 +146,14 @@
     //const unsigned char PIN_                              =  40;
     const unsigned char PIN_H_MIN_LIMIT                     =  39;
     const unsigned char PIN_H_MAX_LIMIT                     =  38;
+
+    const unsigned char PIN_H_DIR                           =  49;
+    const unsigned char PIN_H_STP                           =  48;
+    const unsigned char PIN_LED_PODEST                      =  47;
+    const unsigned char PIN_ENABLE_PODEST                   =  46;
+
+    const unsigned char PIN_H_MOVE_UP                       =  51;
+    const unsigned char PIN_H_MOVE_DOWN                     =  50;
 
     #define PIN_IS_SPINDEL_OVRLD                         AE::PN_A1   
     const unsigned char PIN_IS_SPINDEL_OVRLD_ID              =  1;

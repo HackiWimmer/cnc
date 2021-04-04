@@ -27,7 +27,7 @@ namespace CtrlParameter {
   }
 };
 /////////////////////////////////////////////////////////////////////////////////////
-CncArduinoController::SpindelInterface::SpindelInterface(byte pp, byte sp, byte op)
+CncArduinoController::SpindleInterface::SpindleInterface(byte pp, byte sp, byte op)
 : pwrPin      (pp)
 , splPin      (sp)
 , ovlPin      (op)
@@ -38,22 +38,22 @@ CncArduinoController::SpindelInterface::SpindelInterface(byte pp, byte sp, byte 
 {
 }
 /////////////////////////////////////////////////////////////////////////////////////
-CncArduinoController::SpindelInterface::~SpindelInterface() {
+CncArduinoController::SpindleInterface::~SpindleInterface() {
 /////////////////////////////////////////////////////////////////////////////////////
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void CncArduinoController::SpindelInterface::reset() {
+void CncArduinoController::SpindleInterface::reset() {
 /////////////////////////////////////////////////////////////////////////////////////
-  *this = CncArduinoController::SpindelInterface(pwrPin, splPin, ovlPin);  
+  *this = CncArduinoController::SpindleInterface(pwrPin, splPin, ovlPin);  
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void CncArduinoController::SpindelInterface::enable(bool state ) {
+void CncArduinoController::SpindleInterface::enable(bool state ) {
 /////////////////////////////////////////////////////////////////////////////////////
   enabled = state;
   AE::digitalWrite(pwrPin, state ? PL_HIGH : PL_LOW);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::SpindelInterface::isOverloaded() const {
+bool CncArduinoController::SpindleInterface::isOverloaded() const {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( enabled == false )
     return false;
@@ -62,7 +62,7 @@ bool CncArduinoController::SpindelInterface::isOverloaded() const {
   return getRemainingSeconds() > 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-int CncArduinoController::SpindelInterface::getRemainingSeconds() const {
+int CncArduinoController::SpindleInterface::getRemainingSeconds() const {
 // a negative return value represents infinity 
 /////////////////////////////////////////////////////////////////////////////////////
   if ( enabled == false )
@@ -92,12 +92,11 @@ int CncArduinoController::SpindelInterface::getRemainingSeconds() const {
   return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void CncArduinoController::SpindelInterface::setSpeedFactor(int32_t ssf) { 
+void CncArduinoController::SpindleInterface::setSpeedFactor(int32_t ssf) { 
 /////////////////////////////////////////////////////////////////////////////////////
   speedRange = ArdoObj::SpindleTuple::decodeRange(ssf); 
   speedValue = ArdoObj::SpindleTuple::decodeValue(ssf);
   
-  PRINT_DEBUG_VALUE2("Spindle speed range", speedRange, speedValue);
   ARDO_DEBUG_VALUE("Spindle speed range", wxString::Format("%d, %d", speedRange, speedValue))
 
   enable(speedRange != 0 ? true : false);
@@ -105,11 +104,12 @@ void CncArduinoController::SpindelInterface::setSpeedFactor(int32_t ssf) {
   if ( enabled == false )
     return;
 
-  const int ardoRange = 255;
-  const float fact    = (float)(speedRange) / (float)ardoRange;
-
-  PRINT_DEBUG_VALUE2("Spindle speed to write [PWM, V]", round(speedValue * fact), ((speedValue * fact)/255.0 * 10));
-  ARDO_DEBUG_VALUE("Spindle speed to write [PWM, V]", wxString::Format("%d, %f", round(speedValue * fact), (float)((speedValue * fact)/255.0 * 10)));
+  const float fact    = (float)(speedRange) / (float)ArdoObj::SpindleTuple::ardoRange;
+  const int maxVolt   = 10;
+  ARDO_DEBUG_VALUE("Spindle speed to write [PWM, V]", 
+                    wxString::Format("%d, %f", 
+                    round(speedValue * fact), 
+                    (float)((speedValue * fact)/(float)ArdoObj::SpindleTuple::ardoRange * maxVolt)));
   
   AE::analogWrite(splPin, round(speedValue * fact));
 }
@@ -131,7 +131,7 @@ CncArduinoController::CncArduinoController()
 , H                             ( new CncAxisH(StepperSetup( this, PIN_H_STP, PIN_H_DIR, PIN_H_MIN_LIMIT, PIN_H_MAX_LIMIT, PID_INC_DIRECTION_VALUE_H )) )
 , testManager                   (NULL)
 , impulseCalculator             ()
-, spindelInterface              (PIN_SPINDEL_SUPPORT, PIN_SPINDEL_SPEED_INF, PIN_IS_SPINDEL_OVRLD)
+, spindleInterface              (PIN_SPINDEL_SUPPORT, PIN_SPINDEL_SPEED_INF, PIN_IS_SPINDEL_OVRLD)
 , lastI2CData                   ()
 , transactionState              (OFF)
 , podestHardwareState           (OFF)
@@ -246,7 +246,7 @@ void CncArduinoController::reset() {
     probeMode           = OFF;
 
     interactiveMove.reset();
-    spindelInterface.reset();
+    spindleInterface.reset();
     
     X->reset();
     Y->reset();
@@ -578,6 +578,11 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
 
   uint32_t curSpeedDelay = 500;
   while ( stopFunct(this) == false ) {
+
+    byte retValue = checkRuntimeEnv();
+    if ( retValue != RET_OK )
+      return retValue;
+    
     const byte b = H->performStep();
     
     podestStillOpenSteps--;
@@ -1244,13 +1249,14 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     
     case PID_SPEED_MM_SEC:            setSpeedValue_MMSec1000(st.values[0].asInt32());        break;
 
-    case PID_SPINDLE_SPEED:           spindelInterface.setSpeedFactor(st.values[0].asInt32());
+    case PID_SPINDLE_SPEED:           spindleInterface.setSpeedFactor(st.values[0].asInt32());
                                       break;
+
+    case PID_SPINDLE_SWITCH:          switchSpindleState(st.values[0].asBool());              break;
 
     case PID_ENABLE_STEPPERS:         enableStepperPin(st.values[0].asBool());                break;
 
     case PID_PROBE_MODE:              setProbeMode(st.values[0].asBool());                    break;
-    case PID_SPINDLE_SWITCH:          switchSpindleState(st.values[0].asBool());              break;
     
     case PID_ACCEL_PROFILE:           setupAccelProfile(st); 
                                       break;

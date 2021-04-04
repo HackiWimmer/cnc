@@ -180,7 +180,7 @@ void ArduinoPIDs::init() {
 	pids[PID_STEP_PIN]                        .setup("Step Pin", "");
 	pids[PID_DIR_PIN]                         .setup("Direction Pin", "");
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");
-	pids[PID_SPINDLE_SPEED]                   .setup("Spindle Speed", "U/mm");
+	pids[PID_SPINDLE_SPEED]                   .setup("Spindle Speed", "PWM, V, U/min");
 	
 	pids[PID_PODEST_POS]                      .setup("Podest Position", "steps");
 	

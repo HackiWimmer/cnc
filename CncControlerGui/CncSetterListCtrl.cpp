@@ -39,12 +39,12 @@ CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("",	 	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
-	AppendColumn("#",	 	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
-	AppendColumn("PID", 	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("Key", 	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
-	AppendColumn("Value",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("Unit",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("",			wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
+	AppendColumn("#",			wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
+	AppendColumn("PID",		 	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("Key",			wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
+	AppendColumn("Value",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("    Unit",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::REVERSE);
