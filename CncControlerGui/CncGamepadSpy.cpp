@@ -293,6 +293,8 @@ void CncGamepadSpy::updateCncMode(const GamepadEvent* state) {
 			GetGpBmp2()->SetBitmap(dBmpNaviZ);
 			GetGpBmp3()->SetBitmap(aBmpStickLeft);
 			GetGpBmp4()->SetBitmap(aBmpStickRight);
+			dirXY->setMode(CncGamepadDirectionPanel::M_STICK);
+			dirZ ->setMode(CncGamepadDirectionPanel::M_STICK);
 			break;
 			
 		case GamepadEvent::PCM_NAV_XY:
@@ -300,6 +302,8 @@ void CncGamepadSpy::updateCncMode(const GamepadEvent* state) {
 			GetGpBmp2()->SetBitmap(dBmpNaviZ);
 			GetGpBmp3()->SetBitmap(dBmpStickLeft);
 			GetGpBmp4()->SetBitmap(dBmpStickRight);
+			dirXY->setMode(CncGamepadDirectionPanel::M_NAVI);
+			dirZ ->setMode(CncGamepadDirectionPanel::M_INACTIVE);
 			break;
 			
 		case GamepadEvent::PCM_NAV_Z:
@@ -307,13 +311,9 @@ void CncGamepadSpy::updateCncMode(const GamepadEvent* state) {
 			GetGpBmp2()->SetBitmap(aBmpNaviZ);
 			GetGpBmp3()->SetBitmap(dBmpStickLeft);
 			GetGpBmp4()->SetBitmap(dBmpStickRight);
+			dirXY->setMode(CncGamepadDirectionPanel::M_INACTIVE);
+			dirZ ->setMode(CncGamepadDirectionPanel::M_NAVI);
 			break;
-			
-		default:
-			GetGpBmp1()->SetBitmap(dBmpNaviXY);
-			GetGpBmp2()->SetBitmap(dBmpNaviZ);
-			GetGpBmp3()->SetBitmap(dBmpStickLeft);
-			GetGpBmp4()->SetBitmap(dBmpStickRight);
 	}
 }
 ///////////////////////////////////////////////////////////////////

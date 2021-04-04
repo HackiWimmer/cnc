@@ -17,9 +17,12 @@ CncGamepadDirectionPanel::CncGamepadDirectionPanel(wxWindow* parent)
 , xDir		(CncNoneDir)
 , yDir		(CncNoneDir)
 , angle		(-1)
+, mode		(M_STICK)
+, bckColour	(wxColour( 32,  32,  32))
+, fgdColour	(wxColour(100, 100, 100))
 /////////////////////////////////////////////////////////////////////{
 {
-	SetBackgroundColour(wxColour( 32,  32,  32));
+	SetBackgroundColour(bckColour);
 }
 /////////////////////////////////////////////////////////////////////
 CncGamepadDirectionPanel::~CncGamepadDirectionPanel() {
@@ -35,6 +38,19 @@ void CncGamepadDirectionPanel::onSize(wxSizeEvent& event) {
 void CncGamepadDirectionPanel::onEraseBackground(wxEraseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	//Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void CncGamepadDirectionPanel::setMode(Mode m) {
+/////////////////////////////////////////////////////////////////////
+	mode = m;
+	switch ( mode ) {
+		case M_INACTIVE:	fgdColour = bckColour;		break;
+		case M_STICK:		fgdColour = stickColour;	break;
+		case M_NAVI:		fgdColour = naviColour;		break;
+	}
+	
+	if ( IsShownOnScreen() )
+		Refresh();
 }
 /////////////////////////////////////////////////////////////////////
 void CncGamepadDirectionPanel::setDirection(const CncLinearDirection x, const CncLinearDirection y) {
@@ -69,7 +85,7 @@ void CncGamepadDirectionPanel::onPaint(wxPaintEvent& event) {
 		
 		{
 			wxGraphicsPath path = gc->CreatePath();
-			gc->SetPen(wxPen(wxColour(100, 100, 100), 4, wxSOLID));
+			gc->SetPen(wxPen(fgdColour, 4, wxSOLID));
 				path.AddCircle( center.x, center.y, 5.0 );
 				path.AddCircle( center.x, center.y, radius );
 				path.CloseSubpath();
@@ -101,7 +117,7 @@ void CncGamepadDirectionPanel::onPaint(wxPaintEvent& event) {
 				yr = round(sin((angle + aOffset) * PI / 180) * -(radius * rFact));
 				const wxRealPoint q2(center.x + xr, center.y + yr);
 
-				gc->SetPen(wxPen(*wxLIGHT_GREY, 2, wxSOLID));
+				gc->SetPen(wxPen(fgdColour, 2, wxSOLID));
 					path.MoveToPoint(center.x, center.y);
 					path.AddLineToPoint(t1.x, t1.y);
 					
