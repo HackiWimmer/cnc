@@ -797,6 +797,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 	// -----------------------------------------------------------
 	// entry point
 	while ( child ) {
+		bool nodeConsidered = false;
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overloaded functions
 		currentNodeName.assign(child->GetName());
@@ -805,6 +806,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		
 		// ----------------------------------------------------------
 		if ( currentNodeName.IsSameAs("PATH", false) ) {
+			nodeConsidered  = true;
+			
 			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
 			
@@ -816,24 +819,29 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("SYMBOL", false) ) {
+			nodeConsidered  = true;
+			
 			ADD_ATTR_ID
 			ADD_ATTR_TRANSFORM
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("G", false) ) {
+			nodeConsidered  = true;
+			
 			ADD_ATTR_ID
 			ADD_ATTR_TRANSFORM
 			ADD_ATTR_STYLE
 		}
 		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("CIRCLE",	false) )	{ ADD_BASIC_SHAPE(convertCircleToPathData)   }
-		else if ( currentNodeName.IsSameAs("ELLIPSE",	false) )	{ ADD_BASIC_SHAPE(convertEllipseToPathData)  }
-		else if ( currentNodeName.IsSameAs("LINE",		false) )	{ ADD_BASIC_SHAPE(convertLineToPathData)     }
-		else if ( currentNodeName.IsSameAs("POLYGON",	false) )	{ ADD_BASIC_SHAPE(convertPolygonToPathData)  }
-		else if ( currentNodeName.IsSameAs("POLYLINE",	false) )	{ ADD_BASIC_SHAPE(convertPolylineToPathData) }
-		else if ( currentNodeName.IsSameAs("RECT",		false) )	{ ADD_BASIC_SHAPE(convertRectToPathData)     }
+		else if ( currentNodeName.IsSameAs("CIRCLE",	false) )	{ nodeConsidered  = true; ADD_BASIC_SHAPE(convertCircleToPathData)   }
+		else if ( currentNodeName.IsSameAs("ELLIPSE",	false) )	{ nodeConsidered  = true; ADD_BASIC_SHAPE(convertEllipseToPathData)  }
+		else if ( currentNodeName.IsSameAs("LINE",		false) )	{ nodeConsidered  = true; ADD_BASIC_SHAPE(convertLineToPathData)     }
+		else if ( currentNodeName.IsSameAs("POLYGON",	false) )	{ nodeConsidered  = true; ADD_BASIC_SHAPE(convertPolygonToPathData)  }
+		else if ( currentNodeName.IsSameAs("POLYLINE",	false) )	{ nodeConsidered  = true; ADD_BASIC_SHAPE(convertPolylineToPathData) }
+		else if ( currentNodeName.IsSameAs("RECT",		false) )	{ nodeConsidered  = true; ADD_BASIC_SHAPE(convertRectToPathData)     }
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("USE", false) ) {
+			nodeConsidered  = true; 
 			registerNextDebugNode(currentNodeName);
 			
 			UseDirectiveVector& udv = svgUserAgent.getUseInfoVector();
@@ -843,6 +851,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.StartsWith("Cnc") ) { 
+			nodeConsidered  = true; 
+			
 			if ( processCncParameter(child) == false )
 				return false; 
 		}
@@ -860,13 +870,14 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		
 		// close the id, transform and style attribute (on demand)
 		if ( last != NULL ) {
-			
-			if ( last->HasAttribute("id") )			svgUserAgent.removeId(last->GetAttribute("id"));
-			if ( last->HasAttribute("transform") )	svgUserAgent.removeLastTransform();
-			
-			// only style attributes from <g> are colleted before
-			if ( last->GetName().IsSameAs("g", false) )
-				if ( last->HasAttribute("style") )	svgUserAgent.removeLastStyle();
+			if ( nodeConsidered == true ) {
+				if ( last->HasAttribute("id") )			svgUserAgent.removeId(last->GetAttribute("id"));
+				if ( last->HasAttribute("transform") )	svgUserAgent.removeLastTransform();
+				
+				// only style attributes from <g> are collected before
+				if ( last->GetName().IsSameAs("g", false) )
+					if ( last->HasAttribute("style") )	svgUserAgent.removeLastStyle();
+			}
 		}
 		
 		if ( cncControl->isInterrupted() == true )

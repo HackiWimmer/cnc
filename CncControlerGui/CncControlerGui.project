@@ -531,6 +531,7 @@
         <File Name="SVGPathHandlerCnc.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Utils">
+        <File Name="SvgTransformMatrix.cpp"/>
         <File Name="SvgCncContext.cpp"/>
         <File Name="SvgCncContext.h"/>
         <File Name="SVGUserAgentInfo.cpp"/>
