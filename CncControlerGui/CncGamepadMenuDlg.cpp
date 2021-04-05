@@ -17,11 +17,60 @@ CncGamepadMenuDlg::CncGamepadMenuDlg(wxWindow* parent)
 , prevB			(false)
 ///////////////////////////////////////////////////////////////////
 {
-
+	//.............................................................
+	auto bind = [&](wxWindow* p) {
+		
+		for ( auto it = p->GetChildren().begin(); it != p->GetChildren().end(); ++it ) {
+			
+			wxWindow* w = dynamic_cast<wxWindow*>( *it );
+			if ( w && w->IsFocusable() ) {
+				w->Bind(wxEVT_SET_FOCUS,		&CncGamepadMenuDlg::onSetFocus,		this);
+			}
+		}
+	};
+	
+	bind(m_panel1);
+	bind(m_panel2);
+	bind(m_panel3);
+	
+	bind(m_panelC);
 }
 ///////////////////////////////////////////////////////////////////
 CncGamepadMenuDlg::~CncGamepadMenuDlg() {
 ///////////////////////////////////////////////////////////////////
+	//.............................................................
+	auto unbind = [&](wxWindow* p) {
+		for ( auto it = p->GetChildren().begin(); it != p->GetChildren().end(); ++it ) {
+			
+			wxWindow* w = dynamic_cast<wxWindow*>( *it );
+			if ( w && w->IsFocusable() ) {
+				w->Unbind(wxEVT_SET_FOCUS,		&CncGamepadMenuDlg::onSetFocus,		this);
+			}
+		}
+	};
+	
+	unbind(m_panel1);
+	unbind(m_panel2);
+	unbind(m_panel3);
+	unbind(m_panelC);
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadMenuDlg::highlight(wxWindow* bt) {
+///////////////////////////////////////////////////////////////////
+	if ( bt ) {
+		
+		// simulate mouse over to switch highlighting also
+		wxUIActionSimulator uai;
+		uai.MouseMove(bt->GetScreenPosition() + wxPoint(5, 5));
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadMenuDlg::onSetFocus(wxFocusEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxWindow* w = wxDynamicCast(event.GetEventObject(), wxWindow);
+	highlight(w);
+	
+	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadMenuDlg::close() {
@@ -68,6 +117,7 @@ void CncGamepadMenuDlg::update(const GamepadEvent* state) {
 	
 	// .............................................................
 	// avoid switch bouncing
+	/*
 	auto check = [&](bool& prev, bool curr) {
 		
 		if ( prev == false && curr == true )	prev = true;
@@ -75,7 +125,8 @@ void CncGamepadMenuDlg::update(const GamepadEvent* state) {
 		
 		return prev;
 	};
-
+	*/
+	
 	// .............................................................
 	auto ckBtUp = [&](bool& prev, bool curr) {
 		if ( prev == false && curr == false )
@@ -103,6 +154,7 @@ void CncGamepadMenuDlg::update(const GamepadEvent* state) {
 	
 	// add more necessary events
 	// ....
+	
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadMenuDlg::onFunction(wxCommandEvent& event) {

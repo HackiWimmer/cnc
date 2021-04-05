@@ -197,6 +197,7 @@ protected:
     wxButton* m_button48825;
     wxButton* m_button488;
     wxStaticLine* m_staticLine516;
+    wxPanel* m_panelC;
     wxButton* m_btCancel;
 
 protected:
@@ -221,6 +222,7 @@ public:
     wxPanel* GetPanel3() { return m_panel3; }
     wxStaticLine* GetStaticLine516() { return m_staticLine516; }
     wxButton* GetBtCancel() { return m_btCancel; }
+    wxPanel* GetPanelC() { return m_panelC; }
     wxPanel* GetPanel518() { return m_panel518; }
     CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Gamepad Quick Menu"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncGamepadMenuDlgBase();

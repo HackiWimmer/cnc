@@ -195,6 +195,10 @@ void CncGamepadSpy::update(const GamepadEvent* state) {
 			
 		m_modeBook->SetSelection(MODE_GNC);
 		updateModeText("Not connected");
+		
+		if ( quickMenu->IsShownOnScreen() == true )
+			quickMenu->Show(false);
+		
 		return;
 	}
 	

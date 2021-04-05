@@ -1,6 +1,7 @@
 #ifndef CNCGAMEPADMENUDLG_H
 #define CNCGAMEPADMENUDLG_H
 
+#include <vector>
 #include "wxCrafterGamePort.h"
 
 class GamepadEvent;
@@ -19,7 +20,7 @@ class CncGamepadMenuDlg : public CncGamepadMenuDlgBase {
 		virtual void onReferencePosition(wxCommandEvent& event);
 		virtual void onRunTemplate(wxCommandEvent& event);
 		virtual void onFunction(wxCommandEvent& event);
-		
+
 	private:
 		
 		bool prevUp;
@@ -29,7 +30,10 @@ class CncGamepadMenuDlg : public CncGamepadMenuDlgBase {
 		bool prevA;
 		bool prevB;
 		
+		void onSetFocus(wxFocusEvent& event);
+		
 		void close();
+		void highlight(wxWindow* bt);
 };
 
 #endif // CNCGAMEPADMENUDLG_H

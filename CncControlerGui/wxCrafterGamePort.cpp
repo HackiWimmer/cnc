@@ -698,6 +698,7 @@ CncGamepadMenuDlgBase::CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id, co
     m_button48825->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     wxFont m_button48825Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_button48825->SetFont(m_button48825Font);
+    m_button48825->SetToolTip(_("ewe"));
     
     boxSizer496->Add(m_button48825, 0, wxALL, WXC_FROM_DIP(2));
     m_button48825->SetMinSize(wxSize(190,-1));
@@ -728,7 +729,18 @@ CncGamepadMenuDlgBase::CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id, co
     
     flexGridSizer520->Add(flexGridSizer512, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_btCancel = new wxButton(m_panel518, wxID_ANY, _("Cancel . . ."), wxDefaultPosition, wxDLG_UNIT(m_panel518, wxSize(-1,-1)), 0);
+    m_panelC = new wxPanel(m_panel518, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel518, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer512->Add(m_panelC, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer526 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer526->SetFlexibleDirection( wxBOTH );
+    flexGridSizer526->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer526->AddGrowableCol(0);
+    flexGridSizer526->AddGrowableRow(0);
+    m_panelC->SetSizer(flexGridSizer526);
+    
+    m_btCancel = new wxButton(m_panelC, wxID_ANY, _("Cancel . . ."), wxDefaultPosition, wxDLG_UNIT(m_panelC, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btCancel->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("playstation-cross-dark-icon48")), wxRIGHT);
     m_btCancel->SetBitmapMargins(2,2);
@@ -738,7 +750,7 @@ CncGamepadMenuDlgBase::CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id, co
     wxFont m_btCancelFont(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_btCancel->SetFont(m_btCancelFont);
     
-    flexGridSizer512->Add(m_btCancel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    flexGridSizer526->Add(m_btCancel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     SetName(wxT("CncGamepadMenuDlgBase"));
     SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
