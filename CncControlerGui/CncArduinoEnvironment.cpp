@@ -69,7 +69,6 @@ CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
 	
 	m_btPowerSwitch->SetValue(true);
 	decoratePowerSwitch(); 
-	onPowerButton();
 	
 	m_btEmergency->SetValue(LimitSwitch::EMERGENCY_SWITCH_OFF); 
 	decorateEmergencySwitch();
@@ -317,6 +316,9 @@ void CncArduinoEnvironment::onStartupTimer(wxTimerEvent& event) {
 	
 	SetClientSize(size);
 	Refresh();
+	
+	onPowerButton();
+	m_startupTimer->Stop();
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::onContinuousTimer(wxTimerEvent& event) {

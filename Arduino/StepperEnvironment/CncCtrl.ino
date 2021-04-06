@@ -108,7 +108,7 @@ void CncArduinoController::SpindleInterface::setSpeedFactor(int32_t ssf) {
   const int maxVolt   = 10;
   ARDO_DEBUG_VALUE("Spindle speed to write [PWM, V]", 
                     wxString::Format("%d, %f", 
-                    round(speedValue * fact), 
+                    (int)round(speedValue * fact), 
                     (float)((speedValue * fact)/(float)ArdoObj::SpindleTuple::ardoRange * maxVolt)));
   
   AE::analogWrite(splPin, round(speedValue * fact));

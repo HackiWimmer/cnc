@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=05/04/2021
+Date                   :=06/04/2021
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/msys64/mingw64/bin/g++.exe
 SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
@@ -62,7 +62,7 @@ AS       := C:/msys64/mingw64/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files\CodeLite
-Objects0=$(IntermediateDirectory)/SvgTransformMatrix.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgApplicationPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncBoundarySpace.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncTsTplProcessing.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPositionStorage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncOSDConfigList.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGUserAgentInfo.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGParserBase.cpp$(ObjectSuffix) \
+Objects0=$(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgApplicationPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncBoundarySpace.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncTsTplProcessing.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPositionStorage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncOSDConfigList.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGUserAgentInfo.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgTransformMatrix.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGParserBase.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/SVGUserAgent.cpp$(ObjectSuffix) $(IntermediateDirectory)/FileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_CncUsbPortScanner.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_CncCameraHelper.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMillingSoundController.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorTextStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorSvgStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_SerialGtk.cpp$(ObjectSuffix) $(IntermediateDirectory)/BaseEndPoint.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/3D_GLContextGCodePreview.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextTestCube.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextCncPath.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextCncPathBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLOpenGLPathBufferStore.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLCommon.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodePathHandlerGL.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgGeneralPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLLabelCluser.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeField.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/GCodeCommands.cpp$(ObjectSuffix) $(IntermediateDirectory)/ManuallyParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncGamePadMsw.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncGamepadGtk.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncBinaryTemplateStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/BinaryPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/BinaryFileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/Tests_Test_Base.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPosSpyListCtrl.cpp$(ObjectSuffix) \
@@ -140,12 +140,6 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/SvgTransformMatrix.cpp$(ObjectSuffix): SvgTransformMatrix.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SvgTransformMatrix.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SvgTransformMatrix.cpp$(DependSuffix) -MM SvgTransformMatrix.cpp
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/SvgTransformMatrix.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SvgTransformMatrix.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/SvgTransformMatrix.cpp$(PreprocessSuffix): SvgTransformMatrix.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SvgTransformMatrix.cpp$(PreprocessSuffix) SvgTransformMatrix.cpp
-
 $(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix): CfgWorkingPage.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CfgWorkingPage.cpp$(DependSuffix) -MM CfgWorkingPage.cpp
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CfgWorkingPage.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix) $(IncludePath)
@@ -187,6 +181,12 @@ $(IntermediateDirectory)/SVGUserAgentInfo.cpp$(ObjectSuffix): SVGUserAgentInfo.c
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/SVGUserAgentInfo.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SVGUserAgentInfo.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/SVGUserAgentInfo.cpp$(PreprocessSuffix): SVGUserAgentInfo.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SVGUserAgentInfo.cpp$(PreprocessSuffix) SVGUserAgentInfo.cpp
+
+$(IntermediateDirectory)/SvgTransformMatrix.cpp$(ObjectSuffix): SvgTransformMatrix.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SvgTransformMatrix.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SvgTransformMatrix.cpp$(DependSuffix) -MM SvgTransformMatrix.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/SvgTransformMatrix.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SvgTransformMatrix.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/SvgTransformMatrix.cpp$(PreprocessSuffix): SvgTransformMatrix.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SvgTransformMatrix.cpp$(PreprocessSuffix) SvgTransformMatrix.cpp
 
 $(IntermediateDirectory)/SVGPathHandlerCnc.cpp$(ObjectSuffix): SVGPathHandlerCnc.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SVGPathHandlerCnc.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SVGPathHandlerCnc.cpp$(DependSuffix) -MM SVGPathHandlerCnc.cpp
