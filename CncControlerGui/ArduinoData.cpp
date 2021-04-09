@@ -196,9 +196,11 @@ AE::PinName AE::ArduinoData::convertPinName(const char type, int name) {
 	if ( type == 'D' ) 
 		return name >= minDPinIndex && name <= maxDPinIndex ? (PinName)name : PN_NULL;
 	
-	#warning + minAPinIndex longer equired ?????
+	// Here we talking about analog pins, there are defined
+	//  #ifndef SKETCH_COMPILE
+	//     PN_A0 = 54, PN_A1 = 55, ...
 	
-	const int idx = name + minAPinIndex;
+	const int idx = ( name < minAPinIndex ? name + minAPinIndex : name );
 	return idx >= minAPinIndex && idx <= maxAPinIndex ? (PinName)idx : PN_NULL;
 }
 ////////////////////////////////////////////////////////////////////

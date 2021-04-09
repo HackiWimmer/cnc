@@ -424,11 +424,8 @@ void ArduinoAnalogPins::init() {
 		pins[i]  = s.c_str();
 	}
 
-	pins[0]   = "Abort/Reset";
-	pins[0]   = "Abort/Reset";
-	pins[0]   = "Abort/Reset";
-
-	pins[PIN_IS_SPINDEL_OVRLD_ID]	= "SPINDLE OVERLOAD PIN";
+	pins[PIN_INTERRUPT_LED_ID]         = "ABORT/RESET PIN";
+	pins[PIN_IS_SPINDEL_OVRLD_ID]      = "SPINDLE OVERLOAD PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoAnalogPins::getPinLabel(unsigned int id) {
