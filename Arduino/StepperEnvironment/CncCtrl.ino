@@ -105,12 +105,14 @@ void CncArduinoController::SpindleInterface::setSpeedFactor(int32_t ssf) {
     return;
 
   const float fact    = (float)(speedRange) / (float)ArdoObj::SpindleTuple::ardoRange;
-  const int maxVolt   = 10;
+
+  #define maxVolt 10
   ARDO_DEBUG_VALUE("Spindle speed to write [PWM, V]", 
                     wxString::Format("%d, %f", 
                     (int)round(speedValue * fact), 
                     (float)((speedValue * fact)/(float)ArdoObj::SpindleTuple::ardoRange * maxVolt)));
-  
+  #undef maxVolt
+      
   AE::analogWrite(splPin, round(speedValue * fact));
 }
 
@@ -274,7 +276,7 @@ bool CncArduinoController::isReadyToRun() {
 
   if ( READ_EXT_INNTERRUPT_PIN == EXTERNAL_INTERRRUPT_ON ) {
     LastErrorCodes::clear(); 
-    ArduinoMainLoop::pushMessage(MT_ERROR, E_EXTERNEL_INTERRUPT); 
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_INTERRUPT); 
     ret = false; 
   }
 
@@ -982,7 +984,7 @@ byte CncArduinoController::checkRuntimeEnv() {
   }
 
   if ( READ_EXT_INNTERRUPT_PIN == EXTERNAL_INTERRRUPT_ON ) {
-    ArduinoMainLoop::pushMessage(MT_ERROR, E_EXTERNEL_INTERRUPT); 
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_INTERRUPT); 
     return RET_ERROR;
   }
 

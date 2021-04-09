@@ -29,7 +29,12 @@ bool SerialThreadStub::connect(const char* portName) {
 	
 	if ( ok == true ) {
 		wakeUpOnDemand();
+		
+		// first set connected to support clearRemainingBytes() below
 		setConnected(isSerialThreadRunning());
+		
+		// set connected if clearing remaining bytes was successfully
+		setConnected(clearRemainingBytes(true));
 		
 		if ( isConnected() ) {
 			IndividualCommandEvent evt(ID::NotifyConneting);
@@ -74,6 +79,9 @@ void SerialThreadStub::disconnect(void) {
 	
 	if ( ok == true ) {
 		wakeUpOnDemand();
+		
+		clearRemainingBytes(true);
+		
 		setConnected(false);
 		
 		if ( isSerialThreadRunning() == false )
@@ -149,12 +157,16 @@ void SerialThreadStub::onPeriodicallyAppEvent(bool interrupted) {
 ///////////////////////////////////////////////////////////////////
 	// nothing to do
 }
+#include "CncControl.h"
 ///////////////////////////////////////////////////////////////////
 int SerialThreadStub::readData(void *buffer, unsigned int nbByte) { 
 ///////////////////////////////////////////////////////////////////
 	typedef IndividualCommandEvent::EvtSerialStub ID;
 
 	if ( isConnected() == false )
+		return 0;
+		
+	if ( cncControl && cncControl->isInterrupted() )
 		return 0;
 	
 	wakeUpOnDemand();
@@ -193,6 +205,9 @@ bool SerialThreadStub::writeData(void *buffer, unsigned int nbByte) {
 	if ( isConnected() == false )
 		return false;
 		
+	if ( cncControl && cncControl->isInterrupted() )
+		return false;
+
 	spyWriteData(buffer, nbByte);
 	
 	wakeUpOnDemand();

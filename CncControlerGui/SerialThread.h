@@ -23,12 +23,11 @@ class SerialThread : public wxThread {
 	
 	protected:
 		
-		enum class SerialState		{ DISCONNECTED=0, CONNECTED=1 };
+		enum class SerialState		{ INTERRUPTED = -1, DISCONNECTED = 0, CONNECTED = 1 };
 
 		MainFrame* 					pHandler;
 		bool 						exit;
 		bool						processAdmChl;
-		bool						interruped;
 		SerialState					serialState;
 		
 		ArduinoMainLoop				arduinoMainLoop;
@@ -62,6 +61,7 @@ class SerialThread : public wxThread {
 
 		virtual ExitCode Entry();
 		
+		void interrupt();
 		void idleThread();
 		void publishPinNotification();
 		void publishData(bool force = false);
@@ -80,6 +80,7 @@ class SerialThread : public wxThread {
 		bool						notifyConnecting();
 		bool						notifyConnected();
 		bool						notifyDisconnected();
+		bool						notifyInterrupted();
 		SerialEndPoint* 			getSerialAppEndPoint() 			{ return app; }
 		WireEndPoint* 				getWireSlaveEndPoint() 			{ return slave; }
 		SerialAdminChannelSender*	getAdminChannelSenderEndPoint() { return adminSender; }
@@ -90,7 +91,7 @@ class SerialThread : public wxThread {
 		static bool					getI2CStateValue(int id, int count, unsigned char& ls, unsigned char& ss);
 		
 		// additional interface
-		static bool 				isInterruped();
+		static bool 				isInterrupted();
 		static void 				ardoDebugMessage(const char type, const char* msg, const char* context) {
 										SerialThread::publishMessage(type, msg ? msg : "", context ? context : "");
 		}

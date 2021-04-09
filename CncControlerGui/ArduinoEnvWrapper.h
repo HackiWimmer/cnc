@@ -5,7 +5,7 @@
 #include <sstream>
 
 
-// delcares the interface
+// declares the interface
 #include "../Arduino/StepperEnvironment/ArdoEnv.h"
 
 // support the main loop

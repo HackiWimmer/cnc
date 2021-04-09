@@ -202,6 +202,21 @@ void Implementation::run() {
 	std::cout << "Start . . ." << std::endl;
 	
 	
+	#define STR_HELPER(x) #x
+	#define STR(x) STR_HELPER(x)
+
+	#define VERSION_MAJOR_NUM 0
+	#define VERSION_MINOR_NUM 8
+	#define VERSION_INDEX_NUM 9
+	#define VERSION_STRING "" STR(VERSION_MAJOR_NUM) "." STR(VERSION_MINOR_NUM) "." STR(VERSION_INDEX_NUM) "\0"
+
+	#define VER_FILEVERSION             VERSION_MAJOR_NUM,VERSION_MINOR_NUM,VERSION_INDEX_NUM,0
+	#define VER_FILEVERSION_STR         VERSION_STRING 
+	
+	
+	std::cout <<  wxString::FormatVER_FILEVERSION << std::endl;
+	
+	return;
 	
     ISpVoice * pVoice = NULL;
 

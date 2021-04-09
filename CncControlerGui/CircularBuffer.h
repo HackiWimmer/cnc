@@ -4,6 +4,44 @@
 #include <algorithm>
 #include <cstring>
 #include "wx/thread.h"
+#include "CncCommon.h"
+
+class CncMutexLocker {
+	
+	private:
+		 wxMutex&	m_mutex;
+		 bool 		m_ok;
+		
+		CncMutexLocker(const wxMutexLocker&);
+		CncMutexLocker& operator=(const wxMutexLocker&);
+		
+	public:
+		CncMutexLocker(wxMutex &mutex, unsigned long msec = 0) 
+		: m_mutex(mutex)
+		, m_ok(false)
+		{
+			m_ok = ( msec > 0 ? m_mutex.LockTimeout(msec) == wxMUTEX_NO_ERROR 
+			                  : m_mutex.Lock()            == wxMUTEX_NO_ERROR 
+			       );
+		}
+		
+		~CncMutexLocker() {
+			if ( isOk() ) m_mutex.Unlock();
+		}
+		
+		bool isOk() const { return m_ok; }
+};
+
+
+#define CNC_MUTEX_LOCK_OLD(timeout) \
+		wxMutexLocker mlk(mutex);
+
+#define CNC_MUTEX_LOCK(timeout) \
+		CncMutexLocker mlk(mutex, timeout); \
+		if ( mlk.isOk() == false ) \
+		{ \
+			wxASSERT_MSG(NULL, CNC_LOG_FUNCT); \
+		}
 
 template <typename T>
 class CircularBuffer {
@@ -80,14 +118,16 @@ int CircularBuffer<T>::size() {
 template<typename T>
 void CircularBuffer<T>::setTimeout(unsigned int timeout) {
 ///////////////////////////////////////////////////////////////////
-	wxMutexLocker mlk(mutex);
+	CNC_MUTEX_LOCK(1500);
+	
 	timeoutMillis = timeout;
 }
 ///////////////////////////////////////////////////////////////////
 template<typename T>
 void CircularBuffer<T>::clear() {
 ///////////////////////////////////////////////////////////////////
-	wxMutexLocker mlk(mutex);
+	CNC_MUTEX_LOCK(1500);
+	
 	front	= 0;
 	rear	= 0;
 	count	= 0;
@@ -101,7 +141,9 @@ bool CircularBuffer<T>::peak(T& frontByte) {
 		return false;
 	
 	bool ret = true;
-	wxMutexLocker mlk(mutex);
+	
+	CNC_MUTEX_LOCK(1500);
+	
 	ret = count > 0;
 	if ( ret ) 	
 		frontByte = buffer[front];
@@ -117,7 +159,9 @@ bool CircularBuffer<T>::read(T& frontByte){
 		return false;
 
 	bool ret = true;
-	wxMutexLocker mlk(mutex);
+	
+	CNC_MUTEX_LOCK(1500);
+	
 	ret = count > 0;
 	if ( ret ) {
 		frontByte = buffer[front];
@@ -138,9 +182,10 @@ int CircularBuffer<T>::read(T* b, int size) {
 		return 0;
 		
 	if ( count <= 0 ) 
-		return false;
+		return 0;
 	
-	wxMutexLocker mlk(mutex);
+	CNC_MUTEX_LOCK(1500);
+	
 	// read whatever exits - max up to size
 	int bytesAvailable = std::min(size, count);
 	
@@ -160,7 +205,8 @@ bool CircularBuffer<T>::write(T data) {
 	if ( count >= totalCapacity ) 
 		return false;
 	
-	wxMutexLocker mlk(mutex);
+	CNC_MUTEX_LOCK(1500);
+	
 	bool ret = count < totalCapacity;
 	if ( ret ) {
 		buffer[rear] = data;
@@ -183,7 +229,8 @@ bool CircularBuffer<T>::write(T* b, int size) {
 	if ( count + size >= totalCapacity ) 
 		return false;
 	
-	wxMutexLocker mlk(mutex);
+	CNC_MUTEX_LOCK(1500);
+	
 	bool ret =  count + size < totalCapacity;
 	if ( ret ) {
 		for ( auto i=0; i<size; i++ ) {

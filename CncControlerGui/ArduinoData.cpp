@@ -196,6 +196,8 @@ AE::PinName AE::ArduinoData::convertPinName(const char type, int name) {
 	if ( type == 'D' ) 
 		return name >= minDPinIndex && name <= maxDPinIndex ? (PinName)name : PN_NULL;
 	
+	#warning + minAPinIndex longer equired ?????
+	
 	const int idx = name + minAPinIndex;
 	return idx >= minAPinIndex && idx <= maxAPinIndex ? (PinName)idx : PN_NULL;
 }

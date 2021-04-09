@@ -1,11 +1,39 @@
-
-  
+ 
 #ifdef DEBUG 
 MAINICON ICON "APP_ICON_D.ico"
 #else
 MAINICON ICON "APP_ICON_R.ico"
 #endif
 
-
 #include "wx/msw/wx.rc"
+#include "Version.h"
+
+1 VERSIONINFO
+  FILEVERSION      RC_FILEVERSION
+  PRODUCTVERSION   RC_PRODUCTVERSION
+  FILEFLAGSMASK    VS_FFI_FILEFLAGSMASK
+  FILEFLAGS        (VS_FF_SPECIALBUILD|VS_FF_PRERELEASE)
+  FILEOS           VOS__WINDOWS32
+  FILETYPE         VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004E4"
+        BEGIN
+            VALUE "CompanyName",            RC_COMPANY_STR
+            VALUE "FileDescription",        RC_DESCRIPTION_STR
+            VALUE "FileVersion",            RC_FILEVERSION_STR
+            VALUE "InternalName",           RC_PROGNAME_STR
+            VALUE "LegalCopyright",         RC_COPYRIGHT_STR
+            VALUE "OriginalFilename",       RC_PROGNAME_STR
+            VALUE "ProductName",            RC_PRODUCTNAME_STR
+            VALUE "ProductVersion",         RC_PRODUCTVERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1252
+    END
+END
+
 

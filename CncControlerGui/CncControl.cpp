@@ -595,10 +595,17 @@ void CncControl::interrupt(const char* why) {
 ///////////////////////////////////////////////////////////////////
 	std::cerr << wxString::Format("CncControl: Interrupted: %s", why ? why : "") << std::endl;
 	
-	interruptState = true;
-	switchSpindleOff(true);
+	// try always to switch the spindle off
+	const bool force = true;
+	switchSpindleOff(force);
 	
-	throw CncInterruption(why);
+	// to do this only once
+	if ( interruptState == false ) {
+		interruptState = true;
+		
+		std::cerr << wxString::Format("CncControl: Throw a CncInterruption exception") << std::endl;
+		throw CncInterruption(why);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::isReadyToRun() {
@@ -984,7 +991,7 @@ bool CncControl::dispatchEventQueue() {
 	static       CncMilliTimestamp tsLastUpdate     = 0;
 	
 	if ( isInterrupted() ) {
-		std::cerr << "CncControl::dispatchEventQueue: Interrupt detected"<< std::endl;
+		std::cerr << CNC_LOG_FUNCT_A(": Interrupt detected\n");
 		return false;
 	}
 	
@@ -997,7 +1004,7 @@ bool CncControl::dispatchEventQueue() {
 		// stop immediately . . .
 		if ( gamepad.hasEmptyMovement() )
 			if ( stopInteractiveMove() == false )
-				std::cerr << "CncControl::dispatchEventQueue(): stopInteractiveMove() failed" << std::endl;
+				std::cerr << CNC_LOG_FUNCT_A(" stopInteractiveMove() failed\n");
 	}
 	
 	if ( THE_CONTEXT->isAllowEventHandling() ) {
@@ -1013,22 +1020,22 @@ bool CncControl::dispatchEventQueue() {
 			THE_APP->dispatchAll();
 			tsLastDispatch = CncTimeFunctions::getMilliTimestamp();
 		}
-		
 	}
 	
 	if ( CncAsyncKeyboardState::isEscapePressed() != 0 ) {
+		
+		// assign ESC to an interrupt event only if the emergency button is active
 		if ( THE_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true ) {
-			std::cerr << "dispatchEventQueue: ESCAPE key detected" << std::endl;
-			interrupt("ESCAPE detected");
+			std::cerr << CNC_LOG_FUNCT_A(": ESCAPE key detected\n");
+			interrupt("ESCAPE key detected");
 		}
 	}
 	
 	if ( isInterrupted() ) {
-		std::cerr << "dispatchEventQueue: Interrupt detected"<< std::endl;
-		return false;
+		std::cerr << "dispatchEventQueue: Interrupt detected" << std::endl;
 	}
 	
-	return !isInterrupted();
+	return isInterrupted() == false;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialCallback() {
@@ -1039,7 +1046,7 @@ bool CncControl::SerialCallback() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
-	// Event handling, enables the interrrpt functionality
+	// Event handling, enables the interrupt functionality
 	if ( dispatchEventQueue() == false )
 		return false;
 	
@@ -1191,7 +1198,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 ///////////////////////////////////////////////////////////////////
-	// Event handling, enables the interrrpt functionality
+	// Event handling, enables the interrupt functionality
 	if ( dispatchEventQueue() == false )
 		return false;
 	
@@ -1213,26 +1220,34 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 		THE_APP->displayNotification(notification);
 	}
 	
+	// -----------------------------------------------------------
+	auto format = [](wxString& s) {
+		if ( s.Last() == '\n' ) 
+			s = s.BeforeLast('\n').Trim();
+		
+		return s;
+	};
+	
 	switch ( type ) {
 		
 		case 'W':	cnc::msg.logWarning(now.Format("Warning Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logWarning(msg);
-					cnc::cex1 << "Received the following CNC Controller Warning: '" << msg << "'";
+					cnc::cex1 << "Received the following CNC Controller Warning: '" << format(msg) << "'\n";
 					break;
 					
 		case 'E':	cnc::msg.logError(now.Format("Error Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logError(msg);
-					std::cerr << "Received the following CNC Controller Error: '" << msg << "'";
+					std::cerr << "Received the following CNC Controller Error: '" << format(msg) << "'\n";
 					break;
 					
-		case 'D':	cnc::msg.logDebug(now.Format("Debug Message received: %H:%M:%S.%l \n"));
+		case 'D':	cnc::msg.logDebug(now.Format("Debug Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logDebug(msg);
 					cnc::cex1 << "Serial Remote Debug: " << msg;
 					break;
 
 		default:	cnc::msg.logInfo(now.Format("Info Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logInfo(msg);
-					std::cout << "Received the following CNC Controller Information: '" << msg << "'";
+					std::cout << "Received the following CNC Controller Information: '" << format(msg) << "'\n";
 	}
 	
 	cnc::msg.setTextColour(wxColour(192, 192, 192));
@@ -1256,7 +1271,7 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 		return ret;
 	};
 	
-	// Event handling, enables the interrrpt functionality
+	// Event handling, enables the interrupt functionality
 	if ( dispatchEventQueue() == false )
 		return false;
 	
@@ -1320,7 +1335,7 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) {
 		// app positions are always from type major
 		// so || pid == PID_XYZ_POS_MAJOR isn't necessary
-		// the compairison below is necessary, because this method is also called
+		// the comparison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos || force == true) {
 			PositionStorage::addPos(PositionStorage::TRIGGER_APP_POS, curCtlPos);

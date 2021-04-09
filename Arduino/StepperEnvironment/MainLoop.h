@@ -36,6 +36,7 @@ class ArduinoMainLoop {
 
     void setup();
     void loop();
+    void interrupt();
 
     // common function interface
     static bool     isSketchEnv();

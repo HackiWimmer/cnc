@@ -1,0 +1,16 @@
+# --------------------------------------------------------------------------------
+# This file try to collect some how to info around this project and its dependencies 
+#  - no guarantee of completeness.
+# Furthermore, this file is continuous under construction
+# --------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------
+# dgb lock all backtraces 
+	gdb attach <PID>
+	thread apply all bt
+	
+# --------------------------------------------------------------------------------
+# addr2line 
+	?? address how to get address
+	addr2line -e <...>.exe -j .text -p +0x<address>
+	

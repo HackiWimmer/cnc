@@ -472,6 +472,7 @@
       <File Name="MainFrame.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="Version.h"/>
       <File Name="CircularBuffer.cpp"/>
       <File Name="CircularBuffer.h"/>
       <File Name="PointAbs.h"/>
@@ -876,7 +877,7 @@
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="..\..\..\..\..\msys64\mingw64\bin\gdb.exe" IsExtended="no">
         <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>

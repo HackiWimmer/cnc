@@ -43,6 +43,12 @@
 	#define CNC_PRINT_FUNCT 			std::cout << CNC_LOG_FUNCT										<< std::endl;
 	#define CNC_PRINT_FUNCT_A(...)		std::cout << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
 	#define CNC_PRINT_FUNCT_B(...)		std::cout << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
+	
+	#define CNC_DISPLAY_LOCATION		wxMessageBox(CNC_LOG_LOCATION,									"CNC_DISPLAY_LOCATION");
+	#define CNC_DISPLAY_LOCATION_A(...)	wxMessageBox(CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__)),	"CNC_DISPLAY_LOCATION_A");
+	#define CNC_DISPLAY_FUNCT			wxMessageBox(CNC_LOG_FUNCT,										"CNC_DISPLAY_FUNCT");
+	#define CNC_DISPLAY_FUNCT_A(...)	wxMessageBox(CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__)),	"CNC_DISPLAY_FUNCT_A");
+	#define CNC_DISPLAY_FUNCT_B(...)	wxMessageBox(CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__)),	"CNC_DISPLAY_FUNCT_B");
 
 // -------------------------------------------------------------------
 // common ostream operators

@@ -119,7 +119,7 @@
 
     // PINA
     const unsigned char PIN_TOUCH_CONTACT                   =  29;
-    const unsigned char PIN_INTERRUPT_LED                   =  28;
+    //const unsigned char PIN_                              =  28;
     //const unsigned char PIN_                              =  27;
     //const unsigned char PIN_                              =  26;
     //const unsigned char PIN_                              =  25;
@@ -154,6 +154,9 @@
 
     const unsigned char PIN_H_MOVE_UP                       =  51;
     const unsigned char PIN_H_MOVE_DOWN                     =  50;
+
+    #define PIN_INTERRUPT_LED                            AE::PN_A0   
+    const unsigned char PIN_INTERRUPT_LED_ID                =   0;
 
     #define PIN_IS_SPINDEL_OVRLD                         AE::PN_A1   
     const unsigned char PIN_IS_SPINDEL_OVRLD_ID              =  1;
@@ -276,7 +279,7 @@
     const unsigned char PIN_EXTERNAL_INTERRUPT              =  13;
     
     const unsigned char PIN_IS_CTRL_POWERED                 =   0;
-    const unsigned char PIN_IS_SPINDLE_POWERED                 =   0;
+    const unsigned char PIN_IS_SPINDLE_POWERED              =   0;
     const unsigned char PIN_INTERRUPT_LED                   =   0;
     const unsigned char PIN_SPINDEL_SUPPORT                 =   0;
     const unsigned char PIN_SPINDEL_SPEED_INF               =   0;

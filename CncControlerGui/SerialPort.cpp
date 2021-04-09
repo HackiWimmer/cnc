@@ -384,6 +384,7 @@ int Serial::peekData(void *buffer, unsigned int nbByte) {
 	int bytesRead = readData(buffer, nbByte);
 	unsigned char *p = (unsigned char*)buffer;
 	
+	// store . . . 
 	for ( int i=0; i<bytesRead ; i++ ) {
 		readBuffer.push_back(*p);
 		p++;
@@ -463,7 +464,12 @@ void Serial::decodeMessage(const int bytes, const unsigned char* mutliByteStream
 		if ( mutliByteStream[2] != E_NO_ERROR ) {
 			message << ArduinoErrorCodes::getECLabel(mutliByteStream[2]);
 			message << " ";
+			
+			if (  mutliByteStream[2] == E_INTERRUPT ) {
+				cncControl->interrupt("By controller message");
+			}
 		}
+		
 		
 		// skip over to the text part
 		p += 2;
@@ -645,15 +651,21 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 	unsigned int cnt = 0;
 	
 	while ( remainingBytes > 0 ) {
+		
+		if ( cncControl->isInterrupted() ) {
+			std::cerr << CNC_LOG_FUNCT_A(": Interrupt detected:\n");
+			break;
+		}
+		
 		bytesRead = readData(oneReadBuf, std::min(remainingBytes, maxBytes));
-		//bytesRead = readData(oneReadBuf, 1);
 		
 		if ( bytesRead > 0 ) {
 			
 			// Make the memcpy below safe
 			// Please note this condition normally not occurs
 			if ( bytesRead > (int)remainingBytes ) {
-				std::cerr << "Serial::readDataUntilSizeAvailable: readData(...) delivers to much bytes:" 
+				std::cerr << CNC_LOG_FUNCT 
+				<< ": readData(...) delivers to much bytes:" 
 				<< " Requested: " << std::min(remainingBytes, maxBytes)
 				<< " Received: "  << bytesRead
  				<< std::endl;
@@ -671,14 +683,18 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 			
 			if ( ++cnt > maxDelay ) {
 				if ( withErrorMsg == true )
-					std::cerr << "Serial::readDataUntilSizeAvailable Timeout reached:" << std::endl;
+					std::cerr << CNC_LOG_FUNCT_A(": Timeout reached\n");
 					
 				//return 0;
 				break;
 			}
-				
-			if ( cnt%100 == 0 )
-				cncControl->SerialCallback();
+			
+			if ( cnt%100 == 0 ) {
+				if ( cncControl->SerialCallback() == false ) {
+					std::cerr << CNC_LOG_FUNCT_A(": Serial Callback failed:\n");
+					break;
+				}
+			}
 		}
 	}
 	
@@ -699,19 +715,18 @@ int Serial::readDataUntilMultyByteClose(unsigned char* buffer, unsigned int nbBy
 		
 		// error handling
 		if ( readFailedCounter > 100 ) {
-			std::cerr << "Serial::readDataUntilMultyByteClose: Max count of failed reads a reached." 
-			<< std::endl;
+			std::cerr << CNC_LOG_FUNCT_A(": Max count of failed reads is reached.\n"); 
 			fetch = false;
 			break;
 		}
 		
 		// error handling
 		if ( (unsigned int)byteCounter >= nbByte ) {
-			std::cerr << "Serial::readDataUntilMultyByteClose: To much data availiable." 
-			<< " Max bytes: "    << nbByte
-			<< " Byte counter: " << byteCounter
-			<< std::endl;
-			fetch = false;
+			std::cerr	<< CNC_LOG_FUNCT_A(": To much data available.")
+						<< " Max bytes: "    << nbByte
+						<< " Byte counter: " << byteCounter
+						<< std::endl;
+				fetch = false;
 			break;
 		}
 		
@@ -732,7 +747,11 @@ int Serial::readDataUntilMultyByteClose(unsigned char* buffer, unsigned int nbBy
 			}
 			
 			// to release user events
-			cncControl->SerialCallback();
+			if ( cncControl->SerialCallback() == false ) {
+				std::cerr << CNC_LOG_FUNCT_A(": SerialCallback() failed.\n"); 
+				fetch = false;
+				break;
+			}
 			
 		} else {
 			
@@ -1027,7 +1046,9 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 				cei.infoType 		= CEITSetter;
 				cei.setterPid		= si.pid;
 				cei.setterValueList = si.values;
-				sendSerialControllerCallback(cei);
+				
+				if ( sendSerialControllerCallback(cei) == false )
+					return false;
 				
 				// serialize
 				SerialFetchInfo sfi(cmd);
@@ -1413,7 +1434,9 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 		lastFetchResult.ret		= ret; \
 		handshakeInfo.command	= sfi.command; \
 		handshakeInfo.handshake = ret; \
-		cncControl->SerialControllerCallback(handshakeInfo);
+		 \
+		if ( cncControl->SerialControllerCallback(handshakeInfo) == false ) \
+			return false;
 	
 	// main fetch loop
 	lastFetchResult.resetResult(); 
@@ -1520,7 +1543,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			// -----------------------------------------------------------
 			// fetch type unknown
 			// -----------------------------------------------------------
-			//evaluateResult..........................................
+			// evaluateResult ..........................................
 			default: {
 				std::stringstream ss;
 				ss	<< "Serial::evaluateResult : Invalid Acknowlege:" << std::endl
@@ -1743,10 +1766,9 @@ bool Serial::decodeText(unsigned char pid, SerialFetchInfo& sfi, std::ostream& m
 						break;
 		
 		case PID_MSG:	if ( (bytes = readDataUntilMultyByteClose(sfi.multiByteResult, sizeof(sfi.multiByteResult) - 1)) > 0 ) {
-							ret = true;
 							ControllerMsgInfo cmi;
 							decodeMessage(bytes, sfi.multiByteResult, cmi.message);
-							cncControl->SerialMessageCallback(cmi);
+							ret = cncControl->SerialMessageCallback(cmi);
 						}
 						break;
 
@@ -1849,9 +1871,7 @@ bool Serial::decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi) {
 		sfi.Mc.p += LONG_BUF_SIZE;
 	}
 	
-	sendSerialControllerCallback(ci);
-	
-	return true;
+	return sendSerialControllerCallback(ci);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
@@ -1884,8 +1904,7 @@ bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 		sfi.Lc.p += LONG_BUF_SIZE;
 	}
 	
-	sendSerialControllerCallback(ci);
-	return true;
+	return sendSerialControllerCallback(ci);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
@@ -1929,8 +1948,7 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 		sfi.Sc.p += 1;
 	}
 
-	sendSerialControllerCallback(ci);
-	return true;
+	return sendSerialControllerCallback(ci);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::processMoveSequence(CncMoveSequence& sequence) {

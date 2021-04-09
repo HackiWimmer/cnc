@@ -269,9 +269,8 @@
   const unsigned char E_LIMIT_SWITCH_ACTIVE               =  51;
   const unsigned char E_RMDR_INVALID_STP_POINTER          =  52;
 
-  const unsigned char E_PURE_TEXT_VALUE_ERROR             = 251;
-  const unsigned char E_INTERRUPT                         = 252;
-  const unsigned char E_EXTERNEL_INTERRUPT                = 253;
+  const unsigned char E_PURE_TEXT_VALUE_ERROR             = 252;
+  const unsigned char E_INTERRUPT                         = 253;
   const unsigned char E_TOTAL_COUNT                       = 254;
 
 // .........................................................

@@ -237,7 +237,7 @@ template<> byte CncArduinoStepper<PESIMISTIC>::initiateStep() {
   // avoid everything in this states
   if ( isInterrupted() )
     return RET_INTERRUPT;
-
+  
   if ( stepDirection == SD_UNKNOWN ) {
     controller->broadcastInterrupt();
     return RET_INTERRUPT;

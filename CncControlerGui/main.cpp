@@ -473,7 +473,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 			APPEND_LOCATION_TO_STACK_TRACE_FILE;
 			
-			throw;
+			//throw;
 			return true;
 		}
 		

@@ -693,6 +693,14 @@ bool sendDataToI2CSlave(const byte data[], unsigned int len) {
   return ( ret == 0 && bytes == (int)len );
 }
 ///////////////////////////////////////////////////////
+void ArduinoMainLoop::interrupt() {
+///////////////////////////////////////////////////////
+  if ( THE_CONTROLLER == NULL )
+    return;
+
+  THE_CONTROLLER->broadcastInterrupt();  
+}
+///////////////////////////////////////////////////////
 void ArduinoMainLoop::setup() {
 ///////////////////////////////////////////////////////
   CNC_MAIN_LOOP_LOG_FUNCTION();
@@ -705,66 +713,66 @@ void ArduinoMainLoop::setup() {
   LastErrorCodes::clear(); 
 
   // digital pins
-  AE::pinMode(PIN_X_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,            PL_LOW);
-  AE::pinMode(PIN_Y_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,            PL_LOW);
-  AE::pinMode(PIN_Z_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,            PL_LOW);
-  AE::pinMode(PIN_X_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_X_DIR,            PL_LOW);
-  AE::pinMode(PIN_Y_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,            PL_LOW);
-  AE::pinMode(PIN_Z_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,            PL_LOW);
+  AE::pinMode(PIN_X_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,              PL_LOW);
+  AE::pinMode(PIN_Y_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,              PL_LOW);
+  AE::pinMode(PIN_Z_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,              PL_LOW);
+  AE::pinMode(PIN_X_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_X_DIR,              PL_LOW);
+  AE::pinMode(PIN_Y_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_DIR,              PL_LOW);
+  AE::pinMode(PIN_Z_DIR,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_DIR,              PL_LOW);
 
-  AE::pinMode(PIN_X_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_X_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Y_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Y_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Z_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
-  AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_X_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MIN_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_X_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_X_MAX_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Y_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MIN_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Y_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Y_MAX_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Z_MIN_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MIN_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_Z_MAX_LIMIT,          PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF);
 
-  AE::pinMode(READ_EXT_INNTERRUPT_PIN,  PM_INPUT);   AE::digitalWrite(PIN_Z_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF);
+  AE::pinMode(PIN_EXTERNAL_INTERRUPT,   PM_INPUT);   AE::digitalWrite(PIN_EXTERNAL_INTERRUPT, EXTERNAL_INTERRRUPT_OFF);
 
-  AE::pinMode(PIN_ENABLE_PODEST,        PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODEST,    PL_LOW);
-  AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,   ENABLE_STATE_OFF);
-  AE::pinMode(PIN_ENABLE_SPINDLE,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_SPINDLE,   SPINDLE_STATE_OFF);
+  AE::pinMode(PIN_ENABLE_PODEST,        PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODEST,      PL_LOW);
+  AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,     ENABLE_STATE_OFF);
+  AE::pinMode(PIN_ENABLE_SPINDLE,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_SPINDLE,     SPINDLE_STATE_OFF);
 
-  AE::pinMode(PIN_LED_PODEST,           PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODEST,       PL_LOW);
+  AE::pinMode(PIN_LED_PODEST,           PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODEST,         PL_LOW);
 
   if ( PIN_H_MIN_LIMIT != 0 ) 
-    { AE::pinMode(PIN_H_MIN_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MIN_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF); }
+    { AE::pinMode(PIN_H_MIN_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MIN_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF); }
     
   if ( PIN_H_MAX_LIMIT != 0 ) 
-    { AE::pinMode(PIN_H_MAX_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MAX_LIMIT,      LimitSwitch::LIMIT_SWITCH_OFF); }
+    { AE::pinMode(PIN_H_MAX_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MAX_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF); }
 
   if ( PIN_H_STP != 0 ) 
-    { AE::pinMode(PIN_H_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_H_STP,            PL_LOW); }
+    { AE::pinMode(PIN_H_STP,            PM_OUTPUT);  AE::digitalWrite(PIN_H_STP,              PL_LOW); }
     
   if ( PIN_H_DIR != 0 ) 
-    { AE::pinMode(PIN_H_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_H_DIR,            PL_LOW); }
+    { AE::pinMode(PIN_H_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_H_DIR,              PL_LOW); }
 
   if ( PIN_H_MOVE_UP != 0 ) 
-    { AE::pinMode(PIN_H_MOVE_UP,        PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_UP,        PODEST_SWITCH_OFF); }
+    { AE::pinMode(PIN_H_MOVE_UP,        PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_UP,          PODEST_SWITCH_OFF); }
     
   if ( PIN_H_MOVE_DOWN != 0 ) 
-    { AE::pinMode(PIN_H_MOVE_DOWN,      PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,      PODEST_SWITCH_OFF); }
+    { AE::pinMode(PIN_H_MOVE_DOWN,      PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,        PODEST_SWITCH_OFF); }
 
   if ( PIN_IS_CTRL_POWERED > 0 )  
-     { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_CTRL_POWERED,  POWER_STATE_OFF); }
+     { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_CTRL_POWERED,    POWER_STATE_OFF); }
      
   if ( PIN_IS_SPINDLE_POWERED > 0 )
-    { AE::pinMode(PIN_IS_SPINDLE_POWERED,  PM_INPUT);   AE::digitalWrite(PIN_IS_SPINDLE_POWERED, SPINDLE_STATE_OFF); }
+    { AE::pinMode(PIN_IS_SPINDLE_POWERED, PM_INPUT); AE::digitalWrite(PIN_IS_SPINDLE_POWERED, SPINDLE_STATE_OFF); }
 
   if ( PIN_TOUCH_CONTACT > 0 )
-    { AE::pinMode(PIN_TOUCH_CONTACT,    PM_INPUT);   AE::digitalWrite(PIN_TOUCH_CONTACT,    PL_HIGH); }
+    { AE::pinMode(PIN_TOUCH_CONTACT,    PM_INPUT);   AE::digitalWrite(PIN_TOUCH_CONTACT,      PL_HIGH); }
 
   if ( PIN_IS_SPINDEL_OVRLD > 0 )
-    { AE::pinMode(PIN_IS_SPINDEL_OVRLD, PM_INPUT);   AE::analogWrite(PIN_IS_SPINDEL_OVRLD,  ANALOG_LOW); }
+    { AE::pinMode(PIN_IS_SPINDEL_OVRLD, PM_INPUT);   AE::analogWrite(PIN_IS_SPINDEL_OVRLD,    ANALOG_LOW); }
 
   if ( PIN_SPINDEL_SUPPORT > 0 )
-    { AE::pinMode(PIN_SPINDEL_SUPPORT,  PM_OUTPUT);  AE::digitalWrite(PIN_SPINDEL_SUPPORT,  PL_LOW); }
+    { AE::pinMode(PIN_SPINDEL_SUPPORT,  PM_OUTPUT);  AE::digitalWrite(PIN_SPINDEL_SUPPORT,    PL_LOW); }
 
   if ( PIN_INTERRUPT_LED > 0 )
-    { AE::pinMode(PIN_INTERRUPT_LED,    PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,     ANALOG_LOW); }
+    { AE::pinMode(PIN_INTERRUPT_LED,    PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,       ANALOG_LOW); }
 
   if ( PIN_SPINDEL_SPEED_INF > 0 )
-    { AE::pinMode(PIN_SPINDEL_SPEED_INF,PM_OUTPUT);  AE::analogWrite(PIN_SPINDEL_SPEED_INF, ANALOG_LOW); }
+    { AE::pinMode(PIN_SPINDEL_SPEED_INF,PM_OUTPUT);  AE::analogWrite(PIN_SPINDEL_SPEED_INF,   ANALOG_LOW); }
     
 
   // analog pins

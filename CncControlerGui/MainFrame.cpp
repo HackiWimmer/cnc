@@ -191,7 +191,10 @@ CncTransactionLockBase::~CncTransactionLockBase() {
 	if ( referenceCounter > 0 )
 		referenceCounter--;
 	
-	parent->m_serialTimer->Start();
+	const bool b = parent->cnc != NULL ? parent->cnc->isInterrupted() == false : false;
+		
+	if ( b ) 
+		parent->m_serialTimer->Start();
 }
 ////////////////////////////////////////////////////////////////////
 bool CncTransactionLockBase::waitUntilCncIsAvailable() {
@@ -1252,6 +1255,12 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
+	while ( true ) {
+		waitActive(300);
+	}
+	
+	
+	
 	const uint32_t trgF1000_MMSEC = ( 700 / 60 )	* 1000;
 	
 	const uint32_t A_1000			= 2.003			* 1000;
@@ -1320,6 +1329,8 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
+	
+	GblFunc::stacktrace(std::cout);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -2163,21 +2174,14 @@ void MainFrame::dispatchAll() {
 	
 	// the following code is the best compromise, but aui handling isn't perfect
 	
-	
-	
-	
 	//if ( wxTheApp->HasPendingEvents() )
 		//wxTheApp->ProcessPendingEvents();
-		
-	int c = 0;
-		
+	
+	
 	while ( evtLoop->Pending() ) {
 		evtLoop->Dispatch();
-		c++;
 	}
 	
-	if ( c > 16 )
-		;//std::cout << "Q: "<< c << std::endl;
 	
 	//wxTheApp->Yield();
 	
@@ -4609,6 +4613,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		std::cerr << CNC_LOG_FUNCT << ": Unhandled Exception!" << std::endl;
 	}
 	
+	enableControls();
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -4847,10 +4852,32 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 void MainFrame::emergencyStop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	std::cerr << "Emergency Stop detected" << std::endl;
-
-	wxASSERT(cnc);
-	cnc->interrupt("Emergency Stop detected");
-
+	
+	// catch exceptions here to not influence the wx event queue 
+	auto doCatch = [&] () {
+		
+		if ( serialThread == NULL )
+			serialThread->notifyInterrupted();
+			
+		m_serialTimer->Stop();
+	};
+	
+	try {
+		wxASSERT(cnc);
+		cnc->interrupt("Emergency Stop detected");
+	}
+	catch (const CncInterruption& ex) {
+		std::cerr << CNC_LOG_FUNCT << ": Exception received:" 
+		          << std::endl
+				  << ex.what()
+				  << std::endl;
+		doCatch();
+	}
+	catch (...) {
+		std::cerr << CNC_LOG_FUNCT << ": Unhandled Exception!" << std::endl;
+		doCatch();
+	}
+	
 	refPositionDlg->setEnforceFlag(true);
 }
 ///////////////////////////////////////////////////////////////////

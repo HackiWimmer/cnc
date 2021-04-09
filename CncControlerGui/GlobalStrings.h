@@ -2,16 +2,17 @@
 #define GLOBAL_STRINGS_H
 
 #include "wx/string.h"
+#include "Version.h"
 
 ////////////////////////////////////////////////////////////////////
 namespace VersionInfo {
 
-	const wxString major			= "0";
-	const wxString minor			= "9";
-	const wxString index			= "8";
+	const wxString major			= CNC_VERSION_MAJOR_STR;
+	const wxString minor			= CNC_VERSION_MINOR_STR;
+	const wxString index			= CNC_VERSION_INDEX_STR;
 
 	const wxString text 			= "";
-	const wxString number			= wxString::Format("%s.%s.%s", major, minor, index);
+	const wxString number			= CNC_VERSION_STR;
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -30,8 +31,8 @@ struct GlobalConstStringDatabase {
 	#endif
 
 	// common
-	const wxString programTitel			= wxString("Woodworking CNC Controller");
-	const wxString copyRight			= wxString("invented by Hacki Wimmer 2016 - 2021");
+	const wxString programTitel			= wxString(CNC_DESCRIPTION_STR);
+	const wxString copyRight			= wxString(CNC_COPYRIGHT_STR);
 	const wxString versionNumber		= VersionInfo::number;
 	const wxString programVersion		= wxString(wxString::Format("%s.%s", versionNumber, buildFlag));
 	

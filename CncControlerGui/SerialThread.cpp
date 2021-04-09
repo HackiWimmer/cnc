@@ -38,7 +38,7 @@ struct SerialInterruptException : public std::system_error {
 
 ///////////////////////////////////////////////////////////////////
 SerialThread*	SerialThread::theSerialThread() { return SERIAL_THREAD; }
-bool 			SerialThread::isInterruped() 	{ return SERIAL_THREAD ? SERIAL_THREAD->interruped : false; }
+bool 			SerialThread::isInterrupted() 	{ return SERIAL_THREAD ? SERIAL_THREAD->serialState == SerialState::INTERRUPTED : false; }
 ///////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////
@@ -47,7 +47,6 @@ SerialThread::SerialThread(MainFrame *handler)
 , pHandler			( handler )
 , exit				( false )
 , processAdmChl		( true )
-, interruped		( false )
 , serialState		( SerialState::DISCONNECTED )
 , arduinoMainLoop	()
 , tsStartup			( CncTimeFunctions::getNanoTimestamp() )
@@ -137,6 +136,12 @@ bool SerialThread::notifyDisconnected() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
+bool SerialThread::notifyInterrupted() {
+///////////////////////////////////////////////////////////////////
+	interrupt();
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 wxThread::ExitCode SerialThread::Entry() {
 ///////////////////////////////////////////////////////////////////
 	APPEND_THREAD_ID_TO_STACK_TRACE_FILE;
@@ -156,15 +161,11 @@ wxThread::ExitCode SerialThread::Entry() {
 		
 	} catch (const SerialInterruptException& e) {
 		publishMessage('E', wxString::Format("Setup: Caught an interrupt: %s", e.what()), CNC_LOG_FUNCT);
-		
-		interruped 		= true;
-		serialState 	= SerialState::DISCONNECTED;
+		interrupt();
 		
 	} catch (...) {
 		publishMessage('E', wxString::Format("Setup: Caught an unknown exception:"), CNC_LOG_FUNCT);
-		
-		interruped 		= true;
-		serialState 	= SerialState::DISCONNECTED;
+		interrupt();
 	}
 	
 	// loop .....
@@ -192,15 +193,11 @@ wxThread::ExitCode SerialThread::Entry() {
 					
 			} catch (const SerialInterruptException& e) {
 				publishMessage('E', wxString::Format("Loop: Caught an interrupt: %s", e.what()), CNC_LOG_FUNCT);
-				
-				interruped 		= true;
-				serialState 	= SerialState::DISCONNECTED;
+				interrupt();
 				
 			} catch (...) {
 				publishMessage('E', wxString::Format("Loop: Caught an unknown exception:"), CNC_LOG_FUNCT);
-				
-				interruped 		= true;
-				serialState 	= SerialState::DISCONNECTED;
+				interrupt();
 			}
 			
 		} // while
@@ -209,17 +206,25 @@ wxThread::ExitCode SerialThread::Entry() {
 	
 	// post complete event
 	wxQueueEvent(THE_FRAME, new SerialEvent(wxEVT_SERIAL_THREAD, MainFrame::EventId::COMPLETED));
-	
 	return NULL;
+}
+///////////////////////////////////////////////////////////////////
+void SerialThread::interrupt() {
+///////////////////////////////////////////////////////////////////
+	serialState = SerialState::INTERRUPTED;
+	arduinoMainLoop.interrupt();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialThread::idleThread() {
 ///////////////////////////////////////////////////////////////////
 	static unsigned int idleCounter = 0;
 	
-	// return immediately if something on the serial
-	if ( app2ctl->size() != 0 ) { idleCounter = 0; return; }
-	if ( ctl2app->size() != 0 ) { idleCounter = 0; return; }
+	// check this, otherwise the cpu usage is high during the state INTERRUPTED 
+	if ( serialState != SerialState::INTERRUPTED ) {
+		// return immediately if something on the serial
+		if ( app2ctl->size() != 0 ) { idleCounter = 0; return; }
+		if ( ctl2app->size() != 0 ) { idleCounter = 0; return; }
+	}
 	
 	// provide a cool down phase
 	if ( ++idleCounter < 1024 )	{ return; }
@@ -227,14 +232,15 @@ void SerialThread::idleThread() {
 	// and now idle
 	switch ( serialState ) {
 		
+		case SerialState::INTERRUPTED:		this->Sleep(300);
+											break;
+
 		case SerialState::CONNECTED:		this->Sleep(50);
 											break;
 											
 		case SerialState::DISCONNECTED:
 		default:							this->Sleep(250);
 	}
-	
-	//this->Sleep(10);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialThread::publishPinNotification() {
@@ -313,7 +319,7 @@ void SerialThread::dispatchAdminChannel() {
 				// -----------------------------------------------
 				case MID::FORCE_DATA_NOTIFICATION:
 				{
-					if ( interruped == false ) {
+					if ( isInterrupted() == false ) {
 						publishDataNotification = false;
 					}
 					
@@ -323,7 +329,7 @@ void SerialThread::dispatchAdminChannel() {
 				// -----------------------------------------------
 				case MID::DATA_NOTIFICATION:
 				{
-					if ( interruped == false ) 
+					if ( isInterrupted() == false ) 
 						publishDataNotification = true;
 						
 					break;
@@ -332,7 +338,7 @@ void SerialThread::dispatchAdminChannel() {
 				// -----------------------------------------------
 				case MID::NOTIFY_PIN_UPDATE:
 				{
-					if ( interruped == false ) 
+					if ( isInterrupted() == false ) 
 						publishPinNotification();
 						
 					break;
@@ -341,11 +347,28 @@ void SerialThread::dispatchAdminChannel() {
 				// -----------------------------------------------
 				case MID::SET_DIGITAL_PIN:
 				{
-					if ( interruped == false ) {
-						// example: 10, true
-						arduinoDataStore->digitalWrite(	sam.getValue<unsigned int>(VN::VAL1),
-														sam.getValue<bool        >(VN::VAL2));
-						publishPinNotification();
+					// specialize the PIN_EXTERNAL_INTERRUPT
+					if ( (int)sam.getValue<unsigned int>(VN::VAL1) == PIN_EXTERNAL_INTERRUPT ) {
+						
+						if ( sam.getValue<bool>(VN::VAL2) > 0 ) {
+							
+							throw SerialInterruptException("Released by a user event . . ."); 
+						}
+						else { 
+							publishMessage('I', "Reset emergency button . . .", CNC_LOG_FUNCT);
+							arduinoDataStore->digitalWrite(PIN_EXTERNAL_INTERRUPT, EXTERNAL_INTERRRUPT_OFF);
+							publishPinNotification();
+						}
+						
+					}
+					// default handling
+					else {
+						if ( isInterrupted() == false ) {
+							// example: 10, true
+							arduinoDataStore->digitalWrite(	sam.getValue<unsigned int>(VN::VAL1),
+															sam.getValue<bool        >(VN::VAL2));
+							publishPinNotification();
+						}
 					}
 					
 					break;
@@ -359,13 +382,6 @@ void SerialThread::dispatchAdminChannel() {
 					pinValue = sam.getValue<int>(VN::VAL2);
 					
 					arduinoDataStore->analogWrite(pinName, pinValue);
-
-					if ( pinName == AE::PN_A0 ) {
-						
-						if ( pinValue > 0 ) { throw SerialInterruptException("Released by a user event . . ."); }
-						else 				{ interruped = false; publishMessage('I', "Interruped reseted . . .", CNC_LOG_FUNCT); }
-						
-					}
 					
 					publishPinNotification();
 					
@@ -375,7 +391,7 @@ void SerialThread::dispatchAdminChannel() {
 				// -----------------------------------------------
 				case MID::SET_I2C_STATES:
 				{
-					if ( interruped == false ) {
+					if ( isInterrupted() == false ) {
 						
 						i2cStates[I2C_BYTE_SUPPORT_STATE] = sam.getValue<unsigned char>(VN::VAL1);
 						i2cStates[I2C_BYTE_LIMIT_STATE]   = sam.getValue<unsigned char>(VN::VAL2);
@@ -436,7 +452,7 @@ const char* SerialThread::ardoGetErrLabel(unsigned char e) {
 ////////////////////////////////////////////////////////////////////
 void SerialThread::pinMode(AE::PinName pin, AE::PinMode pm) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return;
 		
 	// check first if there`s a (pin) update pending
@@ -449,7 +465,7 @@ void SerialThread::pinMode(AE::PinName pin, AE::PinMode pm) {
 ////////////////////////////////////////////////////////////////////
 void SerialThread::digitalWrite(AE::PinName pin, AE::PinLevel pl) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return;
 		
 	if ( ARDUINO_DATA_STORE != NULL )
@@ -458,7 +474,7 @@ void SerialThread::digitalWrite(AE::PinName pin, AE::PinLevel pl) {
 ////////////////////////////////////////////////////////////////////
 AE::PinLevel SerialThread::digitalRead(AE::PinName pin) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return PL_UNDEFINED;
 	
 	// check first if there`s a (pin) update pending
@@ -470,7 +486,7 @@ AE::PinLevel SerialThread::digitalRead(AE::PinName pin) {
 ////////////////////////////////////////////////////////////////////
 void SerialThread::analogWrite(AE::PinName pin, int value) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return;
 	
 	if ( ARDUINO_DATA_STORE != NULL )
@@ -479,7 +495,7 @@ void SerialThread::analogWrite(AE::PinName pin, int value) {
 ////////////////////////////////////////////////////////////////////
 int16_t SerialThread::analogRead(AE::PinName pin) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return 0;
 	
 	// check first if there`s a (pin) update pending
@@ -517,7 +533,7 @@ uint32_t SerialThread::micros() {
 ////////////////////////////////////////////////////////////////////
 void SerialThread::delay(uint32_t milliSeconds) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return;
 	
 	CncTimeFunctions::sleepMilliseconds(milliSeconds);
@@ -525,7 +541,7 @@ void SerialThread::delay(uint32_t milliSeconds) {
 ////////////////////////////////////////////////////////////////////
 void SerialThread::delayMicroseconds(int16_t microsSeconds) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return;
 	
 	CncTimeFunctions::sleepMircoseconds(microsSeconds);
@@ -533,7 +549,7 @@ void SerialThread::delayMicroseconds(int16_t microsSeconds) {
 ////////////////////////////////////////////////////////////////////
 uint8_t SerialThread::getDigitalPinToPort(uint8_t pin) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return AE::PN_NOT_A_PIN;
 		
 	if ( AE::ArduinoData::isPin((AE::PinName)pin) == true ) {
@@ -548,7 +564,7 @@ uint8_t SerialThread::getDigitalPinToPort(uint8_t pin) {
 ////////////////////////////////////////////////////////////////////
 uint8_t SerialThread::getPinMode(uint8_t pin) {
 ////////////////////////////////////////////////////////////////////
-	if ( SerialThread::isInterruped() == true )
+	if ( SerialThread::isInterrupted() == true )
 		return AE::PN_NOT_A_PIN;
 		
 	if ( ARDUINO_DATA_STORE == NULL )

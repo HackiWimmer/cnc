@@ -150,7 +150,8 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 
     template<bool IMPL>
     friend class        CncArduinoStepper;
-    
+
+    friend class        ArduinoMainLoop;
     friend class        ArduinoTestManager;
     friend class        CncAxisX;
     friend class        CncAxisY;
