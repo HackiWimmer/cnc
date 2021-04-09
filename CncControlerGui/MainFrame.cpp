@@ -1255,12 +1255,6 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	while ( true ) {
-		waitActive(300);
-	}
-	
-	
-	
 	const uint32_t trgF1000_MMSEC = ( 700 / 60 )	* 1000;
 	
 	const uint32_t A_1000			= 2.003			* 1000;
@@ -1329,8 +1323,14 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
-	
-	GblFunc::stacktrace(std::cout);
+
+	std::cout << BUILD_YEAR << std::endl;
+	std::cout << BUILD_MONTH<< std::endl;
+	std::cout << BUILD_DAY<< std::endl;
+	std::cout << BUILD_HOUR<< std::endl;
+	std::cout << BUILD_MIN<< std::endl;
+	std::cout << BUILD_SEC<< std::endl;
+	std::cout << (BUILD_SEC + BUILD_MIN + BUILD_HOUR) << std::endl;
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {

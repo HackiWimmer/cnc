@@ -5,6 +5,7 @@
 #include "SerialThread.h"
 #include "SerialEndPoint.h"
 #include "SerialThreadStub.h"
+#include "CncControl.h"
 #include "CncUserEvents.h"
 #include <wx/frame.h>
 extern wxFrame* THE_FRAME;
@@ -157,7 +158,6 @@ void SerialThreadStub::onPeriodicallyAppEvent(bool interrupted) {
 ///////////////////////////////////////////////////////////////////
 	// nothing to do
 }
-#include "CncControl.h"
 ///////////////////////////////////////////////////////////////////
 int SerialThreadStub::readData(void *buffer, unsigned int nbByte) { 
 ///////////////////////////////////////////////////////////////////
