@@ -127,6 +127,13 @@ void PathHandlerBase::processClientId(long id) {
 	pathListMgr.addEntryAdm(id);
 }
 //////////////////////////////////////////////////////////////////
+void PathHandlerBase::processFeedSpeed(CncSpeedMode mode) {
+//////////////////////////////////////////////////////////////////
+	// do nothing, have to be overridden by classes which
+	// knowing current feed speed values for the given mode
+	std::cerr << CNC_LOG_FUNCT_A(": Invalid call. This method have to be overridden to use\n");
+}
+//////////////////////////////////////////////////////////////////
 void PathHandlerBase::processFeedSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN) {
 //////////////////////////////////////////////////////////////////
 	pathListMgr.addEntryAdm(mode, feedSpeed_MM_MIN);
@@ -182,10 +189,13 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 		currentPos.incXY(moveX, moveY);
 		startPos.setXY(currentPos.getX(), currentPos.getY());
 		
-		if ( cnc::dblCompareNull(moveX) == false || cnc::dblCompareNull(moveY) == false )
-			return true;
-
-		ret = processLinearMove(false);
+		// to decouple the sub path the following speed mode switch is important . . . 
+		processFeedSpeed(CncSpeedRapid);
+		{
+			// . . . now this is a flying (rapid) move 
+			ret = processLinearMove(false);
+		}
+		processFeedSpeed(CncSpeedWork);
 	}
 	
 	return ret;
@@ -478,7 +488,7 @@ bool PathHandlerBase::processQuadraticBezierSmooth_2DXY(char c, unsigned int cou
 	}
 	
 	// debug only
-	if ( true ) {
+	if ( false ) {
 		const float cpX  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).x;
 		const float cpY  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).y;
 		const float cprX = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x;
@@ -522,7 +532,7 @@ bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, 
 	}
 	
 	// debug only
-	if ( true ) {
+	if ( false ) {
 		const float cpX  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).x;
 		const float cpY  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).y;
 		const float cprX = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x;

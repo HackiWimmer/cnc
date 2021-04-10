@@ -136,6 +136,19 @@ bool SVGPathHandlerCnc::finishCurrentPath() {
 	return PathHandlerBase::finishCurrentPath();
 }
 //////////////////////////////////////////////////////////////////
+void SVGPathHandlerCnc::processFeedSpeed(CncSpeedMode mode) {
+//////////////////////////////////////////////////////////////////
+	switch ( mode ) {
+		case CncSpeedRapid:	pathListMgr.addEntryAdm(mode, currentCncContext.getCurrentRapidSpeed_MM_MIN());
+							break;
+							
+		case CncSpeedWork:	pathListMgr.addEntryAdm(mode, currentCncContext.getCurrentWorkSpeed_MM_MIN());
+							break;
+							
+		default:			std::cerr << CNC_LOG_FUNCT_A(": Invalid speed mode\n");
+	}
+}
+//////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::activateNextPath(long clientID) {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL(CNC_LOG_FUNCT);

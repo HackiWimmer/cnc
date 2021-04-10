@@ -79,7 +79,7 @@ bool GCodePathHandlerBase::processLinearMove(GCodeBlock& gcb) {
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
 	
-	#warning to delete
+	#warning to delete (march 2021)
 	/*
 	if ( gcb.hasF() )
 		changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());

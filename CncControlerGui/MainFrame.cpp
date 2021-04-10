@@ -2766,8 +2766,7 @@ bool MainFrame::connectSerialPort() {
 		
 		if ( (ret = cnc->setup()) == true ) {
 			
-			#warning reactivate again
-			//refPositionDlg->setEnforceFlag(cnc->isEmulator() == false);
+			refPositionDlg->setEnforceFlag(cnc->isEmulator() == false);
 			
 			notifyConfigUpdate();
 			decorateSpindleState(cnc->getSpindleState());

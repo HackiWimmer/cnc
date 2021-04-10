@@ -132,7 +132,7 @@ bool SvgCncContextBase::provide(const wxXmlNode* node) {
 	wxXmlAttribute* a = node->GetAttributes();
 	while ( a != NULL ) {
 		if ( provide(a) == false )
-			std::cerr << CNC_LOG_FUNCT_A(" Invalid attribute name, storage failed\n");
+			std::cerr << CNC_LOG_FUNCT_A(" Invalid attribute name ='%s', storage failed\n", a->GetName());
 			
 		a = a->GetNext();
 	}
