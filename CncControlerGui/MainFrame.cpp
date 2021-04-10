@@ -1323,14 +1323,6 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
-
-	std::cout << BUILD_YEAR << std::endl;
-	std::cout << BUILD_MONTH<< std::endl;
-	std::cout << BUILD_DAY<< std::endl;
-	std::cout << BUILD_HOUR<< std::endl;
-	std::cout << BUILD_MIN<< std::endl;
-	std::cout << BUILD_SEC<< std::endl;
-	std::cout << (BUILD_SEC + BUILD_MIN + BUILD_HOUR) << std::endl;
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {

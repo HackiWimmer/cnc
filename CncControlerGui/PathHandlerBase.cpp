@@ -311,14 +311,14 @@ bool PathHandlerBase::processARC_2DXY(char c, unsigned int count, const double v
 					break;
 					
 		case 'A':	ps.p1 = transformCurveLibPoint(values[5], values[6]);
-		
+					
 					// set current pos and control point without transformation
 					currentPos.setX(values[5]);
 					currentPos.setY(values[6]);
 					break;
 					
 		default:	ps.p1 = ps.p0;
-		
+					
 					// current pos leaves unchanged
 	}
 	
@@ -348,8 +348,9 @@ bool PathHandlerBase::processQuadraticBezier_2DXY(char c, unsigned int count, co
 	appendDebugValueDetail("Input Unit", CncUnitCalculatorBase::getUnitAsStr(unitCalculator.getInputUnit()));
 	
 	// define parameters
-	//  - p0 (startPos) for curve lib is always absolute
-	//  - p1 - p2 for curve lib is always absolute
+	//  - p0 (startPos):	for curve lib is always absolute
+	//  - p1 - p2:			for curve lib are always absolute
+	//  - pCtl:				is always absolute
 	CncCurveLib::ParameterQuadraticBezier& ps = quadraticBezierCurve.getParameterSet();
 	CncCurveLib::Point pCtl;
 	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY()); 
@@ -358,35 +359,32 @@ bool PathHandlerBase::processQuadraticBezier_2DXY(char c, unsigned int count, co
 		case 'q': 	ps.p1 = transformCurveLibPoint(values[0] + currentPos.getX(), values[1] + currentPos.getY()); 
 					ps.p2 = transformCurveLibPoint(values[2] + currentPos.getX(), values[3] + currentPos.getY()); 
 					
-					// set current pos and control point without transformation
+					// set control point and current pos without transformation
+					pCtl = {values[0] + currentPos.getX(), values[1] + currentPos.getY()};
+					
 					currentPos.setX(values[2] + currentPos.getX());
 					currentPos.setY(values[3] + currentPos.getY());
 					
-					pCtl = {values[0] + currentPos.getX(), values[1] + currentPos.getY()};
 					break;
 					
 		case 'Q':	ps.p1 = transformCurveLibPoint(values[0], values[1]);
 					ps.p2 = transformCurveLibPoint(values[2], values[3]);
 					
-					// set current pos and control point without transformation
+					// set control point and current pos without transformation
+					pCtl = {values[0], values[1]};
+					
 					currentPos.setX(values[2]);
 					currentPos.setY(values[3]);
 					
-					pCtl = {values[0], values[1]};
 					break;
 					
-		default:	ps.p1 = ps.p0;
-					ps.p2 = ps.p0;
-					
-					// current pos leaves unchanged
-					pCtl = ps.p1;
+		default:	wxASSERT_MSG(NULL, wxString::Format("QuadraticBezier: Invalid command: %c", c));
 	}
 	
 	const bool ret = processQuadraticBezier_2DXY(ps);
 	if ( ret == true ) {
 		// Store the last control point
-		CncCurveLib::Point cp{currentPos.getX(), currentPos.getY()};
-		lastQuadraticControlPoint.setControlPoint(cp, pCtl);
+		lastQuadraticControlPoint.setCtrlPointAbs(pCtl);
 	}
 
 	return ret;
@@ -410,7 +408,7 @@ bool PathHandlerBase::processCubicBezier_2DXY(char c, unsigned int count, const 
 	
 	// define parameters
 	//  - p0 (startPos) for curve lib is always absolute
-	//  - p1 - p3 for curve lib is always absolute
+	//  - p1 - p3 for curve lib are always absolute
 	CncCurveLib::ParameterCubicBezier& ps = cubicBezierCurve.getParameterSet();
 	CncCurveLib::Point pCtl;
 	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY());
@@ -420,38 +418,33 @@ bool PathHandlerBase::processCubicBezier_2DXY(char c, unsigned int count, const 
 					ps.p2 = transformCurveLibPoint(values[2] + currentPos.getX(), values[3] + currentPos.getY()); 
 					ps.p3 = transformCurveLibPoint(values[4] + currentPos.getX(), values[5] + currentPos.getY()); 
 					
-					// set current pos and control point without transformation
+					// set control point and current pos without transformation
+					pCtl = {values[2] + currentPos.getX(), values[3] + currentPos.getY()};
+
 					currentPos.setX(values[4] + currentPos.getX());
 					currentPos.setY(values[5] + currentPos.getY());
 					
-					pCtl = {values[2] + currentPos.getX(), values[3] + currentPos.getY()};
 					break;
 					
 		case 'C':	ps.p1 = transformCurveLibPoint(values[0], values[1]);
 					ps.p2 = transformCurveLibPoint(values[2], values[3]);
 					ps.p3 = transformCurveLibPoint(values[4], values[5]);
 					
-					// set current pos and control point without transformation
+					// set control point and current pos without transformation
+					pCtl = {values[2], values[3]};
+					
 					currentPos.setX(values[4]);
 					currentPos.setY(values[5]);
 					
-					pCtl = {values[2], values[3]};
-					
 					break;
 					
-		default:	ps.p1 = ps.p0; 
-					ps.p2 = ps.p0;
-					ps.p3 = ps.p0;
-					
-					// current pos leaves unchanged
-					pCtl = ps.p2;
+		default:	wxASSERT_MSG(NULL, wxString::Format("CubicBezier: Invalid command: %c", c));
 	}
 	
 	const bool ret = processCubicBezier_2DXY(ps);
 	if ( ret == true ) {
 		// Store the last control point
-		CncCurveLib::Point cp{currentPos.getX(), currentPos.getY()};
-		lastCubicControlPoint.setControlPoint(cp, pCtl);
+		lastCubicControlPoint.setCtrlPointAbs(pCtl);
 	}
 
 	return ret;
@@ -469,12 +462,31 @@ bool PathHandlerBase::processQuadraticBezierSmooth_2DXY(char c, unsigned int cou
 	double newValues[MAX_PARAMETER_VALUES];
 	newValues[3] = values[1];
 	newValues[2] = values[0];
-	newValues[1] = lastQuadraticControlPoint.getLastControlPoint(p0).y; // todo abs or rel???
-	newValues[0] = lastQuadraticControlPoint.getLastControlPoint(p0).x; // todo abs or rel???
 	
 	switch ( c ) {
-		case 't': c = 'q'; break;
-		case 'T': c = 'Q'; break;
+		case 't':	c = 'q'; 
+					newValues[1] = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).y - currentPos.getY();
+					newValues[0] = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x - currentPos.getX();
+					break;
+					
+		case 'T':	c = 'Q'; 
+					newValues[1] = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).y;
+					newValues[0] = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x;
+					break;
+					
+		default:	wxASSERT_MSG(NULL, wxString::Format("QuadraticBezierSmooth: Invalid command: %c", c));
+	}
+	
+	// debug only
+	if ( true ) {
+		const float cpX  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).x;
+		const float cpY  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).y;
+		const float cprX = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x;
+		const float cprY = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).y;
+		
+		std::cout << wxString::Format("cur(%lf,%lf)\n", 					currentPos.getX(), currentPos.getY());
+		std::cout << wxString::Format("ctl(%lf,%lf) reflected(%lf,%lf)\n",	cpX, cpY, cprX, cprY);
+		std::cout << wxString::Format("%c %lf,%lf %lf,%lf\n",				c, newValues[0], newValues[1], newValues[2], newValues[3]);
 	}
 	
 	return processCommand_2DXY(c, 4, newValues);
@@ -494,12 +506,31 @@ bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, 
 	newValues[4] = values[2];
 	newValues[3] = values[1];
 	newValues[2] = values[0];
-	newValues[1] = lastCubicControlPoint.getLastControlPoint(p0).y; // todo abs or rel ???
-	newValues[0] = lastCubicControlPoint.getLastControlPoint(p0).x; // todo abs or rel ???
 	
 	switch ( c ) {
-		case 's': c = 'C'; break;
-		case 'S': c = 'C'; break;
+		case 's':	c = 'c'; 
+					newValues[1] = lastCubicControlPoint.getLastCtrlPointReflectedAbs(p0).y - currentPos.getY();
+					newValues[0] = lastCubicControlPoint.getLastCtrlPointReflectedAbs(p0).x - currentPos.getX();
+					break;
+			
+		case 'S':	c = 'C'; 
+					newValues[1] = lastCubicControlPoint.getLastCtrlPointReflectedAbs(p0).y;
+					newValues[0] = lastCubicControlPoint.getLastCtrlPointReflectedAbs(p0).x;
+					break;
+					
+		default:	wxASSERT_MSG(NULL, wxString::Format("CubicBezierSmooth: Invalid command: %c", c));
+	}
+	
+	// debug only
+	if ( true ) {
+		const float cpX  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).x;
+		const float cpY  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).y;
+		const float cprX = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x;
+		const float cprY = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).y;
+		
+		std::cout << wxString::Format("cur(%lf,%lf)\n", 					currentPos.getX(), currentPos.getY());
+		std::cout << wxString::Format("ctl(%lf,%lf) reflected(%lf,%lf)\n",	cpX, cpY, cprX, cprY);
+		std::cout << wxString::Format("%c %lf,%lf %lf,%lf %lf,%lf\n",		c, newValues[0], newValues[1], newValues[2], newValues[3], newValues[4], newValues[5]);
 	}
 	
 	return processCommand_2DXY(c, 6, newValues);

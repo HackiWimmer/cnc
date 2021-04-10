@@ -49,7 +49,7 @@ inline int SVGParserBase::getCommandParaCount(char c) {
 //////////////////////////////////////////////////////////////////
 bool SVGParserBase::evaluatePath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
-	// data contains the content of the d="" attribute, this a multi command context
+	// data contains the content of the d="" attribute, this is a multi command context
 	// there's an example:
 	// d = "
 	//      M 0.68598735,110.12961 21.583664,93.092966 41.867069,42.606192 83.739072,47.632386 94.14101,38.983749 97.47977,6.2701413 
@@ -103,15 +103,18 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 	
 	if ( para.Length() == 0 )
 		return true;
+	
+	if ( false )
+		std::cout << para << std::endl;
 
 	double values[MAX_PARAMETER_VALUES];
 	
 	wxString token;
-	char c 						= '\0';
-	unsigned int sPos 			= 0;
-	unsigned int valueCounter 	= 0;
-	unsigned int commandCounter = 0;
-	int parameterCount 			= -1;
+	char c						= '\0';
+	unsigned int sPos			=  0;
+	unsigned int valueCounter	=  0;
+	unsigned int commandCounter	=  0;
+	int parameterCount			= -1;
 
 	for (unsigned int i=sPos; i<para.Length(); i++) {
 		
@@ -128,9 +131,10 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 			}
 		}
 		else {
+			// list of possible separators
 			if ( para[i] == ' ' || para[i] == ',' || para[i] == '-' || para[i] == '+' ) {
 				
-				// handle exponential presentation
+				// handle exponential presentation - i is always > 0
 				if ( (para[i] == '-' || para[i] == '+') && ( para[i-1] == 'e' || para[i-1] == 'E') ) 
 					continue;
 				

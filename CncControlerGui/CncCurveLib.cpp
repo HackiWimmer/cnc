@@ -3,8 +3,50 @@
 #include "CncCommon.h"
 #include "CncCurveLib.h"
 
-//////////////////////////////////////////////////////////////////
+
 const float CncCurveLib::PI = 3.14159265359f;
+
+
+//////////////////////////////////////////////////////////////////
+void CncCurveLib::LastControlPoint::setCtrlPointAbs(const CncCurveLib::Point& p) {
+//////////////////////////////////////////////////////////////////
+	valid = true;
+	point = p;
+}
+//////////////////////////////////////////////////////////////////
+const CncCurveLib::Point& CncCurveLib::LastControlPoint::getLastCtrlPointAbs(const CncCurveLib::Point& currentPoint) const {
+//////////////////////////////////////////////////////////////////
+	if ( hasControlPoint() )
+		return point;
+	
+	// If there is no previous command or if the previous command was not a bezier + curve,
+	// assume the first control point is identically  with the current point
+	return currentPoint;
+}
+//////////////////////////////////////////////////////////////////
+const CncCurveLib::Point CncCurveLib::LastControlPoint::getLastCtrlPointReflectedAbs(const CncCurveLib::Point& currentPoint) const {
+//////////////////////////////////////////////////////////////////
+	if ( hasControlPoint() ) {
+		
+		// Reflect (mirroring) the last control point, 
+		// where point is always absolute
+		const float dx = currentPoint.x - point.x;
+		const float dy = currentPoint.y - point.y;
+		
+		CncCurveLib::Point p( 
+			currentPoint.x + dx, 
+			currentPoint.y + dy 
+		);
+		
+		return p;
+	}
+	
+	// If there is no previous command or if the previous command was not a bezier + curve,
+	// assume the first control point is identically  with the current point
+	return currentPoint;
+}
+
+
 
 //////////////////////////////////////////////////////////////////
 float CncCurveLib::clamp(float val, float minVal, float maxVal) {
@@ -263,115 +305,3 @@ void CncCurveLib::ParameterElliptical::prepare() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-//////////////////////////////////////////////////////////////////
-const CncCurveLib::Point CncCurveLib::getPointOnEllipticalArcOld(CncCurveLib::ParameterSet& ps, const float t) {
-//////////////////////////////////////////////////////////////////
-	ps.rx = fabs(ps.rx);
-	ps.ry = fabs(ps.ry);
-
-	ps.xAxisRotation = fmod(ps.xAxisRotation, 360.0f);
-
-	float xAxisRotationRadians = CncCurveLib::toRadians(ps.xAxisRotation);
-
-	// If the endpoints are identical, then this is equivalent to omitting the elliptical arc segment entirely.
-	if( ps.p0 == ps.p1 ) return ps.p0;
-
-	// If rx = 0 or ry = 0 then this arc is treated as a straight line segment joining the endpoints.
-	if( ps.rx == 0 || ps.ry == 0) return getPointOnLine(ps, t);
-
-	// Following "Conversion from endpoint to center parameterization"
-	// http://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
-
-	// Step #1: Compute transformedPoint
-	double dx = (ps.p0.x - ps.p1.x)/2;
-	double dy = (ps.p0.y - ps.p1.y)/2;
-
-	auto transformedPoint = CncCurveLib::Point(
-		+cos(xAxisRotationRadians) * dx + sin(xAxisRotationRadians) * dy,
-		-sin(xAxisRotationRadians) * dx + cos(xAxisRotationRadians) * dy
-	);
-
-	// Ensure radius are large enough
-	double radiiCheck = pow(transformedPoint.x, 2)/pow(ps.rx, 2) + pow(transformedPoint.y, 2)/pow(ps.ry, 2);
-	if( radiiCheck > 1 ) {
-		ps.rx = sqrt(radiiCheck) * ps.rx;
-		ps.ry = sqrt(radiiCheck) * ps.ry;
-	}
-
-	// Step #2: Compute transformedCenter
-	double cSquareNumerator = pow(ps.rx, 2)*pow(ps.ry, 2) - pow(ps.rx, 2)*pow(transformedPoint.y, 2) - pow(ps.ry, 2)*pow(transformedPoint.x, 2);
-	double cSquareRootDenom = pow(ps.rx, 2)*pow(transformedPoint.y, 2) + pow(ps.ry, 2)*pow(transformedPoint.x, 2);
-	double cRadicand        = cSquareNumerator/cSquareRootDenom;
-
-	// Make sure this never drops below zero because of precision
-	cRadicand = cRadicand < 0 ? 0 : cRadicand;
-	double cCoef = (ps.largeArcFlag != ps.sweepFlag ? 1 : -1) * sqrt(cRadicand);
-
-	auto transformedCenter = CncCurveLib::Point(
-		cCoef*(+(ps.rx * transformedPoint.y) / ps.ry),
-		cCoef*(-(ps.ry * transformedPoint.x) / ps.rx)
-	);
-
-	// Step #3: Compute center
-	auto center = CncCurveLib::Point(
-		cos(xAxisRotationRadians) * transformedCenter.x - sin(xAxisRotationRadians) * transformedCenter.y + ((ps.p0.x + ps.p1.x)/2),
-		sin(xAxisRotationRadians) * transformedCenter.x + cos(xAxisRotationRadians) * transformedCenter.y + ((ps.p0.y + ps.p1.y)/2)
-	);
-
-	// Step #4: Compute start/sweep angles
-	// Start angle of the elliptical arc prior to the stretch and rotate operations.
-	// Difference between the start and end angles
-	auto startVector = CncCurveLib::Point(
-		(transformedPoint.x-transformedCenter.x) / ps.rx,
-		(transformedPoint.y-transformedCenter.y) / ps.ry
-	);
-
-	float startAngle = CncCurveLib::angleBetween(CncCurveLib::Point(1.0f, 0.0f), startVector);
-
-	auto endVector = CncCurveLib::Point(
-		(-transformedPoint.x - transformedCenter.x) / ps.rx,
-		(-transformedPoint.y - transformedCenter.y) / ps.ry
-	);
-
-	float sweepAngle = CncCurveLib::angleBetween(startVector, endVector);
-
-	if     ( !ps.sweepFlag && sweepAngle > 0)	sweepAngle -= 2 * PI;
-	else if(  ps.sweepFlag && sweepAngle < 0)	sweepAngle += 2 * PI;
-
-	// We use % instead of `mod(..)` because we want it to be -360deg to 360deg(but actually in radians)
-	sweepAngle = fmod(sweepAngle, 2 * PI);
-
-	// From http://www.w3.org/TR/SVG/implnote.html#ArcParameterizationAlternatives
-	float angle              = startAngle + (sweepAngle * t);
-	double ellipseComponentX = ps.rx * cos(angle);
-	double ellipseComponentY = ps.ry * sin(angle);
-
-	// Attach some extra info to use
-	ps.EARI.ellipticalArcCenter 	= CncCurveLib::Point(center.x, center.y);
-	ps.EARI.ellipticalArcStartAngle = startAngle;
-	ps.EARI.ellipticalArcEndAngle 	= startAngle + sweepAngle;
-	ps.EARI.ellipticalArcAngle 		= angle;
-	ps.EARI.resultantRx 			= ps.rx;
-	ps.EARI.resultantRy 			= ps.ry;
-
-	auto point = CncCurveLib::Point(
-		cos(xAxisRotationRadians)*ellipseComponentX - sin(xAxisRotationRadians)*ellipseComponentY + center.x,
-		sin(xAxisRotationRadians)*ellipseComponentX + cos(xAxisRotationRadians)*ellipseComponentY + center.y
-	);
-
-	return point;
-}
-*/ 
