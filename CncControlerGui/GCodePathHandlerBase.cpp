@@ -37,11 +37,15 @@ bool GCodePathHandlerBase::moveToOrigin(GCodeBlock& gcb) {
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
-void GCodePathHandlerBase::updateCurrentPosition(GCodeBlock& gcb) {
+bool GCodePathHandlerBase::updateCurrentPosition(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
+	const CncDoublePosition ref(currentPos);
+	
 	if ( gcb.hasX() ) currentPos.setX(gcb.getXMoveAbsolute(currentPos));
 	if ( gcb.hasY() ) currentPos.setY(gcb.getYMoveAbsolute(currentPos));
 	if ( gcb.hasZ() ) currentPos.setZ(gcb.getZMoveAbsolute(currentPos));
+	
+	return ref.isFloatingEqual(currentPos) == false;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerBase::processParameterEFS(GCodeBlock& gcb) {
@@ -70,7 +74,10 @@ bool GCodePathHandlerBase::processRapidLinearMove(GCodeBlock& gcb) {
 	// change to the maximum configured speed
 	changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedRapid, THE_CONFIG->getDefaultRapidSpeed_MM_MIN());
 	
-	updateCurrentPosition(gcb);
+	// in this case position ins't changed
+	if ( updateCurrentPosition(gcb) == false)
+		return true; 
+		
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
@@ -79,16 +86,10 @@ bool GCodePathHandlerBase::processLinearMove(GCodeBlock& gcb) {
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
 	
-	#warning to delete (march 2021)
-	/*
-	if ( gcb.hasF() )
-		changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());
-	
-	if ( gcb.hasS() )
-		changeCurrentSpindleSpeed(gcb.getCurrentSpindleSpeed());
-	*/
-	
-	updateCurrentPosition(gcb);
+	// in this case position ins't changed
+	if ( updateCurrentPosition(gcb) == false)
+		return true;
+		
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////

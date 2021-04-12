@@ -49,7 +49,7 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		CutterCompensation	cutterCompMode;
 		int 				toolLengthOffsetId;
 		
-		void				updateCurrentPosition(GCodeBlock& gcb);
+		bool				updateCurrentPosition(GCodeBlock& gcb);
 };
 
 #endif
