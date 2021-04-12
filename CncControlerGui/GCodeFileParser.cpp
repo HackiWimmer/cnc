@@ -159,8 +159,28 @@ bool GCodeFileParser::spool() {
 	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
 	CncAutoFreezer caf(ctrl);
 	
+	programEnd = false;
 	for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it) {
-		performBlock(*it);
+		
+		if ( performBlock(*it) == false ) {
+			std::cerr << CNC_LOG_FUNCT_A(" performBlock() failed!\n");
+			break;
+		}
+		
+		if ( programEnd == true ) {
+			const long remaining = std::distance(it, gCodeSequence.end());
+			
+			if ( remaining > 1 ) {
+				std::cout	<< "Info: Program end detected at line " 
+							<< ClientIds::lineNumber(it->clientID)
+							<< ", but still " 
+							<< remaining 
+							<< " GCode blocks remaining \n"
+				;
+			}
+			
+			break;
+		}
 		
 		if ( THE_APP->isDisplayParserDetails() == true )
 			ctrl->addBlock(*it);
@@ -197,6 +217,9 @@ bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
 		if ( gcb.isValid() && GCodeCommands::isBlockCommand(nextField.getCmd()) ) {
 			if ( prepareBlock(gcb) == false )
 				return false;
+				
+			if ( programEnd == true )
+				return true;
 			
 			gcb.reInit();
 		} 
