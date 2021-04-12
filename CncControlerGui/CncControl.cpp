@@ -2097,6 +2097,10 @@ bool CncControl::stopInteractiveMove() {
 		}
 	}
 	CNC_PRINT_INTERACTIVE_FUNCT_A("End\n");
+	
+	// synchronize the app position
+	curAppPos = curCtlPos;
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
