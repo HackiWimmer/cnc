@@ -788,9 +788,14 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		ADD_ATTR_TRANSFORM \
 		\
 		wxString ret; \
-		if ( SVGElementConverter::function(child, ret) ) \
+		if ( SVGElementConverter::function(child, ret) ) {\
+			if ( false ) { \
+				std::cout << "Constructed Path: " << ret << std::endl; \
+			} \
+			 \
 			if ( evaluatePath(ret) == false ) \
 				return false; \
+		} \
 	}
 	
 	

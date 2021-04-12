@@ -1,5 +1,98 @@
 #include "SvgTransformMatrix.h"
 
+
+/////////////////////////////////////////////////////////
+const double SVGTransformMatrix::getTranslateX() const {
+/////////////////////////////////////////////////////////
+	return E;
+}
+/////////////////////////////////////////////////////////
+const double SVGTransformMatrix::getTranslateY() const {
+/////////////////////////////////////////////////////////
+	return F;
+}
+/////////////////////////////////////////////////////////
+const double SVGTransformMatrix::getScaleX() const {
+/////////////////////////////////////////////////////////
+	DecomposedValues ret;
+	decomposeMatrix(ret);
+	return ret.scaleX;
+}
+/////////////////////////////////////////////////////////
+const double SVGTransformMatrix::getScaleY() const {
+/////////////////////////////////////////////////////////
+	DecomposedValues ret;
+	decomposeMatrix(ret);
+	return ret.scaleY;
+}
+/////////////////////////////////////////////////////////
+const double SVGTransformMatrix::getRotation() const {
+/////////////////////////////////////////////////////////
+	DecomposedValues ret;
+	decomposeMatrix(ret);
+	return ret.rotate;
+}
+/////////////////////////////////////////////////////////
+const double SVGTransformMatrix::getSkewX() const {
+/////////////////////////////////////////////////////////
+	DecomposedValues ret;
+	decomposeMatrix(ret);
+	return ret.skewX;
+}
+/////////////////////////////////////////////////////////
+const double SVGTransformMatrix::getSkewY() const {
+/////////////////////////////////////////////////////////
+	DecomposedValues ret;
+	decomposeMatrix(ret);
+	return ret.skewY;
+}
+/////////////////////////////////////////////////////////
+void SVGTransformMatrix::decomposeMatrix(DecomposedValues& ret) const {
+/////////////////////////////////////////////////////////
+	ret.scaleX = sqrt(A * A + B * B);
+	ret.scaleY = sqrt(C * C + D * D);
+
+	// If determinant is negative, one axis was flipped.
+	const double determinant = A * D - B * C;
+	if ( determinant < 0 ) {
+		// Flip axis with minimum unit vector dot product.
+		if ( A < D )	ret.scaleX = -ret.scaleX;
+		else			ret.scaleY = -ret.scaleY;
+	}
+	
+	// Re-normalize matrix to remove scale.
+	double nA = A;
+	double nB = B;
+	double nC = C;
+	double nD = D;
+	
+	if ( ret.scaleX ) {
+		nA *= 1 / ret.scaleX;
+		nB *= 1 / ret.scaleX;
+	}
+	
+	if ( ret.scaleY ) {
+		nC *= 1 / ret.scaleY;
+		nD *= 1 / ret.scaleY;
+	}
+
+	// Compute rotation and re-normalize matrix.
+	ret.rotate = atan2(nB, nA) * 180.0 / PI;
+	
+	#warning how to caluclate this?
+	ret.skewX = 42.42;
+	ret.skewY = 42.42;
+}
+/////////////////////////////////////////////////////////
+std::ostream& SVGTransformMatrix::decomposeMatrix(std::ostream& o) {
+/////////////////////////////////////////////////////////
+	o << wxString::Format("translation(%lf,%lf)\n",	getTranslateX(), getTranslateY());
+	o << wxString::Format("scale(%lf,%lf)\n",		getScaleX(), getScaleY());
+	o << wxString::Format("rotation(%lf)\n",		getRotation());
+	o << wxString::Format("skewX(%lf)\n",			getSkewX());
+	o << wxString::Format("skewY(%lf)\n",			getSkewY());
+	return o;
+}
 /////////////////////////////////////////////////////////
 bool SVGTransformMatrix::unchanged() {
 /////////////////////////////////////////////////////////

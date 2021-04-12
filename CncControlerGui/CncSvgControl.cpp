@@ -22,6 +22,9 @@ END_EVENT_TABLE()
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::OnPaint(wxPaintEvent& event) {
 	/////////////////////////////////////////////////////////////////////
+		wxSVGCtrl::OnPaint(event);
+		return;
+		
 		if ( IsShownOnScreen() ) {
 			// this overrides the default behaviour to get access to adjust the background colour
 			if (!m_doc)				m_buffer = wxBitmap();
@@ -48,12 +51,18 @@ END_EVENT_TABLE()
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::OnEraseBackground(wxEraseEvent &event) {
 	/////////////////////////////////////////////////////////////////////
+		wxSVGCtrl::OnEraseBackground(event);
+		return;
+		
 		// this overrides the default behaviour to get access to adjust the background colour
 		event.Skip(true);
 	}
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::RepaintBuffer() {
 	/////////////////////////////////////////////////////////////////////
+		wxSVGCtrl::RepaintBuffer();
+		return;
+		
 		if ( IsShownOnScreen() ) {
 			
 			int w = -1, h = -1;
@@ -160,7 +169,8 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 							<< tmpLogger.GetBuffer()
 							<< std::endl;
 			}
-				
+			
+			Refresh();
 			return ret;
 		}
 	#else

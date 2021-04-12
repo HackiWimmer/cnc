@@ -153,6 +153,7 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 	cncBlockParameters.add(wxString::Format("%s=\"Center\"",					ctx.ID_PATH_MODE));
 	cncBlockParameters.add(wxString::Format("%s=\"Pocket\"",					ctx.ID_PATH_MODE));
 	cncBlockParameters.add(wxString::Format("%s=\"On/Off\"",					ctx.ID_SPINDLE_STATE));
+	cncBlockParameters.add(wxString::Format("%s=\"Yes/No\"",					ctx.ID_ARG_SWEEP_FLAG));
 }
 ///////////////////////////////////////////////////////////////////
 CncBaseEditor::~CncBaseEditor() {

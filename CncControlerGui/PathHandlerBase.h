@@ -110,6 +110,7 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		virtual bool isInitialized();
 		
 		// transformation
+		virtual bool invertPathArgSweepFlag() const			{ return false; }
 		virtual void transform(double& xAbs, double& yAbs) 	{}
 		
 		const CncCurveLib::Point transformCurveLibPoint(double xAbs, double yAbs) {

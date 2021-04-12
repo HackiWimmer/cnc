@@ -11,6 +11,16 @@ typedef std::vector<double> TransformParameterList;
 class SVGTransformMatrix {
 	
 	private:
+		
+		struct DecomposedValues {
+			
+			double scaleX = 0.0;
+			double scaleY = 0.0;
+			double rotate = 0.0;
+			double skewX  = 0.0;
+			double skewY  = 0.0;
+		};
+		
 		double A;
 		double B;
 		double C;
@@ -19,6 +29,8 @@ class SVGTransformMatrix {
 		double F;
 		
 		wxRealPoint result;
+		
+		void decomposeMatrix(DecomposedValues& ret) const;
 		
 		/////////////////////////////////////////////////////////
 		int evaluateTransformParameters(wxString& pStr, TransformParameterList & p) {
@@ -93,16 +105,25 @@ class SVGTransformMatrix {
 		{}
 
 		/////////////////////////////////////////////////////////
-		const double getA() const { return A; }
-		const double getB() const { return B; }
-		const double getC() const { return C; }
-		const double getD() const { return D; }
-		const double getE() const { return E; }
-		const double getF() const { return F; }
+		const double getA()					const { return A; }
+		const double getB()					const { return B; }
+		const double getC()					const { return C; }
+		const double getD()					const { return D; }
+		const double getE()					const { return E; }
+		const double getF()					const { return F; }
+		
+		const double getTranslateX()		const;
+		const double getTranslateY()		const;
+		const double getScaleX()			const;
+		const double getScaleY()			const;
+		const double getRotation()			const;
+		const double getSkewX()				const;
+		const double getSkewY()				const;
 		
 		bool unchanged();
 		
 		void multiply(const SVGTransformMatrix& m);
+		std::ostream& decomposeMatrix(std::ostream& o);
 		wxRealPoint& transform(double& x, double& y);
 		
 		bool translate(TransformParameterList p);

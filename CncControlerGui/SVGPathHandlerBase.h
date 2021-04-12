@@ -28,7 +28,7 @@ class SVGPathHandlerBase : public PathHandlerBase {
 		SVGTransformMatrix 		currentSvgTransformMatrix;
 		SvgCncContext			currentCncContext;
 		
-		virtual void 			transform(double& xAbs, double& yAbs)			{ currentSvgTransformMatrix.transform(xAbs, yAbs); }
+		virtual void 			transform(double& xAbs, double& yAbs);
 		virtual bool 			callback(const CncCurveLib::Point& p);
 		virtual bool 			processLinearMove(bool alreadyRendered);
 		

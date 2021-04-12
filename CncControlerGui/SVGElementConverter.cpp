@@ -1,4 +1,5 @@
 #include <iostream>
+#include "CncConfig.h"
 #include "SVGElementConverter.h"
 
 wxXmlNode* SVGElementConverter::_xmlNode 	= NULL;
@@ -262,12 +263,7 @@ bool SVGElementConverter::convertRectToPathData(wxXmlNode* child, wxString& ret)
 		
 	} else {
 		
-		#warning convertRectToPathData sweepFlag = 0;
-		// Note: With respect to the svg description below the sweep flag has to be 1
-		// but this results in a wrong display regarding the further implementation. 
-		// It's currently not clear were the wrong code is located and the rest of the 
-		// elliptical arc drawing seams to be ok, therefore this work around
-		const int sweepFlag = 0;
+		const int sweepFlag = 1;
 		 
 		//perform an absolute moveto operation to location (x+rx,y)
 		ret << x + rx << " " << y;

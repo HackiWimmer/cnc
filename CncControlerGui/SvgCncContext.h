@@ -241,9 +241,11 @@ class SvgCncContext : public SvgCncContextBase {
 		const char * 			ID_SPINDLE_SPEED	= "SpeedSpindle";
 		
 		const char * 			ID_SPINDLE_STATE	= "Spindle";
-
+		
 		const char * 			ID_DEPT				= "ZDepth";
 		const char * 			ID_MAX_FEED_STEP	= "ZMaxFeedStep";
+		
+		const char *			ID_ARG_SWEEP_FLAG	= "InvertPathArgSweepFlag";
 
 		SvgCncContext();
 		explicit SvgCncContext(const SvgCncContext& scc);
@@ -285,6 +287,9 @@ class SvgCncContext : public SvgCncContextBase {
 		double					getCurrentZDepth() 							const	{ return currentZDepth; }
 		const char* 			getCurrentZDeptAsStr()						const;
 		double					getCurrentZMaxFeedStep()					const	{ return currentZMaxFeedStep; } 
+		
+		bool					invertPathArgSweeFlag()						const	{ return convertToBool(ID_ARG_SWEEP_FLAG); }
+		
 		void					getParameterList(DcmItemList& rows)			const;
 		
 		void					setFillColour(const wxColour & col);

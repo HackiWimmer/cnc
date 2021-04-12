@@ -279,6 +279,7 @@ SvgCncContext::SvgCncContext()
 	provide(ID_RAPID_SPEED,		wxString::Format("R%+.1lf",		currentRapidSpeed_MM_MIN));
 	provide(ID_WORK_SPEED,		wxString::Format("W%+.1lf",		currentWorkSpeed_MM_MIN));
 	provide(ID_SPINDLE_SPEED,	wxString::Format("S%+.1lf",		currentSpindleSpeed_U_MIN));
+	provide(ID_ARG_SWEEP_FLAG,	"No");
 }
 //////////////////////////////////////////////////////////////////
 SvgCncContext::SvgCncContext(const SvgCncContext& scc) 
@@ -610,10 +611,6 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		
 		switch ( mode ) {
 			case Delete:
-			{
-				// handled by the parameter map 
-				break;
-			}
 			case Update:
 			{
 				// handled by the parameter map 
@@ -621,6 +618,21 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 			}
 		}
 	}
+	// ----------------------------------------------------------
+	else if ( name.IsSameAs(ID_ARG_SWEEP_FLAG) ) {
+		commandExists = true;
+		
+		switch ( mode ) {
+			case Delete:
+			case Update:
+			{
+				// handled by the parameter map 
+				break;
+			}
+		}
+		
+	}
+		
 	// ----------------------------------------------------------
 	// final checks
 	if ( commandExists == false ) {
@@ -868,6 +880,13 @@ void SvgCncContext::addTool(const wxString& toolString) {
 //////////////////////////////////////////////////////////////////
 	const wxString id(toolString.BeforeFirst('='));
 	wxString val(toolString.AfterFirst('='));
+	
+	if ( val.Contains("[") == false )
+		std::cerr << "Invalid tool string: '" << toolString << "' : missing '['" << std::endl;
+	
+	if ( val.Contains("]") == false )
+		std::cerr << "Invalid tool string: '" << toolString << "' : missing ']'" << std::endl;
+
 	val.Replace("[","");
 	val.Replace("]","");
 	val.Replace(";","");
