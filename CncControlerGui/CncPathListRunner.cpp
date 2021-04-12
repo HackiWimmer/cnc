@@ -478,11 +478,16 @@ bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) 
 	}
 	
 	if ( currentInterface->processSpindleStateSwitch(curr.spindleState) == false ) {
-		std::cerr << CNC_LOG_FUNCT << ": processSpindleStateSwitch() failed!" << std::endl;
+		std::cerr << CNC_LOG_FUNCT_A(": processSpindleStateSwitch() failed!\n");
 		return false;
 	}
 	
-	return currentInterface->processSpindleSpeedChange(curr.spindleSpeed_U_MIN);
+	if ( currentInterface->processSpindleSpeedChange(curr.spindleSpeed_U_MIN) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(": processSpindleSpeedChange() failed!\n");
+		return false;
+	}
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {

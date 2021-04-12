@@ -329,7 +329,7 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 		default: 	return displayUnhandledBlockCommand(gcb);
 	}
 	
-	// perfom debug information 
+	// perform debug information 
 	if ( runInfo.getCurrentDebugState() == true ) {
 		registerNextDebugNode(GCodeCommands::explainGCodeCommand(gcb.nodeName)); 
 		

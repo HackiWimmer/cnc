@@ -346,7 +346,7 @@ bool PathHandlerBase::processARC_2DXY(char c, unsigned int count, const double v
 	// changes the path direction . . . 
 	// Therefore, this has to be considered. 
 	//const int sweepFlag = THE_CONFIG->getSvgConvertToRightHandFlag() ? 0 : 1;
-	ps.sweepFlag		= THE_CONFIG->getSvgConvertToRightHandFlag() ? !ps.sweepFlag : ps.sweepFlag;
+	ps.sweepFlag		= convertToRightHandCoordSystem() ? !ps.sweepFlag : ps.sweepFlag;
 	
 	// additionally the following context flag is also considered here 
 	// - my be debug only

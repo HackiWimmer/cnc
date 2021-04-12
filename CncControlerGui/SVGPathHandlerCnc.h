@@ -61,6 +61,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		virtual bool			isInitialized() 			const 	{ return initialized; }
 		virtual bool			performModifications();
 		
+		virtual bool			convertToRightHandCoordSystem() const;
 		virtual bool			invertPathArgSweepFlag() const;
 		virtual void			processFeedSpeed(CncSpeedMode mode);
 		

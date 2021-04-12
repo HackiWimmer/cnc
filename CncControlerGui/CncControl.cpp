@@ -786,12 +786,14 @@ bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value ) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == false )
 		return true;
+	
+	// values less then zero defines as default ans indicates 
+	// not spindle speed change
+	if ( cnc::dblCmp::lt(value, 0.0) )
+		return true;
 
 	int16_t val =  -1;
 	int16_t rng = THE_CONFIG->getSpindleSpeedStepRange();
-	
-	if ( cnc::dblCmp::le(value, 0.0) )
-		return false;
 	
 	const double		min = std::min(THE_CONFIG->getSpindleSpeedMin(), THE_CONFIG->getSpindleSpeedMax());
 	const double		max = THE_CONFIG->getSpindleSpeedMax();
@@ -808,7 +810,7 @@ bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value ) {
 	rng = stp;
 	
 	if ( processSetter(PID_SPINDLE_SPEED, ArdoObj::SpindleTuple::encode(val, rng)) == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(": failed\n");
+		std::cerr << CNC_LOG_FUNCT_A(": encode failed\n");
 		return false;
 	}
 	
