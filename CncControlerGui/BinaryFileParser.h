@@ -30,9 +30,11 @@ class BinaryFileParser : protected CncBinaryTemplateStreamer
 		BinaryFileParser(const char* fullFileName, BinaryPathHandlerBase* ph = NULL);
 		virtual ~BinaryFileParser();
 		
-		virtual void deligateTrigger(const Trigger::BeginRun& tr)				{ pathHandler->deligateTrigger(tr); }
-		virtual void deligateTrigger(const Trigger::EndRun& tr)					{ pathHandler->deligateTrigger(tr); }
-		virtual void changePathListRunnerInterface(const wxString& portName)	{ pathHandler->changePathListRunnerInterface(portName); }
+		virtual void deligateTrigger(const Trigger::BeginRun& tr)				{ wxASSERT(pathHandler); pathHandler->deligateTrigger(tr); }
+		virtual void deligateTrigger(const Trigger::EndRun& tr)					{ wxASSERT(pathHandler); pathHandler->deligateTrigger(tr); }
+		virtual void changePathListRunnerInterface(const wxString& portName)	{ wxASSERT(pathHandler); pathHandler->changePathListRunnerInterface(portName); }
+		virtual void initCurrentPos(const CncDoublePosition& pos)				{ wxASSERT(pathHandler); pathHandler->initCurrentPos(pos); } 
+		
 		
 		bool preface() { return preprocess(); }
 		

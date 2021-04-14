@@ -18,13 +18,8 @@ class GCodeBlock {
 		inline double getMoveRelative(double thisValue, double currentAxisValue) {
 			if ( thisValue == INVALID_GCODE_FIELD_VALUE )
 				return 0.0d;
-				
-			double ret = thisValue;
-				
-			if ( isAbsolutePositioningXYZ() == true )
-				ret =  thisValue - currentAxisValue;
 			
-			return ret;
+			return ( isAbsolutePositioningXYZ() ? thisValue - currentAxisValue : thisValue);
 		}
 		
 		/////////////////////////////////////////////////////
@@ -32,12 +27,7 @@ class GCodeBlock {
 			if ( thisValue == INVALID_GCODE_FIELD_VALUE )
 				return currentAxisValue;
 				
-			double ret = thisValue;
-				
-			if ( isAbsolutePositioningXYZ() == false )
-				ret =  currentAxisValue + thisValue;
-			
-			return ret;
+			return ( isAbsolutePositioningXYZ() ? thisValue : currentAxisValue + thisValue );
 		}
 		
 	public:

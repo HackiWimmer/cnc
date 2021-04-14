@@ -52,6 +52,10 @@ class CncPathListManager {
 		
 	protected:
 		
+		void	clear();
+		
+		void					setReferencePos(const CncDoublePosition& p);
+		
 		const CncPathList&		getProtectedPathList()		const	{ return pathList; }
 		const CncPathList&		getProtectedGuideList()		const	{ return guideList; }
 		const ClipperLib::Path&	getProtectedClipperPath()	const 	{ return clipperPath; }
@@ -134,10 +138,8 @@ class CncPathListManager {
 		auto	cFirstPosEntryIterator()							const;
 		auto	crLastPosEntryIterator()							const;
 		bool	hasMovement()										const;
-
-		void	setReferencePos(const CncDoublePosition& p)			{ referencePos = p; }
-
-		void	clear();
+		
+		void	init(const CncDoublePosition& p);
 		
 		void	changeToGuideType(GuideType gt = ORIG_PATH);
 		

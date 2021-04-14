@@ -25,9 +25,7 @@ void ManuallyParser::reset(const CncDoublePosition& pos) {
 /////////////////////////////////////////////////////////////
 	moves.clear();
 	setupToolId(-1);
-	
-	wxASSERT(pathHandler);
-	pathHandler->initCurrentPos(pos);
+	initCurrentPos(pos);
 }
 /////////////////////////////////////////////////////////////
 void ManuallyParser::setupToolId(int id) {

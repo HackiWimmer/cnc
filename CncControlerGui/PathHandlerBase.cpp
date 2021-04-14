@@ -171,9 +171,6 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 		// the first move is always absolute - see comment above!
 		startPos.setXY(values[0], values[1]); 
 		
-		// than give the path list manager the reference from where we are coming 
-		pathListMgr.setReferencePos(currentPos);
-		
 		// the first move is always absolute - see comment above!
 		currentPos.setXY(startPos.getX(), startPos.getY());
 		
@@ -638,7 +635,7 @@ bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, const doub
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::prepareWork() {
 //////////////////////////////////////////////////////////////////
-	pathListMgr.clear();
+	pathListMgr.init(currentPos);
 	totalLength = 0.0;
 	
 	return true;

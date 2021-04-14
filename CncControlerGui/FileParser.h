@@ -61,6 +61,7 @@ class FileParser {
 		virtual void deligateTrigger(const Trigger::BeginRun& tr)				= 0;
 		virtual void deligateTrigger(const Trigger::EndRun& tr)					= 0;
 		virtual void changePathListRunnerInterface(const wxString& portName)	= 0;
+		virtual void initCurrentPos(const CncDoublePosition& pos)				= 0;
 		
 		virtual bool processDebug();
 		virtual bool processRelease();

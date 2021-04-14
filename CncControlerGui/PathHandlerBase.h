@@ -131,6 +131,9 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		virtual const char* getName() const { return "PathHandlerBase"; }
 		virtual void initNextClientId(long id) {}
 		
+		const CncDoublePosition& getStartPos()		const { return startPos;   }
+		const CncDoublePosition& getCurrentPos()	const { return currentPos; }
+		
 		void setFileParser(FileParser* fp) { fileParser = fp; }
 		void initCurrentPos(const CncDoublePosition& pos);
 		

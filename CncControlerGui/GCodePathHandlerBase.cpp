@@ -4,8 +4,8 @@
 //////////////////////////////////////////////////////////////////
 GCodePathHandlerBase::GCodePathHandlerBase() 
 : PathHandlerBase()
-, cutterCompMode(CC_OFF)
-, toolLengthOffsetId(-1)
+, cutterCompMode		(CC_OFF)
+, toolLengthOffsetId	(-1)
 {
 //////////////////////////////////////////////////////////////////
 	changeInputUnit(Unit::mm, false);
@@ -19,7 +19,7 @@ bool GCodePathHandlerBase::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	if ( PathHandlerBase::prepareWork() == false)
 		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::prepareWork() failed!\n");
-		
+	
 	return prepareWorkImpl();
 }
 //////////////////////////////////////////////////////////////////

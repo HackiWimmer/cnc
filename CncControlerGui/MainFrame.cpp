@@ -3873,11 +3873,15 @@ bool MainFrame::processVirtualTemplate() {
 	ps.PRC.user			= "Hacki Wimmer";
 	const Trigger::BeginRun begRun(ps);
 	
+	wxASSERT( cnc );
 	wxASSERT( inboundFileParser );
 	
 	inboundFileParser->deligateTrigger(begRun);
 	inboundFileParser->enableUserAgentControls(isDisplayParserDetails());
 	inboundFileParser->setInboundSourceControl(sourceEditor);
+	
+	#warning .........
+	inboundFileParser->initCurrentPos(cnc->getCurAppPosMetric());
 	
 	bool ret;
 	if ( isDebugMode == true ) 	ret = inboundFileParser->processDebug();
@@ -3958,6 +3962,7 @@ bool MainFrame::processGCodeTemplate() {
 	
 	inboundFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), new GCodePathHandlerCnc(cnc));
 	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
+	
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3996,9 +4001,15 @@ bool MainFrame::processManualTemplate() {
 	p->reset(cnc->getCurAppPosMetric());
 	p->addMove(move);
 	
+	CNC_TRANSACTION_LOCK_RET_ON_ERROR(false)
+	
+	motionMonitor->pushInteractiveProcessMode();
+	
 	bool ret = false;
 	if ( isDebugMode == true ) 	ret = p->processDebug();
 	else 						ret = p->processRelease();
+	
+	motionMonitor->popInteractiveProcessMode();
 	
 	return ret;
 }
@@ -4247,53 +4258,53 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::checkReferencePositionState() {
 ///////////////////////////////////////////////////////////////////
+	const CncTemplateFormat tf = getCurrentTemplateFormat();
+	if ( tf == TplManual || tf == TplTest )
+		return true;
+		
 	const CncDoublePosition refPos(CncStartPositionResolver::getReferencePosition());
-	const bool zero			= ( cnc->getCurAppPosMetric() != refPos );
 	const bool refPosValid	= refPositionDlg->isReferenceStateValid();
+	const bool zero			= ( cnc->getCurAppPosMetric() != refPos );
 	
 	if ( refPosValid == false ) {
-		const CncTemplateFormat tf = getCurrentTemplateFormat();
+		wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n");
 		
-		if ( tf != TplManual && tf != TplTest ) {
-			wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n");
+		const int ret = showReferencePositionDlg(msg);
+		if ( ret == wxID_OK && zero == false ) {
+			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
 			
-			const int ret = showReferencePositionDlg(msg);
-			if ( ret == wxID_OK && zero == false ) {
-				cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
-				
-				// Safety: Always return false in this case because this will
-				// stopp the current startet run. 
-				return false;
-			}
+			// Safety: Always return false in this case because this will
+			// stop the currently started run. 
+			return false;
+		}
+	}
 	
-			// check current position
-			if ( zero ) {
-				wxASSERT( cnc != NULL );
+	if ( zero ) {
+		wxASSERT( cnc != NULL );
+		
+		bool openDlg = false;
+		switch ( THE_CONFIG->getRunConfirmationModeAsChar() ) {
+			// Always
+			case 'A':	openDlg = true; break;
+			// Serial Port only
+			case 'S': 	openDlg = !cnc->isEmulator(); break;
+			// Never
+			default:	openDlg = false;
+		}
+		
+		CncStartPositionResolver dlg(this);
+		int ret = wxID_OK;
+		
+		if ( openDlg == true ) 	ret = dlg.ShowModal();
+		else 					ret = dlg.resolve("M[xyz]");
 
-				bool openDlg = false;
-				switch ( THE_CONFIG->getRunConfirmationModeAsChar() ) {
-					// Always
-					case 'A':	openDlg = true; break;
-					// Serial Port only
-					case 'S': 	openDlg = !cnc->isEmulator(); break;
-					// Never
-					default:	openDlg = false;
-				}
-
-				CncStartPositionResolver dlg(this);
-				int ret = wxID_OK;
-
-				if ( openDlg == true ) 	ret = dlg.ShowModal();
-				else 					ret = dlg.resolve();
-
-				if ( ret == wxID_OK )
-					cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
-				
-				// Safety: Always return false in this case because this will
-				// stopp the current startet run. 
-				if ( openDlg == true )
-					return false;
-			}
+		if ( ret == wxID_OK ) {
+			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
+		}
+		else {
+			//Always return false in this case because this will
+			// stop the currently started run. 
+			return false;
 		}
 	}
 	
@@ -4525,7 +4536,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			}
 		}
 		
-		// do this before the clearing opertions below, 
+		// do this before the clearing operations below, 
 		// because then the ref pos correction will be also removed
 		// as well as the previous drawing
 		if ( checkReferencePositionState() == false )

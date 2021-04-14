@@ -9,14 +9,16 @@ class CncStartPositionResolver : public CncStartPositionResolverBase {
 		CncStartPositionResolver(wxWindow* parent);
 		virtual ~CncStartPositionResolver();
 		
-		int resolve();
-
+		int resolve(const wxString& cmd);
+		
 		static const CncDoublePosition& getReferencePosition() { return ReferencePosition; }
 		
 	protected:
 		static const CncDoublePosition ReferencePosition;
 		
 		CncDoublePosition distance;
+		
+		int resolve();
 		
 		virtual void onCancel(wxCommandEvent& event);
 		virtual void onOk(wxCommandEvent& event);

@@ -1,14 +1,16 @@
 #include "CncConfig.h"
 #include "CncControl.h"
 #include "MainFrameProxy.h"
+#include "CncMotionMonitor.h"
 #include "CncStartPositionResolver.h"
 
 const CncDoublePosition CncStartPositionResolver::ReferencePosition	= CncDoublePosition(0.0, 0.0, 0.0);
+const char* UnchgStr = "<Leave Unchanged>";
 
 ///////////////////////////////////////////////////////////////////
 CncStartPositionResolver::CncStartPositionResolver(wxWindow* parent)
-: CncStartPositionResolverBase(parent)
-, distance(0.0, 0.0, 0.0)
+: CncStartPositionResolverBase	(parent)
+, distance						(0.0, 0.0, 0.0)
 ///////////////////////////////////////////////////////////////////
 {
 	auto format = [&](const CncDoublePosition& p, wxTextCtrl* X, wxTextCtrl* Y, wxTextCtrl* Z) {
@@ -28,7 +30,17 @@ CncStartPositionResolver::CncStartPositionResolver(wxWindow* parent)
 	format(cp,			m_currentPositionX, 	m_currentPositionY, 	m_currentPositionZ);
 	format(rf,			m_referencePositionX,	m_referencePositionY,	m_referencePositionZ);
 	format(distance, 	m_distanceX, 			m_distanceY, 			m_distanceZ);
-
+	
+	wxArrayString items;
+	items.Add("Mode 01:              M[xy]");
+	items.Add("Mode 02:              U[z]  ->  M[xy]");
+	items.Add("Mode 03:              U[z]  ->  M[x]  -> M[y]");
+	
+	items.Add(wxString::Format("Mode 99:              %s",UnchgStr));
+	
+	m_sequenceList->Clear();
+	m_sequenceList->InsertItems(items, 0);
+	m_sequenceList->Select(0);
 	m_sequenceList->SetFocus();
 }
 ///////////////////////////////////////////////////////////////////
@@ -49,18 +61,36 @@ void CncStartPositionResolver::onOk(wxCommandEvent& event) {
 int CncStartPositionResolver::resolve() {
 ///////////////////////////////////////////////////////////////////
 	const wxString sel(m_sequenceList->GetStringSelection().AfterFirst(':').Trim(false).Trim(true));
-	
-	wxStringTokenizer tokenizer(sel, "-> ");
+	return resolve(sel);
+}
+///////////////////////////////////////////////////////////////////
+int CncStartPositionResolver::resolve(const wxString& cmd) {
+///////////////////////////////////////////////////////////////////
+	wxStringTokenizer tokenizer(cmd, "-> ");
 	while ( tokenizer.HasMoreTokens() ) {
 		wxString token = tokenizer.GetNextToken();
 		
 		if ( token.IsEmpty() == false ) {
 			//std::cout << token << std::endl;
+			
+			CncControl* cnc = APP_PROXY::getCncControl();
+			const double dx = -distance.getX();
+			const double dy = -distance.getY();
+			const double dz = -distance.getZ();
+			
+			APP_PROXY::getMotionMonitor()->pushInteractiveProcessMode();
+			
 			bool ret = true;
-			if 		( token == "dx") { ret = APP_PROXY::getCncControl()->moveRelLinearMetricXYZ(distance.getX(), 	0.0, 				0.0				, false); }
-			else if ( token == "dy") { ret = APP_PROXY::getCncControl()->moveRelLinearMetricXYZ(0.0, 				distance.getY(), 	0.0				, false); }
-			else if ( token == "dz") { ret = APP_PROXY::getCncControl()->moveRelLinearMetricXYZ(0.0, 				0.0, 				distance.getZ()	, false); }
-			else					 { ret = false; }
+			if 		( token == "M[x]")		{ ret = cnc->moveRelLinearMetricXYZ( dx,	0.0,	0.0, false); }
+			else if ( token == "M[y]")		{ ret = cnc->moveRelLinearMetricXYZ(0.0,	 dy,	0.0, false); }
+			else if ( token == "M[z]")		{ ret = cnc->moveRelLinearMetricXYZ(0.0,	0.0,	 dz, false); }
+			else if ( token == "M[xy]")		{ ret = cnc->moveRelLinearMetricXYZ( dx,	 dy,	0.0, false); }
+			else if ( token == "M[xyz]")	{ ret = cnc->moveRelLinearMetricXYZ( dx,	 dy,	 dz, false); }
+			else if ( token == "U[z]")		{ ret = cnc->moveZToMaxLimit(); }
+			else if ( token == UnchgStr )	{ ret = true; }
+			else							{ ret = false; }
+			
+			APP_PROXY::getMotionMonitor()->pushInteractiveProcessMode();
 			
 			if ( ret == false ) {
 				std::cerr << "CncStartPositionResolver::resolve(): Error while resolve '" << token << "'" << std::endl;

@@ -859,20 +859,22 @@ bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm, double z
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::checkContent(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.hasPositionChange() ) {
-		if ( cnc::dblCmp::nu(curr.totalDistance) == true)  {
-			std::cout << CNC_LOG_FUNCT_A(": Warning: pos change with distance = 0!\n");
-			std::cout << curr << std::endl;
-			// warning only check more . . .
+	if ( curr.clientId > 0 ) {
+		if ( curr.hasPositionChange() ) {
+			if ( cnc::dblCmp::nu(curr.totalDistance) == true)  {
+				std::cout << CNC_LOG_FUNCT_A(": Warning: pos change with distance = 0!\n");
+				std::cout << curr << std::endl;
+				// warning only check more . . .
+			}
 		}
-	}
-	
-	if ( curr.hasSpeedChange() ) {
-		if ( cnc::dblCmp::nu(curr.totalDistance) != true)  {
-			std::cout << CNC_LOG_FUNCT_A(": Error: Feed speed change combined with a pos change!\n");
-			std::cerr << curr << std::endl;
-			
-			return false;
+		
+		if ( curr.hasSpeedChange() ) {
+			if ( cnc::dblCmp::nu(curr.totalDistance) != true)  {
+				std::cout << CNC_LOG_FUNCT_A(": Error: Feed speed change combined with a pos change!\n");
+				std::cerr << curr << std::endl;
+				
+				return false;
+			}
 		}
 	}
 	

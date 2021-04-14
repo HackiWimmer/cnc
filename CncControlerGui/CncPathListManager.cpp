@@ -228,6 +228,11 @@ auto CncPathListManager::crLastPosEntryIterator() const {
 	return it;
 }
 //////////////////////////////////////////////////////////////////
+void CncPathListManager::setReferencePos(const CncDoublePosition& p) { 
+//////////////////////////////////////////////////////////////////
+	referencePos = p; 
+}
+//////////////////////////////////////////////////////////////////
 bool CncPathListManager::hasMovement() const { 
 //////////////////////////////////////////////////////////////////
 	return cFirstPosEntryIterator() != cend(); 
@@ -514,6 +519,29 @@ size_t CncPathListManager::normalizeLinkedEntry(long clientId, CncSpeedMode mode
 	}
 	
 	return getPathListSize();
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::init(const CncDoublePosition& p) {
+//////////////////////////////////////////////////////////////////
+	// first clear the content
+	clear();
+	
+	setReferencePos(p);
+	
+	// .. and the create the fist entry based on the given 
+	// current position
+	CncPathListEntry initialEntry;
+	initialEntry.content			= CncPathListEntry::CONT_POSITION;
+	initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
+	initialEntry.entryDistance		= CncPathListEntry::NoDistance;
+	initialEntry.entryTarget		= p;
+	initialEntry.clientId			= 0;
+	initialEntry.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
+	initialEntry.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
+	initialEntry.spindleState		= CncPathListEntry::DefaultSpindleState;
+	initialEntry.spindleSpeed_U_MIN	= CncPathListEntry::DefaultSpindleSpeedValue;
+	
+	initNextPath(initialEntry);
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::clear() {
