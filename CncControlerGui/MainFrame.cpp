@@ -2946,7 +2946,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	THE_CONTEXT->setHardwareFlag(setup.hasHardware);
 	
 	speedMonitor->clear();
-	speedMonitor->activate(THE_CONTEXT->canSpeedMonitoring());
+	speedMonitor->activate(true);
 	
 	decorateSecureDlgChoice(setup.secureDlg);
 	
@@ -8424,12 +8424,10 @@ void MainFrame::cncTransactionLockCallback(CncTransactionLockBase* tal) {
 	getLoggerView()->popProcessMode(LoggerSelection::VAL::CNC);
 	getCncPreProcessor()->popProcessMode();
 	positionStorage->popProcessMode();
-	speedMonitor->deactivate();
 } 
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cncTransactionReleaseCallback(CncTransactionLockBase* tal) {
 /////////////////////////////////////////////////////////////////////
-	speedMonitor->activate(THE_CONTEXT->canSpeedMonitoring());
 	positionStorage->pushProcessMode();
 	getCncPreProcessor()->pushUpdateMode();
 	getLoggerView()->pushUpdateMode(LoggerSelection::VAL::CNC);

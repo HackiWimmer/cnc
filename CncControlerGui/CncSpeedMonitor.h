@@ -170,7 +170,7 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 					return;
 				}
 				
-				// or a next new entry
+				// or a next new entry . . . every new unit = millisecond / resolution * resolution
 				auto last = points.rbegin();
 				if ( abs((long)(ts - last->ts)) > 0 ) {
 					points.add(std::move(Point(ts, r, c)));
@@ -178,7 +178,9 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 				}
 				
 				// or accumulate
-				last->cfgF_MM_MIN.add(c);
+				// but this is primary sufficient for the measured real-time values
+				// last->cfgF_MM_MIN.add(c);
+				
 				last->rltF_MM_MIN.add(r);
 			}
 			
@@ -217,11 +219,13 @@ class CncSpeedMonitorRunner {
 		CncSpeedMonitor* monitor;
 
 	public:
-		CncSpeedMonitorRunner(CncSpeedMonitor* sm)
+		CncSpeedMonitorRunner(CncSpeedMonitor* sm, bool clear = true)
 		: monitor(sm)
 		{
-			if ( monitor && THE_CONTEXT->canSpeedMonitoring() )
+			if ( monitor && THE_CONTEXT->canSpeedMonitoring() ) {
+				monitor->clear();
 				monitor->start();
+			}
 		}
 
 		~CncSpeedMonitorRunner() {

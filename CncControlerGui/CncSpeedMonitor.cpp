@@ -65,7 +65,7 @@ void CncSpeedMonitor::activate(bool enable) {
 	m_sliderRecordResolutionH->Enable(enable);
 	m_sliderRecordResolutionV->Enable(enable);
 	
-	m_sliderTimeCompressionV->Enable(enable);
+	m_sliderTimeCompressionH->Enable(enable);
 	m_sliderTimeCompressionV->Enable(enable);
 	
 	m_scrollBarH->Enable(enable);

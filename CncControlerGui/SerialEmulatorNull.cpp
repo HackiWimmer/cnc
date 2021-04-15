@@ -1105,7 +1105,11 @@ void SerialEmulatorNULL::notifyMovePartAfter() {
 	#undef INC_AXIS
 	
 	// speed management
-	#warning - speed management deactivated - this can may be removed
+	// synchronize measured speed to configured because this serial port
+	// do not support any further speed management - see below
+	setRealtimeFeedSpeed_MM_MIN(getFeedSpeed_MMSec());
+	
+	// speed management deactivated - this can may be removed
 	/*
 	if ( getFeedSpeed_MMSec() > 0.0 ) {
 		
@@ -1133,7 +1137,7 @@ void SerialEmulatorNULL::notifyMovePartAfter() {
 			setRealtimeFeedSpeed_MM_MIN(rtmF_MMSec * 1000 * 60);
 		}
 	}
-	 */
+	*/
 	
 	// position mnagement
 	replyPosition(false);
