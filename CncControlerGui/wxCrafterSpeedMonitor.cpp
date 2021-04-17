@@ -46,7 +46,7 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer409->AddGrowableRow(1);
     m_horizontalPanel->SetSizer(flexGridSizer409);
     
-    wxFlexGridSizer* flexGridSizer7523 = new wxFlexGridSizer(1, 13, 0, 0);
+    wxFlexGridSizer* flexGridSizer7523 = new wxFlexGridSizer(1, 14, 0, 0);
     flexGridSizer7523->SetFlexibleDirection( wxBOTH );
     flexGridSizer7523->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer7523->AddGrowableCol(10);
@@ -85,6 +85,13 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7523->Add(m_btToggleReceivedSpeedAxisH, 0, wxALL, WXC_FROM_DIP(1));
     m_btToggleReceivedSpeedAxisH->SetMinSize(wxSize(26,26));
+    
+    m_btToggleAbsRelModeH = new wxBitmapToggleButton(m_horizontalPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("resize")), wxDefaultPosition, wxDLG_UNIT(m_horizontalPanel, wxSize(26,26)), 0);
+    m_btToggleAbsRelModeH->SetToolTip(_("Display Absolute"));
+    m_btToggleAbsRelModeH->SetValue(true);
+    
+    flexGridSizer7523->Add(m_btToggleAbsRelModeH, 0, wxALL, WXC_FROM_DIP(1));
+    m_btToggleAbsRelModeH->SetMinSize(wxSize(26,26));
     
     m_staticLine7557 = new wxStaticLine(m_horizontalPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_horizontalPanel, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -238,6 +245,13 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer7523115->Add(m_btToggleReceivedSpeedAxisV, 0, wxALL, WXC_FROM_DIP(1));
     m_btToggleReceivedSpeedAxisV->SetMinSize(wxSize(26,26));
     
+    m_btToggleAbsRelModeV = new wxBitmapToggleButton(m_verticalPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("resize")), wxDefaultPosition, wxDLG_UNIT(m_verticalPanel, wxSize(26,26)), 0);
+    m_btToggleAbsRelModeV->SetToolTip(_("Display Absolute"));
+    m_btToggleAbsRelModeV->SetValue(true);
+    
+    flexGridSizer7523115->Add(m_btToggleAbsRelModeV, 0, wxALL, WXC_FROM_DIP(1));
+    m_btToggleAbsRelModeV->SetMinSize(wxSize(26,26));
+    
     m_staticLine7557721 = new wxStaticLine(m_verticalPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_verticalPanel, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer7523115->Add(m_staticLine7557721, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
@@ -369,6 +383,7 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     m_btToggleMeasurePointsAxisH->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleMeasurePointsAxis), NULL, this);
     m_btToggleConfiguredAxisH->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleConfiguredAxis), NULL, this);
     m_btToggleReceivedSpeedAxisH->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleReceivedSpeedAxis), NULL, this);
+    m_btToggleAbsRelModeH->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleAbsRelMode), NULL, this);
     m_btClearH->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onClear), NULL, this);
     m_btSaveH->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onSave), NULL, this);
     m_sliderTimeCompressionH->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::onChangeDisplayCompression), NULL, this);
@@ -395,6 +410,7 @@ CncSpeedMonitorBase::CncSpeedMonitorBase(wxWindow* parent, wxWindowID id, const 
     m_btToggleMeasurePointsAxisV->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleMeasurePointsAxis), NULL, this);
     m_btToggleConfiguredAxisV->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleConfiguredAxis), NULL, this);
     m_btToggleReceivedSpeedAxisV->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleReceivedSpeedAxis), NULL, this);
+    m_btToggleAbsRelModeV->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleAbsRelMode), NULL, this);
     m_btClearV->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onClear), NULL, this);
     m_btSaveV->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onSave), NULL, this);
     m_darwingAreaV->Connect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onSize), NULL, this);
@@ -422,6 +438,7 @@ CncSpeedMonitorBase::~CncSpeedMonitorBase()
     m_btToggleMeasurePointsAxisH->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleMeasurePointsAxis), NULL, this);
     m_btToggleConfiguredAxisH->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleConfiguredAxis), NULL, this);
     m_btToggleReceivedSpeedAxisH->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleReceivedSpeedAxis), NULL, this);
+    m_btToggleAbsRelModeH->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleAbsRelMode), NULL, this);
     m_btClearH->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onClear), NULL, this);
     m_btSaveH->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onSave), NULL, this);
     m_sliderTimeCompressionH->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSpeedMonitorBase::onChangeDisplayCompression), NULL, this);
@@ -448,6 +465,7 @@ CncSpeedMonitorBase::~CncSpeedMonitorBase()
     m_btToggleMeasurePointsAxisV->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleMeasurePointsAxis), NULL, this);
     m_btToggleConfiguredAxisV->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleConfiguredAxis), NULL, this);
     m_btToggleReceivedSpeedAxisV->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleReceivedSpeedAxis), NULL, this);
+    m_btToggleAbsRelModeV->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onToggleAbsRelMode), NULL, this);
     m_btClearV->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onClear), NULL, this);
     m_btSaveV->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSpeedMonitorBase::onSave), NULL, this);
     m_darwingAreaV->Disconnect(wxEVT_SIZE, wxSizeEventHandler(CncSpeedMonitorBase::onSize), NULL, this);

@@ -139,6 +139,8 @@ void ArduinoAccelManager::changeState(const State s) {
 
     notifyACMStateChange(s); 
 
+    PRINT_DEBUG_VALUE1("s", s)
+
     #ifndef SKETCH_COMPILE 
       if ( true ) {
         switch ( s ) {
@@ -301,7 +303,7 @@ uint32_t ArduinoAccelManager::initNextImpulse(AxisSignatureIndex axisSignatureId
     case P_DEACCEL:
     {
       curImplIdx++;
-      // Note: Due to the unsigned characteristic of idxS_ST and curS_ST they have to be 
+      // Note: Due to the unsigned characteristic of curImplIdx and curImplCnt they have to be 
       // casted to a signed value to avoid overflows
       // ArdoObj::absolute: this with respect to get a falling curve here
       ret = cnvSpeedToDelay(fD.fctValue1000( ArdoObj::absolute((int32_t)curImplIdx - (int32_t)curImplCnt)) );
@@ -327,8 +329,8 @@ uint32_t ArduinoAccelManager::initNextImpulse(AxisSignatureIndex axisSignatureId
   }
 
   // shift the master feed rate to the concrete movement situation
-  // Setup::feedRate_FT[axisSignatureIdx] stored with factore C_2_08
+  // Setup::feedRate_FT[axisSignatureIdx] stored with factor C_2_08
   curSpeedDelay = ( ret * Setup::feedRate_FT[axisSignatureIdx] ) >> 8;
-  
+
   return curSpeedDelay;
 }

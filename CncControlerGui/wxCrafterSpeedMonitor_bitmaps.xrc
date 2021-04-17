@@ -15,6 +15,7 @@
   <object class="wxBitmap" name="bricks">bitmaps\bricks.png</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
   <object class="wxBitmap" name="insert-chart-bar">bitmaps\insert-chart-bar.png</object>
+  <object class="wxBitmap" name="resize">bitmaps\resize.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="weather-clouds-2 (2)">bitmaps\weather-clouds-2 (2).png</object>
 </resource>

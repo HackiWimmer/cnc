@@ -36,6 +36,11 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 	m_darwingAreaV	->SetBackgroundColour(bgc);
 	m_bottomAxisV	->SetBackgroundColour(bgc);
 	
+	m_btToggleAbsRelModeH->SetValue(true);
+	m_btToggleAbsRelModeV->SetValue(true);
+	m_btToggleAbsRelModeH->SetToolTip("Display Relative");
+	m_btToggleAbsRelModeV->SetToolTip("Display Relative");
+	
 	init();
 }
 ////////////////////////////////////////////////////////////////
@@ -310,10 +315,33 @@ void CncSpeedMonitor::onToggleConnection(wxCommandEvent& event) {
 	decorateConnectBtn();
 }
 ////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::onToggleAbsRelMode(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
+	wxBitmapToggleButton* masterButton = horztl ? m_btToggleAbsRelModeH : m_btToggleConnectionV;
+	wxBitmapToggleButton* slaveButton  = horztl ? m_btToggleAbsRelModeV : m_btToggleConnectionH;
+	slaveButton->SetValue(masterButton->GetValue());
+	
+	diagram.presentation = masterButton->GetValue() ? Diagram::DRAbsolute : Diagram::DRRelative;
+
+	if ( masterButton->GetValue() == true ) {
+		masterButton->SetToolTip("Display Relative");
+		slaveButton->SetToolTip("Display Relative");
+	}
+	else {
+		masterButton->SetToolTip("Display Absolute");
+		slaveButton->SetToolTip("Display Absolute");
+	}
+	
+	Refresh();
+}
+////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::init() {
 ////////////////////////////////////////////////////////////////
 	typedef Diagram::Resolution  DRes;
 	typedef Diagram::Compression DCom;
+	
+	diagram.presentation = m_btToggleAbsRelModeH->GetValue() ? Diagram::DRAbsolute : Diagram::DRRelative;
 	
 	switch ( diagram.resolution ) {
 		case DRes::DS_Sec:				m_sliderRecordResolutionH->SetValue(1);	m_sliderRecordResolutionV->SetValue(1); break;

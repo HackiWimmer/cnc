@@ -59,6 +59,7 @@ protected:
     wxBitmapToggleButton* m_btToggleMeasurePointsAxisH;
     wxBitmapToggleButton* m_btToggleConfiguredAxisH;
     wxBitmapToggleButton* m_btToggleReceivedSpeedAxisH;
+    wxBitmapToggleButton* m_btToggleAbsRelModeH;
     wxStaticLine* m_staticLine7557;
     wxBitmapButton* m_btClearH;
     wxBitmapButton* m_btSaveH;
@@ -78,6 +79,7 @@ protected:
     wxBitmapToggleButton* m_btToggleMeasurePointsAxisV;
     wxBitmapToggleButton* m_btToggleConfiguredAxisV;
     wxBitmapToggleButton* m_btToggleReceivedSpeedAxisV;
+    wxBitmapToggleButton* m_btToggleAbsRelModeV;
     wxStaticLine* m_staticLine7557721;
     wxBitmapButton* m_btClearV;
     wxBitmapButton* m_btSaveV;
@@ -97,6 +99,7 @@ protected:
     virtual void onToggleMeasurePointsAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleConfiguredAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleReceivedSpeedAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleAbsRelMode(wxCommandEvent& event) { event.Skip(); }
     virtual void onClear(wxCommandEvent& event) { event.Skip(); }
     virtual void onSave(wxCommandEvent& event) { event.Skip(); }
     virtual void onChangeDisplayCompression(wxScrollEvent& event) { event.Skip(); }
@@ -117,6 +120,7 @@ public:
     wxBitmapToggleButton* GetBtToggleMeasurePointsAxisH() { return m_btToggleMeasurePointsAxisH; }
     wxBitmapToggleButton* GetBtToggleConfiguredAxisH() { return m_btToggleConfiguredAxisH; }
     wxBitmapToggleButton* GetBtToggleReceivedSpeedAxisH() { return m_btToggleReceivedSpeedAxisH; }
+    wxBitmapToggleButton* GetBtToggleAbsRelModeH() { return m_btToggleAbsRelModeH; }
     wxStaticLine* GetStaticLine7557() { return m_staticLine7557; }
     wxBitmapButton* GetBtClearH() { return m_btClearH; }
     wxBitmapButton* GetBtSaveH() { return m_btSaveH; }
@@ -136,6 +140,7 @@ public:
     wxBitmapToggleButton* GetBtToggleMeasurePointsAxisV() { return m_btToggleMeasurePointsAxisV; }
     wxBitmapToggleButton* GetBtToggleConfiguredAxisV() { return m_btToggleConfiguredAxisV; }
     wxBitmapToggleButton* GetBtToggleReceivedSpeedAxisV() { return m_btToggleReceivedSpeedAxisV; }
+    wxBitmapToggleButton* GetBtToggleAbsRelModeV() { return m_btToggleAbsRelModeV; }
     wxStaticLine* GetStaticLine7557721() { return m_staticLine7557721; }
     wxBitmapButton* GetBtClearV() { return m_btClearV; }
     wxBitmapButton* GetBtSaveV() { return m_btSaveV; }

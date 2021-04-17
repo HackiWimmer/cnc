@@ -35,6 +35,7 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		void update();
 		
 	protected:
+		virtual void onToggleAbsRelMode(wxCommandEvent& event);
 		virtual void onChangeDisplayCompression(wxScrollEvent& event);
 		virtual void onChangeScrollBarH(wxScrollEvent& event);
 		virtual void onChangeScrollBarV(wxScrollEvent& event);
@@ -97,7 +98,7 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 			static const int	offsetAxisF 	= 17;
 			
 			Points 				points;
-			Presentation		presentation	= DRAbsolute;
+			Presentation		presentation	= DRRelative;//DRAbsolute;
 			Orientation			orientation		= DOHorizontal;
 			Resolution			resolution		= DS_HundredthSec;
 			
@@ -133,8 +134,10 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 			
 			//----------------------------------------------------
 			double getVirtualMaxF() const {
-				return ( presentation == DRAbsolute ? THE_CONFIG->getMaxSpeedXYZ_MM_MIN() 
-													: maxF_MM_MIN);
+				const double stretchFactor = 0.2;
+				const double max = (presentation == DRAbsolute ? THE_CONFIG->getMaxSpeedXYZ_MM_MIN() : maxF_MM_MIN);
+				
+				return max + max * stretchFactor;
 			}
 			
 			//----------------------------------------------------

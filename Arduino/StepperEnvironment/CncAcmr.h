@@ -21,7 +21,7 @@ class ArduinoAccelManager {
           if ( frX > 0.0 && frY > 0.0 && frZ > 0.0) {
             feedRate_Master1000 = ArdoObj::maximum(ArdoObj::maximum(frX, frY), frZ) * 1000;
   
-            // fr has thr unit mm  
+            // fr has the unit mm  
             const uint32_t cdx_UM = pow(frX * 1000, 2);
             const uint32_t cdy_UM = pow(frY * 1000, 2);
             const uint32_t cdz_UM = pow(frZ * 1000, 2);
