@@ -190,8 +190,11 @@ void CncVideoCapturePanel::onTimer(wxTimerEvent& event) {
 void CncVideoCapturePanel::onPaint(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	//wxAutoBufferedPaintDC dc(this);
-	wxPaintDC dc(this);
-	dc.Clear();
+	//wxPaintDC dc(this);
+	//dc.Clear();
+	wxAutoBufferedPaintDC paintDC(this);
+	paintDC.Clear();
+	wxGCDC dc(paintDC);
 	
 	if ( cameraTimer.IsRunning() == false ) {
 		dc.SetTextForeground(*wxRED);
@@ -204,11 +207,19 @@ void CncVideoCapturePanel::onPaint(wxPaintEvent& event) {
 	
 	if ( cameraBitmap->IsOk() == false )
 		return;
+		
+	const wxSize size = GetSize();
+	const int w  = size.x;
+	const int h  = size.y;
+	const int bw = cameraBitmap->GetWidth();
+	const int bh = cameraBitmap->GetHeight();
+
+	const wxPoint center(w / 2, h / 2);
+	//std::cout << wxString::Format("%d, %d, %d, %d, %d, %d\n",w, h, bw, bh, (w - bw) / 2, ( h - bh ) / 2);
 	
-	int bw = cameraBitmap->GetWidth();
-	int bh = cameraBitmap->GetHeight();
+	dc.DrawBitmap(*cameraBitmap,  (w - bw) / 2, ( h - bh ) / 2, false);
 	
-	dc.DrawBitmap(*cameraBitmap, 0, 0, false);
+	/*
 	dc.SetBackground(*wxWHITE_BRUSH);
 	
 	if ( dc.GetSize().x > bw ) {
@@ -221,47 +232,28 @@ void CncVideoCapturePanel::onPaint(wxPaintEvent& event) {
 		dc.SetClippingRegion(0, bh, dc.GetSize().x, dc.GetSize().y - bh );
 		dc.Clear();
 	}
+	*/
 	
-	//create graphics context from it
-	wxGraphicsContext *gc = wxGraphicsContext::Create(dc);
-	if ( gc != NULL ) {
-		// make a path that contains a circle and some lines
-		const wxPen pen(*wxRED, 1, wxSOLID);
-		gc->SetPen(pen);
-		
-		wxGraphicsPath path = gc->CreatePath();
-		
-		const wxRealPoint center(dc.GetSize().x / 2.0, dc.GetSize().y / 2.0);
-		
-		path.AddCircle( center.x, center.y, 30.0 );
-		
-		if ( ddCrossFlag ) {
-			path.MoveToPoint(0.0, 0.0);
-			path.AddLineToPoint(dc.GetSize().x, dc.GetSize().y);
-			
-			path.MoveToPoint(dc.GetSize().x, 0.0);
-			path.AddLineToPoint(0.0, dc.GetSize().y);
-		}
-		
-		if ( hvCrossFlag ) {
-			path.MoveToPoint(0.0, center.y);
-			path.AddLineToPoint(dc.GetSize().x, center.y);
-			
-			path.MoveToPoint(center.x, 0.0);
-			path.AddLineToPoint(center.x, dc.GetSize().y);
-		}
-		
-		path.CloseSubpath();
-		
-		if ( rectFlag ) {
-			path.AddRectangle(center.x - 7.5, center.y - 7.5, 15.0, 15.0);
-		}
-		
-		gc->StrokePath(path);
-		
-		delete gc;
+	dc.SetBackground(*wxTRANSPARENT_BRUSH);
+	dc.SetBrush(*wxTRANSPARENT_BRUSH);
+	dc.SetPen(*wxRED);
+	if ( ddCrossFlag ) {
+		dc.DrawLine(0, 0, w, h);
+		dc.DrawLine(0, h, w, 0);
+	}
+	
+	if ( hvCrossFlag ) {
+		dc.DrawLine(0, center.y, w, center.y);
+		dc.DrawLine(center.x, 0, center.x, h);
+	}
+	
+	if ( rectFlag ) {
+		const int lr = 7;
+		dc.DrawRectangle(center.x - lr + 1, center.y - lr + 1, 2 * lr, 2 * lr);
+		dc.DrawCircle(center, 12.0);
+		dc.DrawCircle(center, 16.0);
+		dc.DrawCircle(center, 22.0);
+		dc.DrawCircle(center, 36.0);
+	
 	}
 }
-
-
-

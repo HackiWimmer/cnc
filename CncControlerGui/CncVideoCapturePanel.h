@@ -39,7 +39,7 @@ class CncVideoCapturePanel : public wxPanel {
 		
 	private:
 		
-		static const int	FPS 			= 25;
+		static const int	FPS 			= 30;
 		static const int	TIMERVALUE		= ( 1000 / FPS );
 		
 		bool				hvCrossFlag;
