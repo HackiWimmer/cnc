@@ -137,7 +137,7 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 	const SvgCncContext			ctx;
 	const SvgCncContextMacro	mac;
 	cncBlockParameters.add(wxString::Format("%s=\"MacroName\"",					mac.MACRO_IDENTIFIER));
-	cncBlockParameters.add(wxString::Format("%s=\"T_300={3.00};T_600={6.0}\"",	ctx.ID_TOOL_LIST));
+	cncBlockParameters.add(wxString::Format("%s=\"T_300=[3.00];T_600=[6.0]\"",	ctx.ID_TOOL_LIST));
 	cncBlockParameters.add(wxString::Format("%s=\"T_300\"",						ctx.ID_TOOL_SEL));
 	cncBlockParameters.add(wxString::Format("%s=\"Yes/No\"",					ctx.ID_COLOUR_SCHEME));
 	cncBlockParameters.add(wxString::Format("%s=\"Z-0\"",						ctx.ID_DEPT));
@@ -913,11 +913,16 @@ void CncBaseEditor::prepareNewTemplateFile(CncTemplateFormat tf) {
 		AppendText("\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n");
 		AppendText("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100mm\" height=\"100mm\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\r\n");
 		AppendText("<title>CNC Woodworking standard template</title>\r\n");
-		AppendText("<desc>....</desc>\r\n");
+		AppendText("<desc>Project XYZ</desc>\r\n");
 		
-		AppendText(SvgNodeTemplates::getSamplesAsString());
-	
-		AppendText("\r\n");
+		//AppendText(SvgNodeTemplates::getSamplesAsString());
+		
+		AppendText("\t<CncParameterBlock ToolList=\"T_300=[3.00];T_600=[6.0]\" ToolSelect=\"T_300\" UseColourScheme=\"Yes\"/>\r\n");
+		AppendText("\t<CncParameterBlock SpeedRapid=\"R+2500\" SpeedWork=\"W+900\"/>\r\n");
+		AppendText("\t<CncParameterBlock ZDepth=\"Z-1.0\"/>\r\n");
+		AppendText("\t<CncParameterBlock Spindle=\"On\"/>\r\n");
+		AppendText("\t<rect x=\"10\" y=\"10\" width=\"50\" height=\"50\" style=\"fill:rgb(255,255,255);stroke-width:1;stroke:rgb(0,0,0)\" />\r\n");
+		AppendText("\t<CncParameterBlock Spindle=\"Off\"/>\r\n");
 		AppendText("</svg>\r\n");
 		
 	} else if ( tf == TplGcode ) {

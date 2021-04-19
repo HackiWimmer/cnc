@@ -821,18 +821,6 @@ ImageLibPortSelector::ImageLibPortSelector()
             m_bitmaps.insert(std::make_pair(wxT("BMP_PS_UNKNOWN"), bmp));
         }
     }
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PS_UNKNOWN@2x"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_PS_UNKNOWN@2x"), bmp));
-        }
-    }
     
     {
         wxBitmap bmp;

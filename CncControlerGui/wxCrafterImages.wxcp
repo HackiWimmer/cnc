@@ -924,7 +924,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/connect.png"
+       "m_path": "bitmaps/ConConnected.png"
       }],
      "m_events": [],
      "m_children": []
@@ -943,7 +943,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/conflict.png"
+       "m_path": "bitmaps/ConUnknown.png"
       }],
      "m_events": [],
      "m_children": []
@@ -962,7 +962,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/16-minus.png"
+       "m_path": "bitmaps/ConError.png"
       }],
      "m_events": [],
      "m_children": []
@@ -981,7 +981,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/replcae-16.png"
+       "m_path": "bitmaps/ConAvailable.png"
       }],
      "m_events": [],
      "m_children": []

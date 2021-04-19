@@ -2814,6 +2814,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	struct InitialSetup {
 		
 		wxString serialFileName		= "";
+		wxString description		= "";
 		bool probeMode				= false;
 		bool interactiveMoving		= false;
 		bool secureDlg				= false;
@@ -2826,14 +2827,11 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 
 	} setup;
 	
-	
-	#warning Add a description here
-	m_portSelector->SetToolTip("Add a description here");
-	
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
 		
 		setup.serialFileName.assign("dev/null");
+		setup.description.assign("This port represents a simple emulator. It simulates the controller interface as best it can and discards all CNC output to dev/null.");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2844,6 +2842,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncEMU_NULL);
 		
 		setup.serialFileName.assign("PreprocessorOnly/File");
+		setup.description.assign("Illustrates only the preprocessor output without involving the CNC controller and store it file based.");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2854,6 +2853,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncEMU_NULL);
 		
 		setup.serialFileName.assign("PreprocessorOnly/Monitor/");
+		setup.description.assign("Illustrates only the preprocessor output without involving the CNC controller.");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2864,6 +2864,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncEMU_TXT);
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundTxtFileName());
+		setup.description.assign("This port represents a simple emulator. It simulates the controller interface as best it can and converts all CNC output to a text format.");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2874,6 +2875,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncEMU_SVG);
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundSvgFileName());
+		setup.description.assign("This port represents a simple emulator. It simulates the controller interface as best it can and converts all CNC output to SVG format.");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2884,6 +2886,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncEMU_GCODE);
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundGCodeFileName());
+		setup.description.assign("This port represents a simple emulator. It simulates the controller interface as best it can and converts all CNC output to GCode format.");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2894,6 +2897,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncEMU_BIN);
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
+		setup.description.assign("This port represents a simple emulator. It simulates the controller interface as best it can and converts all CNC output to a binary format.");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2904,6 +2908,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncPORT_EMU_ARDUINO);
 		
 		setup.serialFileName.assign("::Arduino");
+		setup.description.assign("This port represents a complex simulator. It runs the Arduino Sketch in a separate thread of this application without any CNC hardware.");
 		setup.probeMode			= true;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2914,6 +2919,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncPORT);
 		
 		setup.serialFileName.assign(wxString::Format("\\\\.\\%s", sel));
+		setup.description.assign("This port stands for a specific hardware USB Arduino stepper environment connection.");
 		setup.probeMode			= false;
 		setup.interactiveMoving	= true;
 		setup.secureDlg			= false;
@@ -2933,6 +2939,8 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		m_menuItemUpdCoors->Check(false);
 	}
 	
+	m_portSelector->SetToolTip(setup.description);
+
 	if ( inboundFileParser != NULL )
 		inboundFileParser->changePathListRunnerInterface(sel);
 	
@@ -3552,11 +3560,25 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 								"New Template File", 
 								wxEmptyString,
 								defaultTplDir, 
-                                "SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode", 
+								"SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode", 
 								wxFD_SAVE/*|wxFD_OVERWRITE_PROMPT*/);
-
-	if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
-		return; 
+								
+	while ( true ) {
+		
+		if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
+			return; 
+		
+		wxFileName fn(newFileDialog.GetPath());
+		if ( fn.Exists() == false )
+			break;
+		
+		const wxString msg(wxString::Format("The file name '%s' already exists. Do you really want to override it?", newFileDialog.GetPath()));
+		wxMessageDialog dlg(this, msg, _T("New template . . . "), wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
+		
+		int ret = dlg.ShowModal();
+		if ( ret == wxID_YES )
+			break;
+	}
 	
 	// store old template file values
 	const wxString ov(getCurrentTemplateFileName());
@@ -3618,9 +3640,9 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
 		
-	} else {
+	} 
+	else {
 		prepareAndShowMonitorTemplatePreview(true);
-		
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -3880,8 +3902,6 @@ bool MainFrame::processVirtualTemplate() {
 	inboundFileParser->deligateTrigger(begRun);
 	inboundFileParser->enableUserAgentControls(isDisplayParserDetails());
 	inboundFileParser->setInboundSourceControl(sourceEditor);
-	
-	#warning .........
 	inboundFileParser->initCurrentPos(cnc->getCurAppPosMetric());
 	
 	bool ret;

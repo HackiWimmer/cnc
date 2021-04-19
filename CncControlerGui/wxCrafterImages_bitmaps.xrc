@@ -125,12 +125,10 @@
   <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-typedef@2x.png</object>
   <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-typedef@2x.png</object>
   <object class="wxBitmap" name="BMP_PROBE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\RunCtrl\iconmonstr-flask-9-16.png</object>
-  <object class="wxBitmap" name="BMP_PS_ACCESS_DENIED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\conflict.png</object>
-  <object class="wxBitmap" name="BMP_PS_AVAILABLE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\replcae-16.png</object>
-  <object class="wxBitmap" name="BMP_PS_CONNECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\connect.png</object>
-  <object class="wxBitmap" name="BMP_PS_UNKNOWN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>
-  <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
-  <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
+  <object class="wxBitmap" name="BMP_PS_ACCESS_DENIED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\ConUnknown.png</object>
+  <object class="wxBitmap" name="BMP_PS_AVAILABLE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\ConAvailable.png</object>
+  <object class="wxBitmap" name="BMP_PS_CONNECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\ConConnected.png</object>
+  <object class="wxBitmap" name="BMP_PS_UNKNOWN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\ConError.png</object>
   <object class="wxBitmap" name="BMP_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\RunCtrl\iconmonstr-window-21-16.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\RunCtrl\CncDebug.png</object>
   <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\arrow-right-3.png</object>
