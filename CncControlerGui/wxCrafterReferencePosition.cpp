@@ -621,7 +621,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     m_cameraCapturePlaceholder = new wxPanel(m_panelCamera, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelCamera, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    flexGridSizer341->Add(m_cameraCapturePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer341->Add(m_cameraCapturePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_staticLine513 = new wxStaticLine(m_panelCamera, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelCamera, wxSize(-1,-1)), wxLI_VERTICAL);
     

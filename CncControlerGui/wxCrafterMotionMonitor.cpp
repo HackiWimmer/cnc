@@ -1628,7 +1628,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     m_btnHardwareBox = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnHardwareBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("hardwarebox")), wxLEFT);
+    m_btnHardwareBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncHardwareBox")), wxLEFT);
     m_btnHardwareBox->SetBitmapMargins(2,2);
     #endif
     m_btnHardwareBox->SetToolTip(_("Toggle: Show Hardwarebox"));
@@ -1638,7 +1638,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     m_btnBoundBox = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnBoundBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("boundbox")), wxLEFT);
+    m_btnBoundBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncBoundbox")), wxLEFT);
     m_btnBoundBox->SetBitmapMargins(2,2);
     #endif
     m_btnBoundBox->SetToolTip(_("Toggle: Show Boundbox"));
@@ -1652,7 +1652,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     m_btnOrigin = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnOrigin->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxLEFT);
+    m_btnOrigin->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("RefPos")), wxLEFT);
     m_btnOrigin->SetBitmapMargins(2,2);
     #endif
     m_btnOrigin->SetToolTip(_("Toggle: Show Origin"));
@@ -1662,7 +1662,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     m_btnGuidePathes = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnGuidePathes->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("edit-guides")), wxLEFT);
+    m_btnGuidePathes->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncGuidePath")), wxLEFT);
     m_btnGuidePathes->SetBitmapMargins(2,2);
     #endif
     m_btnGuidePathes->SetToolTip(_("Toggle: Show Guide Pathes"));
@@ -1672,7 +1672,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     m_btnRuler = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnRuler->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ruler2")), wxLEFT);
+    m_btnRuler->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncRuler")), wxLEFT);
     m_btnRuler->SetBitmapMargins(2,2);
     #endif
     m_btnRuler->SetToolTip(_("Toggle: Show Ruler"));
@@ -1692,7 +1692,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     m_btnFlyPath = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnFlyPath->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("link_editor")), wxLEFT);
+    m_btnFlyPath->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncPath")), wxLEFT);
     m_btnFlyPath->SetBitmapMargins(2,2);
     #endif
     m_btnFlyPath->SetToolTip(_("Toggle: Show Fly Path"));
@@ -1702,7 +1702,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     
     m_btnPosMarker = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnPosMarker->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-marker")), wxLEFT);
+    m_btnPosMarker->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncPosition")), wxLEFT);
     m_btnPosMarker->SetBitmapMargins(2,2);
     #endif
     m_btnPosMarker->SetToolTip(_("Toggle: Show Position Marker"));

@@ -177,6 +177,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void testChangedSpindleSpeed(wxScrollEvent& event);
+		virtual void testChangingSpindleSpeed(wxScrollEvent& event);
 		virtual void toggleTemplateShowEOL(wxCommandEvent& event);
 		virtual void toggleTemplateShowWs(wxCommandEvent& event);
 		virtual void onSwitchSecLeftBook(wxCommandEvent& event);

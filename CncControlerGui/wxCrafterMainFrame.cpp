@@ -38,7 +38,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_auibarMain, wxAuiPaneInfo().Name(wxT("Toolbar")).Caption(_("Main")).Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).BestSize(40,40).MinSize(40,40).MaxSize(40,40).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
-    m_bmpButton4490 = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("application-side-boxes")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_bmpButton4490 = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncFolder")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_bmpButton4490->SetToolTip(_("Toggle Template Manager"));
     m_auibarMain->AddControl(m_bmpButton4490);
     
@@ -47,7 +47,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText1842 = new wxStaticText(m_auibarMain, wxID_ANY, _("Port:"), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     m_auibarMain->AddControl(m_staticText1842);
     
-    m_searchConnections = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("database_refresh")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_searchConnections = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncPort")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_searchConnections->SetToolTip(_("Update COM ports"));
     m_auibarMain->AddControl(m_searchConnections);
     
@@ -64,17 +64,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_refPosition->SetToolTip(_("Determine Reference Position"));
     m_auibarMain->AddControl(m_refPosition);
     
-    m_anchorPosition = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("Anchor")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
+    m_anchorPosition = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncAnchors")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     m_anchorPosition->SetToolTip(_("Determine Anchor Positions"));
     m_auibarMain->AddControl(m_anchorPosition);
     
-    m_btSelectReferences = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-orientation")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectReferences = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("RefDim")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_btSelectReferences->SetToolTip(_("More References"));
     m_auibarMain->AddControl(m_btSelectReferences);
     
     m_auibarMain->AddSeparator();
     
-    m_btSelectSetup = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("system-settings")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectSetup = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncSettings")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_btSelectSetup->SetToolTip(_("Setup Page"));
     m_auibarMain->AddControl(m_btSelectSetup);
     
@@ -82,27 +82,27 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btSelectManuallyMove->SetToolTip(_("Manuallay Motion Controls"));
     m_auibarMain->AddControl(m_btSelectManuallyMove);
     
-    m_btSelectTemplate = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("package-supported")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectTemplate = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncTemplate")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_btSelectTemplate->SetToolTip(_("Inbound Template Page"));
     m_auibarMain->AddControl(m_btSelectTemplate);
     
     m_auibarMain->AddSeparator();
     
-    m_btSelectInboundTest = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectInboundTest = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncTest")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_btSelectInboundTest->SetToolTip(_("Test Page"));
     m_auibarMain->AddControl(m_btSelectInboundTest);
     
-    m_btSelectInboundPreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("filepreview")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectInboundPreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncPreviewLeft")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_btSelectInboundPreview->SetToolTip(_("Inbound Preview"));
     m_auibarMain->AddControl(m_btSelectInboundPreview);
     
     m_auibarMain->AddSeparator();
     
-    m_btSelectCncPreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("brick-go1")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectCncPreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncMonitor")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_btSelectCncPreview->SetToolTip(_("CNC Monitor"));
     m_auibarMain->AddControl(m_btSelectCncPreview);
     
-    m_btSelectTemplatePreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("document-preview")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectTemplatePreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncPreviewRight")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_btSelectTemplatePreview->SetToolTip(_("Template Preview"));
     m_auibarMain->AddControl(m_btSelectTemplatePreview);
     
@@ -179,17 +179,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_rcSecureDlg->SetToolTip(_("Toggle Secure Run Dialog Mode"));
     m_auibarMain->AddControl(m_rcSecureDlg);
     
-    m_rcRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("iconmonstr-process-1-16")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncRun")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_rcRun->SetToolTip(_("Run - Release"));
     m_auibarMain->AddControl(m_rcRun);
     
     m_auibarMain->AddSeparator();
     
-    m_rcPause = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("iconmonstr-pause-16")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcPause = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncPause")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_rcPause->SetToolTip(_("Pause"));
     m_auibarMain->AddControl(m_rcPause);
     
-    m_rcStop = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("iconmonstr-stop-16")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcStop = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncStop")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_rcStop->SetToolTip(_("Stop"));
     m_auibarMain->AddControl(m_rcStop);
     
@@ -197,7 +197,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_btnEmergenyStop = new wxButton(m_auibarMain, wxID_ANY, _("Emergency Stop [ESC]"), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnEmergenyStop->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("error")), wxRIGHT);
+    m_btnEmergenyStop->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("process-stop")), wxRIGHT);
     m_btnEmergenyStop->SetBitmapMargins(10,2);
     #endif
     m_btnEmergenyStop->SetBackgroundColour(wxColour(wxT("rgb(128,64,64)")));
@@ -2667,7 +2667,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer215715->Add(m_staticLine225337, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    wxFlexGridSizer* flexGridSizer2275 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2275 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2275->SetFlexibleDirection( wxBOTH );
     flexGridSizer2275->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2275->AddGrowableCol(0);
@@ -2687,7 +2687,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8590->AddGrowableRow(0);
     m_panel8592->SetSizer(flexGridSizer8590);
     
-    m_testToolPowerState = new wxStaticText(m_panel8592, wxID_ANY, _("Tool is switched 'On'"), wxDefaultPosition, wxDLG_UNIT(m_panel8592, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_testToolPowerState = new wxStaticText(m_panel8592, wxID_ANY, _("Spindle is switched 'On'"), wxDefaultPosition, wxDLG_UNIT(m_panel8592, wxSize(-1,-1)), wxALIGN_CENTRE);
     m_testToolPowerState->SetBackgroundColour(wxColour(wxT("rgb(255,128,128)")));
     m_testToolPowerState->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_testToolPowerStateFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
@@ -2695,12 +2695,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer8590->Add(m_testToolPowerState, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
     
-    m_testToolPowerBtn = new wxButton(m_testToolPage, wxID_ANY, _("Switch Tool On"), wxDefaultPosition, wxDLG_UNIT(m_testToolPage, wxSize(-1,80)), 0);
-    wxFont m_testToolPowerBtnFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_testToolPowerBtn->SetFont(m_testToolPowerBtnFont);
+    m_testSpindleSpeedSlider = new wxSlider(m_testToolPage, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDLG_UNIT(m_testToolPage, wxSize(-1,-1)), wxSL_HORIZONTAL);
     
-    flexGridSizer2275->Add(m_testToolPowerBtn, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_testToolPowerBtn->SetMinSize(wxSize(-1,80));
+    flexGridSizer2275->Add(m_testSpindleSpeedSlider, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_testSpindlePowerBtn = new wxButton(m_testToolPage, wxID_ANY, _("Switch Spindle On"), wxDefaultPosition, wxDLG_UNIT(m_testToolPage, wxSize(-1,80)), 0);
+    wxFont m_testSpindlePowerBtnFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_testSpindlePowerBtn->SetFont(m_testSpindlePowerBtnFont);
+    
+    flexGridSizer2275->Add(m_testSpindlePowerBtn, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_testSpindlePowerBtn->SetMinSize(wxSize(-1,80));
     
     m_mainBookPreviewPanel = new wxPanel(m_mainViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainViewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_mainViewBook->AddPage(m_mainBookPreviewPanel, _("Page"), false);
@@ -5028,7 +5032,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer8248->Add(m_staticLine8267, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_secToolbar = new wxPanel(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,32)), wxTAB_TRAVERSAL);
+    m_secToolbar = new wxPanel(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,42)), wxTAB_TRAVERSAL);
     
     flexGridSizer8248->Add(m_secToolbar, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -5045,58 +5049,64 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8326->AddGrowableCol(0);
     flexGridSizer8326->AddGrowableRow(0);
     
-    flexGridSizer8324->Add(flexGridSizer8326, 1, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(0));
+    flexGridSizer8324->Add(flexGridSizer8326, 1, wxALL|wxALIGN_CENTER|wxALIGN_LEFT, WXC_FROM_DIP(0));
     
-    m_loadTemplateSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("document-open-5")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
+    m_loadTemplateSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncFolder")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(32,32)), wxBU_AUTODRAW);
     m_loadTemplateSec->SetToolTip(_("Open Template"));
     
     flexGridSizer8326->Add(m_loadTemplateSec, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(2));
-    m_loadTemplateSec->SetMinSize(wxSize(26,26));
+    m_loadTemplateSec->SetMinSize(wxSize(32,32));
     
     m_staticLine8346 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer8326->Add(m_staticLine8346, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
+    wxFlexGridSizer* flexGridSizer9937 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer9937->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9937->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer8326->Add(flexGridSizer9937, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
     m_staticText18423 = new wxStaticText(m_secToolbar, wxID_ANY, _("Port:"), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), 0);
     
-    flexGridSizer8326->Add(m_staticText18423, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer9937->Add(m_staticText18423, 0, wxALL, WXC_FROM_DIP(2));
     
     m_portSelectorSec = new wxBitmapComboBox(m_secToolbar, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxArrayString(), wxCB_READONLY);
     
     flexGridSizer8326->Add(m_portSelectorSec, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
-    m_btConnectSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), 0);
+    m_btConnectSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(32,32)), 0);
     m_btConnectSec->SetToolTip(_("Connect to mirco controller"));
     
-    flexGridSizer8326->Add(m_btConnectSec, 0, wxALL, WXC_FROM_DIP(2));
-    m_btConnectSec->SetMinSize(wxSize(26,26));
+    flexGridSizer8326->Add(m_btConnectSec, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(2));
+    m_btConnectSec->SetMinSize(wxSize(32,32));
     
     m_staticLine83464 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer8326->Add(m_staticLine83464, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_btZeroSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btZeroSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("RefPos")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(32,32)), wxBU_AUTODRAW);
     m_btZeroSec->SetToolTip(_("Evaluate Hardware Reference"));
     
     flexGridSizer8326->Add(m_btZeroSec, 0, wxALL, WXC_FROM_DIP(2));
-    m_btZeroSec->SetMinSize(wxSize(26,26));
+    m_btZeroSec->SetMinSize(wxSize(32,32));
     
-    m_btEvaluateHWRef = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-orientation")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
+    m_btEvaluateHWRef = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("RefDim")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(32,32)), wxBU_AUTODRAW);
     m_btEvaluateHWRef->SetToolTip(_("Evaluate Hardware Reference"));
     
     flexGridSizer8326->Add(m_btEvaluateHWRef, 0, wxALL, WXC_FROM_DIP(2));
-    m_btEvaluateHWRef->SetMinSize(wxSize(26,26));
+    m_btEvaluateHWRef->SetMinSize(wxSize(32,32));
     
     m_staticLine834643 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer8326->Add(m_staticLine834643, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_btTogglePreviewMonitorSec = new wxBitmapToggleButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("brick-go1")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), 0);
+    m_btTogglePreviewMonitorSec = new wxBitmapToggleButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncMonitor")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(32,32)), 0);
     m_btTogglePreviewMonitorSec->SetToolTip(_("Toggle View: Preview vs. Monitor"));
     m_btTogglePreviewMonitorSec->SetValue(true);
     
-    flexGridSizer8326->Add(m_btTogglePreviewMonitorSec, 0, wxALL, WXC_FROM_DIP(2));
-    m_btTogglePreviewMonitorSec->SetMinSize(wxSize(26,26));
+    flexGridSizer8326->Add(m_btTogglePreviewMonitorSec, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(2));
+    m_btTogglePreviewMonitorSec->SetMinSize(wxSize(32,32));
     
     m_panel8328 = new wxPanel(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
@@ -5106,37 +5116,37 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8281->SetFlexibleDirection( wxBOTH );
     flexGridSizer8281->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer8324->Add(flexGridSizer8281, 1, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    flexGridSizer8324->Add(flexGridSizer8281, 1, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
     
-    m_rcRunSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arrow-right-3")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
+    m_rcRunSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncRun")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(32,32)), wxBU_AUTODRAW);
     m_rcRunSec->SetToolTip(_("Run"));
     
-    flexGridSizer8281->Add(m_rcRunSec, 0, wxALL, WXC_FROM_DIP(2));
-    m_rcRunSec->SetMinSize(wxSize(26,26));
+    flexGridSizer8281->Add(m_rcRunSec, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(2));
+    m_rcRunSec->SetMinSize(wxSize(32,32));
     
     m_staticLine8291 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer8281->Add(m_staticLine8291, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_rcPauseSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-playback-pause-blue")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
+    m_rcPauseSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncPause")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(32,32)), wxBU_AUTODRAW);
     m_rcPauseSec->SetToolTip(_("Pause"));
     
-    flexGridSizer8281->Add(m_rcPauseSec, 0, wxALL, WXC_FROM_DIP(2));
-    m_rcPauseSec->SetMinSize(wxSize(26,26));
+    flexGridSizer8281->Add(m_rcPauseSec, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(2));
+    m_rcPauseSec->SetMinSize(wxSize(32,32));
     
-    m_rcStopSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-debugger_stop")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
+    m_rcStopSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncStop")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(32,32)), wxBU_AUTODRAW);
     m_rcStopSec->SetToolTip(_("Stop"));
     
-    flexGridSizer8281->Add(m_rcStopSec, 0, wxALL, WXC_FROM_DIP(2));
-    m_rcStopSec->SetMinSize(wxSize(26,26));
+    flexGridSizer8281->Add(m_rcStopSec, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(2));
+    m_rcStopSec->SetMinSize(wxSize(32,32));
     
     m_staticLine82917 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer8281->Add(m_staticLine82917, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_btnEmergenyStopSec = new wxButton(m_secToolbar, wxID_ANY, _("Emergency Stop [ESC]"), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), 0);
+    m_btnEmergenyStopSec = new wxButton(m_secToolbar, wxID_ANY, _("Emergency Stop [ESC]"), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,38)), wxBU_EXACTFIT);
     #if wxVERSION_NUMBER >= 2904
-    m_btnEmergenyStopSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("error")), wxRIGHT);
+    m_btnEmergenyStopSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("process-stop")), wxRIGHT);
     m_btnEmergenyStopSec->SetBitmapMargins(10,2);
     #endif
     m_btnEmergenyStopSec->SetBackgroundColour(wxColour(wxT("rgb(128,64,64)")));
@@ -5144,7 +5154,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btnEmergenyStopSec->SetToolTip(_("Interrupt the CNC Controller"));
     
     flexGridSizer8281->Add(m_btnEmergenyStopSec, 0, wxALL, WXC_FROM_DIP(0));
-    m_secToolbar->SetMinSize(wxSize(-1,32));
+    m_secToolbar->SetMinSize(wxSize(-1,42));
     
     m_staticLine9185 = new wxStaticLine(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -6109,7 +6119,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_testCountX->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
     m_testCountX->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::testCountXUpdated), NULL, this);
     m_btDetachTest2->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::detachTest), NULL, this);
-    m_testToolPowerBtn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
+    m_testSpindleSpeedSlider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::testChangedSpindleSpeed), NULL, this);
+    m_testSpindleSpeedSlider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::testChangingSpindleSpeed), NULL, this);
+    m_testSpindleSpeedSlider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::testChangingSpindleSpeed), NULL, this);
+    m_testSpindlePowerBtn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
     m_outboundNotebook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::outboundBookChanged), NULL, this);
     m_outboundNotebook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGING, wxNotebookEventHandler(MainFrameBClass::outboundBookChanging), NULL, this);
     m_notebookConfig->Connect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::nootebookConfigChanged), NULL, this);
@@ -6364,7 +6377,10 @@ MainFrameBClass::~MainFrameBClass()
     m_testCountX->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
     m_testCountX->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::testCountXUpdated), NULL, this);
     m_btDetachTest2->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::detachTest), NULL, this);
-    m_testToolPowerBtn->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
+    m_testSpindleSpeedSlider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::testChangedSpindleSpeed), NULL, this);
+    m_testSpindleSpeedSlider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::testChangingSpindleSpeed), NULL, this);
+    m_testSpindleSpeedSlider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::testChangingSpindleSpeed), NULL, this);
+    m_testSpindlePowerBtn->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
     m_outboundNotebook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::outboundBookChanged), NULL, this);
     m_outboundNotebook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGING, wxNotebookEventHandler(MainFrameBClass::outboundBookChanging), NULL, this);
     m_notebookConfig->Disconnect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::nootebookConfigChanged), NULL, this);

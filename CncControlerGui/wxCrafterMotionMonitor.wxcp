@@ -15188,7 +15188,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/hardwarebox.png"
+           "m_path": "bitmaps/CncHardwareBox.png"
           }, {
            "type": "choice",
            "m_label": "Direction",
@@ -15283,7 +15283,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/boundbox.png"
+           "m_path": "bitmaps/CncBoundbox.png"
           }, {
            "type": "choice",
            "m_label": "Direction",
@@ -15445,7 +15445,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/snap-orto.png"
+           "m_path": "bitmaps/RefPos.png"
           }, {
            "type": "choice",
            "m_label": "Direction",
@@ -15540,7 +15540,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/edit-guides.png"
+           "m_path": "bitmaps/CncGuidePath.png"
           }, {
            "type": "choice",
            "m_label": "Direction",
@@ -15635,7 +15635,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/ruler2.png"
+           "m_path": "bitmaps/CncRuler.png"
           }, {
            "type": "choice",
            "m_label": "Direction",
@@ -15825,7 +15825,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/link_editor.png"
+           "m_path": "bitmaps/CncPath.png"
           }, {
            "type": "choice",
            "m_label": "Direction",
@@ -15920,7 +15920,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/16-marker.png"
+           "m_path": "bitmaps/CncPosition.png"
           }, {
            "type": "choice",
            "m_label": "Direction",

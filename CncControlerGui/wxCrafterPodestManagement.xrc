@@ -37,10 +37,25 @@
                 <growablecols>0,2,4</growablecols>
                 <growablerows>0</growablerows>
                 <object class="sizeritem">
-                  <flag>wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL</flag>
-                  <border>5</border>
-                  <object class="wxStaticBitmap" name="m_staticBitmap9569">
-                    <bitmap>bitmaps/lift.png</bitmap>
+                  <flag>wxALL|wxEXPAND</flag>
+                  <object class="wxPanel" name="m_panel9613">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                    <object class="wxFlexGridSizer">
+                      <cols>1</cols>
+                      <rows>1</rows>
+                      <vgap>0</vgap>
+                      <hgap>0</hgap>
+                      <growablecols>0</growablecols>
+                      <growablerows>0</growablerows>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL</flag>
+                        <border>5</border>
+                        <object class="wxStaticBitmap" name="m_staticBitmap9569">
+                          <bitmap>bitmaps/lift.png</bitmap>
+                        </object>
+                      </object>
+                    </object>
                   </object>
                 </object>
                 <object class="sizeritem">

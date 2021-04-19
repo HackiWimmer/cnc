@@ -139,7 +139,7 @@ void ArduinoAccelManager::changeState(const State s) {
 
     notifyACMStateChange(s); 
 
-    PRINT_DEBUG_VALUE1("s", s)
+    //PRINT_DEBUG_VALUE1("s", s)
 
     #ifndef SKETCH_COMPILE 
       if ( true ) {

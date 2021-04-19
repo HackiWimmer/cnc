@@ -254,6 +254,5 @@ void CncVideoCapturePanel::onPaint(wxPaintEvent& event) {
 		dc.DrawCircle(center, 16.0);
 		dc.DrawCircle(center, 22.0);
 		dc.DrawCircle(center, 36.0);
-	
 	}
 }

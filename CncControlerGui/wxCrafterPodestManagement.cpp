@@ -63,9 +63,21 @@ CncPodestManagementBase::CncPodestManagementBase(wxWindow* parent, wxWindowID id
     
     flexGridSizer9572->Add(flexGridSizer9567, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticBitmap9569 = new wxStaticBitmap(m_basePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lift")), wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), 0 );
+    m_panel9613 = new wxPanel(m_basePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel9613->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
     
-    flexGridSizer9567->Add(m_staticBitmap9569, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    flexGridSizer9567->Add(m_panel9613, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer9615 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer9615->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9615->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9615->AddGrowableCol(0);
+    flexGridSizer9615->AddGrowableRow(0);
+    m_panel9613->SetSizer(flexGridSizer9615);
+    
+    m_staticBitmap9569 = new wxStaticBitmap(m_panel9613, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lift")), wxDefaultPosition, wxDLG_UNIT(m_panel9613, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer9615->Add(m_staticBitmap9569, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
     
     m_staticLine9571 = new wxStaticLine(m_basePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_basePanel, wxSize(-1,-1)), wxLI_VERTICAL);
     

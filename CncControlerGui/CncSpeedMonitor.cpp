@@ -36,8 +36,8 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 	m_darwingAreaV	->SetBackgroundColour(bgc);
 	m_bottomAxisV	->SetBackgroundColour(bgc);
 	
-	m_btToggleAbsRelModeH->SetValue(true);
-	m_btToggleAbsRelModeV->SetValue(true);
+	m_btToggleAbsRelModeH->SetValue(false);
+	m_btToggleAbsRelModeV->SetValue(false);
 	m_btToggleAbsRelModeH->SetToolTip("Display Relative");
 	m_btToggleAbsRelModeV->SetToolTip("Display Relative");
 	
@@ -318,8 +318,8 @@ void CncSpeedMonitor::onToggleConnection(wxCommandEvent& event) {
 void CncSpeedMonitor::onToggleAbsRelMode(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
 	const bool horztl = diagram.orientation == Diagram::DOHorizontal;
-	wxBitmapToggleButton* masterButton = horztl ? m_btToggleAbsRelModeH : m_btToggleConnectionV;
-	wxBitmapToggleButton* slaveButton  = horztl ? m_btToggleAbsRelModeV : m_btToggleConnectionH;
+	wxBitmapToggleButton* masterButton = horztl ? m_btToggleAbsRelModeH : m_btToggleAbsRelModeV;
+	wxBitmapToggleButton* slaveButton  = horztl ? m_btToggleAbsRelModeV : m_btToggleAbsRelModeH;
 	slaveButton->SetValue(masterButton->GetValue());
 	
 	diagram.presentation = masterButton->GetValue() ? Diagram::DRAbsolute : Diagram::DRRelative;

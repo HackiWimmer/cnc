@@ -1068,7 +1068,8 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btSelectCncPreview);
 	registerGuiControl(m_btSelectTemplatePreview);
 	registerGuiControl(m_cbContentPosSpy);
-	registerGuiControl(m_testToolPowerBtn);
+	registerGuiControl(m_testSpindlePowerBtn);
+	registerGuiControl(m_testSpindleSpeedSlider);
 	registerGuiControl(m_portSelector);
 	registerGuiControl(m_portSelectorSec);
 	registerGuiControl(m_connect);
@@ -6528,11 +6529,11 @@ void MainFrame::rcReset(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSpindleState(bool state) {
 ///////////////////////////////////////////////////////////////////
-	m_testToolPowerBtn->SetLabel             (state == SPINDLE_STATE_OFF ? "Switch Tool 'On'"       : "Switch Tool 'Off'");
+	m_testSpindlePowerBtn->SetLabel             (state == SPINDLE_STATE_OFF ? "Switch Spindle 'On'"    : "Switch Spindle 'Off'");
 
-	m_testToolPowerState->SetLabel           (state == SPINDLE_STATE_OFF ? "Tool is switched 'Off'" : "Tool is switched 'On'");
-	m_testToolPowerState->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128)    : *wxGREEN);
-	m_testToolPowerState->SetForegroundColour(state == SPINDLE_STATE_OFF ? *wxWHITE                 : *wxBLACK);
+	m_testToolPowerState->SetLabel           (state == SPINDLE_STATE_OFF ? "Spindle is switched 'Off'" : "Spindle is switched 'On'");
+	m_testToolPowerState->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128)       : *wxGREEN);
+	m_testToolPowerState->SetForegroundColour(state == SPINDLE_STATE_OFF ? *wxWHITE                    : *wxBLACK);
 	
 	m_testToolPowerState->Refresh(true);
 	m_testToolPowerState->Update();
@@ -6569,6 +6570,12 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 		cnc->switchSpindleOn();
 		startAnimationControl();
 		
+		m_testSpindleSpeedSlider->SetMin((int)THE_CONFIG->getSpindleSpeedMin());
+		m_testSpindleSpeedSlider->SetMax((int)THE_CONFIG->getSpindleSpeedMax());
+		
+		if ( cnc != NULL ) 
+			m_testSpindleSpeedSlider->SetValue((int)cnc->getConfiguredSpindleSpeed());
+			
 	} else {
 		cnc->switchSpindleOff();
 		stopAnimationControl();
@@ -6577,10 +6584,24 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 	cncToolState = cnc->getSpindleState();
 	enableControls(cncToolState == SPINDLE_STATE_OFF);
 	
-	if ( m_testToolPowerBtn->IsShownOnScreen() )
-		m_testToolPowerBtn->Enable(true);
+	if ( m_testSpindlePowerBtn->IsShownOnScreen() ) {
+		m_testSpindlePowerBtn->Enable(true);
+		m_testSpindleSpeedSlider->Enable(true);
+	}
 		
 	updateSetterList();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::testChangedSpindleSpeed(wxScrollEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc != NULL && cnc->getSpindleState() == SPINDLE_STATE_ON ) {
+		cnc->changeCurrentSpindleSpeed_U_MIN((float)m_testSpindleSpeedSlider->GetValue());
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::testChangingSpindleSpeed(wxScrollEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_testSpindleSpeedSlider->SetToolTip(wxString::Format("%d U/min", m_testSpindleSpeedSlider->GetValue()));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
@@ -8324,8 +8345,6 @@ void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareZAxis(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	CncGampadDeactivator cgd(this);
-
 	wxString msg("Do you really want to evaluate the dimensions of the Z axis?\n");
 	msg.append("Execution Plan:\n\n");
 	msg.append(" 1. Moves Z axis to maximum position\n");
@@ -8339,7 +8358,8 @@ void MainFrame::onEvaluateHardwareZAxis(wxCommandEvent& event) {
 	dlg.SetFooterIcon(wxICON_WARNING);
 
 	if ( dlg.ShowModal() == wxID_YES ) {
-		
+		CncGampadDeactivator cgd(this);
+
 		selectMonitorBookCncPanel();
 		disableControls();
 		

@@ -44,7 +44,7 @@
           <fg/>
           <bitmapsize>16,16</bitmapsize>
           <object class="wxBitmapButton" name="m_bmpButton4490">
-            <bitmap>bitmaps/application-side-boxes.png</bitmap>
+            <bitmap>bitmaps/CncFolder.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Toggle Template Manager]]>
@@ -57,7 +57,7 @@
             <style/>
           </object>
           <object class="wxBitmapButton" name="m_searchConnections">
-            <bitmap>bitmaps/database_refresh.png</bitmap>
+            <bitmap>bitmaps/CncPort.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Update COM ports]]>
@@ -98,7 +98,7 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_anchorPosition">
-            <bitmap>bitmaps/Anchor.png</bitmap>
+            <bitmap>bitmaps/CncAnchors.png</bitmap>
             <style/>
             <tooltip>
               <![CDATA[Determine Anchor Positions]]>
@@ -106,7 +106,7 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_btSelectReferences">
-            <bitmap>bitmaps/view-orientation.png</bitmap>
+            <bitmap>bitmaps/RefDim.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[More References]]>
@@ -115,7 +115,7 @@
           </object>
           <object class="separator"/>
           <object class="wxBitmapButton" name="m_btSelectSetup">
-            <bitmap>bitmaps/system-settings.png</bitmap>
+            <bitmap>bitmaps/CncSettings.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Setup Page]]>
@@ -131,7 +131,7 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_btSelectTemplate">
-            <bitmap>bitmaps/package-supported.png</bitmap>
+            <bitmap>bitmaps/CncTemplate.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Inbound Template Page]]>
@@ -140,7 +140,7 @@
           </object>
           <object class="separator"/>
           <object class="wxBitmapButton" name="m_btSelectInboundTest">
-            <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
+            <bitmap>bitmaps/CncTest.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Test Page]]>
@@ -148,7 +148,7 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_btSelectInboundPreview">
-            <bitmap>bitmaps/filepreview.png</bitmap>
+            <bitmap>bitmaps/CncPreviewLeft.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Inbound Preview]]>
@@ -157,7 +157,7 @@
           </object>
           <object class="separator"/>
           <object class="wxBitmapButton" name="m_btSelectCncPreview">
-            <bitmap>bitmaps/brick-go1.png</bitmap>
+            <bitmap>bitmaps/CncMonitor.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[CNC Monitor]]>
@@ -165,7 +165,7 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_btSelectTemplatePreview">
-            <bitmap>bitmaps/document-preview.png</bitmap>
+            <bitmap>bitmaps/CncPreviewRight.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Template Preview]]>
@@ -303,7 +303,7 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_rcRun">
-            <bitmap>bitmaps/RunCtrl/iconmonstr-process-1-16.png</bitmap>
+            <bitmap>bitmaps/CncRun.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Run - Release]]>
@@ -312,7 +312,7 @@
           </object>
           <object class="separator"/>
           <object class="wxBitmapButton" name="m_rcPause">
-            <bitmap>bitmaps/RunCtrl/iconmonstr-pause-16.png</bitmap>
+            <bitmap>bitmaps/CncPause.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Pause]]>
@@ -320,7 +320,7 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_rcStop">
-            <bitmap>bitmaps/RunCtrl/iconmonstr-stop-16.png</bitmap>
+            <bitmap>bitmaps/CncStop.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Stop]]>
@@ -336,7 +336,7 @@
             <tooltip>
               <![CDATA[Interrupt the CNC Controller]]>
             </tooltip>
-            <bitmap>bitmaps/error.png</bitmap>
+            <bitmap>bitmaps/process-stop.png</bitmap>
             <bitmapposition>wxRIGHT</bitmapposition>
             <default>0</default>
           </object>
@@ -4506,7 +4506,7 @@ Tool Power</label>
                                         <option>1</option>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
-                                          <rows>2</rows>
+                                          <rows>3</rows>
                                           <vgap>0</vgap>
                                           <hgap>0</hgap>
                                           <growablecols>0</growablecols>
@@ -4527,7 +4527,7 @@ Tool Power</label>
                                                 <object class="sizeritem">
                                                   <flag>wxALL|wxALIGN_CENTER</flag>
                                                   <object class="wxStaticText" name="m_testToolPowerState">
-                                                    <label>Tool is switched 'On'</label>
+                                                    <label>Spindle is switched 'On'</label>
                                                     <style>wxALIGN_CENTRE</style>
                                                     <bg>#FF8080</bg>
                                                     <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
@@ -4546,10 +4546,20 @@ Tool Power</label>
                                           </object>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
+                                            <border>5</border>
+                                            <object class="wxSlider" name="m_testSpindleSpeedSlider">
+                                              <style>wxSL_HORIZONTAL</style>
+                                              <min>0</min>
+                                              <max>100</max>
+                                              <value>50</value>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL|wxEXPAND</flag>
                                             <border>1</border>
                                             <minsize>-1,80</minsize>
-                                            <object class="wxButton" name="m_testToolPowerBtn">
-                                              <label>Switch Tool On</label>
+                                            <object class="wxButton" name="m_testSpindlePowerBtn">
+                                              <label>Switch Spindle On</label>
                                               <style/>
                                               <size>-1,80</size>
                                               <font>
@@ -8714,12 +8724,12 @@ State</label>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
-              <minsize>-1,32</minsize>
+              <minsize>-1,42</minsize>
               <object class="wxPanel" name="m_secToolbar">
                 <style>wxTAB_TRAVERSAL</style>
-                <size>-1,32</size>
+                <size>-1,42</size>
                 <object class="wxFlexGridSizer">
-                  <minsize>-1,32</minsize>
+                  <minsize>-1,42</minsize>
                   <cols>3</cols>
                   <rows>1</rows>
                   <vgap>0</vgap>
@@ -8727,7 +8737,7 @@ State</label>
                   <growablecols>1</growablecols>
                   <growablerows>0</growablerows>
                   <object class="sizeritem" name="flexGridSizer8326">
-                    <flag>wxALL|wxALIGN_LEFT</flag>
+                    <flag>wxALL|wxALIGN_CENTER|wxALIGN_LEFT</flag>
                     <option>1</option>
                     <object class="wxFlexGridSizer">
                       <cols>11</cols>
@@ -8739,10 +8749,10 @@ State</label>
                       <object class="sizeritem">
                         <flag>wxALL|wxALIGN_LEFT</flag>
                         <border>2</border>
-                        <minsize>26,26</minsize>
+                        <minsize>32,32</minsize>
                         <object class="wxBitmapButton" name="m_loadTemplateSec">
-                          <bitmap>bitmaps/document-open-5.png</bitmap>
-                          <size>26,26</size>
+                          <bitmap>bitmaps/CncFolder.png</bitmap>
+                          <size>32,32</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Open Template]]>
@@ -8757,12 +8767,23 @@ State</label>
                           <style>wxLI_VERTICAL</style>
                         </object>
                       </object>
-                      <object class="sizeritem">
-                        <flag>wxALL</flag>
-                        <border>5</border>
-                        <object class="wxStaticText" name="m_staticText18423">
-                          <label>Port:</label>
-                          <style/>
+                      <object class="sizeritem" name="flexGridSizer9937">
+                        <flag>wxALL|wxALIGN_CENTER</flag>
+                        <object class="wxFlexGridSizer">
+                          <cols>1</cols>
+                          <rows>2</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols/>
+                          <growablerows/>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>2</border>
+                            <object class="wxStaticText" name="m_staticText18423">
+                              <label>Port:</label>
+                              <style/>
+                            </object>
+                          </object>
                         </object>
                       </object>
                       <object class="sizeritem">
@@ -8785,12 +8806,12 @@ State</label>
                         </object>
                       </object>
                       <object class="sizeritem">
-                        <flag>wxALL</flag>
+                        <flag>wxALL|wxALIGN_CENTER</flag>
                         <border>2</border>
-                        <minsize>26,26</minsize>
+                        <minsize>32,32</minsize>
                         <object class="wxBitmapButton" name="m_btConnectSec">
                           <bitmap>bitmaps/16-connected.png</bitmap>
-                          <size>26,26</size>
+                          <size>32,32</size>
                           <style/>
                           <tooltip>
                             <![CDATA[Connect to mirco controller]]>
@@ -8808,10 +8829,10 @@ State</label>
                       <object class="sizeritem">
                         <flag>wxALL</flag>
                         <border>2</border>
-                        <minsize>26,26</minsize>
+                        <minsize>32,32</minsize>
                         <object class="wxBitmapButton" name="m_btZeroSec">
-                          <bitmap>bitmaps/snap-orto.png</bitmap>
-                          <size>26,26</size>
+                          <bitmap>bitmaps/RefPos.png</bitmap>
+                          <size>32,32</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Evaluate Hardware Reference]]>
@@ -8822,10 +8843,10 @@ State</label>
                       <object class="sizeritem">
                         <flag>wxALL</flag>
                         <border>2</border>
-                        <minsize>26,26</minsize>
+                        <minsize>32,32</minsize>
                         <object class="wxBitmapButton" name="m_btEvaluateHWRef">
-                          <bitmap>bitmaps/view-orientation.png</bitmap>
-                          <size>26,26</size>
+                          <bitmap>bitmaps/RefDim.png</bitmap>
+                          <size>32,32</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Evaluate Hardware Reference]]>
@@ -8841,13 +8862,13 @@ State</label>
                         </object>
                       </object>
                       <object class="sizeritem">
-                        <flag>wxALL</flag>
+                        <flag>wxALL|wxALIGN_CENTER</flag>
                         <border>2</border>
-                        <minsize>26,26</minsize>
+                        <minsize>32,32</minsize>
                         <object class="wxBitmapToggleButton" name="m_btTogglePreviewMonitorSec">
                           <style/>
-                          <size>26,26</size>
-                          <bitmap>bitmaps/brick-go1.png</bitmap>
+                          <size>32,32</size>
+                          <bitmap>bitmaps/CncMonitor.png</bitmap>
                           <tooltip>
                             <![CDATA[Toggle View: Preview vs. Monitor]]>
                           </tooltip>
@@ -8863,7 +8884,7 @@ State</label>
                     </object>
                   </object>
                   <object class="sizeritem" name="flexGridSizer8281">
-                    <flag>wxALL|wxALIGN_RIGHT</flag>
+                    <flag>wxALL|wxALIGN_CENTER</flag>
                     <option>1</option>
                     <object class="wxFlexGridSizer">
                       <cols>7</cols>
@@ -8873,12 +8894,12 @@ State</label>
                       <growablecols/>
                       <growablerows/>
                       <object class="sizeritem">
-                        <flag>wxALL</flag>
+                        <flag>wxALL|wxALIGN_CENTER</flag>
                         <border>2</border>
-                        <minsize>26,26</minsize>
+                        <minsize>32,32</minsize>
                         <object class="wxBitmapButton" name="m_rcRunSec">
-                          <bitmap>bitmaps/arrow-right-3.png</bitmap>
-                          <size>26,26</size>
+                          <bitmap>bitmaps/CncRun.png</bitmap>
+                          <size>32,32</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Run]]>
@@ -8894,12 +8915,12 @@ State</label>
                         </object>
                       </object>
                       <object class="sizeritem">
-                        <flag>wxALL</flag>
+                        <flag>wxALL|wxALIGN_CENTER</flag>
                         <border>2</border>
-                        <minsize>26,26</minsize>
+                        <minsize>32,32</minsize>
                         <object class="wxBitmapButton" name="m_rcPauseSec">
-                          <bitmap>bitmaps/media-playback-pause-blue.png</bitmap>
-                          <size>26,26</size>
+                          <bitmap>bitmaps/CncPause.png</bitmap>
+                          <size>32,32</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Pause]]>
@@ -8908,12 +8929,12 @@ State</label>
                         </object>
                       </object>
                       <object class="sizeritem">
-                        <flag>wxALL</flag>
+                        <flag>wxALL|wxALIGN_CENTER</flag>
                         <border>2</border>
-                        <minsize>26,26</minsize>
+                        <minsize>32,32</minsize>
                         <object class="wxBitmapButton" name="m_rcStopSec">
-                          <bitmap>bitmaps/16-debugger_stop.png</bitmap>
-                          <size>26,26</size>
+                          <bitmap>bitmaps/CncStop.png</bitmap>
+                          <size>32,32</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Stop]]>
@@ -8932,13 +8953,14 @@ State</label>
                         <flag>wxALL</flag>
                         <object class="wxButton" name="m_btnEmergenyStopSec">
                           <label>Emergency Stop [ESC]</label>
-                          <style/>
+                          <style>wxBU_EXACTFIT</style>
+                          <size>-1,38</size>
                           <bg>#804040</bg>
                           <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                           <tooltip>
                             <![CDATA[Interrupt the CNC Controller]]>
                           </tooltip>
-                          <bitmap>bitmaps/error.png</bitmap>
+                          <bitmap>bitmaps/process-stop.png</bitmap>
                           <bitmapposition>wxRIGHT</bitmapposition>
                           <default>0</default>
                         </object>

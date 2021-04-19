@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 9934,
+  "m_objCounter": 9937,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxCrafterMainFrame_bitmaps.cpp",
@@ -356,7 +356,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/application-side-boxes.png"
+           "m_path": "bitmaps/CncFolder.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -533,7 +533,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/database_refresh.png"
+           "m_path": "bitmaps/CncPort.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -885,7 +885,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/Anchor.png"
+           "m_path": "bitmaps/CncAnchors.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -967,7 +967,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/view-orientation.png"
+           "m_path": "bitmaps/RefDim.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -1069,7 +1069,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/system-settings.png"
+           "m_path": "bitmaps/CncSettings.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -1233,7 +1233,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/package-supported.png"
+           "m_path": "bitmaps/CncTemplate.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -1335,7 +1335,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/software-update-available-3 (2).png"
+           "m_path": "bitmaps/CncTest.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -1417,7 +1417,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/filepreview.png"
+           "m_path": "bitmaps/CncPreviewLeft.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -1519,7 +1519,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/brick-go1.png"
+           "m_path": "bitmaps/CncMonitor.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -1601,7 +1601,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/document-preview.png"
+           "m_path": "bitmaps/CncPreviewRight.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -2922,7 +2922,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/RunCtrl/iconmonstr-process-1-16.png"
+           "m_path": "bitmaps/CncRun.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -3024,7 +3024,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/RunCtrl/iconmonstr-pause-16.png"
+           "m_path": "bitmaps/CncPause.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -3106,7 +3106,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/RunCtrl/iconmonstr-stop-16.png"
+           "m_path": "bitmaps/CncStop.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -3216,7 +3216,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/error.png"
+           "m_path": "bitmaps/process-stop.png"
           }, {
            "type": "choice",
            "m_label": "Direction",
@@ -28723,7 +28723,7 @@
                             }, {
                              "type": "string",
                              "m_label": "# Rows:",
-                             "m_value": "2"
+                             "m_value": "3"
                             }, {
                              "type": "string",
                              "m_label": "Growable columns:",
@@ -28921,7 +28921,7 @@
                                   }, {
                                    "type": "multi-string",
                                    "m_label": "Label:",
-                                   "m_value": "Tool is switched 'On'"
+                                   "m_value": "Spindle is switched 'On'"
                                   }, {
                                    "type": "string",
                                    "m_label": "Wrap:",
@@ -28931,6 +28931,106 @@
                                  "m_children": []
                                 }]
                               }]
+                            }, {
+                             "m_type": 4419,
+                             "proportion": 0,
+                             "border": 5,
+                             "gbSpan": "1,1",
+                             "gbPosition": "0,0",
+                             "m_styles": ["wxSL_HORIZONTAL"],
+                             "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+                             "m_properties": [{
+                               "type": "winid",
+                               "m_label": "ID:",
+                               "m_winid": "wxID_ANY"
+                              }, {
+                               "type": "string",
+                               "m_label": "Size:",
+                               "m_value": "-1,-1"
+                              }, {
+                               "type": "string",
+                               "m_label": "Minimum Size:",
+                               "m_value": "-1,-1"
+                              }, {
+                               "type": "string",
+                               "m_label": "Name:",
+                               "m_value": "m_testSpindleSpeedSlider"
+                              }, {
+                               "type": "multi-string",
+                               "m_label": "Tooltip:",
+                               "m_value": ""
+                              }, {
+                               "type": "colour",
+                               "m_label": "Bg Colour:",
+                               "colour": "<Default>"
+                              }, {
+                               "type": "colour",
+                               "m_label": "Fg Colour:",
+                               "colour": "<Default>"
+                              }, {
+                               "type": "font",
+                               "m_label": "Font:",
+                               "m_value": ""
+                              }, {
+                               "type": "bool",
+                               "m_label": "Hidden",
+                               "m_value": false
+                              }, {
+                               "type": "bool",
+                               "m_label": "Disabled",
+                               "m_value": false
+                              }, {
+                               "type": "bool",
+                               "m_label": "Focused",
+                               "m_value": false
+                              }, {
+                               "type": "string",
+                               "m_label": "Class Name:",
+                               "m_value": ""
+                              }, {
+                               "type": "string",
+                               "m_label": "Include File:",
+                               "m_value": ""
+                              }, {
+                               "type": "string",
+                               "m_label": "Style:",
+                               "m_value": ""
+                              }, {
+                               "type": "string",
+                               "m_label": "Value:",
+                               "m_value": "50"
+                              }, {
+                               "type": "string",
+                               "m_label": "Min value:",
+                               "m_value": "0"
+                              }, {
+                               "type": "string",
+                               "m_label": "Max value:",
+                               "m_value": "100"
+                              }],
+                             "m_events": [{
+                               "m_eventName": "wxEVT_SCROLL_CHANGED",
+                               "m_eventClass": "wxScrollEvent",
+                               "m_eventHandler": "wxScrollEventHandler",
+                               "m_functionNameAndSignature": "testChangedSpindleSpeed(wxScrollEvent& event)",
+                               "m_description": "Process wxEVT_SCROLL_CHANGED end of scrolling events (MSW only).",
+                               "m_noBody": false
+                              }, {
+                               "m_eventName": "wxEVT_SCROLL_THUMBRELEASE",
+                               "m_eventClass": "wxScrollEvent",
+                               "m_eventHandler": "wxScrollEventHandler",
+                               "m_functionNameAndSignature": "testChangingSpindleSpeed(wxScrollEvent& event)",
+                               "m_description": "Process wxEVT_SCROLL_THUMBRELEASE thumb release events.",
+                               "m_noBody": false
+                              }, {
+                               "m_eventName": "wxEVT_SCROLL_THUMBTRACK",
+                               "m_eventClass": "wxScrollEvent",
+                               "m_eventHandler": "wxScrollEventHandler",
+                               "m_functionNameAndSignature": "testChangingSpindleSpeed(wxScrollEvent& event)",
+                               "m_description": "Process wxEVT_SCROLL_THUMBTRACK thumbtrack events (frequent events sent as the user drags the thumbtrack).",
+                               "m_noBody": false
+                              }],
+                             "m_children": []
                             }, {
                              "m_type": 4400,
                              "proportion": 0,
@@ -28954,7 +29054,7 @@
                               }, {
                                "type": "string",
                                "m_label": "Name:",
-                               "m_value": "m_testToolPowerBtn"
+                               "m_value": "m_testSpindlePowerBtn"
                               }, {
                                "type": "multi-string",
                                "m_label": "Tooltip:",
@@ -28998,7 +29098,7 @@
                               }, {
                                "type": "string",
                                "m_label": "Label:",
-                               "m_value": "Switch Tool On"
+                               "m_value": "Switch Spindle On"
                               }, {
                                "type": "bool",
                                "m_label": "Default Button",
@@ -51853,11 +51953,11 @@
             }, {
              "type": "string",
              "m_label": "Size:",
-             "m_value": "-1,32"
+             "m_value": "-1,42"
             }, {
              "type": "string",
              "m_label": "Minimum Size:",
-             "m_value": "-1,32"
+             "m_value": "-1,42"
             }, {
              "type": "string",
              "m_label": "Name:",
@@ -51957,7 +52057,7 @@
                "gbSpan": "1,1",
                "gbPosition": "0,0",
                "m_styles": [],
-               "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_LEFT"],
+               "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER", "wxALIGN_LEFT"],
                "m_properties": [{
                  "type": "string",
                  "m_label": "Minimum Size:",
@@ -52011,11 +52111,11 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
@@ -52063,7 +52163,7 @@
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
-                   "m_path": "bitmaps/document-open-5.png"
+                   "m_path": "bitmaps/CncFolder.png"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -52146,80 +52246,127 @@
                  "m_events": [],
                  "m_children": []
                 }, {
-                 "m_type": 4405,
+                 "m_type": 4403,
                  "proportion": 0,
-                 "border": 5,
+                 "border": 0,
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
                  "m_styles": [],
-                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER"],
                  "m_properties": [{
-                   "type": "winid",
-                   "m_label": "ID:",
-                   "m_winid": "wxID_ANY"
-                  }, {
-                   "type": "string",
-                   "m_label": "Size:",
-                   "m_value": "-1,-1"
-                  }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
                    "m_value": "-1,-1"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
-                   "m_value": "m_staticText18423"
-                  }, {
-                   "type": "multi-string",
-                   "m_label": "Tooltip:",
-                   "m_value": ""
-                  }, {
-                   "type": "colour",
-                   "m_label": "Bg Colour:",
-                   "colour": "<Default>"
-                  }, {
-                   "type": "colour",
-                   "m_label": "Fg Colour:",
-                   "colour": "<Default>"
-                  }, {
-                   "type": "font",
-                   "m_label": "Font:",
-                   "m_value": ""
-                  }, {
-                   "type": "bool",
-                   "m_label": "Hidden",
-                   "m_value": false
-                  }, {
-                   "type": "bool",
-                   "m_label": "Disabled",
-                   "m_value": false
-                  }, {
-                   "type": "bool",
-                   "m_label": "Focused",
-                   "m_value": false
-                  }, {
-                   "type": "string",
-                   "m_label": "Class Name:",
-                   "m_value": ""
-                  }, {
-                   "type": "string",
-                   "m_label": "Include File:",
-                   "m_value": ""
+                   "m_value": "flexGridSizer9937"
                   }, {
                    "type": "string",
                    "m_label": "Style:",
                    "m_value": ""
                   }, {
-                   "type": "multi-string",
-                   "m_label": "Label:",
-                   "m_value": "Port:"
+                   "type": "string",
+                   "m_label": "# Columns:",
+                   "m_value": "1"
                   }, {
                    "type": "string",
-                   "m_label": "Wrap:",
-                   "m_value": "-1"
+                   "m_label": "# Rows:",
+                   "m_value": "2"
+                  }, {
+                   "type": "string",
+                   "m_label": "Growable columns:",
+                   "m_value": ""
+                  }, {
+                   "type": "string",
+                   "m_label": "Growable rows:",
+                   "m_value": ""
+                  }, {
+                   "type": "string",
+                   "m_label": "Horizontal gap:",
+                   "m_value": "0"
+                  }, {
+                   "type": "string",
+                   "m_label": "Vertical gap:",
+                   "m_value": "0"
                   }],
                  "m_events": [],
-                 "m_children": []
+                 "m_children": [{
+                   "m_type": 4405,
+                   "proportion": 0,
+                   "border": 2,
+                   "gbSpan": "1,1",
+                   "gbPosition": "0,0",
+                   "m_styles": [],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                   "m_properties": [{
+                     "type": "winid",
+                     "m_label": "ID:",
+                     "m_winid": "wxID_ANY"
+                    }, {
+                     "type": "string",
+                     "m_label": "Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Minimum Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Name:",
+                     "m_value": "m_staticText18423"
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Tooltip:",
+                     "m_value": ""
+                    }, {
+                     "type": "colour",
+                     "m_label": "Bg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "colour",
+                     "m_label": "Fg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "font",
+                     "m_label": "Font:",
+                     "m_value": ""
+                    }, {
+                     "type": "bool",
+                     "m_label": "Hidden",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Disabled",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Focused",
+                     "m_value": false
+                    }, {
+                     "type": "string",
+                     "m_label": "Class Name:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Include File:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Style:",
+                     "m_value": ""
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Label:",
+                     "m_value": "Port:"
+                    }, {
+                     "type": "string",
+                     "m_label": "Wrap:",
+                     "m_value": "-1"
+                    }],
+                   "m_events": [],
+                   "m_children": []
+                  }]
                 }, {
                  "m_type": 4520,
                  "proportion": 0,
@@ -52313,7 +52460,7 @@
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
                  "m_styles": [],
-                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER"],
                  "m_properties": [{
                    "type": "winid",
                    "m_label": "ID:",
@@ -52321,11 +52468,11 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
@@ -52470,11 +52617,11 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
@@ -52522,7 +52669,7 @@
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
-                   "m_path": "bitmaps/snap-orto.png"
+                   "m_path": "bitmaps/RefPos.png"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -52552,11 +52699,11 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
@@ -52604,7 +52751,7 @@
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
-                   "m_path": "bitmaps/view-orientation.png"
+                   "m_path": "bitmaps/RefDim.png"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -52693,7 +52840,7 @@
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
                  "m_styles": [],
-                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER"],
                  "m_properties": [{
                    "type": "winid",
                    "m_label": "ID:",
@@ -52701,11 +52848,11 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
@@ -52753,7 +52900,7 @@
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
-                   "m_path": "bitmaps/brick-go1.png"
+                   "m_path": "bitmaps/CncMonitor.png"
                   }, {
                    "type": "bool",
                    "m_label": "Checked",
@@ -52843,7 +52990,7 @@
                "gbSpan": "1,1",
                "gbPosition": "0,0",
                "m_styles": [],
-               "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_RIGHT"],
+               "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER"],
                "m_properties": [{
                  "type": "string",
                  "m_label": "Minimum Size:",
@@ -52889,7 +53036,7 @@
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
                  "m_styles": ["wxBU_AUTODRAW"],
-                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER"],
                  "m_properties": [{
                    "type": "winid",
                    "m_label": "ID:",
@@ -52897,11 +53044,11 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
@@ -52949,7 +53096,7 @@
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
-                   "m_path": "bitmaps/arrow-right-3.png"
+                   "m_path": "bitmaps/CncRun.png"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -53038,7 +53185,7 @@
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
                  "m_styles": ["wxBU_AUTODRAW"],
-                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER"],
                  "m_properties": [{
                    "type": "winid",
                    "m_label": "ID:",
@@ -53046,11 +53193,11 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
@@ -53098,7 +53245,7 @@
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
-                   "m_path": "bitmaps/media-playback-pause-blue.png"
+                   "m_path": "bitmaps/CncPause.png"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -53120,7 +53267,7 @@
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
                  "m_styles": ["wxBU_AUTODRAW"],
-                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                 "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER"],
                  "m_properties": [{
                    "type": "winid",
                    "m_label": "ID:",
@@ -53128,11 +53275,11 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "26,26"
+                   "m_value": "32,32"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
@@ -53180,7 +53327,7 @@
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
-                   "m_path": "bitmaps/16-debugger_stop.png"
+                   "m_path": "bitmaps/CncStop.png"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -53268,7 +53415,7 @@
                  "border": 0,
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
-                 "m_styles": [],
+                 "m_styles": ["wxBU_EXACTFIT"],
                  "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
                  "m_properties": [{
                    "type": "winid",
@@ -53277,7 +53424,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "-1,-1"
+                   "m_value": "-1,38"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
@@ -53337,7 +53484,7 @@
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
-                   "m_path": "bitmaps/error.png"
+                   "m_path": "bitmaps/process-stop.png"
                   }, {
                    "type": "choice",
                    "m_label": "Direction",

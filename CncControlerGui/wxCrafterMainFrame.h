@@ -355,7 +355,8 @@ protected:
     wxStaticLine* m_staticLine225337;
     wxPanel* m_panel8592;
     wxStaticText* m_testToolPowerState;
-    wxButton* m_testToolPowerBtn;
+    wxSlider* m_testSpindleSpeedSlider;
+    wxButton* m_testSpindlePowerBtn;
     wxPanel* m_mainBookPreviewPanel;
     wxPanel* m_filePreviewPlaceholder;
     wxPanel* m_panel4398;
@@ -841,6 +842,8 @@ protected:
     virtual void selectTestIntervalMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCountXSpinCtl(wxSpinEvent& event) { event.Skip(); }
     virtual void testCountXUpdated(wxCommandEvent& event) { event.Skip(); }
+    virtual void testChangedSpindleSpeed(wxScrollEvent& event) { event.Skip(); }
+    virtual void testChangingSpindleSpeed(wxScrollEvent& event) { event.Skip(); }
     virtual void testSwitchToolOnOff(wxCommandEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void outboundBookChanging(wxNotebookEvent& event) { event.Skip(); }
@@ -1252,7 +1255,8 @@ public:
     wxStaticLine* GetStaticLine225337() { return m_staticLine225337; }
     wxStaticText* GetTestToolPowerState() { return m_testToolPowerState; }
     wxPanel* GetPanel8592() { return m_panel8592; }
-    wxButton* GetTestToolPowerBtn() { return m_testToolPowerBtn; }
+    wxSlider* GetTestSpindleSpeedSlider() { return m_testSpindleSpeedSlider; }
+    wxButton* GetTestSpindlePowerBtn() { return m_testSpindlePowerBtn; }
     wxPanel* GetTestToolPage() { return m_testToolPage; }
     wxListbook* GetTestCaseBook() { return m_testCaseBook; }
     wxPanel* GetPanelMainTest() { return m_panelMainTest; }

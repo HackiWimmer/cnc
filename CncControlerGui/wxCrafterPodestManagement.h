@@ -42,6 +42,7 @@ class CncPodestManagementBase : public wxDialog
 {
 protected:
     wxPanel* m_basePanel;
+    wxPanel* m_panel9613;
     wxStaticBitmap* m_staticBitmap9569;
     wxStaticLine* m_staticLine9571;
     wxTextCtrl* m_moveRelative;
@@ -72,6 +73,7 @@ protected:
 
 public:
     wxStaticBitmap* GetStaticBitmap9569() { return m_staticBitmap9569; }
+    wxPanel* GetPanel9613() { return m_panel9613; }
     wxStaticLine* GetStaticLine9571() { return m_staticLine9571; }
     wxTextCtrl* GetMoveRelative() { return m_moveRelative; }
     wxStaticText* GetStaticText9611() { return m_staticText9611; }
