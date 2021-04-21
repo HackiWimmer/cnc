@@ -879,7 +879,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 				if ( last->HasAttribute("id") )			svgUserAgent.removeId(last->GetAttribute("id"));
 				if ( last->HasAttribute("transform") )	svgUserAgent.removeLastTransform();
 				
-				// only style attributes from <g> are collected before
+				// only style attributes are collected from <g> before
 				if ( last->GetName().IsSameAs("g", false) )
 					if ( last->HasAttribute("style") )	svgUserAgent.removeLastStyle();
 			}

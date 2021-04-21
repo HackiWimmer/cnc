@@ -149,6 +149,12 @@ void PathHandlerBase::processSpindleSpeed(double feedSpeed_U_MIN) {
 	pathListMgr.addEntrySpl(feedSpeed_U_MIN);
 }
 //////////////////////////////////////////////////////////////////
+const CncCurveLib::Point PathHandlerBase::transformCurveLibPoint(double xAbs, double yAbs) {
+//////////////////////////////////////////////////////////////////
+	//transform(xAbs, yAbs);
+	return CncCurveLib::Point(xAbs, yAbs);
+}
+//////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
 	ASSERT_PH_PARA_COUNT(2) // will return on failure
@@ -336,18 +342,16 @@ bool PathHandlerBase::processARC_2DXY(char c, unsigned int count, const double v
 	ps.sweepFlag		= (bool)values[4];
 	
 	// Note: 
-	// With respect to the svg description below the sweep flag has to be 1
-	// but this results in a wrong display regarding the svg is converted to a 
-	// right hand coordinate system.
-	// conversion: translate="transform(0,hight) scale(1,-1) - where scaleY = -1
+	// With respect to the svg description the sweep flag has to be 
+	// converted to a right hand coordinate system.
+	// conversion: translate="transform(0, hight) scale(1, -1) 
 	// changes the path direction . . . 
 	// Therefore, this has to be considered. 
-	//const int sweepFlag = THE_CONFIG->getSvgConvertToRightHandFlag() ? 0 : 1;
-	ps.sweepFlag		= convertToRightHandCoordSystem() ? !ps.sweepFlag : ps.sweepFlag;
+	//ps.sweepFlag	= convertToRightHandCoordSystem()	? !ps.sweepFlag : ps.sweepFlag;
 	
 	// additionally the following context flag is also considered here 
 	// - my be debug only
-	ps.sweepFlag		= invertPathArgSweepFlag()					 ? !ps.sweepFlag : ps.sweepFlag;
+	ps.sweepFlag	= invertPathArgSweepFlag()			? !ps.sweepFlag : ps.sweepFlag;
 	
 	return processARC_2DXY(ps);
 }

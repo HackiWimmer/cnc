@@ -55,7 +55,7 @@ bool SVGPathHandlerBase::callback(const CncCurveLib::Point& p) {
 	param.absX 					= p.x;
 	param.absY 					= p.y;
 	param.absZ 					= currentPos.getZ();
-	param.alreadyTransformed 	= true;
+	param.alreadyTransformed 	= false;//true;
 	param.alreadyRendered		= true;
 	
 	return processLinearMove(param);

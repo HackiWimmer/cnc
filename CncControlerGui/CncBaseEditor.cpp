@@ -908,12 +908,30 @@ void CncBaseEditor::prepareNewTemplateFile(CncTemplateFormat tf) {
 	ClearAll();
 	
 	if ( tf == TplSvg ) {
+		
+		// the y position content of an svg file is always adjusted to a 
+		// left hand coordinate system ( down = +y)
+		
+		const float docWidthMM		= 100.0;
+		const float docHeightMM		= 100.0;
+		const float recWidthMM		=  50.0;
+		const float recHeigthMM		=  50.0;
+		const float yRightHandVal	=  10.0;
+		const float xLeftHandVal	=  10.0;
+		const float yLeftHandVal	= docHeightMM - yRightHandVal - recHeigthMM;
+		const wxString dimDoc(wxString::Format("width=\"%.1fmm\" height=\"%.1fmm\" viewBox=\"0 0 %.1f %.1f\" ", docWidthMM, docHeightMM, docWidthMM, docHeightMM));
+		const wxString dimRec(wxString::Format("x=\"%.1f\" y=\"%.1f\" width=\"%.1lf\" height=\"%.1lf\"", xLeftHandVal, yLeftHandVal, recWidthMM, recHeigthMM));
+		
 		AppendText("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\r\n");
-		AppendText("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\r\n");
-		AppendText("\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n");
-		AppendText("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100mm\" height=\"100mm\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\r\n");
+		AppendText("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\" ");
+			AppendText("\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n");
+			
+		AppendText("<svg xmlns=\"http://www.w3.org/2000/svg\" ");
+			AppendText(dimDoc);
+			AppendText(" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\r\n");
+			
 		AppendText("<title>CNC Woodworking standard template</title>\r\n");
-		AppendText("<desc>Project XYZ</desc>\r\n");
+		AppendText("<desc>Cnc Project XYZ</desc>\r\n");
 		
 		//AppendText(SvgNodeTemplates::getSamplesAsString());
 		
@@ -921,11 +939,15 @@ void CncBaseEditor::prepareNewTemplateFile(CncTemplateFormat tf) {
 		AppendText("\t<CncParameterBlock SpeedRapid=\"R+2500\" SpeedWork=\"W+900\"/>\r\n");
 		AppendText("\t<CncParameterBlock ZDepth=\"Z-1.0\"/>\r\n");
 		AppendText("\t<CncParameterBlock Spindle=\"On\"/>\r\n");
-		AppendText("\t<rect x=\"10\" y=\"10\" width=\"50\" height=\"50\" style=\"fill:rgb(255,255,255);stroke-width:1;stroke:rgb(0,0,0)\" />\r\n");
+		AppendText("\t<rect ");
+			AppendText(dimRec);
+			AppendText(" style=\"fill:rgb(255,255,255);stroke-width:1;stroke:rgb(0,0,0)\" />\r\n");
+			
 		AppendText("\t<CncParameterBlock Spindle=\"Off\"/>\r\n");
 		AppendText("</svg>\r\n");
 		
 	} else if ( tf == TplGcode ) {
+		
 		AppendText("(<1: Programm start>)\n");
 		AppendText("G17 G40\n");
 		AppendText("G80\n");

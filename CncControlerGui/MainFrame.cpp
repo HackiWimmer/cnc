@@ -3324,17 +3324,23 @@ void MainFrame::updateMonitoring() {
 	THE_CONTEXT->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
 	THE_CONTEXT->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
 	
-	if ( isDisplayParserDetails() == false ) {
-		m_dvListCtrlSvgUAInboundPathList->DeleteAllItems();
-		m_dvListCtrlSvgUAUseDirective->DeleteAllItems();
-		m_dvListCtrlSvgUADetailInfo->DeleteAllItems();
-		
-		m_dvListCtrlSvgUAInboundPathList->Update();
-		m_dvListCtrlSvgUAUseDirective->Update();
-		m_dvListCtrlSvgUADetailInfo->Update();
-		
-		getGCodeSequenceList()->clearAll();
-	}
+	if ( isDisplayParserDetails() == false )
+		clearTemplateEditorExtViews();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::clearTemplateEditorExtViews() {
+///////////////////////////////////////////////////////////////////
+	m_svgRootNode->Clear();
+	
+	m_dvListCtrlSvgUAInboundPathList->DeleteAllItems();
+	m_dvListCtrlSvgUAUseDirective->DeleteAllItems();
+	m_dvListCtrlSvgUADetailInfo->DeleteAllItems();
+	
+	m_dvListCtrlSvgUAInboundPathList->Update();
+	m_dvListCtrlSvgUAUseDirective->Update();
+	m_dvListCtrlSvgUADetailInfo->Update();
+	
+	getGCodeSequenceList()->clearAll();
 }
 ///////////////////////////////////////////////////////////////////
 const char* MainFrame::getTemplateFormatName(const wxString& fileName) {
@@ -3543,6 +3549,9 @@ void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 	
 	// publish model type
 	prepareMotionMonitorViewType();
+	
+	// user agent & co
+	clearTemplateEditorExtViews();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::newTemplate(wxCommandEvent& event) {

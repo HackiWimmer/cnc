@@ -575,6 +575,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		double getConfiguredSpindleSpeed();
 		
+		void clearTemplateEditorExtViews();
+		
 	protected:
 	
 		void tryToSelectClientId(long clientId, ClientIdSelSource::ID tss);

@@ -221,8 +221,15 @@ void CncMonitorHSplitterWindow::showBottomWindow(bool show) {
 		
 		SetMinimumPaneSize(20);
 		
-		SetSashGravity((splitterHeight - lastBottomWindowHeight) / splitterHeight);
-		SetSashPosition(splitterHeight - lastBottomWindowHeight);
+		if ( splitterHeight > 0 ) {
+			const float gravity = std::max(0.0f, std::min((float)((splitterHeight - lastBottomWindowHeight) / splitterHeight), 1.0f));
+			SetSashGravity(gravity);
+			SetSashPosition(splitterHeight - lastBottomWindowHeight);
+		}
+		else {
+			SetSashGravity(1.0);
+			SetSashPosition(splitterHeight * 10);
+		}
 	}
 }
 
