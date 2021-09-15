@@ -2,22 +2,19 @@
 #define CNC_SVG_CONTROL_H
 
 #define WX_SVG_SUPPORT
-#define WX_WEBVIEW_SUPPORT
+#define WX_WEBVIEW_SUPPORT_XXXXX
 
-
-	#ifdef WX_SVG_SUPPORT
-		#include <wxSVG/svgctrl.h>
-		#include <wxSVG/SVGDocument.h>
-		#include <wxSVG/SVGCanvas.h>
-		#define SVG_VIEWER_CLASS_PARENT 		wxSVGCtrl
-	#else
-		#ifdef WX_WEBVIEW_SUPPORT
-			#include <wx/webview.h>
-			#define SVG_VIEWER_CLASS_PARENT 	wxWebView
-		#esle
-			#define SVG_VIEWER_CLASS_PARENT		wxPanel
-		#endif
-	#endif
+#ifdef WX_SVG_SUPPORT
+	#include <wxSVG/svgctrl.h>
+	#include <wxSVG/SVGDocument.h>
+	#include <wxSVG/SVGCanvas.h>
+	#include <CncWxSvgVersionInfo.h>
+	#define CNC_SVG_VERSIONFO 				CNC_WX_SVG_VERSIONFO
+	#define SVG_VIEWER_CLASS_PARENT 		wxSVGCtrl
+#else
+	#define CNC_SVG_VERSIONFO				"<wxPanel>"
+	#define SVG_VIEWER_CLASS_PARENT			wxPanel
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
 class CncSvgViewer : public SVG_VIEWER_CLASS_PARENT {
@@ -38,6 +35,9 @@ class CncSvgViewer : public SVG_VIEWER_CLASS_PARENT {
 		void clear();
 		void update();
 		bool loadFile(const wxString& filename, const char* contextInfo = NULL);
+		
+		// It isn't better available currently
+		static const char* versionInfo() { return CNC_SVG_VERSIONFO; }
 		
 	protected:
 		

@@ -1,5 +1,5 @@
-#include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+#include <wx/filedlg.h>
 #include "wxCrafterImages.h"
 #include "CncCommon.h"
 #include "CncContext.h"
@@ -499,7 +499,13 @@ int CncSpeedMonitor::Diagram::getFAsPx(double value) {
 ////////////////////////////////////////////////////////////////
 	const bool horztl = (orientation == DOHorizontal);
 	
-	if ( horztl )
+	if ( getVirtualMaxF() == 0.0 )
+		return 0;
+	
+	if ( plotFRange == 0 )
+		return 0;
+	
+	if ( horztl ) 
 		return plotFRange - offsetAxisF - ( value / getVirtualMaxF() * plotFRange);
 	
 	return offsetAxisF + value / getVirtualMaxF() * plotFRange;
@@ -522,7 +528,7 @@ void CncSpeedMonitor::Diagram::plotBtLf(wxGCDC& dc, const wxRect& rect) {
 	last      = last + timeOffset;
 	
 	const double v		= last->cfgF_MM_MIN.getAvg();
-	const int 	 px		= getFAsPx(v) - ( orientation == DOVertical ? offsetAxisF : 0 );
+	const int	 px		= getFAsPx(v) - ( orientation == DOVertical ? offsetAxisF : 0 );
 	
 	if ( orientation == DOHorizontal ) {
 		dc.DrawRectangle(1, px, rect.GetWidth() - 2 , rect.GetHeight() - px - 1);
@@ -541,7 +547,7 @@ void CncSpeedMonitor::Diagram::plotToRt(wxGCDC& dc, const wxRect& rect) {
 		
 	if ( points.getCount() == 0 )
 		return;
-		
+	
 	dc.SetPen			(rltPen);
 	dc.SetBrush			(rltBrush);
 	dc.SetTextForeground(rltPen.GetColour());
@@ -551,7 +557,7 @@ void CncSpeedMonitor::Diagram::plotToRt(wxGCDC& dc, const wxRect& rect) {
 	last      = last + timeOffset;
 	
 	const double v		= last->rltF_MM_MIN.getAvg();
-	const int 	 px		= getFAsPx(v) - ( orientation == DOVertical ? offsetAxisF : 0 );
+	const int	 px		= getFAsPx(v) - ( orientation == DOVertical ? offsetAxisF : 0 );
 	
 	if ( orientation == DOHorizontal ) {
 		dc.DrawRectangle(1, px, rect.GetWidth() - 2 , rect.GetHeight() - px - 1);
@@ -667,7 +673,6 @@ void CncSpeedMonitor::Diagram::plotMain(wxGCDC& dc, const wxRect& rect) {
 			if ( showCfgSpeed == true ) {
 				const int y1 = getFAsPx(itPrev->cfgF_MM_MIN.getAvg());
 				const int y2 = getFAsPx(itCurr->cfgF_MM_MIN.getAvg());
-					
 				dc.SetPen(cfgPen);
 				if ( y1 == y2 ) { dc.DrawLine(ts1, y1, ts2, y2); }
 				else			{ dc.DrawLine(ts1, y1, ts2, y1); dc.DrawLine(ts2, y1, ts2, y2); }

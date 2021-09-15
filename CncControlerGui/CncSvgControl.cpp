@@ -7,12 +7,13 @@
 #include "CncStringLogger.h"
 #include "CncSvgControl.h"
 
-BEGIN_EVENT_TABLE(CncSvgViewer, wxSVGCtrl)
+BEGIN_EVENT_TABLE(CncSvgViewer, SVG_VIEWER_CLASS_PARENT)
 	EVT_MOUSE_EVENTS(CncSvgViewer::OnMouse)
 END_EVENT_TABLE()
 
-//----------------------------------------------------------------------
 #ifdef WX_SVG_SUPPORT
+
+//----------------------------------------------------------------------
 
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::Init() {
@@ -92,14 +93,22 @@ END_EVENT_TABLE()
 		}
 	}
 	
+	/////////////////////////////////////////////////////////////////////
+	void CncSvgViewer::init() {
+	/////////////////////////////////////////////////////////////////////
+		SetFitToFrame(true);
+	}
+
+#else
+
+	/////////////////////////////////////////////////////////////////////
+	void CncSvgViewer::init() {
+	/////////////////////////////////////////////////////////////////////
+	}
+
 #endif
 //----------------------------------------------------------------------
 
-/////////////////////////////////////////////////////////////////////
-void CncSvgViewer::init() {
-/////////////////////////////////////////////////////////////////////
-	SetFitToFrame(true);
-}
 /////////////////////////////////////////////////////////////////////
 void CncSvgViewer::OnMouse(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
@@ -129,11 +138,7 @@ void CncSvgViewer::clear() {
 	#ifdef WX_SVG_SUPPORT
 		 Clear();
 	#else
-		#ifdef WX_WEBVIEW_SUPPORT
-			LoadURL("about:blank");
-		#else
-			SetToolTip(""));
-		#endif
+		SetToolTip("");
 	#endif
 }
 /////////////////////////////////////////////////////////////////////
@@ -142,11 +147,7 @@ void CncSvgViewer::update() {
 	#ifdef WX_SVG_SUPPORT
 		 Update();
 	#else
-		#ifdef WX_WEBVIEW_SUPPORT
-			LoadURL("about:blank");
-		#else
-			SetToolTip(""));
-		#endif
+		SetToolTip("");
 	#endif
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -174,12 +175,8 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 			return ret;
 		}
 	#else
-		#ifdef WX_WEBVIEW_SUPPORT
-			return LoadURL(filename);
-		#else
-			SetToolTip(wxString::Format("wxPanel: Can't display %s", filename));
-			return false;
-		#endif
+		SetToolTip(wxString::Format("wxPanel: Can't display %s", filename));
+		return false;
 	#endif
 }
 

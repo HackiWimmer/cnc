@@ -1,76 +1,130 @@
 # --------------------------------------------------------------------------------
-# This file try collects some build info around this project and its dependencies 
+# This file try to collect some build info around this project and its dependencies 
 #  - no guarantee of completeness.
 # Furthermore, this file is continuous under construction
 # --------------------------------------------------------------------------------
 
 # --------------------------------------------------------------------------------
+# wxWidgets: Add gcode lexer to wx
+# use previous wx release as a templete (search gcode and copy found parts)
+# --------------------------------------------------------------------------------
+
+	modify <wxWidgets-?.?.?>\build\msw\makefile.gcc					- add gcode parts
+	modify <wxWidgets-?.?.?>\include\wx\stcstc.h					- add gcode parts
+	modify <wxWidgets-?.?.?>\src\stc\scintilla\src\Catalog.cxx		- add gcode parts
+	modify <wxWidgets-?.?.?>\src\stc\scintilla\include\SciLexer.h	- add gcode parts
+
+	copy <prev> to <wxWidgets-?.?.?>\src\stc\scintilla\lexers\LexGCode.cxx
+ 
+ 
+# --------------------------------------------------------------------------------
 # windows: building wx with mingw
- # open a cmd batch window or a Git Batch window
+# Its used to 
+#  - support a build environment for Codelite
+#  - provide a run-time environment
+# --------------------------------------------------------------------------------
 
- # may be try this before
- which g++
- g++ -v
- 
- # modify Scintilla lexer on demand
+	# open a cmd batch window or a Git Batch window
 
- # build ...
- cd <wxDir>/build/msw
- mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release clean
- mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release 
- 
- # Important environment variables:
- # - in particular WXWIN controls the used (build env) version
- WXCFG		gcc_dll\mswu
- WXWIN		<wxDir>
- PATH		... <wx DLL Dir> ...
+	# may be try this before
+	which g++
+	g++ -v
+
+	# modify Scintilla lexer on demand
+
+	# build ...
+	cd <wxDir>/build/msw
+
+	# may be: (Under some circumstances, while compiling on multiple cores, you may receive compilation error at the very beginning about missing setup.h file. 
+	# To overcome this issue, generate this file first with setup_h tag at the end of build parameters: )
+	mingw32-make -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release setup_h
+
+	mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release clean
+	mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release 
+
+	# Important environment variables:
+	# - in particular WXWIN controls the used (build env) version
+	WXCFG		gcc_dll\mswu
+	WXWIN		<wxDir>
+	PATH		... <wx DLL Dir> ...
 
 
 # --------------------------------------------------------------------------------
 # msys2: building wx 
- # open MSys2 gui/env
- 
- #may be try this before
- which g++
- g++ -v
+# Its used to 
+#  - support a build environment for wxSvg
+# --------------------------------------------------------------------------------
 
- # modify Scintilla lexer on demand
- 
- # build ...
- mkdir <wxDir>/build/mysy2
- cd <wxDir>/build/mysy2
- ../../configure
- make clean
- make -j4
- make install
- 
+	# open MSys2 gui/env
+
+	#may be try this before
+	which g++
+	g++ -v
+
+	# modify Scintilla lexer on demand
+
+	# build ...
+	mkdir <wxDir>/build/mysy2
+	cd <wxDir>/build/mysy2
+	../../configure
+
+	#if a GCode Lexer added
+	# use previous wx release as a templete (search gcode and copy found parts)
+	modify <wxWidgets-?.?.?>\build\msys2\Makefile		- add gcode parts
+
+	make clean
+	make -j4
+	make install
+
 # --------------------------------------------------------------------------------
 # windows: building wx samples with mingw
+# --------------------------------------------------------------------------------
  
- # same as descibed for the wx lib above, but with the samples dir
- 
- cd <wxDir>/build/samples
- mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release clean
- mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release 
-  
+	# same as descibed for the wx lib above, but with the samples dir
+
+	cd <wxDir>/build/samples
+
+	# may be: (Under some circumstances, while compiling on multiple cores, you may receive compilation error at the very beginning about missing setup.h file. 
+	# To overcome this issue, generate this file first with setup_h tag at the end of build parameters: )
+	mingw32-make -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release setup_h
+
+	mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release clean
+	mingw32-make -j4 -f makefile.gcc SHARED=1 UNICODE=1 BUILD=release 
+
+
 # --------------------------------------------------------------------------------
 # windows: building opencv
- mkdir <opencvDir>/mingwbuild
- 
- # Open a CMake Gui
- #  source dir = <opencvDir>/source
- #  build dir <opencvDir>/mingwbuild
- 
- cd <opencvDir>/mingwbuild
- cmake .
- 
- 
+# Its used to support a camera interface
 # --------------------------------------------------------------------------------
-# windows: building wxsvg
 
- # As I remember this was very hard with a lot of dependencies 
- # - unfortunately currently no more infoas available
- #
- # TODO repeat and describe
- 
+	mkdir <opencvDir>/mingwbuild
+
+	# Open a CMake Gui
+	#  source dir = <opencvDir>/source
+	#  build dir <opencvDir>/mingwbuild
+
+	cd <opencvDir>/mingwbuild
+	cmake .
+
+
+# --------------------------------------------------------------------------------
+# msys2: building wxsvg
+#  There is no known windows build environment available for this library.
+#  Therefore, a mysy2 build is necessary. 
+#  It was very hard to provide a lot of dependencies, like:
+#   - libcairo
+#   - libavutil
+#   - libavformat
+#   - libavcodec
+#   - libxvidcore
+#   - libexpat
+#   - libexif
+#   - libswscale
+# --------------------------------------------------------------------------------
+
+	cd <wxSVGDir>
+	configure
+	make
+	make install
+
  

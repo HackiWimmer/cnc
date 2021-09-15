@@ -1463,8 +1463,7 @@ void MainFrame::traceWxWidgetsVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceWxSvgVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
-	// It isn't better available currently
-	out << "1.5.21";
+	out << CncSvgViewer::versionInfo();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceBoostVersion(std::ostream& out) {

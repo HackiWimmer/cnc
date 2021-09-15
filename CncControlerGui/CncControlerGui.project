@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="CncControllerGui" InternalType="GUI" Version="11000">
+  <VirtualDirectory Name="@ini">
+    <File Name="CncControllerLruStore.ini"/>
+    <File Name="CncController.ini"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="@hints">
+    <File Name="../Common howto hints.txt"/>
+    <File Name="../Common build hints.txt"/>
+  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
@@ -116,6 +124,14 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="StcLexer ">
+      <VirtualDirectory Name="wx3.1.5">
+        <File Name="../../../../wxWidgets-3.1.5/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.5/src/stc/scintilla/lexers/LexHTML.cxx" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.5/build/msw/makefile.gcc" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.5/include/wx/stc/stc.h" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.5/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.5/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release;"/>
+      </VirtualDirectory>
       <VirtualDirectory Name="wx3.1.2">
         <File Name="../../../../wxWidgets-3.1.2/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;Gprof;"/>
         <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Debug;Release;Gprof;"/>
@@ -645,11 +661,7 @@
     <File Name="wxCrafterImages.wxcp"/>
     <File Name="wxCrafterGamePort.wxcp"/>
     <File Name="wxCrafterContextObserver.wxcp"/>
-    <File Name="win_resources.rc" ExcludeProjConfig=""/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="Config">
-    <File Name="Commands1.txt"/>
-    <File Name="../Todos and known issues.txt"/>
+    <File Name="win_resources.rc" ExcludeProjConfig="Release;"/>
   </VirtualDirectory>
   <VirtualDirectory Name="UnitTests">
     <VirtualDirectory Name="Tests">
@@ -830,9 +842,9 @@
     <Configuration Name="Release" CompilerType="MinGW 64bit ( MSYS2 64bit )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g1;-fpic;-O3;-std=c++2a;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="C:/@Development/boost_1_71_0"/>
+        <IncludePath Value="C:/@Development/boost_1_77_0"/>
         <IncludePath Value="C:/msys64/mingw64/include"/>
-        <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.22/include"/>
         <IncludePath Value="C:/@Development/opencv/build/include"/>
         <IncludePath Value="C:/@Development/openvg"/>
         <Preprocessor Value="NDEBUG"/>
@@ -841,6 +853,7 @@
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
         <LibraryPath Value="."/>
+        <LibraryPath Value="C:/@Development/wxWidgets-3.1.5/lib/gcc_dll"/>
         <LibraryPath Value="C:/msys64/mingw64/lib"/>
         <LibraryPath Value="C:/@Development/opencv/mingwbuild/lib"/>
         <Library Value="libwxmsw31u_stc"/>
@@ -864,6 +877,8 @@
         <Library Value="strmiids"/>
         <Library Value="glu32"/>
         <Library Value="glew32"/>
+        <Library Value="ole32"/>
+        <Library Value="oleaut32"/>
         <Library Value="freeglut"/>
         <Library Value="Xinput9_1_0"/>
         <Library Value="libopencv_core451"/>
@@ -889,9 +904,10 @@
         <Command Enabled="yes">g++ -v</Command>
         <Command Enabled="yes">echo %WXWIN%</Command>
         <Command Enabled="yes">where g++</Command>
-        <Command Enabled="yes"/>
       </PreBuild>
-      <PostBuild/>
+      <PostBuild>
+        <Command Enabled="yes">copy "C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\Release\CncControllerGui.exe" c:\temp</Command>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>

@@ -4,11 +4,13 @@
   <WorkspaceParserPaths/>
   <Project Name="CncControllerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
   <Project Name="CncControllerTest" Path="CncControllerTest/CncControllerTest.project" Active="No"/>
+  <Project Name="EnvSetupTest" Path="EnvSetupTest/EnvSetupTest.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="CncControllerGui" ConfigName="Release"/>
       <Project Name="CncControllerTest" ConfigName="Release"/>
+      <Project Name="EnvSetupTest" ConfigName="Release"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
@@ -19,11 +21,13 @@
       <Project Name="NavigatorPanel" ConfigName="Debug"/>
       <Project Name="wxWidgetsTest" ConfigName="Debug"/>
       <Project Name="CncControllerTest" ConfigName="Debug"/>
+      <Project Name="EnvSetupTest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Gprof" Selected="yes">
       <Environment/>
       <Project Name="CncControllerGui" ConfigName="Release"/>
       <Project Name="CncControllerTest" ConfigName="Debug"/>
+      <Project Name="EnvSetupTest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>
