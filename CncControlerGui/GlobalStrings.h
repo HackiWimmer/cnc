@@ -4,9 +4,25 @@
 #include "wx/string.h"
 #include "Version.h"
 
+// ----------------------------------------------------------------
+// do this here (outside of Version.h) to have full wxString support
+
+	#define CNC_VERSION_MAJOR_STR   wxString::Format("%d", CNC_VERSION_MAJOR_NUM)
+	#define CNC_VERSION_MINOR_STR   wxString::Format("%d", CNC_VERSION_MINOR_NUM)
+	#define CNC_VERSION_INDEX_STR   wxString::Format("%d", CNC_VERSION_INDEX_NUM)
+	#define CNC_VERSION_BUILD_STR   wxString::Format("%d", CNC_VERSION_BUILD_NUM)
+
+	#define CNC_VERSION_STR         wxString::Format("%d.%d.%d (%d)", \
+									CNC_VERSION_MAJOR_NUM, \
+									CNC_VERSION_MINOR_NUM, \
+									CNC_VERSION_INDEX_NUM, \
+									CNC_VERSION_BUILD_NUM)
+// ----------------------------------------------------------------
+
+
 ////////////////////////////////////////////////////////////////////
 namespace VersionInfo {
-
+	
 	const wxString major			= CNC_VERSION_MAJOR_STR;
 	const wxString minor			= CNC_VERSION_MINOR_STR;
 	const wxString index			= CNC_VERSION_INDEX_STR;

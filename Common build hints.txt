@@ -126,5 +126,15 @@
 	configure
 	make
 	make install
+	
+	# provide enhanced veriosn infomation by the following file: 
+	<wxSVGDir>/include/CncWxSvgVersionInfo.h
+	
+	Content:{
+		#ifndef CNC_WX_SVG_VERSION_INFO
+		#define CNC_WX_SVG_VERSION_INFO
+			#define CNC_WX_SVG_VERSIONFO "?.?.??"
+		#endif
+	}
 
  

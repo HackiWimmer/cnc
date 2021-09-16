@@ -38,7 +38,7 @@ MainDialogBaseClass::MainDialogBaseClass(wxWindow* parent, wxWindowID id, const 
     flexGridSizer46->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer46->AddGrowableCol(0);
     flexGridSizer46->AddGrowableRow(0);
-    flexGridSizer46->SetMinSize(500,300);
+    flexGridSizer46->SetMinSize(500,800);
     this->SetSizer(flexGridSizer46);
     
     wxFlexGridSizer* flexGridSizer31 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -49,13 +49,13 @@ MainDialogBaseClass::MainDialogBaseClass(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer46->Add(flexGridSizer31, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_listbook68 = new wxListbook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLB_DEFAULT|wxBK_DEFAULT);
-    m_listbook68->SetName(wxT("m_listbook68"));
+    m_choicebook74 = new wxChoicebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_choicebook74->SetName(wxT("m_choicebook74"));
     
-    flexGridSizer31->Add(m_listbook68, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer31->Add(m_choicebook74, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_panel35 = new wxPanel(m_listbook68, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook68, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_listbook68->AddPage(m_panel35, _("Version"), false);
+    m_panel35 = new wxPanel(m_choicebook74, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_choicebook74, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_choicebook74->AddPage(m_panel35, _("Version"), true);
     
     wxFlexGridSizer* flexGridSizer17 = new wxFlexGridSizer(4, 2, 0, 0);
     flexGridSizer17->SetFlexibleDirection( wxBOTH );
@@ -94,8 +94,8 @@ MainDialogBaseClass::MainDialogBaseClass(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer17->Add(m_wxSvgVersionInfo, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_panel37 = new wxPanel(m_listbook68, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook68, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_listbook68->AddPage(m_panel37, _("wxSvg"), false);
+    m_panel37 = new wxPanel(m_choicebook74, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_choicebook74, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_choicebook74->AddPage(m_panel37, _("wxSvg"), false);
     
     wxFlexGridSizer* flexGridSizer43 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer43->SetFlexibleDirection( wxBOTH );
@@ -106,14 +106,14 @@ MainDialogBaseClass::MainDialogBaseClass(wxWindow* parent, wxWindowID id, const 
     
     m_wxSvgParent = new wxPanel(m_panel37, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel37, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    flexGridSizer43->Add(m_wxSvgParent, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer43->Add(m_wxSvgParent, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     m_wxSvgParent->SetMinSize(wxSize(100,100));
     
-    m_panel39 = new wxPanel(m_listbook68, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook68, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_listbook68->AddPage(m_panel39, _("OpenGl"), false);
+    m_panel39 = new wxPanel(m_choicebook74, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_choicebook74, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_choicebook74->AddPage(m_panel39, _("OpenGl"), false);
     
-    m_panel41 = new wxPanel(m_listbook68, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook68, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_listbook68->AddPage(m_panel41, _("OpenCV"), false);
+    m_panel41 = new wxPanel(m_choicebook74, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_choicebook74, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_choicebook74->AddPage(m_panel41, _("OpenCV"), false);
     
     m_staticLine15 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -133,7 +133,7 @@ MainDialogBaseClass::MainDialogBaseClass(wxWindow* parent, wxWindowID id, const 
     boxSizer12->Add(m_buttonCancel, 0, wxALL, WXC_FROM_DIP(5));
     
     SetName(wxT("MainDialogBaseClass"));
-    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
+    SetSize(wxDLG_UNIT(this, wxSize(500,800)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

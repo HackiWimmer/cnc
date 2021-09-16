@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="CncControllerGui" InternalType="GUI" Version="11000">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
+    </Plugin>
+  </Plugins>
   <VirtualDirectory Name="@ini">
     <File Name="CncControllerLruStore.ini"/>
     <File Name="CncController.ini"/>
@@ -8,11 +13,6 @@
     <File Name="../Common howto hints.txt"/>
     <File Name="../Common build hints.txt"/>
   </VirtualDirectory>
-  <Plugins>
-    <Plugin Name="qmake">
-      <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
-    </Plugin>
-  </Plugins>
   <Reconciliation>
     <Regexes/>
     <Excludepaths/>
@@ -661,7 +661,7 @@
     <File Name="wxCrafterImages.wxcp"/>
     <File Name="wxCrafterGamePort.wxcp"/>
     <File Name="wxCrafterContextObserver.wxcp"/>
-    <File Name="win_resources.rc" ExcludeProjConfig="Release;"/>
+    <File Name="win_resources.rc" ExcludeProjConfig=""/>
   </VirtualDirectory>
   <VirtualDirectory Name="UnitTests">
     <VirtualDirectory Name="Tests">
@@ -886,7 +886,7 @@
         <Library Value="libopencv_videoio451"/>
         <Library Value="libopencv_highgui451"/>
       </Linker>
-      <ResourceCompiler Options="$(shell wx-config --rcflags);-D NDEBUG;" Required="no"/>
+      <ResourceCompiler Options="$(shell wx-config --rcflags );-D NDEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="$(ConfigurationName)" Command="$(OutputFile)" CommandArguments="" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">

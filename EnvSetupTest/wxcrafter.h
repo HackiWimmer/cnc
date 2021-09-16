@@ -14,7 +14,7 @@
 #include <wx/iconbndl.h>
 #include <wx/artprov.h>
 #include <wx/sizer.h>
-#include <wx/listbook.h>
+#include <wx/choicebk.h>
 #include <wx/panel.h>
 #include <wx/imaglist.h>
 #include <wx/stattext.h>
@@ -40,7 +40,7 @@
 class MainDialogBaseClass : public wxDialog
 {
 protected:
-    wxListbook* m_listbook68;
+    wxChoicebook* m_choicebook74;
     wxPanel* m_panel35;
     wxStaticText* m_staticText21;
     wxStaticText* m_wxVersionInfo;
@@ -75,11 +75,11 @@ public:
     wxPanel* GetPanel37() { return m_panel37; }
     wxPanel* GetPanel39() { return m_panel39; }
     wxPanel* GetPanel41() { return m_panel41; }
-    wxListbook* GetListbook68() { return m_listbook68; }
+    wxChoicebook* GetChoicebook74() { return m_choicebook74; }
     wxStaticLine* GetStaticLine15() { return m_staticLine15; }
     wxButton* GetButtonOK() { return m_buttonOK; }
     wxButton* GetButtonCancel() { return m_buttonCancel; }
-    MainDialogBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Dialog"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    MainDialogBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Dialog"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,800), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxFULL_REPAINT_ON_RESIZE);
     virtual ~MainDialogBaseClass();
 };
 

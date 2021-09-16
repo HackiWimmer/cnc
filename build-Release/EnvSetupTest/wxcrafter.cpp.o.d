@@ -136,13 +136,17 @@
  C:/@Development/wxWidgets-3.1.5/include/wx/panel.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/msw/panel.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/sizer.h \
- C:/@Development/wxWidgets-3.1.5/include/wx/listbook.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/choicebk.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/bookctrl.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/control.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/msw/control.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/withimages.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/notebook.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/msw/notebook.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/choice.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/ctrlsub.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/msw/ctrlsub.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/msw/choice.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/stattext.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/msw/stattext.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/statline.h \
@@ -438,7 +442,7 @@ C:/@Development/wxWidgets-3.1.5/include/wx/msw/panel.h:
 
 C:/@Development/wxWidgets-3.1.5/include/wx/sizer.h:
 
-C:/@Development/wxWidgets-3.1.5/include/wx/listbook.h:
+C:/@Development/wxWidgets-3.1.5/include/wx/choicebk.h:
 
 C:/@Development/wxWidgets-3.1.5/include/wx/bookctrl.h:
 
@@ -451,6 +455,14 @@ C:/@Development/wxWidgets-3.1.5/include/wx/withimages.h:
 C:/@Development/wxWidgets-3.1.5/include/wx/notebook.h:
 
 C:/@Development/wxWidgets-3.1.5/include/wx/msw/notebook.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/choice.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/ctrlsub.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/msw/ctrlsub.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/msw/choice.h:
 
 C:/@Development/wxWidgets-3.1.5/include/wx/stattext.h:
 

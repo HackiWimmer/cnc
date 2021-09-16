@@ -1317,8 +1317,7 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logWarningMessage("Test function 3");
 	
-	THE_CONTEXT->anchorMap;
-	
+	std::cout << RC_FILEVERSION_STR << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {

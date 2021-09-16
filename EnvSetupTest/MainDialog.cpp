@@ -87,6 +87,8 @@ void MainDialog::onInitDialog(wxInitDialogEvent& event) {
 	}
 	
 	svgCtrl = new wxSVGCtrl(m_wxSvgParent);
-	svgCtrl->SetFitToFrame(true);
+	//svgCtrl->SetFitToFrame(true);
+	svgCtrl->SetClientSize(m_wxSvgParent->GetClientSize() - wxSize(5,5));
 	svgCtrl->Load("C:\\@Development\\@Projekte\\c++\\CNCGuiController\\EnvSetupTest\\car.svg");
+	
 }

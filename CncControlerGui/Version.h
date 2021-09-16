@@ -1,7 +1,13 @@
 #ifndef VERSION_H
 #define VERSION_H
 	
-	#include <wx/string.h>
+	// -----------------------------------------------------------------------------------------------------------------
+	// define the CNC program version here:
+	// the rest appears automatically
+	#define CNC_VERSION_MAJOR_VAL    0
+	#define CNC_VERSION_MINOR_VAL    9
+	#define CNC_VERSION_INDEX_VAL    0
+	// -----------------------------------------------------------------------------------------------------------------
 	
 	#define STR_HELPER(x) #x
 	#define STR(x) STR_HELPER(x)
@@ -73,9 +79,9 @@
 	const unsigned int CNC_BUILD_MIN_INT        = BUILD_MIN;
 	const unsigned int CNC_BUILD_SEC_INT        = BUILD_SEC;
 	
-	const unsigned int CNC_VERSION_MAJOR_NUM    =  0;
-	const unsigned int CNC_VERSION_MINOR_NUM    =  8;
-	const unsigned int CNC_VERSION_INDEX_NUM    =  9;
+	const unsigned int CNC_VERSION_MAJOR_NUM    =  CNC_VERSION_MAJOR_VAL;
+	const unsigned int CNC_VERSION_MINOR_NUM    =  CNC_VERSION_MINOR_VAL;
+	const unsigned int CNC_VERSION_INDEX_NUM    =  CNC_VERSION_INDEX_VAL;
 	const unsigned int CNC_VERSION_BUILD_NUM    = CNC_BUILD_YEAR_INT
 	                                            + CNC_BUILD_MONTH_INT  * 12
 	                                            + CNC_BUILD_DAY_INT    * 31
@@ -84,33 +90,22 @@
 	                                            + CNC_BUILD_SEC_INT    * 60
 	                                            ;
 	
-	#define CNC_VERSION_MAJOR_STR               wxString::Format("%d", CNC_VERSION_MAJOR_NUM)
-	#define CNC_VERSION_MINOR_STR               wxString::Format("%d", CNC_VERSION_MINOR_NUM)
-	#define CNC_VERSION_INDEX_STR               wxString::Format("%d", CNC_VERSION_INDEX_NUM)
-	#define CNC_VERSION_BUILD_STR               wxString::Format("%d", CNC_VERSION_BUILD_NUM)
-
 	#define CNC_COMPANY_STR                     "Hacki Wimmer"
 	#define CNC_DESCRIPTION_STR                 "Woodworking CNC Controller"
 	#define CNC_COPYRIGHT_STR                   "invented by Hacki Wimmer 2016 - 2021"
 	#define CNC_PROGNAME_STR                    "CncControllerGui.exe"
 	#define CNC_PRODUCTNAME_STR                 CNC_DESCRIPTION_STR
 	
-	#define CNC_VERSION_STR                     wxString::Format("%d.%d.%d.%d", \
-	                                            CNC_VERSION_MAJOR_NUM, \
-	                                            CNC_VERSION_MINOR_NUM, \
-	                                            CNC_VERSION_INDEX_NUM, \
-	                                            CNC_VERSION_BUILD_NUM)
-	
 	#define RC_COMPANY_STR                      CNC_COMPANY_STR      "\0"
 	#define RC_DESCRIPTION_STR                  CNC_DESCRIPTION_STR  "\0"
 	#define RC_COPYRIGHT_STR                    CNC_COPYRIGHT_STR    "\0"
 	#define RC_PROGNAME_STR                     CNC_PROGNAME_STR     "\0"
 	#define RC_PRODUCTNAME_STR                  CNC_PRODUCTNAME_STR  "\0"
-
-	#define RC_FILEVERSION                      CNC_VERSION_MAJOR_NUM,CNC_VERSION_MINOR_NUM,CNC_VERSION_INDEX_NUM,CNC_VERSION BUILD_INT
-	#define RC_FILEVERSION_STR                  CNC_VERSION_STR 
 	
-	#define RC_PRODUCTVERSION                   CNC_VERSION_MAJOR_NUM,CNC_VERSION_MINOR_NUM,CNC_VERSION_INDEX_NUM,CNC_VERSION_BUILD_INT
-	#define RC_PRODUCTVERSION_STR               CNC_VERSION_STR
+	#define RC_FILEVERSION                      CNC_VERSION_MAJOR_VAL,CNC_VERSION_MINOR_VAL,CNC_VERSION_INDEX_VAL
+	#define RC_PRODUCTVERSION                   CNC_VERSION_MAJOR_VAL,CNC_VERSION_MINOR_VAL,CNC_VERSION_INDEX_VAL
+	
+	#define RC_FILEVERSION_STR                  "" STR(CNC_VERSION_MAJOR_VAL) "." STR(CNC_VERSION_MINOR_VAL) "." STR(CNC_VERSION_INDEX_VAL)
+	#define RC_PRODUCTVERSION_STR               RC_FILEVERSION_STR
 
 #endif // VERSION_H
