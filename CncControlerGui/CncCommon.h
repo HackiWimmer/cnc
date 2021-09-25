@@ -360,6 +360,15 @@ class SecureLeftBookSelection {
 };
 
 //-----------------------------------------------------------------
+class SecurePrefiewBookSelection {
+	public:
+		enum VAL {
+			LEFT_PREVIEW			= 0,
+			RIGHT_PREVIEW			= 1
+		};
+};
+
+//-----------------------------------------------------------------
 class CncPathListManager;
 namespace Trigger {
 	

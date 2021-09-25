@@ -16,6 +16,7 @@ class CncLoggerView : public CncLoggerViewBase {
 		
 		bool doShowLoggerOnCommand() const	{ return m_btLoggerOnDemand->GetValue(); }
 		void setShowOnDemandState(bool s)	{ m_btLoggerOnDemand->SetValue(s); }
+		void setSecureMode(bool state);
 		
 		void enable(bool state);
 		void enableListCtrlsOnly(bool state);

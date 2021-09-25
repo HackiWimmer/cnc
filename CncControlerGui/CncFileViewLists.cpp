@@ -33,15 +33,15 @@ wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
 CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms, long style)
-: CncLargeScaledListCtrl(parent, style)
-, lruList()
-, eventTimer(new wxTimer())
-, defaultItemAttr()
-, selectedItemAttr()
-, popupMenu(NULL)
-, isLeaveEventActive(true)
-, maxSize(ms)
-, lastEventType(EventType::UNKNOWN)
+: CncLargeScaledListCtrl	(parent, style)
+, lruList					()
+, eventTimer				(new wxTimer())
+, defaultItemAttr			()
+, selectedItemAttr			()
+, popupMenu					(NULL)
+, isLeaveEventActive		(true)
+, maxSize					(ms)
+, lastEventType				(EventType::UNKNOWN)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -50,20 +50,11 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::REVERSE);
 	
-	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+	wxFont font(smallFontSize, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxColour(32, 32, 32));
-	SetTextColour(wxColour(255, 255, 255));
-	
-	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
-	defaultItemAttr.SetFont(font);
-	defaultItemAttr.SetTextColour(GetTextColour());
-	
-	selectedItemAttr 	= defaultItemAttr;
-	selectedItemAttr	.SetTextColour(wxColour(255, 242,   0));
-	selectedItemAttr	.SetFont(font.Bold());
-	
+	setBigTheme(false);
+
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
 	imageList->Add(ImageLibFile().Bitmap("BMP_LRU_FILE"));
@@ -106,6 +97,37 @@ CncLruFileViewListCtrl::~CncLruFileViewListCtrl() {
 	
 	eventTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncLruFileViewListCtrl::onEventTimer), NULL, this);
 	wxDELETE( eventTimer );
+}
+/////////////////////////////////////////////////////////////
+void CncLruFileViewListCtrl::setBigTheme(bool big) {
+/////////////////////////////////////////////////////////////
+	const int size = big ? bigFontSize : smallFontSize;
+	
+	const wxColour tc = big ? wxColour(32,   32,  32) : wxColour(255, 255, 255);
+	const wxColour bc = big ? wxColour(255, 255, 255) : wxColour( 32,  32,  32);
+	const wxColour sc = big ? wxColour(255, 128, 128) : wxColour(255, 242,   0);
+	
+	{
+		wxFont font(GetFont());
+		font.SetPointSize(size);
+		SetFont(font);
+		SetTextColour(tc);
+		SetBackgroundColour(bc);
+	}
+	{
+		wxFont font(defaultItemAttr.GetFont());
+		font.SetPointSize(size);
+		defaultItemAttr.SetFont(font);
+		defaultItemAttr.SetTextColour(GetTextColour());
+		defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
+	}
+	{
+		wxFont font(selectedItemAttr.GetFont());
+		font.SetPointSize(size);
+		selectedItemAttr.SetFont(font);
+		selectedItemAttr.SetTextColour(sc);
+		selectedItemAttr.SetBackgroundColour(GetBackgroundColour());
+	}
 }
 /////////////////////////////////////////////////////////////
 int CncLruFileViewListCtrl::OnGetItemColumnImage(long item, long column) const {
@@ -483,11 +505,12 @@ wxEND_EVENT_TABLE()
 /////////////////////////////////////////////////////////////
 CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
-, fileEntries()
-, eventTimer(new wxTimer())
-, defaultItemAttr()
-, selectedItemAttr()
-, lastEventType(EventType::UNKNOWN)
+, fileEntries		()
+, eventTimer		(new wxTimer())
+, defaultItemAttr	()
+, selectedItemAttr	()
+, lastEventType		(EventType::UNKNOWN)
+, caller			(NULL)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -499,16 +522,10 @@ CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
+	setBigTheme(false);
+	
 	SetBackgroundColour(wxColour(32, 32, 32));
 	SetTextColour(wxColour(255, 255, 255));
-	
-	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
-	defaultItemAttr.SetFont(font);
-	defaultItemAttr.SetTextColour(GetTextColour());
-	
-	selectedItemAttr 	= defaultItemAttr;
-	selectedItemAttr	.SetTextColour(wxColour(255, 242,   0));
-	selectedItemAttr	.SetFont(font.Bold());
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
@@ -532,6 +549,37 @@ CncFileViewListCtrl::~CncFileViewListCtrl() {
 	
 	eventTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncFileViewListCtrl::onEventTimer), NULL, this);
 	wxDELETE( eventTimer );
+}
+/////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::setBigTheme(bool big) {
+/////////////////////////////////////////////////////////////
+	const int size = big ? bigFontSize : smallFontSize;
+	
+	const wxColour tc = big ? wxColour(32,   32,  32) : wxColour(255, 255, 255);
+	const wxColour bc = big ? wxColour(255, 255, 255) : wxColour( 32,  32,  32);
+	const wxColour sc = big ? wxColour(255, 128, 128) : wxColour(255, 242,   0);
+	
+	{
+		wxFont font(GetFont());
+		font.SetPointSize(size);
+		SetFont(font);
+		SetTextColour(tc);
+		SetBackgroundColour(bc);
+	}
+	{
+		wxFont font(defaultItemAttr.GetFont());
+		font.SetPointSize(size);
+		defaultItemAttr.SetFont(font);
+		defaultItemAttr.SetTextColour(GetTextColour());
+		defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
+	}
+	{
+		wxFont font(selectedItemAttr.GetFont());
+		font.SetPointSize(size);
+		selectedItemAttr.SetFont(font);
+		selectedItemAttr.SetTextColour(sc);
+		selectedItemAttr.SetBackgroundColour(GetBackgroundColour());
+	}
 }
 /////////////////////////////////////////////////////////////////////
 bool CncFileViewListCtrl::isItemValid(long item) const {
@@ -629,11 +677,10 @@ void CncFileViewListCtrl::onSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncFileViewListCtrl::onLeaveWindow(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	CncFileView* fv = static_cast<CncFileView*>(GetParent());
-	if ( fv == NULL )
+	if ( caller == NULL )
 		return;
-	
-	fv->fileListLeave(event);
+		
+	caller->fileListLeave(event);
 }
 /////////////////////////////////////////////////////////////////////
 void CncFileViewListCtrl::onSelectListItem(wxListEvent& event) {
@@ -666,14 +713,13 @@ void CncFileViewListCtrl::onActivateListItem(wxListEvent& event) {
 void CncFileViewListCtrl::onEventTimer(wxTimerEvent& event) { 
 //////////////////////////////////////////////////////////////
 	CFVL_PRINT_LOCATION_CTX_FILE
-
-	CncFileView* fv = static_cast<CncFileView*>(GetParent());
-	if ( fv == NULL )
+	
+	if ( caller == NULL )
 		return;
 		
 	switch ( lastEventType ) {
-		case EventType::PREVIEW:	fv->fileListSelected(getLastSelection()); 	break;
-		case EventType::OPEN:		fv->fileListActivated(getLastSelection());	break;
+		case EventType::PREVIEW:	caller->fileListSelected(getLastSelection()); 	break;
+		case EventType::OPEN:		caller->fileListActivated(getLastSelection());	break;
 		default:					;
 	}
 	

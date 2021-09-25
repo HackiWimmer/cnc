@@ -31,6 +31,19 @@ CncLoggerView::~CncLoggerView() {
 	wxDELETE( traceCtrl );
 	wxDELETE( traceInfoBar );
 }
+/////////////////////////////////////////////////////////////////
+void CncLoggerView::setSecureMode(bool state) {
+/////////////////////////////////////////////////////////////////
+	if ( state == true ) {
+		m_btLoggerOnDemand->Hide();
+		setShowOnDemandState(false);
+	}
+	else {
+		m_btLoggerOnDemand->Show();
+		setShowOnDemandState(doShowLoggerOnCommand());
+	}
+	Layout();
+}
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::select(LoggerSelection::VAL id) {
 /////////////////////////////////////////////////////////////////////
@@ -226,13 +239,14 @@ void CncLoggerView::onSave(wxCommandEvent& event) {
 											 );
 	const wxFileName fn(fileName);
 	
-	loggerLists.at(currentLoggerIndex)->writeToFile(fn);
-	if ( fn.Exists() ) {
-		 
-		wxString tool;
-		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
-		
-		GblFunc::executeExternalProgram(tool, fileName, true);
+	if ( loggerLists.at(currentLoggerIndex)->writeToFile(fn) ) {
+		if ( fn.Exists() ) {
+			 
+			wxString tool;
+			CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+			
+			GblFunc::executeExternalProgram(tool, fileName, true);
+		}
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -248,12 +262,12 @@ void CncLoggerView::saveAll(bool doOpen) {
 											 );
 	const wxFileName fn(fileName);
 	
-	loggerLists.at(currentLoggerIndex)->writeToFile(fn, true);
-	
-	if ( doOpen && fn.Exists() ) {
-		wxString tool;
-		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
-		GblFunc::executeExternalProgram(tool, fileName, true);
+	if ( loggerLists.at(currentLoggerIndex)->writeToFile(fn, true) ) {
+		if ( doOpen && fn.Exists() ) {
+			wxString tool;
+			CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+			GblFunc::executeExternalProgram(tool, fileName, true);
+		}
 	}
 }
 /////////////////////////////////////////////////////////////////////

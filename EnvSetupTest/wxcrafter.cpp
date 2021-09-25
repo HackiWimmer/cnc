@@ -115,6 +115,24 @@ MainDialogBaseClass::MainDialogBaseClass(wxWindow* parent, wxWindowID id, const 
     m_panel41 = new wxPanel(m_choicebook74, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_choicebook74, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_choicebook74->AddPage(m_panel41, _("OpenCV"), false);
     
+    m_panel163 = new wxPanel(m_choicebook74, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_choicebook74, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_choicebook74->AddPage(m_panel163, _("COM Scan"), true);
+    
+    wxFlexGridSizer* flexGridSizer165 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer165->SetFlexibleDirection( wxBOTH );
+    flexGridSizer165->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer165->AddGrowableCol(0);
+    flexGridSizer165->AddGrowableRow(1);
+    m_panel163->SetSizer(flexGridSizer165);
+    
+    m_button167 = new wxButton(m_panel163, wxID_ANY, _("Scan"), wxDefaultPosition, wxDLG_UNIT(m_panel163, wxSize(-1,-1)), 0);
+    
+    flexGridSizer165->Add(m_button167, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_comScanOutput = new wxTextCtrl(m_panel163, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel163, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP);
+    
+    flexGridSizer165->Add(m_comScanOutput, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     m_staticLine15 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer46->Add(m_staticLine15, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
@@ -144,11 +162,13 @@ MainDialogBaseClass::MainDialogBaseClass(wxWindow* parent, wxWindowID id, const 
     }
     // Connect events
     this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(MainDialogBaseClass::onInitDialog), NULL, this);
+    m_button167->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialogBaseClass::onScanCOM), NULL, this);
     
 }
 
 MainDialogBaseClass::~MainDialogBaseClass()
 {
     this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(MainDialogBaseClass::onInitDialog), NULL, this);
+    m_button167->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialogBaseClass::onScanCOM), NULL, this);
     
 }

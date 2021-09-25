@@ -33,6 +33,7 @@
 #include <wx/gdicmn.h>
 #include <wx/richmsgdlg.h>
 #include <wx/richtooltip.h>
+#include <wx/uiaction.h>
 #include <boost/version.hpp>
 #include "Codelite/cl_aui_dock_art.h"
 #include "OSD/CncUsbPortScanner.h"
@@ -88,6 +89,7 @@
 #include "CncFileViewLists.h"
 #include "CncPodestManagement.h"
 #include "CncExternalViewBox.h"
+#include "CncSecureCtrlPanel.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
 #include "CncPreprocessor.h"
@@ -485,7 +487,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , runConfirmationInfo					(RunConfirmationInfo::Wait)
 , interactiveTransactionLock			(NULL)
 , startTimerTimeout						(250)
-, serialTimerTimeout					(500)
+, serialTimerTimeout					(1000)
 , traceTimerTimeout						(125)
 , traceTimerCounter						(0)
 , lastPortName							(wxT(""))
@@ -532,6 +534,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , positionStorage						(new CncPositionStorageView(this))
 , usbConnectionObserver					(new CncUsbConnectionObserver(this))
 , anchorPositionDlg						(new CncAnchorPosition(this))
+, secureCtrlPanel						(NULL)
 , perspectiveHandler					(globalConfig, m_menuPerspective)
 , config								(globalConfig)
 , lruStore								(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -935,9 +938,19 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_outboundFileSource, outboundEditor);
 	
 	// File View
-	fileView = new CncFileView(this);
+	fileView = new CncFileView(this, false);
 	GblFunc::replaceControl(m_mainFileViewPlaceholder, fileView);
 	
+	// Transfer file list
+	transferFileView = new CncTransferFileView(this, true);
+	GblFunc::replaceControl(m_mainFileTransferPlaceholder, transferFileView);
+	/*
+	transferFileView->openDirectory(CncFileNameService::getTransferDir());
+	wxListItem item;
+	transferFileView->getFileView()->GetColumn(CncFileViewListCtrl::COL_FILE, item);
+	item.SetText("Transfer Area:");
+	transferFileView->getFileView()->SetColumn(CncFileViewListCtrl::COL_FILE, item);
+	*/
 	// Inbound File Preview
 	mainFilePreview = new CncFilePreview(this, "GLMainPreview");
 	GblFunc::replaceControl(m_filePreviewPlaceholder, mainFilePreview);
@@ -1039,6 +1052,9 @@ void MainFrame::installCustControls() {
 	
 	cncManuallyMoveCoordPanel = new CncManuallyMoveCoordinates(this);
 	GblFunc::replaceControl(m_manuallyMoveCoordPlaceholder, cncManuallyMoveCoordPanel);
+	
+	secureCtrlPanel = new CncSecureCtrlPanel(this);
+	GblFunc::replaceControl(m_securityCtrlPanelPlaceholder, secureCtrlPanel);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -1049,6 +1065,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(sourceEditor);
 	registerGuiControl(outboundEditor);
 	registerGuiControl(fileView);
+	registerGuiControl(transferFileView);
 	registerGuiControl(lruFileView);
 	
 	registerGuiControl(m_editorToolBox);
@@ -1071,11 +1088,8 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_testSpindlePowerBtn);
 	registerGuiControl(m_testSpindleSpeedSlider);
 	registerGuiControl(m_portSelector);
-	registerGuiControl(m_portSelectorSec);
 	registerGuiControl(m_connect);
-	registerGuiControl(m_btConnectSec);
-	registerGuiControl(m_btEvaluateHWRef);
-	registerGuiControl(m_btTogglePreviewMonitorSec);
+	registerGuiControl(secureCtrlPanel->GetBtConnectSec());
 	registerGuiControl(m_btAdditionalParameters);
 	registerGuiControl(m_btResetHardwareReference);
 	registerGuiControl(m_btEvaluateHardwareReference);
@@ -1312,17 +1326,25 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 	
 	
 }
+#include "CncGamepadMenuDlg.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logWarningMessage("Test function 3");
 	
-	std::cout << RC_FILEVERSION_STR << std::endl;
+	CncGamepadMenuDlg dlg(this);
+	dlg.ShowModal();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
+	
+	int sel = m_securePreviewBook->GetSelection();
+	
+	if ( sel == SecurePrefiewBookSelection::VAL::LEFT_PREVIEW ) m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::RIGHT_PREVIEW);
+	else 														m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::LEFT_PREVIEW);
+	
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -1355,10 +1377,17 @@ void MainFrame::activateSecureMode(bool state) {
 	
 	m_btDearctivateSecureRunMode->Enable(THE_CONTEXT->secureModeInfo.isActivatedByStartup);
 	
+	CncSecureCtrlPanel* scp = secureCtrlPanel;
+	wxASSERT( scp != NULL );
+	
 	// switch the state
 	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
+		
 		perspectiveHandler.logCurrentPerspective();
 		hideAllAuiPanes(true);
+		
+		lruFileView->setBigTheme(true);
+		transferFileView->getFileView()->setBigTheme(true);
 		
 		if ( IsFullScreen() == false )
 			ShowFullScreen(true);
@@ -1369,69 +1398,82 @@ void MainFrame::activateSecureMode(bool state) {
 		if ( cncExtMainPreview->IsShownOnScreen() )
 			cncExtMainPreview->Show(false);
 			
+		// ensure known conditions
 		m_keepFileManagerPreview->SetValue(false);
 		m_keepFileManagerPreview->Enable(false);
-		m_externFileManagerPreview->SetValue(true);
+		m_externFileManagerPreview->SetValue(false);
 		m_externFileManagerPreview->Enable(false);
-			
-		cncExtViewBoxCluster->hideAll();
-			
-		GblFunc::swapControls(m_secMonitorPlaceholder,				drawPane3D->GetDrawPanePanel());
-		GblFunc::swapControls(m_secLoggerPlaceholder, 				getLoggerView());
-		GblFunc::swapControls(m_secSpeedMonitorPlaceholder,			speedMonitor->GetDrawingAreaBook());
-		GblFunc::swapControls(m_fileViewsPlaceholder,				m_fileViews);
-		GblFunc::swapControls(m_cncOverviewsPlaceholder,			cncLCDPositionPanel);
-		GblFunc::swapControls(m_secGamepadPlaceholder,				gamepadSpy);
 		
-		getLoggerView()->setShowOnDemandState(false);
+		cncExtViewBoxCluster->hideAll();
+		
+		GblFunc::swapControls(m_secMonitorPlaceholder,						drawPane3D->GetDrawPanePanel());
+		GblFunc::swapControls(m_secLoggerPlaceholder, 						getLoggerView());
+		GblFunc::swapControls(scp->GetTransferDirPlaceholder(),				transferFileView->getFileView());
+		GblFunc::swapControls(scp->GetLruFilePlaceholder(),					lruFileView);
+		GblFunc::swapControls(m_leftTplPrevirePlaceholder,					mainFilePreview);
+		GblFunc::swapControls(m_rightTplPrevirePlaceholder,					monitorFilePreview);
+		GblFunc::swapControls(m_cncOverviewsPlaceholder,					cncLCDPositionPanel);
+		GblFunc::swapControls(m_secGamepadPlaceholder,						gamepadSpy);
+		
+		
+		// default show the preview of loaded template
+		m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::RIGHT_PREVIEW);
+		getLoggerView()->setSecureMode(true);
 		
 	} else {
 		
-		m_keepFileManagerPreview->SetValue(false);
-		m_keepFileManagerPreview->Enable(true);
-		m_externFileManagerPreview->SetValue(true);
-		m_externFileManagerPreview->Enable(true);
-
+		lruFileView->setBigTheme(false);
+		transferFileView->getFileView()->setBigTheme(false);
+		
 		if ( IsFullScreen() == true )
 			ShowFullScreen(false);
 		
 		if ( THE_CONTEXT->secureModeInfo.isDeactivatedByUser == true )	perspectiveHandler.loadDefaultPerspective();
 		else 															perspectiveHandler.restoreLoggedPerspective();
 		
-		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),		m_secMonitorPlaceholder);
-		GblFunc::swapControls(getLoggerView(),						m_secLoggerPlaceholder);
-		GblFunc::swapControls(speedMonitor->GetDrawingAreaBook(),	m_secSpeedMonitorPlaceholder);
-		GblFunc::swapControls(m_fileViews,							m_fileViewsPlaceholder);
-		GblFunc::swapControls(cncLCDPositionPanel,					m_cncOverviewsPlaceholder);
-		GblFunc::swapControls(gamepadSpy,							m_secGamepadPlaceholder);
+		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),			m_secMonitorPlaceholder);
+		GblFunc::swapControls(getLoggerView(),							m_secLoggerPlaceholder);
+		GblFunc::swapControls(lruFileView,								scp->GetLruFilePlaceholder());
+		GblFunc::swapControls(transferFileView->getFileView(),			scp->GetTransferDirPlaceholder());
+		GblFunc::swapControls(mainFilePreview,							m_leftTplPrevirePlaceholder);
+		GblFunc::swapControls(monitorFilePreview,						m_rightTplPrevirePlaceholder);
+		GblFunc::swapControls(cncLCDPositionPanel,						m_cncOverviewsPlaceholder);
+		GblFunc::swapControls(gamepadSpy,								m_secGamepadPlaceholder);
 		
-		getLoggerView()->setShowOnDemandState(getLoggerView()->doShowLoggerOnCommand());
+		getLoggerView()->setSecureMode(false);
 	}
 	
 	GetAuimgrMain()->Update();
-	
-	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
-		if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) {
-			
-			wxFileName fn(getCurrentTemplateFileName());
-			if ( fn.Exists() == false ) {
-				if ( lruFileView != NULL )
-					fn.Assign(lruFileView->getFileName(0));
-				
-				bool fileOpened = false;
-				if ( fn.Exists() == true ) {
-					m_inputFileName->SetValue(fn.GetFullName());
-					m_inputFileName->SetHint(fn.GetFullPath());
-					fileOpened = openFile();
-				}
-				
-				if ( fileOpened == false ) {
-					wxCommandEvent dummy;
-					openTemplate(dummy);
-				}
-			}
-		}
+	secureCtrlPanel->activate(THE_CONTEXT->secureModeInfo.isActive);
+
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::getFirstLruFile(wxString& ret) {
+///////////////////////////////////////////////////////////////////
+	if ( lruFileView != NULL && lruFileView->getFileCount() > 0 ) {
+		ret.assign(lruFileView->getFileName(0));
+		return true;
 	}
+		
+	ret.Clear();
+	return false;
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::setTemplateName(const wxString& pathFile) {
+///////////////////////////////////////////////////////////////////
+	wxFileName fn(pathFile);
+	return setTemplateName(fn);
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::setTemplateName(const wxFileName& pathFile) {
+///////////////////////////////////////////////////////////////////
+	if ( pathFile.Exists() == true ) {
+		m_inputFileName->SetValue(pathFile.GetFullName());
+		m_inputFileName->SetHint(pathFile.GetFullPath());
+		return true;
+	}
+	
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceGccVersion(std::ostream& out) {
@@ -1497,6 +1539,7 @@ void MainFrame::traceOpenCvVersion(std::ostream& out) {
 void MainFrame::onStartupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_startupTimer->Stop();
+	
 	
 	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == false ) {
 		// Setup AUI Windows menue
@@ -1578,12 +1621,11 @@ void MainFrame::onStartupTimer(wxTimerEvent& event) {
 	// default slect the cnc panel view
 	selectMonitorBookCncPanel();
 	
+	// Auto open last ?
+	if ( THE_CONFIG->getAutoOpenLastFlag() )
+		openInitialTemplateFile();
+	
 	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == false ) {
-		
-		// Auto open last ?
-		if ( THE_CONFIG->getAutoOpenLastFlag() )
-			openInitialTemplateFile();
-		
 		// Auto process ?
 		if ( THE_CONFIG->getAutoProcessFlag() ) {
 			
@@ -2229,21 +2271,25 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 				case DBT_DEVICEARRIVAL:	{
 					if ( isProcessing() == false ) {
 						
-						if ( usbConnectionObserver->IsShown() ) {
-							usbConnectionObserver->setPortName(portName);
-							return ret;
-						}
 						
-						if ( usbConnectionObserver->getSensitivity() == true ) {
-							usbConnectionObserver->setPortName(portName);
-							if ( usbConnectionObserver->ShowModal() == wxID_YES ) {
-								m_portSelector->SetStringSelection(portName);
-								m_portSelectorSec->SetStringSelection(portName);
-								connectSerialPortDialog();
+						if ( m_portSelector->FindString(portName) ) {
+							
+							if ( usbConnectionObserver->IsShown() ) {
+								usbConnectionObserver->setPortName(portName);
+								return ret;
 							}
-						}
-						else {
-							cnc::trc.logInfoMessage(wxString::Format("New USB connection available, name: %s", portName));
+							
+							if ( usbConnectionObserver->getSensitivity() == true ) {
+								usbConnectionObserver->setPortName(portName);
+								if ( usbConnectionObserver->ShowModal() == wxID_YES ) {
+									m_portSelector->SetStringSelection(portName);
+									secureCtrlPanel->setPortSelection(portName);
+									connectSerialPortDialog();
+								}
+							}
+							else {
+								cnc::trc.logInfoMessage(wxString::Format("New USB connection available, name: %s", portName));
+							}
 						}
 					}
 				}
@@ -2312,75 +2358,79 @@ void MainFrame::decoratePortSelector(bool list) {
 ///////////////////////////////////////////////////////////////////
 	CncRunAnimationControl rac(this);
 	
-	m_portSelector   ->Clear();
-	m_portSelectorSec->Clear();
-	m_portSelectorSec->SetClientSize(200, -1);
+	m_portSelector ->Clear();
+	secureCtrlPanel->clearPortSelection();
 	
 	//------------------------------------------------------------
-	auto appendItem = [&](const wxString& item, const wxBitmap& bitmap = wxNullBitmap) {
-		m_portSelector->Append   (item,  bitmap);
-		m_portSelectorSec->Append(item,  bitmap);
+	auto appendItem = [&](const wxString& item, const wxString& bitmapName = "") {
+		wxBitmap bitmap = bitmapName.IsEmpty() == false ? ImageLibPortSelector().Bitmap(bitmapName) : wxNullBitmap;
+	
+		m_portSelector->Append      (item,  bitmap);
+		secureCtrlPanel->addPortName(item,  bitmapName);
 	};
 	
 	// add default preprocessor ports ports
-	if ( lastPortName == _portPreProcMonitor )	appendItem(_portPreProcMonitor,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portPreProcMonitor,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portPreProcMonitor )	appendItem(_portPreProcMonitor,		PortSelector::BMP_PS_CONNECTED);
+	else										appendItem(_portPreProcMonitor,		PortSelector::BMP_PS_AVAILABLE);
 	
-	if ( lastPortName == _portPreProcFile )		appendItem(_portPreProcFile,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portPreProcFile,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portPreProcFile )		appendItem(_portPreProcFile,		PortSelector::BMP_PS_CONNECTED);
+	else										appendItem(_portPreProcFile,		PortSelector::BMP_PS_AVAILABLE);
 	
-	appendItem(_portSeparator, wxNullBitmap);
+	appendItem(_portSeparator);
 	
 	// add default cnc ports
-	if ( lastPortName == _portEmulatorNULL )	appendItem(_portEmulatorNULL,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorNULL,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorNULL )	appendItem(_portEmulatorNULL,		PortSelector::BMP_PS_CONNECTED);
+	else										appendItem(_portEmulatorNULL,		PortSelector::BMP_PS_AVAILABLE);
 	
-	if ( lastPortName == _portEmulatorTEXT )	appendItem(_portEmulatorTEXT,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorTEXT,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorTEXT )	appendItem(_portEmulatorTEXT,		PortSelector::BMP_PS_CONNECTED);
+	else										appendItem(_portEmulatorTEXT,		PortSelector::BMP_PS_AVAILABLE);
 	
-	if ( lastPortName == _portEmulatorSVG )		appendItem(_portEmulatorSVG,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorSVG,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorSVG )		appendItem(_portEmulatorSVG,		PortSelector::BMP_PS_CONNECTED);
+	else										appendItem(_portEmulatorSVG,		PortSelector::BMP_PS_AVAILABLE);
 	
-	if ( lastPortName == _portEmulatorGCODE )	appendItem(_portEmulatorGCODE,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorGCODE,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorGCODE )	appendItem(_portEmulatorGCODE,		PortSelector::BMP_PS_CONNECTED);
+	else										appendItem(_portEmulatorGCODE,		PortSelector::BMP_PS_AVAILABLE);
 	
-	if ( lastPortName == _portEmulatorBIN )		appendItem(_portEmulatorBIN, 		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorBIN,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorBIN )		appendItem(_portEmulatorBIN, 		PortSelector::BMP_PS_CONNECTED);
+	else										appendItem(_portEmulatorBIN,		PortSelector::BMP_PS_AVAILABLE);
 	
-	if ( lastPortName == _portEmulatorArduino )	appendItem(_portEmulatorArduino,	ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorArduino, 	ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorArduino )	appendItem(_portEmulatorArduino,	PortSelector::BMP_PS_CONNECTED);
+	else										appendItem(_portEmulatorArduino, 	PortSelector::BMP_PS_AVAILABLE);
 	
 	// add com cnc ports
-	int  pStart		= list == true ?  1 :  0;
-	int  pEnd		= list == true ? 11 : 32;//256;
 	bool available	= false;
 	
 	//------------------------------------------------------------
-	auto appendCOMItem = [&](const wxString& item, const wxBitmap& bitmap = wxNullBitmap) {
+	auto appendCOMItem = [&](const wxString& item, const wxString& bitmapName = "") {
 		
 		if ( available == false ) {
-			appendItem(_portSeparator, wxNullBitmap);
+			appendItem(_portSeparator);
 			available = true;
 		}
 		
-		appendItem(item, bitmap);
+		appendItem(item, bitmapName);
 	};
 	
-	for (int i = pStart; i < pEnd; i++) {
+	CncAvailableArduionPorts::PortList pl;
+	CncAvailableArduionPorts::evaluate(pl);
+	
+	for ( auto it = pl.begin(); it != pl.end(); ++it ) {
 		
-		const wxString pn(wxString::Format("COM%d", i));
+		const CncAvailableArduionPorts::Port& port = *it;
+	
+		const wxString pn(wxString::Format("COM%d - %s", port.num, port.desc));
 		const bool b  = cnc && cnc->isConnected() && lastPortName == pn;
-		const int ret = CncUsbPortScanner::isComPortAvailable(i);
+		const int ret = CncUsbPortScanner::isComPortAvailable(port.num);
 		
 		switch ( ret ) {
-			case 0:		appendCOMItem(pn, ImageLibPortSelector().Bitmap(b ? "BMP_PS_CONNECTED" : "BMP_PS_ACCESS_DENIED"));
+			case 0:		appendCOMItem(pn, (b ? PortSelector::BMP_PS_CONNECTED : PortSelector::BMP_PS_ACCESS_DENIED));
 						break;
 						
-			case 1:		appendCOMItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+			case 1:		appendCOMItem(pn, PortSelector::BMP_PS_AVAILABLE);
 						break;
 						
 			default: 	if ( list == true ) 
-							appendCOMItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_UNKNOWN"));
+							appendCOMItem(pn, PortSelector::BMP_PS_UNKNOWN);
 		}
 	}
 	
@@ -2388,8 +2438,7 @@ void MainFrame::decoratePortSelector(bool list) {
 	if ( m_portSelector->FindString(lastPortName) != wxNOT_FOUND )
 		m_portSelector->SetStringSelection(lastPortName);
 		
-	if ( m_portSelectorSec->FindString(lastPortName) != wxNOT_FOUND )
-		m_portSelectorSec->SetStringSelection(lastPortName);
+	secureCtrlPanel->setPortSelection(lastPortName);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::setIcons() {
@@ -2473,14 +2522,20 @@ bool MainFrame::Show(bool show) {
 		showMotionMonitorReplayPane(true);
 
 		auto startTimer = [](wxTimer* timer, unsigned int value, const char* name) {
-
+			
 			if ( timer->IsRunning() == false) {
 				timer->Start(value);
-
-				APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Call %s->Start(%d)", name, value));
-
+				APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Start timer: Call %s->Start(%d)", name, value));
+			
 			} else {
-				APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("%s [%d] already started", name, timer->GetInterval()));
+				
+				if ( timer->GetInterval() != (int)value ) {
+					timer->Start(value);
+					APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Restart Timer: Call %s->Start(%d)", name, value));
+				}
+				else {
+					APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("%s [%d] already started", name, timer->GetInterval()));
+				}
 			}
 		};
 		
@@ -2566,7 +2621,7 @@ void MainFrame::initializeConnectionSelector() {
 	wxString value;
 	THE_CONFIG->getDefaultPort(value);
 	m_portSelector   ->SetStringSelection(value);
-	m_portSelectorSec->SetStringSelection(value); //???
+	secureCtrlPanel->setPortSelection(value); //???
 	defaultPortName.assign(value);
 	
 	// initialize update interval
@@ -2682,24 +2737,29 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
 	::wxAboutBox(info);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::selectPort(wxCommandEvent& event) {
+void MainFrame::selectPort(const wxString& portName) {
 ///////////////////////////////////////////////////////////////////
 	if ( m_portSelector->GetStringSelection().IsSameAs(_portSeparator) ) {
 		m_portSelector->SetStringSelection(lastPortName);
 		return;
 	}
-	
+
+	if ( GetPortSelector()->FindString(portName) == wxNOT_FOUND )
+		return;
+		
+	GetPortSelector()->SetStringSelection(portName);
+
 	if ( lastPortName != m_portSelector->GetStringSelection() ) {
 		connectSerialPortDialog();
 		
-		m_portSelectorSec->SetStringSelection(m_portSelector->GetStringSelection());
+		// Update secure panel also
+		secureCtrlPanel->setPortSelection(m_portSelector->GetStringSelection());
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::selectPortSec(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_portSelector->SetStringSelection(m_portSelectorSec->GetStringSelection());
-	selectPort(event);
+void MainFrame::selectPort(wxCommandEvent& event) {
+//////////////////////////////////////////////////
+	selectPort(m_portSelector->GetStringSelection());
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::connectSerialPortDialog() {
@@ -2916,7 +2976,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	else {
 		cnc = new CncControl(CncPORT);
 		
-		setup.serialFileName.assign(wxString::Format("\\\\.\\%s", sel));
+		setup.serialFileName.assign(wxString::Format("\\\\.\\%s", sel.BeforeFirst(' ')));
 		setup.description.assign("This port stands for a specific hardware USB Arduino stepper environment connection.");
 		setup.probeMode			= false;
 		setup.interactiveMoving	= true;
@@ -3030,28 +3090,36 @@ void MainFrame::enableRunControls(bool state) {
 		std::clog << std::endl;
 	}
 	
+	wxASSERT(secureCtrlPanel != NULL);
+	
 	// all buttons of the run control have to be enabled/disabeled here
 	// every time
 	
-	isPause() ? m_rcDebugConfig->Enable(false) : m_rcRun->Enable(state);
-	isPause() ? m_rcDebugConfig->Enable(false) : m_rcRunSec->Enable(state);
+	if ( isPause() ) {
+		m_rcDebugConfig->Enable(false);
+	}
+	else {
+		m_rcRun->Enable(state);
+		secureCtrlPanel->GetRcRunSec()->Enable(state);
+	}
 	
 	if ( isDebugMode == false ) {
 		
-		isPause() ? m_rcRun->Enable(true)              : m_rcRun->Enable(state); 
-		isPause() ? m_rcRunSec->Enable(true)           : m_rcRunSec->Enable(state); 
-		isPause() ? m_rcDebug->Enable(false)           : m_rcDebug->Enable(state);
-		isPause() ? m_rcPause->Enable(false)           : m_rcPause->Enable(!state);
-		isPause() ? m_rcPauseSec->Enable(false)        : m_rcPauseSec->Enable(!state);
-		isPause() ? m_rcStop->Enable(true)             : m_rcStop->Enable(!state);
-		isPause() ? m_rcStopSec->Enable(true)          : m_rcStopSec->Enable(!state);
-		isPause() ? m_btnEmergenyStop->Enable(true)    : m_btnEmergenyStop->Enable(!state);
-		isPause() ? m_btnEmergenyStopSec->Enable(true) : m_btnEmergenyStopSec->Enable(!state);
+		isPause() ? m_rcRun->Enable(true)									: m_rcRun->Enable(state); 
+		isPause() ? secureCtrlPanel->GetRcRunSec()->Enable(true)			: secureCtrlPanel->GetRcRunSec()->Enable(state);
+		isPause() ? m_rcDebug->Enable(false)								: m_rcDebug->Enable(state);
+		isPause() ? m_rcPause->Enable(false)								: m_rcPause->Enable(!state);
+		isPause() ? secureCtrlPanel->GetRcPauseSec()->Enable(false)			: secureCtrlPanel->GetRcPauseSec()->Enable(!state);
+		isPause() ? m_rcStop->Enable(true)									: m_rcStop->Enable(!state);
+		isPause() ? secureCtrlPanel->GetRcStopSec()->Enable(true)			: secureCtrlPanel->GetRcStopSec()->Enable(!state);
+		isPause() ? m_btnEmergenyStop->Enable(true)							: m_btnEmergenyStop->Enable(!state);
+		isPause() ? secureCtrlPanel->GetBtnEmergenyStopSec()->Enable(true)	: secureCtrlPanel->GetBtnEmergenyStopSec()->Enable(!state);
 		
 		m_rcReset->Enable(isPause() == false && state);
 		m_rcNextStep->Enable(false);
 		m_rcNextBreakpoint->Enable(false);
 		m_rcFinish->Enable(false);
+		secureCtrlPanel->lockSelection(state == false);
 		
 	} else {
 		
@@ -3079,7 +3147,7 @@ void MainFrame::enableControls(bool state) {
 	
 	m_secureSplitterMainV->SetSashInvisible(!state);
 	m_secureSplitterMainH->SetSashInvisible(!state);
-	m_splitterProcessLeft->SetSashInvisible(!state);
+	m_secureSplitterLoggerV->SetSashInvisible(!state);
 	
 	// enable menu bar
 	enableMenuItems(state);
@@ -3620,6 +3688,11 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplate(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	openTemplate();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openTemplate() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(m_inputFileName);
 	wxString templateName("..\\Templates\\");
@@ -5491,6 +5564,9 @@ void MainFrame::openMainPreview(const wxString& fn) {
 	
 	selectMainBookPreviewPanel();
 	openPreview(mainFilePreview, fn);
+	
+	if (THE_CONTEXT->secureModeInfo.isActive == true )
+		m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::LEFT_PREVIEW);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openMonitorPreview(const wxString& fn) {
@@ -5510,7 +5586,7 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 		prepareAndShowMonitorTemplatePreview();
 		return;
 	}
-
+	
 	wxFileName fn(f);
 	m_inputFileName->SetValue(fn.GetFullName());
 	m_inputFileName->SetHint(fn.GetFullPath());
@@ -5535,12 +5611,14 @@ void MainFrame::openNavigatorFromGamepad() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::filePreviewListLeave() {
 ///////////////////////////////////////////////////////////////////
+	if (THE_CONTEXT->secureModeInfo.isActive == true )
+		m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::RIGHT_PREVIEW);
+		
 	if ( m_keepFileManagerPreview->IsChecked() )
 		return false;
 	
 	if ( CncAsyncKeyboardState::isControlPressed() )
 		return false;
-	
 	
 	if ( cncExtMainPreview != NULL && cncExtMainPreview->IsShownOnScreen() == true ) {
 		cncExtMainPreview->selectView(CncExternalViewBox::Preview::TEMPLATE);
@@ -7724,6 +7802,7 @@ void MainFrame::toggleIdleRequests(wxCommandEvent& event) {
 	
 	if ( state )	m_serialTimer->Start();
 	else			m_serialTimer->Stop();
+	
 
 	decorateIdleState(m_serialTimer->IsRunning());
 }
@@ -8699,7 +8778,6 @@ void MainFrame::onToggleSecMainView(wxCommandEvent& event) {
 void MainFrame::selectSecureMonitorView() {
 /////////////////////////////////////////////////////////////////////
 	m_secureMainBook->SetSelection(0);
-	m_secLeftBook->SetSelection(SecureLeftBookSelection::VAL::PROCESS_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDClickSpeedSliderValue(wxMouseEvent& event) {
@@ -8742,15 +8820,6 @@ void MainFrame::traceAllCameraDevices(wxCommandEvent& event) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::onSwitchSecLeftBook(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	const int newSel = (m_secLeftBook->GetSelection() + 1 ) % m_secLeftBook->GetPageCount(); 
-	m_secLeftBook->SetSelection(newSel);
-	
-	if ( m_secLeftBook->GetSelection() == SecureLeftBookSelection::VAL::PROCESS_PANEL )
-		selectSecureMonitorView();
-}
-/////////////////////////////////////////////////////////////////////
 double MainFrame::getConfiguredSpindleSpeed() {
 /////////////////////////////////////////////////////////////////////
 	if ( cnc )
@@ -8758,7 +8827,13 @@ double MainFrame::getConfiguredSpindleSpeed() {
 	
 	return 0.0;
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onExecuteOsk(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	openFileExtern("FreeVK.exe","",true);
 
+
+}
 
 
 /////////////////////////////////////////////////////////////////////

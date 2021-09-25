@@ -3,12 +3,16 @@
 
 #include <vector>
 #include <wx/dir.h>
+#include "CncFileViewCallback.h"
 #include "wxCrafterFileView.h"
 
 typedef std::vector<wxString> ExtFilterList;
 
 class CncFileViewListCtrl;
-class CncFileView : public CncFileViewBase, public wxDirTraverser {
+class CncFileView	: public CncFileViewBase
+					, public wxDirTraverser
+					, public CncFileViewCallback::Interface
+{
 	
 	protected:
 		virtual void selectOpenTemplate(wxCommandEvent& event);
@@ -24,13 +28,16 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		friend CncFileViewListCtrl;
 	
 	public:
-		CncFileView(wxWindow* parent);
+		CncFileView(wxWindow* parent, bool staticDir);
 		virtual ~CncFileView();
 		
 		virtual wxDirTraverseResult OnFile(const wxString& filename);
 		virtual wxDirTraverseResult OnDir(const wxString& dirname);
 		
 		virtual bool Enable(bool enable=true);
+		
+		const wxString getCurrentDirectory() const	{ return m_currentDirectory->GetValue(); }
+		CncFileViewListCtrl* getFileView() const	{ return fileList; }
 
 		bool openDirectory(const wxString& dirName);
 		bool selectFileInList(const wxString& fileName);
@@ -44,6 +51,7 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		wxString 				defaultPath;
 		CncFileViewListCtrl*	fileList;
 		ExtFilterList 			filterList;
+		bool					staticDir;
 
 		bool makePathValid(wxString& p);
 		bool openFile(const wxString& fileName);
@@ -53,6 +61,13 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		
 		bool avoidSelectListEvent;
 		wxString lastSelection;
+};
+
+class CncTransferFileView : public CncFileView {
+	
+	public:
+		CncTransferFileView(wxWindow* parent, bool staticDir);
+		virtual ~CncTransferFileView();
 };
 
 #endif // CNCFILEVIEW_H

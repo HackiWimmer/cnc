@@ -95,7 +95,7 @@
   <object class="wxBitmap" name="BMP_HIDE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_up.png</object>
   <object class="wxBitmap" name="BMP_INDEX">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database-key.png</object>
   <object class="wxBitmap" name="BMP_LOCKED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\msn-blocked.png</object>
-  <object class="wxBitmap" name="BMP_LRU_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database-link.png</object>
+  <object class="wxBitmap" name="BMP_LRU_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database-gear.png</object>
   <object class="wxBitmap" name="BMP_LRU_FILE_SELECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database-go.png</object>
   <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\mill.png</object>
   <object class="wxBitmap" name="BMP_MINUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>

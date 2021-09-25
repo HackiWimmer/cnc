@@ -6,6 +6,7 @@
 #include "OSD/CncAsyncKeyboardState.h"
 #include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
+#include "CncFileNameService.h"
 #include "CncFileViewLists.h"
 #include "CncFileView.h"
 
@@ -19,12 +20,13 @@ const char* BIN_FILES 		= "*.bct";
 #define CFV_PRINT_LOCATION_CTX_SOMETHING	//	CNC_PRINT_LOCATION
 
 /////////////////////////////////////////////////////////////////
-CncFileView::CncFileView(wxWindow* parent)
+CncFileView::CncFileView(wxWindow* parent, bool sd)
 : CncFileViewBase(parent)
 , wxDirTraverser()
 , defaultPath("")
 , fileList(NULL)
 , filterList()
+, staticDir(sd)
 , avoidSelectListEvent(false)
 , lastSelection()
 /////////////////////////////////////////////////////////////////
@@ -32,6 +34,8 @@ CncFileView::CncFileView(wxWindow* parent)
 	// File List 
 	fileList = new CncFileViewListCtrl(this, wxLC_SINGLE_SEL);
 	GblFunc::replaceControl(m_fileListPlaceholder, fileList);
+	
+	fileList->setObserver(this);
 	
 	filterList.push_back(ALL_FILES);
 	filterList.push_back(SVG_FILES);
@@ -43,6 +47,17 @@ CncFileView::CncFileView(wxWindow* parent)
 		m_filterExtention->Append(*it);
 		
 	m_filterExtention->Select(0);
+	
+	if ( staticDir == true ) {
+		m_btDirUp->Hide();
+		m_btRefresh->Hide();
+		m_btDefaultPath->Hide();
+		m_btNewTemplate->Hide();
+		m_btOpenTemplate->Hide();
+		m_filterExtention->Hide();
+		m_currentDirectory->Hide();
+		Layout();
+	}
 }
 /////////////////////////////////////////////////////////////////
 CncFileView::~CncFileView() {
@@ -120,6 +135,9 @@ wxDirTraverseResult CncFileView::OnFile(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
 wxDirTraverseResult CncFileView::OnDir(const wxString& dirName) {
 /////////////////////////////////////////////////////////////////
+	if ( staticDir == true )
+		return wxDIR_IGNORE;
+		
 	const wxFileName fn(dirName);
 	const wxString name(fn.GetFullName());
 	
@@ -132,7 +150,9 @@ wxDirTraverseResult CncFileView::OnDir(const wxString& dirName) {
 bool CncFileView::openDirectory(const wxString& dirName) {
 /////////////////////////////////////////////////////////////////
 	fileList->deleteAllEntries();
-	fileList->addFileEntry("..", CncFileViewListCtrl::FileListImage::FTI_FOLDER_UP);
+	
+	if ( staticDir == false )
+		fileList->addFileEntry("..", CncFileViewListCtrl::FileListImage::FTI_FOLDER_UP);
 	
 	wxString dn(dirName);
 	makePathValid(dn);
@@ -329,4 +349,23 @@ void CncFileView::selectNewTemplate(wxCommandEvent& event) {
 void CncFileView::selectOpenTemplate(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////
 	APP_PROXY::openTemplate();
+}
+
+
+/////////////////////////////////////////////////////////////////
+CncTransferFileView::CncTransferFileView(wxWindow* parent, bool staticDir)
+: CncFileView	(parent, staticDir)
+/////////////////////////////////////////////////////////////////
+{
+	openDirectory(CncFileNameService::getTransferDir());
+	
+	wxListItem item;
+	getFileView()->GetColumn(CncFileViewListCtrl::COL_FILE, item);
+	item.SetText("Transfer area:");
+	getFileView()->SetColumn(CncFileViewListCtrl::COL_FILE, item);
+	
+}
+/////////////////////////////////////////////////////////////////
+CncTransferFileView::~CncTransferFileView() {
+/////////////////////////////////////////////////////////////////
 }

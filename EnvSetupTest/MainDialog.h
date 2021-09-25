@@ -17,6 +17,7 @@ class MainDialog : public MainDialogBaseClass
 		void traceWxSvgVersion(std::ostream& out);
 		
 	protected:
+		virtual void onScanCOM(wxCommandEvent& event);
 		virtual void onInitDialog(wxInitDialogEvent& event);
 		
 		wxSVGCtrl* svgCtrl;

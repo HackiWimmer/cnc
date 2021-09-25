@@ -488,15 +488,17 @@ bool CncLoggerListCtrl::writeToFile(const wxFileName& fn, bool allRows) {
 	}
 	
 	if ( entries.size() > 0 ) {
-		const size_t firstRow = allRows ? 0                 : GetTopItem();
+		const size_t firstRow = allRows ? 0                  : GetTopItem();
 		const size_t lastRow  = allRows ? GetItemCount() - 1 : firstRow + std::min(GetCountPerPage(), GetItemCount() - 1);
 		
 		// check boundaries
 		if ( firstRow >= entries.size() || lastRow >= entries.size() )  {
 			
-			std::cerr << "CncLoggerListCtrl::writeToFile: Invalid boundaries:"		<< std::endl;
+			std::cerr << "CncLoggerListCtrl::writeToFile: Invalid boundaries:"			<< std::endl;
 			std::cerr << " Available row count       : " << entries.size()				<< std::endl;
 			std::cerr << " Evaluated first / last row: " << firstRow << ", " << lastRow	<< std::endl;
+			
+			out.close();
 			return false;
 		}
 		
@@ -528,6 +530,8 @@ bool CncLoggerListCtrl::copyToClipboard(bool allRows) {
 				std::cerr << "CncLoggerListCtrl::copyToClipboard: Invalid boundaries:"		<< std::endl;
 				std::cerr << " Available row count       : " << entries.size()				<< std::endl;
 				std::cerr << " Evaluated first / last row: " << firstRow << ", " << lastRow	<< std::endl;
+				
+				wxTheClipboard->Close();
 				return false;
 			}
 			

@@ -3,6 +3,7 @@
 
 #include <wx/filename.h>
 #include <wx/timer.h>
+#include "CncFileViewCallback.h"
 #include "CncLargeScaleListCtrl.h"
 
 class wxFileConfig;
@@ -51,6 +52,9 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		static const int miCopyLruListEntry			= 8001;
 		static const int miRemoveLruListEntry		= 8002;
 		
+		static const int smallFontSize				=  8;
+		static const int bigFontSize				= 16;
+		
 		static const int COL_FILE 					= 0;
 		static const int TOTAL_COL_COUNT			= 1;
 		static const int COL_STRECH					= COL_FILE;
@@ -71,6 +75,8 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		bool removeFile(const wxString& f);
 		bool load(wxFileConfig* config);
 		bool save(wxFileConfig* config);
+		
+		void setBigTheme(bool big);
 		
 		wxDECLARE_NO_COPY_CLASS(CncLruFileViewListCtrl);
 		wxDECLARE_EVENT_TABLE();
@@ -104,12 +110,13 @@ class CncFileViewListCtrl : public CncLargeScaledListCtrl {
 		
 		enum EventType { UNKNOWN, PREVIEW, OPEN };
 		
-		FileEntryList 	fileEntries;
-		wxTimer* 		eventTimer;
+		FileEntryList 					fileEntries;
+		wxTimer* 						eventTimer;
 
-		wxListItemAttr defaultItemAttr;
-		wxListItemAttr selectedItemAttr;
-		EventType		lastEventType;
+		wxListItemAttr					defaultItemAttr;
+		wxListItemAttr					selectedItemAttr;
+		EventType						lastEventType;
+		CncFileViewCallback::Interface*	caller;
 		
 		virtual wxString OnGetItemText(long item, long column) const;
 		virtual int OnGetItemColumnImage(long item, long column) const;
@@ -129,6 +136,9 @@ class CncFileViewListCtrl : public CncLargeScaledListCtrl {
 		static const int TOTAL_COL_COUNT	= 1;
 		static const int COL_STRECH			= COL_FILE;
 		
+		static const int smallFontSize		=  8;
+		static const int bigFontSize		= 16;
+
 		CncFileViewListCtrl(wxWindow *parent, long style);
 		virtual ~CncFileViewListCtrl();
 		
@@ -139,6 +149,9 @@ class CncFileViewListCtrl : public CncLargeScaledListCtrl {
 		void deleteAllEntries();
 		void addFileEntry(const wxString& name, FileListImage fii);
 		bool selectFileInList(const wxString& fileName);
+		
+		void setBigTheme(bool big);
+		void setObserver(CncFileViewCallback::Interface* o) { caller = o; }
 		
 		wxDECLARE_NO_COPY_CLASS(CncFileViewListCtrl);
 		wxDECLARE_EVENT_TABLE();

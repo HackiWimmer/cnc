@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-clear@2x">bitmaps\16-clear@2x.png</object>
+  <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="16-execute@2x">bitmaps\CodeLite\16-execute@2x.png</object>
+  <object class="wxBitmap" name="16-file_open@2x">bitmaps\CodeLite\16-file_open@2x.png</object>
+  <object class="wxBitmap" name="16-find_in_files">bitmaps\CodeLite\16-find_in_files.png</object>
+  <object class="wxBitmap" name="16-find_in_files@2x">bitmaps\CodeLite\16-find_in_files@2x.png</object>
+  <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
+  <object class="wxBitmap" name="16-home@2x">bitmaps\16-home@2x.png</object>
+  <object class="wxBitmap" name="16-regular-expression@2x">bitmaps\CodeLite\16-regular-expression@2x.png</object>
+  <object class="wxBitmap" name="24-clean">bitmaps\CodeLite\24-clean.png</object>
+  <object class="wxBitmap" name="24-clean@2x">bitmaps\CodeLite\24-clean@2x.png</object>
+  <object class="wxBitmap" name="CncAnchors">bitmaps\CncAnchors.png</object>
+  <object class="wxBitmap" name="CncFolder">bitmaps\CncFolder.png</object>
+  <object class="wxBitmap" name="CncPause">bitmaps\CncPause.png</object>
+  <object class="wxBitmap" name="CncRun">bitmaps\CncRun.png</object>
+  <object class="wxBitmap" name="CncStop">bitmaps\CncStop.png</object>
+  <object class="wxBitmap" name="CncTest">bitmaps\CncTest.png</object>
+  <object class="wxBitmap" name="RefDim">bitmaps\RefDim.png</object>
+  <object class="wxBitmap" name="RefPos">bitmaps\RefPos.png</object>
+  <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
+  <object class="wxBitmap" name="close-16">bitmaps\close-16.png</object>
+  <object class="wxBitmap" name="edit-move">bitmaps\edit-move.png</object>
+  <object class="wxBitmap" name="emergency-button-klein">bitmaps\emergency-button-klein.png</object>
+  <object class="wxBitmap" name="iconmonstr-control-panel-8-16">bitmaps\RunCtrl\iconmonstr-control-panel-8-16.png</object>
+  <object class="wxBitmap" name="iconmonstr-synchronization-8-16">bitmaps\RunCtrl\iconmonstr-synchronization-8-16.png</object>
+  <object class="wxBitmap" name="keyboard">bitmaps\keyboard.png</object>
+  <object class="wxBitmap" name="trace">bitmaps\trace.png</object>
+</resource>

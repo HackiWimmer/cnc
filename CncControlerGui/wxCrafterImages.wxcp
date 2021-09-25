@@ -702,7 +702,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/database-link.png"
+       "m_path": "bitmaps/database-gear.png"
       }],
      "m_events": [],
      "m_children": []

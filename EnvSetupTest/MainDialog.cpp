@@ -3,6 +3,7 @@
 #include <wx/version.h>
 #include <boost/version.hpp>
 #include <CncWxSvgVersionInfo.h>
+#include "OSD/CncUsbPortScanner.cpp"
 #include "wxSVG/svgctrl.h"
 #include "MainDialog.h"
 
@@ -91,4 +92,30 @@ void MainDialog::onInitDialog(wxInitDialogEvent& event) {
 	svgCtrl->SetClientSize(m_wxSvgParent->GetClientSize() - wxSize(5,5));
 	svgCtrl->Load("C:\\@Development\\@Projekte\\c++\\CNCGuiController\\EnvSetupTest\\car.svg");
 	
+}
+///////////////////////////////////////////////////////////////////
+void MainDialog::onScanCOM(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_comScanOutput->Clear();
+	
+	CncArduinoRegisteryScanner ars;
+	CncArduinoRegisteryScanner::RegResult result;
+	ars.scan(result);
+	
+	for ( auto it = result.begin(); it != result.end(); ++it ) {
+		std::stringstream ss;
+		//ss << (*it) << std::endl;
+		
+		ss 	<< it->regPath		<< "\n"
+			<< it->friendlyName	<< "\n" 
+			<< it->portName		<< ", "
+			<< it->portNum		<< std::endl 
+		;
+		
+		m_comScanOutput->AppendText(wxString::Format("%s\n",ss.str().c_str()));
+	}
+	
+
+	//RegCloseKey(hKey);
+
 }

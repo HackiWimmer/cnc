@@ -22,6 +22,7 @@ wxString	CncFileNameService::_tempDirectorySession(wxT(""));
 wxString	CncFileNameService::_configDirectory(wxT(""));
 wxString	CncFileNameService::_baseDirectory(wxT(""));
 wxString	CncFileNameService::_databaseDirectory(wxT(""));
+wxString	CncFileNameService::_transferDirectory(wxT(""));
 wxString	CncFileNameService::_session(wxT(""));
 
 wxString 	globalSessionString;
@@ -191,11 +192,14 @@ void CncFileNameService::init() {
 	_baseDirectory 		= _configDirectory;
 	_databaseDirectory 	= _baseDirectory + "Database" + sep;
 	
+	_transferDirectory 	= _baseDirectory + "Transfer" + sep;
+	
 	// fill path store
 	_pathList.AddEnvList("PATH");
 	_pathList.Add(CncFileNameService::getExecutableDir());
 	_pathList.Add(CncFileNameService::getBaseDir());
 	_pathList.Add(CncFileNameService::getDatabaseDir());
+	_pathList.Add(CncFileNameService::getTransferDir());
 	_pathList.Add(CncFileNameService::getConfigDir());
 	_pathList.Add(CncFileNameService::getHomeDir());
 	_pathList.Add(CncFileNameService::getTempDirOS());
@@ -208,6 +212,7 @@ void CncFileNameService::trace(std::ostream& os) {
 	os << "Executable Dir                    : " << CncFileNameService::getExecutableDir() 							<< std::endl;
 	os << "Base Dir                          : " << CncFileNameService::getBaseDir()								<< std::endl;
 	os << "Databse Dir                       : " << CncFileNameService::getDatabaseDir()							<< std::endl;
+	os << "Transfer Dir                      : " << CncFileNameService::getTransferDir()							<< std::endl;
 	os << "Config Dir                        : " << CncFileNameService::getConfigDir() 								<< std::endl;
 	os << "Users Home Dir                    : " << CncFileNameService::getHomeDir() 								<< std::endl;
 	os << "Users Temp Dir                    : " << CncFileNameService::getTempDirOS() 								<< std::endl;

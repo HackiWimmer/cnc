@@ -149,12 +149,17 @@
  C:/@Development/wxWidgets-3.1.5/include/wx/msw/choice.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/stattext.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/msw/stattext.h \
- C:/@Development/wxWidgets-3.1.5/include/wx/statline.h \
- C:/@Development/wxWidgets-3.1.5/include/wx/msw/statline.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/button.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/anybutton.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/msw/anybutton.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/msw/button.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/textctrl.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/textentry.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/msw/textentry.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/ioswrap.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/msw/textctrl.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/statline.h \
+ C:/@Development/wxWidgets-3.1.5/include/wx/msw/statline.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/persist.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/confbase.h \
  C:/@Development/wxWidgets-3.1.5/include/wx/base64.h \
@@ -468,10 +473,6 @@ C:/@Development/wxWidgets-3.1.5/include/wx/stattext.h:
 
 C:/@Development/wxWidgets-3.1.5/include/wx/msw/stattext.h:
 
-C:/@Development/wxWidgets-3.1.5/include/wx/statline.h:
-
-C:/@Development/wxWidgets-3.1.5/include/wx/msw/statline.h:
-
 C:/@Development/wxWidgets-3.1.5/include/wx/button.h:
 
 C:/@Development/wxWidgets-3.1.5/include/wx/anybutton.h:
@@ -479,6 +480,20 @@ C:/@Development/wxWidgets-3.1.5/include/wx/anybutton.h:
 C:/@Development/wxWidgets-3.1.5/include/wx/msw/anybutton.h:
 
 C:/@Development/wxWidgets-3.1.5/include/wx/msw/button.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/textctrl.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/textentry.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/msw/textentry.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/ioswrap.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/msw/textctrl.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/statline.h:
+
+C:/@Development/wxWidgets-3.1.5/include/wx/msw/statline.h:
 
 C:/@Development/wxWidgets-3.1.5/include/wx/persist.h:
 

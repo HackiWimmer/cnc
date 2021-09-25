@@ -105,6 +105,7 @@
   <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
   <object class="wxBitmap" name="actionrun">bitmaps\actionrun.png</object>
   <object class="wxBitmap" name="align-vertical-top">bitmaps\align-vertical-top.png</object>
+  <object class="wxBitmap" name="application-cascade">bitmaps\application-cascade.png</object>
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
   <object class="wxBitmap" name="application-view-gallery">bitmaps\application-view-gallery.png</object>
@@ -158,6 +159,7 @@
   <object class="wxBitmap" name="iconmonstr-next-step-16">bitmaps\RunCtrl\iconmonstr-next-step-16.png</object>
   <object class="wxBitmap" name="iconmonstr-synchronization-8-16">bitmaps\RunCtrl\iconmonstr-synchronization-8-16.png</object>
   <object class="wxBitmap" name="iconmonstr-window-21-16">bitmaps\RunCtrl\iconmonstr-window-21-16.png</object>
+  <object class="wxBitmap" name="keyboard">bitmaps\keyboard.png</object>
   <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
   <object class="wxBitmap" name="network-wireless-full (2)">bitmaps\network-wireless-full (2).png</object>
   <object class="wxBitmap" name="network-wireless-low (2)">bitmaps\network-wireless-low (2).png</object>

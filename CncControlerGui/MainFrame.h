@@ -85,6 +85,7 @@ class CncPositionStorageView;
 class CncPodestManagement;
 class CncUsbConnectionObserver;
 class CncAnchorPosition;
+class CncSecureCtrlPanel;
 
 class CncTouchBlockDetector;
 
@@ -177,11 +178,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onExecuteOsk(wxCommandEvent& event);
 		virtual void testChangedSpindleSpeed(wxScrollEvent& event);
 		virtual void testChangingSpindleSpeed(wxScrollEvent& event);
 		virtual void toggleTemplateShowEOL(wxCommandEvent& event);
 		virtual void toggleTemplateShowWs(wxCommandEvent& event);
-		virtual void onSwitchSecLeftBook(wxCommandEvent& event);
 		virtual void traceAllCameraDevices(wxCommandEvent& event);
 		virtual void onDClickSpeedSliderValue(wxMouseEvent& event);
 		virtual void onToggleSecMainView(wxCommandEvent& event);
@@ -227,7 +228,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void openSpeedPlayground(wxCommandEvent& event);
 		virtual void onChangePreviewMode(wxCommandEvent& event);
 		virtual void connectSec(wxCommandEvent& event);
-		virtual void selectPortSec(wxCommandEvent& event);
 		virtual void onCloseSecureRunAuiPane(wxCommandEvent& event);
 		virtual void onOpenGLContextObserver(wxCommandEvent& event);
 		virtual void changeMonitorListBook(wxListbookEvent& event);
@@ -611,6 +611,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
 		CncParsingSynopsisTrace* getParsingSynopsisTrace();
 		
+		bool setTemplateName(const wxString& pathFile);
+		bool setTemplateName(const wxFileName& pathFile);
+		bool getFirstLruFile(wxString& ret);
+		void openTemplate();
+		
 		bool readSerialThreadData(AE::TransferData& td);
 		
 		bool startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z);
@@ -620,6 +625,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool stopInteractiveMove();
 		
 		bool connectSerialPort();
+		void selectPort(const wxString& portName);
 		
 		void decorateProbeMode(bool probeMode);
 		void decorateSecureDlgChoice(bool useDlg);
@@ -666,6 +672,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncGamepadTransactionLock;
 		friend class CncGamepadMenuDlg;
 		friend class CncSerialSpyPanel;
+		friend class CncSecureCtrlPanel;
 
 		friend class GamepadThread;
 		friend class SerialThread;
@@ -707,6 +714,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncOutboundEditor* 				outboundEditor;
 		CncMotionMonitor* 				motionMonitor;
 		CncFileView* 					fileView;
+		CncFileView*					transferFileView;
 		CncFilePreview* 				mainFilePreview;
 		CncFilePreview* 				outboundFilePreview;
 		CncFilePreview* 				monitorFilePreview;
@@ -743,6 +751,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncPositionStorageView*			positionStorage;
 		CncUsbConnectionObserver*		usbConnectionObserver;
 		CncAnchorPosition*				anchorPositionDlg;
+		CncSecureCtrlPanel*				secureCtrlPanel;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;

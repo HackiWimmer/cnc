@@ -23,12 +23,21 @@
 ////////////////////////////////////////////////////////////////////
 namespace VersionInfo {
 	
-	const wxString major			= CNC_VERSION_MAJOR_STR;
-	const wxString minor			= CNC_VERSION_MINOR_STR;
-	const wxString index			= CNC_VERSION_INDEX_STR;
+	const wxString major				= CNC_VERSION_MAJOR_STR;
+	const wxString minor				= CNC_VERSION_MINOR_STR;
+	const wxString index				= CNC_VERSION_INDEX_STR;
 
-	const wxString text 			= "";
-	const wxString number			= CNC_VERSION_STR;
+	const wxString text 				= "";
+	const wxString number				= CNC_VERSION_STR;
+};
+
+////////////////////////////////////////////////////////////////////
+namespace PortSelector {
+	
+	const wxString BMP_PS_CONNECTED		= "BMP_PS_CONNECTED";
+	const wxString BMP_PS_AVAILABLE		= "BMP_PS_AVAILABLE";
+	const wxString BMP_PS_ACCESS_DENIED	= "BMP_PS_ACCESS_DENIED";
+	const wxString BMP_PS_UNKNOWN		= "BMP_PS_UNKNOWN";
 };
 
 ////////////////////////////////////////////////////////////////////

@@ -18,8 +18,9 @@
 #include <wx/panel.h>
 #include <wx/imaglist.h>
 #include <wx/stattext.h>
-#include <wx/statline.h>
 #include <wx/button.h>
+#include <wx/textctrl.h>
+#include <wx/statline.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -54,12 +55,16 @@ protected:
     wxPanel* m_wxSvgParent;
     wxPanel* m_panel39;
     wxPanel* m_panel41;
+    wxPanel* m_panel163;
+    wxButton* m_button167;
+    wxTextCtrl* m_comScanOutput;
     wxStaticLine* m_staticLine15;
     wxButton* m_buttonOK;
     wxButton* m_buttonCancel;
 
 protected:
     virtual void onInitDialog(wxInitDialogEvent& event) { event.Skip(); }
+    virtual void onScanCOM(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText21() { return m_staticText21; }
@@ -75,6 +80,9 @@ public:
     wxPanel* GetPanel37() { return m_panel37; }
     wxPanel* GetPanel39() { return m_panel39; }
     wxPanel* GetPanel41() { return m_panel41; }
+    wxButton* GetButton167() { return m_button167; }
+    wxTextCtrl* GetComScanOutput() { return m_comScanOutput; }
+    wxPanel* GetPanel163() { return m_panel163; }
     wxChoicebook* GetChoicebook74() { return m_choicebook74; }
     wxStaticLine* GetStaticLine15() { return m_staticLine15; }
     wxButton* GetButtonOK() { return m_buttonOK; }

@@ -21,6 +21,7 @@ class CncFileNameService {
 		static wxString		_configDirectory;
 		static wxString		_baseDirectory;
 		static wxString		_databaseDirectory;
+		static wxString		_transferDirectory;
 		static wxString		_session;
 		static wxString		_configFileName;
 		static wxString		_lruFileName;
@@ -46,6 +47,7 @@ class CncFileNameService {
 		static const wxString& getTempDirSession()						{ return _tempDirectorySession; }
 		static const wxString& getConfigDir()							{ return _configDirectory; }
 		static const wxString& getDatabaseDir() 						{ return _databaseDirectory; }
+		static const wxString& getTransferDir()							{ return _transferDirectory; }
 		
 		static const char* getSession()									{ return _session; }
 		

@@ -479,6 +479,8 @@ protected:
     wxNotebook* m_notebookFileView;
     wxPanel* m_panel9828;
     wxPanel* m_lruListPlaceholder;
+    wxPanel* m_panel9955;
+    wxPanel* m_mainFileTransferPlaceholder;
     wxPanel* m_panel9830;
     wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_winLoggerView;
@@ -580,38 +582,14 @@ protected:
     wxPanel* m_secureRunPanel;
     wxStaticBitmap* m_staticBitmap8269;
     wxStaticText* m_staticText8271;
+    wxStaticText* m_secureVersionInfo;
+    wxButton* m_btOskPanel;
     wxBitmapButton* m_btDearctivateSecureRunMode;
     wxButton* m_btCloseSecurePanel;
-    wxStaticLine* m_staticLine8267;
-    wxPanel* m_secToolbar;
-    wxBitmapButton* m_loadTemplateSec;
-    wxStaticLine* m_staticLine8346;
-    wxStaticText* m_staticText18423;
-    wxBitmapComboBox* m_portSelectorSec;
-    wxBitmapButton* m_btConnectSec;
-    wxStaticLine* m_staticLine83464;
-    wxBitmapButton* m_btZeroSec;
-    wxBitmapButton* m_btEvaluateHWRef;
-    wxStaticLine* m_staticLine834643;
-    wxBitmapToggleButton* m_btTogglePreviewMonitorSec;
-    wxPanel* m_panel8328;
-    wxBitmapButton* m_rcRunSec;
-    wxStaticLine* m_staticLine8291;
-    wxBitmapButton* m_rcPauseSec;
-    wxBitmapButton* m_rcStopSec;
-    wxStaticLine* m_staticLine82917;
-    wxButton* m_btnEmergenyStopSec;
     wxStaticLine* m_staticLine9185;
     wxSplitterWindow* m_secureSplitterMainV;
     wxPanel* m_splitterPageLeft;
-    wxSimplebook* m_secLeftBook;
-    wxPanel* m_panelSecPreview;
-    wxPanel* m_fileViewsPlaceholder;
-    wxPanel* m_panelSecProcess;
-    wxSplitterWindow* m_splitterProcessLeft;
-    wxPanel* m_splitterPage9916;
-    wxPanel* m_secSpeedMonitorPlaceholder;
-    wxPanel* m_splitterPage9920;
+    wxPanel* m_securityCtrlPanelPlaceholder;
     wxPanel* m_secGamepadPlaceholder;
     wxPanel* m_cncOverviewsPlaceholder;
     wxPanel* m_splitterPageRight;
@@ -619,7 +597,6 @@ protected:
     wxPanel* m_splitterPageMonitor;
     wxSimplebook* m_secureMainBook;
     wxPanel* m_panelMonitor;
-    wxStaticText* m_staticTextMotionMoinitor1;
     wxPanel* m_secMonitorPlaceholder;
     wxButton* m_3D_TopSec;
     wxButton* m_3D_BottomSec;
@@ -633,8 +610,17 @@ protected:
     wxButton* m_3D_Perspective3Sec;
     wxButton* m_3D_Perspective4Sec;
     wxStaticLine* m_staticLine234122;
+    wxStaticLine* m_staticLine9953;
     wxPanel* m_splitterPageLogger;
+    wxSplitterWindow* m_secureSplitterLoggerV;
+    wxPanel* m_splitterPageLoggerV;
     wxPanel* m_secLoggerPlaceholder;
+    wxPanel* m_splitterPagePreviewV;
+    wxSimplebook* m_securePreviewBook;
+    wxPanel* m_panel9997;
+    wxPanel* m_leftTplPrevirePlaceholder;
+    wxPanel* m_panel9999;
+    wxPanel* m_rightTplPrevirePlaceholder;
     wxPanel* m_cncGamepadSpy;
     wxPanel* m_gamepadSpyPlaceholder;
     wxPanel* m_cncCoordinateView;
@@ -891,12 +877,9 @@ protected:
     virtual void goPosSypPrevId(wxCommandEvent& event) { event.Skip(); }
     virtual void goPosSypNextId(wxCommandEvent& event) { event.Skip(); }
     virtual void onPaintSpeedPanel(wxPaintEvent& event) { event.Skip(); }
+    virtual void onExecuteOsk(wxCommandEvent& event) { event.Skip(); }
     virtual void onDeactivateSecureRunMode(wxCommandEvent& event) { event.Skip(); }
     virtual void onCloseSecureRunAuiPane(wxCommandEvent& event) { event.Skip(); }
-    virtual void onSwitchSecLeftBook(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectPortSec(wxCommandEvent& event) { event.Skip(); }
-    virtual void connectSec(wxCommandEvent& event) { event.Skip(); }
-    virtual void onToggleSecMainView(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
@@ -1382,6 +1365,8 @@ public:
     wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
     wxPanel* GetLruListPlaceholder() { return m_lruListPlaceholder; }
     wxPanel* GetPanel9828() { return m_panel9828; }
+    wxPanel* GetMainFileTransferPlaceholder() { return m_mainFileTransferPlaceholder; }
+    wxPanel* GetPanel9955() { return m_panel9955; }
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
     wxPanel* GetPanel9830() { return m_panel9830; }
     wxNotebook* GetNotebookFileView() { return m_notebookFileView; }
@@ -1485,40 +1470,15 @@ public:
     wxPanel* GetAccelaerationMonitorView() { return m_accelaerationMonitorView; }
     wxStaticBitmap* GetStaticBitmap8269() { return m_staticBitmap8269; }
     wxStaticText* GetStaticText8271() { return m_staticText8271; }
+    wxStaticText* GetSecureVersionInfo() { return m_secureVersionInfo; }
+    wxButton* GetBtOskPanel() { return m_btOskPanel; }
     wxBitmapButton* GetBtDearctivateSecureRunMode() { return m_btDearctivateSecureRunMode; }
     wxButton* GetBtCloseSecurePanel() { return m_btCloseSecurePanel; }
-    wxStaticLine* GetStaticLine8267() { return m_staticLine8267; }
-    wxBitmapButton* GetLoadTemplateSec() { return m_loadTemplateSec; }
-    wxStaticLine* GetStaticLine8346() { return m_staticLine8346; }
-    wxStaticText* GetStaticText18423() { return m_staticText18423; }
-    wxBitmapComboBox* GetPortSelectorSec() { return m_portSelectorSec; }
-    wxBitmapButton* GetBtConnectSec() { return m_btConnectSec; }
-    wxStaticLine* GetStaticLine83464() { return m_staticLine83464; }
-    wxBitmapButton* GetBtZeroSec() { return m_btZeroSec; }
-    wxBitmapButton* GetBtEvaluateHWRef() { return m_btEvaluateHWRef; }
-    wxStaticLine* GetStaticLine834643() { return m_staticLine834643; }
-    wxBitmapToggleButton* GetBtTogglePreviewMonitorSec() { return m_btTogglePreviewMonitorSec; }
-    wxPanel* GetPanel8328() { return m_panel8328; }
-    wxBitmapButton* GetRcRunSec() { return m_rcRunSec; }
-    wxStaticLine* GetStaticLine8291() { return m_staticLine8291; }
-    wxBitmapButton* GetRcPauseSec() { return m_rcPauseSec; }
-    wxBitmapButton* GetRcStopSec() { return m_rcStopSec; }
-    wxStaticLine* GetStaticLine82917() { return m_staticLine82917; }
-    wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
-    wxPanel* GetSecToolbar() { return m_secToolbar; }
     wxStaticLine* GetStaticLine9185() { return m_staticLine9185; }
-    wxPanel* GetFileViewsPlaceholder() { return m_fileViewsPlaceholder; }
-    wxPanel* GetPanelSecPreview() { return m_panelSecPreview; }
-    wxPanel* GetSecSpeedMonitorPlaceholder() { return m_secSpeedMonitorPlaceholder; }
-    wxPanel* GetSplitterPage9916() { return m_splitterPage9916; }
+    wxPanel* GetSecurityCtrlPanelPlaceholder() { return m_securityCtrlPanelPlaceholder; }
     wxPanel* GetSecGamepadPlaceholder() { return m_secGamepadPlaceholder; }
     wxPanel* GetCncOverviewsPlaceholder() { return m_cncOverviewsPlaceholder; }
-    wxPanel* GetSplitterPage9920() { return m_splitterPage9920; }
-    wxSplitterWindow* GetSplitterProcessLeft() { return m_splitterProcessLeft; }
-    wxPanel* GetPanelSecProcess() { return m_panelSecProcess; }
-    wxSimplebook* GetSecLeftBook() { return m_secLeftBook; }
     wxPanel* GetSplitterPageLeft() { return m_splitterPageLeft; }
-    wxStaticText* GetStaticTextMotionMoinitor1() { return m_staticTextMotionMoinitor1; }
     wxPanel* GetSecMonitorPlaceholder() { return m_secMonitorPlaceholder; }
     wxButton* Get3D_TopSec() { return m_3D_TopSec; }
     wxButton* Get3D_BottomSec() { return m_3D_BottomSec; }
@@ -1534,8 +1494,17 @@ public:
     wxStaticLine* GetStaticLine234122() { return m_staticLine234122; }
     wxPanel* GetPanelMonitor() { return m_panelMonitor; }
     wxSimplebook* GetSecureMainBook() { return m_secureMainBook; }
+    wxStaticLine* GetStaticLine9953() { return m_staticLine9953; }
     wxPanel* GetSplitterPageMonitor() { return m_splitterPageMonitor; }
     wxPanel* GetSecLoggerPlaceholder() { return m_secLoggerPlaceholder; }
+    wxPanel* GetSplitterPageLoggerV() { return m_splitterPageLoggerV; }
+    wxPanel* GetLeftTplPrevirePlaceholder() { return m_leftTplPrevirePlaceholder; }
+    wxPanel* GetPanel9997() { return m_panel9997; }
+    wxPanel* GetRightTplPrevirePlaceholder() { return m_rightTplPrevirePlaceholder; }
+    wxPanel* GetPanel9999() { return m_panel9999; }
+    wxSimplebook* GetSecurePreviewBook() { return m_securePreviewBook; }
+    wxPanel* GetSplitterPagePreviewV() { return m_splitterPagePreviewV; }
+    wxSplitterWindow* GetSecureSplitterLoggerV() { return m_secureSplitterLoggerV; }
     wxPanel* GetSplitterPageLogger() { return m_splitterPageLogger; }
     wxSplitterWindow* GetSecureSplitterMainH() { return m_secureSplitterMainH; }
     wxPanel* GetSplitterPageRight() { return m_splitterPageRight; }

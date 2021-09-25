@@ -38,6 +38,20 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
+    <VirtualDirectory Name="Secure">
+      <File Name="CncSecureSlidepadDialog.h"/>
+      <File Name="CncSecureSlidepadDialog.cpp"/>
+      <File Name="CncSecureSlidepad.h"/>
+      <File Name="CncSecureSlidepad.cpp"/>
+      <File Name="CncSecureNumpadDialog.h"/>
+      <File Name="CncSecureNumpadDialog.cpp"/>
+      <File Name="CncSecureCtrlPanel.h"/>
+      <File Name="CncSecureCtrlPanel.cpp"/>
+      <File Name="CncSecureManuallyMovePanel.h"/>
+      <File Name="CncSecureManuallyMovePanel.cpp"/>
+      <File Name="CncSecureNumpad.h"/>
+      <File Name="CncSecureNumpad.cpp"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="wxCode">
       <File Name="wxCode/lcdwindow.h"/>
       <File Name="wxCode/lcdwindow.cpp"/>
@@ -252,6 +266,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncMoveDefinition.h"/>
+      <File Name="CncFileViewCallback.h"/>
       <File Name="CncGamepadFilter.h"/>
       <File Name="CncGamepadFilter.cpp"/>
       <File Name="CncAnchorInfo.h"/>
@@ -422,6 +438,9 @@
       <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Debug;release2;Gprof;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterSecurePanel.h"/>
+      <File Name="wxCrafterSecurePanel_bitmaps.cpp"/>
+      <File Name="wxCrafterSecurePanel.cpp"/>
       <File Name="wxCrafterPodestManagement_bitmaps.cpp"/>
       <File Name="wxCrafterPodestManagement.h"/>
       <File Name="wxCrafterPodestManagement.cpp"/>
@@ -642,6 +661,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
+    <File Name="wxCrafterSecurePanel.wxcp"/>
     <File Name="wxCrafterPodestManagement.wxcp"/>
     <File Name="wxCrafterSerialSpy.wxcp"/>
     <File Name="wxCrafterLoggerPanel.wxcp"/>
@@ -887,7 +907,7 @@
         <Library Value="libopencv_highgui451"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags );-D NDEBUG;" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="$(ConfigurationName)" Command="$(OutputFile)" CommandArguments="" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="$(ConfigurationName)" Command="$(OutputFile)" CommandArguments="-s" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -906,7 +926,7 @@
         <Command Enabled="yes">where g++</Command>
       </PreBuild>
       <PostBuild>
-        <Command Enabled="yes">copy "C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\Release\CncControllerGui.exe" c:\temp</Command>
+        <Command Enabled="yes">copy "C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\Release\CncControllerGui.exe" "t:\"</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
