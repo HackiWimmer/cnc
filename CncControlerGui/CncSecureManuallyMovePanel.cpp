@@ -20,22 +20,16 @@ CncSecureManuallyMovePanel::CncSecureManuallyMovePanel(wxWindow* parent)
 	axisButtons.push_back(m_btX);
 	axisButtons.push_back(m_btY);
 	axisButtons.push_back(m_btZ);
-	axisButtons.push_back(m_btx);
-	axisButtons.push_back(m_bty);
-	axisButtons.push_back(m_btz);
 	
 	dimButtons.push_back(m_bt1D);
 	dimButtons.push_back(m_bt2D);
 	dimButtons.push_back(m_bt3D);
 	
-	for ( auto it=axisButtons.begin(); it != axisButtons.end(); ++it )
-		(*it)->SetValue(false);
-	
 	for ( auto it=dimButtons.begin(); it != dimButtons.end(); ++it )
 		(*it)->SetValue(false);
 
 	m_bt2D->SetValue(true);
-	setCurrentAxisMode('X');
+	
 	updateResult();
 }
 /////////////////////////////////////////////////////////////////
@@ -63,6 +57,7 @@ void CncSecureManuallyMovePanel::onClearZ(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////
 void CncSecureManuallyMovePanel::onClearF(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////
+	currentValueF = cnc::getSpeedValue(FINE);
 	updateResult();
 }
 /////////////////////////////////////////////////////////////////
@@ -82,59 +77,24 @@ void CncSecureManuallyMovePanel::onAxis(wxCommandEvent& event) {
 	wxToggleButton* bt = ((wxToggleButton*)(event.GetEventObject()));
 	
 	if ( bt ) {
-		setCurrentAxisMode(bt->GetLabel());
-		updateResult();
+		const char axis = bt->GetLabel().Length() > 0 ? bt->GetLabel()[0] : INVALID_AXIS;
+		
+		switch ( axis ) {
+			case 'x':		bt->SetLabel("X"); break;
+			case 'X':		bt->SetLabel("x"); break;
+			case 'y':		bt->SetLabel("Y"); break;
+			case 'Y':		bt->SetLabel("y"); break;
+			case 'z':		bt->SetLabel("Z"); break;
+			case 'Z':		bt->SetLabel("z"); break;
+			case 'f':
+			case 'F':		bt->SetLabel("F"); break;
+			default:		currentAxis = INVALID_AXIS;
+		}
 	}
-}
-/////////////////////////////////////////////////////////////////
-bool CncSecureManuallyMovePanel::setCurrentAxisMode(const char axis) {
-/////////////////////////////////////////////////////////////////
-	wxToggleButton* bt = NULL;
-	
-	switch ( axis ) {
-		case 'x':		currentAxis = axis; bt = m_btx; break;
-		case 'X':		currentAxis = axis; bt = m_btX; break;
-		case 'y':		currentAxis = axis; bt = m_bty; break;
-		case 'Y':		currentAxis = axis; bt = m_btY; break;
-		case 'z':		currentAxis = axis; bt = m_btz; break;
-		case 'Z':		currentAxis = axis; bt = m_btZ; break;
-		default:		currentAxis = INVALID_AXIS;
-	}
-	
-	// reset selection
-	for ( auto it=axisButtons.begin(); it != axisButtons.end(); ++it ) {
-		(*it)->SetValue(false);
-	}
-	
-	if ( bt == NULL )
-		return false;
-	
-	bt->SetValue(true);
-	return true;
-}
-/////////////////////////////////////////////////////////////////
-bool CncSecureManuallyMovePanel::setCurrentAxisMode(const wxString& axis) {
-/////////////////////////////////////////////////////////////////
-	if ( axis.Length() > 0 )
-		return setCurrentAxisMode((const char)axis[0]);
-	
-	return false;
 }
 /////////////////////////////////////////////////////////////////
 void CncSecureManuallyMovePanel::updateResult() {
 /////////////////////////////////////////////////////////////////
-	switch ( currentAxis ) {
-		case 'x':
-		case 'X':		m_axisX->ChangeValue(wxString::Format("%c", currentAxis));
-						break;
-		case 'y':
-		case 'Y':		m_axisY->ChangeValue(wxString::Format("%c", currentAxis));
-						break;
-		case 'z':
-		case 'Z':		m_axisZ->ChangeValue(wxString::Format("%c", currentAxis));
-						break;
-	}
-	
 	m_valueX->ChangeValue(wxString::Format(AXIS_RESULT_FORMAT,  currentValueX));
 	m_valueY->ChangeValue(wxString::Format(AXIS_RESULT_FORMAT,  currentValueY));
 	m_valueZ->ChangeValue(wxString::Format(AXIS_RESULT_FORMAT,  currentValueZ));
@@ -144,125 +104,63 @@ void CncSecureManuallyMovePanel::updateResult() {
 	m_btMove->Enable(b);
 }
 /////////////////////////////////////////////////////////////////
-double CncSecureManuallyMovePanel::getCurrentAxisValue() {
-/////////////////////////////////////////////////////////////////
-	double value = 0.0;
-	switch ( currentAxis ) {
-		case 'x':
-		case 'X':		value = currentValueX;
-						break;
-		case 'y':
-		case 'Y':		value = currentValueY;
-						break;
-		case 'z':
-		case 'Z':		value = currentValueZ;
-						break;
-						
-		default:		std::cerr	<< CNC_LOG_FUNCT_A(wxString::Format(" : Invalid currentAxis '%c'!", currentAxis)) 
-									<< std::endl;
-	}
-	
-	return value;
-}
-/////////////////////////////////////////////////////////////////
-bool CncSecureManuallyMovePanel::setCurrentAxisValue(double v) {
-/////////////////////////////////////////////////////////////////
-	switch ( currentAxis ) {
-		case 'x':
-		case 'X':		currentValueX = v;
-						return true;
-		case 'y':
-		case 'Y':		currentValueY = v;
-						return true;
-		case 'z':
-		case 'Z':		currentValueZ = v;
-						return true;
-						
-		default:		std::cerr	<< CNC_LOG_FUNCT_A(wxString::Format(" : Invalid currentAxis '%c'!", currentAxis)) 
-									<< std::endl;
-	}
-	
-	return false;
-}
-/////////////////////////////////////////////////////////////////
-const wxString& CncSecureManuallyMovePanel::prepareStringValue(wxString& strVal) {
-/////////////////////////////////////////////////////////////////
-	double value			= getCurrentAxisValue();
-	
-	if ( value == 0.0 )  {
-		if ( lastNumber == DOT )	strVal.assign(wxString::Format("0%c", DOT));
-		else						strVal.assign("");
-	}
-	else {
-		strVal.assign(wxString::Format(AXIS_RESULT_FORMAT, value));
-		
-		// remove tailing charters on demand
-		if ( strVal.Length() > 0 && strVal.Contains(DOT) ) {
-			while ( strVal.Length() > 0 && ( strVal.Last() == '0' || strVal.Last() == DOT ) ) {
-				strVal.RemoveLast();
-			}
-		}
-		
-		if ( lastNumber == DOT ) {
-			strVal.append(DOT);
-		}
-		else {
-			if ( lastNumber != BKS && strVal.Length() == wxString("+123").Length() ) {
-				strVal.append(DOT);
-			}
-		}
-	}
-	
-	return strVal;
-}
-/////////////////////////////////////////////////////////////////
 void CncSecureManuallyMovePanel::onLeftDownResultValue(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////
 	event.Skip(false);
 	
-	wxString info;
+	enum Type { NUMPAD, SLIDEPAD };
 	wxTextCtrl* rv = ((wxTextCtrl*)(event.GetEventObject()));
-	if      ( rv == m_valueX )	{ setCurrentAxisMode(m_axisX->GetValue());	info.assign(m_axisX->GetValue()); }
-	else if ( rv == m_valueY )	{ setCurrentAxisMode(m_axisY->GetValue());	info.assign(m_axisY->GetValue()); }
-	else if ( rv == m_valueZ )	{ setCurrentAxisMode(m_axisZ->GetValue());	info.assign(m_axisZ->GetValue()); }
-	else if ( rv == m_valueF )	{ setCurrentAxisMode(INVALID_AXIS); 		info.assign(m_axisF->GetValue()); }
+	
+	// ----------------------------------------------------------
+	auto updateValue = [&](Type type, double& currentValue, const wxString& info) {
+		switch ( type )
+		{
+			case SLIDEPAD:
+			{
+				CncSecureSlidepadDialog dlg(this);
+				CncSecureSlidepad::SliderValues values;
+				/*
+				values.push_back(cnc::getSpeedValue(FINEST));
+				values.push_back(cnc::getSpeedValue(FINE));
+				values.push_back(cnc::getSpeedValue(MEDIUM));
+				values.push_back(cnc::getSpeedValue(ROUGH));
+				values.push_back(cnc::getSpeedValue(ROUGHEST));
+				*/
+				values.push_back(cnc::getSpeedValue(FINEST));
+				values.push_back(cnc::getSpeedValue(ROUGHEST));
+				
+				dlg.setValues(values, currentValue);
+				dlg.setInfo(info);
+				dlg.Center(wxCENTRE_ON_SCREEN);
+				
+				if ( dlg.ShowModal() == wxID_OK ) 
+					currentValue = (double)(dlg.getValue());
+					
+				break;
+			}
+			case NUMPAD:
+			{
+				CncSecureNumpadDialog dlg(this->GetParent(), CncSecureNumpad::Type::DOUBLE);
+				dlg.setValue(currentValue);
+				dlg.setInfo(info);
+				dlg.Center(wxCENTRE_ON_SCREEN);
+				
+				if ( dlg.ShowModal() == wxID_OK ) 
+					currentValue = dlg.getValueAsDouble();
+					
+				break;
+			}
+		}
+	};
+	
+	// ----------------------------------------------------------
+	if      ( rv == m_valueX )	{ updateValue(NUMPAD,   currentValueX, m_btX->GetLabel()); }
+	else if ( rv == m_valueY )	{ updateValue(NUMPAD,   currentValueY, m_btY->GetLabel()); }
+	else if ( rv == m_valueZ )	{ updateValue(NUMPAD,   currentValueZ, m_btZ->GetLabel()); }
+	else if ( rv == m_valueF )	{ updateValue(SLIDEPAD, currentValueF, m_btF->GetLabel()); }
 	else						return;
 	
-	if ( currentAxis == INVALID_AXIS )
-	{
-		CncSecureSlidepadDialog dlg(this);
-		CncSecureSlidepad::SliderValues values;
-		/*
-		values.push_back(cnc::getSpeedValue(FINEST));
-		values.push_back(cnc::getSpeedValue(FINE));
-		values.push_back(cnc::getSpeedValue(MEDIUM));
-		values.push_back(cnc::getSpeedValue(ROUGH));
-		values.push_back(cnc::getSpeedValue(ROUGHEST));
-		*/
-		values.push_back(cnc::getSpeedValue(FINEST));
-		values.push_back(cnc::getSpeedValue(ROUGHEST));
-		
-		double val; m_valueF->GetValue().ToDouble(&val);
-		dlg.setValues(values, val);
-		dlg.setInfo(info);
-		dlg.Center(wxCENTRE_ON_SCREEN);
-		
-		if ( dlg.ShowModal() == wxID_OK ) 
-			m_valueF->ChangeValue(wxString::Format(SPEED_RESULT_FORMAT, (double)(dlg.getValue())));
-	}
-	else 
-	{
-		CncSecureNumpadDialog dlg(this->GetParent(), CncSecureNumpad::Type::DOUBLE);
-		dlg.setValue(getCurrentAxisValue());
-		dlg.setInfo(info);
-		dlg.Center(wxCENTRE_ON_SCREEN);
-		
-		if ( dlg.ShowModal() == wxID_OK ) 
-		{
-			setCurrentAxisValue(dlg.getValueAsDouble());
-			updateResult();
-		}
-	}
+	updateResult();
 }
 /////////////////////////////////////////////////////////////////
 void CncSecureManuallyMovePanel::onMove(wxCommandEvent& event) {
@@ -279,11 +177,11 @@ void CncSecureManuallyMovePanel::onMove(wxCommandEvent& event) {
 	
 	CncMoveDefinition cmd;
 	
-	cmd.x.absolute	= (char)(m_axisX->GetValue()[0]) == 'X';
+	cmd.x.absolute	= (char)(m_btX->GetLabel()[0]) == 'X';
 	cmd.x.value		= currentValueX;
-	cmd.y.absolute	= (char)(m_axisY->GetValue()[0]) == 'Y';
+	cmd.y.absolute	= (char)(m_btY->GetLabel()[0]) == 'Y';
 	cmd.y.value		= currentValueY;
-	cmd.z.absolute	= (char)(m_axisZ->GetValue()[0]) == 'Z';
+	cmd.z.absolute	= (char)(m_btZ->GetLabel()[0]) == 'Z';
 	cmd.z.value		= currentValueZ;
 	//cmd.f			= currentEnumF;
 	cmd.speedMode	= CncSpeedMode::CncSpeedRapid;

@@ -13,14 +13,14 @@
 #include <wx/panel.h>
 #include <wx/artprov.h>
 #include <wx/sizer.h>
+#include <wx/stattext.h>
 #include <wx/listbook.h>
 #include <wx/imaglist.h>
-#include <wx/stattext.h>
 #include <wx/simplebook.h>
 #include <wx/button.h>
 #include <wx/tglbtn.h>
-#include <wx/statline.h>
 #include <wx/textctrl.h>
+#include <wx/statline.h>
 #include <wx/scrolbar.h>
 #include <wx/dialog.h>
 #include <wx/iconbndl.h>
@@ -44,6 +44,8 @@
 class CncSecureCtrlPanelBase : public wxPanel
 {
 protected:
+    wxStaticText* m_staticText433;
+    wxStaticText* m_PortName;
     wxListbook* m_leftBook;
     wxPanel* m_lpConnect;
     wxPanel* m_lpLoad;
@@ -96,6 +98,8 @@ protected:
     virtual void onStackTraceStoreSec(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText433() { return m_staticText433; }
+    wxStaticText* GetPortName() { return m_PortName; }
     wxPanel* GetLpConnect() { return m_lpConnect; }
     wxPanel* GetLpLoad() { return m_lpLoad; }
     wxPanel* GetLpRef() { return m_lpRef; }
@@ -139,25 +143,17 @@ class CncSecureManuallyMovePanelBase : public wxPanel
 {
 protected:
     wxToggleButton* m_btX;
-    wxToggleButton* m_btY;
-    wxToggleButton* m_btZ;
-    wxToggleButton* m_btx;
-    wxToggleButton* m_bty;
-    wxToggleButton* m_btz;
-    wxStaticLine* m_staticLine282;
-    wxTextCtrl* m_axisX;
     wxTextCtrl* m_valueX;
     wxTextCtrl* m_unitX;
-    wxTextCtrl* m_axisY;
+    wxToggleButton* m_btY;
     wxTextCtrl* m_valueY;
     wxTextCtrl* m_unitY;
-    wxTextCtrl* m_axisZ;
+    wxToggleButton* m_btZ;
     wxTextCtrl* m_valueZ;
     wxTextCtrl* m_unitZ;
-    wxTextCtrl* m_axisF;
+    wxToggleButton* m_btF;
     wxTextCtrl* m_valueF;
-    wxTextCtrl* m_unitF1;
-    wxTextCtrl* m_unitF2;
+    wxTextCtrl* m_unitF;
     wxStaticLine* m_staticLine2823;
     wxToggleButton* m_bt1D;
     wxToggleButton* m_bt2D;
@@ -176,25 +172,17 @@ protected:
 
 public:
     wxToggleButton* GetBtX() { return m_btX; }
-    wxToggleButton* GetBtY() { return m_btY; }
-    wxToggleButton* GetBtZ() { return m_btZ; }
-    wxToggleButton* GetBtx() { return m_btx; }
-    wxToggleButton* GetBty() { return m_bty; }
-    wxToggleButton* GetBtz() { return m_btz; }
-    wxStaticLine* GetStaticLine282() { return m_staticLine282; }
-    wxTextCtrl* GetAxisX() { return m_axisX; }
     wxTextCtrl* GetValueX() { return m_valueX; }
     wxTextCtrl* GetUnitX() { return m_unitX; }
-    wxTextCtrl* GetAxisY() { return m_axisY; }
+    wxToggleButton* GetBtY() { return m_btY; }
     wxTextCtrl* GetValueY() { return m_valueY; }
     wxTextCtrl* GetUnitY() { return m_unitY; }
-    wxTextCtrl* GetAxisZ() { return m_axisZ; }
+    wxToggleButton* GetBtZ() { return m_btZ; }
     wxTextCtrl* GetValueZ() { return m_valueZ; }
     wxTextCtrl* GetUnitZ() { return m_unitZ; }
-    wxTextCtrl* GetAxisF() { return m_axisF; }
+    wxToggleButton* GetBtF() { return m_btF; }
     wxTextCtrl* GetValueF() { return m_valueF; }
-    wxTextCtrl* GetUnitF1() { return m_unitF1; }
-    wxTextCtrl* GetUnitF2() { return m_unitF2; }
+    wxTextCtrl* GetUnitF() { return m_unitF; }
     wxStaticLine* GetStaticLine2823() { return m_staticLine2823; }
     wxToggleButton* GetBt1D() { return m_bt1D; }
     wxToggleButton* GetBt2D() { return m_bt2D; }

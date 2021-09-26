@@ -151,7 +151,8 @@ protected:
     wxTimer* m_observeTimer;
     wxTimer* m_startupTimer;
     wxStaticBitmap* m_staticBitmap5593;
-    wxStaticText* m_staticText5589;
+    wxStaticText* m_staticText55891;
+    wxStaticText* m_portName;
     wxPanel* m_connectActivityPanel;
     wxStaticText* m_observeCounterLabel;
 
@@ -165,7 +166,8 @@ public:
     wxTimer* GetObserveTimer() { return m_observeTimer; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }
     wxStaticBitmap* GetStaticBitmap5593() { return m_staticBitmap5593; }
-    wxStaticText* GetStaticText5589() { return m_staticText5589; }
+    wxStaticText* GetStaticText55891() { return m_staticText55891; }
+    wxStaticText* GetPortName() { return m_portName; }
     wxPanel* GetConnectActivityPanel() { return m_connectActivityPanel; }
     wxStaticText* GetObserveCounterLabel() { return m_observeCounterLabel; }
     CncConnectProgressBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Serial Connect Progress"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxSTAY_ON_TOP|wxCAPTION);

@@ -45,7 +45,8 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("Last recently used:", wxLIST_FORMAT_LEFT, 250);
+	AppendColumn(""						, wxLIST_FORMAT_LEFT,  24);
+	AppendColumn("Last recently used:"	, wxLIST_FORMAT_LEFT, 250);
 	
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::REVERSE);
@@ -135,7 +136,7 @@ int CncLruFileViewListCtrl::OnGetItemColumnImage(long item, long column) const {
 	if ( isItemValid(item) == false )
 		return -1;
 		
-	if ( column != COL_FILE )
+	if ( column != COL_IMAGE )
 		return -1;
 
 	return item != getLastSelection() ? 0 : 1;
@@ -514,6 +515,7 @@ CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
+	AppendColumn(""			, wxLIST_FORMAT_LEFT,  24);
 	AppendColumn("Workarea:", wxLIST_FORMAT_LEFT, 250);
 	
 	// determine styles
@@ -624,7 +626,7 @@ int CncFileViewListCtrl::OnGetItemColumnImage(long item, long column) const {
 	if ( isItemValid(item) == false )
 		return -1;
 		
-	if ( column != COL_FILE )
+	if ( column != COL_IMAGE )
 		return -1;
 		
 	if ( fileEntries.at(item).imageIdx == FileListImage::FTI_FILE_SELECTED && item != getLastSelection() )

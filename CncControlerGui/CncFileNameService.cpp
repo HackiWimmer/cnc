@@ -254,7 +254,7 @@ void CncFileNameService::deleteFile(wxString fn) {
 		wxRemoveFile(fn);
 }
 ///////////////////////////////////////////////////////////////////
-const char* CncFileNameService::getTempFileName(const wxString& extention) {
+wxString CncFileNameService::getTempFileName(const wxString& extention) {
 ///////////////////////////////////////////////////////////////////
 	wxString ret = wxFileName::CreateTempFileName(_tempDirectorySession);
 	ret.append(".");
@@ -263,9 +263,8 @@ const char* CncFileNameService::getTempFileName(const wxString& extention) {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-const char* CncFileNameService::getTempFileName(CncTemplateFormat f) {
+wxString CncFileNameService::getTempFileName(CncTemplateFormat f) {
 ///////////////////////////////////////////////////////////////////
-	
 	switch ( f ) {
 		case TplBinary:		return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "BIN")); 
 		case TplSvg:		return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "SVG"));
@@ -273,12 +272,12 @@ const char* CncFileNameService::getTempFileName(CncTemplateFormat f) {
 		default:			return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "CTF"));
 	}
 	
-	return "";
+	return wxEmptyString;
 }
 ///////////////////////////////////////////////////////////////////
-const char* CncFileNameService::getCncTemplatePreviewFileName(CncTemplateFormat f) { 
+wxString CncFileNameService::getCncTemplatePreviewFileName(CncTemplateFormat f) { 
 ///////////////////////////////////////////////////////////////////
-	return "";
+	return wxEmptyString;
 }
 
 

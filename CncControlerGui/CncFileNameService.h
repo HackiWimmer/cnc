@@ -51,24 +51,24 @@ class CncFileNameService {
 		
 		static const char* getSession()									{ return _session; }
 		
-		static const char* getTempFileName(CncTemplateFormat f);
-		static const char* getTempFileName(const wxString& extention);
-		static const char* getCncTemplatePreviewFileName(CncTemplateFormat f);
+		static wxString getTempFileName(CncTemplateFormat f);
+		static wxString getTempFileName(const wxString& extention);
+		static wxString getCncTemplatePreviewFileName(CncTemplateFormat f);
 		
-		static const char* getStackTraceFileName()						{ return wxString(_tempDirectorySession + "CncStackTrace.txt"); }
+		static wxString getStackTraceFileName()							{ return wxString(_tempDirectorySession + "CncStackTrace.txt"); }
 		
-		static const char* getCncOutboundTxtFileName()					{ return wxString(_tempDirectorySession + "CncOutboundEmu.txt"); }
-		static const char* getCncOutboundSvgFileName()					{ return wxString(_tempDirectorySession + "CncOutboundEmu.svg"); }
-		static const char* getCncOutboundGCodeFileName()				{ return wxString(_tempDirectorySession + "CncOutboundEmu.gcode"); }
-		static const char* getCncOutboundBinFileName()					{ return wxString(_tempDirectorySession + "CncOutboundEmu.bct"); }
+		static wxString getCncOutboundTxtFileName()						{ return wxString(_tempDirectorySession + "CncOutboundEmu.txt"); }
+		static wxString getCncOutboundSvgFileName()						{ return wxString(_tempDirectorySession + "CncOutboundEmu.svg"); }
+		static wxString getCncOutboundGCodeFileName()					{ return wxString(_tempDirectorySession + "CncOutboundEmu.gcode"); }
+		static wxString getCncOutboundBinFileName()						{ return wxString(_tempDirectorySession + "CncOutboundEmu.bct"); }
 		
-		static const char* getCncOutboundTempFileName()					{ return wxString(_tempDirectorySession + "CncOutboundTempEmu.xml"); }
-		static const char* getCncDrawPaneTraceFileName()				{ return wxString(_tempDirectorySession + "CncDrawPaneTrace.txt"); }
+		static wxString getCncOutboundTempFileName()					{ return wxString(_tempDirectorySession + "CncOutboundTempEmu.xml"); }
+		static wxString getCncDrawPaneTraceFileName()					{ return wxString(_tempDirectorySession + "CncDrawPaneTrace.txt"); }
 		
-		static const char* getBlankHtmlPageFileName()					{ return wxString(_tempDirectorySession + "CncBlank.html"); }
-		static const char* getErrorHtmlPageFileName()					{ return wxString(_tempDirectorySession + "CncError.html"); }
+		static wxString getBlankHtmlPageFileName()						{ return wxString(_tempDirectorySession + "CncBlank.html"); }
+		static wxString getErrorHtmlPageFileName()						{ return wxString(_tempDirectorySession + "CncError.html"); }
 		
-		static const char* getCncPathListFileStoreDefFileName()			{ return wxString(_tempDirectorySession + "CncPathListFileStore.csv"); }
+		static wxString getCncPathListFileStoreDefFileName()			{ return wxString(_tempDirectorySession + "CncPathListFileStore.csv"); }
 		
 		static void deleteCncOutboundSvgFileName()						{ deleteFile(wxString(getCncOutboundSvgFileName())); }
 		static void deleteCncOutboundTempFileName()						{ deleteFile(wxString(getCncOutboundTempFileName())); }

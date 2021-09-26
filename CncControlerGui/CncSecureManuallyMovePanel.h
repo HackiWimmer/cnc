@@ -40,10 +40,6 @@ class CncSecureManuallyMovePanel : public CncSecureManuallyMovePanelBase {
 		double				currentValueF;
 		
 		void				updateResult();
-		double				getCurrentAxisValue();
-		bool				setCurrentAxisValue(double v);
-		bool				setCurrentAxisMode(const char axis);
-		bool				setCurrentAxisMode(const wxString& axis);
 		const wxString&		prepareStringValue(wxString& val);
 		
 };

@@ -487,6 +487,8 @@ CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, 
     wxFlexGridSizer* flexGridSizer5582 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer5582->SetFlexibleDirection( wxBOTH );
     flexGridSizer5582->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5582->AddGrowableCol(1);
+    flexGridSizer5582->AddGrowableRow(0);
     
     boxSizer5596->Add(flexGridSizer5582, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
@@ -494,19 +496,26 @@ CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer5582->Add(m_staticBitmap5593, 0, wxALL, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer5591 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer5591 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer5591->SetFlexibleDirection( wxBOTH );
     flexGridSizer5591->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5591->AddGrowableCol(0);
-    flexGridSizer5591->AddGrowableRow(1);
+    flexGridSizer5591->AddGrowableRow(2);
     
     flexGridSizer5582->Add(flexGridSizer5591, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticText5589 = new wxStaticText(this, wxID_ANY, _("Connecting the Serial Port. . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5589Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5589->SetFont(m_staticText5589Font);
+    m_staticText55891 = new wxStaticText(this, wxID_ANY, _("Connecting the Serial Port . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText55891Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText55891->SetFont(m_staticText55891Font);
     
-    flexGridSizer5591->Add(m_staticText5589, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5591->Add(m_staticText55891, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_portName = new wxStaticText(this, wxID_ANY, _("<PortName>"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_portName->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_portNameFont(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_portName->SetFont(m_portNameFont);
+    
+    flexGridSizer5591->Add(m_portName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     wxFlexGridSizer* flexGridSizer169 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer169->SetFlexibleDirection( wxBOTH );
@@ -514,20 +523,20 @@ CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer169->AddGrowableCol(0);
     flexGridSizer169->AddGrowableRow(0);
     
-    flexGridSizer5591->Add(flexGridSizer169, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer5591->Add(flexGridSizer169, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_connectActivityPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(120,16)), wxTAB_TRAVERSAL);
+    m_connectActivityPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,16)), wxTAB_TRAVERSAL);
     m_connectActivityPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     
-    flexGridSizer169->Add(m_connectActivityPanel, 0, wxALL, WXC_FROM_DIP(5));
-    m_connectActivityPanel->SetMinSize(wxSize(120,16));
+    flexGridSizer169->Add(m_connectActivityPanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    m_connectActivityPanel->SetMinSize(wxSize(-1,16));
     
     m_observeCounterLabel = new wxStaticText(this, wxID_ANY, _("0"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(30,-1)), wxALIGN_RIGHT);
     m_observeCounterLabel->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_observeCounterLabelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_observeCounterLabel->SetFont(m_observeCounterLabelFont);
     
-    flexGridSizer169->Add(m_observeCounterLabel, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer169->Add(m_observeCounterLabel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     m_observeCounterLabel->SetMinSize(wxSize(30,-1));
     
     SetName(wxT("CncConnectProgressBase"));

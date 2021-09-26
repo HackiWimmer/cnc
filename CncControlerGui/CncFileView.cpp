@@ -32,7 +32,7 @@ CncFileView::CncFileView(wxWindow* parent, bool sd)
 /////////////////////////////////////////////////////////////////
 {
 	// File List 
-	fileList = new CncFileViewListCtrl(this, wxLC_SINGLE_SEL);
+	fileList = new CncFileViewListCtrl(this, wxLC_SINGLE_SEL | wxLC_HRULES);
 	GblFunc::replaceControl(m_fileListPlaceholder, fileList);
 	
 	fileList->setObserver(this);
@@ -195,15 +195,19 @@ void CncFileView::fileListActivated(long item) {
 /////////////////////////////////////////////////////////////////
 	CFV_PRINT_LOCATION_CTX_FILE
 
-	wxListItem info;
-	info.m_itemId = item;
-	info.m_col = 0;
+	wxListItem info1;
+	info1.m_itemId = item;
+	info1.m_col = CncFileViewListCtrl::COL_IMAGE;
 	
-	if ( fileList->GetItem(info) == false )
+	wxListItem info2;
+	info2.m_itemId = item;
+	info2.m_col = CncFileViewListCtrl::COL_FILE;
+	
+	if ( fileList->GetItem(info1) == false || fileList->GetItem(info2) == false )
 		return;
 		
-	const wxString itemName = info.GetText();
-	const int itemTyp       = info.GetImage();
+	const wxString itemName = info2.GetText();
+	const int itemTyp       = info1.GetImage();
 	
 	wxFileName curDir(m_currentDirectory->GetValue());
 	wxString name;
@@ -274,15 +278,19 @@ void CncFileView::fileListSelected(long item) {
 		return; 
 	}
 	
-	wxListItem info;
-	info.m_itemId = item;
-	info.m_col = 0;
+	wxListItem info1;
+	info1.m_itemId = item;
+	info1.m_col = CncFileViewListCtrl::COL_IMAGE;
 	
-	if ( fileList->GetItem(info) == false )
+	wxListItem info2;
+	info2.m_itemId = item;
+	info2.m_col = CncFileViewListCtrl::COL_FILE;
+	
+	if ( fileList->GetItem(info1) == false || fileList->GetItem(info2) == false )
 		return;
 		
-	wxString itemName = info.GetText();
-	int itemTyp       = info.GetImage();
+	wxString itemName = info2.GetText();
+	int itemTyp       = info1.GetImage();
 	
 	wxFileName curDir(m_currentDirectory->GetValue());
 	wxString name;

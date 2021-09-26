@@ -1,0 +1,6 @@
+
+Assertion: ../../src/msw/listctrl.cpp: GetSubItemRect: 1280: 
+  Condition : "item >= 0 && item < GetItemCount()"
+  Message   : invalid item in GetSubItemRect
+  Stacktrace:
+

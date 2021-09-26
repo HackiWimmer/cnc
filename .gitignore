@@ -13,12 +13,8 @@ CncControllerTest/Gprof/**
 CncControllerTest/Resources/**
 CncControllerTest/Doxyfile/**
 
-UnitTests/Release/**
-UnitTests/Debug/**
-
 EnvSetupTest/Release/**
 EnvSetupTest/Debug/**
-
 
 #*.exe
 #*.txt

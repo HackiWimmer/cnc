@@ -147,7 +147,7 @@ void GblFunc::freeze(wxWindow* wnd, bool state) {
 ///////////////////////////////////////////////////////////////////
 void GblFunc::appendToStackTraceFile(const wxString& st) {
 ///////////////////////////////////////////////////////////////////
-	std::ofstream ofs (CncFileNameService::getStackTraceFileName(), std::ofstream::app);
+	std::ofstream ofs (CncFileNameService::getStackTraceFileName().c_str().AsChar(), std::ofstream::app);
 	if ( ofs.good() ) 
 		ofs << st << std::endl;
 	
@@ -165,7 +165,7 @@ void GblFunc::storeStacktrace(const wxString& st) {
 	unsigned int id = StackTrace::Database.size();
 	StackTrace::Database.push_back(st);
 	
-	std::ofstream ofs (CncFileNameService::getStackTraceFileName(), std::ofstream::app);
+	std::ofstream ofs (CncFileNameService::getStackTraceFileName().c_str().AsChar(), std::ofstream::app);
 	if ( ofs.good() ) {
 		ofs << "Stacktrace #: " << id << std::endl
 			<< st

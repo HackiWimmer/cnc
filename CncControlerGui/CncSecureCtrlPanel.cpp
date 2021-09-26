@@ -101,6 +101,9 @@ class CncSecurePortListCtrl : public CncLargeScaledListCtrl {
 	
 		// --------------------------------------------------------
 		virtual bool isItemValid(long item) const {
+			
+			wxASSERT( GetItemCount() == portEntries.size() );
+			
 			if( item < 0 || item > (long)(portEntries.size() - 1) )
 				return false;
 				
@@ -174,15 +177,17 @@ class CncSecurePortListCtrl : public CncLargeScaledListCtrl {
 		}
 		// ---------------------------------------------------------
 		void deleteAllEntries() {
+			SetItemCount(portEntries.size());
+			
 			CncLargeScaledListCtrl::clear();
 			portEntries.clear();
-	
-			SetItemCount(portEntries.size());
+			
 			Refresh();
 		}
 		// ---------------------------------------------------------
 		void addPortEntry(const wxString& name, PortListImage pii) {
 			portEntries.push_back(PortEntry(name, pii));
+			
 			SetItemCount(portEntries.size());
 			Refresh();
 		}

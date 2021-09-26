@@ -55,8 +55,9 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		static const int smallFontSize				=  8;
 		static const int bigFontSize				= 16;
 		
-		static const int COL_FILE 					= 0;
-		static const int TOTAL_COL_COUNT			= 1;
+		static const int COL_IMAGE 					= 0;
+		static const int COL_FILE 					= 1;
+		static const int TOTAL_COL_COUNT			= 2;
 		static const int COL_STRECH					= COL_FILE;
 		
 		CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms, long style);
@@ -132,8 +133,9 @@ class CncFileViewListCtrl : public CncLargeScaledListCtrl {
 		virtual bool isItemValid(long item) const;
 
 	public:
-		static const int COL_FILE 			= 0;
-		static const int TOTAL_COL_COUNT	= 1;
+		static const int COL_IMAGE 			= 0;
+		static const int COL_FILE 			= 1;
+		static const int TOTAL_COL_COUNT	= 2;
 		static const int COL_STRECH			= COL_FILE;
 		
 		static const int smallFontSize		=  8;

@@ -610,6 +610,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	
 	defaultSpeedSlider->showValue(true);
 	defaultSpeedSlider->setToolTipWindow(m_defaultSpeedSliderValue);
+	
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -926,7 +927,7 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_panelTemplateObserverPlaceholder, templateObserver);
 	
 	// LRU List 
-	lruFileView = new CncLruFileViewListCtrl(this, 24, wxLC_SINGLE_SEL);
+	lruFileView = new CncLruFileViewListCtrl(this, 24, wxLC_SINGLE_SEL | wxLC_HRULES);
 	GblFunc::replaceControl(m_lruListPlaceholder, lruFileView);
 	
 	// Source Editor
@@ -944,13 +945,7 @@ void MainFrame::installCustControls() {
 	// Transfer file list
 	transferFileView = new CncTransferFileView(this, true);
 	GblFunc::replaceControl(m_mainFileTransferPlaceholder, transferFileView);
-	/*
-	transferFileView->openDirectory(CncFileNameService::getTransferDir());
-	wxListItem item;
-	transferFileView->getFileView()->GetColumn(CncFileViewListCtrl::COL_FILE, item);
-	item.SetText("Transfer Area:");
-	transferFileView->getFileView()->SetColumn(CncFileViewListCtrl::COL_FILE, item);
-	*/
+	
 	// Inbound File Preview
 	mainFilePreview = new CncFilePreview(this, "GLMainPreview");
 	GblFunc::replaceControl(m_filePreviewPlaceholder, mainFilePreview);
@@ -2765,6 +2760,8 @@ void MainFrame::selectPort(wxCommandEvent& event) {
 bool MainFrame::connectSerialPortDialog() {
 ///////////////////////////////////////////////////////////////////
 	CncConnectProgress dlg(this);
+	dlg.GetPortName()->SetLabel(m_portSelector->GetStringSelection());
+	
 	return ( dlg.ShowModal() == wxID_OK);
 }
 ///////////////////////////////////////////////////////////////////
@@ -2837,6 +2834,8 @@ bool MainFrame::connectSerialPort() {
 				m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
 				m_miRqtIdleMessages->Enable(true);
 			}
+			
+			secureCtrlPanel->GetPortName()->SetLabel(m_portSelector->GetStringSelection());
 		}
 	}
 	
@@ -3694,7 +3693,6 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplate() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(m_inputFileName);
 	wxString templateName("..\\Templates\\");
 	CncFileDialog openFileDialog(this,
 								_("Open Template File"),
@@ -3703,14 +3701,13 @@ void MainFrame::openTemplate() {
 								"SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode|Binary Tpl Files (*.bct)|*.bct",
 								wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
-	if ( openFileDialog.ShowModal() == wxID_CANCEL ) {
+	if ( openFileDialog.ShowModal() == wxID_CANCEL || openFileDialog.GetFilename().IsEmpty() )
 		return;
-	}
 
 	// store old template file values
 	const wxString ov = getCurrentTemplateFileName();
 	const wxString oh = getCurrentTemplatePathFileName();
-
+	
 	// set new template file values
 	m_inputFileName->SetValue(openFileDialog.GetFilename());
 	m_inputFileName->SetHint(openFileDialog.GetPath());
@@ -4898,7 +4895,7 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 	
 	// wxString tfn(CncFileNameService::getCncTemplatePreviewFileName(getCurrentTemplateFormat()));
 	// this causes file access errors between this app and the internet explorer
-	// write a temp file instead to have anytime a new one
+	// write a temp file instead to have any time a new one
 	wxString tfn(CncFileNameService::getTempFileName(getCurrentTemplateFormat()));
 	
 	CncTemplateFormat tf = getCurrentTemplateFormat();

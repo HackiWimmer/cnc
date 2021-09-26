@@ -217,6 +217,7 @@ bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
 		lastSelection = item;
 	}
 	
+	bool ret = true;
 	if ( ensureVisible == true ) {
 		
 		if ( IsFrozen() == false )
@@ -225,16 +226,20 @@ bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
 		const long total = GetItemCount();
 		const long cpp   = GetCountPerPage();
 		
-		EnsureVisible(item);
+		if ( cpp > 0 ) 
+		{
+			if ( ( ret = EnsureVisible(item)) == true )
+			{
+				if ( cpp > 1 && listType == NORMAL )
+					ret = EnsureVisible(item + cpp < total ? item + cpp - 1: total - 1 );
+			}
+		}
 		
-		if ( cpp > 1 && listType == NORMAL )
-			EnsureVisible(item + cpp < total ? item + cpp - 1: total - 1 );
-
 		if ( IsFrozen() == true )
 			Thaw();
 	}
-		
-	return true;
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::goForwardUnitlColumnChangeIntern(long item, long column) {
