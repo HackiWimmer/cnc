@@ -26,20 +26,17 @@ class CncSecureManuallyMovePanel : public CncSecureManuallyMovePanelBase {
 		const char*			AXIS_RESULT_FORMAT	= "%+.3lf";
 		const char*			SPEED_RESULT_FORMAT	= "%.1lf";
 		const char 			DOT					= '.';
-		const char			BKS					= '\b';
 		const char			INVALID_AXIS		='\0';
-		const char			INVALID_NUMBER		='\0';
 		
 		AxisButtons			axisButtons;
 		DimButtons			dimButtons;
-		char				currentAxis;
-		char				lastNumber;
 		double				currentValueX;
 		double				currentValueY;
 		double				currentValueZ;
 		double				currentValueF;
 		
 		void				updateResult();
+		void				setTooltip(wxToggleButton* bt);
 		const wxString&		prepareStringValue(wxString& val);
 		
 };

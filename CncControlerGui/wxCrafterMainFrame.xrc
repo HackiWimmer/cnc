@@ -2872,7 +2872,7 @@ Positions</label>
                                       <growablerows>0</growablerows>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxEXPAND</flag>
-                                        <object class="wxScrolledWindow" name="m_scrollWin8684">
+                                        <object class="wxScrolledWindow" name="m_scrollWinPredefinedPositions">
                                           <style>wxHSCROLL|wxVSCROLL</style>
                                           <scrollrate>5,5</scrollrate>
                                           <object class="wxFlexGridSizer">
@@ -2898,7 +2898,7 @@ Positions</label>
                                                   <object class="wxStaticText" name="m_staticText1171">
                                                     <label>Home:</label>
                                                     <style/>
-                                                    <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                                                    <fg>wxSYS_COLOUR_ACTIVECAPTION</fg>
                                                     <font>
                                                       <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
                                                       <style>normal</style>
@@ -2923,7 +2923,7 @@ Positions</label>
                                                       <object class="wxComboBox" name="m_homeDefintion">
                                                         <style>wxCB_READONLY</style>
                                                         <font>
-                                                          <size>9</size>
+                                                          <size>14</size>
                                                           <style>normal</style>
                                                           <weight>bold</weight>
                                                           <family>swiss</family>
@@ -2989,7 +2989,7 @@ Positions</label>
                                                           <object class="wxComboBox" name="m_zeroMoveModeXY">
                                                             <style>wxCB_READONLY</style>
                                                             <font>
-                                                              <size>9</size>
+                                                              <size>14</size>
                                                               <style>normal</style>
                                                               <weight>bold</weight>
                                                               <family>swiss</family>
@@ -3054,7 +3054,7 @@ Positions</label>
                                                           <object class="wxComboBox" name="m_zeroMoveModeXYZ">
                                                             <style>wxCB_READONLY</style>
                                                             <font>
-                                                              <size>9</size>
+                                                              <size>14</size>
                                                               <style>normal</style>
                                                               <weight>bold</weight>
                                                               <family>swiss</family>
@@ -3122,7 +3122,7 @@ Positions</label>
                                                           <object class="wxComboBox" name="m_zeroMoveModeZ">
                                                             <style>wxCB_READONLY</style>
                                                             <font>
-                                                              <size>9</size>
+                                                              <size>14</size>
                                                               <style>normal</style>
                                                               <weight>bold</weight>
                                                               <family>swiss</family>
@@ -3187,7 +3187,7 @@ Positions</label>
                                                   <object class="wxStaticText" name="m_staticText1177233">
                                                     <label>XY Axis:</label>
                                                     <style/>
-                                                    <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                                                    <fg>wxSYS_COLOUR_ACTIVECAPTION</fg>
                                                     <font>
                                                       <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
                                                       <style>normal</style>
@@ -3220,8 +3220,8 @@ Positions</label>
                                                           <object class="wxButton" name="m_xToMax">
                                                             <label>Move X Axis to Max</label>
                                                             <style/>
-                                                            <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3244,7 +3244,7 @@ Positions</label>
                                                             <label>Move X Axis to Mid</label>
                                                             <style/>
                                                             <bg>#808000</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3266,8 +3266,8 @@ Positions</label>
                                                           <object class="wxButton" name="m_xToMin">
                                                             <label>Move X Axis to Min</label>
                                                             <style/>
-                                                            <bg>wxSYS_COLOUR_GRAYTEXT</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <bg>wxSYS_COLOUR_BTNSHADOW</bg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3300,8 +3300,8 @@ Positions</label>
                                                           <object class="wxButton" name="m_yToMax">
                                                             <label>Move Y Axis to Max</label>
                                                             <style/>
-                                                            <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3324,7 +3324,7 @@ Positions</label>
                                                             <label>Move Y Axis to Mid</label>
                                                             <style/>
                                                             <bg>#808000</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3346,8 +3346,8 @@ Positions</label>
                                                           <object class="wxButton" name="m_yToMin">
                                                             <label>Move Y Axis to Min</label>
                                                             <style/>
-                                                            <bg>wxSYS_COLOUR_GRAYTEXT</bg>
-                                                            <fg>wxSYS_COLOUR_BTNFACE</fg>
+                                                            <bg>wxSYS_COLOUR_BTNSHADOW</bg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3392,7 +3392,7 @@ Positions</label>
                                                   <object class="wxStaticText" name="m_staticText1175">
                                                     <label>Z Axis:</label>
                                                     <style/>
-                                                    <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                                                    <fg>wxSYS_COLOUR_ACTIVECAPTION</fg>
                                                     <font>
                                                       <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
                                                       <style>normal</style>
@@ -3425,8 +3425,8 @@ Positions</label>
                                                           <object class="wxButton" name="m_zToMax">
                                                             <label>Move Z Axis to Max</label>
                                                             <style/>
-                                                            <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3449,7 +3449,7 @@ Positions</label>
                                                             <label>Move Z Axis to Mid</label>
                                                             <style/>
                                                             <bg>#808000</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3471,8 +3471,8 @@ Positions</label>
                                                           <object class="wxButton" name="m_zToMin">
                                                             <label>Move Z Axis to Min</label>
                                                             <style/>
-                                                            <bg>wxSYS_COLOUR_GRAYTEXT</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <bg>wxSYS_COLOUR_BTNSHADOW</bg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3505,8 +3505,8 @@ Positions</label>
                                                           <object class="wxButton" name="m_zToTop">
                                                             <label>Move Z Axis to Top</label>
                                                             <style/>
-                                                            <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -3528,8 +3528,8 @@ Positions</label>
                                                           <object class="wxButton" name="m_zToBottom">
                                                             <label>Move Z Axis to Bottom</label>
                                                             <style/>
-                                                            <bg>wxSYS_COLOUR_GRAYTEXT</bg>
-                                                            <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                            <bg>wxSYS_COLOUR_BTNSHADOW</bg>
+                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
                                                             <font>
                                                               <size>9</size>
                                                               <style>normal</style>
@@ -8815,19 +8815,19 @@ State</label>
                     <object class="sizeritem">
                       <flag>wxALL|wxEXPAND</flag>
                       <border>1</border>
-                      <minsize>-1,90</minsize>
-                      <object class="wxPanel" name="m_secGamepadPlaceholder">
+                      <minsize>-1,120</minsize>
+                      <object class="wxPanel" name="m_cncOverviewsPlaceholder">
                         <style>wxTAB_TRAVERSAL</style>
-                        <size>-1,90</size>
                         <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
                       </object>
                     </object>
                     <object class="sizeritem">
                       <flag>wxALL|wxEXPAND</flag>
                       <border>1</border>
-                      <minsize>-1,120</minsize>
-                      <object class="wxPanel" name="m_cncOverviewsPlaceholder">
+                      <minsize>-1,90</minsize>
+                      <object class="wxPanel" name="m_secGamepadPlaceholder">
                         <style>wxTAB_TRAVERSAL</style>
+                        <size>-1,90</size>
                         <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
                       </object>
                     </object>

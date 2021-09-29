@@ -266,6 +266,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncReferenceEvaluation.h"/>
+      <File Name="CncReferenceEvaluation.cpp"/>
       <File Name="CncMoveDefinition.h"/>
       <File Name="CncFileViewCallback.h"/>
       <File Name="CncGamepadFilter.h"/>
@@ -870,6 +872,7 @@
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
+        <Preprocessor Value="wxUSE_DPI_AWARE_MANIFEST=2"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
         <LibraryPath Value="."/>

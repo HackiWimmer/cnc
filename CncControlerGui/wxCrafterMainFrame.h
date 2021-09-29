@@ -265,7 +265,7 @@ protected:
     wxStaticLine* m_staticLine783;
     wxListbook* m_listbookManallyMotionControl;
     wxPanel* m_preposPanel;
-    wxScrolledWindow* m_scrollWin8684;
+    wxScrolledWindow* m_scrollWinPredefinedPositions;
     wxStaticText* m_staticText1171;
     wxComboBox* m_homeDefintion;
     wxButton* m_moveHome;
@@ -590,8 +590,8 @@ protected:
     wxSplitterWindow* m_secureSplitterMainV;
     wxPanel* m_splitterPageLeft;
     wxPanel* m_securityCtrlPanelPlaceholder;
-    wxPanel* m_secGamepadPlaceholder;
     wxPanel* m_cncOverviewsPlaceholder;
+    wxPanel* m_secGamepadPlaceholder;
     wxPanel* m_splitterPageRight;
     wxSplitterWindow* m_secureSplitterMainH;
     wxPanel* m_splitterPageMonitor;
@@ -1175,7 +1175,7 @@ public:
     wxButton* GetZToMin() { return m_zToMin; }
     wxButton* GetZToTop() { return m_zToTop; }
     wxButton* GetZToBottom() { return m_zToBottom; }
-    wxScrolledWindow* GetScrollWin8684() { return m_scrollWin8684; }
+    wxScrolledWindow* GetScrollWinPredefinedPositions() { return m_scrollWinPredefinedPositions; }
     wxPanel* GetPreposPanel() { return m_preposPanel; }
     wxPanel* GetManuallyMoveCoordPlaceholder() { return m_manuallyMoveCoordPlaceholder; }
     wxScrolledWindow* GetScrollWin8689() { return m_scrollWin8689; }
@@ -1476,8 +1476,8 @@ public:
     wxButton* GetBtCloseSecurePanel() { return m_btCloseSecurePanel; }
     wxStaticLine* GetStaticLine9185() { return m_staticLine9185; }
     wxPanel* GetSecurityCtrlPanelPlaceholder() { return m_securityCtrlPanelPlaceholder; }
-    wxPanel* GetSecGamepadPlaceholder() { return m_secGamepadPlaceholder; }
     wxPanel* GetCncOverviewsPlaceholder() { return m_cncOverviewsPlaceholder; }
+    wxPanel* GetSecGamepadPlaceholder() { return m_secGamepadPlaceholder; }
     wxPanel* GetSplitterPageLeft() { return m_splitterPageLeft; }
     wxPanel* GetSecMonitorPlaceholder() { return m_secMonitorPlaceholder; }
     wxButton* Get3D_TopSec() { return m_3D_TopSec; }

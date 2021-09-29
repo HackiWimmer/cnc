@@ -370,11 +370,11 @@ bool CncTouchBlockDetector::checkParameters() {
 		if ( cnc::dblCmp::nu(parameters.touchBlockYCheekThickness) || parameters.touchBlockYCheekThickness < 0.0 )
 			ADD_ERROR_CODE("Invalid touch block y cheek thickness: ", parameters.touchBlockYCheekThickness);
 		// ...
+		
+		if ( cnc::dblCmp::nu(parameters.touchDiameter) || parameters.touchDiameter < 0.0 )
+			ADD_ERROR_CODE("Invalid touch diameter: ", parameters.touchDiameter);
 	}
 	
-	if ( cnc::dblCmp::nu(parameters.touchDiameter) || parameters.touchDiameter < 0.0 )
-		ADD_ERROR_CODE("Invalid touch diameter: ", parameters.touchDiameter);
-		
 	// ...
 	
 	return hasError() == false;

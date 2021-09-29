@@ -14,13 +14,15 @@
 #include <wx/artprov.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/statbmp.h>
 #include <wx/listbook.h>
 #include <wx/imaglist.h>
 #include <wx/simplebook.h>
 #include <wx/button.h>
+#include <wx/statline.h>
+#include <wx/bmpbuttn.h>
 #include <wx/tglbtn.h>
 #include <wx/textctrl.h>
-#include <wx/statline.h>
 #include <wx/scrolbar.h>
 #include <wx/dialog.h>
 #include <wx/iconbndl.h>
@@ -45,7 +47,8 @@ class CncSecureCtrlPanelBase : public wxPanel
 {
 protected:
     wxStaticText* m_staticText433;
-    wxStaticText* m_PortName;
+    wxStaticText* m_portName;
+    wxStaticBitmap* m_bmpConnectionStateSecure;
     wxListbook* m_leftBook;
     wxPanel* m_lpConnect;
     wxPanel* m_lpLoad;
@@ -54,22 +57,32 @@ protected:
     wxPanel* m_lpRun;
     wxPanel* m_lpMisc;
     wxStaticText* m_rightHeadline;
-    wxSimplebook* m_rigthBook;
+    wxSimplebook* m_rightBook;
     wxPanel* m_rpConnect;
     wxStaticText* m_staticText71;
     wxPanel* m_portSelectorPlaceholder;
     wxButton* m_btConnectSec;
     wxButton* m_btResetSec;
+    wxStaticLine* m_staticLine446;
+    wxButton* m_btHardwareRefSec;
     wxPanel* m_rpLoad;
     wxPanel* m_transferDirPlaceholder;
     wxPanel* m_lruFilePlaceholder;
     wxButton* m_btLoadTemplate;
     wxPanel* m_rpRef;
+    wxPanel* m_evaluateReferencePlaceholder;
     wxButton* m_btZeroSec;
-    wxButton* m_btHardwareRefSec;
-    wxButton* m_btAnchorSec;
     wxPanel* m_rpManually;
+    wxListbook* m_listbook435;
+    wxPanel* m_panel437;
     wxPanel* m_manuallyMovePlaceholder;
+    wxPanel* m_panel466;
+    wxPanel* m_navigatorPlaceholder;
+    wxPanel* m_speedSliderPlaceholder;
+    wxBitmapButton* m_bmpButton483;
+    wxPanel* m_panel441;
+    wxPanel* m_predefinedPositionsPlaceholder;
+    wxPanel* m_panel443;
     wxPanel* m_rpRun;
     wxButton* m_rcRunSec;
     wxButton* m_rcPauseSec;
@@ -80,15 +93,15 @@ protected:
     wxButton* m_btSessionDir;
     wxButton* m_btTestFunct;
     wxButton* m_btStackTrace;
+    wxButton* m_btAnchorSec;
 
 protected:
     virtual void onLeftBookPageChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void onConnectSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onResetSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onEvaluateHardwareReference(wxCommandEvent& event) { event.Skip(); }
     virtual void onOpenTemplateSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onSetReferencePosition(wxCommandEvent& event) { event.Skip(); }
-    virtual void onEvaluateHardwareReference(wxCommandEvent& event) { event.Skip(); }
-    virtual void onDetermineAnchorPositionsSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onPauseSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStopSec(wxCommandEvent& event) { event.Skip(); }
@@ -96,10 +109,12 @@ protected:
     virtual void onSessionDirSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onTestFunctionSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStackTraceStoreSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onDetermineAnchorPositionsSec(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText433() { return m_staticText433; }
-    wxStaticText* GetPortName() { return m_PortName; }
+    wxStaticText* GetPortName() { return m_portName; }
+    wxStaticBitmap* GetBmpConnectionStateSecure() { return m_bmpConnectionStateSecure; }
     wxPanel* GetLpConnect() { return m_lpConnect; }
     wxPanel* GetLpLoad() { return m_lpLoad; }
     wxPanel* GetLpRef() { return m_lpRef; }
@@ -112,16 +127,26 @@ public:
     wxPanel* GetPortSelectorPlaceholder() { return m_portSelectorPlaceholder; }
     wxButton* GetBtConnectSec() { return m_btConnectSec; }
     wxButton* GetBtResetSec() { return m_btResetSec; }
+    wxStaticLine* GetStaticLine446() { return m_staticLine446; }
+    wxButton* GetBtHardwareRefSec() { return m_btHardwareRefSec; }
     wxPanel* GetRpConnect() { return m_rpConnect; }
     wxPanel* GetTransferDirPlaceholder() { return m_transferDirPlaceholder; }
     wxPanel* GetLruFilePlaceholder() { return m_lruFilePlaceholder; }
     wxButton* GetBtLoadTemplate() { return m_btLoadTemplate; }
     wxPanel* GetRpLoad() { return m_rpLoad; }
+    wxPanel* GetEvaluateReferencePlaceholder() { return m_evaluateReferencePlaceholder; }
     wxButton* GetBtZeroSec() { return m_btZeroSec; }
-    wxButton* GetBtHardwareRefSec() { return m_btHardwareRefSec; }
-    wxButton* GetBtAnchorSec() { return m_btAnchorSec; }
     wxPanel* GetRpRef() { return m_rpRef; }
     wxPanel* GetManuallyMovePlaceholder() { return m_manuallyMovePlaceholder; }
+    wxPanel* GetPanel437() { return m_panel437; }
+    wxPanel* GetNavigatorPlaceholder() { return m_navigatorPlaceholder; }
+    wxPanel* GetSpeedSliderPlaceholder() { return m_speedSliderPlaceholder; }
+    wxBitmapButton* GetBmpButton483() { return m_bmpButton483; }
+    wxPanel* GetPanel466() { return m_panel466; }
+    wxPanel* GetPredefinedPositionsPlaceholder() { return m_predefinedPositionsPlaceholder; }
+    wxPanel* GetPanel441() { return m_panel441; }
+    wxPanel* GetPanel443() { return m_panel443; }
+    wxListbook* GetListbook435() { return m_listbook435; }
     wxPanel* GetRpManually() { return m_rpManually; }
     wxButton* GetRcRunSec() { return m_rcRunSec; }
     wxButton* GetRcPauseSec() { return m_rcPauseSec; }
@@ -132,8 +157,9 @@ public:
     wxButton* GetBtSessionDir() { return m_btSessionDir; }
     wxButton* GetBtTestFunct() { return m_btTestFunct; }
     wxButton* GetBtStackTrace() { return m_btStackTrace; }
+    wxButton* GetBtAnchorSec() { return m_btAnchorSec; }
     wxPanel* GetRpMisc() { return m_rpMisc; }
-    wxSimplebook* GetRigthBook() { return m_rigthBook; }
+    wxSimplebook* GetRightBook() { return m_rightBook; }
     CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~CncSecureCtrlPanelBase();
 };

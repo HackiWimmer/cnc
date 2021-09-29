@@ -4,6 +4,8 @@
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-file_save.1">bitmaps\CodeLite\16-file_save.1.png</object>
+  <object class="wxBitmap" name="16-home@2x">bitmaps\16-home@2x.png</object>
+  <object class="wxBitmap" name="16-navi@2x">bitmaps\16-navi@2x.png</object>
   <object class="wxBitmap" name="16-step_in@2x">bitmaps\CodeLite\16-step_in@2x.png</object>
   <object class="wxBitmap" name="Anchor">bitmaps\Anchor.png</object>
   <object class="wxBitmap" name="abb-export">bitmaps\abb-export.png</object>

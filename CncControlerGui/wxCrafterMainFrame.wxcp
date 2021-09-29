@@ -19715,7 +19715,7 @@
                             }, {
                              "type": "string",
                              "m_label": "Name:",
-                             "m_value": "m_scrollWin8684"
+                             "m_value": "m_scrollWinPredefinedPositions"
                             }, {
                              "type": "multi-string",
                              "m_label": "Tooltip:",
@@ -19893,7 +19893,7 @@
                                   }, {
                                    "type": "colour",
                                    "m_label": "Fg Colour:",
-                                   "colour": "Highlight"
+                                   "colour": "ActiveCaption"
                                   }, {
                                    "type": "font",
                                    "m_label": "Font:",
@@ -20018,7 +20018,7 @@
                                     }, {
                                      "type": "font",
                                      "m_label": "Font:",
-                                     "m_value": "9,normal, bold, swiss, 0, Segoe UI"
+                                     "m_value": "14,normal, bold, swiss, 0, Segoe UI"
                                     }, {
                                      "type": "bool",
                                      "m_label": "Hidden",
@@ -20317,7 +20317,7 @@
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
-                                       "m_value": "9,normal, bold, swiss, 0, Segoe UI"
+                                       "m_value": "14,normal, bold, swiss, 0, Segoe UI"
                                       }, {
                                        "type": "bool",
                                        "m_label": "Hidden",
@@ -20617,7 +20617,7 @@
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
-                                       "m_value": "9,normal, bold, swiss, 0, Segoe UI"
+                                       "m_value": "14,normal, bold, swiss, 0, Segoe UI"
                                       }, {
                                        "type": "bool",
                                        "m_label": "Hidden",
@@ -20917,7 +20917,7 @@
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
-                                       "m_value": "9,normal, bold, swiss, 0, Segoe UI"
+                                       "m_value": "14,normal, bold, swiss, 0, Segoe UI"
                                       }, {
                                        "type": "bool",
                                        "m_label": "Hidden",
@@ -21207,7 +21207,7 @@
                                   }, {
                                    "type": "colour",
                                    "m_label": "Fg Colour:",
-                                   "colour": "Highlight"
+                                   "colour": "ActiveCaption"
                                   }, {
                                    "type": "font",
                                    "m_label": "Font:",
@@ -21370,11 +21370,11 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Bg Colour:",
-                                       "colour": "Highlight"
+                                       "colour": "ActiveCaption"
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -21469,7 +21469,7 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -21560,11 +21560,11 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Bg Colour:",
-                                       "colour": "GrayText"
+                                       "colour": "ButtonShadow"
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -21702,11 +21702,11 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Bg Colour:",
-                                       "colour": "Highlight"
+                                       "colour": "ActiveCaption"
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -21801,7 +21801,7 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -21892,11 +21892,11 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Bg Colour:",
-                                       "colour": "GrayText"
+                                       "colour": "ButtonShadow"
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonFace"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -22107,7 +22107,7 @@
                                   }, {
                                    "type": "colour",
                                    "m_label": "Fg Colour:",
-                                   "colour": "Highlight"
+                                   "colour": "ActiveCaption"
                                   }, {
                                    "type": "font",
                                    "m_label": "Font:",
@@ -22270,11 +22270,11 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Bg Colour:",
-                                       "colour": "Highlight"
+                                       "colour": "ActiveCaption"
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -22369,7 +22369,7 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -22460,11 +22460,11 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Bg Colour:",
-                                       "colour": "GrayText"
+                                       "colour": "ButtonShadow"
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -22602,11 +22602,11 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Bg Colour:",
-                                       "colour": "Highlight"
+                                       "colour": "ActiveCaption"
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -22697,11 +22697,11 @@
                                       }, {
                                        "type": "colour",
                                        "m_label": "Bg Colour:",
-                                       "colour": "GrayText"
+                                       "colour": "ButtonShadow"
                                       }, {
                                        "type": "colour",
                                        "m_label": "Fg Colour:",
-                                       "colour": "ButtonHighlight"
+                                       "colour": "ButtonText"
                                       }, {
                                        "type": "font",
                                        "m_label": "Font:",
@@ -52582,15 +52582,15 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "-1,90"
+                   "m_value": "-1,-1"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "-1,90"
+                   "m_value": "-1,120"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
-                   "m_value": "m_secGamepadPlaceholder"
+                   "m_value": "m_cncOverviewsPlaceholder"
                   }, {
                    "type": "multi-string",
                    "m_label": "Tooltip:",
@@ -52649,15 +52649,15 @@
                   }, {
                    "type": "string",
                    "m_label": "Size:",
-                   "m_value": "-1,-1"
+                   "m_value": "-1,90"
                   }, {
                    "type": "string",
                    "m_label": "Minimum Size:",
-                   "m_value": "-1,120"
+                   "m_value": "-1,90"
                   }, {
                    "type": "string",
                    "m_label": "Name:",
-                   "m_value": "m_cncOverviewsPlaceholder"
+                   "m_value": "m_secGamepadPlaceholder"
                   }, {
                    "type": "multi-string",
                    "m_label": "Tooltip:",

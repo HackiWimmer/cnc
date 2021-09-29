@@ -3,17 +3,17 @@
 
 namespace CncFileViewCallback {
 	
-		class Interface {
+	class Interface {
+		
+		public:
+			Interface() {}
+			virtual ~Interface() {}
 			
-			public:
-				Interface() {}
-				virtual ~Interface() {}
-				
-				virtual void fileListSelected(long item) {}
-				virtual void fileListActivated(long item) {}
-				virtual void fileListLeave(wxMouseEvent& event) {}
-			
-		};
+			virtual void fileListSelected(long item) {}
+			virtual void fileListActivated(long item) {}
+			virtual void fileListLeave(wxMouseEvent& event) {}
+		
+	};
 };
 
 #endif

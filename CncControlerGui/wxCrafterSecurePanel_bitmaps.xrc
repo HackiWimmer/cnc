@@ -3,13 +3,17 @@
   <!-- Handler Generation is ON -->
   <object class="wxBitmap" name="16-clear@2x">bitmaps\16-clear@2x.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
-  <object class="wxBitmap" name="16-execute@2x">bitmaps\CodeLite\16-execute@2x.png</object>
   <object class="wxBitmap" name="16-file_open@2x">bitmaps\CodeLite\16-file_open@2x.png</object>
   <object class="wxBitmap" name="16-find_in_files">bitmaps\CodeLite\16-find_in_files.png</object>
   <object class="wxBitmap" name="16-find_in_files@2x">bitmaps\CodeLite\16-find_in_files@2x.png</object>
+  <object class="wxBitmap" name="16-finger@2x">bitmaps\CodeLite\16-finger@2x.png</object>
   <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
   <object class="wxBitmap" name="16-home@2x">bitmaps\16-home@2x.png</object>
+  <object class="wxBitmap" name="16-marker@2x">bitmaps\16-marker@2x.png</object>
+  <object class="wxBitmap" name="16-navi@2x">bitmaps\16-navi@2x.png</object>
+  <object class="wxBitmap" name="16-plus2@2x">bitmaps\CodeLite\16-plus2@2x.png</object>
   <object class="wxBitmap" name="16-regular-expression@2x">bitmaps\CodeLite\16-regular-expression@2x.png</object>
+  <object class="wxBitmap" name="16-start@2x">bitmaps\16-start@2x.png</object>
   <object class="wxBitmap" name="24-clean">bitmaps\CodeLite\24-clean.png</object>
   <object class="wxBitmap" name="24-clean@2x">bitmaps\CodeLite\24-clean@2x.png</object>
   <object class="wxBitmap" name="CncAnchors">bitmaps\CncAnchors.png</object>
@@ -27,5 +31,6 @@
   <object class="wxBitmap" name="iconmonstr-control-panel-8-16">bitmaps\RunCtrl\iconmonstr-control-panel-8-16.png</object>
   <object class="wxBitmap" name="iconmonstr-synchronization-8-16">bitmaps\RunCtrl\iconmonstr-synchronization-8-16.png</object>
   <object class="wxBitmap" name="keyboard">bitmaps\keyboard.png</object>
+  <object class="wxBitmap" name="plugin_not_ok">bitmaps\plugin_not_ok.png</object>
   <object class="wxBitmap" name="trace">bitmaps\trace.png</object>
 </resource>

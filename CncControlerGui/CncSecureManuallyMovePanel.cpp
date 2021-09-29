@@ -9,8 +9,6 @@ CncSecureManuallyMovePanel::CncSecureManuallyMovePanel(wxWindow* parent)
 : CncSecureManuallyMovePanelBase		(parent)
 , axisButtons							()
 , dimButtons							()
-, currentAxis							(INVALID_AXIS)
-, lastNumber							(INVALID_NUMBER)
 , currentValueX							(0.0)
 , currentValueY							(0.0)
 , currentValueZ							(0.0)
@@ -25,16 +23,28 @@ CncSecureManuallyMovePanel::CncSecureManuallyMovePanel(wxWindow* parent)
 	dimButtons.push_back(m_bt2D);
 	dimButtons.push_back(m_bt3D);
 	
+	for ( auto it=axisButtons.begin(); it != axisButtons.end(); ++it )
+		setTooltip(*it);
+		
 	for ( auto it=dimButtons.begin(); it != dimButtons.end(); ++it )
 		(*it)->SetValue(false);
 
 	m_bt2D->SetValue(true);
-	
 	updateResult();
 }
 /////////////////////////////////////////////////////////////////
 CncSecureManuallyMovePanel::~CncSecureManuallyMovePanel() {
 /////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////
+void CncSecureManuallyMovePanel::setTooltip(wxToggleButton* bt) {
+/////////////////////////////////////////////////////////////////
+	const char axis = bt->GetLabel().Length() > 0 ? bt->GetLabel()[0] : INVALID_AXIS;
+	if ( axis == INVALID_AXIS )
+		return;
+		
+	if ( islower(axis) )	bt->SetToolTip("Switch to absolute move mode");
+	else					bt->SetToolTip("Switch to relative move mode");
 }
 /////////////////////////////////////////////////////////////////
 void CncSecureManuallyMovePanel::onClearX(wxMouseEvent& event) {
@@ -79,6 +89,7 @@ void CncSecureManuallyMovePanel::onAxis(wxCommandEvent& event) {
 	if ( bt ) {
 		const char axis = bt->GetLabel().Length() > 0 ? bt->GetLabel()[0] : INVALID_AXIS;
 		
+		bool tooltip = true;
 		switch ( axis ) {
 			case 'x':		bt->SetLabel("X"); break;
 			case 'X':		bt->SetLabel("x"); break;
@@ -87,9 +98,12 @@ void CncSecureManuallyMovePanel::onAxis(wxCommandEvent& event) {
 			case 'z':		bt->SetLabel("Z"); break;
 			case 'Z':		bt->SetLabel("z"); break;
 			case 'f':
-			case 'F':		bt->SetLabel("F"); break;
-			default:		currentAxis = INVALID_AXIS;
+			case 'F':		bt->SetLabel("F"); 
+			default:		tooltip = false;
 		}
+		
+		if ( tooltip == true )
+			setTooltip(bt);
 	}
 }
 /////////////////////////////////////////////////////////////////

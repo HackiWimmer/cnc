@@ -4,6 +4,7 @@
 CncSecureSlidepad::CncSecureSlidepad(wxWindow* parent)
 : CncSecureSlidepadBase		(parent)
 , sliderValues				()
+, caller					(NULL)
 /////////////////////////////////////////////////////////////////////
 {
 	sliderValues.push_back(0);
@@ -112,15 +113,24 @@ void CncSecureSlidepad::updateResult() {
 	}
 	else if ( sliderValues.size() == 2 ) 
 	{
-	
-		m_textResult->ChangeValue(wxString::Format("%d", sliderValues[0] + m_scrollbar->GetThumbPosition()));
+		const int newVal = sliderValues[0] + m_scrollbar->GetThumbPosition();
+		m_textResult->ChangeValue(wxString::Format("%d", newVal));
+		
+		if ( caller )
+			caller->sliderValueChanged(m_scrollbar->GetThumbPosition(), newVal);
 	}
 	else 
 	{
 		const int val = m_scrollbar->GetThumbPosition();
 		
-		if ( val < (int)sliderValues.size() )	m_textResult->ChangeValue(wxString::Format("%+d", sliderValues[val]));
-		else									m_textResult->ChangeValue("0");
+		int newVal = 0;
+		if ( val < (int)sliderValues.size() )
+			newVal =  sliderValues[val];
+			
+		m_textResult->ChangeValue(wxString::Format("%d", newVal));
+		
+		if ( caller )
+			caller->sliderValueChanged(val, newVal);
 	}
 }
 /////////////////////////////////////////////////////////////////////

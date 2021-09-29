@@ -1265,6 +1265,7 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
+	/*
 	const uint32_t trgF1000_MMSEC = ( 700 / 60 )	* 1000;
 	
 	const uint32_t A_1000			= 2.003			* 1000;
@@ -1283,7 +1284,7 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 	const int32_t I2 = -V0 - sqrt(V1 + V0 * V0);
 	
 	std::cout << "I1 = " << I1 << ", I2 = " << I2 << std::endl;
-	
+	*/
 	/*
 	std::cout	<< std::showpos << std::fixed << std::setw( 11 ) << std::setprecision( 6 )
 			<< "v1: " << v1 << std::endl;
@@ -1409,7 +1410,8 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(m_rightTplPrevirePlaceholder,					monitorFilePreview);
 		GblFunc::swapControls(m_cncOverviewsPlaceholder,					cncLCDPositionPanel);
 		GblFunc::swapControls(m_secGamepadPlaceholder,						gamepadSpy);
-		
+		GblFunc::swapControls(scp->GetPredefinedPositionsPlaceholder(),		m_scrollWinPredefinedPositions);
+		GblFunc::swapControls(scp->GetNavigatorPlaceholder(),				navigatorPanel);
 		
 		// default show the preview of loaded template
 		m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::RIGHT_PREVIEW);
@@ -1434,6 +1436,8 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(monitorFilePreview,						m_rightTplPrevirePlaceholder);
 		GblFunc::swapControls(cncLCDPositionPanel,						m_cncOverviewsPlaceholder);
 		GblFunc::swapControls(gamepadSpy,								m_secGamepadPlaceholder);
+		GblFunc::swapControls(m_scrollWinPredefinedPositions,			scp->GetPredefinedPositionsPlaceholder());
+		GblFunc::swapControls(navigatorPanel,							scp->GetNavigatorPlaceholder());
 		
 		getLoggerView()->setSecureMode(false);
 	}
@@ -2278,7 +2282,6 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 								usbConnectionObserver->setPortName(portName);
 								if ( usbConnectionObserver->ShowModal() == wxID_YES ) {
 									m_portSelector->SetStringSelection(portName);
-									secureCtrlPanel->setPortSelection(portName);
 									connectSerialPortDialog();
 								}
 							}
@@ -2430,10 +2433,10 @@ void MainFrame::decoratePortSelector(bool list) {
 	}
 	
 	// select the last port, if availiable
-	if ( m_portSelector->FindString(lastPortName) != wxNOT_FOUND )
+	if ( m_portSelector->FindString(lastPortName) != wxNOT_FOUND ) {
 		m_portSelector->SetStringSelection(lastPortName);
-		
-	secureCtrlPanel->setPortSelection(lastPortName);
+		secureCtrlPanel->updatePortSelection(lastPortName);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::setIcons() {
@@ -2615,8 +2618,7 @@ void MainFrame::initializeConnectionSelector() {
 	// initialize com port
 	wxString value;
 	THE_CONFIG->getDefaultPort(value);
-	m_portSelector   ->SetStringSelection(value);
-	secureCtrlPanel->setPortSelection(value); //???
+	m_portSelector ->SetStringSelection(value);
 	defaultPortName.assign(value);
 	
 	// initialize update interval
@@ -2732,29 +2734,20 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
 	::wxAboutBox(info);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::selectPort(const wxString& portName) {
+void MainFrame::selectPort(wxCommandEvent& event) {
+//////////////////////////////////////////////////
+	selectPort();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectPort() {
 ///////////////////////////////////////////////////////////////////
 	if ( m_portSelector->GetStringSelection().IsSameAs(_portSeparator) ) {
 		m_portSelector->SetStringSelection(lastPortName);
 		return;
 	}
-
-	if ( GetPortSelector()->FindString(portName) == wxNOT_FOUND )
-		return;
-		
-	GetPortSelector()->SetStringSelection(portName);
-
-	if ( lastPortName != m_portSelector->GetStringSelection() ) {
+	
+	if ( lastPortName != m_portSelector->GetStringSelection() )
 		connectSerialPortDialog();
-		
-		// Update secure panel also
-		secureCtrlPanel->setPortSelection(m_portSelector->GetStringSelection());
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectPort(wxCommandEvent& event) {
-//////////////////////////////////////////////////
-	selectPort(m_portSelector->GetStringSelection());
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::connectSerialPortDialog() {
@@ -2814,6 +2807,7 @@ bool MainFrame::connectSerialPort() {
 	lastPortName.clear();
 	
 	bool ret = false;
+	secureCtrlPanel->notifyConnection(false, "");
 	if ( (ret = cnc->connect(serialFileName)) == true )  {
 		
 		lastPortName.assign(sel);
@@ -2835,7 +2829,7 @@ bool MainFrame::connectSerialPort() {
 				m_miRqtIdleMessages->Enable(true);
 			}
 			
-			secureCtrlPanel->GetPortName()->SetLabel(m_portSelector->GetStringSelection());
+			secureCtrlPanel->notifyConnection(true, m_portSelector->GetStringSelection());
 		}
 	}
 	

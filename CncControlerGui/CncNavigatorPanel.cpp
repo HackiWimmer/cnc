@@ -81,6 +81,12 @@ CncNavigatorPanel::~CncNavigatorPanel() {
 	wxDELETE ( continuousEvent );
 }
 ///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::setSecureMode(bool state) {
+///////////////////////////////////////////////////////////////////
+	config.showContextMenu  = !state;
+	config.speedByAmplitude = !state;
+}
+///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::precreateSegmentAngles() {
 ///////////////////////////////////////////////////////////////////
 	outerRegions.clear();
@@ -611,6 +617,7 @@ void CncNavigatorPanel::onMouse(wxMouseEvent& event) {
 	if ( IsEnabled() == false )
 		return;
 		
+	
 	if ( event.RightDown() ) {
 		displayContextMenu();
 		return;
@@ -869,6 +876,6 @@ void CncNavigatorPanel::stopContinuousEvent() {
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::displayContextMenu() {
 ///////////////////////////////////////////////////////////////////
-	if ( popupMenu ) 
+	if ( popupMenu && config.showContextMenu == true ) 
 		PopupMenu(popupMenu);
 }

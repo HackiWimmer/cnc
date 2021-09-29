@@ -27,6 +27,8 @@ class CncNavigatorPanel : public wxPanel {
 			bool showRegionInfo			= true;
 			bool showRegionTip			= true;
 			
+			bool showContextMenu		= true;
+			
 			int margin 					= 10;
 			int alignment				= wxALIGN_NOT;
 			
@@ -80,6 +82,7 @@ class CncNavigatorPanel : public wxPanel {
 		
 		virtual bool Enable(bool enable=true);
 		
+		void setSecureMode(bool state);
 		void setStepMode(CncStepMode sm) { stepMode = sm; }
 		
 	private:

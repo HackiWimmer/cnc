@@ -7,6 +7,16 @@
 class CncSecureSlidepad : public CncSecureSlidepadBase
 {
 	public:
+		
+		class Interface {
+		
+			public:
+				Interface() {}
+				virtual ~Interface() {}
+				
+				virtual void sliderValueChanged(int index, int value) {}
+		};
+		
 		CncSecureSlidepad(wxWindow* parent);
 		virtual ~CncSecureSlidepad();
 		
@@ -15,13 +25,16 @@ class CncSecureSlidepad : public CncSecureSlidepadBase
 		bool	setValues(const SliderValues& list, int index);
 		void	setInfo(const wxString& info);
 		
+		void	setCallerInterface(Interface* inf) { caller = inf; }
+		
 		int		getValue() const;
 		
 	protected:
 		virtual void onScrollChanged(wxScrollEvent& event);
 		
 	private:
-		SliderValues sliderValues;
+		SliderValues	sliderValues;
+		Interface*		caller;
 		
 		void prepareScrollbar();
 		void updateResult();

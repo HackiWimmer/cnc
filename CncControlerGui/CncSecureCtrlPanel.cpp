@@ -223,21 +223,60 @@ wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////////////
 CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
-: CncSecureCtrlPanelBase	(parent)
-, portSelectorList			(NULL)
-, manuallyMovePanel			(NULL)
+: CncSecureCtrlPanelBase				(parent)
+, CncSecureSlidepad::Interface			()
+, CncReferenceEvaluation::Interface		()
+, portSelectorList						(NULL)
+, manuallyMovePanel						(NULL)
+, referencePanel						(NULL)
+, speedpad								(NULL)
+, pageVector							()
 /////////////////////////////////////////////////////////////////////
 {
-	// port selector control
+	// ---------------------------------------------------------------
+	auto setPageWidth = [&](wxWindow* page, int width){
+		int pos = m_rightBook->FindPage(page);
+		if ( pos >=0 && pos < (int)pageVector.size() )
+			pageVector.at(pos).width = width;
+	};
+
+	// setup additional page information
+	wxASSERT( m_leftBook->GetPageCount() ==  m_rightBook->GetPageCount() );
+	for (unsigned int i = 0; i < m_leftBook->GetPageCount(); i++ ) {
+		PageInfo pi;
+		pageVector.push_back(pi);
+	}
+	
+	setPageWidth(m_rpManually,	800);
+	setPageWidth(m_rpRef,		800);
+	
 	portSelectorList = new CncSecurePortListCtrl(this, this, wxLC_HRULES | wxLC_SINGLE_SEL | wxLC_NO_HEADER); 
 	GblFunc::replaceControl(m_portSelectorPlaceholder, portSelectorList);
 	
 	manuallyMovePanel = new CncSecureManuallyMovePanel(this); 
 	GblFunc::replaceControl(m_manuallyMovePlaceholder, manuallyMovePanel);
 	
-	const int sel = 0;
-	m_leftBook->SetSelection(sel);
-	m_rigthBook->SetSelection(sel);
+	referencePanel = new CncReferenceEvaluation(this); 
+	GblFunc::replaceControl(m_evaluateReferencePlaceholder, referencePanel);
+	referencePanel->setCallerInterface(this);
+	
+	speedpad = new CncSecureSlidepad(this); 
+	GblFunc::replaceControl(m_speedSliderPlaceholder, speedpad);
+	speedpad->setInfo("Speed F:");
+	CncSecureSlidepad::SliderValues values;
+	{
+		values.push_back(cnc::getSpeedValue(FINEST));
+		values.push_back(cnc::getSpeedValue(FINE));
+		values.push_back(cnc::getSpeedValue(MEDIUM));
+		values.push_back(cnc::getSpeedValue(ROUGH));
+		values.push_back(cnc::getSpeedValue(ROUGHEST));
+	}
+	speedpad->setValues(values, cnc::getSpeedValue(FINE));
+	speedpad->setCallerInterface(this);
+	speedpad->GetInfoText()->SetForegroundColour(*wxWHITE);
+	
+	m_leftBook->SetSelection(0);
+	m_rightBook->SetSelection(0);
 	performRightHeadline();
 	
 	THE_APP->GetSecureVersionInfo()->SetLabel(CNC_VERSION_STR);
@@ -246,17 +285,33 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 CncSecureCtrlPanel::~CncSecureCtrlPanel() {
 /////////////////////////////////////////////////////////////////////
 	wxDELETE(portSelectorList);
+	wxDELETE(manuallyMovePanel);
+	wxDELETE(referencePanel);
+	wxDELETE(speedpad);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::onLeftBookPageChanged(wxListbookEvent& event) {
+void CncSecureCtrlPanel::sliderValueChanged(int pos, int value) {
+/////////////////////////////////////////////////////////////////////
+	// Notification from navigator speed slider
+	THE_APP->selectStepSensitivity(pos);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onLeftBookPageChanged() {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(m_leftBook->GetPageCount() == m_rightBook->GetPageCount() );
 	
 	const int sel = m_leftBook->GetSelection();
-	m_rigthBook->SetSelection(sel);
-	m_rightHeadline->SetLabel("sss");
+	m_rightBook->SetSelection(sel);
+	
+	if ( sel >=0 && sel < (int)pageVector.size() )
+		THE_APP->GetSecureSplitterMainV()->SetSashPosition(pageVector.at(sel).width);
 	
 	performRightHeadline();
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onLeftBookPageChanged(wxListbookEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	onLeftBookPageChanged();
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onEmergencySec(wxCommandEvent& event) {
@@ -340,8 +395,14 @@ void CncSecureCtrlPanel::tryToProvideTemplate() {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::setPortSelection(const wxString& portName) {
 /////////////////////////////////////////////////////////////////////
+	//portSelectorList->selectPortInList(portName);
+	THE_APP->GetPortSelector()->SetStringSelection(portName);
+	THE_APP->selectPort();
+	
+}/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::updatePortSelection(const wxString& portName) {
+/////////////////////////////////////////////////////////////////////
 	portSelectorList->selectPortInList(portName);
-	THE_APP->selectPort(portName);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::addPortName(const wxString& portName, const wxString& imageName) {
@@ -352,6 +413,17 @@ void CncSecureCtrlPanel::addPortName(const wxString& portName, const wxString& i
 void CncSecureCtrlPanel::clearPortSelection() {
 /////////////////////////////////////////////////////////////////////
 	portSelectorList->deleteAllEntries();
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::notifyConnection(bool state, const wxString& portName) {
+/////////////////////////////////////////////////////////////////////
+	const wxBitmap bmpC = ImageLib16().Bitmap("BMP_OK16");
+	const wxBitmap bmpD = ImageLib16().Bitmap("BMP_WARNING16");
+	
+	m_portName->SetLabel(portName);
+	m_btHardwareRefSec->Enable(THE_CONTEXT->hasHardware() && state == true );
+	m_bmpConnectionStateSecure->SetBitmap( state == true ? bmpC : bmpD);
+	m_bmpConnectionStateSecure->Refresh();
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onOpenTemplateSec(wxCommandEvent& event) {
@@ -374,14 +446,29 @@ void CncSecureCtrlPanel::onStackTraceStoreSec(wxCommandEvent& event) {
 	THE_APP->showStacktraceStore(event);
 }
 /////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::referenceNotifyMessage(const wxString& msg, int flags) {
+//////////// /////////////////////////////////////////////////////////
+	switch (flags) {
+		case wxICON_INFORMATION:	std::cout << msg << std::endl;
+									break;
+									
+		case wxICON_ERROR:
+									
+		default:					std::cerr << msg << std::endl;
+	}
+}
+/////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::activate(bool b) {
 /////////////////////////////////////////////////////////////////////
+	THE_APP->navigatorPanel->setSecureMode(b);
+	
+	
 	if ( b ) {
 		if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) {
 			tryToProvideTemplate();
 		}
 		
-	
+		
 	}
 	else {
 

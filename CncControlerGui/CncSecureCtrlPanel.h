@@ -1,12 +1,16 @@
 #ifndef CNCSECURECTRLPANEL_H
 #define CNCSECURECTRLPANEL_H
 
+#include "CncSecureSlidepad.h"
+#include "CncReferenceEvaluation.h"
 #include "wxCrafterSecurePanel.h"
 
 class CncSecurePortListCtrl;
 class CncSecureManuallyMovePanel;
 
-class CncSecureCtrlPanel : public CncSecureCtrlPanelBase
+class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
+							, public CncSecureSlidepad::Interface
+							, public CncReferenceEvaluation::Interface
 {
 	public:
 		CncSecureCtrlPanel(wxWindow* parent);
@@ -15,10 +19,11 @@ class CncSecureCtrlPanel : public CncSecureCtrlPanelBase
 		void activate(bool b);
 		void lockSelection(bool b);
 		
-		void setPortSelection(const wxString& portName);
-		
 		void clearPortSelection();
 		void addPortName(const wxString& portName, const wxString& imageName = "");
+		
+		void updatePortSelection(const wxString& portName);
+		void notifyConnection(bool state, const wxString& portName);
 		
 	protected:
 		virtual void onStackTraceStoreSec(wxCommandEvent& event);
@@ -37,13 +42,30 @@ class CncSecureCtrlPanel : public CncSecureCtrlPanelBase
 		virtual void onStopSec(wxCommandEvent& event);
 		virtual void onLeftBookPageChanged(wxListbookEvent& event);
 		
+		void setPortSelection(const wxString& portName);
+		
+		virtual void sliderValueChanged(int pos, int value);
+		virtual void referenceNotifyMessage(const wxString& msg, int flags = wxICON_INFORMATION);
+		
+		friend class CncSecurePortListCtrl;
+		
 	private:
-	
+		
+		struct PageInfo {
+			int width = 520;
+		};
+		
+		typedef std::vector<PageInfo> PageVector;
+		
 		CncSecurePortListCtrl*			portSelectorList;
-		CncSecureManuallyMovePanel*		manuallyMovePanel;
+		CncSecureManuallyMovePanel*		manuallyMovePanel; 
+		CncReferenceEvaluation*			referencePanel;
+		CncSecureSlidepad*				speedpad;
+		PageVector						pageVector;
 		
 		void performRightHeadline();
 		void tryToProvideTemplate();
+		void onLeftBookPageChanged();
 };
 
 #endif // CNCSECURECTRLPANEL_H

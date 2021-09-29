@@ -625,7 +625,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool stopInteractiveMove();
 		
 		bool connectSerialPort();
-		void selectPort(const wxString& portName);
+		void selectPort();
 		
 		void decorateProbeMode(bool probeMode);
 		void decorateSecureDlgChoice(bool useDlg);

@@ -8,7 +8,7 @@
 #include "CncTouchBlockDetector.h"
 
 class CncExternalViewBox;
-class CncGamepadSpy;
+//class CncGamepadSpy;
 
 class CncReferencePosition	: public CncReferencePositionBase
 							, public CncTouchBlockDetector::CallbackInterface
