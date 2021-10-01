@@ -360,11 +360,12 @@ class SecureLeftBookSelection {
 };
 
 //-----------------------------------------------------------------
-class SecurePrefiewBookSelection {
+class SecurePreviewBookSelection {
 	public:
 		enum VAL {
 			LEFT_PREVIEW			= 0,
-			RIGHT_PREVIEW			= 1
+			RIGHT_PREVIEW			= 1,
+			CAMERA_PREVIEW			= 2
 		};
 };
 

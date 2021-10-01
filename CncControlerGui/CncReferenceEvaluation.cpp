@@ -10,6 +10,7 @@
 #include "MainFrame.h"
 #include "CncExternalViewBox.h"
 #include "CncAutoProgressDialog.h"
+#include "CncSecureNumpadDialog.h"
 #include "CncReferenceEvaluation.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -20,7 +21,10 @@ CncReferenceEvaluation::CncReferenceEvaluation(wxWindow* parent)
 , caller									(NULL)
 , cameraCapture								(NULL)
 , extCameraPreview							(new CncExternalViewBox(this))
+, setButton									(NULL)
+, cancelButton								(NULL)
 , touchCorner								(TM_UNKNOWN)
+, cameraSwapState							(SS_ATTACHED)
 ///////////////////////////////////////////////////////////////////
 {
 	if ( THE_CONFIG->getCameraSupportFlag() == true ) {
@@ -48,7 +52,8 @@ CncReferenceEvaluation::CncReferenceEvaluation(wxWindow* parent)
 	val.SetPrecision(3);
 	m_workpiceThickness->SetValidator(val);
 
-	m_cbPrevTest		->SetValue(false);
+	m_tbPrevTest		->SetValue(false);
+	m_tbPrevTest		->SetLabel(m_tbPrevTest->GetValue() ? "Yes" : "No");
 	m_touchDiameter		->SetValidator(val);
 	m_touchDiameter		->SetValue(wxString::Format("%.3lf", 0.00));
 	m_workpiceThickness	->SetValue(wxString::Format("%.3lf", 0.00));
@@ -61,6 +66,46 @@ CncReferenceEvaluation::~CncReferenceEvaluation() {
 ///////////////////////////////////////////////////////////////////
 	wxDELETE(cameraCapture);
 	wxDELETE(extCameraPreview);
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::init() {
+///////////////////////////////////////////////////////////////////
+	m_btZeroX->SetValue(true);
+	m_btZeroY->SetValue(true);
+	m_btZeroZ->SetValue(true);
+	determineZeroMode();
+	selectEvaluationMode();
+	
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::cancel() {
+///////////////////////////////////////////////////////////////////
+	if ( cameraCapture != NULL ) 
+		cameraCapture->stop();
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::set() {
+///////////////////////////////////////////////////////////////////
+	if ( isWorkpieceThicknessNeeded() ) {
+		if ( cnc::dblCompareNull(getWorkpieceThickness()) == true ) {
+			wxMessageDialog dlg(this, 
+								_T("For the chosen mode workpiece thickness can't be 0.0"), 
+								_T("Invalid Workpiece Thickness  . . ."), 
+								wxOK|wxICON_ERROR|wxCENTRE);
+			dlg.ShowModal();
+			return;
+		}
+	}
+	
+	if ( cameraCapture != NULL ) 
+		cameraCapture->stop();
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::resetTempSetting() {
+///////////////////////////////////////////////////////////////////
+	m_btZeroX->SetValue(true);
+	m_btZeroY->SetValue(true);
+	m_btZeroZ->SetValue(true);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::mode1(wxCommandEvent& event) {
@@ -151,14 +196,38 @@ void CncReferenceEvaluation::onTouchDiameterKeyDown(wxKeyEvent& event) {
 		}
 	}
 	
-	#warning add if secure mode
-	
 	// to ensure the default handling
+	event.Skip();
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::onTouchDiameterLeftDown(wxMouseEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
+		event.Skip(false);
+		
+		CncSecureNumpadDialog dlg(this, CncSecureNumpad::Type::DOUBLE, 3, 0.0, 30.0);
+		dlg.setValue(m_touchDiameter->GetValue());
+		dlg.setInfo("Touch Diameter:");
+		dlg.Center(wxCENTRE_ON_SCREEN);
+		
+		if ( dlg.ShowModal() == wxID_OK ) 
+			m_touchDiameter->ChangeValue(wxString::Format("%.3lf", dlg.getValueAsDouble()));
+			
+		return;
+	}
+	
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::onTouchTest(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->hasHardware() == false ) {
+		if ( caller )
+			caller->referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no test possible");
+			
+		return;
+	}
+	
 	CncRunAnimationControl rac(THE_APP);
 	
 	Enable(false);
@@ -194,6 +263,13 @@ void CncReferenceEvaluation::onTouchTest(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::onTouchXYZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->hasHardware() == false ) {
+		if ( caller )
+			caller->referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no XYZ Touch possible");
+			
+		return;
+	}
+
 	typedef CncTouchBlockDetector::Parameters PARA;
 	CncRunAnimationControl rac(THE_APP);
 	touch((wxWindow*)event.GetEventObject(), PARA::TM_TOUCH_XYZ);
@@ -201,6 +277,13 @@ void CncReferenceEvaluation::onTouchXYZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::onTouchZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->hasHardware() == false ) {
+		if ( caller )
+			caller->referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no z Touch possible");
+			
+		return;
+	}
+
 	typedef CncTouchBlockDetector::Parameters PARA;
 	CncRunAnimationControl rac(THE_APP);
 	touch((wxWindow*)event.GetEventObject(), PARA::TM_TOUCH_Z);
@@ -340,6 +423,23 @@ short CncReferenceEvaluation::evaluateMode() const {
 	return CncRM_Unknown;
 }
 ///////////////////////////////////////////////////////////////////
+bool CncReferenceEvaluation::isWorkpieceThicknessNeeded() const {
+///////////////////////////////////////////////////////////////////
+	const short mode = evaluateMode();
+	switch ( mode ) {
+		case CncRM_Mode1:			return false;
+		case CncRM_Mode2:			return false;
+		case CncRM_Mode3:			return true;
+		case CncRM_Mode4:			return true;
+		case CncRM_Mode5:			return false;
+		case CncRM_Mode6:			return false;
+		case CncRM_Touchblock:		return false;
+		case CncRM_Camera:			return false;
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool CncReferenceEvaluation::isWorkpieceThicknessAvailable() const {
 ///////////////////////////////////////////////////////////////////
 	const short mode = evaluateMode();
@@ -376,9 +476,10 @@ void CncReferenceEvaluation::determineZeroMode() {
 		return bt->GetValue() == true ? '0' : '-';
 	};
 	
-	#warning reactivate
-	//m_btSet->SetLabel(wxString::Format("Zero (%c, %c, %c)", evaluate(m_btZeroX), evaluate(m_btZeroY), evaluate(m_btZeroZ)));
-	//m_btSet->Enable(m_btZeroX->GetValue() == true || m_btZeroY->GetValue() == true || m_btZeroZ->GetValue() == true);
+	if ( setButton ) {
+		setButton->SetLabel(wxString::Format("Zero (%c, %c, %c)", evaluate(m_btZeroX), evaluate(m_btZeroY), evaluate(m_btZeroZ)));
+		setButton->Enable(m_btZeroX->GetValue() == true || m_btZeroY->GetValue() == true || m_btZeroZ->GetValue() == true);
+	}
 	
 	updatePreview();
 }
@@ -437,6 +538,26 @@ void CncReferenceEvaluation::selectEvaluationMode() {
 								break;
 	}
 	
+	// attach/detach camera
+	if ( THE_CONTEXT->hasHardware() == true ) 
+	{
+		if ( THE_APP->GetPanelCamerPreviewPlaceholder() && THE_APP->GetPanelCamerPreviewPlaceholder()->IsShown() )
+		{
+			if ( caller )
+				caller->cameraNotifyPreview(sel == SEL_CAMERA);
+			
+			if (  sel == SEL_CAMERA && cameraSwapState == SS_ATTACHED ) {
+				GblFunc::swapControls(THE_APP->GetPanelCameraPreviewPlaceholder(), m_panelCameraArea);
+				cameraSwapState = SS_DETACHED; 
+			}
+				
+			if (  sel != SEL_CAMERA && cameraSwapState == SS_DETACHED ) {
+				GblFunc::swapControls(THE_APP->GetPanelCameraPreviewPlaceholder(), m_panelCameraArea);
+				cameraSwapState = SS_ATTACHED;
+			}
+		}
+	}
+	
 	m_measuremetOffsetX->SetValue(wxString::Format("%.3lf", x));
 	m_measuremetOffsetY->SetValue(wxString::Format("%.3lf", y));
 	m_measuremetOffsetZ->SetValue(wxString::Format("%.3lf", z));
@@ -467,17 +588,39 @@ void CncReferenceEvaluation::notifyProgess(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
 	if ( caller )
 		caller->referenceNotifyMessage(msg, wxICON_INFORMATION);
+		
+	m_continuousTimer->Start();
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::notifyError(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
 	if ( caller )
 		caller->referenceNotifyMessage(msg, wxICON_ERROR);
+		
+	m_continuousTimer->Start();
 }
 ///////////////////////////////////////////////////////////////////
 const CncReferenceEvaluation::TouchCorner CncReferenceEvaluation::getTouchCorner() const {
 ///////////////////////////////////////////////////////////////////
 	return touchCorner;
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::onContinuousTimer(wxTimerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	static wxDateTime tsLast = wxDateTime::Now();
+	
+	if ( (wxDateTime::Now() - tsLast).Abs().GetSeconds() > 5 ) 
+	{
+		if ( caller )
+			caller->referenceDismissMessage();
+		
+		tsLast = wxDateTime::Now();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::onTogglePrevTest(wxCommandEvent& event) { 
+///////////////////////////////////////////////////////////////////
+	m_tbPrevTest->SetLabel( m_tbPrevTest->GetValue() ? "Yes" : "No");
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::touch(wxWindow* btn, CncTouchBlockDetector::Parameters::TouchMode tm) {
@@ -508,7 +651,7 @@ void CncReferenceEvaluation::touch(wxWindow* btn, CncTouchBlockDetector::Paramet
 	CncAutoProgressDialog progressDlg(this);
 	progressDlg.Show(true);
 	
-		if ( m_cbPrevTest->GetValue() == true ) {
+		if ( m_tbPrevTest->GetValue() == true ) {
 			
 			wxString msg;
 			msg =	"Close the contact manually. " \

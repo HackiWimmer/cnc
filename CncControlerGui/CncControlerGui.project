@@ -266,6 +266,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncPodestMgmtMovement.h"/>
+      <File Name="CncPodestMgmtMovement.cpp"/>
       <File Name="CncReferenceEvaluation.h"/>
       <File Name="CncReferenceEvaluation.cpp"/>
       <File Name="CncMoveDefinition.h"/>

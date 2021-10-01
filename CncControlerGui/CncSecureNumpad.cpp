@@ -22,13 +22,21 @@ CncSecureNumpad::CncSecureNumpad(wxWindow* parent, Type t, int p, double mi, dou
 	switch( type ) {
 		case LONG:		m_btDot->Enable(false);
 						setValue("");
+						m_intervalText->SetLabel(wxString::Format("[ %ld ... %ld ]", (long)mi, (long)ma));
 						break;
 						
 		case DOUBLE:	m_btDot->Enable(true);
 						setValue("");
 						length++;
+						
+						wxString format("%"); format.append(wxString::Format(".%dlf", precision));
+						format.assign(wxString::Format("[ %s ... %s ]", format, format));
+						
+						m_intervalText->SetLabel(wxString::Format(format, mi, ma));
 						break;
 	}
+	
+	
 }
 ///////////////////////////////////////////////////////////////////
 CncSecureNumpad::~CncSecureNumpad() {
@@ -40,18 +48,26 @@ void CncSecureNumpad::setInfo(const wxString& info) {
 	if ( info.EndsWith(":") )	m_infoText->SetLabel(info);
 	else						m_infoText->SetLabel(wxString::Format("%s:", info));
 }
+void	setIntervalInfo(const wxString& info);
 ///////////////////////////////////////////////////////////////////
 void CncSecureNumpad::setValue(long v) {
 ///////////////////////////////////////////////////////////////////
-	setValue(wxString::Format("%ld", v));
+	if ( v == 0 ) 	setValue("");
+	else			setValue(wxString::Format("%ld", v));
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureNumpad::setValue(double v) {
 ///////////////////////////////////////////////////////////////////
-	wxString format("%"); 
-	format.append(wxString::Format(".%dlf", precision));
-
-	setValue(wxString::Format(format, v));
+	if ( cnc::dblCmp::nu(v) ) 
+	{
+		setValue(wxString::Format(".%s", wxString('0', precision)));
+	}
+	else
+	{
+		wxString format("%"); 
+		format.append(wxString::Format(".%dlf", precision));
+		setValue(wxString::Format(format, v));
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureNumpad::setValue(const wxString& v)  {
@@ -63,6 +79,9 @@ void CncSecureNumpad::setValue(const wxString& v)  {
 	wxString value(v);
 	value.Replace("-", "");
 	value.Replace("+", "");
+	
+	while ( value.StartsWith('0') )
+		value.assign(value.Remove(0));
 	
 	m_textResult->ChangeValue(value);
 	m_textResult->SetInsertionPoint(0);

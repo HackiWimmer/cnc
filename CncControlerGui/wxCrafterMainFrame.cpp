@@ -5315,12 +5315,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_splitterPagePreviewV = new wxPanel(m_secureSplitterLoggerV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterLoggerV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_secureSplitterLoggerV->SplitVertically(m_splitterPageLoggerV, m_splitterPagePreviewV, 0);
     
-    wxFlexGridSizer* flexGridSizer9987 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer9987 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer9987->SetFlexibleDirection( wxBOTH );
     flexGridSizer9987->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer9987->AddGrowableCol(0);
+    flexGridSizer9987->AddGrowableCol(1);
     flexGridSizer9987->AddGrowableRow(0);
     m_splitterPagePreviewV->SetSizer(flexGridSizer9987);
+    
+    m_staticLine10023 = new wxStaticLine(m_splitterPagePreviewV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPagePreviewV, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer9987->Add(m_staticLine10023, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_securePreviewBook = new wxSimplebook(m_splitterPagePreviewV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPagePreviewV, wxSize(-1,-1)), wxBK_DEFAULT);
     m_securePreviewBook->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
@@ -5329,35 +5333,50 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer9987->Add(m_securePreviewBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_panel9997 = new wxPanel(m_securePreviewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_securePreviewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_securePreviewBook->AddPage(m_panel9997, _("Page"), false);
+    m_panelTemplate = new wxPanel(m_securePreviewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_securePreviewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_securePreviewBook->AddPage(m_panelTemplate, _("Page"), false);
     
     wxFlexGridSizer* flexGridSizer10001 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer10001->SetFlexibleDirection( wxBOTH );
     flexGridSizer10001->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer10001->AddGrowableCol(0);
     flexGridSizer10001->AddGrowableRow(0);
-    m_panel9997->SetSizer(flexGridSizer10001);
+    m_panelTemplate->SetSizer(flexGridSizer10001);
     
-    m_leftTplPrevirePlaceholder = new wxPanel(m_panel9997, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel9997, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_leftTplPrevirePlaceholder = new wxPanel(m_panelTemplate, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTemplate, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_leftTplPrevirePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
     flexGridSizer10001->Add(m_leftTplPrevirePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_panel9999 = new wxPanel(m_securePreviewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_securePreviewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_securePreviewBook->AddPage(m_panel9999, _("Page"), false);
+    m_panelPreview = new wxPanel(m_securePreviewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_securePreviewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_securePreviewBook->AddPage(m_panelPreview, _("Page"), false);
     
     wxFlexGridSizer* flexGridSizer10003 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer10003->SetFlexibleDirection( wxBOTH );
     flexGridSizer10003->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer10003->AddGrowableCol(0);
     flexGridSizer10003->AddGrowableRow(0);
-    m_panel9999->SetSizer(flexGridSizer10003);
+    m_panelPreview->SetSizer(flexGridSizer10003);
     
-    m_rightTplPrevirePlaceholder = new wxPanel(m_panel9999, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel9999, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_rightTplPrevirePlaceholder = new wxPanel(m_panelPreview, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPreview, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_rightTplPrevirePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
     
     flexGridSizer10003->Add(m_rightTplPrevirePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_panelCamera = new wxPanel(m_securePreviewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_securePreviewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_securePreviewBook->AddPage(m_panelCamera, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer10015 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer10015->SetFlexibleDirection( wxBOTH );
+    flexGridSizer10015->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer10015->AddGrowableCol(0);
+    flexGridSizer10015->AddGrowableRow(0);
+    m_panelCamera->SetSizer(flexGridSizer10015);
+    
+    m_panelCameraPreviewPlaceholder = new wxPanel(m_panelCamera, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelCamera, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panelCameraPreviewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_CAPTIONTEXT));
+    
+    flexGridSizer10015->Add(m_panelCameraPreviewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_cncGamepadSpy = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     

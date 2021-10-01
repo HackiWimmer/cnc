@@ -13,10 +13,8 @@
 #include "CncVideoCapturePanel.h"
 
 // ----------------------------------------------------------------------------
-// CncNavigatorPanel Event Table
+// CncVideoCapturePanel Event Table
 // ----------------------------------------------------------------------------
-wxDEFINE_EVENT(wxEVT_CNC_NAVIGATOR_PANEL_TIMER,	wxTimerEvent);
-
 wxBEGIN_EVENT_TABLE(CncVideoCapturePanel, wxPanel)
 
 	EVT_PAINT					(CncVideoCapturePanel::onPaint)
@@ -97,7 +95,7 @@ bool CncVideoCapturePanel::start() {
 	}
 	
 	if ( THE_CONTEXT->hasHardware() == false ) {
-		setErrowMessage("The current connected Serial Port has no hardware.\nTherefore, no camera available.");
+		setErrowMessage("The current connected serial port do not support hardware.\nTherefore, no camera available.");
 		return false;
 	}
 		

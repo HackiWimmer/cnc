@@ -20,11 +20,12 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 				Interface() {}
 				virtual ~Interface() {}
 				
+				virtual void cameraNotifyPreview(bool show) {}
 				virtual void referenceNotifyMessage(const wxString& msg, int flags = wxICON_INFORMATION) {}
 				virtual void referenceDismissMessage() {}
 		};
 		
-		void setCallerInterface(Interface* inf) { caller = inf; }
+		void setCallbackInterface(Interface* inf) { caller = inf; }
 		
 		CncReferenceEvaluation(wxWindow* parent);
 		virtual ~CncReferenceEvaluation();
@@ -37,7 +38,17 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		bool					shouldZeroY()			const	{ return m_btZeroY->GetValue(); }
 		bool					shouldZeroZ()			const	{ return m_btZeroZ->GetValue(); }
 		
+		void 					init();
+		void					set();
+		void					cancel();
+		void					updatePreview();
+		void					resetTempSetting();
+		
+		void					setSetButton(wxButton* bt)    { setButton    = bt; }
+		void					setCancelButton(wxButton* bt) { cancelButton = bt; }
+		
 	protected:
+
 		virtual void toggleZeroX(wxCommandEvent& event);
 		virtual void toggleZeroY(wxCommandEvent& event);
 		virtual void toggleZeroZ(wxCommandEvent& event);
@@ -48,6 +59,9 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		virtual void mode4(wxCommandEvent& event);
 		virtual void mode5(wxCommandEvent& event);
 		virtual void mode6(wxCommandEvent& event);
+		virtual void onTouchDiameterLeftDown(wxMouseEvent& event);
+		virtual void onTogglePrevTest(wxCommandEvent& event);
+		virtual void onContinuousTimer(wxTimerEvent& event);
 		virtual void onSelectEvaluationMode(wxListbookEvent& event);
 		virtual void onSelectTouchCorner(wxCommandEvent& event);
 		virtual void onTouchDiameterKeyDown(wxKeyEvent& event);
@@ -61,11 +75,13 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		virtual void notifyError(const wxString& msg);
 
 		short evaluateMode() const;
-			
+		
 		void setMode(short mode);
-		void updatePreview();
 		
 	private:
+		
+		enum SwapState {SS_ATTACHED, SS_DETACHED};
+		
 		static const int		SEL_TOUCHBLOCK	= 0;
 		static const int		SEL_CAMERA		= 1;
 		static const int		SEL_BY_EYE		= 2;
@@ -76,7 +92,11 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		CncVideoCapturePanel*	cameraCapture;
 		CncExternalViewBox* 	extCameraPreview;
 		
+		wxButton*				setButton;
+		wxButton*				cancelButton;
+		
 		TouchCorner				touchCorner;
+		SwapState				cameraSwapState;
 		
 		void					selectEvaluationMode();
 		void					updateCameraParameter();
@@ -87,6 +107,7 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		
 		void					determineZeroMode();
 		bool					isWorkpieceThicknessAvailable()									const;
+		bool					isWorkpieceThicknessNeeded()									const;
 		double					getValueAsDouble(wxTextCtrl* ctrl, double defaultValue = 0.0)	const;
 		
 		void					touch(wxWindow* btn, CncTouchBlockDetector::Parameters::TouchMode tm);

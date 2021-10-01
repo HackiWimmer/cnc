@@ -616,11 +616,14 @@ protected:
     wxPanel* m_splitterPageLoggerV;
     wxPanel* m_secLoggerPlaceholder;
     wxPanel* m_splitterPagePreviewV;
+    wxStaticLine* m_staticLine10023;
     wxSimplebook* m_securePreviewBook;
-    wxPanel* m_panel9997;
+    wxPanel* m_panelTemplate;
     wxPanel* m_leftTplPrevirePlaceholder;
-    wxPanel* m_panel9999;
+    wxPanel* m_panelPreview;
     wxPanel* m_rightTplPrevirePlaceholder;
+    wxPanel* m_panelCamera;
+    wxPanel* m_panelCameraPreviewPlaceholder;
     wxPanel* m_cncGamepadSpy;
     wxPanel* m_gamepadSpyPlaceholder;
     wxPanel* m_cncCoordinateView;
@@ -1498,10 +1501,13 @@ public:
     wxPanel* GetSplitterPageMonitor() { return m_splitterPageMonitor; }
     wxPanel* GetSecLoggerPlaceholder() { return m_secLoggerPlaceholder; }
     wxPanel* GetSplitterPageLoggerV() { return m_splitterPageLoggerV; }
+    wxStaticLine* GetStaticLine10023() { return m_staticLine10023; }
     wxPanel* GetLeftTplPrevirePlaceholder() { return m_leftTplPrevirePlaceholder; }
-    wxPanel* GetPanel9997() { return m_panel9997; }
+    wxPanel* GetPanelTemplate() { return m_panelTemplate; }
     wxPanel* GetRightTplPrevirePlaceholder() { return m_rightTplPrevirePlaceholder; }
-    wxPanel* GetPanel9999() { return m_panel9999; }
+    wxPanel* GetPanelPreview() { return m_panelPreview; }
+    wxPanel* GetPanelCameraPreviewPlaceholder() { return m_panelCameraPreviewPlaceholder; }
+    wxPanel* GetPanelCamera() { return m_panelCamera; }
     wxSimplebook* GetSecurePreviewBook() { return m_securePreviewBook; }
     wxPanel* GetSplitterPagePreviewV() { return m_splitterPagePreviewV; }
     wxSplitterWindow* GetSecureSplitterLoggerV() { return m_secureSplitterLoggerV; }

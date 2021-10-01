@@ -15,12 +15,12 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/statbmp.h>
+#include <wx/statline.h>
 #include <wx/listbook.h>
 #include <wx/imaglist.h>
 #include <wx/simplebook.h>
 #include <wx/button.h>
-#include <wx/statline.h>
-#include <wx/bmpbuttn.h>
+#include <wx/infobar.h>
 #include <wx/tglbtn.h>
 #include <wx/textctrl.h>
 #include <wx/scrolbar.h>
@@ -49,12 +49,14 @@ protected:
     wxStaticText* m_staticText433;
     wxStaticText* m_portName;
     wxStaticBitmap* m_bmpConnectionStateSecure;
+    wxStaticLine* m_staticLine501;
     wxListbook* m_leftBook;
     wxPanel* m_lpConnect;
     wxPanel* m_lpLoad;
     wxPanel* m_lpRef;
     wxPanel* m_lpManually;
     wxPanel* m_lpRun;
+    wxPanel* m_plPodest;
     wxPanel* m_lpMisc;
     wxStaticText* m_rightHeadline;
     wxSimplebook* m_rightBook;
@@ -70,8 +72,9 @@ protected:
     wxPanel* m_lruFilePlaceholder;
     wxButton* m_btLoadTemplate;
     wxPanel* m_rpRef;
+    wxInfoBar* m_referenceInfobar;
     wxPanel* m_evaluateReferencePlaceholder;
-    wxButton* m_btZeroSec;
+    wxButton* m_btSet;
     wxPanel* m_rpManually;
     wxListbook* m_listbook435;
     wxPanel* m_panel437;
@@ -79,7 +82,6 @@ protected:
     wxPanel* m_panel466;
     wxPanel* m_navigatorPlaceholder;
     wxPanel* m_speedSliderPlaceholder;
-    wxBitmapButton* m_bmpButton483;
     wxPanel* m_panel441;
     wxPanel* m_predefinedPositionsPlaceholder;
     wxPanel* m_panel443;
@@ -89,11 +91,14 @@ protected:
     wxButton* m_rcStopSec;
     wxStaticText* m_staticText90;
     wxButton* m_btnEmergenyStopSec;
+    wxPanel* m_rpPodest;
+    wxPanel* m_podestPlaceholder;
     wxPanel* m_rpMisc;
     wxButton* m_btSessionDir;
     wxButton* m_btTestFunct;
     wxButton* m_btStackTrace;
     wxButton* m_btAnchorSec;
+    wxStaticLine* m_staticLine5011;
 
 protected:
     virtual void onLeftBookPageChanged(wxListbookEvent& event) { event.Skip(); }
@@ -101,7 +106,7 @@ protected:
     virtual void onResetSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onEvaluateHardwareReference(wxCommandEvent& event) { event.Skip(); }
     virtual void onOpenTemplateSec(wxCommandEvent& event) { event.Skip(); }
-    virtual void onSetReferencePosition(wxCommandEvent& event) { event.Skip(); }
+    virtual void onReferenceSet(wxCommandEvent& event) { event.Skip(); }
     virtual void onRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onPauseSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStopSec(wxCommandEvent& event) { event.Skip(); }
@@ -115,11 +120,13 @@ public:
     wxStaticText* GetStaticText433() { return m_staticText433; }
     wxStaticText* GetPortName() { return m_portName; }
     wxStaticBitmap* GetBmpConnectionStateSecure() { return m_bmpConnectionStateSecure; }
+    wxStaticLine* GetStaticLine501() { return m_staticLine501; }
     wxPanel* GetLpConnect() { return m_lpConnect; }
     wxPanel* GetLpLoad() { return m_lpLoad; }
     wxPanel* GetLpRef() { return m_lpRef; }
     wxPanel* GetLpManually() { return m_lpManually; }
     wxPanel* GetLpRun() { return m_lpRun; }
+    wxPanel* GetPlPodest() { return m_plPodest; }
     wxPanel* GetLpMisc() { return m_lpMisc; }
     wxListbook* GetLeftBook() { return m_leftBook; }
     wxStaticText* GetRightHeadline() { return m_rightHeadline; }
@@ -134,14 +141,14 @@ public:
     wxPanel* GetLruFilePlaceholder() { return m_lruFilePlaceholder; }
     wxButton* GetBtLoadTemplate() { return m_btLoadTemplate; }
     wxPanel* GetRpLoad() { return m_rpLoad; }
+    wxInfoBar* GetReferenceInfobar() { return m_referenceInfobar; }
     wxPanel* GetEvaluateReferencePlaceholder() { return m_evaluateReferencePlaceholder; }
-    wxButton* GetBtZeroSec() { return m_btZeroSec; }
+    wxButton* GetBtSet() { return m_btSet; }
     wxPanel* GetRpRef() { return m_rpRef; }
     wxPanel* GetManuallyMovePlaceholder() { return m_manuallyMovePlaceholder; }
     wxPanel* GetPanel437() { return m_panel437; }
     wxPanel* GetNavigatorPlaceholder() { return m_navigatorPlaceholder; }
     wxPanel* GetSpeedSliderPlaceholder() { return m_speedSliderPlaceholder; }
-    wxBitmapButton* GetBmpButton483() { return m_bmpButton483; }
     wxPanel* GetPanel466() { return m_panel466; }
     wxPanel* GetPredefinedPositionsPlaceholder() { return m_predefinedPositionsPlaceholder; }
     wxPanel* GetPanel441() { return m_panel441; }
@@ -154,12 +161,15 @@ public:
     wxStaticText* GetStaticText90() { return m_staticText90; }
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
     wxPanel* GetRpRun() { return m_rpRun; }
+    wxPanel* GetPodestPlaceholder() { return m_podestPlaceholder; }
+    wxPanel* GetRpPodest() { return m_rpPodest; }
     wxButton* GetBtSessionDir() { return m_btSessionDir; }
     wxButton* GetBtTestFunct() { return m_btTestFunct; }
     wxButton* GetBtStackTrace() { return m_btStackTrace; }
     wxButton* GetBtAnchorSec() { return m_btAnchorSec; }
     wxPanel* GetRpMisc() { return m_rpMisc; }
     wxSimplebook* GetRightBook() { return m_rightBook; }
+    wxStaticLine* GetStaticLine5011() { return m_staticLine5011; }
     CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~CncSecureCtrlPanelBase();
 };
@@ -223,6 +233,7 @@ class CncSecureNumpadBase : public wxPanel
 {
 protected:
     wxStaticText* m_infoText;
+    wxStaticText* m_intervalText;
     wxTextCtrl* m_signValue;
     wxTextCtrl* m_textResult;
     wxButton* m_bt7;
@@ -255,6 +266,7 @@ protected:
 
 public:
     wxStaticText* GetInfoText() { return m_infoText; }
+    wxStaticText* GetIntervalText() { return m_intervalText; }
     wxTextCtrl* GetSignValue() { return m_signValue; }
     wxTextCtrl* GetTextResult() { return m_textResult; }
     wxButton* GetBt7() { return m_bt7; }

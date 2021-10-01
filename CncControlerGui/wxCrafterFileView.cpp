@@ -115,34 +115,17 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent, wxWindowID id, const wx
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer3760 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3760 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer3760->SetFlexibleDirection( wxBOTH );
     flexGridSizer3760->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3760->AddGrowableCol(0);
-    flexGridSizer3760->AddGrowableRow(0);
+    flexGridSizer3760->AddGrowableRow(1);
     this->SetSizer(flexGridSizer3760);
     
-    m_previewBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_previewBook->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_previewBook->SetName(wxT("m_previewBook"));
-    m_previewBook->SetEffect(wxSHOW_EFFECT_NONE);
-    
-    flexGridSizer3760->Add(m_previewBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_panel3764 = new wxPanel(m_previewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_previewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_previewBook->AddPage(m_panel3764, _("Page"), false);
-    
-    wxFlexGridSizer* flexGridSizer3768 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer3768->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3768->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3768->AddGrowableCol(0);
-    flexGridSizer3768->AddGrowableRow(1);
-    m_panel3764->SetSizer(flexGridSizer3768);
-    
-    m_panel52 = new wxPanel(m_panel3764, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel3764, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel52 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_panel52->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     
-    flexGridSizer3768->Add(m_panel52, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer3760->Add(m_panel52, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer53 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer53->SetFlexibleDirection( wxBOTH );
@@ -155,13 +138,30 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent, wxWindowID id, const wx
     
     flexGridSizer53->Add(flexGridSizer48, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_staticText47 = new wxStaticText(m_panel52, wxID_ANY, _("Serial Outbound File Preview:"), wxDefaultPosition, wxDLG_UNIT(m_panel52, wxSize(-1,-1)), 0);
-    wxFont m_staticText47Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText47->SetFont(m_staticText47Font);
+    m_previewTitle = new wxStaticText(m_panel52, wxID_ANY, _("Serial Outbound File Preview:"), wxDefaultPosition, wxDLG_UNIT(m_panel52, wxSize(-1,-1)), 0);
+    wxFont m_previewTitleFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_previewTitle->SetFont(m_previewTitleFont);
     
-    flexGridSizer48->Add(m_staticText47, 0, wxALL, WXC_FROM_DIP(1));
+    flexGridSizer48->Add(m_previewTitle, 0, wxALL, WXC_FROM_DIP(1));
     
     flexGridSizer48->Add(0, 26, 1, wxALL, WXC_FROM_DIP(1));
+    
+    m_previewBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_previewBook->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_previewBook->SetName(wxT("m_previewBook"));
+    m_previewBook->SetEffect(wxSHOW_EFFECT_NONE);
+    
+    flexGridSizer3760->Add(m_previewBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_panel3764 = new wxPanel(m_previewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_previewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_previewBook->AddPage(m_panel3764, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer3768 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer3768->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3768->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3768->AddGrowableCol(0);
+    flexGridSizer3768->AddGrowableRow(0);
+    m_panel3764->SetSizer(flexGridSizer3768);
     
     m_svgPreviewPlaceholder = new wxPanel(m_panel3764, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel3764, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_svgPreviewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));

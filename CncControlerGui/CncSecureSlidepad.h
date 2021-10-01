@@ -25,7 +25,7 @@ class CncSecureSlidepad : public CncSecureSlidepadBase
 		bool	setValues(const SliderValues& list, int index);
 		void	setInfo(const wxString& info);
 		
-		void	setCallerInterface(Interface* inf) { caller = inf; }
+		void	setCallbackInterface(Interface* inf) { caller = inf; }
 		
 		int		getValue() const;
 		

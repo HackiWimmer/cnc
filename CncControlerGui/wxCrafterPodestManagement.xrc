@@ -4,9 +4,8 @@
     <title>Cnc Podest Management</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE</style>
-    <size>540,300</size>
     <object class="wxFlexGridSizer">
-      <minsize>540,300</minsize>
+      <minsize>540,500</minsize>
       <cols>1</cols>
       <rows>1</rows>
       <vgap>0</vgap>
@@ -38,7 +37,7 @@
                 <growablerows>0</growablerows>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND</flag>
-                  <object class="wxPanel" name="m_panel9613">
+                  <object class="wxPanel" name="m_panelPicture">
                     <style>wxTAB_TRAVERSAL</style>
                     <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
                     <object class="wxFlexGridSizer">
@@ -65,139 +64,11 @@
                     <style>wxLI_VERTICAL</style>
                   </object>
                 </object>
-                <object class="sizeritem" name="flexGridSizer95431">
-                  <flag>wxALL|wxEXPAND</flag>
-                  <option>1</option>
-                  <object class="wxFlexGridSizer">
-                    <cols>1</cols>
-                    <rows>3</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>0</growablecols>
-                    <growablerows>1,2</growablerows>
-                    <object class="sizeritem" name="flexGridSizer9600">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <object class="wxFlexGridSizer">
-                        <cols>2</cols>
-                        <rows>1</rows>
-                        <vgap>0</vgap>
-                        <hgap>0</hgap>
-                        <growablecols>0</growablecols>
-                        <growablerows/>
-                        <object class="sizeritem">
-                          <flag>wxALL|wxEXPAND</flag>
-                          <border>3</border>
-                          <minsize>64,-1</minsize>
-                          <object class="wxTextCtrl" name="m_moveRelative">
-                            <style>wxTE_RIGHT</style>
-                            <size>64,-1</size>
-                            <value>99.999</value>
-                          </object>
-                        </object>
-                        <object class="sizeritem">
-                          <flag>wxALL|wxEXPAND</flag>
-                          <border>5</border>
-                          <object class="wxStaticText" name="m_staticText9611">
-                            <label>mm</label>
-                            <style/>
-                            <font>
-                              <size>9</size>
-                              <style>normal</style>
-                              <weight>bold</weight>
-                              <family>swiss</family>
-                              <underlined>0</underlined>
-                              <face>Segoe UI</face>
-                            </font>
-                          </object>
-                        </object>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>2</border>
-                      <object class="wxBitmapButton" name="m_btRelativeUp">
-                        <bitmap>bitmaps/podestRelativeUp.png</bitmap>
-                        <style>wxBU_AUTODRAW</style>
-                        <bg>wxSYS_COLOUR_BTNFACE</bg>
-                        <default>0</default>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>2</border>
-                      <object class="wxBitmapButton" name="m_btRelativeDown">
-                        <bitmap>bitmaps/podestRelativeDown.png</bitmap>
-                        <style>wxBU_AUTODRAW</style>
-                        <bg>wxSYS_COLOUR_BTNFACE</bg>
-                        <default>0</default>
-                      </object>
-                    </object>
-                  </object>
-                </object>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND</flag>
-                  <border>5</border>
-                  <object class="wxStaticLine" name="m_staticLine95714">
-                    <style>wxLI_VERTICAL</style>
-                  </object>
-                </object>
-                <object class="sizeritem" name="flexGridSizer9543">
-                  <flag>wxALL|wxEXPAND</flag>
-                  <option>1</option>
-                  <object class="wxFlexGridSizer">
-                    <cols>1</cols>
-                    <rows>3</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>0</growablecols>
-                    <growablerows>1,2</growablerows>
-                    <object class="sizeritem" name="flexGridSizer9609">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>3</border>
-                      <object class="wxFlexGridSizer">
-                        <cols>1</cols>
-                        <rows>1</rows>
-                        <vgap>0</vgap>
-                        <hgap>0</hgap>
-                        <growablecols>0</growablecols>
-                        <growablerows>0</growablerows>
-                        <object class="sizeritem">
-                          <flag>wxALL|wxEXPAND</flag>
-                          <object class="wxTextCtrl" name="m_textCtrl9604">
-                            <style>wxTE_READONLY|wxTE_CENTRE</style>
-                            <font>
-                              <size>9</size>
-                              <style>normal</style>
-                              <weight>bold</weight>
-                              <family>swiss</family>
-                              <underlined>0</underlined>
-                              <face>Segoe UI</face>
-                            </font>
-                            <value>Freehand</value>
-                          </object>
-                        </object>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>2</border>
-                      <object class="wxBitmapButton" name="m_btManuallyUp">
-                        <bitmap>bitmaps/podestManuallyUp.png</bitmap>
-                        <style>wxBU_AUTODRAW</style>
-                        <bg>wxSYS_COLOUR_BTNSHADOW</bg>
-                        <default>0</default>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>2</border>
-                      <object class="wxBitmapButton" name="m_btManuallyDown">
-                        <bitmap>bitmaps/podestManuallyDown.png</bitmap>
-                        <style>wxBU_AUTODRAW</style>
-                        <bg>wxSYS_COLOUR_BTNSHADOW</bg>
-                        <default>0</default>
-                      </object>
-                    </object>
+                  <object class="wxPanel" name="m_panelMovementPlaceholder">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
                   </object>
                 </object>
               </object>
@@ -245,6 +116,190 @@
                   </object>
                 </object>
               </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="CncPodestMgmtMovementBase">
+    <style>wxTAB_TRAVERSAL</style>
+    <bg>wxSYS_COLOUR_3DLIGHT</bg>
+    <object class="wxFlexGridSizer">
+      <minsize>300,400</minsize>
+      <cols>1</cols>
+      <rows>3</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>0,2</growablerows>
+      <object class="sizeritem" name="flexGridSizer9543">
+        <flag>wxALL|wxEXPAND</flag>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>1</cols>
+          <rows>3</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>1,2</growablerows>
+          <object class="sizeritem" name="flexGridSizer9609">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>3</border>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>1</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <object class="wxTextCtrl" name="m_textCtrl9604">
+                  <style>wxTE_READONLY|wxTE_CENTRE</style>
+                  <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                  <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                  <font>
+                    <size>12</size>
+                    <style>normal</style>
+                    <weight>bold</weight>
+                    <family>swiss</family>
+                    <underlined>0</underlined>
+                    <face>Segoe UI</face>
+                  </font>
+                  <value>Freehand Movement</value>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>2</border>
+            <object class="wxBitmapButton" name="m_btManuallyUp">
+              <bitmap>bitmaps/podestManuallyUp.png</bitmap>
+              <style>wxBU_AUTODRAW</style>
+              <bg>wxSYS_COLOUR_BTNSHADOW</bg>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>2</border>
+            <object class="wxBitmapButton" name="m_btManuallyDown">
+              <bitmap>bitmaps/podestManuallyDown.png</bitmap>
+              <style>wxBU_AUTODRAW</style>
+              <bg>wxSYS_COLOUR_BTNSHADOW</bg>
+              <default>0</default>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxStaticLine" name="m_staticLine9622">
+          <style>wxLI_HORIZONTAL</style>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer95431">
+        <flag>wxALL|wxEXPAND</flag>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>1</cols>
+          <rows>4</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>2,3</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>3</border>
+            <object class="wxTextCtrl" name="m_textCtrl96042">
+              <style>wxTE_READONLY|wxTE_CENTRE</style>
+              <bg>wxSYS_COLOUR_BTNTEXT</bg>
+              <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+              <font>
+                <size>12</size>
+                <style>normal</style>
+                <weight>bold</weight>
+                <family>swiss</family>
+                <underlined>0</underlined>
+                <face>Segoe UI</face>
+              </font>
+              <value>Precise Movement</value>
+            </object>
+          </object>
+          <object class="sizeritem" name="flexGridSizer9600">
+            <flag>wxALL|wxEXPAND</flag>
+            <object class="wxFlexGridSizer">
+              <cols>3</cols>
+              <rows>2</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>2</growablecols>
+              <growablerows/>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>5</border>
+                <object class="wxStaticText" name="m_staticText9624">
+                  <label>Distance:</label>
+                  <style/>
+                  <font>
+                    <size>9</size>
+                    <style>normal</style>
+                    <weight>bold</weight>
+                    <family>swiss</family>
+                    <underlined>0</underlined>
+                    <face>Segoe UI</face>
+                  </font>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxStaticText" name="m_staticText9611">
+                  <label>[mm]</label>
+                  <style/>
+                  <font>
+                    <size>9</size>
+                    <style>normal</style>
+                    <weight>bold</weight>
+                    <family>swiss</family>
+                    <underlined>0</underlined>
+                    <face>Segoe UI</face>
+                  </font>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>4</border>
+                <minsize>64,-1</minsize>
+                <object class="wxTextCtrl" name="m_moveRelative">
+                  <style>wxTE_RIGHT</style>
+                  <size>64,-1</size>
+                  <value>99.999</value>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>2</border>
+            <object class="wxBitmapButton" name="m_btRelativeUp">
+              <bitmap>bitmaps/podestRelativeUp.png</bitmap>
+              <style>wxBU_AUTODRAW</style>
+              <bg>wxSYS_COLOUR_BTNFACE</bg>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>2</border>
+            <object class="wxBitmapButton" name="m_btRelativeDown">
+              <bitmap>bitmaps/podestRelativeDown.png</bitmap>
+              <style>wxBU_AUTODRAW</style>
+              <bg>wxSYS_COLOUR_BTNFACE</bg>
+              <default>0</default>
             </object>
           </object>
         </object>

@@ -16,6 +16,7 @@ class CncFilePreview : public CncFilePreviewBase
 		
 		bool selectEmptyPreview();
 		bool selectPreview(const wxString& fileName);
+		void setTitle(const wxString& title)			{ m_previewTitle->SetLabel(title); }
 		
 		friend class CncFilePreviewWnd;
 		

@@ -949,14 +949,17 @@ void MainFrame::installCustControls() {
 	// Inbound File Preview
 	mainFilePreview = new CncFilePreview(this, "GLMainPreview");
 	GblFunc::replaceControl(m_filePreviewPlaceholder, mainFilePreview);
+	mainFilePreview->setTitle("File Preview:");
 	
 	// Outbound File Preview
 	outboundFilePreview = new CncFilePreview(this, "GLOutboundPreview");
 	GblFunc::replaceControl(m_outboundPreviewPlaceholder, outboundFilePreview);
+	outboundFilePreview->setTitle("Serial Outbound Preview:");
 
 	// File Preview
 	monitorFilePreview = new CncFilePreview(this, "GLMontiorPreview");
 	GblFunc::replaceControl(m_monitorTemplatePreviewPlaceHolder, monitorFilePreview);
+	monitorFilePreview->setTitle("Template Preview:");
 	
 	// External previews
 	cncExtMainPreview = new CncExternalViewBox(this);
@@ -1338,8 +1341,8 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 	
 	int sel = m_securePreviewBook->GetSelection();
 	
-	if ( sel == SecurePrefiewBookSelection::VAL::LEFT_PREVIEW ) m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::RIGHT_PREVIEW);
-	else 														m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::LEFT_PREVIEW);
+	if ( sel == SecurePreviewBookSelection::VAL::LEFT_PREVIEW ) m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::RIGHT_PREVIEW);
+	else 														m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::LEFT_PREVIEW);
 	
 }
 /////////////////////////////////////////////////////////////////////
@@ -1364,6 +1367,22 @@ void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::activateSecureMode(bool state) {
 ///////////////////////////////////////////////////////////////////
+
+	//-------------------------------------------------------------
+	auto swapControls = [&]() {
+		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),		m_secMonitorPlaceholder);
+		GblFunc::swapControls(getLoggerView(),						m_secLoggerPlaceholder);
+		GblFunc::swapControls(lruFileView,							scp->GetLruFilePlaceholder());
+		GblFunc::swapControls(transferFileView->getFileView(),		scp->GetTransferDirPlaceholder());
+		GblFunc::swapControls(mainFilePreview,						m_leftTplPrevirePlaceholder);
+		GblFunc::swapControls(monitorFilePreview,					m_rightTplPrevirePlaceholder);
+		GblFunc::swapControls(cncLCDPositionPanel,					m_cncOverviewsPlaceholder);
+		GblFunc::swapControls(gamepadSpy,							m_secGamepadPlaceholder);
+		GblFunc::swapControls(m_scrollWinPredefinedPositions,		scp->GetPredefinedPositionsPlaceholder());
+		GblFunc::swapControls(navigatorPanel,						scp->GetNavigatorPlaceholder());
+	};
+	
+	
 	// log the state
 	THE_CONTEXT->secureModeInfo.isActive = state;
 	
@@ -1402,6 +1421,9 @@ void MainFrame::activateSecureMode(bool state) {
 		
 		cncExtViewBoxCluster->hideAll();
 		
+		getLoggerView()->setSecureMode(true);
+		swapControls();
+		/*
 		GblFunc::swapControls(m_secMonitorPlaceholder,						drawPane3D->GetDrawPanePanel());
 		GblFunc::swapControls(m_secLoggerPlaceholder, 						getLoggerView());
 		GblFunc::swapControls(scp->GetTransferDirPlaceholder(),				transferFileView->getFileView());
@@ -1412,10 +1434,10 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(m_secGamepadPlaceholder,						gamepadSpy);
 		GblFunc::swapControls(scp->GetPredefinedPositionsPlaceholder(),		m_scrollWinPredefinedPositions);
 		GblFunc::swapControls(scp->GetNavigatorPlaceholder(),				navigatorPanel);
-		
+		*/
 		// default show the preview of loaded template
-		m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::RIGHT_PREVIEW);
-		getLoggerView()->setSecureMode(true);
+		m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::RIGHT_PREVIEW);
+
 		
 	} else {
 		
@@ -1428,7 +1450,8 @@ void MainFrame::activateSecureMode(bool state) {
 		if ( THE_CONTEXT->secureModeInfo.isDeactivatedByUser == true )	perspectiveHandler.loadDefaultPerspective();
 		else 															perspectiveHandler.restoreLoggedPerspective();
 		
-		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),			m_secMonitorPlaceholder);
+		swapControls();
+		/*		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),			m_secMonitorPlaceholder);
 		GblFunc::swapControls(getLoggerView(),							m_secLoggerPlaceholder);
 		GblFunc::swapControls(lruFileView,								scp->GetLruFilePlaceholder());
 		GblFunc::swapControls(transferFileView->getFileView(),			scp->GetTransferDirPlaceholder());
@@ -1438,6 +1461,7 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(gamepadSpy,								m_secGamepadPlaceholder);
 		GblFunc::swapControls(m_scrollWinPredefinedPositions,			scp->GetPredefinedPositionsPlaceholder());
 		GblFunc::swapControls(navigatorPanel,							scp->GetNavigatorPlaceholder());
+		*/
 		
 		getLoggerView()->setSecureMode(false);
 	}
@@ -5557,7 +5581,7 @@ void MainFrame::openMainPreview(const wxString& fn) {
 	openPreview(mainFilePreview, fn);
 	
 	if (THE_CONTEXT->secureModeInfo.isActive == true )
-		m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::LEFT_PREVIEW);
+		m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::LEFT_PREVIEW);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openMonitorPreview(const wxString& fn) {
@@ -5603,7 +5627,7 @@ void MainFrame::openNavigatorFromGamepad() {
 bool MainFrame::filePreviewListLeave() {
 ///////////////////////////////////////////////////////////////////
 	if (THE_CONTEXT->secureModeInfo.isActive == true )
-		m_securePreviewBook->SetSelection(SecurePrefiewBookSelection::VAL::RIGHT_PREVIEW);
+		m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::RIGHT_PREVIEW);
 		
 	if ( m_keepFileManagerPreview->IsChecked() )
 		return false;

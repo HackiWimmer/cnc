@@ -9132,12 +9132,19 @@ State</label>
                                     <object class="wxPanel" name="m_splitterPagePreviewV">
                                       <style>wxTAB_TRAVERSAL</style>
                                       <object class="wxFlexGridSizer">
-                                        <cols>1</cols>
+                                        <cols>2</cols>
                                         <rows>1</rows>
                                         <vgap>0</vgap>
                                         <hgap>0</hgap>
-                                        <growablecols>0</growablecols>
+                                        <growablecols>1</growablecols>
                                         <growablerows>0</growablerows>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>1</border>
+                                          <object class="wxStaticLine" name="m_staticLine10023">
+                                            <style>wxLI_VERTICAL</style>
+                                          </object>
+                                        </object>
                                         <object class="sizeritem">
                                           <flag>wxALL|wxEXPAND</flag>
                                           <object class="wxSimplebook" name="m_securePreviewBook">
@@ -9147,7 +9154,7 @@ State</label>
                                             <object class="simplebookpage">
                                               <label>Page</label>
                                               <selected>0</selected>
-                                              <object class="wxPanel" name="m_panel9997">
+                                              <object class="wxPanel" name="m_panelTemplate">
                                                 <style>wxTAB_TRAVERSAL</style>
                                                 <object class="wxFlexGridSizer">
                                                   <cols>1</cols>
@@ -9170,7 +9177,7 @@ State</label>
                                             <object class="simplebookpage">
                                               <label>Page</label>
                                               <selected>0</selected>
-                                              <object class="wxPanel" name="m_panel9999">
+                                              <object class="wxPanel" name="m_panelPreview">
                                                 <style>wxTAB_TRAVERSAL</style>
                                                 <object class="wxFlexGridSizer">
                                                   <cols>1</cols>
@@ -9184,6 +9191,28 @@ State</label>
                                                     <object class="wxPanel" name="m_rightTplPrevirePlaceholder">
                                                       <style>wxTAB_TRAVERSAL</style>
                                                       <bg>wxSYS_COLOUR_BTNSHADOW</bg>
+                                                    </object>
+                                                  </object>
+                                                </object>
+                                              </object>
+                                            </object>
+                                            <object class="simplebookpage">
+                                              <label>Page</label>
+                                              <selected>0</selected>
+                                              <object class="wxPanel" name="m_panelCamera">
+                                                <style>wxTAB_TRAVERSAL</style>
+                                                <object class="wxFlexGridSizer">
+                                                  <cols>1</cols>
+                                                  <rows>1</rows>
+                                                  <vgap>0</vgap>
+                                                  <hgap>0</hgap>
+                                                  <growablecols>0</growablecols>
+                                                  <growablerows>0</growablerows>
+                                                  <object class="sizeritem">
+                                                    <flag>wxALL|wxEXPAND</flag>
+                                                    <object class="wxPanel" name="m_panelCameraPreviewPlaceholder">
+                                                      <style>wxTAB_TRAVERSAL</style>
+                                                      <bg>wxSYS_COLOUR_CAPTIONTEXT</bg>
                                                     </object>
                                                   </object>
                                                 </object>

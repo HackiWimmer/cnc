@@ -3,6 +3,7 @@
 
 #include "CncSecureSlidepad.h"
 #include "CncReferenceEvaluation.h"
+#include "CncPodestMgmtMovement.h"
 #include "wxCrafterSecurePanel.h"
 
 class CncSecurePortListCtrl;
@@ -11,8 +12,20 @@ class CncSecureManuallyMovePanel;
 class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 							, public CncSecureSlidepad::Interface
 							, public CncReferenceEvaluation::Interface
+							, public CncPodestMgmtMovement::Interface
 {
 	public:
+		
+		enum MainBookPages {
+			PAGE_CONNECT	= 0,
+			PAGE_LOAD,
+			PAGE_REF,
+			PAGE_MOVE,
+			PAGE_RUN,
+			PAGE_PODEST,
+			PAGE_MISC
+		};
+		
 		CncSecureCtrlPanel(wxWindow* parent);
 		virtual ~CncSecureCtrlPanel();
 		
@@ -26,12 +39,12 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		void notifyConnection(bool state, const wxString& portName);
 		
 	protected:
+		virtual void onReferenceSet(wxCommandEvent& event);
 		virtual void onStackTraceStoreSec(wxCommandEvent& event);
 		virtual void onSessionDirSec(wxCommandEvent& event);
 		virtual void onTestFunctionSec(wxCommandEvent& event);
 		virtual void onOpenTemplateSec(wxCommandEvent& event);
 		virtual void onDetermineAnchorPositionsSec(wxCommandEvent& event);
-		virtual void onSetReferencePosition(wxCommandEvent& event);
 		virtual void onEvaluateHardwareReference(wxCommandEvent& event);
 		
 		virtual void onConnectSec(wxCommandEvent& event);
@@ -45,7 +58,12 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		void setPortSelection(const wxString& portName);
 		
 		virtual void sliderValueChanged(int pos, int value);
+		virtual void cameraNotifyPreview(bool show);
 		virtual void referenceNotifyMessage(const wxString& msg, int flags = wxICON_INFORMATION);
+		virtual void referenceDismissMessage();
+		virtual void podestNotifyEnable(bool state);
+		virtual void podestNotifyInit(bool state);
+		virtual void podestNotifyClose(bool state);
 		
 		friend class CncSecurePortListCtrl;
 		
@@ -59,6 +77,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		
 		CncSecurePortListCtrl*			portSelectorList;
 		CncSecureManuallyMovePanel*		manuallyMovePanel; 
+		CncPodestMgmtMovement*			podestPanel;
 		CncReferenceEvaluation*			referencePanel;
 		CncSecureSlidepad*				speedpad;
 		PageVector						pageVector;
