@@ -154,7 +154,7 @@
   const unsigned char PID_I2C_LIMIT_VALUE                 =  47;
   const unsigned char PID_I2C_SUPPORT_VALUE               =  48;
  
-  const unsigned char PID_SPINDLE_SWITCH                     =  50;
+  const unsigned char PID_SPINDLE_SWITCH                  =  50;
   const unsigned char PID_POS_REPLY_THRESHOLD             =  51;
   const unsigned char PID_MAX_DIMENSION_X                 =  52;
   const unsigned char PID_MAX_DIMENSION_Y                 =  53;
@@ -172,7 +172,7 @@
   const unsigned char PID_X_POS                           =  67;
   const unsigned char PID_Y_POS                           =  68;
   const unsigned char PID_Z_POS                           =  69;
-
+  
   const unsigned char PID_STEP_PIN                        =  70;
   const unsigned char PID_DIR_PIN                         =  71;
   const unsigned char PID_ENABLE_STEPPERS                 =  72;

@@ -491,7 +491,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , traceTimerTimeout						(125)
 , traceTimerCounter						(0)
 , lastPortName							(wxT(""))
-, defaultPortName						(wxT(""))
 , cnc									(new CncControl(CncEMU_NULL))
 , lruFileView							(NULL)
 , sourceEditor							(NULL)
@@ -1355,8 +1354,8 @@ void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) {
-		
+	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) 
+	{
 		Close();
 		return;
 	}
@@ -1367,7 +1366,9 @@ void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::activateSecureMode(bool state) {
 ///////////////////////////////////////////////////////////////////
-
+	CncSecureCtrlPanel* scp = secureCtrlPanel;
+	wxASSERT( scp != NULL );
+	
 	//-------------------------------------------------------------
 	auto swapControls = [&]() {
 		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),		m_secMonitorPlaceholder);
@@ -1379,9 +1380,7 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(cncLCDPositionPanel,					m_cncOverviewsPlaceholder);
 		GblFunc::swapControls(gamepadSpy,							m_secGamepadPlaceholder);
 		GblFunc::swapControls(m_scrollWinPredefinedPositions,		scp->GetPredefinedPositionsPlaceholder());
-		GblFunc::swapControls(navigatorPanel,						scp->GetNavigatorPlaceholder());
 	};
-	
 	
 	// log the state
 	THE_CONTEXT->secureModeInfo.isActive = state;
@@ -1391,9 +1390,6 @@ void MainFrame::activateSecureMode(bool state) {
 	getLoggerView()->setShowOnDemandState(!useIt);
 	
 	m_btDearctivateSecureRunMode->Enable(THE_CONTEXT->secureModeInfo.isActivatedByStartup);
-	
-	CncSecureCtrlPanel* scp = secureCtrlPanel;
-	wxASSERT( scp != NULL );
 	
 	// switch the state
 	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
@@ -1422,22 +1418,11 @@ void MainFrame::activateSecureMode(bool state) {
 		cncExtViewBoxCluster->hideAll();
 		
 		getLoggerView()->setSecureMode(true);
+		
 		swapControls();
-		/*
-		GblFunc::swapControls(m_secMonitorPlaceholder,						drawPane3D->GetDrawPanePanel());
-		GblFunc::swapControls(m_secLoggerPlaceholder, 						getLoggerView());
-		GblFunc::swapControls(scp->GetTransferDirPlaceholder(),				transferFileView->getFileView());
-		GblFunc::swapControls(scp->GetLruFilePlaceholder(),					lruFileView);
-		GblFunc::swapControls(m_leftTplPrevirePlaceholder,					mainFilePreview);
-		GblFunc::swapControls(m_rightTplPrevirePlaceholder,					monitorFilePreview);
-		GblFunc::swapControls(m_cncOverviewsPlaceholder,					cncLCDPositionPanel);
-		GblFunc::swapControls(m_secGamepadPlaceholder,						gamepadSpy);
-		GblFunc::swapControls(scp->GetPredefinedPositionsPlaceholder(),		m_scrollWinPredefinedPositions);
-		GblFunc::swapControls(scp->GetNavigatorPlaceholder(),				navigatorPanel);
-		*/
+		
 		// default show the preview of loaded template
 		m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::RIGHT_PREVIEW);
-
 		
 	} else {
 		
@@ -1451,24 +1436,12 @@ void MainFrame::activateSecureMode(bool state) {
 		else 															perspectiveHandler.restoreLoggedPerspective();
 		
 		swapControls();
-		/*		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),			m_secMonitorPlaceholder);
-		GblFunc::swapControls(getLoggerView(),							m_secLoggerPlaceholder);
-		GblFunc::swapControls(lruFileView,								scp->GetLruFilePlaceholder());
-		GblFunc::swapControls(transferFileView->getFileView(),			scp->GetTransferDirPlaceholder());
-		GblFunc::swapControls(mainFilePreview,							m_leftTplPrevirePlaceholder);
-		GblFunc::swapControls(monitorFilePreview,						m_rightTplPrevirePlaceholder);
-		GblFunc::swapControls(cncLCDPositionPanel,						m_cncOverviewsPlaceholder);
-		GblFunc::swapControls(gamepadSpy,								m_secGamepadPlaceholder);
-		GblFunc::swapControls(m_scrollWinPredefinedPositions,			scp->GetPredefinedPositionsPlaceholder());
-		GblFunc::swapControls(navigatorPanel,							scp->GetNavigatorPlaceholder());
-		*/
 		
 		getLoggerView()->setSecureMode(false);
 	}
 	
 	GetAuimgrMain()->Update();
 	secureCtrlPanel->activate(THE_CONTEXT->secureModeInfo.isActive);
-
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::getFirstLruFile(wxString& ret) {
@@ -2294,8 +2267,11 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 				case DBT_DEVICEARRIVAL:	{
 					if ( isProcessing() == false ) {
 						
-						
-						if ( m_portSelector->FindString(portName) ) {
+						const int portIdx = isPortNameAvailable(portName);
+						if ( portIdx != wxNOT_FOUND ) 
+						{
+							// override blurred search port names like COM4
+							portName = m_portSelector->GetString(portIdx);
 							
 							if ( usbConnectionObserver->IsShown() ) {
 								usbConnectionObserver->setPortName(portName);
@@ -2304,6 +2280,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 							
 							if ( usbConnectionObserver->getSensitivity() == true ) {
 								usbConnectionObserver->setPortName(portName);
+								
 								if ( usbConnectionObserver->ShowModal() == wxID_YES ) {
 									m_portSelector->SetStringSelection(portName);
 									connectSerialPortDialog();
@@ -2364,6 +2341,25 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 #else
 	// currently no equivalent
 #endif
+///////////////////////////////////////////////////////////////////
+int MainFrame::isPortNameAvailable(const wxString& portName, bool exact) {
+///////////////////////////////////////////////////////////////////
+	const int pos = m_portSelector->FindString(portName);
+	
+	if ( pos != wxNOT_FOUND )
+		return pos;
+		
+	if ( exact == false )
+	{
+		for (int i = 0; i < (int)m_portSelector->GetCount(); i++ )
+		{
+			if ( m_portSelector->GetString(i).Contains(portName) )
+				return i;
+		}
+	}
+	
+	return wxNOT_FOUND;
+}
 ///////////////////////////////////////////////////////////////////
 void MainFrame::searchAvailiablePorts(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
@@ -2639,11 +2635,13 @@ void MainFrame::initializeConnectionSelector() {
 	m_unit->SetStringSelection(THE_CONFIG->getDefaultDisplayUnitAsStr());
 	updateUnit();
 	
-	// initialize com port
+	// initialize default serial port
 	wxString value;
-	THE_CONFIG->getDefaultPort(value);
-	m_portSelector ->SetStringSelection(value);
-	defaultPortName.assign(value);
+	const bool exactSearch = false;
+	const int portIdx = isPortNameAvailable(THE_CONFIG->getDefaultPort(value), exactSearch);
+	
+	if ( portIdx != wxNOT_FOUND )
+		m_portSelector->SetSelection(portIdx);
 	
 	// initialize update interval
 	THE_CONTEXT->setUpdateInterval(m_displayInterval->GetValue());
@@ -3279,35 +3277,44 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 	
 	CncUsbConnectionObserver::Deactivator noUsbPopup(usbConnectionObserver);
 	
-	refPositionDlg->setMessage(msg);
-	
 	activateGamepadNotifications(true);
 	CncGamepadSpy::ContextSwaper gcs(gamepadSpy, CncGamepadSpy::GPC_REFPOS);
 	
+	refPositionDlg->setMessage(msg);
 	const int ret = refPositionDlg->ShowModal();
 	
-	if ( ret == wxID_OK ) {
-		
-		THE_BOUNDS->setWorkpieceThickness(refPositionDlg->getWorkpieceThickness());
-		THE_BOUNDS->setMeasurementOffset(refPositionDlg->getMeasurementOffset());
-		THE_BOUNDS->setRefPositionMode(refPositionDlg->getReferenceMode());
-		
-		motionMonitor->clear();
-		
-		setControllerZero(refPositionDlg->getReferenceMode(),
-						  refPositionDlg->shouldZeroX() ? THE_BOUNDS->getCalculatedRefPositionMetric().getX() : cnc::dbl::MIN, 
-						  refPositionDlg->shouldZeroY() ? THE_BOUNDS->getCalculatedRefPositionMetric().getY() : cnc::dbl::MIN, 
-						  refPositionDlg->shouldZeroZ() ? THE_BOUNDS->getCalculatedRefPositionMetric().getZ() : cnc::dbl::MIN 
-						 );
-		
-		motionMonitor->Refresh();
+	if ( ret == wxID_OK )
+	{
+		RefPosResult parameter;
+		refPositionDlg->getResult(parameter);
+		updateReferencePosition(&parameter);
 	} 
-	else {
+	else 
+	{
 		cnc::cex1 << " Set reference position aborted . . . " << std::endl;
 	}
 	
 	//selectMonitorBookCncPanel();
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::updateReferencePosition(RefPosResult* parameter) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT ( parameter != NULL );
+	
+	THE_BOUNDS->setWorkpieceThickness(parameter->workpieceThickness);
+	THE_BOUNDS->setMeasurementOffset (parameter->measurementOffset);
+	THE_BOUNDS->setRefPositionMode   (parameter->refMode);
+	
+	motionMonitor->clear();
+	
+	setControllerZero(parameter->refMode,
+					  parameter->zeroX ? THE_BOUNDS->getCalculatedRefPositionMetric().getX() : cnc::dbl::MIN, 
+					  parameter->zeroY ? THE_BOUNDS->getCalculatedRefPositionMetric().getY() : cnc::dbl::MIN, 
+					  parameter->zeroZ ? THE_BOUNDS->getCalculatedRefPositionMetric().getZ() : cnc::dbl::MIN 
+					 );
+						 
+	motionMonitor->Refresh();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::notifyConfigUpdate() {
@@ -7548,7 +7555,7 @@ bool MainFrame::updateInteractiveMove() {
 	return ret;
 }
 /////////////////////////////////////////////////////////////////////
-bool MainFrame::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
+bool MainFrame::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
@@ -7559,7 +7566,7 @@ bool MainFrame::updateInteractiveMove(const CncLinearDirection x, const CncLinea
 			ret = cnc->popSerial();
 			
 		if ( ret == true )
-			ret = cnc->updateInteractiveMove(x, y, z);
+			ret = cnc->updateInteractiveMove(x, y, z, modifySpeed);
 	}
 	
 	return ret;

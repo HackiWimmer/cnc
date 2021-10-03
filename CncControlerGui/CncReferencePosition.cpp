@@ -124,21 +124,6 @@ void CncReferencePosition::showInformation() {
 	if ( infoMessage.IsEmpty() == false )
 		m_infobar->ShowMessage(infoMessage);
 }
-/*
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::determineZeroMode() {
-///////////////////////////////////////////////////////////////////
-	auto evaluate = [&](wxBitmapToggleButton* bt) {
-		wxASSERT( bt != NULL );
-		return bt->GetValue() == true ? '0' : '-';
-	};
-	
-	m_btSet->SetLabel(wxString::Format("Zero (%c, %c, %c)", evaluate(m_btZeroX), evaluate(m_btZeroY), evaluate(m_btZeroZ)));
-	m_btSet->Enable(m_btZeroX->GetValue() == true || m_btZeroY->GetValue() == true || m_btZeroZ->GetValue() == true);
-	
-	updatePreview();
-}
-*/
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::onInfoTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
@@ -155,8 +140,10 @@ void CncReferencePosition::setEnforceFlag(bool s) {
 ///////////////////////////////////////////////////////////////////
 	valid = !s;
 	
+	const int refMode = (int)referencePanel->getReferenceMode();
+	
 	wxBitmap bmp(ImageLib24().Bitmap( valid ? "BMP_TRAFFIC_LIGHT_GREEN" : "BMP_TRAFFIC_LIGHT_RED")); 
-	const wxString mod(wxString::Format("Reference position mode: %d",      ( valid ? (int)getReferenceMode() : -1 ) ));
+	const wxString mod(wxString::Format("Reference position mode: %s [%d]", cnc::getReferenceModeAsString(referencePanel->getReferenceMode()), ( valid ? refMode : -1 ) ));
 	const wxString tip(wxString::Format("Reference position state: %s\n%s", ( valid ? "Valid" : "Invalid" ), mod));
 	
 	// display ref pos mode too
@@ -165,7 +152,7 @@ void CncReferencePosition::setEnforceFlag(bool s) {
 		wxMemoryDC mdc(bmp);
 		mdc.SetFont(font);
 		mdc.SetTextForeground(wxColor(0, 0, 0));
-		mdc.DrawText(wxString::Format("%d", (int)getReferenceMode()), {5, 1});
+		mdc.DrawText(wxString::Format("%d", refMode), {5, 1});
 		bmp = mdc.GetAsBitmap();
 	}
 	

@@ -2,17 +2,19 @@
 #define CNCPODESTMGMTMOVEMENT_H
 
 #include "CncCommon.h"
+#include "CncSecureScrollButton.h"
 #include "wxCrafterPodestManagement.h"
 
-class CncPodestMgmtMovement : public CncPodestMgmtMovementBase
+class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
+							, public CncSecureScrollButton::CallbackInterface
 {
 	public:
 		
-		class Interface {
+		class CallbackInterface {
 		
 			public:
-				Interface() {}
-				virtual ~Interface() {}
+				CallbackInterface() {}
+				virtual ~CallbackInterface() {}
 				
 				virtual void podestNotifyEnable(bool state) {}
 				virtual void podestNotifyInit(bool state) {}
@@ -25,22 +27,19 @@ class CncPodestMgmtMovement : public CncPodestMgmtMovementBase
 		bool init();
 		bool close();
 		
-		void setCallbackInterface(Interface* inf) { caller = inf; }
+		void setCallbackInterface(CallbackInterface* inf) { caller = inf; }
 		
 	protected:
 		virtual void onLeftDownDistance(wxMouseEvent& event);
-		virtual void onPodestDownLeave(wxMouseEvent& event);
-		virtual void onPodestDownLeftDown(wxMouseEvent& event);
-		virtual void onPodestDownLeftUp(wxMouseEvent& event);
 		virtual void onPodestRelativeDown(wxCommandEvent& event);
 		virtual void onPodestRelativeUp(wxCommandEvent& event);
-		virtual void onPodestUpLeave(wxMouseEvent& event);
-		virtual void onPodestUpLeftDown(wxMouseEvent& event);
-		virtual void onPodestUpLeftUp(wxMouseEvent& event);
+		
+		virtual void notifyValueChange(const CncSecureScrollButton::CBI::Data& d);
 		
 	private:
-		CncLinearDirection	direction;
-		Interface*			caller;
+		CncLinearDirection		direction;
+		CncSecureScrollButton*	interactiveMove;
+		CallbackInterface*		caller;
 		
 		void reset();
 		void process();

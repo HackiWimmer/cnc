@@ -19,8 +19,8 @@
 #include <wx/statline.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
-#include <wx/bmpbuttn.h>
 #include <wx/stattext.h>
+#include <wx/bmpbuttn.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -74,8 +74,7 @@ class CncPodestMgmtMovementBase : public wxPanel
 {
 protected:
     wxTextCtrl* m_textCtrl9604;
-    wxBitmapButton* m_btManuallyUp;
-    wxBitmapButton* m_btManuallyDown;
+    wxPanel* m_intactiveMovePlaceholder;
     wxStaticLine* m_staticLine9622;
     wxTextCtrl* m_textCtrl96042;
     wxStaticText* m_staticText9624;
@@ -85,20 +84,13 @@ protected:
     wxBitmapButton* m_btRelativeDown;
 
 protected:
-    virtual void onPodestUpLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void onPodestUpLeftUp(wxMouseEvent& event) { event.Skip(); }
-    virtual void onPodestUpLeave(wxMouseEvent& event) { event.Skip(); }
-    virtual void onPodestDownLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void onPodestDownLeftUp(wxMouseEvent& event) { event.Skip(); }
-    virtual void onPodestDownLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void onLeftDownDistance(wxMouseEvent& event) { event.Skip(); }
     virtual void onPodestRelativeUp(wxCommandEvent& event) { event.Skip(); }
     virtual void onPodestRelativeDown(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxTextCtrl* GetTextCtrl9604() { return m_textCtrl9604; }
-    wxBitmapButton* GetBtManuallyUp() { return m_btManuallyUp; }
-    wxBitmapButton* GetBtManuallyDown() { return m_btManuallyDown; }
+    wxPanel* GetIntactiveMovePlaceholder() { return m_intactiveMovePlaceholder; }
     wxStaticLine* GetStaticLine9622() { return m_staticLine9622; }
     wxTextCtrl* GetTextCtrl96042() { return m_textCtrl96042; }
     wxStaticText* GetStaticText9624() { return m_staticText9624; }

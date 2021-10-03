@@ -161,12 +161,11 @@ CncPodestMgmtMovementBase::CncPodestMgmtMovementBase(wxWindow* parent, wxWindowI
     flexGridSizer9618->AddGrowableRow(2);
     this->SetSizer(flexGridSizer9618);
     
-    wxFlexGridSizer* flexGridSizer9543 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer9543 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer9543->SetFlexibleDirection( wxBOTH );
     flexGridSizer9543->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9543->AddGrowableCol(0);
     flexGridSizer9543->AddGrowableRow(1);
-    flexGridSizer9543->AddGrowableRow(2);
     
     flexGridSizer9618->Add(flexGridSizer9543, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -189,15 +188,10 @@ CncPodestMgmtMovementBase::CncPodestMgmtMovementBase(wxWindow* parent, wxWindowI
     
     flexGridSizer9609->Add(m_textCtrl9604, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_btManuallyUp = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("podestManuallyUp")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_btManuallyUp->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+    m_intactiveMovePlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_intactiveMovePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer9543->Add(m_btManuallyUp, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_btManuallyDown = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("podestManuallyDown")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_btManuallyDown->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
-    
-    flexGridSizer9543->Add(m_btManuallyDown, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    flexGridSizer9543->Add(m_intactiveMovePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_staticLine9622 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -212,7 +206,7 @@ CncPodestMgmtMovementBase::CncPodestMgmtMovementBase(wxWindow* parent, wxWindowI
     
     flexGridSizer9618->Add(flexGridSizer95431, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_textCtrl96042 = new wxTextCtrl(this, wxID_ANY, wxT("Precise Movement"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_READONLY|wxTE_CENTRE);
+    m_textCtrl96042 = new wxTextCtrl(this, wxID_ANY, wxT("Exact Movement"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_READONLY|wxTE_CENTRE);
     m_textCtrl96042->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_textCtrl96042->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_textCtrl96042Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
@@ -268,12 +262,6 @@ CncPodestMgmtMovementBase::CncPodestMgmtMovementBase(wxWindow* parent, wxWindowI
          GetSizer()->Fit(this);
     }
     // Connect events
-    m_btManuallyUp->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestUpLeftDown), NULL, this);
-    m_btManuallyUp->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestUpLeftUp), NULL, this);
-    m_btManuallyUp->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestUpLeave), NULL, this);
-    m_btManuallyDown->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestDownLeftDown), NULL, this);
-    m_btManuallyDown->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestDownLeftUp), NULL, this);
-    m_btManuallyDown->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestDownLeave), NULL, this);
     m_moveRelative->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestMgmtMovementBase::onLeftDownDistance), NULL, this);
     m_btRelativeUp->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestMgmtMovementBase::onPodestRelativeUp), NULL, this);
     m_btRelativeDown->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestMgmtMovementBase::onPodestRelativeDown), NULL, this);
@@ -282,12 +270,6 @@ CncPodestMgmtMovementBase::CncPodestMgmtMovementBase(wxWindow* parent, wxWindowI
 
 CncPodestMgmtMovementBase::~CncPodestMgmtMovementBase()
 {
-    m_btManuallyUp->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestUpLeftDown), NULL, this);
-    m_btManuallyUp->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestUpLeftUp), NULL, this);
-    m_btManuallyUp->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestUpLeave), NULL, this);
-    m_btManuallyDown->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestDownLeftDown), NULL, this);
-    m_btManuallyDown->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestDownLeftUp), NULL, this);
-    m_btManuallyDown->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncPodestMgmtMovementBase::onPodestDownLeave), NULL, this);
     m_moveRelative->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncPodestMgmtMovementBase::onLeftDownDistance), NULL, this);
     m_btRelativeUp->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestMgmtMovementBase::onPodestRelativeUp), NULL, this);
     m_btRelativeDown->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPodestMgmtMovementBase::onPodestRelativeDown), NULL, this);

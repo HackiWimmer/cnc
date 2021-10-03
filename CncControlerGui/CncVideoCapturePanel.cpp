@@ -132,10 +132,10 @@ bool CncVideoCapturePanel::stop() {
 	if ( cameraTimer.IsRunning() )
 		cameraTimer.Stop();
 		
-	if ( THE_CONFIG->getCameraSupportFlag() == false )
+	if ( THE_CONFIG && THE_CONFIG->getCameraSupportFlag() == false )
 		return false;
 		
-	if ( THE_CONTEXT->hasHardware() == false )
+	if ( THE_CONTEXT && THE_CONTEXT->hasHardware() == false )
 		return false;
 
 	if ( cameraCapture->isOpened() )

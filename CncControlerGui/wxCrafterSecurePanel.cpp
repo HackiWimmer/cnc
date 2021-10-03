@@ -316,10 +316,51 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer468->AddGrowableRow(0);
     m_panel466->SetSizer(flexGridSizer468);
     
-    m_navigatorPlaceholder = new wxPanel(m_panel466, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel466, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_navigatorPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    wxFlexGridSizer* flexGridSizer519 = new wxFlexGridSizer(2, 3, 0, 0);
+    flexGridSizer519->SetFlexibleDirection( wxBOTH );
+    flexGridSizer519->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer519->AddGrowableCol(0);
+    flexGridSizer519->AddGrowableCol(1);
+    flexGridSizer519->AddGrowableCol(2);
+    flexGridSizer519->AddGrowableRow(1);
     
-    flexGridSizer468->Add(m_navigatorPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer468->Add(flexGridSizer519, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText521 = new wxStaticText(m_panel466, wxID_ANY, _("X"), wxDefaultPosition, wxDLG_UNIT(m_panel466, wxSize(-1,-1)), 0);
+    m_staticText521->SetForegroundColour(wxColour(wxT("rgb(255,128,128)")));
+    wxFont m_staticText521Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText521->SetFont(m_staticText521Font);
+    
+    flexGridSizer519->Add(m_staticText521, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
+    
+    m_staticText523 = new wxStaticText(m_panel466, wxID_ANY, _("Y"), wxDefaultPosition, wxDLG_UNIT(m_panel466, wxSize(-1,-1)), 0);
+    m_staticText523->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_staticText523Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText523->SetFont(m_staticText523Font);
+    
+    flexGridSizer519->Add(m_staticText523, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
+    
+    m_staticText525 = new wxStaticText(m_panel466, wxID_ANY, _("Z"), wxDefaultPosition, wxDLG_UNIT(m_panel466, wxSize(-1,-1)), 0);
+    m_staticText525->SetForegroundColour(wxColour(wxT("rgb(0,128,0)")));
+    wxFont m_staticText525Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText525->SetFont(m_staticText525Font);
+    
+    flexGridSizer519->Add(m_staticText525, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
+    
+    m_interactiveMoveXPlaceholder = new wxPanel(m_panel466, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel466, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_interactiveMoveXPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+    
+    flexGridSizer519->Add(m_interactiveMoveXPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_interactiveMoveYPlaceholder = new wxPanel(m_panel466, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel466, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_interactiveMoveYPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer519->Add(m_interactiveMoveYPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_interactiveMoveZPlaceholder = new wxPanel(m_panel466, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel466, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_interactiveMoveZPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer519->Add(m_interactiveMoveZPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer473 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer473->SetFlexibleDirection( wxBOTH );

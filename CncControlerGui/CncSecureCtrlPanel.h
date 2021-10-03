@@ -4,15 +4,17 @@
 #include "CncSecureSlidepad.h"
 #include "CncReferenceEvaluation.h"
 #include "CncPodestMgmtMovement.h"
+#include "CncSecureScrollButton.h"
 #include "wxCrafterSecurePanel.h"
 
 class CncSecurePortListCtrl;
 class CncSecureManuallyMovePanel;
 
 class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
-							, public CncSecureSlidepad::Interface
-							, public CncReferenceEvaluation::Interface
-							, public CncPodestMgmtMovement::Interface
+							, public CncSecureSlidepad::CallbackInterface
+							, public CncReferenceEvaluation::CallbackInterface
+							, public CncPodestMgmtMovement::CallbackInterface
+							, public CncSecureScrollButton::CallbackInterface
 {
 	public:
 		
@@ -64,6 +66,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		virtual void podestNotifyEnable(bool state);
 		virtual void podestNotifyInit(bool state);
 		virtual void podestNotifyClose(bool state);
+		virtual void notifyValueChange(const CncSecureScrollButton::CBI::Data& d);
 		
 		friend class CncSecurePortListCtrl;
 		
@@ -76,7 +79,10 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		typedef std::vector<PageInfo> PageVector;
 		
 		CncSecurePortListCtrl*			portSelectorList;
-		CncSecureManuallyMovePanel*		manuallyMovePanel; 
+		CncSecureManuallyMovePanel*		manuallyMovePanel;
+		CncSecureScrollButton*			interactiveMoveX;
+		CncSecureScrollButton*			interactiveMoveY;
+		CncSecureScrollButton*			interactiveMoveZ;
 		CncPodestMgmtMovement*			podestPanel;
 		CncReferenceEvaluation*			referencePanel;
 		CncSecureSlidepad*				speedpad;

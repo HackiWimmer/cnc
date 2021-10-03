@@ -405,7 +405,7 @@ class CncControl {
 		bool moveZToMid();
 		
 		bool startInteractiveMove(CncStepSensitivity s, CncInteractiveMoveDriver imd);
-		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed=0);
 		bool updateInteractiveMove();
 		bool stopInteractiveMove();
 		bool isInteractiveMoveActive() { return currentInteractiveMoveInfo.active(); }

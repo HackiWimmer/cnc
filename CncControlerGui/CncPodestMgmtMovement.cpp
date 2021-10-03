@@ -1,4 +1,5 @@
 #include "MainFrameProxy.h"
+#include "GlobalFunctions.h"
 #include "CncControl.h"
 #include "CncContext.h"
 #include "CncSecureNumpadDialog.h"
@@ -6,14 +7,17 @@
 
 ///////////////////////////////////////////////////////////////////
 CncPodestMgmtMovement::CncPodestMgmtMovement(wxWindow* parent)
-: CncPodestMgmtMovementBase				(parent)
-, direction								(CncNoneDir)
-, caller								(NULL)
+: CncPodestMgmtMovementBase					(parent)
+, CncSecureScrollButton::CallbackInterface	()
+, direction									(CncNoneDir)
+, interactiveMove							(NULL)
+, caller									(NULL)
 ///////////////////////////////////////////////////////////////////
 {
-	// otherwise this negative effects the leave window callback
-	m_btManuallyUp	->SetToolTip("");
-	m_btManuallyDown->SetToolTip("");
+	interactiveMove = new CncSecureScrollButton(this, wxVERTICAL,CncSecureScrollButton::Mode::M_BOTH, 1, wxSize(-1,200));
+	GblFunc::replaceControl(m_intactiveMovePlaceholder, interactiveMove);
+	interactiveMove->setCallbackInterface(this);
+	interactiveMove->SetBackgroundColour(*wxYELLOW);
 	
 	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	val.SetRange(0.0, THE_CONFIG->getMaxDimensionH());
@@ -27,11 +31,20 @@ CncPodestMgmtMovement::~CncPodestMgmtMovement() {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
+void CncPodestMgmtMovement::notifyValueChange(const CncSecureScrollButton::CBI::Data& d) {
+///////////////////////////////////////////////////////////////////
+	// interactiveMove callback
+	const CncLinearDirection prevDirection = direction;
+	
+	if ( d.currValue == 0 )	direction = CncNoneDir;
+	else					direction = d.currValue < 0 ? CncNegDir : CncPosDir;
+	
+	if ( prevDirection != direction )
+		process();
+}
+///////////////////////////////////////////////////////////////////
 void CncPodestMgmtMovement::enable(bool state) {
 ///////////////////////////////////////////////////////////////////
-	m_btManuallyUp	->Enable(state);
-	m_btManuallyDown->Enable(state);
-	
 	m_btRelativeUp	->Enable(state);
 	m_btRelativeDown->Enable(state);
 	
@@ -56,21 +69,30 @@ void CncPodestMgmtMovement::process() {
 		return;
 	}
 	
-	//std::cout << direction<< std::endl;
-	
-	bool ret = true;
-	
-	switch ( direction ) {
-		case CncNegDir:
-		case CncPosDir:		ret = cnc->processMovePodest((int32_t)direction, false);
-							break;
-							
-		case CncNoneDir:	ret = cnc->sendQuitMove();
-							break;
+	const bool testOnly = false;
+	if ( testOnly ) {
+		switch ( direction ) {
+			case CncNegDir:		std::cout << "Neg:   " << (int32_t)direction << std::endl; break;
+			case CncPosDir:		std::cout << "Pos:   " << (int32_t)direction << std::endl; break;
+			case CncNoneDir:	std::cout << "Quite: " << std::endl; break;
+		}
 	}
-	
-	if ( ret == false ) 
-		std::cerr << CNC_LOG_FUNCT_A(": Cnc processing failed! Direction = %d", (int)direction) << std::endl;
+	else
+	{
+		bool ret = true;
+		
+		switch ( direction ) {
+			case CncNegDir:
+			case CncPosDir:		ret = cnc->processMovePodest((int32_t)direction, false);
+								break;
+								
+			case CncNoneDir:	ret = cnc->sendQuitMove();
+								break;
+		}
+		
+		if ( ret == false ) 
+			std::cerr << CNC_LOG_FUNCT_A(": Cnc processing failed! Direction = %d", (int)direction) << std::endl;
+	}
 }
 ///////////////////////////////////////////////////////////////////
 bool CncPodestMgmtMovement::init() {
@@ -140,44 +162,6 @@ int32_t CncPodestMgmtMovement::evaluateStepsToMove() {
 ///////////////////////////////////////////////////////////////////
 	const double mmtm = evaluateMillimeterToMove();
 	return THE_CONFIG->convertMetricToStepsH(mmtm);
-}
-///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onPodestUpLeave(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	reset();
-	event.Skip();
-}
-///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onPodestDownLeave(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	reset();
-	event.Skip();
-}
-///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onPodestUpLeftDown(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	direction = CncPosDir;
-	process();
-	event.Skip();
-}
-///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onPodestUpLeftUp(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	reset();
-	event.Skip();
-}
-///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onPodestDownLeftDown(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	direction = CncNegDir;
-	process();
-	event.Skip();
-}
-///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onPodestDownLeftUp(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	reset();
-	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodestMgmtMovement::onPodestRelativeUp(wxCommandEvent& event) {

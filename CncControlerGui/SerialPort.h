@@ -416,7 +416,7 @@ class Serial {
 		
 		bool processStartInteractiveMove();
 		bool processUpdateInteractiveMove();
-		bool processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		bool processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed=0);
 		
 		bool processMoveSequence(CncMoveSequence& moveSequence);
 		

@@ -863,6 +863,8 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 		const int32_t val = configuredFeedSpeed_MM_MIN * FLT_FACT / 60;
 		const char mode   = cnc::getCncSpeedTypeAsCharacter(configuredSpeedMode);
 		
+		CNC_PRINT_FUNCT_A(" %d", val);
+		
 		if ( processSetter(PID_SPEED_MM_SEC, ArdoObj::SpeedTuple::encode(mode, val)) == false ) {
 			std::cerr << CNC_LOG_FUNCT << " processSetter(PID_SPEED_MM_SEC) failed" << std::endl;
 			return false;
@@ -2044,13 +2046,13 @@ bool CncControl::startInteractiveMove(CncStepSensitivity s, CncInteractiveMoveDr
 	return isInteractiveMoveActive();
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
+bool CncControl::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed) {
 ///////////////////////////////////////////////////////////////////
 	CNC_PRINT_INTERACTIVE_FUNCT_A("Begin\n");
 	if ( isInteractiveMoveActive() == false )
 		return false;
 		
-	const bool ret = serialPort->processUpdateInteractiveMove(x, y, z);
+	const bool ret = serialPort->processUpdateInteractiveMove(x, y, z, modifySpeed);
 	if ( ret == false ) {
 		std::cerr << CNC_LOG_FUNCT_A(": processUpdateInteractiveMove failed\n");
 		

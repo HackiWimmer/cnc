@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 9658,
+  "m_objCounter": 9664,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9XXInitBitmapResources",
   "m_bitmapsFile": "wxCrafterPodestManagement_bitmaps.cpp",
@@ -1113,7 +1113,7 @@
         }, {
          "type": "string",
          "m_label": "# Rows:",
-         "m_value": "3"
+         "m_value": "2"
         }, {
          "type": "string",
          "m_label": "Growable columns:",
@@ -1121,7 +1121,7 @@
         }, {
          "type": "string",
          "m_label": "Growable rows:",
-         "m_value": "1,2"
+         "m_value": "1"
         }, {
          "type": "string",
          "m_label": "Horizontal gap:",
@@ -1267,12 +1267,12 @@
            "m_children": []
           }]
         }, {
-         "m_type": 4404,
+         "m_type": 4408,
          "proportion": 0,
-         "border": 2,
+         "border": 5,
          "gbSpan": "1,1",
          "gbPosition": "0,0",
-         "m_styles": ["wxBU_AUTODRAW"],
+         "m_styles": ["wxTAB_TRAVERSAL"],
          "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
          "m_properties": [{
            "type": "winid",
@@ -1289,7 +1289,7 @@
           }, {
            "type": "string",
            "m_label": "Name:",
-           "m_value": "m_btManuallyUp"
+           "m_value": "m_intactiveMovePlaceholder"
           }, {
            "type": "multi-string",
            "m_label": "Tooltip:",
@@ -1297,7 +1297,7 @@
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
-           "colour": "ButtonShadow"
+           "colour": "ActiveCaption"
           }, {
            "type": "colour",
            "m_label": "Fg Colour:",
@@ -1330,133 +1330,8 @@
            "type": "string",
            "m_label": "Style:",
            "m_value": ""
-          }, {
-           "type": "bitmapPicker",
-           "m_label": "Bitmap File:",
-           "m_path": "bitmaps/podestManuallyUp.png"
-          }, {
-           "type": "bool",
-           "m_label": "Default Button",
-           "m_value": false
           }],
-         "m_events": [{
-           "m_eventName": "wxEVT_LEFT_DOWN",
-           "m_eventClass": "wxMouseEvent",
-           "m_eventHandler": "wxMouseEventHandler",
-           "m_functionNameAndSignature": "onPodestUpLeftDown(wxMouseEvent& event)",
-           "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
-           "m_noBody": false
-          }, {
-           "m_eventName": "wxEVT_LEFT_UP",
-           "m_eventClass": "wxMouseEvent",
-           "m_eventHandler": "wxMouseEventHandler",
-           "m_functionNameAndSignature": "onPodestUpLeftUp(wxMouseEvent& event)",
-           "m_description": "Process a wxEVT_LEFT_UP event.",
-           "m_noBody": false
-          }, {
-           "m_eventName": "wxEVT_LEAVE_WINDOW",
-           "m_eventClass": "wxMouseEvent",
-           "m_eventHandler": "wxMouseEventHandler",
-           "m_functionNameAndSignature": "onPodestUpLeave(wxMouseEvent& event)",
-           "m_description": "Process a wxEVT_LEAVE_WINDOW event.",
-           "m_noBody": false
-          }],
-         "m_children": []
-        }, {
-         "m_type": 4404,
-         "proportion": 0,
-         "border": 2,
-         "gbSpan": "1,1",
-         "gbPosition": "0,0",
-         "m_styles": ["wxBU_AUTODRAW"],
-         "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
-         "m_properties": [{
-           "type": "winid",
-           "m_label": "ID:",
-           "m_winid": "wxID_ANY"
-          }, {
-           "type": "string",
-           "m_label": "Size:",
-           "m_value": "-1,-1"
-          }, {
-           "type": "string",
-           "m_label": "Minimum Size:",
-           "m_value": "-1,-1"
-          }, {
-           "type": "string",
-           "m_label": "Name:",
-           "m_value": "m_btManuallyDown"
-          }, {
-           "type": "multi-string",
-           "m_label": "Tooltip:",
-           "m_value": ""
-          }, {
-           "type": "colour",
-           "m_label": "Bg Colour:",
-           "colour": "ButtonShadow"
-          }, {
-           "type": "colour",
-           "m_label": "Fg Colour:",
-           "colour": "<Default>"
-          }, {
-           "type": "font",
-           "m_label": "Font:",
-           "m_value": ""
-          }, {
-           "type": "bool",
-           "m_label": "Hidden",
-           "m_value": false
-          }, {
-           "type": "bool",
-           "m_label": "Disabled",
-           "m_value": false
-          }, {
-           "type": "bool",
-           "m_label": "Focused",
-           "m_value": false
-          }, {
-           "type": "string",
-           "m_label": "Class Name:",
-           "m_value": ""
-          }, {
-           "type": "string",
-           "m_label": "Include File:",
-           "m_value": ""
-          }, {
-           "type": "string",
-           "m_label": "Style:",
-           "m_value": ""
-          }, {
-           "type": "bitmapPicker",
-           "m_label": "Bitmap File:",
-           "m_path": "bitmaps/podestManuallyDown.png"
-          }, {
-           "type": "bool",
-           "m_label": "Default Button",
-           "m_value": false
-          }],
-         "m_events": [{
-           "m_eventName": "wxEVT_LEFT_DOWN",
-           "m_eventClass": "wxMouseEvent",
-           "m_eventHandler": "wxMouseEventHandler",
-           "m_functionNameAndSignature": "onPodestDownLeftDown(wxMouseEvent& event)",
-           "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
-           "m_noBody": false
-          }, {
-           "m_eventName": "wxEVT_LEFT_UP",
-           "m_eventClass": "wxMouseEvent",
-           "m_eventHandler": "wxMouseEventHandler",
-           "m_functionNameAndSignature": "onPodestDownLeftUp(wxMouseEvent& event)",
-           "m_description": "Process a wxEVT_LEFT_UP event.",
-           "m_noBody": false
-          }, {
-           "m_eventName": "wxEVT_LEAVE_WINDOW",
-           "m_eventClass": "wxMouseEvent",
-           "m_eventHandler": "wxMouseEventHandler",
-           "m_functionNameAndSignature": "onPodestDownLeave(wxMouseEvent& event)",
-           "m_description": "Process a wxEVT_LEAVE_WINDOW event.",
-           "m_noBody": false
-          }],
+         "m_events": [],
          "m_children": []
         }]
       }, {
@@ -1639,7 +1514,7 @@
           }, {
            "type": "string",
            "m_label": "Value:",
-           "m_value": "Precise Movement"
+           "m_value": "Exact Movement"
           }, {
            "type": "string",
            "m_label": "Text Hint",

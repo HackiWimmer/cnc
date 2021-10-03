@@ -6,6 +6,16 @@
 #include "CncVideoCapturePanel.h"
 #include "CncTouchBlockDetector.h"
 
+struct RefPosResult 
+{
+	CncRefPositionMode	refMode				= CncRM_Unknown;
+	double 				workpieceThickness	= 0.0;
+	CncDoubleOffset		measurementOffset	= CncDoubleOffset();
+	bool				zeroX				= false;
+	bool				zeroY				= false;
+	bool				zeroZ				= false;
+};
+
 class CncExternalViewBox;
 class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 								, public CncTouchBlockDetector::CallbackInterface
@@ -14,21 +24,23 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 	public:
 		enum TouchCorner { TM_UNKNOWN, TM_A, TM_B, TM_C, TM_D };
 		
-		class Interface {
-		
+		class CallbackInterface 
+		{
 			public:
-				Interface() {}
-				virtual ~Interface() {}
+				CallbackInterface() {}
+				virtual ~CallbackInterface() {}
 				
 				virtual void cameraNotifyPreview(bool show) {}
 				virtual void referenceNotifyMessage(const wxString& msg, int flags = wxICON_INFORMATION) {}
 				virtual void referenceDismissMessage() {}
 		};
 		
-		void setCallbackInterface(Interface* inf) { caller = inf; }
+		void setCallbackInterface(CallbackInterface* inf) { caller = inf; }
 		
 		CncReferenceEvaluation(wxWindow* parent);
 		virtual ~CncReferenceEvaluation();
+		
+		const RefPosResult& 	getResult(RefPosResult&)const;
 		
 		CncRefPositionMode		getReferenceMode()		const;
 		double					getWorkpieceThickness()	const;
@@ -88,7 +100,7 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		
 		wxImage					imgTouchCorner[5];
 		
-		Interface*				caller;
+		CallbackInterface*		caller;
 		CncVideoCapturePanel*	cameraCapture;
 		CncExternalViewBox* 	extCameraPreview;
 		

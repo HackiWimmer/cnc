@@ -6,7 +6,7 @@
 #include "wxCrafterPodestManagement.h"
 
 class CncPodestManagement	: public CncPodestManagementBase
-							, public CncPodestMgmtMovement::Interface
+							, public CncPodestMgmtMovement::CallbackInterface
 {
 	
 	public:

@@ -138,11 +138,11 @@
         <option>1</option>
         <object class="wxFlexGridSizer">
           <cols>1</cols>
-          <rows>3</rows>
+          <rows>2</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols>0</growablecols>
-          <growablerows>1,2</growablerows>
+          <growablerows>1</growablerows>
           <object class="sizeritem" name="flexGridSizer9609">
             <flag>wxALL|wxEXPAND</flag>
             <border>3</border>
@@ -174,22 +174,10 @@
           </object>
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
-            <border>2</border>
-            <object class="wxBitmapButton" name="m_btManuallyUp">
-              <bitmap>bitmaps/podestManuallyUp.png</bitmap>
-              <style>wxBU_AUTODRAW</style>
-              <bg>wxSYS_COLOUR_BTNSHADOW</bg>
-              <default>0</default>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>2</border>
-            <object class="wxBitmapButton" name="m_btManuallyDown">
-              <bitmap>bitmaps/podestManuallyDown.png</bitmap>
-              <style>wxBU_AUTODRAW</style>
-              <bg>wxSYS_COLOUR_BTNSHADOW</bg>
-              <default>0</default>
+            <border>5</border>
+            <object class="wxPanel" name="m_intactiveMovePlaceholder">
+              <style>wxTAB_TRAVERSAL</style>
+              <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
             </object>
           </object>
         </object>
@@ -226,7 +214,7 @@
                 <underlined>0</underlined>
                 <face>Segoe UI</face>
               </font>
-              <value>Precise Movement</value>
+              <value>Exact Movement</value>
             </object>
           </object>
           <object class="sizeritem" name="flexGridSizer9600">

@@ -30,13 +30,8 @@ class CncReferencePosition	: public CncReferencePositionBase
 		
 		void					hitKey(int keyCode, int modifier = wxMOD_NONE );
 		
-		CncRefPositionMode		getReferenceMode()		const	{ return referencePanel->getReferenceMode(); }
-		double					getWorkpieceThickness()	const	{ return referencePanel->getWorkpieceThickness(); }
-		CncDoubleOffset			getMeasurementOffset()	const	{ return referencePanel->getMeasurementOffset(); }
-		bool					shouldZeroX()			const	{ return referencePanel->shouldZeroX(); }
-		bool					shouldZeroY()			const	{ return referencePanel->shouldZeroY(); }
-		bool					shouldZeroZ()			const	{ return referencePanel->shouldZeroZ(); }
-		bool					isReferenceStateValid()	const	{ return valid; }
+		const RefPosResult&		getResult(RefPosResult& result)	const { return referencePanel->getResult(result); } 
+		bool					isReferenceStateValid()			const { return valid; }
 		
 		void					shiftStepSensitivity();
 		void					selectStepSensitivity(int sel);

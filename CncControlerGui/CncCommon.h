@@ -143,6 +143,8 @@ namespace cnc {
 	const char*					getTemplateFormatAsString(const CncTemplateFormat tf);
 	const char*					getExtention(const CncTemplateFormat tf);
 	
+	const char*					getReferenceModeAsString(CncRefPositionMode m);
+	
 	void						traceSetterValueList(std::ostream& s, unsigned char pid, const SetterValueList& values, int32_t factor = 1);
 	void						traceLineNumberTranslater(std::ostream& s, const LineNumberTranslater& lnt);
 	

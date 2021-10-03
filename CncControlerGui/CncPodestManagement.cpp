@@ -7,9 +7,9 @@
 
 ///////////////////////////////////////////////////////////////////
 CncPodestManagement::CncPodestManagement(wxWindow* parent)
-: CncPodestManagementBase				(parent)
-, CncPodestMgmtMovement::Interface		()
-, movement								(NULL)
+: CncPodestManagementBase					(parent)
+, CncPodestMgmtMovement::CallbackInterface	()
+, movement									(NULL)
 ///////////////////////////////////////////////////////////////////
 {
 	movement = new CncPodestMgmtMovement(this); 

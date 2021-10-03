@@ -891,11 +891,13 @@ bool CncArduinoController::processSignalUpdate(byte& retValue) {
 
   bool ret = false;
   switch ( b[0] ) {
-    
+
     case PID_XYZ_INTERACTIVE_POS: {
-      int32_t dx; if ( ArduinoMainLoop::readInt8(dx) == false )    dx = 0;
-      int32_t dy; if ( ArduinoMainLoop::readInt8(dy) == false )    dy = 0;
-      int32_t dz; if ( ArduinoMainLoop::readInt8(dz) == false )    dz = 0;
+      int32_t dx; if ( ArduinoMainLoop::readInt8(dx) == false )    dx =   0;
+      int32_t dy; if ( ArduinoMainLoop::readInt8(dy) == false )    dy =   0;
+      int32_t dz; if ( ArduinoMainLoop::readInt8(dz) == false )    dz =   0;
+      int32_t ds; if ( ArduinoMainLoop::readInt8(ds) == false )    ds = '+';
+      int32_t df; if ( ArduinoMainLoop::readInt8(df) == false )    df =   0;
 
       // Check the serail again
       byte serialFrontByte = CMD_INVALID;
@@ -907,6 +909,8 @@ bool CncArduinoController::processSignalUpdate(byte& retValue) {
                               return processSignal(serialFrontByte, retValue);
         }
       }
+
+      #warning do something with ds && df
 
       // init the movment update
       // As Int8 to resolve also negative values

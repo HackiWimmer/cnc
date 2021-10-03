@@ -80,7 +80,12 @@ protected:
     wxPanel* m_panel437;
     wxPanel* m_manuallyMovePlaceholder;
     wxPanel* m_panel466;
-    wxPanel* m_navigatorPlaceholder;
+    wxStaticText* m_staticText521;
+    wxStaticText* m_staticText523;
+    wxStaticText* m_staticText525;
+    wxPanel* m_interactiveMoveXPlaceholder;
+    wxPanel* m_interactiveMoveYPlaceholder;
+    wxPanel* m_interactiveMoveZPlaceholder;
     wxPanel* m_speedSliderPlaceholder;
     wxPanel* m_panel441;
     wxPanel* m_predefinedPositionsPlaceholder;
@@ -147,7 +152,12 @@ public:
     wxPanel* GetRpRef() { return m_rpRef; }
     wxPanel* GetManuallyMovePlaceholder() { return m_manuallyMovePlaceholder; }
     wxPanel* GetPanel437() { return m_panel437; }
-    wxPanel* GetNavigatorPlaceholder() { return m_navigatorPlaceholder; }
+    wxStaticText* GetStaticText521() { return m_staticText521; }
+    wxStaticText* GetStaticText523() { return m_staticText523; }
+    wxStaticText* GetStaticText525() { return m_staticText525; }
+    wxPanel* GetInteractiveMoveXPlaceholder() { return m_interactiveMoveXPlaceholder; }
+    wxPanel* GetInteractiveMoveYPlaceholder() { return m_interactiveMoveYPlaceholder; }
+    wxPanel* GetInteractiveMoveZPlaceholder() { return m_interactiveMoveZPlaceholder; }
     wxPanel* GetSpeedSliderPlaceholder() { return m_speedSliderPlaceholder; }
     wxPanel* GetPanel466() { return m_panel466; }
     wxPanel* GetPredefinedPositionsPlaceholder() { return m_predefinedPositionsPlaceholder; }

@@ -11,7 +11,24 @@ namespace cnc {
 	const char* USER_DEFIND_SPEED_CHAR_DESC		= "Userdefined speed";
 };
 
-
+//////////////////////////////////////////////////////////////
+const char* cnc::getReferenceModeAsString(CncRefPositionMode mode) {
+//////////////////////////////////////////////////////////////
+	switch (mode)
+	{ 
+		case CncRM_Unknown:		return "Unknown";
+		case CncRM_Mode1:		return "Manual Mode 1";
+		case CncRM_Mode2:		return "Manual Mode 2"; 
+		case CncRM_Mode3:		return "Manual Mode 3"; 
+		case CncRM_Mode4:		return "Manual Mode 4"; 
+		case CncRM_Mode5:		return "Manual Mode 5"; 
+		case CncRM_Mode6:		return "Manual Mode 6"; 
+		case CncRM_Touchblock:	return "Touchblock Mode";
+		case CncRM_Camera:		return "Camera Mode"; 
+	}
+	
+	return "????";
+}
 //////////////////////////////////////////////////////////////
 CncStepSensitivity cnc::getStepSensitivityOfIndex(unsigned int index) {
 //////////////////////////////////////////////////////////////

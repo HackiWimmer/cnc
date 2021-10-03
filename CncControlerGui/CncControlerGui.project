@@ -39,6 +39,8 @@
   <Dependencies/>
   <VirtualDirectory Name="Source">
     <VirtualDirectory Name="Secure">
+      <File Name="CncSecureScrollButton.h"/>
+      <File Name="CncSecureScrollButton.cpp"/>
       <File Name="CncSecureSlidepadDialog.h"/>
       <File Name="CncSecureSlidepadDialog.cpp"/>
       <File Name="CncSecureSlidepad.h"/>

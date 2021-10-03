@@ -68,6 +68,18 @@ CncReferenceEvaluation::~CncReferenceEvaluation() {
 	wxDELETE(extCameraPreview);
 }
 ///////////////////////////////////////////////////////////////////
+const RefPosResult& CncReferenceEvaluation::getResult(RefPosResult& result) const {
+///////////////////////////////////////////////////////////////////
+	result.refMode				= getReferenceMode();
+	result.workpieceThickness	= getWorkpieceThickness();
+	result.measurementOffset	= getMeasurementOffset();
+	result.zeroX				= m_btZeroX->GetValue();
+	result.zeroY				= m_btZeroY->GetValue();
+	result.zeroZ				= m_btZeroZ->GetValue();
+	
+	return result;
+}
+///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::init() {
 ///////////////////////////////////////////////////////////////////
 	m_btZeroX->SetValue(true);
@@ -75,7 +87,6 @@ void CncReferenceEvaluation::init() {
 	m_btZeroZ->SetValue(true);
 	determineZeroMode();
 	selectEvaluationMode();
-	
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::cancel() {
@@ -541,7 +552,7 @@ void CncReferenceEvaluation::selectEvaluationMode() {
 	// attach/detach camera
 	if ( THE_CONTEXT->hasHardware() == true ) 
 	{
-		if ( THE_APP->GetPanelCamerPreviewPlaceholder() && THE_APP->GetPanelCamerPreviewPlaceholder()->IsShown() )
+		if ( THE_APP->GetPanelCameraPreviewPlaceholder() && THE_APP->GetPanelCameraPreviewPlaceholder()->IsShown() )
 		{
 			if ( caller )
 				caller->cameraNotifyPreview(sel == SEL_CAMERA);

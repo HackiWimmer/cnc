@@ -89,6 +89,8 @@ class CncSecureCtrlPanel;
 
 class CncTouchBlockDetector;
 
+struct RefPosResult;
+
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -178,7 +180,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void onExecuteOsk(wxCommandEvent& event);
+		virtual void onExecuteOsk(wxCommandEvent& event);
 		virtual void testChangedSpindleSpeed(wxScrollEvent& event);
 		virtual void testChangingSpindleSpeed(wxScrollEvent& event);
 		virtual void toggleTemplateShowEOL(wxCommandEvent& event);
@@ -611,6 +613,10 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
 		CncParsingSynopsisTrace* getParsingSynopsisTrace();
 		
+		void updateReferencePosition(RefPosResult* parameter);
+		
+		int isPortNameAvailable(const wxString& portName, bool exact=false);
+		
 		bool setTemplateName(const wxString& pathFile);
 		bool setTemplateName(const wxFileName& pathFile);
 		bool getFirstLruFile(wxString& ret);
@@ -621,7 +627,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z);
 		bool startInteractiveMove(CncInteractiveMoveDriver imd);
 		bool updateInteractiveMove();
-		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed=0);
 		bool stopInteractiveMove();
 		
 		bool connectSerialPort();
@@ -705,7 +711,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		int 							traceTimerCounter;
 		
 		wxString 						lastPortName;
-		wxString 						defaultPortName;
 		
 		CncControl* 					cnc;
 		

@@ -1208,21 +1208,23 @@ bool Serial::processStartInteractiveMove() {
 	return writeData(cmd, LEN);
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
+bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
 		std::cout << "SERIAL::processUpdateInteractiveMove()::ERROR: Not connected\n";
 		return false;
 	}
 	
-	const unsigned int LEN = 6;
+	const unsigned int LEN = 8;
 	unsigned char cmd[LEN];
 	cmd[0] = SIG_UPDATE;
-	cmd[1] = (unsigned char)3;
+	cmd[1] = (unsigned char) 5;
 	cmd[2] = PID_XYZ_INTERACTIVE_POS;
 	cmd[3] = (unsigned char)x;
 	cmd[4] = (unsigned char)y;
 	cmd[5] = (unsigned char)z;
+	cmd[6] = (unsigned char) modifySpeed < 0 ? '-' : '+';
+	cmd[7] = (unsigned char) abs(modifySpeed);
 	
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
