@@ -597,7 +597,19 @@ protected:
     wxPanel* m_splitterPageMonitor;
     wxSimplebook* m_secureMainBook;
     wxPanel* m_panelMonitor;
+    wxButton* m_secureShowHardwareBox;
+    wxButton* m_secureShowBoundBox;
+    wxButton* m_secureShowOrigin;
+    wxButton* m_secureShowGuidePathes;
+    wxButton* m_secureShowRuler;
+    wxButton* m_secureShowHelplines;
+    wxButton* m_secureShowFlyPathes;
+    wxButton* m_secureShowPosMarker;
+    wxButton* m_secureShowMillingCutter;
+    wxButton* m_secureRefreshMonitor;
+    wxButton* m_secureClearMonitor;
     wxPanel* m_secMonitorPlaceholder;
+    wxButton* m_3D_TopSec12;
     wxButton* m_3D_TopSec;
     wxButton* m_3D_BottomSec;
     wxButton* m_3D_FrontSec;
@@ -883,6 +895,18 @@ protected:
     virtual void onExecuteOsk(wxCommandEvent& event) { event.Skip(); }
     virtual void onDeactivateSecureRunMode(wxCommandEvent& event) { event.Skip(); }
     virtual void onCloseSecureRunAuiPane(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleHardwareBox(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleBoundBox(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleOrigin(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleGuidePathes(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleRuler(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleHelpLines(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleFlyPathes(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTogglePosMarker(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleMillingCutter(wxCommandEvent& event) { event.Skip(); }
+    virtual void onRefreshMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void onClearMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void onResetView(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
@@ -1482,7 +1506,19 @@ public:
     wxPanel* GetCncOverviewsPlaceholder() { return m_cncOverviewsPlaceholder; }
     wxPanel* GetSecGamepadPlaceholder() { return m_secGamepadPlaceholder; }
     wxPanel* GetSplitterPageLeft() { return m_splitterPageLeft; }
+    wxButton* GetSecureShowHardwareBox() { return m_secureShowHardwareBox; }
+    wxButton* GetSecureShowBoundBox() { return m_secureShowBoundBox; }
+    wxButton* GetSecureShowOrigin() { return m_secureShowOrigin; }
+    wxButton* GetSecureShowGuidePathes() { return m_secureShowGuidePathes; }
+    wxButton* GetSecureShowRuler() { return m_secureShowRuler; }
+    wxButton* GetSecureShowHelplines() { return m_secureShowHelplines; }
+    wxButton* GetSecureShowFlyPathes() { return m_secureShowFlyPathes; }
+    wxButton* GetSecureShowPosMarker() { return m_secureShowPosMarker; }
+    wxButton* GetSecureShowMillingCutter() { return m_secureShowMillingCutter; }
+    wxButton* GetSecureRefreshMonitor() { return m_secureRefreshMonitor; }
+    wxButton* GetSecureClearMonitor() { return m_secureClearMonitor; }
     wxPanel* GetSecMonitorPlaceholder() { return m_secMonitorPlaceholder; }
+    wxButton* Get3D_TopSec12() { return m_3D_TopSec12; }
     wxButton* Get3D_TopSec() { return m_3D_TopSec; }
     wxButton* Get3D_BottomSec() { return m_3D_BottomSec; }
     wxButton* Get3D_FrontSec() { return m_3D_FrontSec; }

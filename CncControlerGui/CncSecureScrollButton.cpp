@@ -50,6 +50,9 @@ CncSecureScrollButton::CncSecureScrollButton(wxWindow* parent, wxOrientation ori
 	if (GetSizer())
 		 GetSizer()->Fit(this);
 		 
+		#warning
+	EnableTouchEvents(wxTOUCH_ALL_GESTURES);
+		 
 	// Connect events
 	scrollbar->Connect(wxEVT_SCROLL_CHANGED,			wxScrollEventHandler(CncSecureScrollButton::onChangedValue), NULL, this);
 	scrollbar->Connect(wxEVT_SCROLL_THUMBRELEASE,		wxScrollEventHandler(CncSecureScrollButton::onThumbrelease), NULL, this);
@@ -137,26 +140,13 @@ void CncSecureScrollButton::publish(bool continuous) {
 ///////////////////////////////////////////////////////////////////////
 void CncSecureScrollButton::onChangedValue(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////////
-	if ( released == true )
-	{
-		released = false;
-		return;
-	}
-	
-	if ( skipped == true ) 
-	{
-		skipped = false;
-		return;
-	}
-	
-	publish(true);
-	
+	reset();
 	event.Skip();
+	return;
 }
 ///////////////////////////////////////////////////////////////////////
 void CncSecureScrollButton::onSkipValue(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////////
-	//publish(false);
 	reset();
 	skipped = true;
 	event.Skip();
@@ -171,14 +161,12 @@ void CncSecureScrollButton::onThumbtrack(wxScrollEvent& event) {
 void CncSecureScrollButton::onThumbrelease(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////////
 	reset();
-	released = true;
-	
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////////
 void CncSecureScrollButton::onLeaveWindow(wxMouseEvent& event) { 
 ///////////////////////////////////////////////////////////////////////
-	reset();
+	//reset();
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////////

@@ -1,1 +1,0 @@
-../build-Release/EnvSetupTest/win_resources.rc.o ../build-Release/EnvSetupTest/MainDialog.cpp.o ../build-Release/EnvSetupTest/wxcrafter_bitmaps.cpp.o ../build-Release/EnvSetupTest/wxcrafter.cpp.o ../build-Release/EnvSetupTest/main.cpp.o   

@@ -26,6 +26,9 @@
 #include <wx/scrolbar.h>
 #include <wx/dialog.h>
 #include <wx/iconbndl.h>
+#include <wx/bitmap.h>
+#include <map>
+#include <wx/icon.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -56,6 +59,7 @@ protected:
     wxPanel* m_lpRef;
     wxPanel* m_lpManually;
     wxPanel* m_lpRun;
+    wxPanel* m_lpCtrl;
     wxPanel* m_plPodest;
     wxPanel* m_lpMisc;
     wxStaticText* m_rightHeadline;
@@ -77,25 +81,35 @@ protected:
     wxButton* m_btSet;
     wxPanel* m_rpManually;
     wxListbook* m_listbook435;
-    wxPanel* m_panel437;
+    wxPanel* m_panelCMD;
     wxPanel* m_manuallyMovePlaceholder;
-    wxPanel* m_panel466;
+    wxPanel* m_panelIM;
     wxStaticText* m_staticText521;
     wxStaticText* m_staticText523;
     wxStaticText* m_staticText525;
     wxPanel* m_interactiveMoveXPlaceholder;
     wxPanel* m_interactiveMoveYPlaceholder;
     wxPanel* m_interactiveMoveZPlaceholder;
+    wxStaticText* m_staticText5211;
+    wxStaticText* m_staticText5233;
+    wxStaticText* m_staticText5254;
     wxPanel* m_speedSliderPlaceholder;
-    wxPanel* m_panel441;
+    wxPanel* m_panelITP;
+    wxToggleButton* m_toggleButton554;
+    wxPanel* m_interactiveTouchpadXYZ;
+    wxPanel* m_panelPD;
     wxPanel* m_predefinedPositionsPlaceholder;
-    wxPanel* m_panel443;
+    wxPanel* m_panelPA;
+    wxPanel* m_panelQ1;
+    wxPanel* m_panelQ2;
+    wxPanel* m_panelQ3;
     wxPanel* m_rpRun;
     wxButton* m_rcRunSec;
     wxButton* m_rcPauseSec;
     wxButton* m_rcStopSec;
     wxStaticText* m_staticText90;
     wxButton* m_btnEmergenyStopSec;
+    wxPanel* m_rpCtrl;
     wxPanel* m_rpPodest;
     wxPanel* m_podestPlaceholder;
     wxPanel* m_rpMisc;
@@ -112,6 +126,7 @@ protected:
     virtual void onEvaluateHardwareReference(wxCommandEvent& event) { event.Skip(); }
     virtual void onOpenTemplateSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onReferenceSet(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleTouchpadPane(wxCommandEvent& event) { event.Skip(); }
     virtual void onRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onPauseSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStopSec(wxCommandEvent& event) { event.Skip(); }
@@ -131,6 +146,7 @@ public:
     wxPanel* GetLpRef() { return m_lpRef; }
     wxPanel* GetLpManually() { return m_lpManually; }
     wxPanel* GetLpRun() { return m_lpRun; }
+    wxPanel* GetLpCtrl() { return m_lpCtrl; }
     wxPanel* GetPlPodest() { return m_plPodest; }
     wxPanel* GetLpMisc() { return m_lpMisc; }
     wxListbook* GetLeftBook() { return m_leftBook; }
@@ -151,18 +167,27 @@ public:
     wxButton* GetBtSet() { return m_btSet; }
     wxPanel* GetRpRef() { return m_rpRef; }
     wxPanel* GetManuallyMovePlaceholder() { return m_manuallyMovePlaceholder; }
-    wxPanel* GetPanel437() { return m_panel437; }
+    wxPanel* GetPanelCMD() { return m_panelCMD; }
     wxStaticText* GetStaticText521() { return m_staticText521; }
     wxStaticText* GetStaticText523() { return m_staticText523; }
     wxStaticText* GetStaticText525() { return m_staticText525; }
     wxPanel* GetInteractiveMoveXPlaceholder() { return m_interactiveMoveXPlaceholder; }
     wxPanel* GetInteractiveMoveYPlaceholder() { return m_interactiveMoveYPlaceholder; }
     wxPanel* GetInteractiveMoveZPlaceholder() { return m_interactiveMoveZPlaceholder; }
+    wxStaticText* GetStaticText5211() { return m_staticText5211; }
+    wxStaticText* GetStaticText5233() { return m_staticText5233; }
+    wxStaticText* GetStaticText5254() { return m_staticText5254; }
     wxPanel* GetSpeedSliderPlaceholder() { return m_speedSliderPlaceholder; }
-    wxPanel* GetPanel466() { return m_panel466; }
+    wxPanel* GetPanelIM() { return m_panelIM; }
+    wxToggleButton* GetToggleButton554() { return m_toggleButton554; }
+    wxPanel* GetInteractiveTouchpadXYZ() { return m_interactiveTouchpadXYZ; }
+    wxPanel* GetPanelITP() { return m_panelITP; }
     wxPanel* GetPredefinedPositionsPlaceholder() { return m_predefinedPositionsPlaceholder; }
-    wxPanel* GetPanel441() { return m_panel441; }
-    wxPanel* GetPanel443() { return m_panel443; }
+    wxPanel* GetPanelPD() { return m_panelPD; }
+    wxPanel* GetPanelQ1() { return m_panelQ1; }
+    wxPanel* GetPanelQ2() { return m_panelQ2; }
+    wxPanel* GetPanelQ3() { return m_panelQ3; }
+    wxPanel* GetPanelPA() { return m_panelPA; }
     wxListbook* GetListbook435() { return m_listbook435; }
     wxPanel* GetRpManually() { return m_rpManually; }
     wxButton* GetRcRunSec() { return m_rcRunSec; }
@@ -171,6 +196,7 @@ public:
     wxStaticText* GetStaticText90() { return m_staticText90; }
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
     wxPanel* GetRpRun() { return m_rpRun; }
+    wxPanel* GetRpCtrl() { return m_rpCtrl; }
     wxPanel* GetPodestPlaceholder() { return m_podestPlaceholder; }
     wxPanel* GetRpPodest() { return m_rpPodest; }
     wxButton* GetBtSessionDir() { return m_btSessionDir; }
@@ -362,6 +388,35 @@ public:
     wxButton* GetBtOk() { return m_btOk; }
     CncSecureSlidepadDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Sliderpad"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncSecureSlidepadDialogBase();
+};
+
+
+class ImageLibSecure : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibSecure();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibSecure();
 };
 
 #endif

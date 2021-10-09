@@ -4,7 +4,7 @@
 #include "CncSecureSlidepad.h"
 #include "CncReferenceEvaluation.h"
 #include "CncPodestMgmtMovement.h"
-#include "CncSecureScrollButton.h"
+#include "CncSecureGesturesPanel.h"
 #include "wxCrafterSecurePanel.h"
 
 class CncSecurePortListCtrl;
@@ -14,7 +14,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 							, public CncSecureSlidepad::CallbackInterface
 							, public CncReferenceEvaluation::CallbackInterface
 							, public CncPodestMgmtMovement::CallbackInterface
-							, public CncSecureScrollButton::CallbackInterface
+							, public CncSecureGesturesPanel::CallbackInterface
 {
 	public:
 		
@@ -40,7 +40,10 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		void updatePortSelection(const wxString& portName);
 		void notifyConnection(bool state, const wxString& portName);
 		
+		CncReferenceEvaluation* getReferencePanel() const { return referencePanel; }
+		
 	protected:
+		virtual void onToggleTouchpadPane(wxCommandEvent& event);
 		virtual void onReferenceSet(wxCommandEvent& event);
 		virtual void onStackTraceStoreSec(wxCommandEvent& event);
 		virtual void onSessionDirSec(wxCommandEvent& event);
@@ -66,11 +69,20 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		virtual void podestNotifyEnable(bool state);
 		virtual void podestNotifyInit(bool state);
 		virtual void podestNotifyClose(bool state);
-		virtual void notifyValueChange(const CncSecureScrollButton::CBI::Data& d);
+		
+		virtual void notifyStarting(const CncSecureGesturesPanel::State s);
+		virtual void notifyPositionChanged(const CncSecureGesturesPanel::Data& d);
+		virtual void notifyPositionHeld(const CncSecureGesturesPanel::Data& d);
 		
 		friend class CncSecurePortListCtrl;
 		
 	private:
+		
+		static const int CallbackID_SPX		=  1;
+		static const int CallbackID_SPY		=  2;
+		static const int CallbackID_SPZ		=  3;
+		static const int CallbackID_TPXY	= 10;
+		static const int CallbackID_TPZ		= 11;
 		
 		struct PageInfo {
 			int width = 520;
@@ -80,9 +92,10 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		
 		CncSecurePortListCtrl*			portSelectorList;
 		CncSecureManuallyMovePanel*		manuallyMovePanel;
-		CncSecureScrollButton*			interactiveMoveX;
-		CncSecureScrollButton*			interactiveMoveY;
-		CncSecureScrollButton*			interactiveMoveZ;
+		CncSecureGesturesPanel*			interactiveMoveX;
+		CncSecureGesturesPanel*			interactiveMoveY;
+		CncSecureGesturesPanel*			interactiveMoveZ;
+		CncSecureGesturesPanel*			interactiveTouchpadXYZ;
 		CncPodestMgmtMovement*			podestPanel;
 		CncReferenceEvaluation*			referencePanel;
 		CncSecureSlidepad*				speedpad;

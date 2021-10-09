@@ -10,7 +10,7 @@ class CncSecureManuallyMovePanel : public CncSecureManuallyMovePanelBase {
 		virtual ~CncSecureManuallyMovePanel();
 		
 	protected:
-    virtual void onClearF(wxMouseEvent& event);
+		virtual void onClearF(wxMouseEvent& event);
 		virtual void onSetDimMode(wxCommandEvent& event);
 		virtual void onClearX(wxMouseEvent& event);
 		virtual void onClearY(wxMouseEvent& event);

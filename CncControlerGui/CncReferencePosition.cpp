@@ -11,13 +11,11 @@
 #include "CncContext.h"
 #include "CncExternalViewBox.h"
 #include "CncAutoProgressDialog.h"
-#include "wxCrafterImages.h"
 #include "CncReferencePosition.h"
 
 ///////////////////////////////////////////////////////////////////
 CncReferencePosition::CncReferencePosition(wxWindow* parent)
 : CncReferencePositionBase	(parent)
-, valid						(false)
 , navigationPanel			(NULL)
 , referencePanel			(NULL)
 , infoMessage				()
@@ -36,6 +34,7 @@ CncReferencePosition::CncReferencePosition(wxWindow* parent)
 	
 	referencePanel = new CncReferenceEvaluation(this);
 	GblFunc::replaceControl(m_evaluateReferencePlaceholder, referencePanel);
+	referencePanel->setCallbackInterface(this);
 	
 	m_rbStepSensitivity->SetFocusFromKbd();
 	referencePanel->updatePreview();
@@ -49,6 +48,22 @@ CncReferencePosition::~CncReferencePosition() {
 	
 	wxDELETE(navigationPanel);
 	wxDELETE(referencePanel);
+}
+/////////////////////////////////////////////////////////////////////
+void CncReferencePosition::referenceNotifyMessage(const wxString& msg, int flags) {
+//////////// /////////////////////////////////////////////////////////
+	wxString m(msg);
+	while ( m.EndsWith("\n") )
+		m.RemoveLast();
+	
+	m_infobar->ShowMessage(m, flags);
+}
+/////////////////////////////////////////////////////////////////////
+void CncReferencePosition::referenceDismissMessage() {
+/////////////////////////////////////////////////////////////////////
+	//CNC_PRINT_FUNCT
+	m_infobar->Dismiss();
+	Layout();
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::setMessage(const wxString& msg) {
@@ -94,7 +109,6 @@ void CncReferencePosition::cancel(wxCommandEvent& event) {
 void CncReferencePosition::set(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	referencePanel->set();
-	valid = true;
 	EndModal(wxID_OK);
 }
 ///////////////////////////////////////////////////////////////////
@@ -130,43 +144,6 @@ void CncReferencePosition::onInfoTimer(wxTimerEvent& event) {
 	m_infoTimer->Stop();
 	showInformation();
 }
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::resetTempSetting() {
-///////////////////////////////////////////////////////////////////
-	referencePanel->resetTempSetting();
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::setEnforceFlag(bool s) {
-///////////////////////////////////////////////////////////////////
-	valid = !s;
-	
-	const int refMode = (int)referencePanel->getReferenceMode();
-	
-	wxBitmap bmp(ImageLib24().Bitmap( valid ? "BMP_TRAFFIC_LIGHT_GREEN" : "BMP_TRAFFIC_LIGHT_RED")); 
-	const wxString mod(wxString::Format("Reference position mode: %s [%d]", cnc::getReferenceModeAsString(referencePanel->getReferenceMode()), ( valid ? refMode : -1 ) ));
-	const wxString tip(wxString::Format("Reference position state: %s\n%s", ( valid ? "Valid" : "Invalid" ), mod));
-	
-	// display ref pos mode too
-	if ( valid == true ) {
-		const wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-		wxMemoryDC mdc(bmp);
-		mdc.SetFont(font);
-		mdc.SetTextForeground(wxColor(0, 0, 0));
-		mdc.DrawText(wxString::Format("%d", refMode), {5, 1});
-		bmp = mdc.GetAsBitmap();
-	}
-	
-	THE_APP->GetRefPosState()->SetToolTip(tip);
-	THE_APP->GetRefPosState()->SetBitmap(bmp);
-	THE_APP->GetStatusBar()->Refresh();
-	THE_APP->GetStatusBar()->Update();
-	
-	wxRichToolTip rTip("Reference Position Information", tip);
-	rTip.SetIcon(wxICON_INFORMATION);
-	//rTip.SetTipKind(wxTipKind_TopLeft);
-	rTip.ShowFor(THE_APP->GetRefPosState());
-}
-
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::onKillCtrlFocus(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////

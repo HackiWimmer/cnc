@@ -180,6 +180,18 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void onResetView(wxCommandEvent& event);
+		virtual void onToggleFlyPathes(wxCommandEvent& event);
+		virtual void onToggleGuidePathes(wxCommandEvent& event);
+		virtual void onToggleHelpLines(wxCommandEvent& event);
+		virtual void onToggleMillingCutter(wxCommandEvent& event);
+		virtual void onToggleOrigin(wxCommandEvent& event);
+		virtual void onTogglePosMarker(wxCommandEvent& event);
+		virtual void onClearMonitor(wxCommandEvent& event);
+		virtual void onRefreshMonitor(wxCommandEvent& event);
+		virtual void onToggleBoundBox(wxCommandEvent& event);
+		virtual void onToggleHardwareBox(wxCommandEvent& event);
+		virtual void onToggleRuler(wxCommandEvent& event);
 		virtual void onExecuteOsk(wxCommandEvent& event);
 		virtual void testChangedSpindleSpeed(wxScrollEvent& event);
 		virtual void testChangingSpindleSpeed(wxScrollEvent& event);
@@ -662,6 +674,12 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void motionMonitorViewPerspective2();
 		void motionMonitorViewPerspective3();
 		void motionMonitorViewPerspective4();
+		
+		bool isReferenceStateValid() const;
+		void setReferencePosMessage(const wxString& msg);
+		const RefPosResult& getReferencePosResult(RefPosResult& result)	const;
+		void setReferencePosEnforceFlag(bool s);
+		void resetReferencePosTempSetting();
 		
 		friend class MainFrameProxy;
 		friend class CncMsgHistoryLoggerProxy;

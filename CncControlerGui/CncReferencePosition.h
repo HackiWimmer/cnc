@@ -8,6 +8,7 @@
 
 class CncExternalViewBox;
 class CncReferencePosition	: public CncReferencePositionBase
+							, public CncReferenceEvaluation::CallbackInterface
 {
 	protected:
 		virtual void onKillCtrlFocus(wxFocusEvent& event);
@@ -19,6 +20,9 @@ class CncReferencePosition	: public CncReferencePositionBase
 		virtual void show(wxShowEvent& event);
 		virtual void cancel(wxCommandEvent& event);
 		virtual void set(wxCommandEvent& event);
+		
+		virtual void referenceNotifyMessage(const wxString& msg, int flags = wxICON_INFORMATION);
+		virtual void referenceDismissMessage();
 
 	public:
 		enum TouchCorner { TM_UNKNOWN, TM_A, TM_B, TM_C, TM_D };
@@ -31,17 +35,16 @@ class CncReferencePosition	: public CncReferencePositionBase
 		void					hitKey(int keyCode, int modifier = wxMOD_NONE );
 		
 		const RefPosResult&		getResult(RefPosResult& result)	const { return referencePanel->getResult(result); } 
-		bool					isReferenceStateValid()			const { return valid; }
+		bool					isReferenceStateValid()			const { return referencePanel->isReferenceStateValid(); }
 		
 		void					shiftStepSensitivity();
 		void					selectStepSensitivity(int sel);
 		
-		void					setEnforceFlag(bool s);
-		void					resetTempSetting();
+		void					setEnforceFlag(bool s)			      { referencePanel->setEnforceFlag(s); }
+		void					resetTempSetting()				      { referencePanel->resetTempSetting(); }
 	
 	private:
 
-		bool					valid;
 		CncNavigatorPanel*		navigationPanel;
 		CncReferenceEvaluation*	referencePanel;
 

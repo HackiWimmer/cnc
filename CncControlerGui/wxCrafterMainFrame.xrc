@@ -8871,12 +8871,189 @@ State</label>
                                   <object class="wxPanel" name="m_panelMonitor">
                                     <style>wxTAB_TRAVERSAL</style>
                                     <object class="wxFlexGridSizer">
-                                      <cols>2</cols>
+                                      <cols>3</cols>
                                       <rows>1</rows>
                                       <vgap>0</vgap>
                                       <hgap>0</hgap>
-                                      <growablecols>0</growablecols>
+                                      <growablecols>1</growablecols>
                                       <growablerows>0</growablerows>
+                                      <object class="sizeritem" name="flexGridSizer10025">
+                                        <flag>wxALL|wxEXPAND</flag>
+                                        <option>1</option>
+                                        <object class="wxFlexGridSizer">
+                                          <cols>1</cols>
+                                          <rows>20</rows>
+                                          <vgap>0</vgap>
+                                          <hgap>0</hgap>
+                                          <growablecols/>
+                                          <growablerows/>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowHardwareBox">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Hardware Box]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/CncHardwareBox.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowBoundBox">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Bound Box]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/CncBoundbox.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowOrigin">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Origin]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/RefPos.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowGuidePathes">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Guide Pathes]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/CncGuidePath.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowRuler">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Ruler]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/CncRuler.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowHelplines">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Helplines]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/view-grid.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowFlyPathes">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Fly Pathes]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/CncPath.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowPosMarker">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Position Marker]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/CncPosition.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureShowMillingCutter">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Show/Hide Milling Cutter]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/cutter.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureRefreshMonitor">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Refresh Monitor]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/CodeLite/16-file_reload.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_secureClearMonitor">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Clear Monitor]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/16-clean.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
+                                        </object>
+                                      </object>
                                       <object class="sizeritem" name="flexGridSizer9867">
                                         <flag>wxALL|wxEXPAND</flag>
                                         <object class="wxFlexGridSizer">
@@ -8905,6 +9082,21 @@ State</label>
                                           <hgap>0</hgap>
                                           <growablecols>0</growablecols>
                                           <growablerows/>
+                                          <object class="sizeritem">
+                                            <flag>wxALL</flag>
+                                            <minsize>40,40</minsize>
+                                            <object class="wxButton" name="m_3D_TopSec12">
+                                              <label/>
+                                              <style/>
+                                              <size>40,40</size>
+                                              <tooltip>
+                                                <![CDATA[Normalize View]]>
+                                              </tooltip>
+                                              <bitmap>bitmaps/CodeLite/16-file_reload.png</bitmap>
+                                              <bitmapposition>wxLEFT</bitmapposition>
+                                              <default>0</default>
+                                            </object>
+                                          </object>
                                           <object class="sizeritem">
                                             <flag>wxALL</flag>
                                             <minsize>40,40</minsize>
@@ -9148,7 +9340,7 @@ State</label>
                                         <object class="sizeritem">
                                           <flag>wxALL|wxEXPAND</flag>
                                           <object class="wxSimplebook" name="m_securePreviewBook">
-                                            <style>wxBK_DEFAULT</style>
+                                            <style/>
                                             <effect>wxSHOW_EFFECT_NONE</effect>
                                             <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
                                             <object class="simplebookpage">

@@ -2226,6 +2226,21 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 		wxString portName("Undefined");
 		PDEV_BROADCAST_HDR lpdb = NULL;
 		
+		#warning
+		/*
+		if ( message == WM_GESTURE) {
+			
+			GESTUREINFO gi;  
+			ZeroMemory(&gi, sizeof(GESTUREINFO));
+			gi.cbSize = sizeof(GESTUREINFO);
+			BOOL bResult  = GetGestureInfo((HGESTUREINFO)lParam, &gi);
+		
+			HWND hwnd = wxWindow::FindFocus() ? wxWindow::FindFocus()->GetHandle() : 0;
+		
+			CNC_PRINT_FUNCT_A(" %d %d %d", hwnd, gi.hwndTarget, gi.dwID)
+		}
+		*/
+		
 		if ( message == WM_DEVICECHANGE) {
 			// logging
 			switch ( wParam ) {
@@ -2838,7 +2853,7 @@ bool MainFrame::connectSerialPort() {
 		
 		if ( (ret = cnc->setup()) == true ) {
 			
-			refPositionDlg->setEnforceFlag(cnc->isEmulator() == false);
+			setReferencePosEnforceFlag(cnc->isEmulator() == false);
 			
 			notifyConfigUpdate();
 			decorateSpindleState(cnc->getSpindleState());
@@ -3211,8 +3226,8 @@ void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, doub
 	if ( cnc::dblCmp::gt(y, cnc::dbl::MIN) ) cnc->setZeroPosY(THE_CONFIG->convertMetricToStepsY(y));
 	if ( cnc::dblCmp::gt(z, cnc::dbl::MIN) ) cnc->setZeroPosZ(THE_CONFIG->convertMetricToStepsZ(z));
 	
-	refPositionDlg->resetTempSetting();
-	refPositionDlg->setEnforceFlag(false);
+	resetReferencePosTempSetting();
+	setReferencePosEnforceFlag(false);
 	
 	// align the hardware offset ith the new logical software origin
 	if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
@@ -3280,13 +3295,13 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 	activateGamepadNotifications(true);
 	CncGamepadSpy::ContextSwaper gcs(gamepadSpy, CncGamepadSpy::GPC_REFPOS);
 	
-	refPositionDlg->setMessage(msg);
+	setReferencePosMessage(msg);
 	const int ret = refPositionDlg->ShowModal();
 	
 	if ( ret == wxID_OK )
 	{
 		RefPosResult parameter;
-		refPositionDlg->getResult(parameter);
+		getReferencePosResult(parameter);
 		updateReferencePosition(&parameter);
 	} 
 	else 
@@ -4365,7 +4380,7 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
  	
 		dlg.ShowModal();
 		
-		refPositionDlg->setEnforceFlag(true);
+		setReferencePosEnforceFlag(true);
 		return false;
 	}
 	
@@ -4386,7 +4401,7 @@ bool MainFrame::checkReferencePositionState() {
 		return true;
 		
 	const CncDoublePosition refPos(CncStartPositionResolver::getReferencePosition());
-	const bool refPosValid	= refPositionDlg->isReferenceStateValid();
+	const bool refPosValid	= isReferenceStateValid();
 	const bool zero			= ( cnc->getCurAppPosMetric() != refPos );
 	
 	if ( refPosValid == false ) {
@@ -4824,7 +4839,7 @@ bool MainFrame::processTemplateIntern() {
 			std::cerr << "PC pos        : " << cnc->getCurAppPos() << std::endl;
 			std::cerr << "Controller pos: " << cnc->requestControllerPos() << std::endl;
 			
-			refPositionDlg->setEnforceFlag(true);
+			setReferencePosEnforceFlag(true);
 		}
 		
 		ret = false;
@@ -4840,7 +4855,7 @@ bool MainFrame::processTemplateIntern() {
 			cnc->isPositionOutOfRange(min, true);
 			cnc->isPositionOutOfRange(max, true);
 			
-			refPositionDlg->setEnforceFlag(true);
+			setReferencePosEnforceFlag(true);
 		//}
 	}
 	
@@ -5003,7 +5018,7 @@ void MainFrame::emergencyStop(wxCommandEvent& event) {
 		doCatch();
 	}
 	
-	refPositionDlg->setEnforceFlag(true);
+	setReferencePosEnforceFlag(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::navigateX(CncDirection d) {
@@ -5232,7 +5247,7 @@ d) X(mid), Y(mid), Z(mid)
 	wxASSERT( cnc );
 	CNC_TRANSACTION_LOCK
 	
-	const bool refPosValid = refPositionDlg->isReferenceStateValid();
+	const bool refPosValid = isReferenceStateValid();
 	if ( refPosValid == false ) {
 		cnc::trc.logError("The current reference position isn't valid. Therefore, can't move home");
 		return;
@@ -6651,7 +6666,7 @@ void MainFrame::rcStop(wxCommandEvent& event) {
 void MainFrame::rcReset(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	requestReset();
-	refPositionDlg->setEnforceFlag(true);
+	setReferencePosEnforceFlag(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSpindleState(bool state) {
@@ -6840,6 +6855,78 @@ void MainFrame::motionMonitorViewPerspective3() {
 void MainFrame::motionMonitorViewPerspective4() {
 ///////////////////////////////////////////////////////////////////
 	drawPane3D->showFromPerspective4();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onClearMonitor(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->clearMonitor();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onRefreshMonitor(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->refreshMonitor();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleBoundBox(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleBoundBox();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleHardwareBox(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleHardwareBox();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleRuler(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleRuler();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleFlyPathes(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleFlyPathes();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleGuidePathes(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleGuidePathes();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleHelpLines(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleHelpLines();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleMillingCutter(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleMillingCutter();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleOrigin(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleOrigin();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onTogglePosMarker(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->togglePosMarker();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onResetView(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->resetView();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearMotionMonitor() {
@@ -8853,8 +8940,69 @@ double MainFrame::getConfiguredSpindleSpeed() {
 void MainFrame::onExecuteOsk(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	openFileExtern("FreeVK.exe","",true);
-
-
+}
+/////////////////////////////////////////////////////////////////////
+bool MainFrame::isReferenceStateValid() const {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT ( secureCtrlPanel );
+	wxASSERT ( refPositionDlg );
+	
+	if ( THE_CONTEXT->secureModeInfo.isActive == true )
+		return secureCtrlPanel->getReferencePanel()->isReferenceStateValid();
+		
+	return refPositionDlg->isReferenceStateValid();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setReferencePosMessage(const wxString& msg) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT ( secureCtrlPanel );
+	wxASSERT ( refPositionDlg );
+	
+	if ( THE_CONTEXT->secureModeInfo.isActive == true )
+	{
+		secureCtrlPanel->getReferencePanel()->setMessage(msg);
+		return;
+	}
+		
+	refPositionDlg->setMessage(msg);
+}
+/////////////////////////////////////////////////////////////////////
+const RefPosResult& MainFrame::getReferencePosResult(RefPosResult& result)	const {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT ( secureCtrlPanel );
+	wxASSERT ( refPositionDlg );
+	
+	if ( THE_CONTEXT->secureModeInfo.isActive == true )
+		return secureCtrlPanel->getReferencePanel()->getResult(result);
+		
+	return refPositionDlg->getResult(result);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setReferencePosEnforceFlag(bool s) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT ( secureCtrlPanel );
+	wxASSERT ( refPositionDlg );
+	
+	// chnage the order
+	if ( THE_CONTEXT->secureModeInfo.isActive == true )
+	{
+		refPositionDlg->setEnforceFlag(s);
+		secureCtrlPanel->getReferencePanel()->setEnforceFlag(s);
+	}
+	else
+	{
+		secureCtrlPanel->getReferencePanel()->setEnforceFlag(s);
+		refPositionDlg->setEnforceFlag(s);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::resetReferencePosTempSetting() {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT ( secureCtrlPanel );
+	wxASSERT ( refPositionDlg );
+	
+	secureCtrlPanel->getReferencePanel()->resetTempSetting();
+	refPositionDlg->resetTempSetting();
 }
 
 

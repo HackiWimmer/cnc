@@ -34,7 +34,6 @@ class CncSecureScrollButton : public wxPanel
 				virtual void notifyValueChange(const CncSecureScrollButton::CBI::Data& d) {}
 		};
 		
-		
 		enum Mode { M_NEGATIVE, M_POSITIVE, M_BOTH };
 		
 		CncSecureScrollButton(wxWindow* parent, wxOrientation = wxHORIZONTAL, Mode mode = M_BOTH, int sensitivity = 3, wxSize minSize = wxSize(50,50));

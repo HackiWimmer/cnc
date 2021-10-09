@@ -3,6 +3,7 @@
   <!-- Handler Generation is ON -->
   <object class="wxBitmap" name="16-clear@2x">bitmaps\16-clear@2x.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="16-ctrl@2x">bitmaps\16-ctrl@2x.png</object>
   <object class="wxBitmap" name="16-file_open@2x">bitmaps\CodeLite\16-file_open@2x.png</object>
   <object class="wxBitmap" name="16-find_in_files">bitmaps\CodeLite\16-find_in_files.png</object>
   <object class="wxBitmap" name="16-find_in_files@2x">bitmaps\CodeLite\16-find_in_files@2x.png</object>
@@ -15,8 +16,10 @@
   <object class="wxBitmap" name="16-plus2@2x">bitmaps\CodeLite\16-plus2@2x.png</object>
   <object class="wxBitmap" name="16-regular-expression@2x">bitmaps\CodeLite\16-regular-expression@2x.png</object>
   <object class="wxBitmap" name="16-start@2x">bitmaps\16-start@2x.png</object>
+  <object class="wxBitmap" name="16-windows@2x">bitmaps\CodeLite\16-windows@2x.png</object>
   <object class="wxBitmap" name="24-clean">bitmaps\CodeLite\24-clean.png</object>
   <object class="wxBitmap" name="24-clean@2x">bitmaps\CodeLite\24-clean@2x.png</object>
+  <object class="wxBitmap" name="BMP_CROSSHAIR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\crosshair1.png</object>
   <object class="wxBitmap" name="CncAnchors">bitmaps\CncAnchors.png</object>
   <object class="wxBitmap" name="CncFolder">bitmaps\CncFolder.png</object>
   <object class="wxBitmap" name="CncPause">bitmaps\CncPause.png</object>

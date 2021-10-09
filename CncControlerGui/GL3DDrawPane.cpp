@@ -180,7 +180,7 @@ void GL3DDrawPane::activate3DPerspectiveButton(wxButton* bt) {
 		bt->SetBackgroundColour(active);
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onToggleOptionPane(wxCommandEvent& event) {
+void GL3DDrawPane::toggleOptionPane() {
 /////////////////////////////////////////////////////////////////////
 	THE_APP->toggleMotionMonitorOptionPane(false);
 }
@@ -275,72 +275,72 @@ void GL3DDrawPane::showFromPerspective4() {
 	motionMonitor->viewIso4();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onToggleHardwareBox(wxCommandEvent& event) {
+void GL3DDrawPane::toggleHardwareBox() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showHardwareBox);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onToggleBoundBox(wxCommandEvent& event) {
+void GL3DDrawPane::toggleBoundBox() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showBoundBox);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onToggleFlyPathes(wxCommandEvent& event) {
+void GL3DDrawPane::toggleFlyPathes() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showFlyPath);
 	motionMonitor->reconstruct();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onToggleGuidePathes(wxCommandEvent& event) {
+void GL3DDrawPane::toggleGuidePathes() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showGuidePathes);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onToggleHelpLines(wxCommandEvent& event) {
+void GL3DDrawPane::toggleHelpLines() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showHelpLines);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onToggleOrigin(wxCommandEvent& event) {
+void GL3DDrawPane::toggleOrigin() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showOrigin);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onTogglePosMarker(wxCommandEvent& event) {
+void GL3DDrawPane::togglePosMarker() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showPosMarker);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onShowMillingCutter(wxCommandEvent& event) {
+void GL3DDrawPane::toggleMillingCutter() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showMillingCutter);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onToggleRuler(wxCommandEvent& event) {
+void GL3DDrawPane::toggleRuler() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showRuler);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onClearMonitor(wxCommandEvent& event) {
+void GL3DDrawPane::clearMonitor() {
 /////////////////////////////////////////////////////////////////////
 	THE_APP->clearMotionMonitor();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onRefreshMonitor(wxCommandEvent& event) {
+void GL3DDrawPane::refreshMonitor() {
 /////////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->isOnlineUpdateDrawPane() ) 
 		motionMonitor->update(true);
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::onResetView(wxCommandEvent& event) {
+void GL3DDrawPane::resetView() {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->normalizeMonitor();
 }

@@ -748,6 +748,7 @@ byte CncArduinoController::acceptInteractiveMove(byte) {
     if ( ArdoTs::timespan(interactiveMove.tsLast) > maxMicrosWithoutUpdate ) {
       interactiveMove.reset();
       ret = RET_HALT;
+      ARDO_DEBUG_MESSAGE('D', wxString::Format("ArdoTs::timespan(interactiveMove.tsLast) > %ld", (int32_t)maxMicrosWithoutUpdate))
       break;
     }
   }
@@ -911,6 +912,8 @@ bool CncArduinoController::processSignalUpdate(byte& retValue) {
       }
 
       #warning do something with ds && df
+
+      changeInteractiveFactor(df);
 
       // init the movment update
       // As Int8 to resolve also negative values

@@ -47,6 +47,19 @@ CncStepSensitivity cnc::getStepSensitivityOfIndex(unsigned int index) {
 	return stepSensitivity;
 }
 //////////////////////////////////////////////////////////////
+int cnc::getSpeedStepSensitivityIndex(CncStepSensitivity s) {
+//////////////////////////////////////////////////////////////
+	switch ( s ) {
+		case FINEST:	return 0;
+		case FINE:		return 1;
+		case MEDIUM:	return 2;
+		case ROUGH:		return 3;
+		case ROUGHEST:	return 4;
+	}
+	
+	return 0;
+}
+//////////////////////////////////////////////////////////////
 float cnc::getSpeedValue(CncStepSensitivity s) {
 //////////////////////////////////////////////////////////////
 	double newSpeed = 1.0;

@@ -593,18 +593,21 @@ CncUsbConnectionDetectedBase::CncUsbConnectionDetectedBase(wxWindow* parent, wxW
 
     this->SetFocus();
     
-    wxFlexGridSizer* flexGridSizer5915 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer5915 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer5915->SetFlexibleDirection( wxBOTH );
     flexGridSizer5915->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5915->AddGrowableCol(0);
-    flexGridSizer5915->AddGrowableRow(1);
+    flexGridSizer5915->AddGrowableRow(0);
+    flexGridSizer5915->AddGrowableRow(2);
     this->SetSizer(flexGridSizer5915);
     
     wxFlexGridSizer* flexGridSizer5917 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer5917->SetFlexibleDirection( wxBOTH );
     flexGridSizer5917->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5917->AddGrowableCol(1);
+    flexGridSizer5917->AddGrowableRow(0);
     
-    flexGridSizer5915->Add(flexGridSizer5917, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5915->Add(flexGridSizer5917, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticBitmap5919 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("24-help@2x")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
     
@@ -614,29 +617,31 @@ CncUsbConnectionDetectedBase::CncUsbConnectionDetectedBase(wxWindow* parent, wxW
     flexGridSizer5930->SetFlexibleDirection( wxBOTH );
     flexGridSizer5930->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5930->AddGrowableCol(0);
+    flexGridSizer5930->AddGrowableRow(0);
     flexGridSizer5930->AddGrowableRow(1);
     
     flexGridSizer5917->Add(flexGridSizer5930, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_staticText5921 = new wxStaticText(this, wxID_ANY, _("Should a connection established to port:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     
-    flexGridSizer5930->Add(m_staticText5921, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5930->Add(m_staticText5921, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_portName = new wxStaticText(this, wxID_ANY, _("PORT"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     m_portName->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
     wxFont m_portNameFont(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_portName->SetFont(m_portNameFont);
     
-    flexGridSizer5930->Add(m_portName, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer5930->Add(m_portName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticLine262 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5915->Add(m_staticLine262, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     wxFlexGridSizer* flexGridSizer5923 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer5923->SetFlexibleDirection( wxBOTH );
     flexGridSizer5923->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5923->AddGrowableCol(0);
-    flexGridSizer5923->AddGrowableCol(1);
-    flexGridSizer5923->AddGrowableRow(0);
     
-    flexGridSizer5915->Add(flexGridSizer5923, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    flexGridSizer5915->Add(flexGridSizer5923, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_BOTTOM, WXC_FROM_DIP(0));
     
     m_ignore = new wxButton(this, wxID_ANY, _("Ignore"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -644,7 +649,7 @@ CncUsbConnectionDetectedBase::CncUsbConnectionDetectedBase(wxWindow* parent, wxW
     m_ignore->SetBitmapMargins(2,2);
     #endif
     
-    flexGridSizer5923->Add(m_ignore, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    flexGridSizer5923->Add(m_ignore, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     m_ignore->SetMinSize(wxSize(120,-1));
     
     m_connect = new wxButton(this, wxID_ANY, _("Connect"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
@@ -656,11 +661,11 @@ CncUsbConnectionDetectedBase::CncUsbConnectionDetectedBase(wxWindow* parent, wxW
     wxFont m_connectFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_connect->SetFont(m_connectFont);
     
-    flexGridSizer5923->Add(m_connect, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    flexGridSizer5923->Add(m_connect, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     m_connect->SetMinSize(wxSize(120,-1));
     
     SetName(wxT("CncUsbConnectionDetectedBase"));
-    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
+    SetSize(wxDLG_UNIT(this, wxSize(400,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

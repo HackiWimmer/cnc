@@ -40,6 +40,8 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		CncReferenceEvaluation(wxWindow* parent);
 		virtual ~CncReferenceEvaluation();
 		
+		bool					isReferenceStateValid()	const	{ return valid; }
+		
 		const RefPosResult& 	getResult(RefPosResult&)const;
 		
 		CncRefPositionMode		getReferenceMode()		const;
@@ -56,8 +58,11 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		void					updatePreview();
 		void					resetTempSetting();
 		
+		void					setEnforceFlag(bool s);
 		void					setSetButton(wxButton* bt)    { setButton    = bt; }
 		void					setCancelButton(wxButton* bt) { cancelButton = bt; }
+		
+		void					setMessage(const wxString& msg);
 		
 	protected:
 
@@ -99,6 +104,8 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		static const int		SEL_BY_EYE		= 2;
 		
 		wxImage					imgTouchCorner[5];
+		
+		bool					valid;
 		
 		CallbackInterface*		caller;
 		CncVideoCapturePanel*	cameraCapture;

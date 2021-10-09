@@ -12,12 +12,14 @@
 #include "CncAutoProgressDialog.h"
 #include "CncSecureNumpadDialog.h"
 #include "CncReferenceEvaluation.h"
+#include "wxCrafterImages.h"
 
 ///////////////////////////////////////////////////////////////////
 CncReferenceEvaluation::CncReferenceEvaluation(wxWindow* parent)
 : CncReferenceEvaluationBase				(parent)
 , CncTouchBlockDetector::CallbackInterface	()
 , CncVideoCapturePanel::CallbackInterface	()
+, valid										(false)
 , caller									(NULL)
 , cameraCapture								(NULL)
 , extCameraPreview							(new CncExternalViewBox(this))
@@ -36,6 +38,8 @@ CncReferenceEvaluation::CncReferenceEvaluation(wxWindow* parent)
 		extCameraPreview->setupView(CncExternalViewBox::Default::VIEW1, cameraCapture, "External Camera Preview . . . ");
 	}
 	
+	// default value
+	m_notebookEvalMode->SetSelection(SEL_BY_EYE);
 	setMode(CncRefPositionMode::CncRM_Mode5);
 	selectEvaluationMode();
 	
@@ -66,6 +70,12 @@ CncReferenceEvaluation::~CncReferenceEvaluation() {
 ///////////////////////////////////////////////////////////////////
 	wxDELETE(cameraCapture);
 	wxDELETE(extCameraPreview);
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::setMessage(const wxString& msg) {
+///////////////////////////////////////////////////////////////////
+	if ( caller )
+		caller->referenceNotifyMessage(msg);
 }
 ///////////////////////////////////////////////////////////////////
 const RefPosResult& CncReferenceEvaluation::getResult(RefPosResult& result) const {
@@ -110,6 +120,8 @@ void CncReferenceEvaluation::set() {
 	
 	if ( cameraCapture != NULL ) 
 		cameraCapture->stop();
+		
+	valid = true;
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::resetTempSetting() {
@@ -632,6 +644,37 @@ void CncReferenceEvaluation::onContinuousTimer(wxTimerEvent& event) {
 void CncReferenceEvaluation::onTogglePrevTest(wxCommandEvent& event) { 
 ///////////////////////////////////////////////////////////////////
 	m_tbPrevTest->SetLabel( m_tbPrevTest->GetValue() ? "Yes" : "No");
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::setEnforceFlag(bool s) {
+///////////////////////////////////////////////////////////////////
+	valid = !s;
+	
+	const int refMode = (int)getReferenceMode();
+	
+	wxBitmap bmp(ImageLib24().Bitmap( valid ? "BMP_TRAFFIC_LIGHT_GREEN" : "BMP_TRAFFIC_LIGHT_RED")); 
+	const wxString mod(wxString::Format("Reference position mode: %s [%d]", cnc::getReferenceModeAsString(getReferenceMode()), ( valid ? refMode : -1 ) ));
+	const wxString tip(wxString::Format("Reference position state: %s\n%s", ( valid ? "Valid" : "Invalid" ), mod));
+	
+	// display ref pos mode too
+	if ( valid == true ) {
+		const wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+		wxMemoryDC mdc(bmp);
+		mdc.SetFont(font);
+		mdc.SetTextForeground(wxColor(0, 0, 0));
+		mdc.DrawText(wxString::Format("%d", refMode), {5, 1});
+		bmp = mdc.GetAsBitmap();
+	}
+	
+	THE_APP->GetRefPosState()->SetToolTip(tip);
+	THE_APP->GetRefPosState()->SetBitmap(bmp);
+	THE_APP->GetStatusBar()->Refresh();
+	THE_APP->GetStatusBar()->Update();
+	
+	wxRichToolTip rTip("Reference Position Information", tip);
+	rTip.SetIcon(wxICON_INFORMATION);
+	//rTip.SetTipKind(wxTipKind_TopLeft);
+	rTip.ShowFor(THE_APP->GetRefPosState());
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::touch(wxWindow* btn, CncTouchBlockDetector::Parameters::TouchMode tm) {

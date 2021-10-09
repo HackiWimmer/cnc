@@ -73,13 +73,19 @@
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
   <object class="wxBitmap" name="CncAnchors">bitmaps\CncAnchors.png</object>
+  <object class="wxBitmap" name="CncBoundbox">bitmaps\CncBoundbox.png</object>
   <object class="wxBitmap" name="CncDebug">bitmaps\RunCtrl\CncDebug.png</object>
   <object class="wxBitmap" name="CncFolder">bitmaps\CncFolder.png</object>
+  <object class="wxBitmap" name="CncGuidePath">bitmaps\CncGuidePath.png</object>
+  <object class="wxBitmap" name="CncHardwareBox">bitmaps\CncHardwareBox.png</object>
   <object class="wxBitmap" name="CncMonitor">bitmaps\CncMonitor.png</object>
+  <object class="wxBitmap" name="CncPath">bitmaps\CncPath.png</object>
   <object class="wxBitmap" name="CncPause">bitmaps\CncPause.png</object>
   <object class="wxBitmap" name="CncPort">bitmaps\CncPort.png</object>
+  <object class="wxBitmap" name="CncPosition">bitmaps\CncPosition.png</object>
   <object class="wxBitmap" name="CncPreviewLeft">bitmaps\CncPreviewLeft.png</object>
   <object class="wxBitmap" name="CncPreviewRight">bitmaps\CncPreviewRight.png</object>
+  <object class="wxBitmap" name="CncRuler">bitmaps\CncRuler.png</object>
   <object class="wxBitmap" name="CncRun">bitmaps\CncRun.png</object>
   <object class="wxBitmap" name="CncSettings">bitmaps\CncSettings.png</object>
   <object class="wxBitmap" name="CncStop">bitmaps\CncStop.png</object>
@@ -122,6 +128,7 @@
   <object class="wxBitmap" name="clear">bitmaps\clear.png</object>
   <object class="wxBitmap" name="close">bitmaps\close.png</object>
   <object class="wxBitmap" name="code-context">bitmaps\code-context.png</object>
+  <object class="wxBitmap" name="cutter">bitmaps\cutter.png</object>
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
   <object class="wxBitmap" name="database-error">bitmaps\database-error.png</object>
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
@@ -190,6 +197,7 @@
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>
   <object class="wxBitmap" name="view-file-columns">bitmaps\view-file-columns.png</object>
+  <object class="wxBitmap" name="view-grid">bitmaps\view-grid.png</object>
   <object class="wxBitmap" name="view-list-text">bitmaps\view-list-text.png</object>
   <object class="wxBitmap" name="view-process-all">bitmaps\view-process-all.png</object>
   <object class="wxBitmap" name="view-process-system">bitmaps\view-process-system.png</object>

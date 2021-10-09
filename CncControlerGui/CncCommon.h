@@ -134,6 +134,7 @@ namespace cnc {
 	CncSpeedMode				getCncSpeedType(char m);
 	float						getSpeedValue(CncStepSensitivity s);
 	float						getSpeedValue(float amplitude);
+	int							getSpeedStepSensitivityIndex(CncStepSensitivity s);
 	int							getSpeedStepSensitivityIndex(float amplitude);
 	const std::vector<float>&	getSpeedStepSensitivityFactors(std::vector<float>& ret);
 	bool						isCncSpeedType(char m);

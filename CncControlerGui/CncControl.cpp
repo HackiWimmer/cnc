@@ -863,8 +863,6 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 		const int32_t val = configuredFeedSpeed_MM_MIN * FLT_FACT / 60;
 		const char mode   = cnc::getCncSpeedTypeAsCharacter(configuredSpeedMode);
 		
-		CNC_PRINT_FUNCT_A(" %d", val);
-		
 		if ( processSetter(PID_SPEED_MM_SEC, ArdoObj::SpeedTuple::encode(mode, val)) == false ) {
 			std::cerr << CNC_LOG_FUNCT << " processSetter(PID_SPEED_MM_SEC) failed" << std::endl;
 			return false;

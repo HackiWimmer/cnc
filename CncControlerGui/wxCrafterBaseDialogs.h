@@ -181,6 +181,7 @@ protected:
     wxStaticBitmap* m_staticBitmap5919;
     wxStaticText* m_staticText5921;
     wxStaticText* m_portName;
+    wxStaticLine* m_staticLine262;
     wxButton* m_ignore;
     wxButton* m_connect;
 
@@ -193,9 +194,10 @@ public:
     wxStaticBitmap* GetStaticBitmap5919() { return m_staticBitmap5919; }
     wxStaticText* GetStaticText5921() { return m_staticText5921; }
     wxStaticText* GetPortName() { return m_portName; }
+    wxStaticLine* GetStaticLine262() { return m_staticLine262; }
     wxButton* GetIgnore() { return m_ignore; }
     wxButton* GetConnect() { return m_connect; }
-    CncUsbConnectionDetectedBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("New controller connection is available . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
+    CncUsbConnectionDetectedBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("New controller connection is available . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncUsbConnectionDetectedBase();
 };
 

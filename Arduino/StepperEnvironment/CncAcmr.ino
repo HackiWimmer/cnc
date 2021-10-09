@@ -95,6 +95,7 @@ ArduinoAccelManager::ArduinoAccelManager()
 , active                  (false)
 , curState                (P_UNDEF)
 , curType                 (T_MODEL_DRIVEN)
+, interactiveFactor       (1)
 , curSpeedDelay           (0)
 , curImplIdx              (0)
 , curImplCnt              (0)
@@ -268,6 +269,11 @@ uint32_t ArduinoAccelManager::initNextImpulse(AxisSignatureIndex axisSignatureId
     case P_ACCEL: 
     {
       ret = cnvSpeedToDelay( fA.fctValue1000(curImplIdx) );
+
+#warning
+if (curType == T_INTERACTIVE )
+  ret /= (interactiveFactor / 2.0);
+      
       curImplIdx++;
       
       // state machine handling
@@ -290,6 +296,9 @@ uint32_t ArduinoAccelManager::initNextImpulse(AxisSignatureIndex axisSignatureId
       ret = cfgSpeedDelay;
       curImplIdx++;
       
+if (curType == T_INTERACTIVE )
+   ret /= (interactiveFactor / 2.0);
+        
       // state machine handling
       // interactive moves stay in mode P_TARGET until they stops
       if ( curType == T_MODEL_DRIVEN ) {

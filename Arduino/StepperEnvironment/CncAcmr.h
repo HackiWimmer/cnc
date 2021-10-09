@@ -150,6 +150,7 @@ class ArduinoAccelManager {
     
     State       curState;
     Type        curType;
+    short       interactiveFactor;
     uint32_t    curSpeedDelay;
     uint32_t    curImplIdx;
     uint32_t    curImplCnt;
@@ -182,6 +183,11 @@ class ArduinoAccelManager {
     bool        initMove        (uint32_t mD_IMPL);
     bool        initMove        (uint32_t mD_IMPL, uint32_t mF1000_MMSec);
     uint32_t    initNextImpulse (AxisSignatureIndex axisSignatureIdx);
+
+    void        changeInteractiveFactor(short factor) {
+      if ( factor != 0 )
+        interactiveFactor = factor;
+    }
 
     void        activate(bool s)                          { active = s; }
     bool        isAccelInitialized()                const { return initialized; }

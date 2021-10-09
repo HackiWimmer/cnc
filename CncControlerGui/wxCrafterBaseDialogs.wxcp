@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 260,
+  "m_objCounter": 262,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC3105InitBitmapResources",
   "m_bitmapsFile": "wxCrafterBaseDialogs_bitmaps.cpp",
@@ -4564,7 +4564,7 @@
    "m_properties": [{
      "type": "string",
      "m_label": "Size:",
-     "m_value": "500,300"
+     "m_value": "400,-1"
     }, {
      "type": "string",
      "m_label": "Minimum Size:",
@@ -4698,7 +4698,7 @@
       }, {
        "type": "string",
        "m_label": "# Rows:",
-       "m_value": "2"
+       "m_value": "3"
       }, {
        "type": "string",
        "m_label": "Growable columns:",
@@ -4706,7 +4706,7 @@
       }, {
        "type": "string",
        "m_label": "Growable rows:",
-       "m_value": "1"
+       "m_value": "0,2"
       }, {
        "type": "string",
        "m_label": "Horizontal gap:",
@@ -4720,7 +4720,7 @@
      "m_children": [{
        "m_type": 4403,
        "proportion": 1,
-       "border": 5,
+       "border": 0,
        "gbSpan": "1,1",
        "gbPosition": "0,0",
        "m_styles": [],
@@ -4748,11 +4748,11 @@
         }, {
          "type": "string",
          "m_label": "Growable columns:",
-         "m_value": ""
+         "m_value": "1"
         }, {
          "type": "string",
          "m_label": "Growable rows:",
-         "m_value": ""
+         "m_value": "0"
         }, {
          "type": "string",
          "m_label": "Horizontal gap:",
@@ -4869,7 +4869,7 @@
           }, {
            "type": "string",
            "m_label": "Growable rows:",
-           "m_value": "1"
+           "m_value": "0,1"
           }, {
            "type": "string",
            "m_label": "Horizontal gap:",
@@ -4883,7 +4883,7 @@
          "m_children": [{
            "m_type": 4405,
            "proportion": 0,
-           "border": 5,
+           "border": 1,
            "gbSpan": "1,1",
            "gbPosition": "0,0",
            "m_styles": [],
@@ -4947,7 +4947,7 @@
             }, {
              "type": "multi-string",
              "m_label": "Label:",
-             "m_value": "Should a connection established to port: "
+             "m_value": "Should a connection established to port:"
             }, {
              "type": "string",
              "m_label": "Wrap:",
@@ -4958,11 +4958,11 @@
           }, {
            "m_type": 4405,
            "proportion": 0,
-           "border": 5,
+           "border": 1,
            "gbSpan": "1,1",
            "gbPosition": "0,0",
            "m_styles": [],
-           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_RIGHT"],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
            "m_properties": [{
              "type": "winid",
              "m_label": "ID:",
@@ -5033,13 +5033,80 @@
           }]
         }]
       }, {
-       "m_type": 4403,
-       "proportion": 1,
+       "m_type": 4418,
+       "proportion": 0,
        "border": 5,
        "gbSpan": "1,1",
        "gbPosition": "0,0",
+       "m_styles": ["wxLI_HORIZONTAL"],
+       "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+       "m_properties": [{
+         "type": "winid",
+         "m_label": "ID:",
+         "m_winid": "wxID_ANY"
+        }, {
+         "type": "string",
+         "m_label": "Size:",
+         "m_value": "-1,-1"
+        }, {
+         "type": "string",
+         "m_label": "Minimum Size:",
+         "m_value": "-1,-1"
+        }, {
+         "type": "string",
+         "m_label": "Name:",
+         "m_value": "m_staticLine262"
+        }, {
+         "type": "multi-string",
+         "m_label": "Tooltip:",
+         "m_value": ""
+        }, {
+         "type": "colour",
+         "m_label": "Bg Colour:",
+         "colour": "<Default>"
+        }, {
+         "type": "colour",
+         "m_label": "Fg Colour:",
+         "colour": "<Default>"
+        }, {
+         "type": "font",
+         "m_label": "Font:",
+         "m_value": ""
+        }, {
+         "type": "bool",
+         "m_label": "Hidden",
+         "m_value": false
+        }, {
+         "type": "bool",
+         "m_label": "Disabled",
+         "m_value": false
+        }, {
+         "type": "bool",
+         "m_label": "Focused",
+         "m_value": false
+        }, {
+         "type": "string",
+         "m_label": "Class Name:",
+         "m_value": ""
+        }, {
+         "type": "string",
+         "m_label": "Include File:",
+         "m_value": ""
+        }, {
+         "type": "string",
+         "m_label": "Style:",
+         "m_value": ""
+        }],
+       "m_events": [],
+       "m_children": []
+      }, {
+       "m_type": 4403,
+       "proportion": 1,
+       "border": 0,
+       "gbSpan": "1,1",
+       "gbPosition": "0,0",
        "m_styles": [],
-       "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL"],
+       "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER_HORIZONTAL", "wxALIGN_BOTTOM"],
        "m_properties": [{
          "type": "string",
          "m_label": "Minimum Size:",
@@ -5063,11 +5130,11 @@
         }, {
          "type": "string",
          "m_label": "Growable columns:",
-         "m_value": "0,1"
+         "m_value": ""
         }, {
          "type": "string",
          "m_label": "Growable rows:",
-         "m_value": "0"
+         "m_value": ""
         }, {
          "type": "string",
          "m_label": "Horizontal gap:",
@@ -5085,7 +5152,7 @@
          "gbSpan": "1,1",
          "gbPosition": "0,0",
          "m_styles": [],
-         "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER_HORIZONTAL"],
+         "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
          "m_properties": [{
            "type": "winid",
            "m_label": "ID:",
@@ -5180,7 +5247,7 @@
          "gbSpan": "1,1",
          "gbPosition": "0,0",
          "m_styles": [],
-         "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER_HORIZONTAL"],
+         "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
          "m_properties": [{
            "type": "winid",
            "m_label": "ID:",

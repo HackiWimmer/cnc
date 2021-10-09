@@ -31,20 +31,36 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		void showFromPerspective3();
 		void showFromPerspective4();
 		
+		void toggleOptionPane();
+		void toggleHardwareBox();
+		void toggleBoundBox();
+		void toggleFlyPathes();
+		void toggleGuidePathes();
+		void toggleHelpLines();
+		void toggleOrigin();
+		void togglePosMarker();
+		void toggleRuler();
+		void toggleMillingCutter();
+		
+		void resetView();
+		void clearMonitor();
+		void refreshMonitor();
+		
 	protected:
-		virtual void onResetView(wxCommandEvent& event);
-		virtual void onShowMillingCutter(wxCommandEvent& event);
-		virtual void onToggleHardwareBox(wxCommandEvent& event);
-		virtual void onClearMonitor(wxCommandEvent& event);
-		virtual void onRefreshMonitor(wxCommandEvent& event);
-		virtual void onToggleGuidePathes(wxCommandEvent& event);
-		virtual void onToggleBoundBox(wxCommandEvent& event);
-		virtual void onToggleFlyPathes(wxCommandEvent& event);
-		virtual void onToggleHelpLines(wxCommandEvent& event);
-		virtual void onToggleOrigin(wxCommandEvent& event);
-		virtual void onTogglePosMarker(wxCommandEvent& event);
-		virtual void onToggleRuler(wxCommandEvent& event);
-		virtual void onToggleOptionPane(wxCommandEvent& event);
+		
+		virtual void onResetView(wxCommandEvent& event)				{ resetView();            }
+		virtual void onShowMillingCutter(wxCommandEvent& event)		{ toggleMillingCutter();  }
+		virtual void onToggleHardwareBox(wxCommandEvent& event)		{ toggleHardwareBox();    }
+		virtual void onClearMonitor(wxCommandEvent& event)			{ clearMonitor();         }
+		virtual void onRefreshMonitor(wxCommandEvent& event)		{ refreshMonitor();       }
+		virtual void onToggleGuidePathes(wxCommandEvent& event)		{ toggleGuidePathes();    }
+		virtual void onToggleBoundBox(wxCommandEvent& event)		{ toggleBoundBox();       }
+		virtual void onToggleFlyPathes(wxCommandEvent& event)		{ toggleFlyPathes();      }
+		virtual void onToggleHelpLines(wxCommandEvent& event)		{ toggleHelpLines();      }
+		virtual void onToggleOrigin(wxCommandEvent& event)			{ toggleOrigin();         }
+		virtual void onTogglePosMarker(wxCommandEvent& event)		{ togglePosMarker();      }
+		virtual void onToggleRuler(wxCommandEvent& event)			{ toggleRuler();          }
+		virtual void onToggleOptionPane(wxCommandEvent& event)		{ toggleOptionPane();     }
 		virtual void onShowFromTop(wxCommandEvent& event)			{ showFromTop();          }
 		virtual void onShowFromBottom(wxCommandEvent& event)		{ showFromBottom();       }
 		virtual void onShowFromFront(wxCommandEvent& event)			{ showFromFront();        }
