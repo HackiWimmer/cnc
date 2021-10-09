@@ -8,13 +8,13 @@
 ///////////////////////////////////////////////////////////////////
 CncPodestMgmtMovement::CncPodestMgmtMovement(wxWindow* parent)
 : CncPodestMgmtMovementBase					(parent)
-, CncSecureScrollButton::CallbackInterface	()
+, CncSecureGesturesPanel::CallbackInterface	()
 , direction									(CncNoneDir)
 , interactiveMove							(NULL)
 , caller									(NULL)
 ///////////////////////////////////////////////////////////////////
 {
-	interactiveMove = new CncSecureScrollButton(this, wxVERTICAL,CncSecureScrollButton::Mode::M_BOTH, 1, wxSize(-1,200));
+	interactiveMove = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 3);
 	GblFunc::replaceControl(m_intactiveMovePlaceholder, interactiveMove);
 	interactiveMove->setCallbackInterface(this);
 	interactiveMove->SetBackgroundColour(*wxYELLOW);
@@ -31,16 +31,26 @@ CncPodestMgmtMovement::~CncPodestMgmtMovement() {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::notifyValueChange(const CncSecureScrollButton::CBI::Data& d) {
+void CncPodestMgmtMovement::notifyStarting(const CncSecureGesturesPanel::State s) {
 ///////////////////////////////////////////////////////////////////
-	// interactiveMove callback
+	// nothing to do
+}
+///////////////////////////////////////////////////////////////////
+void CncPodestMgmtMovement::notifyPositionChanged(const CncSecureGesturesPanel::Data& d) {
+///////////////////////////////////////////////////////////////////
+	// interactive move callback
 	const CncLinearDirection prevDirection = direction;
 	
-	if ( d.currValue == 0 )	direction = CncNoneDir;
-	else					direction = d.currValue < 0 ? CncNegDir : CncPosDir;
+	if ( d.range == 0 )	direction = CncNoneDir;
+	else				direction = d.range < 0 ? CncNegDir : CncPosDir;
 	
-	if ( prevDirection != direction )
-		process();
+	if      ( direction == CncNoneDir    )	process();
+	else if ( direction != prevDirection )	process();
+}
+///////////////////////////////////////////////////////////////////
+void CncPodestMgmtMovement::notifyPositionHeld(const CncSecureGesturesPanel::Data& d) {
+///////////////////////////////////////////////////////////////////
+	// nothing to do
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodestMgmtMovement::enable(bool state) {

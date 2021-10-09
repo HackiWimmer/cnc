@@ -50,9 +50,6 @@ CncSecureScrollButton::CncSecureScrollButton(wxWindow* parent, wxOrientation ori
 	if (GetSizer())
 		 GetSizer()->Fit(this);
 		 
-		#warning
-	EnableTouchEvents(wxTOUCH_ALL_GESTURES);
-		 
 	// Connect events
 	scrollbar->Connect(wxEVT_SCROLL_CHANGED,			wxScrollEventHandler(CncSecureScrollButton::onChangedValue), NULL, this);
 	scrollbar->Connect(wxEVT_SCROLL_THUMBRELEASE,		wxScrollEventHandler(CncSecureScrollButton::onThumbrelease), NULL, this);

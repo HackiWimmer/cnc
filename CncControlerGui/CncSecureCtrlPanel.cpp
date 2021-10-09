@@ -328,10 +328,6 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	speedpad->GetInfoText()->SetForegroundColour(*wxWHITE);
 	*/
 	
-	m_leftBook->SetSelection(0);
-	m_rightBook->SetSelection(0);
-	performRightHeadline();
-	
 	THE_APP->GetSecureVersionInfo()->SetLabel(CNC_VERSION_STR);
 }
 /////////////////////////////////////////////////////////////////////
@@ -565,6 +561,11 @@ void CncSecureCtrlPanel::onStackTraceStoreSec(wxCommandEvent& event) {
 	THE_APP->showStacktraceStore(event);
 }
 /////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::requestResolveLimitStates(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->requestResolveLimitStates(event);
+}
+/////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::referenceNotifyMessage(const wxString& msg, int flags) {
 //////////// /////////////////////////////////////////////////////////
 	wxString m(msg);
@@ -649,7 +650,11 @@ void CncSecureCtrlPanel::activate(bool b) {
 			tryToProvideTemplate();
 		}
 		
-		
+		const int sel = PAGE_CONNECT;
+		m_leftBook->SetSelection(sel);
+		m_rightBook->SetSelection(sel);
+		THE_APP->GetSecureSplitterMainV()->SetSashPosition(pageVector.at(sel).width);
+		performRightHeadline();
 	}
 	else {
 

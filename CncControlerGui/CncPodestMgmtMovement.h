@@ -2,11 +2,11 @@
 #define CNCPODESTMGMTMOVEMENT_H
 
 #include "CncCommon.h"
-#include "CncSecureScrollButton.h"
+#include "CncSecureGesturesPanel.h"
 #include "wxCrafterPodestManagement.h"
 
 class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
-							, public CncSecureScrollButton::CallbackInterface
+							, public CncSecureGesturesPanel::CallbackInterface
 {
 	public:
 		
@@ -30,16 +30,19 @@ class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
 		void setCallbackInterface(CallbackInterface* inf) { caller = inf; }
 		
 	protected:
+	
 		virtual void onLeftDownDistance(wxMouseEvent& event);
 		virtual void onPodestRelativeDown(wxCommandEvent& event);
 		virtual void onPodestRelativeUp(wxCommandEvent& event);
 		
-		virtual void notifyValueChange(const CncSecureScrollButton::CBI::Data& d);
+		virtual void notifyStarting(const CncSecureGesturesPanel::State s);
+		virtual void notifyPositionChanged(const CncSecureGesturesPanel::Data& d);
+		virtual void notifyPositionHeld(const CncSecureGesturesPanel::Data& d);
 		
 	private:
-		CncLinearDirection		direction;
-		CncSecureScrollButton*	interactiveMove;
-		CallbackInterface*		caller;
+		CncLinearDirection			direction;
+		CncSecureGesturesPanel*		interactiveMove;
+		CallbackInterface*			caller;
 		
 		void reset();
 		void process();

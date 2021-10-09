@@ -317,7 +317,7 @@ void CncSecureGesturesPanel::recalculate() {
 		
 		
 		
-		
+		#warning
 	}
 	
 	Refresh();
@@ -522,6 +522,8 @@ void CncSecureGesturesPanel::onPaint(wxPaintEvent& WXUNUSED(event)) {
 	//-----------------------------------------------------------------
 	// label
 	const wxFont font(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+	dc.SetFont(font);
+	
 	wxRect rangeRect = innerRect;
 	wxRect ratioRect = innerRect;
 	int rangeAlign   = 0;
@@ -546,10 +548,12 @@ void CncSecureGesturesPanel::onPaint(wxPaintEvent& WXUNUSED(event)) {
 		case wxBOTH:
 			rangeAlign =  wxALIGN_TOP | wxALIGN_LEFT;
 			ratioAlign =  wxALIGN_TOP | wxALIGN_RIGHT;
+			
+			dc.DrawLabel(wxString::Format("(%+4d|%+4d)",	lastData.xVal, lastData.yVal),	innerRect, wxALIGN_BOTTOM | wxALIGN_LEFT);
+			dc.DrawLabel(wxString::Format("%+.0lf Degree ",	lastData.angle),				innerRect, wxALIGN_BOTTOM | wxALIGN_RIGHT);
 			break;
 	}
 	
-	dc.SetFont(font);
 	dc.DrawLabel(wxString::Format("%+2d",		lastData.range),		rangeRect, rangeAlign);
 	dc.DrawLabel(wxString::Format("%+.0lf%",	lastData.ratio * 100 ), ratioRect, ratioAlign);
 	

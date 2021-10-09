@@ -196,7 +196,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer593->Add(m_staticLine446, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_btHardwareRefSec = new wxButton(m_rpConnect, wxID_ANY, _("Evaluate\nHardware\nReference"), wxDefaultPosition, wxDLG_UNIT(m_rpConnect, wxSize(-1,-1)), 0);
+    m_btHardwareRefSec = new wxButton(m_rpConnect, wxID_ANY, _("Evaluate\nHardware Reference"), wxDefaultPosition, wxDLG_UNIT(m_rpConnect, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btHardwareRefSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("RefDim")), wxLEFT);
     m_btHardwareRefSec->SetBitmapMargins(2,2);
@@ -209,12 +209,17 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rpLoad = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_rightBook->AddPage(m_rpLoad, _("Page"), false);
     
-    wxFlexGridSizer* flexGridSizer97 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer97 = new wxFlexGridSizer(5, 1, 0, 0);
     flexGridSizer97->SetFlexibleDirection( wxBOTH );
     flexGridSizer97->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer97->AddGrowableCol(0);
-    flexGridSizer97->AddGrowableRow(1);
+    flexGridSizer97->AddGrowableRow(2);
     m_rpLoad->SetSizer(flexGridSizer97);
+    
+    m_staticText711 = new wxStaticText(m_rpLoad, wxID_ANY, _("Select a Template"), wxDefaultPosition, wxDLG_UNIT(m_rpLoad, wxSize(-1,-1)), 0);
+    m_staticText711->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    
+    flexGridSizer97->Add(m_staticText711, 0, wxALL, WXC_FROM_DIP(5));
     
     m_transferDirPlaceholder = new wxPanel(m_rpLoad, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rpLoad, wxSize(-1,160)), wxTAB_TRAVERSAL);
     m_transferDirPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
@@ -553,7 +558,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_btnEmergenyStopSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("emergengy_red_yellow")), wxLEFT);
     m_btnEmergenyStopSec->SetBitmapMargins(2,2);
     #endif
-    m_btnEmergenyStopSec->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_btnEmergenyStopSec->SetBackgroundColour(wxColour(wxT("rgb(255,128,128)")));
     wxFont m_btnEmergenyStopSecFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_btnEmergenyStopSec->SetFont(m_btnEmergenyStopSecFont);
     
@@ -562,10 +567,22 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rpCtrl = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_rightBook->AddPage(m_rpCtrl, _("Page"), false);
     
-    wxFlexGridSizer* flexGridSizer560 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer560 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer560->SetFlexibleDirection( wxBOTH );
     flexGridSizer560->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer560->AddGrowableCol(0);
     m_rpCtrl->SetSizer(flexGridSizer560);
+    
+    m_resolveLimit = new wxButton(m_rpCtrl, wxID_ANY, _("Resolve Limit-\nSwitch Situation"), wxDefaultPosition, wxDLG_UNIT(m_rpCtrl, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_resolveLimit->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-warning")), wxLEFT);
+    m_resolveLimit->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_resolveLimitFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_resolveLimit->SetFont(m_resolveLimitFont);
+    
+    flexGridSizer560->Add(m_resolveLimit, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_resolveLimit->SetMinSize(wxSize(-1,80));
     
     m_rpPodest = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_rightBook->AddPage(m_rpPodest, _("Page"), false);
@@ -659,6 +676,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rcPauseSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onPauseSec), NULL, this);
     m_rcStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
     m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
+    m_resolveLimit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::requestResolveLimitStates), NULL, this);
     m_btSessionDir->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSessionDirSec), NULL, this);
     m_btTestFunct->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunctionSec), NULL, this);
     m_btStackTrace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStackTraceStoreSec), NULL, this);
@@ -679,6 +697,7 @@ CncSecureCtrlPanelBase::~CncSecureCtrlPanelBase()
     m_rcPauseSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onPauseSec), NULL, this);
     m_rcStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
     m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
+    m_resolveLimit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::requestResolveLimitStates), NULL, this);
     m_btSessionDir->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSessionDirSec), NULL, this);
     m_btTestFunct->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunctionSec), NULL, this);
     m_btStackTrace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStackTraceStoreSec), NULL, this);

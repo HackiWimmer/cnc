@@ -24,6 +24,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 			PAGE_REF,
 			PAGE_MOVE,
 			PAGE_RUN,
+			PAGE_CONTROLLER,
 			PAGE_PODEST,
 			PAGE_MISC
 		};
@@ -43,6 +44,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		CncReferenceEvaluation* getReferencePanel() const { return referencePanel; }
 		
 	protected:
+		virtual void requestResolveLimitStates(wxCommandEvent& event);
 		virtual void onToggleTouchpadPane(wxCommandEvent& event);
 		virtual void onReferenceSet(wxCommandEvent& event);
 		virtual void onStackTraceStoreSec(wxCommandEvent& event);

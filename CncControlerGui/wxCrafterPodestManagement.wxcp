@@ -1075,7 +1075,7 @@
       }, {
        "type": "string",
        "m_label": "Growable rows:",
-       "m_value": "0,2"
+       "m_value": "0"
       }, {
        "type": "string",
        "m_label": "Horizontal gap:",
@@ -1436,7 +1436,7 @@
         }, {
          "type": "string",
          "m_label": "Growable rows:",
-         "m_value": "2,3"
+         "m_value": ""
         }, {
          "type": "string",
          "m_label": "Horizontal gap:",
@@ -1745,11 +1745,11 @@
             }, {
              "type": "string",
              "m_label": "Size:",
-             "m_value": "64,-1"
+             "m_value": "-1,-1"
             }, {
              "type": "string",
              "m_label": "Minimum Size:",
-             "m_value": "64,-1"
+             "m_value": "64,32"
             }, {
              "type": "string",
              "m_label": "Name:",
@@ -1769,7 +1769,7 @@
             }, {
              "type": "font",
              "m_label": "Font:",
-             "m_value": ""
+             "m_value": "12,normal, normal, swiss, 0, Segoe UI"
             }, {
              "type": "bool",
              "m_label": "Hidden",
@@ -1840,11 +1840,11 @@
           }, {
            "type": "string",
            "m_label": "Size:",
-           "m_value": "-1,-1"
+           "m_value": "-1,80"
           }, {
            "type": "string",
            "m_label": "Minimum Size:",
-           "m_value": "-1,-1"
+           "m_value": "-1,80"
           }, {
            "type": "string",
            "m_label": "Name:",
@@ -1856,7 +1856,7 @@
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
-           "colour": "ButtonFace"
+           "colour": "Tooltip"
           }, {
            "type": "colour",
            "m_label": "Fg Colour:",
@@ -1922,11 +1922,11 @@
           }, {
            "type": "string",
            "m_label": "Size:",
-           "m_value": "-1,-1"
+           "m_value": "-1,80"
           }, {
            "type": "string",
            "m_label": "Minimum Size:",
-           "m_value": "-1,-1"
+           "m_value": "-1,80"
           }, {
            "type": "string",
            "m_label": "Name:",
@@ -1938,7 +1938,7 @@
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
-           "colour": "ButtonFace"
+           "colour": "Tooltip"
           }, {
            "type": "colour",
            "m_label": "Fg Colour:",

@@ -132,7 +132,7 @@
       <vgap>0</vgap>
       <hgap>0</hgap>
       <growablecols>0</growablecols>
-      <growablerows>0,2</growablerows>
+      <growablerows>0</growablerows>
       <object class="sizeritem" name="flexGridSizer9543">
         <flag>wxALL|wxEXPAND</flag>
         <option>1</option>
@@ -198,7 +198,7 @@
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols>0</growablecols>
-          <growablerows>2,3</growablerows>
+          <growablerows/>
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
             <border>3</border>
@@ -261,10 +261,17 @@
               <object class="sizeritem">
                 <flag>wxALL|wxEXPAND</flag>
                 <border>4</border>
-                <minsize>64,-1</minsize>
+                <minsize>64,32</minsize>
                 <object class="wxTextCtrl" name="m_moveRelative">
                   <style>wxTE_RIGHT</style>
-                  <size>64,-1</size>
+                  <font>
+                    <size>12</size>
+                    <style>normal</style>
+                    <weight>normal</weight>
+                    <family>swiss</family>
+                    <underlined>0</underlined>
+                    <face>Segoe UI</face>
+                  </font>
                   <value>99.999</value>
                 </object>
               </object>
@@ -273,20 +280,24 @@
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
             <border>2</border>
+            <minsize>-1,80</minsize>
             <object class="wxBitmapButton" name="m_btRelativeUp">
               <bitmap>bitmaps/podestRelativeUp.png</bitmap>
+              <size>-1,80</size>
               <style>wxBU_AUTODRAW</style>
-              <bg>wxSYS_COLOUR_BTNFACE</bg>
+              <bg>wxSYS_COLOUR_INFOBK</bg>
               <default>0</default>
             </object>
           </object>
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
             <border>2</border>
+            <minsize>-1,80</minsize>
             <object class="wxBitmapButton" name="m_btRelativeDown">
               <bitmap>bitmaps/podestRelativeDown.png</bitmap>
+              <size>-1,80</size>
               <style>wxBU_AUTODRAW</style>
-              <bg>wxSYS_COLOUR_BTNFACE</bg>
+              <bg>wxSYS_COLOUR_INFOBK</bg>
               <default>0</default>
             </object>
           </object>

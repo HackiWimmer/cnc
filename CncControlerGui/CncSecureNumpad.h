@@ -46,7 +46,10 @@ class CncSecureNumpad	: public CncSecureNumpadBase
 		long	getValueAsLong();
 		double	getValueAsDouble();
 		
+		virtual bool Show(bool show = true);
+		
 	protected:
+	
 		virtual void onContextMenuResult(wxContextMenuEvent& event);
 		virtual void onTextUpdatedResult(wxCommandEvent& event);
 		virtual void onCharResult(wxKeyEvent& event);

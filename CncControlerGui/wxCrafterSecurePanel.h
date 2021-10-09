@@ -72,6 +72,7 @@ protected:
     wxStaticLine* m_staticLine446;
     wxButton* m_btHardwareRefSec;
     wxPanel* m_rpLoad;
+    wxStaticText* m_staticText711;
     wxPanel* m_transferDirPlaceholder;
     wxPanel* m_lruFilePlaceholder;
     wxButton* m_btLoadTemplate;
@@ -110,6 +111,7 @@ protected:
     wxStaticText* m_staticText90;
     wxButton* m_btnEmergenyStopSec;
     wxPanel* m_rpCtrl;
+    wxButton* m_resolveLimit;
     wxPanel* m_rpPodest;
     wxPanel* m_podestPlaceholder;
     wxPanel* m_rpMisc;
@@ -131,6 +133,7 @@ protected:
     virtual void onPauseSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStopSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onEmergencySec(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
     virtual void onSessionDirSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onTestFunctionSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStackTraceStoreSec(wxCommandEvent& event) { event.Skip(); }
@@ -158,6 +161,7 @@ public:
     wxStaticLine* GetStaticLine446() { return m_staticLine446; }
     wxButton* GetBtHardwareRefSec() { return m_btHardwareRefSec; }
     wxPanel* GetRpConnect() { return m_rpConnect; }
+    wxStaticText* GetStaticText711() { return m_staticText711; }
     wxPanel* GetTransferDirPlaceholder() { return m_transferDirPlaceholder; }
     wxPanel* GetLruFilePlaceholder() { return m_lruFilePlaceholder; }
     wxButton* GetBtLoadTemplate() { return m_btLoadTemplate; }
@@ -196,6 +200,7 @@ public:
     wxStaticText* GetStaticText90() { return m_staticText90; }
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
     wxPanel* GetRpRun() { return m_rpRun; }
+    wxButton* GetResolveLimit() { return m_resolveLimit; }
     wxPanel* GetRpCtrl() { return m_rpCtrl; }
     wxPanel* GetPodestPlaceholder() { return m_podestPlaceholder; }
     wxPanel* GetRpPodest() { return m_rpPodest; }
