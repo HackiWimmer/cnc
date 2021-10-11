@@ -270,6 +270,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncPolarRegionDetector.cpp"/>
+      <File Name="CncPolarRegionDetector.h"/>
       <File Name="CncPodestMgmtMovement.h"/>
       <File Name="CncPodestMgmtMovement.cpp"/>
       <File Name="CncReferenceEvaluation.h"/>

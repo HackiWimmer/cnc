@@ -1104,7 +1104,7 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 bool Serial::pushCommand(const unsigned char c) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
-		std::cout << "SERIAL::processUpdateInteractiveMove()::ERROR: Not connected\n";
+		std::cout << "SERIAL::pushCommand()::ERROR: Not connected\n";
 		return false;
 	}
 	
@@ -1193,7 +1193,7 @@ bool Serial::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRend
 bool Serial::processStartInteractiveMove() {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
-		std::cout << "SERIAL::processUpdateInteractiveMove()::ERROR: Not connected\n";
+		std::cout << "SERIAL::processStartInteractiveMove()::ERROR: Not connected\n";
 		return false;
 	}
 	
@@ -1211,7 +1211,7 @@ bool Serial::processStartInteractiveMove() {
 bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
-		std::cout << "SERIAL::processUpdateInteractiveMove()::ERROR: Not connected\n";
+		std::cout << "SERIAL::processUpdateInteractiveMove(x,y,z)::ERROR: Not connected\n";
 		return false;
 	}
 	
@@ -1274,7 +1274,7 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char cmdType) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
-		std::cerr << "SERIAL::processMoveXY()::ERROR: Not connected\n";
+		std::cerr << "SERIAL::processMoveInternal()::ERROR: Not connected\n";
 		return false;
 	}
 	
@@ -1335,7 +1335,7 @@ bool Serial::processMovePodest(int32_t steps, bool exact) {
 		return true;
 	
 	if ( isConnected() == false ) {
-		std::cerr << "SERIAL::processMoveXY()::ERROR: Not connected\n";
+		std::cerr << "SERIAL::processMovePodest()::ERROR: Not connected\n";
 		return false;
 	}
 	

@@ -7,8 +7,10 @@ class CncSecureGesturesPanel : public wxPanel
 {
 	private:
 		
-		static const int border					= 4;
+		static const int border					=  4;
 		static const int defaultCallbackId		= -1;
+		static const int updateTimerId			= 10;
+		static const int observerTimerId		= 20;
 		
 	public:
 		
@@ -79,7 +81,7 @@ class CncSecureGesturesPanel : public wxPanel
 		~CncSecureGesturesPanel();
 		
 		void init()										{ reset(); }
-		void update()									{ calculateDimensions(); Refresh(); }
+		void update()									{ calculateDimensions(); applyPosChange(false); }
 		
 		void setCenterBitmap(const wxBitmap& bmp)		{ centreBmp = bmp; }
 		void setType(const Type& t )					{ type = t; }
@@ -98,7 +100,7 @@ class CncSecureGesturesPanel : public wxPanel
 		void onSize(wxSizeEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onLeave(wxMouseEvent& event);
-		void onUpdateTimer(wxTimerEvent& event);
+		void onTimer(wxTimerEvent& event);
 			
 		void onPan(wxPanGestureEvent& event);
 		void onZoom(wxZoomGestureEvent& event);
@@ -115,6 +117,9 @@ class CncSecureGesturesPanel : public wxPanel
 		State				state;
 		
 		wxTimer*			updateTimer;
+		wxTimer*			observerTimer;
+		
+		wxDateTime			observerTs;
 		
 		wxOrientation		orientation;
 		Type				type;
@@ -122,8 +127,9 @@ class CncSecureGesturesPanel : public wxPanel
 		int					sensitivity;
 		
 		wxBitmap			centreBmp;
-		wxPoint				centre;
-		wxPoint				zero;
+		wxPoint				centrePt;
+		wxPoint				zeroPt;
+		wxPoint				currentPt;
 		wxRect				innerRect;
 		wxRect				leftRect;
 		wxRect				rightRect;
@@ -138,7 +144,6 @@ class CncSecureGesturesPanel : public wxPanel
 		bool				mouseDown;
 		
 		Data				lastData;
-
 		
 		wxPoint2DDouble		m_translateDistance;
 		wxAffineMatrix2D	m_affineMatrix;
@@ -146,9 +151,12 @@ class CncSecureGesturesPanel : public wxPanel
 		double				m_lastRotationAngle;
 		
 		void	reset();
+		void	applyPosChange(bool useTimer);
+		void	applyPosHeld();
+		
 		void	calculateZero();
 		void	calculateDimensions();
-		void	calculateCoordinates(int x, int y);
+		void	calculateCoordinates();
 		
 		void	startTimer();
 		void	stopTimer();

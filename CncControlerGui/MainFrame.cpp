@@ -1087,6 +1087,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_portSelector);
 	registerGuiControl(m_connect);
 	registerGuiControl(secureCtrlPanel->GetBtConnectSec());
+	registerGuiControl(secureCtrlPanel->GetBtResetSec());
 	registerGuiControl(m_btAdditionalParameters);
 	registerGuiControl(m_btResetHardwareReference);
 	registerGuiControl(m_btEvaluateHardwareReference);
@@ -2225,21 +2226,6 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 	
 		wxString portName("Undefined");
 		PDEV_BROADCAST_HDR lpdb = NULL;
-		
-		#warning
-		/*
-		if ( message == WM_GESTURE) {
-			
-			GESTUREINFO gi;  
-			ZeroMemory(&gi, sizeof(GESTUREINFO));
-			gi.cbSize = sizeof(GESTUREINFO);
-			BOOL bResult  = GetGestureInfo((HGESTUREINFO)lParam, &gi);
-		
-			HWND hwnd = wxWindow::FindFocus() ? wxWindow::FindFocus()->GetHandle() : 0;
-		
-			CNC_PRINT_FUNCT_A(" %d %d %d", hwnd, gi.hwndTarget, gi.dwID)
-		}
-		*/
 		
 		if ( message == WM_DEVICECHANGE) {
 			// logging

@@ -65,8 +65,13 @@ class GamepadEvent : public wxThreadEvent {
 			int   	stickResolutionFactor		=    1;
 			float 	leftStickX					= 0.0f;
 			float 	leftStickY					= 0.0f;
+			float	leftStickLen				= 0.0f;
 			float 	rightStickX					= 0.0f;
 			float 	rightStickY					= 0.0f;
+			float	rightStickLen				= 0.0f;
+			
+			float	minStickLen					= 0.0f;
+			float	maxStickLen					= 0.0f;
 			
 			bool isChangedLeftStickX			= false;
 			bool isChangedLeftStickY			= false;

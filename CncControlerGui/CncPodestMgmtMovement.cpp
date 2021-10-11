@@ -38,6 +38,9 @@ void CncPodestMgmtMovement::notifyStarting(const CncSecureGesturesPanel::State s
 ///////////////////////////////////////////////////////////////////
 void CncPodestMgmtMovement::notifyPositionChanged(const CncSecureGesturesPanel::Data& d) {
 ///////////////////////////////////////////////////////////////////
+	if ( IsShownOnScreen() == false )
+		return;
+		
 	// interactive move callback
 	const CncLinearDirection prevDirection = direction;
 	
@@ -74,8 +77,15 @@ void CncPodestMgmtMovement::reset() {
 void CncPodestMgmtMovement::process() {
 ///////////////////////////////////////////////////////////////////
 	CncControl* cnc = APP_PROXY::getCncControl();
-	if ( cnc == NULL ) {
+	if ( cnc == NULL ) 
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
+		return;
+	}
+	
+	if ( cnc->isConnected() == false )
+	{
+		std::cerr << CNC_LOG_FUNCT_A(": Not connected!") << std::endl;
 		return;
 	}
 	

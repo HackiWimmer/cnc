@@ -48,8 +48,8 @@
 	bool APP_PROXY::updateInteractiveMove()
 	{ return THE_APP->updateInteractiveMove(); }
 	
-	bool APP_PROXY::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z)
-	{ return THE_APP->updateInteractiveMove(x, y, z); }
+	bool APP_PROXY::updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed)
+	{ return THE_APP->updateInteractiveMove(x, y, z, modifySpeed); }
 	
 	bool APP_PROXY::stopInteractiveMove()
 	{ return THE_APP->stopInteractiveMove(); }

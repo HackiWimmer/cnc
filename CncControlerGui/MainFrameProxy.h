@@ -62,7 +62,7 @@ class MainFrameProxy {
 		static bool startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z);
 		static bool startInteractiveMove(CncInteractiveMoveDriver imd);
 		static bool updateInteractiveMove();
-		static bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		static bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed=0);
 		static bool stopInteractiveMove();
 		
 		static void releaseControllerSetupFromConfig();

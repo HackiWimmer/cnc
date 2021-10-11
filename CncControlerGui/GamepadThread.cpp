@@ -6,6 +6,7 @@
 GamepadThread::GamepadThread(MainFrame *handler)
 : wxThread(wxTHREAD_DETACHED)
 , pHandler					(handler)
+, polarDetector				()
 , exit						(false)
 , prevButtonLeftStick		(false)
 , prevButtonRightStick		(false)
@@ -224,11 +225,6 @@ void GamepadThread::evaluateNotifications(const CncGamepad& gamepad, GamepadEven
 		
 		typedef CncLinearDirection CLD;
 		
-		auto isValueInRange = [&](float value) {
-			const float threshold = (float)state.data.stickResolutionFactor / 4;
-			return (abs(value) >= abs(threshold)); 
-		};
-		
 		state.data.dx 		= CLD::CncNoneDir;
 		state.data.dy 		= CLD::CncNoneDir;
 		state.data.dz 		= CLD::CncNoneDir;
@@ -240,16 +236,17 @@ void GamepadThread::evaluateNotifications(const CncGamepad& gamepad, GamepadEven
 		
 		switch ( state.data.posCtrlMode ) {
 			case GamepadEvent::PCM_STICKS: {
-			
-				if ( isValueInRange(state.data.leftStickX) )
-					state.data.dx = state.data.leftStickX  >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
-									
-				if ( isValueInRange(state.data.leftStickY) )
-					state.data.dy = state.data.leftStickY  >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
-					
-				if ( isValueInRange(state.data.rightStickY) )
-					state.data.dz = state.data.rightStickY >= 0.0f ? CLD::CncPosDir : CLD::CncNegDir;
-					
+				polarDetector.setCoordinatesAbs(state.data.leftStickX, state.data.leftStickY);
+				state.data.dx = polarDetector.getDirectionX();
+				state.data.dy = polarDetector.getDirectionY();
+				state.data.leftStickLen = polarDetector.getLength();
+				
+				polarDetector.setCoordinatesAbs(float(0.0), state.data.rightStickY);
+				state.data.dz = polarDetector.getDirectionY();
+				state.data.rightStickLen = polarDetector.getLength();
+				
+				state.data.minStickLen = std::min(state.data.leftStickLen, state.data.rightStickLen);
+				state.data.maxStickLen = std::max(state.data.leftStickLen, state.data.rightStickLen);
 				break;
 			}
 			case GamepadEvent::PCM_NAV_XY: {

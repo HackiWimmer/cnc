@@ -367,7 +367,12 @@ void CncGamepadSpy::processInteractiveMovement(const GamepadEvent& state) {
 			}
 			else {
 				if ( currentMoveInfo.update(dx, dy, dz) == true ) {
-					const bool b = APP_PROXY::updateInteractiveMove(dx, dy, dz);
+					
+					#warning
+					CNC_PRINT_FUNCT_A(": %f, %d", state.data.minStickLen, (int)(state.data.leftStickLen / 4));
+		
+					
+					const bool b = APP_PROXY::updateInteractiveMove(dx, dy, dz, (int)(state.data.leftStickLen / 2) );
 					currentMovementState = b ? MS_RUNNING : MS_ERROR;
 					currentMoveInfo.reset();
 					

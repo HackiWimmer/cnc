@@ -420,7 +420,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer548->AddGrowableRow(1);
     m_panelITP->SetSizer(flexGridSizer548);
     
-    m_toggleButton554 = new wxToggleButton(m_panelITP, wxID_ANY, _("XY Pane"), wxDefaultPosition, wxDLG_UNIT(m_panelITP, wxSize(-1,-1)), 0);
+    m_toggleButton554 = new wxToggleButton(m_panelITP, wxID_ANY, _("XY Plane"), wxDefaultPosition, wxDLG_UNIT(m_panelITP, wxSize(-1,-1)), 0);
     wxFont m_toggleButton554Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_toggleButton554->SetFont(m_toggleButton554Font);
     m_toggleButton554->SetValue(true);

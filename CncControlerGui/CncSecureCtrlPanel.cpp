@@ -5,6 +5,7 @@
 #include "CncContext.h"
 #include "wxCrafterImages.h"
 #include "CncSecureManuallyMovePanel.h"
+#include "CncPolarRegionDetector.h"
 #include "CncSecureCtrlPanel.h"
 
 class CncSecurePortListCtrl : public CncLargeScaledListCtrl {
@@ -342,20 +343,29 @@ CncSecureCtrlPanel::~CncSecureCtrlPanel() {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::notifyStarting(const CncSecureGesturesPanel::State s) {
 /////////////////////////////////////////////////////////////////////
+	if ( THE_APP->getCncControl()->isConnected() == false )
+		return;
+		
 	const int pos = cnc::getSpeedStepSensitivityIndex(FINE);
-	
 	THE_APP->selectStepSensitivity(pos);
 	THE_APP->startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR); 
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::notifyPositionHeld(const CncSecureGesturesPanel::Data& d) {
 /////////////////////////////////////////////////////////////////////
+	if ( THE_APP->getCncControl()->isConnected() == false )
+		return;
+
 	CNC_PRINT_FUNCT
 	THE_APP->updateInteractiveMove();
+	//notifyPositionChanged(d);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::notifyPositionChanged(const CncSecureGesturesPanel::Data& d) {
 /////////////////////////////////////////////////////////////////////
+	if ( THE_APP->getCncControl()->isConnected() == false )
+		return;
+
 	// stop ....
 	if ( d.isZero() )
 	{
@@ -377,26 +387,39 @@ void CncSecureCtrlPanel::notifyPositionChanged(const CncSecureGesturesPanel::Dat
 	
 	switch ( d.cbId ) 
 	{
-		case CallbackID_SPX:	dx = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir ); 
-								break;
-								
-		case CallbackID_SPY:	dy = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
-								break;
-								
+		case CallbackID_SPX:
+		{
+			dx = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
+			break;
+		}
+		case CallbackID_SPY:
+		{	
+			dy = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
+			break;
+		}
 		case CallbackID_SPZ:
-		case CallbackID_TPZ:	dz = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
-								break;
-								
-		case CallbackID_TPXY:	dx = ( d.xVal ? ( ( d.xVal  < 0 ) ? CncNegDir : CncPosDir ) : CncNoneDir );
-								dy = ( d.yVal ? ( ( d.yVal  < 0 ) ? CncNegDir : CncPosDir ) : CncNoneDir );
-								break;
-								
-		default:				return;
+		case CallbackID_TPZ:
+		{
+			dz = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
+			break;
+		}
+		case CallbackID_TPXY:
+		{
+			CncPolarRegionDetector prd(d.xVal, d.yVal);
+			dx = prd.getDirectionX();
+			dy = prd.getDirectionY();
+			break;
+		}
+		default:
+		{
+			return;
+		}
 	}
 	
 	// move . . . 
 	const int modifySpeed = abs(d.range);
-	std::cout << wxString::Format("updateInteractiveMove(%+d, %+d, %+d, %d)\n", (int)dx, (int)dy, (int)dz, abs(d.range));
+	
+	//std::cout << wxString::Format("updateInteractiveMove(%+d, %+d, %+d, %d)\n", (int)dx, (int)dy, (int)dz, abs(d.range));
 	THE_APP->updateInteractiveMove(dx, dy, dz, modifySpeed);
 }
 /////////////////////////////////////////////////////////////////////
@@ -457,7 +480,11 @@ void CncSecureCtrlPanel::onStopSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onConnectSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	m_leftBook->Enable(false);
+	
 	THE_APP->connectSec(event);
+	
+	m_leftBook->Enable(true);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onEvaluateHardwareReference(wxCommandEvent& event) {
@@ -631,7 +658,7 @@ void CncSecureCtrlPanel::onToggleTouchpadPane(wxCommandEvent& event) {
 			break;
 			
 		case CallbackID_TPZ:
-			((wxToggleButton*)event.GetEventObject())->SetLabel("XY Pane");
+			((wxToggleButton*)event.GetEventObject())->SetLabel("XY Plane");
 			interactiveTouchpadXYZ->setCallbackId(CallbackID_TPXY);
 			interactiveTouchpadXYZ->setOrientation(wxBOTH);
 			interactiveTouchpadXYZ->SetBackgroundColour(wxColour(255, 255, 184));

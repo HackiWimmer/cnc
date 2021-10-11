@@ -4543,7 +4543,7 @@
                         }, {
                          "type": "string",
                          "m_label": "Label:",
-                         "m_value": "XY Pane"
+                         "m_value": "XY Plane"
                         }, {
                          "type": "bool",
                          "m_label": "Checked",

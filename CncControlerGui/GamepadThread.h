@@ -3,6 +3,7 @@
 
 #include <wx/thread.h>
 #include "GamepadEvent.h"
+#include "CncPolarRegionDetector.h"
 #include "CncGamePad.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -15,6 +16,7 @@ class GamepadThread : public wxThread {
 	
 	protected:
 		MainFrame*					pHandler;
+		CncPolarRegionDetector		polarDetector;
 		bool						exit;
 		bool						prevButtonLeftStick;
 		bool						prevButtonRightStick;
