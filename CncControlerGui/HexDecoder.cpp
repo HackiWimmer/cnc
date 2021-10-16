@@ -357,6 +357,8 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 		case CMD_MOVE:
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE_UNTIL_LIMIT_IS_FREE:
+		case CMD_MOVE_PODEST:
+		case CMD_MOVE_PODEST_EXACT:
 		{
 			if ( readNextHexBytes(restToken, 1, value) == false ) 
 				break;
@@ -392,6 +394,8 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 		case CMD_HEARTBEAT:
 		case CMD_PERFORM_TEST:
 		case CMD_MOVE_INTERACTIVE:
+		case CMD_ACTIVATE_PODEST_HW:
+		case CMD_DEACTIVATE_PODEST_HW:
 		{
 			ret.more << wxString::Format("<Command without further content>");
 			break;

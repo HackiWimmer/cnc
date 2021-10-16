@@ -622,6 +622,16 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer121->Add(m_btSessionDir, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
+    m_btSerialSpy = new wxButton(m_rpMisc, wxID_ANY, _("Open\nSerial Spy"), wxDefaultPosition, wxDLG_UNIT(m_rpMisc, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-find_and_replace")), wxLEFT);
+    m_btSerialSpy->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btSerialSpyFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_btSerialSpy->SetFont(m_btSerialSpyFont);
+    
+    flexGridSizer121->Add(m_btSerialSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
     m_btTestFunct = new wxButton(m_rpMisc, wxID_ANY, _("Execute Test\nFunction"), wxDefaultPosition, wxDLG_UNIT(m_rpMisc, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btTestFunct->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncTest")), wxLEFT);
@@ -678,6 +688,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_resolveLimit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::requestResolveLimitStates), NULL, this);
     m_btSessionDir->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSessionDirSec), NULL, this);
+    m_btSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_btTestFunct->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunctionSec), NULL, this);
     m_btStackTrace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStackTraceStoreSec), NULL, this);
     m_btAnchorSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onDetermineAnchorPositionsSec), NULL, this);
@@ -699,6 +710,7 @@ CncSecureCtrlPanelBase::~CncSecureCtrlPanelBase()
     m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_resolveLimit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::requestResolveLimitStates), NULL, this);
     m_btSessionDir->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSessionDirSec), NULL, this);
+    m_btSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_btTestFunct->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunctionSec), NULL, this);
     m_btStackTrace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStackTraceStoreSec), NULL, this);
     m_btAnchorSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onDetermineAnchorPositionsSec), NULL, this);

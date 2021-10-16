@@ -361,32 +361,22 @@ void CncSerialSpyListCtrl::updateColumnWidth() {
 	if ( autoColumnSizing == false )
 		return;
 		
-	// avoid flicker
-	if ( IsFrozen() == false )
-		Freeze();
-		
 	// first set default sizes depending on content
 	SetColumnWidth(COL_TYPE, 	 26);
 	SetColumnWidth(COL_NUM, 	 64);
-	SetColumnWidth(COL_LINE, 	120);
-	SetColumnWidth(COL_DECODED,	  0);
 	
-	// try to strech the second (key) column
+	// try to stretch the second (key) column
 	const int scrollbarWidth = 26;
+	
 	int size = GetSize().GetWidth() 
+	         - GetColumnWidth(COL_TYPE) 
 	         - GetColumnWidth(COL_NUM) 
 			 - scrollbarWidth;
 	
 	size /= liveDecoding ? 2 : 1;
 	
-	if ( size > GetColumnWidth(COL_LINE) )
-		SetColumnWidth(COL_LINE, size);
-		
-	if ( liveDecoding && size > GetColumnWidth(COL_DECODED) )
-		SetColumnWidth(COL_DECODED, size);
-		
-	if ( IsFrozen() == true )
-		Thaw();
+	SetColumnWidth(COL_LINE, size);
+	SetColumnWidth(COL_DECODED, liveDecoding ? size : 0 );
 }
 /////////////////////////////////////////////////////////////
 bool CncSerialSpyListCtrl::isItemValid(long item) const {

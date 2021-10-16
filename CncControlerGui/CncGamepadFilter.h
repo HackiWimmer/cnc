@@ -9,15 +9,15 @@ class CncGamepadFilterInstance {
 	public:
 		
 		static const int FILTER_NOTHING							=   0;
-		static const int FILTER_CNC_AVTIVATION					=   1;
-		static const int FILTER_QUICK_MENU_AVTIVATION			=   2;
+		static const int FILTER_CNC_ACTIVATION					=   1;
+		static const int FILTER_QUICK_MENU_ACTIVATION			=   2;
 		
 		CncGamepadFilterInstance();
 		~CncGamepadFilterInstance();
 		
 		int getFilter()					const	{ return filter; }
-		bool canActivateCncMode()		const	{ return !( filter & FILTER_CNC_AVTIVATION );        }
-		bool canActicateQuickMenu()		const	{ return !( filter & FILTER_QUICK_MENU_AVTIVATION ); }
+		bool canActivateCncMode()		const	{ return !( filter & FILTER_CNC_ACTIVATION );        }
+		bool canActicateQuickMenu()		const	{ return !( filter & FILTER_QUICK_MENU_ACTIVATION ); }
 		
 		void clear()							{ filter = filter; }
 		void addFilter(int f)					{ filter |= f; }

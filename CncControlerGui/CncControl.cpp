@@ -1360,7 +1360,7 @@ void CncControl::postCtlPosition(unsigned char pid) {
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) {
 		PositionStorage::addPos(PositionStorage::TRIGGER_CTL_POS, curCtlPos);
 		
-		// a position compairsion isn't necessay here because the serialControllerCallback(...)
+		// a position comparison isn't necessary here because the serialControllerCallback(...)
 		// call this method only on position changes
 		THE_APP->addCtlPosition(	pid, 
 									getClientId(), 

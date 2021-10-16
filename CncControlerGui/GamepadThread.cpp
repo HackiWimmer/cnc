@@ -11,7 +11,7 @@ GamepadThread::GamepadThread(MainFrame *handler)
 , prevButtonLeftStick		(false)
 , prevButtonRightStick		(false)
 , prevBackButton			(false)
-, defaultSleepMillis		(100)
+, defaultSleepMillis		(200)
 , currentSleepMillis		(defaultSleepMillis)
 , avoidSwitchBouncingFact	(1)
 , prevUsageMode				(GamepadEvent::UM_NAV_GUI)
@@ -225,9 +225,13 @@ void GamepadThread::evaluateNotifications(const CncGamepad& gamepad, GamepadEven
 		
 		typedef CncLinearDirection CLD;
 		
-		state.data.dx 		= CLD::CncNoneDir;
-		state.data.dy 		= CLD::CncNoneDir;
-		state.data.dz 		= CLD::CncNoneDir;
+		state.data.dx				= CLD::CncNoneDir;
+		state.data.dy				= CLD::CncNoneDir;
+		state.data.dz				= CLD::CncNoneDir;
+		state.data.leftStickLen		= 0.0f;
+		state.data.rightStickLen	= 0.0f;
+		state.data.minStickLen		= 0.0f;
+		state.data.maxStickLen		= 0.0f;
 		
 		const bool left		= state.data.buttonLeft; 
 		const bool right	= state.data.buttonRight;
@@ -245,8 +249,26 @@ void GamepadThread::evaluateNotifications(const CncGamepad& gamepad, GamepadEven
 				state.data.dz = polarDetector.getDirectionY();
 				state.data.rightStickLen = polarDetector.getLength();
 				
-				state.data.minStickLen = std::min(state.data.leftStickLen, state.data.rightStickLen);
-				state.data.maxStickLen = std::max(state.data.leftStickLen, state.data.rightStickLen);
+				// length are always positive
+				const bool bln = cnc::dblCmp::nu(state.data.leftStickLen);
+				const bool brn = cnc::dblCmp::nu(state.data.rightStickLen);
+				
+				if      ( bln && !brn )
+				{
+					state.data.minStickLen = state.data.rightStickLen;
+					state.data.maxStickLen = state.data.rightStickLen;
+				}
+				else if ( !bln && brn )
+				{
+					state.data.minStickLen = state.data.leftStickLen;
+					state.data.maxStickLen = state.data.leftStickLen;
+				}
+				else
+				{
+					state.data.minStickLen = std::min(state.data.leftStickLen, state.data.rightStickLen);
+					state.data.maxStickLen = std::max(state.data.leftStickLen, state.data.rightStickLen);
+				}
+				
 				break;
 			}
 			case GamepadEvent::PCM_NAV_XY: {

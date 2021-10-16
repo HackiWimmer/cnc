@@ -19,8 +19,8 @@ void CncGamepadFilterInstance::rmvFilter(int f) {
 			filter &= q; 
 	};
 	
-	rmvod(FILTER_CNC_AVTIVATION);
-	rmvod(FILTER_QUICK_MENU_AVTIVATION); 
+	rmvod(FILTER_CNC_ACTIVATION);
+	rmvod(FILTER_QUICK_MENU_ACTIVATION); 
 }
 
 #warning

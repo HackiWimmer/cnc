@@ -1,5 +1,6 @@
 #include <wx/textdlg.h>
 #include "GlobalFunctions.h"
+#include "CncContext.h" 
 #include "MainFrame.h"
 #include "CncMessageDialog.h"
 #include "CncSerialSpyListCtrl.h"

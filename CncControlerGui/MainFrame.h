@@ -681,6 +681,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void setReferencePosEnforceFlag(bool s);
 		void resetReferencePosTempSetting();
 		
+		bool resetPodiumDistance();
+		bool applyPodiumDistance();
+		
 		friend class MainFrameProxy;
 		friend class CncMsgHistoryLoggerProxy;
 		friend class CncLoggerListCtrl;
@@ -691,6 +694,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncConfig;
 		friend class CncContext;
 		friend class CncGampadDeactivator;
+		friend class CncIdleCheckDeactivator;
 		friend class CncTransactionLockBase;
 		friend class CncTransactionLock;
 		friend class CncGamepadTransactionLock;
@@ -703,6 +707,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class SerialThreadStub;
 		
 		friend class CncArduinoEnvironment;
+		friend class CncPodestMgmtMovement;
 
 		// to remove . . .
 			friend class CncFileView;
@@ -1033,6 +1038,44 @@ class CncGamepadTransactionLock : public CncTransactionLockBase {
 	public:
 		explicit CncGamepadTransactionLock(MainFrame* p);
 		virtual ~CncGamepadTransactionLock();
+};
+
+////////////////////////////////////////////////////////////////////
+class CncIdleCheckDeactivator {
+	
+	private:
+		static unsigned int	referenceCounter;
+		
+		MainFrame*	parent;
+		bool		prevState;
+	
+	public:
+		CncIdleCheckDeactivator(MainFrame* p)
+		: parent		(p)
+		, prevState	(false)
+		{
+			wxASSERT ( parent );
+			
+			prevState = parent->m_miRqtIdleMessages->IsChecked();
+			if ( prevState != false )
+				parent->m_miRqtIdleMessages->Check(false);
+				
+			referenceCounter++;
+		}
+		
+		~CncIdleCheckDeactivator()
+		{
+			wxASSERT ( parent );
+			
+			parent->m_miRqtIdleMessages->Check(prevState);
+			
+			referenceCounter--;
+		}
+		
+		static void activate(bool b) { 
+			if ( THE_APP )
+				THE_APP->m_miRqtIdleMessages->Check(b); 
+		}
 };
 
 ////////////////////////////////////////////////////////////////////

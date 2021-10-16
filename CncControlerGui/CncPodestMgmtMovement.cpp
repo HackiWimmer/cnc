@@ -1,4 +1,4 @@
-#include "MainFrameProxy.h"
+#include "MainFrame.h"
 #include "GlobalFunctions.h"
 #include "CncControl.h"
 #include "CncContext.h"
@@ -8,52 +8,92 @@
 ///////////////////////////////////////////////////////////////////
 CncPodestMgmtMovement::CncPodestMgmtMovement(wxWindow* parent)
 : CncPodestMgmtMovementBase					(parent)
-, CncSecureGesturesPanel::CallbackInterface	()
 , direction									(CncNoneDir)
 , interactiveMove							(NULL)
 , caller									(NULL)
 ///////////////////////////////////////////////////////////////////
 {
-	interactiveMove = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 3);
+	interactiveMove = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 1);
 	GblFunc::replaceControl(m_intactiveMovePlaceholder, interactiveMove);
-	interactiveMove->setCallbackInterface(this);
 	interactiveMove->SetBackgroundColour(*wxYELLOW);
 	
 	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	val.SetRange(0.0, THE_CONFIG->getMaxDimensionH());
 	val.SetPrecision(3);
-	m_moveRelative->SetValidator(val);
 	
+	m_moveRelative->SetValidator(val);
 	m_moveRelative->ChangeValue("0.000");
+	
+	Bind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncPodestMgmtMovement::onInteractiveMove,	this);
 }
 ///////////////////////////////////////////////////////////////////
 CncPodestMgmtMovement::~CncPodestMgmtMovement() {
 ///////////////////////////////////////////////////////////////////
+	Unbind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncPodestMgmtMovement::onInteractiveMove,	this);
+	
+	wxDELETE(interactiveMove);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::notifyStarting(const CncSecureGesturesPanel::State s) {
-///////////////////////////////////////////////////////////////////
-	// nothing to do
-}
-///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::notifyPositionChanged(const CncSecureGesturesPanel::Data& d) {
+void CncPodestMgmtMovement::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( IsShownOnScreen() == false )
 		return;
-		
-	// interactive move callback
+
 	const CncLinearDirection prevDirection = direction;
 	
-	if ( d.range == 0 )	direction = CncNoneDir;
-	else				direction = d.range < 0 ? CncNegDir : CncPosDir;
+	// stop ....
+	if ( event.data.isZero() )
+	{
+		if ( prevDirection != CncNoneDir )
+		{		
+			direction = CncNoneDir;
+			return process();
+		}
+	}
 	
-	if      ( direction == CncNoneDir    )	process();
-	else if ( direction != prevDirection )	process();
-}
-///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::notifyPositionHeld(const CncSecureGesturesPanel::Data& d) {
-///////////////////////////////////////////////////////////////////
-	// nothing to do
+	switch ( event.GetId() )
+	{
+		case CncSecureGesturesPanelEvent::Id::CSGP_STARTING:
+		{
+			if ( prevDirection != CncNoneDir )
+			{
+				// stop ....
+				direction = CncNoneDir;
+				process();
+			}
+			
+			break;
+		}
+		case CncSecureGesturesPanelEvent::Id::CSGP_POS_CHANGED:
+		{
+			auto determineDir = [&]() {
+				if ( event.data.range == 0 )	direction = CncNoneDir;
+				else							direction = event.data.range < 0 ? CncNegDir : CncPosDir;
+			};
+			
+			if ( prevDirection != CncNoneDir )
+			{
+				determineDir();
+				
+				if ( prevDirection != direction )
+				{
+					// stop ....
+					direction = CncNoneDir;
+					process();
+				}
+			}
+			
+			determineDir();
+			if ( direction != prevDirection )
+				process();
+			
+			break;
+		}
+		case CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD:
+		{
+			break;
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodestMgmtMovement::enable(bool state) {
@@ -76,7 +116,7 @@ void CncPodestMgmtMovement::reset() {
 ///////////////////////////////////////////////////////////////////
 void CncPodestMgmtMovement::process() {
 ///////////////////////////////////////////////////////////////////
-	CncControl* cnc = APP_PROXY::getCncControl();
+	CncControl* cnc = THE_APP->getCncControl();
 	if ( cnc == NULL ) 
 	{
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
@@ -99,11 +139,12 @@ void CncPodestMgmtMovement::process() {
 	}
 	else
 	{
+		const bool exact = false;
 		bool ret = true;
 		
 		switch ( direction ) {
 			case CncNegDir:
-			case CncPosDir:		ret = cnc->processMovePodest((int32_t)direction, false);
+			case CncPosDir:		ret = cnc->processMovePodest((int32_t)direction, exact);
 								break;
 								
 			case CncNoneDir:	ret = cnc->sendQuitMove();
@@ -117,7 +158,7 @@ void CncPodestMgmtMovement::process() {
 ///////////////////////////////////////////////////////////////////
 bool CncPodestMgmtMovement::init() {
 ///////////////////////////////////////////////////////////////////
-	CncControl* cnc = APP_PROXY::getCncControl();
+	CncControl* cnc = THE_APP->getCncControl();
 	bool ret = true;
 	
 	if ( cnc == NULL ) {
@@ -140,7 +181,7 @@ bool CncPodestMgmtMovement::init() {
 ///////////////////////////////////////////////////////////////////
 bool CncPodestMgmtMovement::close() {
 ///////////////////////////////////////////////////////////////////
-	CncControl* cnc = APP_PROXY::getCncControl();
+	CncControl* cnc = THE_APP->getCncControl();
 	bool ret = true;
 	
 	if ( cnc == NULL ) {
@@ -163,7 +204,7 @@ bool CncPodestMgmtMovement::close() {
 	}
 	
 	if ( caller )
-		caller->podestNotifyInit(ret);
+		caller->podestNotifyClose(ret);
 	
 	return ret;
 }
@@ -181,12 +222,24 @@ double CncPodestMgmtMovement::evaluateMillimeterToMove() {
 int32_t CncPodestMgmtMovement::evaluateStepsToMove() {
 ///////////////////////////////////////////////////////////////////
 	const double mmtm = evaluateMillimeterToMove();
-	return THE_CONFIG->convertMetricToStepsH(mmtm);
+	const int32_t ret = THE_CONFIG->convertMetricToStepsH(mmtm);
+	
+	if ( false )
+	{
+		std::cout 	<< "calcFactH      : " << THE_CONFIG->getCalculationFactH()	<< std::endl
+					<< "getStepsH()    : " << THE_CONFIG->getStepsH()			<< std::endl
+					<< "getPitchH()    : " << THE_CONFIG->getPitchH()			<< std::endl
+					<< "mm2Move        : " << mmtm								<< std::endl
+					<< "steps2Move     : " << ret								<< std::endl
+		; 
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodestMgmtMovement::onPodestRelativeUp(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	CncControl* cnc = APP_PROXY::getCncControl();
+	CncControl* cnc = THE_APP->getCncControl();
 	if ( cnc == NULL ) {
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
 		return;
@@ -194,7 +247,8 @@ void CncPodestMgmtMovement::onPodestRelativeUp(wxCommandEvent& event) {
 	
 	enable(false);
 	
-		if ( cnc->processMovePodest(evaluateStepsToMove() * (+1), true) == false )
+		const bool exact = true;
+		if ( cnc->processMovePodest(evaluateStepsToMove() * (+1), exact) == false )
 			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodest() failed !") << std::endl;
 	
 	enable(true);
@@ -202,15 +256,15 @@ void CncPodestMgmtMovement::onPodestRelativeUp(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncPodestMgmtMovement::onPodestRelativeDown(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	CncControl* cnc = APP_PROXY::getCncControl();
+	CncControl* cnc = THE_APP->getCncControl();
 	if ( cnc == NULL ) {
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
 		return;
 	}
 	
 	enable(false);
-	
-		if ( cnc->processMovePodest(evaluateStepsToMove() * (-1), true) == false )
+		const bool exact = true;
+		if ( cnc->processMovePodest(evaluateStepsToMove() * (-1), exact) == false )
 			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodest() failed !") << std::endl;
 	
 	enable(true);

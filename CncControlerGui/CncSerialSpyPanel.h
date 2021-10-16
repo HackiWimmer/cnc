@@ -20,6 +20,7 @@ class CncSerialSpyPanel : public CncSerialSpyPanelBase {
 		void		updateIntervalSlider();
 		
 	protected:
+	
 		virtual void onLiveDebug(wxCommandEvent& event);
 		virtual void onUpdateIntervalSlider(wxScrollEvent& event);
 		virtual void onAutoColumnSize(wxCommandEvent& event);

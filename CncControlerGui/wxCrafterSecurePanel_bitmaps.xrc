@@ -5,6 +5,8 @@
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-ctrl@2x">bitmaps\16-ctrl@2x.png</object>
   <object class="wxBitmap" name="16-file_open@2x">bitmaps\CodeLite\16-file_open@2x.png</object>
+  <object class="wxBitmap" name="16-find_and_replace">bitmaps\CodeLite\16-find_and_replace.png</object>
+  <object class="wxBitmap" name="16-find_and_replace@2x">bitmaps\CodeLite\16-find_and_replace@2x.png</object>
   <object class="wxBitmap" name="16-find_in_files">bitmaps\CodeLite\16-find_in_files.png</object>
   <object class="wxBitmap" name="16-find_in_files@2x">bitmaps\CodeLite\16-find_in_files@2x.png</object>
   <object class="wxBitmap" name="16-finger@2x">bitmaps\CodeLite\16-finger@2x.png</object>

@@ -6,7 +6,6 @@
 #include "wxCrafterPodestManagement.h"
 
 class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
-							, public CncSecureGesturesPanel::CallbackInterface
 {
 	public:
 		
@@ -35,11 +34,10 @@ class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
 		virtual void onPodestRelativeDown(wxCommandEvent& event);
 		virtual void onPodestRelativeUp(wxCommandEvent& event);
 		
-		virtual void notifyStarting(const CncSecureGesturesPanel::State s);
-		virtual void notifyPositionChanged(const CncSecureGesturesPanel::Data& d);
-		virtual void notifyPositionHeld(const CncSecureGesturesPanel::Data& d);
+		void onInteractiveMove(CncSecureGesturesPanelEvent& event);
 		
 	private:
+	
 		CncLinearDirection			direction;
 		CncSecureGesturesPanel*		interactiveMove;
 		CallbackInterface*			caller;

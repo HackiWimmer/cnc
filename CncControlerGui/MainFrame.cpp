@@ -124,8 +124,9 @@ extern GlobalConstStringDatabase globalStrings;
 extern void GlobalStreamRedirectionReset();
 
 ////////////////////////////////////////////////////////////////////
-unsigned int CncTransactionLockBase::referenceCounter	= 0;
-unsigned int CncGampadDeactivator::referenceCounter		= 0;
+unsigned int CncTransactionLockBase::referenceCounter		= 0;
+unsigned int CncGampadDeactivator::referenceCounter			= 0;
+unsigned int CncIdleCheckDeactivator::referenceCounter		= 0;
 
 ////////////////////////////////////////////////////////////////////
 // app defined events
@@ -2185,7 +2186,7 @@ void MainFrame::dispatchAll() {
 		return;
 		
 	/*
-	Please note: This is th fastest version, but evtLoop->Yield() is better then the code below, 
+	Please note: This is the fastest version, but evtLoop->Yield() is better then the code below, 
 	it also considers timer events, aui-handling etc.
 	
 	while ( evtLoop->Pending() )
@@ -2193,7 +2194,7 @@ void MainFrame::dispatchAll() {
 	*/
 
 	/*
-	wxEVT_CATEGORY_ALL =
+	wxEVT_CATERY_ALL =
 		wxEVT_CATEGORY_UI|wxEVT_CATEGORY_USER_INPUT|wxEVT_CATEGORY_SOCKET| \
 		wxEVT_CATEGORY_TIMER|wxEVT_CATEGORY_THREAD|wxEVT_CATEGORY_UNKNOWN| \
 		wxEVT_CATEGORY_CLIPBOARD
@@ -2208,12 +2209,17 @@ void MainFrame::dispatchAll() {
 		//wxTheApp->ProcessPendingEvents();
 	
 	
+	
+	
+	/*
 	while ( evtLoop->Pending() ) {
 		evtLoop->Dispatch();
 	}
-	
+	*/
 	
 	//wxTheApp->Yield();
+	
+	wxTheApp->SafeYield(this, true);
 	
 }
 #ifdef __WXMSW__
@@ -3225,46 +3231,59 @@ void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, doub
 	}
 }
 /////////////////////////////////////////////////////////////////////
+bool MainFrame::resetPodiumDistance() {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc->resetPodestDistance() == false ) 
+	{
+		std::cerr << CNC_LOG_FUNCT_A(": Can't reset podium position\n");
+		return false;
+	}
+	
+	return true;
+}
+/////////////////////////////////////////////////////////////////////
+bool MainFrame::applyPodiumDistance() {
+/////////////////////////////////////////////////////////////////////
+	CNC_TRANSACTION_LOCK_RET_ON_ERROR(false);
+	
+	CncIdleCheckDeactivator icd(this);
+	
+	const double dbl = cnc->getPodestDistanceMetric() * (-1);
+	
+	// log the current position before the correction operation below applies
+	const CncLongPosition prevPos = cnc->requestControllerPos();
+	
+	// correct the z position by the .podest movement
+	cnc->setZeroPosZ(prevPos.getZ() + THE_CONFIG->convertMetricToStepsZ(dbl) );
+	
+	// align the hardware offset with the new logical software origin
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
+		CncLongPosition offset(THE_BOUNDS->getHardwareOffset().getAsSteps());
+		offset -= prevPos;
+		THE_BOUNDS->setHardwareOffset(offset);
+		
+		cnc::trc.logInfoMessage("The hardware offset was realigned to the new origin . . .");
+	}
+	
+	return true;
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::onPodestManagement(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( podestManagementDlg == NULL )
 		return;
 		
-	if ( cnc->resetPodestDistance() == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(": Can't reset podest position\n");
+	if ( resetPodiumDistance() == false ) 
 		return;
-	}
 	
-	const bool prev = m_miRqtIdleMessages->IsChecked();
-	m_miRqtIdleMessages->Check(false);
+	const int filter = CncGamepadFilterInstance::FILTER_QUICK_MENU_ACTIVATION | CncGamepadFilterInstance::FILTER_CNC_ACTIVATION;
+	CncGamepadFilter gf(THE_CONTEXT->gamepadFilterInstance, filter);
 	
-		//CncGampadDeactivator cpd(this);
-		const int filter = CncGamepadFilterInstance::FILTER_QUICK_MENU_AVTIVATION | CncGamepadFilterInstance::FILTER_CNC_AVTIVATION;
-		CncGamepadFilter gf(THE_CONTEXT->gamepadFilterInstance, filter);
-		
-		podestManagementDlg->ShowModal();
-		waitActive(500);
-		
-		CNC_TRANSACTION_LOCK
-		const double dbl = cnc->getPodestDistanceMetric() * (-1);
-		
-		// log the current position before the correction operation below applies
-		const CncLongPosition prevPos = cnc->requestControllerPos();
-		
-		// correct the z position by the podest movement
-		cnc->setZeroPosZ(prevPos.getZ() + THE_CONFIG->convertMetricToStepsZ(dbl) );
-		
-		// align the hardware offset ith the new logical software origin
-		if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
-			CncLongPosition offset(THE_BOUNDS->getHardwareOffset().getAsSteps());
-			offset -= prevPos;
-			THE_BOUNDS->setHardwareOffset(offset);
-			
-			cnc::trc.logInfoMessage("The hardware offset was realigned to the new origin . . .");
-		}
-
+	CncIdleCheckDeactivator icd(this);
+	podestManagementDlg->ShowModal();
+	waitActive(500);
 	
-	m_miRqtIdleMessages->Check(prev);
+	applyPodiumDistance();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectUnit(wxCommandEvent& event) {

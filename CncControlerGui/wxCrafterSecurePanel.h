@@ -116,6 +116,7 @@ protected:
     wxPanel* m_podestPlaceholder;
     wxPanel* m_rpMisc;
     wxButton* m_btSessionDir;
+    wxButton* m_btSerialSpy;
     wxButton* m_btTestFunct;
     wxButton* m_btStackTrace;
     wxButton* m_btAnchorSec;
@@ -135,6 +136,7 @@ protected:
     virtual void onEmergencySec(wxCommandEvent& event) { event.Skip(); }
     virtual void requestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
     virtual void onSessionDirSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSerialSpySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onTestFunctionSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStackTraceStoreSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onDetermineAnchorPositionsSec(wxCommandEvent& event) { event.Skip(); }
@@ -205,6 +207,7 @@ public:
     wxPanel* GetPodestPlaceholder() { return m_podestPlaceholder; }
     wxPanel* GetRpPodest() { return m_rpPodest; }
     wxButton* GetBtSessionDir() { return m_btSessionDir; }
+    wxButton* GetBtSerialSpy() { return m_btSerialSpy; }
     wxButton* GetBtTestFunct() { return m_btTestFunct; }
     wxButton* GetBtStackTrace() { return m_btStackTrace; }
     wxButton* GetBtAnchorSec() { return m_btAnchorSec; }

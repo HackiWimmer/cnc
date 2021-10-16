@@ -7,10 +7,11 @@
 #include "wxCrafterSecurePanel.h"
 #include "CncSecureGesturesPanel.h"
 
+wxDEFINE_EVENT(wxEVT_CNC_SECURE_GESTURES_PANEL,	CncSecureGesturesPanelEvent);
+
 ///////////////////////////////////////////////////////////////////
 CncSecureGesturesPanel::CncSecureGesturesPanel(wxWindow* parent, wxOrientation o, Type t, Mode m, int s)
 : wxPanel			(parent, wxID_ANY)
-, caller			(NULL)
 , callbackId		(defaultCallbackId)
 , state				(S_INACTIVE)
 , updateTimer		(new wxTimer(this, updateTimerId))
@@ -36,7 +37,7 @@ CncSecureGesturesPanel::CncSecureGesturesPanel(wxWindow* parent, wxOrientation o
 , lineColour		(wxColour( 64,  64,  64))
 , innerColour		(wxColour(200, 200, 200))
 , mouseDown			(false)
-, lastData			()
+, lastEvent			(new CncSecureGesturesPanelEvent())
 ///////////////////////////////////////////////////////////////////
 {
 	SetBackgroundStyle(wxBG_STYLE_PAINT);
@@ -94,6 +95,18 @@ CncSecureGesturesPanel::~CncSecureGesturesPanel() {
 	// unbind . . . 
 	
 	stopTimer();
+	
+	wxDELETE(lastEvent);
+}
+//////////////////////////////////////////////////
+CncSecureGesturesPanelEvent& CncSecureGesturesPanel::prepareEvent(int id) { 
+//////////////////////////////////////////////////
+	wxASSERT(lastEvent); 
+	//lastEvent->reset();
+	lastEvent->SetEventObject(this); 
+	lastEvent->SetId(id); 
+	
+	return *lastEvent; 
 }
 ///////////////////////////////////////////////////////////////////
 CncSecureGesturesPanel::State CncSecureGesturesPanel::skipState() {
@@ -119,12 +132,6 @@ void CncSecureGesturesPanel::stopTimer() {
 	observerTimer->Stop();
 	updateTimer->Stop();
 	state = S_INACTIVE;
-}
-///////////////////////////////////////////////////////////////////
-void CncSecureGesturesPanel::setCallbackInterface(CallbackInterface* inf, int id) {
-///////////////////////////////////////////////////////////////////
-	caller 		= inf;
-	callbackId	= id;
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::calculateCoordinates() {
@@ -163,18 +170,22 @@ void CncSecureGesturesPanel::calculateCoordinates() {
 	}
 	
 	// something changed?
+	CSGPEvent::Data& lastData = lastEvent->data;
 	if ( lastData.xPos == centrePt.x && lastData.yPos == centrePt.y )
 		return;
 	
-	if ( IsShown() && caller && skipState() == S_STARTING )
-		caller->notifyStarting(state);
+	const State s = skipState();
+	if ( s == S_STARTING )
+	{
+		CncSecureGesturesPanelEvent evt(CncSecureGesturesPanelEvent::Id::CSGP_STARTING);
+		wxPostEvent(GetParent(), evt );
+	}
 		
 	// determine distance to zeroPt
 	const int dx = centrePt.x - zeroPt.x;
 	const int dy = zeroPt.y   - centrePt.y;
 	
-	const Data ref = lastData;
-	//lastData.reset();
+	const CSGPEvent::Data ref = lastData;
 	
 	lastData.xPos	= centrePt.x;
 	lastData.yPos	= centrePt.y;
@@ -370,6 +381,7 @@ void CncSecureGesturesPanel::recalculate() {
 	
 	//std::cout << callbackId << ": " << lastData.xVal << ", " <<  lastData.yVal << std::endl;
 	
+	CSGPEvent::Data& lastData = lastEvent->data;
 	
 	if ( lastData.xVal == 0 && lastData.yVal == 0 )
 	{
@@ -417,9 +429,9 @@ void CncSecureGesturesPanel::applyPosChange(bool useTimer) {
 	Refresh();
 	
 	// notify . . .
-	if ( IsShown() && caller )
-		caller->notifyPositionChanged(lastData);
-		
+	if ( IsShown() )
+		wxPostEvent(GetParent(), prepareEvent(CncSecureGesturesPanelEvent::Id::CSGP_POS_CHANGED));
+	
 	if ( useTimer == true )
 	{
 		const bool stop = ( m_translateDistance.m_x == zeroPt.x && m_translateDistance.m_y == zeroPt.y );
@@ -435,8 +447,8 @@ void CncSecureGesturesPanel::applyPosChange(bool useTimer) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::applyPosHeld() {
 ///////////////////////////////////////////////////////////////////
-	if ( IsShown() && caller )
-		caller->notifyPositionHeld(lastData);
+	if ( IsShown() )
+		wxPostEvent(GetParent(), prepareEvent(CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD));
 }
 /////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onSize(wxSizeEvent& event) {
@@ -452,7 +464,7 @@ void CncSecureGesturesPanel::onTimer(wxTimerEvent& event) {
 	{
 		case updateTimerId:
 		{
-			lastData.isTimerChanged = true;
+			lastEvent->data.isTimerChanged = true;
 			applyPosHeld();
 			break;
 		}
@@ -646,13 +658,13 @@ void CncSecureGesturesPanel::onPaint(wxPaintEvent& WXUNUSED(event)) {
 			rangeAlign =  wxALIGN_TOP | wxALIGN_LEFT;
 			ratioAlign =  wxALIGN_TOP | wxALIGN_RIGHT;
 			
-			dc.DrawLabel(wxString::Format("(%+4d|%+4d)",	lastData.xVal, lastData.yVal),	innerRect, wxALIGN_BOTTOM | wxALIGN_LEFT);
-			dc.DrawLabel(wxString::Format("%+.0lf Degree ",	lastData.angle),				innerRect, wxALIGN_BOTTOM | wxALIGN_RIGHT);
+			dc.DrawLabel(wxString::Format("(%+4d|%+4d)",	lastEvent->data.xVal, lastEvent->data.yVal),	innerRect, wxALIGN_BOTTOM | wxALIGN_LEFT);
+			dc.DrawLabel(wxString::Format("%+.0lf Degree ",	lastEvent->data.angle),							innerRect, wxALIGN_BOTTOM | wxALIGN_RIGHT);
 			break;
 	}
 	
-	dc.DrawLabel(wxString::Format("%+2d",		lastData.range),		rangeRect, rangeAlign);
-	dc.DrawLabel(wxString::Format("%+.0lf%",	lastData.ratio * 100 ), ratioRect, ratioAlign);
+	dc.DrawLabel(wxString::Format("%+2d",		lastEvent->data.range),			rangeRect, rangeAlign);
+	dc.DrawLabel(wxString::Format("%+.0lf%",	lastEvent->data.ratio * 100 ),	ratioRect, ratioAlign);
 }
 /////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onLeave(wxMouseEvent& event) {
@@ -706,6 +718,8 @@ void CncSecureGesturesPanel::onMouse(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onPan(wxPanGestureEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	event.StopPropagation();
+	
 	if ( event.IsGestureEnd() )
 	{
 		if ( type == T_BUTTON )

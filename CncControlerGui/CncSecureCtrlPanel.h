@@ -14,7 +14,6 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 							, public CncSecureSlidepad::CallbackInterface
 							, public CncReferenceEvaluation::CallbackInterface
 							, public CncPodestMgmtMovement::CallbackInterface
-							, public CncSecureGesturesPanel::CallbackInterface
 {
 	public:
 		
@@ -25,7 +24,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 			PAGE_MOVE,
 			PAGE_RUN,
 			PAGE_CONTROLLER,
-			PAGE_PODEST,
+			PAGE_PODIUM,
 			PAGE_MISC
 		};
 		
@@ -44,6 +43,8 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		CncReferenceEvaluation* getReferencePanel() const { return referencePanel; }
 		
 	protected:
+    virtual void onSerialSpySec(wxCommandEvent& event);
+	
 		virtual void requestResolveLimitStates(wxCommandEvent& event);
 		virtual void onToggleTouchpadPane(wxCommandEvent& event);
 		virtual void onReferenceSet(wxCommandEvent& event);
@@ -62,6 +63,8 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		virtual void onStopSec(wxCommandEvent& event);
 		virtual void onLeftBookPageChanged(wxListbookEvent& event);
 		
+		void onInteractiveMove(CncSecureGesturesPanelEvent& event);
+		
 		void setPortSelection(const wxString& portName);
 		
 		virtual void sliderValueChanged(int pos, int value);
@@ -71,10 +74,6 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		virtual void podestNotifyEnable(bool state);
 		virtual void podestNotifyInit(bool state);
 		virtual void podestNotifyClose(bool state);
-		
-		virtual void notifyStarting(const CncSecureGesturesPanel::State s);
-		virtual void notifyPositionChanged(const CncSecureGesturesPanel::Data& d);
-		virtual void notifyPositionHeld(const CncSecureGesturesPanel::Data& d);
 		
 		friend class CncSecurePortListCtrl;
 		
@@ -105,7 +104,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		
 		void performRightHeadline();
 		void tryToProvideTemplate();
-		void onLeftBookPageChanged();
+		void onLeftBookPageChanged(int oldSel = -1);
 };
 
 #endif // CNCSECURECTRLPANEL_H

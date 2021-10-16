@@ -1350,10 +1350,14 @@ bool Serial::processMovePodest(int32_t steps, bool exact) {
 		std::clog << std::endl;
 		return true;
 	}
-
-	// Always log the start postion
-	if ( cncControl->SerialCallback() == false )
-		return false;
+		
+	if ( exact == true ) 
+	{
+		// log the start position on demand
+		// exact == false has an interactive characteristic 
+		if ( cncControl->SerialCallback() == false )
+			return false;
+	}
 	
 	unsigned char* p = moveCommand;
 	unsigned int idx = 0;
@@ -1379,8 +1383,11 @@ bool Serial::processMovePodest(int32_t steps, bool exact) {
 	sfi.Mc.value2		= 0;
 	sfi.Mc.value3		= 0;
 	
-	if ( serializeMove(sfi, moveCommand, idx) == false ) {
-		cncControl->SerialCallback();
+	if ( serializeMove(sfi, moveCommand, idx) == false ) 
+	{
+		if ( exact == true )  
+			cncControl->SerialCallback();
+			
 		return false;
 	}
 	
@@ -1507,7 +1514,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			}
 			
 			// -----------------------------------------------------------
-			// fetch type multibyte results
+			// fetch type multi byte results
 			// -----------------------------------------------------------
 			//evaluateResult..........................................
 			case RET_SOH:
@@ -1535,6 +1542,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 					
 				} else {
 					// break fetch loop
+					std::cerr << "RET_SOH: Break fetch loop with false!"<< std::endl;
 					return false;
 				}
 				
@@ -2220,13 +2228,12 @@ bool Serial::serializeMove(SerialFetchInfo& sfi, const unsigned char* buffer, un
 		return false;
 	}
 
-	// to provide a time an pos reference for the speed calculation
+	// to provide a time and pos reference for the speed calculation
 	logMeasurementRefTs(cncControl->getCurAppPos());
 	
 	lastFetchResult.init(buffer[0]);
-	
 	if ( writeData((void*)buffer, nbByte) == false) {
-		std::cerr << "Serial::processMove: Unable to write data" << std::endl;
+		std::cerr << "Serial::serializeMove: Unable to write data" << std::endl;
 		return false;
 	}
 	

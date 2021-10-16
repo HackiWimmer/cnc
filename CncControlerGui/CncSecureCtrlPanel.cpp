@@ -229,7 +229,6 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 , CncSecureSlidepad::CallbackInterface			()
 , CncReferenceEvaluation::CallbackInterface		()
 , CncPodestMgmtMovement::CallbackInterface		()
-, CncSecureGesturesPanel::CallbackInterface		()
 , portSelectorList								(NULL)
 , manuallyMovePanel								(NULL)
 , interactiveMoveX								(NULL)
@@ -267,39 +266,39 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	
 	interactiveMoveX = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 5);
 	GblFunc::replaceControl(m_interactiveMoveXPlaceholder, interactiveMoveX);
-	interactiveMoveX->setCallbackInterface(this, CallbackID_SPX);
+	interactiveMoveX->setCallbackId(CallbackID_SPX);
 	interactiveMoveX->SetBackgroundColour(wxColour(255, 128, 128));
 	
 	interactiveMoveY = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 5);
 	GblFunc::replaceControl(m_interactiveMoveYPlaceholder, interactiveMoveY);
-	interactiveMoveY->setCallbackInterface(this, CallbackID_SPY);
+	interactiveMoveY->setCallbackId(CallbackID_SPY);
 	interactiveMoveY->SetBackgroundColour(wxColour(  0, 120, 215));
 	
 	interactiveMoveZ = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 5);
 	GblFunc::replaceControl(m_interactiveMoveZPlaceholder, interactiveMoveZ);
-	interactiveMoveZ->setCallbackInterface(this, CallbackID_SPZ);
+	interactiveMoveZ->setCallbackId(CallbackID_SPZ);
 	interactiveMoveZ->SetBackgroundColour(wxColour(  0, 128,  0));
 	
 	interactiveTouchpadXYZ = new CncSecureGesturesPanel(this, wxBOTH, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 5);
 	GblFunc::replaceControl(m_interactiveTouchpadXYZ, interactiveTouchpadXYZ);
-	interactiveTouchpadXYZ->setCallbackInterface(this, CallbackID_TPXY);
+	interactiveTouchpadXYZ->setCallbackId(CallbackID_TPXY);
 	interactiveTouchpadXYZ->SetBackgroundColour(wxColour(255, 255, 184));
 	
 	
 	
 				CncSecureGesturesPanel* panelQ1 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_POSITIVE, 10);
 				GblFunc::replaceControl(m_panelQ1, panelQ1);
-				panelQ1->setCallbackInterface(this, CallbackID_TPZ+6);
+				panelQ1->setCallbackId(CallbackID_TPZ+6);
 				panelQ1->SetBackgroundColour(wxColour(  0, 128,  0));
 				
 				CncSecureGesturesPanel* panelQ2 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_NEGATIVE, 10);
 				GblFunc::replaceControl(m_panelQ2, panelQ2);
-				panelQ2->setCallbackInterface(this, CallbackID_TPZ+6);
+				panelQ2->setCallbackId(CallbackID_TPZ+6);
 				panelQ2->SetBackgroundColour(wxColour(  0, 128,  0));
 				
 				CncSecureGesturesPanel* panelQ3 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 10);
 				GblFunc::replaceControl(m_panelQ3, panelQ3);
-				panelQ3->setCallbackInterface(this, CallbackID_TPZ+6);
+				panelQ3->setCallbackId(CallbackID_TPZ+6);
 				panelQ3->SetBackgroundColour(wxColour(  0, 128,  0));
 				
 				
@@ -312,22 +311,7 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	GblFunc::replaceControl(m_evaluateReferencePlaceholder, referencePanel);
 	referencePanel->setCallbackInterface(this);
 	
-	/*
-	speedpad = new CncSecureSlidepad(this); 
-	GblFunc::replaceControl(m_speedSliderPlaceholder, speedpad);
-	speedpad->setInfo("Speed F:");
-	CncSecureSlidepad::SliderValues values;
-	{
-		values.push_back(cnc::getSpeedValue(FINEST));
-		values.push_back(cnc::getSpeedValue(FINE));
-		values.push_back(cnc::getSpeedValue(MEDIUM));
-		values.push_back(cnc::getSpeedValue(ROUGH));
-		values.push_back(cnc::getSpeedValue(ROUGHEST));
-	}
-	speedpad->setValues(values, cnc::getSpeedValue(FINE));
-	speedpad->setCallbackInterface(this);
-	speedpad->GetInfoText()->SetForegroundColour(*wxWHITE);
-	*/
+	Bind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncSecureCtrlPanel::onInteractiveMove,	this);
 	
 	THE_APP->GetSecureVersionInfo()->SetLabel(CNC_VERSION_STR);
 }
@@ -341,86 +325,86 @@ CncSecureCtrlPanel::~CncSecureCtrlPanel() {
 	wxDELETE(speedpad);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::notifyStarting(const CncSecureGesturesPanel::State s) {
-/////////////////////////////////////////////////////////////////////
-	if ( THE_APP->getCncControl()->isConnected() == false )
-		return;
-		
-	const int pos = cnc::getSpeedStepSensitivityIndex(FINE);
-	THE_APP->selectStepSensitivity(pos);
-	THE_APP->startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR); 
-}
-/////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::notifyPositionHeld(const CncSecureGesturesPanel::Data& d) {
+void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( THE_APP->getCncControl()->isConnected() == false )
 		return;
 
-	CNC_PRINT_FUNCT
-	THE_APP->updateInteractiveMove();
-	//notifyPositionChanged(d);
-}
-/////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::notifyPositionChanged(const CncSecureGesturesPanel::Data& d) {
-/////////////////////////////////////////////////////////////////////
-	if ( THE_APP->getCncControl()->isConnected() == false )
-		return;
-
-	// stop ....
-	if ( d.isZero() )
+	switch( event.GetId() )
 	{
-		THE_APP->stopInteractiveMove();
-		return;
+		case CncSecureGesturesPanelEvent::Id::CSGP_STARTING:
+		{
+			const int pos = cnc::getSpeedStepSensitivityIndex(FINE);
+			THE_APP->selectStepSensitivity(pos);
+			THE_APP->startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR);
+			break;
+		}
+		case CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD:
+		{
+			THE_APP->updateInteractiveMove();
+			break;
+		}
+		case CncSecureGesturesPanelEvent::Id::CSGP_POS_CHANGED:
+		{
+			// stop ....
+			if ( event.data.isZero() )
+			{
+				THE_APP->stopInteractiveMove();
+				return;
+			}
+			
+			// may be nothing to to
+			if ( event.data.isChanged() == false )
+				return;
+				
+			// determine direction(s)
+			CncLinearDirection dx = CncNoneDir;
+			CncLinearDirection dy = CncNoneDir;
+			CncLinearDirection dz = CncNoneDir;
+			
+			bool move = false;
+			switch ( event.data.cbId ) 
+			{
+				case CallbackID_SPX:
+				{
+					dx = ( event.data.range != 0 ? ( event.data.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
+					move = true;
+					break;
+				}
+				case CallbackID_SPY:
+				{	
+					dy = ( event.data.range != 0 ? ( event.data.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
+					move = true;
+					break;
+				}
+				case CallbackID_SPZ:
+				case CallbackID_TPZ:
+				{
+					dz = ( event.data.range != 0 ? ( event.data.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
+					move = true;
+					break;
+				}
+				case CallbackID_TPXY:
+				{
+					CncPolarRegionDetector prd(event.data.xVal, event.data.yVal);
+					dx = prd.getDirectionX();
+					dy = prd.getDirectionY();
+					move = true;
+					break;
+				}
+			}
+			
+			if ( move )
+			{
+				const int modifySpeed = abs(event.data.range);
+				
+				//std::cout << wxString::Format("updateInteractiveMove(%+d, %+d, %+d, %d)\n", (int)dx, (int)dy, (int)dz, abs(d.range));
+				THE_APP->updateInteractiveMove(dx, dy, dz, modifySpeed);
+			}
+			
+			break;
+		}
 	}
-	
-	//std::cout << d << std::endl;
-	//return;
-	
-	// may be nothing to to
-	if ( d.isChanged() == false )
-		return;
-	
-	// determine direction(s)
-	CncLinearDirection dx = CncNoneDir;
-	CncLinearDirection dy = CncNoneDir;
-	CncLinearDirection dz = CncNoneDir;
-	
-	switch ( d.cbId ) 
-	{
-		case CallbackID_SPX:
-		{
-			dx = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
-			break;
-		}
-		case CallbackID_SPY:
-		{	
-			dy = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
-			break;
-		}
-		case CallbackID_SPZ:
-		case CallbackID_TPZ:
-		{
-			dz = ( d.range != 0 ? ( d.range < 0  ? CncNegDir : CncPosDir ) : CncNoneDir );
-			break;
-		}
-		case CallbackID_TPXY:
-		{
-			CncPolarRegionDetector prd(d.xVal, d.yVal);
-			dx = prd.getDirectionX();
-			dy = prd.getDirectionY();
-			break;
-		}
-		default:
-		{
-			return;
-		}
-	}
-	
-	// move . . . 
-	const int modifySpeed = abs(d.range);
-	
-	//std::cout << wxString::Format("updateInteractiveMove(%+d, %+d, %+d, %d)\n", (int)dx, (int)dy, (int)dz, abs(d.range));
-	THE_APP->updateInteractiveMove(dx, dy, dz, modifySpeed);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::sliderValueChanged(int pos, int value) {
@@ -429,33 +413,44 @@ void CncSecureCtrlPanel::sliderValueChanged(int pos, int value) {
 	THE_APP->selectStepSensitivity(pos);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::onLeftBookPageChanged() {
+void CncSecureCtrlPanel::onLeftBookPageChanged(int oldSel) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(m_leftBook->GetPageCount() == m_rightBook->GetPageCount() );
 	
-	const int sel = m_leftBook->GetSelection();
-	m_rightBook->SetSelection(sel);
+	const int newSel = m_leftBook->GetSelection();
+	m_rightBook->SetSelection(newSel);
 	
-	if ( sel >=0 && sel < (int)pageVector.size() )
-		THE_APP->GetSecureSplitterMainV()->SetSashPosition(pageVector.at(sel).width);
+	if ( newSel >=0 && newSel < (int)pageVector.size() )
+		THE_APP->GetSecureSplitterMainV()->SetSashPosition(pageVector.at(newSel).width);
 	
 	performRightHeadline();
 	
-	switch (sel) {
-		case PAGE_PODEST:	podestPanel->init();
+	//---------------------------------------------------------------
+	switch ( oldSel )
+	{
+		case PAGE_PODIUM:	THE_APP->applyPodiumDistance();
+							CncIdleCheckDeactivator::activate(true);
+							podestPanel->close();
+							THE_APP->waitActive(500);
+							break;
+	}
+	
+	//---------------------------------------------------------------
+	switch ( newSel ) 
+	{
+		case PAGE_PODIUM:	CncIdleCheckDeactivator::activate(false);
+							THE_APP->resetPodiumDistance();
+							podestPanel->init();
 							break;
 							
 		case PAGE_REF:		referencePanel->init();
 							break;
-							
-		default:			podestPanel->close();
-							
 	}
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onLeftBookPageChanged(wxListbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	onLeftBookPageChanged();
+	onLeftBookPageChanged(event.GetOldSelection());
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onEmergencySec(wxCommandEvent& event) {
@@ -586,6 +581,21 @@ void CncSecureCtrlPanel::onTestFunctionSec(wxCommandEvent& event) {
 void CncSecureCtrlPanel::onStackTraceStoreSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	THE_APP->showStacktraceStore(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onSerialSpySec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxAuiPaneInfo& pane = THE_APP->GetAuimgrMain()->GetPane("SerialSpy");
+	if ( pane.IsFloating() == false )
+		pane.Float();
+		
+	if ( pane.IsShown() == false )
+		pane.Show(true);
+		
+	const wxSize size =  THE_APP->GetClientSize();
+	pane.FloatingSize(size.GetX() / 3, size.GetY() / 3);
+		
+	THE_APP->GetAuimgrMain()->Update();
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::requestResolveLimitStates(wxCommandEvent& event) {
