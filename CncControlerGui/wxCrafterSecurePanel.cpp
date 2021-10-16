@@ -1521,6 +1521,113 @@ CncSecureSlidepadDialogBase::~CncSecureSlidepadDialogBase()
     
 }
 
+CncSecureRotateModelPanelBase::CncSecureRotateModelPanelBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC6911InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer569 = new wxFlexGridSizer(4, 1, 0, 0);
+    flexGridSizer569->SetFlexibleDirection( wxBOTH );
+    flexGridSizer569->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer569->AddGrowableCol(0);
+    flexGridSizer569->AddGrowableRow(0);
+    flexGridSizer569->AddGrowableRow(1);
+    flexGridSizer569->AddGrowableRow(2);
+    flexGridSizer569->AddGrowableRow(3);
+    this->SetSizer(flexGridSizer569);
+    
+    wxFlexGridSizer* flexGridSizer57825 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer57825->SetFlexibleDirection( wxBOTH );
+    flexGridSizer57825->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer57825->AddGrowableCol(0);
+    flexGridSizer57825->AddGrowableRow(1);
+    
+    flexGridSizer569->Add(flexGridSizer57825, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText58036 = new wxStaticText(this, wxID_ANY, _("Zoom:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText58036Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText58036->SetFont(m_staticText58036Font);
+    
+    flexGridSizer57825->Add(m_staticText58036, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_zoomPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_zoomPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer57825->Add(m_zoomPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5782 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5782->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5782->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5782->AddGrowableCol(0);
+    flexGridSizer5782->AddGrowableRow(1);
+    
+    flexGridSizer569->Add(flexGridSizer5782, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText5803 = new wxStaticText(this, wxID_ANY, _("Rotate X:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5803Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5803->SetFont(m_staticText5803Font);
+    
+    flexGridSizer5782->Add(m_staticText5803, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_rotateXPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_rotateXPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer5782->Add(m_rotateXPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer578 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer578->SetFlexibleDirection( wxBOTH );
+    flexGridSizer578->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer578->AddGrowableCol(0);
+    flexGridSizer578->AddGrowableRow(1);
+    
+    flexGridSizer569->Add(flexGridSizer578, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText58035 = new wxStaticText(this, wxID_ANY, _("Rotate Y:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText58035Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText58035->SetFont(m_staticText58035Font);
+    
+    flexGridSizer578->Add(m_staticText58035, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_rotateYPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_rotateYPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer578->Add(m_rotateYPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5788 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5788->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5788->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5788->AddGrowableCol(0);
+    flexGridSizer5788->AddGrowableRow(1);
+    
+    flexGridSizer569->Add(flexGridSizer5788, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText580359 = new wxStaticText(this, wxID_ANY, _("Rotate Z:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText580359Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText580359->SetFont(m_staticText580359Font);
+    
+    flexGridSizer5788->Add(m_staticText580359, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_rotateZPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_rotateZPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer5788->Add(m_rotateZPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    SetName(wxT("CncSecureRotateModelPanelBase"));
+    SetSize(wxDLG_UNIT(this, wxSize(80,300)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+}
+
+CncSecureRotateModelPanelBase::~CncSecureRotateModelPanelBase()
+{
+}
+
 ImageLibSecure::ImageLibSecure()
     : wxImageList(16, 16, true)
     , m_imagesWidth(16)
@@ -1543,6 +1650,120 @@ ImageLibSecure::ImageLibSecure()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_CROSSHAIR"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_LEFT_RIGHT32"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_LEFT_RIGHT32"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_LEFT_RIGHT16"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_LEFT_RIGHT16"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_LEFT_RIGHT16@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_LEFT_RIGHT16@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_UP_DOWN32"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_UP_DOWN32"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_UP_DOWN16"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_UP_DOWN16"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_UP_DOWN16@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_UP_DOWN16@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_ALL32"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_ALL32"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_ALL16"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_ALL16"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_ALL16@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_ALL16@2x"), bmp));
         }
     }
     

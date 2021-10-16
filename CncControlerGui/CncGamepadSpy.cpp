@@ -368,7 +368,7 @@ void CncGamepadSpy::processInteractiveMovement(const GamepadEvent& state) {
 			else {
 				if ( currentMoveInfo.update(dx, dy, dz) == true ) {
 					
-					const bool b = APP_PROXY::updateInteractiveMove(dx, dy, dz, (int)(state.data.leftStickLen / 4) );
+					const bool b = APP_PROXY::updateInteractiveMove(dx, dy, dz, translateStickToSpeedValue(state) );
 					currentMovementState = b ? MS_RUNNING : MS_ERROR;
 					currentMoveInfo.reset();
 					
@@ -400,4 +400,19 @@ void CncGamepadSpy::processInteractiveMovement(const GamepadEvent& state) {
 			break;
 		}
 	}
+}
+///////////////////////////////////////////////////////////////////
+int CncGamepadSpy::translateStickToSpeedValue(const GamepadEvent& state) {
+///////////////////////////////////////////////////////////////////
+	const float minStrickValue =  0.0f;
+	const float maxStrickValue = 16.0f;
+	const float v               = std::max(minStrickValue, std::min(maxStrickValue, state.data.minStickLen));
+	
+	if		( std::less_equal<float>{}(v,  4.0) ) return 1;
+	else if	( std::less_equal<float>{}(v,  8.0) ) return 2;
+	else if	( std::less_equal<float>{}(v, 11.0) ) return 3;
+	else if	( std::less_equal<float>{}(v, 14.0) ) return 4;
+	else if	( std::less_equal<float>{}(v, 16.0) ) return 5;
+	
+	return 1;
 }

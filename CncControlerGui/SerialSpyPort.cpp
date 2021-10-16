@@ -69,19 +69,3 @@ void SerialSpyPort::spyWriteData(void *buffer, unsigned int nbByte) {
 		wxPostEvent(THE_FRAME, evt);
 	}
 }
-///////////////////////////////////////////////////////////////////
-int SerialSpyPort::readData(void *buffer, unsigned int nbByte) {
-///////////////////////////////////////////////////////////////////
-	int ret = Serial::readData(buffer, nbByte);
-	spyReadData(buffer, ret);
-	
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool SerialSpyPort::writeData(void *buffer, unsigned int nbByte) {
-///////////////////////////////////////////////////////////////////
-	spyWriteData(buffer, nbByte);
-	bool ret = Serial::writeData(buffer, nbByte);
-	
-	return ret;
-}

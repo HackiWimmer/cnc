@@ -181,7 +181,7 @@ class ArduinoCmdDecoderMovePodest : public ArduinoCmdDecoderBase {
 
         // delegate values
         switch ( valueCount ) {
-          // axis Z Only
+          // axis H Only
           case 1: {
             result.dh = value; 
             break;

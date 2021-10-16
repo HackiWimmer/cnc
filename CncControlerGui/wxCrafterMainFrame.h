@@ -608,6 +608,8 @@ protected:
     wxButton* m_secureShowMillingCutter;
     wxButton* m_secureRefreshMonitor;
     wxButton* m_secureClearMonitor;
+    wxStaticLine* m_staticLine10042;
+    wxPanel* m_secRotateSliderPlaceholder;
     wxPanel* m_secMonitorPlaceholder;
     wxButton* m_3D_TopSec12;
     wxButton* m_3D_TopSec;
@@ -702,7 +704,7 @@ protected:
     wxMenuItem* m_miMotorEnableState;
     wxMenuItem* m_miPerformToolTest;
     wxMenuItem* m_miResolveLimitState;
-    wxMenuItem* m_miPodestManagement;
+    wxMenuItem* m_miPodiumManagement;
     wxMenuItem* m_menuItem881;
     wxMenuItem* m_miRqtCurPos;
     wxMenuItem* m_miRqtLimit;
@@ -956,7 +958,7 @@ protected:
     virtual void requestEnableStepperMotors(wxCommandEvent& event) { event.Skip(); }
     virtual void requestToolTest(wxCommandEvent& event) { event.Skip(); }
     virtual void requestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
-    virtual void onPodestManagement(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPodiumManagement(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentPos(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitState(wxCommandEvent& event) { event.Skip(); }
     virtual void requestReset(wxCommandEvent& event) { event.Skip(); }
@@ -1517,6 +1519,8 @@ public:
     wxButton* GetSecureShowMillingCutter() { return m_secureShowMillingCutter; }
     wxButton* GetSecureRefreshMonitor() { return m_secureRefreshMonitor; }
     wxButton* GetSecureClearMonitor() { return m_secureClearMonitor; }
+    wxStaticLine* GetStaticLine10042() { return m_staticLine10042; }
+    wxPanel* GetSecRotateSliderPlaceholder() { return m_secRotateSliderPlaceholder; }
     wxPanel* GetSecMonitorPlaceholder() { return m_secMonitorPlaceholder; }
     wxButton* Get3D_TopSec12() { return m_3D_TopSec12; }
     wxButton* Get3D_TopSec() { return m_3D_TopSec; }

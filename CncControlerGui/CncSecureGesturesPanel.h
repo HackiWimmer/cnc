@@ -154,6 +154,7 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 			
 			bool isTimerChanged = false;
 			bool isRangeChanged	= false;
+			bool isRatioChanged	= false;
 			bool isAngleChanged	= false;
 			
 			bool isChanged()	const	{ return (isTimerChanged || isRangeChanged || isAngleChanged); }

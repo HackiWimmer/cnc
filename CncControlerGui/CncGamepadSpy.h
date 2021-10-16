@@ -123,6 +123,8 @@ class CncGamepadSpy : public CncGamepadSpyBase {
 		
 		void processStepwiseMovement(const GamepadEvent& state);
 		void processInteractiveMovement(const GamepadEvent& state);
+		
+		int translateStickToSpeedValue(const GamepadEvent& state);
 };
 
 #endif // CNCGAMEPADSPY_H

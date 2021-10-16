@@ -9,6 +9,7 @@
 
 class CncSecurePortListCtrl;
 class CncSecureManuallyMovePanel;
+class CncSecureRotateModelPanel;
 
 class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 							, public CncSecureSlidepad::CallbackInterface
@@ -93,6 +94,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		
 		CncSecurePortListCtrl*			portSelectorList;
 		CncSecureManuallyMovePanel*		manuallyMovePanel;
+		CncSecureRotateModelPanel*		rotateModelPanel;
 		CncSecureGesturesPanel*			interactiveMoveX;
 		CncSecureGesturesPanel*			interactiveMoveY;
 		CncSecureGesturesPanel*			interactiveMoveZ;

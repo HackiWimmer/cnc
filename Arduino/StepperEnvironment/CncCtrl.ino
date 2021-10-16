@@ -578,7 +578,10 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
   // The corresponding dtor will inverse this again
   PodestEnabler pe;
 
-  uint32_t curSpeedDelay = 500;
+  const int32_t maxSpeedDelay = 1100;
+  const int32_t minSpeedDelay =  150;
+  uint32_t      curSpeedDelay = maxSpeedDelay;
+  
   while ( stopFunct(this) == false ) {
 
     byte retValue = checkRuntimeEnv();
@@ -590,7 +593,7 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
     podestStillOpenSteps--;
 
     // slow down the podest movement
-    if ( curSpeedDelay > 0 ) {
+    if ( curSpeedDelay >= minSpeedDelay ) {
       AE::delayMicroseconds(curSpeedDelay);
       curSpeedDelay--;
     }
@@ -911,8 +914,7 @@ bool CncArduinoController::processSignalUpdate(byte& retValue) {
         }
       }
 
-      #warning do something with ds && df
-
+      // Interactive speed management
       changeInteractiveFactor(df);
 
       // init the movment update

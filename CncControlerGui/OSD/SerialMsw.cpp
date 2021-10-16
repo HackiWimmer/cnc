@@ -182,13 +182,17 @@ int SerialMsw::readData(void *buffer, unsigned int nbByte) {
 	const int bytesRead   = readBufferedData(buffer, nbByte);
 	const int bytesToRead = nbByte - bytesRead;
 	
-	return bytesToRead > 0 ? readDataNative(buffer, nbByte) : bytesRead;
+	const int ret = bytesToRead > 0 ? readDataNative(buffer, nbByte) : bytesRead;
+	spyReadData(buffer, ret);
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialMsw::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	//Writes data from a buffer through the Serial connection
 	//return true on success.
+	spyWriteData(buffer, nbByte);
 	return writeDataNative(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////

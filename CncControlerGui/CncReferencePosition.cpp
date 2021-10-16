@@ -156,10 +156,6 @@ void CncReferencePosition::onKillCtrlFocus(wxFocusEvent& event) {
 	modify(m_rbStepSensitivity);
 	modify(m_rbStepMode);
 	
-	#warning
-	//(modify(m_cbPrevTest);
-	//modify(m_notebookEvalMode);
-	
 	Refresh();
 }
 ///////////////////////////////////////////////////////////////////
@@ -174,9 +170,6 @@ void CncReferencePosition::onSetCtrlFocus(wxFocusEvent& event) {
 
 	modify(m_rbStepSensitivity);
 	modify(m_rbStepMode);
-	#warning
-	//modify(m_cbPrevTest);
-	//modify(m_notebookEvalMode);
 	
 	Refresh();
 }

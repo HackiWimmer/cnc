@@ -180,6 +180,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void onPodiumManagement(wxCommandEvent& event);
 		virtual void onResetView(wxCommandEvent& event);
 		virtual void onToggleFlyPathes(wxCommandEvent& event);
 		virtual void onToggleGuidePathes(wxCommandEvent& event);
@@ -200,7 +201,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void traceAllCameraDevices(wxCommandEvent& event);
 		virtual void onDClickSpeedSliderValue(wxMouseEvent& event);
 		virtual void onToggleSecMainView(wxCommandEvent& event);
-		virtual void onPodestManagement(wxCommandEvent& event);
 		virtual void viewCoordinates(wxCommandEvent& event);
 		virtual void viewGamepadSpy(wxCommandEvent& event);
 		virtual void onLeftDClickTemplateName(wxMouseEvent& event);
@@ -590,6 +590,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		double getConfiguredSpindleSpeed();
 		
 		void clearTemplateEditorExtViews();
+		
+		void motionMonitorZoom(float fact);
+		void motionMonitorRotateX(float angle);
+		void motionMonitorRotateY(float angle);
+		void motionMonitorRotateZ(float angle);
 		
 	protected:
 	

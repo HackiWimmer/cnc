@@ -24,6 +24,18 @@
   <object class="wxBitmap" name="24-clean">bitmaps\CodeLite\24-clean.png</object>
   <object class="wxBitmap" name="24-clean@2x">bitmaps\CodeLite\24-clean@2x.png</object>
   <object class="wxBitmap" name="BMP_CROSSHAIR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\crosshair1.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_ALL16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-all.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_ALL16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-all@2x.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_ALL16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-all@2x.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_ALL32">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-all@2x.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_LEFT_RIGHT16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-left.Right.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_LEFT_RIGHT16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-left.Right@2x.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_LEFT_RIGHT16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-left.Right@2x.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_LEFT_RIGHT32">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-left.Right@2x.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_UP_DOWN16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-UpDown.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_UP_DOWN16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-UpDown@2x.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_UP_DOWN16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-UpDown@2x.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_UP_DOWN32">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Navi-UpDown@2x.png</object>
   <object class="wxBitmap" name="CncAnchors">bitmaps\CncAnchors.png</object>
   <object class="wxBitmap" name="CncFolder">bitmaps\CncFolder.png</object>
   <object class="wxBitmap" name="CncPause">bitmaps\CncPause.png</object>

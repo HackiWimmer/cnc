@@ -399,6 +399,34 @@ public:
 };
 
 
+class CncSecureRotateModelPanelBase : public wxPanel
+{
+protected:
+    wxStaticText* m_staticText58036;
+    wxPanel* m_zoomPlaceholder;
+    wxStaticText* m_staticText5803;
+    wxPanel* m_rotateXPlaceholder;
+    wxStaticText* m_staticText58035;
+    wxPanel* m_rotateYPlaceholder;
+    wxStaticText* m_staticText580359;
+    wxPanel* m_rotateZPlaceholder;
+
+protected:
+
+public:
+    wxStaticText* GetStaticText58036() { return m_staticText58036; }
+    wxPanel* GetZoomPlaceholder() { return m_zoomPlaceholder; }
+    wxStaticText* GetStaticText5803() { return m_staticText5803; }
+    wxPanel* GetRotateXPlaceholder() { return m_rotateXPlaceholder; }
+    wxStaticText* GetStaticText58035() { return m_staticText58035; }
+    wxPanel* GetRotateYPlaceholder() { return m_rotateYPlaceholder; }
+    wxStaticText* GetStaticText580359() { return m_staticText580359; }
+    wxPanel* GetRotateZPlaceholder() { return m_rotateZPlaceholder; }
+    CncSecureRotateModelPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(80,300), long style = wxTAB_TRAVERSAL);
+    virtual ~CncSecureRotateModelPanelBase();
+};
+
+
 class ImageLibSecure : public wxImageList
 {
 protected:

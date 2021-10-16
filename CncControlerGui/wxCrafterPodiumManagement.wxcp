@@ -80,7 +80,7 @@
     }, {
      "type": "string",
      "m_label": "Title:",
-     "m_value": "Cnc Podest Management"
+     "m_value": "Cnc Podium Management"
     }, {
      "type": "virtualFolderPicker",
      "m_label": "Virtual Folder:",

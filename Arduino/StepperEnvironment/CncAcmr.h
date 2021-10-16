@@ -184,8 +184,9 @@ class ArduinoAccelManager {
     bool        initMove        (uint32_t mD_IMPL, uint32_t mF1000_MMSec);
     uint32_t    initNextImpulse (AxisSignatureIndex axisSignatureIdx);
 
-    void        changeInteractiveFactor(short factor) {
-      if ( factor != 0 )
+    void        changeInteractiveFactor(short factor) 
+    {
+      if ( factor > 0 && factor < 10 )
         interactiveFactor = factor;
     }
 

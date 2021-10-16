@@ -5258,13 +5258,23 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer10025->Add(m_secureClearMonitor, 0, wxALL, WXC_FROM_DIP(0));
     m_secureClearMonitor->SetMinSize(wxSize(40,40));
     
-    wxFlexGridSizer* flexGridSizer9867 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer9867 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer9867->SetFlexibleDirection( wxBOTH );
     flexGridSizer9867->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer9867->AddGrowableCol(0);
+    flexGridSizer9867->AddGrowableCol(2);
     flexGridSizer9867->AddGrowableRow(0);
     
     flexGridSizer9860->Add(flexGridSizer9867, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticLine10042 = new wxStaticLine(m_panelMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer9867->Add(m_staticLine10042, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_secRotateSliderPlaceholder = new wxPanel(m_panelMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_secRotateSliderPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
+    
+    flexGridSizer9867->Add(m_secRotateSliderPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_secRotateSliderPlaceholder->SetMinSize(wxSize(80,-1));
     
     m_secMonitorPlaceholder = new wxPanel(m_panelMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_secMonitorPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
@@ -5749,9 +5759,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_miResolveLimitState->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-warning")));
     m_menuRequestor->Append(m_miResolveLimitState);
     
-    m_miPodestManagement = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Podest Management"), wxT(""), wxITEM_NORMAL);
-    m_miPodestManagement->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-sort")));
-    m_menuRequestor->Append(m_miPodestManagement);
+    m_miPodiumManagement = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Podium Management"), wxT(""), wxITEM_NORMAL);
+    m_miPodiumManagement->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-sort")));
+    m_menuRequestor->Append(m_miPodiumManagement);
     
     m_menuRequestor->AppendSeparator();
     
@@ -6309,7 +6319,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Connect(m_miPerformToolTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestToolTest), NULL, this);
     this->Connect(m_miResolveLimitState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResolveLimitStates), NULL, this);
-    this->Connect(m_miPodestManagement->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::onPodestManagement), NULL, this);
+    this->Connect(m_miPodiumManagement->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::onPodiumManagement), NULL, this);
     this->Connect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Connect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Connect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
@@ -6570,7 +6580,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Disconnect(m_miPerformToolTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestToolTest), NULL, this);
     this->Disconnect(m_miResolveLimitState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResolveLimitStates), NULL, this);
-    this->Disconnect(m_miPodestManagement->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::onPodestManagement), NULL, this);
+    this->Disconnect(m_miPodiumManagement->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::onPodiumManagement), NULL, this);
     this->Disconnect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Disconnect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Disconnect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);

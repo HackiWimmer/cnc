@@ -6,6 +6,7 @@
 #include "wxCrafterImages.h"
 #include "CncSecureManuallyMovePanel.h"
 #include "CncPolarRegionDetector.h"
+#include "CncSecureRotateModelPanel.h"
 #include "CncSecureCtrlPanel.h"
 
 class CncSecurePortListCtrl : public CncLargeScaledListCtrl {
@@ -231,6 +232,7 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 , CncPodestMgmtMovement::CallbackInterface		()
 , portSelectorList								(NULL)
 , manuallyMovePanel								(NULL)
+, rotateModelPanel								(NULL)
 , interactiveMoveX								(NULL)
 , interactiveMoveY								(NULL)
 , interactiveMoveZ								(NULL)
@@ -264,20 +266,26 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	manuallyMovePanel = new CncSecureManuallyMovePanel(this); 
 	GblFunc::replaceControl(m_manuallyMovePlaceholder, manuallyMovePanel);
 	
+	rotateModelPanel  = new CncSecureRotateModelPanel(this);
+	GblFunc::replaceControl(THE_APP->GetSecRotateSliderPlaceholder(), rotateModelPanel);
+	
 	interactiveMoveX = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 5);
 	GblFunc::replaceControl(m_interactiveMoveXPlaceholder, interactiveMoveX);
 	interactiveMoveX->setCallbackId(CallbackID_SPX);
 	interactiveMoveX->SetBackgroundColour(wxColour(255, 128, 128));
+	interactiveMoveX->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN32"));
 	
 	interactiveMoveY = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 5);
 	GblFunc::replaceControl(m_interactiveMoveYPlaceholder, interactiveMoveY);
 	interactiveMoveY->setCallbackId(CallbackID_SPY);
 	interactiveMoveY->SetBackgroundColour(wxColour(  0, 120, 215));
+	interactiveMoveY->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN32"));
 	
 	interactiveMoveZ = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 5);
 	GblFunc::replaceControl(m_interactiveMoveZPlaceholder, interactiveMoveZ);
 	interactiveMoveZ->setCallbackId(CallbackID_SPZ);
 	interactiveMoveZ->SetBackgroundColour(wxColour(  0, 128,  0));
+	interactiveMoveZ->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN32"));
 	
 	interactiveTouchpadXYZ = new CncSecureGesturesPanel(this, wxBOTH, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 5);
 	GblFunc::replaceControl(m_interactiveTouchpadXYZ, interactiveTouchpadXYZ);
@@ -320,6 +328,7 @@ CncSecureCtrlPanel::~CncSecureCtrlPanel() {
 /////////////////////////////////////////////////////////////////////
 	wxDELETE(portSelectorList);
 	wxDELETE(manuallyMovePanel);
+	wxDELETE(rotateModelPanel);
 	wxDELETE(podestPanel);
 	wxDELETE(referencePanel);
 	wxDELETE(speedpad);
@@ -397,8 +406,6 @@ void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 			if ( move )
 			{
 				const int modifySpeed = abs(event.data.range);
-				
-				//std::cout << wxString::Format("updateInteractiveMove(%+d, %+d, %+d, %d)\n", (int)dx, (int)dy, (int)dz, abs(d.range));
 				THE_APP->updateInteractiveMove(dx, dy, dz, modifySpeed);
 			}
 			
@@ -665,6 +672,7 @@ void CncSecureCtrlPanel::onToggleTouchpadPane(wxCommandEvent& event) {
 			interactiveTouchpadXYZ->setCallbackId(CallbackID_TPZ);
 			interactiveTouchpadXYZ->setOrientation(wxVERTICAL);
 			interactiveTouchpadXYZ->SetBackgroundColour(wxColour(  0, 128,  0));
+			interactiveTouchpadXYZ->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN32"));
 			break;
 			
 		case CallbackID_TPZ:
@@ -672,6 +680,7 @@ void CncSecureCtrlPanel::onToggleTouchpadPane(wxCommandEvent& event) {
 			interactiveTouchpadXYZ->setCallbackId(CallbackID_TPXY);
 			interactiveTouchpadXYZ->setOrientation(wxBOTH);
 			interactiveTouchpadXYZ->SetBackgroundColour(wxColour(255, 255, 184));
+			interactiveTouchpadXYZ->setCenterBitmap(ImageLibSecure().Bitmap("BMP_CROSSHAIR"));
 			break;
 	}
 	

@@ -270,9 +270,8 @@ uint32_t ArduinoAccelManager::initNextImpulse(AxisSignatureIndex axisSignatureId
     {
       ret = cnvSpeedToDelay( fA.fctValue1000(curImplIdx) );
 
-#warning
-if (curType == T_INTERACTIVE )
-  ret /= (interactiveFactor / 2.0);
+      if (curType == T_INTERACTIVE )
+        ret /= (interactiveFactor);
       
       curImplIdx++;
       
@@ -296,8 +295,8 @@ if (curType == T_INTERACTIVE )
       ret = cfgSpeedDelay;
       curImplIdx++;
       
-if (curType == T_INTERACTIVE )
-   ret /= (interactiveFactor / 2.0);
+      if (curType == T_INTERACTIVE )
+         ret /= (interactiveFactor);
         
       // state machine handling
       // interactive moves stay in mode P_TARGET until they stops

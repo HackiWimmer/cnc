@@ -9057,12 +9057,27 @@ State</label>
                                       <object class="sizeritem" name="flexGridSizer9867">
                                         <flag>wxALL|wxEXPAND</flag>
                                         <object class="wxFlexGridSizer">
-                                          <cols>1</cols>
+                                          <cols>3</cols>
                                           <rows>1</rows>
                                           <vgap>0</vgap>
                                           <hgap>0</hgap>
-                                          <growablecols>0</growablecols>
+                                          <growablecols>2</growablecols>
                                           <growablerows>0</growablerows>
+                                          <object class="sizeritem">
+                                            <flag>wxALL|wxEXPAND</flag>
+                                            <border>1</border>
+                                            <object class="wxStaticLine" name="m_staticLine10042">
+                                              <style>wxLI_VERTICAL</style>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL|wxEXPAND</flag>
+                                            <minsize>80,-1</minsize>
+                                            <object class="wxPanel" name="m_secRotateSliderPlaceholder">
+                                              <style>wxTAB_TRAVERSAL</style>
+                                              <bg>wxSYS_COLOUR_INFOBK</bg>
+                                            </object>
+                                          </object>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
                                             <object class="wxPanel" name="m_secMonitorPlaceholder">
@@ -10025,8 +10040,8 @@ State</label>
             <![CDATA[]]>
           </help>
         </object>
-        <object class="wxMenuItem" name="m_miPodestManagement">
-          <label>Podest Management</label>
+        <object class="wxMenuItem" name="m_miPodiumManagement">
+          <label>Podium Management</label>
           <bitmap>bitmaps/CodeLite/16-sort.png</bitmap>
           <accel>
             <![CDATA[]]>

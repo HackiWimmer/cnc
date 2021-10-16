@@ -39,8 +39,8 @@ CncReferenceEvaluation::CncReferenceEvaluation(wxWindow* parent)
 	}
 	
 	// default value
-	m_notebookEvalMode->SetSelection(SEL_BY_EYE);
 	setMode(CncRefPositionMode::CncRM_Mode5);
+	m_notebookEvalMode->SetSelection(SEL_BY_EYE);
 	selectEvaluationMode();
 	
 	imgTouchCorner[0] = wxImage();

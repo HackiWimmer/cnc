@@ -2192,6 +2192,9 @@ bool CncControl::evaluateHardwareReference() {
 	THE_BOUNDS->setHardwareOffset(curCtlPos);
 	THE_BOUNDS->setHardwareOffsetValid(true); 
 	
+	ret = changeCurrentFeedSpeedXYZ_MM_MIN(4500, CncSpeedUserDefined);
+	if ( ret == false ) { return returnFalse("Error while changeCurrentFeedSpeedXYZ_MM_MIN()"); }
+	
 	// move to previous positions
 	moveRelLinearStepsXY(abs(prevCtlPos.getX() - curCtlPos.getX()), abs(prevCtlPos.getY() - curCtlPos.getY()), false);
 	moveRelStepsZ(-abs(prevCtlPos.getZ() - curCtlPos.getZ()));

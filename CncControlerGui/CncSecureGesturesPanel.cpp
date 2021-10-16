@@ -42,6 +42,9 @@ CncSecureGesturesPanel::CncSecureGesturesPanel(wxWindow* parent, wxOrientation o
 {
 	SetBackgroundStyle(wxBG_STYLE_PAINT);
 	
+	const wxFont font(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+	SetFont(font);
+	
 	Bind(wxEVT_PAINT,			&CncSecureGesturesPanel::onPaint,			this);
 	Bind(wxEVT_SIZE,			&CncSecureGesturesPanel::onSize,			this);
 	Bind(wxEVT_MOTION,			&CncSecureGesturesPanel::onMouse,			this);
@@ -282,6 +285,7 @@ void CncSecureGesturesPanel::calculateCoordinates() {
 	
 	// additionally change information
 	lastData.isRangeChanged = ( lastData.range != ref.range );
+	lastData.isRatioChanged = ( lastData.ratio != ref.ratio );
 	lastData.isAngleChanged = ( lastData.angle != ref.angle );
 	lastData.isTimerChanged = false;
 }
@@ -630,8 +634,7 @@ void CncSecureGesturesPanel::onPaint(wxPaintEvent& WXUNUSED(event)) {
 	
 	//-----------------------------------------------------------------
 	// label
-	const wxFont font(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-	dc.SetFont(font);
+	dc.SetFont(GetFont());
 	
 	wxRect rangeRect = innerRect;
 	wxRect ratioRect = innerRect;
@@ -709,10 +712,10 @@ void CncSecureGesturesPanel::onMouse(wxMouseEvent& event) {
 									m_translateDistance.m_y =  event.GetY();
 									break;
 			}
+			
+			// apply
+			applyPosChange(true);
 		}
-		
-		// apply
-		applyPosChange(true);
 	}
 }
 ///////////////////////////////////////////////////////////////////

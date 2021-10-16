@@ -231,7 +231,7 @@ void CncVideoCapturePanel::onPaint(wxPaintEvent& event) {
 		dc.Clear();
 	}
 	*/
-	
+
 	dc.SetBackground(*wxTRANSPARENT_BRUSH);
 	dc.SetBrush(*wxTRANSPARENT_BRUSH);
 	dc.SetPen(*wxRED);
@@ -248,8 +248,8 @@ void CncVideoCapturePanel::onPaint(wxPaintEvent& event) {
 	if ( rectFlag ) {
 		const int lr = 7;
 		dc.DrawRectangle(center.x - lr + 1, center.y - lr + 1, 2 * lr, 2 * lr);
-		dc.DrawCircle(center, 12.0);
-		dc.DrawCircle(center, 16.0);
+		//dc.DrawCircle(center, 12.0);
+		//dc.DrawCircle(center, 16.0);
 		dc.DrawCircle(center, 22.0);
 		dc.DrawCircle(center, 36.0);
 	}
