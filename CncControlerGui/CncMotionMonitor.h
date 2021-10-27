@@ -183,6 +183,13 @@ class CncMotionMonitor : public CncGlCanvas
 		void onEraseBackground(wxEraseEvent& event);
 		void onCameraRotationTimer(wxTimerEvent& event);
 		
+		void onPan(wxPanGestureEvent& event);
+		void onZoom(wxZoomGestureEvent& event);
+		void onRotate(wxRotateGestureEvent& event);
+		void onTwoFingerTap(wxTwoFingerTapEvent& event);
+		void onLongPress(wxLongPressEvent& event);
+		void onPressAndTap(wxPressAndTapEvent& event);
+		
 		void performMouseCoordAndToolTip();
 		
 	private:

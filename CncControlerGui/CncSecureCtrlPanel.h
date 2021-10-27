@@ -41,11 +41,13 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		void updatePortSelection(const wxString& portName);
 		void notifyConnection(bool state, const wxString& portName);
 		
+		void notifyResetMonitorView();
+		
 		CncReferenceEvaluation* getReferencePanel() const { return referencePanel; }
 		
 	protected:
-    virtual void onSerialSpySec(wxCommandEvent& event);
 	
+		virtual void onSerialSpySec(wxCommandEvent& event);
 		virtual void requestResolveLimitStates(wxCommandEvent& event);
 		virtual void onToggleTouchpadPane(wxCommandEvent& event);
 		virtual void onReferenceSet(wxCommandEvent& event);

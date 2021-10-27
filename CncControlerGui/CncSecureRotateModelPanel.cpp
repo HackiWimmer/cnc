@@ -16,33 +16,37 @@ CncSecureRotateModelPanel::CncSecureRotateModelPanel(wxWindow* parent)
 {
 	const wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
 	
-	zoomPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 1);
+	zoomPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 1);
 	GblFunc::replaceControl(m_zoomPlaceholder, zoomPanel);
 	zoomPanel->setCallbackId(CBID_ZOOM);
 	zoomPanel->SetBackgroundColour(wxColour(  0, 128, 255));
 	zoomPanel->SetFont(font);
 	zoomPanel->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN16"));
+	zoomPanel->init();
 	
-	rotateXPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 1);
+	rotateXPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 1);
 	GblFunc::replaceControl(m_rotateXPlaceholder, rotateXPanel);
 	rotateXPanel->setCallbackId(CBID_ROTATE_X);
 	rotateXPanel->SetBackgroundColour(wxColour(128, 128, 255));
 	rotateXPanel->SetFont(font);
 	rotateXPanel->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN16"));
+	rotateXPanel->init();
 	
-	rotateYPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 1);
+	rotateYPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 1);
 	GblFunc::replaceControl(m_rotateYPlaceholder, rotateYPanel);
 	rotateYPanel->setCallbackId(CBID_ROTATE_Y);
 	rotateYPanel->SetBackgroundColour(wxColour( 128,   0, 255));
 	rotateYPanel->SetFont(font);
 	rotateYPanel->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN16"));
+	rotateYPanel->init();
 	
-	rotateZPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 1);
+	rotateZPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 1);
 	GblFunc::replaceControl(m_rotateZPlaceholder, rotateZPanel);
 	rotateZPanel->setCallbackId(CBID_ROTATE_Z);
 	rotateZPanel->SetBackgroundColour(wxColour( 255,   0, 255));
 	rotateZPanel->SetFont(font);
 	rotateZPanel->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN16"));
+	rotateZPanel->init();
 	
 	Bind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncSecureRotateModelPanel::onModifyModel, this);
 }
@@ -92,14 +96,15 @@ void CncSecureRotateModelPanel::onModifyModel(CncSecureGesturesPanelEvent& event
 					break;
 				}
 			}
+			
+			break;
 		}
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureRotateModelPanel::reset() {
 ///////////////////////////////////////////////////////////////////
-	#warning really necessary?
-	zoomPanel->init();
+	zoomPanel   ->init();
 	rotateXPanel->init();
 	rotateYPanel->init();
 	rotateZPanel->init();

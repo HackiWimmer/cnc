@@ -19,10 +19,10 @@ class CncSecureRotateModelPanel : public CncSecureRotateModelPanelBase
 		
 	private:
 		
-		const static int CBID_ZOOM		= 10;
-		const static int CBID_ROTATE_X	= 11;
-		const static int CBID_ROTATE_Y	= 12;
-		const static int CBID_ROTATE_Z	= 13;
+		const static int CBID_ZOOM		= 110;
+		const static int CBID_ROTATE_X	= 111;
+		const static int CBID_ROTATE_Y	= 112;
+		const static int CBID_ROTATE_Z	= 113;
 	
 		CncSecureGesturesPanel* zoomPanel;
 		CncSecureGesturesPanel* rotateXPanel;

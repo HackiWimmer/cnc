@@ -89,6 +89,30 @@ void CncGlCanvas::decScale() {
 	context->getModelScale().incScale();
 }
 //////////////////////////////////////////////////
+void CncGlCanvas::setScale(float scale) {
+//////////////////////////////////////////////////
+	if ( context == NULL )
+		return;
+		
+	context->getModelScale().setScale(scale);
+}
+//////////////////////////////////////////////////
+void CncGlCanvas::setScaleByRatio(float ratio) {
+//////////////////////////////////////////////////
+	if ( context == NULL )
+		return;
+		
+	context->getModelScale().setScaleByRatio(ratio);
+}
+//////////////////////////////////////////////////
+float CncGlCanvas::getScaleRatio() const {
+//////////////////////////////////////////////////
+	if ( context == NULL )
+		return 1.0f;
+		
+	return context->getModelScale().getScaleRatio();
+}
+//////////////////////////////////////////////////
 void CncGlCanvas::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 	if ( context == NULL )

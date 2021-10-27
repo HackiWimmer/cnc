@@ -2,6 +2,7 @@
 #define CNCSECURESLIDEPAD_H
 
 #include <vector>
+#include "CncSecureGesturesPanel.h"
 #include "wxCrafterSecurePanel.h"
 
 class CncSecureSlidepad : public CncSecureSlidepadBase
@@ -17,28 +18,35 @@ class CncSecureSlidepad : public CncSecureSlidepadBase
 				virtual void sliderValueChanged(int index, int value) {}
 		};
 		
+		enum Resulution { ResOnes = 1, ResTens = 10, ResHundreds = 100, ResThousands = 1000};
+		
 		CncSecureSlidepad(wxWindow* parent);
 		virtual ~CncSecureSlidepad();
 		
 		typedef std::vector<int> SliderValues;
 		
-		bool	setValues(const SliderValues& list, int index);
 		void	setInfo(const wxString& info);
+		
+		bool	setValues(const SliderValues& list, int index);
+		void	setValueByRatio(float ratio) { slider->setValueByRatio(ratio); }
+		int		getValue() const;
 		
 		void	setCallbackInterface(CallbackInterface* inf) { caller = inf; }
 		
-		int		getValue() const;
-		
 	protected:
-		virtual void onScrollChanged(wxScrollEvent& event);
+		
+		void onSliderEvent(CncSecureGesturesPanelEvent& event);
 		
 	private:
-		SliderValues		sliderValues;
-		CallbackInterface*	caller;
+	
+		static const int		callbackId = 624;
+	
+		SliderValues			sliderValues;
+		CncSecureGesturesPanel*	slider;
+		CallbackInterface*		caller;
+		Resulution				resolution;
 		
-		void prepareScrollbar();
-		void updateResult();
-		
+		void updateResult(float ratio);
 		int findValue(int value) const;
 };
 

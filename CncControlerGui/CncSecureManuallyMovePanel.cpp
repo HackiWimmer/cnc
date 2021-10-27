@@ -140,8 +140,13 @@ void CncSecureManuallyMovePanel::onLeftDownResultValue(wxMouseEvent& event) {
 				values.push_back(cnc::getSpeedValue(ROUGH));
 				values.push_back(cnc::getSpeedValue(ROUGHEST));
 				*/
-				values.push_back(cnc::getSpeedValue(FINEST));
-				values.push_back(cnc::getSpeedValue(ROUGHEST));
+				//values.push_back(cnc::getSpeedValue(FINEST));
+				#warning
+				
+				//values.push_back(-cnc::getSpeedValue(ROUGHEST));
+				values.push_back(0);
+				values.push_back(+cnc::getSpeedValue(ROUGHEST));
+				
 				
 				dlg.setValues(values, currentValue);
 				dlg.setInfo(info);

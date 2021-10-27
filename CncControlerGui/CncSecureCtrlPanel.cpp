@@ -296,18 +296,41 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	
 				CncSecureGesturesPanel* panelQ1 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_POSITIVE, 10);
 				GblFunc::replaceControl(m_panelQ1, panelQ1);
-				panelQ1->setCallbackId(CallbackID_TPZ+6);
+				panelQ1->setCallbackId(6001);
 				panelQ1->SetBackgroundColour(wxColour(  0, 128,  0));
+				panelQ1->init();
 				
 				CncSecureGesturesPanel* panelQ2 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_NEGATIVE, 10);
 				GblFunc::replaceControl(m_panelQ2, panelQ2);
-				panelQ2->setCallbackId(CallbackID_TPZ+6);
+				panelQ2->setCallbackId(6002);
 				panelQ2->SetBackgroundColour(wxColour(  0, 128,  0));
+				panelQ2->init();
 				
 				CncSecureGesturesPanel* panelQ3 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 10);
 				GblFunc::replaceControl(m_panelQ3, panelQ3);
-				panelQ3->setCallbackId(CallbackID_TPZ+6);
+				panelQ3->setCallbackId(6003);
 				panelQ3->SetBackgroundColour(wxColour(  0, 128,  0));
+				panelQ3->init();
+				
+				CncSecureGesturesPanel* panelQ4 = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_POSITIVE, 10);
+				GblFunc::replaceControl(m_panelQ4, panelQ4);
+				panelQ4->setCallbackId(6004);
+				panelQ4->SetBackgroundColour(wxColour(  0, 128,  0));
+				panelQ4->init();
+				
+				CncSecureGesturesPanel* panelQ5 = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_NEGATIVE, 10);
+				GblFunc::replaceControl(m_panelQ5, panelQ5);
+				panelQ5->setCallbackId(6005);
+				panelQ5->SetBackgroundColour(wxColour(  0, 128,  0));
+				panelQ5->init();
+				
+				CncSecureGesturesPanel* panelQ6 = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 10);
+				GblFunc::replaceControl(m_panelQ6, panelQ6);
+				panelQ6->setCallbackId(6006);
+				panelQ6->SetBackgroundColour(wxColour(  0, 128,  0));
+				panelQ6->init();
+				
+				
 				
 				
 	
@@ -332,6 +355,11 @@ CncSecureCtrlPanel::~CncSecureCtrlPanel() {
 	wxDELETE(podestPanel);
 	wxDELETE(referencePanel);
 	wxDELETE(speedpad);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::notifyResetMonitorView() {
+/////////////////////////////////////////////////////////////////////
+	rotateModelPanel->reset();
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
@@ -701,6 +729,9 @@ void CncSecureCtrlPanel::activate(bool b) {
 		m_rightBook->SetSelection(sel);
 		THE_APP->GetSecureSplitterMainV()->SetSashPosition(pageVector.at(sel).width);
 		performRightHeadline();
+		
+		#warning
+		//notifyResetMonitorView();
 	}
 	else {
 

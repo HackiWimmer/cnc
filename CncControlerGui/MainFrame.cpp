@@ -1396,6 +1396,8 @@ void MainFrame::activateSecureMode(bool state) {
 	// switch the state
 	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
 		
+		getLoggerView()->setSecureMode(true);
+		
 		perspectiveHandler.logCurrentPerspective();
 		hideAllAuiPanes(true);
 		
@@ -1418,8 +1420,6 @@ void MainFrame::activateSecureMode(bool state) {
 		m_externFileManagerPreview->Enable(false);
 		
 		cncExtViewBoxCluster->hideAll();
-		
-		getLoggerView()->setSecureMode(true);
 		
 		swapControls();
 		
@@ -6932,6 +6932,9 @@ void MainFrame::onResetView(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(drawPane3D);
 	drawPane3D->resetView();
+	
+	if ( secureCtrlPanel )
+		secureCtrlPanel->notifyResetMonitorView();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearMotionMonitor() {
@@ -8988,7 +8991,7 @@ void MainFrame::setReferencePosEnforceFlag(bool s) {
 	wxASSERT ( secureCtrlPanel );
 	wxASSERT ( refPositionDlg );
 	
-	// chnage the order
+	// change the order
 	if ( THE_CONTEXT->secureModeInfo.isActive == true )
 	{
 		refPositionDlg->setEnforceFlag(s);
@@ -9010,22 +9013,10 @@ void MainFrame::resetReferencePosTempSetting() {
 	refPositionDlg->resetTempSetting();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::motionMonitorZoom(float fact) {
+void MainFrame::motionMonitorZoom(float ratio) {
 /////////////////////////////////////////////////////////////////////
-#warning implement
-/*	if ( fact == 0 )
-	{
-		motionMonitor->setZoom(1.0);
-		return;
-	}
-	
-	float zoom = motionMonitor->getZoom();
-	if ( fact < 0 ) zoom -= 0.1;
-	else			zoom += 0.5;
-	
-	motionMonitor->setZoom(zoom);
+	motionMonitor->setScaleByRatio(ratio);
 	motionMonitor->Refresh();
-	*/
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::motionMonitorRotateX(float angle) {

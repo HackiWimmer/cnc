@@ -81,7 +81,20 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	
 	createRuler(GLContextBase::ModelType::MT_RIGHT_HAND);
 	
-	EnableTouchEvents(wxTOUCH_ZOOM_GESTURE | wxTOUCH_ROTATE_GESTURE);
+	if ( !EnableTouchEvents(wxTOUCH_ALL_GESTURES) )
+	{
+		CNC_PRINT_FUNCT_A("Failed to enable touch events\n");
+	}
+	else
+	{
+		// Still bind event handlers just in case they still work
+		Bind(wxEVT_GESTURE_PAN,		&CncMotionMonitor::onPan,			this);
+		Bind(wxEVT_GESTURE_ZOOM,	&CncMotionMonitor::onZoom,			this);
+		Bind(wxEVT_GESTURE_ROTATE,	&CncMotionMonitor::onRotate,		this);
+		Bind(wxEVT_TWO_FINGER_TAP,	&CncMotionMonitor::onTwoFingerTap,	this);
+		Bind(wxEVT_LONG_PRESS,		&CncMotionMonitor::onLongPress,		this);
+		Bind(wxEVT_PRESS_AND_TAP,	&CncMotionMonitor::onPressAndTap,	this);
+	}
 }
 //////////////////////////////////////////////////
 CncMotionMonitor::~CncMotionMonitor() {
@@ -571,5 +584,33 @@ void CncMotionMonitor::popInteractiveProcessMode() {
 	processMode = false;
 	monitor->popInteractiveProcessMode();
 }
-
-
+//////////////////////////////////////////////////
+void CncMotionMonitor::onPan(wxPanGestureEvent& event) {
+//////////////////////////////////////////////////
+	// currently only implemented to disable all gesture events
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::onZoom(wxZoomGestureEvent& event) {
+//////////////////////////////////////////////////
+	// currently only implemented to disable all gesture events
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::onRotate(wxRotateGestureEvent& event) {
+//////////////////////////////////////////////////
+	// currently only implemented to disable all gesture events
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::onTwoFingerTap(wxTwoFingerTapEvent& event) {
+//////////////////////////////////////////////////
+	// currently only implemented to disable all gesture events
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::onLongPress(wxLongPressEvent& event) {
+//////////////////////////////////////////////////
+	// currently only implemented to disable all gesture events
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::onPressAndTap(wxPressAndTapEvent& event) {
+//////////////////////////////////////////////////
+	// currently only implemented to disable all gesture events
+}

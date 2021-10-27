@@ -30,6 +30,9 @@ class CncGlCanvas : public wxGLCanvas {
 		
 		void incScale();
 		void decScale();
+		void setScale(float scale);
+		void setScaleByRatio(float ratio);
+		float getScaleRatio()	const;
 		
 		bool isContextValid() 	const { return lastSetCurrent; }
 		bool isAlreadyPainted() const { return alreadyPainted; }

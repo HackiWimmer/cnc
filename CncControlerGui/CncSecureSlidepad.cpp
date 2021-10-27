@@ -1,20 +1,36 @@
+#include "GlobalFunctions.h"
 #include "CncSecureSlidepad.h"
 
 /////////////////////////////////////////////////////////////////////
 CncSecureSlidepad::CncSecureSlidepad(wxWindow* parent)
 : CncSecureSlidepadBase		(parent)
 , sliderValues				()
+, slider					(NULL)
 , caller					(NULL)
+, resolution				(ResTens)
 /////////////////////////////////////////////////////////////////////
 {
 	sliderValues.push_back(0);
 	sliderValues.push_back(1);
 	
-	prepareScrollbar();
+	const wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+	
+	slider = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_POSITIVE, 10);
+	GblFunc::replaceControl(m_gesturePanelPlaceholder, slider);
+	slider->setCallbackId(callbackId);
+	slider->SetBackgroundColour(wxColour(  0, 128,  0));
+	slider->SetFont(font);
+	slider->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_LEFT_RIGHT32"));
+	slider->init();
+	
+	Bind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncSecureSlidepad::onSliderEvent, this);
 }
 /////////////////////////////////////////////////////////////////////
 CncSecureSlidepad::~CncSecureSlidepad() {
 /////////////////////////////////////////////////////////////////////
+	Unbind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncSecureSlidepad::onSliderEvent, this);
+	
+	wxDELETE(slider);
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureSlidepad::setInfo(const wxString& info) {
@@ -37,23 +53,45 @@ bool CncSecureSlidepad::setValues(const SliderValues& list, int startValue) {
 	if ( list.size() < 2 ) 
 		return false;
 		
-	sliderValues = list;
-	prepareScrollbar();
+	const int max = list.back();
+	const int min = list.front();
 	
-	const int index = findValue(startValue);
-	if  ( sliderValues.size() == 2 ) 
+	if ( max == min || max < min )
 	{
-		m_scrollbar->SetThumbPosition(index);
+		std::cerr << CNC_LOG_FUNCT << ": Invalid boundaries: min=" << min << " max=" << max  << std::endl;
+		return false;
+	}
+	
+	if ( startValue < min || startValue > max )
+	{
+		std::cerr << CNC_LOG_FUNCT << ": Invalid start value: min=" << min << " value=" << startValue << " max=" << max  << std::endl;
+		return false;
+	}
+	
+	sliderValues = list;
+	
+	if		( min <= 0 && max <= 0 )	slider->setMode(CncSecureGesturesPanel::Mode::M_NEGATIVE);
+	else if ( min  < 0 && max >= 0 )	slider->setMode(CncSecureGesturesPanel::Mode::M_BOTH);
+	else if ( min >= 0 && max  > 0 )	slider->setMode(CncSecureGesturesPanel::Mode::M_POSITIVE);
+	
+	slider->update();
+	
+	if ( sliderValues.size() == 2 ) 
+	{
+		const float ratio = CncRangeTranslator<int>(min, max, cncLeft).ratioFromValue(startValue);
+		slider->setValueByRatio(ratio);
 	}
 	else
 	{
-		if ( index >=0 && index < (int)sliderValues.size() )	m_scrollbar->SetThumbPosition(index);
-		else													m_scrollbar->SetThumbPosition(0);
+		
+		
+		
+		
 	}
 	
-	updateResult(); 
 	return true;
 }
+/*
 /////////////////////////////////////////////////////////////////////
 int CncSecureSlidepad::findValue(int value) const {
 /////////////////////////////////////////////////////////////////////
@@ -79,33 +117,14 @@ int CncSecureSlidepad::findValue(int value) const {
 	
 	return -1;
 }
+*/
+
+
+
+
+
 /////////////////////////////////////////////////////////////////////
-void CncSecureSlidepad::prepareScrollbar() {
-/////////////////////////////////////////////////////////////////////
-	m_scrollbar->SetThumbSize(1);
-	m_scrollbar->SetPageSize(1);
-	
-	
-	if ( sliderValues.size() < 2 ) 
-	{
-		m_scrollbar->SetRange(1);
-		m_scrollbar->Enable(false);
-	}
-	else if ( sliderValues.size() == 2 ) 
-	{
-		m_scrollbar->SetRange((sliderValues[1] - sliderValues[0]) + 1);
-		m_scrollbar->Enable(true);
-	}
-	else 
-	{
-		m_scrollbar->SetRange(sliderValues.size() );
-		m_scrollbar->Enable(true);
-	}
-	
-	updateResult(); 
-}
-/////////////////////////////////////////////////////////////////////
-void CncSecureSlidepad::updateResult() {
+void CncSecureSlidepad::updateResult(float ratio) {
 /////////////////////////////////////////////////////////////////////
 	if ( sliderValues.size() < 2 ) 
 	{
@@ -113,28 +132,37 @@ void CncSecureSlidepad::updateResult() {
 	}
 	else if ( sliderValues.size() == 2 ) 
 	{
-		const int newVal = sliderValues[0] + m_scrollbar->GetThumbPosition();
-		m_textResult->ChangeValue(wxString::Format("%d", newVal));
-		
-		if ( caller )
-			caller->sliderValueChanged(m_scrollbar->GetThumbPosition(), newVal);
+		int val = CncRangeTranslator<int>(sliderValues.front(), sliderValues.back(), cncLeft).valueFromRatio(ratio);
+		val = wxRound(double(val) / resolution) * resolution;
+		m_textResult->ChangeValue(wxString::Format("%d", val));
 	}
-	else 
+	else
 	{
-		const int val = m_scrollbar->GetThumbPosition();
 		
-		int newVal = 0;
-		if ( val < (int)sliderValues.size() )
-			newVal =  sliderValues[val];
-			
-		m_textResult->ChangeValue(wxString::Format("%d", newVal));
 		
-		if ( caller )
-			caller->sliderValueChanged(val, newVal);
+		
+		
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureSlidepad::onScrollChanged(wxScrollEvent& event) {
+void CncSecureSlidepad::onSliderEvent(CncSecureGesturesPanelEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	updateResult();
+	// may be nothing to to
+	if ( event.data.isRatioChanged == false )
+		return;
+	
+	switch( event.GetId() )
+	{
+		//case CncSecureGesturesPanelEvent::Id::CSGP_STARTING:
+		//case CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD:
+		case CncSecureGesturesPanelEvent::Id::CSGP_POS_CHANGED:
+		{
+			if ( event.data.cbId == callbackId )
+			{
+				updateResult(event.data.ratio);
+			}
+			
+			break;
+		}
+	}
 }

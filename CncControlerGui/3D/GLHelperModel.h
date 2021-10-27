@@ -1,6 +1,8 @@
 #ifndef OPENGL_MODEL_HELPER_H
 #define OPENGL_MODEL_HELPER_H
 
+#include "CncCommon.h"
+
 namespace GLI {
 	
 	////////////////////////////////////////////////////////////////
@@ -26,13 +28,39 @@ namespace GLI {
 			////////////////////////////////////////////
 			const float getStepWidth()		const	{ return _step; }
 			const float getScaleFactor()	const	{ return _scale; }
-			const float getMaxScaleFactor()	const 	{ return 4.0; }
+			const float getMinScaleFactor()	const 	{ return _minScaleFactor; }
+			const float getMaxScaleFactor()	const 	{ return _maxScaleFactor; }
 			void resetScale()						{ _scale = 1.0; }
-			void incScale() 						{ _scale = std::min(_scale + _step, getMaxScaleFactor()); }
+			void setScale(float scale)				{ _scale = std::max(_minScaleFactor, std::min(scale,_maxScaleFactor)); }
+			void incScale() 						{ _scale = std::min(_scale + _step, _maxScaleFactor); }
 			void decScale()							{ _scale = std::max(_scale - _step, _step); }
-			void setStepWidth(float f) 				{ _step = ( f >= 0.01f && f <= 10.0f  ? f : _step); } 
+			
+			void setScaleByRatio(float ratio)
+			{
+				if      ( cnc::fltCmp::eq(ratio, 0.0) )		setScale( 1.0 );
+				else if ( ratio < 0.0 )						setScale( (-1)/ratio * _minScaleFactor );
+				else if ( ratio > 0.0 )						setScale( ratio      * _maxScaleFactor + 1.0 );
+			}
+			
+			float getScaleRatio() const
+			{
+				const float posDist = +(_maxScaleFactor - 1.0);
+				const float negDist = -(1.0 - _minScaleFactor);
+				
+				float ret = 1.0;
+				if      ( cnc::fltCmp::eq(_scale, 1.0) )	ret = 0.0;
+				else if ( _scale < 1.0 )					ret = _scale/negDist;
+				else if ( _scale > 1.0)						ret = _scale/posDist;
+				
+				return ret;
+			}
+			
+			void setStepWidth(float f) 				{ _step = ( f >= 0.01f && f <= 0.50f  ? f : _step); } 
 			
 		private:
+			static constexpr float _minScaleFactor = 0.01f;
+			static constexpr float _maxScaleFactor = 5.00f;
+			
 			float _step;
 			float _scale;
 	};

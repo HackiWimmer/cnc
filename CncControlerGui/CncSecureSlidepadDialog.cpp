@@ -7,7 +7,7 @@ CncSecureSlidepadDialog::CncSecureSlidepadDialog(wxWindow* parent)
 , slidepad							(NULL)
 /////////////////////////////////////////////////////////////////////
 {
-	// slidepad control
+	// slide pad control
 	slidepad = new CncSecureSlidepad(this); 
 	GblFunc::replaceControl(m_slidepadPlaceholder, slidepad);
 }

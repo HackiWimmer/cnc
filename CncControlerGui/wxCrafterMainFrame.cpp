@@ -5068,50 +5068,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer8248->Add(m_staticLine9185, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_secureSplitterMainV = new wxSplitterWindow(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), wxSP_3D);
-    m_secureSplitterMainV->SetSashGravity(0.2);
-    m_secureSplitterMainV->SetMinimumPaneSize(10);
-    
-    flexGridSizer8248->Add(m_secureSplitterMainV, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_splitterPageLeft = new wxPanel(m_secureSplitterMainV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMainV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    
-    wxFlexGridSizer* flexGridSizer9924 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer9924->SetFlexibleDirection( wxBOTH );
-    flexGridSizer9924->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer9924->AddGrowableCol(0);
-    flexGridSizer9924->AddGrowableRow(0);
-    m_splitterPageLeft->SetSizer(flexGridSizer9924);
-    
-    m_securityCtrlPanelPlaceholder = new wxPanel(m_splitterPageLeft, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLeft, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_securityCtrlPanelPlaceholder->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    
-    flexGridSizer9924->Add(m_securityCtrlPanelPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_securityCtrlPanelPlaceholder->SetMinSize(wxSize(-1,20));
-    
-    m_cncOverviewsPlaceholder = new wxPanel(m_splitterPageLeft, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLeft, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_cncOverviewsPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    
-    flexGridSizer9924->Add(m_cncOverviewsPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_cncOverviewsPlaceholder->SetMinSize(wxSize(-1,120));
-    
-    m_secGamepadPlaceholder = new wxPanel(m_splitterPageLeft, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLeft, wxSize(-1,90)), wxTAB_TRAVERSAL);
-    m_secGamepadPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    
-    flexGridSizer9924->Add(m_secGamepadPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_secGamepadPlaceholder->SetMinSize(wxSize(-1,90));
-    
-    m_splitterPageRight = new wxPanel(m_secureSplitterMainV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMainV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_secureSplitterMainV->SplitVertically(m_splitterPageLeft, m_splitterPageRight, 0);
-    
     wxFlexGridSizer* flexGridSizer8368 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer8368->SetFlexibleDirection( wxBOTH );
     flexGridSizer8368->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer8368->AddGrowableCol(0);
     flexGridSizer8368->AddGrowableRow(0);
-    m_splitterPageRight->SetSizer(flexGridSizer8368);
     
-    m_secureSplitterMainH = new wxSplitterWindow(m_splitterPageRight, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageRight, wxSize(-1,-1)), wxSP_3D);
+    flexGridSizer8248->Add(flexGridSizer8368, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_secureSplitterMainH = new wxSplitterWindow(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), wxSP_3D);
     m_secureSplitterMainH->SetSashGravity(0.7);
     m_secureSplitterMainH->SetMinimumPaneSize(10);
     
@@ -5119,14 +5084,45 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_splitterPageMonitor = new wxPanel(m_secureSplitterMainH, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMainH, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
+    wxFlexGridSizer* flexGridSizer10045 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer10045->SetFlexibleDirection( wxBOTH );
+    flexGridSizer10045->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer10045->AddGrowableCol(0);
+    flexGridSizer10045->AddGrowableRow(0);
+    m_splitterPageMonitor->SetSizer(flexGridSizer10045);
+    
+    m_secureSplitterMainV = new wxSplitterWindow(m_splitterPageMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(-1,-1)), wxSP_3D);
+    m_secureSplitterMainV->SetSashGravity(0.25);
+    m_secureSplitterMainV->SetMinimumPaneSize(10);
+    
+    flexGridSizer10045->Add(m_secureSplitterMainV, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPageLeft = new wxPanel(m_secureSplitterMainV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMainV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    wxFlexGridSizer* flexGridSizer9924 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer9924->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9924->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9924->AddGrowableCol(0);
+    flexGridSizer9924->AddGrowableRow(0);
+    m_splitterPageLeft->SetSizer(flexGridSizer9924);
+    
+    m_securityCtrlPanelPlaceholder = new wxPanel(m_splitterPageLeft, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLeft, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_securityCtrlPanelPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_securityCtrlPanelPlaceholder->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer9924->Add(m_securityCtrlPanelPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPageRight = new wxPanel(m_secureSplitterMainV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMainV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_secureSplitterMainV->SplitVertically(m_splitterPageLeft, m_splitterPageRight, 0);
+    
     wxFlexGridSizer* flexGridSizer9233 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer9233->SetFlexibleDirection( wxBOTH );
     flexGridSizer9233->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9233->AddGrowableCol(0);
     flexGridSizer9233->AddGrowableRow(0);
-    m_splitterPageMonitor->SetSizer(flexGridSizer9233);
+    m_splitterPageRight->SetSizer(flexGridSizer9233);
     
-    m_secureMainBook = new wxSimplebook(m_splitterPageMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(-1,-1)), 0);
+    m_secureMainBook = new wxSimplebook(m_splitterPageRight, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageRight, wxSize(-1,-1)), 0);
     m_secureMainBook->SetName(wxT("m_secureMainBook"));
     m_secureMainBook->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -5406,7 +5402,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer23118->Add(m_staticLine234122, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_staticLine9953 = new wxStaticLine(m_splitterPageMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine9953 = new wxStaticLine(m_splitterPageRight, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageRight, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer9233->Add(m_staticLine9953, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
@@ -5420,19 +5416,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8265->AddGrowableRow(0);
     m_splitterPageLogger->SetSizer(flexGridSizer8265);
     
-    wxFlexGridSizer* flexGridSizer9961 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer9961->SetFlexibleDirection( wxBOTH );
-    flexGridSizer9961->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer9961->AddGrowableCol(0);
-    flexGridSizer9961->AddGrowableRow(0);
-    
-    flexGridSizer8265->Add(flexGridSizer9961, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
     m_secureSplitterLoggerV = new wxSplitterWindow(m_splitterPageLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLogger, wxSize(-1,-1)), wxSP_3D);
     m_secureSplitterLoggerV->SetSashGravity(0.7);
     m_secureSplitterLoggerV->SetMinimumPaneSize(10);
     
-    flexGridSizer9961->Add(m_secureSplitterLoggerV, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer8265->Add(m_secureSplitterLoggerV, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_splitterPageLoggerV = new wxPanel(m_secureSplitterLoggerV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterLoggerV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
@@ -5443,10 +5431,52 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer9991->AddGrowableRow(0);
     m_splitterPageLoggerV->SetSizer(flexGridSizer9991);
     
-    m_secLoggerPlaceholder = new wxPanel(m_splitterPageLoggerV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLoggerV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter10057 = new wxSplitterWindow(m_splitterPageLoggerV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLoggerV, wxSize(-1,-1)), wxSP_3D);
+    m_splitter10057->SetSashGravity(0.3);
+    m_splitter10057->SetMinimumPaneSize(10);
+    
+    flexGridSizer9991->Add(m_splitter10057, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPage10061 = new wxPanel(m_splitter10057, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter10057, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    wxFlexGridSizer* flexGridSizer10044 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer10044->SetFlexibleDirection( wxBOTH );
+    flexGridSizer10044->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer10044->AddGrowableCol(0);
+    flexGridSizer10044->AddGrowableRow(1);
+    flexGridSizer10044->SetMinSize(220,-1);
+    m_splitterPage10061->SetSizer(flexGridSizer10044);
+    
+    m_cncOverviewsPlaceholder = new wxPanel(m_splitterPage10061, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage10061, wxSize(320,120)), wxTAB_TRAVERSAL);
+    m_cncOverviewsPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer10044->Add(m_cncOverviewsPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_cncOverviewsPlaceholder->SetMinSize(wxSize(320,120));
+    
+    m_secGamepadPlaceholder = new wxPanel(m_splitterPage10061, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage10061, wxSize(-1,90)), wxTAB_TRAVERSAL);
+    m_secGamepadPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer10044->Add(m_secGamepadPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_secGamepadPlaceholder->SetMinSize(wxSize(-1,90));
+    
+    m_splitterPage10065 = new wxPanel(m_splitter10057, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter10057, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter10057->SplitVertically(m_splitterPage10061, m_splitterPage10065, 0);
+    
+    wxFlexGridSizer* flexGridSizer10067 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer10067->SetFlexibleDirection( wxBOTH );
+    flexGridSizer10067->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer10067->AddGrowableCol(1);
+    flexGridSizer10067->AddGrowableRow(0);
+    m_splitterPage10065->SetSizer(flexGridSizer10067);
+    
+    m_staticLine10069 = new wxStaticLine(m_splitterPage10065, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage10065, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer10067->Add(m_staticLine10069, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_secLoggerPlaceholder = new wxPanel(m_splitterPage10065, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage10065, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_secLoggerPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
     
-    flexGridSizer9991->Add(m_secLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer10067->Add(m_secLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_splitterPagePreviewV = new wxPanel(m_secureSplitterLoggerV, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterLoggerV, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_secureSplitterLoggerV->SplitVertically(m_splitterPageLoggerV, m_splitterPagePreviewV, 0);

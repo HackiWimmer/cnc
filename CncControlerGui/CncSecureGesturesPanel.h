@@ -2,113 +2,155 @@
 #define CNC_SECURE_GESTURES_PANEL_H
 
 #include "wx/wx.h"
+#include "CncCommon.h"
+
+// ----------------------------------------------------------------------------
+#define CNC_SECURE_GESTURES_PANEL_DEFAUTL_CALLBACK_ID -1
+
+// ----------------------------------------------------------------------------
+
+enum CncEdge { cncLeft, cncTop, cncRight, cncBottom };
+
+template <class T> 
+class CncRangeTranslator {
+	
+	private:
+		T				min;
+		T				max;
+		T				rng;
+		CncEdge			edge;
+		unsigned int	len;
+		
+		// ------------------------------------------------------------
+		T shift(T value)
+		{
+			return value - min;
+		}
+		
+	public:
+		
+		CncRangeTranslator(T a, T b)
+		: CncRangeTranslator(a, b, cncLeft, abs(b - a))
+		{}
+
+		CncRangeTranslator(T a, T b, CncEdge e)
+		: CncRangeTranslator(a, b, e, abs(b - a))
+		{}
+		
+		CncRangeTranslator(T a, T b, CncEdge e, unsigned int l)
+		: min	(a)
+		, max	(b)
+		, rng	(T(0))
+		, edge	(e)
+		, len	(l)
+		{
+			if ( min < max ) 
+				rng = max - min;
+				
+			// else rng = T(0)
+		}
+		
+		T getMin()					const { return min; }
+		T getMax()					const { return max; }
+		T getRange()				const { return rng; }
+		
+		bool good()					const { return ( rng != T(0) ); }
+		bool isInRange(T value)		const { return ( value >= min && value <= max ); }
+		
+		// ------------------------------------------------------------
+		T valueFromRatio(float ratio)
+		{
+			T value = T(0);
+			if ( good() )
+			{
+				if ( ratio < 0.0 )
+				{
+					if ( min < T(0) )
+						value = abs(min) * ratio;
+				}
+				else if ( ratio > 0.0 )
+				{
+					if ( max > T(0) ) 
+						value = abs(max) * ratio;
+				}
+			}
+			
+			return value;
+		}
+		
+		// ------------------------------------------------------------
+		float ratioFromValue(T value)
+		{
+			float ratio = 0.0;
+			if ( good() )
+			{
+				if ( isInRange(value) == false )
+				{
+					std::cerr << CNC_LOG_FUNCT <<  ": Value out of range:" << min << " < " << value << " > " << max << std::endl;
+				}
+				else
+				{
+					if ( value < T(0) )
+					{
+						if ( min < T(0) )
+							ratio = float(value) / abs(min);
+					}
+					else if ( value > T(0) )
+					{
+						if ( max > T(0) )
+							ratio = float(value) / abs(max);
+					}
+				}
+			}
+			
+			return ratio;
+		}
+		
+		// ------------------------------------------------------------
+		int calcByRatio(float ratio)
+		{
+			if ( good() == false )
+				return -420001;
+				
+			return calcByValue(valueFromRatio(ratio));
+		}
+		
+		// ------------------------------------------------------------
+		int calcByValue(T value)
+		{
+			if ( good() == false )
+				return -420001;
+			
+			if ( isInRange(value) == false )
+			{
+				std::cerr << CNC_LOG_FUNCT <<  ": Value out of range:" << min << " < " << value << " > " << max << std::endl;
+				return -420002;
+			}
+				
+			const T maxS = shift(max);
+			const T valS = shift(value);
+			
+			int ret = wxRound(double(valS * len ) / maxS);
+			
+			switch ( edge )
+			{
+				case cncLeft:
+				case cncTop: 
+					break;
+					
+				case cncRight:
+				case cncBottom:
+					ret = len - ret;
+					break;
+			}
+			
+			return ret;
+		}
+};
 
 // ----------------------------------------------------------------------------
 class CncSecureGesturesPanelEvent;
 wxDECLARE_EVENT(wxEVT_CNC_SECURE_GESTURES_PANEL, CncSecureGesturesPanelEvent);
-
-// ----------------------------------------------------------------------------
-class CncSecureGesturesPanel : public wxPanel
-{
-	public:
-		
-		static const int border					=  4;
-		static const int defaultCallbackId		= -1;
-		static const int updateTimerId			= 10;
-		static const int observerTimerId		= 20;
-		
-		enum State	{ S_INACTIVE, S_STARTING, S_CONTINUING };
-		enum Type	{ T_SWITCH, T_BUTTON };
-		enum Mode	{ M_NEGATIVE, M_POSITIVE, M_BOTH };
-		
-		CncSecureGesturesPanel(wxWindow* parent, wxOrientation o = wxBOTH, Type t = T_BUTTON, Mode m = M_BOTH, int sensitivity = 3);
-		~CncSecureGesturesPanel();
-		
-		void init()										{ reset(); }
-		void update()									{ calculateDimensions(); applyPosChange(false); }
-		
-		void setCenterBitmap(const wxBitmap& bmp)		{ centreBmp = bmp; }
-		void setType(const Type& t )					{ type = t; }
-		void setMode(const Mode& m )					{ mode = m; }
-		void setOrientation(const wxOrientation& o)		{ orientation = o; }
-		void setSensitivity(int s)						{ sensitivity = abs(s); }
-		
-		void setCallbackId(int id)						{ callbackId = id; }
-		int getCallbackId()						const	{ return callbackId; }
-		
-	protected:
-		
-		void onPaint(wxPaintEvent& event);
-		void onSize(wxSizeEvent& event);
-		void onMouse(wxMouseEvent& event);
-		void onLeave(wxMouseEvent& event);
-		void onTimer(wxTimerEvent& event);
-			
-		void onPan(wxPanGestureEvent& event);
-		void onZoom(wxZoomGestureEvent& event);
-		void onRotate(wxRotateGestureEvent& event);
-		void onTwoFingerTap(wxTwoFingerTapEvent& event);
-		void onLongPress(wxLongPressEvent& event);
-		void onPressAndTap(wxPressAndTapEvent& event);
-		
-	private:
-		
-		typedef CncSecureGesturesPanelEvent CSGPEvent;
-		
-		int					callbackId;
-		
-		State				state;
-		
-		wxTimer*			updateTimer;
-		wxTimer*			observerTimer;
-		
-		wxDateTime			observerTs;
-		
-		wxOrientation		orientation;
-		Type				type;
-		Mode				mode;
-		int					sensitivity;
-		
-		wxBitmap			centreBmp;
-		wxPoint				centrePt;
-		wxPoint				zeroPt;
-		wxPoint				currentPt;
-		wxRect				innerRect;
-		wxRect				leftRect;
-		wxRect				rightRect;
-		wxRect				topRect;
-		wxRect				bottomRect;
-		int					regionLen;
-		int					totalLen;
-		wxSize				knobSize;
-		wxColour			knobColour;
-		wxColour			lineColour;
-		wxColour			innerColour;
-		bool				mouseDown;
-		
-		CSGPEvent*			lastEvent;
-		
-		wxPoint2DDouble		m_translateDistance;
-		wxAffineMatrix2D	m_affineMatrix;
-		double				m_lastZoomFactor;
-		double				m_lastRotationAngle;
-		
-		void	reset();
-		void	applyPosChange(bool useTimer);
-		void	applyPosHeld();
-		
-		void	calculateZero();
-		void	calculateDimensions();
-		void	calculateCoordinates();
-		
-		void	startTimer();
-		void	stopTimer();
-		
-		void	recalculate();
-		
-		CncSecureGesturesPanelEvent&	prepareEvent(int id);
-		CncSecureGesturesPanel::State	skipState();
-};
 
 // ----------------------------------------------------------------------------
 class CncSecureGesturesPanelEvent : public wxCommandEvent {
@@ -135,7 +177,7 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 		{
 			wxDateTime tsLast	= wxDateTime::Now();
 			
-			int cbId			= CncSecureGesturesPanel::defaultCallbackId;
+			int cbId			= CNC_SECURE_GESTURES_PANEL_DEFAUTL_CALLBACK_ID;
 			
 			int xPos			= 0;
 			int yPos			= 0;
@@ -198,5 +240,148 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 		Data data;
 };
 
+typedef CncSecureGesturesPanelEvent::Data GestureData;
+
+
+// ----------------------------------------------------------------------------
+class CncSecureGesturesPanel : public wxPanel
+{
+	public:
+		
+		static const int defaultCallbackId		= CNC_SECURE_GESTURES_PANEL_DEFAUTL_CALLBACK_ID;
+		static const int border					=  4;
+		static const int updateTimerId			= 10;
+		static const int observerTimerId		= 20;
+		
+		enum State	{ S_INACTIVE, S_STARTING, S_CONTINUING };
+		enum Type	{ T_SWITCH, T_BUTTON };
+		enum Mode	{ M_NEGATIVE, M_POSITIVE, M_BOTH };
+		
+		CncSecureGesturesPanel(wxWindow* parent, wxOrientation o = wxBOTH, Type t = T_BUTTON, Mode m = M_BOTH, int sensitivity = 3);
+		virtual ~CncSecureGesturesPanel();
+		
+		virtual bool Show(bool show = true);
+		virtual bool Layout();
+		virtual bool Enable(bool enable=true);
+		
+		void init()										{ reset(); }
+		void update()									{ calculateDimensions(); applyPosChange(false); }
+		
+		void setCenterBitmap(const wxBitmap& bmp)		{ behaviorChanged = true; centreBmp = bmp; }
+		void setType(const Type& t )					{ behaviorChanged = true; type = t; }
+		void setMode(const Mode& m )					{ behaviorChanged = true; mode = m; }
+		void setOrientation(const wxOrientation& o)		{ behaviorChanged = true; orientation = o; }
+		void setSensitivity(int s)						{ behaviorChanged = true; sensitivity = abs(s); }
+		
+		int getSensitivity()					const	{ return sensitivity; }
+		
+		void setCallbackId(int id)						{ callbackId = id; }
+		int getCallbackId()						const	{ return callbackId; }
+		
+		void setValueByRatio(float ratio, float angle = 0.0f);
+		void setValueByValue(float value, float angle = 0.0f);
+		
+		char getModeAsCharacter(Mode m) const
+		{
+			switch ( m )
+			{
+				case M_NEGATIVE:	return 'N';
+				case M_POSITIVE:	return 'P';
+				case M_BOTH:		return 'B';
+			}
+			
+			return '?';
+		}
+		
+		char getOrientationAsCharacter(wxOrientation o) const
+		{
+			switch ( o )
+			{
+				case wxHORIZONTAL:	return 'H';
+				case wxVERTICAL:	return 'V';
+				case wxBOTH:		return 'B';
+			}
+			
+			return '?';
+		}	protected:
+		
+		void onPaint(wxPaintEvent& event);
+		void onSize(wxSizeEvent& event);
+		void onShow(wxShowEvent& event);
+		void onInitPanel(wxInitDialogEvent& event);
+		void onMouse(wxMouseEvent& event);
+		void onLeave(wxMouseEvent& event);
+		void onTimer(wxTimerEvent& event);
+			
+		void onPan(wxPanGestureEvent& event);
+		void onZoom(wxZoomGestureEvent& event);
+		void onRotate(wxRotateGestureEvent& event);
+		void onTwoFingerTap(wxTwoFingerTapEvent& event);
+		void onLongPress(wxLongPressEvent& event);
+		void onPressAndTap(wxPressAndTapEvent& event);
+		
+	private:
+		
+		typedef CncSecureGesturesPanelEvent CSGPEvent;
+		
+		int					callbackId;
+		
+		State				state;
+		
+		wxTimer*			updateTimer;
+		wxTimer*			observerTimer;
+		
+		wxDateTime			observerTs;
+		
+		bool				behaviorChanged; 
+		wxOrientation		orientation;
+		Type				type;
+		Mode				mode;
+		int					sensitivity;
+		
+		wxBitmap			centreBmp;
+		wxPoint				centrePt;
+		wxPoint				zeroPt;
+		wxPoint				currentPt;
+		wxRect				innerRect;
+		wxRect				leftRect;
+		wxRect				rightRect;
+		wxRect				topRect;
+		wxRect				bottomRect;
+		int					regionLen;
+		int					totalLen;
+		wxSize				knobSize;
+		wxColour			knobColour;
+		wxColour			lineColour;
+		wxColour			innerColour;
+		bool				mouseDown;
+		
+		CSGPEvent*			lastEvent;
+		
+		wxPoint2DDouble		translatedDistance;
+		
+		// old sample vars start
+		wxAffineMatrix2D	m_affineMatrix;
+		double				m_lastZoomFactor;
+		double				m_lastRotationAngle;
+		// old sample vars end
+		
+		void	reset();
+		void	applyPosChange(bool useTimer);
+		void	applyPosHeld();
+		
+		void	calculateDimensions();
+		void	calculateCoordinates();
+		
+		void	startTimer();
+		void	stopTimer();
+		
+		void	recalculate();
+		
+		void	trace(std::ostream& o, const wxString& context, const wxString& more=wxEmptyString);
+		
+		CncSecureGesturesPanelEvent&	prepareEvent(int id);
+		CncSecureGesturesPanel::State	skipState();
+};
 
 #endif

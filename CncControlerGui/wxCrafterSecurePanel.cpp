@@ -463,14 +463,28 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_panelPAImgIndex = m_listbook435_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-plus2@2x")));
     m_listbook435->AddPage(m_panelPA, _("Predefined\nAnchors"), false, m_panelPAImgIndex);
     
-    wxFlexGridSizer* flexGridSizer541 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer611 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer611->SetFlexibleDirection( wxBOTH );
+    flexGridSizer611->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer611->AddGrowableCol(0);
+    flexGridSizer611->AddGrowableRow(0);
+    flexGridSizer611->AddGrowableRow(1);
+    m_panelPA->SetSizer(flexGridSizer611);
+    
+    wxFlexGridSizer* flexGridSizer541 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer541->SetFlexibleDirection( wxBOTH );
     flexGridSizer541->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer541->AddGrowableCol(0);
-    flexGridSizer541->AddGrowableRow(0);
     flexGridSizer541->AddGrowableRow(1);
     flexGridSizer541->AddGrowableRow(2);
-    m_panelPA->SetSizer(flexGridSizer541);
+    flexGridSizer541->AddGrowableRow(3);
+    
+    flexGridSizer611->Add(flexGridSizer541, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText600 = new wxStaticText(m_panelPA, wxID_ANY, _("for testing only . . ."), wxDefaultPosition, wxDLG_UNIT(m_panelPA, wxSize(-1,-1)), 0);
+    m_staticText600->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer541->Add(m_staticText600, 0, wxALL, WXC_FROM_DIP(5));
     
     m_panelQ1 = new wxPanel(m_panelPA, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPA, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_panelQ1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
@@ -486,6 +500,31 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_panelQ3->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
     
     flexGridSizer541->Add(m_panelQ3, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer604 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer604->SetFlexibleDirection( wxBOTH );
+    flexGridSizer604->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer604->AddGrowableCol(0);
+    flexGridSizer604->AddGrowableCol(1);
+    flexGridSizer604->AddGrowableCol(2);
+    flexGridSizer604->AddGrowableRow(0);
+    
+    flexGridSizer611->Add(flexGridSizer604, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_panelQ4 = new wxPanel(m_panelPA, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPA, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panelQ4->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer604->Add(m_panelQ4, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_panelQ5 = new wxPanel(m_panelPA, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPA, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panelQ5->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
+    
+    flexGridSizer604->Add(m_panelQ5, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_panelQ6 = new wxPanel(m_panelPA, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPA, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panelQ6->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVEBORDER));
+    
+    flexGridSizer604->Add(m_panelQ6, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_rpRun = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_rightBook->AddPage(m_rpRun, _("Page"), false);
@@ -1268,7 +1307,7 @@ CncSecureSlidepadBase::CncSecureSlidepadBase(wxWindow* parent, wxWindowID id, co
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer397 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer397 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer397->SetFlexibleDirection( wxBOTH );
     flexGridSizer397->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer397->AddGrowableCol(0);
@@ -1300,11 +1339,11 @@ CncSecureSlidepadBase::CncSecureSlidepadBase(wxWindow* parent, wxWindowID id, co
     
     flexGridSizer373->Add(m_textResult, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_scrollbar = new wxScrollBar(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxSB_HORIZONTAL);
-    m_scrollbar->SetScrollbar(0, 1, 10, 1);
+    m_gesturePanelPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_gesturePanelPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer397->Add(m_scrollbar, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    m_scrollbar->SetMinSize(wxSize(-1,80));
+    flexGridSizer397->Add(m_gesturePanelPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    m_gesturePanelPlaceholder->SetMinSize(wxSize(-1,80));
     
     SetName(wxT("CncSecureSlidepadBase"));
     SetMinClientSize(wxSize(500,140));
@@ -1312,31 +1351,117 @@ CncSecureSlidepadBase::CncSecureSlidepadBase(wxWindow* parent, wxWindowID id, co
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    // Connect events
-    m_scrollbar->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Connect(wxEVT_SCROLL_LINEUP, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Connect(wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Connect(wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Connect(wxEVT_SCROLL_PAGEUP, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Connect(wxEVT_SCROLL_BOTTOM, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Connect(wxEVT_SCROLL_TOP, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    
 }
 
 CncSecureSlidepadBase::~CncSecureSlidepadBase()
 {
-    m_scrollbar->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Disconnect(wxEVT_SCROLL_LINEUP, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Disconnect(wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Disconnect(wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Disconnect(wxEVT_SCROLL_PAGEUP, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Disconnect(wxEVT_SCROLL_BOTTOM, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
-    m_scrollbar->Disconnect(wxEVT_SCROLL_TOP, wxScrollEventHandler(CncSecureSlidepadBase::onScrollChanged), NULL, this);
+}
+
+CncSecureRotateModelPanelBase::CncSecureRotateModelPanelBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC6911InitBitmapResources();
+        bBitmapLoaded = true;
+    }
     
+    wxFlexGridSizer* flexGridSizer569 = new wxFlexGridSizer(4, 1, 0, 0);
+    flexGridSizer569->SetFlexibleDirection( wxBOTH );
+    flexGridSizer569->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer569->AddGrowableCol(0);
+    flexGridSizer569->AddGrowableRow(0);
+    flexGridSizer569->AddGrowableRow(1);
+    flexGridSizer569->AddGrowableRow(2);
+    flexGridSizer569->AddGrowableRow(3);
+    this->SetSizer(flexGridSizer569);
+    
+    wxFlexGridSizer* flexGridSizer57825 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer57825->SetFlexibleDirection( wxBOTH );
+    flexGridSizer57825->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer57825->AddGrowableCol(0);
+    flexGridSizer57825->AddGrowableRow(1);
+    
+    flexGridSizer569->Add(flexGridSizer57825, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText58036 = new wxStaticText(this, wxID_ANY, _("Zoom:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText58036Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText58036->SetFont(m_staticText58036Font);
+    
+    flexGridSizer57825->Add(m_staticText58036, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_zoomPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_zoomPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer57825->Add(m_zoomPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5782 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5782->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5782->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5782->AddGrowableCol(0);
+    flexGridSizer5782->AddGrowableRow(1);
+    
+    flexGridSizer569->Add(flexGridSizer5782, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText5803 = new wxStaticText(this, wxID_ANY, _("Rotate X:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5803Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5803->SetFont(m_staticText5803Font);
+    
+    flexGridSizer5782->Add(m_staticText5803, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_rotateXPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_rotateXPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer5782->Add(m_rotateXPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer578 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer578->SetFlexibleDirection( wxBOTH );
+    flexGridSizer578->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer578->AddGrowableCol(0);
+    flexGridSizer578->AddGrowableRow(1);
+    
+    flexGridSizer569->Add(flexGridSizer578, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText58035 = new wxStaticText(this, wxID_ANY, _("Rotate Y:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText58035Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText58035->SetFont(m_staticText58035Font);
+    
+    flexGridSizer578->Add(m_staticText58035, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_rotateYPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_rotateYPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer578->Add(m_rotateYPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5788 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5788->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5788->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5788->AddGrowableCol(0);
+    flexGridSizer5788->AddGrowableRow(1);
+    
+    flexGridSizer569->Add(flexGridSizer5788, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText580359 = new wxStaticText(this, wxID_ANY, _("Rotate Z:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText580359Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText580359->SetFont(m_staticText580359Font);
+    
+    flexGridSizer5788->Add(m_staticText580359, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_rotateZPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_rotateZPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer5788->Add(m_rotateZPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    SetName(wxT("CncSecureRotateModelPanelBase"));
+    SetSize(wxDLG_UNIT(this, wxSize(80,300)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+}
+
+CncSecureRotateModelPanelBase::~CncSecureRotateModelPanelBase()
+{
 }
 
 CncSecureNumpadDialogBase::CncSecureNumpadDialogBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
@@ -1519,113 +1644,6 @@ CncSecureSlidepadDialogBase::~CncSecureSlidepadDialogBase()
     m_btCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureSlidepadDialogBase::onCancel), NULL, this);
     m_btOk->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureSlidepadDialogBase::onOk), NULL, this);
     
-}
-
-CncSecureRotateModelPanelBase::CncSecureRotateModelPanelBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-    : wxPanel(parent, id, pos, size, style)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC6911InitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    
-    wxFlexGridSizer* flexGridSizer569 = new wxFlexGridSizer(4, 1, 0, 0);
-    flexGridSizer569->SetFlexibleDirection( wxBOTH );
-    flexGridSizer569->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer569->AddGrowableCol(0);
-    flexGridSizer569->AddGrowableRow(0);
-    flexGridSizer569->AddGrowableRow(1);
-    flexGridSizer569->AddGrowableRow(2);
-    flexGridSizer569->AddGrowableRow(3);
-    this->SetSizer(flexGridSizer569);
-    
-    wxFlexGridSizer* flexGridSizer57825 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer57825->SetFlexibleDirection( wxBOTH );
-    flexGridSizer57825->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer57825->AddGrowableCol(0);
-    flexGridSizer57825->AddGrowableRow(1);
-    
-    flexGridSizer569->Add(flexGridSizer57825, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText58036 = new wxStaticText(this, wxID_ANY, _("Zoom:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText58036Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText58036->SetFont(m_staticText58036Font);
-    
-    flexGridSizer57825->Add(m_staticText58036, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
-    
-    m_zoomPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_zoomPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer57825->Add(m_zoomPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer5782 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5782->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5782->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5782->AddGrowableCol(0);
-    flexGridSizer5782->AddGrowableRow(1);
-    
-    flexGridSizer569->Add(flexGridSizer5782, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText5803 = new wxStaticText(this, wxID_ANY, _("Rotate X:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5803Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5803->SetFont(m_staticText5803Font);
-    
-    flexGridSizer5782->Add(m_staticText5803, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
-    
-    m_rotateXPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_rotateXPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer5782->Add(m_rotateXPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer578 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer578->SetFlexibleDirection( wxBOTH );
-    flexGridSizer578->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer578->AddGrowableCol(0);
-    flexGridSizer578->AddGrowableRow(1);
-    
-    flexGridSizer569->Add(flexGridSizer578, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText58035 = new wxStaticText(this, wxID_ANY, _("Rotate Y:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText58035Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText58035->SetFont(m_staticText58035Font);
-    
-    flexGridSizer578->Add(m_staticText58035, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
-    
-    m_rotateYPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_rotateYPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer578->Add(m_rotateYPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer5788 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5788->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5788->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5788->AddGrowableCol(0);
-    flexGridSizer5788->AddGrowableRow(1);
-    
-    flexGridSizer569->Add(flexGridSizer5788, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText580359 = new wxStaticText(this, wxID_ANY, _("Rotate Z:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText580359Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText580359->SetFont(m_staticText580359Font);
-    
-    flexGridSizer5788->Add(m_staticText580359, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
-    
-    m_rotateZPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_rotateZPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer5788->Add(m_rotateZPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    SetName(wxT("CncSecureRotateModelPanelBase"));
-    SetSize(wxDLG_UNIT(this, wxSize(80,300)));
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
-    }
-}
-
-CncSecureRotateModelPanelBase::~CncSecureRotateModelPanelBase()
-{
 }
 
 ImageLibSecure::ImageLibSecure()

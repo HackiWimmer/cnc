@@ -587,14 +587,12 @@ protected:
     wxBitmapButton* m_btDearctivateSecureRunMode;
     wxButton* m_btCloseSecurePanel;
     wxStaticLine* m_staticLine9185;
+    wxSplitterWindow* m_secureSplitterMainH;
+    wxPanel* m_splitterPageMonitor;
     wxSplitterWindow* m_secureSplitterMainV;
     wxPanel* m_splitterPageLeft;
     wxPanel* m_securityCtrlPanelPlaceholder;
-    wxPanel* m_cncOverviewsPlaceholder;
-    wxPanel* m_secGamepadPlaceholder;
     wxPanel* m_splitterPageRight;
-    wxSplitterWindow* m_secureSplitterMainH;
-    wxPanel* m_splitterPageMonitor;
     wxSimplebook* m_secureMainBook;
     wxPanel* m_panelMonitor;
     wxButton* m_secureShowHardwareBox;
@@ -628,6 +626,12 @@ protected:
     wxPanel* m_splitterPageLogger;
     wxSplitterWindow* m_secureSplitterLoggerV;
     wxPanel* m_splitterPageLoggerV;
+    wxSplitterWindow* m_splitter10057;
+    wxPanel* m_splitterPage10061;
+    wxPanel* m_cncOverviewsPlaceholder;
+    wxPanel* m_secGamepadPlaceholder;
+    wxPanel* m_splitterPage10065;
+    wxStaticLine* m_staticLine10069;
     wxPanel* m_secLoggerPlaceholder;
     wxPanel* m_splitterPagePreviewV;
     wxStaticLine* m_staticLine10023;
@@ -1505,8 +1509,6 @@ public:
     wxButton* GetBtCloseSecurePanel() { return m_btCloseSecurePanel; }
     wxStaticLine* GetStaticLine9185() { return m_staticLine9185; }
     wxPanel* GetSecurityCtrlPanelPlaceholder() { return m_securityCtrlPanelPlaceholder; }
-    wxPanel* GetCncOverviewsPlaceholder() { return m_cncOverviewsPlaceholder; }
-    wxPanel* GetSecGamepadPlaceholder() { return m_secGamepadPlaceholder; }
     wxPanel* GetSplitterPageLeft() { return m_splitterPageLeft; }
     wxButton* GetSecureShowHardwareBox() { return m_secureShowHardwareBox; }
     wxButton* GetSecureShowBoundBox() { return m_secureShowBoundBox; }
@@ -1538,8 +1540,16 @@ public:
     wxPanel* GetPanelMonitor() { return m_panelMonitor; }
     wxSimplebook* GetSecureMainBook() { return m_secureMainBook; }
     wxStaticLine* GetStaticLine9953() { return m_staticLine9953; }
+    wxPanel* GetSplitterPageRight() { return m_splitterPageRight; }
+    wxSplitterWindow* GetSecureSplitterMainV() { return m_secureSplitterMainV; }
     wxPanel* GetSplitterPageMonitor() { return m_splitterPageMonitor; }
+    wxPanel* GetCncOverviewsPlaceholder() { return m_cncOverviewsPlaceholder; }
+    wxPanel* GetSecGamepadPlaceholder() { return m_secGamepadPlaceholder; }
+    wxPanel* GetSplitterPage10061() { return m_splitterPage10061; }
+    wxStaticLine* GetStaticLine10069() { return m_staticLine10069; }
     wxPanel* GetSecLoggerPlaceholder() { return m_secLoggerPlaceholder; }
+    wxPanel* GetSplitterPage10065() { return m_splitterPage10065; }
+    wxSplitterWindow* GetSplitter10057() { return m_splitter10057; }
     wxPanel* GetSplitterPageLoggerV() { return m_splitterPageLoggerV; }
     wxStaticLine* GetStaticLine10023() { return m_staticLine10023; }
     wxPanel* GetLeftTplPrevirePlaceholder() { return m_leftTplPrevirePlaceholder; }
@@ -1553,8 +1563,6 @@ public:
     wxSplitterWindow* GetSecureSplitterLoggerV() { return m_secureSplitterLoggerV; }
     wxPanel* GetSplitterPageLogger() { return m_splitterPageLogger; }
     wxSplitterWindow* GetSecureSplitterMainH() { return m_secureSplitterMainH; }
-    wxPanel* GetSplitterPageRight() { return m_splitterPageRight; }
-    wxSplitterWindow* GetSecureSplitterMainV() { return m_secureSplitterMainV; }
     wxPanel* GetSecureRunPanel() { return m_secureRunPanel; }
     wxPanel* GetGamepadSpyPlaceholder() { return m_gamepadSpyPlaceholder; }
     wxPanel* GetCncGamepadSpy() { return m_cncGamepadSpy; }

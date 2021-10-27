@@ -23,7 +23,6 @@
 #include <wx/infobar.h>
 #include <wx/tglbtn.h>
 #include <wx/textctrl.h>
-#include <wx/scrolbar.h>
 #include <wx/dialog.h>
 #include <wx/iconbndl.h>
 #include <wx/bitmap.h>
@@ -101,9 +100,13 @@ protected:
     wxPanel* m_panelPD;
     wxPanel* m_predefinedPositionsPlaceholder;
     wxPanel* m_panelPA;
+    wxStaticText* m_staticText600;
     wxPanel* m_panelQ1;
     wxPanel* m_panelQ2;
     wxPanel* m_panelQ3;
+    wxPanel* m_panelQ4;
+    wxPanel* m_panelQ5;
+    wxPanel* m_panelQ6;
     wxPanel* m_rpRun;
     wxButton* m_rcRunSec;
     wxButton* m_rcPauseSec;
@@ -190,9 +193,13 @@ public:
     wxPanel* GetPanelITP() { return m_panelITP; }
     wxPanel* GetPredefinedPositionsPlaceholder() { return m_predefinedPositionsPlaceholder; }
     wxPanel* GetPanelPD() { return m_panelPD; }
+    wxStaticText* GetStaticText600() { return m_staticText600; }
     wxPanel* GetPanelQ1() { return m_panelQ1; }
     wxPanel* GetPanelQ2() { return m_panelQ2; }
     wxPanel* GetPanelQ3() { return m_panelQ3; }
+    wxPanel* GetPanelQ4() { return m_panelQ4; }
+    wxPanel* GetPanelQ5() { return m_panelQ5; }
+    wxPanel* GetPanelQ6() { return m_panelQ6; }
     wxPanel* GetPanelPA() { return m_panelPA; }
     wxListbook* GetListbook435() { return m_listbook435; }
     wxPanel* GetRpManually() { return m_rpManually; }
@@ -339,17 +346,44 @@ class CncSecureSlidepadBase : public wxPanel
 protected:
     wxStaticText* m_infoText;
     wxTextCtrl* m_textResult;
-    wxScrollBar* m_scrollbar;
+    wxPanel* m_gesturePanelPlaceholder;
 
 protected:
-    virtual void onScrollChanged(wxScrollEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetInfoText() { return m_infoText; }
     wxTextCtrl* GetTextResult() { return m_textResult; }
-    wxScrollBar* GetScrollbar() { return m_scrollbar; }
+    wxPanel* GetGesturePanelPlaceholder() { return m_gesturePanelPlaceholder; }
     CncSecureSlidepadBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~CncSecureSlidepadBase();
+};
+
+
+class CncSecureRotateModelPanelBase : public wxPanel
+{
+protected:
+    wxStaticText* m_staticText58036;
+    wxPanel* m_zoomPlaceholder;
+    wxStaticText* m_staticText5803;
+    wxPanel* m_rotateXPlaceholder;
+    wxStaticText* m_staticText58035;
+    wxPanel* m_rotateYPlaceholder;
+    wxStaticText* m_staticText580359;
+    wxPanel* m_rotateZPlaceholder;
+
+protected:
+
+public:
+    wxStaticText* GetStaticText58036() { return m_staticText58036; }
+    wxPanel* GetZoomPlaceholder() { return m_zoomPlaceholder; }
+    wxStaticText* GetStaticText5803() { return m_staticText5803; }
+    wxPanel* GetRotateXPlaceholder() { return m_rotateXPlaceholder; }
+    wxStaticText* GetStaticText58035() { return m_staticText58035; }
+    wxPanel* GetRotateYPlaceholder() { return m_rotateYPlaceholder; }
+    wxStaticText* GetStaticText580359() { return m_staticText580359; }
+    wxPanel* GetRotateZPlaceholder() { return m_rotateZPlaceholder; }
+    CncSecureRotateModelPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(80,300), long style = wxTAB_TRAVERSAL);
+    virtual ~CncSecureRotateModelPanelBase();
 };
 
 
@@ -396,34 +430,6 @@ public:
     wxButton* GetBtOk() { return m_btOk; }
     CncSecureSlidepadDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Sliderpad"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncSecureSlidepadDialogBase();
-};
-
-
-class CncSecureRotateModelPanelBase : public wxPanel
-{
-protected:
-    wxStaticText* m_staticText58036;
-    wxPanel* m_zoomPlaceholder;
-    wxStaticText* m_staticText5803;
-    wxPanel* m_rotateXPlaceholder;
-    wxStaticText* m_staticText58035;
-    wxPanel* m_rotateYPlaceholder;
-    wxStaticText* m_staticText580359;
-    wxPanel* m_rotateZPlaceholder;
-
-protected:
-
-public:
-    wxStaticText* GetStaticText58036() { return m_staticText58036; }
-    wxPanel* GetZoomPlaceholder() { return m_zoomPlaceholder; }
-    wxStaticText* GetStaticText5803() { return m_staticText5803; }
-    wxPanel* GetRotateXPlaceholder() { return m_rotateXPlaceholder; }
-    wxStaticText* GetStaticText58035() { return m_staticText58035; }
-    wxPanel* GetRotateYPlaceholder() { return m_rotateYPlaceholder; }
-    wxStaticText* GetStaticText580359() { return m_staticText580359; }
-    wxPanel* GetRotateZPlaceholder() { return m_rotateZPlaceholder; }
-    CncSecureRotateModelPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(80,300), long style = wxTAB_TRAVERSAL);
-    virtual ~CncSecureRotateModelPanelBase();
 };
 
 
