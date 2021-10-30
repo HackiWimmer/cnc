@@ -5443,7 +5443,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer10044->SetFlexibleDirection( wxBOTH );
     flexGridSizer10044->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer10044->AddGrowableCol(0);
-    flexGridSizer10044->AddGrowableRow(1);
+    flexGridSizer10044->AddGrowableRow(0);
     flexGridSizer10044->SetMinSize(220,-1);
     m_splitterPage10061->SetSizer(flexGridSizer10044);
     

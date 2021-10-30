@@ -378,7 +378,7 @@ int Serial::peekData(void *buffer, unsigned int nbByte) {
 	//bytes available. The function return -1 when nothing could
 	//be read, the number of bytes actually read.
 	
-	if ( traceSpyInfo && spyWrite )
+	if ( traceSpyInfo && spyRead )
 		cnc::spy.addMarker("Peek Data");
 	
 	int bytesRead = readData(buffer, nbByte);
@@ -390,7 +390,7 @@ int Serial::peekData(void *buffer, unsigned int nbByte) {
 		p++;
 	}
 	
-	if ( bytesRead > 0 && traceSpyInfo && spyWrite )
+	if ( bytesRead > 0 && traceSpyInfo && spyRead )
 		cnc::spy.addMarker(wxString::Format(" %d Byte(s) peeked . . . ", bytesRead));
 	
 	return bytesRead;
@@ -440,8 +440,37 @@ bool Serial::writeData(unsigned char cmd) {
 	buffer[0] = cmd;
 	buffer[1] = '\0';
 	
-	lastFetchResult.init(cmd);
 	return writeData(buffer, 1);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::writeDataAndForget(unsigned char cmd) {
+///////////////////////////////////////////////////////////////////
+	LastSerialResult prevFetchResult = lastFetchResult;
+	lastFetchResult.init(cmd);
+	
+	const bool ret =  writeData(cmd);
+	
+	// restore fetch result
+	lastFetchResult = prevFetchResult;
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::writeDataAndForget(unsigned char* buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	if ( buffer == NULL )
+	{
+		CNC_CERR_FUNCT_A(": Invalid buffer")
+		return false;
+	}
+	
+	LastSerialResult prevFetchResult = lastFetchResult;
+	lastFetchResult.init(buffer[0]);
+	
+	const bool ret =  writeData(buffer, nbByte);
+	
+	// restore fetch result
+	lastFetchResult = prevFetchResult;
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::decodeMessage(const int bytes, const unsigned char* mutliByteStream, std::ostream& message) {
@@ -640,7 +669,7 @@ unsigned char Serial::fetchControllerResult(SerialFetchInfo& sfi) {
 ///////////////////////////////////////////////////////////////////
 int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByte, unsigned int maxDelay, bool withErrorMsg) {
 ///////////////////////////////////////////////////////////////////
-	// Assumtion buffer allocates nbByte bytes
+	// Assumption buffer allocates nbByte bytes
 	static const unsigned int maxBytes = 1024;
 	unsigned char oneReadBuf[maxBytes];
 
@@ -821,7 +850,8 @@ bool Serial::popSerial() {
 ///////////////////////////////////////////////////////////////////
 bool Serial::processIdle() {
 ///////////////////////////////////////////////////////////////////
-	if ( isConnected() == false ) {
+	if ( isConnected() == false )
+	{
 		std::cerr << "SERIAL::processIdle()::ERROR: Not connected\n";
 		return false;
 	}
@@ -836,18 +866,24 @@ bool Serial::processIdle() {
 		cnc::spy.initializeResult(wxString::Format("Send: '%s'", ArduinoCMDs::getCMDLabel(cmd)));
 	
 	lastFetchResult.init(cmd);
-	if ( writeData(cmd) ) {
+	if ( writeData(cmd) )
+	{
 		
 		SerialFetchInfo sfi(lastFetchResult.cmd);
+		sfi.fetchTimeout = 1000;
 
-		bool ret = evaluateResultWrapper(sfi, std::cout);
-		if ( ret == false ) {
+		const bool ret = evaluateResultWrapper(sfi, std::cout);
+		if ( ret == false )
+		{
 			//std::cerr << "Error while processing idle: " << std::endl;
 			//std::cerr << "Request \"Error Info\" for more details." << std::endl;
 		}
+		
 		return ret;
 		
-	} else {
+	}
+	else
+	{
 		std::cerr << "Serial::processSetter: Unable to write data" << std::endl;
 		cncControl->SerialCallback();
 		return false;
@@ -1017,10 +1053,11 @@ bool Serial::sendSignal(const unsigned char cmd) {
 	}
 	
 	if ( traceSpyInfo && spyWrite )
-		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd, ArduinoCMDs::getCMDLabel(cmd)));
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]     %u", cmd, ArduinoCMDs::getCMDLabel(cmd), lastFetchResult.index));
 	
-	lastFetchResult.init(cmd);
-	return writeData(cmd);
+	// Signals are may be asynchronous and occurring while fetching other command. 
+	// Therefore, writeDataAndForget() is used.
+	return writeDataAndForget(cmd);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) { 
@@ -1028,10 +1065,6 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 	if ( nbByte <=0 || buffer == NULL )
 		return true;
 		
-	#warning is no longer necessary (20.03.2021), remove this after a while
-	// activate this during the execute command
-	//ControllerCallbackShouldSynchronizeAppPosition instance(this);
-
 	const unsigned char cmd = buffer[0];
 	bool ret = false;
 	
@@ -1204,8 +1237,9 @@ bool Serial::processStartInteractiveMove() {
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
 
-	lastFetchResult.init(cmd[0]);
-	return writeData(cmd, LEN);
+	// Interactive commands are may be asynchronous and occurring while fetching other command. 
+	// Therefore, writeDataAndForget() is used.
+	return writeDataAndForget(cmd, LEN);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed) {
@@ -1229,8 +1263,9 @@ bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncL
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
 		
-	lastFetchResult.init(cmd[0]);
-	return writeData(cmd, LEN);
+	// Interactive commands are may be asynchronous and occurring while fetching other command. 
+	// Therefore, writeDataAndForget() is used.
+	return writeDataAndForget(cmd, LEN);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::processUpdateInteractiveMove() {
@@ -1249,8 +1284,9 @@ bool Serial::processUpdateInteractiveMove() {
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
 		
-	lastFetchResult.init(cmd[0]);
-	return writeData(cmd, LEN);
+	// Interactive commands are may be asynchronous and occurring while fetching other command. 
+	// Therefore, writeDataAndForget() is used.
+	return writeDataAndForget(cmd, LEN);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::resolveLimits(unsigned int size, const int32_t (&values)[3]) {
@@ -1583,7 +1619,6 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 bool Serial::RET_MORE_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	// currently nothing specific to do
-
 	if ( traceSpyInfo )
 		cnc::spy.finalizeRET_MORE();
 	

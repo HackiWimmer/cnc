@@ -42,6 +42,16 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		void toggleRuler();
 		void toggleMillingCutter();
 		
+		bool stateHardwareBox()								 const { return motionMonitor->getContextOptions().showHardwareBox;   }
+		bool stateBoundBox()								 const { return motionMonitor->getContextOptions().showBoundBox;      }
+		bool stateFlyPathes()								 const { return motionMonitor->getContextOptions().showFlyPath;       }
+		bool stateGuidePathes()								 const { return motionMonitor->getContextOptions().showGuidePathes;   }
+		bool stateHelpLines()								 const { return motionMonitor->getContextOptions().showHelpLines;     }
+		bool stateOrigin()									 const { return motionMonitor->getContextOptions().showOrigin;        }
+		bool stateRuler()									 const { return motionMonitor->getContextOptions().showRuler;         }
+		bool statePosMarker()								 const { return motionMonitor->getContextOptions().showPosMarker;     }
+		bool stateMillingCutter()							 const { return motionMonitor->getContextOptions().showMillingCutter; }
+		
 		void resetView();
 		void clearMonitor();
 		void refreshMonitor();

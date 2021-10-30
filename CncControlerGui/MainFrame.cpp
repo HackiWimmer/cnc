@@ -1700,17 +1700,24 @@ void MainFrame::onSerialTimer(wxTimerEvent& event) {
 		CncConfig::NotificationDeactivator cfgNotDeactivation(false);
 		
 		// it's very important to avoid event handling during the idle processing
-		// to prevent the start of furter commands
+		// to prevent the start of further commands
 		THE_CONTEXT->setAllowEventHandling(false);
 		
 		// request the idle information
-		cnc->sendIdleMessage();
+		const bool ret = cnc->sendIdleMessage();
+		if ( ret == false )
+		{
+			CNC_CERR_FUNCT_A(": Error while processing sendIdleMessage()!")
+			m_serialTimer->Stop();
+			m_miRqtIdleMessages->Check(false);
+		}
 		
 		// reconstructed the previous event handling mode
 		THE_CONTEXT->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
 		
 		// restart due to the previous Stop() command
-		m_serialTimer->Start();
+		if ( ret == true )
+			m_serialTimer->Start();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2233,9 +2240,11 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 		wxString portName("Undefined");
 		PDEV_BROADCAST_HDR lpdb = NULL;
 		
-		if ( message == WM_DEVICECHANGE) {
+		if ( message == WM_DEVICECHANGE )
+		{
 			// logging
-			switch ( wParam ) {
+			switch ( wParam )
+			{
 				case DBT_DEVICEARRIVAL:			lpdb = (PDEV_BROADCAST_HDR)lParam;
 												if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
 													PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT) lpdb;
@@ -2246,6 +2255,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 												cnc::trc.logInfo(wxString("A new COM device was detected on port: ") << portName);
 												break;
 												
+				case DBT_DEVICEREMOVEPENDING:
 				case DBT_DEVICEREMOVECOMPLETE:	lpdb = (PDEV_BROADCAST_HDR)lParam;
 												if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
 													PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT) lpdb;
@@ -2264,63 +2274,81 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 		WXLRESULT ret = wxFrame::MSWWindowProc ( message, wParam, lParam );
 		
 		// do some more actions 
-		if ( message == WM_DEVICECHANGE) {
+		if ( message == WM_DEVICECHANGE)
+		{
 			// update port selector
 			if ( wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE )
 				decoratePortSelector();
 			
-			switch ( wParam ) {
+			switch ( wParam )
+			{
 				// ask for connect - on demand . . . 
-				case DBT_DEVICEARRIVAL:	{
-					if ( isProcessing() == false ) {
-						
+				case DBT_DEVICEARRIVAL:
+				{
+					if ( isProcessing() == false )
+					{
 						const int portIdx = isPortNameAvailable(portName);
 						if ( portIdx != wxNOT_FOUND ) 
 						{
 							// override blurred search port names like COM4
 							portName = m_portSelector->GetString(portIdx);
 							
-							if ( usbConnectionObserver->IsShown() ) {
+							if ( usbConnectionObserver->IsShown() )
+							{
 								usbConnectionObserver->setPortName(portName);
 								return ret;
 							}
 							
-							if ( usbConnectionObserver->getSensitivity() == true ) {
+							if ( usbConnectionObserver->getSensitivity() == true )
+							{
 								usbConnectionObserver->setPortName(portName);
 								
-								if ( usbConnectionObserver->ShowModal() == wxID_YES ) {
+								if ( usbConnectionObserver->ShowModal() == wxID_YES )
+								{
 									m_portSelector->SetStringSelection(portName);
 									connectSerialPortDialog();
 								}
 							}
-							else {
+							else
+							{
 								cnc::trc.logInfoMessage(wxString::Format("New USB connection available, name: %s", portName));
 							}
 						}
 					}
+					
+					break;
 				}
-				break;
 				
 				// check if current com connection is effected
-				case DBT_DEVICEREMOVECOMPLETE:	{
+				case DBT_DEVICEREMOVEPENDING:
+				case DBT_DEVICEREMOVECOMPLETE:
+				{
 					// check if the current connection is effected
-					if ( lastPortName == portName ) {
-						if ( cnc && cnc->isConnected() ) {
+					//CNC_PRINT_FUNCT_A(" %s    %s", lastPortName, portName )
+					if ( lastPortName.Contains(portName) )
+					{
+						if ( cnc && cnc->isConnected() )
+						{
 							cnc->interrupt("Serial Device Removed");
 							cnc->disconnect();
 							lastPortName.clear();
-							std::cerr << "Connection brocken" << std::endl;
-							cnc::trc.logWarning("Connection broken . . .");
+							
+							const wxString msg("Connection broken . . .");
+							std::cerr << msg << std::endl;
+							cnc::trc.logError(msg);
+							wxMessageBox(msg, CNC_LOG_FUNCT);
 						}
 						
 						if ( usbConnectionObserver->IsShown() ) {
 							usbConnectionObserver->EndModal(wxID_NO);
 						}
 					}
+					
 					break;
 				}
 				
-				case DBT_DEVNODES_CHANGED: {
+				case DBT_DEVNODES_CHANGED: 
+				{
 					activateGamepadNotificationsOnDemand(true);
 					break;
 				}
@@ -2858,7 +2886,7 @@ bool MainFrame::connectSerialPort() {
 				m_miRqtIdleMessages->Enable(true);
 			}
 			
-			secureCtrlPanel->notifyConnection(true, m_portSelector->GetStringSelection());
+			secureCtrlPanel->notifyConnection(true, lastPortName);
 		}
 	}
 	
@@ -4111,50 +4139,31 @@ bool MainFrame::processGCodeTemplate() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processManualTemplate() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
 	wxASSERT( cncManuallyMoveCoordPanel );
 	
-	if ( inboundFileParser != NULL )
-		delete inboundFileParser;
-		
-	ManuallyParser* p = new ManuallyParser(new ManuallyPathHandlerCnc(cnc));
-	inboundFileParser = p;
-	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
-
-	typedef ManuallyPathHandlerCnc::MoveDefinition MMD;
-
-	MMD move;
+	CncMoveDefinition move;
+	move.x.absolute		= cncManuallyMoveCoordPanel->isAbsoluteMove();
+	move.x.value		= cncManuallyMoveCoordPanel->getValueX();
+	move.y.absolute		= cncManuallyMoveCoordPanel->isAbsoluteMove();
+	move.y.value		= cncManuallyMoveCoordPanel->getValueY();
+	move.z.absolute		= cncManuallyMoveCoordPanel->isAbsoluteMove();
+	move.z.value		= cncManuallyMoveCoordPanel->getValueZ();
+	
 	move.speedMode 		= CncSpeedUserDefined;
-	move.absoluteMove	= cncManuallyMoveCoordPanel->isAbsoluteMove();
+	move.speedValue		= (double)(defaultSpeedSlider->getValueMM_MIN());
+	
+	move.moveMode		= CncMoveDefinition::convert(cncManuallyMoveCoordPanel->getMoveMode(), CncMoveDefinition::MoveMode::MM_2D);
+	
 	move.toolState		= cncManuallyMoveCoordPanel->switchToolOn();
 	move.correctLimit	= cncManuallyMoveCoordPanel->correctLimitStates();
-	move.moveMode		= MMD::convert(cncManuallyMoveCoordPanel->getMoveMode(), MMD::MM_2D);
-	
-	move.f = (double)(defaultSpeedSlider->getValueMM_MIN());
-	move.x = cncManuallyMoveCoordPanel->getValueX();
-	move.y = cncManuallyMoveCoordPanel->getValueY();
-	move.z = cncManuallyMoveCoordPanel->getValueZ();
 	
 	if ( m_unit->GetValue() == "steps" ) {
-		move.x *= THE_CONFIG->getDisplayFactX();
-		move.y *= THE_CONFIG->getDisplayFactY();
-		move.z *= THE_CONFIG->getDisplayFactZ();
+		move.x.value *= THE_CONFIG->getDisplayFactX();
+		move.y.value *= THE_CONFIG->getDisplayFactY();
+		move.z.value *= THE_CONFIG->getDisplayFactZ();
 	} 
 	
-	p->reset(cnc->getCurAppPosMetric());
-	p->addMove(move);
-	
-	CNC_TRANSACTION_LOCK_RET_ON_ERROR(false)
-	
-	motionMonitor->pushInteractiveProcessMode();
-	
-	bool ret = false;
-	if ( isDebugMode == true ) 	ret = p->processDebug();
-	else 						ret = p->processRelease();
-	
-	motionMonitor->popInteractiveProcessMode();
-	
-	return ret;
+	return processManualMove(move);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processTestTemplate() {
@@ -4179,6 +4188,34 @@ bool MainFrame::processTestTemplate() {
 	
 	std::cerr << "MainFrame::processTestTemplate(): Invalid page selection!" << std::endl;
 	return false;
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::processManualMove(const CncMoveDefinition& md) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	
+	if ( inboundFileParser != NULL )
+		delete inboundFileParser;
+	
+	ManuallyParser* p = new ManuallyParser(new ManuallyPathHandlerCnc(cnc));
+	inboundFileParser = p;
+	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
+	
+	p->reset(cnc->getCurAppPosMetric());
+	p->addMove(md);
+	
+	CNC_TRANSACTION_LOCK_RET_ON_ERROR(false)
+	
+	motionMonitor->pushInteractiveProcessMode();
+	
+	bool ret = false;
+	if ( isDebugMode == true ) 	ret = p->processDebug();
+	else 						ret = p->processRelease();
+	
+	motionMonitor->popInteractiveProcessMode();
+	motionMonitor->update(true);
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processTestInterval() {
@@ -6926,6 +6963,8 @@ void MainFrame::onTogglePosMarker(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(drawPane3D);
 	drawPane3D->togglePosMarker();
+	
+	m_secureShowMillingCutter->Enable(drawPane3D->statePosMarker());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onResetView(wxCommandEvent& event) {

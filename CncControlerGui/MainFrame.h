@@ -20,6 +20,7 @@
 #include "CncSerialSpyPanel.h"
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
+#include "CncMoveDefinition.h"
 #include "CncMotionMonitorVertexTrace.h"
 #include "CncTouchBlockDetector.h"
 #include "CncSummaryListCtrl.h"
@@ -86,7 +87,7 @@ class CncPodestManagement;
 class CncUsbConnectionObserver;
 class CncAnchorPosition;
 class CncSecureCtrlPanel;
-
+class CncSecureManuallyMovePanel;
 class CncTouchBlockDetector;
 
 struct RefPosResult;
@@ -689,6 +690,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool resetPodiumDistance();
 		bool applyPodiumDistance();
 		
+		bool processManualMove(const CncMoveDefinition& md);
+		
 		friend class MainFrameProxy;
 		friend class CncMsgHistoryLoggerProxy;
 		friend class CncLoggerListCtrl;
@@ -713,6 +716,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		friend class CncArduinoEnvironment;
 		friend class CncPodestMgmtMovement;
+		friend class CncSecureManuallyMovePanel;
 
 		// to remove . . .
 			friend class CncFileView;

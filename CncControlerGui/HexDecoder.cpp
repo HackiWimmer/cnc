@@ -404,23 +404,46 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 		{
 			if ( readNextHexBytes(restToken, 1, value) == false ) 
 				break;
-			ret.more << "LEN = " << decodeHexValueAsInteger(value);
-			
-			if ( readNextHexBytes(restToken, 1, value) == false ) 
-				break;
-			ret.more << wxString::Format("; PID = [%03d] %s", decodeHexValueAsInteger(value), decodeHexValueAsArduinoPID(value));
-			
-			if ( readNextHexBytes(restToken, 1, value) == false ) 
-				break;
-			ret.more << "; X = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
 				
-			if ( readNextHexBytes(restToken, 1, value) == false ) 
-				break;
-			ret.more << "; Y = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
+			const int len = decodeHexValueAsInteger(value);
+			ret.more << "LEN = " << len;
 			
 			if ( readNextHexBytes(restToken, 1, value) == false ) 
 				break;
-			ret.more << "; Z = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
+				
+			const int subPid = decodeHexValueAsInteger(value);
+			ret.more << wxString::Format("; PID = [%03d] %s", subPid, decodeHexValueAsArduinoPID(value));
+			
+			// only if further data is announced
+			if ( len > 0 )
+			{
+				switch ( subPid )
+				{
+					case PID_XYZ_INTERACTIVE_POS:
+					{
+						if ( readNextHexBytes(restToken, 1, value) == false ) 
+							break;
+						ret.more << "; X = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
+							
+						if ( readNextHexBytes(restToken, 1, value) == false ) 
+							break;
+						ret.more << "; Y = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
+						
+						if ( readNextHexBytes(restToken, 1, value) == false ) 
+							break;
+						ret.more << "; Z = " << decodeHexValueAsInt8(value); // As Int8 to resolve also negative values
+						
+						
+						if ( readNextHexBytes(restToken, 1, value) == false ) 
+							break;
+						ret.more << "; Fx = " << decodeHexValueAsUInt8(value); 
+						
+						if ( readNextHexBytes(restToken, 1, value) == false ) 
+							break;
+						ret.more << decodeHexValueAsInt8(value); 
+					}
+				}
+			}
 			
 			break;
 		}
@@ -561,7 +584,7 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 					if      ( index == 0x06 ) { ret.more.assign(wxString::Format("X = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
 					else if ( index == 0x0A ) { ret.more.assign(wxString::Format("Y = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
 					else if ( index == 0x0E ) { ret.more.assign(wxString::Format("Z = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
-					else if ( index == 0x12 ) { ret.more.assign(wxString::Format("F = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
+					else if ( index == 0x12 ) { ret.more.assign(wxString::Format("F = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ) / FLT_FACT )); }
 					else if ( index == 0x13 ) { ret.more.assign(wxString::Format("%s", decodeHexValueAsArduinoPID ( hexString ))); }
 					
 					break;

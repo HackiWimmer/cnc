@@ -56253,7 +56253,7 @@
                               }, {
                                "type": "string",
                                "m_label": "Growable rows:",
-                               "m_value": "1"
+                               "m_value": "0"
                               }, {
                                "type": "string",
                                "m_label": "Horizontal gap:",

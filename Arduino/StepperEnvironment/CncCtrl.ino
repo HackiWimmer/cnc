@@ -734,12 +734,13 @@ byte CncArduinoController::acceptInteractiveMove(byte) {
 
   setPosReplyState(true);
   setPosReplyThreshold(posReplyThreshold);
+  //setPosReplyThreshold(10000);
   setProbeMode(OFF);
   enableStepperPin(ENABLE_STATE_ON);
 
   const uint32_t maxMicrosWithoutUpdate = 1000L * 1000L; // 1s
   
-  interactiveMove.tsLast  = ArdoTs::now();
+  interactiveMove.tsLast = ArdoTs::now();
   interactiveMove.active = true;
   
   while ( interactiveMove.active == true ) {
@@ -748,12 +749,23 @@ byte CncArduinoController::acceptInteractiveMove(byte) {
     if ( ret != RET_OK )
       break;
 
-    if ( ArdoTs::timespan(interactiveMove.tsLast) > maxMicrosWithoutUpdate ) {
+    const uint32_t lastTsn = ArdoTs::timespan(interactiveMove.tsLast);
+    if ( lastTsn > maxMicrosWithoutUpdate ) {
+      //ARDO_DEBUG_MESSAGE('D', wxString::Format("ArdoTs::timespan(interactiveMove.tsLast) %ld > %ld [%ld](%ld)", (int32_t)lastTsn, (int32_t)maxMicrosWithoutUpdate, (int32_t)interactiveMove.tsLast, (int32_t)ArdoTs::now()))
+
+      // check if any move parameters are active
+      const bool b = ( interactiveMove.valueX == 0 && interactiveMove.valueY == 0 && interactiveMove.valueZ == 0);
+
+      // reset move parameters
       interactiveMove.reset();
-      ret = RET_HALT;
-      ARDO_DEBUG_MESSAGE('D', wxString::Format("ArdoTs::timespan(interactiveMove.tsLast) > %ld", (int32_t)maxMicrosWithoutUpdate))
+
+      // It's only a HALT if a movement was still active
+      ret = b ? RET_OK : RET_HALT;
+
+      // stop move loop
       break;
     }
+    
   }
 
   cancelInteractiveMove(0);
@@ -930,11 +942,14 @@ bool CncArduinoController::processSignalUpdate(byte& retValue) {
     {
       // this updates the interaction timestamp only
       updateInteractiveMove();
+      
+      ret       = true;
+      retValue  = RET_OK;
+      
       break;  
     }
-    
-    default: {
-      
+    default:
+    {
       // remove unknown update
       for( int i = 0; i < ArdoObj::minimum(Serial.available(), (int)cmdLen); i++)
         Serial.read();

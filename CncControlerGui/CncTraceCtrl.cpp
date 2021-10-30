@@ -29,7 +29,7 @@ void CncTraceInfoBar::showMessage(const char type, const wxString& msg) {
 	CncInfoBar::showMessage(type, msg);
 	
 	// if a new trace with a different design (colour) appears until the 
-	// infobar is already shown a call of Refresh ensures the correct coloring . . . 
+	// infobar is already shown a call of Refresh ensures the correct colouring . . . 
 	if ( IsShownOnScreen() == true )
 		Refresh();
 }

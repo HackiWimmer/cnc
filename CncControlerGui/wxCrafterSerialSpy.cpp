@@ -23,6 +23,7 @@ CncSerialSpyPanelBase::CncSerialSpyPanelBase(wxWindow* parent, wxWindowID id, co
         bBitmapLoaded = true;
     }
     this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    this->SetToolTip(_("rewre"));
     
     wxFlexGridSizer* flexGridSizer27261 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer27261->SetFlexibleDirection( wxBOTH );

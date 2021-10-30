@@ -471,7 +471,7 @@ class CncControl {
 		void				setSpyMode(Serial::SypMode sm)								{ getSerial()->setSpyMode(sm); }
 		void				addGuidePath(const CncPathListManager& plm, double zOffset);
 		void				updatePreview3D();
-		void 				sendIdleMessage();
+		bool 				sendIdleMessage();
 		
 		int					traceReadBuffer(std::ostream& ostr)					const	{ return getSerial()->traceReadBuffer(ostr); }
 		int					peekAndTraceReadBuffer(std::ostream& ostr)					{ return getSerial()->peekAndTraceReadBuffer(ostr); }

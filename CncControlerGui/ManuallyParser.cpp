@@ -33,7 +33,7 @@ void ManuallyParser::setupToolId(int id) {
 	toolId = id;
 }
 /////////////////////////////////////////////////////////////
-void ManuallyParser::addMove(const ManuallyPathHandlerCnc::MoveDefinition& md) {
+void ManuallyParser::addMove(const CncMoveDefinition& md) {
 /////////////////////////////////////////////////////////////
 	moves.push_back(md);
 }
@@ -47,7 +47,8 @@ bool ManuallyParser::preprocess() {
 bool ManuallyParser::spool() {
 /////////////////////////////////////////////////////////////
 	long clientId = 1;
-	for ( auto it = moves.begin(); it != moves.end(); ++it ) {
+	for ( auto it = moves.begin(); it != moves.end(); ++it ) 
+	{
 		initNextClientId(CLIENT_ID.TPL_FACTOR * clientId++);
 		
 		if ( pathHandler->processLinearMove(*it) == false )

@@ -159,17 +159,17 @@ class CncSecurePortListCtrl : public CncLargeScaledListCtrl {
 		virtual ~CncSecurePortListCtrl() {
 		}
 		// ---------------------------------------------------------
-		virtual bool Enable(bool enable=true) {
-			GblFunc::freeze(this, !enable);
-			Refresh();
-			return CncLargeScaledListCtrl::Enable(enable); 
-		}
+		//virtual bool Enable(bool enable=true) {
+			//GblFunc::freeze(this, !enable);
+			//Refresh();
+			//return CncLargeScaledListCtrl::Enable(enable); 
+		//}
 		// ---------------------------------------------------------
 		void updateColumnWidth() {
 			// avoid flicker
 			GblFunc::freeze(this, true);
 				
-			// try to strech the second (key) column
+			// try to stretch the second (key) column
 			const int size = GetSize().GetWidth() - 26; 
 			
 			if ( size > GetColumnWidth(COL_STRECH) )
@@ -366,24 +366,32 @@ void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( THE_APP->getCncControl()->isConnected() == false )
 		return;
-
+		
+	wxWindow* evtWnd = ((wxWindow*)event.GetEventObject());
+	const bool isShownOnScreen = ( evtWnd && evtWnd->IsShownOnScreen() );
+	
 	switch( event.GetId() )
 	{
 		case CncSecureGesturesPanelEvent::Id::CSGP_STARTING:
 		{
-			const int pos = cnc::getSpeedStepSensitivityIndex(FINE);
-			THE_APP->selectStepSensitivity(pos);
-			THE_APP->startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR);
+			if ( isShownOnScreen == true )
+			{
+				const int pos = cnc::getSpeedStepSensitivityIndex(FINE);
+				THE_APP->selectStepSensitivity(pos);
+				THE_APP->startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR);
+			}
 			break;
 		}
 		case CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD:
 		{
-			THE_APP->updateInteractiveMove();
+			if ( isShownOnScreen == true )
+				THE_APP->updateInteractiveMove();
+				
 			break;
 		}
 		case CncSecureGesturesPanelEvent::Id::CSGP_POS_CHANGED:
 		{
-			// stop ....
+			// stop (always!!!)
 			if ( event.data.isZero() )
 			{
 				THE_APP->stopInteractiveMove();
@@ -431,7 +439,7 @@ void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 				}
 			}
 			
-			if ( move )
+			if ( move && isShownOnScreen )
 			{
 				const int modifySpeed = abs(event.data.range);
 				THE_APP->updateInteractiveMove(dx, dy, dz, modifySpeed);
@@ -510,11 +518,8 @@ void CncSecureCtrlPanel::onStopSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onConnectSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	m_leftBook->Enable(false);
-	
+	GblGuiCtrlDisabler gcd(portSelectorList);
 	THE_APP->connectSec(event);
-	
-	m_leftBook->Enable(true);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onEvaluateHardwareReference(wxCommandEvent& event) {
@@ -568,10 +573,12 @@ void CncSecureCtrlPanel::tryToProvideTemplate() {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::setPortSelection(const wxString& portName) {
 /////////////////////////////////////////////////////////////////////
+	GblGuiCtrlDisabler gcd(portSelectorList);
+	
 	THE_APP->GetPortSelector()->SetStringSelection(portName);
 	THE_APP->selectPort();
-	
-}/////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::updatePortSelection(const wxString& portName) {
 /////////////////////////////////////////////////////////////////////
 	portSelectorList->selectPortInList(portName);
@@ -593,6 +600,8 @@ void CncSecureCtrlPanel::notifyConnection(bool state, const wxString& portName) 
 	const wxBitmap bmpD = ImageLib16().Bitmap("BMP_WARNING16");
 	
 	m_portName->SetLabel(portName);
+	m_portName->Refresh();
+	
 	m_btHardwareRefSec->Enable(THE_CONTEXT->hasHardware() && state == true );
 	m_bmpConnectionStateSecure->SetBitmap( state == true ? bmpC : bmpD);
 	m_bmpConnectionStateSecure->Refresh();
@@ -628,7 +637,7 @@ void CncSecureCtrlPanel::onSerialSpySec(wxCommandEvent& event) {
 		pane.Show(true);
 		
 	const wxSize size =  THE_APP->GetClientSize();
-	pane.FloatingSize(size.GetX() / 3, size.GetY() / 3);
+	pane.FloatingSize(size.GetX() / 3, size.GetY() * 0.8 );
 		
 	THE_APP->GetAuimgrMain()->Update();
 }

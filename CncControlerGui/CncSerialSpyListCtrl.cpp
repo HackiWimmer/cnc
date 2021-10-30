@@ -142,6 +142,17 @@ CncSerialSpyListCtrl::~CncSerialSpyListCtrl() {
 	clearAll();
 }
 /////////////////////////////////////////////////////////////
+void CncSerialSpyListCtrl::setRefreshInterval(int v) { 
+/////////////////////////////////////////////////////////////
+	refreshInterval = v; 
+	startRefreshInterval();
+}
+/////////////////////////////////////////////////////////////
+void CncSerialSpyListCtrl::startRefreshInterval() { 
+/////////////////////////////////////////////////////////////
+	spyDisplaylTimer.Start(refreshInterval); 
+}
+/////////////////////////////////////////////////////////////
 void CncSerialSpyListCtrl::enableLiveDecoding(bool state) {
 /////////////////////////////////////////////////////////////
 	liveDecoding = state;
@@ -283,6 +294,7 @@ wxString CncSerialSpyListCtrl::OnGetItemText(long item, long column) const {
 	
 	return _("");
 }
+
 /////////////////////////////////////////////////////////////
 void CncSerialSpyListCtrl::flush() {
 /////////////////////////////////////////////////////////////
@@ -294,6 +306,8 @@ void CncSerialSpyListCtrl::refreshList() {
 	if ( entries.size() <= 0 )
 		return;
 	
+	spyDisplaylTimer.Stop();
+	
 	SetItemCount(entries.size());
 	
 	if ( autoScrolling == true ) {
@@ -301,6 +315,8 @@ void CncSerialSpyListCtrl::refreshList() {
 		EnsureVisible(entries.size() - 1);
 		Refresh();
 	}
+	
+	startRefreshInterval();
 }
 /////////////////////////////////////////////////////////////
 const wxString CncSerialSpyListCtrl::getLine(long item) const {
@@ -337,22 +353,22 @@ void CncSerialSpyListCtrl::addLine(const wxString& line, const wxString& appendi
 	
 	entries.push_back(std::move(Entry(line, appendix, lt)));
 	
-	if ( lt >= LT_ResultOk && lt <= LT_ResultInterrupt ) {
-		if ( CncTimeFunctions::getMilliTimestamp() - tsLast > refreshInterval / 2 ) {
-			refreshList();
-			startRefreshInterval();
-			tsLast = CncTimeFunctions::getMilliTimestamp();
-		}
-	}
-	else {
-		switch ( lt ) {
-			case LT_Marker:
-			case LT_Enable:
-			case LT_Disable:	refreshList();
-								break;
-								
-			default:			;
-		}
+	switch ( lt ) 
+	{
+		case LT_ResultError:
+		case LT_ResultWarning:
+		case LT_ResultLimit:
+		case LT_ResultHalt:
+		case LT_ResultQuit:
+		case LT_ResultInterrupt:
+		
+		//case LT_Marker: Marker are used internally too often, Manually marker are followed by a flush()
+		
+		case LT_Enable:
+		case LT_Disable:			refreshList();
+									break;
+							
+		default:			;
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -554,19 +570,26 @@ bool CncSerialSpyListCtrl::decodeSerialSpyLineIntern(long item, SpyHexDecoder::D
 	// determine prev and next inbound
 	details.inbound.prev.clear();
 	details.inbound.next.clear();
-	if ( lineInfo.type == Type::LIT_INBOUND ) {
+	if ( lineInfo.type == Type::LIT_INBOUND )
+	{
 		const auto end = entries.begin() + item;
 		
 		// prev ...
-		for ( auto it = end; ; --it ) {
+		for ( auto it = end; ; --it )
+		{
 			CncSerialSpyListCtrl::LineInfo li;
 			decodeLineInfo(it->line, li);
-			details.inbound.prev.Prepend(li.hexString);
 			
-			// stop at RET_SOH
-			if ( li.hexString == wxString::Format("%02X", RET_SOH) )
-				break;
+			// skip asynchronous signals on demand 
+			if ( li.type == Type::LIT_INBOUND )
+			{
+				details.inbound.prev.Prepend(li.hexString);
 				
+				// stop at RET_SOH
+				if ( li.hexString == wxString::Format("%02X", RET_SOH) )
+					break;
+			}
+			
 			// stop at entries.begin()
 			if ( it == entries.begin() )
 				break;

@@ -5,8 +5,7 @@
 
 struct CncMoveDefinition {
 	
-	enum MoveMode { MM_1D, MM_2D, MM_3D };
-	
+	enum MoveMode { MM_1D, MM_2D, MM_3D };	
 	struct Axis {
 		bool	absolute	= false;
 		double	value		= 0.0;
@@ -17,7 +16,7 @@ struct CncMoveDefinition {
 	Axis z;
 	
 	CncSpeedMode speedMode	= CncSpeedMode::CncSpeedRapid;
-	CncStepSensitivity f	= FINE;
+	double speedValue		= 0.0;
 	
 	MoveMode moveMode		= MM_2D;
 	
@@ -48,7 +47,7 @@ struct CncMoveDefinition {
 				<< (a.x.absolute ? 'X' : 'x')	<< ": " << wxString::Format("%+.3lf", a.x.value)	<< std::endl
 				<< (a.y.absolute ? 'Y' : 'y')	<< ": " << wxString::Format("%+.3lf", a.y.value)	<< std::endl
 				<< (a.z.absolute ? 'Z' : 'z')	<< ": " << wxString::Format("%+.3lf", a.z.value)	<< std::endl
-				<< 'F' 							<< ": " << cnc::getSpeedValue(a.f)					<< std::endl
+				<< 'F' 							<< ": " << wxString::Format("%+.1lf", a.speedValue)	<< std::endl
 		;
 		
 		return ostr;

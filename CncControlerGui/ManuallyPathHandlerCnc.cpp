@@ -44,7 +44,7 @@ void ManuallyPathHandlerCnc::switchSpindleState(bool state) {
 	state == true ? cncControl->switchSpindleOn() : cncControl->switchSpindleOff();
 }
 //////////////////////////////////////////////////////////////////
-bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
+bool ManuallyPathHandlerCnc::processLinearMove(const CncMoveDefinition& md) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT( cncControl != NULL );
 	
@@ -52,14 +52,14 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 	switchSpindleState(md.toolState);
 	
 	// speed handling
-	if ( md.speedMode != lastSpeedMode || md.f != lastSpeedValue ) {
-		if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(md.f, md.speedMode) == false )
+	if ( md.speedMode != lastSpeedMode || md.speedValue != lastSpeedValue ) {
+		if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(md.speedValue, md.speedMode) == false )
 			return false;
 	}
 	
 	// -------------------------------------------------------------
-	auto move = [&]() {
-		
+	auto move = [&]()
+	{
 		bool ret = processLinearMove(false);
 		if ( ret == false && md.correctLimit == true ) {
 			ret = cncControl->correctLimitPositions();
@@ -68,98 +68,78 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 		return ret;
 	};
 	
-	bool ret = false;
+	// -------------------------------------------------------------
+	auto prepareAxisX = [&](const CncMoveDefinition::Axis& a)
+	{
+		// define move
+		if ( a.absolute )	currentPos.setX(a.value);
+		else				currentPos.incX(a.value);
+	};
 	
-	switch ( md.moveMode ) {
-		case MoveDefinition::MM_1D:
+	// -------------------------------------------------------------
+	auto prepareAxisY = [&](const CncMoveDefinition::Axis& a)
+	{
+		// define move
+		if ( a.absolute )	currentPos.setY(a.value);
+		else				currentPos.incY(a.value);
+	};
+	
+	// -------------------------------------------------------------
+	auto prepareAxisZ = [&](const CncMoveDefinition::Axis& a)
+	{
+		// define move
+		if ( a.absolute )	currentPos.setZ(a.value);
+		else				currentPos.incZ(a.value);
+	};
+	
+	// trace
+	//std::clog << CNC_LOG_FUNCT << md << std::endl;
+	
+	bool ret = false;
+	switch ( md.moveMode ) 
+	{
+		case CncMoveDefinition::MoveMode::MM_1D:
 		{
 			// define X move
-			if ( md.absoluteMove == true ) {
-				currentPos.setX(md.x);
-				currentPos.setY(currentPos.getY());
-				currentPos.setZ(currentPos.getZ());
-			} else {
-				currentPos.incX(md.x);
-				currentPos.incY(0.0);
-				currentPos.incZ(0.0);
-			}
-			
+			prepareAxisX(md.x);
 			ret = move();
-			if ( ret == false)
-				break;
 			
-			// define Y move
-			if ( md.absoluteMove == true ) {
-				currentPos.setX(currentPos.getX());
-				currentPos.setY(md.y);
-				currentPos.setZ(currentPos.getZ());
-			} else {
-				currentPos.incX(0.0);
-				currentPos.incY(md.y);
-				currentPos.incZ(0.0);
+			if ( ret == true )
+			{
+				// define Y move
+				prepareAxisY(md.y);
+				ret = move();
+				
+				if ( ret == true )
+				{
+					// define Z move
+					prepareAxisZ(md.z);
+					ret = move();
+				}
 			}
-			
-			ret = move();
-			if ( ret == false)
-				break;
-
-			// define Z move
-			if ( md.absoluteMove == true ) {
-				currentPos.setX(currentPos.getX());
-				currentPos.setY(currentPos.getY());
-				currentPos.setZ(md.z);
-			} else {
-				currentPos.incX(0.0);
-				currentPos.incY(0.0);
-				currentPos.incZ(md.z);
-			}
-			
-			ret = move();
 			break;
 		}
-		case MoveDefinition::MM_2D:
+		case CncMoveDefinition::MoveMode::MM_2D:
 		{
 			// define XY move
-			if ( md.absoluteMove == true ) {
-				currentPos.setX(md.x);
-				currentPos.setY(md.y);
-				currentPos.setZ(currentPos.getZ());
-			} else {
-				currentPos.incX(md.x);
-				currentPos.incY(md.y);
-				currentPos.incZ(0.0);
-			}
-			
+			prepareAxisX(md.x);
+			prepareAxisY(md.y);
 			ret = move();
-			if ( ret == false)
-				break;
 			
-			// define Z move
-			if ( md.absoluteMove == true ) {
-				currentPos.setX(currentPos.getX());
-				currentPos.setY(currentPos.getY());
-				currentPos.setZ(md.z);
-			} else {
-				currentPos.incX(0.0);
-				currentPos.incY(0.0);
-				currentPos.incZ(md.z);
+			if ( ret == true )
+			{
+				// define Z move
+				prepareAxisZ(md.z);
+				ret = move();
 			}
-			
-			ret = move();
 			break;
 		}
-		case MoveDefinition::MM_3D:
+		case CncMoveDefinition::MoveMode::MM_3D:
 		{
 			// define move
-			if ( md.absoluteMove == true ) {
-				currentPos.setX(md.x);
-				currentPos.setY(md.y);
-				currentPos.setZ(md.z);
-			} else {
-				currentPos.incX(md.x);
-				currentPos.incY(md.y);
-				currentPos.incZ(md.z);
-			}
+			prepareAxisX(md.x);
+			prepareAxisY(md.y);
+			prepareAxisZ(md.z);
 			
 			ret = move();
 			break;

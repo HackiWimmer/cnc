@@ -2,6 +2,7 @@
 #include "CncMoveDefinition.h"
 #include "CncSecureNumpadDialog.h"
 #include "CncSecureSlidepadDialog.h"
+#include "MainFrame.h"
 #include "CncSecureManuallyMovePanel.h"
 
 /////////////////////////////////////////////////////////////////
@@ -133,19 +134,19 @@ void CncSecureManuallyMovePanel::onLeftDownResultValue(wxMouseEvent& event) {
 			{
 				CncSecureSlidepadDialog dlg(this);
 				CncSecureSlidepad::SliderValues values;
-				/*
+				
 				values.push_back(cnc::getSpeedValue(FINEST));
 				values.push_back(cnc::getSpeedValue(FINE));
 				values.push_back(cnc::getSpeedValue(MEDIUM));
 				values.push_back(cnc::getSpeedValue(ROUGH));
 				values.push_back(cnc::getSpeedValue(ROUGHEST));
-				*/
-				//values.push_back(cnc::getSpeedValue(FINEST));
+
 				#warning
 				
 				//values.push_back(-cnc::getSpeedValue(ROUGHEST));
-				values.push_back(0);
-				values.push_back(+cnc::getSpeedValue(ROUGHEST));
+				//values.push_back(+cnc::getSpeedValue(FINEST));
+				//values.push_back(0);
+				//values.push_back(+cnc::getSpeedValue(ROUGHEST));
 				
 				
 				dlg.setValues(values, currentValue);
@@ -202,10 +203,17 @@ void CncSecureManuallyMovePanel::onMove(wxCommandEvent& event) {
 	cmd.y.value		= currentValueY;
 	cmd.z.absolute	= (char)(m_btZ->GetLabel()[0]) == 'Z';
 	cmd.z.value		= currentValueZ;
-	//cmd.f			= currentEnumF;
-	cmd.speedMode	= CncSpeedMode::CncSpeedRapid;
-	cmd.moveMode	= CncMoveDefinition::convert(getDimMode());
 	
-	std::cout << cmd;
+	cmd.speedMode	= CncSpeedMode::CncSpeedRapid;
+	cmd.speedValue	= currentValueF;
+	
+	cmd.moveMode	= CncMoveDefinition::convert(getDimMode());
+	//std::cout << cmd;
+	
+	if ( THE_APP->processManualMove(cmd) == false )
+	{
+		CNC_CERR_FUNCT_A(": processManualMove() failed ");
+		std::cerr << cmd;
+	}
 }
 

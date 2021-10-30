@@ -6,6 +6,7 @@
 #include "wxCrafterImages.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "CncCommon.h"
+#include "CncContext.h"
 #include "CncConfig.h"
 #include "MainFrame.h"
 #include "GlobalFunctions.h"
@@ -300,10 +301,14 @@ void CncLoggerListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::updateContent() {
 /////////////////////////////////////////////////////////////
-	if ( joinTheApp == true ) {
+	if ( joinTheApp == true )
+	{
+		const bool secure = THE_CONTEXT->secureModeInfo.isActive;
+		
 		if (   showOnDemand 		== true  
 			&& IsShownOnScreen()	== false 
-			&& IsShown() 			== true
+			&& IsShown()			== true
+			&& secure				== false
 		   ) 
 		{
 			if ( CNC_READY ) {

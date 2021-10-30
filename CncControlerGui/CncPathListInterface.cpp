@@ -25,7 +25,7 @@ bool CncPathListMonitor::dispatchEventQueue() {
 	static       CncMilliTimestamp tsLastDispatch   = 0;
 
 	if ( THE_CONTEXT->isAllowEventHandling() ) {
-		const CncMilliTimespan timespanEvent   = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getMilliTimestamp(), tsLastDispatch);
+		const CncMilliTimespan timespanEvent = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getMilliTimestamp(), tsLastDispatch);
 		
 		if ( timespanEvent >= THE_CONTEXT->getUpdateInterval() ) {
 			APP_PROXY::getMotionMonitor()->update(true);

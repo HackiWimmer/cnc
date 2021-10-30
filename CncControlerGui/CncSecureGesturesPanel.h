@@ -9,8 +9,6 @@
 
 // ----------------------------------------------------------------------------
 
-enum CncEdge { cncLeft, cncTop, cncRight, cncBottom };
-
 template <class T> 
 class CncRangeTranslator {
 	
@@ -28,6 +26,8 @@ class CncRangeTranslator {
 		}
 		
 	public:
+		
+		const static int errorValueBase = -420000;
 		
 		CncRangeTranslator(T a, T b)
 		: CncRangeTranslator(a, b, cncLeft, abs(b - a))
@@ -50,12 +50,89 @@ class CncRangeTranslator {
 			// else rng = T(0)
 		}
 		
-		T getMin()					const { return min; }
-		T getMax()					const { return max; }
-		T getRange()				const { return rng; }
+		T getMin()						const { return min; }
+		T getMax()						const { return max; }
+		T getRange()					const { return rng; }
 		
-		bool good()					const { return ( rng != T(0) ); }
-		bool isInRange(T value)		const { return ( value >= min && value <= max ); }
+		bool good()						const { return ( rng != T(0) ); }
+		bool isInRange(T value)			const { return ( value >= min && value <= max ); }
+		
+		static
+		bool isErrorValue(int value)		  { return ( value <  0 ); }
+		
+		// ------------------------------------------------------------
+		char getEdgeAsChar(CncEdge edge) const 
+		{
+			switch ( edge )
+			{
+				case cncLeft:	return 'L';
+				case cncTop:	return 'T'; 
+				case cncRight:	return 'R';
+				case cncBottom:	return 'B';
+				case cncCenter:	return 'C';
+			}
+			
+			return '?';
+		}
+		
+		// ------------------------------------------------------------
+		friend std::ostream &operator<< (std::ostream &ostr, const CncRangeTranslator &t) 
+		{
+			ostr	<< "CncRangeTranslator[good=" << t.good() << "]"
+					<< " min=" << t.min
+					<< " max=" << t.max
+					<< " rng=" << t.rng
+					<< " len=" << t.len
+					<< " edg=" << t.getEdgeAsChar(t.edge)
+			;
+			
+			return ostr;
+		}
+		
+		// ------------------------------------------------------------
+		static float ratioFromIndex(unsigned int index, unsigned int totCnt)
+		{
+			if ( totCnt < index )
+			{
+				std::cerr << CNC_LOG_FUNCT <<  ": Invalid index:" << index << " tot= " << totCnt << std::endl;
+				return 0.0f;
+			}
+				
+			const float distance = 1.0 / totCnt;
+			
+			// +0.5 to reach approximately the middle of the region
+			return ( index + 0.5 ) * distance;
+		}
+		
+		// ------------------------------------------------------------
+		static int indexFromRatio(float ratio, unsigned int totCnt)
+		{
+			if ( totCnt <= 0 )
+			{
+				std::cerr << CNC_LOG_FUNCT <<  ": Invalid total count:" << totCnt << std::endl;
+				return -1;
+			}
+			
+			if ( ratio < 0.0f )
+			{
+				std::cerr << CNC_LOG_FUNCT <<  ": Invalid ratio:" << ratio << std::endl;
+				return -1;
+			}
+			
+			const float distance = 1.0 / totCnt;
+			
+			if ( ratio < distance )
+				return 0;
+				
+			for ( unsigned int i = 1; i <= totCnt; i++)
+			{
+				if ( distance * i >= ratio )
+					return i - 1;
+			}
+			
+			std::cerr << CNC_LOG_FUNCT <<  ": Cant determine index! ratio:" << ratio << std::endl;
+			return -1;
+		}
 		
 		// ------------------------------------------------------------
 		T valueFromRatio(float ratio)
@@ -66,12 +143,16 @@ class CncRangeTranslator {
 				if ( ratio < 0.0 )
 				{
 					if ( min < T(0) )
-						value = abs(min) * ratio;
+						value = min + ( abs(rng * ratio) );
 				}
-				else if ( ratio > 0.0 )
+				else if ( ratio >= 0.0 )
 				{
 					if ( max > T(0) ) 
-						value = abs(max) * ratio;
+						value = min + ( abs(rng * ratio) );
+						
+					// consider special centre behaviour 
+					if ( cnc::fltCmp::nu(ratio) && edge == cncCenter )
+						value = T(0);
 				}
 			}
 			
@@ -93,12 +174,16 @@ class CncRangeTranslator {
 					if ( value < T(0) )
 					{
 						if ( min < T(0) )
-							ratio = float(value) / abs(min);
+							ratio = float(value - min) / abs(rng);
 					}
-					else if ( value > T(0) )
+					else if ( value >= T(0) )
 					{
 						if ( max > T(0) )
-							ratio = float(value) / abs(max);
+							ratio = float(value - min) / abs(rng);
+						
+						// consider special centre behaviour 
+						if ( value == T(0) && edge == cncCenter )
+							ratio = 0.0;
 					}
 				}
 			}
@@ -110,7 +195,7 @@ class CncRangeTranslator {
 		int calcByRatio(float ratio)
 		{
 			if ( good() == false )
-				return -420001;
+				return errorValueBase - 1;
 				
 			return calcByValue(valueFromRatio(ratio));
 		}
@@ -119,12 +204,12 @@ class CncRangeTranslator {
 		int calcByValue(T value)
 		{
 			if ( good() == false )
-				return -420001;
+				return errorValueBase - 1;
 			
 			if ( isInRange(value) == false )
 			{
 				std::cerr << CNC_LOG_FUNCT <<  ": Value out of range:" << min << " < " << value << " > " << max << std::endl;
-				return -420002;
+				return errorValueBase - 2;
 			}
 				
 			const T maxS = shift(max);
@@ -135,7 +220,8 @@ class CncRangeTranslator {
 			switch ( edge )
 			{
 				case cncLeft:
-				case cncTop: 
+				case cncTop:
+				case cncCenter:
 					break;
 					
 				case cncRight:
@@ -163,7 +249,13 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 			CSGP_POS_HELD		= 201
 		};
 		
-		static const char* getEventIdAsString(Id id) {
+		static const char* getEventIdAsString(int id)
+		{
+			return getEventIdAsString(Id(id));
+		}
+		
+		static const char* getEventIdAsString(Id id) 
+		{
 			switch ( id ) {
 				case CSGP_STARTING:				return "CSGP_STARTING";
 				case CSGP_POS_CHANGED:			return "CSGP_POS_CHANGED";
@@ -201,7 +293,17 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 			
 			bool isChanged()	const	{ return (isTimerChanged || isRangeChanged || isAngleChanged); }
 			bool isZero()		const	{ return range == 0; }
-			void reset()				{ *this = Data(); }
+			
+			void reset(bool deep = false)
+			{
+				const int prevCbId = cbId;
+				*this = Data();
+				
+				if ( deep == false )
+				{
+					cbId = prevCbId;
+				}
+			}
 			
 			friend std::ostream &operator<< (std::ostream &ostr, const Data &d) 
 			{
@@ -235,6 +337,16 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 		virtual wxEvent *Clone() const 
 		{
 			return new CncSecureGesturesPanelEvent(*this);
+		}
+		
+		friend std::ostream &operator<< (std::ostream &ostr, const CncSecureGesturesPanelEvent &e) 
+		{
+			const wxString context(CncSecureGesturesPanelEvent::getEventIdAsString(e.GetId()));
+			
+			ostr	<< "[" << context << "]" << wxString(20 - context.length() , ' ') << ": "
+					<< e.data;
+			
+			return ostr;
 		}
 		
 		Data data;
@@ -279,7 +391,6 @@ class CncSecureGesturesPanel : public wxPanel
 		int getCallbackId()						const	{ return callbackId; }
 		
 		void setValueByRatio(float ratio, float angle = 0.0f);
-		void setValueByValue(float value, float angle = 0.0f);
 		
 		char getModeAsCharacter(Mode m) const
 		{

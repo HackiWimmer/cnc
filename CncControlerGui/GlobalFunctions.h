@@ -36,6 +36,26 @@ class GblFunc {
 		
 };
 
+class GblGuiCtrlDisabler {
+	
+	private:
+		wxWindow* ctrl;
+		
+	public:
+		GblGuiCtrlDisabler(wxWindow* c)
+		: ctrl(c)
+		{
+			if ( ctrl != NULL )
+				ctrl->Enable(false);
+		}
+		
+		~GblGuiCtrlDisabler()
+		{
+			if ( ctrl != NULL )
+				ctrl->Enable(true);
+		}
+};
+
 #define APPEND_THREAD_ID_TO_STACK_TRACE_FILE		GblFunc::appendToStackTraceFileTS(wxString::Format("%s: TID=[%ld]",    CNC_LOG_FUNCT, wxThread::GetCurrentId()));
 #define APPEND_THREAD_IDTO_STACK_TRACE_FILE_A(msg)	GblFunc::appendToStackTraceFileTS(wxString::Format("%s: TID=[%ld] %s", CNC_LOG_FUNCT, wxThread::GetCurrentId(), msg));
 #define APPEND_LOCATION_TO_STACK_TRACE_FILE 		GblFunc::appendToStackTraceFileTS(CNC_LOG_LOCATION);

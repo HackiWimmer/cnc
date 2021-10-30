@@ -18,22 +18,29 @@ class CncSecureSlidepad : public CncSecureSlidepadBase
 				virtual void sliderValueChanged(int index, int value) {}
 		};
 		
-		enum Resulution { ResOnes = 1, ResTens = 10, ResHundreds = 100, ResThousands = 1000};
+		enum Resolution{ ResOnes = 1, ResTens = 10, ResHundreds = 100, ResThousands = 1000};
 		
 		CncSecureSlidepad(wxWindow* parent);
 		virtual ~CncSecureSlidepad();
 		
 		typedef std::vector<int> SliderValues;
 		
+		int		getValue() const;
+
 		void	setInfo(const wxString& info);
 		
 		bool	setValues(const SliderValues& list, int index);
-		void	setValueByRatio(float ratio) { slider->setValueByRatio(ratio); }
-		int		getValue() const;
+		void	setValueByRatio(float ratio) 					{ slider->setValueByRatio(ratio); }
 		
-		void	setCallbackInterface(CallbackInterface* inf) { caller = inf; }
+		void	setResolution(Resolution r)						{ resolution = r; }
+		void	setCallbackInterface(CallbackInterface* inf)	{ caller = inf; }
+		
+		void	setShowEndButtons(bool show);
 		
 	protected:
+		virtual void onLeftDownResult(wxMouseEvent& event);
+		virtual void onSkipToMax(wxCommandEvent& event);
+		virtual void onSkipToMin(wxCommandEvent& event);
 		
 		void onSliderEvent(CncSecureGesturesPanelEvent& event);
 		
@@ -44,10 +51,10 @@ class CncSecureSlidepad : public CncSecureSlidepadBase
 		SliderValues			sliderValues;
 		CncSecureGesturesPanel*	slider;
 		CallbackInterface*		caller;
-		Resulution				resolution;
+		Resolution				resolution;
 		
 		void updateResult(float ratio);
-		int findValue(int value) const;
+		int findIndex(int value) const;
 };
 
 #endif // CNCSECURESLIDEPAD_H

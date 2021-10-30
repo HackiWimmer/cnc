@@ -2506,15 +2506,15 @@ void CncControl::updatePreview3D() {
 		THE_APP->getMotionMonitor()->update(true);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::sendIdleMessage() {
+bool CncControl::sendIdleMessage() {
 ///////////////////////////////////////////////////////////////////
 	if ( getSerial() == NULL )
-		return;
+		return false;
 		
 	if ( getSerial()->isCommandActive() == true )
-		return;
+		return false;
 	
-	getSerial()->processIdle();
+	return getSerial()->processIdle();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::addGuidePath(const CncPathListManager& plm, double zOffset) {

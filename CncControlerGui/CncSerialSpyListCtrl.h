@@ -108,7 +108,7 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		CncMilliTimestamp	tsLast;
 		 
 		void					refreshList();
-		void					startRefreshInterval() { spyDisplaylTimer.Start(refreshInterval); }
+		void					startRefreshInterval();
 		
 		bool 					decodeSerialSpyLineIntern(long item, SpyHexDecoder::Details& details) const ;
 		
@@ -142,7 +142,7 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		const wxString 			getSelectedLine() const;
 		long 		 			getSelectedItem() const;
 		
-		void 					setRefreshInterval(int v)			{ refreshInterval = v; }
+		void 					setRefreshInterval(int v);
 		
 		void 					installOpenDetails(wxAnyButton* b)	{ openDetails = b; }
 		void					enableLiveDecoding(bool state);

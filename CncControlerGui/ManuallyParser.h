@@ -23,7 +23,7 @@ class ManuallyParser : public FileParser {
 		void reset();
 		void reset(const CncDoublePosition& pos);
 		void setupToolId(int id);
-		void addMove(const ManuallyPathHandlerCnc::MoveDefinition& md);
+		void addMove(const CncMoveDefinition& md);
 		
 	protected:
 		ManuallyPathHandlerCnc* pathHandler;
@@ -39,7 +39,7 @@ class ManuallyParser : public FileParser {
 		virtual bool shouldAToolChangeProcessed() { return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
 		
 	private:
-		typedef std::vector<ManuallyPathHandlerCnc::MoveDefinition> Moves;
+		typedef std::vector<CncMoveDefinition> Moves;
 		
 		Moves moves;
 		int toolId;

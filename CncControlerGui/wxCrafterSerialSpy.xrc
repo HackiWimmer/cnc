@@ -4,6 +4,9 @@
     <size>500,300</size>
     <style>wxTAB_TRAVERSAL</style>
     <bg>wxSYS_COLOUR_BTNTEXT</bg>
+    <tooltip>
+      <![CDATA[rewre]]>
+    </tooltip>
     <object class="wxFlexGridSizer">
       <cols>1</cols>
       <rows>2</rows>

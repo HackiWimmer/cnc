@@ -215,13 +215,11 @@ CncSecureGesturesPanelEvent& CncSecureGesturesPanel::prepareEvent(int id) {
 ///////////////////////////////////////////////////////////////////
 bool CncSecureGesturesPanel::Layout() {
 ///////////////////////////////////////////////////////////////////
-	//CNC_PRINT_FUNCT_A(":ID=%d", callbackId)
 	return wxPanel::Layout();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncSecureGesturesPanel::Enable(bool enable) {
 ///////////////////////////////////////////////////////////////////
-	//CNC_PRINT_FUNCT_A(":ID=%d", callbackId)
 	return wxPanel::Enable(enable);
 }
 ///////////////////////////////////////////////////////////////////
@@ -229,11 +227,8 @@ bool CncSecureGesturesPanel::Show(bool show) {
 ///////////////////////////////////////////////////////////////////
 	const bool ret = wxPanel::Show(show);
 	
-	//CNC_PRINT_FUNCT_A(":ID=%d", callbackId)
-	
 	if ( ret == true && show == true )
 	{
-		//CNC_PRINT_FUNCT_A(":ID=%d", callbackId)
 		init();
 	}
 	
@@ -473,7 +468,21 @@ void CncSecureGesturesPanel::onPaint(wxPaintEvent& WXUNUSED(event)) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::calculateDimensions() {
 ///////////////////////////////////////////////////////////////////
-	const wxSize size = GetClientSize();
+	// ensure even dimensions 
+	if ( true )
+	{
+		wxSize virtualSize = GetClientSize();
+		if ( virtualSize.GetWidth() % 2 != 0 )
+			virtualSize.SetWidth(virtualSize.GetWidth() + 1);
+		
+		if ( virtualSize.GetHeight() % 2 != 0 )
+			virtualSize.SetHeight(virtualSize.GetHeight() + 1);
+		
+		SetVirtualSize(virtualSize);
+	}
+	
+	// determine base . . .
+	const wxSize size = GetVirtualSize();
 	
 	// ------------------------------------------------------------
 	// determine zero position
@@ -639,11 +648,8 @@ void CncSecureGesturesPanel::calculateCoordinates() {
 	
 	const State s = skipState();
 	if ( s == S_STARTING )
-	{
-		CncSecureGesturesPanelEvent evt(CncSecureGesturesPanelEvent::Id::CSGP_STARTING);
-		wxPostEvent(GetParent(), evt );
-	}
-		
+		wxPostEvent(GetParent(), prepareEvent(CncSecureGesturesPanelEvent::Id::CSGP_STARTING));
+	
 	// determine distance to zeroPt
 	const int dx = centrePt.x - zeroPt.x;
 	const int dy = zeroPt.y   - centrePt.y;
@@ -832,10 +838,9 @@ void CncSecureGesturesPanel::onTimer(wxTimerEvent& event) {
 		case observerTimerId:
 		{
 			const wxTimeSpan diff = wxDateTime::UNow() - observerTs;
-			if  ( diff.GetMilliseconds() > 500 ) {
-				CNC_PRINT_FUNCT
+			if  ( diff.GetMilliseconds() > 500 ) 
 				reset();
-			}
+			
 			break;
 		}
 	}
@@ -845,14 +850,24 @@ void CncSecureGesturesPanel::onLeave(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////
 	event.Skip();
 	
-	mouseDown = false;
+	const bool b = updateTimer->IsRunning()
+				|| mouseDown == true
+				|| state     != S_INACTIVE;
 	
-	if ( type == T_BUTTON )
-		reset();
+	if ( b )
+	{
+		mouseDown = false;
+		
+		if ( type == T_BUTTON )
+			reset();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::setValueByRatio(float ratio, float angle) {
 ///////////////////////////////////////////////////////////////////
+	if ( totalLen <= 0 )
+		return;
+		
 	wxString errMsg;
 	switch ( mode )
 	{
@@ -880,36 +895,54 @@ void CncSecureGesturesPanel::setValueByRatio(float ratio, float angle) {
 		ratio *= (-1);
 	}
 	
+	// ----------------------------------------------------------------------
+	auto translateRange = [](const wxString& context, int min, int max, CncEdge edge, int len, float ratio) 
+	{
+		CncRangeTranslator<int> trans(min, max, edge, len);
+		const int ret = trans.calcByRatio(ratio);
+		
+		if ( CncRangeTranslator<int>::isErrorValue( ret ) ) 
+		{
+			std::cerr	<< CNC_LOG_LOCATION << ": Invalid value " << ret
+						<< std::endl
+						<< " --> " << trans
+						<< std::endl
+			; 
+		}
+		
+		return ret;
+	};
+	
 	// prepare new control position . . .
 	switch ( orientation ) 
 	{
 		case wxHORIZONTAL:
 		{
 			// constant Y coordinate
-			translatedDistance.m_y = GetClientSize().GetHeight() / 2;
+			translatedDistance.m_y = zeroPt.y;
 			
 			// determine X coordinate
 			switch ( mode )
 			{
 				case M_NEGATIVE:
 				{	
-					translatedDistance.m_x  = CncRangeTranslator<int>(-totalLen, 0, cncLeft, totalLen).calcByRatio(ratio);
+					translatedDistance.m_x  = translateRange(CNC_LOG_LOCATION, -totalLen, 0, cncLeft, totalLen, ratio);
 					translatedDistance.m_x += knobSize.GetWidth() / 2 + border;
 					break;
 				}
 				case M_POSITIVE:
 				{
-					translatedDistance.m_x  = CncRangeTranslator<int>(0, +totalLen, cncLeft, totalLen).calcByRatio(ratio);
+					translatedDistance.m_x  = translateRange(CNC_LOG_LOCATION, 0, +totalLen, cncLeft, totalLen, ratio);
 					translatedDistance.m_x += knobSize.GetWidth() / 2 + border;
 					break;
 				}
 				case M_BOTH:
 				{
-					const int len = GetClientSize().GetWidth();
+					const int len = GetVirtualSize().GetWidth();
 					const int min = wxRound(float(-len) / 2);
 					const int max = min * (-1);
 					
-					translatedDistance.m_x = CncRangeTranslator<int>(min, max, cncLeft, len).calcByRatio(ratio);
+					translatedDistance.m_x = translateRange(CNC_LOG_LOCATION, min, max, cncCenter, len, ratio);
 					break;
 				}
 			}
@@ -920,30 +953,30 @@ void CncSecureGesturesPanel::setValueByRatio(float ratio, float angle) {
 		case wxVERTICAL:
 		{
 			// constant X coordinate
-			translatedDistance.m_x = GetClientSize().GetWidth() / 2;
+			translatedDistance.m_x = zeroPt.x;
 			
 			// determine Y coordinate
 			switch ( mode )
 			{
 				case M_NEGATIVE:
 				{
-					translatedDistance.m_y  = CncRangeTranslator<int>(-totalLen, 0, cncBottom, totalLen).calcByRatio(ratio);
+					translatedDistance.m_y  = translateRange(CNC_LOG_LOCATION, -totalLen, 0, cncBottom, totalLen, ratio);
 					translatedDistance.m_y += (knobSize.GetHeight() / 2 + border);
 					break;
 				}	
 				case M_POSITIVE:
 				{
-					translatedDistance.m_y  = CncRangeTranslator<int>(0, +totalLen, cncBottom, totalLen).calcByRatio(ratio);
+					translatedDistance.m_y  = translateRange(CNC_LOG_LOCATION, 0, +totalLen, cncBottom, totalLen, ratio);
 					translatedDistance.m_y += (knobSize.GetHeight() / 2 + border);
 					break;
 				}
 				case M_BOTH:
 				{
-					const int len = GetClientSize().GetHeight();
+					const int len = GetVirtualSize().GetHeight();// % 2 == 0 ? GetClientSize().GetHeight() : GetClientSize().GetHeight() + 1;
 					const int min = wxRound(float(-len) / 2);
 					const int max = min * (-1);
 					
-					translatedDistance.m_y = CncRangeTranslator<int>(min, max, cncBottom, len).calcByRatio(ratio);
+					translatedDistance.m_y = translateRange(CNC_LOG_LOCATION, min, max, cncCenter, len, ratio);
 					break;
 				}
 			}
@@ -965,7 +998,7 @@ void CncSecureGesturesPanel::setValueByRatio(float ratio, float angle) {
 				}
 				case M_BOTH:
 				{
-					const float radius = CncRangeTranslator<float>(0.0f, float(totalLen), cncLeft, totalLen).calcByRatio(ratio);
+					const float radius = CncRangeTranslator<float>(0.0f, float(totalLen), cncCenter, totalLen).calcByRatio(ratio);
 					const float dx = radius * cos(angle * PI / 180);
 					const float dy = radius * sin(angle * PI / 180);
 					
@@ -982,15 +1015,6 @@ void CncSecureGesturesPanel::setValueByRatio(float ratio, float angle) {
 	}
 	
 	applyPosChange(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncSecureGesturesPanel::setValueByValue(float value, float angle) {
-///////////////////////////////////////////////////////////////////
-
-
-
-
-	
 }
 /////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onMouse(wxMouseEvent& event) {
@@ -1014,10 +1038,10 @@ void CncSecureGesturesPanel::onMouse(wxMouseEvent& event) {
 			switch ( orientation )
 			{
 				case wxHORIZONTAL:	translatedDistance.m_x = event.GetX();
-									translatedDistance.m_y = GetClientSize().GetHeight() / 2;
+									translatedDistance.m_y = zeroPt.y;
 									break;
 									
-				case wxVERTICAL:	translatedDistance.m_x = GetClientSize().GetWidth() / 2;
+				case wxVERTICAL:	translatedDistance.m_x = zeroPt.x;
 									translatedDistance.m_y = event.GetY();
 									break;
 									
@@ -1194,7 +1218,7 @@ void CncSecureGesturesPanel::trace(std::ostream& o, const wxString & context, co
 	// a simple filter
 	//const bool traceIt = false;
 	//const bool traceIt = callbackId > 6000;
-	const bool traceIt = callbackId == 6001;
+	const bool traceIt = callbackId == 1111 || callbackId == 1110;
 	
 	if ( traceIt )
 	{
@@ -1232,8 +1256,8 @@ void CncSecureGesturesPanel::trace(std::ostream& o, const wxString & context, co
 				translatedDistance.m_x,
 				translatedDistance.m_y,
 				totalLen, 
-				GetClientSize().GetWidth(),
-				GetClientSize().GetHeight()
+				GetVirtualSize().GetWidth(),
+				GetVirtualSize().GetHeight()
 			)
 		;
 		

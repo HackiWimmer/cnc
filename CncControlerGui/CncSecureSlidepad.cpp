@@ -1,4 +1,5 @@
 #include "GlobalFunctions.h"
+#include "CncSecureNumpadDialog.h"
 #include "CncSecureSlidepad.h"
 
 /////////////////////////////////////////////////////////////////////
@@ -24,6 +25,8 @@ CncSecureSlidepad::CncSecureSlidepad(wxWindow* parent)
 	slider->init();
 	
 	Bind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncSecureSlidepad::onSliderEvent, this);
+	
+	setShowEndButtons(false);
 }
 /////////////////////////////////////////////////////////////////////
 CncSecureSlidepad::~CncSecureSlidepad() {
@@ -31,6 +34,12 @@ CncSecureSlidepad::~CncSecureSlidepad() {
 	Unbind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncSecureSlidepad::onSliderEvent, this);
 	
 	wxDELETE(slider);
+}
+///////////////////////////////////////////////////////////////////
+void CncSecureSlidepad::setShowEndButtons(bool show) {
+///////////////////////////////////////////////////////////////////
+	m_btMin->Show(show);
+	m_btMax->Show(show);
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureSlidepad::setInfo(const wxString& info) {
@@ -46,6 +55,17 @@ int CncSecureSlidepad::getValue() const {
 		return (int)ret;
 	
 	return 0;
+}
+/////////////////////////////////////////////////////////////////////
+int CncSecureSlidepad::findIndex(int value) const {
+/////////////////////////////////////////////////////////////////////
+	for( auto it = sliderValues.begin(); it != sliderValues.end(); ++it )
+	{
+		if ( *it == value )
+			return std::distance(sliderValues.begin(), it);
+	}
+	
+	return -1;
 }
 /////////////////////////////////////////////////////////////////////
 bool CncSecureSlidepad::setValues(const SliderValues& list, int startValue) { 
@@ -76,72 +96,72 @@ bool CncSecureSlidepad::setValues(const SliderValues& list, int startValue) {
 	
 	slider->update();
 	
+	float ratio = 0.0;
 	if ( sliderValues.size() == 2 ) 
 	{
-		const float ratio = CncRangeTranslator<int>(min, max, cncLeft).ratioFromValue(startValue);
-		slider->setValueByRatio(ratio);
+		CncRangeTranslator<int> trans(min, max, cncLeft);
+		ratio = trans.ratioFromValue(startValue);
 	}
 	else
 	{
-		
-		
-		
-		
+		ratio = CncRangeTranslator<int>::ratioFromIndex(findIndex(startValue), sliderValues.size());
 	}
+	
+	//cnc::cex1 << CNC_LOG_FUNCT_A(" ratio=%f ", ratio) << trans << std::endl;
+	slider->setValueByRatio(ratio);
 	
 	return true;
 }
-/*
-/////////////////////////////////////////////////////////////////////
-int CncSecureSlidepad::findValue(int value) const {
-/////////////////////////////////////////////////////////////////////
-	if ( sliderValues.size() < 2 ) 
-		return -1;
-		
-	if  ( sliderValues.size() == 2 ) 
-	{
-		auto it = sliderValues.begin();
-		for ( int i=0; i < m_scrollbar->GetRange(); i++)  {
-			
-			if ( (*it) + i == value )
-				return i;
-		}
-	}
-	else
-	{
-		for( auto it = sliderValues.begin(); it != sliderValues.end(); ++it ) {
-			if ( *it == value )
-				return std::distance(sliderValues.begin(), it);
-		}
-	}
-	
-	return -1;
-}
-*/
-
-
-
-
-
 /////////////////////////////////////////////////////////////////////
 void CncSecureSlidepad::updateResult(float ratio) {
 /////////////////////////////////////////////////////////////////////
+	const int min = sliderValues.front();
+	const int max = sliderValues.back();
+	
 	if ( sliderValues.size() < 2 ) 
 	{
 		m_textResult->ChangeValue("0");
 	}
 	else if ( sliderValues.size() == 2 ) 
 	{
-		int val = CncRangeTranslator<int>(sliderValues.front(), sliderValues.back(), cncLeft).valueFromRatio(ratio);
+		CncRangeTranslator<int> trans(min, max, cncLeft);
+		int val = trans.valueFromRatio(ratio);
+		
+		// perform resolution and display
 		val = wxRound(double(val) / resolution) * resolution;
 		m_textResult->ChangeValue(wxString::Format("%d", val));
 	}
 	else
 	{
+		// ----------------------------------------------------------
+		auto displayDefault = [&](int index)
+		{
+			CNC_CERR_FUNCT_A(": Invalid index from ratio: %d", index)
+			
+			// perform resolution and display using min as default
+			int val = wxRound(double(min) / resolution) * resolution;
+			m_textResult->ChangeValue(wxString::Format("%d", val));
+		};
 		
+		const size_t index = CncRangeTranslator<int>::indexFromRatio(ratio, sliderValues.size());
+		//CNC_CLOG_FUNCT_A(": index=%d", index);
 		
-		
-		
+		if ( index < 0 )
+		{
+			displayDefault(index);
+		}
+		else
+		{
+			if ( (unsigned int)(index) < sliderValues.size() )
+			{
+				int val = wxRound(double(sliderValues.at(index)) / resolution) * resolution;
+				m_textResult->ChangeValue(wxString::Format("%d", val));
+			}
+			else
+			{
+				displayDefault(index);
+			}
+		}
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -165,4 +185,39 @@ void CncSecureSlidepad::onSliderEvent(CncSecureGesturesPanelEvent& event) {
 			break;
 		}
 	}
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureSlidepad::onLeftDownResult(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	const int max = sliderValues.back();
+	const int min = sliderValues.front();
+	
+	CncSecureNumpadDialog dlg(this, CncSecureNumpad::Type::LONG, 0, min, max);
+	dlg.setValue(m_textResult->GetValue());
+	dlg.setInfo(m_infoText->GetLabel());
+	dlg.Center(wxCENTRE_ON_SCREEN);
+	
+	if ( dlg.ShowModal() != wxID_OK )
+		return; 
+	
+	const double newValue = dlg.getValueAsDouble();
+	if ( newValue < double(min) || newValue > double(max) )
+	{
+		CNC_CERR_FUNCT_A(": Value out of range(%d,%d): %.1lf", min, max, newValue)
+		return;
+	}
+	
+	CncRangeTranslator<int> trans(min, max, cncLeft);
+	const float ratio = trans.ratioFromValue(int(newValue));
+	slider->setValueByRatio(ratio);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureSlidepad::onSkipToMax(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	slider->setValueByRatio(1.0);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureSlidepad::onSkipToMin(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	slider->setValueByRatio(0.0);
 }

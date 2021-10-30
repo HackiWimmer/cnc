@@ -184,7 +184,10 @@ void CncSerialSpyPanel::markSerialSpy(wxCommandEvent& event) {
 	dlg.SetMaxLength(64);
 	
 	if ( dlg.ShowModal() == wxID_OK )
+	{
 		serialSpyListCtrl->addLine(dlg.GetValue(), CncSerialSpyListCtrl::LineType::LT_Marker);
+		serialSpyListCtrl->flush();
+	}
 }
 /////////////////////////////////////////////////////////////
 void CncSerialSpyPanel::openSpyDetailWindow(wxCommandEvent& event) {

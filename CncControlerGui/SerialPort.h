@@ -242,6 +242,9 @@ class Serial {
 		
 		void clearReadBuffer();
 		
+		bool writeDataAndForget(unsigned char cmd);
+		bool writeDataAndForget(unsigned char* buffer, unsigned int nbByte);
+		
 	protected:
 		
 		class ControllerCallbackShouldSynchronizeAppPosition {

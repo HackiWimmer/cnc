@@ -245,7 +245,9 @@ protected:
     wxToggleButton* m_bt1D;
     wxToggleButton* m_bt2D;
     wxToggleButton* m_bt3D;
+    wxStaticText* m_staticText619;
     wxButton* m_btMove;
+    wxStaticText* m_staticText622;
 
 protected:
     virtual void onAxis(wxCommandEvent& event) { event.Skip(); }
@@ -274,7 +276,9 @@ public:
     wxToggleButton* GetBt1D() { return m_bt1D; }
     wxToggleButton* GetBt2D() { return m_bt2D; }
     wxToggleButton* GetBt3D() { return m_bt3D; }
+    wxStaticText* GetStaticText619() { return m_staticText619; }
     wxButton* GetBtMove() { return m_btMove; }
+    wxStaticText* GetStaticText622() { return m_staticText622; }
     CncSecureManuallyMovePanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~CncSecureManuallyMovePanelBase();
 };
@@ -346,14 +350,21 @@ class CncSecureSlidepadBase : public wxPanel
 protected:
     wxStaticText* m_infoText;
     wxTextCtrl* m_textResult;
+    wxButton* m_btMin;
     wxPanel* m_gesturePanelPlaceholder;
+    wxButton* m_btMax;
 
 protected:
+    virtual void onLeftDownResult(wxMouseEvent& event) { event.Skip(); }
+    virtual void onSkipToMin(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSkipToMax(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetInfoText() { return m_infoText; }
     wxTextCtrl* GetTextResult() { return m_textResult; }
+    wxButton* GetBtMin() { return m_btMin; }
     wxPanel* GetGesturePanelPlaceholder() { return m_gesturePanelPlaceholder; }
+    wxButton* GetBtMax() { return m_btMax; }
     CncSecureSlidepadBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~CncSecureSlidepadBase();
 };

@@ -107,6 +107,7 @@ static struct ClientIds {
 // global enumartions
 	enum CncUnit 					{ CncSteps, CncMetric };
 	enum CncAxis					{ Axis_X, Axis_Y, Axis_Z, Axis_H };
+	enum CncEdge					{ cncLeft, cncTop, cncRight, cncBottom, cncCenter };
 	enum CncInteractiveMoveDriver	{ IMD_NONE, IMD_GAMEPAD, IMD_NAVIGATOR };
 	enum CncDirection 				{ CncUndefDir, CncClockwise, CncCounterClockwise };
 	enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};

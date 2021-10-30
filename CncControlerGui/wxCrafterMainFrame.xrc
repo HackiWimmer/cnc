@@ -9329,7 +9329,7 @@ State</label>
                                         <vgap>0</vgap>
                                         <hgap>0</hgap>
                                         <growablecols>0</growablecols>
-                                        <growablerows>1</growablerows>
+                                        <growablerows>0</growablerows>
                                         <object class="sizeritem">
                                           <flag>wxALL|wxEXPAND</flag>
                                           <border>1</border>

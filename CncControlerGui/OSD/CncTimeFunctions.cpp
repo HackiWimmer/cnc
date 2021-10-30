@@ -275,3 +275,27 @@ void CncTimeFunctions::sleepMilliseconds(unsigned int milliseconds) {
 */
 	wxMilliSleep(milliseconds);
 }
+
+
+
+namespace CncTest {
+	
+	class CncTimeFunctionsTest {
+		
+		public:
+			CncTimeFunctionsTest()
+			{
+				std::cout << (long long)CncTimeFunctions::getNanoTimestamp()  << std::endl;
+				std::cout << (long long)CncTimeFunctions::getMicroTimestamp() << std::endl;
+				std::cout << (long long)CncTimeFunctions::getMilliTimestamp() << std::endl;
+				
+				CncMilliTimestamp ts1 = CncTimeFunctions::getMilliTimestamp();
+				CncTimeFunctions::sleepMilliseconds(500);
+				
+				std::cout << (CncTimeFunctions::getMilliTimestamp() - ts1) << std::endl;
+				
+				CNC_PRINT_FUNCT
+				abort();
+			}
+	} ;//T;
+};

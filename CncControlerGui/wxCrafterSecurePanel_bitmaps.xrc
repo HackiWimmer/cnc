@@ -45,6 +45,8 @@
   <object class="wxBitmap" name="RefDim">bitmaps\RefDim.png</object>
   <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
   <object class="wxBitmap" name="close-16">bitmaps\close-16.png</object>
+  <object class="wxBitmap" name="cncArrowLeft">bitmaps\cncArrowLeft.png</object>
+  <object class="wxBitmap" name="cncArrowRight">bitmaps\cncArrowRight.png</object>
   <object class="wxBitmap" name="edit-move">bitmaps\edit-move.png</object>
   <object class="wxBitmap" name="emergengy_red_yellow">bitmaps\emergengy_red_yellow.png</object>
   <object class="wxBitmap" name="iconmonstr-control-panel-8-16">bitmaps\RunCtrl\iconmonstr-control-panel-8-16.png</object>
