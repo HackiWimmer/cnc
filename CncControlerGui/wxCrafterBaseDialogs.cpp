@@ -675,17 +675,19 @@ CncUsbConnectionDetectedBase::CncUsbConnectionDetectedBase(wxWindow* parent, wxW
         CentreOnScreen(wxBOTH);
     }
     // Connect events
-    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncUsbConnectionDetectedBase::initDilaog), NULL, this);
-    m_ignore->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::ignore), NULL, this);
-    m_connect->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::connect), NULL, this);
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncUsbConnectionDetectedBase::onInitDialog), NULL, this);
+    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncUsbConnectionDetectedBase::onCloseDinalog), NULL, this);
+    m_ignore->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::onIgnore), NULL, this);
+    m_connect->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::onConnect), NULL, this);
     
 }
 
 CncUsbConnectionDetectedBase::~CncUsbConnectionDetectedBase()
 {
-    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncUsbConnectionDetectedBase::initDilaog), NULL, this);
-    m_ignore->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::ignore), NULL, this);
-    m_connect->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::connect), NULL, this);
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncUsbConnectionDetectedBase::onInitDialog), NULL, this);
+    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncUsbConnectionDetectedBase::onCloseDinalog), NULL, this);
+    m_ignore->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::onIgnore), NULL, this);
+    m_connect->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::onConnect), NULL, this);
     
 }
 

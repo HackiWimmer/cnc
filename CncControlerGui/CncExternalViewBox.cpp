@@ -20,8 +20,10 @@ CncExternalViewBoxCluster::CncExternalViewBoxCluster(wxWindow* parent)
 	cluster[EVB_SetterList]	= new CncExternalViewBox(parent);
 	cluster[EVB_CtrlMsg]	= new CncExternalViewBox(parent);
 	
-	const bool b = static_cast<int>(Node::EVB_ENUM_COUNT) == cluster.size();
-	wxASSERT_MSG(b, wxString::Format("Wrong number of cluster nodes. Required=%d, Registered=%d", static_cast<int>(Node::EVB_ENUM_COUNT), (int)cluster.size()));
+	wxASSERT_MSG(
+		static_cast<int>(Node::EVB_ENUM_COUNT) == cluster.size(), 
+		wxString::Format("Wrong number of cluster nodes. Required=%d, Registered=%d", static_cast<int>(Node::EVB_ENUM_COUNT), (int)cluster.size())
+	);
 }
 //////////////////////////////////////////////////////////////////
 CncExternalViewBoxCluster::~CncExternalViewBoxCluster() {

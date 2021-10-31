@@ -4633,11 +4633,11 @@
     }, {
      "type": "string",
      "m_label": "Inherited Class",
-     "m_value": "CncUsbConnectionDetectedBaseCncUsbConnectionDetected"
+     "m_value": "CncUsbConnectionObserver"
     }, {
      "type": "string",
      "m_label": "File:",
-     "m_value": "CncUsbConnectionDetectedBaseCncUsbConnectionDetected"
+     "m_value": "CncUsbConnectionObserver"
     }, {
      "type": "string",
      "m_label": "Class Decorator",
@@ -4667,8 +4667,15 @@
      "m_eventName": "wxEVT_INIT_DIALOG",
      "m_eventClass": "wxInitDialogEvent",
      "m_eventHandler": "wxInitDialogEventHandler",
-     "m_functionNameAndSignature": "initDilaog(wxInitDialogEvent& event)",
+     "m_functionNameAndSignature": "onInitDialog(wxInitDialogEvent& event)",
      "m_description": "A wxInitDialogEvent is sent as a dialog or panel is being initialised. Handlers for this event can transfer data to the window.\nThe default handler calls wxWindow::TransferDataToWindow",
+     "m_noBody": false
+    }, {
+     "m_eventName": "wxEVT_CLOSE_WINDOW",
+     "m_eventClass": "wxCloseEvent",
+     "m_eventHandler": "wxCloseEventHandler",
+     "m_functionNameAndSignature": "onCloseDinalog(wxCloseEvent& event)",
+     "m_description": "Process a close event. This event applies to wxFrame and wxDialog classes",
      "m_noBody": false
     }],
    "m_children": [{
@@ -5235,7 +5242,7 @@
            "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
            "m_eventClass": "wxCommandEvent",
            "m_eventHandler": "wxCommandEventHandler",
-           "m_functionNameAndSignature": "ignore(wxCommandEvent& event)",
+           "m_functionNameAndSignature": "onIgnore(wxCommandEvent& event)",
            "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
            "m_noBody": false
           }],
@@ -5330,7 +5337,7 @@
            "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
            "m_eventClass": "wxCommandEvent",
            "m_eventHandler": "wxCommandEventHandler",
-           "m_functionNameAndSignature": "connect(wxCommandEvent& event)",
+           "m_functionNameAndSignature": "onConnect(wxCommandEvent& event)",
            "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
            "m_noBody": false
           }],

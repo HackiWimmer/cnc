@@ -15,7 +15,8 @@
 				HANDLE hSerial;
 				
 				//determine OS error message
-				inline void displayErrorInfo(DWORD lastError, LPCTSTR lpszFunction);
+				void displayErrorInfo(DWORD lastError, const wxString& context);
+				const wxString& evaluateErrorInfo(wxString& ret, DWORD lastError);
 				
 				int readDataNative(void *buffer, unsigned int nbByte);
 				bool writeDataNative(void *buffer, unsigned int nbByte);

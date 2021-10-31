@@ -734,7 +734,6 @@ byte CncArduinoController::acceptInteractiveMove(byte) {
 
   setPosReplyState(true);
   setPosReplyThreshold(posReplyThreshold);
-  //setPosReplyThreshold(10000);
   setProbeMode(OFF);
   enableStepperPin(ENABLE_STATE_ON);
 

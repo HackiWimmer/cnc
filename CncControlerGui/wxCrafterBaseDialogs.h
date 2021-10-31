@@ -186,9 +186,10 @@ protected:
     wxButton* m_connect;
 
 protected:
-    virtual void initDilaog(wxInitDialogEvent& event) { event.Skip(); }
-    virtual void ignore(wxCommandEvent& event) { event.Skip(); }
-    virtual void connect(wxCommandEvent& event) { event.Skip(); }
+    virtual void onInitDialog(wxInitDialogEvent& event) { event.Skip(); }
+    virtual void onCloseDinalog(wxCloseEvent& event) { event.Skip(); }
+    virtual void onIgnore(wxCommandEvent& event) { event.Skip(); }
+    virtual void onConnect(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxStaticBitmap* GetStaticBitmap5919() { return m_staticBitmap5919; }

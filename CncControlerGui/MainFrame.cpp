@@ -204,7 +204,7 @@ bool CncTransactionLockBase::waitUntilCncIsAvailable() {
 ////////////////////////////////////////////////////////////////////
 	bool ret = false;
 	
-	if ( parent->cnc != NULL ) {
+	if ( parent->cnc ) {
 		
 		unsigned counter = 0;
 		while ( parent->cnc->isCommandActive() ) {
@@ -224,8 +224,11 @@ bool CncTransactionLockBase::waitUntilCncIsAvailable() {
 		
 		ret = ( parent->cnc->isCommandActive() == false );
 		
-		if ( parent->cnc->serialDataAvailable() == true )
-			parent->cnc->peekAndTraceReadBuffer(std::cout);
+		if ( parent->cnc->isConnected() )
+		{
+			if ( parent->cnc->serialDataAvailable() == true )
+				parent->cnc->peekAndTraceReadBuffer(std::cout);
+		}
 	}
 	
 	return ret;
@@ -2229,147 +2232,248 @@ void MainFrame::dispatchAll() {
 	wxTheApp->SafeYield(this, true);
 	
 }
+///////////////////////////////////////////////////////////////////
+void MainFrame::handleCommonException() {
+///////////////////////////////////////////////////////////////////
+	#warning may be do more here
+	
+	// stop idle request
+	m_serialTimer->Stop();
+	
+	disconnectSerialPort();
+	
+	if ( serialThread == NULL )
+		serialThread->notifyInterrupted();
+		
+	if ( usbConnectionObserver->IsShown() ) 
+		usbConnectionObserver->EndModal(wxID_NO);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::handleCncInterruptException(const CncInterruption& ex) {
+///////////////////////////////////////////////////////////////////
+	std::cerr	<< std::endl
+				<< wxString('!',80)
+				<< std::endl
+				
+				<< CNC_LOG_FUNCT
+				<< ":"
+				<< std::endl
+				<< " Exception received:" 
+				<< std::endl
+				
+				<< "Context: "
+				<< std::endl
+				<< " " << ex.getCatchLocation()
+				<< std::endl
+				
+				<< "What:"
+				<< std::endl
+				<< " " << ex.what()
+				<< std::endl
+				
+				<< wxString('!',80)
+				<< std::endl
+				<< std::endl
+	;
+	
+	handleCommonException();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::handleUnhandledException(const wxString& context) {
+///////////////////////////////////////////////////////////////////
+	std::cerr	<< std::endl
+				<< wxString('!',80)
+				<< std::endl
+				
+				<< CNC_LOG_FUNCT 
+				<< ":"
+				<< std::endl
+				<< " Unhandled exception received:"
+				<< std::endl
+				
+				<< "Context: "
+				<< std::endl
+				<< " " << context
+				<< std::endl
+				
+				<< wxString('!',80)
+				<< std::endl
+				<< std::endl
+	;
+	
+	handleCommonException();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::notifyComPortArrival(const wxString& rawPortName) {
+///////////////////////////////////////////////////////////////////
+	cnc::trc.logInfo(wxString("A new COM device was detected on port: ") << rawPortName);
+	
+	wxString portName(rawPortName);
+	const int portIdx = isPortNameAvailable(portName);
+	if ( portIdx != wxNOT_FOUND ) 
+	{
+		// override blurred search port names like COM4
+		// with its long name
+		portName = m_portSelector->GetString(portIdx);
+		
+		if ( usbConnectionObserver->IsShown() )
+		{
+			// update port name only
+			usbConnectionObserver->setPortName(portName);
+		}
+		else
+		{
+			if ( usbConnectionObserver->getSensitivity() == true )
+			{
+				usbConnectionObserver->setPortName(portName);
+				
+				if ( usbConnectionObserver->ShowModal() == wxID_YES )
+				{
+					m_portSelector->SetStringSelection(portName);
+					connectSerialPortDialog();
+				}
+			}
+			else
+			{
+				cnc::trc.logInfoMessage(wxString::Format("New USB connection available, name: %s", portName));
+			}
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::notifyComPortRemoval(const wxString& rawPortName) {
+///////////////////////////////////////////////////////////////////
+	// The content of lastPortName is may be already empty. 
+	// This is the case if an corresponding exception was handled before 
+	// CNC_PRINT_FUNCT_A("'%s'.Contains(%s)", lastPortName, rawPortName)
+	
+	// check if the current connection is effected
+	if ( lastPortName.Contains(rawPortName) )
+	{
+		const wxString msg(wxString::Format("The connected COM device was removed from port: %s. Try to disconnect to clean-up the situation", rawPortName));
+		cnc::trc.logError(msg);
+		
+		// try to disconnect
+		disconnectSerialPort();
+	}
+	else
+	{
+		const wxString msg(wxString::Format("The unused COM device was removed from port: %s", rawPortName));
+		cnc::trc.logInfo(msg);
+	}
+}
 #ifdef __WXMSW__
+///////////////////////////////////////////////////////////////////
+WXLRESULT MainFrame::onDeviceChange(WXUINT message, WXWPARAM wParam, WXLPARAM lParam) {
+///////////////////////////////////////////////////////////////////
+	wxString portName("Undefined");
+	
+	// ------------------------------------------------------------
+	// logging
+	auto traceDeviceEvent = [&](const wxString& context)
+	{
+		if ( false )
+		{
+			PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)lParam;
+			long type = lpdb ? lpdb->dbch_devicetype : -1;
+			
+			CNC_CLOG_FUNCT_A(": %s: type=%ld", context, type)
+		}
+	};
+	
+	// ------------------------------------------------------------
+	auto isPortType = [&]()
+	{
+		PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)lParam;
+		return ( lpdb && lpdb->dbch_devicetype == DBT_DEVTYP_PORT );
+	};
+	
+	// ------------------------------------------------------------
+	auto evaluatePortName = [&]()
+	{
+		if ( isPortType() )
+		{
+			PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT)lParam;
+			const wxString n(pPort->dbcp_name);
+			portName.assign(n);
+			
+			return true;
+		}
+		
+		return false;
+	};
+	
+	// ------------------------------------------------------------
+	// evaluation
+	switch ( wParam )
+	{
+		case DBT_DEVICEARRIVAL:
+		{
+			//if ( isProcessing() == false )
+			if ( CncTransactionLockBase::isLocked() == false )
+			{
+				traceDeviceEvent(wxString::Format("DBT_DEVICEARRIVAL(%d)", (int)wParam));
+				
+				if ( evaluatePortName() )
+				{
+					decoratePortSelector();
+					notifyComPortArrival(portName);
+				}
+			}
+			
+			break;
+		}
+		case DBT_DEVICEREMOVECOMPLETE:
+		{
+			traceDeviceEvent(wxString::Format("DBT_DEVICEREMOVECOMPLETE(%d)", (int)wParam));
+			
+			if ( evaluatePortName() )
+			{
+				notifyComPortRemoval(portName);
+				decoratePortSelector();
+			}
+			
+			break;
+		}
+		case DBT_DEVNODES_CHANGED: 
+		{
+			traceDeviceEvent(wxString::Format("DBT_DEVNODES_CHANGED(%d)", (int)wParam));
+			
+			activateGamepadNotificationsOnDemand(true);
+			break;
+		}
+		default:
+		{
+			// show also not handled event types
+			if ( false )
+				traceDeviceEvent(wxString::Format("DBT_XXX(%d)", (int)wParam));
+		}
+	}
+	
+	// default system handling
+	return MainFrameBase::MSWWindowProc(message, wParam, lParam);
+}
 ///////////////////////////////////////////////////////////////////
 WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lParam) {
 ///////////////////////////////////////////////////////////////////
-	//return wxFrame::MSWWindowProc ( message, wParam, lParam );
-	
-	try {
-	
-		wxString portName("Undefined");
-		PDEV_BROADCAST_HDR lpdb = NULL;
-		
-		if ( message == WM_DEVICECHANGE )
+	try 
+	{
+		switch ( message )
 		{
-			// logging
-			switch ( wParam )
-			{
-				case DBT_DEVICEARRIVAL:			lpdb = (PDEV_BROADCAST_HDR)lParam;
-												if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
-													PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT) lpdb;
-													wxString n(pPort->dbcp_name);
-													portName.assign(n);
-												}
-												
-												cnc::trc.logInfo(wxString("A new COM device was detected on port: ") << portName);
-												break;
-												
-				case DBT_DEVICEREMOVEPENDING:
-				case DBT_DEVICEREMOVECOMPLETE:	lpdb = (PDEV_BROADCAST_HDR)lParam;
-												if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
-													PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT) lpdb;
-													wxString n(pPort->dbcp_name);
-													portName.assign(n);
-												}
-												
-												cnc::trc.logInfo(wxString("The COM device was removed from port: ") << portName);
-												break;
-												
-				default: ;
-			}
+			case WM_DEVICECHANGE:	return onDeviceChange(message, wParam, lParam);
+			default:				return MainFrameBase::MSWWindowProc(message, wParam, lParam);
 		}
-		
-		// do all the default stuff here first
-		WXLRESULT ret = wxFrame::MSWWindowProc ( message, wParam, lParam );
-		
-		// do some more actions 
-		if ( message == WM_DEVICECHANGE)
-		{
-			// update port selector
-			if ( wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE )
-				decoratePortSelector();
-			
-			switch ( wParam )
-			{
-				// ask for connect - on demand . . . 
-				case DBT_DEVICEARRIVAL:
-				{
-					if ( isProcessing() == false )
-					{
-						const int portIdx = isPortNameAvailable(portName);
-						if ( portIdx != wxNOT_FOUND ) 
-						{
-							// override blurred search port names like COM4
-							portName = m_portSelector->GetString(portIdx);
-							
-							if ( usbConnectionObserver->IsShown() )
-							{
-								usbConnectionObserver->setPortName(portName);
-								return ret;
-							}
-							
-							if ( usbConnectionObserver->getSensitivity() == true )
-							{
-								usbConnectionObserver->setPortName(portName);
-								
-								if ( usbConnectionObserver->ShowModal() == wxID_YES )
-								{
-									m_portSelector->SetStringSelection(portName);
-									connectSerialPortDialog();
-								}
-							}
-							else
-							{
-								cnc::trc.logInfoMessage(wxString::Format("New USB connection available, name: %s", portName));
-							}
-						}
-					}
-					
-					break;
-				}
-				
-				// check if current com connection is effected
-				case DBT_DEVICEREMOVEPENDING:
-				case DBT_DEVICEREMOVECOMPLETE:
-				{
-					// check if the current connection is effected
-					//CNC_PRINT_FUNCT_A(" %s    %s", lastPortName, portName )
-					if ( lastPortName.Contains(portName) )
-					{
-						if ( cnc && cnc->isConnected() )
-						{
-							cnc->interrupt("Serial Device Removed");
-							cnc->disconnect();
-							lastPortName.clear();
-							
-							const wxString msg("Connection broken . . .");
-							std::cerr << msg << std::endl;
-							cnc::trc.logError(msg);
-							wxMessageBox(msg, CNC_LOG_FUNCT);
-						}
-						
-						if ( usbConnectionObserver->IsShown() ) {
-							usbConnectionObserver->EndModal(wxID_NO);
-						}
-					}
-					
-					break;
-				}
-				
-				case DBT_DEVNODES_CHANGED: 
-				{
-					activateGamepadNotificationsOnDemand(true);
-					break;
-				}
-				
-				default: ;
-			} 
-		}
-		
-		return ret;
 	}
-	catch (const CncInterruption& ex) {
-		std::cerr << CNC_LOG_FUNCT << ": Exception received:" 
-		          << std::endl
-				  << ex.what()
-				  << std::endl;
+	catch (const CncInterruption& ex) 
+	{
+		CncInterruption nex(ex);
+		nex.addCatchLocation(CNC_LOG_FUNCT);
+		handleCncInterruptException(nex);
 	}
-	catch (...) {
-		std::cerr << CNC_LOG_FUNCT << ": Unhandled Exception!" << std::endl;
+	catch (...) 
+	{
+		handleUnhandledException(CNC_LOG_FUNCT);
 	}
-	
-	m_serialTimer->Stop();
 	
 	return 0L;
 }
@@ -2791,6 +2895,22 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
 	::wxAboutBox(info);
 }
 ///////////////////////////////////////////////////////////////////
+bool MainFrame::disconnectSerialPort() {
+///////////////////////////////////////////////////////////////////
+	bool ret = true;
+	
+	if ( cnc && cnc->isConnected() )
+	{
+		ret = cnc->disconnect();
+		
+		m_portSelector->SetSelection(wxNOT_FOUND);
+		lastPortName.clear();
+		secureCtrlPanel->notifyConnection(false, "");
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::selectPort(wxCommandEvent& event) {
 //////////////////////////////////////////////////
 	selectPort();
@@ -2852,9 +2972,12 @@ bool MainFrame::connectSerialPort() {
 	createCncControl(sel, serialFileName);
 	
 	if ( cnc == NULL )
+	{
+		CNC_CERR_FUNCT_A(": Can't create a new cnc controller")
 		return false;
-		
-	// initialize the postion controls
+	}
+	
+	// initialize the position controls
 	setControllerZero(CncRM_Mode5, 0.0, 0.0, 0.0);
 	
 	statisticsPane->setCncControl(cnc);
@@ -2865,14 +2988,14 @@ bool MainFrame::connectSerialPort() {
 	
 	bool ret = false;
 	secureCtrlPanel->notifyConnection(false, "");
-	if ( (ret = cnc->connect(serialFileName)) == true )  {
-		
+	if ( (ret = cnc->connect(serialFileName)) == true ) 
+	{
 		lastPortName.assign(sel);
 		clearMotionMonitor();
 		clearPositionSpy();
 		
-		if ( (ret = cnc->setup()) == true ) {
-			
+		if ( (ret = cnc->setup()) == true )
+		{
 			setReferencePosEnforceFlag(cnc->isEmulator() == false);
 			
 			notifyConfigUpdate();
@@ -2881,7 +3004,8 @@ bool MainFrame::connectSerialPort() {
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
 			
-			if ( cnc->canProcessIdle() ) {
+			if ( cnc->canProcessIdle() )
+			{
 				m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
 				m_miRqtIdleMessages->Enable(true);
 			}
@@ -2911,7 +3035,8 @@ bool MainFrame::connectSerialPort() {
 const wxString& MainFrame::createCncControl(const wxString& sel, wxString& serialFileName) {
 ///////////////////////////////////////////////////////////////////
 	// disconnect and delete the current cnc control
-	if ( cnc != NULL ) {
+	if ( cnc != NULL ) 
+	{
 		cnc->disconnect();
 		delete cnc;
 	}
@@ -2935,7 +3060,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 
 	} setup;
 	
-	if ( sel == _portEmulatorNULL ) {
+	if ( sel == _portEmulatorNULL || sel.IsEmpty() ) {
 		cnc = new CncControl(CncEMU_NULL);
 		
 		setup.serialFileName.assign("dev/null");
@@ -4785,14 +4910,15 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		
 		return ret;
 	}
-	catch (const CncInterruption& ex) {
-		std::cerr << CNC_LOG_FUNCT << ": Exception received:" 
-		          << std::endl
-				  << ex.what()
-				  << std::endl;
+	catch (const CncInterruption& ex) 
+	{
+		CncInterruption nex(ex);
+		nex.addCatchLocation(CNC_LOG_FUNCT);
+		handleCncInterruptException(nex);
 	}
-	catch (...) {
-		std::cerr << CNC_LOG_FUNCT << ": Unhandled Exception!" << std::endl;
+	catch (...) 
+	{
+		handleUnhandledException(CNC_LOG_FUNCT);
 	}
 	
 	enableControls();
@@ -5035,29 +5161,19 @@ void MainFrame::emergencyStop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	std::cerr << "Emergency Stop detected" << std::endl;
 	
-	// catch exceptions here to not influence the wx event queue 
-	auto doCatch = [&] () {
-		
-		if ( serialThread == NULL )
-			serialThread->notifyInterrupted();
-			
-		m_serialTimer->Stop();
-	};
-	
 	try {
 		wxASSERT(cnc);
 		cnc->interrupt("Emergency Stop detected");
 	}
-	catch (const CncInterruption& ex) {
-		std::cerr << CNC_LOG_FUNCT << ": Exception received:" 
-		          << std::endl
-				  << ex.what()
-				  << std::endl;
-		doCatch();
+	catch (const CncInterruption& ex) 
+	{
+		CncInterruption nex(ex);
+		nex.addCatchLocation(CNC_LOG_FUNCT);
+		handleCncInterruptException(nex);
 	}
-	catch (...) {
-		std::cerr << CNC_LOG_FUNCT << ": Unhandled Exception!" << std::endl;
-		doCatch();
+	catch (...) 
+	{
+		handleUnhandledException(CNC_LOG_FUNCT);
 	}
 	
 	setReferencePosEnforceFlag(true);

@@ -5,6 +5,8 @@
 #include "CncArduino.h"
 #include "CncCommon.h"
 #include "CncConfig.h"
+#include "GlobalFunctions.h"
+#include "CncExceptions.h"
 #include "MainFrameProxy.h"
 #include "SerialMsw.h"
 
@@ -68,13 +70,17 @@ bool SerialMsw::connect(const char* portName) {
 			NULL);
 	
 	//Check if the connection was successful
-	if( hSerial == INVALID_HANDLE_VALUE ) {
-		DWORD lastError = GetLastError();
-		if( lastError == ERROR_FILE_NOT_FOUND ){
+	if( hSerial == INVALID_HANDLE_VALUE )
+	{
+		const DWORD lastError = GetLastError();
+		if( lastError == ERROR_FILE_NOT_FOUND )
+		{
 			std::cerr << " Serial::ERROR: Handle was not attached. Reason: " << portName << " not available.\n";
-		} else {
+		} 
+		else 
+		{
 			std::cerr << " Serial::ERROR: Errno: " << lastError << "\n";
-			displayErrorInfo(lastError, _T("CreateFileA"));
+			displayErrorInfo(lastError, CNC_LOG_FUNCT_A("[%s]", "CreateFileA"));
 		}
 		
 		return false;
@@ -203,8 +209,8 @@ int SerialMsw::readDataNative(void *buffer, unsigned int nbByte) {
 	//Number of bytes we'll really ask to read
 	unsigned int toRead = 0;
 	
-	COMSTAT status;
-	DWORD errors;
+	COMSTAT	status;
+	DWORD	errors;
 	
 	//Use the ClearCommError function to get status info on the Serial port
 	ClearCommError(this->hSerial, &errors, &status);
@@ -218,11 +224,24 @@ int SerialMsw::readDataNative(void *buffer, unsigned int nbByte) {
 		else							toRead = status.cbInQue;
 	}
 	
-	//Try to read the require number of chars, and return the number of read bytes on success
-	if( ReadFile(this->hSerial, buffer, toRead, &bytesRead, NULL) )
-		return bytesRead;
+	if ( toRead > 0 )
+	{
+		// Try to read the require number of chars, and return the number of read bytes on success
+		if ( ReadFile(this->hSerial, buffer, toRead, &bytesRead, NULL) )
+			return bytesRead;
+			
+		const DWORD lastError = GetLastError();
+		if ( lastError != 0 && lastError != ERROR_IO_PENDING )
+		{
+			wxString errorMessage;
+			evaluateErrorInfo(errorMessage, lastError);
+			
+			ClearCommError(this->hSerial, &errors, &status);
+			throw CncInterruption(wxString::Format("%s: %s", CNC_LOG_FUNCT, errorMessage), CncInterruption::CNC_EX_READ_ERROR);
+		}
+	}
 	
-	//If nothing has been read, or that an error was detected return 0
+	// If nothing has been read, or that an error was detected return 0
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////
@@ -230,49 +249,76 @@ bool SerialMsw::writeDataNative(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	DWORD bytesSend;
 	
-	COMSTAT status;
-	DWORD errors;
+	if( WriteFile(this->hSerial, buffer, nbByte, &bytesSend, 0) == false )
+	{
+		COMSTAT	status;
+		DWORD	errors;
 		
-	if( !WriteFile(this->hSerial, buffer, nbByte, &bytesSend, 0) ) {
-		std::cerr << "Serial::writeData(): WriteFile failed" << std::endl;
+		const DWORD lastError = GetLastError();
+		wxString errorMessage;
+		evaluateErrorInfo(errorMessage, lastError);
+		
 		ClearCommError(this->hSerial, &errors, &status);
-		return false;
+		throw CncInterruption(wxString::Format("%s: %s", CNC_LOG_FUNCT, errorMessage), CncInterruption::CNC_EX_WRITE_ERROR);
 	} 
 	
 	if ( nbByte != bytesSend )
-		std::cerr << "Serial::writeData(): nbByte != bytesSend" << std::endl;
+	{
+		wxString errorMessage(wxString::Format("nbByte != bytesSend [%ld != %ld]", CNC_LOG_FUNCT, (long)nbByte, (long)bytesSend));
+		throw CncInterruption(wxString::Format("%s: %s", CNC_LOG_FUNCT, errorMessage), CncInterruption::CNC_EX_WRITE_ERROR);
+	}
 	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialMsw::displayErrorInfo(DWORD lastError, LPCTSTR lpszFunction) {
+const wxString& SerialMsw::evaluateErrorInfo(wxString& ret, DWORD lastError) {
+///////////////////////////////////////////////////////////////////
+	ret.clear();
+	
+	// Retrieve the system error message for the last-error code
+	if ( lastError != 0 )
+	{
+		LPVOID	lpMsgBuf;
+		DWORD	dw = lastError;
+		
+		const DWORD nChars = FormatMessage
+		(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dw,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR) &lpMsgBuf,
+			0, 
+			NULL
+		);
+		
+		/*
+		LPSTR   = char*
+		LPCSTR  = const char*
+		LPWSTR  = wchar_t*
+		LPCWSTR = const wchar_t*
+		LPTSTR  = char* or wchar_t* depending on _UNICODE
+		LPCTSTR = const char* or const wchar_t* depending on _UNICODE
+		*/
+		if ( nChars > 0 && lpMsgBuf )
+			ret.assign(static_cast<const wchar_t*>(lpMsgBuf));
+			
+		LocalFree(lpMsgBuf);
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void SerialMsw::displayErrorInfo(DWORD lastError, const wxString& context) {
 ///////////////////////////////////////////////////////////////////
 	// Retrieve the system error message for the last-error code
-	LPVOID lpMsgBuf;
-	DWORD dw = lastError;
-
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-		FORMAT_MESSAGE_FROM_SYSTEM |
-		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
-		dw,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR) &lpMsgBuf,
-		0, 
-		NULL
-	);
-		
-	/*
-	LPSTR   = char*
-	LPCSTR  = const char*
-	LPWSTR  = wchar_t*
-	LPCWSTR = const wchar_t*
-	LPTSTR  = char* or wchar_t* depending on _UNICODE
-	LPCTSTR = const char* or const wchar_t* depending on _UNICODE
-	*/
-	std::cerr << " Error Message: " << wxString(static_cast<const wchar_t*>(lpMsgBuf)) << std::endl;
-	LocalFree(lpMsgBuf);
+	if ( lastError != 0 )
+	{
+		wxString errorMessage;
+		CNC_CERR_FUNCT_A("%s: Error Message: '%s'", context, evaluateErrorInfo(errorMessage, lastError))
+	}
 }
 
 #endif

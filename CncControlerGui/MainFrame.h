@@ -27,6 +27,7 @@
 #include "Codelite/wxPNGAnimation.h"
 #include "CncNavigatorPanel.h"
 #include "CncMessageDialog.h"
+#include "CncExceptions.h"
 
 ////////////////////////////////////////////////////////////////////
 // forward declarations
@@ -499,6 +500,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void initialize(void);
 		bool secureRun() { return processTemplateIntern(); }
 		
+		void handleCncInterruptException(const CncInterruption& ex);
+		void handleUnhandledException(const wxString& context);
+		
 		wxListCtrl* 		getCtrlSerialSpy()			{ return (wxListCtrl* )(serialSpyPanel->getSerialSpyCtrl()); }
 		CncMotionMonitor*	getMotionMonitor()			{ return motionMonitor; }
 		wxMenuItem*			GetMiMotorEnableState()		{ return m_miMotorEnableState; }
@@ -548,6 +552,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		//////////////////////////////////////////////////////////////////////////////////
 #		ifdef __WXMSW__
 			virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
+			WXLRESULT onDeviceChange(WXUINT, WXWPARAM, WXLPARAM);
 #		else
 			// currently no equivalent
 #		endif
@@ -1006,7 +1011,12 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void resetMinMaxPositions();
 		bool connectSerialPortDialog();
+		bool disconnectSerialPort();
 		
+		void notifyComPortArrival(const wxString& rawPortName);
+		void notifyComPortRemoval(const wxString& rawPortName);
+		
+		void handleCommonException();
 };
 
 ////////////////////////////////////////////////////////////////////

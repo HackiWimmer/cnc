@@ -570,7 +570,7 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 					if      ( index == 0x06 ) { ret.more.assign(wxString::Format("Id     = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) ))); }
 					else if ( index == 0x07 ) { ret.more.assign(wxString::Format("Limit  = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
 					else if ( index == 0x08 ) { ret.more.assign(wxString::Format("Switch = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
-					else if ( index == 0x09 ) { ret.more.assign(wxString::Format("Const  = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
+					else if ( index == 0x09 ) { ret.more.assign(wxString::Format("Power  = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
 					else if ( index == 0x0A ) { ret.more.assign(wxString::Format("Const  = %d",   (int)decodeHexValueAsUInt8( lastInboundBytes(1) ))); }
 					else if ( index == 0x0B ) { ret.more.assign(wxString::Format("%s", decodeHexValueAsArduinoPID ( hexString ))); }
 					

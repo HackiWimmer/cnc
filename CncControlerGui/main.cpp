@@ -18,6 +18,7 @@
 #include "CncStreamBuffers.h"
 #include "CncContext.h"
 #include "CncCommon.h"
+#include "CncExceptions.h"
 #include "GlobalStrings.h"
 #include "GlobalFunctions.h"
 #include "MainFrame.h"
@@ -471,9 +472,42 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual bool OnExceptionInMainLoop() {
 		///////////////////////////////////////////////////////////
-			APPEND_LOCATION_TO_STACK_TRACE_FILE;
+			try
+			{
+				APPEND_LOCATION_TO_STACK_TRACE_FILE;
+				throw;
+			}
+			catch (const CncInterruption& ex) 
+			{
+				if ( THE_APP )
+				{
+					CncInterruption nex(ex);
+					nex.addCatchLocation(CNC_LOG_FUNCT);
+					THE_APP->handleCncInterruptException(nex);
+				}
+				else
+				{
+					std::cerr	<< CNC_LOG_FUNCT 
+								<< ": Exception received:" 
+								<< std::endl
+								<< ex.what()
+								<< std::endl;
+				}
+			}
+			catch (...)
+			{
+				if ( THE_APP )
+				{
+					THE_APP->handleUnhandledException(CNC_LOG_FUNCT);
+				}
+				else
+				{
+					std::cerr	<< CNC_LOG_FUNCT 
+								<< ": Unhandled exception received:" 
+								<< std::endl;
+				}
+			}
 			
-			//throw;
 			return true;
 		}
 		

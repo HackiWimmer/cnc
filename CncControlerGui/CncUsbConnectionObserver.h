@@ -38,9 +38,10 @@ class CncUsbConnectionObserver : public CncUsbConnectionDetectedBase {
 		void setSensitiv(bool state) { sensitivity = state; }
 		
 	protected:
-		virtual void initDilaog(wxInitDialogEvent& event);
-		virtual void connect(wxCommandEvent& event);
-		virtual void ignore(wxCommandEvent& event);
+		virtual void onCloseDialog(wxCloseEvent& event);
+		virtual void onConnect(wxCommandEvent& event);
+		virtual void onIgnore(wxCommandEvent& event);
+		virtual void onInitDialog(wxInitDialogEvent& event);
 		
 	private:
 		bool sensitivity; 

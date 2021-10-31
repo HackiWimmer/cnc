@@ -392,8 +392,21 @@ long CncControl::convertDoubleToCtrlLong(unsigned char id, float f) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::disconnect() {
 ///////////////////////////////////////////////////////////////////
-	if ( serialPort->isConnected() ) {
-		enableStepperMotors(ENABLE_STATE_OFF);
+	if ( serialPort->isConnected() )
+	{
+		try
+		{
+			// this can fail if the corresponding connection is broken
+			// e.g. the usb cable is switched off, etc.
+			enableStepperMotors(ENABLE_STATE_OFF);
+		}
+		catch(...)
+		{
+			// the catch is placed here to enable a finally disconnect
+			// in all circumstances to be able to connect to a different port
+			// to get the application into a valid state again
+			CNC_CERR_FUNCT_A(": The final try to disable the stepper motors failed");
+		}
 		
 		std::cout << " Disconnecting serial port . . .\n";
 		THE_APP->getLoggerView()->logCurrentPosition(LoggerSelection::VAL::CNC);
