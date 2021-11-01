@@ -282,7 +282,7 @@ void CncLoggerListCtrl::updateColumnWidth() {
 	// avoid flicker
 	const bool b = IsShownOnScreen() && IsFrozen() == false;
 	CncAutoFreezer caf( b ? this : NULL);
-		
+	
 	// first set default sizes depending on content
 	SetColumnWidth(COL_LNR, 	 72);
 	SetColumnWidth(COL_TXT, 	 wxLIST_AUTOSIZE);
@@ -325,19 +325,22 @@ void CncLoggerListCtrl::updateContent() {
 	
 	SetItemCount(entries.size());
 	
-	if ( IsShownOnScreen() == true ) {
-		EnsureVisible(GetItemCount() - 1);
+	if ( IsShownOnScreen() == true )
+	{
+		ensureVisible(GetItemCount() - 1);
 		Refresh();
 	}
 }
 //////////////////////////////////////////////////
 void CncLoggerListCtrl::onDisplayTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////
-	if ( anyUpdate == true ) {
-		
+	if ( anyUpdate == true ) 
+	{
 		SetItemCount(entries.size());
-		if ( IsShownOnScreen() == true ) {
-			EnsureVisible(GetItemCount() - 1);
+		
+		if ( IsShownOnScreen() == true )
+		{
+			ensureVisible(GetItemCount() - 1);
 			Refresh();
 		}
 		anyUpdate = false;
@@ -346,8 +349,8 @@ void CncLoggerListCtrl::onDisplayTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::onSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	updateColumnWidth();
 	event.Skip(true);
+	updateColumnWidth();
 }
 //////////////////////////////////////////////////
 void CncLoggerListCtrl::onPaint(wxPaintEvent& event) {

@@ -97,9 +97,10 @@ void CncMessageListCtrl::appendMessage(const char type, const wxString& message,
 /////////////////////////////////////////////////////////////
 	messages.push_back(std::move(Message(type, message, context)));
 	
-	if ( displayTimer.IsRunning() == false ) {
+	if ( displayTimer.IsRunning() == false )
+	{
 		SetItemCount(messages.size());
-		EnsureVisible((long)(messages.size() - 1));
+		ensureVisible((long)(messages.size() - 1));
 	}
 }
 /////////////////////////////////////////////////////////////
@@ -209,5 +210,5 @@ void CncMessageListCtrl::onDisplayTimer(wxTimerEvent& event) {
 		return;
 	
 	SetItemCount(messages.size());
-	EnsureVisible((long)(messages.size() - 1));
+	ensureVisible((long)(messages.size() - 1));
 }

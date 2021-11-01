@@ -199,15 +199,15 @@ bool CncLargeScaledListCtrl::isItemSelected(long item) const {
 	return GetItemState(item, wxLIST_STATE_SELECTED == wxLIST_STATE_SELECTED);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
+bool CncLargeScaledListCtrl::selectItem(long item, bool doEnsureVisible) {
 ///////////////////////////////////////////////////////////////////
 	if ( isItemValid(item) == false )
 		return false;
 		
 	const int itemState  = GetItemState(item, wxLIST_STATE_SELECTED);
 	
-	if ( itemState != wxLIST_STATE_SELECTED && blockSelectionEvent == false ) {
-
+	if ( itemState != wxLIST_STATE_SELECTED && blockSelectionEvent == false )
+	{
 		// deselect
 		if ( isItemValid(lastSelection) == true )
 			SetItemState(lastSelection, 0, wxLIST_STATE_SELECTED);
@@ -218,27 +218,35 @@ bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
 	}
 	
 	bool ret = true;
-	if ( ensureVisible == true ) {
+	if ( doEnsureVisible == true )
+		ret = ensureVisible(item);
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncLargeScaledListCtrl::ensureVisible(long item) {
+///////////////////////////////////////////////////////////////////
+	const bool frozenBefore = IsFrozen();
+	
+	if ( frozenBefore == false )
+		Freeze();
 		
-		if ( IsFrozen() == false )
-			Freeze();
-			
-		const long total = GetItemCount();
-		const long cpp   = GetCountPerPage();
-		
-		if ( cpp > 0 ) 
+	const long total = GetItemCount();
+	const long cpp   = GetCountPerPage();
+	
+	bool ret = false;
+	if ( cpp > 0 && total > cpp ) 
+	{
+		if ( ( ret = EnsureVisible(item)) == true )
 		{
-			if ( ( ret = EnsureVisible(item)) == true )
-			{
-				if ( cpp > 1 && listType == NORMAL )
-					ret = EnsureVisible(item + cpp < total ? item + cpp - 1: total - 1 );
-			}
+			if ( cpp > 1 && listType == NORMAL )
+				ret = EnsureVisible(item + cpp < total ? item + cpp - 1: total - 1 );
 		}
-		
-		if ( IsFrozen() == true )
-			Thaw();
 	}
 	
+	if ( frozenBefore && IsFrozen() )
+		Thaw();
+		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////

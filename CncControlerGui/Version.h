@@ -6,7 +6,7 @@
 	// the rest appears automatically
 	#define CNC_VERSION_MAJOR_VAL    0
 	#define CNC_VERSION_MINOR_VAL    9
-	#define CNC_VERSION_INDEX_VAL    1
+	#define CNC_VERSION_INDEX_VAL    2
 	// -----------------------------------------------------------------------------------------------------------------
 	
 	#define STR_HELPER(x) #x

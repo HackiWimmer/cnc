@@ -135,19 +135,21 @@ void CncSecureManuallyMovePanel::onLeftDownResultValue(wxMouseEvent& event) {
 				CncSecureSlidepadDialog dlg(this);
 				CncSecureSlidepad::SliderValues values;
 				
-				values.push_back(cnc::getSpeedValue(FINEST));
-				values.push_back(cnc::getSpeedValue(FINE));
-				values.push_back(cnc::getSpeedValue(MEDIUM));
-				values.push_back(cnc::getSpeedValue(ROUGH));
-				values.push_back(cnc::getSpeedValue(ROUGHEST));
-
-				#warning
-				
-				//values.push_back(-cnc::getSpeedValue(ROUGHEST));
-				//values.push_back(+cnc::getSpeedValue(FINEST));
-				//values.push_back(0);
-				//values.push_back(+cnc::getSpeedValue(ROUGHEST));
-				
+				if ( true )
+				{
+					// a set of values ...
+					values.push_back(cnc::getSpeedValue(FINEST));
+					values.push_back(cnc::getSpeedValue(FINE));
+					values.push_back(cnc::getSpeedValue(MEDIUM));
+					values.push_back(cnc::getSpeedValue(ROUGH));
+					values.push_back(cnc::getSpeedValue(ROUGHEST));
+				}
+				else
+				{
+					// ... vs. a range
+					values.push_back(0);
+					values.push_back(+cnc::getSpeedValue(ROUGHEST));
+				}
 				
 				dlg.setValues(values, currentValue);
 				dlg.setInfo(info);

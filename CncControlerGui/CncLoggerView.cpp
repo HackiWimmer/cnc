@@ -37,11 +37,13 @@ void CncLoggerView::setSecureMode(bool state) {
 /////////////////////////////////////////////////////////////////
 	CncAutoFreezer caf(this);
 	{
-		if ( state == true ) {
+		if ( state == true ) 
+		{
 			m_btLoggerOnDemand->Hide();
 			setShowOnDemandState(false);
 		}
-		else {
+		else 
+		{
 			m_btLoggerOnDemand->Show();
 			setShowOnDemandState(doShowLoggerOnCommand());
 		}
@@ -127,7 +129,6 @@ void CncLoggerView::initialize() {
 			loggerLists.push_back(standard);
 		}
 	}
-	GblFunc::freeze(this, false);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::clearTrace() {

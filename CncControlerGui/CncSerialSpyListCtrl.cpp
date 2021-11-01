@@ -5,6 +5,7 @@
 #include "MainFrame.h"
 #include "HexDecoder.h"
 #include "DataControlModel.h"
+#include "CncAutoFreezer.h"
 #include "CncSerialSpyListCtrl.h"
 #include "wxCrafterSerialSpy.h"
 
@@ -285,7 +286,8 @@ wxString CncSerialSpyListCtrl::OnGetItemText(long item, long column) const {
 	
 	const wxString decoded( le.appendix.IsEmpty() == false ? le.appendix : ( liveDecoding ? decodeSerialSpyLine(item, ret) : "" ) );
 	
-	switch ( column ) {
+	switch ( column )
+	{
 		case COL_NUM:		return wxString::Format("%ld",		(item + 1) % LONG_MAX );
 		case COL_TYPE:		return wxString::Format("%d",		(int)le.lt);
 		case COL_LINE:		return wxString::Format("%s",		le.line);
@@ -294,7 +296,6 @@ wxString CncSerialSpyListCtrl::OnGetItemText(long item, long column) const {
 	
 	return _("");
 }
-
 /////////////////////////////////////////////////////////////
 void CncSerialSpyListCtrl::flush() {
 /////////////////////////////////////////////////////////////
@@ -305,23 +306,28 @@ void CncSerialSpyListCtrl::refreshList() {
 /////////////////////////////////////////////////////////////
 	if ( entries.size() <= 0 )
 		return;
-	
-	spyDisplaylTimer.Stop();
-	
-	SetItemCount(entries.size());
-	
-	if ( autoScrolling == true ) {
-		deselectAll();
-		EnsureVisible(entries.size() - 1);
-		Refresh();
+		
+	CncAutoFreezer caf(this);
+	{
+		spyDisplaylTimer.Stop();
+		
+		SetItemCount(entries.size());
+		
+		if ( autoScrolling == true )
+		{
+			deselectAll();
+			ensureVisible(entries.size() - 1);
+			Refresh();
+		}
+		
+		startRefreshInterval();
 	}
-	
-	startRefreshInterval();
 }
 /////////////////////////////////////////////////////////////
 const wxString CncSerialSpyListCtrl::getLine(long item) const {
 /////////////////////////////////////////////////////////////
-	if ( isItemValid(item) == true ) {
+	if ( isItemValid(item) == true )
+	{
 		const Entry& le = entries.at(item);
 		return _(le.line);
 	}
