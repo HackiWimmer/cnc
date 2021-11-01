@@ -243,7 +243,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void onEvaluateHardwareReference(wxCommandEvent& event);
 		virtual void openSpeedPlayground(wxCommandEvent& event);
 		virtual void onChangePreviewMode(wxCommandEvent& event);
-		virtual void connectSec(wxCommandEvent& event);
 		virtual void onCloseSecureRunAuiPane(wxCommandEvent& event);
 		virtual void onOpenGLContextObserver(wxCommandEvent& event);
 		virtual void changeMonitorListBook(wxListbookEvent& event);
@@ -654,6 +653,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool stopInteractiveMove();
 		
 		bool connectSerialPort();
+		bool connectSerialPortDialog();
 		void selectPort();
 		
 		void decorateProbeMode(bool probeMode);
@@ -1010,7 +1010,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void navigateZ(CncDirection d);
 		
 		void resetMinMaxPositions();
-		bool connectSerialPortDialog();
 		bool disconnectSerialPort();
 		
 		void notifyComPortArrival(const wxString& rawPortName);

@@ -96,6 +96,55 @@ bool SpyHexDecoder::skipNextHexBytes(wxString& hexValues, unsigned int count) {
 	return readNextHexBytes(hexValues, count, dummy);
 }
 //////////////////////////////////////////////////////////
+void SpyHexDecoder::decodeValuesAsSetter(SpyHexDecoder::Details& ret, wxString& restToken, unsigned char pid) {
+//////////////////////////////////////////////////////////
+	unsigned int byteCount = getByteCount(restToken);
+	
+	if ( byteCount == 0 )
+		return;
+		
+	ret.more << ": value(s) = ";
+		
+	if ( byteCount%4 != 0 ) {
+		decodeHexStringAsIntegers(restToken, ret.more);
+		return;
+	}
+		
+	wxStringTokenizer tokenizer(restToken, " ");
+	unsigned int count = 0;
+	wxString value;
+	
+	cnc::SetterValueList svl;
+	
+	while ( tokenizer.HasMoreTokens() )
+	{
+		const wxString token(tokenizer.GetNextToken());
+		
+		if ( token.IsEmpty() == false ) {
+			count++;
+			
+			switch ( count%4 ) {
+				case 1:	
+				case 2:
+				case 3: value.Prepend(token); 
+						break;
+						
+				case 0: value.Prepend(token);
+						if ( count > 4 )
+							ret.more << ", ";
+							
+						svl.push_back(decodeHexValueAsInteger(value));
+						value.clear();
+						break;
+			}
+		}
+	}
+	
+	std::stringstream ss;
+	cnc::traceSetterValueList(ss, pid, svl, pid < PID_FLOAT_RANG_START ? 1 : FLT_FACT);
+	ret.more << ss.str().c_str();
+}
+//////////////////////////////////////////////////////////
 void SpyHexDecoder::decodeValuesDefault(SpyHexDecoder::Details& ret, wxString& restToken) {
 /////////////////////////////////////////////////////////
 	unsigned int byteCount = getByteCount(restToken);
@@ -114,7 +163,8 @@ void SpyHexDecoder::decodeValuesDefault(SpyHexDecoder::Details& ret, wxString& r
 	unsigned int count = 0;
 	wxString value;
 	
-	while ( tokenizer.HasMoreTokens() ) {
+	while ( tokenizer.HasMoreTokens() )
+	{
 		const wxString token(tokenizer.GetNextToken());
 		
 		if ( token.IsEmpty() == false ) {
@@ -343,7 +393,8 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 			if ( readNextHexBytes(restToken, 1, value) == false ) 
 				break;
 				
-			ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(value), decodeHexValueAsArduinoPID(value));
+			unsigned char pid = decodeHexValueAsInt8(value);
+			ret.more << wxString::Format("PID = [%03d] %s", (int)pid, decodeHexValueAsArduinoPID(value));
 
 			if ( readNextHexBytes(restToken, 1, value) == false ) 
 				break;
@@ -351,7 +402,7 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 			ret.more << "; Size = ";
 			ret.more << decodeHexValueAsInteger(value);
 			
-			decodeValuesDefault(ret, restToken);
+			decodeValuesAsSetter(ret, restToken, pid);
 			break;
 		}
 		case CMD_MOVE:
@@ -608,7 +659,7 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 		case RET_ERROR:
 		case RET_INTERRUPT:
 		case RET_HALT:
-		case RET_QUIT:		ret.more << decodeHexStringAsIntegers(hexString, temp);
+		case RET_QUIT:		ret.more << decodeHexValueAsArduinoPID(hexString);//<< decodeHexStringAsIntegers(hexString, temp);
 							break;
 							
 		// Context ----------------------------------------------------------------------------

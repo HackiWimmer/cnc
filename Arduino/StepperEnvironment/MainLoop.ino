@@ -839,19 +839,19 @@ void ArduinoMainLoop::loop() {
   
   switch ( c ) {
 
-    // SB command -  Peek Serial
+    // SB command - Pop Serial
     case CMD_POP_SERIAL:
-          // Do nothing this here
-          // This is a calling controller only command
+          // Do nothing here
+          // This is only a routine on the a calling-controller side
           r = RET_NULL;
           break;
     
-    // SB command -  Reset
+    // SB command - Reset
     case CMD_RESET_CONTROLLER:
           r = reset();
           break;
 
-    // SB command -  Push/Pop Transaction
+    // SB command - Push/Pop Transaction
     case CMD_PUSH_TRANSACTION:
     case CMD_POP_TRANSACTION:
           r = controller->acceptTransaction(c);

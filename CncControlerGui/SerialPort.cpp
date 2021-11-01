@@ -379,19 +379,22 @@ int Serial::peekData(void *buffer, unsigned int nbByte) {
 	//be read, the number of bytes actually read.
 	
 	if ( traceSpyInfo && spyRead )
-		cnc::spy.addMarker("Peek Data");
+		cnc::spy.addMarker(wxString::Format("|--- Peek %u byte(s) forward", nbByte));
 	
 	int bytesRead = readData(buffer, nbByte);
-	unsigned char *p = (unsigned char*)buffer;
-	
-	// store . . . 
-	for ( int i=0; i<bytesRead ; i++ ) {
-		readBuffer.push_back(*p);
-		p++;
+	if ( bytesRead > 0 )
+	{
+		unsigned char *p = (unsigned char*)buffer;
+		
+		// store . . . 
+		for ( int i=0; i<bytesRead ; i++ ) {
+			readBuffer.push_back(*p);
+			p++;
+		}
 	}
 	
-	if ( bytesRead > 0 && traceSpyInfo && spyRead )
-		cnc::spy.addMarker(wxString::Format(" %d Byte(s) peeked . . . ", bytesRead));
+	if ( traceSpyInfo && spyRead )
+		cnc::spy.addMarker(wxString::Format(" %d Byte(s) peeked  ---|", bytesRead));
 	
 	return bytesRead;
 }
@@ -821,9 +824,10 @@ bool Serial::popSerial() {
 	lastFetchResult.init(cmd);
 	
 	unsigned int counter = 0;
-	while ( dataAvailable() ) {
-		
+	while ( dataAvailable() ) 
+	{
 		const bool ret = evaluateResultWrapper(sfi, std::cout);
+		
 		if ( ret == false ) {
 			std::cerr   << "Error while processing 'Serial::popSerial()': "											<< std::endl
 						<< " Serial CMD = " << ArduinoCMDs::getCMDLabel((const unsigned char)lastFetchResult.cmd)	<< std::endl

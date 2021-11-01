@@ -669,6 +669,7 @@ byte CncArduinoController::initInteractiveSpeed() {
   // which initialzes the accel manager to the interactive mode. The deacceleration phase isn't much
   // imported here, because we can loose steps . . . 
   const uint32_t defaultImpulses = 0;
+  
   if ( cfgF1000_MMSEC && ArduinoAccelManager::initMove(defaultImpulses, cfgF1000_MMSEC) == false )
     return RET_ERROR;
     
@@ -677,17 +678,31 @@ byte CncArduinoController::initInteractiveSpeed() {
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::updateInteractiveMoveValues(int8_t dx, int8_t dy, int8_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
-  const bool bx = interactiveMove.valueX == dx;
-  const bool by = interactiveMove.valueY == dy;
-  const bool bz = interactiveMove.valueZ == dz;
+  if ( ArduinoAccelManager::isInteractiveMoveType() == true ) 
+  {
+    const bool bx = interactiveMove.valueX == dx;
+    const bool by = interactiveMove.valueY == dy;
+    const bool bz = interactiveMove.valueZ == dz;
 
-  if ( ( bx && by && bz ) != true )
-    initInteractiveSpeed();
-  
-  interactiveMove.valueX  = dx;
-  interactiveMove.valueY  = dy;
-  interactiveMove.valueZ  = dz;
-  interactiveMove.tsLast  = ArdoTs::now();
+    // check if any direction is changed
+    if ( ( bx && by && bz ) != true )
+      initInteractiveSpeed();
+    
+    interactiveMove.valueX  = dx;
+    interactiveMove.valueY  = dy;
+    interactiveMove.valueZ  = dz;
+    
+    interactiveMove.tsLast  = ArdoTs::now();
+  }
+  else
+  {
+    // ignore the given values if no interactive move is active
+    interactiveMove.valueX  = 0;
+    interactiveMove.valueY  = 0;
+    interactiveMove.valueZ  = 0;
+
+    interactiveMove.tsLast  = 0;
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::updateInteractiveMove() {
@@ -695,7 +710,7 @@ void CncArduinoController::updateInteractiveMove() {
   interactiveMove.tsLast  = ArdoTs::now();
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::cancelInteractiveMove(byte) {
+byte CncArduinoController::cancelInteractiveMove() {
 /////////////////////////////////////////////////////////////////////////////////////  
   cmsF1000_MMMin = FLT_FACT;
   ArduinoAccelManager::finalize();
@@ -703,20 +718,23 @@ byte CncArduinoController::cancelInteractiveMove(byte) {
   interactiveMove.active  = false;
   interactiveMove.tsLast  = 0;
   
-  updateInteractiveMoveValues(0, 0, 0);
+  interactiveMove.valueX  = 0;
+  interactiveMove.valueY  = 0;
+  interactiveMove.valueZ  = 0;
   
   return RET_OK;  
 }
 /////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::acceptInteractiveMove(byte) {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( ArduinoAccelManager::isInteractiveMoveType() == true ) {    
+  if ( ArduinoAccelManager::isInteractiveMoveType() == true ) 
+  {    
     // this appears from time to time due to the totally asynchron gui usage,
     // but this isn't really a problem. Therefore, return positive in this case  . . . 
     
-    //ArduinoMainLoop::pushMessage(MT_ERROR, E_OTHER_MOVE_CMD_ACTIVE);
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_OTHER_MOVE_CMD_ACTIVE);
+    
     //return RET_ERROR;
-
     return RET_OK;
   }
 
@@ -738,36 +756,46 @@ byte CncArduinoController::acceptInteractiveMove(byte) {
   enableStepperPin(ENABLE_STATE_ON);
 
   const uint32_t maxMicrosWithoutUpdate = 1000L * 1000L; // 1s
+  int8_t timeoutCounter = 3;
   
   interactiveMove.tsLast = ArdoTs::now();
   interactiveMove.active = true;
   
-  while ( interactiveMove.active == true ) {
+  while ( interactiveMove.active == true ) 
+  {
     ret = directMove(interactiveMove.valueX, interactiveMove.valueY, interactiveMove.valueZ);
-    
+
     if ( ret != RET_OK )
       break;
 
     const uint32_t lastTsn = ArdoTs::timespan(interactiveMove.tsLast);
-    if ( lastTsn > maxMicrosWithoutUpdate ) {
-      //ARDO_DEBUG_MESSAGE('D', wxString::Format("ArdoTs::timespan(interactiveMove.tsLast) %ld > %ld [%ld](%ld)", (int32_t)lastTsn, (int32_t)maxMicrosWithoutUpdate, (int32_t)interactiveMove.tsLast, (int32_t)ArdoTs::now()))
-
-      // check if any move parameters are active
-      const bool b = ( interactiveMove.valueX == 0 && interactiveMove.valueY == 0 && interactiveMove.valueZ == 0);
-
-      // reset move parameters
-      interactiveMove.reset();
-
-      // It's only a HALT if a movement was still active
-      ret = b ? RET_OK : RET_HALT;
-
-      // stop move loop
-      break;
-    }
-    
+    if ( lastTsn > maxMicrosWithoutUpdate ) 
+    {
+      if ( timeoutCounter <= 0 )
+      {
+        //ARDO_DEBUG_MESSAGE('D', wxString::Format("ArdoTs::timespan(interactiveMove.tsLast) %ld > %ld [%ld](%ld)", (int32_t)lastTsn, (int32_t)maxMicrosWithoutUpdate, (int32_t)interactiveMove.tsLast, (int32_t)ArdoTs::now()))
+  
+        // check if any move parameters are active
+        const bool b = ( interactiveMove.valueX == 0 && interactiveMove.valueY == 0 && interactiveMove.valueZ == 0);
+  
+        // reset move parameters
+        interactiveMove.reset();
+  
+        // It's only a HALT if a movement was still active
+        ret = b ? RET_OK : RET_HALT;
+  
+        // stop move loop
+        break;
+      }
+      else
+      {
+        // Therefore, the first timeout query is stretched to maxMicrosWithoutUpdate * x
+        timeoutCounter--;
+      }
+    }  
   }
 
-  cancelInteractiveMove(0);
+  cancelInteractiveMove();
   sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
   setPosReplyState(false);
   
@@ -840,7 +868,7 @@ bool CncArduinoController::processSignal(byte sig, byte& retValue) {
                 return false;
                 
     case SIG_QUIT_MOVE:
-                cancelInteractiveMove(SIG_QUIT_MOVE);
+                cancelInteractiveMove();
                 retValue = RET_QUIT;
                 return false; 
 
@@ -916,8 +944,9 @@ bool CncArduinoController::processSignalUpdate(byte& retValue) {
 
       // Check the serail again
       byte serialFrontByte = CMD_INVALID;
-      if ( ArduinoMainLoop::peakSerial(serialFrontByte) == true ) {
-        // Skip this command if one of the following commands is present as next
+      if ( ArduinoMainLoop::peakSerial(serialFrontByte) == true ) 
+      {
+        // Skip this command if one of the following commands are present as next
         switch ( serialFrontByte ) {
           case SIG_QUIT_MOVE:
           case SIG_UPDATE:    Serial.read();

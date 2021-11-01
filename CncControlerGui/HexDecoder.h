@@ -324,6 +324,7 @@ class SpyHexDecoder : public HexDecoder {
 		void			decodeOutbound(SpyHexDecoder::Details& ret);
 		void			decodeInbound(SpyHexDecoder::Details& ret);
 		
+		void			decodeValuesAsSetter(SpyHexDecoder::Details& ret, wxString& restToken, unsigned char pid);
 		void			decodeValuesDefault(SpyHexDecoder::Details& ret, wxString& restToken);
 		void			decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString& restToken);
 

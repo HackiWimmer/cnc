@@ -293,7 +293,9 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	interactiveTouchpadXYZ->SetBackgroundColour(wxColour(255, 255, 184));
 	
 	
-	
+	#warning only a dev setup
+	if ( true )
+	{
 				CncSecureGesturesPanel* panelQ1 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_POSITIVE, 10);
 				GblFunc::replaceControl(m_panelQ1, panelQ1);
 				panelQ1->setCallbackId(6001);
@@ -330,9 +332,7 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 				panelQ6->SetBackgroundColour(wxColour(  0, 128,  0));
 				panelQ6->init();
 				
-				
-				
-				
+	}
 	
 	podestPanel = new CncPodestMgmtMovement(this); 
 	GblFunc::replaceControl(m_podestPlaceholder, podestPanel);
@@ -518,8 +518,31 @@ void CncSecureCtrlPanel::onStopSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onConnectSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	setPortSelection(wxEmptyString);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::setPortSelection(const wxString& portName) {
+/////////////////////////////////////////////////////////////////////
 	GblGuiCtrlDisabler gcd(portSelectorList);
-	THE_APP->connectSec(event);
+	
+	if ( portName.IsEmpty() )
+	{
+		THE_APP->connectSerialPortDialog();
+	}
+	else
+	{
+		THE_APP->GetPortSelector()->SetStringSelection(portName);
+		THE_APP->selectPort();
+	}
+	
+	
+	#warning only a dev setup
+	if ( true )
+	{
+		wxMouseEvent event;
+		THE_APP->dclickHeartbeatState(event);
+		THE_APP->serialSpyPanel->enableSerialSpy(true);
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onEvaluateHardwareReference(wxCommandEvent& event) {
@@ -569,14 +592,6 @@ void CncSecureCtrlPanel::tryToProvideTemplate() {
 		if ( fileOpened == false )
 			THE_APP->openTemplate();
 	}
-}
-/////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::setPortSelection(const wxString& portName) {
-/////////////////////////////////////////////////////////////////////
-	GblGuiCtrlDisabler gcd(portSelectorList);
-	
-	THE_APP->GetPortSelector()->SetStringSelection(portName);
-	THE_APP->selectPort();
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::updatePortSelection(const wxString& portName) {
@@ -739,8 +754,14 @@ void CncSecureCtrlPanel::activate(bool b) {
 		THE_APP->GetSecureSplitterMainV()->SetSashPosition(pageVector.at(sel).width);
 		performRightHeadline();
 		
+		
+		
 		#warning
 		//notifyResetMonitorView();
+		
+		wxCommandEvent event;
+		onSerialSpySec(event);
+		
 	}
 	else {
 

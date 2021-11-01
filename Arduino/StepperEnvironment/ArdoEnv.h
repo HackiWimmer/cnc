@@ -6,14 +6,15 @@
   #define ARDO_LOG_FUNCT __PRETTY_FUNCTION__
 
   #ifndef SKETCH_COMPILE
-
+  // -------------------------------------------------------------------------------------------------------
+  // C++ Application Environment
+  
     #include "wx/string.h"
     typedef unsigned char  byte;
     #define digitalPinToPort(P) AE::getDigitalPinToPort(P)   
     
     namespace AE {
-      // C++ Application Environment
-      
+     
       // addition helper functions
       extern inline void              ardoDebugMessage(const char type, const char* msg, const char* context);
   
@@ -90,6 +91,8 @@
     #define PRINT_DEBUG_VALUE4(vName, vV1, vV2, vV3, vV4)                     AE::ardoDebugValue(vName, vV1, vV2, vV3, vV4, ARDO_LOG_FUNCT);
     #define PRINT_DEBUG_VALUE5(vName, vV1, vV2, vV3, vV4, vV5)                AE::ardoDebugValue(vName, vV1, vV2, vV3, vV4, vV5, ARDO_LOG_FUNCT);
 
+    #define SPRINTF_DEBUG_STRING(...)                                         { char msg[1024]; sprintf(msg, __VA_ARGS__); ArduinoMainLoop::pushMessage(MT_DEBUG, E_NO_ERROR, msg); }
+
     #define ARDO_DEBUG_MESSAGE(type, msg)                                     AE::ardoDebugMessage(type, msg, ARDO_LOG_FUNCT);
     #define ARDO_DEBUG_VALUE(vName, vValue)                                   AE::ardoDebugValue(vName, vValue, ARDO_LOG_FUNCT);
     #define ARDO_TRACE_STEPPER_DIR(sid, value)                                AE::ardoTraceStepperDir(sid, value);
@@ -99,8 +102,11 @@
     
     #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 
+  // -------------------------------------------------------------------------------------------------------
   #else
-    // Arduino Sketch Environment
+  // -------------------------------------------------------------------------------------------------------
+  // Arduino Sketch Environment
+  
     #define AE
     
     template<typename T1>
@@ -144,6 +150,8 @@
     #define PRINT_DEBUG_VALUE3(vName, vV1, vV2, vV3)                        printDebugValue(vName, vV1, vV2, vV3);
     #define PRINT_DEBUG_VALUE4(vName, vV1, vV2, vV3, vV4)                   printDebugValue(vName, vV1, vV2, vV3, vV4);
     #define PRINT_DEBUG_VALUE5(vName, vV1, vV2, vV3, vV4, vV5)              printDebugValue(vName, vV1, vV2, vV3, vV4, vV5);
+    
+    #define SPRINTF_DEBUG_STRING(...)                                       { char msg[1024]; sprintf(msg, __VA_ARGS__); ArduinoMainLoop::pushMessage(MT_DEBUG, E_NO_ERROR, msg); }
 
     #define ARDO_DEBUG_MESSAGE(a,b)                                         // to eliminate this within the arduino context
     #define ARDO_DEBUG_VALUE(a,b)                                           // to eliminate this within the arduino context
@@ -153,6 +161,7 @@
     #define ARDO_TRACE_MOVE(sid, dx, dy, dz)                                // to eliminate this within the arduino context
 
   #endif // #ifndef SKETCH_COMPILE
+  // -------------------------------------------------------------------------------------------------------
 
   const unsigned int MinPinNameValue = (unsigned int)AE::PN_D1;
   const unsigned int MaxPinNameValue = (unsigned int)AE::PN_A5;

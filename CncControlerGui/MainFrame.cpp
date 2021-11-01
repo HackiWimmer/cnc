@@ -3350,11 +3350,6 @@ void MainFrame::connect(wxCommandEvent& event) {
 	connectSerialPortDialog();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::connectSec(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	connectSerialPortDialog();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, double z) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
@@ -8075,7 +8070,6 @@ void MainFrame::toggleIdleRequests(wxCommandEvent& event) {
 	if ( state )	m_serialTimer->Start();
 	else			m_serialTimer->Stop();
 	
-
 	decorateIdleState(m_serialTimer->IsRunning());
 }
 /////////////////////////////////////////////////////////////////////

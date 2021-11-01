@@ -229,7 +229,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     byte                acceptPodestMove(byte cmd);
     
     byte                acceptInteractiveMove(byte cmd);
-    byte                cancelInteractiveMove(byte cmd);
+    byte                cancelInteractiveMove();
 
     // test interface
     byte                performTest();
