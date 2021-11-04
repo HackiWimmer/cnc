@@ -162,8 +162,9 @@ class CncPathListRunner {
 		Interface*			currentInterface;
 		Setup				setup;
 		
-		inline bool isInterrupted();
-		inline bool checkDebugState();
+		bool isInterrupted();
+		bool checkAndPerfromProcessingState();
+		bool checkDebugState();
 		
 		void traceSetup();
 		

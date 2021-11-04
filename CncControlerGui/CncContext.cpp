@@ -5,6 +5,7 @@
 #include "CncGamepadFilter.h"
 #include "CncTemplateContext.h"
 #include "CncBoundarySpace.h"
+#include "CncProcessingInfo.h"
 #include "CncContext.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -12,6 +13,7 @@ CncContext::CncContext()
 : timestamps				()
 , secureModeInfo			()
 , versionInfoMap			()
+, processingInfo			(new CncProcessingInfo())
 , boundarySpace				(new CncBoundarySpace())
 , anchorMap					(new CncAnchorMap())
 , templateContext			(new CncTemplateContext(boundarySpace))
@@ -30,6 +32,7 @@ CncContext::CncContext()
 CncContext::~CncContext() {
 ////////////////////////////////////////////////////////////////////////
 	
+	wxDELETE( processingInfo );
 	wxDELETE( boundarySpace );
 	wxDELETE( anchorMap );
 	wxDELETE( templateContext );
@@ -87,4 +90,24 @@ const wxString& CncContext::traceCommandLineParameter(wxString& s) const {
 		s.append(" ");
 	}
 	return s;
+}
+////////////////////////////////////////////////////////////////////////
+bool CncContext::isPause() const { 
+////////////////////////////////////////////////////////////////////////
+	return processingInfo->isPause(); 
+}
+////////////////////////////////////////////////////////////////////////
+bool CncContext::isProcessing() const { 
+////////////////////////////////////////////////////////////////////////
+	return processingInfo->isProcessing(); 
+}
+////////////////////////////////////////////////////////////////////////
+bool CncContext::togglePause() { 
+////////////////////////////////////////////////////////////////////////
+	return processingInfo->togglePause(); 
+}
+////////////////////////////////////////////////////////////////////////
+void CncContext::resetProcessing() {
+////////////////////////////////////////////////////////////////////////
+	processingInfo->reset();
 }

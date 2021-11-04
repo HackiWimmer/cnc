@@ -28,7 +28,7 @@ void ArduinoCMDs::init() {
 	cmds[CMD_POP_TRANSACTION]                  = "Pop Transaction";
 	
 	cmds[SIG_INTERRUPPT]                       = "Push Signal Interrupt";
-	cmds[SIG_HALT]                             = "Push Signal Pause";
+	cmds[SIG_HALT]                             = "Push Signal Halt";
 	cmds[SIG_PAUSE]                            = "Push Signal Pause";
 	cmds[SIG_RESUME]                           = "Push Signal Resume";
 	cmds[SIG_QUIT_MOVE]                        = "Push Signal Quit Move";

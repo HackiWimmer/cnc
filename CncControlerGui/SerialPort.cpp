@@ -16,7 +16,9 @@
 #include "CncCommon.h"
 #include "SerialPort.h"
 
+///////////////////////////////////////////////////////////////////
 unsigned char SerialCommandLocker::lockedCommand = CMD_INVALID;
+
 ///////////////////////////////////////////////////////////////////
 bool SerialCommandLocker::lock(CncControl* cnc) {
 ///////////////////////////////////////////////////////////////////
@@ -31,7 +33,7 @@ bool SerialCommandLocker::lock(CncControl* cnc) {
 		}
 	}
 */
-	// error sitiuation
+	// error situation
 	if ( lockedCommand != CMD_INVALID ) {
 		
 		std::cerr 	<< "Try to lock command: '" 
@@ -48,9 +50,130 @@ bool SerialCommandLocker::lock(CncControl* cnc) {
 	locking       = true;
 	lockedCommand = command;
 	
+	parent->serialCommandLockCallback();
+	
 	return true;
 }
 
+///////////////////////////////////////////////////////////////////
+bool Serial::test() {
+///////////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	if ( false ) {
+		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+		cms.addMetricPosXYZ( +200,  +0,   0);
+
+		return processMoveSequence(cms);
+	}
+
+	if ( true ) {
+		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+		
+		float q = 1.0;
+		for ( auto i=0; i<5; i++) {
+			for ( auto j=0; j<10; j++) 
+				cms.addMetricPosXYZ( q * +10, q *  +10,   0);
+			
+			for ( auto j=0; j<10; j++) 
+				cms.addMetricPosXYZ( q * +10, q *  -10,   0);
+				
+			for ( auto j=0; j<10; j++) 
+				cms.addMetricPosXYZ( q * -10, q *  -10,   0);
+				
+			for ( auto j=0; j<10; j++) 
+				cms.addMetricPosXYZ( q * -10, q * +10,   0);
+				
+			q -= 0.1;
+		}
+
+		return processMoveSequence(cms);
+	}
+
+	if ( true ) {
+		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+		cms.addMetricPosXYZ(+0,   +0, +10);
+		cms.addMetricPosXYZ(+10, +20,  +0);
+		cms.addMetricPosXYZ(+0,   +0, -10);
+
+
+		cms.addMetricPosXYZ( +50,  +20,   0);
+		cms.addMetricPosXYZ( +20,  +10,   0);
+		cms.addMetricPosXYZ( +20,   -5,   0);
+		cms.addMetricPosXYZ( +15,   -3,   0);
+		cms.addMetricPosXYZ( +10,   -2,   0);
+		cms.addMetricPosXYZ( +20,  +10,   0);
+
+		return processMoveSequence(cms);
+	}
+	
+	if ( true ) {
+		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+		
+		bool fOneB  = true;
+		bool fInt8  = true;
+		bool fInt16 = false;
+		bool fInt32 = false;
+		
+		for ( int i = 0; i <50; i++ ) {
+			// one byte values
+			if ( fOneB ) {
+				cms.addStepPosXYZ(+1, -1, +1);
+				cms.addStepPosXYZ(-1, +1,  0);
+				cms.addStepPosXYZ(+1,  0,  0);
+				cms.addStepPosXYZ( 0, -1,  0);
+				cms.addStepPosXYZ( 0,  0, +1);
+			}
+			
+			// int8_t values
+			if ( fInt8 ) {
+				cms.addStepPosXYZ(+11, -12, +13);
+				cms.addStepPosXYZ(-11,  12,   0);
+				cms.addStepPosXYZ(-11,   0,   0);
+				cms.addStepPosXYZ(  0,  12,   0);
+				cms.addStepPosXYZ(  0,   0, -13);
+			}
+			
+			// int16_t values
+			if ( fInt16 ) {
+				cms.addStepPosXYZ(+1000, +2000, +30);
+				cms.addStepPosXYZ(+1000, +2000,   0);
+				cms.addStepPosXYZ(-1000,     0,   0);
+				cms.addStepPosXYZ(    0, -2000,   0);
+				cms.addStepPosXYZ(    0,     0, -30);
+			}
+			
+			// int32_t values
+			if ( fInt32 ) {
+				cms.addStepPosXYZ(+100000, +200000, +30);
+				cms.addStepPosXYZ(+100000, +200000,   0);
+				cms.addStepPosXYZ(-100000,       0,   0);
+				cms.addStepPosXYZ(      0, -200000,   0);
+				cms.addStepPosXYZ(      0,     0,   -30);
+			}
+		}
+		
+		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
+		ret = processMoveSequence(cms);
+	}
+	else {
+		CncMoveSequence cms(CMD_MOVE_SEQUENCE);
+		
+		for ( int i = 0; i < 500; i++ ) {
+			// one byte values
+			cms.addStepPosXYZ(+1, -1, +1);
+			cms.addStepPosXYZ(-1, +1,  0);
+			cms.addStepPosXYZ(+1,  0,  0);
+			cms.addStepPosXYZ( 0, -1,  0);
+			cms.addStepPosXYZ( 0,  0, +1);
+		}
+		
+		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
+		ret = processMoveSequence(cms);
+	}
+	
+	return ret;
+}
 
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
@@ -65,6 +188,7 @@ Serial::Serial(CncControl* cnc)
 , tsMeasurementStart					(0LL)
 , tsMeasurementRef						(0LL)
 , tsMeasurementLast						(0LL)
+, flagPrependPause						(false)
 , cncControl							(cnc)
 , measurementActive						(false)
 , portName								()
@@ -624,7 +748,8 @@ bool Serial::clearRemainingBytes(bool trace) {
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.addMarker(CNC_LOG_FUNCT);
 		
-	while ( ( bytes = readData(oneReadBuf, maxBytes - 1)) ) {
+	while ( ( bytes = readData(oneReadBuf, maxBytes - 1)) )
+	{
 		std::cout << CNC_LOG_FUNCT;
 		
 		const wxString appendix(wxString::Format("Cleared bytes (# %u):", bytes));
@@ -643,14 +768,15 @@ bool Serial::clearRemainingBytes(bool trace) {
 			std::cout << std::endl;
 		}
 		
-		if ( counter++ > 16 ) {
-			std::cerr << CNC_LOG_FUNCT << ": Fatal Error. Cancel reading more bytes from serial" << std::endl;
+		if ( counter++ > 16 )
+		{
+			CNC_CERR_FUNCT_A(": Fatal Error. Cancel reading more bytes from serial")
 			return false;
 		}
 	}
 	
 	if ( trace == true && bytes == 0 ) {
-		std::cout << " Remaining bytes (# 0): " << std::endl;
+		CNC_COUT_FUNCT_A(": Remaining bytes (# 0): ")
 	}
 	
 	return true;
@@ -810,7 +936,7 @@ bool Serial::popSerial() {
 	
 	const unsigned char cmd = CMD_POP_SERIAL;
 	
-	SerialCommandLocker scl(cmd);
+	SerialCommandLocker scl(this,cmd);
 	if ( scl.lock(cncControl) == false )
 		return true;
 	
@@ -862,7 +988,7 @@ bool Serial::processIdle() {
 	
 	const unsigned char cmd = CMD_IDLE;
 	
-	SerialCommandLocker scl(cmd);
+	SerialCommandLocker scl(this, cmd);
 	if ( scl.lock(NULL) == false )
 		return true;
 	
@@ -936,7 +1062,7 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 		p   += LONG_BUF_SIZE;
 	}
 	
-	SerialCommandLocker scl(cmd[0]);
+	SerialCommandLocker scl(this, cmd[0]);
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "Serial::processSetter: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		std::clog << " Running Command: '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
@@ -996,7 +1122,7 @@ bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 	cmd[0] = CMD_GETTER;
 	cmd[1] = pid;
 	
-	SerialCommandLocker scl(cmd[0]);
+	SerialCommandLocker scl(this, cmd[0]);
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "Serial::processGetter: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		std::clog << " Running Command: '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
@@ -1163,7 +1289,7 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 		return false;
 	}
 	
-	SerialCommandLocker scl(cmd);
+	SerialCommandLocker scl(this, cmd);
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "Serial::processCommand(): Serial is currently in fetching mode. This command will be rejected:" << std::endl;
 		std::clog << " Running Command: '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
@@ -1318,7 +1444,7 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 		return false;
 	}
 	
-	SerialCommandLocker scl(cmdType);
+	SerialCommandLocker scl(this, cmdType);
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "Serial::processMove: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		std::clog << " Running Command : '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
@@ -1381,7 +1507,7 @@ bool Serial::processMovePodest(int32_t steps, bool exact) {
 	
 	const unsigned char cmd = exact == true ? CMD_MOVE_PODEST_EXACT : CMD_MOVE_PODEST;
 	
-	SerialCommandLocker scl(cmd);
+	SerialCommandLocker scl(this, cmd);
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "Serial::processMovePodest: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		std::clog << " Running Command : '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
@@ -2011,7 +2137,7 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 	if ( sequence.getCount() == 0 )
 		return true;
 	
-	SerialCommandLocker scl(sequence.getType());
+	SerialCommandLocker scl(this, sequence.getType());
 	if ( scl.lock(cncControl) == false ) {
 		std::clog << "SERIAL::processMoveSequence(): Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		return true;
@@ -2024,7 +2150,7 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 	// create move sequence write buffer
 	CncMoveSequence::FlushResult result;
 	if ( sequence.flush(result) == false ) {
-		std::clog << "SERIAL::processMoveSequence(): seqeunce.flush failed" << std::endl;
+		std::clog << "SERIAL::processMoveSequence(): sequence.flush failed" << std::endl;
 		return false;
 	}
 	
@@ -2034,7 +2160,7 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 		return false;
 	}
 	
-	// runtime check - should not appear, becaue sequence.getCount() is checked above
+	// runtime check - should not appear, because sequence.getCount() is checked above
 	if ( sequence.getPortionIndex().size() == 0 ) {
 		std::cerr << "SERIAL::processMoveSequence(): empty portion" << std::endl;
 		return false;
@@ -2108,7 +2234,7 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 			cncControl->SerialCallback();
 			return false;
 		}
-	}
+	} // for
 	
 	// final quality check
 	if ( totalFlushedSize != currentFlushedSize ) {
@@ -2123,125 +2249,7 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 	
 	return true;
 }
-///////////////////////////////////////////////////////////////////
-bool Serial::test() {
-///////////////////////////////////////////////////////////////////
-	bool ret = false;
-	
-	if ( false ) {
-		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
-		cms.addMetricPosXYZ( +200,  +0,   0);
 
-		return processMoveSequence(cms);
-	}
-
-	if ( true ) {
-		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
-		
-		float q = 1.0;
-		for ( auto i=0; i<5; i++) {
-			for ( auto j=0; j<10; j++) 
-				cms.addMetricPosXYZ( q * +10, q *  +10,   0);
-			
-			for ( auto j=0; j<10; j++) 
-				cms.addMetricPosXYZ( q * +10, q *  -10,   0);
-				
-			for ( auto j=0; j<10; j++) 
-				cms.addMetricPosXYZ( q * -10, q *  -10,   0);
-				
-			for ( auto j=0; j<10; j++) 
-				cms.addMetricPosXYZ( q * -10, q * +10,   0);
-				
-			q -= 0.1;
-		}
-
-		return processMoveSequence(cms);
-	}
-
-	if ( true ) {
-		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
-		cms.addMetricPosXYZ(+0,   +0, +10);
-		cms.addMetricPosXYZ(+10, +20,  +0);
-		cms.addMetricPosXYZ(+0,   +0, -10);
-
-
-		cms.addMetricPosXYZ( +50,  +20,   0);
-		cms.addMetricPosXYZ( +20,  +10,   0);
-		cms.addMetricPosXYZ( +20,   -5,   0);
-		cms.addMetricPosXYZ( +15,   -3,   0);
-		cms.addMetricPosXYZ( +10,   -2,   0);
-		cms.addMetricPosXYZ( +20,  +10,   0);
-
-		return processMoveSequence(cms);
-	}
-	
-	if ( true ) {
-		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
-		
-		bool fOneB  = true;
-		bool fInt8  = true;
-		bool fInt16 = false;
-		bool fInt32 = false;
-		
-		for ( int i = 0; i <50; i++ ) {
-			// one byte values
-			if ( fOneB ) {
-				cms.addStepPosXYZ(+1, -1, +1);
-				cms.addStepPosXYZ(-1, +1,  0);
-				cms.addStepPosXYZ(+1,  0,  0);
-				cms.addStepPosXYZ( 0, -1,  0);
-				cms.addStepPosXYZ( 0,  0, +1);
-			}
-			
-			// int8_t values
-			if ( fInt8 ) {
-				cms.addStepPosXYZ(+11, -12, +13);
-				cms.addStepPosXYZ(-11,  12,   0);
-				cms.addStepPosXYZ(-11,   0,   0);
-				cms.addStepPosXYZ(  0,  12,   0);
-				cms.addStepPosXYZ(  0,   0, -13);
-			}
-			
-			// int16_t values
-			if ( fInt16 ) {
-				cms.addStepPosXYZ(+1000, +2000, +30);
-				cms.addStepPosXYZ(+1000, +2000,   0);
-				cms.addStepPosXYZ(-1000,     0,   0);
-				cms.addStepPosXYZ(    0, -2000,   0);
-				cms.addStepPosXYZ(    0,     0, -30);
-			}
-			
-			// int32_t values
-			if ( fInt32 ) {
-				cms.addStepPosXYZ(+100000, +200000, +30);
-				cms.addStepPosXYZ(+100000, +200000,   0);
-				cms.addStepPosXYZ(-100000,       0,   0);
-				cms.addStepPosXYZ(      0, -200000,   0);
-				cms.addStepPosXYZ(      0,     0,   -30);
-			}
-		}
-		
-		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
-		ret = processMoveSequence(cms);
-	}
-	else {
-		CncMoveSequence cms(CMD_MOVE_SEQUENCE);
-		
-		for ( int i = 0; i < 500; i++ ) {
-			// one byte values
-			cms.addStepPosXYZ(+1, -1, +1);
-			cms.addStepPosXYZ(-1, +1,  0);
-			cms.addStepPosXYZ(+1,  0,  0);
-			cms.addStepPosXYZ( 0, -1,  0);
-			cms.addStepPosXYZ( 0,  0, +1);
-		}
-		
-		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
-		ret = processMoveSequence(cms);
-	}
-	
-	return ret;
-}
 ///////////////////////////////////////////////////////////////////
 bool Serial::serializeSetter(SerialFetchInfo& sfi, const unsigned char* buffer, unsigned int nbByte) { 
 ///////////////////////////////////////////////////////////////////
@@ -2282,4 +2290,54 @@ bool Serial::serializeMove(SerialFetchInfo& sfi, const unsigned char* buffer, un
 		
 	logMeasurementLastTs();
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::isCommandActive() { 
+///////////////////////////////////////////////////////////////////
+	return SerialCommandLocker::isCommandActive(); 
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::isPopSerialActive() {
+///////////////////////////////////////////////////////////////////
+	return SerialCommandLocker::getLockedCommand() == CMD_POP_SERIAL; 
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::isIdleActive() { 
+///////////////////////////////////////////////////////////////////
+	return SerialCommandLocker::getLockedCommand() == CMD_IDLE; 
+}
+///////////////////////////////////////////////////////////////////
+void Serial::serialCommandLockCallback() {
+///////////////////////////////////////////////////////////////////
+	// currently nothing todo
+	//CNC_PRINT_FUNCT
+}
+///////////////////////////////////////////////////////////////////
+void Serial::serialCommandUnlockCallback() {
+///////////////////////////////////////////////////////////////////
+	if ( flagPrependPause == true )
+	{
+		#warning
+		CNC_PRINT_FUNCT
+		
+		flagPrependPause = false;
+		sendSignal(SIG_PAUSE);
+	}
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::sendPause() { 
+///////////////////////////////////////////////////////////////////
+	if ( SerialCommandLocker::isCommandActive() )
+	{
+		flagPrependPause = true;
+		return true;
+	}
+	
+	return sendSignal(SIG_PAUSE);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::sendResume() {
+///////////////////////////////////////////////////////////////////
+	flagPrependPause = false;
+	return sendSignal(SIG_RESUME);
 }

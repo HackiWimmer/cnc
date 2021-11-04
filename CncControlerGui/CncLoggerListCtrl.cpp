@@ -203,7 +203,8 @@ void CncLoggerListCtrl::add(const wxString& text) {
 	
 	const wxChar delimiter = '\n';
 	wxStringTokenizer lines(text, wxString("\n"));
-	while ( lines.HasMoreTokens() ) {
+	while ( lines.HasMoreTokens() )
+	{
 		const wxString token = lines.GetNextToken();
 		
 		if ( token.Len() > 0 ) {
@@ -281,7 +282,7 @@ void CncLoggerListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////////////
 	// avoid flicker
 	const bool b = IsShownOnScreen() && IsFrozen() == false;
-	CncAutoFreezer caf( b ? this : NULL);
+	//CncAutoFreezer caf( b ? this : NULL);
 	
 	// first set default sizes depending on content
 	SetColumnWidth(COL_LNR, 	 72);

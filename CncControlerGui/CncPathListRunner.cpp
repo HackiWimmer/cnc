@@ -1,6 +1,6 @@
 #include <math.h>
 #include "CncCommon.h"
-#include "MainFrameProxy.h"
+#include "MainFrame.h"
 #include "CncContext.h"
 #include "CncConfig.h"
 #include "FileParser.h"
@@ -228,7 +228,7 @@ void CncPathListRunner::changePathListRunnerInterfaceImpl(const wxString& portNa
 	
 	if		( portName.IsSameAs(_portPreProcMonitor) )	installInterface(new CncPathListMonitor());
 	else if	( portName.IsSameAs(_portPreProcFile) )		installInterface(new CncPathListFileStore());
-	else												installInterface(new CncCtrl(APP_PROXY::getCncControl()));
+	else												installInterface(new CncCtrl(THE_APP->getCncControl()));
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::installInterface(CncPathListRunner::Interface* iface) {
@@ -266,7 +266,7 @@ void CncPathListRunner::traceSetup() {
 	ss << "Max XY Pitch        : " << Move::maxXYPitchRadians	<< std::endl;
 	ss << "Max  Z Pitch        : " << Move::maxZPitchRadians	<< std::endl;
 	
-	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+	CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 	wxASSERT( cpp != NULL );
 	
 	cpp->addOperatingTraceSeparator("Current Setup");
@@ -292,8 +292,16 @@ bool CncPathListRunner::checkDebugState() {
 //////////////////////////////////////////////////////////////////
 	if ( setup.fileParser != NULL )
 		return setup.fileParser->evaluateDebugState();
-
+	
 	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::checkAndPerfromProcessingState() {
+//////////////////////////////////////////////////////////////////
+	if ( setup.fileParser != NULL )
+		return setup.fileParser->evaluateProcessingState();
+
+	return THE_APP->evaluateAndPerformProcessingState();
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::finalizeCurrMoveSequence(long nextClientId) {
@@ -309,8 +317,8 @@ bool CncPathListRunner::initializeNextMoveSequence(long clientId) {
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::initializeNextMoveSequence(double value_MM_MIN, char mode, long clientId) {
 //////////////////////////////////////////////////////////////////
-	if ( setup.optAnalyse == true ) {
-		
+	if ( setup.optAnalyse == true )
+	{
 		CncMoveSequence::SpeedInfo si(value_MM_MIN, mode);
 		
 		// to hand over the speed info on demand
@@ -318,7 +326,8 @@ bool CncPathListRunner::initializeNextMoveSequence(double value_MM_MIN, char mod
 			si = currentSequence->getCurrentSpeedInfo();
 		
 		// this will also publish the current sequence
-		if ( destroyMoveSequence() == false ) {
+		if ( destroyMoveSequence() == false )
+		{
 			std::cerr << CNC_LOG_FUNCT << ": destroyMoveSequence failed!" << std::endl;
 			return false;
 		}
@@ -381,7 +390,7 @@ bool CncPathListRunner::publishMoveSequence() {
 		return false;
 	}
 	
-	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+	CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 		
 	// if the corresponding list isn't connected this call does nothing and returns only
 	cpp->addMoveSequence(*currentSequence);
@@ -396,16 +405,22 @@ bool CncPathListRunner::publishMoveSequence() {
 		
 	if ( currentSequence->getCount() == 0 ) {
 		if ( setup.trace == true ) {
-			const char* msg = "Call of publishMoveSequence(): Empty CncMoveSequence, nothing was publsihed.";
+			const char* msg = "Call of publishMoveSequence(): Empty CncMoveSequence, nothing was published.";
 			cpp->addOperatingTraceMovSeqSep(msg);
 		}
 		
 		return true;
 	}
 	
+	if ( checkAndPerfromProcessingState() == false )
+	{
+		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
+		return false;
+	}
+	
 	currentInterface->processClientIDChange(currentSequence->getLastClientId());
 	const bool ret = currentInterface->processMoveSequence(*currentSequence);
-
+	
 	if ( setup.trace == true )
 		cpp->addOperatingTraceMovSeqSep(wxString::Format("Call of publishMoveSequence() returned with %d", (int)ret));
 		
@@ -422,7 +437,7 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 	if ( isInterrupted() == true )
 		return false;
 		
-	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+	CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 	
 	if ( setup.trace == true )
 		cpp->addOperatingTraceSeparator(wxString::Format("ClientID Change (%ld)", curr.clientId));
@@ -447,13 +462,19 @@ bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr
 		const wxString msg(wxString::Format("Feed Speed Change (%c - %5.1lf)", 
 											cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), curr.feedSpeed_MM_MIN));
 											
-		APP_PROXY::getCncPreProcessor()->addOperatingTraceSeparator(msg);
+		THE_APP->getCncPreProcessor()->addOperatingTraceSeparator(msg);
 	}
 		
 	const long nextClientID = next ? next->clientId : CLIENT_ID.INVALID;
 	
 	if ( initializeNextMoveSequence(curr.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), nextClientID) == false ) {
 		std::cerr << CNC_LOG_FUNCT << ": initNextMoveSequence failed!" << std::endl;
+		return false;
+	}
+	
+	if ( checkAndPerfromProcessingState() == false )
+	{
+		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
 		return false;
 	}
 	
@@ -474,7 +495,13 @@ bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) 
 		const wxString msg(wxString::Format("Spindle State, Speed Change (%s, %.1lf)", 
 											curr.spindleState ? "ON" : "OFF", curr.spindleSpeed_U_MIN));
 											
-		APP_PROXY::getCncPreProcessor()->addOperatingTraceSeparator(msg);
+		THE_APP->getCncPreProcessor()->addOperatingTraceSeparator(msg);
+	}
+	
+	if ( checkAndPerfromProcessingState() == false )
+	{
+		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
+		return false;
 	}
 	
 	if ( currentInterface->processSpindleStateSwitch(curr.spindleState) == false ) {
@@ -501,7 +528,7 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 			<< "Already Rendered : " << curr.alreadyRendered				<< std::endl
 		;
 		
-		CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+		CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 		wxASSERT( cpp != NULL );
 		
 		cpp->addOperatingTraceMovSeqSep("Next PhysicallyMoveRaw");
@@ -513,7 +540,13 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 												curr.entryTarget.getX(), 
 												curr.entryTarget.getY(), 
 												curr.entryTarget.getZ());
-
+	
+	if ( checkAndPerfromProcessingState() == false )
+	{
+		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
+		return false;
+	}
+	
 	return currentInterface->processPathListEntry(curr);
 }
 //////////////////////////////////////////////////////////////////
@@ -546,7 +579,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	};
 	
 	// -----------------------------------------------------------
-	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+	CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 	wxASSERT( cpp != NULL );
 
 	// -----------------------------------------------------------
@@ -600,7 +633,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		c = n; 
 		n = getNextEntry(itCurr); 
 		
-		if ( c != NULL )	APP_PROXY::getCncPreProcessor()->addPathListEntry(*c);
+		if ( c != NULL )	THE_APP->getCncPreProcessor()->addPathListEntry(*c);
 		else				std::cerr << CNC_LOG_FUNCT << ": skipToNextEntry() failed!" << std::endl;
 			
 		return (c != NULL && n != NULL);
@@ -748,7 +781,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	if ( plm.getPathType() == CncPathListManager::PathType::PT_GUIDE_PATH )
 		return publishGuidePath(plm, 0.0);
 	
-	CncPreprocessor* cpp = APP_PROXY::getCncPreProcessor();
+	CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 	
 	autoSetup(false);
 	
@@ -761,8 +794,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	}
 	
 	// freeze only if shown to speed up performance - significantly!
-	if ( cpp->IsShownOnScreen() )
-		CncAutoFreezer caf(cpp);
+	CncAutoFreezer caf(cpp->IsShownOnScreen() ? cpp : NULL);
 	
 	// Main loop over all path list manager cnc entries
 	auto beg = plm.cbegin();
@@ -776,9 +808,15 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		if ( isInterrupted()   == true )	return false;
 		if ( checkDebugState() == false )	return false;
 		
+		if ( checkAndPerfromProcessingState() == false )
+		{
+			CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
+			return false;
+		}
+		
 		// if the corresponding gui list isn't connected this call 
 		// does nothing and returns only
-		APP_PROXY::getCncPreProcessor()->addPathListEntry(curr);
+		THE_APP->getCncPreProcessor()->addPathListEntry(curr);
 
 		// ----------------------------------------------------------
 		if ( curr.isNothingChanged() == true ) {

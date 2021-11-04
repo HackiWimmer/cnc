@@ -641,7 +641,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rpMisc = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_rightBook->AddPage(m_rpMisc, _("Page"), false);
     
-    wxFlexGridSizer* flexGridSizer121 = new wxFlexGridSizer(10, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer121 = new wxFlexGridSizer(6, 1, 0, 0);
     flexGridSizer121->SetFlexibleDirection( wxBOTH );
     flexGridSizer121->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer121->AddGrowableCol(0);
@@ -649,7 +649,19 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer121->AddGrowableRow(1);
     flexGridSizer121->AddGrowableRow(2);
     flexGridSizer121->AddGrowableRow(3);
+    flexGridSizer121->AddGrowableRow(4);
+    flexGridSizer121->AddGrowableRow(5);
     m_rpMisc->SetSizer(flexGridSizer121);
+    
+    m_btOSEnvrionment = new wxButton(m_rpMisc, wxID_ANY, _("Open Application\nEnvironment"), wxDefaultPosition, wxDLG_UNIT(m_rpMisc, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btOSEnvrionment->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("system-run-5")), wxLEFT);
+    m_btOSEnvrionment->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btOSEnvrionmentFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_btOSEnvrionment->SetFont(m_btOSEnvrionmentFont);
+    
+    flexGridSizer121->Add(m_btOSEnvrionment, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_btSessionDir = new wxButton(m_rpMisc, wxID_ANY, _("Open Session\nDirectory"), wxDefaultPosition, wxDLG_UNIT(m_rpMisc, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -671,16 +683,6 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer121->Add(m_btSerialSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_btTestFunct = new wxButton(m_rpMisc, wxID_ANY, _("Execute Test\nFunction"), wxDefaultPosition, wxDLG_UNIT(m_rpMisc, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btTestFunct->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncTest")), wxLEFT);
-    m_btTestFunct->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btTestFunctFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btTestFunct->SetFont(m_btTestFunctFont);
-    
-    flexGridSizer121->Add(m_btTestFunct, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
     m_btStackTrace = new wxButton(m_rpMisc, wxID_ANY, _("Open Stack\nTrace Store"), wxDefaultPosition, wxDLG_UNIT(m_rpMisc, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btStackTrace->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("trace")), wxLEFT);
@@ -690,6 +692,16 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_btStackTrace->SetFont(m_btStackTraceFont);
     
     flexGridSizer121->Add(m_btStackTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_btTestFunct = new wxButton(m_rpMisc, wxID_ANY, _("Execute Test\nFunction"), wxDefaultPosition, wxDLG_UNIT(m_rpMisc, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btTestFunct->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncTest")), wxLEFT);
+    m_btTestFunct->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btTestFunctFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_btTestFunct->SetFont(m_btTestFunctFont);
+    
+    flexGridSizer121->Add(m_btTestFunct, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_btAnchorSec = new wxButton(m_rpMisc, wxID_ANY, _("Determine\nAnchor\nPositions"), wxDefaultPosition, wxDLG_UNIT(m_rpMisc, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -726,10 +738,11 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rcStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
     m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_resolveLimit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::requestResolveLimitStates), NULL, this);
+    m_btOSEnvrionment->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onAppEnvironmentSec), NULL, this);
     m_btSessionDir->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSessionDirSec), NULL, this);
     m_btSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
-    m_btTestFunct->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunctionSec), NULL, this);
     m_btStackTrace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStackTraceStoreSec), NULL, this);
+    m_btTestFunct->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunctionSec), NULL, this);
     m_btAnchorSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onDetermineAnchorPositionsSec), NULL, this);
     
 }
@@ -748,10 +761,11 @@ CncSecureCtrlPanelBase::~CncSecureCtrlPanelBase()
     m_rcStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
     m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_resolveLimit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::requestResolveLimitStates), NULL, this);
+    m_btOSEnvrionment->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onAppEnvironmentSec), NULL, this);
     m_btSessionDir->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSessionDirSec), NULL, this);
     m_btSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
-    m_btTestFunct->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunctionSec), NULL, this);
     m_btStackTrace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStackTraceStoreSec), NULL, this);
+    m_btTestFunct->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunctionSec), NULL, this);
     m_btAnchorSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onDetermineAnchorPositionsSec), NULL, this);
     
 }

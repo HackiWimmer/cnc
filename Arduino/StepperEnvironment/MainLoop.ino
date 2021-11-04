@@ -262,29 +262,6 @@ bool ArduinoMainLoop::peakSerial(unsigned char& c) {
   c = Serial.peek();
   return true;
 }
-/////////////////////////////////////////////////////////////////////////////////////
-bool ArduinoMainLoop::checkSerialForPauseCommands(bool currentPauseState) {
-/////////////////////////////////////////////////////////////////////////////////////
-  bool ret = currentPauseState;
-  
-  if ( Serial.available() > 0 ) {
-    
-    switch ( Serial.peek() ) {
-      case 'p': ret = PAUSE_INACTIVE; 
-                // remove the cmd for serial
-                Serial.read(); 
-                break;
-                
-      case 'P': ret = PAUSE_ACTIVE;
-                // remove the cmd for serial
-                Serial.read();  
-                break;
-    }
-  }
-
-  return ret;
-}
-
 ///////////////////////////////////////////////////////////////
 byte ArduinoMainLoop::readSerialByteWithTimeout(uint32_t timeoutMicros) {
 ////////////////////////////////////////////////////////////////

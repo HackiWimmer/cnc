@@ -4,7 +4,8 @@
 #include <wx/string.h>
 #include <wx/variant.h>
 #include "DataControlModel.h"
-#include "FileParserRunInfo.h"
+#include "CncProcessingInfo.h"
+#include "CncContext.h"
 
 class wxStaticText;
 class wxBitmapButton;
@@ -55,9 +56,6 @@ class FileParser {
 		FileParser(const wxString& fn);
 		virtual ~FileParser();
 		
-		bool isPause() { return runInfo.getPauseFlag(); }
-		bool isProcessing() { return runInfo.isProcessing(); }
-		
 		virtual void deligateTrigger(const Trigger::BeginRun& tr)				= 0;
 		virtual void deligateTrigger(const Trigger::EndRun& tr)					= 0;
 		virtual void changePathListRunnerInterface(const wxString& portName)	= 0;
@@ -65,8 +63,6 @@ class FileParser {
 		
 		virtual bool processDebug();
 		virtual bool processRelease();
-		
-		bool togglePause();
 		
 		void debugNextBreakPoint();
 		void debugNextStep();
@@ -93,8 +89,6 @@ class FileParser {
 		void appendDebugValuePath(DcmRow& row);
 		void appendDebugValueDetail(DcmRow& row);
 		
-		bool isWaitingForUserEvents() { return waitingForUserEvents; }
-		
 		// configuration page handling
 		const int staticPageOffset = 1;
 		static wxPropertyGridManager* debuggerConfigurationPropertyGrid;
@@ -104,12 +98,10 @@ class FileParser {
 
 	protected:
 		
-		wxString fileName;
-		FileParserRunInfo runInfo;
-		bool waitingForUserEvents;
+		wxString			fileName;
 
-		DebugCtrl debugControls;
-		CncSourceEditor* inboundSourceControl;
+		DebugCtrl			debugControls;
+		CncSourceEditor*	inboundSourceControl;
 		
 		virtual bool process();
 		virtual bool preprocess() = 0;
@@ -119,9 +111,7 @@ class FileParser {
 		virtual void logMeasurementStart() = 0;
 		virtual void logMeasurementEnd() = 0;
 		
-		virtual void initNextRunPhase(FileParserRunInfo::RunPhase p);
-		
-		virtual bool isInterrupted() { return false; }
+		virtual void initNextRunPhase(CncProcessingInfo::RunPhase p);
 		virtual void broadcastDebugState(bool state) {}
 		
 		bool evaluateProcessingState();
@@ -130,7 +120,6 @@ class FileParser {
 		void setCurrentLineNumber(long ln);
 		void incCurrentLineNumber() { setCurrentLineNumber(++currentLineNumber); }
 		bool hasLineABreakpoint(long ln);
-		bool checkBreakpoint();
 		
 		void registerNextDebugNode(const wxString& nodeName);
 		
@@ -145,10 +134,6 @@ class FileParser {
 		long currentLineNumber;
 		ToolIds	toolIds;
 		
-		#define SHOULD_DEBUG_HERE										\
-			if ( runInfo.getCurrentDebugState() == false )				\
-				return;
-				
 		void displayToolId(const wxString& id);
 		void displayToolId(int id);
 		

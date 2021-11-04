@@ -1,3 +1,4 @@
+#include <wx/display.h>
 #include "CncArduino.h"
 #include "CncArduinoPinsListCtrl.h"
 #include "CncMessageListCtrl.h"
@@ -8,6 +9,8 @@
 #include "../Arduino/StepperEnvironment/ArdoEnv.h"
 #include "wxCrafterImages.h"
 #include "CncArduinoEnvironment.h"
+
+wxSize smallWindowSize(1100, 600);
 
 ///////////////////////////////////////////////////////////////////
 CncArduinoEnvironment::CncArduinoEnvironment(wxWindow* parent)
@@ -188,6 +191,33 @@ CncArduinoEnvironment::~CncArduinoEnvironment() {
 	wxDELETE( lsOff   );
 }
 ///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::stretchSize(bool small) {
+//////////////////////////////////////////////////////////////////
+	if ( small == true )
+	{
+		SetClientSize(smallWindowSize);
+		
+		m_splitterMainH->SetSashPosition(smallWindowSize.GetHeight());
+		m_arduinoBitmap->Show(false);
+	}
+	else
+	{
+		wxDisplay display(wxDisplay::GetFromWindow(this));
+		const wxRect screen = display.GetClientArea();
+		SetClientSize(screen.GetWidth() * 0.95, screen.GetHeight() * 0.95 );
+		
+		wxPoint p(screen.GetPosition());
+		p += wxSize(10, 10);
+		SetPosition(screen.GetPosition());
+		
+		m_splitterMainH->SetSashPosition(screen.GetHeight() * 0.7);
+		m_arduinoBitmap->Show(true);
+	}
+	
+	Layout();
+	Refresh();
+}
+///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::shutdownTimer() {
 ///////////////////////////////////////////////////////////////////
 	m_startupTimer->Stop();
@@ -225,8 +255,8 @@ void CncArduinoEnvironment::enableControls(bool state, bool all) {
 	
 	m_btForceUpdate->Enable(state);
 	m_btClearTrace->Enable(state);
-	m_btPeriphery->Enable(state);
-	m_btConfiguration->Enable(state);
+	m_btSmallSize->Enable(state);
+	m_btExpandedSize->Enable(state);
 	
 	lsiMinX.button->Enable(state);
 	lsiMaxX.button->Enable(state);
@@ -313,8 +343,11 @@ void CncArduinoEnvironment::onStartupTimer(wxTimerEvent& event) {
 	// fixing layout problems
 	wxSize size = GetClientSize();
 	size.IncBy(1);
-	
 	SetClientSize(size);
+	
+	if ( size.GetWidth() < smallWindowSize.GetWidth() || size.GetHeight() < smallWindowSize.GetHeight() )
+		stretchSize(true);
+	
 	Refresh();
 	
 	onPowerButton();
@@ -515,16 +548,6 @@ void CncArduinoEnvironment::onLsLeftUp(wxMouseEvent& event) {
 	publishStatesUpdate();
 	
 	event.Skip();
-}
-///////////////////////////////////////////////////////////////////
-void CncArduinoEnvironment::onSelectArduinoPeriphery(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_contextBook->SetSelection(BookSelection::BS_Periphery);
-}
-///////////////////////////////////////////////////////////////////
-void CncArduinoEnvironment::onSelectConfiguration(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_contextBook->SetSelection(BookSelection::BS_Configuration);
 }
 ///////////////////////////////////////////////////////////////////
 void CncArduinoEnvironment::onClearTrace(wxCommandEvent& event) {
@@ -839,3 +862,14 @@ void CncArduinoEnvironment::setValuesUpdateInterval() {
 		m_valuesUpdateIntervalValue->SetLabel(wxString::Format("%d", val));
 	}
 }
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::onStretchToSmallSize(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	stretchSize(true);
+}
+///////////////////////////////////////////////////////////////////
+void CncArduinoEnvironment::onStretchToExpandedSize(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	stretchSize(false);
+}
+

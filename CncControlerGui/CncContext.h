@@ -18,6 +18,7 @@ typedef std::map<wxString, wxString>	VersionInfoMap;
 typedef std::vector<wxString>			CommandLineParameterMap;
 
 // -----------------------------------------------------------
+class CncProcessingInfo;
 class CncBoundarySpace;
 class CncAnchorMap;
 class CncTemplateContext;
@@ -62,6 +63,7 @@ struct CncContext {
 		TsTplProcessing 			timestamps;
 		SecureModeInfo				secureModeInfo;
 		VersionInfoMap				versionInfoMap;
+		CncProcessingInfo*			processingInfo;
 		CncBoundarySpace*			boundarySpace;
 		CncAnchorMap*				anchorMap;
 		CncTemplateContext*			templateContext;
@@ -81,6 +83,11 @@ struct CncContext {
 		
 		void setProbeMode(bool state); 
 		bool isProbeMode() 										const	{ return probeMode; }
+		
+		bool isPause()											const;
+		bool isProcessing()										const;
+		bool togglePause();
+		void resetProcessing();
 		
 		void setInteractiveMoveingMode(bool state)						{ interactiveMoveMode = state; }
 		bool canInteractiveMoving()								const	{ return interactiveMoveMode;  }

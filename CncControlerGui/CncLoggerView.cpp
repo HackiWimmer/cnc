@@ -23,9 +23,26 @@ CncLoggerView::CncLoggerView(wxWindow* parent)
 /////////////////////////////////////////////////////////////////////
 CncLoggerView::~CncLoggerView() {
 /////////////////////////////////////////////////////////////////////
-	// this will document any content logged during the shutdown processing
-	// without any change to read it in the gui.
-	saveAll(false);
+	// save the current log information
+	const bool doOpenWithEditor = false; // true did't work any more at this program state
+	const bool doJoinApp        = false; // true will crash at this program state
+	
+	const wxString msg(wxString::Format("**********************************************************\n%s: Logger closed at: %s\n**********************************************************\n", 
+						CNC_LOG_FUNCT, 
+						wxDateTime::Now().FormatISOTime())
+	);
+	
+	loggerLists.at(LoggerSelection::VAL::STARTUP)->setJoinTheAppState(doJoinApp);
+	popImmediatelyMode(LoggerSelection::VAL::STARTUP);
+	add(LoggerSelection::VAL::STARTUP, msg);
+	saveAll(LoggerSelection::VAL::STARTUP, doOpenWithEditor);
+	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("after finalize startup logger . . .")
+	
+	loggerLists.at(LoggerSelection::VAL::CNC)->setJoinTheAppState(doJoinApp);
+	popImmediatelyMode(LoggerSelection::VAL::CNC);
+	add(LoggerSelection::VAL::CNC, msg);
+	saveAll(LoggerSelection::VAL::CNC, doOpenWithEditor);
+	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("after finalize runtime logger . . .")
 	
 	loggerLists.clear();
 	
@@ -49,6 +66,17 @@ void CncLoggerView::setSecureMode(bool state) {
 		}
 		Layout();
 	}
+}
+/////////////////////////////////////////////////////////////////////
+const char* CncLoggerView::getLoggerIDAsStr(LoggerSelection::VAL id) {
+/////////////////////////////////////////////////////////////////////
+	// the return value has to be file name compatible 
+	switch ( id ) 
+	{
+		case LoggerSelection::VAL::STARTUP:	return "CNC-Startup";
+		case LoggerSelection::VAL::CNC:		return "CNC-Runtime";
+	}
+	return "CNC-UnkownLogger";
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::select(LoggerSelection::VAL id) {
@@ -247,49 +275,63 @@ void CncLoggerView::onSave(wxCommandEvent& event) {
 	if ( loggerLists.size() != MaxLoggerCount )
 		return;
 
-	const wxString& fileName(wxString::Format("%s%s%s%s",	CncFileNameService::getTempDirSession(), 
-															"CncLoggerContent", 
+	const wxString& fileName(wxString::Format("%s%s.%s%s",	CncFileNameService::getTempDirSession(), 
+															getLoggerIDAsStr(currentLoggerIndex), 
 															wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S"), 
 															".txt")
 											 );
 	const wxFileName fn(fileName);
 	
-	if ( loggerLists.at(currentLoggerIndex)->writeToFile(fn) ) {
-		if ( fn.Exists() ) {
-			 
+	if ( loggerLists.at(currentLoggerIndex)->writeToFile(fn) )
+	{
+		if ( fn.Exists() )
+		{
 			wxString tool;
-			CncConfig::getGlobalCncConfig()->getEditorTool(tool);
-			
-			GblFunc::executeExternalProgram(tool, fileName, true);
-		}
-	}
-}
-/////////////////////////////////////////////////////////////////////
-void CncLoggerView::saveAll(bool doOpen) {
-/////////////////////////////////////////////////////////////////////
-	if ( loggerLists.size() != MaxLoggerCount )
-		return;
-		
-	const wxString& fileName(wxString::Format("%s%s%s%s",	CncFileNameService::getTempDirSession(), 
-															"CncLoggerContent", 
-															wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S"), 
-															".txt")
-											 );
-	const wxFileName fn(fileName);
-	
-	if ( loggerLists.at(currentLoggerIndex)->writeToFile(fn, true) ) {
-		if ( doOpen && fn.Exists() ) {
-			wxString tool;
-			CncConfig::getGlobalCncConfig()->getEditorTool(tool);
-			GblFunc::executeExternalProgram(tool, fileName, true);
+			if ( CncConfig::getGlobalCncConfig() )
+			{
+				CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+				GblFunc::executeExternalProgram(tool, fileName, true);
+			}
 		}
 	}
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::onSaveAll(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	saveAll(true);
+	saveAll(currentLoggerIndex, true);
 }
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::saveAll(LoggerSelection::VAL id, bool doOpen) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+		
+	const wxString& fileName(wxString::Format("%s%s.%s%s",	CncFileNameService::getTempDirSession(), 
+															getLoggerIDAsStr(id), 
+															wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S"), 
+															".txt")
+											 );
+	const wxFileName fn(fileName);
+	
+	if ( loggerLists.at(id)->writeToFile(fn, true) )
+	{
+		if ( doOpen && fn.Exists() )
+		{
+			wxString tool;
+			if ( CncConfig::getGlobalCncConfig() )
+			{
+				CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+				GblFunc::executeExternalProgram(tool, fileName, true);
+			}
+		}
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::saveAll(bool doOpen) {
+/////////////////////////////////////////////////////////////////////
+	saveAll(currentLoggerIndex, doOpen);
+}
+
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::onView(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
@@ -375,4 +417,14 @@ void CncLoggerView::add(LoggerSelection::VAL id, const wxString& text) {
 		return;
 		
 	loggerLists.at(id)->add(text);
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::add(const char c) {
+/////////////////////////////////////////////////////////////////////
+	loggerLists.at(currentLoggerIndex)->add(c);
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::add(const wxString& text) {
+/////////////////////////////////////////////////////////////////////
+	loggerLists.at(currentLoggerIndex)->add(text);
 }

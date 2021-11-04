@@ -210,7 +210,7 @@ void CncPathListEntryListCtrl::updateColumnWidth() {
 
 	// avoid flicker
 	const bool b = IsShownOnScreen() && IsFrozen() == false;
-	CncAutoFreezer caf( b ? this : NULL);
+	//CncAutoFreezer caf( b ? this : NULL);
 	
 	int colWidthSum = 0;
 	for ( int i = 0; i < GetColumnCount(); i++ ) {

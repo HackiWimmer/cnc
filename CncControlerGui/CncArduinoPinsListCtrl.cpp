@@ -68,10 +68,10 @@ CncArduinoPinsListCtrl::CncArduinoPinsListCtrl(wxWindow *parent, long style)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("Typ:", 	wxLIST_FORMAT_CENTRE, 	 40);
-	AppendColumn("Num",		wxLIST_FORMAT_CENTRE, 	 40);
-	AppendColumn("Label", 	wxLIST_FORMAT_LEFT, 	132);
-	AppendColumn("Value", 	wxLIST_FORMAT_LEFT, 	 80);
+	AppendColumn("Typ:", 	wxLIST_FORMAT_CENTRE,	 40);
+	AppendColumn("Num",		wxLIST_FORMAT_CENTRE,	 36);
+	AppendColumn("Value", 	wxLIST_FORMAT_LEFT,		 60);
+	AppendColumn("Label", 	wxLIST_FORMAT_LEFT,		132);
 	
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::NORMAL);

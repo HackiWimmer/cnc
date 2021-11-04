@@ -36,6 +36,8 @@ class CncLoggerView : public CncLoggerViewBase {
 		void changeResultForLoggedPosition	(LoggerSelection::VAL id, const wxString& text);
 		void add							(LoggerSelection::VAL id, const char c);
 		void add							(LoggerSelection::VAL id, const wxString& text);
+		void add							(const char c);
+		void add							(const wxString& text);
 		
 		void clearTrace();
 		void changeTextAttr					(const wxTextAttr& ta);
@@ -44,7 +46,10 @@ class CncLoggerView : public CncLoggerViewBase {
 		
 		void openTraceHistory();
 		
+		void saveAll(LoggerSelection::VAL id, bool doOpen);
 		void saveAll(bool doOpen);
+		
+		static const char* getLoggerIDAsStr(LoggerSelection::VAL id);
 		
 	protected:
 		

@@ -31,8 +31,9 @@ class CncArduinoPinsListCtrl : public CncLargeScaledListCtrl {
 		
 		static const int COL_TYP 					=  0;
 		static const int COL_NUM 					=  1;
-		static const int COL_LABEL 					=  2;
-		static const int COL_VAL 					=  3;
+		static const int COL_VAL 					=  2;
+		static const int COL_LABEL 					=  3;
+		
 		static const int TOTAL_COL_COUNT			=  4;
 		
 		CncArduinoPinsListCtrl(wxWindow *parent, long style);

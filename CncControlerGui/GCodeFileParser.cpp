@@ -353,7 +353,7 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	}
 	
 	// perform debug information 
-	if ( runInfo.getCurrentDebugState() == true ) {
+	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
 		registerNextDebugNode(GCodeCommands::explainGCodeCommand(gcb.nodeName)); 
 		
 		static DcmItemList rows;

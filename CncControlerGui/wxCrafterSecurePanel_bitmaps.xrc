@@ -54,5 +54,6 @@
   <object class="wxBitmap" name="keyboard">bitmaps\keyboard.png</object>
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
   <object class="wxBitmap" name="plugin_not_ok">bitmaps\plugin_not_ok.png</object>
+  <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
   <object class="wxBitmap" name="trace">bitmaps\trace.png</object>
 </resource>

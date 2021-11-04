@@ -65,10 +65,9 @@ class SVGFileParser : public SVGParserBase
 		
 		virtual bool preprocess();
 		virtual bool postprocess();
-		virtual void initNextRunPhase(FileParserRunInfo::RunPhase p);
+		virtual void initNextRunPhase(CncProcessingInfo::RunPhase p);
 		virtual void initNextPath(const wxString& data);
 		virtual bool evaluateProcessingCallback();
-		virtual bool isInterrupted() { return cncControl->isInterrupted(); }
 		virtual bool addPathElement(char c, unsigned int count, double values[]);
 		virtual void initNextClientId(long id);
 		

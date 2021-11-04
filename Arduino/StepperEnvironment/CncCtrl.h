@@ -92,7 +92,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     bool                podestHardwareState;
     bool                posReplyState;
     bool                probeMode;
-    bool                pause;
+    bool                pauseState;
     bool                I2CAvailable;
 
     uint32_t            cfgF1000_MMSEC   = 0;

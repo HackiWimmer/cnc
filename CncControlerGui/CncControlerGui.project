@@ -272,6 +272,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncProcessingInfo.cpp"/>
+      <File Name="CncProcessingInfo.h"/>
       <File Name="CncPolarRegionDetector.cpp"/>
       <File Name="CncPolarRegionDetector.h"/>
       <File Name="CncPodestMgmtMovement.h"/>
@@ -559,9 +561,7 @@
         <File Name="PathHandlerBase.h"/>
         <File Name="PathHandlerBase.cpp"/>
       </VirtualDirectory>
-      <VirtualDirectory Name="Utils">
-        <File Name="FileParserRunInfo.h"/>
-      </VirtualDirectory>
+      <VirtualDirectory Name="Utils"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Inbound - SVG">
       <VirtualDirectory Name="Parser">

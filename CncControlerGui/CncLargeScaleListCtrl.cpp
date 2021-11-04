@@ -1,6 +1,7 @@
 #include <iostream>
 #include <climits>
 #include "CncConfig.h"
+#include "CncAutoFreezer.h"
 #include "CncLargeScaleListCtrl.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -226,11 +227,15 @@ bool CncLargeScaledListCtrl::selectItem(long item, bool doEnsureVisible) {
 ///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::ensureVisible(long item) {
 ///////////////////////////////////////////////////////////////////
+	if ( IsShownOnScreen() == false )
+		return true;
+	
 	const bool frozenBefore = IsFrozen();
 	
 	if ( frozenBefore == false )
 		Freeze();
 		
+	CncAutoFreezer caf(this);
 	const long total = GetItemCount();
 	const long cpp   = GetCountPerPage();
 	
@@ -244,9 +249,6 @@ bool CncLargeScaledListCtrl::ensureVisible(long item) {
 		}
 	}
 	
-	if ( frozenBefore && IsFrozen() )
-		Thaw();
-		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////

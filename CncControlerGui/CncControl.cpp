@@ -1617,13 +1617,16 @@ bool CncControl::switchSpindleOn() {
 	if ( isInterrupted() )
 		return false;
 
-	if ( spindlePowerState == SPINDLE_STATE_OFF ) { 
-		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_ON) ) {
-			
+	if ( spindlePowerState == SPINDLE_STATE_OFF )
+	{ 
+		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_ON) )
+		{
 			CncSpindleSound::play(getConfiguredSpindleSpeed());
 			
 			spindlePowerState = SPINDLE_STATE_ON;
 			displaySpindleState(spindlePowerState);
+			
+			THE_APP->waitActive(500);
 		}
 	}
 	
@@ -1635,9 +1638,10 @@ bool CncControl::switchSpindleOff(bool force) {
 	if ( isInterrupted() )
 		return false;
 
-	if ( spindlePowerState == SPINDLE_STATE_ON || force == true ) {
-		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_OFF) ) {
-			
+	if ( spindlePowerState == SPINDLE_STATE_ON || force == true )
+	{
+		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_OFF) )
+		{
 			CncSpindleSound::stop();
 			
 			spindlePowerState = SPINDLE_STATE_OFF;

@@ -9,11 +9,6 @@ GCodePathHandlerCnc::GCodePathHandlerCnc(CncControl* cnc)
 {
 //////////////////////////////////////////////////////////////////
 	changeInputUnit(Unit::mm);
-	
-	// add the file parser to the runner setup
-	// the rest is already set by CncPathListRunner(cnc)
-	CncPathListRunner::Setup& setup = getSetup();
-	setup.fileParser				= fileParser;
 }
 //////////////////////////////////////////////////////////////////
 GCodePathHandlerCnc::~GCodePathHandlerCnc() {
@@ -22,6 +17,11 @@ GCodePathHandlerCnc::~GCodePathHandlerCnc() {
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::prepareWorkImpl() {
 //////////////////////////////////////////////////////////////////
+	// add the file parser to the runner setup
+	// the rest is already set by ctor CncPathListRunner(cnc)
+	CncPathListRunner::Setup& setup = getSetup();
+	setup.fileParser				= fileParser;
+
 	return true;
 }
 //////////////////////////////////////////////////////////////////

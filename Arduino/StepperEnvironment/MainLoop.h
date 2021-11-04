@@ -69,7 +69,6 @@ class ArduinoMainLoop {
     static bool     convertLongToFloat(const int32_t val, float& ret);
 
     static bool     peakSerial(unsigned char& c);
-    static bool     checkSerialForPauseCommands(bool currentPauseState);
     static byte     readSerialByteWithTimeout(uint32_t timeoutMicros=minSerialReadTimeoutMicros);
     static int8_t   readSerialBytesWithTimeout(byte* buffer, int8_t length, uint32_t timeoutMicros=minSerialReadTimeoutMicros);
 

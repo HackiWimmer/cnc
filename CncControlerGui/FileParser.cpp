@@ -15,6 +15,12 @@
 #include "wxCrafterMainFrame.h"
 #include "FileParser.h"
 
+////////////////////////////////////////////////////////////////////////////
+#define SHOULD_DEBUG_HERE													\
+	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == false )		\
+		return;
+
+////////////////////////////////////////////////////////////////////////////
 wxPropertyGridManager* FileParser::debuggerConfigurationPropertyGrid = NULL;
 const char* CFG_DBG_AUTO_BRKP 	= "CFG_DBG_AUTO_BRKP";
 const char* CFG_DBG_AREA_PREP	= "CFG_DBG_AREA_PREP";
@@ -132,7 +138,6 @@ void DEBUG_CTRL::currentNodeAddToCategory(const wxString& catLabel, const wxStri
 ////////////////////////////////////////////////////////////////////////////
 FileParser::FileParser(const wxString& fn) 
 : fileName				(fn)
-, runInfo				()
 , debugControls			()
 , inboundSourceControl	(NULL)
 , currentLineNumber		(UNDEFINED_LINE_NUMBER)
@@ -324,25 +329,25 @@ void FileParser::appendDebugValueDetail(const char* key, wxVariant value) {
 ////////////////////////////////////////////////////////////////////////////
 bool FileParser::processRelease() {
 ////////////////////////////////////////////////////////////////////////////
-	runInfo.releaseAllPhases();
+	THE_CONTEXT->processingInfo->releaseAllPhases();
 	
 	if ( debugControls.config.shouldStopAfterPreprocessing() )
-		runInfo.stopProcessingAfter(FileParserRunInfo::RP_Preprocesser);
+		THE_CONTEXT->processingInfo->stopProcessingAfter(CncProcessingInfo::RP_Preprocesser);
 		
 	return process();
 }
 ////////////////////////////////////////////////////////////////////////////
 bool FileParser::processDebug() {
 ////////////////////////////////////////////////////////////////////////////
-	runInfo.debugAllPhases();
-	runInfo.setDebugMode(FileParserRunInfo::RP_Preprocesser, debugControls.config.shouldDebugPreprocessing());
-	runInfo.setDebugMode(FileParserRunInfo::RP_Spool, debugControls.config.shouldDebugSpooling());
+	THE_CONTEXT->processingInfo->debugAllPhases();
+	THE_CONTEXT->processingInfo->setDebugMode(CncProcessingInfo::RP_Preprocesser, debugControls.config.shouldDebugPreprocessing());
+	THE_CONTEXT->processingInfo->setDebugMode(CncProcessingInfo::RP_Spool, debugControls.config.shouldDebugSpooling());
 	
 	if ( debugControls.config.shouldStopAfterPreprocessing() )
-		runInfo.stopProcessingAfter(FileParserRunInfo::RP_Preprocesser);
+		THE_CONTEXT->processingInfo->stopProcessingAfter(CncProcessingInfo::RP_Preprocesser);
 
 	if ( debugControls.config.autoBreakpoint() )
-		runInfo.setStepByStepFlag(true);
+		THE_CONTEXT->processingInfo->setStepByStepFlag(true);
 	
 	return process();
 }
@@ -353,14 +358,14 @@ bool FileParser::process() {
 	toolIds.clear();
 	
 	// first: preprocessing
-	initNextRunPhase(FileParserRunInfo::RP_Preprocesser);
+	initNextRunPhase(CncProcessingInfo::RP_Preprocesser);
 	THE_CONTEXT->timestamps.logPreTimeStart();
 	bool ret = preprocess();
 	THE_CONTEXT->timestamps.logPreTimeEnd();
 	
 	// second: spooling
-	if ( runInfo.processMore() && ret == true ) {
-		initNextRunPhase(FileParserRunInfo::RP_Spool);
+	if ( THE_CONTEXT->processingInfo->processMore() && ret == true ) {
+		initNextRunPhase(CncProcessingInfo::RP_Spool);
 		
 		THE_CONTEXT->timestamps.logSerialTimeStart();
 		logMeasurementStart();
@@ -386,14 +391,14 @@ bool FileParser::process() {
 		debuggerConfigurationPropertyGrid->Update();
 	}
 	
-	initNextRunPhase(FileParserRunInfo::RP_Unknown);
+	initNextRunPhase(CncProcessingInfo::RP_Unknown);
 	return ret;
 }
 ////////////////////////////////////////////////////////////////////////////
 void FileParser::setCurrentLineNumber(long ln) {
 ////////////////////////////////////////////////////////////////////////////
 	currentLineNumber = ln;
-	runInfo.setLastLineNumber(ln);
+	THE_CONTEXT->processingInfo->setLastLineNumber(ln);
 
 	// to handle the pause flag
 	evaluateProcessingState();
@@ -407,33 +412,25 @@ bool FileParser::hasLineABreakpoint(long ln) {
 	return (inboundSourceControl->MarginGetText(ln) == "B");
 }
 //////////////////////////////////////////////////////////////////
-bool FileParser::checkBreakpoint() {
+void FileParser::initNextRunPhase(CncProcessingInfo::RunPhase p) {
 //////////////////////////////////////////////////////////////////
-	if ( runInfo.getStepByStepFlag() == true )
-		return true;
-		
-	return hasLineABreakpoint(currentLineNumber - 1);
-}
-//////////////////////////////////////////////////////////////////
-void FileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
-//////////////////////////////////////////////////////////////////
-	runInfo.setCurrentRunPhase(p);
+	THE_CONTEXT->processingInfo->setCurrentRunPhase(p);
 	
-	if ( debuggerConfigurationPropertyGrid != NULL && runInfo.getCurrentDebugState() ) {
+	if ( debuggerConfigurationPropertyGrid != NULL && THE_CONTEXT->processingInfo->getCurrentDebugState() ) {
 		switch ( p ) {
-			case FileParserRunInfo::RP_Preprocesser:
+			case CncProcessingInfo::RP_Preprocesser:
 				if ( debugControls.config.shouldDebugPreprocessing() == false )
 					return;
 					
-				debugControls.currentPage = debuggerConfigurationPropertyGrid->AddPage(runInfo.getCurrentDebugPhaseAsString(), 
+				debugControls.currentPage = debuggerConfigurationPropertyGrid->AddPage(THE_CONTEXT->processingInfo->getCurrentDebugPhaseAsString(), 
 				                                                                       ImageLibDebugger().Bitmap("BMP_DB_PREPROCESSING"));
 				break;
 				
-			case FileParserRunInfo::RP_Spool:
+			case CncProcessingInfo::RP_Spool:
 				if ( debugControls.config.shouldDebugSpooling() == false )
 					return;
 					
-				debugControls.currentPage = debuggerConfigurationPropertyGrid->AddPage(runInfo.getCurrentDebugPhaseAsString(),
+				debugControls.currentPage = debuggerConfigurationPropertyGrid->AddPage(THE_CONTEXT->processingInfo->getCurrentDebugPhaseAsString(),
 				                                                                       ImageLibDebugger().Bitmap("BMP_DB_SPOOLING"));
 				break;
 				
@@ -446,44 +443,38 @@ void FileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
 		
 		// create the main category for the new page
 		wxString name(wxString::Format("%d", debugControls.propCount++));
-		debugControls.currentMainCategory = new wxPropertyCategory(runInfo.getCurrentDebugPhaseAsString(), name);
+		debugControls.currentMainCategory = new wxPropertyCategory(THE_CONTEXT->processingInfo->getCurrentDebugPhaseAsString(), name);
 		debugControls.currentMainCategory->SetExpanded(true);
 		debugControls.currentPage->Append(debugControls.currentMainCategory);
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
-bool FileParser::togglePause() {
-////////////////////////////////////////////////////////////////////////////
-	runInfo.setPauseFlag(!runInfo.getPauseFlag());
-	return runInfo.getPauseFlag();
-}
-////////////////////////////////////////////////////////////////////////////
 void FileParser::debugNextBreakPoint() {
 ////////////////////////////////////////////////////////////////////////////
-	if ( runInfo.getCurrentDebugState() == true ) {
-		runInfo.setStepByStepFlag(false);
-		runInfo.resetLastLineNumber();
+	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
+		THE_CONTEXT->processingInfo->setStepByStepFlag(false);
+		THE_CONTEXT->processingInfo->resetLastLineNumber();
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
 void FileParser::debugNextStep() {
 ////////////////////////////////////////////////////////////////////////////
-	if ( runInfo.getCurrentDebugState() == true ) {
-		runInfo.setStepByStepFlag(true);
-		runInfo.resetLastLineNumber();
+	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
+		THE_CONTEXT->processingInfo->setStepByStepFlag(true);
+		THE_CONTEXT->processingInfo->resetLastLineNumber();
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
 void FileParser::debugStop() {
 ////////////////////////////////////////////////////////////////////////////
-	runInfo.setCurrentDebugState(false);
-	runInfo.setStopFlag(true);
+	THE_CONTEXT->processingInfo->setCurrentDebugState(false);
+	THE_CONTEXT->processingInfo->setStopFlag(true);
 	broadcastDebugState(false);
 }
 ////////////////////////////////////////////////////////////////////////////
 void FileParser::debugFinish() {
 ////////////////////////////////////////////////////////////////////////////
-	runInfo.setCurrentDebugState(false);
+	THE_CONTEXT->processingInfo->setCurrentDebugState(false);
 	broadcastDebugState(false);
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -497,46 +488,24 @@ void FileParser::selectSourceControl(unsigned long ln) {
 //////////////////////////////////////////////////////////////////
 bool FileParser::evaluateProcessingState() {
 //////////////////////////////////////////////////////////////////
-	if ( isInterrupted() == true )
-		return false;
-		
-	if ( runInfo.getStopFlag() == true )
-		return false;
-		
-	// pause handling
-	while ( runInfo.getPauseFlag() == true ) {
-		THE_APP->dispatchAll();
-		
-		if ( isInterrupted() == true ) {
-			runInfo.setPauseFlag(false);
-			return false;
-		}
-			
-		if ( runInfo.getStopFlag() == true ) {
-			runInfo.setPauseFlag(false);
-			return false;
-		}
-		
-		CncTimeFunctions::sleepMilliseconds(25);
-	}
-	
-	return true;
+	return THE_APP->evaluateAndPerformProcessingState();
 }
 ////////////////////////////////////////////////////////////////////////////
 bool FileParser::evaluateDebugState(bool force) {
 ////////////////////////////////////////////////////////////////////////////
 	// check abort condition
-	if ( isInterrupted() == true )
+	if ( THE_APP->isInterrupted() == true )
 		return false;
 		
 	// check abort condition
-	if ( runInfo.getStopFlag() == true )
+	if ( THE_CONTEXT->processingInfo->getStopFlag() == true )
 		return false;
 		
-	// is debugging activated
-	if ( runInfo.getCurrentDebugState() == false )
+	// is debugging deactivated?
+	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == false )
 		return true;
 		
+	// ---------------------------------------------------------------------
 	// debug handling - first update gui controls
 		
 	// select the current line number among hasLineABreakpoint()  
@@ -550,7 +519,7 @@ bool FileParser::evaluateDebugState(bool force) {
 	// ensure curent debug node is visible
 	wxPGProperty* p = debugControls.currentNode;
 	if ( p != NULL ) {
-		// if debugControls.currentNode has childreen select a little bit forward
+		// if debugControls.currentNode has children select a little bit forward
 		switch ( p->GetChildCount() ) {
 			case 0: 	break; // nothing to do - debugControls.currentNode will be selected
 			case 1:
@@ -565,36 +534,46 @@ bool FileParser::evaluateDebugState(bool force) {
 		debuggerConfigurationPropertyGrid->SelectProperty(debugControls.currentNode, true);
 	}
 
+	// ---------------------------------------------------------------------
 	// debug handling - wait for user events - on demand
+	auto checkBreakpoint = [&]() 
+	{
+		if ( THE_CONTEXT->processingInfo->getStepByStepFlag() == true )
+			return true;
+			
+		return hasLineABreakpoint(currentLineNumber - 1);
+	};
 
 	// loop while next debug step should be appear (user event)
-	while ( checkBreakpoint() == true ) {
-		waitingForUserEvents = true;
-		
+	bool ret = true;
+	while ( checkBreakpoint() == true )
+	{
+		THE_CONTEXT->processingInfo->setWaitingForUserEvents(true);
 		THE_APP->dispatchAll();
 		
-		if ( isInterrupted() == true ) {
-			waitingForUserEvents = false;
-			return false;
+		if ( THE_APP->isInterrupted() == true )
+		{
+			ret = false;
+			break;
 		}
-			
-		if ( runInfo.getStopFlag() == true ) {
-			waitingForUserEvents = false;
-			return false;
+		
+		if ( THE_CONTEXT->processingInfo->getStopFlag() == true )
+		{
+			ret = false;
+			break;
 		}
-			
-		if ( runInfo.getCurrentDebugState() == false )
+		
+		if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == false )
 			break;
 			
-		if ( runInfo.isLastLineNumberDefined() == false )
+		if ( THE_CONTEXT->processingInfo->isLastLineNumberDefined() == false )
 			break;
 			
 		CncTimeFunctions::sleepMilliseconds(25);
 	}
 	
-	waitingForUserEvents = false;
-	
-	return true;
+	THE_CONTEXT->processingInfo->setWaitingForUserEvents(false);
+	return ret;
 }
 
 

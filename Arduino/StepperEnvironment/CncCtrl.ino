@@ -139,7 +139,7 @@ CncArduinoController::CncArduinoController()
 , podestHardwareState           (OFF)
 , posReplyState                 (OFF)
 , probeMode                     (OFF)
-, pause                         (OFF)
+, pauseState                    (PAUSE_INACTIVE)
 , I2CAvailable                  (false)
 , cfgF1000_MMSEC                (0)
 , cmsF1000_MMMin                (0)
@@ -873,17 +873,17 @@ bool CncArduinoController::processSignal(byte sig, byte& retValue) {
                 return false; 
 
     case SIG_UPDATE:
-                // remove the signal from serial
+                // retValue will be determined as reference of processSignalUpdate()
                 return processSignalUpdate(retValue);
 
     case SIG_PAUSE:
-                pause = PAUSE_ACTIVE;
+                pauseState = PAUSE_ACTIVE;
                 
                 // Don't return here - see the pause handling below
                 break;
 
     case SIG_RESUME:
-                pause = PAUSE_INACTIVE;
+                pauseState = PAUSE_INACTIVE;
 
                 // Don't return here - see the pause handling below
                 break;
@@ -892,26 +892,62 @@ bool CncArduinoController::processSignal(byte sig, byte& retValue) {
 
   // ----------------------------------------------------------
   // pause handling
-  if ( pause == PAUSE_ACTIVE ) {
+  #warning pause handling
+  if ( false )
+  {
+    // --------------------------------------------------------
+    auto checkSerialForPauseCommands = [&](bool currentPauseState)
+    {
+      bool ret = currentPauseState;
+    
+      const int availableByteCount = Serial.available();
+      if ( availableByteCount > 0 ) {
+    
+        const byte b = Serial.peek();
+        switch ( b ) 
+        {
+          case 'p': ret = PAUSE_INACTIVE; 
+                    // remove the cmd for serial
+                    Serial.read(); 
+                    break;
+                    
+          case 'P': ret = PAUSE_ACTIVE;
+                    // remove the cmd for serial
+                    Serial.read();  
+                    break;
+    
+          default:  ret = PAUSE_INACTIVE; 
+                    SPRINTF_DEBUG_STRING("XXX: %d, %d", (int)b, availableByteCount)
+        }
+      }
+    
+      return ret;
+    };
 
-     static const short PAUSE_WAIT_DELAY = 50;
-     static const short HB_MOD           = 1000 / PAUSE_WAIT_DELAY;
-     
-     switchSpindleState( pause == PAUSE_ACTIVE ? SPINDLE_STATE_OFF : SPINDLE_STATE_ON, FORCE);
-
-     // loop
-     unsigned short counter = 0;
-     while ( ArduinoMainLoop::checkSerialForPauseCommands(pause) == PAUSE_ACTIVE ) {
-         
-      if ( counter%HB_MOD == 0 )
-        processHeartbeat();
-        
-      AE::delay(PAUSE_WAIT_DELAY);
-      counter ++;
-     }
-     
-     pause = PAUSE_INACTIVE;
-     switchSpindleState( pause == PAUSE_ACTIVE ? SPINDLE_STATE_OFF : SPINDLE_STATE_ON, FORCE);
+    // --------------------------------------------------------
+    if ( pauseState == PAUSE_ACTIVE ) 
+    {
+  
+       static const short PAUSE_WAIT_DELAY = 50;
+       static const short HB_MOD           = 1000 / PAUSE_WAIT_DELAY;
+       
+       switchSpindleState( pauseState == PAUSE_ACTIVE ? SPINDLE_STATE_OFF : SPINDLE_STATE_ON, FORCE);
+  
+       // loop
+       unsigned short counter = 0;
+       while ( checkSerialForPauseCommands(pauseState) == PAUSE_ACTIVE )
+       {
+           
+        if ( counter%HB_MOD == 0 )
+          processHeartbeat();
+          
+        AE::delay(PAUSE_WAIT_DELAY);
+        counter ++;
+       }
+       
+       pauseState = PAUSE_INACTIVE;
+       switchSpindleState( pauseState == PAUSE_ACTIVE ? SPINDLE_STATE_OFF : SPINDLE_STATE_ON, FORCE);
+    }
   }
   
   retValue = RET_OK;

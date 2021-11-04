@@ -365,7 +365,7 @@ void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 	cwp.setCurrentLineNumber(getCurrentLineNumber());
 	
 	// ----------------------------------------------------------
-	if ( runInfo.getCurrentDebugState() == true ) {
+	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
 		wxString content;
 		debugXMLAttribute(attr, content);
 		appendDebugValueBase("Attributes", content);
@@ -414,10 +414,10 @@ void SVGFileParser::clearControls() {
 	svgUserAgent.clearControls();
 }
 //////////////////////////////////////////////////////////////////
-void SVGFileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
+void SVGFileParser::initNextRunPhase(CncProcessingInfo::RunPhase p) {
 //////////////////////////////////////////////////////////////////
 	FileParser::initNextRunPhase(p);
-	getPathHandler()->setDebugState(runInfo.getCurrentDebugState());
+	getPathHandler()->setDebugState(THE_CONTEXT->processingInfo->getCurrentDebugState());
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::spool() {
@@ -461,7 +461,7 @@ bool SVGFileParser::spool() {
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(uai.nodeName);
 		
-		if ( runInfo.getCurrentDebugState() == true ) {
+		if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
 			registerNextDebugNode(uai.nodeName);
 			
 			DcmItemList dil;
@@ -476,7 +476,7 @@ bool SVGFileParser::spool() {
 		if ( performPath(uai) == false ) {
 			
 			// in this case to stop here is valid
-			if ( runInfo.getStopFlag() == true )
+			if ( THE_CONTEXT->processingInfo->getStopFlag() == true )
 				return true;
 				
 			std::cerr	<< CNC_LOG_FUNCT << ": Failed" 

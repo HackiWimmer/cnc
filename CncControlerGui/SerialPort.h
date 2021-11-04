@@ -28,33 +28,6 @@ class CncControl;
 class CncPathListManager;
 
 //------------------------------------------------------------
-class SerialCommandLocker {
-	
-	private:
-		static unsigned char lockedCommand;
-		
-		bool locking;
-		unsigned char command;
-		
-	public:
-		SerialCommandLocker(unsigned char cmd) 
-		: locking(false)
-		, command(cmd)
-		{}
-		
-		~SerialCommandLocker() {
-			if ( locking == true )
-				lockedCommand = CMD_INVALID;
-		}
-		
-		bool lock(CncControl* cnc);
-		unsigned char getCommand() const { return command; }
-		
-		static unsigned char getLockedCommand() { return lockedCommand; }
-		static bool isCommandActive()			{ return lockedCommand != CMD_INVALID; }
-};
-
-//------------------------------------------------------------
 struct LastSerialResult {
 	unsigned char cmd 		= CMD_INVALID;
 	unsigned char ret		= RET_NULL;
@@ -240,6 +213,8 @@ class Serial {
 		CncNanoTimestamp tsMeasurementRef;
 		CncNanoTimestamp tsMeasurementLast;
 		
+		bool flagPrependPause;
+		
 		void clearReadBuffer();
 		
 		bool writeDataAndForget(unsigned char cmd);
@@ -357,6 +332,9 @@ class Serial {
 		
 		virtual bool writeMoveSequenceRawCallback(unsigned char* buffer, unsigned int nbByte) { return true; }
 		
+		void serialCommandLockCallback();
+		void serialCommandUnlockCallback();
+		
 		friend class SerialCommandLocker;
 		
 	public:
@@ -400,12 +378,11 @@ class Serial {
 		
 		const LastSerialResult& getLastFetchResult() { return lastFetchResult; }
 		
-		// return the current command flag
-		bool isCommandActive() 		{ return SerialCommandLocker::isCommandActive(); }
-		bool isPopSerialActive()	{ return SerialCommandLocker::getLockedCommand() == CMD_POP_SERIAL; }
-		bool isIdleActive()			{ return SerialCommandLocker::getLockedCommand() == CMD_IDLE; }
+		bool isCommandActive();
+		bool isPopSerialActive();
+		bool isIdleActive();
 		
-		// port writting
+		// port writing
 		bool popSerial();
 		bool processIdle();
 		
@@ -441,10 +418,11 @@ class Serial {
 		
 		bool sendInterrupt()		{ return sendSignal(SIG_INTERRUPPT);     }
 		bool sendHalt()				{ return sendSignal(SIG_HALT);           }
-		bool sendPause()			{ return sendSignal(SIG_PAUSE);          }
-		bool sendResume()			{ return sendSignal(SIG_RESUME);         }
 		bool sendQuitMove()			{ return sendSignal(SIG_QUIT_MOVE);      }
 		bool sendSoftwareReset()	{ return sendSignal(SIG_SOFTWARE_RESET); }
+		
+		bool sendPause();
+		bool sendResume();
 		
 		// trigger
 		virtual void processTrigger(const Trigger::BeginRun& tr)	{}
@@ -476,6 +454,41 @@ class Serial {
 
 		// test behavior only
 		virtual bool test();
+};
+
+//------------------------------------------------------------
+class SerialCommandLocker {
+	
+	private:
+		static unsigned char lockedCommand;
+		
+		Serial*			parent;
+		bool			locking;
+		unsigned char	command;
+		
+	public:
+		SerialCommandLocker(Serial* p, unsigned char cmd) 
+		: parent	(p)
+		, locking	(false)
+		, command	(cmd)
+		{
+			wxASSERT(parent);
+		}
+		
+		~SerialCommandLocker() 
+		{
+			if ( locking == true )
+			{
+				lockedCommand = CMD_INVALID;
+				parent->serialCommandUnlockCallback();
+			}
+		}
+		
+		bool lock(CncControl* cnc);
+		unsigned char getCommand() const { return command; }
+		
+		static unsigned char getLockedCommand() { return lockedCommand; }
+		static bool isCommandActive()			{ return lockedCommand != CMD_INVALID; }
 };
 
 #endif // SERIALCLASS_H_INCLUDED

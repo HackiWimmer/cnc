@@ -176,10 +176,10 @@ void CncReferencePosition::onSetCtrlFocus(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::hitKey(int keyCode, int modifier) {
 ///////////////////////////////////////////////////////////////////
+	#warning Is this longer necessary ? (Nov 2021)
+	/*
 	wxWindow* focusWnd = wxWindow::FindFocus();
 	
-	#warning
-	/*
 	wxUIActionSimulator uai;
 	// Special redirect for this control to keep the default wxTextControl 
 	// handling for cursor left and right 

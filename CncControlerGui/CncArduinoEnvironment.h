@@ -30,21 +30,23 @@ class CncArduinoEnvironment : public CncArduinoEnvironmentBase {
 		
 		void shutdownTimer();
 		
+		void stretchSize(bool small=true);
+		
 		void activateOnClose(bool state) { canClose = state; }
 		
 	protected:
+		virtual void onStretchToExpandedSize(wxCommandEvent& event);
+		virtual void onStretchToSmallSize(wxCommandEvent& event);
 		virtual void onPowerButton(wxCommandEvent& event);
 		virtual void onValuesUpdateInterval(wxScrollEvent& event);
 		virtual void onLoggerUpdateInterval(wxScrollEvent& event);
 		virtual void onSortPins(wxCommandEvent& event);
 		virtual void onConfigChanged(wxPropertyGridEvent& event);
 		virtual void onConfigChanging(wxPropertyGridEvent& event);
-		virtual void onSelectConfiguration(wxCommandEvent& event);
 		virtual void onShow(wxShowEvent& event);
 		virtual void onEmergencyButton(wxCommandEvent& event);
 		virtual void onClearTrace(wxCommandEvent& event);
 		virtual void onForceUpdate(wxCommandEvent& event);
-		virtual void onSelectArduinoPeriphery(wxCommandEvent& event);
 		virtual void onClose(wxCloseEvent& event);
 		virtual void onStartupTimer(wxTimerEvent& event);
 		virtual void onContinuousTimer(wxTimerEvent& event);

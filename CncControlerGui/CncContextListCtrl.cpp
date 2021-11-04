@@ -127,6 +127,9 @@ wxString CncContextListCtrl::OnGetItemText(long item, long column) const {
 	else if ( index++ == item ) return eval(column, "Serial.CanSpeedMonitoring",						formatBool		(THE_CONTEXT->canSpeedMonitoring()));
 	else if ( index++ == item ) return eval(column, "Serial.HasHardware",								formatBool		(THE_CONTEXT->hasHardware()));
 	
+	else if ( index++ == item ) return eval(column, "Processing.isPause",								formatBool		(THE_CONTEXT->isPause()));
+	else if ( index++ == item ) return eval(column, "Processing.isProcessing",							formatBool		(THE_CONTEXT->isProcessing()));
+	
 	// ....
 	
 	wxASSERT ( index < MAX_ITEM_COUNT );

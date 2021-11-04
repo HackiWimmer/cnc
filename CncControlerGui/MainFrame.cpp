@@ -194,9 +194,7 @@ CncTransactionLockBase::~CncTransactionLockBase() {
 	if ( referenceCounter > 0 )
 		referenceCounter--;
 	
-	const bool b = parent->cnc != NULL ? parent->cnc->isInterrupted() == false : false;
-		
-	if ( b ) 
+	if ( parent->isInterrupted() == false ) 
 		parent->m_serialTimer->Start();
 }
 ////////////////////////////////////////////////////////////////////
@@ -453,14 +451,19 @@ MainFrameBase::~MainFrameBase() {
 ///////////////////////////////////////////////////////////////////
 	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Entry . . .")
 	
+	// housekeeping
+	CncFileNameService::sessionHousekeeping();
+	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("after Session Housekeeping . . .")
+
 	GlobalStreamRedirectionReset();
+	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("after Stream Redirection . . .")
 	
 	// beautifying only
 	logger->GetParent()->SetBackgroundColour(*wxBLACK);
 	
 	//Unbinding
 	tmpTraceInfo->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBase::traceTextUpdated), NULL, this);
-
+	
 	// clear
 	cncDELETE( controllerMsgHistory );
 	cncDELETE( tmpTraceInfo );
@@ -469,10 +472,6 @@ MainFrameBase::~MainFrameBase() {
 	cncDELETE( logger );
 	
 	THE_FRAME = NULL;
-	
-	//hosuekeeping
-	CncFileNameService::sessionHousekeeping();
-	CncFileNameService::sessionHousekeeping();
 	
 	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Finalized . . .")
 }
@@ -711,7 +710,7 @@ MainFrame::~MainFrame() {
 	cncDELETE( config );
 	
 	DeletePendingEvents();
-
+	
 	// log exit dtor
 	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Finalized . . .")
 }
@@ -1996,7 +1995,7 @@ void MainFrame::onSerialThreadInitialized(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onSerialThreadCompletion(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	std::cout << CNC_LOG_LOCATION << std::endl;
+	std::clog << CNC_LOG_FUNCT << std::endl;
 	serialThread = NULL;
 }
 ///////////////////////////////////////////////////////////////////
@@ -2086,6 +2085,7 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		{
 			wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 			cnc->sendHalt();
+			cnc->reset();
 			cnc->disconnect();
 			
 			// this will crash if a run  or debug is active
@@ -2194,7 +2194,7 @@ void MainFrame::dispatchAll() {
 	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
 	if ( evtLoop == NULL )
 		return;
-		
+	
 	/*
 	Please note: This is the fastest version, but evtLoop->Yield() is better then the code below, 
 	it also considers timer events, aui-handling etc.
@@ -2218,17 +2218,14 @@ void MainFrame::dispatchAll() {
 	//if ( wxTheApp->HasPendingEvents() )
 		//wxTheApp->ProcessPendingEvents();
 	
-	
-	
-	
 	/*
 	while ( evtLoop->Pending() ) {
 		evtLoop->Dispatch();
 	}
 	*/
 	
+	// Since wxWidgets 3.1.x: This is the best compromise 
 	//wxTheApp->Yield();
-	
 	wxTheApp->SafeYield(this, true);
 	
 }
@@ -2247,6 +2244,14 @@ void MainFrame::handleCommonException() {
 		
 	if ( usbConnectionObserver->IsShown() ) 
 		usbConnectionObserver->EndModal(wxID_NO);
+		
+	// to get the full gui control again
+	enableRunControls(true);
+	
+	// go silent again
+	CncSpindleSound::stop();
+	
+	THE_CONTEXT->resetProcessing();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::handleCncInterruptException(const CncInterruption& ex) {
@@ -3177,10 +3182,10 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	if ( inboundFileParser != NULL )
 		inboundFileParser->changePathListRunnerInterface(sel);
 	
-	const bool sound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() && setup.speedMonitor == true );
-	CncSpindleSound::activate(sound);
+	const bool withSound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() );
+	CncSpindleSound::activate(withSound);
 	
-	// config setup
+	// configuration setup
 	serialFileName.assign(setup.serialFileName);
 	THE_CONTEXT->setInteractiveMoveingMode(setup.interactiveMoving);
 	THE_CONTEXT->setProbeMode(setup.probeMode);
@@ -4786,14 +4791,16 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processTemplateWrapper(bool confirm) {
 ///////////////////////////////////////////////////////////////////
-	try {
+	try 
+	{
 		wxASSERT(cnc);
-		if ( cnc->isInterrupted() == true ) {
-			std::cerr << "MainFrame::processTemplateWrapper(): Run aborted - Interrupt detected!" << std::endl;
+		if ( isInterrupted() == true )
+		{
+			CNC_CERR_FUNCT_A(": Run aborted - Interrupt detected!")
 			return false;
 		}
 		
-		bool ret = true;
+		THE_CONTEXT->resetProcessing();
 		
 		serialSpyPanel->clearSerialSpyBeforNextRun();
 		
@@ -4825,12 +4832,14 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		const CncTemplateFormat tf = getCurrentTemplateFormat();
 		const wxString fn (getCurrentTemplatePathFileName());
 		
-		if ( tf != TplManual && tf != TplTest ) {
-			if ( fn.IsEmpty() == true ) {
+		if ( tf != TplManual && tf != TplTest )
+		{
+			if ( fn.IsEmpty() == true )
+			{
 				notification.location	= MainFrame::Notification::Location::NL_MonitorView;
 				notification.type		= 'W';
 				notification.title		= "Run Template";
-				notification.message	= "Not template loaded . . . ";
+				notification.message	= "No template loaded . . . ";
 				displayNotification(notification);
 				return false;
 			}
@@ -4854,15 +4863,19 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		decorateOutboundSaveControls(false);
 		cncPreprocessor->clearAll();
 		
-		if ( cnc->isReadyToRun() == false ) {
-			std::cerr << "MainFrame::processTemplateWrapper: Controller isn't ready to run: Run was rejected!" << std::endl;
+		bool ret = true;
+		
+		if ( cnc->isReadyToRun() == false ) 
+		{
+			CNC_CERR_FUNCT_A(": Controller isn't ready to run: Run was rejected!")
 			ret = false;
 		}
 		
 		if ( ret == true )
 			ret = checkIfRunCanBeProcessed(confirm);
 			
-		if ( ret == true ) {
+		if ( ret == true )
+		{
 			// This instance starts and stops the speed monitor
 			CncSpeedMonitorRunner smr(speedMonitor);
 			ret = processTemplateIntern();
@@ -4871,23 +4884,25 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			motionMonitor->updateMonitorAndOptions();
 			statisticsPane->updateReplayPane();
 		}
-		else {
-			std::cerr << "MainFrame::processTemplateWrapper(): checkIfRunCanBeProcessed() failed" << std::endl;
+		else
+		{
+			CNC_CERR_FUNCT_A(": checkIfRunCanBeProcessed() failed")
 		}
 		
 		// prepare final statements
 		const wxString probeMode(THE_CONTEXT->isProbeMode() ? "ON" :"OFF");
 		
-		if ( ret == false) {
+		if ( ret == false)
+		{
 			wxString hint("not successfully");
-			cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
+			CNC_CEX1_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint))
 			lock.setErrorMode();
 			
 			THE_TPL_CTX->resetValidRuns();
 		} 
-		else {
-			std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
-			
+		else
+		{
+			CNC_CLOG_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode))
 			THE_TPL_CTX->registerValidRun();
 		}
 		
@@ -4896,12 +4911,16 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		bounds.setMaxBound(cnc->getMaxPositionsMetric());
 		THE_TPL_CTX->registerBounderies(bounds);
 		
-		if ( inboundFileParser ) {
+		if ( inboundFileParser )
+		{
 			const Trigger::EndRun endRun(ret);
 			inboundFileParser->deligateTrigger(endRun);
 		}
 		
 		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
+		
+		// go silent again - in all cases
+		CncSpindleSound::stop();
 		
 		return ret;
 	}
@@ -4916,7 +4935,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		handleUnhandledException(CNC_LOG_FUNCT);
 	}
 	
-	enableControls();
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -4997,7 +5015,7 @@ bool MainFrame::processTemplateIntern() {
 	
 	// Check positions
 	if ( cnc->validateAppAgainstCtlPosition() == false ) {
-		if ( cnc->isInterrupted() == false ) {
+		if ( isInterrupted() == false ) {
 			std::cerr << "Validate positions failed" << std::endl;
 			std::cerr << "PC pos        : " << cnc->getCurAppPos() << std::endl;
 			std::cerr << "Controller pos: " << cnc->requestControllerPos() << std::endl;
@@ -5009,7 +5027,7 @@ bool MainFrame::processTemplateIntern() {
 	}
 	
 	if ( cnc->getPositionOutOfRangeFlag() == true ) {
-		//if ( cnc->isInterrupted() == false ) {
+		//if ( isInterrupted() == false ) {
 			std::cerr << "Out of range: During the last run the position limits were exceeded." << std::endl;
 			CncLongPosition::Watermarks wm = cnc->getWaterMarks();
 			CncLongPosition min(wm.xMin, wm.yMin, wm.zMin);
@@ -5195,7 +5213,7 @@ void MainFrame::navigateX(CncDirection d) {
 		default: ;
 	}
 
-	if ( cnc->isInterrupted() ) {
+	if ( isInterrupted() ) {
 		std::cerr << "CNC controller is interrupted, nothing will be done."<< std::endl;
 		return;
 	}
@@ -5224,7 +5242,7 @@ void MainFrame::navigateY(CncDirection d) {
 		default: ;
 	}
 	
-	if ( cnc->isInterrupted() ) {
+	if ( isInterrupted() ) {
 		std::cerr << "CNC controller is interrupted, nothing will be done."<< std::endl;
 		return;
 	}
@@ -5253,7 +5271,7 @@ void MainFrame::navigateZ(CncDirection d) {
 		default: ;
 	}
 
-	if ( cnc->isInterrupted() ) {
+	if ( isInterrupted() ) {
 		std::cerr << "CNC controller is interrupted, nothing will be done."<< std::endl;
 		return;
 	}
@@ -6763,15 +6781,15 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcPause() {
 ///////////////////////////////////////////////////////////////////
-	if ( isPause() )	cnc->sendResume();
-	else				cnc->sendPause();
-	
-	if ( inboundFileParser != NULL ) {
-		inboundFileParser->togglePause();
-		enableRunControls(inboundFileParser->isPause());
-	}
+	// first update the state context
+	THE_CONTEXT->togglePause();
+	enableRunControls(THE_CONTEXT->isPause());
 	
 	decorateRunButton();
+	
+	// last perform the pause state through the serial 
+	if ( isPause() )	cnc->sendResume();
+	else				cnc->sendPause();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcPause(wxCommandEvent& event) {
@@ -7267,14 +7285,13 @@ void MainFrame::onDebugUserNotificationTimer(wxTimerEvent& event) {
 	const wxColour c1(227, 227, 227);
 	const wxColour c2(255, 201, 14);
 	
-	if ( inboundFileParser ) {
-		if ( inboundFileParser->isWaitingForUserEvents() == false ) {
-			if ( m_rcNextBreakpoint->GetBackgroundColour() != c1 )	m_rcNextBreakpoint->SetBackgroundColour(c1);
-			if ( m_rcNextStep->GetBackgroundColour() != c1 )		m_rcNextStep->SetBackgroundColour(c1);
-			if ( m_rcFinish->GetBackgroundColour() != c1 )			m_rcFinish->SetBackgroundColour(c1);
-			
-			return;
-		}
+	if ( THE_CONTEXT->processingInfo->isWaitingForUserEvents() == true )
+	{
+		if ( m_rcNextBreakpoint->GetBackgroundColour() != c1 )	m_rcNextBreakpoint->SetBackgroundColour(c1);
+		if ( m_rcNextStep->GetBackgroundColour() != c1 )		m_rcNextStep->SetBackgroundColour(c1);
+		if ( m_rcFinish->GetBackgroundColour() != c1 )			m_rcFinish->SetBackgroundColour(c1);
+		
+		return;
 	}
 	
 	if ( m_rcNextBreakpoint->GetBackgroundColour() == c1 )	m_rcNextBreakpoint->SetBackgroundColour(c2);
@@ -8420,9 +8437,16 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 	typedef IndividualCommandEvent::ValueName 		VN;
 	
 	//---------------------------------------------------------------
-	auto showArduinoEnv = [&](bool state) {
+	auto showArduinoEnv = [&](bool state)
+	{
 		if ( cncArduinoEnvironment && cncArduinoEnvironment->IsShownOnScreen() == !state )
 			cncArduinoEnvironment->Show(state);
+			
+		if ( state == true )
+		{
+			if ( cncArduinoEnvironment->IsIconized() )
+				cncArduinoEnvironment->Restore();
+		}
 	};
 	
 	//---------------------------------------------------------------
@@ -9182,7 +9206,53 @@ void MainFrame::motionMonitorRotateZ(float angle) {
 /////////////////////////////////////////////////////////////////////
 	motionMonitor->setAngleZ(angle);
 }
-
+/////////////////////////////////////////////////////////////////////
+bool MainFrame::evaluateAndPerformProcessingState() {
+/////////////////////////////////////////////////////////////////////
+	if ( isInterrupted() == true )
+		return false;
+		
+	if ( THE_CONTEXT->processingInfo->getStopFlag() == true )
+		return false;
+		
+	// pause handling
+	CncLongPosition curStartingPos(cnc->getCurCtlPos());
+	
+	if (THE_CONTEXT->processingInfo->isPause() ) 
+	{
+		// pause
+		const bool prevSpindleState = cnc->getSpindleState();
+		cnc->moveZToTop();
+		cnc->switchSpindleOff(true);
+		
+		while ( THE_CONTEXT->processingInfo->isPause() == true )
+		{
+			dispatchAll();
+			motionMonitor->update();
+			
+			if ( isInterrupted() == true )
+			{
+				THE_CONTEXT->processingInfo->setPauseFlag(false);
+				return false;
+			}
+				
+			if ( THE_CONTEXT->processingInfo->getStopFlag() == true ) {
+				THE_CONTEXT->processingInfo->setPauseFlag(false);
+				return false;
+			}
+			
+			CncTimeFunctions::sleepMilliseconds(25);
+		}
+	
+		// resume
+		if ( prevSpindleState == true )
+			cnc->switchSpindleOn();
+			
+		cnc->moveToPos(curStartingPos);
+	}
+	
+	return true;
+}
 
 
 /////////////////////////////////////////////////////////////////////

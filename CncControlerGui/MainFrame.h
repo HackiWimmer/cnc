@@ -174,7 +174,6 @@ class MainFrameBase : public MainFrameBClass {
 		CncLoggerView*				getLoggerView()			{ return loggerView; }
 		CncTraceProxy* 				getTrace() 				{ return tmpTraceInfo; }
 		CncMsgHistoryLoggerProxy*	getCtrlMessageHistory() { return controllerMsgHistory; }
-		
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -601,6 +600,12 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void motionMonitorRotateY(float angle);
 		void motionMonitorRotateZ(float angle);
 		
+		bool isPause()						{ return THE_CONTEXT->isPause(); }
+		bool isProcessing() 				{ return THE_CONTEXT->isProcessing(); }
+		bool isInterrupted()				{ return ( cnc ? cnc->isInterrupted() : false); }
+		
+		bool evaluateAndPerformProcessingState();
+		
 	protected:
 	
 		void tryToSelectClientId(long clientId, ClientIdSelSource::ID tss);
@@ -722,6 +727,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncArduinoEnvironment;
 		friend class CncPodestMgmtMovement;
 		friend class CncSecureManuallyMovePanel;
+		
+		friend class CncPathListRunner;
 
 		// to remove . . .
 			friend class CncFileView;
@@ -931,9 +938,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void logTimeConsumed();
 		
 		void determineRunMode();
-		
-		bool isPause()				{ return inboundFileParser != NULL ? inboundFileParser->isPause()            : false; }
-		bool isProcessing() 		{ return inboundFileParser != NULL ? inboundFileParser->isProcessing()       : false; }
 		
 		void startDebugUserNotification();
 		void stopDebugUserNotification();

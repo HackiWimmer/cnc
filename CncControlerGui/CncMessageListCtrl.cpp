@@ -3,6 +3,7 @@
 #include "wxCrafterImages.h"
 #include "CncArduino.h"
 #include "CncCommon.h"
+#include "CncAutoFreezer.h"
 #include "GlobalFunctions.h"
 #include "CncMessageListCtrl.h"
 
@@ -101,6 +102,7 @@ void CncMessageListCtrl::appendMessage(const char type, const wxString& message,
 	{
 		SetItemCount(messages.size());
 		ensureVisible((long)(messages.size() - 1));
+		Refresh();
 	}
 }
 /////////////////////////////////////////////////////////////
@@ -161,7 +163,6 @@ void CncMessageListCtrl::onSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	event.Skip();
 	updateColumnWidth();
-	Refresh();
 }
 /////////////////////////////////////////////////////////////////////
 void CncMessageListCtrl::updateColumnWidth() {
@@ -170,24 +171,24 @@ void CncMessageListCtrl::updateColumnWidth() {
 		return;
 		
 	// avoid flicker
-	GblFunc::freeze(this, true);
+	const bool b = IsShownOnScreen() && IsFrozen() == false;
+	//CncAutoFreezer caf( b ? this : NULL);
+	{
+		int colWidthSum = 0;
+		for ( int i = 0; i < GetColumnCount(); i++ ) {
+			if ( i == COL_STRECH )
+				continue;
+				
+			colWidthSum += GetColumnWidth(i);
+		}
 		
-	int colWidthSum = 0;
-	for ( int i = 0; i < GetColumnCount(); i++ ) {
-		if ( i == COL_STRECH )
-			continue;
-			
-		colWidthSum += GetColumnWidth(i);
+		const int scrollbarWidth = 26;
+		int size = GetSize().GetWidth() 
+				 - colWidthSum
+				 - scrollbarWidth;
+				 
+		SetColumnWidth(COL_STRECH, size);
 	}
-	
-	const int scrollbarWidth = 26;
-	int size = GetSize().GetWidth() 
-	         - colWidthSum
-			 - scrollbarWidth;
-			 
-	SetColumnWidth(COL_STRECH, size);
-
-	GblFunc::freeze(this, false);
 }
 /////////////////////////////////////////////////////////////////////
 bool CncMessageListCtrl::setUpdateInterval(int value) {
@@ -211,4 +212,5 @@ void CncMessageListCtrl::onDisplayTimer(wxTimerEvent& event) {
 	
 	SetItemCount(messages.size());
 	ensureVisible((long)(messages.size() - 1));
+	Refresh();
 }

@@ -146,7 +146,7 @@ CncOpenGLContextObserverHistoryListCtrl::CncOpenGLContextObserverHistoryListCtrl
 /////////////////////////////////////////////////////////////
 CncOpenGLContextObserverHistoryListCtrl::~CncOpenGLContextObserverHistoryListCtrl() {
 /////////////////////////////////////////////////////////////
-	delete popupMenu;
+	wxDELETE(popupMenu);
 }
 /////////////////////////////////////////////////////////////
 void CncOpenGLContextObserverHistoryListCtrl::onRightDown(wxMouseEvent& event) {

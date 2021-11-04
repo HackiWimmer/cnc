@@ -627,6 +627,11 @@ void CncSecureCtrlPanel::onOpenTemplateSec(wxCommandEvent& event) {
 	THE_APP->openTemplate(event);
 }
 /////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onAppEnvironmentSec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->showOSEnvironment(event);
+}
+/////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onSessionDirSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	THE_APP->openSessionDialog(event);
@@ -770,4 +775,5 @@ void CncSecureCtrlPanel::activate(bool b) {
 	//..
 	
 }
+
 

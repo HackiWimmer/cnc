@@ -3,10 +3,6 @@
   <!-- Handler Generation is ON -->
   <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
   <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
-  <object class="wxBitmap" name="16-cog">bitmaps\16-cog.png</object>
-  <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
-  <object class="wxBitmap" name="16-pull">bitmaps\16-pull.png</object>
-  <object class="wxBitmap" name="16-pull@2x">bitmaps\16-pull@2x.png</object>
   <object class="wxBitmap" name="16-sort">bitmaps\CodeLite\16-sort.png</object>
   <object class="wxBitmap" name="16-sort@2x">bitmaps\CodeLite\16-sort@2x.png</object>
   <object class="wxBitmap" name="24-redo">bitmaps\CodeLite\24-redo.png</object>
@@ -41,7 +37,12 @@
   <object class="wxBitmap" name="application-view-tile">bitmaps\application-view-tile.png</object>
   <object class="wxBitmap" name="ardo_power_off">bitmaps\ardo_power_off.png</object>
   <object class="wxBitmap" name="arduino_logo">bitmaps\Arduino\arduino_logo.png</object>
+  <object class="wxBitmap" name="aui-expand2">bitmaps\aui-expand2.png</object>
+  <object class="wxBitmap" name="aui-minimize">bitmaps\aui-minimize.png</object>
+  <object class="wxBitmap" name="aui-minimize@2x">bitmaps\aui-minimize@2x.png</object>
   <object class="wxBitmap" name="bug (2)">bitmaps\bug (2).png</object>
+  <object class="wxBitmap" name="contrast-high">bitmaps\contrast-high.png</object>
+  <object class="wxBitmap" name="database-table">bitmaps\database-table.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="emergency-button-klein">bitmaps\emergency-button-klein.png</object>
   <object class="wxBitmap" name="snail">bitmaps\snail.png</object>

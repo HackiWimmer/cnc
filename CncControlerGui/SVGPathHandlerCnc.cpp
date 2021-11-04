@@ -31,11 +31,6 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	
-	// add the file parser to the runner setup
-	// the rest is already set by CncPathListRunner(cnc)
-	CncPathListRunner::Setup& setup = getSetup();
-	setup.fileParser = fileParser;
 }
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::~SVGPathHandlerCnc() {
@@ -539,6 +534,11 @@ bool SVGPathHandlerCnc::prepareWork() {
 		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::prepareWork() failed!\n");
 		return false;
 	}
+	
+	// add the file parser to the runner setup
+	// the rest is already set by ctor CncPathListRunner(cnc)
+	CncPathListRunner::Setup& setup = getSetup();
+	setup.fileParser = fileParser;
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();
