@@ -184,7 +184,7 @@ void CncGamepadMenuDlg::onReferencePosition(wxCommandEvent& event) {
 	close();
 }
 ///////////////////////////////////////////////////////////////////
-void CncGamepadMenuDlg::onPodestManagement(wxCommandEvent& event) {
+void CncGamepadMenuDlg::onPodiumManagement(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxMenuEvent evt(wxEVT_COMMAND_MENU_SELECTED, THE_APP->m_miPodiumManagement->GetId());
 	wxPostEvent(THE_APP, evt);

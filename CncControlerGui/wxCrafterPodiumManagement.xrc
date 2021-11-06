@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
-  <object class="wxDialog" name="CncPodestManagementBase">
+  <object class="wxDialog" name="CncPodiumManagementBase">
     <title>Cnc Podium Management</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE</style>
@@ -122,7 +122,7 @@
       </object>
     </object>
   </object>
-  <object class="wxPanel" name="CncPodestMgmtMovementBase">
+  <object class="wxPanel" name="CncPodiumMgmtMovementBase">
     <style>wxTAB_TRAVERSAL</style>
     <bg>wxSYS_COLOUR_3DLIGHT</bg>
     <object class="wxFlexGridSizer">
@@ -282,7 +282,7 @@
             <border>2</border>
             <minsize>-1,80</minsize>
             <object class="wxBitmapButton" name="m_btRelativeUp">
-              <bitmap>bitmaps/podestRelativeUp.png</bitmap>
+              <bitmap>bitmaps/podiumRelativeUp.png</bitmap>
               <size>-1,80</size>
               <style>wxBU_AUTODRAW</style>
               <bg>wxSYS_COLOUR_INFOBK</bg>
@@ -294,7 +294,7 @@
             <border>2</border>
             <minsize>-1,80</minsize>
             <object class="wxBitmapButton" name="m_btRelativeDown">
-              <bitmap>bitmaps/podestRelativeDown.png</bitmap>
+              <bitmap>bitmaps/podiumRelativeDown.png</bitmap>
               <size>-1,80</size>
               <style>wxBU_AUTODRAW</style>
               <bg>wxSYS_COLOUR_INFOBK</bg>

@@ -10,7 +10,6 @@
 #include "CncConfig.h"
 #include "MainFrame.h"
 #include "GlobalFunctions.h"
-#include "CncAutoFreezer.h"
 #include "CncFileNameService.h"
 #include "CncMessageDialog.h"
 #include "CncLoggerView.h"
@@ -35,7 +34,7 @@ CncLoggerListCtrl::LoggerEntry::LoggerEntry(const wxString& t, const wxString& r
 {}
 
 // ----------------------------------------------------------------------------
-// CncSetterListCtrl Event Table
+// CncLoggerListCtrl Event Table
 // ----------------------------------------------------------------------------
 wxDEFINE_EVENT(wxEVT_LOGGER_DISPLAY_TIMER,  wxTimerEvent);
 
@@ -59,6 +58,7 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 , entries					() 
 , updateMode				(UM_Normal)
 , updateModePreviously		(UM_Normal)
+, sizeChanged				(false)
 , joinTheApp				(false)
 , showOnDemand				(false)
 , anyUpdate					(false)
@@ -71,7 +71,7 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 	entries.reserve(10 * 1000);
 	next();
 	
-	// add colums
+	// add columns
 	AppendColumn("A",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("B",	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
 	AppendColumn("C",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -277,28 +277,6 @@ wxListItemAttr* CncLoggerListCtrl::OnGetItemAttr(long item) const {
 	// this indicates to use the default style
 	return (wxListItemAttr*)(&defaultItemAttr);
 }
-/////////////////////////////////////////////////////////////////////
-void CncLoggerListCtrl::updateColumnWidth() {
-/////////////////////////////////////////////////////////////////////
-	// avoid flicker
-	const bool b = IsShownOnScreen() && IsFrozen() == false;
-	//CncAutoFreezer caf( b ? this : NULL);
-	
-	// first set default sizes depending on content
-	SetColumnWidth(COL_LNR, 	 72);
-	SetColumnWidth(COL_TXT, 	 wxLIST_AUTOSIZE);
-	SetColumnWidth(COL_RET, 	 40);
-	
-	// try to strech the second (key) column
-	const int scrollbarWidth = 26;
-	int size = GetSize().GetWidth() 
-	         - GetColumnWidth(COL_LNR) 
-			 - GetColumnWidth(COL_RET) 
-			 - scrollbarWidth;
-			 
-	if ( size > GetColumnWidth(COL_TXT) )
-		SetColumnWidth(COL_TXT, size);
-}
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::updateContent() {
 /////////////////////////////////////////////////////////////
@@ -350,13 +328,18 @@ void CncLoggerListCtrl::onDisplayTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::onSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	event.Skip(true);
-	updateColumnWidth();
+	sizeChanged = true;
+	event.Skip();
 }
 //////////////////////////////////////////////////
 void CncLoggerListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
-	wxPaintDC dc(this);
+	if ( sizeChanged == true )
+	{
+		updateColumnWidth(COL_STRECH);
+		sizeChanged = false;
+	}
+	
 	event.Skip();
 }
 //////////////////////////////////////////////////

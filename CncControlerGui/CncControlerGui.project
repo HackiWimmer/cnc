@@ -272,12 +272,14 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncPodiumManagement.cpp"/>
+      <File Name="CncPodiumManagement.h"/>
+      <File Name="CncPodiumMgmtMovement.cpp"/>
+      <File Name="CncPodiumMgmtMovement.h"/>
       <File Name="CncProcessingInfo.cpp"/>
       <File Name="CncProcessingInfo.h"/>
       <File Name="CncPolarRegionDetector.cpp"/>
       <File Name="CncPolarRegionDetector.h"/>
-      <File Name="CncPodestMgmtMovement.h"/>
-      <File Name="CncPodestMgmtMovement.cpp"/>
       <File Name="CncReferenceEvaluation.h"/>
       <File Name="CncReferenceEvaluation.cpp"/>
       <File Name="CncMoveDefinition.h"/>
@@ -305,8 +307,6 @@
       <File Name="CncVideoCapturePanel.h"/>
       <File Name="CncTouchBlockDetector.cpp"/>
       <File Name="CncTouchBlockDetector.h"/>
-      <File Name="CncPodestManagement.h"/>
-      <File Name="CncPodestManagement.cpp"/>
       <VirtualDirectory Name="Sound">
         <File Name="CncMillingSoundController.cpp"/>
         <File Name="CncMillingSoundController.h"/>
@@ -452,12 +452,12 @@
       <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Debug;release2;Gprof;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterPodiumManagement_bitmaps.cpp"/>
+      <File Name="wxCrafterPodiumManagement.h"/>
+      <File Name="wxCrafterPodiumManagement.cpp"/>
       <File Name="wxCrafterSecurePanel.h"/>
       <File Name="wxCrafterSecurePanel_bitmaps.cpp"/>
       <File Name="wxCrafterSecurePanel.cpp"/>
-      <File Name="wxCrafterPodestManagement_bitmaps.cpp"/>
-      <File Name="wxCrafterPodestManagement.h"/>
-      <File Name="wxCrafterPodestManagement.cpp"/>
       <File Name="wxCrafterSerialSpy.cpp"/>
       <File Name="wxCrafterSerialSpy.h"/>
       <File Name="wxCrafterSerialSpy_bitmaps.cpp"/>
@@ -634,6 +634,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncSecurePortListCtrl.cpp"/>
+      <File Name="CncSecurePortListCtrl.h"/>
       <File Name="CncAnchorPosListCtrl.cpp"/>
       <File Name="CncAnchorPosListCtrl.h"/>
       <File Name="CncLoggerListCtrl.cpp"/>

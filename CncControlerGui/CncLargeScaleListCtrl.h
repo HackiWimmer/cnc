@@ -150,6 +150,7 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		virtual long searchRow(const wxString& what, int searchColumn);
 		
 		virtual bool isItemValid(long item) const;
+		virtual void updateColumnWidth(int stretchColumn);
 	
 	private:
 		

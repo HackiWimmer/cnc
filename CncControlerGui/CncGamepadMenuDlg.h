@@ -15,7 +15,7 @@ class CncGamepadMenuDlg : public CncGamepadMenuDlgBase {
 		void update(const GamepadEvent* state);
 		
 	protected:
-		virtual void onPodestManagement(wxCommandEvent& event);
+		virtual void onPodiumManagement(wxCommandEvent& event);
 		virtual void onCancel(wxCommandEvent& event);
 		virtual void onReferencePosition(wxCommandEvent& event);
 		virtual void onRunTemplate(wxCommandEvent& event);

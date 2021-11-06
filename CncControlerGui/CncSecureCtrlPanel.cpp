@@ -7,229 +7,15 @@
 #include "CncSecureManuallyMovePanel.h"
 #include "CncPolarRegionDetector.h"
 #include "CncSecureRotateModelPanel.h"
+#include "CncSecurePortListCtrl.h"
 #include "CncSecureCtrlPanel.h"
-
-class CncSecurePortListCtrl : public CncLargeScaledListCtrl {
-	
-	public:
-		enum PortListImage {
-			PTI_CONNECTED 		=  0,
-			PTI_AVAILABLE  		=  1,
-			PTI_ACCESS_DENIED 	=  2,
-			PTI_UNKNOWN			=  3,
-			PTI_EMPTY			= -1
-		};
-		
-		const PortListImage getImgaeIndex(const wxString& name) {
-			
-			if      (name.IsSameAs(PortSelector::BMP_PS_CONNECTED))     return PTI_CONNECTED;
-			else if (name.IsSameAs(PortSelector::BMP_PS_AVAILABLE))     return PTI_AVAILABLE;
-			else if (name.IsSameAs(PortSelector::BMP_PS_ACCESS_DENIED)) return PTI_UNKNOWN;
-			else if (name.IsSameAs(PortSelector::BMP_PS_UNKNOWN)) 		return PTI_ACCESS_DENIED;
-			
-			return PTI_EMPTY;
-		}
-		
-		struct PortEntry {
-			PortListImage	imageIdx;
-			wxString		portName;
-			
-			PortEntry(const wxString& n, PortListImage i) 
-			: imageIdx(i)
-			, portName(n)
-			{}
-		};
-		
-		typedef std::vector<PortEntry> PortEntryList;
-	
-	private:
-		
-		PortEntryList		portEntries;
-		CncSecureCtrlPanel*	securePanel;
-		
-		wxListItemAttr		defaultItemAttr;
-		wxListItemAttr		selectedItemAttr;
-		
-		// --------------------------------------------------------
-		virtual wxString OnGetItemText(long item, long column) const {
-			if ( isItemValid(item) == false )
-				return _("");
-		
-			if ( column != COL_NAME )
-				return _("");
-			
-			return portEntries.at(item).portName;
-		}
-		// --------------------------------------------------------
-		virtual int OnGetItemColumnImage(long item, long column) const {
-			if ( isItemValid(item) == false )
-				return -1;
-				
-			if ( column != COL_STATE )
-				return -1;
-				
-			return portEntries.at(item).imageIdx;
-		}
-		// --------------------------------------------------------
-		virtual wxListItemAttr* OnGetItemAttr(long item) const {
-			return (wxListItemAttr*)(item != getLastSelection() ? &defaultItemAttr : &selectedItemAttr);
-		}
-		// --------------------------------------------------------
-		void onSize(wxSizeEvent& event) {
-			updateColumnWidth();
-			event.Skip(true);
-		}
-		// --------------------------------------------------------
-		void onSelectListItem(wxListEvent& event) {
-			//CNC_PRINT_FUNCT;
-		}
-		// --------------------------------------------------------
-		void onActivateListItem(wxListEvent& event) {
-			
-			long item = event.m_itemIndex;
-			if ( item == wxNOT_FOUND )
-				return;
-			
-			if ( isItemValid(item) == false )
-				return;
-				
-			if ( securePanel ) {
-				securePanel->setPortSelection(portEntries.at(item).portName);
-				setLastSelection(item);
-			}
-		}
-		
-	protected:
-	
-		// --------------------------------------------------------
-		virtual bool isItemValid(long item) const {
-			
-			wxASSERT( GetItemCount() == portEntries.size() );
-			
-			if( item < 0 || item > (long)(portEntries.size() - 1) )
-				return false;
-				
-			return true;
-		}
-
-	public:
-		static const int COL_STATE 			= 0;
-		static const int COL_NAME 			= 1;
-		static const int TOTAL_COL_COUNT	= 2;
-		static const int COL_STRECH			= COL_NAME;
-		
-		// --------------------------------------------------------
-		CncSecurePortListCtrl(wxWindow *parent, CncSecureCtrlPanel* panel, long style)
-		: CncLargeScaledListCtrl	(parent, style)
-		, portEntries				()
-		, securePanel				(panel)
-		, defaultItemAttr			()
-		, selectedItemAttr			()
-		{
-			// add colums
-			AppendColumn("", wxLIST_FORMAT_LEFT, 30);
-			AppendColumn("", wxLIST_FORMAT_LEFT, 30);
-			
-			// determine styles
-			setListType(CncLargeScaledListCtrl::ListType::REVERSE);
-			
-			wxFont font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-			SetFont(font);
-			
-			SetTextColour(wxColour(32, 32, 32));
-			SetBackgroundColour(wxColour(255, 255, 255));
-			
-			defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
-			defaultItemAttr.SetFont(font);
-			defaultItemAttr.SetTextColour(GetTextColour());
-			
-			selectedItemAttr 	= defaultItemAttr;
-			selectedItemAttr	.SetTextColour(wxColour(255, 128, 128));
-			selectedItemAttr	.SetFont(font.Bold());
-			
-			wxImageList* imageList = new wxImageList(16, 16, true);
-			imageList->RemoveAll();
-			imageList->Add(ImageLibPortSelector().Bitmap(PortSelector::BMP_PS_CONNECTED));
-			imageList->Add(ImageLibPortSelector().Bitmap(PortSelector::BMP_PS_AVAILABLE));
-			imageList->Add(ImageLibPortSelector().Bitmap(PortSelector::BMP_PS_ACCESS_DENIED));
-			imageList->Add(ImageLibPortSelector().Bitmap(PortSelector::BMP_PS_UNKNOWN));
-			SetImageList(imageList, wxIMAGE_LIST_SMALL);
-		}
-		// ---------------------------------------------------------
-		virtual ~CncSecurePortListCtrl() {
-		}
-		// ---------------------------------------------------------
-		//virtual bool Enable(bool enable=true) {
-			//GblFunc::freeze(this, !enable);
-			//Refresh();
-			//return CncLargeScaledListCtrl::Enable(enable); 
-		//}
-		// ---------------------------------------------------------
-		void updateColumnWidth() {
-			// avoid flicker
-			GblFunc::freeze(this, true);
-				
-			// try to stretch the second (key) column
-			const int size = GetSize().GetWidth() - 26; 
-			
-			if ( size > GetColumnWidth(COL_STRECH) )
-				SetColumnWidth(COL_STRECH, size);
-				
-			GblFunc::freeze(this, false);
-		}
-		// ---------------------------------------------------------
-		void deleteAllEntries() {
-			SetItemCount(portEntries.size());
-			
-			CncLargeScaledListCtrl::clear();
-			portEntries.clear();
-			
-			Refresh();
-		}
-		// ---------------------------------------------------------
-		void addPortEntry(const wxString& name, PortListImage pii) {
-			portEntries.push_back(PortEntry(name, pii));
-			
-			SetItemCount(portEntries.size());
-			Refresh();
-		}
-		// ---------------------------------------------------------
-		void addPortEntry(const wxString& name, const wxString& image) {
-			addPortEntry(name, getImgaeIndex(image));
-		}
-		// ---------------------------------------------------------
-		bool selectPortInList(const wxString& portName) {
-			for ( auto it = portEntries.begin(); it != portEntries.end(); ++it ) {
-				
-				if ( it->portName == portName ) {
-					selectItem(std::distance(portEntries.begin(), it), true);
-					return true;
-				}
-			}
-			
-			return false;
-		}
-		
-		wxDECLARE_NO_COPY_CLASS(CncSecurePortListCtrl);
-		wxDECLARE_EVENT_TABLE();
-};
-
-/////////////////////////////////////////////////////////////////////
-
-wxBEGIN_EVENT_TABLE(CncSecurePortListCtrl, CncLargeScaledListCtrl)
-	EVT_SIZE				(			CncSecurePortListCtrl::onSize				)
-	EVT_LIST_ITEM_SELECTED	(wxID_ANY, 	CncSecurePortListCtrl::onSelectListItem		)
-	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 	CncSecurePortListCtrl::onActivateListItem	)
-wxEND_EVENT_TABLE()
-/////////////////////////////////////////////////////////////////////
-
 
 /////////////////////////////////////////////////////////////////////
 CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 : CncSecureCtrlPanelBase						(parent)
 , CncSecureSlidepad::CallbackInterface			()
 , CncReferenceEvaluation::CallbackInterface		()
-, CncPodestMgmtMovement::CallbackInterface		()
+, CncPodiumMgmtMovement::CallbackInterface		()
 , portSelectorList								(NULL)
 , manuallyMovePanel								(NULL)
 , rotateModelPanel								(NULL)
@@ -237,7 +23,7 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 , interactiveMoveY								(NULL)
 , interactiveMoveZ								(NULL)
 , interactiveTouchpadXYZ						(NULL)
-, podestPanel									(NULL)
+, podiumPanel									(NULL)
 , referencePanel								(NULL)
 , speedpad										(NULL)
 , pageVector									()
@@ -334,9 +120,9 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 				
 	}
 	
-	podestPanel = new CncPodestMgmtMovement(this); 
-	GblFunc::replaceControl(m_podestPlaceholder, podestPanel);
-	podestPanel->setCallbackInterface(this);
+	podiumPanel = new CncPodiumMgmtMovement(this); 
+	GblFunc::replaceControl(m_podiumPlaceholder, podiumPanel);
+	podiumPanel->setCallbackInterface(this);
 	
 	referencePanel = new CncReferenceEvaluation(this); 
 	GblFunc::replaceControl(m_evaluateReferencePlaceholder, referencePanel);
@@ -352,7 +138,7 @@ CncSecureCtrlPanel::~CncSecureCtrlPanel() {
 	wxDELETE(portSelectorList);
 	wxDELETE(manuallyMovePanel);
 	wxDELETE(rotateModelPanel);
-	wxDELETE(podestPanel);
+	wxDELETE(podiumPanel);
 	wxDELETE(referencePanel);
 	wxDELETE(speedpad);
 }
@@ -473,7 +259,7 @@ void CncSecureCtrlPanel::onLeftBookPageChanged(int oldSel) {
 	{
 		case PAGE_PODIUM:	THE_APP->applyPodiumDistance();
 							CncIdleCheckDeactivator::activate(true);
-							podestPanel->close();
+							podiumPanel->close();
 							THE_APP->waitActive(500);
 							break;
 	}
@@ -483,7 +269,7 @@ void CncSecureCtrlPanel::onLeftBookPageChanged(int oldSel) {
 	{
 		case PAGE_PODIUM:	CncIdleCheckDeactivator::activate(false);
 							THE_APP->resetPodiumDistance();
-							podestPanel->init();
+							podiumPanel->init();
 							break;
 							
 		case PAGE_REF:		referencePanel->init();
@@ -494,6 +280,13 @@ void CncSecureCtrlPanel::onLeftBookPageChanged(int oldSel) {
 void CncSecureCtrlPanel::onLeftBookPageChanged(wxListbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	onLeftBookPageChanged(event.GetOldSelection());
+}
+/////////////////////////////////////////////////////////////////////
+int CncSecureCtrlPanel::aktivateReferencePanel() {
+/////////////////////////////////////////////////////////////////////
+	m_leftBook->SetSelection(PAGE_REF);
+	
+	return wxID_OK;
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onEmergencySec(wxCommandEvent& event) {
@@ -688,18 +481,18 @@ void CncSecureCtrlPanel::cameraNotifyPreview(bool show) {
 	else				THE_APP->GetSecurePreviewBook()->SetSelection(SecurePreviewBookSelection::VAL::RIGHT_PREVIEW);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::podestNotifyEnable(bool state)  {
+void CncSecureCtrlPanel::podiumNotifyEnable(bool state)  {
 /////////////////////////////////////////////////////////////////////
 	m_leftBook->Enable(state);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::podestNotifyInit(bool state) {
+void CncSecureCtrlPanel::podiumNotifyInit(bool state) {
 /////////////////////////////////////////////////////////////////////
 	if ( state == false )
 		CNC_PRINT_FUNCT
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::podestNotifyClose(bool state) {
+void CncSecureCtrlPanel::podiumNotifyClose(bool state) {
 /////////////////////////////////////////////////////////////////////
 	if ( state == false )
 		CNC_PRINT_FUNCT
@@ -746,8 +539,6 @@ void CncSecureCtrlPanel::onToggleTouchpadPane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::activate(bool b) {
 /////////////////////////////////////////////////////////////////////
-	THE_APP->navigatorPanel->setSecureMode(b);
-	
 	if ( b ) {
 		if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) {
 			tryToProvideTemplate();
@@ -761,11 +552,11 @@ void CncSecureCtrlPanel::activate(bool b) {
 		
 		
 		
-		#warning
+		#warning only a dev setup
 		//notifyResetMonitorView();
 		
 		wxCommandEvent event;
-		onSerialSpySec(event);
+		//onSerialSpySec(event);
 		
 	}
 	else {

@@ -27,6 +27,8 @@ void CncSpindleSound::deactivate() {
 /////////////////////////////////////////////////////////////
 void CncSpindleSound::play(double speed_U_MIN) {
 /////////////////////////////////////////////////////////////
+	//CNC_CLOG_FUNCT_A("%d, %lf, %lf", CncSpindleSound::playing, speed_U_MIN, curSpeed_U_MIN)
+	
 	if ( CncSpindleSound::active == false )
 		return;
 	
@@ -69,6 +71,8 @@ void CncSpindleSound::stop() {
 /////////////////////////////////////////////////////////////
 	wxSound::Stop();
 	CncSpindleSound::playing = false;
+	
+	//CNC_CEX1_FUNCT_A("%d", CncSpindleSound::playing)
 }
 /////////////////////////////////////////////////////////////
 bool CncSpindleSound::isPlaying() {

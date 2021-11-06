@@ -3,11 +3,11 @@
 #include "CncControl.h"
 #include "CncContext.h"
 #include "CncSecureNumpadDialog.h"
-#include "CncPodestMgmtMovement.h"
+#include "CncPodiumMgmtMovement.h"
 
 ///////////////////////////////////////////////////////////////////
-CncPodestMgmtMovement::CncPodestMgmtMovement(wxWindow* parent)
-: CncPodestMgmtMovementBase					(parent)
+CncPodiumMgmtMovement::CncPodiumMgmtMovement(wxWindow* parent)
+: CncPodiumMgmtMovementBase					(parent)
 , direction									(CncNoneDir)
 , interactiveMove							(NULL)
 , caller									(NULL)
@@ -24,17 +24,17 @@ CncPodestMgmtMovement::CncPodestMgmtMovement(wxWindow* parent)
 	m_moveRelative->SetValidator(val);
 	m_moveRelative->ChangeValue("0.000");
 	
-	Bind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncPodestMgmtMovement::onInteractiveMove,	this);
+	Bind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncPodiumMgmtMovement::onInteractiveMove,	this);
 }
 ///////////////////////////////////////////////////////////////////
-CncPodestMgmtMovement::~CncPodestMgmtMovement() {
+CncPodiumMgmtMovement::~CncPodiumMgmtMovement() {
 ///////////////////////////////////////////////////////////////////
-	Unbind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncPodestMgmtMovement::onInteractiveMove,	this);
+	Unbind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncPodiumMgmtMovement::onInteractiveMove,	this);
 	
 	wxDELETE(interactiveMove);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
+void CncPodiumMgmtMovement::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( IsShownOnScreen() == false )
 		return;
@@ -96,16 +96,16 @@ void CncPodestMgmtMovement::onInteractiveMove(CncSecureGesturesPanelEvent& event
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::enable(bool state) {
+void CncPodiumMgmtMovement::enable(bool state) {
 ///////////////////////////////////////////////////////////////////
 	m_btRelativeUp	->Enable(state);
 	m_btRelativeDown->Enable(state);
 	
 	if ( caller )
-		caller->podestNotifyEnable(state);
+		caller->podiumNotifyEnable(state);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::reset() {
+void CncPodiumMgmtMovement::reset() {
 ///////////////////////////////////////////////////////////////////
 	if ( direction == CncNoneDir )
 		return;
@@ -114,7 +114,7 @@ void CncPodestMgmtMovement::reset() {
 	process();
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::process() {
+void CncPodiumMgmtMovement::process() {
 ///////////////////////////////////////////////////////////////////
 	CncControl* cnc = THE_APP->getCncControl();
 	if ( cnc == NULL ) 
@@ -144,7 +144,7 @@ void CncPodestMgmtMovement::process() {
 		
 		switch ( direction ) {
 			case CncNegDir:
-			case CncPosDir:		ret = cnc->processMovePodest((int32_t)direction, exact);
+			case CncPosDir:		ret = cnc->processMovePodium((int32_t)direction, exact);
 								break;
 								
 			case CncNoneDir:	ret = cnc->sendQuitMove();
@@ -156,7 +156,7 @@ void CncPodestMgmtMovement::process() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool CncPodestMgmtMovement::init() {
+bool CncPodiumMgmtMovement::init() {
 ///////////////////////////////////////////////////////////////////
 	CncControl* cnc = THE_APP->getCncControl();
 	bool ret = true;
@@ -167,19 +167,19 @@ bool CncPodestMgmtMovement::init() {
 	}
 
 	if ( ret == true ) {
-		if ( cnc->processCommand(CMD_ACTIVATE_PODEST_HW, std::cout) == false ) {
-			std::cerr << CNC_LOG_FUNCT_A(": Can't activate podest hardware!") << std::endl;
+		if ( cnc->processCommand(CMD_ACTIVATE_PODIUM_HW, std::cout) == false ) {
+			std::cerr << CNC_LOG_FUNCT_A(": Can't activate podium hardware!") << std::endl;
 			ret = false;
 		}
 	}
 	
 	if ( caller )
-		caller->podestNotifyInit(ret);
+		caller->podiumNotifyInit(ret);
 			
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncPodestMgmtMovement::close() {
+bool CncPodiumMgmtMovement::close() {
 ///////////////////////////////////////////////////////////////////
 	CncControl* cnc = THE_APP->getCncControl();
 	bool ret = true;
@@ -197,19 +197,19 @@ bool CncPodestMgmtMovement::close() {
 		}
 		
 		// deactivate the hardware again
-		if ( cnc->processCommand(CMD_DEACTIVATE_PODEST_HW, std::cout) == false ) {
-			std::cerr << CNC_LOG_FUNCT_A(": Can't deactivate podest hardware!") << std::endl;
+		if ( cnc->processCommand(CMD_DEACTIVATE_PODIUM_HW, std::cout) == false ) {
+			std::cerr << CNC_LOG_FUNCT_A(": Can't deactivate podium hardware!") << std::endl;
 			ret = false;
 		}
 	}
 	
 	if ( caller )
-		caller->podestNotifyClose(ret);
+		caller->podiumNotifyClose(ret);
 	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-double CncPodestMgmtMovement::evaluateMillimeterToMove() {
+double CncPodiumMgmtMovement::evaluateMillimeterToMove() {
 ///////////////////////////////////////////////////////////////////
 	double dh;
 	if ( m_moveRelative->GetValue().ToDouble(&dh) )
@@ -219,7 +219,7 @@ double CncPodestMgmtMovement::evaluateMillimeterToMove() {
 	return 0.0;
 }
 ///////////////////////////////////////////////////////////////////
-int32_t CncPodestMgmtMovement::evaluateStepsToMove() {
+int32_t CncPodiumMgmtMovement::evaluateStepsToMove() {
 ///////////////////////////////////////////////////////////////////
 	const double mmtm = evaluateMillimeterToMove();
 	const int32_t ret = THE_CONFIG->convertMetricToStepsH(mmtm);
@@ -237,7 +237,7 @@ int32_t CncPodestMgmtMovement::evaluateStepsToMove() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onPodestRelativeUp(wxCommandEvent& event) {
+void CncPodiumMgmtMovement::onPodiumRelativeUp(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	CncControl* cnc = THE_APP->getCncControl();
 	if ( cnc == NULL ) {
@@ -248,13 +248,13 @@ void CncPodestMgmtMovement::onPodestRelativeUp(wxCommandEvent& event) {
 	enable(false);
 	
 		const bool exact = true;
-		if ( cnc->processMovePodest(evaluateStepsToMove() * (+1), exact) == false )
-			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodest() failed !") << std::endl;
+		if ( cnc->processMovePodium(evaluateStepsToMove() * (+1), exact) == false )
+			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodium() failed !") << std::endl;
 	
 	enable(true);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onPodestRelativeDown(wxCommandEvent& event) {
+void CncPodiumMgmtMovement::onPodiumRelativeDown(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	CncControl* cnc = THE_APP->getCncControl();
 	if ( cnc == NULL ) {
@@ -264,13 +264,13 @@ void CncPodestMgmtMovement::onPodestRelativeDown(wxCommandEvent& event) {
 	
 	enable(false);
 		const bool exact = true;
-		if ( cnc->processMovePodest(evaluateStepsToMove() * (-1), exact) == false )
-			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodest() failed !") << std::endl;
+		if ( cnc->processMovePodium(evaluateStepsToMove() * (-1), exact) == false )
+			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodium() failed !") << std::endl;
 	
 	enable(true);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestMgmtMovement::onLeftDownDistance(wxMouseEvent& event) {
+void CncPodiumMgmtMovement::onLeftDownDistance(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
 		event.Skip(false);

@@ -642,7 +642,7 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 											writerGetterValues(pid, limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
 											break;
 											
-		case PID_PODEST_POS: 				writerGetterValues(pid, 0.0); break;
+		case PID_PODIUM_POS: 				writerGetterValues(pid, 0.0); break;
 		
 		default:							auto it = setterMap.find((int)pid);
 											if ( it != setterMap.end() ) {

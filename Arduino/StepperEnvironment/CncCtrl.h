@@ -7,6 +7,7 @@
 #include "DecSeq.h"
 #include "CncAcmr.h"
 #include "CncRndr.h"
+#include "CncPod.h"
 #include "CncTest.h"
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -18,10 +19,11 @@ class CncAxisH;
 class CncArduinoController : public ArduinoCmdDecoderGetter, 
                              public ArduinoCmdDecoderSetter,
                              public ArduinoCmdDecoderMove,
-                             public ArduinoCmdDecoderMovePodest,
+                             public ArduinoCmdDecoderMovePodium,
                              public ArduinoCmdDecoderMoveSequence,
                              public ArduinoPositionRenderer,
-                             public ArduinoAccelManager
+                             public ArduinoAccelManager,
+                             public ArduinoPodiumManager
 {                                    
   private:
 
@@ -50,15 +52,15 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
         int getRemainingSeconds() const;
     };
 
-    class PodestEnabler {
+    class PodiumEnabler {
       public:
-        PodestEnabler()  { PodestEnabler::enable();  }
-        ~PodestEnabler() { PodestEnabler::disable(); }
+        PodiumEnabler()  { PodiumEnabler::enable();  }
+        ~PodiumEnabler() { PodiumEnabler::disable(); }
 
-        static void enable(bool state = true) { AE::digitalWrite(PIN_ENABLE_PODEST, state); AE::delayMicroseconds(100); }
-        static void disable()                 { PodestEnabler::enable(false); }
+        static void enable(bool state = true) { AE::digitalWrite(PIN_ENABLE_PODIUM, state); AE::delayMicroseconds(100); }
+        static void disable()                 { PodiumEnabler::enable(false); }
         
-        static bool isEnabled()               { return AE::digitalRead(PIN_ENABLE_PODEST); }
+        static bool isEnabled()               { return AE::digitalRead(PIN_ENABLE_PODIUM); }
     };
 
     struct InteractiveMove {
@@ -74,7 +76,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     
     };
 
-    typedef bool  (*stopPodestHardware_funct)  (CncArduinoController* ctrl);
+    typedef bool  (*stopPodiumHardware_funct)  (CncArduinoController* ctrl);
     typedef ArduinoImpulseCalculator ImpulseCalculator;
 
     CncAxisX*           X;
@@ -89,7 +91,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     ArdoObj::I2CData    lastI2CData;
 
     bool                transactionState;
-    bool                podestHardwareState;
+    bool                podiumHardwareState;
     bool                posReplyState;
     bool                probeMode;
     bool                pauseState;
@@ -104,7 +106,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     uint32_t            tsMoveStart;
     uint32_t            tsMoveLast;
 
-    int32_t             podestStillOpenSteps;
+    int32_t             podiumStillOpenSteps;
     
     InteractiveMove     interactiveMove;  
     
@@ -141,10 +143,10 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     byte                moveUntilContact    (int32_t dx, int32_t dy, int32_t dz);
     byte                moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz);
 
-    byte                movePodest(int32_t stepDir, stopPodestHardware_funct stopFunct);
-    static bool         stopMovePodestExact(CncArduinoController* ctrl);
-    static bool         stopMovePodestBySignal(CncArduinoController* ctrl);
-    static bool         stopMovePodestBySwitch(CncArduinoController* ctrl);
+    byte                movePodium(int32_t stepDir, stopPodiumHardware_funct stopFunct);
+    static bool         stopMovePodiumExact(CncArduinoController* ctrl);
+    static bool         stopMovePodiumBySignal(CncArduinoController* ctrl);
+    static bool         stopMovePodiumBySwitch(CncArduinoController* ctrl);
 
   protected:
 
@@ -163,7 +165,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     virtual byte        process(const ArduinoCmdDecoderSetter::Result& st);
     virtual byte        process(const ArduinoCmdDecoderMove::Result& mv);
     virtual byte        process(const ArduinoCmdDecoderMoveSequence::Result& seq);
-    virtual byte        process(const ArduinoCmdDecoderMovePodest::Result& mv);
+    virtual byte        process(const ArduinoCmdDecoderMovePodium::Result& mv);
 
     virtual byte        initialize(const ArduinoCmdDecoderMoveSequence::Result& seq);
     virtual byte        finalize  (const ArduinoCmdDecoderMoveSequence::Result& seq);
@@ -213,20 +215,20 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     
     bool                evaluateI2CData();
     bool                evaluateI2CAvailable();
-    bool                evaluatePodestSwitch();
+    bool                evaluatePodiumSwitches();
 
     bool                processSignal(byte sig);
     bool                processHeartbeat();
 
     byte                acceptTransaction(byte c);
-    byte                activatePodestHardware(byte c);
+    byte                activatePodiumHardware(byte c);
     
     byte                acceptGetter();
     byte                acceptSetter();
     byte                acceptMove(byte cmd);
     byte                acceptMoveSequence(byte cmd);
 
-    byte                acceptPodestMove(byte cmd);
+    byte                acceptPodiumMove(byte cmd);
     
     byte                acceptInteractiveMove(byte cmd);
     byte                cancelInteractiveMove();

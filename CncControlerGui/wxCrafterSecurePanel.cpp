@@ -115,10 +115,10 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_lpCtrlImgIndex = m_leftBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-windows@2x")));
     m_leftBook->AddPage(m_lpCtrl, _("Controller\nManagement"), false, m_lpCtrlImgIndex);
     
-    m_plPodest = new wxPanel(m_leftBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_leftBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_plPodestImgIndex;
-    m_plPodestImgIndex = m_leftBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-lift@2x")));
-    m_leftBook->AddPage(m_plPodest, _("Podium\nManagement"), false, m_plPodestImgIndex);
+    m_plPodium = new wxPanel(m_leftBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_leftBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_plPodiumImgIndex;
+    m_plPodiumImgIndex = m_leftBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-lift@2x")));
+    m_leftBook->AddPage(m_plPodium, _("Podium\nManagement"), false, m_plPodiumImgIndex);
     
     m_lpMisc = new wxPanel(m_leftBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_leftBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_lpMiscImgIndex;
@@ -623,20 +623,20 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer560->Add(m_resolveLimit, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     m_resolveLimit->SetMinSize(wxSize(-1,80));
     
-    m_rpPodest = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_rightBook->AddPage(m_rpPodest, _("Page"), false);
+    m_rpPodium = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_rightBook->AddPage(m_rpPodium, _("Page"), false);
     
     wxFlexGridSizer* flexGridSizer508 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer508->SetFlexibleDirection( wxBOTH );
     flexGridSizer508->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer508->AddGrowableCol(0);
     flexGridSizer508->AddGrowableRow(0);
-    m_rpPodest->SetSizer(flexGridSizer508);
+    m_rpPodium->SetSizer(flexGridSizer508);
     
-    m_podestPlaceholder = new wxPanel(m_rpPodest, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rpPodest, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_podestPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_podiumPlaceholder = new wxPanel(m_rpPodium, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rpPodium, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_podiumPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer508->Add(m_podestPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer508->Add(m_podiumPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_rpMisc = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_rightBook->AddPage(m_rpMisc, _("Page"), false);
@@ -660,6 +660,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     #endif
     wxFont m_btOSEnvrionmentFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_btOSEnvrionment->SetFont(m_btOSEnvrionmentFont);
+    m_btOSEnvrionment->SetToolTip(_("wew"));
     
     flexGridSizer121->Add(m_btOSEnvrionment, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     

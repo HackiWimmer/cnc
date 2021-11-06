@@ -3,7 +3,6 @@
 #include "CncFileNameService.h"
 #include "CncTraceCtrl.h"
 #include "CncConfig.h"
-#include "CncAutoFreezer.h"
 #include "CncLoggerView.h"
 
 /////////////////////////////////////////////////////////////////////
@@ -52,20 +51,17 @@ CncLoggerView::~CncLoggerView() {
 /////////////////////////////////////////////////////////////////
 void CncLoggerView::setSecureMode(bool state) {
 /////////////////////////////////////////////////////////////////
-	CncAutoFreezer caf(this);
+	if ( state == true ) 
 	{
-		if ( state == true ) 
-		{
-			m_btLoggerOnDemand->Hide();
-			setShowOnDemandState(false);
-		}
-		else 
-		{
-			m_btLoggerOnDemand->Show();
-			setShowOnDemandState(doShowLoggerOnCommand());
-		}
-		Layout();
+		m_btLoggerOnDemand->Hide();
+		setShowOnDemandState(false);
 	}
+	else 
+	{
+		m_btLoggerOnDemand->Show();
+		setShowOnDemandState(doShowLoggerOnCommand());
+	}
+	Layout();
 }
 /////////////////////////////////////////////////////////////////////
 const char* CncLoggerView::getLoggerIDAsStr(LoggerSelection::VAL id) {
@@ -99,63 +95,55 @@ void CncLoggerView::select(LoggerSelection::VAL id) {
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::enable(bool state) {
 /////////////////////////////////////////////////////////////////////
-	CncAutoFreezer caf(this);
-	{
-		m_btClear->Enable(state);
-		m_btCopy->Enable(state);
-		m_btCopyAll->Enable(state);
-		m_btSave->Enable(state);
-		m_btSaveAll->Enable(state);
-		m_btView->Enable(state);
-		m_btViewAll->Enable(state);
-		m_btLoggerOnDemand->Enable(state);
-		m_btClearTraceHistory->Enable(state);
-		m_btShowTraceHistory->Enable(state);
-	}
+	m_btClear->Enable(state);
+	m_btCopy->Enable(state);
+	m_btCopyAll->Enable(state);
+	m_btSave->Enable(state);
+	m_btSaveAll->Enable(state);
+	m_btView->Enable(state);
+	m_btViewAll->Enable(state);
+	m_btLoggerOnDemand->Enable(state);
+	m_btClearTraceHistory->Enable(state);
+	m_btShowTraceHistory->Enable(state);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::enableListCtrlsOnly(bool state) {
 /////////////////////////////////////////////////////////////////////
-	CncAutoFreezer caf(this);
+	for ( auto it = loggerLists.begin(); it != loggerLists.end(); ++it )
 	{
-		for ( auto it = loggerLists.begin(); it != loggerLists.end(); ++it ) {
-			CncLoggerListCtrl* list = *it;
-			list->Enable(state);
-		}
+		CncLoggerListCtrl* list = *it;
+		list->Enable(state);
 	}
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::initialize() {
 /////////////////////////////////////////////////////////////////////
-	CncAutoFreezer caf(this);
-	{
-		if ( traceCtrl == NULL ) {
-			traceCtrl = new CncTraceCtrl(this);
-			GblFunc::replaceControl(m_tracePlaceholder, traceCtrl);
-		}
+	if ( traceCtrl == NULL ) {
+		traceCtrl = new CncTraceCtrl(this);
+		GblFunc::replaceControl(m_tracePlaceholder, traceCtrl);
+	}
+	
+	// trace ctr is only a background control 
+	// its content will be displayed with traceInfoBar
+	traceCtrl->Show(false);
+	
+	traceInfoBar = new CncTraceInfoBar(this);
+	GblFunc::replaceControl(m_traceViewInfobarPlaceholder, traceInfoBar);
+	
+	traceInfoBar->SetShowHideEffects(wxSHOW_EFFECT_ROLL_TO_TOP, wxSHOW_EFFECT_ROLL_TO_BOTTOM);
+	traceInfoBar->SetEffectDuration(10);
+	
+	if ( loggerLists.size() == 0 ) {
 		
-		// trace ctr is only a background control 
-		// its content will be displayed with traceInfoBar
-		traceCtrl->Show(false);
-		
-		traceInfoBar = new CncTraceInfoBar(this);
-		GblFunc::replaceControl(m_traceViewInfobarPlaceholder, traceInfoBar);
-		
-		traceInfoBar->SetShowHideEffects(wxSHOW_EFFECT_ROLL_TO_TOP, wxSHOW_EFFECT_ROLL_TO_BOTTOM);
-		traceInfoBar->SetEffectDuration(10);
-		
-		if ( loggerLists.size() == 0 ) {
-			
-			CncLoggerListCtrl* startup = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
-			GblFunc::replaceControl(m_startupLoggerPlaceholder, startup);
-			loggerLists.push_back(startup);
+		CncLoggerListCtrl* startup = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
+		GblFunc::replaceControl(m_startupLoggerPlaceholder, startup);
+		loggerLists.push_back(startup);
 
-			CncLoggerListCtrl* standard = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
-			standard->setJoinTheAppState(true);
-			standard->setShowOnDemand(m_btLoggerOnDemand->GetValue());
-			GblFunc::replaceControl(m_standardLoggerPlaceholder, standard);
-			loggerLists.push_back(standard);
-		}
+		CncLoggerListCtrl* standard = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
+		standard->setJoinTheAppState(true);
+		standard->setShowOnDemand(m_btLoggerOnDemand->GetValue());
+		GblFunc::replaceControl(m_standardLoggerPlaceholder, standard);
+		loggerLists.push_back(standard);
 	}
 }
 /////////////////////////////////////////////////////////////////////

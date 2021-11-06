@@ -311,7 +311,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			}
 			//...................
 			wxPGProperty* hAxis = NULL;
-			curCatLabel.assign("H-Axis - Podest");
+			curCatLabel.assign("H-Axis - Podium");
 			hAxis = hardware->AppendChild( new wxPropertyCategory(curCatLabel));
 			registerCategory(curCatLabel, hAxis);
 			{

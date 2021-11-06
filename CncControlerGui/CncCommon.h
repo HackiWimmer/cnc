@@ -104,7 +104,7 @@ static struct ClientIds {
 } CLIENT_ID;
 
 // -------------------------------------------------------------------
-// global enumartions
+// global enumerations
 	enum CncUnit 					{ CncSteps, CncMetric };
 	enum CncAxis					{ Axis_X, Axis_Y, Axis_Z, Axis_H };
 	enum CncEdge					{ cncLeft, cncTop, cncRight, cncBottom, cncCenter };
@@ -122,6 +122,10 @@ static struct ClientIds {
 	enum CncTemplateFormat 			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
 	enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
 	enum CncRefPositionMode 		{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6, CncRM_Touchblock = 7, CncRM_Camera = 8 };
+	
+// -------------------------------------------------------------------
+// global typedefs
+typedef bool CncSpindlePowerState;
 
 // -------------------------------------------------------------------
 namespace cnc {

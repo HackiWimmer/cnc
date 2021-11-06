@@ -13,7 +13,6 @@
 #include <wx/dcclient.h>
 #include <wx/pen.h>
 #include "CommandTemplates.h"
-#include "CncToolStateControl.h"
 #include "CncPathListManager.h"
 #include "CncCommon.h"
 #include "PenHandler.h"
@@ -137,8 +136,6 @@ class CncControl {
 		
 		Serial* getSerial() const { wxASSERT(serialPort); return serialPort; }
 		
-		// Tool state handling
-		CncToolStateControl	toolState;
 		CncLimitStates		limitStates;
 		
 		
@@ -150,10 +147,6 @@ class CncControl {
 		void setValue(wxTextCtrl *ctl, int32_t val);
 		void setValue(wxTextCtrl *ctl, double val);
 		void setValue(wxTextCtrl *ctl, const char* t);
-		
-		
-		// Tool management
-		void setSpindleState(bool state);
 		
 		// Limit management
 		void displayLimitState(wxWindow* ctl, bool value);
@@ -264,7 +257,6 @@ class CncControl {
 		
 		// getter list wrapper
 		bool displayGetterList(const PidList& pidlist);
-		void displaySpindleState(const bool state);
 		
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
@@ -272,10 +264,10 @@ class CncControl {
 		bool processMoveSequence(CncMoveSequence& moveSequence);
 		
 		bool processGetter(unsigned char pid, GetterValues& ret);
-		bool processMovePodest(int32_t steps, bool exact);
+		bool processMovePodium(int32_t steps, bool exact);
 		
-		bool resetPodestDistance();
-		double getPodestDistanceMetric();
+		bool resetPodiumDistance();
+		double getPodiumDistanceMetric();
 		
 		// Zero positioning
 		void setZeroPosX(int32_t v);
@@ -339,7 +331,11 @@ class CncControl {
 		bool switchSpindleState(bool on);
 		bool switchSpindleOn();
 		bool switchSpindleOff(bool force = false);
-		bool getSpindleState() { return spindlePowerState; }
+		
+		CncSpindlePowerState getSpindlePowerState() const { return spindlePowerState; }
+		bool isSpindleOn()					const { return spindlePowerState == SPINDLE_STATE_ON; }
+		bool isSpindleOff()					const { return spindlePowerState == SPINDLE_STATE_OFF; }
+		
 		// Updates the configure trace control
 		void notifyConfigUpdate();
 		

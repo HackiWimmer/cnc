@@ -87,7 +87,7 @@
 #include "CncMotionVertexTrace.h"
 #include "CncTemplateObserver.h"
 #include "CncFileViewLists.h"
-#include "CncPodestManagement.h"
+#include "CncPodiumManagement.h"
 #include "CncExternalViewBox.h"
 #include "CncSecureCtrlPanel.h"
 #include "GL3DOptionPane.h"
@@ -151,8 +151,6 @@ unsigned int CncIdleCheckDeactivator::referenceCounter		= 0;
 
 #define MF_PRINT_LOCATION_CTX_FILE			//	CNC_PRINT_LOCATION
 #define MF_PRINT_LOCATION_CTX_SOMETHING		//	CNC_PRINT_LOCATION
-
-#define cncDELETE( p ) { wxDELETE( p ); APPEND_LOCATION_TO_STACK_TRACE_FILE_A("finalized dtor of '"#p"'"); }
 
 #define CNC_TRANSACTION_LOCK \
 	CncTransactionLock lock(this); \
@@ -487,6 +485,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , canClose								(true)
 , evaluatePositions						(true)
 , ignoreDirControlEvents				(false)
+, toolState								()
 , runConfirmationInfo					(RunConfirmationInfo::Wait)
 , interactiveTransactionLock			(NULL)
 , startTimerTimeout						(250)
@@ -552,7 +551,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , guiControls							()
 , menuItems								()
 , refPositionDlg						(new CncReferencePosition(this))
-, podestManagementDlg					(new CncPodestManagement(this))
+, podiumManagementDlg					(new CncPodiumManagement(this))
 {
 ///////////////////////////////////////////////////////////////////
 	APPEND_THREAD_ID_TO_STACK_TRACE_FILE;
@@ -613,6 +612,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	defaultSpeedSlider->showValue(true);
 	defaultSpeedSlider->setToolTipWindow(m_defaultSpeedSliderValue);
 	
+	toolState.setControl(GetToolState());
+	
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -665,7 +666,7 @@ MainFrame::~MainFrame() {
 	lruStore->Flush();
 	cncDELETE ( lruStore );
 	
-	cncDELETE( podestManagementDlg );
+	cncDELETE( podiumManagementDlg );
 	cncDELETE( refPositionDlg );
 	cncDELETE( openGLContextObserver );
 	cncDELETE( cncExtViewBoxCluster );
@@ -723,8 +724,8 @@ void MainFrame::onGlobalKeyDownHook(wxKeyEvent& event) {
 		return;
 	}
 	
-	if ( podestManagementDlg && podestManagementDlg->IsShownOnScreen() ) {
-		wxPostEvent(podestManagementDlg, event);
+	if ( podiumManagementDlg && podiumManagementDlg->IsShownOnScreen() ) {
+		wxPostEvent(podiumManagementDlg, event);
 		event.Skip(false);
 		return;
 	}
@@ -1059,6 +1060,9 @@ void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(secureCtrlPanel->GetBtConnectSec());
+	registerGuiControl(secureCtrlPanel->GetBtResetSec());
+	
 	registerGuiControl(m_btCloseSecurePanel);
 	
 	registerGuiControl(navigatorPanel);
@@ -1089,8 +1093,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_testSpindleSpeedSlider);
 	registerGuiControl(m_portSelector);
 	registerGuiControl(m_connect);
-	registerGuiControl(secureCtrlPanel->GetBtConnectSec());
-	registerGuiControl(secureCtrlPanel->GetBtResetSec());
 	registerGuiControl(m_btAdditionalParameters);
 	registerGuiControl(m_btResetHardwareReference);
 	registerGuiControl(m_btEvaluateHardwareReference);
@@ -3004,7 +3006,7 @@ bool MainFrame::connectSerialPort() {
 			setReferencePosEnforceFlag(cnc->isEmulator() == false);
 			
 			notifyConfigUpdate();
-			decorateSpindleState(cnc->getSpindleState());
+			decorateSpindleState(cnc->getSpindlePowerState());
 			
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
@@ -3386,7 +3388,7 @@ void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, doub
 /////////////////////////////////////////////////////////////////////
 bool MainFrame::resetPodiumDistance() {
 /////////////////////////////////////////////////////////////////////
-	if ( cnc->resetPodestDistance() == false ) 
+	if ( cnc->resetPodiumDistance() == false ) 
 	{
 		std::cerr << CNC_LOG_FUNCT_A(": Can't reset podium position\n");
 		return false;
@@ -3401,12 +3403,12 @@ bool MainFrame::applyPodiumDistance() {
 	
 	CncIdleCheckDeactivator icd(this);
 	
-	const double dbl = cnc->getPodestDistanceMetric() * (-1);
+	const double dbl = cnc->getPodiumDistanceMetric() * (-1);
 	
 	// log the current position before the correction operation below applies
 	const CncLongPosition prevPos = cnc->requestControllerPos();
 	
-	// correct the z position by the .podest movement
+	// correct the z position by the .podium movement
 	cnc->setZeroPosZ(prevPos.getZ() + THE_CONFIG->convertMetricToStepsZ(dbl) );
 	
 	// align the hardware offset with the new logical software origin
@@ -3423,7 +3425,7 @@ bool MainFrame::applyPodiumDistance() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onPodiumManagement(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( podestManagementDlg == NULL )
+	if ( podiumManagementDlg == NULL )
 		return;
 		
 	if ( resetPodiumDistance() == false ) 
@@ -3433,7 +3435,7 @@ void MainFrame::onPodiumManagement(wxCommandEvent& event) {
 	CncGamepadFilter gf(THE_CONTEXT->gamepadFilterInstance, filter);
 	
 	CncIdleCheckDeactivator icd(this);
-	podestManagementDlg->ShowModal();
+	podiumManagementDlg->ShowModal();
 	waitActive(500);
 	
 	applyPodiumDistance();
@@ -3446,26 +3448,34 @@ void MainFrame::selectUnit(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 int MainFrame::showReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(refPositionDlg);
+	wxASSERT ( secureCtrlPanel );
+	wxASSERT ( refPositionDlg );
 	
 	CncUsbConnectionObserver::Deactivator noUsbPopup(usbConnectionObserver);
 	
 	activateGamepadNotifications(true);
 	CncGamepadSpy::ContextSwaper gcs(gamepadSpy, CncGamepadSpy::GPC_REFPOS);
 	
-	setReferencePosMessage(msg);
-	const int ret = refPositionDlg->ShowModal();
-	
-	if ( ret == wxID_OK )
+	int ret = wxID_CANCEL;
+	if ( THE_CONTEXT->secureModeInfo.isActive == true )
 	{
-		RefPosResult parameter;
-		getReferencePosResult(parameter);
-		updateReferencePosition(&parameter);
-	} 
-	else 
-	{
-		cnc::cex1 << " Set reference position aborted . . . " << std::endl;
+		secureCtrlPanel->getReferencePanel()->setMessage(msg);
+		ret = secureCtrlPanel->aktivateReferencePanel();
 	}
+	else
+	{
+		refPositionDlg->setMessage(msg);
+		ret = refPositionDlg->ShowModal();
+		if ( ret == wxID_OK )
+		{
+			RefPosResult parameter;
+			getReferencePosResult(parameter);
+			updateReferencePosition(&parameter);
+		} 
+	}
+
+	if ( ret != wxID_OK )
+		cnc::cex1 << " Set reference position aborted . . . " << std::endl;
 	
 	//selectMonitorBookCncPanel();
 	return ret;
@@ -6783,13 +6793,10 @@ void MainFrame::rcPause() {
 ///////////////////////////////////////////////////////////////////
 	// first update the state context
 	THE_CONTEXT->togglePause();
+	
+	// update gui
 	enableRunControls(THE_CONTEXT->isPause());
-	
 	decorateRunButton();
-	
-	// last perform the pause state through the serial 
-	if ( isPause() )	cnc->sendResume();
-	else				cnc->sendPause();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcPause(wxCommandEvent& event) {
@@ -6821,16 +6828,19 @@ void MainFrame::rcFinish(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcStop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
+	cnc->sendHalt();
 	
-	// toggle only the pause flag
+	// toggle the pause flag
 	if ( isPause() == true )
-		rcPause(event);
+	{
+		THE_CONTEXT->togglePause();
+		enableRunControls(THE_CONTEXT->isPause());
+		decorateRunButton();
+	}
 	
 	if ( inboundFileParser != NULL )
 		inboundFileParser->debugStop();
-
-	cnc->sendHalt();
+	
 	cnc::trc.logInfo("Current session is stopped");
 }
 ///////////////////////////////////////////////////////////////////
@@ -6840,9 +6850,10 @@ void MainFrame::rcReset(wxCommandEvent& event) {
 	setReferencePosEnforceFlag(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::decorateSpindleState(bool state) {
+void MainFrame::decorateSpindleState(CncSpindlePowerState state) {
 ///////////////////////////////////////////////////////////////////
-	m_testSpindlePowerBtn->SetLabel             (state == SPINDLE_STATE_OFF ? "Switch Spindle 'On'"    : "Switch Spindle 'Off'");
+	// decorate the test environment
+	m_testSpindlePowerBtn->SetLabel          (state == SPINDLE_STATE_OFF ? "Switch Spindle 'On'"       : "Switch Spindle 'Off'");
 
 	m_testToolPowerState->SetLabel           (state == SPINDLE_STATE_OFF ? "Spindle is switched 'Off'" : "Spindle is switched 'On'");
 	m_testToolPowerState->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128)       : *wxGREEN);
@@ -6856,6 +6867,13 @@ void MainFrame::decorateSpindleState(bool state) {
 		m_testToolPowerState->GetParent()->Refresh(true);
 		m_testToolPowerState->GetParent()->Update();
 	}
+	
+	// decorate the tool info bitmap
+	if ( state == SPINDLE_STATE_ON )	toolState.setState(CncToolStateControl::green);
+	else 								toolState.setState(CncToolStateControl::red);
+	
+	// decorate motion monitor
+	motionMonitor->setSpindlePowerState(state);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
@@ -6867,7 +6885,7 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 		return;
 	}
 	
-	bool cncToolState = cnc->getSpindleState();
+	CncSpindlePowerState cncToolState = cnc->getSpindlePowerState();
 	
 	if ( cncToolState == SPINDLE_STATE_OFF ) {
 		
@@ -6894,7 +6912,7 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 		stopAnimationControl();
 	}
 	
-	cncToolState = cnc->getSpindleState();
+	cncToolState = cnc->getSpindlePowerState();
 	enableControls(cncToolState == SPINDLE_STATE_OFF);
 	
 	if ( m_testSpindlePowerBtn->IsShownOnScreen() ) {
@@ -6907,7 +6925,7 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::testChangedSpindleSpeed(wxScrollEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( cnc != NULL && cnc->getSpindleState() == SPINDLE_STATE_ON ) {
+	if ( cnc != NULL && cnc->getSpindlePowerState() == SPINDLE_STATE_ON ) {
 		cnc->changeCurrentSpindleSpeed_U_MIN((float)m_testSpindleSpeedSlider->GetValue());
 	}
 }
@@ -7126,7 +7144,7 @@ void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 		case TestBookSelection::VAL::INTERVAL:	break;
 		
 		case TestBookSelection::VAL::TOOL:		if ( cnc != NULL )
-													decorateSpindleState(cnc->getSpindleState());
+													decorateSpindleState(cnc->getSpindlePowerState());
 													
 												break;
 												
@@ -9134,20 +9152,6 @@ bool MainFrame::isReferenceStateValid() const {
 	return refPositionDlg->isReferenceStateValid();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::setReferencePosMessage(const wxString& msg) {
-/////////////////////////////////////////////////////////////////////
-	wxASSERT ( secureCtrlPanel );
-	wxASSERT ( refPositionDlg );
-	
-	if ( THE_CONTEXT->secureModeInfo.isActive == true )
-	{
-		secureCtrlPanel->getReferencePanel()->setMessage(msg);
-		return;
-	}
-		
-	refPositionDlg->setMessage(msg);
-}
-/////////////////////////////////////////////////////////////////////
 const RefPosResult& MainFrame::getReferencePosResult(RefPosResult& result)	const {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT ( secureCtrlPanel );
@@ -9216,14 +9220,19 @@ bool MainFrame::evaluateAndPerformProcessingState() {
 		return false;
 		
 	// pause handling
-	CncLongPosition curStartingPos(cnc->getCurCtlPos());
-	
 	if (THE_CONTEXT->processingInfo->isPause() ) 
 	{
+		CncLongPosition curStartingPos(cnc->getCurCtlPos());
+		
 		// pause
-		const bool prevSpindleState = cnc->getSpindleState();
-		cnc->moveZToTop();
-		cnc->switchSpindleOff(true);
+		const CncSpindlePowerState prevSpindleState = cnc->getSpindlePowerState();
+		if ( cnc->moveZToTop() == false )
+			return false;
+			
+		if ( cnc->switchSpindleOff(true) == false )
+			return false;
+			
+		cnc->sendPause();
 		
 		while ( THE_CONTEXT->processingInfo->isPause() == true )
 		{
@@ -9236,19 +9245,26 @@ bool MainFrame::evaluateAndPerformProcessingState() {
 				return false;
 			}
 				
-			if ( THE_CONTEXT->processingInfo->getStopFlag() == true ) {
+			if ( THE_CONTEXT->processingInfo->getStopFlag() == true )
+			{
 				THE_CONTEXT->processingInfo->setPauseFlag(false);
 				return false;
 			}
 			
 			CncTimeFunctions::sleepMilliseconds(25);
 		}
-	
+		
 		// resume
-		if ( prevSpindleState == true )
-			cnc->switchSpindleOn();
-			
-		cnc->moveToPos(curStartingPos);
+		cnc->sendResume();
+		
+		if ( prevSpindleState == SPINDLE_STATE_ON )
+		{
+			if ( cnc->switchSpindleOn() == false )
+				return false;
+		}
+		
+		if ( cnc->moveToPos(curStartingPos) == false )
+			return false;
 	}
 	
 	return true;

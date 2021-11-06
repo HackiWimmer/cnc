@@ -1495,21 +1495,21 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMovePodest(int32_t steps, bool exact) {
+bool Serial::processMovePodium(int32_t steps, bool exact) {
 ///////////////////////////////////////////////////////////////////
 	if ( steps == 0 )
 		return true;
 	
 	if ( isConnected() == false ) {
-		std::cerr << "SERIAL::processMovePodest()::ERROR: Not connected\n";
+		std::cerr << "SERIAL::processMovePodium()::ERROR: Not connected\n";
 		return false;
 	}
 	
-	const unsigned char cmd = exact == true ? CMD_MOVE_PODEST_EXACT : CMD_MOVE_PODEST;
+	const unsigned char cmd = exact == true ? CMD_MOVE_PODIUM_EXACT : CMD_MOVE_PODIUM;
 	
 	SerialCommandLocker scl(this, cmd);
 	if ( scl.lock(cncControl) == false ) {
-		std::clog << "Serial::processMovePodest: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		std::clog << "Serial::processMovePodium: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		std::clog << " Running Command : '" << ArduinoCMDs::getCMDLabel(SerialCommandLocker::getLockedCommand()) << "'\n";
 		std::clog << " This Command    : '" << ArduinoCMDs::getCMDLabel(cmd) << "'\n";
 		std::clog << "  Steps: " << steps;

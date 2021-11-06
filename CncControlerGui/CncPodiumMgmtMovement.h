@@ -1,11 +1,11 @@
-#ifndef CNCPODESTMGMTMOVEMENT_H
-#define CNCPODESTMGMTMOVEMENT_H
+#ifndef CNCPODIUMMGMTMOVEMENT_H
+#define CNCPODIUMMGMTMOVEMENT_H
 
 #include "CncCommon.h"
 #include "CncSecureGesturesPanel.h"
-#include "wxCrafterPodestManagement.h"
+#include "wxCrafterPodiumManagement.h"
 
-class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
+class CncPodiumMgmtMovement	: public CncPodiumMgmtMovementBase
 {
 	public:
 		
@@ -15,13 +15,13 @@ class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
 				CallbackInterface() {}
 				virtual ~CallbackInterface() {}
 				
-				virtual void podestNotifyEnable(bool state) {}
-				virtual void podestNotifyInit(bool state) {}
-				virtual void podestNotifyClose(bool state) {}
+				virtual void podiumNotifyEnable(bool state) {}
+				virtual void podiumNotifyInit(bool state) {}
+				virtual void podiumNotifyClose(bool state) {}
 		};
 		
-		CncPodestMgmtMovement(wxWindow* parent);
-		virtual ~CncPodestMgmtMovement();
+		CncPodiumMgmtMovement(wxWindow* parent);
+		virtual ~CncPodiumMgmtMovement();
 		
 		bool init();
 		bool close();
@@ -31,8 +31,8 @@ class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
 	protected:
 	
 		virtual void onLeftDownDistance(wxMouseEvent& event);
-		virtual void onPodestRelativeDown(wxCommandEvent& event);
-		virtual void onPodestRelativeUp(wxCommandEvent& event);
+		virtual void onPodiumRelativeDown(wxCommandEvent& event);
+		virtual void onPodiumRelativeUp(wxCommandEvent& event);
 		
 		void onInteractiveMove(CncSecureGesturesPanelEvent& event);
 		
@@ -51,4 +51,4 @@ class CncPodestMgmtMovement	: public CncPodestMgmtMovementBase
 		int32_t evaluateStepsToMove();
 };
 
-#endif // CNCPODESTMGMTMOVEMENT_H
+#endif // CNCPODIUMMGMTMOVEMENT_H

@@ -37,6 +37,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name)
 , modelScale				()
 , modelRotate				()
 , cameraPos					()
+, spindlePowerState			(SPINDLE_STATE_OFF)
 , theTexture				(0)
 {
 /////////////////////////////////////////////////////////////////
@@ -118,6 +119,11 @@ bool GLContextBase::init() {
 	return true;
 }
 /////////////////////////////////////////////////////////////////
+void GLContextBase::setSpindlePowerState(CncSpindlePowerState state) {
+/////////////////////////////////////////////////////////////////
+	spindlePowerState = state;
+}
+/////////////////////////////////////////////////////////////////
 void GLContextBase::enableSmoothing(bool enable) {
 /////////////////////////////////////////////////////////////////
 	enable == true ? glEnable(GL_LINE_SMOOTH) : glDisable(GL_LINE_SMOOTH);
@@ -162,16 +168,17 @@ void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z
 	const GLint slices = 32;
 	const GLint stacks = 32;
 	
+	spindlePowerState == SPINDLE_STATE_ON ? glColor4ub (255, 200, 200, 32) : glColor4ub (255, 233, 157, 32);
+	
 	// tool part
 	{
 		glPushMatrix();
 		
-			glColor4ub (255, 233, 157, 32);
 			glTranslatef(x, y, z); 
 
 			GLUquadricObj* tool = gluNewQuadric();
 			gluQuadricTexture(tool, GL_TRUE);
-			gluQuadricDrawStyle(tool, GLU_LINE);
+			gluQuadricDrawStyle(tool, spindlePowerState == SPINDLE_STATE_ON ? GLU_LINE: GLU_SILHOUETTE);
 			
 			switch ( d ) {
 				case CncDimension3D: 
@@ -197,12 +204,11 @@ void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z
 	{
 		glPushMatrix();
 		
-			glColor4ub (255, 201, 14, 100);
 			glTranslatef(x, y, z + (totalLength - shaftLength) );
 			
 			GLUquadricObj* shaft = gluNewQuadric();
 			gluQuadricTexture(shaft, GL_TRUE);
-			gluQuadricDrawStyle(shaft, GLU_LINE);
+			gluQuadricDrawStyle(shaft, spindlePowerState == SPINDLE_STATE_ON ? GLU_LINE : GLU_SILHOUETTE);
 			gluCylinder(shaft, shaftRadius, shaftRadius, totalLength - shaftLength, slices * 2, stacks * 2);
 			gluDeleteQuadric(shaft);
 			

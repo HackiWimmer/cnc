@@ -1,9 +1,10 @@
 #include <iostream>
 #include <wx/imaglist.h>
+#include <wx/dcclient.h>
+#include <wx/graphics.h>
 #include "wxCrafterImages.h"
 #include "CncArduino.h"
 #include "CncCommon.h"
-#include "CncAutoFreezer.h"
 #include "GlobalFunctions.h"
 #include "CncMessageListCtrl.h"
 
@@ -14,6 +15,7 @@ wxDEFINE_EVENT(wxEVT_MSG_LIST_DISPLAY_TIMER,  wxTimerEvent);
 
 wxBEGIN_EVENT_TABLE(CncMessageListCtrl, CncLargeScaledListCtrl)
 	EVT_SIZE				(								CncMessageListCtrl::onSize				)
+	EVT_PAINT				(								CncMessageListCtrl::onPaint				)
 	EVT_LIST_ITEM_SELECTED	(wxID_ANY,						CncMessageListCtrl::onSelectListItem	)
 	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY,						CncMessageListCtrl::onActivateListItem	)
 	EVT_TIMER				(wxEVT_MSG_LIST_DISPLAY_TIMER,	CncMessageListCtrl::onDisplayTimer		)
@@ -23,6 +25,7 @@ wxEND_EVENT_TABLE()
 CncMessageListCtrl::CncMessageListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
 , messages			()
+, sizeChanged		(false)
 , updateInterval	(0)
 , displayTimer		(this, wxEVT_MSG_LIST_DISPLAY_TIMER)
 , itemAttrInfo		()
@@ -161,34 +164,8 @@ void CncMessageListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncMessageListCtrl::onSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	sizeChanged = true;
 	event.Skip();
-	updateColumnWidth();
-}
-/////////////////////////////////////////////////////////////////////
-void CncMessageListCtrl::updateColumnWidth() {
-/////////////////////////////////////////////////////////////////////
-	if ( GetColumnCount() <= 0 )
-		return;
-		
-	// avoid flicker
-	const bool b = IsShownOnScreen() && IsFrozen() == false;
-	//CncAutoFreezer caf( b ? this : NULL);
-	{
-		int colWidthSum = 0;
-		for ( int i = 0; i < GetColumnCount(); i++ ) {
-			if ( i == COL_STRECH )
-				continue;
-				
-			colWidthSum += GetColumnWidth(i);
-		}
-		
-		const int scrollbarWidth = 26;
-		int size = GetSize().GetWidth() 
-				 - colWidthSum
-				 - scrollbarWidth;
-				 
-		SetColumnWidth(COL_STRECH, size);
-	}
 }
 /////////////////////////////////////////////////////////////////////
 bool CncMessageListCtrl::setUpdateInterval(int value) {
@@ -213,4 +190,15 @@ void CncMessageListCtrl::onDisplayTimer(wxTimerEvent& event) {
 	SetItemCount(messages.size());
 	ensureVisible((long)(messages.size() - 1));
 	Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void CncMessageListCtrl::onPaint(wxPaintEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( sizeChanged == true )
+	{
+		updateColumnWidth(COL_STRECH);
+		sizeChanged = false;
+	}
+	event.Skip();
+	
 }

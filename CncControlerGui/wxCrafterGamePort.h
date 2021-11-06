@@ -204,7 +204,7 @@ protected:
     virtual void onReferencePosition(wxCommandEvent& event) { event.Skip(); }
     virtual void onFunction(wxCommandEvent& event) { event.Skip(); }
     virtual void onRunTemplate(wxCommandEvent& event) { event.Skip(); }
-    virtual void onPodestManagement(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPodiumManagement(wxCommandEvent& event) { event.Skip(); }
     virtual void onCancel(wxCommandEvent& event) { event.Skip(); }
 
 public:

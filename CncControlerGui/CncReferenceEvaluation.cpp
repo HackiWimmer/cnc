@@ -19,6 +19,7 @@ CncReferenceEvaluation::CncReferenceEvaluation(wxWindow* parent)
 : CncReferenceEvaluationBase				(parent)
 , CncTouchBlockDetector::CallbackInterface	()
 , CncVideoCapturePanel::CallbackInterface	()
+, tsLast									(wxDateTime::Now())
 , valid										(false)
 , caller									(NULL)
 , cameraCapture								(NULL)
@@ -74,8 +75,7 @@ CncReferenceEvaluation::~CncReferenceEvaluation() {
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::setMessage(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
-	if ( caller )
-		caller->referenceNotifyMessage(msg);
+	referenceNotifyMessage(msg);
 }
 ///////////////////////////////////////////////////////////////////
 const RefPosResult& CncReferenceEvaluation::getResult(RefPosResult& result) const {
@@ -245,9 +245,7 @@ void CncReferenceEvaluation::onTouchDiameterLeftDown(wxMouseEvent& event) {
 void CncReferenceEvaluation::onTouchTest(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->hasHardware() == false ) {
-		if ( caller )
-			caller->referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no test possible");
-			
+		referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no test possible");
 		return;
 	}
 	
@@ -261,18 +259,16 @@ void CncReferenceEvaluation::onTouchTest(wxCommandEvent& event) {
 		msg =	"Close the contact manually. " \
 				"The test stops after some seconds if no closed contact state was detected. [ESC] will abort the test . . .";
 		
-		if ( caller )
-			caller->referenceNotifyMessage(msg);
+		referenceNotifyMessage(msg);
 		
 		CncTouchBlockDetector::Parameters para;
 		para.touchMode	= CncTouchBlockDetector::Parameters::TM_TOUCH_TEST;
 		para.caller		= this;
 		CncTouchBlockDetector::Result result = THE_APP->processTouchTest(para);
 		
-		if ( caller ) {
-			if ( result.hasErrorInfo() )	caller->referenceNotifyMessage(result.errorInfo, wxICON_ERROR);
-			else							caller->referenceDismissMessage();
-		}
+		if ( result.hasErrorInfo() )	referenceNotifyMessage(result.errorInfo, wxICON_ERROR);
+		else							referenceDismissMessage();
+
 		
 	progressDlg.Show(false);
 	Enable(true);
@@ -287,9 +283,7 @@ void CncReferenceEvaluation::onTouchTest(wxCommandEvent& event) {
 void CncReferenceEvaluation::onTouchXYZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->hasHardware() == false ) {
-		if ( caller )
-			caller->referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no XYZ Touch possible");
-			
+		referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no XYZ Touch possible");
 		return;
 	}
 
@@ -301,9 +295,7 @@ void CncReferenceEvaluation::onTouchXYZ(wxCommandEvent& event) {
 void CncReferenceEvaluation::onTouchZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONTEXT->hasHardware() == false ) {
-		if ( caller )
-			caller->referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no z Touch possible");
-			
+		referenceNotifyMessage("The current connected serial port do not support hardware.\n Therefore, no z Touch possible");
 		return;
 	}
 
@@ -609,17 +601,13 @@ const wxImage& CncReferenceEvaluation::getTouchCornerImage(const TouchCorner m) 
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::notifyProgess(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
-	if ( caller )
-		caller->referenceNotifyMessage(msg, wxICON_INFORMATION);
-		
+	referenceNotifyMessage(msg, wxICON_INFORMATION);
 	m_continuousTimer->Start();
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::notifyError(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
-	if ( caller )
-		caller->referenceNotifyMessage(msg, wxICON_ERROR);
-		
+	referenceNotifyMessage(msg, wxICON_ERROR);
 	m_continuousTimer->Start();
 }
 ///////////////////////////////////////////////////////////////////
@@ -630,13 +618,9 @@ const CncReferenceEvaluation::TouchCorner CncReferenceEvaluation::getTouchCorner
 ///////////////////////////////////////////////////////////////////
 void CncReferenceEvaluation::onContinuousTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	static wxDateTime tsLast = wxDateTime::Now();
-	
 	if ( (wxDateTime::Now() - tsLast).Abs().GetSeconds() > 5 ) 
 	{
-		if ( caller )
-			caller->referenceDismissMessage();
-		
+		referenceDismissMessage();
 		tsLast = wxDateTime::Now();
 	}
 }
@@ -711,8 +695,7 @@ void CncReferenceEvaluation::touch(wxWindow* btn, CncTouchBlockDetector::Paramet
 			msg =	"Close the contact manually. " \
 					"The test stops after some seconds if no closed contact state was detected. [ESC] will abort the processing . . .";
 			
-			if ( caller )
-				caller->referenceNotifyMessage(msg);
+			referenceNotifyMessage(msg);
 			
 			CncTouchBlockDetector::Parameters testPara;
 			testPara.touchMode	= CncTouchBlockDetector::Parameters::TM_TOUCH_TEST;
@@ -724,24 +707,21 @@ void CncReferenceEvaluation::touch(wxWindow* btn, CncTouchBlockDetector::Paramet
 			tip.SetTipKind(wxTipKind_TopLeft);
 			tip.ShowFor(btn);
 			
-			if ( result.processResult == false ) {
-				if ( caller ) {
-					if ( result.hasErrorInfo() )	caller->referenceNotifyMessage(result.errorInfo, wxICON_ERROR);
-					else							caller->referenceDismissMessage();
-				}
+			if ( result.processResult == false ) 
+			{
+				if ( result.hasErrorInfo() )	referenceNotifyMessage(result.errorInfo, wxICON_ERROR);
+				else							referenceDismissMessage();
+				
 				progressDlg.Show(false);
 				Enable(true);
 				return;
 			}
 			
-			if ( caller )
-				caller->referenceNotifyMessage("The process will wait a second . . . ");
-				
+			referenceNotifyMessage("The process will wait a second . . . ");
 			THE_APP->waitActive(1000);
 		}
 		
-		if ( caller )
-			caller->referenceNotifyMessage("Running the " + touchToken + " . . . ");
+		referenceNotifyMessage("Running the " + touchToken + " . . . ");
 		
 		CncTouchBlockDetector::Parameters para;
 		para.touchMode					= tm;
@@ -769,13 +749,28 @@ void CncReferenceEvaluation::touch(wxWindow* btn, CncTouchBlockDetector::Paramet
 	progressDlg.Show(false);
 	Enable(true);
 	
-	if ( caller ) {
-		if ( result.hasErrorInfo() )	caller->referenceNotifyMessage(result.errorInfo, wxICON_ERROR);
-		else							caller->referenceDismissMessage();
-	}
+	if ( result.hasErrorInfo() )	referenceNotifyMessage(result.errorInfo, wxICON_ERROR);
+	else							referenceDismissMessage();
 
 	wxRichToolTip tip(touchToken, result.processResult ? "Touch was successful." : "Touch was failed!");
 	tip.SetIcon(result.processResult ? wxICON_INFORMATION : wxICON_ERROR);
 	tip.SetTipKind(wxTipKind_TopLeft);
 	tip.ShowFor(btn);
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::referenceNotifyMessage(const wxString& msg, int flags) {
+///////////////////////////////////////////////////////////////////
+	if ( caller ) 
+	{
+		caller->referenceNotifyMessage(msg, flags);
+		
+		// restart interval
+		tsLast = wxDateTime::Now();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncReferenceEvaluation::referenceDismissMessage() {
+///////////////////////////////////////////////////////////////////
+	if ( caller ) 
+		caller->referenceDismissMessage();
 }

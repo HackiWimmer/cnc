@@ -3,39 +3,39 @@
 #include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
 #include "CncControl.h"
-#include "CncPodestManagement.h"
+#include "CncPodiumManagement.h"
 
 ///////////////////////////////////////////////////////////////////
-CncPodestManagement::CncPodestManagement(wxWindow* parent)
-: CncPodestManagementBase					(parent)
-, CncPodestMgmtMovement::CallbackInterface	()
+CncPodiumManagement::CncPodiumManagement(wxWindow* parent)
+: CncPodiumManagementBase					(parent)
+, CncPodiumMgmtMovement::CallbackInterface	()
 , movement									(NULL)
 ///////////////////////////////////////////////////////////////////
 {
-	movement = new CncPodestMgmtMovement(this); 
+	movement = new CncPodiumMgmtMovement(this); 
 	GblFunc::replaceControl(m_panelMovementPlaceholder, movement);
 	movement->setCallbackInterface(this);
 }
 ///////////////////////////////////////////////////////////////////
-CncPodestManagement::~CncPodestManagement() {
+CncPodiumManagement::~CncPodiumManagement() {
 ///////////////////////////////////////////////////////////////////
 	wxDELETE(movement);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::podestNotifyEnable(bool state) {
+void CncPodiumManagement::podiumNotifyEnable(bool state) {
 ///////////////////////////////////////////////////////////////////
 	m_btClose->Enable(state);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::podestNotifyInit(bool state) {
+void CncPodiumManagement::podiumNotifyInit(bool state) {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::podestNotifyClose(bool state) {
+void CncPodiumManagement::podiumNotifyClose(bool state) {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::showInfo() {
+void CncPodiumManagement::showInfo() {
 ///////////////////////////////////////////////////////////////////
 	wxRichToolTip tip(	"Additional information", 
 						"While this dialog is shown, the corresponding hardware buttons are active."
@@ -46,11 +46,11 @@ void CncPodestManagement::showInfo() {
 	tip.ShowFor(m_info);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::onShow(wxShowEvent& event) {
+void CncPodiumManagement::onShow(wxShowEvent& event) {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::onInit(wxInitDialogEvent& event) {
+void CncPodiumManagement::onInit(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( movement->init() == false ) {
 		Show(false);
@@ -60,13 +60,13 @@ void CncPodestManagement::onInit(wxInitDialogEvent& event) {
 	showInfo();
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::onClose(wxCommandEvent& event) {
+void CncPodiumManagement::onClose(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	movement->close();
 	Show(false);
 }
 ///////////////////////////////////////////////////////////////////
-void CncPodestManagement::onLefDownInfo(wxMouseEvent& event) {
+void CncPodiumManagement::onLefDownInfo(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	showInfo();
 }

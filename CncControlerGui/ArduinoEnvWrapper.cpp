@@ -7,6 +7,7 @@
 #include "../Arduino/StepperEnvironment/CncStep.ino"
 #include "../Arduino/StepperEnvironment/CncRndr.ino"
 #include "../Arduino/StepperEnvironment/CncAcmr.ino"
+#include "../Arduino/StepperEnvironment/CncPod.ino"
 #include "../Arduino/StepperEnvironment/ArdoObj.ino"
 #include "../Arduino/StepperEnvironment/ArdoErr.ino"
 

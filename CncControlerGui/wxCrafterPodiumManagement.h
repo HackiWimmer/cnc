@@ -38,7 +38,7 @@
 #endif
 
 
-class CncPodestManagementBase : public wxDialog
+class CncPodiumManagementBase : public wxDialog
 {
 protected:
     wxPanel* m_basePanel;
@@ -65,12 +65,12 @@ public:
     wxStaticBitmap* GetInfo() { return m_info; }
     wxButton* GetBtClose() { return m_btClose; }
     wxPanel* GetBasePanel() { return m_basePanel; }
-    CncPodestManagementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Podium Management"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
-    virtual ~CncPodestManagementBase();
+    CncPodiumManagementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Podium Management"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~CncPodiumManagementBase();
 };
 
 
-class CncPodestMgmtMovementBase : public wxPanel
+class CncPodiumMgmtMovementBase : public wxPanel
 {
 protected:
     wxTextCtrl* m_textCtrl9604;
@@ -85,8 +85,8 @@ protected:
 
 protected:
     virtual void onLeftDownDistance(wxMouseEvent& event) { event.Skip(); }
-    virtual void onPodestRelativeUp(wxCommandEvent& event) { event.Skip(); }
-    virtual void onPodestRelativeDown(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPodiumRelativeUp(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPodiumRelativeDown(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxTextCtrl* GetTextCtrl9604() { return m_textCtrl9604; }
@@ -98,8 +98,8 @@ public:
     wxTextCtrl* GetMoveRelative() { return m_moveRelative; }
     wxBitmapButton* GetBtRelativeUp() { return m_btRelativeUp; }
     wxBitmapButton* GetBtRelativeDown() { return m_btRelativeDown; }
-    CncPodestMgmtMovementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
-    virtual ~CncPodestMgmtMovementBase();
+    CncPodiumMgmtMovementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    virtual ~CncPodiumMgmtMovementBase();
 };
 
 #endif

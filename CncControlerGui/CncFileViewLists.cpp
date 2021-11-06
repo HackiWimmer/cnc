@@ -149,16 +149,23 @@ wxListItemAttr* CncLruFileViewListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////////////
 void CncLruFileViewListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////////////
-	// avoid flicker
-	GblFunc::freeze(this, true);
+	if ( GetColumnCount() <= 0 )
+		return;
 		
-	// try to strech the second (key) column
-	const int size = GetSize().GetWidth() - 26; 
+	int colWidthSum = 0;
+	for ( int i = 0; i < GetColumnCount(); i++ ) {
+		if ( i == COL_STRECH )
+			continue;
+			
+		colWidthSum += GetColumnWidth(i);
+	}
 	
-	if ( size > GetColumnWidth(COL_STRECH) )
-		SetColumnWidth(COL_STRECH, size);
-		
-	GblFunc::freeze(this, false);
+	const int scrollbarWidth = 26;
+	int size = GetSize().GetWidth() 
+			 - colWidthSum
+			 - scrollbarWidth;
+			 
+	SetColumnWidth(COL_STRECH, size);
 }
 /////////////////////////////////////////////////////////////////////
 bool CncLruFileViewListCtrl::Enable(bool enable) {
@@ -653,16 +660,23 @@ wxListItemAttr* CncFileViewListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////////////
 void CncFileViewListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////////////
-	// avoid flicker
-	GblFunc::freeze(this, true);
+	if ( GetColumnCount() <= 0 )
+		return;
 		
-	// try to strech the second (key) column
-	const int size = GetSize().GetWidth() - 26; 
+	int colWidthSum = 0;
+	for ( int i = 0; i < GetColumnCount(); i++ ) {
+		if ( i == COL_STRECH )
+			continue;
+			
+		colWidthSum += GetColumnWidth(i);
+	}
 	
-	if ( size > GetColumnWidth(COL_STRECH) )
-		SetColumnWidth(COL_STRECH, size);
-		
-	GblFunc::freeze(this, false);
+	const int scrollbarWidth = 26;
+	int size = GetSize().GetWidth() 
+			 - colWidthSum
+			 - scrollbarWidth;
+			 
+	SetColumnWidth(COL_STRECH, size);
 }
 /////////////////////////////////////////////////////////////////////
 bool CncFileViewListCtrl::Enable(bool enable) {

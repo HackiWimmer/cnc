@@ -4,9 +4,9 @@
   "m_objCounter": 9664,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9XXInitBitmapResources",
-  "m_bitmapsFile": "wxCrafterPodestManagement_bitmaps.cpp",
+  "m_bitmapsFile": "wxCrafterPodiumManagement_bitmaps.cpp",
   "m_GenerateCodeTypes": 3,
-  "m_outputFileName": "wxCrafterPodestManagement",
+  "m_outputFileName": "wxCrafterPodiumManagement",
   "m_firstWindowId": 10000,
   "m_useEnum": true,
   "m_useUnderscoreMacro": true,
@@ -32,7 +32,7 @@
     }, {
      "type": "string",
      "m_label": "Name:",
-     "m_value": "CncPodestManagementBase"
+     "m_value": "CncPodiumManagementBase"
     }, {
      "type": "multi-string",
      "m_label": "Tooltip:",
@@ -93,11 +93,11 @@
     }, {
      "type": "string",
      "m_label": "Inherited Class",
-     "m_value": "CncPodestManagement"
+     "m_value": "CncPodiumManagement"
     }, {
      "type": "string",
      "m_label": "File:",
-     "m_value": "CncPodestManagement"
+     "m_value": "CncPodiumManagement"
     }, {
      "type": "string",
      "m_label": "Class Decorator",
@@ -972,7 +972,7 @@
     }, {
      "type": "string",
      "m_label": "Name:",
-     "m_value": "CncPodestMgmtMovementBase"
+     "m_value": "CncPodiumMgmtMovementBase"
     }, {
      "type": "multi-string",
      "m_label": "Tooltip:",
@@ -1029,11 +1029,11 @@
     }, {
      "type": "string",
      "m_label": "Inherited Class",
-     "m_value": "CncPodestMgmtMovement"
+     "m_value": "CncPodiumMgmtMovement"
     }, {
      "type": "string",
      "m_label": "File:",
-     "m_value": "CncPodestMgmtMovement"
+     "m_value": "CncPodiumMgmtMovement"
     }, {
      "type": "string",
      "m_label": "Class Decorator",
@@ -1892,7 +1892,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/podestRelativeUp.png"
+           "m_path": "bitmaps/podiumRelativeUp.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -1902,7 +1902,7 @@
            "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
            "m_eventClass": "wxCommandEvent",
            "m_eventHandler": "wxCommandEventHandler",
-           "m_functionNameAndSignature": "onPodestRelativeUp(wxCommandEvent& event)",
+           "m_functionNameAndSignature": "onPodiumRelativeUp(wxCommandEvent& event)",
            "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
            "m_noBody": false
           }],
@@ -1974,7 +1974,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/podestRelativeDown.png"
+           "m_path": "bitmaps/podiumRelativeDown.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -1984,7 +1984,7 @@
            "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
            "m_eventClass": "wxCommandEvent",
            "m_eventHandler": "wxCommandEventHandler",
-           "m_functionNameAndSignature": "onPodestRelativeDown(wxCommandEvent& event)",
+           "m_functionNameAndSignature": "onPodiumRelativeDown(wxCommandEvent& event)",
            "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
            "m_noBody": false
           }],

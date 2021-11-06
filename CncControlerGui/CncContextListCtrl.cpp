@@ -56,28 +56,21 @@ void CncContextListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////////////
 	if ( GetColumnCount() <= 0 )
 		return;
-
-	// avoid flicker
-	if ( IsFrozen() == false )
-		Freeze();
-
+		
 	int colWidthSum = 0;
 	for ( int i = 0; i < GetColumnCount(); i++ ) {
 		if ( i == COL_STRECH )
 			continue;
-
+			
 		colWidthSum += GetColumnWidth(i);
 	}
-
+	
 	const int scrollbarWidth = 26;
-	int size = GetSize().GetWidth()
-	         - colWidthSum
+	int size = GetSize().GetWidth() 
+			 - colWidthSum
 			 - scrollbarWidth;
-
+			 
 	SetColumnWidth(COL_STRECH, size);
-
-	if ( IsFrozen() == true )
-		Thaw();
 }
 /////////////////////////////////////////////////////////////
 void CncContextListCtrl::onSelectListItem(wxListEvent& event) {

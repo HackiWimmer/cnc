@@ -30,6 +30,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		Entries					entries;
 		UpdateMode				updateMode;
 		UpdateMode				updateModePreviously;
+		bool					sizeChanged;
 		bool					joinTheApp;
 		bool					showOnDemand;
 		bool					anyUpdate;
@@ -40,7 +41,6 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		
 		void					processUpdateMode();
 		void					updateContent();
-		void					updateColumnWidth();
 		
 		void 					onPaint(wxPaintEvent& event);
 		void 					onSize(wxSizeEvent& event);
@@ -66,6 +66,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		static const int 		COL_TXT 			= 1;
 		static const int 		COL_RET 			= 2;
 		static const int 		TOTAL_COL_COUNT		= 3;
+		static const int		COL_STRECH			= COL_TXT;
 		
 		CncLoggerListCtrl(wxWindow *parent, long style);
 		virtual ~CncLoggerListCtrl();

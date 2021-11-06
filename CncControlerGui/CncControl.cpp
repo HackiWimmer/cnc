@@ -62,7 +62,6 @@ CncControl::CncControl(CncPortType pt)
 , spindlePowerState					(SPINDLE_STATE_OFF)
 , stepDelay							(0)
 , lastCncHeartbeatValue				(0)
-, toolState							()
 , positionCheck						(true)
 {
 //////////////////////////////////////////////////////////////////
@@ -76,25 +75,18 @@ CncControl::CncControl(CncPortType pt)
 	else if ( pt == CncPORT_EMU_ARDUINO )	serialPort = new SerialThreadStub(this);
 	else 									serialPort = new SerialEmulatorNULL(this);
 	
-	toolState.setControl(THE_APP->GetToolState());
-	setSpindleState(true);
-	
 	serialPort->enableSpyOutput();
 }
 ///////////////////////////////////////////////////////////////////
 CncControl::~CncControl() {
 ///////////////////////////////////////////////////////////////////
 	setterMap.clear();
+	switchSpindleOff();
 	
-	assert(serialPort);
-	
-	if ( getSpindleState() == SPINDLE_STATE_ON )
-		switchSpindleOff();
-	
-	// safty
+	// safety
 	disconnect();
 
-	delete serialPort;
+	cncDELETE(serialPort);
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getStartPosMetric() {
@@ -669,9 +661,9 @@ bool CncControl::processGetter(unsigned char pid, GetterValues& ret) {
 	return getSerial()->processGetter(pid, ret); 
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::processMovePodest(int32_t steps, bool exact) {
+bool CncControl::processMovePodium(int32_t steps, bool exact) {
 ///////////////////////////////////////////////////////////////////
-	return getSerial()->processMovePodest(steps, exact); 
+	return getSerial()->processMovePodium(steps, exact); 
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::isInterrupted() {
@@ -1302,8 +1294,8 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 					if ( checkSetterCount(cei.setterPid, size, 1) == false )
 						return false;
 						
-					spindlePowerState = (bool)cei.setterValueList.front();
-					displaySpindleState(spindlePowerState);
+					//spindlePowerState = (bool)cei.setterValueList.front();
+					//displaySpindleState(spindlePowerState);
 					break;
 				}
 				case PID_SPEED_MM_SEC:
@@ -1597,16 +1589,6 @@ bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool al
 	                             alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::setSpindleState(bool state) {
-///////////////////////////////////////////////////////////////////
-	if ( state == true ) {
-		toolState.setState(CncToolStateControl::red);
-	} else {
-		if ( spindlePowerState == SPINDLE_STATE_ON )	toolState.setState(CncToolStateControl::green);
-		else 											toolState.setState(CncToolStateControl::red);
-	}
-}
-///////////////////////////////////////////////////////////////////
 bool CncControl::switchSpindleState(bool on) {
 ///////////////////////////////////////////////////////////////////
 	return on ? switchSpindleOn() : switchSpindleOff();
@@ -1616,7 +1598,7 @@ bool CncControl::switchSpindleOn() {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
 		return false;
-
+	
 	if ( spindlePowerState == SPINDLE_STATE_OFF )
 	{ 
 		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_ON) )
@@ -1624,8 +1606,7 @@ bool CncControl::switchSpindleOn() {
 			CncSpindleSound::play(getConfiguredSpindleSpeed());
 			
 			spindlePowerState = SPINDLE_STATE_ON;
-			displaySpindleState(spindlePowerState);
-			
+			THE_APP->decorateSpindleState(spindlePowerState);
 			THE_APP->waitActive(500);
 		}
 	}
@@ -1645,17 +1626,11 @@ bool CncControl::switchSpindleOff(bool force) {
 			CncSpindleSound::stop();
 			
 			spindlePowerState = SPINDLE_STATE_OFF;
-			displaySpindleState(spindlePowerState);
+			THE_APP->decorateSpindleState(spindlePowerState);
 		}
 	}
 	
 	return true;
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::displaySpindleState(const bool state) {
-///////////////////////////////////////////////////////////////////
-	THE_APP->decorateSpindleState(state);
-	setSpindleState(state);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::displayGetterList(const PidList& pidList) {
@@ -2545,27 +2520,27 @@ void CncControl::addGuidePath(const CncPathListManager& plm, double zOffset) {
 		THE_APP->getMotionMonitor()->appendGuidPath(plm, zOffset);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::resetPodestDistance() {
+bool CncControl::resetPodiumDistance() {
 ///////////////////////////////////////////////////////////////////
-	if ( getSerial()->processSetter(PID_PODEST_POS, 0) == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(": Can't reset podest position\n");
+	if ( getSerial()->processSetter(PID_PODIUM_POS, 0) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Can't reset podium position\n");
 		return false;
 	}
 	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-double CncControl::getPodestDistanceMetric() {
+double CncControl::getPodiumDistanceMetric() {
 ///////////////////////////////////////////////////////////////////
 	GetterValues list;
 	
-	if ( getSerial()->processGetter(PID_PODEST_POS, list) == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(": Can't request podest position\n");
+	if ( getSerial()->processGetter(PID_PODIUM_POS, list) == false ) {
+		std::cerr << CNC_LOG_FUNCT_A(": Can't request podium position\n");
 		return 0.0;
 	}
 	
 	if ( list.size() != 1 ) {
-		std::cerr << CNC_LOG_FUNCT_A(": Invalid response while request podest position, size = %ld\n", (long)list.size());
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid response while request podium position, size = %ld\n", (long)list.size());
 		return 0.0;
 	}
 	

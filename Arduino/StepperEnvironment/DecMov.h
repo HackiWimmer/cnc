@@ -111,7 +111,7 @@ class ArduinoCmdDecoderMove : public ArduinoCmdDecoderBase {
 };
 
 // ------------------------------------------------------------------------
-class ArduinoCmdDecoderMovePodest : public ArduinoCmdDecoderBase {
+class ArduinoCmdDecoderMovePodium : public ArduinoCmdDecoderBase {
 
   public:
     static const uint8_t MAX_MOVE_VALUES = 1;
@@ -126,16 +126,16 @@ class ArduinoCmdDecoderMovePodest : public ArduinoCmdDecoderBase {
       }
     };
     
-    ArduinoCmdDecoderMovePodest()
+    ArduinoCmdDecoderMovePodium()
     : ArduinoCmdDecoderBase()
     , result  ()
     {}
     
-    virtual ~ArduinoCmdDecoderMovePodest() 
+    virtual ~ArduinoCmdDecoderMovePodium() 
     {}
 
   protected:
-    virtual byte process(const ArduinoCmdDecoderMovePodest::Result& mv) = 0;
+    virtual byte process(const ArduinoCmdDecoderMovePodium::Result& mv) = 0;
 
   private:
   
@@ -149,7 +149,7 @@ class ArduinoCmdDecoderMovePodest : public ArduinoCmdDecoderBase {
   public:
 
     // ----------------------------------------------------------------------
-    byte decodeMovePodest(byte cmd) {
+    byte decodeMovePodium(byte cmd) {
       typedef ArduinoMainLoop AML;
 
       reset();

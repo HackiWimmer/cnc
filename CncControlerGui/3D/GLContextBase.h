@@ -11,6 +11,8 @@
 #include "3D/GLGuidePath.h"
 #include "3D/GLInclude.h"
 
+#include "CncCommon.h"
+
 /////////////////////////////////////////////////////////////////
 struct GLContextOptions {
 	
@@ -247,7 +249,9 @@ class GLContextBase : public wxGLContext {
 		double getMouseVertexAsMetricX()	{ return currentMouseVertexInfo.getAsMetricX(getCurrentScaleFactor()); }
 		double getMouseVertexAsMetricY()	{ return currentMouseVertexInfo.getAsMetricY(getCurrentScaleFactor()); }
 		double getMouseVertexAsMetricZ()	{ return currentMouseVertexInfo.getAsMetricZ(getCurrentScaleFactor()); }
-
+		
+		void setSpindlePowerState(CncSpindlePowerState state);
+		
 	protected:
 		
 		////////////////////////////////////////////////////
@@ -269,28 +273,30 @@ class GLContextBase : public wxGLContext {
 				{}
 		};
 		
-		wxGLCanvas*			associatedCanvas;
-		wxString 			contextName;
+		wxGLCanvas*				associatedCanvas;
+		wxString 				contextName;
 		
-		bool				enabled;
-		bool 				initialized;
+		bool					enabled;
+		bool 					initialized;
 		
-		FrontCatchingMode	frontCatchingMode;
+		FrontCatchingMode		frontCatchingMode;
 		
-		GuidePathes			guidePathes;
+		GuidePathes				guidePathes;
 		
-		MouseVertexInfo		currentMouseVertexInfo;
-		GLContextOptions 	options;
+		MouseVertexInfo			currentMouseVertexInfo;
+		GLContextOptions 		options;
 		
-		float				zoom;
+		float					zoom;
 		
-		ViewMode			viewMode;
-		CoordOrginInfo 		coordOriginInfo;
-		ModelType			modelType;
-		GLViewPort*			viewPort;
-		GLI::ModelScale 	modelScale;
-		GLI::ModelRotate	modelRotate;
-		GLI::CameraPosition cameraPos;
+		ViewMode				viewMode;
+		CoordOrginInfo 			coordOriginInfo;
+		ModelType				modelType;
+		GLViewPort*				viewPort;
+		GLI::ModelScale 		modelScale;
+		GLI::ModelRotate		modelRotate;
+		GLI::CameraPosition		cameraPos;
+		
+		CncSpindlePowerState	spindlePowerState;
 		
 		virtual float getAutoScaleFactor() { return 1.0; }
 		

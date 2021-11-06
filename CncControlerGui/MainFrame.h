@@ -13,6 +13,7 @@
 #include "FileParser.h"
 #include "BinaryFileParser.h"
 #include "CncControl.h"
+#include "CncToolStateControl.h"
 #include "CncPerspective.h"
 #include "CncMotionMonitor.h"
 #include "CncFileView.h"
@@ -84,7 +85,7 @@ class CncSpeedPlayground;
 class CncGamepadSpy;
 class CncGamepadControllerState;
 class CncPositionStorageView;
-class CncPodestManagement;
+class CncPodiumManagement;
 class CncUsbConnectionObserver;
 class CncAnchorPosition;
 class CncSecureCtrlPanel;
@@ -545,7 +546,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void releaseControllerSetupFromConfig();
 		void notifyConfigUpdate();
 		void changeCrossingThickness();
-		void decorateSpindleState(bool state);
+		void decorateSpindleState(CncSpindlePowerState state);
 		
 		//////////////////////////////////////////////////////////////////////////////////
 #		ifdef __WXMSW__
@@ -692,7 +693,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void motionMonitorViewPerspective4();
 		
 		bool isReferenceStateValid() const;
-		void setReferencePosMessage(const wxString& msg);
 		const RefPosResult& getReferencePosResult(RefPosResult& result)	const;
 		void setReferencePosEnforceFlag(bool s);
 		void resetReferencePosTempSetting();
@@ -725,7 +725,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class SerialThreadStub;
 		
 		friend class CncArduinoEnvironment;
-		friend class CncPodestMgmtMovement;
+		friend class CncPodiumMgmtMovement;
 		friend class CncSecureManuallyMovePanel;
 		
 		friend class CncPathListRunner;
@@ -746,6 +746,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool 							evaluatePositions;
 		bool 							ignoreDirControlEvents;
 		
+		CncToolStateControl				toolState;
 		RunConfirmationInfo  			runConfirmationInfo;
 		CncGamepadTransactionLock*		interactiveTransactionLock;
 		
@@ -823,7 +824,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncApp::MenuItems	menuItems;
 		
 		CncReferencePosition* refPositionDlg;
-		CncPodestManagement*  podestManagementDlg; 
+		CncPodiumManagement*  podiumManagementDlg; 
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
 		

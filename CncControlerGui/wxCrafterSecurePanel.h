@@ -59,7 +59,7 @@ protected:
     wxPanel* m_lpManually;
     wxPanel* m_lpRun;
     wxPanel* m_lpCtrl;
-    wxPanel* m_plPodest;
+    wxPanel* m_plPodium;
     wxPanel* m_lpMisc;
     wxStaticText* m_rightHeadline;
     wxSimplebook* m_rightBook;
@@ -115,8 +115,8 @@ protected:
     wxButton* m_btnEmergenyStopSec;
     wxPanel* m_rpCtrl;
     wxButton* m_resolveLimit;
-    wxPanel* m_rpPodest;
-    wxPanel* m_podestPlaceholder;
+    wxPanel* m_rpPodium;
+    wxPanel* m_podiumPlaceholder;
     wxPanel* m_rpMisc;
     wxButton* m_btOSEnvrionment;
     wxButton* m_btSessionDir;
@@ -157,7 +157,7 @@ public:
     wxPanel* GetLpManually() { return m_lpManually; }
     wxPanel* GetLpRun() { return m_lpRun; }
     wxPanel* GetLpCtrl() { return m_lpCtrl; }
-    wxPanel* GetPlPodest() { return m_plPodest; }
+    wxPanel* GetPlPodium() { return m_plPodium; }
     wxPanel* GetLpMisc() { return m_lpMisc; }
     wxListbook* GetLeftBook() { return m_leftBook; }
     wxStaticText* GetRightHeadline() { return m_rightHeadline; }
@@ -213,8 +213,8 @@ public:
     wxPanel* GetRpRun() { return m_rpRun; }
     wxButton* GetResolveLimit() { return m_resolveLimit; }
     wxPanel* GetRpCtrl() { return m_rpCtrl; }
-    wxPanel* GetPodestPlaceholder() { return m_podestPlaceholder; }
-    wxPanel* GetRpPodest() { return m_rpPodest; }
+    wxPanel* GetPodiumPlaceholder() { return m_podiumPlaceholder; }
+    wxPanel* GetRpPodium() { return m_rpPodium; }
     wxButton* GetBtOSEnvrionment() { return m_btOSEnvrionment; }
     wxButton* GetBtSessionDir() { return m_btSessionDir; }
     wxButton* GetBtSerialSpy() { return m_btSerialSpy; }

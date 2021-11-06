@@ -60,10 +60,10 @@
 
   const unsigned char CMD_MOVE_INTERACTIVE                =  '%'; //  37 0x25
 
-  const unsigned char CMD_ACTIVATE_PODEST_HW              =  '['; //  91 0x5B
-  const unsigned char CMD_DEACTIVATE_PODEST_HW            =  ']'; //  93 0x5E
-  const unsigned char CMD_MOVE_PODEST                     =  '$'; //  36 0x24
-  const unsigned char CMD_MOVE_PODEST_EXACT               =  '&'; //  38 0x26
+  const unsigned char CMD_ACTIVATE_PODIUM_HW              =  '['; //  91 0x5B
+  const unsigned char CMD_DEACTIVATE_PODIUM_HW            =  ']'; //  93 0x5E
+  const unsigned char CMD_MOVE_PODIUM                     =  '$'; //  36 0x24
+  const unsigned char CMD_MOVE_PODIUM_EXACT               =  '&'; //  38 0x26
  
   const unsigned char CMD_PRINT_CONFIG                    =  'c'; //  99 0x63
   const unsigned char CMD_PRINT_TIMESTAMP                 =  'T'; //  84 0x54
@@ -176,7 +176,7 @@
   const unsigned char PID_STEP_PIN                        =  70;
   const unsigned char PID_DIR_PIN                         =  71;
   const unsigned char PID_ENABLE_STEPPERS                 =  72;
-  const unsigned char PID_PODEST_POS                      =  73;
+  const unsigned char PID_PODIUM_POS                      =  73;
 
   const unsigned char PID_INC_DIRECTION_VALUE_X           =  80;
   const unsigned char PID_INC_DIRECTION_VALUE_Y           =  81;
@@ -252,8 +252,8 @@
   const unsigned char E_INVALID_MOVE_SEQUENCE             =  10;
   const unsigned char E_INVALID_PARAM_SIZE                =  11;
   const unsigned char E_INVALID_TRANSACTION_STATE         =  12;
-  const unsigned char E_PODEST_DIR_CHANGE_FAILED          =  13;
-  const unsigned char E_PODEST_MOVE_FAILED                =  14;
+  const unsigned char E_PODIUM_DIR_CHANGE_FAILED          =  13;
+  const unsigned char E_PODIUM_MOVE_FAILED                =  14;
   const unsigned char E_AVOID_READY_TO_RUN                =  15;
 
   const unsigned char E_STEPPER_NOT_ENABLED               =  20;

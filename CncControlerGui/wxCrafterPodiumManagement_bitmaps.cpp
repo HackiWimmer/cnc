@@ -529,44 +529,44 @@ static unsigned char xml_res_file_7[] = {
 114,32,71,101,110,101,114,97,116,105,111,110,32,105,115,32,79,78,32,45,
 45,62,10,32,32,60,111,98,106,101,99,116,32,99,108,97,115,115,61,34,119,
 120,66,105,116,109,97,112,34,32,110,97,109,101,61,34,49,54,45,105,110,102,
-111,64,50,120,34,62,119,120,67,114,97,102,116,101,114,80,111,100,101,115,
-116,77,97,110,97,103,101,109,101,110,116,95,98,105,116,109,97,112,115,46,
+111,64,50,120,34,62,119,120,67,114,97,102,116,101,114,80,111,100,105,117,
+109,77,97,110,97,103,101,109,101,110,116,95,98,105,116,109,97,112,115,46,
 99,112,112,36,98,105,116,109,97,112,115,95,67,111,100,101,76,105,116,101,
 95,49,54,45,105,110,102,111,64,50,120,46,112,110,103,60,47,111,98,106,101,
 99,116,62,10,32,32,60,111,98,106,101,99,116,32,99,108,97,115,115,61,34,
 119,120,66,105,116,109,97,112,34,32,110,97,109,101,61,34,49,54,45,115,111,
-114,116,34,62,119,120,67,114,97,102,116,101,114,80,111,100,101,115,116,
+114,116,34,62,119,120,67,114,97,102,116,101,114,80,111,100,105,117,109,
 77,97,110,97,103,101,109,101,110,116,95,98,105,116,109,97,112,115,46,99,
 112,112,36,98,105,116,109,97,112,115,95,67,111,100,101,76,105,116,101,95,
 49,54,45,115,111,114,116,46,112,110,103,60,47,111,98,106,101,99,116,62,
 10,32,32,60,111,98,106,101,99,116,32,99,108,97,115,115,61,34,119,120,66,
 105,116,109,97,112,34,32,110,97,109,101,61,34,49,54,45,115,111,114,116,
-64,50,120,34,62,119,120,67,114,97,102,116,101,114,80,111,100,101,115,116,
+64,50,120,34,62,119,120,67,114,97,102,116,101,114,80,111,100,105,117,109,
 77,97,110,97,103,101,109,101,110,116,95,98,105,116,109,97,112,115,46,99,
 112,112,36,98,105,116,109,97,112,115,95,67,111,100,101,76,105,116,101,95,
 49,54,45,115,111,114,116,64,50,120,46,112,110,103,60,47,111,98,106,101,
 99,116,62,10,32,32,60,111,98,106,101,99,116,32,99,108,97,115,115,61,34,
 119,120,66,105,116,109,97,112,34,32,110,97,109,101,61,34,108,105,102,116,
-34,62,119,120,67,114,97,102,116,101,114,80,111,100,101,115,116,77,97,110,
+34,62,119,120,67,114,97,102,116,101,114,80,111,100,105,117,109,77,97,110,
 97,103,101,109,101,110,116,95,98,105,116,109,97,112,115,46,99,112,112,36,
 98,105,116,109,97,112,115,95,108,105,102,116,46,112,110,103,60,47,111,98,
 106,101,99,116,62,10,32,32,60,111,98,106,101,99,116,32,99,108,97,115,115,
 61,34,119,120,66,105,116,109,97,112,34,32,110,97,109,101,61,34,112,111,
-100,101,115,116,82,101,108,97,116,105,118,101,68,111,119,110,34,62,119,
-120,67,114,97,102,116,101,114,80,111,100,101,115,116,77,97,110,97,103,101,
+100,105,117,109,82,101,108,97,116,105,118,101,68,111,119,110,34,62,119,
+120,67,114,97,102,116,101,114,80,111,100,105,117,109,77,97,110,97,103,101,
 109,101,110,116,95,98,105,116,109,97,112,115,46,99,112,112,36,98,105,116,
-109,97,112,115,95,112,111,100,101,115,116,82,101,108,97,116,105,118,101,
+109,97,112,115,95,112,111,100,105,117,109,82,101,108,97,116,105,118,101,
 68,111,119,110,46,112,110,103,60,47,111,98,106,101,99,116,62,10,32,32,60,
 111,98,106,101,99,116,32,99,108,97,115,115,61,34,119,120,66,105,116,109,
-97,112,34,32,110,97,109,101,61,34,112,111,100,101,115,116,82,101,108,97,
+97,112,34,32,110,97,109,101,61,34,112,111,100,105,117,109,82,101,108,97,
 116,105,118,101,85,112,34,62,119,120,67,114,97,102,116,101,114,80,111,100,
-101,115,116,77,97,110,97,103,101,109,101,110,116,95,98,105,116,109,97,112,
-115,46,99,112,112,36,98,105,116,109,97,112,115,95,112,111,100,101,115,116,
+105,117,109,77,97,110,97,103,101,109,101,110,116,95,98,105,116,109,97,112,
+115,46,99,112,112,36,98,105,116,109,97,112,115,95,112,111,100,105,117,109,
 82,101,108,97,116,105,118,101,85,112,46,112,110,103,60,47,111,98,106,101,
 99,116,62,10,32,32,60,111,98,106,101,99,116,32,99,108,97,115,115,61,34,
 119,120,66,105,116,109,97,112,34,32,110,97,109,101,61,34,119,105,110,100,
 111,119,45,99,108,111,115,101,45,51,34,62,119,120,67,114,97,102,116,101,
-114,80,111,100,101,115,116,77,97,110,97,103,101,109,101,110,116,95,98,105,
+114,80,111,100,105,117,109,77,97,110,97,103,101,109,101,110,116,95,98,105,
 116,109,97,112,115,46,99,112,112,36,98,105,116,109,97,112,115,95,119,105,
 110,100,111,119,45,99,108,111,115,101,45,51,46,112,110,103,60,47,111,98,
 106,101,99,116,62,10,60,47,114,101,115,111,117,114,99,101,62,10};
@@ -584,13 +584,13 @@ void wxC9ED9XXInitBitmapResources()
         else wxFileSystem::AddHandler(new wxMemoryFSHandlerBase);
     }
 
-    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$bitmaps_CodeLite_16-info@2x.png"), xml_res_file_0, xml_res_size_0, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$bitmaps_CodeLite_16-sort.png"), xml_res_file_1, xml_res_size_1, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$bitmaps_CodeLite_16-sort@2x.png"), xml_res_file_2, xml_res_size_2, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$bitmaps_lift.png"), xml_res_file_3, xml_res_size_3, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$bitmaps_podestRelativeDown.png"), xml_res_file_4, xml_res_size_4, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$bitmaps_podestRelativeUp.png"), xml_res_file_5, xml_res_size_5, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$bitmaps_window-close-3.png"), xml_res_file_6, xml_res_size_6, wxT("image/png"));
-    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$C__@Development_@Projekte_c++_CNCGuiController_CncControlerGui_wxCrafterPodestManagement_bitmaps.xrc"), xml_res_file_7, xml_res_size_7, wxT("text/xml"));
-    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/wxCrafterPodestManagement_bitmaps.cpp$C__@Development_@Projekte_c++_CNCGuiController_CncControlerGui_wxCrafterPodestManagement_bitmaps.xrc"));
+    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$bitmaps_CodeLite_16-info@2x.png"), xml_res_file_0, xml_res_size_0, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$bitmaps_CodeLite_16-sort.png"), xml_res_file_1, xml_res_size_1, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$bitmaps_CodeLite_16-sort@2x.png"), xml_res_file_2, xml_res_size_2, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$bitmaps_lift.png"), xml_res_file_3, xml_res_size_3, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$bitmaps_podiumRelativeDown.png"), xml_res_file_4, xml_res_size_4, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$bitmaps_podiumRelativeUp.png"), xml_res_file_5, xml_res_size_5, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$bitmaps_window-close-3.png"), xml_res_file_6, xml_res_size_6, wxT("image/png"));
+    XRC_ADD_FILE(wxT("XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$C__@Development_@Projekte_c++_CNCGuiController_CncControlerGui_wxCrafterPodiumManagement_bitmaps.xrc"), xml_res_file_7, xml_res_size_7, wxT("text/xml"));
+    wxXmlResource::Get()->Load(wxT("memory:XRC_resource/wxCrafterPodiumManagement_bitmaps.cpp$C__@Development_@Projekte_c++_CNCGuiController_CncControlerGui_wxCrafterPodiumManagement_bitmaps.xrc"));
 }

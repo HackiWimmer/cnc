@@ -3,7 +3,7 @@
 
 #include "CncSecureSlidepad.h"
 #include "CncReferenceEvaluation.h"
-#include "CncPodestMgmtMovement.h"
+#include "CncPodiumMgmtMovement.h"
 #include "CncSecureGesturesPanel.h"
 #include "wxCrafterSecurePanel.h"
 
@@ -14,7 +14,7 @@ class CncSecureRotateModelPanel;
 class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 							, public CncSecureSlidepad::CallbackInterface
 							, public CncReferenceEvaluation::CallbackInterface
-							, public CncPodestMgmtMovement::CallbackInterface
+							, public CncPodiumMgmtMovement::CallbackInterface
 {
 	public:
 		
@@ -43,11 +43,11 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		
 		void notifyResetMonitorView();
 		
+		int aktivateReferencePanel();
 		CncReferenceEvaluation* getReferencePanel() const { return referencePanel; }
 		
 	protected:
-    virtual void onAppEnvironmentSec(wxCommandEvent& event);
-	
+		virtual void onAppEnvironmentSec(wxCommandEvent& event);
 		virtual void onSerialSpySec(wxCommandEvent& event);
 		virtual void requestResolveLimitStates(wxCommandEvent& event);
 		virtual void onToggleTouchpadPane(wxCommandEvent& event);
@@ -68,16 +68,15 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		virtual void onLeftBookPageChanged(wxListbookEvent& event);
 		
 		void onInteractiveMove(CncSecureGesturesPanelEvent& event);
-		
 		void setPortSelection(const wxString& portName);
 		
 		virtual void sliderValueChanged(int pos, int value);
 		virtual void cameraNotifyPreview(bool show);
 		virtual void referenceNotifyMessage(const wxString& msg, int flags = wxICON_INFORMATION);
 		virtual void referenceDismissMessage();
-		virtual void podestNotifyEnable(bool state);
-		virtual void podestNotifyInit(bool state);
-		virtual void podestNotifyClose(bool state);
+		virtual void podiumNotifyEnable(bool state);
+		virtual void podiumNotifyInit(bool state);
+		virtual void podiumNotifyClose(bool state);
 		
 		friend class CncSecurePortListCtrl;
 		
@@ -102,7 +101,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		CncSecureGesturesPanel*			interactiveMoveY;
 		CncSecureGesturesPanel*			interactiveMoveZ;
 		CncSecureGesturesPanel*			interactiveTouchpadXYZ;
-		CncPodestMgmtMovement*			podestPanel;
+		CncPodiumMgmtMovement*			podiumPanel;
 		CncReferenceEvaluation*			referencePanel;
 		CncSecureSlidepad*				speedpad;
 		PageVector						pageVector;

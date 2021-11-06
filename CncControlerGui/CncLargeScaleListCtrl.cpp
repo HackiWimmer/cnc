@@ -1,30 +1,29 @@
 #include <iostream>
 #include <climits>
 #include "CncConfig.h"
-#include "CncAutoFreezer.h"
 #include "CncLargeScaleListCtrl.h"
 
 ///////////////////////////////////////////////////////////////////
 CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size, 
 											   long style, const wxValidator &validator, const wxString &name)
-: wxListCtrl(parent, id, pos, size, (style | wxLC_REPORT | wxLC_VIRTUAL), validator, name)
-, blockSelectionEvent(false)
-, dummyRow(NULL)
-, rows()
-, listType(CncLargeScaledListCtrl::ListType::NORMAL)
-, lastSelection(wxNOT_FOUND)
+: wxListCtrl			(parent, id, pos, size, (style | wxLC_REPORT | wxLC_VIRTUAL), validator, name)
+, blockSelectionEvent	(false)
+, dummyRow				(NULL)
+, rows					()
+, listType				(CncLargeScaledListCtrl::ListType::NORMAL)
+, lastSelection			(wxNOT_FOUND)
 ///////////////////////////////////////////////////////////////////
 {
 	rows.reserve( THE_CONFIG->getConstReserveCapacity() );
 }
 ///////////////////////////////////////////////////////////////////
 CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, long style) 
-: wxListCtrl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, (style | wxLC_REPORT | wxLC_VIRTUAL) )
-, blockSelectionEvent(false)
-, dummyRow(NULL)
-, rows()
-, listType(CncLargeScaledListCtrl::ListType::NORMAL)
-, lastSelection(wxNOT_FOUND)
+: wxListCtrl			(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, (style | wxLC_REPORT | wxLC_VIRTUAL) )
+, blockSelectionEvent	(false)
+, dummyRow				(NULL)
+, rows					()
+, listType				(CncLargeScaledListCtrl::ListType::NORMAL)
+, lastSelection			(wxNOT_FOUND)
 ///////////////////////////////////////////////////////////////////
 {
 	rows.reserve( THE_CONFIG->getConstReserveCapacity() );
@@ -69,6 +68,27 @@ void CncLargeScaledListCtrl::thaw() {
 ///////////////////////////////////////////////////////////////////
 	if ( IsFrozen() == true )
 		Thaw();
+}
+/////////////////////////////////////////////////////////////////////
+void CncLargeScaledListCtrl::updateColumnWidth(int stretchColumn) {
+/////////////////////////////////////////////////////////////////////
+	if ( GetColumnCount() <= 0 )
+		return;
+		
+	int colWidthSum = 0;
+	for ( int i = 0; i < GetColumnCount(); i++ ) {
+		if ( i == stretchColumn )
+			continue;
+			
+		colWidthSum += GetColumnWidth(i);
+	}
+	
+	const int scrollbarWidth = 26;
+	int size = GetSize().GetWidth() 
+			 - colWidthSum
+			 - scrollbarWidth;
+			 
+	SetColumnWidth(stretchColumn, size);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::clear() {
@@ -230,12 +250,6 @@ bool CncLargeScaledListCtrl::ensureVisible(long item) {
 	if ( IsShownOnScreen() == false )
 		return true;
 	
-	const bool frozenBefore = IsFrozen();
-	
-	if ( frozenBefore == false )
-		Freeze();
-		
-	CncAutoFreezer caf(this);
 	const long total = GetItemCount();
 	const long cpp   = GetCountPerPage();
 	

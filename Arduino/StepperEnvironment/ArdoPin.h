@@ -13,8 +13,8 @@
   #define ENABLE_STATE_OFF                                  PL_HIGH
   #define ENABLE_STATE_ON                                   PL_LOW
 
-  #define PODEST_SWITCH_OFF                                 PL_HIGH
-  #define PODEST_SWITCH_ON                                  PL_LOW
+  #define PODIUM_SWITCH_OFF                                 PL_HIGH
+  #define PODIUM_SWITCH_ON                                  PL_LOW
 
   #ifndef SKETCH_COMPILE
 
@@ -149,8 +149,8 @@
 
     const unsigned char PIN_H_DIR                           =  49;
     const unsigned char PIN_H_STP                           =  48;
-    const unsigned char PIN_LED_PODEST                      =  47;
-    const unsigned char PIN_ENABLE_PODEST                   =  46;
+    const unsigned char PIN_LED_PODIUM                      =  47;
+    const unsigned char PIN_ENABLE_PODIUM                   =  46;
 
     const unsigned char PIN_H_MOVE_UP                       =  51;
     const unsigned char PIN_H_MOVE_DOWN                     =  50;

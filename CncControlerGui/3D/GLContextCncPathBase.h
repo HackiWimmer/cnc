@@ -180,20 +180,20 @@ class GLContextCncPathBase : public GLContextBase {
 			void reset() { *this = ReplayContext(); }
 		};
 		
-		GLI::GLCncPath		cncPath;
-		cnc::LongValues		highlightedClientIds;
-		GLI::GLXYZRuler		ruler;
-		DrawType 			drawType;
-		bool				continiousDirConeFlag;
+		GLI::GLCncPath			cncPath;
+		cnc::LongValues			highlightedClientIds;
+		GLI::GLXYZRuler			ruler;
+		DrawType 				drawType;
+		bool					continiousDirConeFlag;
 		
-		long 				currentClientId;
+		long 					currentClientId;
 		
-		ProcessContext		processContext;
-		ReplayContext		replayContext;
+		ProcessContext			processContext;
+		ReplayContext			replayContext;
 		
-		wxColour			rulerColourX;
-		wxColour			rulerColourY;
-		wxColour			rulerColourZ;
+		wxColour				rulerColourX;
+		wxColour				rulerColourY;
+		wxColour				rulerColourZ;
 		
 		virtual void initBufferStore();
 		

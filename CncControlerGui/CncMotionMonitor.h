@@ -142,27 +142,29 @@ class CncMotionMonitor : public CncGlCanvas
 
 		void updateMonitorAndOptions();
 			
-		long getPathItemCount()						{ return monitor->getPathItemCount(); }
+		long getPathItemCount()									{ return monitor->getPathItemCount(); }
 		
-		void setVirtualEnd(long val)				{ monitor->setVirtualEnd(val); }
-		void setVirtualEndToFirst()					{ monitor->setVirtualEndToFirst(); }
-		void setVirtualEndToLast()					{ monitor->setVirtualEndToLast(); }
+		void setVirtualEnd(long val)							{ monitor->setVirtualEnd(val); }
+		void setVirtualEndToFirst()								{ monitor->setVirtualEndToFirst(); }
+		void setVirtualEndToLast()								{ monitor->setVirtualEndToLast(); }
 		
-		long previewNextVertexId()					{ return monitor->previewNextVertexId(); }
-		long previewPreviousVertexId()				{ return monitor->previewPreviousVertexId(); }
-		long previewNextVertexNormalizedId()		{ return monitor->previewNextVertexNormalizedId(); }
-		long previewPreviousVertexNormalizedId()	{ return monitor->previewPreviousVertexNormalizedId(); }
+		long previewNextVertexId()								{ return monitor->previewNextVertexId(); }
+		long previewPreviousVertexId()							{ return monitor->previewPreviousVertexId(); }
+		long previewNextVertexNormalizedId()					{ return monitor->previewNextVertexNormalizedId(); }
+		long previewPreviousVertexNormalizedId()				{ return monitor->previewPreviousVertexNormalizedId(); }
 
-		void incVirtualEnd() 						{ monitor->incVirtualEnd(); } 
-		void decVirtualEnd() 						{ monitor->decVirtualEnd(); }
-		void incVirtualEndById() 					{ monitor->incVirtualEndById(); }
-		void decVirtualEndById() 					{ monitor->decVirtualEndById(); }
+		void incVirtualEnd() 									{ monitor->incVirtualEnd(); } 
+		void decVirtualEnd() 									{ monitor->decVirtualEnd(); }
+		void incVirtualEndById() 								{ monitor->incVirtualEndById(); }
+		void decVirtualEndById() 								{ monitor->decVirtualEndById(); }
 		
-		const long getVirtualEnd()					{ return monitor->getVirtualEnd(); }
-		const long getVirtualEndAsId()				{ return monitor->getVirtualEndAsId(); }
-		const long getVirtualEndAsNormalizedId()	{ return monitor->getVirtualEndAsNormalizedId(); }
+		const long getVirtualEnd()								{ return monitor->getVirtualEnd(); }
+		const long getVirtualEndAsId()							{ return monitor->getVirtualEndAsId(); }
+		const long getVirtualEndAsNormalizedId()				{ return monitor->getVirtualEndAsNormalizedId(); }
 		
-		void clearHighlightEffects()				{ monitor->clearHighlightEffects(); }
+		void clearHighlightEffects()							{ monitor->clearHighlightEffects(); }
+		
+		void setSpindlePowerState(CncSpindlePowerState state)	{ monitor->setSpindlePowerState(state); Refresh(); }
 		
 	protected:
 		GLContextCncPathBase* 		monitor;

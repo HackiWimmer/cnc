@@ -104,6 +104,7 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		static const int		SEL_BY_EYE		= 2;
 		
 		wxImage					imgTouchCorner[5];
+		wxDateTime				tsLast;
 		
 		bool					valid;
 		
@@ -130,6 +131,9 @@ class CncReferenceEvaluation	: public CncReferenceEvaluationBase
 		double					getValueAsDouble(wxTextCtrl* ctrl, double defaultValue = 0.0)	const;
 		
 		void					touch(wxWindow* btn, CncTouchBlockDetector::Parameters::TouchMode tm);
+		
+		void referenceNotifyMessage(const wxString& msg, int flags = wxICON_INFORMATION);
+		void referenceDismissMessage();
 };
 
 #endif // CNCREFERENCEEVALUATION_H

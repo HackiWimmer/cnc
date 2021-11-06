@@ -34,6 +34,7 @@ class CncMessageListCtrl : public CncLargeScaledListCtrl {
 		typedef std::vector<Message> MesageList;
 		MesageList messages;
 		
+		bool			sizeChanged;
 		int 			updateInterval;
 		wxTimer			displayTimer;
 		wxListItemAttr	itemAttrInfo;
@@ -48,13 +49,13 @@ class CncMessageListCtrl : public CncLargeScaledListCtrl {
 
 		void onDisplayTimer(wxTimerEvent& event);
 		void onSize(wxSizeEvent& event);
+		void onPaint(wxPaintEvent& event);
 		void onSelectListItem(wxListEvent& event);
 		void onActivateListItem(wxListEvent& event);
 		
 	protected:
 		
 		virtual bool isItemValid(long item) const;
-		void updateColumnWidth();
 	
 	public:
 		

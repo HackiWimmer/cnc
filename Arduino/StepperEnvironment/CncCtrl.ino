@@ -123,10 +123,11 @@ CncArduinoController::CncArduinoController()
 : ArduinoCmdDecoderGetter       () 
 , ArduinoCmdDecoderSetter       ()
 , ArduinoCmdDecoderMove         () 
-, ArduinoCmdDecoderMovePodest   ()
+, ArduinoCmdDecoderMovePodium   ()
 , ArduinoCmdDecoderMoveSequence ()
 , ArduinoPositionRenderer       ()
 , ArduinoAccelManager           ()
+, ArduinoPodiumManager          ()
 , X                             ( new CncAxisX(StepperSetup( this, PIN_X_STP, PIN_X_DIR, PIN_X_MIN_LIMIT, PIN_X_MAX_LIMIT, PID_INC_DIRECTION_VALUE_X )) )
 , Y                             ( new CncAxisY(StepperSetup( this, PIN_Y_STP, PIN_Y_DIR, PIN_Y_MIN_LIMIT, PIN_Y_MAX_LIMIT, PID_INC_DIRECTION_VALUE_Y )) )
 , Z                             ( new CncAxisZ(StepperSetup( this, PIN_Z_STP, PIN_Z_DIR, PIN_Z_MIN_LIMIT, PIN_Z_MAX_LIMIT, PID_INC_DIRECTION_VALUE_Z )) )
@@ -136,7 +137,7 @@ CncArduinoController::CncArduinoController()
 , spindleInterface              (PIN_SPINDEL_SUPPORT, PIN_SPINDEL_SPEED_INF, PIN_IS_SPINDEL_OVRLD)
 , lastI2CData                   ()
 , transactionState              (OFF)
-, podestHardwareState           (OFF)
+, podiumHardwareState           (OFF)
 , posReplyState                 (OFF)
 , probeMode                     (OFF)
 , pauseState                    (PAUSE_INACTIVE)
@@ -147,12 +148,12 @@ CncArduinoController::CncArduinoController()
 , posReplyThreshold             (100)
 , tsMoveStart                   (0L)
 , tsMoveLast                    (0L)
-, podestStillOpenSteps          (0L)
+, podiumStillOpenSteps          (0L)
 , interactiveMove               ()
 {  
   ArduinoPositionRenderer::setupSteppers(X, Y, Z);
 
-  #warning - remove this again if the podest limit switches for H are installed
+  #warning - remove this again if the podium limit switches for H are installed
   CncAxisH::doConsiderLimitPins(false);
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -216,20 +217,20 @@ bool CncArduinoController::evaluateI2CData() {
   return ArduinoMainLoop::readI2CSlave(lastI2CData);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::evaluatePodestSwitch() {
+bool CncArduinoController::evaluatePodiumSwitches() {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( podestHardwareState == OFF )
+  if ( podiumHardwareState == OFF )
     return true;
 
   // these pins are optionally
   if ( PIN_H_MOVE_UP == 0 || PIN_H_MOVE_DOWN == 0 )
     return true;
 
-  const bool btUp   = ( AE::digitalRead(PIN_H_MOVE_UP)    == PODEST_SWITCH_ON );
-  const bool btDown = ( AE::digitalRead(PIN_H_MOVE_DOWN)  == PODEST_SWITCH_ON );
+  const bool btUp   = ( AE::digitalRead(PIN_H_MOVE_UP)    == PODIUM_SWITCH_ON );
+  const bool btDown = ( AE::digitalRead(PIN_H_MOVE_DOWN)  == PODIUM_SWITCH_ON );
   
   if ( btUp == PL_HIGH || btDown == PL_HIGH ) { 
-    byte b = movePodest(btUp ? +1 : -1, CncArduinoController::stopMovePodestBySwitch);  
+    byte b = movePodium(btUp ? +1 : -1, CncArduinoController::stopMovePodiumBySwitch);  
     return b == RET_OK;
   }
 
@@ -519,12 +520,12 @@ byte CncArduinoController::acceptTransaction(byte cmd) {
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::activatePodestHardware(byte cmd) {
+byte CncArduinoController::activatePodiumHardware(byte cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
-  podestHardwareState = ( cmd == CMD_ACTIVATE_PODEST_HW ? ON : OFF );
-  ARDO_DEBUG_MESSAGE('S', podestHardwareState == ON ? "Switch Podest Harware 'ON'" : "Switch Podest Harware 'OFF'")
+  podiumHardwareState = ( cmd == CMD_ACTIVATE_PODIUM_HW ? ON : OFF );
+  ARDO_DEBUG_MESSAGE('S', podiumHardwareState == ON ? "Switch Podium Harware 'ON'" : "Switch Podium Harware 'OFF'")
 
-  AE::digitalWrite(PIN_LED_PODEST, podestHardwareState ? PL_HIGH : PL_LOW);
+  AE::digitalWrite(PIN_LED_PODIUM, podiumHardwareState ? PL_HIGH : PL_LOW);
    
   return RET_OK;
 }
@@ -539,44 +540,44 @@ byte CncArduinoController::acceptSetter() {
   return decodeSetter();    
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::acceptPodestMove(byte cmd) {
+byte CncArduinoController::acceptPodiumMove(byte cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
-  return decodeMovePodest(cmd);    
+  return decodeMovePodium(cmd);    
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::process(const ArduinoCmdDecoderMovePodest::Result& mv) {
+byte CncArduinoController::process(const ArduinoCmdDecoderMovePodium::Result& mv) {
 /////////////////////////////////////////////////////////////////////////////////////
   byte ret = RET_ERROR;
 
   // first set generally 
-  podestStillOpenSteps = ArdoObj::absolute(mv.dh);
+  podiumStillOpenSteps = ArdoObj::absolute(mv.dh);
   
   switch ( mv.cmd ) {
-    case CMD_MOVE_PODEST_EXACT:
-          ret = movePodest(mv.dh, CncArduinoController::stopMovePodestExact);
+    case CMD_MOVE_PODIUM_EXACT:
+          ret = movePodium(mv.dh, CncArduinoController::stopMovePodiumExact);
           break;
           
-    case CMD_MOVE_PODEST:
-          ret = movePodest(mv.dh, CncArduinoController::stopMovePodestBySignal);
+    case CMD_MOVE_PODIUM:
+          ret = movePodium(mv.dh, CncArduinoController::stopMovePodiumBySignal);
           break;
   }
 
   return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct stopFunct) {
+byte CncArduinoController::movePodium(int32_t stepDir, stopPodiumHardware_funct stopFunct) {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( stopFunct == NULL )
     return RET_ERROR;
 
   if ( H->setDirection(stepDir) == false ) {
-    ArduinoMainLoop::pushMessage(MT_ERROR, E_PODEST_DIR_CHANGE_FAILED, CMD_MOVE_PODEST);
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_PODIUM_DIR_CHANGE_FAILED, CMD_MOVE_PODIUM);
     return RET_ERROR;
   }
 
-  // Create this instance to enable the podest stepper pin and release the brake.
+  // Create this instance to enable the podium stepper pin and release the brake.
   // The corresponding dtor will inverse this again
-  PodestEnabler pe;
+  PodiumEnabler pe;
 
   const int32_t maxSpeedDelay = 1100;
   const int32_t minSpeedDelay =  150;
@@ -590,16 +591,16 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
     
     const byte b = H->performStep();
     
-    podestStillOpenSteps--;
+    podiumStillOpenSteps--;
 
-    // slow down the podest movement
+    // slow down the podium movement
     if ( curSpeedDelay >= minSpeedDelay ) {
       AE::delayMicroseconds(curSpeedDelay);
       curSpeedDelay--;
     }
     
     if ( b != RET_OK ) {
-      ArduinoMainLoop::pushMessage(MT_ERROR, E_PODEST_MOVE_FAILED, CMD_MOVE_PODEST);
+      ArduinoMainLoop::pushMessage(MT_ERROR, E_PODIUM_MOVE_FAILED, CMD_MOVE_PODIUM);
       return b;
     }
   }
@@ -607,12 +608,12 @@ byte CncArduinoController::movePodest(int32_t stepDir, stopPodestHardware_funct 
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::stopMovePodestExact(CncArduinoController* ctrl) {
+bool CncArduinoController::stopMovePodiumExact(CncArduinoController* ctrl) {
 /////////////////////////////////////////////////////////////////////////////////////
-  return ctrl->podestStillOpenSteps <= 0;
+  return ctrl->podiumStillOpenSteps <= 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::stopMovePodestBySignal(CncArduinoController* ctrl){
+bool CncArduinoController::stopMovePodiumBySignal(CncArduinoController* ctrl){
 /////////////////////////////////////////////////////////////////////////////////////
   byte serialFrontByte = CMD_INVALID;
   if ( ArduinoMainLoop::peakSerial(serialFrontByte) == true ) {
@@ -624,8 +625,8 @@ bool CncArduinoController::stopMovePodestBySignal(CncArduinoController* ctrl){
       return true;
     }
     
-    if ( serialFrontByte == CMD_DEACTIVATE_PODEST_HW) {
-      ctrl->activatePodestHardware(serialFrontByte);
+    if ( serialFrontByte == CMD_DEACTIVATE_PODIUM_HW) {
+      ctrl->activatePodiumHardware(serialFrontByte);
 
       // read command from serial
       Serial.read();
@@ -639,22 +640,22 @@ bool CncArduinoController::stopMovePodestBySignal(CncArduinoController* ctrl){
   return false;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncArduinoController::stopMovePodestBySwitch(CncArduinoController* ctrl) {
+bool CncArduinoController::stopMovePodiumBySwitch(CncArduinoController* ctrl) {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( CncArduinoController::stopMovePodestBySignal(ctrl) == true )
+  if ( CncArduinoController::stopMovePodiumBySignal(ctrl) == true )
     return true;
   
-  if ( ctrl->podestHardwareState == OFF )
+  if ( ctrl->podiumHardwareState == OFF )
     return true;
 
   // these pins are optionally  
   if ( PIN_H_MOVE_UP == 0 || PIN_H_MOVE_DOWN == 0 )
     return false;
 
-  if ( AE::digitalRead(PIN_H_MOVE_UP)   == PODEST_SWITCH_ON )
+  if ( AE::digitalRead(PIN_H_MOVE_UP)   == PODIUM_SWITCH_ON )
     return false;
     
-  if ( AE::digitalRead(PIN_H_MOVE_DOWN) == PODEST_SWITCH_ON )
+  if ( AE::digitalRead(PIN_H_MOVE_DOWN) == PODIUM_SWITCH_ON )
     return false;
 
   return true;
@@ -879,77 +880,16 @@ bool CncArduinoController::processSignal(byte sig, byte& retValue) {
     case SIG_PAUSE:
                 pauseState = PAUSE_ACTIVE;
                 
-                // Don't return here - see the pause handling below
-                break;
+                retValue = RET_OK;
+                return true;
 
     case SIG_RESUME:
                 pauseState = PAUSE_INACTIVE;
 
-                // Don't return here - see the pause handling below
-                break;
+                retValue = RET_OK;
+                return true;
   }
 
-
-  // ----------------------------------------------------------
-  // pause handling
-  #warning pause handling
-  if ( false )
-  {
-    // --------------------------------------------------------
-    auto checkSerialForPauseCommands = [&](bool currentPauseState)
-    {
-      bool ret = currentPauseState;
-    
-      const int availableByteCount = Serial.available();
-      if ( availableByteCount > 0 ) {
-    
-        const byte b = Serial.peek();
-        switch ( b ) 
-        {
-          case 'p': ret = PAUSE_INACTIVE; 
-                    // remove the cmd for serial
-                    Serial.read(); 
-                    break;
-                    
-          case 'P': ret = PAUSE_ACTIVE;
-                    // remove the cmd for serial
-                    Serial.read();  
-                    break;
-    
-          default:  ret = PAUSE_INACTIVE; 
-                    SPRINTF_DEBUG_STRING("XXX: %d, %d", (int)b, availableByteCount)
-        }
-      }
-    
-      return ret;
-    };
-
-    // --------------------------------------------------------
-    if ( pauseState == PAUSE_ACTIVE ) 
-    {
-  
-       static const short PAUSE_WAIT_DELAY = 50;
-       static const short HB_MOD           = 1000 / PAUSE_WAIT_DELAY;
-       
-       switchSpindleState( pauseState == PAUSE_ACTIVE ? SPINDLE_STATE_OFF : SPINDLE_STATE_ON, FORCE);
-  
-       // loop
-       unsigned short counter = 0;
-       while ( checkSerialForPauseCommands(pauseState) == PAUSE_ACTIVE )
-       {
-           
-        if ( counter%HB_MOD == 0 )
-          processHeartbeat();
-          
-        AE::delay(PAUSE_WAIT_DELAY);
-        counter ++;
-       }
-       
-       pauseState = PAUSE_INACTIVE;
-       switchSpindleState( pauseState == PAUSE_ACTIVE ? SPINDLE_STATE_OFF : SPINDLE_STATE_ON, FORCE);
-    }
-  }
-  
   retValue = RET_OK;
   return true;
 }
@@ -1293,7 +1233,7 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
 
     case PID_TOUCH_CONTACT_STATE:         writeGetterValue1(PID_TOUCH_CONTACT_STATE,          (int32_t)(AE::digitalRead(PIN_TOUCH_CONTACT) == PL_LOW)); break;
     
-    case PID_PODEST_POS:                  writeGetterValue1(PID_PODEST_POS,                   H->getPosition()); break;
+    case PID_PODIUM_POS:                  writeGetterValue1(PID_PODIUM_POS,                   H->getPosition()); break;
     
     default:                              writeGetterValue1(PID_UNKNOWN, 0);
                                       
@@ -1351,7 +1291,7 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     case PID_ACCEL_PROFILE:           setupAccelProfile(st); 
                                       break;
                                       
-    case PID_PODEST_POS:              H->setPosition(st.values[0].asInt32());                 break;
+    case PID_PODIUM_POS:              H->setPosition(st.values[0].asInt32());                 break;
 
     case PID_PULSE_WIDTH_HIGH_H:      H->setHighPulseWidth(st.values[0].asInt32());           break;
     case PID_FEEDRATE_H:              H->setFeedrate(st.values[0].asFloat());                 break;

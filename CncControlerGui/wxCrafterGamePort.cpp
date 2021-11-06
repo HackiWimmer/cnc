@@ -689,7 +689,7 @@ CncGamepadMenuDlgBase::CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id, co
     
     boxSizer496->Add(m_staticText500, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_button48825 = new wxButton(m_panel3, wxID_ANY, _("Podest\nManagement"), wxDefaultPosition, wxDLG_UNIT(m_panel3, wxSize(190,-1)), wxBU_LEFT);
+    m_button48825 = new wxButton(m_panel3, wxID_ANY, _("Podium\nManagement"), wxDefaultPosition, wxDLG_UNIT(m_panel3, wxSize(190,-1)), wxBU_LEFT);
     #if wxVERSION_NUMBER >= 2904
     m_button48825->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("playstation-circle-dark-icon48")), wxRIGHT);
     m_button48825->SetBitmapMargins(2,2);
@@ -698,7 +698,6 @@ CncGamepadMenuDlgBase::CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id, co
     m_button48825->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     wxFont m_button48825Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_button48825->SetFont(m_button48825Font);
-    m_button48825->SetToolTip(_("ewe"));
     
     boxSizer496->Add(m_button48825, 0, wxALL, WXC_FROM_DIP(2));
     m_button48825->SetMinSize(wxSize(190,-1));
@@ -767,7 +766,7 @@ CncGamepadMenuDlgBase::CncGamepadMenuDlgBase(wxWindow* parent, wxWindowID id, co
     m_button4882026->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
     m_button48820->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
     m_button48824->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onRunTemplate), NULL, this);
-    m_button48825->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onPodestManagement), NULL, this);
+    m_button48825->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onPodiumManagement), NULL, this);
     m_button488->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
     m_btCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onCancel), NULL, this);
     
@@ -779,7 +778,7 @@ CncGamepadMenuDlgBase::~CncGamepadMenuDlgBase()
     m_button4882026->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
     m_button48820->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
     m_button48824->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onRunTemplate), NULL, this);
-    m_button48825->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onPodestManagement), NULL, this);
+    m_button48825->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onPodiumManagement), NULL, this);
     m_button488->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onFunction), NULL, this);
     m_btCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadMenuDlgBase::onCancel), NULL, this);
     

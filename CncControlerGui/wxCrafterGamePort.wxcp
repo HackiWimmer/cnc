@@ -6519,7 +6519,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Label:",
-                   "m_value": "Podest\\nManagement"
+                   "m_value": "Podium\\nManagement"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -6542,7 +6542,7 @@
                    "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
                    "m_eventClass": "wxCommandEvent",
                    "m_eventHandler": "wxCommandEventHandler",
-                   "m_functionNameAndSignature": "onPodestManagement(wxCommandEvent& event)",
+                   "m_functionNameAndSignature": "onPodiumManagement(wxCommandEvent& event)",
                    "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
                    "m_noBody": false
                   }],

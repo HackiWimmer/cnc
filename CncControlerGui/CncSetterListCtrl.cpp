@@ -217,11 +217,9 @@ void CncSetterListCtrl::updateColumnWidth() {
 	SetColumnWidth(COL_TYPE, 	 22);
 	SetColumnWidth(COL_NUM, 	 64);
 	SetColumnWidth(COL_PID, 	 40);
-	SetColumnWidth(COL_KEY, 	wxLIST_AUTOSIZE);
-	SetColumnWidth(COL_VAL, 	wxLIST_AUTOSIZE);
 	SetColumnWidth(COL_UNIT, 	 70);
 	
-	// try to strech the second (key) column
+	// try to stretch the second (key) column
 	const int scrollbarWidth = 26;
 	int size = GetSize().GetWidth() 
 			 - GetColumnWidth(COL_NUM) 

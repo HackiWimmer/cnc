@@ -52,10 +52,10 @@ void ArduinoCMDs::init() {
 	cmds[CMD_MOVE_SEQUENCE]                    = "Push Move Sequence";
 	cmds[CMD_RENDER_AND_MOVE_SEQUENCE]         = "Push Render and Move Sequence";
 	
-	cmds[CMD_ACTIVATE_PODEST_HW]               = "Activate Podest Hardware";
-	cmds[CMD_DEACTIVATE_PODEST_HW]             = "Deactivate Podest Hardware";
-	cmds[CMD_MOVE_PODEST]                      = "Move Podest";
-	cmds[CMD_MOVE_PODEST_EXACT]                = "Move Podest Exact";
+	cmds[CMD_ACTIVATE_PODIUM_HW]               = "Activate Podium Hardware";
+	cmds[CMD_DEACTIVATE_PODIUM_HW]             = "Deactivate Podium Hardware";
+	cmds[CMD_MOVE_PODIUM]                      = "Move Podium";
+	cmds[CMD_MOVE_PODIUM_EXACT]                = "Move Podium Exact";
 	
 	cmds[CMD_PRINT_CONFIG]                     = "Pull Configuration";
 	cmds[CMD_PRINT_VERSION]                    = "Pull Version";
@@ -182,7 +182,7 @@ void ArduinoPIDs::init() {
 	pids[PID_ENABLE_STEPPERS]                 .setup("Stepper Enable State", "");
 	pids[PID_SPINDLE_SPEED]                   .setup("Spindle Speed", "PWM, V, U/min");
 	
-	pids[PID_PODEST_POS]                      .setup("Podest Position", "steps");
+	pids[PID_PODIUM_POS]                      .setup("Podium Position", "steps");
 	
 	pids[PID_PULSE_WIDTH_HIGH]                .setup("Step Pulse Width High", "us");
 	pids[PID_PULSE_WIDTH_HIGH_H]              .setup("Step Pulse Width High H-Axis", "us");
@@ -292,9 +292,9 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_INVALID_PARAM_SIZE]                 = "Arduino::decodeMoveSequence(): Can't read size (int32_t) from Serial: invalid size: ";
 	errorCodes[E_AVOID_READY_TO_RUN]                 = "Arduino::avoidReadyToRun == true";
 	
-	errorCodes[E_INVALID_TRANSACTION_STATE]          = "Arduino::processPodest: Invalid Transaction state";
-	errorCodes[E_PODEST_DIR_CHANGE_FAILED]           = "Arduino::processPodest: Direction change failed";
-	errorCodes[E_PODEST_MOVE_FAILED]                 = "Arduino::processPodest: Move failed";
+	errorCodes[E_INVALID_TRANSACTION_STATE]          = "Arduino::processPodium: Invalid Transaction state";
+	errorCodes[E_PODIUM_DIR_CHANGE_FAILED]           = "Arduino::processPodium: Direction change failed";
+	errorCodes[E_PODIUM_MOVE_FAILED]                 = "Arduino::processPodium: Move failed";
 	
 	errorCodes[E_STEPPER_NOT_ENABLED]                = "Arduino::stepAxisXYZ: Stepper not enabled";
 	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::stepAxisXYZ: Stepper not initialized";
@@ -380,13 +380,13 @@ void ArduinoDigitalPins::init() {
 	
 	pins[PIN_EXTERNAL_INTERRUPT]    = "EXTERNAL INTERRUPT PIN";
 	
-	pins[PIN_H_MOVE_UP]             = "MOVE PODEST UP PIN";
-	pins[PIN_H_MOVE_DOWN]           = "MOVE PODEST DOWN PIN";
+	pins[PIN_H_MOVE_UP]             = "MOVE PODIUM UP PIN";
+	pins[PIN_H_MOVE_DOWN]           = "MOVE PODIUM DOWN PIN";
 
-	pins[PIN_H_DIR]                 = "MOVE PODEST DIR PIN";
-	pins[PIN_H_STP]                 = "MOVE PODEST STEP PIN";
-	pins[PIN_LED_PODEST]            = "PODEST LED PIN";
-	pins[PIN_ENABLE_PODEST]         = "PODEST ENABLE PIN";
+	pins[PIN_H_DIR]                 = "MOVE PODIUM DIR PIN";
+	pins[PIN_H_STP]                 = "MOVE PODIUM STEP PIN";
+	pins[PIN_LED_PODIUM]            = "PODIUM LED PIN";
+	pins[PIN_ENABLE_PODIUM]         = "PODIUM ENABLE PIN";
 	
 	pins[PIN_TOUCH_CONTACT]         = "TOUCH CONTACT PIN";
 	

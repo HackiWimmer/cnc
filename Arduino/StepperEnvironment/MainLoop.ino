@@ -706,11 +706,11 @@ void ArduinoMainLoop::setup() {
 
   AE::pinMode(PIN_EXTERNAL_INTERRUPT,   PM_INPUT);   AE::digitalWrite(PIN_EXTERNAL_INTERRUPT, EXTERNAL_INTERRRUPT_OFF);
 
-  AE::pinMode(PIN_ENABLE_PODEST,        PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODEST,      PL_LOW);
+  AE::pinMode(PIN_ENABLE_PODIUM,        PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM,      PL_LOW);
   AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,     ENABLE_STATE_OFF);
   AE::pinMode(PIN_ENABLE_SPINDLE,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_SPINDLE,     SPINDLE_STATE_OFF);
 
-  AE::pinMode(PIN_LED_PODEST,           PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODEST,         PL_LOW);
+  AE::pinMode(PIN_LED_PODIUM,           PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODIUM,         PL_LOW);
 
   if ( PIN_H_MIN_LIMIT != 0 ) 
     { AE::pinMode(PIN_H_MIN_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MIN_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF); }
@@ -725,10 +725,10 @@ void ArduinoMainLoop::setup() {
     { AE::pinMode(PIN_H_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_H_DIR,              PL_LOW); }
 
   if ( PIN_H_MOVE_UP != 0 ) 
-    { AE::pinMode(PIN_H_MOVE_UP,        PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_UP,          PODEST_SWITCH_OFF); }
+    { AE::pinMode(PIN_H_MOVE_UP,        PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_UP,          PODIUM_SWITCH_OFF); }
     
   if ( PIN_H_MOVE_DOWN != 0 ) 
-    { AE::pinMode(PIN_H_MOVE_DOWN,      PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,        PODEST_SWITCH_OFF); }
+    { AE::pinMode(PIN_H_MOVE_DOWN,      PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,        PODIUM_SWITCH_OFF); }
 
   if ( PIN_IS_CTRL_POWERED > 0 )  
      { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_CTRL_POWERED,    POWER_STATE_OFF); }
@@ -786,8 +786,8 @@ void ArduinoMainLoop::functorIR2() {
 ///////////////////////////////////////////////////////
 void ArduinoMainLoop::loop() {
 ///////////////////////////////////////////////////////
-  // always do this, in cases the hardware isn_t 'free' ist will return immediately
-  controller->evaluatePodestSwitch();
+  // always do this, in cases the podium hardware isn_t 'free' it will return immediately
+  controller->evaluatePodiumSwitches();
 
   // if there is nothing else to do , check I2C and return . . . 
   if ( Serial.available() <= 0 ) {
@@ -869,15 +869,15 @@ void ArduinoMainLoop::loop() {
           r = controller->acceptMoveSequence(c);
           break;
 
-    // MB command - Podest Movement
-    case CMD_MOVE_PODEST:
-    case CMD_MOVE_PODEST_EXACT:
-          r = controller->acceptPodestMove(c);
+    // MB command - Podium Movement
+    case CMD_MOVE_PODIUM:
+    case CMD_MOVE_PODIUM_EXACT:
+          r = controller->acceptPodiumMove(c);
           break;
           
-    case CMD_ACTIVATE_PODEST_HW:
-    case CMD_DEACTIVATE_PODEST_HW:
-          r = controller->activatePodestHardware(c);
+    case CMD_ACTIVATE_PODIUM_HW:
+    case CMD_DEACTIVATE_PODIUM_HW:
+          r = controller->activatePodiumHardware(c);
           break;
 
     // --------------------------------------------------------------------------
