@@ -1355,7 +1355,7 @@ void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	THE_CONTEXT->secureModeInfo.isActivatedByStartup = false;
 	THE_CONTEXT->secureModeInfo.isDeactivatedByUser  = true;
-	m_btDearctivateSecureRunMode->Enable(false);
+	m_btDeactivateSecureRunMode->Enable(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
@@ -1395,7 +1395,7 @@ void MainFrame::activateSecureMode(bool state) {
 	const bool useIt   = THE_CONTEXT->secureModeInfo.useIt;
 	getLoggerView()->setShowOnDemandState(!useIt);
 	
-	m_btDearctivateSecureRunMode->Enable(THE_CONTEXT->secureModeInfo.isActivatedByStartup);
+	m_btDeactivateSecureRunMode->Enable(THE_CONTEXT->secureModeInfo.isActivatedByStartup);
 	
 	// switch the state
 	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
@@ -4811,6 +4811,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		}
 		
 		THE_CONTEXT->resetProcessing();
+		THE_CONTEXT->initPreparationPhase();
 		
 		serialSpyPanel->clearSerialSpyBeforNextRun();
 		
@@ -4988,7 +4989,7 @@ bool MainFrame::processTemplateIntern() {
 			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
 			clearMotionMonitor();
-			// measurement handling will be done by the corespondinf file parser
+			// measurement handling will be done by the corresponding file parser
 			ret = processBinaryTemplate();
 			break;
 			
@@ -4996,7 +4997,7 @@ bool MainFrame::processTemplateIntern() {
 			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
 			clearMotionMonitor();
-			// measurement handling will be done by the corespondinf file parser
+			// measurement handling will be done by the corresponding file parser
 			ret = processSVGTemplate();
 			break;
 			
@@ -5004,7 +5005,7 @@ bool MainFrame::processTemplateIntern() {
 			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
 			clearMotionMonitor();
-			// measurement handling will be done by the corespondinf file parser
+			// measurement handling will be done by the corresponding file parser
 			ret = processGCodeTemplate();
 			break;
 			
@@ -8928,7 +8929,20 @@ void MainFrame::detachMotionMonitor(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachConfiguration(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Config, ((wxButton*)event.GetEventObject()));
+	// this method is also called from the secure panel from a different button
+	// therefore the concrete button pointer
+	
+	//cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Config, ((wxButton*)event.GetEventObject()));
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Config, m_btDetachConfiguration);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::detachTemplateSource(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	// this method is also called from the secure panel from a different button
+	// therefore the concrete button pointer
+	
+	//cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Source, ((wxButton*)event.GetEventObject()));
+	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Source, m_btDetachExternalTemplateSource);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachManuallyTemplate(wxCommandEvent& event) {
@@ -8939,11 +8953,6 @@ void MainFrame::detachManuallyTemplate(wxCommandEvent& event) {
 void MainFrame::detachReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Reference, ((wxButton*)event.GetEventObject()));
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::detachTemplateSource(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	cncExtViewBoxCluster->detachNode(CncExternalViewBoxCluster::Node::EVB_Source, ((wxButton*)event.GetEventObject()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachTest(wxCommandEvent& event) {

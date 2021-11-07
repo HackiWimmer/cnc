@@ -8,7 +8,7 @@ class CncProcessingInfo {
 	
 	public:
 		///////////////////////////////////////////////////////////////
-		enum RunPhase {RP_Unknown=0, RP_Preprocesser=1, RP_Spool=2, RP_LAST=3};
+		enum RunPhase {RP_Unknown=0, RP_Preparation=1, RP_Preprocesser=2, RP_Spool=3, RP_LAST=4 };
 		
 	private:
 		RunPhase runPhase;
@@ -28,6 +28,7 @@ class CncProcessingInfo {
 		
 		void reset();
 		
+		void initPrepationPhase();
 		void stopProcessingAfter(RunPhase fa);
 		bool processMore();
 		void setDebugMode(RunPhase p, bool mode);

@@ -8,21 +8,12 @@
 ///////////////////////////////////////////////////////////////////
 CncSecureRotateModelPanel::CncSecureRotateModelPanel(wxWindow* parent)
 : CncSecureRotateModelPanelBase	(parent)
-, zoomPanel						(NULL)
 , rotateXPanel					(NULL)
 , rotateYPanel					(NULL)
 , rotateZPanel					(NULL)
 ///////////////////////////////////////////////////////////////////
 {
 	const wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-	
-	zoomPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 1);
-	GblFunc::replaceControl(m_zoomPlaceholder, zoomPanel);
-	zoomPanel->setCallbackId(CBID_ZOOM);
-	zoomPanel->SetBackgroundColour(wxColour(  0, 128, 255));
-	zoomPanel->SetFont(font);
-	zoomPanel->setCenterBitmap(ImageLibSecure().Bitmap("BMP_NAVI_UP_DOWN16"));
-	zoomPanel->init();
 	
 	rotateXPanel = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 1);
 	GblFunc::replaceControl(m_rotateXPlaceholder, rotateXPanel);
@@ -55,7 +46,6 @@ CncSecureRotateModelPanel::~CncSecureRotateModelPanel() {
 ///////////////////////////////////////////////////////////////////
 	Unbind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncSecureRotateModelPanel::onModifyModel, this);
 	
-	wxDELETE(zoomPanel);
 	wxDELETE(rotateXPanel);
 	wxDELETE(rotateYPanel);
 	wxDELETE(rotateZPanel);
@@ -66,6 +56,8 @@ void CncSecureRotateModelPanel::onModifyModel(CncSecureGesturesPanelEvent& event
 	// may be nothing to to
 	if ( event.data.isRatioChanged == false )
 		return;
+		
+	//CNC_PRINT_FUNCT_A("eventId=%, callbackId=%d ratio=%lf", event.GetId(), event.data.cbId, event.data.ratio)
 	
 	switch( event.GetId() )
 	{
@@ -75,11 +67,6 @@ void CncSecureRotateModelPanel::onModifyModel(CncSecureGesturesPanelEvent& event
 		{
 			switch( event.data.cbId )
 			{
-				case CBID_ZOOM:
-				{
-					THE_APP->motionMonitorZoom(event.data.ratio);
-					break;
-				}
 				case CBID_ROTATE_X:
 				{
 					THE_APP->motionMonitorRotateX(event.data.ratio * 360.0 );
@@ -104,7 +91,6 @@ void CncSecureRotateModelPanel::onModifyModel(CncSecureGesturesPanelEvent& event
 ///////////////////////////////////////////////////////////////////
 void CncSecureRotateModelPanel::reset() {
 ///////////////////////////////////////////////////////////////////
-	zoomPanel   ->init();
 	rotateXPanel->init();
 	rotateYPanel->init();
 	rotateZPanel->init();

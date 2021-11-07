@@ -62,6 +62,7 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 , cameraRotationStepWidth	(0)
 , cameraRotationSpeed		(100)
 , zoom						(2.0f)
+, lastGestureZoomFactor		(1.0d)
 , currentClientID			(CLIENT_ID.INVALID)
 , processMode				(false)
 {
@@ -81,14 +82,15 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	
 	createRuler(GLContextBase::ModelType::MT_RIGHT_HAND);
 	
-	if ( !EnableTouchEvents(wxTOUCH_ALL_GESTURES) )
+	if ( !EnableTouchEvents(wxTOUCH_ZOOM_GESTURE | wxTOUCH_ROTATE_GESTURE | wxTOUCH_PRESS_GESTURES) )
+	//if ( !EnableTouchEvents(wxTOUCH_ALL_GESTURES) )
 	{
 		CNC_PRINT_FUNCT_A("Failed to enable touch events\n");
 	}
 	else
 	{
 		// Still bind event handlers just in case they still work
-		Bind(wxEVT_GESTURE_PAN,		&CncMotionMonitor::onPan,			this);
+		//Bind(wxEVT_GESTURE_PAN,		&CncMotionMonitor::onPan,			this);
 		Bind(wxEVT_GESTURE_ZOOM,	&CncMotionMonitor::onZoom,			this);
 		Bind(wxEVT_GESTURE_ROTATE,	&CncMotionMonitor::onRotate,		this);
 		Bind(wxEVT_TWO_FINGER_TAP,	&CncMotionMonitor::onTwoFingerTap,	this);
@@ -587,12 +589,28 @@ void CncMotionMonitor::popInteractiveProcessMode() {
 //////////////////////////////////////////////////
 void CncMotionMonitor::onPan(wxPanGestureEvent& event) {
 //////////////////////////////////////////////////
-	// currently only implemented to disable all gesture events
+	// allows the scene movement
+	event.Skip();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onZoom(wxZoomGestureEvent& event) {
 //////////////////////////////////////////////////
-	// currently only implemented to disable all gesture events
+	if ( event.IsGestureStart() )
+		lastGestureZoomFactor = 1.0;
+		
+	const double delta = lastGestureZoomFactor - event.GetZoomFactor();
+	
+	if ( cnc::dblCmp::nu(delta) == false )
+	{
+		CNC_CLOG_FUNCT_A("%lf %lf %lf ", delta, lastGestureZoomFactor, event.GetZoomFactor())
+		
+		if ( cnc::dblCmp::lt(delta, 0.0) )	decScale();
+		else								incScale();
+		
+		Refresh();
+	}
+	
+	lastGestureZoomFactor = event.GetZoomFactor();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onRotate(wxRotateGestureEvent& event) {

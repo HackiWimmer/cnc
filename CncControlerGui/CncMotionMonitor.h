@@ -172,6 +172,7 @@ class CncMotionMonitor : public CncGlCanvas
 		int 						cameraRotationStepWidth;
 		int 						cameraRotationSpeed;
 		float 						zoom;
+		double						lastGestureZoomFactor;
 		long 						currentClientID;
 		
 		virtual void notifyCncPathChanged();

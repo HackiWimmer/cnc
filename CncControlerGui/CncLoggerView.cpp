@@ -3,6 +3,8 @@
 #include "CncFileNameService.h"
 #include "CncTraceCtrl.h"
 #include "CncConfig.h"
+#include "CncContext.h"
+#include "CncProcessingInfo.h"
 #include "CncLoggerView.h"
 
 /////////////////////////////////////////////////////////////////////
@@ -36,7 +38,7 @@ CncLoggerView::~CncLoggerView() {
 	add(LoggerSelection::VAL::STARTUP, msg);
 	saveAll(LoggerSelection::VAL::STARTUP, doOpenWithEditor);
 	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("after finalize startup logger . . .")
-	
+
 	loggerLists.at(LoggerSelection::VAL::CNC)->setJoinTheAppState(doJoinApp);
 	popImmediatelyMode(LoggerSelection::VAL::CNC);
 	add(LoggerSelection::VAL::CNC, msg);
@@ -93,6 +95,23 @@ void CncLoggerView::select(LoggerSelection::VAL id) {
 	m_loggerBook->SetSelection(currentLoggerIndex);
 }
 /////////////////////////////////////////////////////////////////////
+bool CncLoggerView::Enable(bool state) {
+/////////////////////////////////////////////////////////////////////
+	enable(state);
+	
+	if ( state == true )
+	{
+		enableListCtrlsOnly(true);
+	}
+	else 
+	{
+		if ( THE_CONTEXT->processingInfo->isProcessing() )
+			enableListCtrlsOnly(false);
+	}
+	
+	return state;
+}
+/////////////////////////////////////////////////////////////////////
 void CncLoggerView::enable(bool state) {
 /////////////////////////////////////////////////////////////////////
 	m_btClear->Enable(state);
@@ -105,6 +124,9 @@ void CncLoggerView::enable(bool state) {
 	m_btLoggerOnDemand->Enable(state);
 	m_btClearTraceHistory->Enable(state);
 	m_btShowTraceHistory->Enable(state);
+	
+	m_btCncStartupLogger->Enable(state);
+	m_btCncStandardLogger->Enable(state);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::enableListCtrlsOnly(bool state) {
@@ -112,7 +134,7 @@ void CncLoggerView::enableListCtrlsOnly(bool state) {
 	for ( auto it = loggerLists.begin(); it != loggerLists.end(); ++it )
 	{
 		CncLoggerListCtrl* list = *it;
-		list->Enable(state);
+		list->enable(state);
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -215,7 +237,7 @@ void CncLoggerView::popImmediatelyMode(LoggerSelection::VAL id) {
 	if ( loggerLists.size() != MaxLoggerCount )
 		return;
 		
-	loggerLists.at(currentLoggerIndex)->popImmediatelyMode();
+	loggerLists.at(id)->popImmediatelyMode();
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::popProcessMode(LoggerSelection::VAL id) {
@@ -223,7 +245,7 @@ void CncLoggerView::popProcessMode(LoggerSelection::VAL id) {
 	if ( loggerLists.size() != MaxLoggerCount )
 		return;
 		
-	loggerLists.at(currentLoggerIndex)->popProcessMode();
+	loggerLists.at(id)->popProcessMode();
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::pushUpdateMode(LoggerSelection::VAL id) {
@@ -231,7 +253,7 @@ void CncLoggerView::pushUpdateMode(LoggerSelection::VAL id) {
 	if ( loggerLists.size() != MaxLoggerCount )
 		return;
 		
-	loggerLists.at(currentLoggerIndex)->pushUpdateMode();
+	loggerLists.at(id)->pushUpdateMode();
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::onClear(wxCommandEvent& event) {

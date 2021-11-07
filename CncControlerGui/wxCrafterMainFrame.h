@@ -584,7 +584,7 @@ protected:
     wxStaticText* m_staticText8271;
     wxStaticText* m_secureVersionInfo;
     wxButton* m_btOskPanel;
-    wxBitmapButton* m_btDearctivateSecureRunMode;
+    wxBitmapButton* m_btDeactivateSecureRunMode;
     wxButton* m_btCloseSecurePanel;
     wxStaticLine* m_staticLine9185;
     wxSplitterWindow* m_secureSplitterMainH;
@@ -1505,7 +1505,7 @@ public:
     wxStaticText* GetStaticText8271() { return m_staticText8271; }
     wxStaticText* GetSecureVersionInfo() { return m_secureVersionInfo; }
     wxButton* GetBtOskPanel() { return m_btOskPanel; }
-    wxBitmapButton* GetBtDearctivateSecureRunMode() { return m_btDearctivateSecureRunMode; }
+    wxBitmapButton* GetBtDeactivateSecureRunMode() { return m_btDeactivateSecureRunMode; }
     wxButton* GetBtCloseSecurePanel() { return m_btCloseSecurePanel; }
     wxStaticLine* GetStaticLine9185() { return m_staticLine9185; }
     wxPanel* GetSecurityCtrlPanelPlaceholder() { return m_securityCtrlPanelPlaceholder; }

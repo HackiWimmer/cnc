@@ -141,6 +141,7 @@ CncSecureGesturesPanel::CncSecureGesturesPanel(wxWindow* parent, wxOrientation o
 	Bind(wxEVT_SHOW,			&CncSecureGesturesPanel::onShow,			this);
 	Bind(wxEVT_INIT_DIALOG,		&CncSecureGesturesPanel::onInitPanel,		this);
 	Bind(wxEVT_MOTION,			&CncSecureGesturesPanel::onMouse,			this);
+	Bind(wxEVT_LEFT_DCLICK,		&CncSecureGesturesPanel::onMouse,			this);
 	Bind(wxEVT_LEFT_DOWN,		&CncSecureGesturesPanel::onMouse,			this);
 	Bind(wxEVT_LEFT_UP,			&CncSecureGesturesPanel::onMouse,			this);
 	Bind(wxEVT_LEAVE_WINDOW,	&CncSecureGesturesPanel::onLeave,			this);
@@ -176,8 +177,6 @@ CncSecureGesturesPanel::CncSecureGesturesPanel(wxWindow* parent, wxOrientation o
 		Bind(wxEVT_LONG_PRESS,		&CncSecureGesturesPanel::onLongPress,		this);
 		Bind(wxEVT_PRESS_AND_TAP,	&CncSecureGesturesPanel::onPressAndTap,		this);
 	}
-	
-	m_lastZoomFactor = 1.0;
 }
 ///////////////////////////////////////////////////////////////////
 CncSecureGesturesPanel::~CncSecureGesturesPanel() {
@@ -187,6 +186,7 @@ CncSecureGesturesPanel::~CncSecureGesturesPanel() {
 	Unbind(wxEVT_SIZE,				&CncSecureGesturesPanel::onSize,			this);
 	Unbind(wxEVT_SHOW,				&CncSecureGesturesPanel::onShow,			this);
 	Unbind(wxEVT_MOTION,			&CncSecureGesturesPanel::onMouse,			this);
+	Unbind(wxEVT_LEFT_DCLICK,		&CncSecureGesturesPanel::onMouse,			this);
 	Unbind(wxEVT_LEFT_DOWN,			&CncSecureGesturesPanel::onMouse,			this);
 	Unbind(wxEVT_LEFT_UP,			&CncSecureGesturesPanel::onMouse,			this);
 	Unbind(wxEVT_LEAVE_WINDOW,		&CncSecureGesturesPanel::onLeave,			this);
@@ -206,7 +206,6 @@ CncSecureGesturesPanel::~CncSecureGesturesPanel() {
 CncSecureGesturesPanelEvent& CncSecureGesturesPanel::prepareEvent(int id) { 
 //////////////////////////////////////////////////
 	wxASSERT(lastEvent); 
-	//lastEvent->reset();
 	lastEvent->SetEventObject(this); 
 	lastEvent->SetId(id); 
 	
@@ -639,12 +638,15 @@ void CncSecureGesturesPanel::calculateCoordinates() {
 		centrePt.y = yp;
 	}
 	
-	// copy previous information
+	// create a easy to use reference for further changes
 	CSGPEvent::Data& lastData = lastEvent->data;
 	
 	// something changed?
 	if ( lastData.xPos == centrePt.x && lastData.yPos == centrePt.y )
 		return;
+		
+	// copy previous information
+	const CSGPEvent::Data ref = lastEvent->data;
 	
 	const State s = skipState();
 	if ( s == S_STARTING )
@@ -654,7 +656,7 @@ void CncSecureGesturesPanel::calculateCoordinates() {
 	const int dx = centrePt.x - zeroPt.x;
 	const int dy = zeroPt.y   - centrePt.y;
 	
-	const CSGPEvent::Data ref = lastData;
+	//const CSGPEvent::Data ref = lastData;
 	
 	lastData.xPos	= centrePt.x;
 	lastData.yPos	= centrePt.y;
@@ -779,7 +781,6 @@ void CncSecureGesturesPanel::reset() {
 	calculateDimensions();
 	
 	behaviorChanged = false;
-	lastEvent->data.reset();
 	
 	translatedDistance.m_x = zeroPt.x;
 	translatedDistance.m_y = zeroPt.y;
@@ -826,20 +827,26 @@ void CncSecureGesturesPanel::onSize(wxSizeEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	
 	switch (event.GetTimer().GetId() )
 	{
 		case updateTimerId:
 		{
-			lastEvent->data.isTimerChanged = true;
-			applyPosHeld();
+			if ( type == T_BUTTON )
+			{
+				lastEvent->data.isTimerChanged = true;
+				applyPosHeld();
+			}
+			
 			break;
 		}
 		case observerTimerId:
 		{
 			const wxTimeSpan diff = wxDateTime::UNow() - observerTs;
-			if  ( diff.GetMilliseconds() > 500 ) 
-				reset();
+			if ( diff.GetMilliseconds() > 500 )
+			{
+				if ( type == T_BUTTON )
+					reset();
+			}
 			
 			break;
 		}
@@ -1021,6 +1028,14 @@ void CncSecureGesturesPanel::onMouse(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////
 	event.Skip();
 	
+	if ( event.LeftDClick() )
+	{
+		if ( type == T_SWITCH )
+			reset();
+			
+		return;
+	}
+	
 	if ( event.LeftUp() )
 	{
 		mouseDown = false;
@@ -1067,9 +1082,10 @@ void CncSecureGesturesPanel::onPan(wxPanGestureEvent& event) {
 		if ( type == T_BUTTON )
 			reset();
 	}
+	
 	if ( event.IsGestureStart() )
 	{
-		observerTimer->Start(500);
+		observerTimer->Start(400);
 	}
 	else
 	{
@@ -1113,83 +1129,26 @@ void CncSecureGesturesPanel::onPan(wxPanGestureEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onZoom(wxZoomGestureEvent& event) {
 ///////////////////////////////////////////////////////////////////
-/*
-    if ( event.IsGestureStart() )
-    {
-        wxLogMessage("Zoom gesture started");
-
-        m_lastZoomFactor = 1.0;
-    }
-
-    wxLogMessage("Zoom gesture performed with zoom center at (%d, %d) and zoom Factor = %f",
-        event.GetPosition().x, event.GetPosition().y, event.GetZoomFactor());
-
-    const wxPoint& zoomCenter = event.GetPosition();
-
-    // Translate to zoom center
-    m_affineMatrix.Translate(zoomCenter.x, zoomCenter.y);
-    // Scale
-    m_affineMatrix.Scale(event.GetZoomFactor() / m_lastZoomFactor, event.GetZoomFactor() / m_lastZoomFactor);
-    // Translate back
-    m_affineMatrix.Translate(-zoomCenter.x, -zoomCenter.y);
-
-    if ( event.IsGestureEnd() )
-    {
-        wxLogMessage("Zoom gesture ended");
-    }
-
-    m_lastZoomFactor = event.GetZoomFactor();
-
-    Refresh();
-*/
+	// currently only implemented to disable all gesture events
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onRotate(wxRotateGestureEvent& event) {
 ///////////////////////////////////////////////////////////////////
- /*
-   if ( event.IsGestureStart() )
-    {
-        wxLogMessage("Rotate gesture started");
-
-        m_lastRotationAngle = 0.0;
-    }
-
-    wxLogMessage("Rotate gesture performed with rotation center at (%d, %d) and cumulative rotation angle = %f",
-        event.GetPosition().x, event.GetPosition().y, event.GetRotationAngle());
-
-    const wxPoint& rotationCenter = event.GetPosition();
-
-    // Translate to rotation center
-    m_affineMatrix.Translate(rotationCenter.x, rotationCenter.y);
-    // Rotate
-    m_affineMatrix.Rotate(event.GetRotationAngle() - m_lastRotationAngle);
-    // Translate back
-    m_affineMatrix.Translate(-rotationCenter.x, -rotationCenter.y);
-
-    if ( event.IsGestureEnd() )
-    {
-        wxLogMessage("Rotate gesture ended");
-    }
-
-    m_lastRotationAngle = event.GetRotationAngle();
-
-    Refresh();
-*/
+	// currently only implemented to disable all gesture events
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onTwoFingerTap(wxTwoFingerTapEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( event.IsGestureStart() )
-		std::cout << "Two Finger Tap gesture gesture started\n";
-
-	std::cout << wxString::Format("Two Finger Tap gesture performed at (%d, %d)\n", event.GetPosition().x, event.GetPosition().y);
-
-	if ( event.IsGestureEnd() )
-		std::cout << "Two Finger Tap gesture ended\n";
+	{
+		if ( type == T_SWITCH )
+			reset();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onLongPress(wxLongPressEvent& event) {
 ///////////////////////////////////////////////////////////////////
+/*
 	if ( event.IsGestureStart() )
 		std::cout << "Long Press gesture started\n";
 
@@ -1197,10 +1156,12 @@ void CncSecureGesturesPanel::onLongPress(wxLongPressEvent& event) {
 
 	if ( event.IsGestureEnd() )
 		std::cout << "Long Press gesture ended\n";
+*/
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onPressAndTap(wxPressAndTapEvent& event) {
 ///////////////////////////////////////////////////////////////////
+/*
 	if ( event.IsGestureStart() )
 		std::cout << "Press and Tap gesture started\n";
 
@@ -1208,10 +1169,8 @@ void CncSecureGesturesPanel::onPressAndTap(wxPressAndTapEvent& event) {
 
 	if ( event.IsGestureEnd() )
 		std::cout << "Press and Tap gesture ended\n";
+*/
 }
-
-
-
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::trace(std::ostream& o, const wxString & context, const wxString& more) {
 ///////////////////////////////////////////////////////////////////

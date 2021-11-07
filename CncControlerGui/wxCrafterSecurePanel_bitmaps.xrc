@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-class@2x">bitmaps\CodeLite\16-class@2x.png</object>
   <object class="wxBitmap" name="16-clear@2x">bitmaps\16-clear@2x.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-ctrl@2x">bitmaps\16-ctrl@2x.png</object>
@@ -13,11 +14,15 @@
   <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
   <object class="wxBitmap" name="16-home@2x">bitmaps\16-home@2x.png</object>
   <object class="wxBitmap" name="16-lift@2x">bitmaps\16-lift@2x.png</object>
+  <object class="wxBitmap" name="16-marker">bitmaps\CodeLite\16-marker.png</object>
+  <object class="wxBitmap" name="16-marker@2x">bitmaps\CodeLite\16-marker@2x.png</object>
   <object class="wxBitmap" name="16-marker@2x">bitmaps\16-marker@2x.png</object>
   <object class="wxBitmap" name="16-navi@2x">bitmaps\16-navi@2x.png</object>
+  <object class="wxBitmap" name="16-patch@2x">bitmaps\CodeLite\16-patch@2x.png</object>
   <object class="wxBitmap" name="16-plus2@2x">bitmaps\CodeLite\16-plus2@2x.png</object>
   <object class="wxBitmap" name="16-regular-expression@2x">bitmaps\CodeLite\16-regular-expression@2x.png</object>
   <object class="wxBitmap" name="16-start@2x">bitmaps\16-start@2x.png</object>
+  <object class="wxBitmap" name="16-typedef@2x">bitmaps\CodeLite\16-typedef@2x.png</object>
   <object class="wxBitmap" name="16-warning">bitmaps\16-warning.png</object>
   <object class="wxBitmap" name="16-warning@2x">bitmaps\16-warning@2x.png</object>
   <object class="wxBitmap" name="16-windows@2x">bitmaps\CodeLite\16-windows@2x.png</object>
@@ -47,6 +52,7 @@
   <object class="wxBitmap" name="close-16">bitmaps\close-16.png</object>
   <object class="wxBitmap" name="cncArrowLeft">bitmaps\cncArrowLeft.png</object>
   <object class="wxBitmap" name="cncArrowRight">bitmaps\cncArrowRight.png</object>
+  <object class="wxBitmap" name="configure-3">bitmaps\configure-3.png</object>
   <object class="wxBitmap" name="edit-move">bitmaps\edit-move.png</object>
   <object class="wxBitmap" name="emergengy_red_yellow">bitmaps\emergengy_red_yellow.png</object>
   <object class="wxBitmap" name="iconmonstr-control-panel-8-16">bitmaps\RunCtrl\iconmonstr-control-panel-8-16.png</object>

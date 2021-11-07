@@ -294,16 +294,22 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 			bool isChanged()	const	{ return (isTimerChanged || isRangeChanged || isAngleChanged); }
 			bool isZero()		const	{ return range == 0; }
 			
+			/*
 			void reset(bool deep = false)
 			{
-				const int prevCbId = cbId;
+				const Data prev = *this;
 				*this = Data();
 				
 				if ( deep == false )
 				{
-					cbId = prevCbId;
+					cbId = prev.cbId;
+					
+					isRangeChanged = prev.range != range;
+					isRatioChanged = cnc::dblCmp::eq(prev.ratio, ratio) == false;
+					isAngleChanged = cnc::dblCmp::eq(prev.angle, angle) == false;
 				}
 			}
+			*/
 			
 			friend std::ostream &operator<< (std::ostream &ostr, const Data &d) 
 			{
@@ -470,12 +476,7 @@ class CncSecureGesturesPanel : public wxPanel
 		CSGPEvent*			lastEvent;
 		
 		wxPoint2DDouble		translatedDistance;
-		
-		// old sample vars start
 		wxAffineMatrix2D	m_affineMatrix;
-		double				m_lastZoomFactor;
-		double				m_lastRotationAngle;
-		// old sample vars end
 		
 		void	reset();
 		void	applyPosChange(bool useTimer);

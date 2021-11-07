@@ -50,6 +50,9 @@ wxBEGIN_EVENT_TABLE(CncLoggerListCtrl, CncLargeScaledListCtrl)
 	
 	EVT_LIST_ITEM_SELECTED	(wxID_ANY, 						CncLoggerListCtrl::onSelectListItem		)
 	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 						CncLoggerListCtrl::onActivateListItem	)
+	
+	EVT_SCROLLWIN			(								CncLoggerListCtrl::onScroll				)
+
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
@@ -58,6 +61,7 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 , entries					() 
 , updateMode				(UM_Normal)
 , updateModePreviously		(UM_Normal)
+, canScroll					(true)
 , sizeChanged				(false)
 , joinTheApp				(false)
 , showOnDemand				(false)
@@ -95,6 +99,19 @@ CncLoggerListCtrl::~CncLoggerListCtrl() {
 	entries.clear();
 }
 /////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::enable(bool state) {
+/////////////////////////////////////////////////////////////
+	updateContent();
+	
+	canScroll = state;
+	Refresh();
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::onScroll(wxScrollWinEvent& event) {
+/////////////////////////////////////////////////////////////
+	event.Skip();
+}
+/////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::popImmediatelyMode() {
 /////////////////////////////////////////////////////////////
 	updateModePreviously = updateMode;
@@ -117,7 +134,8 @@ void CncLoggerListCtrl::pushUpdateMode() {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::processUpdateMode() {
 /////////////////////////////////////////////////////////////
-	switch ( updateMode ) {
+	switch ( updateMode )
+	{
 		case UM_Immediately:	displayTimer.Stop();
 								break;
 		case UM_Normal:			displayTimer.Start(displayTimerInterval);
@@ -275,7 +293,7 @@ wxListItemAttr* CncLoggerListCtrl::OnGetItemAttr(long item) const {
 	}
 	
 	// this indicates to use the default style
-	return (wxListItemAttr*)(&defaultItemAttr);
+	return NULL;//(wxListItemAttr*)(&defaultItemAttr);
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::updateContent() {
@@ -304,7 +322,7 @@ void CncLoggerListCtrl::updateContent() {
 	
 	SetItemCount(entries.size());
 	
-	if ( IsShownOnScreen() == true )
+	if ( GetItemCount() > 0 && IsShownOnScreen() == true )
 	{
 		ensureVisible(GetItemCount() - 1);
 		Refresh();
@@ -317,7 +335,7 @@ void CncLoggerListCtrl::onDisplayTimer(wxTimerEvent& event) {
 	{
 		SetItemCount(entries.size());
 		
-		if ( IsShownOnScreen() == true )
+		if ( GetItemCount() > 0 && IsShownOnScreen() == true )
 		{
 			ensureVisible(GetItemCount() - 1);
 			Refresh();
@@ -339,6 +357,9 @@ void CncLoggerListCtrl::onPaint(wxPaintEvent& event) {
 		updateColumnWidth(COL_STRECH);
 		sizeChanged = false;
 	}
+	
+	if ( canScroll == false )
+		SetScrollbar(0, 0, 0, 0);
 	
 	event.Skip();
 }
@@ -469,24 +490,26 @@ void CncLoggerListCtrl::onActivateListItem(wxListEvent& event) {
 bool CncLoggerListCtrl::writeToFile(const wxFileName& fn, bool allRows) {
 //////////////////////////////////////////////////
 	if ( fn.DirExists() == false ) {
-		std::cerr << "CncLoggerListCtrl::writeToFile(): Invalid file name: " << fn.GetFullPath() << std::endl;
+		std::cerr <<  CNC_LOG_FUNCT_A(": Invalid file name: ") << fn.GetFullPath() << std::endl;
 		return false;
 	}
 	
 	std::ofstream out(fn.GetFullPath().c_str().AsChar(), std::ofstream::out);
 	if ( !out.good() ) {
-		std::cerr << "CncLoggerListCtrl::writeToFile(): Can't create file: " << fn.GetFullPath() << std::endl;
+		std::cerr <<  CNC_LOG_FUNCT_A(": Can't create file: ") << fn.GetFullPath() << std::endl;
 		return false;
 	}
 	
-	if ( entries.size() > 0 ) {
+	if ( GetItemCount() > 0 )
+	{
 		const size_t firstRow = allRows ? 0                  : GetTopItem();
 		const size_t lastRow  = allRows ? GetItemCount() - 1 : firstRow + std::min(GetCountPerPage(), GetItemCount() - 1);
 		
 		// check boundaries
-		if ( firstRow >= entries.size() || lastRow >= entries.size() )  {
-			
-			std::cerr << "CncLoggerListCtrl::writeToFile: Invalid boundaries:"			<< std::endl;
+		if ( firstRow >= entries.size() || lastRow >= entries.size() )
+		{
+			std::cerr <<  CNC_LOG_FUNCT_A(": Invalid boundaries:")						<< std::endl;
+			std::cerr << " Item row count            : " << GetItemCount()				<< std::endl;
 			std::cerr << " Available row count       : " << entries.size()				<< std::endl;
 			std::cerr << " Evaluated first / last row: " << firstRow << ", " << lastRow	<< std::endl;
 			
@@ -510,16 +533,17 @@ bool CncLoggerListCtrl::copyToClipboard(bool allRows) {
 	bool ret = false;
 	
 	// Write the content of entries to the clipboard
-	if ( wxTheClipboard->Open() ) {
-		
-		if ( entries.size() > 0 ) {
+	if ( wxTheClipboard->Open() )
+	{
+		if ( GetItemCount() > 0 )
+		{
 			const size_t firstRow = allRows ? 0                  : GetTopItem();
 			const size_t lastRow  = allRows ? GetItemCount() - 1 : firstRow + std::min(GetCountPerPage(), GetItemCount() - 1 );
 			
 			// check boundaries
 			if ( firstRow >= entries.size() || lastRow >= entries.size() )  {
 				
-				std::cerr << "CncLoggerListCtrl::copyToClipboard: Invalid boundaries:"		<< std::endl;
+				std::cerr << CNC_LOG_FUNCT_A(": Invalid boundaries:")						<< std::endl;
 				std::cerr << " Available row count       : " << entries.size()				<< std::endl;
 				std::cerr << " Evaluated first / last row: " << firstRow << ", " << lastRow	<< std::endl;
 				
@@ -538,7 +562,8 @@ bool CncLoggerListCtrl::copyToClipboard(bool allRows) {
 			// so do not delete them in the app.
 			ret = wxTheClipboard->SetData( new wxTextDataObject(content) );
 		}
-		else {
+		else 
+		{
 			ret = true;
 		}
 		wxTheClipboard->Close();

@@ -30,6 +30,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		Entries					entries;
 		UpdateMode				updateMode;
 		UpdateMode				updateModePreviously;
+		bool					canScroll;
 		bool					sizeChanged;
 		bool					joinTheApp;
 		bool					showOnDemand;
@@ -50,6 +51,8 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		void 					onRightDown(wxMouseEvent& event);
 		void 					onSelectListItem(wxListEvent& event);
 		void 					onActivateListItem(wxListEvent& event);
+		
+		void 					onScroll(wxScrollWinEvent& event);
 		
 		virtual bool 			isItemValid(long item) const;
 		virtual int 			OnGetItemColumnImage(long item, long column) const;
@@ -85,6 +88,8 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		void popImmediatelyMode();
 		void popProcessMode();
 		void pushUpdateMode();
+		
+		void enable(bool state);
 		
 		void next();
 		void add(const char c);

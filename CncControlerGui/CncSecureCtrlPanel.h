@@ -47,14 +47,19 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		CncReferenceEvaluation* getReferencePanel() const { return referencePanel; }
 		
 	protected:
+		virtual void onEditTemplateSec(wxCommandEvent& event);
+		virtual void onOpenConfigurationSec(wxCommandEvent& event);
+		virtual void onTestFunction1Sec(wxCommandEvent& event);
+		virtual void onTestFunction2Sec(wxCommandEvent& event);
+		virtual void onTestFunction3Sec(wxCommandEvent& event);
+		virtual void onTestFunction4Sec(wxCommandEvent& event);
 		virtual void onAppEnvironmentSec(wxCommandEvent& event);
 		virtual void onSerialSpySec(wxCommandEvent& event);
-		virtual void requestResolveLimitStates(wxCommandEvent& event);
+		virtual void onRequestResolveLimitStates(wxCommandEvent& event);
 		virtual void onToggleTouchpadPane(wxCommandEvent& event);
 		virtual void onReferenceSet(wxCommandEvent& event);
 		virtual void onStackTraceStoreSec(wxCommandEvent& event);
 		virtual void onSessionDirSec(wxCommandEvent& event);
-		virtual void onTestFunctionSec(wxCommandEvent& event);
 		virtual void onOpenTemplateSec(wxCommandEvent& event);
 		virtual void onDetermineAnchorPositionsSec(wxCommandEvent& event);
 		virtual void onEvaluateHardwareReference(wxCommandEvent& event);

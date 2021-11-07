@@ -14,6 +14,8 @@ class CncLoggerView : public CncLoggerViewBase {
 		CncLoggerView(wxWindow* parent);
 		virtual ~CncLoggerView();
 		
+		virtual bool Enable(bool enable = true);
+		
 		bool doShowLoggerOnCommand() const	{ return m_btLoggerOnDemand->GetValue(); }
 		void setShowOnDemandState(bool s)	{ m_btLoggerOnDemand->SetValue(s); }
 		void setSecureMode(bool state);

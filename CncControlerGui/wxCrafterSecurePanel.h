@@ -59,7 +59,7 @@ protected:
     wxPanel* m_lpManually;
     wxPanel* m_lpRun;
     wxPanel* m_lpCtrl;
-    wxPanel* m_plPodium;
+    wxPanel* m_plPodest;
     wxPanel* m_lpMisc;
     wxStaticText* m_rightHeadline;
     wxSimplebook* m_rightBook;
@@ -75,6 +75,7 @@ protected:
     wxPanel* m_transferDirPlaceholder;
     wxPanel* m_lruFilePlaceholder;
     wxButton* m_btLoadTemplate;
+    wxButton* m_btEditTemplate;
     wxPanel* m_rpRef;
     wxInfoBar* m_referenceInfobar;
     wxPanel* m_evaluateReferencePlaceholder;
@@ -114,15 +115,23 @@ protected:
     wxStaticText* m_staticText90;
     wxButton* m_btnEmergenyStopSec;
     wxPanel* m_rpCtrl;
+    wxButton* m_btSerialSpy;
     wxButton* m_resolveLimit;
     wxPanel* m_rpPodium;
     wxPanel* m_podiumPlaceholder;
     wxPanel* m_rpMisc;
+    wxListbook* m_listbook628;
+    wxPanel* m_panel644;
+    wxButton* m_btTestFunct15;
+    wxPanel* m_panel632;
+    wxButton* m_btTestFunct1;
+    wxButton* m_btTestFunct2;
+    wxButton* m_btTestFunct3;
+    wxButton* m_btTestFunct4;
+    wxPanel* m_panel630;
     wxButton* m_btOSEnvrionment;
     wxButton* m_btSessionDir;
-    wxButton* m_btSerialSpy;
     wxButton* m_btStackTrace;
-    wxButton* m_btTestFunct;
     wxButton* m_btAnchorSec;
     wxStaticLine* m_staticLine5011;
 
@@ -132,18 +141,23 @@ protected:
     virtual void onResetSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onEvaluateHardwareReference(wxCommandEvent& event) { event.Skip(); }
     virtual void onOpenTemplateSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onEditTemplateSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onReferenceSet(wxCommandEvent& event) { event.Skip(); }
     virtual void onToggleTouchpadPane(wxCommandEvent& event) { event.Skip(); }
     virtual void onRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onPauseSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStopSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onEmergencySec(wxCommandEvent& event) { event.Skip(); }
-    virtual void requestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSerialSpySec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onRequestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
+    virtual void onOpenConfigurationSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTestFunction1Sec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTestFunction2Sec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTestFunction3Sec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTestFunction4Sec(wxCommandEvent& event) { event.Skip(); }
     virtual void onAppEnvironmentSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onSessionDirSec(wxCommandEvent& event) { event.Skip(); }
-    virtual void onSerialSpySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStackTraceStoreSec(wxCommandEvent& event) { event.Skip(); }
-    virtual void onTestFunctionSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onDetermineAnchorPositionsSec(wxCommandEvent& event) { event.Skip(); }
 
 public:
@@ -157,7 +171,7 @@ public:
     wxPanel* GetLpManually() { return m_lpManually; }
     wxPanel* GetLpRun() { return m_lpRun; }
     wxPanel* GetLpCtrl() { return m_lpCtrl; }
-    wxPanel* GetPlPodium() { return m_plPodium; }
+    wxPanel* GetPlPodest() { return m_plPodest; }
     wxPanel* GetLpMisc() { return m_lpMisc; }
     wxListbook* GetLeftBook() { return m_leftBook; }
     wxStaticText* GetRightHeadline() { return m_rightHeadline; }
@@ -172,6 +186,7 @@ public:
     wxPanel* GetTransferDirPlaceholder() { return m_transferDirPlaceholder; }
     wxPanel* GetLruFilePlaceholder() { return m_lruFilePlaceholder; }
     wxButton* GetBtLoadTemplate() { return m_btLoadTemplate; }
+    wxButton* GetBtEditTemplate() { return m_btEditTemplate; }
     wxPanel* GetRpLoad() { return m_rpLoad; }
     wxInfoBar* GetReferenceInfobar() { return m_referenceInfobar; }
     wxPanel* GetEvaluateReferencePlaceholder() { return m_evaluateReferencePlaceholder; }
@@ -211,16 +226,24 @@ public:
     wxStaticText* GetStaticText90() { return m_staticText90; }
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
     wxPanel* GetRpRun() { return m_rpRun; }
+    wxButton* GetBtSerialSpy() { return m_btSerialSpy; }
     wxButton* GetResolveLimit() { return m_resolveLimit; }
     wxPanel* GetRpCtrl() { return m_rpCtrl; }
     wxPanel* GetPodiumPlaceholder() { return m_podiumPlaceholder; }
     wxPanel* GetRpPodium() { return m_rpPodium; }
+    wxButton* GetBtTestFunct15() { return m_btTestFunct15; }
+    wxPanel* GetPanel644() { return m_panel644; }
+    wxButton* GetBtTestFunct1() { return m_btTestFunct1; }
+    wxButton* GetBtTestFunct2() { return m_btTestFunct2; }
+    wxButton* GetBtTestFunct3() { return m_btTestFunct3; }
+    wxButton* GetBtTestFunct4() { return m_btTestFunct4; }
+    wxPanel* GetPanel632() { return m_panel632; }
     wxButton* GetBtOSEnvrionment() { return m_btOSEnvrionment; }
     wxButton* GetBtSessionDir() { return m_btSessionDir; }
-    wxButton* GetBtSerialSpy() { return m_btSerialSpy; }
     wxButton* GetBtStackTrace() { return m_btStackTrace; }
-    wxButton* GetBtTestFunct() { return m_btTestFunct; }
     wxButton* GetBtAnchorSec() { return m_btAnchorSec; }
+    wxPanel* GetPanel630() { return m_panel630; }
+    wxListbook* GetListbook628() { return m_listbook628; }
     wxPanel* GetRpMisc() { return m_rpMisc; }
     wxSimplebook* GetRightBook() { return m_rightBook; }
     wxStaticLine* GetStaticLine5011() { return m_staticLine5011; }
@@ -376,8 +399,6 @@ public:
 class CncSecureRotateModelPanelBase : public wxPanel
 {
 protected:
-    wxStaticText* m_staticText58036;
-    wxPanel* m_zoomPlaceholder;
     wxStaticText* m_staticText5803;
     wxPanel* m_rotateXPlaceholder;
     wxStaticText* m_staticText58035;
@@ -388,8 +409,6 @@ protected:
 protected:
 
 public:
-    wxStaticText* GetStaticText58036() { return m_staticText58036; }
-    wxPanel* GetZoomPlaceholder() { return m_zoomPlaceholder; }
     wxStaticText* GetStaticText5803() { return m_staticText5803; }
     wxPanel* GetRotateXPlaceholder() { return m_rotateXPlaceholder; }
     wxStaticText* GetStaticText58035() { return m_staticText58035; }

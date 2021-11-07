@@ -5048,11 +5048,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8251->Add(m_btOskPanel, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     m_btOskPanel->SetMinSize(wxSize(40,40));
     
-    m_btDearctivateSecureRunMode = new wxBitmapButton(m_secureRunPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("security-low-2")), wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(40,40)), wxBU_AUTODRAW);
-    m_btDearctivateSecureRunMode->SetToolTip(_("Deactivate Secure Run Mode"));
+    m_btDeactivateSecureRunMode = new wxBitmapButton(m_secureRunPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("security-low-2")), wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(40,40)), wxBU_AUTODRAW);
+    m_btDeactivateSecureRunMode->SetToolTip(_("Deactivate Secure Run Mode"));
     
-    flexGridSizer8251->Add(m_btDearctivateSecureRunMode, 0, wxALL, WXC_FROM_DIP(1));
-    m_btDearctivateSecureRunMode->SetMinSize(wxSize(40,40));
+    flexGridSizer8251->Add(m_btDeactivateSecureRunMode, 0, wxALL, WXC_FROM_DIP(1));
+    m_btDeactivateSecureRunMode->SetMinSize(wxSize(40,40));
     
     m_btCloseSecurePanel = new wxButton(m_secureRunPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(40,40)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -6277,7 +6277,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_bmpButton47183->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypNextId), NULL, this);
     m_speedPanel->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintSpeedPanel), NULL, this);
     m_btOskPanel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onExecuteOsk), NULL, this);
-    m_btDearctivateSecureRunMode->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onDeactivateSecureRunMode), NULL, this);
+    m_btDeactivateSecureRunMode->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onDeactivateSecureRunMode), NULL, this);
     m_btCloseSecurePanel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onCloseSecureRunAuiPane), NULL, this);
     m_secureShowHardwareBox->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onToggleHardwareBox), NULL, this);
     m_secureShowBoundBox->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onToggleBoundBox), NULL, this);
@@ -6538,7 +6538,7 @@ MainFrameBClass::~MainFrameBClass()
     m_bmpButton47183->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypNextId), NULL, this);
     m_speedPanel->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintSpeedPanel), NULL, this);
     m_btOskPanel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onExecuteOsk), NULL, this);
-    m_btDearctivateSecureRunMode->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onDeactivateSecureRunMode), NULL, this);
+    m_btDeactivateSecureRunMode->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onDeactivateSecureRunMode), NULL, this);
     m_btCloseSecurePanel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onCloseSecureRunAuiPane), NULL, this);
     m_secureShowHardwareBox->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onToggleHardwareBox), NULL, this);
     m_secureShowBoundBox->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onToggleBoundBox), NULL, this);

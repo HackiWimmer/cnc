@@ -52083,7 +52083,7 @@
               }, {
                "type": "string",
                "m_label": "Name:",
-               "m_value": "m_btDearctivateSecureRunMode"
+               "m_value": "m_btDeactivateSecureRunMode"
               }, {
                "type": "multi-string",
                "m_label": "Tooltip:",

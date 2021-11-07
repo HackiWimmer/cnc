@@ -8752,7 +8752,7 @@ State</label>
                   <flag>wxALL</flag>
                   <border>1</border>
                   <minsize>40,40</minsize>
-                  <object class="wxBitmapButton" name="m_btDearctivateSecureRunMode">
+                  <object class="wxBitmapButton" name="m_btDeactivateSecureRunMode">
                     <bitmap>bitmaps/security-low-2.png</bitmap>
                     <size>40,40</size>
                     <style>wxBU_AUTODRAW</style>

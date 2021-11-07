@@ -145,10 +145,11 @@ namespace GlobalStreamRedirection {
 	///////////////////////////////////////////////////////////////////
 	void reset() {
 		if ( streamRedirectionState != INSTALLED )
-			return;			
-		// deconstruct redirecting
-		
-		// ungregister text controls
+			return;
+			
+		streamRedirectionState = UNKNOWN;
+			
+		// un-register text controls
 		psbufCout->ungregisterTextControl();
 		psbufClog->ungregisterTextControl();
 		psbufCerr->ungregisterTextControl();

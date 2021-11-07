@@ -1,5 +1,7 @@
 #include "wxCrafterImages.h"
 #include "GlobalFunctions.h"
+#include "CncConfig.h"
+#include "CncContext.h"
 #include "CncUserEvents.h"
 #include "CncExternalViewBox.h"
 
@@ -59,12 +61,23 @@ bool CncExternalViewBoxCluster::detachNode(Node n, wxButton* btn) {
 	if ( evb == NULL )
 		return false;
 		
-	const bool isExtViewActive = !evb->IsShown();
-	
 	// prepare and show external preview
 	evb->setupSwapButton(CncExternalViewBox::Default::VIEW1, btn);
 	evb->selectView(CncExternalViewBox::Default::VIEW1);
-	evb->Show(isExtViewActive);
+	
+	if ( THE_CONTEXT->secureModeInfo.isActive )
+	{
+		if ( evb->IsShownOnScreen() == false )
+		{
+			evb->Maximize(TRUE);
+			evb->ShowModal();
+		}
+	}
+	else
+	{
+		evb->Restore();
+		evb->Show(!evb->IsShown());
+	}
 	
 	return true;
 }

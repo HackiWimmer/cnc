@@ -45,6 +45,7 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	
 	setPageWidth(m_rpManually,	800);
 	setPageWidth(m_rpRef,		800);
+	setPageWidth(m_rpMisc,		800);
 	
 	portSelectorList = new CncSecurePortListCtrl(this, this, wxLC_HRULES | wxLC_SINGLE_SEL | wxLC_NO_HEADER); 
 	GblFunc::replaceControl(m_portSelectorPlaceholder, portSelectorList);
@@ -430,9 +431,34 @@ void CncSecureCtrlPanel::onSessionDirSec(wxCommandEvent& event) {
 	THE_APP->openSessionDialog(event);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::onTestFunctionSec(wxCommandEvent& event) {
+void CncSecureCtrlPanel::onTestFunction1Sec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->testFunction2(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onTestFunction2Sec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->testFunction3(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onTestFunction3Sec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	THE_APP->testFunction1(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onTestFunction4Sec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->testFunction4(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onEditTemplateSec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->detachTemplateSource(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onOpenConfigurationSec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->detachConfiguration(event);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onStackTraceStoreSec(wxCommandEvent& event) {
@@ -455,7 +481,7 @@ void CncSecureCtrlPanel::onSerialSpySec(wxCommandEvent& event) {
 	THE_APP->GetAuimgrMain()->Update();
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::requestResolveLimitStates(wxCommandEvent& event) {
+void CncSecureCtrlPanel::onRequestResolveLimitStates(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	THE_APP->requestResolveLimitStates(event);
 }
@@ -547,6 +573,7 @@ void CncSecureCtrlPanel::activate(bool b) {
 		const int sel = PAGE_CONNECT;
 		m_leftBook->SetSelection(sel);
 		m_rightBook->SetSelection(sel);
+		
 		THE_APP->GetSecureSplitterMainV()->SetSashPosition(pageVector.at(sel).width);
 		performRightHeadline();
 		
@@ -566,5 +593,7 @@ void CncSecureCtrlPanel::activate(bool b) {
 	//..
 	
 }
+
+
 
 

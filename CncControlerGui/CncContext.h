@@ -87,6 +87,7 @@ struct CncContext {
 		bool isPause()											const;
 		bool isProcessing()										const;
 		bool togglePause();
+		void initPreparationPhase();
 		void resetProcessing();
 		
 		void setInteractiveMoveingMode(bool state)						{ interactiveMoveMode = state; }
