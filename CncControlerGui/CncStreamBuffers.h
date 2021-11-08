@@ -19,7 +19,7 @@ class LoggerStreamBuf : public std::streambuf {
 		wxTextAttr 			textAttr;
 		
 	public:
-		enum Type { STD = 'C', LOG = 'L', ERR = 'E', EX1 = '1', TRC = 'T', MSG = 'M', SPY = 'S' };
+		enum Type { STD = 'C', LOG = 'L', ERR = 'E', EX1 = '1', EX2 = '2', EX3 = '3', TRC = 'T', MSG = 'M', SPY = 'S' };
 		
 		static wxString 	startupBuffer;
 		static wxTextAttr 	defaultAttr;
@@ -47,36 +47,51 @@ namespace StartupBuffer {
 };
 
 ///////////////////////////////////////////////////////////////////
-class CncCoutBuf : public LoggerStreamBuf {
+class CncCoutBuf : public LoggerStreamBuf 
+{
 	public:
-		///////////////////////////////////////////////////////////
-		explicit CncCoutBuf(CncTextCtrl* c) 
-		: LoggerStreamBuf(LoggerStreamBuf::Type::STD, c, wxTextAttr(wxColour(232, 232, 232))) {}
-		virtual ~CncCoutBuf() {}
+		explicit CncCoutBuf(CncTextCtrl* c);
+		virtual ~CncCoutBuf();
 };
 
 ///////////////////////////////////////////////////////////////////
-class CncClogBuf : public LoggerStreamBuf {
+class CncClogBuf : public LoggerStreamBuf 
+{
 	public:
-		explicit CncClogBuf(CncTextCtrl* c) 
-		: LoggerStreamBuf(LoggerStreamBuf::Type::LOG, c, wxTextAttr(wxColour(0, 157, 157))) {}
-		virtual ~CncClogBuf() {}
+		explicit CncClogBuf(CncTextCtrl* c);
+		virtual ~CncClogBuf() ;
 };
 
 ///////////////////////////////////////////////////////////////////
-class CncCerrBuf : public LoggerStreamBuf {
+class CncCerrBuf : public LoggerStreamBuf
+{
 	public:
-		explicit CncCerrBuf(CncTextCtrl* c) 
-		: LoggerStreamBuf(LoggerStreamBuf::Type::ERR, c, wxTextAttr(wxColour(255, 64, 64))) {}
-		virtual ~CncCerrBuf() {}
+		explicit CncCerrBuf(CncTextCtrl* c);
+		virtual ~CncCerrBuf();
 };
 
 ///////////////////////////////////////////////////////////////////
-class CncCex1Buf : public LoggerStreamBuf {
+class CncCex1Buf : public LoggerStreamBuf
+{
 	public:
-		explicit CncCex1Buf(CncTextCtrl* c) 
-		: LoggerStreamBuf(LoggerStreamBuf::Type::EX1, c, wxTextAttr(wxColour(255, 201, 14))) {}
-		virtual ~CncCex1Buf() {}
+		explicit CncCex1Buf(CncTextCtrl* c);
+		virtual ~CncCex1Buf();
+};
+
+///////////////////////////////////////////////////////////////////
+class CncCex2Buf : public LoggerStreamBuf
+{
+	public:
+		explicit CncCex2Buf(CncTextCtrl* c);
+		virtual ~CncCex2Buf();
+};
+
+///////////////////////////////////////////////////////////////////
+class CncCex3Buf : public LoggerStreamBuf
+{
+	public:
+		explicit CncCex3Buf(CncTextCtrl* c);
+		virtual ~CncCex3Buf();
 };
 
 ///////////////////////////////////////////////////////////////////

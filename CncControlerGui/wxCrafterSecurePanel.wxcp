@@ -2579,7 +2579,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Label:",
-                   "m_value": "Explorer"
+                   "m_value": "Explore File System"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",
@@ -2674,7 +2674,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Label:",
-                   "m_value": "Edit"
+                   "m_value": "Edit current Template"
                   }, {
                    "type": "bool",
                    "m_label": "Default Button",

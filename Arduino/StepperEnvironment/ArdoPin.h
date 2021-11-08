@@ -111,55 +111,115 @@
     const unsigned char PIN_X_DIR                           =   5;
     const unsigned char PIN_Y_STP                           =   6;
     const unsigned char PIN_Y_DIR                           =   7;
+    
     const unsigned char PIN_Z_STP                           =   8;
     const unsigned char PIN_Z_DIR                           =   9;
-
     const unsigned char PIN_ENABLE_STEPPER                  =  10;
     const unsigned char PIN_ENABLE_SPINDLE                  =  11;
 
+    //const unsigned char PIN_                              =  12;
+    //const unsigned char PIN_                              =  13;
+
+    //const unsigned char PIN_                              =  14;
+    //const unsigned char PIN_                              =  15;
+    //const unsigned char PIN_                              =  16;
+    //const unsigned char PIN_                              =  17;
+
+    //const unsigned char PIN_                              =  18;
+    //const unsigned char PIN_                              =  19;
+    //const unsigned char PIN_                              =  20;
+    //const unsigned char PIN_                              =  21;
+
     // PINA
-    const unsigned char PIN_TOUCH_CONTACT                   =  29;
-    //const unsigned char PIN_                              =  28;
-    //const unsigned char PIN_                              =  27;
-    //const unsigned char PIN_                              =  26;
-    //const unsigned char PIN_                              =  25;
-    //const unsigned char PIN_                              =  24;
-    const unsigned char PIN_IS_SPINDLE_POWERED              =  23;
     const unsigned char PIN_IS_CTRL_POWERED                 =  22;
-    
+    const unsigned char PIN_IS_SPINDLE_POWERED              =  23;
+    //const unsigned char PIN_                              =  24;
+    //const unsigned char PIN_                              =  25;
+ 
+    //const unsigned char PIN_                              =  26;
+    //const unsigned char PIN_                              =  27;
+    //const unsigned char PIN_                              =  28;
+    const unsigned char PIN_TOUCH_CONTACT                   =  29;
+     
     // PINC
-    const unsigned char PIN_X_MIN_LIMIT                     =  37;
-    const unsigned char PIN_X_MAX_LIMIT                     =  36;
-    const unsigned char PIN_Y_MIN_LIMIT                     =  35;
-    const unsigned char PIN_Y_MAX_LIMIT                     =  34;
-    const unsigned char PIN_Z_MIN_LIMIT                     =  33;
-    const unsigned char PIN_Z_MAX_LIMIT                     =  32;
-    const unsigned char PIN_EXTERNAL_INTERRUPT              =  31;
     //const unsigned char PIN_                              =  30;
-
+    const unsigned char PIN_EXTERNAL_INTERRUPT              =  31;
+    const unsigned char PIN_Z_MAX_LIMIT                     =  32;
+    const unsigned char PIN_Z_MIN_LIMIT                     =  33;
+    
+    const unsigned char PIN_Y_MAX_LIMIT                     =  34;
+    const unsigned char PIN_Y_MIN_LIMIT                     =  35;
+    const unsigned char PIN_X_MAX_LIMIT                     =  36;
+    const unsigned char PIN_X_MIN_LIMIT                     =  37;
+    
     // PIN
-    const unsigned char PIN_SPINDEL_SUPPORT                 =  45;
-    const unsigned char PIN_SPINDEL_SPEED_INF               =  44;
-    //const unsigned char PIN_                              =  43;
-    //const unsigned char PIN_                              =  42;
-    //const unsigned char PIN_                              =  41;
-    //const unsigned char PIN_                              =  40;
-    const unsigned char PIN_H_MIN_LIMIT                     =  39;
     const unsigned char PIN_H_MAX_LIMIT                     =  38;
-
-    const unsigned char PIN_H_DIR                           =  49;
-    const unsigned char PIN_H_STP                           =  48;
-    const unsigned char PIN_LED_PODIUM                      =  47;
+    const unsigned char PIN_H_MIN_LIMIT                     =  39;
+    //const unsigned char PIN_                              =  40;
+    //const unsigned char PIN_                              =  41;
+ 
+    //const unsigned char PIN_                              =  42;
+    //const unsigned char PIN_                              =  43;
+    const unsigned char PIN_SPINDEL_SPEED_INF               =  44;
+    const unsigned char PIN_SPINDEL_SUPPORT                 =  45;
+    
     const unsigned char PIN_ENABLE_PODIUM                   =  46;
-
-    const unsigned char PIN_H_MOVE_UP                       =  51;
+    const unsigned char PIN_LED_PODIUM                      =  47;
+    const unsigned char PIN_H_STP                           =  48;
+    const unsigned char PIN_H_DIR                           =  49;
+    
     const unsigned char PIN_H_MOVE_DOWN                     =  50;
+    const unsigned char PIN_H_MOVE_UP                       =  51;
+    //const unsigned char PIN_                              =  52;
+    //const unsigned char PIN_                              =  53;
 
     #define PIN_INTERRUPT_LED                            AE::PN_A0   
     const unsigned char PIN_INTERRUPT_LED_ID                =   0;
 
     #define PIN_IS_SPINDEL_OVRLD                         AE::PN_A1   
     const unsigned char PIN_IS_SPINDEL_OVRLD_ID              =  1;
+
+    //#define PIN_                                       AE::PN_A2   
+    //const unsigned char PIN_IS_                            =  2;
+
+    //#define PIN_                                       AE::PN_A3   
+    //const unsigned char PIN_IS_                            =  3;
+
+    //#define PIN_                                       AE::PN_A4   
+    //const unsigned char PIN_IS_                            =  4;
+    
+    //#define PIN_                                       AE::PN_A5   
+    //const unsigned char PIN_IS_                            =  5;
+
+    //#define PIN_                                       AE::PN_A6   
+    //const unsigned char PIN_IS_                            =  6;
+
+    //#define PIN_                                       AE::PN_A7   
+    //const unsigned char PIN_IS_                           =  7;
+
+    //#define PIN_                                       AE::PN_A8   
+    //const unsigned char PIN_IS_                            =  8;
+
+    //#define PIN_                                       AE::PN_A9   
+    //const unsigned char PIN_IS_                            =  9;
+
+    //#define PIN_                                      AE::PN_A10   
+    //const unsigned char PIN_IS_                           =  10;
+
+    //#define PIN_                                      AE::PN_A11   
+    //const unsigned char PIN_IS_                           =  11;
+
+    //#define PIN_                                      AE::PN_A12   
+    //const unsigned char PIN_IS_                           =  12;
+
+    //#define PIN_                                      AE::PN_A13   
+    //const unsigned char PIN_IS_                           =  13;
+
+    //#define PIN_                                      AE::PN_A14   
+    //const unsigned char PIN_IS_                           =  14;
+
+    //#define PIN_                                      AE::PN_A15   
+    //const unsigned char PIN_IS_                           =  15;
     
     #define READ_LMT_PIN_H_MIN                            ( AE::digitalRead(PIN_H_MIN_LIMIT) ) 
     #define READ_LMT_PIN_H_MAX                            ( AE::digitalRead(PIN_H_MAX_LIMIT) )
@@ -296,7 +356,7 @@
     #define PIN_INTERRUPT                                AE::PN_A0   
     const unsigned char PIN_INTERRUPT_ID                    =   0;
   
-    #define PIN_IS_SPINDEL_OVRLD                                 0
+    #define PIN_IS_SPINDEL_OVRLD                                0
     const unsigned char PIN_IS_SPINDEL_OVRLD_ID              =  0;
 
     #define READ_LMT_PIN_X_MIN                            ( AE::digitalRead(PIN_X_MIN_LIMIT) )

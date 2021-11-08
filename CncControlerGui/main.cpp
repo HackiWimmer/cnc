@@ -51,6 +51,14 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 	CncCex1Buf*  psbufCex1;
 	std::streambuf *sbOldCex1;
 
+	// redirect cnc::cex2
+	CncCex2Buf*  psbufCex2;
+	std::streambuf *sbOldCex2;
+
+	// redirect cnc::cex3
+	CncCex3Buf*  psbufCex3;
+	std::streambuf *sbOldCex3;
+
 	// redirect cnc::trc
 	CncCtrcBuf*  psbufCtrc;
 	std::streambuf *sbOldCtrc;
@@ -63,11 +71,15 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 	CncCspyBuf*  psbufCspy;
 	std::streambuf *sbOldCspy;
 
-	namespace cnc {
-		CncSerialSpyStream spy;
-		CncMsgLogStream msg;
-		CncTraceLogStream trc;
-		CncBasicLogStream cex1;
+	namespace cnc 
+	{
+		CncSerialSpyStream	spy;
+		CncMsgLogStream		msg;
+		CncTraceLogStream	trc;
+		
+		std::ostream		cex1(psbufCex1);
+		std::ostream		cex2(psbufCex2);
+		std::ostream		cex3(psbufCex3);
 	};
 	
 ///////////////////////////////////////////////////////////////////////////
@@ -101,8 +113,17 @@ namespace GlobalStreamRedirection {
 		// redirect ext1 buffer
 		psbufCex1 = new CncCex1Buf(NULL);
 		sbOldCex1 = cnc::cex1.rdbuf();
-		((std::iostream*)&cnc::cex1)->rdbuf(psbufCex1);
-		cnc::cex1.setLogStreamBuffer(psbufCex1);
+		cnc::cex1.rdbuf(psbufCex1);
+		
+		// redirect ext2 buffer
+		psbufCex2= new CncCex2Buf(NULL);
+		sbOldCex2 = cnc::cex2.rdbuf();
+		cnc::cex2.rdbuf(psbufCex2);
+		
+		// redirect ext3 buffer
+		psbufCex3= new CncCex3Buf(NULL);
+		sbOldCex3 = cnc::cex3.rdbuf();
+		cnc::cex3.rdbuf(psbufCex3);
 		
 		streamRedirectionState = PREINSTALLED;
 	}
@@ -120,6 +141,8 @@ namespace GlobalStreamRedirection {
 		psbufClog->setTextControl(mainFrame->getLogger());
 		psbufCerr->setTextControl(mainFrame->getLogger());
 		psbufCex1->setTextControl(mainFrame->getLogger());
+		psbufCex2->setTextControl(mainFrame->getLogger());
+		psbufCex3->setTextControl(mainFrame->getLogger());
 		
 		// redirect trace buffer
 		psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
@@ -153,7 +176,11 @@ namespace GlobalStreamRedirection {
 		psbufCout->ungregisterTextControl();
 		psbufClog->ungregisterTextControl();
 		psbufCerr->ungregisterTextControl();
+		
 		psbufCex1->ungregisterTextControl();
+		psbufCex2->ungregisterTextControl();
+		psbufCex3->ungregisterTextControl();
+
 		psbufCtrc->ungregisterTextControl();
 		psbufCmsg->ungregisterTextControl();
 		psbufCspy->ungregisterTextControl();
@@ -162,7 +189,10 @@ namespace GlobalStreamRedirection {
 		std::cout.rdbuf(sbOldCout);
 		std::cerr.rdbuf(sbOldClog);
 		std::cerr.rdbuf(sbOldCerr);
-		((std::iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
+		cnc::cex1.rdbuf(sbOldCex1);
+		cnc::cex2.rdbuf(sbOldCex2);
+		cnc::cex3.rdbuf(sbOldCex3);
+		
 		((std::iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
 		((std::iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
 		((std::iostream*)&cnc::spy)->rdbuf(sbOldCspy);
@@ -172,6 +202,8 @@ namespace GlobalStreamRedirection {
 		delete psbufClog;
 		delete psbufCerr;
 		delete psbufCex1;
+		delete psbufCex2;
+		delete psbufCex3;
 		delete psbufCtrc;
 		delete psbufCmsg;
 		delete psbufCspy;

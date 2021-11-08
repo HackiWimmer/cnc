@@ -136,7 +136,10 @@ namespace cnc {
 	typedef std::vector<int32_t> 						SetterValueList;
 	typedef std::map<unsigned long, unsigned long> 		LineNumberTranslater;
 	
-	extern CncBasicLogStream							cex1;
+	extern std::ostream									cex1;
+	extern std::ostream									cex2;
+	extern std::ostream									cex3;
+	
 	extern CncTraceLogStream							trc;
 	extern CncMsgLogStream								msg;
 	extern CncSerialSpyStream							spy;

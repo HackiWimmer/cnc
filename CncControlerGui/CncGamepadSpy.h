@@ -105,7 +105,6 @@ class CncGamepadSpy : public CncGamepadSpyBase {
 		CncGamepadDirectionPanel*			dirXY;
 		CncGamepadDirectionPanel*			dirZ;
 		CncGamepadCommadHistoryListCtrl*	cmdHistCtrl;
-		CncGamepadMenuDlg*					quickMenu;
 		MovementState						currentMovementState;
 		MoveInfo 							currentMoveInfo;
 

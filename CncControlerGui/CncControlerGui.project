@@ -291,8 +291,6 @@
       <File Name="CncAnchorPosition.cpp"/>
       <File Name="CncUsbConnectionObserver.h"/>
       <File Name="CncUsbConnectionObserver.cpp"/>
-      <File Name="CncGamepadMenuDlg.h"/>
-      <File Name="CncGamepadMenuDlg.cpp"/>
       <File Name="CncStringLogger.cpp"/>
       <File Name="CncStringLogger.h"/>
       <File Name="CncMillingTrack.cpp" ExcludeProjConfig="Release;"/>
@@ -521,6 +519,7 @@
       <File Name="MainFrame.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="StdStreamRedirector.cpp"/>
       <File Name="Version.h"/>
       <File Name="CircularBuffer.cpp"/>
       <File Name="CircularBuffer.h"/>

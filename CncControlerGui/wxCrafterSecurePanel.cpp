@@ -231,7 +231,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer97->Add(m_lruFilePlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_btLoadTemplate = new wxButton(m_rpLoad, wxID_ANY, _("Explorer"), wxDefaultPosition, wxDLG_UNIT(m_rpLoad, wxSize(-1,-1)), 0);
+    m_btLoadTemplate = new wxButton(m_rpLoad, wxID_ANY, _("Explore File System"), wxDefaultPosition, wxDLG_UNIT(m_rpLoad, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btLoadTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncFolder")), wxLEFT);
     m_btLoadTemplate->SetBitmapMargins(2,2);
@@ -241,7 +241,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer97->Add(m_btLoadTemplate, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_btEditTemplate = new wxButton(m_rpLoad, wxID_ANY, _("Edit"), wxDefaultPosition, wxDLG_UNIT(m_rpLoad, wxSize(-1,-1)), 0);
+    m_btEditTemplate = new wxButton(m_rpLoad, wxID_ANY, _("Edit current Template"), wxDefaultPosition, wxDLG_UNIT(m_rpLoad, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btEditTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-marker")), wxLEFT);
     m_btEditTemplate->SetBitmapMargins(2,2);

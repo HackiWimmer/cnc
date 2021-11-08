@@ -9,7 +9,6 @@
 #include "CncGamepadDirectionPanel.h"
 #include "CncGamepadFilter.h"
 #include "CncGamepadCommandHistory.h"
-#include "CncGamepadMenuDlg.h"
 #include "CncGamepadSpy.h"
 
 /////////////////////////////////////////////////////////////////////
@@ -19,7 +18,6 @@ CncGamepadSpy::CncGamepadSpy(wxWindow* parent)
 , dirXY					(NULL)
 , dirZ					(NULL)
 , cmdHistCtrl			(NULL)
-, quickMenu				(new CncGamepadMenuDlg(THE_APP))
 , currentMovementState	(MS_STOPPED)
 , currentMoveInfo		()
 , activated				(false)
@@ -40,7 +38,6 @@ CncGamepadSpy::~CncGamepadSpy() {
 /////////////////////////////////////////////////////////////////////
 	wxDELETE(dirXY);
 	wxDELETE(dirZ);
-	wxDELETE(quickMenu);
 }
 /////////////////////////////////////////////////////////////////////
 void CncGamepadSpy::updateModeText(const wxString& msg) {
@@ -196,9 +193,6 @@ void CncGamepadSpy::update(const GamepadEvent* state) {
 		m_modeBook->SetSelection(MODE_GNC);
 		updateModeText("Not connected");
 		
-		if ( quickMenu->IsShownOnScreen() == true )
-			quickMenu->Show(false);
-		
 		return;
 	}
 	
@@ -212,27 +206,8 @@ void CncGamepadSpy::update(const GamepadEvent* state) {
 		return;
 	}
 	
-	// handle quick menu
-	if ( THE_CONTEXT->gamepadFilterInstance->canActicateQuickMenu() ) {
-		if ( quickMenu != NULL ) {
-			if ( quickMenu->IsShownOnScreen() == false ) {
-				
-				if ( state->data.buttonStart == true ) {
-					quickMenu->ShowModal();
-					return;
-				}
-			}
-			else {
-				quickMenu->update(state);
-				return;
-			}
-		}
-	}
-	
 	// apply the cnc mode filter on demand
-	const bool b = THE_CONTEXT->gamepadFilterInstance->canActicateQuickMenu();
-	const GamepadEvent::UsageMode um = b ? state->data.usageMode : GamepadEvent::UM_NAV_GUI;
-	
+	const GamepadEvent::UsageMode um = state->data.usageMode;
 	switch ( um ) {
 		case GamepadEvent::UM_NAV_GUI:	if ( m_modeBook->GetSelection() != MODE_GUI ) {
 											m_modeBook->SetSelection(MODE_GUI);
@@ -275,9 +250,6 @@ void CncGamepadSpy::updateCncMode(const GamepadEvent* state) {
 	static wxBitmap dBmpNaviZ       = ImageLibGamepadSpy().Bitmap("BMP_NAVI_Z").ConvertToDisabled();
 	static wxBitmap dBmpStickLeft   = ImageLibGamepadSpy().Bitmap("BMP_STICK_LEFT").ConvertToDisabled();
 	static wxBitmap dBmpStickRight  = ImageLibGamepadSpy().Bitmap("BMP_STICK_RIGHT").ConvertToDisabled();
-	
-	if ( quickMenu && quickMenu->IsShownOnScreen() )
-		quickMenu->Show(false);
 	
 	// Don't check this here to get a continuous user interaction
 	//if ( state.isSomethingChanged == false )

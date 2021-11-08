@@ -30,6 +30,8 @@ class CncControl {
 		enum DimensionMode			{ DM_2D, DM_3D };
 		enum CtrlPowerState			{ CPS_ON = POWER_STATE_ON, CPS_OFF = POWER_STATE_OFF, CPS_NOT_INITIALIZED = -1, CPS_UNKNOWN = -2  };
 		
+		enum RunMode				{ M_TryRun, M_RealRun };
+		
 		static const char* getCtrlPowerStateAsStr(const CtrlPowerState cps) {
 			switch ( cps ) {
 				case CPS_ON:				return "ON";
@@ -96,8 +98,14 @@ class CncControl {
 		bool dispatchEventQueue();
 		
 	protected:
+		//
+		RunMode					runMode;
 		// internal port object
 		Serial* 				serialPort;
+		// internal try run port object
+		Serial*					realRunSerial;
+		// internal try run port object
+		Serial*					tryRunSerial;
 		// Defines the absolute zero pos as a reference pos 
 		CncLongPosition 		zeroAppPos;
 		// Defines the start postion of an object in relation to zeroPos 
@@ -201,6 +209,8 @@ class CncControl {
 		void setClientId(long id) 		{ currentClientId = id; }
 		void resetClientId()			{ setClientId(-1L); }
 		const long getClientId() const 	{ return currentClientId; }
+		
+		void switchRunMode(RunMode m);
 		
 		// Connection to portName
 		bool connect(const char * portName);

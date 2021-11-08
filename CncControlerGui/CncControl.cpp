@@ -43,7 +43,10 @@ CncControl::CncControl(CncPortType pt)
 : currentClientId					(-1)
 , currentInteractiveMoveInfo		()
 , setterMap							()
+, runMode							(M_RealRun)
 , serialPort						(NULL)
+, realRunSerial						(NULL)
+, tryRunSerial						(NULL)
 , zeroAppPos						(0,0,0)
 , startAppPos						(0,0,0)
 , curAppPos							(0,0,0)
@@ -66,14 +69,20 @@ CncControl::CncControl(CncPortType pt)
 {
 //////////////////////////////////////////////////////////////////
 	// Serial factory
-	if      ( pt == CncPORT ) 				serialPort = new SerialOSD(this);
-	else if ( pt == CncEMU_NULL )			serialPort = new SerialEmulatorNULL(this);
-	else if ( pt == CncEMU_TXT )			serialPort = new SerialEmulatorTextStreamer(this);
-	else if ( pt == CncEMU_SVG )			serialPort = new SerialEmulatorSvgStreamer(this);
-	else if ( pt == CncEMU_GCODE )			serialPort = new SerialEmulatorGCodeStreamer(this);
-	else if ( pt == CncEMU_BIN )			serialPort = new SerialEmulatorBinaryStreamer(this);
-	else if ( pt == CncPORT_EMU_ARDUINO )	serialPort = new SerialThreadStub(this);
-	else 									serialPort = new SerialEmulatorNULL(this);
+	if      ( pt == CncPORT ) 				realRunSerial = new SerialOSD(this);
+	else if ( pt == CncEMU_NULL )			realRunSerial = new SerialEmulatorNULL(this);
+	else if ( pt == CncEMU_TXT )			realRunSerial = new SerialEmulatorTextStreamer(this);
+	else if ( pt == CncEMU_SVG )			realRunSerial = new SerialEmulatorSvgStreamer(this);
+	else if ( pt == CncEMU_GCODE )			realRunSerial = new SerialEmulatorGCodeStreamer(this);
+	else if ( pt == CncEMU_BIN )			realRunSerial = new SerialEmulatorBinaryStreamer(this);
+	else if ( pt == CncPORT_EMU_ARDUINO )	realRunSerial = new SerialThreadStub(this);
+	else 									realRunSerial = new SerialEmulatorNULL(this);
+	
+	serialPort = realRunSerial;
+	
+	#warning
+	tryRunSerial = new SerialEmulatorNULL(this);
+	
 	
 	serialPort->enableSpyOutput();
 }
@@ -87,6 +96,25 @@ CncControl::~CncControl() {
 	disconnect();
 
 	cncDELETE(serialPort);
+}
+//////////////////////////////////////////////////////////////////
+void CncControl::switchRunMode(RunMode m) {
+//////////////////////////////////////////////////////////////////
+	if ( m == M_TryRun && tryRunSerial != NULL )
+	{
+		serialPort = tryRunSerial;
+		connect("TryRun");
+		setup(true);
+	}
+	else
+	{
+		if ( serialPort == tryRunSerial )
+		{
+			disconnect();
+		}
+		
+		serialPort = realRunSerial;
+	}
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getStartPosMetric() {

@@ -4,7 +4,6 @@
 #include "wxCrafterImages.h"
 #include "MainFrameProxy.h"
 #include "GlobalStrings.h"
-#include "CncAutoFreezer.h"
 #include "CncConfig.h"
 #include "CncUserEvents.h"
 #include "CncMoveSequenceListCtrl.h"
@@ -190,10 +189,6 @@ void CncMoveSequenceListCtrl::updateColumnWidth() {
 		
 	if ( COL_STRECH < 0 )
 		return;
-		
-	// avoid flicker
-	const bool b = IsShownOnScreen() && IsFrozen() == false;
-	//CncAutoFreezer caf( b ? this : NULL);
 		
 	int colWidthSum = 0;
 	for ( int i = 0; i < GetColumnCount(); i++ ) {

@@ -1273,71 +1273,37 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	/*
-	const uint32_t trgF1000_MMSEC = ( 700 / 60 )	* 1000;
+	CncTextCtrl* l = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
+	{
+		StdStreamRedirector srd(l);
+		cnc->switchRunMode(CncControl::RunMode::M_TryRun);
+		rcRun();
+		cnc->switchRunMode(CncControl::RunMode::M_RealRun);
+		cnc::cex1 << "TEST\n";
+	}
+	cnc::cex1 << "******************************************************\n";
+	cnc::cex1 << l->GetValue();
+	cnc::cex1 << "******************************************************\n";
 	
-	const uint32_t A_1000			= 2.003			* 1000;
-	const uint32_t B_1000			= 2.002			* 1000;
-	const uint32_t C_1000			= 5.55			* 1000;
+	//wxMessageBox(l->GetValue());
 	
-	std::cout << wxString::Format("%ld = %ld I^2 + %ld I + %ld\n", trgF1000_MMSEC, A_1000, B_1000, C_1000);
-	
-	const uint32_t V0 = B_1000 / ( 2 * A_1000);
-	const uint32_t V1 = (trgF1000_MMSEC - C_1000) / A_1000;
-	
-	std::cout << "V0 = " << V0 << ", V1 = " << V1 << std::endl;
-	
-	
-	const int32_t I1 = -V0 + sqrt(V1 + V0 * V0);
-	const int32_t I2 = -V0 - sqrt(V1 + V0 * V0);
-	
-	std::cout << "I1 = " << I1 << ", I2 = " << I2 << std::endl;
-	*/
-	/*
-	std::cout	<< std::showpos << std::fixed << std::setw( 11 ) << std::setprecision( 6 )
-			<< "v1: " << v1 << std::endl;
-	*/
+	delete l;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
 	
-	/*
-	cnc->changeCurrentSpindleSpeed_U_MIN(1.0);
-	cnc->changeCurrentSpindleSpeed_U_MIN(4000.0);
-	cnc->changeCurrentSpindleSpeed_U_MIN(4080.0);
-	cnc->changeCurrentSpindleSpeed_U_MIN(4100.0);
-	cnc->changeCurrentSpindleSpeed_U_MIN(8080.0);
-	cnc->changeCurrentSpindleSpeed_U_MIN(24900.0);
-	cnc->changeCurrentSpindleSpeed_U_MIN(100000.0);
-	*/
-	
-	wxNumberEntryDialog dlg(this, 
-							"Update Value:",
-							"Spindle Speed [U/min]",
-							"Spindle Speed Configuration . . . ", 
-							5000,
-							4000, 
-							25000 
-							);
-	
-	if ( dlg.ShowModal() == wxID_OK ) {
-		dlg.GetValue();
-		
-		cnc->changeCurrentSpindleSpeed_U_MIN((float)dlg.GetValue());
-	}
-	
-	
+	cnc::cex2 << "******************************************************\n";
+	CNC_CERR_FUNCT
+	CNC_CLOG_FUNCT
+	CNC_COUT_FUNCT
+	cnc::cex3 << "******************************************************\n";
 }
-#include "CncGamepadMenuDlg.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logWarningMessage("Test function 3");
-	
-	CncGamepadMenuDlg dlg(this);
-	dlg.ShowModal();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
