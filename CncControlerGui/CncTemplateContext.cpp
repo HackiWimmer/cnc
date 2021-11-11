@@ -13,6 +13,7 @@ CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
 , validRunCount			(0)
 , bounderySpace			(bs)
 , bounderies			()
+, logInformation		()
 //////////////////////////////////////////////////////////////
 {
 }
@@ -104,6 +105,49 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 		<< prefix << "Tool Sel. List          : " << toolSelList					<< std::endl
 		<< prefix << "Tool Sel Count          : " << getToolSelCount()				<< std::endl
 		<< prefix << "Bounderies         [mm] : " << traceBound(bounderies)			<< std::endl
-		
 	;
+	
+	o << std::endl;
+	streamLogInfo(o, indent);
+}
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::streamLogInfo(std::ostream& o, unsigned int indent) const {
+//////////////////////////////////////////////////////////////
+	const wxString prefix(' ', indent);
+	
+	o << "Log Information:" << std::endl;
+	for ( auto it = logInformation.begin(); it != logInformation.end(); ++it )
+	{
+		o << "******************************************************\n";
+		
+		wxStringTokenizer lines((*it), "\n");
+		while ( lines.HasMoreTokens() )
+		{
+			const wxString& token = lines.GetNextToken();
+			o << prefix << token << std::endl;
+		}
+	}
+}
+//////////////////////////////////////////////////////////////
+const wxString CncTemplateContext::getLastLogInfo(unsigned int indent) const {
+//////////////////////////////////////////////////////////////
+	const wxString prefix(' ', indent);
+	if ( logInformation.size() > 0 )
+	{
+		if ( logInformation.back().Contains("\n") )
+		{
+			wxStringTokenizer lines(logInformation.back(), "\n");
+			wxString ret;
+			while ( lines.HasMoreTokens() )
+				ret.append(wxString::Format("%s%s\n", prefix,  lines.GetNextToken()));
+			
+			return ret;
+		}
+		else
+		{
+			return logInformation.back();
+		}
+	}
+	
+	return wxEmptyString;
 }

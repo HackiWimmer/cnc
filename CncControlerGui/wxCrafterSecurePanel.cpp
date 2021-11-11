@@ -539,11 +539,11 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rpRun = new wxPanel(m_rightBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rightBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_rightBook->AddPage(m_rpRun, _("Page"), false);
     
-    wxFlexGridSizer* flexGridSizer77 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer77 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer77->SetFlexibleDirection( wxBOTH );
     flexGridSizer77->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer77->AddGrowableCol(0);
-    flexGridSizer77->AddGrowableRow(1);
+    flexGridSizer77->AddGrowableRow(2);
     m_rpRun->SetSizer(flexGridSizer77);
     
     wxFlexGridSizer* flexGridSizer79 = new wxFlexGridSizer(3, 1, 0, 0);
@@ -586,6 +586,52 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer79->Add(m_rcStopSec, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     m_rcStopSec->SetMinSize(wxSize(-1,80));
+    
+    wxFlexGridSizer* flexGridSizer650 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer650->SetFlexibleDirection( wxBOTH );
+    flexGridSizer650->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer650->AddGrowableCol(0);
+    flexGridSizer650->AddGrowableRow(1);
+    
+    flexGridSizer77->Add(flexGridSizer650, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticLine654 = new wxStaticLine(m_rpRun, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rpRun, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer650->Add(m_staticLine654, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    wxFlexGridSizer* flexGridSizer657 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer657->SetFlexibleDirection( wxBOTH );
+    flexGridSizer657->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer657->AddGrowableCol(0);
+    flexGridSizer657->AddGrowableCol(1);
+    flexGridSizer657->AddGrowableRow(0);
+    
+    flexGridSizer650->Add(flexGridSizer657, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btTemplateContextSec = new wxButton(m_rpRun, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_rpRun, wxSize(30,80)), wxBU_LEFT);
+    #if wxVERSION_NUMBER >= 2904
+    m_btTemplateContextSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-record")), wxRIGHT);
+    m_btTemplateContextSec->SetBitmapMargins(2,2);
+    #endif
+    m_btTemplateContextSec->SetToolTip(_("Template Context"));
+    
+    flexGridSizer657->Add(m_btTemplateContextSec, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_btTemplateContextSec->SetMinSize(wxSize(30,80));
+    
+    m_btTryRunSec = new wxButton(m_rpRun, wxID_ANY, _("Try Run . . ."), wxDefaultPosition, wxDLG_UNIT(m_rpRun, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btTryRunSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncRun")), wxLEFT);
+    m_btTryRunSec->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btTryRunSecFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btTryRunSec->SetFont(m_btTryRunSecFont);
+    
+    flexGridSizer657->Add(m_btTryRunSec, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_btTryRunSec->SetMinSize(wxSize(-1,80));
+    
+    m_staticLine656 = new wxStaticLine(m_rpRun, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rpRun, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer650->Add(m_staticLine656, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     wxFlexGridSizer* flexGridSizer88 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer88->SetFlexibleDirection( wxBOTH );
@@ -811,6 +857,8 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rcRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRunSec), NULL, this);
     m_rcPauseSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onPauseSec), NULL, this);
     m_rcStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
+    m_btTemplateContextSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryStatisticSec), NULL, this);
+    m_btTryRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryRunSec), NULL, this);
     m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_btSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_resolveLimit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRequestResolveLimitStates), NULL, this);
@@ -839,6 +887,8 @@ CncSecureCtrlPanelBase::~CncSecureCtrlPanelBase()
     m_rcRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRunSec), NULL, this);
     m_rcPauseSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onPauseSec), NULL, this);
     m_rcStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
+    m_btTemplateContextSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryStatisticSec), NULL, this);
+    m_btTryRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryRunSec), NULL, this);
     m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_btSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_resolveLimit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRequestResolveLimitStates), NULL, this);

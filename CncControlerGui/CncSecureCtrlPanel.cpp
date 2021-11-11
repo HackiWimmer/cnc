@@ -2,8 +2,10 @@
 #include "GlobalStrings.h"
 #include "GlobalFunctions.h"
 #include "CncCommon.h"
+#include "CncConfig.h"
 #include "CncContext.h"
 #include "wxCrafterImages.h"
+#include "CncTemplateContext.h"
 #include "CncSecureManuallyMovePanel.h"
 #include "CncPolarRegionDetector.h"
 #include "CncSecureRotateModelPanel.h"
@@ -596,4 +598,14 @@ void CncSecureCtrlPanel::activate(bool b) {
 
 
 
-
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onTryRunSec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->rcTryRun(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onTryStatisticSec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	//THE_TPL_CTX->traceTo(cnc::cex1, 3);
+	cnc::cex1 << THE_TPL_CTX->getLastLogInfo() << std::endl;
+}

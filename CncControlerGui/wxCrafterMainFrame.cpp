@@ -175,6 +175,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auibarMain->AddSeparator();
     
+    m_rcTryRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncTryRun")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcTryRun->SetToolTip(_("Try Run - Release"));
+    m_auibarMain->AddControl(m_rcTryRun);
+    
+    m_auibarMain->AddSeparator();
+    
     m_rcSecureDlg = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("iconmonstr-lock-10-16")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_rcSecureDlg->SetToolTip(_("Toggle Secure Run Dialog Mode"));
     m_auibarMain->AddControl(m_rcSecureDlg);
@@ -1042,7 +1048,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer96101->Add(m_staticText5137673, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_templateContext = new wxTextCtrl(m_contextPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_contextPanel, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE);
+    m_templateContext = new wxTextCtrl(m_contextPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_contextPanel, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP);
     m_templateContext->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
     m_templateContext->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_templateContextFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
@@ -6151,6 +6157,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_rcNextBreakpoint->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
     m_rcNextStep->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextStep), NULL, this);
     m_rcFinish->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcFinish), NULL, this);
+    m_rcTryRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcTryRun), NULL, this);
     m_rcSecureDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcSecureDlg), NULL, this);
     m_rcRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
@@ -6412,6 +6419,7 @@ MainFrameBClass::~MainFrameBClass()
     m_rcNextBreakpoint->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
     m_rcNextStep->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextStep), NULL, this);
     m_rcFinish->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcFinish), NULL, this);
+    m_rcTryRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcTryRun), NULL, this);
     m_rcSecureDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcSecureDlg), NULL, this);
     m_rcRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPause->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);

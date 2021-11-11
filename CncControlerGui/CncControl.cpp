@@ -78,24 +78,31 @@ CncControl::CncControl(CncPortType pt)
 	else if ( pt == CncPORT_EMU_ARDUINO )	realRunSerial = new SerialThreadStub(this);
 	else 									realRunSerial = new SerialEmulatorNULL(this);
 	
+	// join the current Serial
 	serialPort = realRunSerial;
 	
-	#warning
-	tryRunSerial = new SerialEmulatorNULL(this);
-	
+	if ( pt == CncPORT || pt == CncPORT_EMU_ARDUINO )
+	{
+		// only in this case create a try run serial
+		// for all other serials this isn't necessary 
+		tryRunSerial = new SerialEmulatorNULL(this);
+	}
 	
 	serialPort->enableSpyOutput();
 }
 ///////////////////////////////////////////////////////////////////
 CncControl::~CncControl() {
 ///////////////////////////////////////////////////////////////////
+	switchRunMode(M_RealRun);
+	
 	setterMap.clear();
 	switchSpindleOff();
 	
 	// safety
 	disconnect();
 
-	cncDELETE(serialPort);
+	cncDELETE(realRunSerial);
+	cncDELETE(tryRunSerial);
 }
 //////////////////////////////////////////////////////////////////
 void CncControl::switchRunMode(RunMode m) {
@@ -103,17 +110,33 @@ void CncControl::switchRunMode(RunMode m) {
 	if ( m == M_TryRun && tryRunSerial != NULL )
 	{
 		serialPort = tryRunSerial;
+		
 		connect("TryRun");
 		setup(true);
 	}
 	else
 	{
-		if ( serialPort == tryRunSerial )
-		{
+		const bool switchBack = ( serialPort == tryRunSerial );
+		if ( switchBack == true )
 			disconnect();
-		}
 		
 		serialPort = realRunSerial;
+		
+		if ( switchBack == true )
+		{
+			// Regarding the serial switch: 
+			// The locally stored controller position has to be aligned to the now present serial.
+			// and furthermore the app position to the ctl pos
+			curCtlPos = requestControllerPos();
+			curAppPos = curCtlPos;
+			
+			// update position text controls
+			postAppPosition(PID_XYZ_POS_MAJOR);
+			postCtlPosition(PID_XYZ_POS_MAJOR);
+			
+			// update the motion monitor too
+			monitorPosition(curCtlPos);
+		}
 	}
 }
 //////////////////////////////////////////////////////////////////
@@ -1373,7 +1396,7 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 		// the comparison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos || force == true) {
-			PositionStorage::addPos(PositionStorage::TRIGGER_APP_POS, curCtlPos);
+			PositionStorage::addPos(PositionStorage::TRIGGER_APP_POS, curAppPos);
 			
 			THE_APP->addAppPosition(	pid, 
 										getClientId(), 
@@ -1700,16 +1723,20 @@ const CncLongPosition CncControl::requestControllerPos() {
 	if ( isConnected() == true && isInterrupted() == false )
 		getSerial()->processGetter(PID_XYZ_POS, list);
 		
-	if ( list.size() != 3 ){
+	if ( list.size() != 3 )
+	{
 		controllerPos.setX(0);
 		controllerPos.setY(0);
 		controllerPos.setZ(0);
 		
-		if ( isConnected() == true && isInterrupted() == false ) {
+		if ( isConnected() == true && isInterrupted() == false )
+		{
 			std::cerr << "CncControl::getControllerPos: Unable to evaluate controllers position:" << std::endl;
 			std::cerr << " Received value count: " << list.size() << ", expected: 3" << std::endl;
 		}
-	} else {
+	}
+	else
+	{
 		controllerPos.setX(list.at(0));
 		controllerPos.setY(list.at(1));
 		controllerPos.setZ(list.at(2));

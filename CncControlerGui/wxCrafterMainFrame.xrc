@@ -294,6 +294,15 @@
             <default>0</default>
           </object>
           <object class="separator"/>
+          <object class="wxBitmapButton" name="m_rcTryRun">
+            <bitmap>bitmaps/CncTryRun.png</bitmap>
+            <style>wxBU_AUTODRAW</style>
+            <tooltip>
+              <![CDATA[Try Run - Release]]>
+            </tooltip>
+            <default>0</default>
+          </object>
+          <object class="separator"/>
           <object class="wxBitmapButton" name="m_rcSecureDlg">
             <bitmap>bitmaps/RunCtrl/iconmonstr-lock-10-16.png</bitmap>
             <style>wxBU_AUTODRAW</style>
@@ -1646,7 +1655,7 @@ Context</label>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxEXPAND</flag>
                                         <object class="wxTextCtrl" name="m_templateContext">
-                                          <style>wxTE_READONLY|wxTE_MULTILINE</style>
+                                          <style>wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP</style>
                                           <bg>#202020</bg>
                                           <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                           <font>

@@ -132,6 +132,7 @@ protected:
     wxPanel* m_panel320;
     wxStaticBitmap* m_staticBitmap317;
     wxPanel* m_panelGUI;
+    wxStaticBitmap* m_staticBitmap3171;
     wxStaticBitmap* m_staticBitmap326;
     wxStaticText* m_staticText300;
     wxStaticLine* m_staticLine312;
@@ -141,6 +142,7 @@ protected:
     wxStaticLine* m_staticLine304;
     wxStaticText* m_keyState;
     wxPanel* m_panelCNC;
+    wxStaticBitmap* m_staticBitmap31712;
     wxStaticBitmap* m_gpBmp1;
     wxStaticBitmap* m_gpBmp2;
     wxStaticBitmap* m_gpBmp3;
@@ -155,6 +157,7 @@ public:
     wxStaticBitmap* GetStaticBitmap317() { return m_staticBitmap317; }
     wxPanel* GetPanel320() { return m_panel320; }
     wxPanel* GetPanelInactive() { return m_panelInactive; }
+    wxStaticBitmap* GetStaticBitmap3171() { return m_staticBitmap3171; }
     wxStaticBitmap* GetStaticBitmap326() { return m_staticBitmap326; }
     wxStaticText* GetStaticText300() { return m_staticText300; }
     wxStaticLine* GetStaticLine312() { return m_staticLine312; }
@@ -164,6 +167,7 @@ public:
     wxStaticLine* GetStaticLine304() { return m_staticLine304; }
     wxStaticText* GetKeyState() { return m_keyState; }
     wxPanel* GetPanelGUI() { return m_panelGUI; }
+    wxStaticBitmap* GetStaticBitmap31712() { return m_staticBitmap31712; }
     wxStaticBitmap* GetGpBmp1() { return m_gpBmp1; }
     wxStaticBitmap* GetGpBmp2() { return m_gpBmp2; }
     wxStaticBitmap* GetGpBmp3() { return m_gpBmp3; }

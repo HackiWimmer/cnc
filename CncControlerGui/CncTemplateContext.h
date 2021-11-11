@@ -1,6 +1,8 @@
 #ifndef CNC_TEMPLATE_CONTEXT_H
 #define CNC_TEMPLATE_CONTEXT_H
 
+#include <vector>
+#include <iostream>
 #include <wx/string.h>
 #include "CncPosition.h"
 
@@ -8,6 +10,8 @@ class CncBoundarySpace;
 class CncTemplateContext {
 	
 	private:
+		
+		typedef std::vector<wxString> LogInformation;
 		
 		wxString					name;
 		wxString					path;
@@ -17,6 +21,7 @@ class CncTemplateContext {
 		
 		CncBoundarySpace*			bounderySpace;
 		CncDoubleBounderies			bounderies;
+		LogInformation				logInformation;
 		
 	protected:
 		
@@ -51,8 +56,13 @@ class CncTemplateContext {
 		void				registerToolSelList(const wxString& tl)	{ toolSelList.assign(tl); }
 		unsigned int		getToolSelCount()				const	{ return toolSelList.Freq(';'); }
 		
-		void				updateGui(bool force)		const;
+		void				updateGui(bool force)			const;
 		void				traceTo(std::ostream& o, unsigned int indent) const;
+		
+		void				streamLogInfo(std::ostream& o, unsigned int indent) const;
+		const wxString		getLastLogInfo(unsigned int indent = 0)				const;
+		void				addLogInfo(const wxString& info)		{ logInformation.push_back(info); }
+		void				clearLogInfo()							{ logInformation.clear(); }
 };
 
 #endif

@@ -20,6 +20,8 @@
   <object class="wxBitmap" name="16-navi@2x">bitmaps\16-navi@2x.png</object>
   <object class="wxBitmap" name="16-patch@2x">bitmaps\CodeLite\16-patch@2x.png</object>
   <object class="wxBitmap" name="16-plus2@2x">bitmaps\CodeLite\16-plus2@2x.png</object>
+  <object class="wxBitmap" name="16-record">bitmaps\16-record.png</object>
+  <object class="wxBitmap" name="16-record@2x">bitmaps\16-record@2x.png</object>
   <object class="wxBitmap" name="16-regular-expression@2x">bitmaps\CodeLite\16-regular-expression@2x.png</object>
   <object class="wxBitmap" name="16-start@2x">bitmaps\16-start@2x.png</object>
   <object class="wxBitmap" name="16-typedef@2x">bitmaps\CodeLite\16-typedef@2x.png</object>

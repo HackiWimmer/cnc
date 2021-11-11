@@ -222,7 +222,7 @@ void CncCspyBuf::addLine(const wxString& line, const wxString& appendix, int typ
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::logCommand(const wxString& cmd) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -239,7 +239,7 @@ void CncSerialSpyStream::initializeResult(const char* msg) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_OK(const char* msg) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -248,7 +248,7 @@ void CncSerialSpyStream::finalizeRET_OK(const char* msg) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_MORE(const char* msg) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -257,7 +257,7 @@ void CncSerialSpyStream::finalizeRET_MORE(const char* msg) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_ERROR(const char* msg) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -266,7 +266,7 @@ void CncSerialSpyStream::finalizeRET_ERROR(const char* msg) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_LIMIT(const char* msg) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -275,7 +275,7 @@ void CncSerialSpyStream::finalizeRET_LIMIT(const char* msg) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_INTERRUPT(const char* msg) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -284,7 +284,7 @@ void CncSerialSpyStream::finalizeRET_INTERRUPT(const char* msg) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_HALT(const char* msg) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -293,7 +293,7 @@ void CncSerialSpyStream::finalizeRET_HALT(const char* msg) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_QUIT(const char* msg) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -302,7 +302,7 @@ void CncSerialSpyStream::finalizeRET_QUIT(const char* msg) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::addMarker(const wxString& mt) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 		
@@ -311,7 +311,7 @@ void CncSerialSpyStream::addMarker(const wxString& mt) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::addDebugEntry(const wxString& mt) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 		
@@ -320,7 +320,7 @@ void CncSerialSpyStream::addDebugEntry(const wxString& mt) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::enableMessage(const char* additional) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -329,7 +329,7 @@ void CncSerialSpyStream::enableMessage(const char* additional) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::disableMessage(const char* additional) {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -341,7 +341,7 @@ void CncSerialSpyStream::logMessage(const char* m) {
 	if ( m == NULL )
 		return;
 	
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 		
@@ -350,7 +350,7 @@ void CncSerialSpyStream::logMessage(const char* m) {
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::logTime() {
 ///////////////////////////////////////////////////////////
-	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(rdbuf());
 	if ( c == NULL )
 		return;
 	
@@ -362,13 +362,10 @@ void CncSerialSpyStream::logTime() {
 //////////////////////////////////////////////////////////
 void CncBasicLogStream::ungregisterTextControl() {
 //////////////////////////////////////////////////////////
+	LoggerStreamBuf* logStreamBuffer = static_cast<LoggerStreamBuf*>(rdbuf());
+	
 	if ( logStreamBuffer != NULL )
 		logStreamBuffer->ungregisterTextControl();
-}
-//////////////////////////////////////////////////////////
-void CncBasicLogStream::setLogStreamBuffer(LoggerStreamBuf* lsb) {
-//////////////////////////////////////////////////////////
-	logStreamBuffer = lsb;
 }
 //////////////////////////////////////////////////////////
 void CncBasicLogStream::resetTextAttr() {
@@ -378,18 +375,21 @@ void CncBasicLogStream::resetTextAttr() {
 //////////////////////////////////////////////////////////
 void CncBasicLogStream::setTextAttr(const wxTextAttr& ta) {
 //////////////////////////////////////////////////////////
+	LoggerStreamBuf* logStreamBuffer = static_cast<LoggerStreamBuf*>(rdbuf());
 	if ( logStreamBuffer != NULL )
 		logStreamBuffer->setTextAttr(ta);
 }
 //////////////////////////////////////////////////////////
 void CncBasicLogStream::setTextColour(const wxColour& c) {
 //////////////////////////////////////////////////////////
+	LoggerStreamBuf* logStreamBuffer = static_cast<LoggerStreamBuf*>(rdbuf());
 	if ( logStreamBuffer != NULL )
 		logStreamBuffer->setTextAttr(wxTextAttr(c));
 }
 //////////////////////////////////////////////////////////
 const wxTextAttr& CncBasicLogStream::getTextAttr() const {
 //////////////////////////////////////////////////////////
+	LoggerStreamBuf* logStreamBuffer = static_cast<LoggerStreamBuf*>(rdbuf());
 	if ( logStreamBuffer != NULL )
 		return logStreamBuffer->getTextAttr();
 		
@@ -398,6 +398,7 @@ const wxTextAttr& CncBasicLogStream::getTextAttr() const {
 //////////////////////////////////////////////////////////
 const wxColour& CncBasicLogStream::getTextColour() const { 
 //////////////////////////////////////////////////////////
+	LoggerStreamBuf* logStreamBuffer = static_cast<LoggerStreamBuf*>(rdbuf());
 	if ( logStreamBuffer != NULL )
 		return logStreamBuffer->getTextAttr().GetTextColour();
 		
@@ -442,7 +443,7 @@ void CncTraceLogStream::logWarningMessage(const char* m) {
 ///////////////////////////////////////////////////////////
 void CncTraceLogStream::logErrorMessage(const char* m) {
 ///////////////////////////////////////////////////////////
-	CncTempTextAttr<LoggerStreamBuf> x(logStreamBuffer, wxTextAttr(errorColour));
+	CncTempTextAttr<CncTraceLogStream> ta(this, wxTextAttr(errorColour));
 	logMessage(m);
 }
 ///////////////////////////////////////////////////////////

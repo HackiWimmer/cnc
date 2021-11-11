@@ -112,6 +112,10 @@ protected:
     wxButton* m_rcRunSec;
     wxButton* m_rcPauseSec;
     wxButton* m_rcStopSec;
+    wxStaticLine* m_staticLine654;
+    wxButton* m_btTemplateContextSec;
+    wxButton* m_btTryRunSec;
+    wxStaticLine* m_staticLine656;
     wxStaticText* m_staticText90;
     wxButton* m_btnEmergenyStopSec;
     wxPanel* m_rpCtrl;
@@ -147,6 +151,8 @@ protected:
     virtual void onRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onPauseSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStopSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTryStatisticSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTryRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onEmergencySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onSerialSpySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onRequestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
@@ -223,6 +229,10 @@ public:
     wxButton* GetRcRunSec() { return m_rcRunSec; }
     wxButton* GetRcPauseSec() { return m_rcPauseSec; }
     wxButton* GetRcStopSec() { return m_rcStopSec; }
+    wxStaticLine* GetStaticLine654() { return m_staticLine654; }
+    wxButton* GetBtTemplateContextSec() { return m_btTemplateContextSec; }
+    wxButton* GetBtTryRunSec() { return m_btTryRunSec; }
+    wxStaticLine* GetStaticLine656() { return m_staticLine656; }
     wxStaticText* GetStaticText90() { return m_staticText90; }
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
     wxPanel* GetRpRun() { return m_rpRun; }

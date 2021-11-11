@@ -18,13 +18,14 @@ struct wxDigitData
 class wxLCDWindow : public wxWindow
 {
 	protected:
-		int mSegmentLen;
-		int mSegmentWidth;
-		int mSpace;
+		int			mSegmentLen;
+		int			mSegmentWidth;
+		int			mSpace;
 
-		int mNumberDigits;
+		int			mNumberDigits;
 		
-		wxString mValue;
+		wxString	mValue;
+		double		lastFloating;
 		
 		wxColour mLightColour;
 		wxColour mLightColourBeforeDecimal;

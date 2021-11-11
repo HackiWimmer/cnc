@@ -73,13 +73,13 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 
 	namespace cnc 
 	{
+		CncBasicLogStream	cex1;
+		CncBasicLogStream	cex2;
+		CncBasicLogStream	cex3;
+		
 		CncSerialSpyStream	spy;
 		CncMsgLogStream		msg;
 		CncTraceLogStream	trc;
-		
-		std::ostream		cex1(psbufCex1);
-		std::ostream		cex2(psbufCex2);
-		std::ostream		cex3(psbufCex3);
 	};
 	
 ///////////////////////////////////////////////////////////////////////////
@@ -90,8 +90,9 @@ namespace GlobalStreamRedirection {
 	State streamRedirectionState = UNKNOWN;
 	
 	///////////////////////////////////////////////////////////////////
-	void preInstall() {
+	void preInstall() 
 	///////////////////////////////////////////////////////////////////
+	{
 		if ( streamRedirectionState != UNKNOWN )
 			return;
 		
@@ -129,7 +130,9 @@ namespace GlobalStreamRedirection {
 	}
 		
 	///////////////////////////////////////////////////////////////////
-	void install(MainFrame* mainFrame) {
+	void install(MainFrame* mainFrame) 
+	///////////////////////////////////////////////////////////////////
+	{
 		if ( streamRedirectionState != PREINSTALLED )
 			return;
 			
@@ -147,26 +150,25 @@ namespace GlobalStreamRedirection {
 		// redirect trace buffer
 		psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
 		sbOldCtrc = cnc::trc.rdbuf();
-		((std::iostream*)&cnc::trc)->rdbuf(psbufCtrc);
-		cnc::trc.setLogStreamBuffer(psbufCtrc);
+		cnc::trc.rdbuf(psbufCtrc);
 		
 		// redirect controller message buffer
 		psbufCmsg = new CncCmsgBuf(mainFrame->getCtrlMessageHistory());
 		sbOldCmsg = cnc::msg.rdbuf();
-		((std::iostream*)&cnc::msg)->rdbuf(psbufCmsg);
-		cnc::msg.setLogStreamBuffer(psbufCmsg);
+		cnc::msg.rdbuf(psbufCmsg);
 		
 		// redirect serial spy buffer
 		psbufCspy = new CncCspyBuf(mainFrame->getCtrlSerialSpy());
 		sbOldCspy = cnc::spy.rdbuf();
-		((std::iostream*)&cnc::spy)->rdbuf(psbufCspy);
-		cnc::spy.setLogStreamBuffer(psbufCspy);
+		cnc::spy.rdbuf(psbufCspy);
 		
 		streamRedirectionState = INSTALLED;
 	}
 		
 	///////////////////////////////////////////////////////////////////
-	void reset() {
+	void reset() 
+	///////////////////////////////////////////////////////////////////
+	{
 		if ( streamRedirectionState != INSTALLED )
 			return;
 			
@@ -192,10 +194,9 @@ namespace GlobalStreamRedirection {
 		cnc::cex1.rdbuf(sbOldCex1);
 		cnc::cex2.rdbuf(sbOldCex2);
 		cnc::cex3.rdbuf(sbOldCex3);
-		
-		((std::iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
-		((std::iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
-		((std::iostream*)&cnc::spy)->rdbuf(sbOldCspy);
+		cnc::trc.rdbuf(sbOldCtrc);
+		cnc::msg.rdbuf(sbOldCmsg);
+		cnc::spy.rdbuf(sbOldCspy);
 		
 		// delete stream buffers
 		delete psbufCout;

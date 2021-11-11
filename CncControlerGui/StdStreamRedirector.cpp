@@ -3,9 +3,9 @@
 //////////////////////////////////////////////////
 namespace cnc 
 {
-	extern std::ostream  cex1;
-	extern std::ostream  cex2;
-	extern std::ostream  cex3;
+	extern CncBasicLogStream cex1;
+	extern CncBasicLogStream cex2;
+	extern CncBasicLogStream cex3;
 }
 //////////////////////////////////////////////////
 

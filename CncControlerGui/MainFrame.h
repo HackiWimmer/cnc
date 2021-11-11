@@ -182,6 +182,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void rcTryRun(wxCommandEvent& event);
 		virtual void onPodiumManagement(wxCommandEvent& event);
 		virtual void onResetView(wxCommandEvent& event);
 		virtual void onToggleFlyPathes(wxCommandEvent& event);
@@ -662,6 +663,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool connectSerialPortDialog();
 		void selectPort();
 		
+		void decorateTryRunState(CncState state);
+		
 		void decorateProbeMode(bool probeMode);
 		void decorateSecureDlgChoice(bool useDlg);
 		void decorateOutboundEditor(const char* fileName = NULL);
@@ -924,6 +927,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void rcRun();
 		void rcPause();
 		
+		void displayPositionSituation(int type, const wxString& msg, const wxString& headLine = "Current Positions:", const wxString& appendix = wxEmptyString);
 		bool checkIfRunCanBeProcessed(bool confirm=true);
 		bool checkReferencePositionState();
 		bool processVirtualTemplate();

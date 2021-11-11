@@ -1062,6 +1062,8 @@ void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
 	registerGuiControl(secureCtrlPanel->GetBtConnectSec());
 	registerGuiControl(secureCtrlPanel->GetBtResetSec());
+	registerGuiControl(secureCtrlPanel->GetBtTryRunSec());
+	registerGuiControl(secureCtrlPanel->GetBtTemplateContextSec());
 	
 	registerGuiControl(m_btCloseSecurePanel);
 	
@@ -1273,26 +1275,15 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	CncTextCtrl* l = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
-	{
-		StdStreamRedirector srd(l);
-		cnc->switchRunMode(CncControl::RunMode::M_TryRun);
-		rcRun();
-		cnc->switchRunMode(CncControl::RunMode::M_RealRun);
-		cnc::cex1 << "TEST\n";
-	}
-	cnc::cex1 << "******************************************************\n";
-	cnc::cex1 << l->GetValue();
-	cnc::cex1 << "******************************************************\n";
-	
-	//wxMessageBox(l->GetValue());
-	
-	delete l;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
+	
+	cnc::trc << "XXXXXXXXXXX\n";
+	
+	cnc::cex2.getTextAttr();
 	
 	cnc::cex2 << "******************************************************\n";
 	CNC_CERR_FUNCT
@@ -1786,22 +1777,6 @@ void MainFrame::updateAppPositionControls() {
 						m_zAxis->ChangeValue(wxString::Format("%4.3lf", pos.getZ() * THE_CONFIG->getDisplayFactZ(unit)));
 						break;
 	}
-	/*
-	// update position
-	switch ( unit ) {
-		case CncSteps:	// update application position
-						m_xAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurAppPos().getX()));
-						m_yAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurAppPos().getY()));
-						m_zAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurAppPos().getZ()));
-						break;
-						
-		case CncMetric:	// update application position
-						m_xAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurAppPos().getX() * THE_CONFIG->getDisplayFactX(unit)));
-						m_yAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurAppPos().getY() * THE_CONFIG->getDisplayFactY(unit)));
-						m_zAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurAppPos().getZ() * THE_CONFIG->getDisplayFactZ(unit)));
-						break;
-	}
-	 */
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateCtlPositionControls() {
@@ -2961,6 +2936,7 @@ bool MainFrame::connectSerialPort() {
 	
 	bool ret = false;
 	secureCtrlPanel->notifyConnection(false, "");
+	
 	if ( (ret = cnc->connect(serialFileName)) == true ) 
 	{
 		lastPortName.assign(sel);
@@ -2976,12 +2952,6 @@ bool MainFrame::connectSerialPort() {
 			
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
-			
-			if ( cnc->canProcessIdle() )
-			{
-				m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
-				m_miRqtIdleMessages->Enable(true);
-			}
 			
 			secureCtrlPanel->notifyConnection(true, lastPortName);
 		}
@@ -3001,6 +2971,17 @@ bool MainFrame::connectSerialPort() {
 		cncOsEnvDialog->update();
 
 	enableControls();
+	
+	// this has to be done after enableControls(), otherwise the state can
+	// no bw reproduced after the next disableControls()!
+	secureCtrlPanel->GetBtTryRunSec()->Enable(cnc->tryRunAvailable());
+	secureCtrlPanel->GetBtTemplateContextSec()->Enable(cnc->tryRunAvailable());
+	
+	if ( ret == true && cnc->canProcessIdle() )
+	{
+		m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
+		m_miRqtIdleMessages->Enable(true);
+	}
 	
 	return ret;
 }
@@ -3725,8 +3706,12 @@ bool MainFrame::openFile(int sourcePageToSelect) {
 	// from getCurrentTemplateFormat
 	selectMainBookSourcePanel(sourcePageToSelect);
 	
+	THE_TPL_CTX->reset();
+	decorateTryRunState(cncUnknown);
+	
 	bool ret = false;
-	switch ( getCurrentTemplateFormat() ) {
+	switch ( getCurrentTemplateFormat() ) 
+	{
 		
 		case TplSvg:	ret = sourceEditor->openFile(getCurrentTemplatePathFileName());
 						break;
@@ -3744,7 +3729,8 @@ bool MainFrame::openFile(int sourcePageToSelect) {
 	selectEditorToolBox(ret);
 	fillFileDetails(ret);
 	
-	if ( ret == true ) {
+	if ( ret == true ) 
+	{
 		decorateExtTemplatePages(getCurrentTemplateFormat());
 		outboundFilePreview->selectEmptyPreview();
 		
@@ -4493,7 +4479,8 @@ void MainFrame::testCountXUpdated(wxCommandEvent& event) {
 	wxString sel = m_testIntervalMode->GetStringSelection();
 	char mode = sel[0];
 	
-	if ( mode != 'A' ) {
+	if ( mode != 'A' )
+	{
 		int val = m_testCountX->GetValue();
 		
 		m_testCountY->SetValue(val);
@@ -4501,34 +4488,61 @@ void MainFrame::testCountXUpdated(wxCommandEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::displayPositionSituation(int type, const wxString& m, const wxString& headLine, const wxString& appendix) {
+///////////////////////////////////////////////////////////////////
+	const CncLongPosition ctrlPos(cnc->requestControllerPos());
+	wxString msg(m);
+	
+	msg	<< "\n" << 
+		wxString::Format("(X, Y, Z): % +10.3lf, % +10.3lf, % +10.3lf [mm]: Application Pos", 
+							cnc->getCurAppPosMetricX(), 
+							cnc->getCurAppPosMetricY(), 
+							cnc->getCurAppPosMetricZ()
+		);
+	
+	msg << "\n" <<
+		wxString::Format("(X, Y, Z): % +10.3lf, % +10.3lf, % +10.3lf [mm]: Controller Pos <requested>", 
+							ctrlPos.getX() * THE_CONFIG->getDisplayFactX(), 
+							ctrlPos.getY() * THE_CONFIG->getDisplayFactY(), 
+							ctrlPos.getZ() * THE_CONFIG->getDisplayFactZ()
+		);
+		
+	if ( true )
+	{
+		msg << "\n" <<
+		wxString::Format("(X, Y, Z): % +10.3lf, % +10.3lf, % +10.3lf [mm]: Controller Pos <locally stored>", 
+							cnc->getCurCtlPosMetricX(), 
+							cnc->getCurCtlPosMetricY(), 
+							cnc->getCurCtlPosMetricZ()
+		);
+	}
+		
+	if ( appendix.IsEmpty() == false )
+		msg	<< "\n\n" << appendix;
+		
+	const int flags =  wxOK | wxCENTRE | type;
+	wxMessageDialog(this, msg, headLine, flags).ShowModal();
+}
+///////////////////////////////////////////////////////////////////
 bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
-	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false ) {
-		
-		wxString msg("Validate positions failed\n");
-		msg << "\nPC pos        : ";
-		msg << cnc->getCurAppPos().getX(); msg << ",";
-		msg << cnc->getCurAppPos().getY(); msg << ",";
-		msg << cnc->getCurAppPos().getZ();
-		msg << "\nController pos: ";
-		msg << cnc->requestControllerPos().getX();  msg << ",";
-		msg << cnc->requestControllerPos().getY();  msg << ",";
-		msg << cnc->requestControllerPos().getZ();
-		msg << "\n\nThe run command will be aborted!";
-
-		wxMessageDialog dlg(this, msg, _T("CNC Position check . . . "), 
-		                    wxOK|wxCENTRE|wxICON_ERROR);
- 	
-		dlg.ShowModal();
+	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false )
+	{
+		displayPositionSituation(	wxICON_ERROR,
+									"Validate positions failed\n", 
+									"CNC Position check . . . ", 
+									"The run command will be aborted!"
+		);
 		
 		setReferencePosEnforceFlag(true);
 		return false;
 	}
 	
 	cnc->evaluateLimitState();
-	if ( cnc->isALimitSwitchActive() ) {
+	if ( cnc->isALimitSwitchActive() )
+	{
 		// always return false to reconfigure zero in this sitiuation
 		std::clog << "MainFrame::checkIfRunCanBeProcessed(): Limit switch detected" << std::endl;
 		return false;
@@ -4876,11 +4890,13 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			lock.setErrorMode();
 			
 			THE_TPL_CTX->resetValidRuns();
+			decorateTryRunState(cncError);
 		} 
 		else
 		{
 			CNC_CLOG_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode))
 			THE_TPL_CTX->registerValidRun();
+			decorateTryRunState(cncOk);
 		}
 		
 		CncDoubleBounderies bounds;
@@ -4922,7 +4938,8 @@ bool MainFrame::processTemplateIntern() {
 	
 	clearPositionSpy();
 	
-	if ( THE_CONTEXT->secureModeInfo.isActive == false ) {
+	if ( THE_CONTEXT->secureModeInfo.isActive == false )
+	{
 		showAuiPane("Outbound");
 		selectMonitorBookCncPanel();
 		
@@ -4934,7 +4951,8 @@ bool MainFrame::processTemplateIntern() {
 	if ( m_mainViewBook->GetSelection() != MainBookSelection::VAL::MANUEL_PANEL && 
 	     m_mainViewBook->GetSelection() != MainBookSelection::VAL::TEST_PANEL && 
 	     m_mainViewBook->GetSelection() != MainBookSelection::VAL::SOURCE_PANEL &&
-	     m_mainViewBook->GetSelection() != MainBookSelection::VAL::SETUP_PANEL) {
+	     m_mainViewBook->GetSelection() != MainBookSelection::VAL::SETUP_PANEL)
+	{
 		selectMainBookSourcePanel();
 	}
 	
@@ -4949,7 +4967,8 @@ bool MainFrame::processTemplateIntern() {
 	const bool forceSave = m_btSvgToggleAutoSaveTplOnProcess->GetValue();
 	
 	bool ret = false;
-	switch ( getCurrentTemplateFormat() ) {
+	switch ( getCurrentTemplateFormat() )
+	{
 		
 		case TplBinary:
 			if ( saveTemplateOnDemand(forceSave) == false )
@@ -4991,11 +5010,15 @@ bool MainFrame::processTemplateIntern() {
 	}
 	
 	// Check positions
-	if ( cnc->validateAppAgainstCtlPosition() == false ) {
-		if ( isInterrupted() == false ) {
-			std::cerr << "Validate positions failed" << std::endl;
-			std::cerr << "PC pos        : " << cnc->getCurAppPos() << std::endl;
-			std::cerr << "Controller pos: " << cnc->requestControllerPos() << std::endl;
+	if ( cnc->validateAppAgainstCtlPosition() == false )
+	{
+		if ( isInterrupted() == false )
+		{
+			displayPositionSituation(	wxICON_ERROR,
+										"Validate positions failed\n", 
+										"CNC Position check . . . ", 
+										"The run command will be aborted!"
+			);
 			
 			setReferencePosEnforceFlag(true);
 		}
@@ -5003,7 +5026,8 @@ bool MainFrame::processTemplateIntern() {
 		ret = false;
 	}
 	
-	if ( cnc->getPositionOutOfRangeFlag() == true ) {
+	if ( cnc->getPositionOutOfRangeFlag() == true )
+	{
 		//if ( isInterrupted() == false ) {
 			std::cerr << "Out of range: During the last run the position limits were exceeded." << std::endl;
 			CncLongPosition::Watermarks wm = cnc->getWaterMarks();
@@ -6684,39 +6708,104 @@ void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 		m_debuggerPropertyManagerGrid->SelectPage(0);
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::rcTryRun(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( cnc->tryRunAvailable() )
+	{
+		const unsigned int prevValidCount = THE_CONTEXT->templateContext->getValidunCount();
+		CncTextCtrl* tmpLogger = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(0, 0));
+		tmpLogger->Hide();
+		{
+			StdStreamRedirector srd(tmpLogger);
+			cnc->switchRunMode(CncControl::RunMode::M_TryRun);
+			rcRun();
+			cnc->switchRunMode(CncControl::RunMode::M_RealRun);
+		}
+		
+		THE_TPL_CTX->addLogInfo(tmpLogger->GetValue());
+		
+		if ( (prevValidCount + 1) != THE_CONTEXT->templateContext->getValidunCount() )
+		{
+			decorateTryRunState(cncError);
+			
+			cnc::cex1 << "Try run was failed"			<< std::endl;
+			cnc::cex1 << THE_TPL_CTX->getLastLogInfo(4)	<< std::endl;
+		}
+		else
+		{
+			decorateTryRunState(cncOk);
+			std::clog << "Try run was successful" << std::endl; 
+		}
+		
+		wxDELETE(tmpLogger);
+	}
+	
+	motionMonitor->update(true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::decorateTryRunState(CncState state) {
+///////////////////////////////////////////////////////////////////
+	wxString bmpName;
+	
+	switch ( state )
+	{ 
+		case cncUnknown:	bmpName.assign("BMP_TRAFFIC_LIGHT_DEFAULT");
+							break;
+		case cncOk:			bmpName.assign("BMP_TRAFFIC_LIGHT_GREEN");
+							break;
+		case cncWarning:	bmpName.assign("BMP_TRAFFIC_LIGHT_YELLOW");
+							break;
+		case cncError:		bmpName.assign("BMP_TRAFFIC_LIGHT_RED");
+							break;
+	}
+	
+	if ( bmpName.IsEmpty() == false )
+	{
+		secureCtrlPanel->GetBtTemplateContextSec()->SetBitmap(ImageLib24().Bitmap(bmpName));
+		secureCtrlPanel->GetBtTemplateContextSec()->SetBitmapDisabled(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_DEFAULT"));
+		secureCtrlPanel->GetBtTemplateContextSec()->Refresh();
+	}
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::rcRun() {
 ///////////////////////////////////////////////////////////////////
 	determineRunMode();
 	
-	if ( THE_CONTEXT->secureModeInfo.useIt == true && m_secureRunPanel->IsShownOnScreen() == false ) {
+	if ( THE_CONTEXT->secureModeInfo.useIt == true && m_secureRunPanel->IsShownOnScreen() == false )
+	{
 		activateSecureMode(!THE_CONTEXT->secureModeInfo.isActive);
 		return;
 	}
 	
 	// ensure the monitor is visible, especially if isPause == true
 	// because then the processing should be resume
-	if ( THE_CONTEXT->secureModeInfo.isActive == false ) {
+	if ( THE_CONTEXT->secureModeInfo.isActive == false )
+	{
 		showAuiPane("Outbound");
 		selectMonitorBookCncPanel();
 	}
-	else {
+	else 
+	{
 		selectSecureMonitorView();
 	}
 
 	// toggle only the pause flag
-	if ( isPause() == true ) {
+	if ( isPause() == true ) 
+	{
 		rcPause();
 		return;
 	}
 	
 	// perform a run
 	// Store the current interval
-	int interval = THE_CONTEXT->getUpdateInterval();
+	const int interval = THE_CONTEXT->getUpdateInterval();
 	
-	if ( isDebugMode == true ) {
+	if ( isDebugMode == true )
+	{
 		
 		// check if the cuurent port is a cnc and no emulator port
-		if ( cnc->getPortType() == CncPORT ) {
+		if ( cnc->getPortType() == CncPORT )
+		{
 			
 			wxString msg("Do you really want to debug a COM port?");
 			wxMessageDialog dlg(this, msg, _T("Port Check . . . "), 
@@ -6731,7 +6820,9 @@ void MainFrame::rcRun() {
 		
 		// to see each line during the debug session
 		THE_CONTEXT->setUpdateInterval(1);
-	} else {
+	}
+	else
+	{
 		
 		if ( THE_CONTEXT->secureModeInfo.isActive == false ) 
 			perspectiveHandler.ensureRunPerspectiveMinimal();
@@ -9251,4 +9342,5 @@ void MainFrame::onIdle(wxIdleEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	//CNC_PRINT_LOCATION
 }
+
 

@@ -125,8 +125,9 @@ void CncLoggerView::enable(bool state) {
 	m_btClearTraceHistory->Enable(state);
 	m_btShowTraceHistory->Enable(state);
 	
-	m_btCncStartupLogger->Enable(state);
-	m_btCncStandardLogger->Enable(state);
+	// allow this explicit
+	//m_btCncStartupLogger->Enable(state);
+	//m_btCncStandardLogger->Enable(state);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::enableListCtrlsOnly(bool state) {
@@ -246,6 +247,7 @@ void CncLoggerView::popProcessMode(LoggerSelection::VAL id) {
 		return;
 		
 	loggerLists.at(id)->popProcessMode();
+	select(id);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::pushUpdateMode(LoggerSelection::VAL id) {

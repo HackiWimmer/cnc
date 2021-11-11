@@ -105,23 +105,24 @@ static struct ClientIds {
 
 // -------------------------------------------------------------------
 // global enumerations
-	enum CncUnit 					{ CncSteps, CncMetric };
+	enum CncUnit					{ CncSteps, CncMetric };
+	enum CncState					{ cncUnknown, cncOk, cncWarning, cncError };
 	enum CncAxis					{ Axis_X, Axis_Y, Axis_Z, Axis_H };
 	enum CncEdge					{ cncLeft, cncTop, cncRight, cncBottom, cncCenter };
 	enum CncInteractiveMoveDriver	{ IMD_NONE, IMD_GAMEPAD, IMD_NAVIGATOR };
-	enum CncDirection 				{ CncUndefDir, CncClockwise, CncCounterClockwise };
+	enum CncDirection				{ CncUndefDir, CncClockwise, CncCounterClockwise };
 	enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};
 	enum CncSpeedMode				{ CncSpeedWork = 0, CncSpeedRapid = 1, CncSpeedMax = 2, CncSpeedUserDefined = 3 }; // dont change the values
-	enum CncPortType 				{ CncPORT, CncPORT_EMU_ARDUINO, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
-	enum CncPathModificationType 	{ CncPM_None=0, CncPM_Inner, CncPM_Outer, CncPM_Center, CncPM_Pocket };
+	enum CncPortType				{ CncPORT, CncPORT_EMU_ARDUINO, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
+	enum CncPathModificationType	{ CncPM_None=0, CncPM_Inner, CncPM_Outer, CncPM_Center, CncPM_Pocket };
 	enum CncPathRuleType 			{ CncPR_None=0, CncPR_EnsureClockwise, CncPR_EnsureCounterClockwise, CncPR_Reverse };
-	enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
-	enum CncStepSensitivity 		{ FINEST = 1, FINE = 20 , MEDIUM = 50, ROUGH = 80, ROUGHEST = 100 };
-	enum CncStepMode		 		{ SM_INTERACTIVE = 0, SM_STEPWISE = 1 };
+	enum CncClipperCornerType		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
+	enum CncStepSensitivity			{ FINEST = 1, FINE = 20 , MEDIUM = 50, ROUGH = 80, ROUGHEST = 100 };
+	enum CncStepMode				{ SM_INTERACTIVE = 0, SM_STEPWISE = 1 };
 	enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4 };
-	enum CncTemplateFormat 			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
-	enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
-	enum CncRefPositionMode 		{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6, CncRM_Touchblock = 7, CncRM_Camera = 8 };
+	enum CncTemplateFormat			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
+	enum CncDimensions				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
+	enum CncRefPositionMode			{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6, CncRM_Touchblock = 7, CncRM_Camera = 8 };
 	
 // -------------------------------------------------------------------
 // global typedefs
@@ -136,9 +137,9 @@ namespace cnc {
 	typedef std::vector<int32_t> 						SetterValueList;
 	typedef std::map<unsigned long, unsigned long> 		LineNumberTranslater;
 	
-	extern std::ostream									cex1;
-	extern std::ostream									cex2;
-	extern std::ostream									cex3;
+	extern CncBasicLogStream							cex1;
+	extern CncBasicLogStream							cex2;
+	extern CncBasicLogStream							cex3;
 	
 	extern CncTraceLogStream							trc;
 	extern CncMsgLogStream								msg;

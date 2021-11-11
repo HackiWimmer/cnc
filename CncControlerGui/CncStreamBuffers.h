@@ -9,6 +9,7 @@ class CncTextCtrl;
 class CncLoggerView;
 class CncStartupLoggerProxy;
 class CncStandardLoggerProxy;
+
 class LoggerStreamBuf : public std::streambuf {
 	
 	private:
@@ -140,16 +141,12 @@ class CncCspyBuf : public LoggerStreamBuf {
 };
 
 ///////////////////////////////////////////////////////////////////
-class CncBasicLogStream : public std::stringstream {
-	
-	protected:
-		LoggerStreamBuf* logStreamBuffer;
+class CncBasicLogStream : public std::ostream { 
 	
 	public:
 		//////////////////////////////////////////////////////////
 		CncBasicLogStream() 
-		: std::stringstream() 
-		, logStreamBuffer(NULL)
+		: std::ostream() 
 		{}
 		
 		//////////////////////////////////////////////////////////
@@ -158,7 +155,6 @@ class CncBasicLogStream : public std::stringstream {
 		
 		//////////////////////////////////////////////////////////
 		void ungregisterTextControl();
-		void setLogStreamBuffer(LoggerStreamBuf* lsb);
 		void resetTextAttr();
 		void setTextAttr(const wxTextAttr& ta);
 		void setTextColour(const wxColour& c);
@@ -212,7 +208,9 @@ class CncTraceLogStream : public CncBasicLogStream {
 		{}
 
 		///////////////////////////////////////////////////////////
-		CncTextCtrl* getTextControl() const {
+		CncTextCtrl* getTextControl() const 
+		{
+			LoggerStreamBuf* logStreamBuffer = static_cast<LoggerStreamBuf*>(rdbuf());
 			if ( logStreamBuffer != NULL )
 				return logStreamBuffer->getTextControl();
 				

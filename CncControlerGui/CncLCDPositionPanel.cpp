@@ -107,18 +107,24 @@ void CncLCDPositionPanel::updateValues() {
 	lcdF->SetValue(THE_APP->GetConfiguredFeedSpeed()->GetValue());
 	lcdS->SetValue(wxString::Format("%.1lf", THE_APP->getConfiguredSpindleSpeed()));
 	
-	if ( THE_BOUNDS->getHardwareOffset().isValid() == false ) {
-		m_cbPosTYpe->Select(PT_LOGICAL);
-		posType = PT_LOGICAL;
-		decoratePosType(posType);
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == false ) 
+	{
+		if ( posType != PT_LOGICAL )
+		{ 
+			m_cbPosTYpe->Select(PT_LOGICAL);
+			posType = PT_LOGICAL;
+			decoratePosType(posType);
+		}
 	}
 	
-	if ( posType == PT_LOGICAL ) {
+	if ( posType == PT_LOGICAL ) 
+	{
 		lcdX->SetValue(THE_APP->GetXAxisCtl()->GetValue());
 		lcdY->SetValue(THE_APP->GetYAxisCtl()->GetValue());
 		lcdZ->SetValue(THE_APP->GetZAxisCtl()->GetValue());
 	}
-	else {
+	else 
+	{
 		double x; THE_APP->GetXAxisCtl()->GetValue().ToDouble(&x);
 		double y; THE_APP->GetYAxisCtl()->GetValue().ToDouble(&y);
 		double z; THE_APP->GetZAxisCtl()->GetValue().ToDouble(&z);

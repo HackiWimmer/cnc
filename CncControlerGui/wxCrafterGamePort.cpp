@@ -400,6 +400,10 @@ CncGamepadSpyBase::CncGamepadSpyBase(wxWindow* parent, wxWindowID id, const wxPo
     wxBoxSizer* boxSizer315 = new wxBoxSizer(wxHORIZONTAL);
     m_panelGUI->SetSizer(boxSizer315);
     
+    m_staticBitmap3171 = new wxStaticBitmap(m_panelGUI, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad_disabled")), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), 0 );
+    
+    boxSizer315->Add(m_staticBitmap3171, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(3));
+    
     wxFlexGridSizer* flexGridSizer290 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer290->SetFlexibleDirection( wxBOTH );
     flexGridSizer290->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -477,12 +481,16 @@ CncGamepadSpyBase::CncGamepadSpyBase(wxWindow* parent, wxWindowID id, const wxPo
     m_panelCNC = new wxPanel(m_modeBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_modeBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_modeBook->AddPage(m_panelCNC, _("Page"), false);
     
-    wxFlexGridSizer* flexGridSizer330 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer330 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer330->SetFlexibleDirection( wxBOTH );
     flexGridSizer330->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer330->AddGrowableCol(1);
+    flexGridSizer330->AddGrowableCol(2);
     flexGridSizer330->AddGrowableRow(0);
     m_panelCNC->SetSizer(flexGridSizer330);
+    
+    m_staticBitmap31712 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad_disabled")), wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer330->Add(m_staticBitmap31712, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(3));
     
     wxFlexGridSizer* flexGridSizer332 = new wxFlexGridSizer(2, 2, 0, 0);
     flexGridSizer332->SetFlexibleDirection( wxBOTH );

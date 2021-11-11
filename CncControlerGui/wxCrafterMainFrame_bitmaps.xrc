@@ -91,6 +91,7 @@
   <object class="wxBitmap" name="CncStop">bitmaps\CncStop.png</object>
   <object class="wxBitmap" name="CncTemplate">bitmaps\CncTemplate.png</object>
   <object class="wxBitmap" name="CncTest">bitmaps\CncTest.png</object>
+  <object class="wxBitmap" name="CncTryRun">bitmaps\CncTryRun.png</object>
   <object class="wxBitmap" name="CubeHardwareDimensions">bitmaps\CubeHardwareDimensions.png</object>
   <object class="wxBitmap" name="CubeHardwareReference">bitmaps\CubeHardwareReference.png</object>
   <object class="wxBitmap" name="HbInactive">bitmaps\HbInactive.png</object>

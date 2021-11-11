@@ -2,6 +2,7 @@
 #include <iostream>
 #include <wx/dcbuffer.h>
 #include <wx/dcgraph.h>
+#include "CncCommon.h"
 
 #define LCD_NUMBER_SEGMENTS 8
 
@@ -18,6 +19,7 @@ wxLCDWindow::wxLCDWindow( wxWindow *parent, wxPoint pos, wxSize size )
 , mSpace			(5)
 , mNumberDigits		(6)
 , mValue			("")
+, lastFloating		(DBL_MAX)
 /////////////////////////////////////////////////////////////////////////////
 {
 	// This has to be done to use wxAutoBufferedPaintDC 
@@ -316,8 +318,18 @@ void wxLCDWindow::SetValue(const wxString& value)
 	mValue.Replace(",", ".");
 	
 	double d;
-	if ( mValue.ToDouble(&d) == false )
+	const bool b = mValue.ToDouble(&d);
+	
+	if ( b == false )
 		mValue.assign("0");
+		
+	// if nothing changed no further action necessary
+	if ( b == true && cnc::dblCmp::eq(lastFloating, d) )
+		return;
+		
+	//CNC_PRINT_FUNCT_A("%lf, %lf", lastFloating, d)
+		
+	lastFloating = d;
 	
 	if ( mValue.Contains("-") ) mLightColourBeforeDecimal = negCol;
 	else						mLightColourBeforeDecimal = posCol;

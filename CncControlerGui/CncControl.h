@@ -210,6 +210,7 @@ class CncControl {
 		void resetClientId()			{ setClientId(-1L); }
 		const long getClientId() const 	{ return currentClientId; }
 		
+		bool tryRunAvailable() const { return tryRunSerial != NULL; }
 		void switchRunMode(RunMode m);
 		
 		// Connection to portName
