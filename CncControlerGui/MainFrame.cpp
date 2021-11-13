@@ -1275,21 +1275,13 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
+	wxStandardPaths& x = wxStandardPaths::Get();
+	CNC_CLOG_FUNCT_A(x.GetExecutablePath())
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
-	
-	cnc::trc << "XXXXXXXXXXX\n";
-	
-	cnc::cex2.getTextAttr();
-	
-	cnc::cex2 << "******************************************************\n";
-	CNC_CERR_FUNCT
-	CNC_CLOG_FUNCT
-	CNC_COUT_FUNCT
-	cnc::cex3 << "******************************************************\n";
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -1300,12 +1292,6 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
-	
-	int sel = m_securePreviewBook->GetSelection();
-	
-	if ( sel == SecurePreviewBookSelection::VAL::LEFT_PREVIEW ) m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::RIGHT_PREVIEW);
-	else 														m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::LEFT_PREVIEW);
-	
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -3131,9 +3117,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	if ( inboundFileParser != NULL )
 		inboundFileParser->changePathListRunnerInterface(sel);
 	
-	const bool withSound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && cnc->isEmulator() );
-	CncSpindleSound::activate(withSound);
-	
 	// configuration setup
 	serialFileName.assign(setup.serialFileName);
 	THE_CONTEXT->setInteractiveMoveingMode(setup.interactiveMoving);
@@ -4488,7 +4471,7 @@ void MainFrame::testCountXUpdated(wxCommandEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::displayPositionSituation(int type, const wxString& m, const wxString& headLine, const wxString& appendix) {
+void MainFrame::displayPositionSituation(int type, const wxString& m, const wxString& headline, const wxString& appendix) {
 ///////////////////////////////////////////////////////////////////
 	const CncLongPosition ctrlPos(cnc->requestControllerPos());
 	wxString msg(m);
@@ -4519,9 +4502,28 @@ void MainFrame::displayPositionSituation(int type, const wxString& m, const wxSt
 		
 	if ( appendix.IsEmpty() == false )
 		msg	<< "\n\n" << appendix;
+	
+	if ( type < 0 )
+	{
+		auto display = [&](std::ostream& o)
+		{
+			o	<< headline	<< std::endl
+				<< msg		<< std::endl
+			;
+		};
 		
-	const int flags =  wxOK | wxCENTRE | type;
-	wxMessageDialog(this, msg, headLine, flags).ShowModal();
+		switch ( type * (-1) )
+		{
+			case wxICON_ERROR:		display(std::cerr); break;
+			case wxICON_WARNING:	display(cnc::cex1); break;
+			default:				display(std::cout);
+		}
+	}
+	else
+	{
+		const int flags =  wxOK | wxCENTRE | type;
+		wxMessageDialog(this, msg, headline, flags).ShowModal();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
@@ -4880,6 +4882,11 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			CNC_CERR_FUNCT_A(": checkIfRunCanBeProcessed() failed")
 		}
 		
+		// try to switch the spindle off 
+		// may be the template <CncParameterBlock Spindle="Off"/>
+		// has not already done this
+		cnc->switchSpindleOff(true);
+		
 		// prepare final statements
 		const wxString probeMode(THE_CONTEXT->isProbeMode() ? "ON" :"OFF");
 		
@@ -4911,9 +4918,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		}
 		
 		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
-		
-		// go silent again - in all cases
-		CncSpindleSound::stop();
 		
 		return ret;
 	}
@@ -5014,7 +5018,7 @@ bool MainFrame::processTemplateIntern() {
 	{
 		if ( isInterrupted() == false )
 		{
-			displayPositionSituation(	wxICON_ERROR,
+			displayPositionSituation(	wxICON_ERROR * (-1),
 										"Validate positions failed\n", 
 										"CNC Position check . . . ", 
 										"The run command will be aborted!"
@@ -6713,10 +6717,13 @@ void MainFrame::rcTryRun(wxCommandEvent& event) {
 	if ( cnc->tryRunAvailable() )
 	{
 		const unsigned int prevValidCount = THE_CONTEXT->templateContext->getValidunCount();
+		// Note: CncTextCtrl isn't the fastest one if a lot of text will be processed
+		// A CncTryRunLoggerProxy alias CncStandardLoggerProxy is may be better here
 		CncTextCtrl* tmpLogger = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(0, 0));
 		tmpLogger->Hide();
 		{
 			StdStreamRedirector srd(tmpLogger);
+			cnc::cex1 << "Try run started: " << wxDateTime::Now().FormatISOTime() << std::endl;
 			cnc->switchRunMode(CncControl::RunMode::M_TryRun);
 			rcRun();
 			cnc->switchRunMode(CncControl::RunMode::M_RealRun);
@@ -7849,6 +7856,14 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
+bool MainFrame::isInteractiveMoveActive() const {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc )
+		return cnc->isInteractiveMoveActive();
+		
+	return false;
+}
+/////////////////////////////////////////////////////////////////////
 bool MainFrame::startInteractiveMove(CncInteractiveMoveDriver imd) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
@@ -7881,13 +7896,15 @@ bool MainFrame::updateInteractiveMove() {
 	wxASSERT(cnc);
 	
 	bool ret = true;
-	if ( cnc->isInteractiveMoveActive() == true ) {
-		
+	if ( isInteractiveMoveActive() == true )
+	{
 		// this is something like a heartbeat
 		ret = cnc->updateInteractiveMove();
-
+		
+		const bool dispatchUserEvents = false;
+		
 		if ( SerialCommandLocker::getLockedCommand() != CMD_POP_SERIAL )
-			ret = cnc->popSerial();
+			ret = cnc->popSerial(dispatchUserEvents);
 	}
 	
 	return ret;
@@ -7898,10 +7915,12 @@ bool MainFrame::updateInteractiveMove(const CncLinearDirection x, const CncLinea
 	wxASSERT(cnc);
 	
 	bool ret = true;
-	if ( cnc->isInteractiveMoveActive() == true ) {
+	if ( isInteractiveMoveActive() == true )
+	{
+		const bool dispatchUserEvents = false;
 		
 		if ( SerialCommandLocker::getLockedCommand() != CMD_POP_SERIAL )
-			ret = cnc->popSerial();
+			ret = cnc->popSerial(dispatchUserEvents);
 			
 		if ( ret == true )
 			ret = cnc->updateInteractiveMove(x, y, z, modifySpeed);

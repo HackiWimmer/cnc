@@ -575,7 +575,7 @@ bool Serial::writeDataAndForget(unsigned char cmd) {
 	LastSerialResult prevFetchResult = lastFetchResult;
 	lastFetchResult.init(cmd);
 	
-	const bool ret =  writeData(cmd);
+	const bool ret = writeData(cmd);
 	
 	// restore fetch result
 	lastFetchResult = prevFetchResult;
@@ -593,7 +593,7 @@ bool Serial::writeDataAndForget(unsigned char* buffer, unsigned int nbByte) {
 	LastSerialResult prevFetchResult = lastFetchResult;
 	lastFetchResult.init(buffer[0]);
 	
-	const bool ret =  writeData(buffer, nbByte);
+	const bool ret = writeData(buffer, nbByte);
 	
 	// restore fetch result
 	lastFetchResult = prevFetchResult;
@@ -1355,8 +1355,9 @@ bool Serial::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRend
 ///////////////////////////////////////////////////////////////////
 bool Serial::processStartInteractiveMove() {
 ///////////////////////////////////////////////////////////////////
-	if ( isConnected() == false ) {
-		std::cout << "SERIAL::processStartInteractiveMove()::ERROR: Not connected\n";
+	if ( isConnected() == false )
+	{
+		CNC_CERR_FUNCT_A(": Not connected");
 		return false;
 	}
 	
@@ -1367,7 +1368,7 @@ bool Serial::processStartInteractiveMove() {
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
 
-	// Interactive commands are may be asynchronous and occurring while fetching other command. 
+	// Interactive commands are may be asynchronous and occurring while fetching other commands. 
 	// Therefore, writeDataAndForget() is used.
 	return writeDataAndForget(cmd, LEN);
 }
@@ -1393,7 +1394,7 @@ bool Serial::processUpdateInteractiveMove(const CncLinearDirection x, const CncL
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
 		
-	// Interactive commands are may be asynchronous and occurring while fetching other command. 
+	// Interactive commands are may be asynchronous and occurring while fetching other commands. 
 	// Therefore, writeDataAndForget() is used.
 	return writeDataAndForget(cmd, LEN);
 }
@@ -1414,7 +1415,7 @@ bool Serial::processUpdateInteractiveMove() {
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0])));
 		
-	// Interactive commands are may be asynchronous and occurring while fetching other command. 
+	// Interactive commands are may be asynchronous and occurring while fetching other commands. 
 	// Therefore, writeDataAndForget() is used.
 	return writeDataAndForget(cmd, LEN);
 }

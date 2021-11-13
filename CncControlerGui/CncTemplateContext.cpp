@@ -108,7 +108,7 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 	;
 	
 	o << std::endl;
-	streamLogInfo(o, indent);
+	streamLogInfo(o, indent + 2);
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::streamLogInfo(std::ostream& o, unsigned int indent) const {

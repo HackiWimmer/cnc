@@ -271,6 +271,8 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 			
 			int cbId			= CNC_SECURE_GESTURES_PANEL_DEFAUTL_CALLBACK_ID;
 			
+			bool userTriggered	= false;
+			
 			int xPos			= 0;
 			int yPos			= 0;
 			
@@ -291,7 +293,7 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 			bool isRatioChanged	= false;
 			bool isAngleChanged	= false;
 			
-			bool isChanged()	const	{ return (isTimerChanged || isRangeChanged || isAngleChanged); }
+			bool isChanged()	const	{ return (isTimerChanged || isRangeChanged || isRatioChanged || isAngleChanged); }
 			bool isZero()		const	{ return range == 0; }
 			
 			/*
@@ -313,14 +315,16 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 			
 			friend std::ostream &operator<< (std::ostream &ostr, const Data &d) 
 			{
-				ostr << wxString::Format("ID: %2d ",			d.cbId);
+				ostr << wxString::Format("CID: %2d ",			d.cbId);
+				ostr << wxString::Format("User: %d ",			d.userTriggered);
+				ostr << wxString::Format("RAST: [%d%d%d%d] ",	d.isRatioChanged, d.isAngleChanged, d.isRangeChanged, d.isTimerChanged);
 				ostr << wxString::Format("Pos: (%4d,%4d); ",	d.xPos, d.yPos);
 				ostr << wxString::Format("Val: (%4d,%4d); ",	d.xVal, d.yVal);
 				ostr << wxString::Format("Max: (%4d,%4d); ",	d.xMax, d.yMax);
 				ostr << wxString::Format("Range: (%2d); ",		d.range);
 				ostr << wxString::Format("Ratio: (%.1lf); ",	d.ratio);
-				ostr << wxString::Format("Radius: (%.1lf); ",	d.radius);
-				ostr << wxString::Format("Angle: (%.6lf); ",	d.angle);
+				ostr << wxString::Format("Radius: (%6.1lf); ",	d.radius);
+				ostr << wxString::Format("Angle: (%8.6lf); ",	d.angle);
 				
 				return ostr;
 			}
@@ -359,7 +363,6 @@ class CncSecureGesturesPanelEvent : public wxCommandEvent {
 };
 
 typedef CncSecureGesturesPanelEvent::Data GestureData;
-
 
 // ----------------------------------------------------------------------------
 class CncSecureGesturesPanel : public wxPanel
@@ -440,6 +443,7 @@ class CncSecureGesturesPanel : public wxPanel
 	private:
 		
 		typedef CncSecureGesturesPanelEvent CSGPEvent;
+		
 		
 		int					callbackId;
 		

@@ -124,6 +124,9 @@ void CncControl::switchRunMode(RunMode m) {
 		
 		if ( switchBack == true )
 		{
+			const bool withSound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && serialPort->getPortType() == CncPORT_EMU_ARDUINO );
+			CncSpindleSound::activate(withSound);
+			
 			// Regarding the serial switch: 
 			// The locally stored controller position has to be aligned to the now present serial.
 			// and furthermore the app position to the ctl pos
@@ -459,6 +462,8 @@ bool CncControl::disconnect() {
 		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "OK");
 	}
 	
+	CncSpindleSound::deactivate();
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -477,18 +482,20 @@ bool CncControl::connect(const char * portName) {
 									   << std::endl;
 									  
 	bool ret = serialPort->connect(portName);
-	if ( ret == true ) {
-		
+	if ( ret == true )
+	{
 		std::cout << " . . . Connection established -";
 		std::clog << " OK" << std::endl;
 		
-	} else {
-		
+		const bool withSound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && serialPort->getPortType() == CncPORT_EMU_ARDUINO );
+		CncSpindleSound::activate(withSound);
+	}
+	else
+	{
 		std::cout << " . . . Connection refused -";
 		std::cerr << " ERROR" << std::endl;
-		
 	}
-
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -505,7 +512,7 @@ void CncControl::onPeriodicallyAppEvent() {
 	serialPort->onPeriodicallyAppEvent(isInterrupted());
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::popSerial() {
+bool CncControl::popSerial(bool dispatchUserEvents) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() == true )
 		return false;
@@ -513,7 +520,12 @@ bool CncControl::popSerial() {
 	if ( isSpyOutputOn() )
 		cnc::spy.addDebugEntry(CNC_LOG_FUNCT_A(": before popSerial()"));
 			
-	const bool ret = serialPort->popSerial();
+	const bool prev = THE_CONTEXT->isAllowEventHandling();
+	THE_CONTEXT->setAllowEventHandling(dispatchUserEvents);
+	
+		const bool ret = serialPort->popSerial();
+	
+	THE_CONTEXT->setAllowEventHandling(prev);
 	
 	if ( isSpyOutputOn() )
 		cnc::spy.addDebugEntry(CNC_LOG_FUNCT_A(": after popSerial()"));
@@ -1053,7 +1065,8 @@ bool CncControl::dispatchEventQueue() {
 		return false;
 	}
 	
-	if ( currentInteractiveMoveInfo.driver == IMD_GAMEPAD ) {
+	if ( currentInteractiveMoveInfo.driver == IMD_GAMEPAD )
+	{
 		// Check the gamepad status also here to stop immediately
 		// Or in other words as fast as possible
 		static CncGamepad gamepad;
@@ -1062,35 +1075,40 @@ bool CncControl::dispatchEventQueue() {
 		// stop immediately . . .
 		if ( gamepad.hasEmptyMovement() )
 			if ( stopInteractiveMove() == false )
-				std::cerr << CNC_LOG_FUNCT_A(" stopInteractiveMove() failed\n");
+				CNC_CERR_FUNCT_A(" stopInteractiveMove() failed");
 	}
 	
-	if ( THE_CONTEXT->isAllowEventHandling() ) {
+	if ( THE_CONTEXT->isAllowEventHandling() )
+	{
 		const CncMilliTimespan timespanMonitor = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getMilliTimestamp(), tsLastUpdate);
 		const CncMilliTimespan timespanEvent   = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getMilliTimestamp(), tsLastDispatch);
 		
-		if ( timespanMonitor >= THE_CONTEXT->getUpdateInterval() ) {
+		if ( timespanMonitor >= THE_CONTEXT->getUpdateInterval() )
+		{
 			updatePreview3D();
 			tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
 		}
 		
-		if ( timespanEvent >= thresholdEvent ) {
+		if ( timespanEvent >= thresholdEvent )
+		{
 			THE_APP->dispatchAll();
 			tsLastDispatch = CncTimeFunctions::getMilliTimestamp();
 		}
 	}
 	
-	if ( CncAsyncKeyboardState::isEscapePressed() != 0 ) {
-		
+	if ( CncAsyncKeyboardState::isEscapePressed() != 0 )
+	{
 		// assign ESC to an interrupt event only if the emergency button is active
-		if ( THE_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true ) {
-			std::cerr << CNC_LOG_FUNCT_A(": ESCAPE key detected\n");
+		if ( THE_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true )
+		{
+			CNC_CERR_FUNCT_A(": ESCAPE key detected")
 			interrupt("ESCAPE key detected");
 		}
 	}
 	
-	if ( isInterrupted() ) {
-		std::cerr << "dispatchEventQueue: Interrupt detected" << std::endl;
+	if ( isInterrupted() )
+	{
+		CNC_CERR_FUNCT_A("dispatchEventQueue: Interrupt detected")
 	}
 	
 	return isInterrupted() == false;
@@ -1650,6 +1668,7 @@ bool CncControl::switchSpindleOn() {
 	if ( isInterrupted() )
 		return false;
 	
+	//CNC_PRINT_FUNCT_A(": spindlePowerState == SPINDLE_STATE_OFF = %d", spindlePowerState == SPINDLE_STATE_OFF)
 	if ( spindlePowerState == SPINDLE_STATE_OFF )
 	{ 
 		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_ON) )
@@ -2098,9 +2117,9 @@ bool CncControl::updateInteractiveMove(const CncLinearDirection x, const CncLine
 		return false;
 		
 	const bool ret = serialPort->processUpdateInteractiveMove(x, y, z, modifySpeed);
-	if ( ret == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(": processUpdateInteractiveMove failed\n");
-		
+	if ( ret == false )
+	{
+		CNC_CERR_FUNCT_A("processUpdateInteractiveMove failed");
 		stopInteractiveMove();
 	}
 	
@@ -2115,9 +2134,9 @@ bool CncControl::updateInteractiveMove() {
 		return false;
 		
 	const bool ret = serialPort->processUpdateInteractiveMove();
-	if ( ret == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(": processUpdateInteractiveMove failed\n");
-		
+	if ( ret == false )
+	{
+		CNC_CERR_FUNCT_A("processUpdateInteractiveMove failed");
 		stopInteractiveMove();
 	}
 	
@@ -2128,27 +2147,35 @@ bool CncControl::updateInteractiveMove() {
 bool CncControl::stopInteractiveMove() {
 ///////////////////////////////////////////////////////////////////
 	CNC_PRINT_INTERACTIVE_FUNCT_A("Begin\n");
-	if ( isInteractiveMoveActive() ) {
-		
-		if ( getSerial()->sendQuitMove() == false ) {
-			std::cerr << CNC_LOG_FUNCT_A(": sendQuitMove() failed\n");
+	
+	if ( isInteractiveMoveActive() )
+	{
+		if ( getSerial()->sendQuitMove() == false )
+		{
+			CNC_CERR_FUNCT_A("sendQuitMove() failed");
 			return false;
 		}
 		
 		// do this immediately after sending the quit signal
 		currentInteractiveMoveInfo.reset();
 		
-		// read left information on demand
-		if ( getSerial()->isCommandActive() == false ) {
-			popSerial();
-		}
+		// Don't do this here because it leads to a start asynchronous behaviour
+		// of interactive commands 
+		/*
+			// read left information on demand
+			const bool dispatchUserEvents = false;
+			if ( getSerial()->isCommandActive() == false )
+				popSerial(dispatchUserEvents);
+		*/
+		
 	}
+	
 	CNC_PRINT_INTERACTIVE_FUNCT_A("End\n");
 	
 	// synchronize the app position
 	curAppPos = curCtlPos;
 	
-	return true;
+	return ( isInteractiveMoveActive() == false );
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::resolveLimits(bool x, bool y, bool z) {

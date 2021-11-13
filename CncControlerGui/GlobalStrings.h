@@ -17,6 +17,20 @@
 									CNC_VERSION_MINOR_NUM, \
 									CNC_VERSION_INDEX_NUM, \
 									CNC_VERSION_BUILD_NUM)
+									
+									
+	#define CNC_VERSION_LONG_STR    wxString::Format("%d.%d.%d (%d) [%2d.%2d.%4d %2d:%2d:%2d]", \
+									CNC_VERSION_MAJOR_NUM, \
+									CNC_VERSION_MINOR_NUM, \
+									CNC_VERSION_INDEX_NUM, \
+									CNC_VERSION_BUILD_NUM, \
+									CNC_BUILD_DAY_INT, \
+									CNC_BUILD_DAY_INT, \
+									CNC_BUILD_YEAR_INT, \
+									CNC_BUILD_HOUR_INT, \
+									CNC_BUILD_MIN_INT, \
+									CNC_BUILD_SEC_INT) 
+									
 // ----------------------------------------------------------------
 
 
@@ -29,6 +43,7 @@ namespace VersionInfo {
 
 	const wxString text 				= "";
 	const wxString number				= CNC_VERSION_STR;
+	const wxString longNumber			= CNC_VERSION_LONG_STR;
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -59,7 +74,7 @@ struct GlobalConstStringDatabase {
 	const wxString programTitel			= wxString(CNC_DESCRIPTION_STR);
 	const wxString copyRight			= wxString(CNC_COPYRIGHT_STR);
 	const wxString versionNumber		= VersionInfo::number;
-	const wxString programVersion		= wxString(wxString::Format("%s.%s", versionNumber, buildFlag));
+	const wxString programVersion		= wxString(wxString::Format("%s.%s - %s", programTitel, CNC_VERSION_LONG_STR, buildFlag));
 	
 	// config
 	const wxString renderSelectorFormat = wxString("%0.3lf mm - %u PPI");

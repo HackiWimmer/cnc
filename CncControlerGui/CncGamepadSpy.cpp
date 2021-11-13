@@ -380,10 +380,10 @@ int CncGamepadSpy::translateStickToSpeedValue(const GamepadEvent& state) {
 	const float maxStrickValue = 16.0f;
 	const float v               = std::max(minStrickValue, std::min(maxStrickValue, state.data.minStickLen));
 	
-	if		( std::less_equal<float>{}(v,  4.0) ) return 1;
-	else if	( std::less_equal<float>{}(v,  8.0) ) return 2;
-	else if	( std::less_equal<float>{}(v, 11.0) ) return 3;
-	else if	( std::less_equal<float>{}(v, 14.0) ) return 4;
+	if		( std::less_equal<float>{}(v,  6.0) ) return 1;
+	else if	( std::less_equal<float>{}(v, 11.0) ) return 2;
+	else if	( std::less_equal<float>{}(v, 13.0) ) return 3;
+	else if	( std::less_equal<float>{}(v, 15.0) ) return 4;
 	else if	( std::less_equal<float>{}(v, 16.0) ) return 5;
 	
 	return 1;

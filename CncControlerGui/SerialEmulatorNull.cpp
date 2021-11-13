@@ -59,15 +59,18 @@ SerialEmulatorNULL::~SerialEmulatorNULL() {
 /////////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::onTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( checkRuntimeEnv() != RET_OK ) {
+	if ( checkRuntimeEnv() != RET_OK )
+	{
 		serialTimer.Stop();
 		replyPosition(true);
 	}
-	else {
-		
-		const int32_t factor = 10;
-		
-		renderAndMove(interactiveX * factor, interactiveY * factor, interactiveZ * factor);
+	else
+	{
+		if ( interactiveMove == true )
+		{
+			const int32_t factor = 10;
+			renderAndMove(interactiveX * factor, interactiveY * factor, interactiveZ * factor);
+		}
 		
 		replyPosition(false);
 		serialTimer.Start(20);
@@ -223,9 +226,10 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 	
 	// if the lastCommand.index is 0 then no read-spooling information available
 	// or in other words lastCommand.Serial is EMPTY
-	if ( lastCommand.index == 0 )  {
-		switch( lastCommand.cmd ) { 
-			
+	if ( lastCommand.index == 0 )
+	{
+		switch( lastCommand.cmd )
+		{ 
 			case CMD_INVALID:						// do nothing if no command is registered
 													ret = 0;
 													break;
@@ -274,9 +278,10 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 		
 		ret = 0;
 		
-		// only if an command is registed
-		if ( lastCommand.cmd != CMD_INVALID ) {
-			// now something should be availibale at the serial
+		// only if an command is registered
+		if ( lastCommand.cmd != CMD_INVALID )
+		{
+			// now something should be available at the serial
 			ret = performSerialBytes((unsigned char*)(buffer), nbByte);
 		}
 	}
@@ -288,88 +293,94 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	// only if something is requested
-	// assumtion: buffer allocates nbByte bytes  
-	if ( nbByte > 0 ) {
-		// debug only
-		bool debug = false;
-		if ( debug ) {
-			std::cout << "performSerialBytes: " << "index: " << lastCommand.index << ", nbByte: " << nbByte << ", length: " << lastCommand.Serial.length() << ", bytes: ";
-			lastCommand.Serial.trace(std::clog);
-		}
+	if ( nbByte == 0 )
+		return 0;
 		
-		// indicate end of serial as false
-		bool last = false;
-		
-		// initialize bytes to copy
-		unsigned int bytesToCopy = nbByte;
-		
-		// check boundings
-		if ( lastCommand.index + bytesToCopy > lastCommand.Serial.length() ) {
-			// in this case not enougth bytes availiable and bytesToCopy 
-			// have to be truncated
-			
-			// prevent an overflow of bytesToCopy which is unsigned
-			if ( lastCommand.Serial.length() - lastCommand.index < 0 ) {
-				std::cerr << "SerialEmulatorNULL::performSerialBytes Determine bytesToCopy failed!"
-				<< "  Current index:  " << lastCommand.index
-				<< ", Bytes to copy: "  << bytesToCopy
-				<< ", Total length: "   << lastCommand.Serial.length()
-				<< std::endl;
-				
-				std::cerr << "Current command will be aborted!"
-				<< std::endl;
-				
-				lastCommand.restLastCmd();
-				return -1;
-			}
-			
-			// indicates the end of the serial
-			last = true;
-			
-			// ... now this substruction is safe
-			bytesToCopy = lastCommand.Serial.length() - lastCommand.index;
-		}
-		
-		// if the boundings are ok this definitive the signal to resetLastCmd()
-		if ( lastCommand.index + bytesToCopy == lastCommand.Serial.length() )
-			last = true;
-		
-		if ( debug ) {
-			std::clog << "bytesToCopy: "<< bytesToCopy << std::endl;
-		}
-		
-		if ( bytesToCopy > 0 ) {
-			// read bytes to copy from serial
-			if ( lastCommand.Serial.getBytes(buffer, lastCommand.index, bytesToCopy) == false ) {
-				std::cerr << "SerialEmulatorNULL::performSerialBytes getBytes(...) failed!"
-				<< "  Current index:  " << lastCommand.index
-				<< ", Bytes to copy: "  << bytesToCopy
-				<< ", Total length: "   << lastCommand.Serial.length()
-				<< std::endl;
-			
-				std::cerr << "Current command will be aborted!"
-				<< std::endl;
-			
-				lastCommand.restLastCmd();
-				return -1;
-			}
-
-			// index handling
-			lastCommand.index += bytesToCopy;
-		}
-		
-		if ( debug ) {
-			std::clog << "last: "<< last << std::endl;
-		}
-
-		// close/finalize the last command
-		if ( last == true )
-			lastCommand.restLastCmd();
-		
-		return bytesToCopy;
+	// assumption: buffer allocates nbByte bytes  
+	
+	// debug only
+	bool debug = false;
+	if ( debug )
+	{
+		std::cout << "performSerialBytes: " << "index: " << lastCommand.index << ", nbByte: " << nbByte << ", length: " << lastCommand.Serial.length() << ", bytes: ";
+		lastCommand.Serial.trace(std::clog);
 	}
 	
-	return 0;
+	// indicate end of serial as false
+	bool last = false;
+	
+	// initialize bytes to copy
+	unsigned int bytesToCopy = nbByte;
+	
+	// check bounding
+	if ( lastCommand.index + bytesToCopy > lastCommand.Serial.length() )
+	{
+		// in this case not enough bytes available and bytesToCopy 
+		// have to be truncated
+		
+		// prevent an overflow of bytesToCopy which is unsigned
+		if ( lastCommand.Serial.length() - lastCommand.index < 0 )
+		{
+			std::cerr << "SerialEmulatorNULL::performSerialBytes Determine bytesToCopy failed!"
+			<< "  Current index:  " << lastCommand.index
+			<< ", Bytes to copy: "  << bytesToCopy
+			<< ", Total length: "   << lastCommand.Serial.length()
+			<< std::endl;
+			
+			std::cerr << "Current command will be aborted!"
+			<< std::endl;
+			
+			lastCommand.restLastCmd();
+			return -1;
+		}
+		
+		// indicates the end of the serial
+		last = true;
+		
+		// ... now this substruction is safe
+		bytesToCopy = lastCommand.Serial.length() - lastCommand.index;
+	}
+	
+	// if the bounding are ok this definitive the signal to resetLastCmd()
+	if ( lastCommand.index + bytesToCopy == lastCommand.Serial.length() )
+		last = true;
+	
+	if ( debug ) {
+		std::clog << "bytesToCopy: "<< bytesToCopy << std::endl;
+	}
+	
+	if ( bytesToCopy > 0 )
+	{
+		// read bytes to copy from serial
+		if ( lastCommand.Serial.getBytes(buffer, lastCommand.index, bytesToCopy) == false )
+		{
+			std::cerr << "SerialEmulatorNULL::performSerialBytes getBytes(...) failed!"
+			<< "  Current index:  " << lastCommand.index
+			<< ", Bytes to copy: "  << bytesToCopy
+			<< ", Total length: "   << lastCommand.Serial.length()
+			<< std::endl;
+		
+			std::cerr << "Current command will be aborted!"
+			<< std::endl;
+		
+			lastCommand.restLastCmd();
+			return -1;
+		}
+
+		// index handling
+		lastCommand.index += bytesToCopy;
+	}
+	
+	if ( debug )
+	{
+		std::clog << "last: "<< last << std::endl;
+	}
+
+	// close/finalize the last command
+	if ( last == true )
+		lastCommand.restLastCmd();
+	
+	return bytesToCopy;
 }
 ///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::performText(unsigned char *buffer, unsigned int nbByte, const char* response) {
@@ -403,11 +414,13 @@ int SerialEmulatorNULL::performConfiguration(unsigned char *buffer, unsigned int
 	lastCommand.Serial.write(wxString::Format("%d:%s\n", PID_COMMON, "Only a setter collection"));
 
 	SetterMap::iterator it;
-	for ( it=setterMap.begin(); it!=setterMap.end(); ++it ) {
+	for ( it=setterMap.begin(); it!=setterMap.end(); ++it )
+	{
 		wxString valueList(wxString::Format(" %d:", it->first));
 		cnc::SetterValueList values = it->second;
 		unsigned int counter = 0;
-		for ( auto itvl = values.begin(); itvl != values.end(); itvl++ ) {
+		for ( auto itvl = values.begin(); itvl != values.end(); itvl++ )
+		{
 			
 			if ( it->first >= PID_FLOAT_RANG_START )	valueList.append(wxString::Format("%.2f", (float)(*itvl/FLT_FACT)));
 			else										valueList.append(wxString::Format("%d",   *itvl));
@@ -446,7 +459,8 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 		return -1;
 	
 	// first publish the limit states on demand . . .
-	if ( limitStates.hasLimit() || limitStates.hasPreviousLimit() ) {
+	if ( limitStates.hasLimit() || limitStates.hasPreviousLimit() )
+	{
 		lastCommand.Serial.write(RET_SOH);
 		lastCommand.Serial.write(PID_LIMIT);
 		lastCommand.Serial.write(limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
@@ -467,10 +481,12 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 ///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::performInteractiveMove(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( interactiveMove == false ) {
+	if ( interactiveMove == false )
+	{
 		interactiveMove = true;
-		serialTimer.Start(1, true);
+		serialTimer.Start(1, wxTIMER_ONE_SHOT);
 	}
+	
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////
@@ -499,8 +515,14 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case SIG_INTERRUPPT:
 		case SIG_HALT:
 		case SIG_PAUSE:
-		case SIG_RESUME:
-		case SIG_QUIT_MOVE:					lastSignal = cmd;
+		case SIG_RESUME:					lastSignal = cmd;
+											return true;
+											
+		case SIG_QUIT_MOVE:					lastSignal      = cmd;
+											interactiveX    = 0L;
+											interactiveY    = 0L;
+											interactiveZ    = 0L;
+											interactiveMove = false;
 											return true;
 											
 		case SIG_UPDATE:					lastSignal = cmd;
@@ -862,10 +884,10 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 	targetMajorPos.inc(x, y, z);
 	
 	// the emulator function readData and writeData runs in the same thread.
-	// so, it isn't possible to repeat a move command with serval position callbacks
+	// so, it isn't possible to repeat a move command with several position callbacks
 	// as a real mirco controller can do.
 	// Instead the the move is supported with its total distance - see readMove. 
-	// however, for a preview this is good enougth!
+	// however, for a preview this is good enough!
 	//
 	// the following linear rendering is only to support a more detailed writeMoveCmd(...)
 	const bool ret = initRenderAndMove(x, y, z);
@@ -879,14 +901,17 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveInteractive(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	// An interactive move is not decodes as a "normal" move,. Therefore, the call below will fail.
-	// If a interactive more should be also handled be the streamer classes a separate callback has 
+	// An interactive move is not decodes as a "normal" move. Therefore, the call below will fail.
+	// If a interactive more should be also handled by the streamer classes a separate callback has 
 	// to be established instead.
 	//if ( writeMoveRawCallback(buffer, nbByte)  == false )
 	//	return false;
 		
 	if ( interactiveMove == true ) 
+	{
+		CNC_CERR_FUNCT_A(": A other interactive move is still active")
 		return false;
+	}
 	
 	// reset
 	interactiveX = 0L;
@@ -900,7 +925,12 @@ bool SerialEmulatorNULL::writeMoveInteractive(unsigned char *buffer, unsigned in
 	const uint32_t defaultImpulses = 0;
 
 	const double speed = getFeedSpeed_MMSec();
-	const bool ret = speed ? initMove(defaultImpulses, speed) : true;
+	const bool ret = speed ? ArduinoAccelManager::initMove(defaultImpulses, speed) : true;
+	
+	if ( ret == false )
+	{
+		CNC_CERR_FUNCT_A(": ArduinoAccelManager::initMove() failed")
+	}
 	
 	lastSignal = CMD_INVALID;
 	return ret;
@@ -922,7 +952,7 @@ bool SerialEmulatorNULL::initializeFeedProfile(int32_t dx , int32_t dy , int32_t
 	const int32_t impulses  = impulseCalculator.calculate(dx, dy, dz);
 	const double speed		= getFeedSpeed_MMSec();
 	
-	const bool ret = speed && impulses ? initMove(impulses, speed) : true;
+	const bool ret = speed && impulses ? ArduinoAccelManager::initMove(impulses, speed) : true;
 	
 	usToSleep = 0LL;
 	
@@ -1028,18 +1058,11 @@ unsigned char SerialEmulatorNULL::signalHandling() {
 		case SIG_INTERRUPPT:		return RET_INTERRUPT;
 		case SIG_HALT:				return RET_HALT;
 		
-		case SIG_PAUSE:				// pause handling
-									while ( lastSignal == SIG_PAUSE ) {
-										THE_APP->dispatchAll();
-										THE_APP->waitActive(25, true);
-									}
-									break;
-		
-		case SIG_RESUME:			lastSignal = CMD_INVALID; 
-									break;
-		
 		case SIG_QUIT_MOVE:			interactiveMove = false;
 									return RET_QUIT;
+		
+		case SIG_PAUSE:				return RET_OK;
+		case SIG_RESUME:			return RET_OK;
 		
 		case SIG_UPDATE:			return RET_OK;
 		
@@ -1063,7 +1086,8 @@ byte SerialEmulatorNULL::checkRuntimeEnv() {
 ///////////////////////////////////////////////////////////////////
 	const unsigned char retSig = signalHandling();
 	
-	if ( retSig != RET_OK )  {
+	if ( retSig != RET_OK )
+	{
 		lastCommand.ret = retSig; 
 		return translateStepAxisRetValue(retSig); 
 	} 

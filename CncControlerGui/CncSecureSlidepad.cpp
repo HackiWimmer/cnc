@@ -168,7 +168,7 @@ void CncSecureSlidepad::updateResult(float ratio) {
 void CncSecureSlidepad::onSliderEvent(CncSecureGesturesPanelEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	// may be nothing to to
-	if ( event.data.isRatioChanged == false )
+	if ( event.data.isChanged() == false )
 		return;
 	
 	switch( event.GetId() )

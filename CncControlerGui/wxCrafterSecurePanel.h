@@ -151,7 +151,7 @@ protected:
     virtual void onRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onPauseSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStopSec(wxCommandEvent& event) { event.Skip(); }
-    virtual void onTryStatisticSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onTemplateContextSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onTryRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onEmergencySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onSerialSpySec(wxCommandEvent& event) { event.Skip(); }

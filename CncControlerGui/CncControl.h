@@ -66,8 +66,8 @@ class CncControl {
 			, stepSensitivity	(FINEST)
 			{}
 			
-			bool active() 		{ return driver != IMD_NONE; }
-			void reset() 		{ *this = InteractiveMoveInfo(); }
+			bool active()	const	{ return driver != IMD_NONE; }
+			void reset()			{ *this = InteractiveMoveInfo(); }
 		};
 		
 		long	 					currentClientId;
@@ -386,7 +386,7 @@ class CncControl {
 		// execute
 		bool execute(const unsigned char* buffer, unsigned int nbByte);
 		//
-		bool popSerial();
+		bool popSerial(bool dispatchUserEvents=true);
 		// processing the given setter values
 		bool processSetter(unsigned char pid, int32_t value);
 		bool processSetter(unsigned char pid, const cnc::SetterValueList& values);
@@ -415,7 +415,7 @@ class CncControl {
 		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed=0);
 		bool updateInteractiveMove();
 		bool stopInteractiveMove();
-		bool isInteractiveMoveActive() { return currentInteractiveMoveInfo.active(); }
+		bool isInteractiveMoveActive() const { return currentInteractiveMoveInfo.active(); }
 		
 		bool manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);
 		bool manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);

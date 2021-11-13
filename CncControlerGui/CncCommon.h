@@ -62,6 +62,18 @@
 	#define CNC_CEX1_FUNCT_A(...)		cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
 	#define CNC_CEX1_FUNCT_B(...)		cnc::cex1 << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
 	
+	#define CNC_CEX2_LOCATION			cnc::cex2 << CNC_LOG_LOCATION									<< std::endl;
+	#define CNC_CEX2_LOCATION_A(...)	cnc::cex2 << CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__))	<< std::endl;
+	#define CNC_CEX2_FUNCT 				cnc::cex2 << CNC_LOG_FUNCT										<< std::endl;
+	#define CNC_CEX2_FUNCT_A(...)		cnc::cex2 << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
+	#define CNC_CEX2_FUNCT_B(...)		cnc::cex2 << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
+
+	#define CNC_CEX3_LOCATION			cnc::cex3 << CNC_LOG_LOCATION									<< std::endl;
+	#define CNC_CEX3_LOCATION_A(...)	cnc::cex3 << CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__))	<< std::endl;
+	#define CNC_CEX3_FUNCT 				cnc::cex3 << CNC_LOG_FUNCT										<< std::endl;
+	#define CNC_CEX3_FUNCT_A(...)		cnc::cex3 << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
+	#define CNC_CEX3_FUNCT_B(...)		cnc::cex3 << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
+
 	#define CNC_PRINT_LOCATION			CNC_COUT_LOCATION
 	#define CNC_PRINT_LOCATION_A(...)	CNC_COUT_LOCATION_A(__VA_ARGS__)
 	#define CNC_PRINT_FUNCT 			CNC_COUT_FUNCT
@@ -406,9 +418,20 @@ class SecurePreviewBookSelection {
 };
 
 //-----------------------------------------------------------------
+class CncBoolSwitch 
+{
+	private:
+		bool& val;
+		
+	public:
+		
+		CncBoolSwitch(bool& b) : val(b)	{ val = true;  }
+		~CncBoolSwitch()				{ val = false; }
+};
+
+//-----------------------------------------------------------------
 class CncPathListManager;
 namespace Trigger {
-	
 	
 	struct ParameterSet {
 		

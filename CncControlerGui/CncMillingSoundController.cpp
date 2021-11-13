@@ -17,7 +17,7 @@ namespace CncSpindleSound
 void CncSpindleSound::activate(bool state) {
 /////////////////////////////////////////////////////////////
 	CncSpindleSound::active = state;
-	wxSound::Stop();
+	stop();
 }
 /////////////////////////////////////////////////////////////
 void CncSpindleSound::deactivate() { 
@@ -27,11 +27,11 @@ void CncSpindleSound::deactivate() {
 /////////////////////////////////////////////////////////////
 void CncSpindleSound::play(double speed_U_MIN) {
 /////////////////////////////////////////////////////////////
-	//CNC_CLOG_FUNCT_A("%d, %lf, %lf", CncSpindleSound::playing, speed_U_MIN, curSpeed_U_MIN)
+	//CNC_CLOG_FUNCT_A("1 %d, %lf, %lf", CncSpindleSound::playing, speed_U_MIN, curSpeed_U_MIN)
 	
 	if ( CncSpindleSound::active == false )
 		return;
-	
+		
 	if ( CncSpindleSound::playing == false || cnc::dblCmp::eq(speed_U_MIN, curSpeed_U_MIN) == false )
 	{
 		const double& max = THE_CONFIG->getSpindleSpeedMax();
@@ -70,7 +70,8 @@ void CncSpindleSound::adjust(double speed_U_MIN) {
 void CncSpindleSound::stop() {
 /////////////////////////////////////////////////////////////
 	wxSound::Stop();
-	CncSpindleSound::playing = false;
+	CncSpindleSound::playing		= false;
+	CncSpindleSound::curSpeed_U_MIN	= 0.0;
 	
 	//CNC_CEX1_FUNCT_A("%d", CncSpindleSound::playing)
 }

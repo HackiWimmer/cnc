@@ -54,7 +54,7 @@ CncSecureRotateModelPanel::~CncSecureRotateModelPanel() {
 void CncSecureRotateModelPanel::onModifyModel(CncSecureGesturesPanelEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// may be nothing to to
-	if ( event.data.isRatioChanged == false )
+	if ( event.data.isChanged() == false )
 		return;
 		
 	//CNC_PRINT_FUNCT_A("eventId=%, callbackId=%d ratio=%lf", event.GetId(), event.data.cbId, event.data.ratio)

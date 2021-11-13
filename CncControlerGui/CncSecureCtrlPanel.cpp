@@ -6,6 +6,7 @@
 #include "CncContext.h"
 #include "wxCrafterImages.h"
 #include "CncTemplateContext.h"
+#include "CncMessageDialog.h"
 #include "CncSecureManuallyMovePanel.h"
 #include "CncPolarRegionDetector.h"
 #include "CncSecureRotateModelPanel.h"
@@ -81,9 +82,8 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	interactiveTouchpadXYZ->setCallbackId(CallbackID_TPXY);
 	interactiveTouchpadXYZ->SetBackgroundColour(wxColour(255, 255, 184));
 	
-	
 	#warning only a dev setup
-	if ( true )
+	if ( false )
 	{
 				CncSecureGesturesPanel* panelQ1 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_POSITIVE, 10);
 				GblFunc::replaceControl(m_panelQ1, panelQ1);
@@ -120,7 +120,6 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 				panelQ6->setCallbackId(6006);
 				panelQ6->SetBackgroundColour(wxColour(  0, 128,  0));
 				panelQ6->init();
-				
 	}
 	
 	podiumPanel = new CncPodiumMgmtMovement(this); 
@@ -133,7 +132,7 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	
 	Bind(wxEVT_CNC_SECURE_GESTURES_PANEL, &CncSecureCtrlPanel::onInteractiveMove,	this);
 	
-	THE_APP->GetSecureVersionInfo()->SetLabel(CNC_VERSION_STR);
+	THE_APP->GetSecureVersionInfo()->SetLabel(CNC_VERSION_LONG_STR);
 }
 /////////////////////////////////////////////////////////////////////
 CncSecureCtrlPanel::~CncSecureCtrlPanel() {
@@ -159,23 +158,45 @@ void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 	wxWindow* evtWnd = ((wxWindow*)event.GetEventObject());
 	const bool isShownOnScreen = ( evtWnd && evtWnd->IsShownOnScreen() );
 	
+	if ( false )
+	{
+		// debug only
+		if ( event.data.cbId == 1 )
+			cnc::cex2 << event << std::endl;
+	}
+	
 	switch( event.GetId() )
 	{
 		case CncSecureGesturesPanelEvent::Id::CSGP_STARTING:
 		{
 			if ( isShownOnScreen == true )
 			{
-				const int pos = cnc::getSpeedStepSensitivityIndex(FINE);
-				THE_APP->selectStepSensitivity(pos);
-				THE_APP->startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR);
+				if ( THE_APP->isInteractiveMoveActive() == false )
+				{
+					const int pos = cnc::getSpeedStepSensitivityIndex(FINE);
+					THE_APP->selectStepSensitivity(pos);
+					
+					if ( THE_APP->startInteractiveMove(CncInteractiveMoveDriver::IMD_NAVIGATOR) == false )
+						CNC_CERR_FUNCT_A("startInteractiveMove() failed")
+				}
 			}
 			break;
 		}
 		case CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD:
 		{
 			if ( isShownOnScreen == true )
-				THE_APP->updateInteractiveMove();
-				
+			{
+
+				// is a interactive move active?
+				if ( THE_APP->isInteractiveMoveActive() == false )
+				{
+					CNC_CERR_FUNCT_A("THE_APP->isInteractiveMoveActive() == false")
+					return;
+				}
+			
+				if ( THE_APP->updateInteractiveMove() == false )
+					CNC_CERR_FUNCT_A("updateInteractiveMove() failed")
+			}
 			break;
 		}
 		case CncSecureGesturesPanelEvent::Id::CSGP_POS_CHANGED:
@@ -183,13 +204,25 @@ void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 			// stop (always!!!)
 			if ( event.data.isZero() )
 			{
-				THE_APP->stopInteractiveMove();
+				if ( THE_APP->stopInteractiveMove() == false )
+					CNC_CERR_FUNCT_A("stopInteractiveMove() failed")
+					
+				if ( THE_APP->isInteractiveMoveActive() == true )
+					CNC_CERR_FUNCT_A("InteractiveMove isn't stopped")
+					
 				return;
 			}
 			
 			// may be nothing to to
 			if ( event.data.isChanged() == false )
 				return;
+				
+			// is a interactive move active?
+			if ( THE_APP->isInteractiveMoveActive() == false )
+			{
+				//CNC_CERR_FUNCT_A("THE_APP->isInteractiveMoveActive() == false")
+				return;
+			}
 				
 			// determine direction(s)
 			CncLinearDirection dx = CncNoneDir;
@@ -231,7 +264,9 @@ void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 			if ( move && isShownOnScreen )
 			{
 				const int modifySpeed = abs(event.data.range);
-				THE_APP->updateInteractiveMove(dx, dy, dz, modifySpeed);
+				
+				if ( THE_APP->updateInteractiveMove(dx, dy, dz, modifySpeed) == false )
+					CNC_CERR_FUNCT_A("updateInteractiveMove(dx, dy, dz) failed")
 			}
 			
 			break;
@@ -538,6 +573,28 @@ void CncSecureCtrlPanel::onReferenceSet(wxCommandEvent& event) {
 	m_leftBook->SetSelection(PAGE_RUN);
 }
 /////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onTryRunSec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->rcTryRun(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onTemplateContextSec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	//THE_TPL_CTX->traceTo(cnc::cex1, 3);
+	//cnc::cex1 << THE_TPL_CTX->getLastLogInfo() << std::endl;
+	std::stringstream ss;
+	THE_TPL_CTX->traceTo(ss, 0);
+	
+	if ( ss.tellp() > 0 )
+	{
+		CncMessageDialog dlg(this, ss.str().c_str(), "Current context", "Template Context");
+		dlg.SetSize(800, 900);
+		dlg.CenterOnParent();
+		dlg.setWordWrap(false);
+		dlg.ShowModal();
+	}
+}
+/////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onToggleTouchpadPane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	interactiveTouchpadXYZ->init();
@@ -598,14 +655,4 @@ void CncSecureCtrlPanel::activate(bool b) {
 
 
 
-/////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::onTryRunSec(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	THE_APP->rcTryRun(event);
-}
-/////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::onTryStatisticSec(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	//THE_TPL_CTX->traceTo(cnc::cex1, 3);
-	cnc::cex1 << THE_TPL_CTX->getLastLogInfo() << std::endl;
-}
+

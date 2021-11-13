@@ -658,6 +658,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool updateInteractiveMove();
 		bool updateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed=0);
 		bool stopInteractiveMove();
+		bool isInteractiveMoveActive() const;
 		
 		bool connectSerialPort();
 		bool connectSerialPortDialog();

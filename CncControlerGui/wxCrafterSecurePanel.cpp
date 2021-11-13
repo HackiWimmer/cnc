@@ -857,7 +857,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rcRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRunSec), NULL, this);
     m_rcPauseSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onPauseSec), NULL, this);
     m_rcStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
-    m_btTemplateContextSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryStatisticSec), NULL, this);
+    m_btTemplateContextSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTemplateContextSec), NULL, this);
     m_btTryRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryRunSec), NULL, this);
     m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_btSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
@@ -887,7 +887,7 @@ CncSecureCtrlPanelBase::~CncSecureCtrlPanelBase()
     m_rcRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRunSec), NULL, this);
     m_rcPauseSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onPauseSec), NULL, this);
     m_rcStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
-    m_btTemplateContextSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryStatisticSec), NULL, this);
+    m_btTemplateContextSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTemplateContextSec), NULL, this);
     m_btTryRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryRunSec), NULL, this);
     m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_btSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);

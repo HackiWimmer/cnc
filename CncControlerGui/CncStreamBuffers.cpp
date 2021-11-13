@@ -115,7 +115,7 @@ CncCex1Buf::~CncCex1Buf() {
 
 ///////////////////////////////////////////////////////////////////
 CncCex2Buf::CncCex2Buf(CncTextCtrl* c) 
-: LoggerStreamBuf(LoggerStreamBuf::Type::EX2, c, wxTextAttr(wxColour(255, 101, 14)))
+: LoggerStreamBuf(LoggerStreamBuf::Type::EX2, c, wxTextAttr(wxColour(  0, 128, 192)))
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -126,7 +126,7 @@ CncCex2Buf:: ~CncCex2Buf() {
 
 ///////////////////////////////////////////////////////////////////
 CncCex3Buf::CncCex3Buf(CncTextCtrl* c) 
-: LoggerStreamBuf(LoggerStreamBuf::Type::EX3, c, wxTextAttr(wxColour(255,  11, 14)))
+: LoggerStreamBuf(LoggerStreamBuf::Type::EX3, c, wxTextAttr(wxColour(192, 192, 192)))
 ///////////////////////////////////////////////////////////////////
 {
 }

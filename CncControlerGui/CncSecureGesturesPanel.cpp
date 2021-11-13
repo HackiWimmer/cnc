@@ -2,6 +2,7 @@
 #include <wx/dcclient.h>
 #include <wx/dcgraph.h>
 #include <wx/dcbuffer.h>
+#include "GlobalFunctions.h"
 #include "CncCommon.h"
 #include "CncPolarRegionDetector.h"
 #include "wxCrafterSecurePanel.h"
@@ -254,6 +255,9 @@ void CncSecureGesturesPanel::startTimer() {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::stopTimer() {
 ///////////////////////////////////////////////////////////////////
+	//CNC_CEX1_FUNCT_A("U:%d, O:%d, S:%d", updateTimer->IsRunning(), observerTimer->IsRunning(), (int) state )
+	//GblFunc::stacktrace(cnc::cex2);
+	
 	observerTimer->Stop();
 	updateTimer->Stop();
 	state = S_INACTIVE;
@@ -752,10 +756,10 @@ void CncSecureGesturesPanel::calculateCoordinates() {
 	*/
 	
 	// additionally change information
-	lastData.isRangeChanged = ( lastData.range != ref.range );
-	lastData.isRatioChanged = ( lastData.ratio != ref.ratio );
-	lastData.isAngleChanged = ( lastData.angle != ref.angle );
 	lastData.isTimerChanged = false;
+	lastData.isRangeChanged = ( lastData.range != ref.range );
+	lastData.isRatioChanged = ( cnc::dblCmp::eq(lastData.ratio, ref.ratio) == false );
+	lastData.isAngleChanged = ( cnc::dblCmp::eq(lastData.angle, ref.angle) == false );
 	
 	CLOG_GESTURE_PANEL("")
 }
@@ -802,9 +806,15 @@ void CncSecureGesturesPanel::applyPosChange(bool useTimer) {
 	
 	if ( useTimer == true )
 	{
-		const bool stop = ( translatedDistance.m_x == zeroPt.x && translatedDistance.m_y == zeroPt.y );
+		/*
+		const bool zero = (	cnc::dblCmp::eq(translatedDistance.m_x, double(zeroPt.x)) && 
+							cnc::dblCmp::eq(translatedDistance.m_y, double(zeroPt.y)) 
+		);
+		*/
 		
-		if ( stop )	stopTimer();
+		const bool zero = lastEvent->data.isZero();
+		
+		if ( zero )	reset();
 		else		startTimer();
 	}
 	else
@@ -815,7 +825,14 @@ void CncSecureGesturesPanel::applyPosChange(bool useTimer) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::applyPosHeld() {
 ///////////////////////////////////////////////////////////////////
-	if ( IsShown() )
+	CncBoolSwitch bs(lastEvent->data.userTriggered);
+	
+	lastEvent->data.isTimerChanged = true;
+	lastEvent->data.isRangeChanged = false;
+	lastEvent->data.isRatioChanged = false;
+	lastEvent->data.isAngleChanged = false;
+	
+	if ( IsShownOnScreen() )
 		wxPostEvent(GetParent(), prepareEvent(CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD));
 }
 /////////////////////////////////////////////////////////////
@@ -833,7 +850,6 @@ void CncSecureGesturesPanel::onTimer(wxTimerEvent& event) {
 		{
 			if ( type == T_BUTTON )
 			{
-				lastEvent->data.isTimerChanged = true;
 				applyPosHeld();
 			}
 			
@@ -1068,6 +1084,7 @@ void CncSecureGesturesPanel::onMouse(wxMouseEvent& event) {
 			//CNC_PRINT_FUNCT_A("(%d)(%lf, %lf)", callbackId, translatedDistance.m_x, translatedDistance.m_y)
 			
 			// apply
+			CncBoolSwitch bs(lastEvent->data.userTriggered);
 			applyPosChange(true);
 		}
 	}
@@ -1114,7 +1131,9 @@ void CncSecureGesturesPanel::onPan(wxPanGestureEvent& event) {
 		}
 		
 		// apply on demand
-		if ( translatedDistance.m_x == 0.0 && translatedDistance.m_x == translatedDistance.m_y )
+		CncBoolSwitch bs(lastEvent->data.userTriggered);
+		
+		if ( cnc::dblCmp::nu(translatedDistance.m_x) && cnc::dblCmp::eq(translatedDistance.m_x, translatedDistance.m_y) )
 		{
 			// apply zero pos
 			applyPosChange(false);
