@@ -126,7 +126,8 @@ protected:
     wxPanel* m_rpMisc;
     wxListbook* m_listbook628;
     wxPanel* m_panel644;
-    wxButton* m_btTestFunct15;
+    wxButton* m_btConfigDlg;
+    wxButton* m_btConfigFile;
     wxPanel* m_panel632;
     wxButton* m_btTestFunct1;
     wxButton* m_btTestFunct2;
@@ -156,7 +157,8 @@ protected:
     virtual void onEmergencySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onSerialSpySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onRequestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
-    virtual void onOpenConfigurationSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onOpenConfigurationDlgSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onOpenConfigurationFileSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onTestFunction1Sec(wxCommandEvent& event) { event.Skip(); }
     virtual void onTestFunction2Sec(wxCommandEvent& event) { event.Skip(); }
     virtual void onTestFunction3Sec(wxCommandEvent& event) { event.Skip(); }
@@ -241,7 +243,8 @@ public:
     wxPanel* GetRpCtrl() { return m_rpCtrl; }
     wxPanel* GetPodiumPlaceholder() { return m_podiumPlaceholder; }
     wxPanel* GetRpPodium() { return m_rpPodium; }
-    wxButton* GetBtTestFunct15() { return m_btTestFunct15; }
+    wxButton* GetBtConfigDlg() { return m_btConfigDlg; }
+    wxButton* GetBtConfigFile() { return m_btConfigFile; }
     wxPanel* GetPanel644() { return m_panel644; }
     wxButton* GetBtTestFunct1() { return m_btTestFunct1; }
     wxButton* GetBtTestFunct2() { return m_btTestFunct2; }

@@ -200,6 +200,7 @@ class SerialEmulatorNULL  : public wxEvtHandler,
 		
 		wxTimer				serialTimer;
 		CncLimitStates 		limitStates;
+		CncLimitStates		lastSentLS;
 		CncNanoTimestamp 	tsMoveStart;
 		uint64_t			usToSleep;
 		
@@ -250,9 +251,6 @@ class SerialEmulatorNULL  : public wxEvtHandler,
 	protected:
 		LastCommand 	lastCommand;
 		unsigned char 	lastSignal;
-		int32_t 		maxDimStepsX;
-		int32_t 		maxDimStepsY;
-		int32_t 		maxDimStepsZ;
 		
 		const CncLongPosition& getCurrentEmulatorPosition() 									{ return curEmulatorPos; }
 		

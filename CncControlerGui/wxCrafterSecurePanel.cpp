@@ -726,15 +726,25 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     wxBoxSizer* boxSizer646 = new wxBoxSizer(wxVERTICAL);
     m_panel644->SetSizer(boxSizer646);
     
-    m_btTestFunct15 = new wxButton(m_panel644, wxID_ANY, _("Open\nConfiguration"), wxDefaultPosition, wxDLG_UNIT(m_panel644, wxSize(-1,-1)), 0);
+    m_btConfigDlg = new wxButton(m_panel644, wxID_ANY, _("Open\nConfiguration Dialog"), wxDefaultPosition, wxDLG_UNIT(m_panel644, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btTestFunct15->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("configure-3")), wxLEFT);
-    m_btTestFunct15->SetBitmapMargins(2,2);
+    m_btConfigDlg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("configure-3")), wxLEFT);
+    m_btConfigDlg->SetBitmapMargins(2,2);
     #endif
-    wxFont m_btTestFunct15Font(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_btTestFunct15->SetFont(m_btTestFunct15Font);
+    wxFont m_btConfigDlgFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_btConfigDlg->SetFont(m_btConfigDlgFont);
     
-    boxSizer646->Add(m_btTestFunct15, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    boxSizer646->Add(m_btConfigDlg, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btConfigFile = new wxButton(m_panel644, wxID_ANY, _("Open\nConfiguration File"), wxDefaultPosition, wxDLG_UNIT(m_panel644, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btConfigFile->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("configure-3")), wxLEFT);
+    m_btConfigFile->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btConfigFileFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_btConfigFile->SetFont(m_btConfigFileFont);
+    
+    boxSizer646->Add(m_btConfigFile, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_panel632 = new wxPanel(m_listbook628, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook628, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panel632ImgIndex;
@@ -862,7 +872,8 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_btSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_resolveLimit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRequestResolveLimitStates), NULL, this);
-    m_btTestFunct15->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onOpenConfigurationSec), NULL, this);
+    m_btConfigDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onOpenConfigurationDlgSec), NULL, this);
+    m_btConfigFile->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onOpenConfigurationFileSec), NULL, this);
     m_btTestFunct1->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunction1Sec), NULL, this);
     m_btTestFunct2->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunction2Sec), NULL, this);
     m_btTestFunct3->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunction3Sec), NULL, this);
@@ -892,7 +903,8 @@ CncSecureCtrlPanelBase::~CncSecureCtrlPanelBase()
     m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_btSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_resolveLimit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRequestResolveLimitStates), NULL, this);
-    m_btTestFunct15->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onOpenConfigurationSec), NULL, this);
+    m_btConfigDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onOpenConfigurationDlgSec), NULL, this);
+    m_btConfigFile->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onOpenConfigurationFileSec), NULL, this);
     m_btTestFunct1->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunction1Sec), NULL, this);
     m_btTestFunct2->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunction2Sec), NULL, this);
     m_btTestFunct3->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTestFunction3Sec), NULL, this);

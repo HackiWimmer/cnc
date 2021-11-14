@@ -448,7 +448,8 @@ void CncSecureCtrlPanel::notifyConnection(bool state, const wxString& portName) 
 	m_portName->SetLabel(portName);
 	m_portName->Refresh();
 	
-	m_btHardwareRefSec->Enable(THE_CONTEXT->hasHardware() && state == true );
+	#warning
+	//m_btHardwareRefSec->Enable(THE_CONTEXT->hasHardware() && state == true );
 	m_bmpConnectionStateSecure->SetBitmap( state == true ? bmpC : bmpD);
 	m_bmpConnectionStateSecure->Refresh();
 }
@@ -493,9 +494,14 @@ void CncSecureCtrlPanel::onEditTemplateSec(wxCommandEvent& event) {
 	THE_APP->detachTemplateSource(event);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::onOpenConfigurationSec(wxCommandEvent& event) {
+void CncSecureCtrlPanel::onOpenConfigurationDlgSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	THE_APP->detachConfiguration(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncSecureCtrlPanel::onOpenConfigurationFileSec(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	THE_APP->openConfigurationFile(event);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onStackTraceStoreSec(wxCommandEvent& event) {
@@ -652,6 +658,7 @@ void CncSecureCtrlPanel::activate(bool b) {
 	//..
 	
 }
+
 
 
 

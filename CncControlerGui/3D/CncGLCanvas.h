@@ -28,8 +28,8 @@ class CncGlCanvas : public wxGLCanvas {
 		void viewIso3() 	{ view(GLContextBase::ViewMode::V3D_ISO3); }
 		void viewIso4() 	{ view(GLContextBase::ViewMode::V3D_ISO4); }
 		
-		void incScale();
-		void decScale();
+		void incScale(float s=0.0);
+		void decScale(float s=0.0);
 		void setScale(float scale);
 		void setScaleByRatio(float ratio);
 		float getScaleRatio()	const;

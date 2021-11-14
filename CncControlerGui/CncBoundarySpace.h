@@ -14,7 +14,7 @@ class CncBoundarySpace {
 			private:
 				bool valid = false;
 				
-				// stores the signed ofset origin to Xmin, Ymin and Zmax
+				// stores the signed offset origin to Xmin, Ymin and Zmax
 				CncLongDistance offset;
 				
 			public:
@@ -86,6 +86,20 @@ class CncBoundarySpace {
 		bool					hasHardwareOffset()								const;
 		bool					isPositionInside(const CncLongPosition& p)		const;
 		bool					isPositionInside(const CncDoublePosition& p)	const;
+		
+		int32_t					getMinStepsX() const;
+		int32_t					getMinStepsY() const;
+		int32_t					getMinStepsZ() const;
+		int32_t					getMaxStepsX() const;
+		int32_t					getMaxStepsY() const;
+		int32_t					getMaxStepsZ() const;
+		
+		double					getMinMetricX() const;
+		double					getMinMetricY() const;
+		double					getMinMetricZ() const;
+		double					getMaxMetricX() const;
+		double					getMaxMetricY() const;
+		double					getMaxMetricZ() const;
 		
 		CncRefPositionMode		getReferencePositionMode()						const	{ return refPostionMode; }
 		double					getWorkpieceThickness()							const	{ return workpieceThickness; }

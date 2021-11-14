@@ -276,7 +276,8 @@ void CncBoundarySpace::calculate() {
 	boundPhysically = boundLogically;
 	boundPhysically.shift(hwo);
 	
-	if ( THE_APP != NULL ) {
+	if ( THE_APP != NULL )
+	{
 		std::stringstream ss; traceTo(ss, 4);
 		THE_APP->GetBounderiesSummary()->ChangeValue(ss.str());
 	}
@@ -298,4 +299,75 @@ void CncBoundarySpace::traceTo(std::ostream& o, unsigned int indent) const{
 		<< prefix << "Bounderies max physically [mm] : " << cnc::dblFormat(boundPhysically.getMaxBound())	<< std::endl
 	;
 }
+///////////////////////////////////////////////////////////////////
+int32_t CncBoundarySpace::getMinStepsX() const {
+///////////////////////////////////////////////////////////////////
+	int32_t min = (-1) * THE_CONFIG->getMaxDimensionStepsX();
+	
+	if ( getHardwareOffset().isValid() )
+		min = THE_BOUNDS->getHardwareOffset().getAsStepsX();
+		
+	return min;
+}
+///////////////////////////////////////////////////////////////////
+int32_t CncBoundarySpace::getMinStepsY() const {
+///////////////////////////////////////////////////////////////////
+	int32_t min = (-1) * THE_CONFIG->getMaxDimensionStepsY();
+	
+	if ( getHardwareOffset().isValid() )
+		min = THE_BOUNDS->getHardwareOffset().getAsStepsY();
+		
+	return min;
+}
+///////////////////////////////////////////////////////////////////
+int32_t CncBoundarySpace::getMinStepsZ() const {
+///////////////////////////////////////////////////////////////////
+	int32_t min = (-1) * THE_CONFIG->getMaxDimensionStepsZ();
 
+	if ( THE_BOUNDS->getHardwareOffset().isValid() )
+	{
+		// The Z origin has to be corrected from max to min because 
+		// the hardware reference is located at min(x), min(y) and max(z)
+		min = THE_BOUNDS->getHardwareOffset().getAsStepsZ() - THE_CONFIG->getMaxDimensionStepsZ();
+	}
+	
+	return min;
+}
+///////////////////////////////////////////////////////////////////
+int32_t CncBoundarySpace::getMaxStepsX() const {
+///////////////////////////////////////////////////////////////////
+	int32_t max = (+1) * THE_CONFIG->getMaxDimensionStepsX();
+
+	if ( getHardwareOffset().isValid() )
+		max = getMinStepsX() + THE_CONFIG->getMaxDimensionStepsX();
+		
+	return max;
+}
+///////////////////////////////////////////////////////////////////
+int32_t CncBoundarySpace::getMaxStepsY() const {
+///////////////////////////////////////////////////////////////////
+	int32_t max = (+1) * THE_CONFIG->getMaxDimensionStepsY();
+
+	if ( getHardwareOffset().isValid() )
+		max = getMinStepsY() + THE_CONFIG->getMaxDimensionStepsY();
+		
+	return max;
+}
+///////////////////////////////////////////////////////////////////
+int32_t CncBoundarySpace::getMaxStepsZ() const {
+///////////////////////////////////////////////////////////////////
+	int32_t max = (+1) * THE_CONFIG->getMaxDimensionStepsZ();
+
+	if ( getHardwareOffset().isValid() )
+		max = getMinStepsZ() + THE_CONFIG->getMaxDimensionStepsZ();
+		
+	return max;
+}
+///////////////////////////////////////////////////////////////////
+double CncBoundarySpace::getMinMetricX() const { return THE_CONFIG->convertStepsToMetricX(getMinStepsX()); }
+double CncBoundarySpace::getMinMetricY() const { return THE_CONFIG->convertStepsToMetricY(getMinStepsY()); }
+double CncBoundarySpace::getMinMetricZ() const { return THE_CONFIG->convertStepsToMetricZ(getMinStepsZ()); }
+double CncBoundarySpace::getMaxMetricX() const { return THE_CONFIG->convertStepsToMetricX(getMinStepsX()); }
+double CncBoundarySpace::getMaxMetricY() const { return THE_CONFIG->convertStepsToMetricY(getMinStepsY()); }
+double CncBoundarySpace::getMaxMetricZ() const { return THE_CONFIG->convertStepsToMetricZ(getMinStepsZ()); }
+///////////////////////////////////////////////////////////////////

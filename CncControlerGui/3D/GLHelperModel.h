@@ -28,12 +28,11 @@ namespace GLI {
 			////////////////////////////////////////////
 			const float getStepWidth()		const	{ return _step; }
 			const float getScaleFactor()	const	{ return _scale; }
-			const float getMinScaleFactor()	const 	{ return _minScaleFactor; }
-			const float getMaxScaleFactor()	const 	{ return _maxScaleFactor; }
+
 			void resetScale()						{ _scale = 1.0; }
 			void setScale(float scale)				{ _scale = std::max(_minScaleFactor, std::min(scale,_maxScaleFactor)); }
-			void incScale() 						{ _scale = std::min(_scale + _step, _maxScaleFactor); }
-			void decScale()							{ _scale = std::max(_scale - _step, _step); }
+			void incScale(float s=0.0) 				{ _scale = std::min(_scale + (s ? s : _step), _maxScaleFactor); }
+			void decScale(float s=0.0)				{ _scale = std::max(_scale - (s ? s : _step), _minScaleFactor); }
 			
 			void setScaleByRatio(float ratio)
 			{
@@ -55,7 +54,10 @@ namespace GLI {
 				return ret;
 			}
 			
-			void setStepWidth(float f) 				{ _step = ( f >= 0.01f && f <= 0.50f  ? f : _step); } 
+			void setStepWidth(float f) 			{ _step = ( f >= _minScaleFactor && f <= 0.50f  ? f : _step); } 
+			
+			static float getMinScaleFactor()	{ return _minScaleFactor; }
+			static float getMaxScaleFactor()	{ return _maxScaleFactor; }
 			
 		private:
 			static constexpr float _minScaleFactor = 0.01f;

@@ -1064,6 +1064,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(secureCtrlPanel->GetBtResetSec());
 	registerGuiControl(secureCtrlPanel->GetBtTryRunSec());
 	registerGuiControl(secureCtrlPanel->GetBtTemplateContextSec());
+	registerGuiControl(secureCtrlPanel->GetBtHardwareRefSec());
 	
 	registerGuiControl(m_btCloseSecurePanel);
 	
@@ -2963,6 +2964,9 @@ bool MainFrame::connectSerialPort() {
 	secureCtrlPanel->GetBtTryRunSec()->Enable(cnc->tryRunAvailable());
 	secureCtrlPanel->GetBtTemplateContextSec()->Enable(cnc->tryRunAvailable());
 	
+	if ( THE_CONTEXT->hasHardware() == false )
+		simulatHardwareReference();
+	
 	if ( ret == true && cnc->canProcessIdle() )
 	{
 		m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
@@ -3307,7 +3311,8 @@ void MainFrame::setControllerZero(CncRefPositionMode m, double x, double y, doub
 	setReferencePosEnforceFlag(false);
 	
 	// align the hardware offset ith the new logical software origin
-	if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == true )
+	{
 		CncLongPosition offset(THE_BOUNDS->getHardwareOffset().getAsSteps());
 		offset -= prevPos;
 		THE_BOUNDS->setHardwareOffset(offset);
@@ -3342,7 +3347,8 @@ bool MainFrame::applyPodiumDistance() {
 	cnc->setZeroPosZ(prevPos.getZ() + THE_CONFIG->convertMetricToStepsZ(dbl) );
 	
 	// align the hardware offset with the new logical software origin
-	if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == true )
+	{
 		CncLongPosition offset(THE_BOUNDS->getHardwareOffset().getAsSteps());
 		offset -= prevPos;
 		THE_BOUNDS->setHardwareOffset(offset);
@@ -8729,13 +8735,29 @@ void MainFrame::updateHardwareReference() {
 	m_hardwareOffsetZ->ChangeValue(wxString::Format("%.3lf", dz));
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::simulatHardwareReference() {
+/////////////////////////////////////////////////////////////////////
+	if ( false )
+	{
+		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
+	}
+	else
+	{
+		// fake a physical hardware reference
+		CNC_CEX1_FUNCT_A("\n No physical hardware support available for the connected port." \
+						 "\n A hardware reference with a centred origin will be simply simulated for any test purpose.")
+						 
+		if ( cnc->simulateHardwareReference() == true )
+			motionMonitor->clear();
+	}
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->hasHardware() == false ) {
-		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
-		return;
-	}
+	if ( THE_CONTEXT->hasHardware() == false )
+		return simulatHardwareReference();
 	
+	// evaluate the physical hardware reference
 	wxString msg("Do you really want to evaluate the hardware reference position?\n\n");
 	msg.append("Execution Plan:\n\n");
 	msg.append(" 1. Moves Z axis to maximum position\n");
@@ -8751,8 +8773,8 @@ void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 	dlg.SetFooterIcon(wxICON_WARNING);
 	
 	CncGamepadSpy::ContextSwaper gcs(gamepadSpy, CncGamepadSpy::GPC_MSGBOX);
-	if ( dlg.ShowModal() == wxID_YES ) {
-		
+	if ( dlg.ShowModal() == wxID_YES )
+	{
 		CncGampadDeactivator cgd(this);
 		
 		selectMonitorBookCncPanel();

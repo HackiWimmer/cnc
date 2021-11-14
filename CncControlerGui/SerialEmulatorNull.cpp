@@ -7,11 +7,11 @@
 #include "CncControl.h"
 #include "MainFrame.h"
 #include "CncContext.h"
+#include "CncBoundarySpace.h"
 #include "SerialEmulatorNull.h"
 
 static const short POINT_LENGTH = 3;
 int pointA[POINT_LENGTH], pointB[POINT_LENGTH];
-
 
 ///////////////////////////////////////////////////////////////////
 wxDEFINE_EVENT(wxEVT_SERIAL_EMU_NULL_TIMER, wxTimerEvent);
@@ -27,6 +27,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , movementTracker						(0L)
 , serialTimer							(this, wxEVT_SERIAL_EMU_NULL_TIMER)
 , limitStates							()
+, lastSentLS							()
 , tsMoveStart							(0LL)
 , usToSleep								(0LL)
 , interactiveMove						(false)
@@ -41,10 +42,6 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , rtmFeedSpeed_MMMin					(0.0)
 , lastCommand							()
 , lastSignal							(CMD_INVALID)
-, maxDimStepsX							(THE_CONFIG->getMaxDimensionStepsX())
-, maxDimStepsY							(THE_CONFIG->getMaxDimensionStepsY())
-, maxDimStepsZ							(THE_CONFIG->getMaxDimensionStepsZ())
-
 ///////////////////////////////////////////////////////////////////
 {
 	this->Bind(wxEVT_TIMER, &SerialEmulatorNULL::onTimer, this, wxEVT_SERIAL_EMU_NULL_TIMER, wxEVT_SERIAL_EMU_NULL_TIMER);
@@ -160,15 +157,22 @@ bool SerialEmulatorNULL::evaluateLimitStateX() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = false;
 	
-	if ( curEmulatorPos.getX() <= -maxDimStepsX ) {
+	const int32_t min = THE_BOUNDS->getMinStepsX();
+	const int32_t max = THE_BOUNDS->getMaxStepsX();
+	
+	if ( curEmulatorPos.getX() <= min )
+	{
 		limitStates.setXLimit(LimitSwitch::LIMIT_MIN);
 		ret = true;
 	}
-		
-	if ( curEmulatorPos.getX() >= +maxDimStepsX ) {
+	else if ( curEmulatorPos.getX() >= max )
+	{
 		limitStates.setXLimit(LimitSwitch::LIMIT_MAX);
 		ret = true;
 	}
+	
+	if ( ret == false )
+		limitStates.setXLimit(LimitSwitch::LIMIT_UNSET);
 	
 	return ret;
 }
@@ -177,16 +181,23 @@ bool SerialEmulatorNULL::evaluateLimitStateY() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = false;
 	
-	if ( curEmulatorPos.getY() <= -(maxDimStepsY) ) {
+	const int32_t min = THE_BOUNDS->getMinStepsY();
+	const int32_t max = THE_BOUNDS->getMaxStepsY();
+	
+	if ( curEmulatorPos.getY() <= min )
+	{
 		limitStates.setYLimit(LimitSwitch::LIMIT_MIN);
 		ret = true;
 	}
-		
-	if ( curEmulatorPos.getY() >= +(maxDimStepsY) ) {
+	else if ( curEmulatorPos.getY() >= max )
+	{
 		limitStates.setYLimit(LimitSwitch::LIMIT_MAX);
 		ret = true;
 	}
-
+	
+	if ( ret == false )
+		limitStates.setYLimit(LimitSwitch::LIMIT_UNSET);
+		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -194,16 +205,23 @@ bool SerialEmulatorNULL::evaluateLimitStateZ() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = false;
 	
-	if ( curEmulatorPos.getZ() <= -(maxDimStepsZ) ) {
+	const int32_t min = THE_BOUNDS->getMinStepsZ();
+	const int32_t max = THE_BOUNDS->getMaxStepsZ();
+	
+	if ( curEmulatorPos.getZ() <= min )
+	{
 		limitStates.setZLimit(LimitSwitch::LIMIT_MIN);
 		ret = true;
 	}
-		
-	if ( curEmulatorPos.getZ() >= +(maxDimStepsZ) ) {
+	else if ( curEmulatorPos.getZ() >= max )
+	{
 		limitStates.setZLimit(LimitSwitch::LIMIT_MAX);
 		ret = true;
 	}
 	
+	if ( ret == false )
+		limitStates.setZLimit(LimitSwitch::LIMIT_UNSET);
+		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -459,11 +477,12 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 		return -1;
 	
 	// first publish the limit states on demand . . .
-	if ( limitStates.hasLimit() || limitStates.hasPreviousLimit() )
+	if ( limitStates.hasLimit() || lastSentLS.hasLimit() )
 	{
 		lastCommand.Serial.write(RET_SOH);
 		lastCommand.Serial.write(PID_LIMIT);
 		lastCommand.Serial.write(limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
+		lastSentLS = limitStates;
 	}
 	
 	// secondary write the major position . . .
@@ -600,7 +619,13 @@ bool SerialEmulatorNULL::writeHeartbeat(unsigned char *buffer, unsigned int nbBy
 ///////////////////////////////////////////////////////////////////
 	static int32_t counter = 0;
 	
-	const unsigned char limitState	= '\0';
+	evaluateLimitStates();
+	CncInterface::ILS::States ls(	limitStates.getXMinLimit(), limitStates.getXMaxLimit(), 
+									limitStates.getYMinLimit(), limitStates.getYMaxLimit(), 
+									limitStates.getZMinLimit(), limitStates.getZMaxLimit()
+	);  
+	
+	const unsigned char limitState	= ls.getValue();
 	const unsigned char buttonState	= '\0';
 	const unsigned char healtyState	=    1;
 	const unsigned char reserved	=  255;
@@ -833,9 +858,7 @@ void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequ
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
-	
 	PositionStorage::addMove(PositionStorage::TRIGGER_SERIAL_NULL, dx, dy, dz);
-	
 	
 	renderAndMove(dx, dy, dz);
 }
@@ -871,7 +894,8 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 	if ( CncCommandDecoder::decodeMove(buffer, nbByte, x, y, z) == false ) 
 		return false;
 		
-	if ( lastCommand.cmd == CMD_MOVE_UNTIL_LIMIT_IS_FREE ) {
+	if ( lastCommand.cmd == CMD_MOVE_UNTIL_LIMIT_IS_FREE )
+	{
 		if ( x != 0 ) limitStates.setLimitX(LimitSwitch::LIMIT_UNSET);
 		if ( y != 0 ) limitStates.setLimitY(LimitSwitch::LIMIT_UNSET);
 		if ( z != 0 ) limitStates.setLimitZ(LimitSwitch::LIMIT_UNSET);
@@ -928,9 +952,7 @@ bool SerialEmulatorNULL::writeMoveInteractive(unsigned char *buffer, unsigned in
 	const bool ret = speed ? ArduinoAccelManager::initMove(defaultImpulses, speed) : true;
 	
 	if ( ret == false )
-	{
 		CNC_CERR_FUNCT_A(": ArduinoAccelManager::initMove() failed")
-	}
 	
 	lastSignal = CMD_INVALID;
 	return ret;
@@ -984,16 +1006,16 @@ bool SerialEmulatorNULL::initRenderAndMove(int32_t dx , int32_t dy , int32_t dz)
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::renderAndMove(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
-	// presetup the move return value, 
-	// it will be overriden by movingXYZ on demand
+	// pre-setup the move return value, 
+	// it will be overridden by movingXYZ on demand
 	lastCommand.ret = RET_OK;
 	
 	tsMoveStart = CncTimeFunctions::getNanoTimestamp();
 	if ( renderMove(dx, dy, dz) != RET_OK )
 		return false;
 		
-	// renderMove() processes the linear distance betwenn two points. Due to a performance 
-	// improvement the position reply isn't continious active for each step. Therefore, to
+	// renderMove() processes the linear distance between two points. Due to a performance 
+	// improvement the position reply isn't continuous active for each step. Therefore, to
 	// get straight lines a the monitoring the current position has to be reported at the 
 	// end of each linear distance.
 	replyPosition(true);
@@ -1023,23 +1045,23 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 	if ( movementTracker >= posReplyThreshold || force == true ) {
 		// due to the fact, that the emulators runs in the 
 		// same thread as the main loop it makes not sense 
-		// to write here someting to the serial. This is 
+		// to write here something to the serial. This is 
 		// because the first main lool readData(...) call 
 		// is at the earliest if this writeMove(...) call is 
 		// totally finished. So, the one and only way to 
-		// communicate continous with the cnc control is to call 
-		// the SerialControllrCallback directly. Otherwise the 
+		// communicate continuous with the cnc control is to call 
+		// the SerialControllerCallback directly. Otherwise the 
 		// complete serial data will be fetched in one block 
 		// at the end if this writeMove(...) call was finalized.
 		
 		ContollerInfo ci;
-		ci.infoType  			= CITPosition;
-		ci.posType   			= curEmulatorPos != targetMajorPos ? PID_XYZ_POS_DETAIL : PID_XYZ_POS_MAJOR;
+		ci.infoType				= CITPosition;
+		ci.posType				= curEmulatorPos != targetMajorPos ? PID_XYZ_POS_DETAIL : PID_XYZ_POS_MAJOR;
 		ci.synchronizeAppPos 	= shouldCallbackAlsoSynchronizeAppPosition();
-		ci.command   			= lastCommand.cmd;
-		ci.xCtrlPos  			= curEmulatorPos.getX();
-		ci.yCtrlPos  			= curEmulatorPos.getY();
-		ci.zCtrlPos  			= curEmulatorPos.getZ();
+		ci.command				= lastCommand.cmd;
+		ci.xCtrlPos				= curEmulatorPos.getX();
+		ci.yCtrlPos				= curEmulatorPos.getY();
+		ci.zCtrlPos				= curEmulatorPos.getZ();
 		
 		ci.feedSpeed 			= getRealtimeFeedSpeed_MMMin();
 		
@@ -1047,6 +1069,20 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 		
 		// reset
 		movementTracker = 0;
+	}
+	
+	evaluateLimitStates();
+	if ( limitStates.hasLimit() || lastSentLS.hasLimit() )
+	{
+		ContollerInfo ci;
+		ci.infoType  			= CITLimit;
+		ci.command				= lastCommand.cmd;
+		ci.xLimit				= limitStates.getXLimit();
+		ci.yLimit				= limitStates.getYLimit();
+		ci.zLimit				= limitStates.getZLimit();
+		
+		sendSerialControllerCallback(ci);
+		lastSentLS = limitStates;
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1102,18 +1138,25 @@ void SerialEmulatorNULL::notifyMovePartAfter() {
 	{ \
 		int32_t d = delta; \
 		const int32_t newPos = curEmulatorPos.get##axis() + d; \
+		const int32_t min    = THE_BOUNDS->getMinSteps##axis(); \
+		const int32_t max    = THE_BOUNDS->getMaxSteps##axis(); \
 		\
-		if ( newPos >= +maxDimSteps##axis ) { \
-			d = +maxDimSteps##axis - curEmulatorPos.get##axis(); \
+		if ( newPos >= max ) \
+		{ \
+			d = max - curEmulatorPos.get##axis(); \
 			limitStates.setLimit##axis(LimitSwitch::LIMIT_MAX); \
 			lastCommand.ret = RET_LIMIT; \
 		\
-		} else if ( newPos <= -maxDimSteps##axis ) { \
-			d = -maxDimSteps##axis - curEmulatorPos.get##axis(); \
+		} \
+		else if ( newPos <= min ) \
+		{ \
+			d = min - curEmulatorPos.get##axis(); \
 			limitStates.setLimit##axis(LimitSwitch::LIMIT_MIN); \
 			lastCommand.ret = RET_LIMIT; \
 		\
-		} else { \
+		} \
+		else \
+		{ \
 			limitStates.setLimit##axis(LimitSwitch::LIMIT_UNSET); \
 		} \
 		\
@@ -1163,7 +1206,7 @@ void SerialEmulatorNULL::notifyMovePartAfter() {
 	}
 	*/
 	
-	// position mnagement
+	// position management
 	replyPosition(false);
 }
 ///////////////////////////////////////////////////////////////////

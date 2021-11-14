@@ -73,20 +73,20 @@ void CncGlCanvas::view(GLContextBase::ViewMode fm) {
 	update();
 }
 //////////////////////////////////////////////////
-void CncGlCanvas::incScale() {
+void CncGlCanvas::incScale(float s) {
 //////////////////////////////////////////////////
 	if ( context == NULL )
 		return;
 		
-	context->getModelScale().decScale();
+	context->getModelScale().decScale(s);
 }
 //////////////////////////////////////////////////
-void CncGlCanvas::decScale() {
+void CncGlCanvas::decScale(float s) {
 //////////////////////////////////////////////////
 	if ( context == NULL )
 		return;
 		
-	context->getModelScale().incScale();
+	context->getModelScale().incScale(s);
 }
 //////////////////////////////////////////////////
 void CncGlCanvas::setScale(float scale) {

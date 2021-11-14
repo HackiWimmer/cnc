@@ -13,8 +13,6 @@ class CncLimitStates {
 		bool yMaxLimit;
 		bool zMinLimit;
 		bool zMaxLimit;
-		
-		bool previousHasLimit;
 	
 		///////////////////////////////////////////////////////////////////
 		void setLimit(int32_t v, bool &min, bool &max) {
@@ -88,7 +86,6 @@ class CncLimitStates {
 		, yMaxLimit(false)
 		, zMinLimit(false)
 		, zMaxLimit(false)
-		, previousHasLimit(false)
 		{}
 		
 		~CncLimitStates() 
@@ -108,9 +105,8 @@ class CncLimitStates {
 		const int32_t getZLimit() const { return getLimit(zMinLimit, zMaxLimit); }
 		
 		///////////////////////////////////////////////////////////////////
-		void reset() {
-			previousHasLimit = hasLimit();
-			
+		void reset() 
+		{
 			xMinLimit = false;
 			xMaxLimit = false;
 			yMinLimit = false;
@@ -120,10 +116,8 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		const bool hasPreviousLimit() const { return previousHasLimit; }
-		
-		///////////////////////////////////////////////////////////////////
-		const bool hasLimit() const {
+		const bool hasLimit() const 
+		{
 			return (xMinLimit || xMaxLimit || yMinLimit || yMaxLimit || zMinLimit || zMaxLimit);
 		}
 		///////////////////////////////////////////////////////////////////
@@ -149,14 +143,16 @@ class CncLimitStates {
 		void setLimitZ(int32_t v) { setZLimit(v); }
 		
 		///////////////////////////////////////////////////////////////////
-		void setXYZLimit(const CncLongPosition& limitInfo) {
+		void setXYZLimit(const CncLongPosition& limitInfo)
+		{
 			setLimit(limitInfo.getX(), xMinLimit, xMaxLimit);
 			setLimit(limitInfo.getY(), yMinLimit, yMaxLimit);
 			setLimit(limitInfo.getZ(), zMinLimit, zMaxLimit);
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		wxString& getLimitInfoString(wxString& ret) const {
+		wxString& getLimitInfoString(wxString& ret) const
+		{
 			wxString ls;
 			
 			ret.clear();
@@ -176,9 +172,11 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void traceLimitInfo() {
+		void traceLimitInfo()
+		{
 			
-			if ( hasLimit() == false ) {
+			if ( hasLimit() == false )
+			{
 				wxString m(cnc::trc.getCurrentMessage());
 				if ( m.StartsWith("Limit state for") )
 					cnc::trc.clear();
@@ -187,7 +185,8 @@ class CncLimitStates {
 			}
 			
 			// -------------------------------------------------------------
-			auto append = [](wxString& ret, const wxString& append) {
+			auto append = [](wxString& ret, const wxString& append)
+			{
 				if ( ret.IsEmpty() ) 	ret.append(append);
 				else					ret.append(wxString::Format(", %s", append));
 			};

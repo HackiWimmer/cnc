@@ -646,6 +646,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		int isPortNameAvailable(const wxString& portName, bool exact=false);
 		
+		void simulatHardwareReference();
+		
 		bool setTemplateName(const wxString& pathFile);
 		bool setTemplateName(const wxFileName& pathFile);
 		bool getFirstLruFile(wxString& ret);

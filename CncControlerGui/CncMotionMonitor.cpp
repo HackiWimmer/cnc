@@ -20,11 +20,12 @@ extern GlobalConstStringDatabase 	globalStrings;
 // ----------------------------------------------------------------------------
 // GlutInitManager
 // ----------------------------------------------------------------------------
-class GlutLibInitManager {
+class GlutLibInitManager
+{
 	public:
 		//////////////////////////////////////////////////////
-		GlutLibInitManager() {
-			
+		GlutLibInitManager() 
+		{
 			// init glut lib a the startup
 			int   argc = 2;
 			char* argv[2] = { globalStrings.programTitel.char_str(), wxString("-gldebug").char_str() };
@@ -34,7 +35,8 @@ class GlutLibInitManager {
 			*/
 		}
 		//////////////////////////////////////////////////////
-		~GlutLibInitManager() {
+		~GlutLibInitManager() 
+		{
 		}
 		
 }; GlutLibInitManager _glim;
@@ -602,10 +604,10 @@ void CncMotionMonitor::onZoom(wxZoomGestureEvent& event) {
 	
 	if ( cnc::dblCmp::nu(delta) == false )
 	{
-		CNC_CLOG_FUNCT_A("%lf %lf %lf ", delta, lastGestureZoomFactor, event.GetZoomFactor())
+		//CNC_CLOG_FUNCT_A("%lf %lf %lf ", delta, lastGestureZoomFactor, event.GetZoomFactor())
 		
-		if ( cnc::dblCmp::lt(delta, 0.0) )	decScale();
-		else								incScale();
+		if ( cnc::dblCmp::lt(delta, 0.0) )	decScale(0.01f);
+		else 								incScale(0.01f);
 		
 		Refresh();
 	}

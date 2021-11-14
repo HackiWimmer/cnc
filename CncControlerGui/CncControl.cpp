@@ -1210,7 +1210,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		// --------------------------------------------------------
 		case CITLimit:
 		{
-			//std::clog << "::L: " << ci.xLimit << ", " << ci.yLimit << ", " << ci.zLimit << std::endl;
+			//CNC_CEX2_FUNCT_A("::L: %ld, %ld, %ld", ci.xLimit, ci.yLimit, ci.zLimit);
 			displayLimitStates(ci.xLimit, ci.yLimit, ci.zLimit);
 			break;
 		}
@@ -1357,27 +1357,32 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 		{
 			size_t size = cei.setterValueList.size();
 			
-			switch ( cei.setterPid ) {
+			switch ( cei.setterPid )
+			{
+				case PID_SPEED_MM_SEC:
+				case PID_SPEED_MM_MIN:
+				{
+					if ( checkSetterCount(cei.setterPid, size, 1) == false )
+						return false;
+					
+					const char mode       = ArdoObj::SpeedTuple::decodeMode(cei.setterValueList.front());
+					const int32_t val     = ArdoObj::SpeedTuple::decodeValue_MMSec1000(cei.setterValueList.front());
+					const float unitFact  = cei.setterPid == PID_SPEED_MM_SEC ? 60.0 : 1.0;
+					
+					configuredFeedSpeed_MM_MIN	= unitFact * val / FLT_FACT;
+					configuredSpeedMode			= cnc::getCncSpeedType(mode);
+					
+					break;
+				}
 				case PID_SPINDLE_SWITCH:
 				{
+					// nothing to do here
+					/*
 					if ( checkSetterCount(cei.setterPid, size, 1) == false )
 						return false;
 						
-					//spindlePowerState = (bool)cei.setterValueList.front();
-					//displaySpindleState(spindlePowerState);
-					break;
-				}
-				case PID_SPEED_MM_SEC:
-				{
-					if ( checkSetterCount(cei.setterPid, size, 1) == false )
-						return false;
-					
-					const char mode   = ArdoObj::SpeedTuple::decodeMode(cei.setterValueList.front());
-					const int32_t val = ArdoObj::SpeedTuple::decodeValue_MMSec1000(cei.setterValueList.front());
-					
-					configuredFeedSpeed_MM_MIN	= 60.0 * val / FLT_FACT;
-					configuredSpeedMode			= cnc::getCncSpeedType(mode);
-					
+						CNC_COUT_FUNCT_A("spindlePowerState=%ld", cei.setterValueList.front());
+					*/
 					break;
 				}
 				case PID_ENABLE_STEPPERS:
@@ -1387,9 +1392,10 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 				}
 				default:
 				{
-					std::cerr	<< "CncControl::SerialExecuteControllerCallback(): Not registered Setter PID: " 
-								<< ArduinoPIDs::getPIDLabel(cei.setterPid) 
-								<< std::endl;
+					CNC_CERR_FUNCT_A(	"Not registered Setter PID: %s [%s]", 
+										ArduinoPIDs::getPIDLabel(cei.setterPid), 
+										ArduinoPIDs::getPIDUnit(cei.setterPid)
+					) 
 				}
 			}
 			
@@ -2232,6 +2238,27 @@ bool CncControl::convertPositionToHardwareCoordinate(const CncDoublePosition& po
 	ret = THE_CONFIG->convertStepsToMetric(ret, sRet);
 	
 	return b;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::simulateHardwareReference() {
+///////////////////////////////////////////////////////////////////
+	CncLongPosition	fakedHwRefPos(curCtlPos);
+	fakedHwRefPos.setX( (-1) * wxRound(THE_CONFIG->getMaxDimensionStepsX() / 2 ));
+	fakedHwRefPos.setY( (-1) * wxRound(THE_CONFIG->getMaxDimensionStepsY() / 2 ));
+	fakedHwRefPos.setZ( (+1) * wxRound(THE_CONFIG->getMaxDimensionStepsZ() / 2 ));
+	
+	const bool ret = fakedHwRefPos != curCtlPos;
+	if ( ret )
+	{
+		THE_BOUNDS->setHardwareOffset(fakedHwRefPos);
+		THE_BOUNDS->setHardwareOffsetValid(true); 
+	}
+	else
+	{
+		CNC_CERR_FUNCT_A("Error while simulate hardware reference")
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::evaluateHardwareReference() {
