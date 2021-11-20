@@ -1654,18 +1654,9 @@ Context</label>
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxEXPAND</flag>
-                                        <object class="wxTextCtrl" name="m_templateContext">
-                                          <style>wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP</style>
-                                          <bg>#202020</bg>
-                                          <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
-                                          <font>
-                                            <size>9</size>
-                                            <style>normal</style>
-                                            <weight>normal</weight>
-                                            <family>modern</family>
-                                            <underlined>0</underlined>
-                                            <face>Consolas</face>
-                                          </font>
+                                        <object class="wxPanel" name="m_templateContextPlaceholder">
+                                          <style>wxTAB_TRAVERSAL</style>
+                                          <bg>wxSYS_COLOUR_INFOBK</bg>
                                         </object>
                                       </object>
                                     </object>
@@ -9995,7 +9986,7 @@ State</label>
         </object>
       </object>
       <object class="wxMenu" name="m_menuRequestor">
-        <label>Controller Requests</label>
+        <label>Controller</label>
         <style/>
         <object class="wxMenuItem" name="m_miRqtIdleMessages">
           <checkable>1</checkable>

@@ -4,10 +4,11 @@
 #include <vector>
 #include <iostream>
 #include <wx/string.h>
+#include "ContextInterface.h"
 #include "CncPosition.h"
 
 class CncBoundarySpace;
-class CncTemplateContext {
+class CncTemplateContext : public ContextInterface {
 	
 	private:
 		
@@ -21,7 +22,6 @@ class CncTemplateContext {
 		
 		CncBoundarySpace*			bounderySpace;
 		CncDoubleBounderies			bounderies;
-		LogInformation				logInformation;
 		
 	protected:
 		
@@ -59,10 +59,20 @@ class CncTemplateContext {
 		void				updateGui(bool force)			const;
 		void				traceTo(std::ostream& o, unsigned int indent) const;
 		
-		void				streamLogInfo(std::ostream& o, unsigned int indent) const;
-		const wxString		getLastLogInfo(unsigned int indent = 0)				const;
-		void				addLogInfo(const wxString& info)		{ logInformation.push_back(info); }
-		void				clearLogInfo()							{ logInformation.clear(); }
+		// context interface
+		virtual void		notifyBeginRun();
+		virtual void		notifyEndRun();
+		
+		virtual void		notifyClientId(long id);
+		
+		virtual void		notifyLimit(const CncInterface::ILS::States& s);
+		virtual void		notifyMove(unsigned char cmd, int32_t dx, int32_t dy, int32_t dz);
+		
+		virtual void		notifySpindleOn();
+		virtual void		notifySpindleOff();
+		
+		virtual void		notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTupleValue s);
+		virtual void		notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTupleValue s);
 };
 
 #endif

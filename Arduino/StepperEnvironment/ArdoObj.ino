@@ -31,7 +31,8 @@ namespace ArdoTs {
 namespace ArdoObj {
 
   // --------------------------------------------------------------
-  int32_t SpeedTuple::encode(char mode, int32_t value_MMSec1000) {
+  int32_t SpeedTuple::encode(char mode, int32_t value_MMSec1000)
+  {
     const int32_t C_2_24 = 16777216;
     value_MMSec1000 = minimum(value_MMSec1000, C_2_24);
 
@@ -41,27 +42,43 @@ namespace ArdoObj {
   }
     
   // --------------------------------------------------------------
-  char SpeedTuple::decodeMode (int32_t encodedValue) {
-    return (encodedValue >> 24);
+  char SpeedTuple::decodeMode (int32_t eValue)
+  {
+    if ( eValue != 0 )
+      return (eValue >> 24);
+
+    return '?';
   }
   
   // --------------------------------------------------------------
-  int32_t SpeedTuple::decodeValue_MMSec1000(int32_t encodedValue) {
-    return ((encodedValue <<  8) >> 8);
+  int32_t SpeedTuple::decodeValue_MMSec1000(int32_t eValue) {
+    if ( eValue != 0 )
+      return ((eValue <<  8) >> 8);
+
+    return 0;
   }
 
   // --------------------------------------------------------------
-  int32_t SpeedTuple::decodeValue_MMSec(int32_t encodedValue) {
-    return SpeedTuple::decodeValue_MMSec1000(encodedValue) / 1000;
+  int32_t SpeedTuple::decodeValue_MMSec(int32_t eValue)
+  {
+    if ( eValue != 0 )
+      return SpeedTuple::decodeValue_MMSec1000(eValue) / 1000;
+
+    return 0;
   }
   
   // --------------------------------------------------------------
-  int32_t SpeedTuple::decodeValue_MMMin(int32_t encodedValue) {
-    return SpeedTuple::decodeValue_MMSec(encodedValue) * 60;
+  int32_t SpeedTuple::decodeValue_MMMin(int32_t eValue)
+  {
+    if ( eValue != 0 )
+      return SpeedTuple::decodeValue_MMSec(eValue) * 60;
+
+    return 0;
   }
 
   // --------------------------------------------------------------
-  int32_t SpindleTuple::encode(int16_t value, int16_t range) {
+  int32_t SpindleTuple::encode(int16_t value, int16_t range)
+  {
     int32_t ret = range;
     ret = (ret << 16);
     
@@ -69,22 +86,32 @@ namespace ArdoObj {
   }
   
   // --------------------------------------------------------------
-  int16_t SpindleTuple::decodeValue(int32_t encodedValue) {
-    return ((encodedValue << 16) >> 16);
+  int16_t SpindleTuple::decodeValue(int32_t eValue)
+  {
+    if ( eValue != 0 )
+      return ((eValue << 16) >> 16);
+
+    return 0;
   }
 
   // --------------------------------------------------------------
-  int16_t SpindleTuple::decodeRange(int32_t encodedValue) {
-    return (encodedValue >> 16);
+  int16_t SpindleTuple::decodeRange(int32_t eValue)
+  {
+    if ( eValue != 0 )
+      return (eValue >> 16);
+
+    return 0;
   }
 
   // --------------------------------------------------------------
-  float SpindleTuple::getPwmFact(int16_t speedRange) {
+  float SpindleTuple::getPwmFact(int16_t speedRange)
+  {
     return (float)(speedRange) / (float)ardoRange;
   }
   
   // --------------------------------------------------------------
-  int16_t SpindleTuple::getPwmValue(int32_t value) {
+  int16_t SpindleTuple::getPwmValue(int32_t value)
+  {
     const int16_t speedRange = decodeRange(value); 
     const int16_t speedValue = decodeValue(value);
     const float fact    = (float)(speedRange) / (float)ardoRange;

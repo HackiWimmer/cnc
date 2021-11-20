@@ -23,6 +23,7 @@
 #include "CncExceptions.h"
 #include "CncCommon.h"
 #include "CncContext.h"
+#include "CncTemplateContext.h"
 #include "CncBoundarySpace.h"
 #include "CncGamePad.h"
 #include "CncFileNameService.h"
@@ -89,6 +90,7 @@ CncControl::CncControl(CncPortType pt)
 	}
 	
 	serialPort->enableSpyOutput();
+	serialPort->setContextInterface(THE_CONTEXT->templateContext);
 }
 ///////////////////////////////////////////////////////////////////
 CncControl::~CncControl() {
@@ -110,6 +112,7 @@ void CncControl::switchRunMode(RunMode m) {
 	if ( m == M_TryRun && tryRunSerial != NULL )
 	{
 		serialPort = tryRunSerial;
+		serialPort->setContextInterface(THE_CONTEXT->templateContext);
 		
 		connect("TryRun");
 		setup(true);
@@ -121,6 +124,7 @@ void CncControl::switchRunMode(RunMode m) {
 			disconnect();
 		
 		serialPort = realRunSerial;
+		serialPort->setContextInterface(THE_CONTEXT->templateContext);
 		
 		if ( switchBack == true )
 		{
@@ -141,6 +145,15 @@ void CncControl::switchRunMode(RunMode m) {
 			monitorPosition(curCtlPos);
 		}
 	}
+}
+//////////////////////////////////////////////////////////////////
+void CncControl::setClientId(long id) {
+//////////////////////////////////////////////////////////////////
+	currentClientId = id;
+	
+	ContextInterface* ci = getSerial()->getContextInterface();
+	if ( ci != NULL )
+		ci->notifyClientId(id);
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getStartPosMetric() {
@@ -850,7 +863,7 @@ bool CncControl::moveZToTop() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value ) {
+bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value) {
 ///////////////////////////////////////////////////////////////////
 	if ( THE_CONFIG->getSpindleSpeedSupportFlag() == false )
 		return true;
@@ -859,28 +872,20 @@ bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value ) {
 	// not spindle speed change
 	if ( cnc::dblCmp::lt(value, 0.0) )
 		return true;
-
-	int16_t val =  -1;
-	int16_t rng = THE_CONFIG->getSpindleSpeedStepRange();
 	
-	const double		min = std::min(THE_CONFIG->getSpindleSpeedMin(), THE_CONFIG->getSpindleSpeedMax());
-	const double		max = THE_CONFIG->getSpindleSpeedMax();
-	const unsigned int	stp = THE_CONFIG->getSpindleSpeedStepRange();
+	const int16_t val = cnc::cvnSpindleSpeed_U_MIN_ToRaw(value);
+	const int16_t rng = THE_CONFIG->getSpindleSpeedStepRange();
 	
-	// range validation/correction
-	value = std::max(min, value);
-	value = std::min(max, value);
-	
-	// Spindle speed range is defined as: 0 ... stp (linear)
-	//   0 -> min
-	// stp -> max
-	val = std::min((unsigned int)((value - min) * stp / (max - min)), stp);
-	rng = stp;
-	
-	if ( processSetter(PID_SPINDLE_SPEED, ArdoObj::SpindleTuple::encode(val, rng)) == false ) {
-		std::cerr << CNC_LOG_FUNCT_A(": encode failed\n");
+	const ArdoObj::SpindleTupleValue eVal = ArdoObj::SpindleTuple::encode(val, rng);
+	if ( processSetter(PID_SPINDLE_SPEED, eVal) == false )
+	{
+		CNC_CERR_FUNCT_A("encode failed");
 		return false;
 	}
+	
+	ContextInterface* ci = getSerial()->getContextInterface();
+	if ( ci != NULL )
+		ci->notifySpindleSpeed(PID_SPINDLE_SPEED, eVal);
 	
 	CncSpindleSound::adjust(value);
 	configuredSpindleSpeed = value;
@@ -915,7 +920,8 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	configuredSpeedModePreviewFlag = false;
 	
 	// avoid the code below if nothing will change
-	if ( configuredSpeedMode != s || force == true ) {
+	if ( configuredSpeedMode != s || force == true )
+	{
 		configuredSpeedMode	= s;
 		somethingChanged	= true;
 		
@@ -924,17 +930,24 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	}
 	
 	// avoid the setter below if nothing will change
-	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false || force == true ) {
+	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false || force == true )
+	{
 		configuredFeedSpeed_MM_MIN	= value;
 		somethingChanged			= true;
 		
 		const int32_t val = configuredFeedSpeed_MM_MIN * FLT_FACT / 60;
 		const char mode   = cnc::getCncSpeedTypeAsCharacter(configuredSpeedMode);
 		
-		if ( processSetter(PID_SPEED_MM_SEC, ArdoObj::SpeedTuple::encode(mode, val)) == false ) {
-			std::cerr << CNC_LOG_FUNCT << " processSetter(PID_SPEED_MM_SEC) failed" << std::endl;
+		const ArdoObj::SpeedTupleValue eVal = ArdoObj::SpeedTuple::encode(mode, val);
+		if ( processSetter(PID_SPEED_MM_SEC, eVal) == false )
+		{
+			CNC_CERR_FUNCT_A("processSetter(PID_SPEED_MM_SEC) failed");
 			return false;
 		}
+		
+		ContextInterface* ci = getSerial()->getContextInterface();
+		if ( ci != NULL )
+			ci->notifyStepperSpeed(PID_SPEED_MM_SEC, eVal);
 	}
 	
 	if ( somethingChanged == true )
@@ -1682,6 +1695,11 @@ bool CncControl::switchSpindleOn() {
 			CncSpindleSound::play(getConfiguredSpindleSpeed());
 			
 			spindlePowerState = SPINDLE_STATE_ON;
+			
+			ContextInterface* ci = getSerial()->getContextInterface();
+			if ( ci != NULL )
+				ci->notifySpindleOn();
+				
 			THE_APP->decorateSpindleState(spindlePowerState);
 			THE_APP->waitActive(500);
 		}
@@ -1703,6 +1721,10 @@ bool CncControl::switchSpindleOff(bool force) {
 			
 			spindlePowerState = SPINDLE_STATE_OFF;
 			THE_APP->decorateSpindleState(spindlePowerState);
+			
+			ContextInterface* ci = getSerial()->getContextInterface();
+			if ( ci != NULL )
+				ci->notifySpindleOff();
 		}
 	}
 	
@@ -1864,6 +1886,7 @@ void CncControl::evaluateLimitState() {
 ///////////////////////////////////////////////////////////////////
 	CncLongPosition ls = requestControllerLimitState();
 	CncInterface::ILS::States states(ls.getX(), ls.getY(), ls.getZ());
+	
 	displayLimitStates(states);
 }
 ///////////////////////////////////////////////////////////////////
@@ -1875,6 +1898,13 @@ void CncControl::displayLimitStates(const int32_t x, const int32_t y, const int3
 ///////////////////////////////////////////////////////////////////
 void CncControl::displayLimitStates(const CncInterface::ILS::States& ls) {
 ///////////////////////////////////////////////////////////////////
+	if ( ls.hasLimits() )
+	{
+		ContextInterface* ci = getSerial()->getContextInterface();
+		if ( ci != NULL )
+			ci->notifyLimit(ls);
+	}
+
 	limitStates.setXMinLimit(ls.xMin());
 	limitStates.setXMaxLimit(ls.xMax());
 	limitStates.setYMinLimit(ls.yMin());
@@ -2240,12 +2270,15 @@ bool CncControl::convertPositionToHardwareCoordinate(const CncDoublePosition& po
 	return b;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::simulateHardwareReference() {
+bool CncControl::simulateHardwareReference(float offsetFact) {
 ///////////////////////////////////////////////////////////////////
-	CncLongPosition	fakedHwRefPos(curCtlPos);
-	fakedHwRefPos.setX( (-1) * wxRound(THE_CONFIG->getMaxDimensionStepsX() / 2 ));
-	fakedHwRefPos.setY( (-1) * wxRound(THE_CONFIG->getMaxDimensionStepsY() / 2 ));
-	fakedHwRefPos.setZ( (+1) * wxRound(THE_CONFIG->getMaxDimensionStepsZ() / 2 ));
+	offsetFact = std::min(0.99999f, offsetFact);
+	offsetFact = std::max(0.00001f, offsetFact);
+	
+	CncLongPosition fakedHwRefPos(curCtlPos);
+	fakedHwRefPos.setX( (-1) * wxRound(THE_CONFIG->getMaxDimensionStepsX() *       offsetFact ));
+	fakedHwRefPos.setY( (-1) * wxRound(THE_CONFIG->getMaxDimensionStepsY() *       offsetFact ));
+	fakedHwRefPos.setZ( (+1) * wxRound(THE_CONFIG->getMaxDimensionStepsZ() * ( 1 - offsetFact )));
 	
 	const bool ret = fakedHwRefPos != curCtlPos;
 	if ( ret )

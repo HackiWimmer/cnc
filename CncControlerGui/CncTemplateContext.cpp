@@ -1,19 +1,20 @@
 #include <wx/filename.h>
 #include "MainFrame.h"
 #include "CncCommon.h"
+#include "CncTemplateContextSummaryPanel.h"
 #include "CncBoundarySpace.h"
 #include "CncTemplateContext.h"
 
 //////////////////////////////////////////////////////////////
 CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
-: name					("")
+: ContextInterface		()
+, name					("")
 , path					("")
 , toolTotList			("")
 , toolSelList			("")
 , validRunCount			(0)
 , bounderySpace			(bs)
 , bounderies			()
-, logInformation		()
 //////////////////////////////////////////////////////////////
 {
 }
@@ -32,6 +33,10 @@ bool CncTemplateContext::isValid() const {
 	if ( wxFileName::Exists(getFileName()) == false )
 		return false;
 	
+	if ( hasErrors() == true )
+		return false;
+		
+		
 	// ....
 	
 	return true;
@@ -69,20 +74,13 @@ void CncTemplateContext::registerBounderies(const CncDoubleBounderies& b) {
 	bounderies = b;
 	updateGui(false);
 }
-
-
-
-
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::updateGui(bool force) const {
 //////////////////////////////////////////////////////////////
-	if ( CncConfig::available() ) {
-		wxTextCtrl* ctrl = THE_APP->GetTemplateContext();
-		if ( ctrl->IsShownOnScreen() || force == true ) {
-			std::stringstream ss;
-			traceTo(ss, 2);
-			ctrl->ChangeValue(ss.str());
-		}
+	if ( CncConfig::available() )
+	{
+		if ( THE_APP->getTemplateContextSummary()->IsShownOnScreen() || force == true )
+			THE_APP->getTemplateContextSummary()->update();
 	}
 }
 //////////////////////////////////////////////////////////////
@@ -98,9 +96,13 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 		);
 	};
 	
-	o	<< prefix << "Name                    : " << getFileName()					<< std::endl
+	wxFileName fn(getFileName());
+	
+	o	<< prefix << "Name                    : " << fn.GetFullName()				<< std::endl
+		<< prefix << "Path                    : " << fn.GetPath()					<< std::endl
 		<< prefix << "Valid                   : " << (isValid() ? "Yes" : "No" )	<< std::endl
 		<< prefix << "Valid run count         : " << validRunCount					<< std::endl
+		<< prefix << "Errors                  : " << hasErrors()					<< std::endl
 		<< prefix << "Tool Tot. List          : " << toolTotList					<< std::endl
 		<< prefix << "Tool Sel. List          : " << toolSelList					<< std::endl
 		<< prefix << "Tool Sel Count          : " << getToolSelCount()				<< std::endl
@@ -108,46 +110,59 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 	;
 	
 	o << std::endl;
-	streamLogInfo(o, indent + 2);
 }
 //////////////////////////////////////////////////////////////
-void CncTemplateContext::streamLogInfo(std::ostream& o, unsigned int indent) const {
+void CncTemplateContext::notifyBeginRun() {
 //////////////////////////////////////////////////////////////
-	const wxString prefix(' ', indent);
-	
-	o << "Log Information:" << std::endl;
-	for ( auto it = logInformation.begin(); it != logInformation.end(); ++it )
-	{
-		o << "******************************************************\n";
-		
-		wxStringTokenizer lines((*it), "\n");
-		while ( lines.HasMoreTokens() )
-		{
-			const wxString& token = lines.GetNextToken();
-			o << prefix << token << std::endl;
-		}
-	}
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifyBeginRun();
 }
 //////////////////////////////////////////////////////////////
-const wxString CncTemplateContext::getLastLogInfo(unsigned int indent) const {
+void CncTemplateContext::notifyEndRun() {
 //////////////////////////////////////////////////////////////
-	const wxString prefix(' ', indent);
-	if ( logInformation.size() > 0 )
-	{
-		if ( logInformation.back().Contains("\n") )
-		{
-			wxStringTokenizer lines(logInformation.back(), "\n");
-			wxString ret;
-			while ( lines.HasMoreTokens() )
-				ret.append(wxString::Format("%s%s\n", prefix,  lines.GetNextToken()));
-			
-			return ret;
-		}
-		else
-		{
-			return logInformation.back();
-		}
-	}
-	
-	return wxEmptyString;
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifyEndRun();
 }
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::notifyClientId(long id) {
+//////////////////////////////////////////////////////////////
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifyClientId(id);
+}
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::notifyLimit(const CncInterface::ILS::States& s) {
+//////////////////////////////////////////////////////////////
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifyLimit(s);
+}
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::notifyMove(unsigned char cmd, int32_t dx, int32_t dy, int32_t dz) {
+//////////////////////////////////////////////////////////////
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifyMove(cmd, dx, dy, dz);
+}
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::notifySpindleOn() {
+//////////////////////////////////////////////////////////////
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifySpindleOn();
+}
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::notifySpindleOff() {
+//////////////////////////////////////////////////////////////
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifySpindleOff();
+}
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTupleValue s) {
+//////////////////////////////////////////////////////////////
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifySpindleSpeed(pid, s);
+}
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTupleValue s) {
+//////////////////////////////////////////////////////////////
+	//CNC_CEX2_FUNCT
+	ContextInterface::notifyStepperSpeed(pid, s);
+}
+

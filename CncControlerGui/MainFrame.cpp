@@ -104,6 +104,8 @@
 #include "CncLastProcessingTimestampSummary.h"
 #include "CncFileDialog.h"
 #include "CncArduinoEnvironment.h"
+#include "CncTemplateContextSummaryPanel.h"
+#include "CncTemplateContextSummaryDialog.h"
 #include "CncLCDPositionPanel.h"
 #include "CncUserEvents.h"
 #include "CncInfoBar.h"
@@ -480,6 +482,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , GlobalConfigManager					(this, GetPgMgrSetup(), globalConfig)
 , gamepadThread							(NULL)
 , serialThread							(NULL)
+, tryRunLoggerProxy						(new CncTryRunLoggerProxy(this))
 , cncSpeedPlayground					(new CncSpeedPlayground(this))
 , isDebugMode							(false)
 , canClose								(true)
@@ -536,6 +539,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , usbConnectionObserver					(new CncUsbConnectionObserver(this))
 , anchorPositionDlg						(new CncAnchorPosition(this))
 , secureCtrlPanel						(NULL)
+, contextSummaryPanel					(NULL)
 , perspectiveHandler					(globalConfig, m_menuPerspective)
 , config								(globalConfig)
 , lruStore								(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -559,6 +563,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	THE_CONFIG->updateLoadTrace(m_cfgLoadTrace, m_cfgObsoleteTrace);
 	
 	m_auimgrMain->SetArtProvider(new clAuiDockArt());
+	
+	tryRunLoggerProxy->Show(false);
 	
 	getLoggerView()->initialize();
 	
@@ -705,6 +711,7 @@ MainFrame::~MainFrame() {
 	cncDELETE( cnc3DVSplitterWindow );
 	cncDELETE( cnc3DHSplitterWindow );
 	cncDELETE( interactiveTransactionLock );
+	cncDELETE( tryRunLoggerProxy );
 	
 	wxASSERT(config);
 	config->Flush();
@@ -1056,6 +1063,9 @@ void MainFrame::installCustControls() {
 	
 	secureCtrlPanel = new CncSecureCtrlPanel(this);
 	GblFunc::replaceControl(m_securityCtrlPanelPlaceholder, secureCtrlPanel);
+	
+	contextSummaryPanel = new CncTemplateContextSummaryPanel(this);
+	GblFunc::replaceControl(m_templateContextPlaceholder, contextSummaryPanel);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -1283,16 +1293,31 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
+	THE_CONTEXT->templateContext->traceContextEntriesTo(cnc::cex3);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logWarningMessage("Test function 3");
+	
+	CncTemplateContextSummaryDialog dlg(this);
+	dlg.update();
+	dlg.ShowModal();
+
+	
+	/*
+	THE_CONTEXT->templateContext->analizeContextEntries(cnc::cex2);
+	
+	if ( THE_CONTEXT->templateContext->hasErrors() )
+		THE_CONTEXT->templateContext->traceErrorInfoTo(std::cerr);
+		*/
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
+	
+	contextSummaryPanel->selectTryRun();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -2960,12 +2985,12 @@ bool MainFrame::connectSerialPort() {
 	enableControls();
 	
 	// this has to be done after enableControls(), otherwise the state can
-	// no bw reproduced after the next disableControls()!
+	// no be reproduced after the next disableControls()!
 	secureCtrlPanel->GetBtTryRunSec()->Enable(cnc->tryRunAvailable());
 	secureCtrlPanel->GetBtTemplateContextSec()->Enable(cnc->tryRunAvailable());
 	
-	if ( THE_CONTEXT->hasHardware() == false )
-		simulatHardwareReference();
+	if ( cnc->isEmulator() == true )
+		simulateHardwareReference();
 	
 	if ( ret == true && cnc->canProcessIdle() )
 	{
@@ -6723,34 +6748,36 @@ void MainFrame::rcTryRun(wxCommandEvent& event) {
 	if ( cnc->tryRunAvailable() )
 	{
 		const unsigned int prevValidCount = THE_CONTEXT->templateContext->getValidunCount();
-		// Note: CncTextCtrl isn't the fastest one if a lot of text will be processed
-		// A CncTryRunLoggerProxy alias CncStandardLoggerProxy is may be better here
-		CncTextCtrl* tmpLogger = new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(0, 0));
-		tmpLogger->Hide();
 		{
-			StdStreamRedirector srd(tmpLogger);
+			StdStreamRedirector srd(tryRunLoggerProxy);
+			
 			cnc::cex1 << "Try run started: " << wxDateTime::Now().FormatISOTime() << std::endl;
 			cnc->switchRunMode(CncControl::RunMode::M_TryRun);
 			rcRun();
 			cnc->switchRunMode(CncControl::RunMode::M_RealRun);
 		}
 		
-		THE_TPL_CTX->addLogInfo(tmpLogger->GetValue());
-		
 		if ( (prevValidCount + 1) != THE_CONTEXT->templateContext->getValidunCount() )
 		{
 			decorateTryRunState(cncError);
 			
-			cnc::cex1 << "Try run was failed"			<< std::endl;
-			cnc::cex1 << THE_TPL_CTX->getLastLogInfo(4)	<< std::endl;
+			m_listbookSource->SetSelection(SourceBookSelection::VAL::CONTEXT);
+			contextSummaryPanel->selectTryRun();
+			
+			cnc::cex1 << "Try run was failed" << std::endl;
+			
+			if ( THE_CONTEXT->secureModeInfo.isActive )
+			{
+				CncTemplateContextSummaryDialog dlg(this);
+				dlg.update();
+				dlg.ShowModal();
+			}
 		}
 		else
 		{
 			decorateTryRunState(cncOk);
 			std::clog << "Try run was successful" << std::endl; 
 		}
-		
-		wxDELETE(tmpLogger);
 	}
 	
 	motionMonitor->update(true);
@@ -8735,7 +8762,7 @@ void MainFrame::updateHardwareReference() {
 	m_hardwareOffsetZ->ChangeValue(wxString::Format("%.3lf", dz));
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::simulatHardwareReference() {
+void MainFrame::simulateHardwareReference(float offsetFact) {
 /////////////////////////////////////////////////////////////////////
 	if ( false )
 	{
@@ -8743,19 +8770,45 @@ void MainFrame::simulatHardwareReference() {
 	}
 	else
 	{
+		if ( offsetFact < 0.0f )
+		{
+			const wxString msg(	"Offset factor (% of max dimension):\n" \
+								"New Hardware Reference:\n" \
+								" X = 0 - <maxDim(X)> * (     factor )\n" \
+								" Y = 0 - <maxDim(Y)> * (     factor )\n" \
+								" Z = 0 + <maxDim(Z)> * ( 1 - factor )\n" \
+								"Range: [0.0001 ... 0.9999]"
+			);
+		
+			wxTextEntryDialog dlg(this, msg, "Simulate a Hardware Reference:", "0.5");
+			dlg.SetMaxLength(6);
+			dlg.SetTextValidator(wxFILTER_NUMERIC);
+				
+			if ( dlg.ShowModal() == wxID_OK  ) 
+			{
+				wxString s = dlg.GetValue();
+				s.Trim(true).Trim(false);
+				if ( s.IsEmpty() == false ) 
+				{
+					double f; s.ToDouble(&f);
+					offsetFact = float(f);
+				}
+			}
+		}
+		
 		// fake a physical hardware reference
 		CNC_CEX1_FUNCT_A("\n No physical hardware support available for the connected port." \
-						 "\n A hardware reference with a centred origin will be simply simulated for any test purpose.")
+						 "\n A default hardware reference will be simply simulated for any test purpose.")
 						 
-		if ( cnc->simulateHardwareReference() == true )
+		if ( cnc->simulateHardwareReference(offsetFact) == true )
 			motionMonitor->clear();
 	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->hasHardware() == false )
-		return simulatHardwareReference();
+	if ( cnc->isEmulator() == true )
+		return simulateHardwareReference(-1.0f);
 	
 	// evaluate the physical hardware reference
 	wxString msg("Do you really want to evaluate the hardware reference position?\n\n");
@@ -9072,7 +9125,7 @@ void MainFrame::onSelectTemplatePanel(wxListbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( (wxWindow*)event.GetEventObject() == m_listbookSource ) {
 		unsigned int sel = event.GetSelection();
-		
+
 		if ( sel == SourceBookSelection::VAL::CONTEXT )
 			THE_TPL_CTX->updateGui(true);
 	}
@@ -9383,5 +9436,4 @@ void MainFrame::onIdle(wxIdleEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	//CNC_PRINT_LOCATION
 }
-
 

@@ -156,7 +156,7 @@ void CncLoggerListCtrl::clearAll() {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::next() {
 /////////////////////////////////////////////////////////////
-	entries.push_back(std::move(LoggerEntry()));
+	entries.push_back(std::move(LoggerEntry("", "", defaultItemAttr)));
 	updateContent();
 }
 /////////////////////////////////////////////////////////////
@@ -204,10 +204,12 @@ void CncLoggerListCtrl::add(const char c) {
 	if ( entries.size() == 0 )
 		next();
 	
-	if ( c == '\n' ) {
+	if ( c == '\n' )
+	{
 		next();
 	}
-	else {
+	else
+	{
 		wxString& text = entries.back().text;
 		text.append(c);
 		updateContent();
@@ -219,13 +221,20 @@ void CncLoggerListCtrl::add(const wxString& text) {
 	if ( entries.size() == 0 )
 		next();
 	
+	add(text, entries.back().listItemAttr);
+	
+	/*
+	if ( entries.size() == 0 )
+		next();
+	
 	const wxChar delimiter = '\n';
 	wxStringTokenizer lines(text, wxString("\n"));
 	while ( lines.HasMoreTokens() )
 	{
 		const wxString token = lines.GetNextToken();
 		
-		if ( token.Len() > 0 ) {
+		if ( token.Len() > 0 )
+		{
 			wxString& text = entries.back().text;
 			text.append(token);
 		}
@@ -235,6 +244,7 @@ void CncLoggerListCtrl::add(const wxString& text) {
 	}
 	
 	updateContent();
+*/
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::add(const wxString& text, const wxListItemAttr& lia) {
@@ -244,8 +254,26 @@ void CncLoggerListCtrl::add(const wxString& text, const wxListItemAttr& lia) {
 		
 	if ( entries.size() == 0 )
 		next();
+		
+	const wxChar delimiter = '\n';
+	wxStringTokenizer lines(text, wxString("\n"));
+	while ( lines.HasMoreTokens() )
+	{
+		const wxString token = lines.GetNextToken();
+		
+		if ( token.Len() > 0 )
+		{
+			wxString& text = entries.back().text;
+			text.append(token);
+			
+			entries.back().listItemAttr = lia;
+		}
+		
+		if ( lines.GetLastDelimiter() == delimiter )
+			next();
+	}
 	
-	entries.push_back(std::move(LoggerEntry(text, "", lia)));
+	//entries.push_back(std::move(LoggerEntry(text, "", lia)));
 	updateContent();
 }
 /////////////////////////////////////////////////////////////

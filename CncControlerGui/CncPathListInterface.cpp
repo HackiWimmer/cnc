@@ -1,3 +1,4 @@
+#include <fstream>
 #include "MainFrameProxy.h"
 #include "CncConfig.h"
 #include "CncContext.h"

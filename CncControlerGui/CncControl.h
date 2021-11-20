@@ -206,7 +206,7 @@ class CncControl {
 		
 		bool isReadyToRun();
 		
-		void setClientId(long id) 		{ currentClientId = id; }
+		void setClientId(long id);
 		void resetClientId()			{ setClientId(-1L); }
 		const long getClientId() const 	{ return currentClientId; }
 		
@@ -307,7 +307,7 @@ class CncControl {
 		bool correctLimitPositions();
 		bool resolveLimits(bool x, bool y, bool z);
 		bool evaluateHardwareReference();
-		bool simulateHardwareReference();
+		bool simulateHardwareReference(float offsetFact=0.5f);
 		
 		bool evaluateHardwareDimensionsXYPlane(DimensionXYPlane& result);
 		bool evaluateHardwareDimensionsZAxis(DimensionZAxis& result);

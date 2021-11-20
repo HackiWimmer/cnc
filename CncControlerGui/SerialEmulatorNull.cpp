@@ -909,7 +909,7 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 	
 	// the emulator function readData and writeData runs in the same thread.
 	// so, it isn't possible to repeat a move command with several position callbacks
-	// as a real mirco controller can do.
+	// as a real micro controller can do.
 	// Instead the the move is supported with its total distance - see readMove. 
 	// however, for a preview this is good enough!
 	//
@@ -1072,7 +1072,10 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 	}
 	
 	evaluateLimitStates();
-	if ( limitStates.hasLimit() || lastSentLS.hasLimit() )
+	const bool b1 = limitStates.hasLimit() == true && lastSentLS.hasLimit()  == false;	// set limit
+	const bool b2 = lastSentLS.hasLimit()  == true && limitStates.hasLimit() == false;	// reset limit
+	
+	if ( b1 || b2 )
 	{
 		ContollerInfo ci;
 		ci.infoType  			= CITLimit;

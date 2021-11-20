@@ -15,8 +15,10 @@ class CncLimitStates {
 		bool zMaxLimit;
 	
 		///////////////////////////////////////////////////////////////////
-		void setLimit(int32_t v, bool &min, bool &max) {
-			switch ( v ) {
+		void setLimit(int32_t v, bool &min, bool &max)
+		{
+			switch ( v )
+			{
 				case LimitSwitch::LIMIT_MIN:
 					min = true;
 					max = false;
@@ -26,7 +28,7 @@ class CncLimitStates {
 					max = true;
 					break;
 				case LimitSwitch::LIMIT_UNSET:
-					min= false;
+					min = false;
 					max = false;
 					break;
 				case LimitSwitch::LIMIT_UNKNOWN:
@@ -38,7 +40,8 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		int32_t getLimit(bool min, bool max) const {
+		int32_t getLimit(bool min, bool max) const
+		{
 			
 			if ( min == true && max == true )
 				return LimitSwitch::LIMIT_UNKNOWN;

@@ -184,6 +184,9 @@ namespace cnc {
 	const std::vector<float>&	getSpeedStepSensitivityFactors(std::vector<float>& ret);
 	bool						isCncSpeedType(char m);
 	
+	int16_t						cvnSpindleSpeed_U_MIN_ToRaw(double value);
+	int32_t						cnvSpidleSpeedRaw_To_U_MIN(int16_t value);
+	
 	const CncTemplateFormat		getTemplateFormatFromFileName(const char* fileName);
 	const CncTemplateFormat		getTemplateFormatFromExtention(const char* extention);
 	const char*					getTemplateFormatAsString(const CncTemplateFormat tf);

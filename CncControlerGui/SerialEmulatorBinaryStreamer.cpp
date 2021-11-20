@@ -59,6 +59,8 @@ bool SerialEmulatorBinaryStreamer::writeMoveSequenceRawCallback(unsigned char* b
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
+	
 	if ( isReadyToStream() )
 		CncBinaryTemplateStreamer::finalize();
 	
@@ -75,16 +77,20 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
+	
 	if ( CncBinaryTemplateStreamer::finalize() == false )
 		std::cerr << CNC_LOG_FUNCT_A(": finalize() failed\n");
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
 	//std::clog << CNC_LOG_FUNCT_A("\n");
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::GuidePath& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
 	#warning processTrigger(const Trigger::GuidePath& tr) impl. missing 
 }

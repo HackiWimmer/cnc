@@ -7,11 +7,8 @@
 #include <wx/string.h>
 #include "OSD/CncTimeFunctions.h"
 #include "CncArduino.h"
-#include "CncCommon.h"
 #include "CncMoveSequence.h"
 #include "CncCommandDecoder.h"
-#include "CncBinaryTemplateStreamer.h"
-#include "SvgUnitCalculator.h"
 #include "CncPosition.h"
 
 
@@ -24,6 +21,7 @@ typedef std::vector<unsigned char> 						PidList;
 typedef std::vector<int32_t> 							GetterValues;
 typedef std::map<unsigned char, GetterValues> 			GetterListValues;
 
+class ContextInterface;
 class CncControl;
 class CncPathListManager;
 
@@ -244,6 +242,7 @@ class Serial {
 		
 		int readBufferedData(void *buffer, unsigned int nbByte);
 		
+		ContextInterface* contextInterface;
 		//cnc control object
 		CncControl* cncControl;
 		// Measurement status
@@ -425,8 +424,8 @@ class Serial {
 		bool sendResume();
 		
 		// trigger
-		virtual void processTrigger(const Trigger::BeginRun& tr)	{}
-		virtual void processTrigger(const Trigger::EndRun& tr)		{}
+		virtual void processTrigger(const Trigger::BeginRun& tr);
+		virtual void processTrigger(const Trigger::EndRun& tr);
 		virtual void processTrigger(const Trigger::NextPath& tr)	{}
 		virtual void processTrigger(const Trigger::SpeedChange& tr)	{}
 		virtual void processTrigger(const Trigger::GuidePath& tr)	{}
@@ -451,6 +450,9 @@ class Serial {
 		double getMeasuredFeedSpeed_MM_SEC() 		{ return measuredFeedSpeed_MM_SEC; }
 
 		virtual void notifySetupSuccesfullyFinsihed() {}
+		
+		void setContextInterface(ContextInterface* ci) { contextInterface = ci; }
+		ContextInterface* getContextInterface() { return contextInterface; }
 
 		// test behavior only
 		virtual bool test();

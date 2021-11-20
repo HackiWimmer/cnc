@@ -4,13 +4,43 @@
 #include "CncConfig.h"
 #include "CncCommon.h"
 
-namespace cnc {
+//////////////////////////////////////////////////////////////
+namespace cnc 
+{
 	const char* RAPID_SPEED_CHAR_DESC			= "Rappid speed";
 	const char* WORK_SPEED_CHAR_DESC			= "Work speed";
 	const char* MAX_SPEED_CHAR_DESC				= "Max speed";
 	const char* USER_DEFIND_SPEED_CHAR_DESC		= "Userdefined speed";
 };
 
+//////////////////////////////////////////////////////////////
+int16_t cnc::cvnSpindleSpeed_U_MIN_ToRaw(double value) {
+//////////////////////////////////////////////////////////////
+	const double		min = std::min(THE_CONFIG->getSpindleSpeedMin(), THE_CONFIG->getSpindleSpeedMax());
+	const double		max = THE_CONFIG->getSpindleSpeedMax();
+	const unsigned int	stp = THE_CONFIG->getSpindleSpeedStepRange();
+	
+	// range validation/correction
+	value = std::max(min, value);
+	value = std::min(max, value);
+	
+	// Spindle speed range is defined as: 0 ... stp (linear)
+	//   0 -> min
+	// stp -> max
+	return std::min((unsigned int)((value - min) * stp / (max - min)), stp);
+}
+//////////////////////////////////////////////////////////////
+int32_t cnc::cnvSpidleSpeedRaw_To_U_MIN(int16_t value) {
+//////////////////////////////////////////////////////////////
+	const double		min = std::min(THE_CONFIG->getSpindleSpeedMin(), THE_CONFIG->getSpindleSpeedMax());
+	const double		max = THE_CONFIG->getSpindleSpeedMax();
+	const unsigned int	stp = THE_CONFIG->getSpindleSpeedStepRange();
+	
+	// Spindle speed range is defined as: 0 ... stp (linear)
+	//   0 -> min
+	// stp -> max
+	return std::max(min + double(value) * ( max - min ) / stp, min);
+}
 //////////////////////////////////////////////////////////////
 const char* cnc::getReferenceModeAsString(CncRefPositionMode mode) {
 //////////////////////////////////////////////////////////////

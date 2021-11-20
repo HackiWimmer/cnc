@@ -34,6 +34,21 @@ class CncStandardLoggerProxy : public CncTextCtrl  {
 };
 
 // --------------------------------------------------------------
+class CncTryRunLoggerProxy : public CncTextCtrl  {
+	
+	public:
+		CncTryRunLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
+		virtual ~CncTryRunLoggerProxy();
+		
+		virtual bool SetDefaultStyle(const wxTextAttr& style);
+		virtual void AppendChar(char c);
+		virtual void AppendText(const wxString &text);
+		
+		wxDECLARE_NO_COPY_CLASS(CncTryRunLoggerProxy);
+};
+
+// --------------------------------------------------------------
 class CncMsgHistoryLoggerProxy : public CncTextCtrl  {
 	
 	public:

@@ -23,6 +23,7 @@
 #include <wx/infobar.h>
 #include <wx/tglbtn.h>
 #include <wx/textctrl.h>
+#include <wx/bmpbuttn.h>
 #include <wx/dialog.h>
 #include <wx/iconbndl.h>
 #include <wx/bitmap.h>
@@ -433,6 +434,58 @@ public:
 };
 
 
+class CncTemplateContextSummaryPanelBase : public wxPanel
+{
+protected:
+    wxStaticText* m_staticText721;
+    wxBitmapButton* m_btCopy;
+    wxBitmapButton* m_btSave;
+    wxStaticLine* m_staticLine719;
+    wxListbook* m_loggerBook;
+    wxPanel* m_plSummary;
+    wxPanel* m_summaryPlaceholder;
+    wxPanel* m_plContextList;
+    wxPanel* m_listPlaceholder;
+    wxPanel* m_plContextAnalysisOverall;
+    wxPanel* m_analysisPlaceholder;
+    wxPanel* m_plContextAnalysisLimit;
+    wxPanel* m_analysisLimitPlaceholder;
+    wxPanel* m_plContextAnalysisMovement;
+    wxPanel* m_analysisMovementPlaceholder;
+    wxPanel* m_plParsingSynopsis;
+    wxPanel* m_parsingSynopsisPlaceholder;
+    wxPanel* m_plTryRunLogger;
+    wxPanel* m_tryRunLoggerPlaceholder;
+
+protected:
+    virtual void onCopyCurrentList(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSaveCurrentList(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText721() { return m_staticText721; }
+    wxBitmapButton* GetBtCopy() { return m_btCopy; }
+    wxBitmapButton* GetBtSave() { return m_btSave; }
+    wxStaticLine* GetStaticLine719() { return m_staticLine719; }
+    wxPanel* GetSummaryPlaceholder() { return m_summaryPlaceholder; }
+    wxPanel* GetPlSummary() { return m_plSummary; }
+    wxPanel* GetListPlaceholder() { return m_listPlaceholder; }
+    wxPanel* GetPlContextList() { return m_plContextList; }
+    wxPanel* GetAnalysisPlaceholder() { return m_analysisPlaceholder; }
+    wxPanel* GetPlContextAnalysisOverall() { return m_plContextAnalysisOverall; }
+    wxPanel* GetAnalysisLimitPlaceholder() { return m_analysisLimitPlaceholder; }
+    wxPanel* GetPlContextAnalysisLimit() { return m_plContextAnalysisLimit; }
+    wxPanel* GetAnalysisMovementPlaceholder() { return m_analysisMovementPlaceholder; }
+    wxPanel* GetPlContextAnalysisMovement() { return m_plContextAnalysisMovement; }
+    wxPanel* GetParsingSynopsisPlaceholder() { return m_parsingSynopsisPlaceholder; }
+    wxPanel* GetPlParsingSynopsis() { return m_plParsingSynopsis; }
+    wxPanel* GetTryRunLoggerPlaceholder() { return m_tryRunLoggerPlaceholder; }
+    wxPanel* GetPlTryRunLogger() { return m_plTryRunLogger; }
+    wxListbook* GetLoggerBook() { return m_loggerBook; }
+    CncTemplateContextSummaryPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,800), long style = wxTAB_TRAVERSAL);
+    virtual ~CncTemplateContextSummaryPanelBase();
+};
+
+
 class CncSecureNumpadDialogBase : public wxDialog
 {
 protected:
@@ -476,6 +529,26 @@ public:
     wxButton* GetBtOk() { return m_btOk; }
     CncSecureSlidepadDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Sliderpad"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncSecureSlidepadDialogBase();
+};
+
+
+class CncTemplateContextSummaryDialogBase : public wxDialog
+{
+protected:
+    wxPanel* m_templateContextPlaceholder;
+    wxStaticLine* m_staticLine671;
+    wxButton* m_btClose;
+
+protected:
+    virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
+    virtual void onCloseFromButton(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxPanel* GetTemplateContextPlaceholder() { return m_templateContextPlaceholder; }
+    wxStaticLine* GetStaticLine671() { return m_staticLine671; }
+    wxButton* GetBtClose() { return m_btClose; }
+    CncTemplateContextSummaryDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Template Context Summary"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,800), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    virtual ~CncTemplateContextSummaryDialogBase();
 };
 
 

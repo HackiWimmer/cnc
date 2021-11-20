@@ -39,6 +39,10 @@
   <Dependencies/>
   <VirtualDirectory Name="Source">
     <VirtualDirectory Name="Secure">
+      <File Name="CncTemplateContextSummaryPanel.h"/>
+      <File Name="CncTemplateContextSummaryPanel.cpp"/>
+      <File Name="CncTemplateContextSummaryDialog.h"/>
+      <File Name="CncTemplateContextSummaryDialog.cpp"/>
       <File Name="CncSecureRotateModelPanel.h"/>
       <File Name="CncSecureRotateModelPanel.cpp"/>
       <File Name="CncSecureGesturesPanel.cpp"/>
@@ -226,6 +230,8 @@
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
       <VirtualDirectory Name="Utils">
+        <File Name="ContextInterface.cpp"/>
+        <File Name="ContextInterface.h"/>
         <File Name="BaseEndPoint.cpp"/>
         <File Name="BaseEndPoint.h"/>
         <File Name="WireEndPoint.cpp"/>

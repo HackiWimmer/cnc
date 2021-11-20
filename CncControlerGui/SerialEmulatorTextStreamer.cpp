@@ -249,6 +249,8 @@ bool SerialEmulatorTextStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::processTrigger(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
+	
 	headerStream.str("");
 	bodyStream.str("");
 	footerStream.str("");
@@ -257,6 +259,8 @@ void SerialEmulatorTextStreamer::processTrigger(const Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::processTrigger(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
+	
 	CncDoublePosition dPos;
 	THE_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 
@@ -296,11 +300,13 @@ void SerialEmulatorTextStreamer::processTrigger(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::processTrigger(const Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
 	initializePath(tr);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::processTrigger(const Trigger::SpeedChange& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
 	currentSpeedMode = tr.currentSpeedMode;
 }
 ///////////////////////////////////////////////////////////////////
@@ -346,6 +352,7 @@ void SerialEmulatorTextStreamer::finalizeFile(const Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::processTrigger(const Trigger::GuidePath& tr) {
 ///////////////////////////////////////////////////////////////////
+	Serial::processTrigger(tr);
 	#warning processTrigger(const Trigger::GuidePath& tr) impl. missing 
 }
 

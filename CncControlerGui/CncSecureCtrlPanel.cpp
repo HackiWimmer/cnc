@@ -448,8 +448,6 @@ void CncSecureCtrlPanel::notifyConnection(bool state, const wxString& portName) 
 	m_portName->SetLabel(portName);
 	m_portName->Refresh();
 	
-	#warning
-	//m_btHardwareRefSec->Enable(THE_CONTEXT->hasHardware() && state == true );
 	m_bmpConnectionStateSecure->SetBitmap( state == true ? bmpC : bmpD);
 	m_bmpConnectionStateSecure->Refresh();
 }

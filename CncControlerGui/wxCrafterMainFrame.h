@@ -187,7 +187,7 @@ protected:
     wxPanel* m_contextPanel;
     wxButton* m_btDetachTemplateContext;
     wxStaticText* m_staticText5137673;
-    wxTextCtrl* m_templateContext;
+    wxPanel* m_templateContextPlaceholder;
     wxPanel* m_mainBookSetup;
     wxPanel* m_panelConfiguration;
     wxButton* m_btDetachConfiguration;
@@ -1105,7 +1105,7 @@ public:
     wxPanel* GetEditorPanel() { return m_editorPanel; }
     wxButton* GetBtDetachTemplateContext() { return m_btDetachTemplateContext; }
     wxStaticText* GetStaticText5137673() { return m_staticText5137673; }
-    wxTextCtrl* GetTemplateContext() { return m_templateContext; }
+    wxPanel* GetTemplateContextPlaceholder() { return m_templateContextPlaceholder; }
     wxPanel* GetContextPanel() { return m_contextPanel; }
     wxListbook* GetListbookSource() { return m_listbookSource; }
     wxPanel* GetPanelTemplateSource() { return m_panelTemplateSource; }

@@ -7,7 +7,7 @@ CncParsingSynopsisTrace::CncParsingSynopsisTrace(wxWindow* parent)
 , synopsisTrace(NULL)
 //////////////////////////////////////////////////////////////////
 {
-	// synopisis list
+	// synopsis list
 	synopsisTrace = new CncParsingSynopsisListCtrl(this, wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_parsingSynopsisListPlaceholder, synopsisTrace);
 }

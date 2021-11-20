@@ -1048,13 +1048,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer96101->Add(m_staticText5137673, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_templateContext = new wxTextCtrl(m_contextPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_contextPanel, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP);
-    m_templateContext->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
-    m_templateContext->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_templateContextFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-    m_templateContext->SetFont(m_templateContextFont);
+    m_templateContextPlaceholder = new wxPanel(m_contextPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_contextPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_templateContextPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
     
-    flexGridSizer9652->Add(m_templateContext, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9652->Add(m_templateContextPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_mainBookSetup = new wxPanel(m_mainViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainViewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_mainViewBook->AddPage(m_mainBookSetup, _("Page"), false);
@@ -5754,7 +5751,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuMonitoring->Append(m_menuItemNormalMonitoring);
     
     m_menuRequestor = new wxMenu();
-    m_menuBar->Append(m_menuRequestor, _("Controller Requests"));
+    m_menuBar->Append(m_menuRequestor, _("Controller"));
     
     m_miRqtIdleMessages = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Request Idle Messages"), wxT(""), wxITEM_CHECK);
     m_menuRequestor->Append(m_miRqtIdleMessages);

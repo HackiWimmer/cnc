@@ -1,6 +1,10 @@
 #ifndef CNC_INTERFACE_H
 #define CNC_INTERFACE_H
 
+#ifndef SKETCH_COMPILE
+  #include <wx/string.h>
+#endif
+
 namespace LimitSwitch {
   
   const bool EXTERNAL_INTERRUPT_ON                       = false;
@@ -110,7 +114,8 @@ namespace CncInterface {
       }
 
       //-------------------------------------------------------------
-      virtual const char* getValueAsString() {
+      virtual const char* getValueAsString()
+      {
         stringValue[0] = getBit(8) == true ? '1' : '0';
         stringValue[1] = getBit(7) == true ? '1' : '0';
         stringValue[2] = getBit(6) == true ? '1' : '0';
@@ -123,9 +128,45 @@ namespace CncInterface {
         
         return stringValue;
       }
+      
+      #ifndef SKETCH_COMPILE
+        virtual wxString getValueAsString() const
+        {
+          wxString ret;
+          char sc[9];
+       
+          sc[0] = getBit(8) == true ? '1' : '0';
+          sc[1] = getBit(7) == true ? '1' : '0';
+          sc[2] = getBit(6) == true ? '1' : '0';
+          sc[3] = getBit(5) == true ? '1' : '0';
+          sc[4] = getBit(4) == true ? '1' : '0';
+          sc[5] = getBit(3) == true ? '1' : '0';
+          sc[6] = getBit(2) == true ? '1' : '0';
+          sc[7] = getBit(1) == true ? '1' : '0';
+          sc[8] = '\0';
+          
+          ret.assign(sc);
+          return ret;
+        }
+        
+        virtual wxString getValueAsReadableString() const
+        {
+          wxString ret;
+          const char x1 = getBit(8) == true ? '1' : '0';
+          const char x2 = getBit(7) == true ? '1' : '0';
+          const char y1 = getBit(6) == true ? '1' : '0';
+          const char y2 = getBit(5) == true ? '1' : '0';
+          const char z1 = getBit(4) == true ? '1' : '0';
+          const char z2 = getBit(3) == true ? '1' : '0';
+                   
+          ret.assign(wxString::Format("x[%c,%c] Y[%c,%c] Z[%c,%c]", x1, x2, y1, y2, z1, z2));
+          return ret;      
+        }
+      #endif
 
       //-------------------------------------------------------------
-      virtual const char* getValueAsReport(char* ret) {
+      virtual const char* getValueAsReport(char* ret)
+      {
         return ret;
       }
   };

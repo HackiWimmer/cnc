@@ -56,6 +56,7 @@ class CncMsgHistoryLoggerProxy;
 class CncTraceProxy;
 class CncLoggerView;
 class CncLoggerListCtrl;
+class CncTryRunLoggerProxy;
 
 class CncSourceEditor;
 class CncOutboundEditor;
@@ -91,6 +92,7 @@ class CncAnchorPosition;
 class CncSecureCtrlPanel;
 class CncSecureManuallyMovePanel;
 class CncTouchBlockDetector;
+class CncTemplateContextSummaryPanel;
 
 struct RefPosResult;
 
@@ -608,6 +610,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		bool evaluateAndPerformProcessingState();
 		
+		CncTemplateContextSummaryPanel* getTemplateContextSummary()	{ return contextSummaryPanel; }
+		
 	protected:
 	
 		void tryToSelectClientId(long clientId, ClientIdSelSource::ID tss);
@@ -631,6 +635,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		SerialThread* serialThread;
 		wxCriticalSection pSerialThreadCS;
+		
+		CncTryRunLoggerProxy*	tryRunLoggerProxy;
 
 		CncSpeedPlayground*	cncSpeedPlayground;
 		
@@ -646,7 +652,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		int isPortNameAvailable(const wxString& portName, bool exact=false);
 		
-		void simulatHardwareReference();
+		void simulateHardwareReference(float offsetFact=0.01);
 		
 		bool setTemplateName(const wxString& pathFile);
 		bool setTemplateName(const wxFileName& pathFile);
@@ -808,6 +814,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncUsbConnectionObserver*		usbConnectionObserver;
 		CncAnchorPosition*				anchorPositionDlg;
 		CncSecureCtrlPanel*				secureCtrlPanel;
+		CncTemplateContextSummaryPanel* contextSummaryPanel;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;

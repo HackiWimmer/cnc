@@ -1,13 +1,14 @@
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "MainFrame.h"
+#include "CncTemplateContextSummaryPanel.h"
 #include "CncLoggerListCtrl.h"
 #include "CncLoggerView.h"
 #include "CncLoggerProxy.h"
 
 //////////////////////////////////////////////////////////////
 CncStartupLoggerProxy::CncStartupLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-						       long style, const wxValidator &validator, const wxString &name)
+												long style, const wxValidator &validator, const wxString &name)
 : CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
 //////////////////////////////////////////////////////////////
 {
@@ -37,7 +38,7 @@ void CncStartupLoggerProxy::AppendText(const wxString &text) {
 
 //////////////////////////////////////////////////////////////
 CncStandardLoggerProxy::CncStandardLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-						       long style, const wxValidator &validator, const wxString &name)
+													long style, const wxValidator &validator, const wxString &name)
 : CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
 //////////////////////////////////////////////////////////////
 {
@@ -64,10 +65,38 @@ void CncStandardLoggerProxy::AppendText(const wxString &text) {
 }
 
 
+//////////////////////////////////////////////////////////////
+CncTryRunLoggerProxy::CncTryRunLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
+												long style, const wxValidator &validator, const wxString &name)
+: CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
+//////////////////////////////////////////////////////////////
+{
+}
+//////////////////////////////////////////////////////////////
+CncTryRunLoggerProxy::~CncTryRunLoggerProxy() {
+//////////////////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////////////////
+bool CncTryRunLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getTryRunLogger()->changeTextAttr(style);
+	return true;
+}
+//////////////////////////////////////////////////////////////
+void CncTryRunLoggerProxy::AppendChar(char c) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getTryRunLogger()->add(c);
+}
+//////////////////////////////////////////////////////////////
+void CncTryRunLoggerProxy::AppendText(const wxString &text) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getTryRunLogger()->add(text);
+}
+
 
 //////////////////////////////////////////////////////////////
 CncMsgHistoryLoggerProxy::CncMsgHistoryLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-						       long style, const wxValidator &validator, const wxString &name)
+													long style, const wxValidator &validator, const wxString &name)
 : CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
 //////////////////////////////////////////////////////////////
 {
@@ -96,7 +125,7 @@ void CncMsgHistoryLoggerProxy::AppendText(const wxString &text) {
 
 /////////////////////////////////////////////////////////////
 CncTraceProxy::CncTraceProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-						     long style, const wxValidator &validator, const wxString &name)
+								long style, const wxValidator &validator, const wxString &name)
 : CncTextCtrl(parent, wxID_ANY, value, pos, size, style | wxTE_RICH | wxTE_READONLY | wxTE_MULTILINE | wxTE_DONTWRAP, validator, name)
 //////////////////////////////////////////////////////////////
 {

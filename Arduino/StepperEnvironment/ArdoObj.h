@@ -155,30 +155,32 @@ namespace ArdoObj {
   }
 
   // --------------------------------------------------------------
-  struct SpeedTuple {
+  struct SpeedTuple
+  {
+    static int32_t encode(char mode, int32_t value_MMSec1000);
     
-      static int32_t encode(char mode, int32_t value_MMSec1000);
-      
-      static char    decodeMode           (int32_t encodedValue);
-      
-      static int32_t decodeValue_MMSec1000(int32_t encodedValue);
-      static int32_t decodeValue_MMSec    (int32_t encodedValue);
-      static int32_t decodeValue_MMMin    (int32_t encodedValue);
+    static char    decodeMode           (int32_t encodedValue);
+    
+    static int32_t decodeValue_MMSec1000(int32_t encodedValue);
+    static int32_t decodeValue_MMSec    (int32_t encodedValue);
+    static int32_t decodeValue_MMMin    (int32_t encodedValue);
   };
+  typedef int32_t SpeedTupleValue;
 
   // --------------------------------------------------------------
-  struct SpindleTuple {
-
-      static const int ardoRange = 255;
+  struct SpindleTuple
+  {
+    static const int ardoRange = 255;
+  
+    static int32_t encode(int16_t value, int16_t range);
     
-      static int32_t encode(int16_t value, int16_t range);
-      
-      static int16_t decodeValue(int32_t encodedValue);
-      static int16_t decodeRange(int32_t encodedValue);
+    static int16_t decodeValue(int32_t encodedValue);
+    static int16_t decodeRange(int32_t encodedValue);
 
-      static float   getPwmFact(int16_t range);
-      static int16_t getPwmValue(int32_t value);
+    static float   getPwmFact(int16_t range);
+    static int16_t getPwmValue(int32_t value);
   };
+  typedef int32_t SpindleTupleValue;
   
   // --------------------------------------------------------------
   // I2C data structure: Stores information about the received 
