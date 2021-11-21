@@ -68,7 +68,6 @@
 #include "CncFileNameService.h"
 #include "CncFilePreviewWnd.h"
 #include "CncSpeedPlayground.h"
-#include "CncParsingSynopsisTrace.h"
 #include "SVGPathHandlerCnc.h"
 #include "ManuallyParser.h"
 #include "SVGFileParser.h"
@@ -423,6 +422,8 @@ MainFrameBase::MainFrameBase(wxWindow* parent)
 , loggerView			( new CncLoggerView				(this))
 , tmpTraceInfo			( new CncTraceProxy				(this))
 , controllerMsgHistory	( new CncMsgHistoryLoggerProxy	(this))
+, tryRunLoggerProxy		( new CncTryRunLoggerProxy		(this))
+, parserSynopsisProxy	( new CncParserSynopsisProxy	(this))
 ////////////////////////////////////////////////////////////////////
 {
 	// If this timers are already started stop it here!
@@ -441,6 +442,8 @@ MainFrameBase::MainFrameBase(wxWindow* parent)
 	startupTrace		->Show(false);
 	tmpTraceInfo		->Show(false);
 	controllerMsgHistory->Show(false);
+	tryRunLoggerProxy	->Show(false);
+	parserSynopsisProxy	->Show(false);
 	
 	GblFunc::replaceControl(m_loggerViewPlaceholder, loggerView);
 	
@@ -465,6 +468,8 @@ MainFrameBase::~MainFrameBase() {
 	tmpTraceInfo->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBase::traceTextUpdated), NULL, this);
 	
 	// clear
+	cncDELETE( parserSynopsisProxy );
+	cncDELETE( tryRunLoggerProxy );
 	cncDELETE( controllerMsgHistory );
 	cncDELETE( tmpTraceInfo );
 	cncDELETE( startupTrace );
@@ -482,7 +487,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , GlobalConfigManager					(this, GetPgMgrSetup(), globalConfig)
 , gamepadThread							(NULL)
 , serialThread							(NULL)
-, tryRunLoggerProxy						(new CncTryRunLoggerProxy(this))
 , cncSpeedPlayground					(new CncSpeedPlayground(this))
 , isDebugMode							(false)
 , canClose								(true)
@@ -563,8 +567,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	THE_CONFIG->updateLoadTrace(m_cfgLoadTrace, m_cfgObsoleteTrace);
 	
 	m_auimgrMain->SetArtProvider(new clAuiDockArt());
-	
-	tryRunLoggerProxy->Show(false);
 	
 	getLoggerView()->initialize();
 	
@@ -711,7 +713,6 @@ MainFrame::~MainFrame() {
 	cncDELETE( cnc3DVSplitterWindow );
 	cncDELETE( cnc3DHSplitterWindow );
 	cncDELETE( interactiveTransactionLock );
-	cncDELETE( tryRunLoggerProxy );
 	
 	wxASSERT(config);
 	config->Flush();
@@ -6748,8 +6749,10 @@ void MainFrame::rcTryRun(wxCommandEvent& event) {
 	if ( cnc->tryRunAvailable() )
 	{
 		const unsigned int prevValidCount = THE_CONTEXT->templateContext->getValidunCount();
+		
+		// streamer redirect section
 		{
-			StdStreamRedirector srd(tryRunLoggerProxy);
+			StdStreamRedirector srd(getTryRunLogger());
 			
 			cnc::cex1 << "Try run started: " << wxDateTime::Now().FormatISOTime() << std::endl;
 			cnc->switchRunMode(CncControl::RunMode::M_TryRun);
@@ -6757,6 +6760,7 @@ void MainFrame::rcTryRun(wxCommandEvent& event) {
 			cnc->switchRunMode(CncControl::RunMode::M_RealRun);
 		}
 		
+		// error handling 
 		if ( (prevValidCount + 1) != THE_CONTEXT->templateContext->getValidunCount() )
 		{
 			decorateTryRunState(cncError);
@@ -9065,12 +9069,6 @@ void MainFrame::onSelectStepMode(wxCommandEvent& event) {
 	
 	const CncStepSensitivity ss = cnc::getStepSensitivityOfIndex(m_rbStepSensitivity->GetSelection());
 	updateSpeedSlider(sm == SM_INTERACTIVE ? cnc::getSpeedValue(ss) : 1.0);
-}
-/////////////////////////////////////////////////////////////////////
-CncParsingSynopsisTrace* MainFrame::getParsingSynopsisTrace() { 
-////////////////////////////////////////////////////////////////////
-	wxASSERT( cncPreprocessor != NULL );
-	return cncPreprocessor->getParsingSynopsisTrace(); 
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::detachMotionMonitor(wxCommandEvent& event) {

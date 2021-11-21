@@ -365,8 +365,6 @@
       <File Name="CncOpenGLContextObserver.cpp"/>
       <File Name="CncLoggerProxy.cpp"/>
       <File Name="CncLoggerProxy.h"/>
-      <File Name="CncParsingSynopsisTrace.h"/>
-      <File Name="CncParsingSynopsisTrace.cpp"/>
       <File Name="CncMotionVertexTrace.h"/>
       <File Name="CncMotionVertexTrace.cpp"/>
       <File Name="CncExceptions.h"/>

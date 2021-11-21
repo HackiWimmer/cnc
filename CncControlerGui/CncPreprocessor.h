@@ -9,7 +9,6 @@
 class CncPathListEntryListCtrl;
 class CncMoveSequenceListCtrl;
 class CncMoveSequenceOverviewListCtrl;
-class CncParsingSynopsisTrace;
 class CncOperatingTrace;
 class CncExternalViewBox;
 
@@ -21,7 +20,6 @@ class CncPreprocessor : public CncPreprocessorBase {
 		CncPathListEntryListCtrl* 			pathListEntries;
 		CncMoveSequenceOverviewListCtrl* 	moveSequenceOverview;
 		CncMoveSequenceListCtrl* 			moveSequence;
-		CncParsingSynopsisTrace*			parsingSynopsis;
 		CncOperatingTrace*					operatingTrace;
 		CncExternalViewBox*					externalPathListEntriesView;
 		CncExternalViewBox*					externalMoveSequenceView;
@@ -37,8 +35,6 @@ class CncPreprocessor : public CncPreprocessorBase {
 
 		CncPreprocessor(wxWindow* parent);
 		virtual ~CncPreprocessor();
-		
-		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ wxASSERT(parsingSynopsis != NULL); return parsingSynopsis; }
 		
 		void select(PreProcessorSelection::VAL page);
 		
@@ -75,7 +71,6 @@ class CncPreprocessor : public CncPreprocessorBase {
 		
 		virtual void formatPathListEntries(wxCommandEvent& event);
 		virtual void onDetachOperatingTraceView(wxCommandEvent& event);
-		virtual void onDetachParsingSynopsisView(wxCommandEvent& event);
 		virtual void onDetachMoveSequenceView(wxCommandEvent& event);
 		virtual void onDetachPathListEntriesView(wxCommandEvent& event);
 		virtual void onMoveSequenceEntryFirst(wxCommandEvent& event);
@@ -86,10 +81,6 @@ class CncPreprocessor : public CncPreprocessorBase {
 		virtual void onPathListEntryLast(wxCommandEvent& event);
 		virtual void onPathListEntryNext(wxCommandEvent& event);
 		virtual void onPathListEntryPrev(wxCommandEvent& event);
-		virtual void clearParsingSynopis(wxCommandEvent& event);
-		virtual void connectParsingSynopis(wxCommandEvent& event);
-		virtual void copyParsingSynopis(wxCommandEvent& event);
-		virtual void saveParsingSynopsis(wxCommandEvent& event);
 		virtual void copyOperatingTrace(wxCommandEvent& event);
 		virtual void saveOperatingTrace(wxCommandEvent& event);
 		virtual void clearOperatingTrace(wxCommandEvent& event);

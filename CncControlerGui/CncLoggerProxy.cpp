@@ -95,6 +95,72 @@ void CncTryRunLoggerProxy::AppendText(const wxString &text) {
 
 
 //////////////////////////////////////////////////////////////
+CncParserSynopsisProxy::CncParserSynopsisProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
+												long style, const wxValidator &validator, const wxString &name)
+: CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
+//////////////////////////////////////////////////////////////
+{
+}
+//////////////////////////////////////////////////////////////
+CncParserSynopsisProxy::~CncParserSynopsisProxy() {
+//////////////////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////////////////////
+bool CncParserSynopsisProxy::hasDebugEntries() const { 
+//////////////////////////////////////////////////////////////////
+	return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasDebugEntries(); 
+}
+//////////////////////////////////////////////////////////////////
+bool CncParserSynopsisProxy::hasWarnEntries() const {
+//////////////////////////////////////////////////////////////////
+	return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasWarnEntries(); 
+}
+//////////////////////////////////////////////////////////////////
+bool CncParserSynopsisProxy::hasErrorEntries() const { 
+//////////////////////////////////////////////////////////////////
+	return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasErrorEntries(); 
+}
+//////////////////////////////////////////////////////////////////
+void CncParserSynopsisProxy::popProcessMode() {
+//////////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->popProcessMode(); 
+}
+//////////////////////////////////////////////////////////////////
+void CncParserSynopsisProxy::pushUpdateMode() {
+//////////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->pushUpdateMode(); 
+}
+//////////////////////////////////////////////////////////////////
+void CncParserSynopsisProxy::addEntry(const char type, const wxString& entry) { 
+//////////////////////////////////////////////////////////////////
+	CncExtLoggerListCtrl* logger = THE_APP->getTemplateContextSummary()->getParsingSynopsis();
+	switch ( type )
+	{
+		case 'W':	logger->addWarnEntry(entry);	break;
+		case 'E':	logger->addErrorEntry(entry);	break;
+		case 'S':	logger->addSeparator(entry);	break;
+		default:	logger->addInfoEntry(entry);
+	}
+}
+//////////////////////////////////////////////////////////////
+bool CncParserSynopsisProxy::SetDefaultStyle(const wxTextAttr& style) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->changeTextAttr(style);
+	return true;
+}
+//////////////////////////////////////////////////////////////
+void CncParserSynopsisProxy::AppendChar(char c) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->add(c);
+}
+//////////////////////////////////////////////////////////////
+void CncParserSynopsisProxy::AppendText(const wxString &text) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->add(text);
+}
+
+
+//////////////////////////////////////////////////////////////
 CncMsgHistoryLoggerProxy::CncMsgHistoryLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
 													long style, const wxValidator &validator, const wxString &name)
 : CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)

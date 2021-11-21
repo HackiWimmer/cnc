@@ -317,15 +317,15 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 
 	// reporting
 	typedef CncUnitCalculator<float> UC;
-	SFP_ADD_SEP("RootNode:");
-	SFP_LOG_INF(wxString::Format("Translated RootNode: %s",  ss.str()));
-	SFP_LOG_INF(wxString::Format(" Input Unit        : %s",  UC::getUnitAsStr(svgRootNode.getInputUnit())));
-	SFP_LOG_INF(wxString::Format(" Width        [px] : %12.3lf", svgRootNode.getWidth()));
-	SFP_LOG_INF(wxString::Format(" Heigth       [px] : %12.3lf", svgRootNode.getHeight()));
-	SFP_LOG_INF(wxString::Format(" Width        [mm] : %12.3lf", svgRootNode.getWidth_MM()));
-	SFP_LOG_INF(wxString::Format(" Heigth       [mm] : %12.3lf", svgRootNode.getHeight_MM()));
-	SFP_LOG_INF(wxString::Format(" Scale X           : %12.3lf", svgRootNode.getScaleX()));
-	SFP_LOG_INF(wxString::Format(" Scale Y           : %12.3lf", svgRootNode.getScaleY()));
+	SFP_ADD_SEP("RootNode:\n");
+	SFP_LOG_INF(wxString::Format("Translated RootNode: %s\n",      ss.str()));
+	SFP_LOG_INF(wxString::Format(" Input Unit        : %s\n",      UC::getUnitAsStr(svgRootNode.getInputUnit())));
+	SFP_LOG_INF(wxString::Format(" Width        [px] : %12.3lf\n", svgRootNode.getWidth()));
+	SFP_LOG_INF(wxString::Format(" Heigth       [px] : %12.3lf\n", svgRootNode.getHeight()));
+	SFP_LOG_INF(wxString::Format(" Width        [mm] : %12.3lf\n", svgRootNode.getWidth_MM()));
+	SFP_LOG_INF(wxString::Format(" Heigth       [mm] : %12.3lf\n", svgRootNode.getHeight_MM()));
+	SFP_LOG_INF(wxString::Format(" Scale X           : %12.3lf\n", svgRootNode.getScaleX()));
+	SFP_LOG_INF(wxString::Format(" Scale Y           : %12.3lf\n", svgRootNode.getScaleY()));
 	
 	pathHandler->setSvgRootNode(svgRootNode);
 	
@@ -379,8 +379,8 @@ void SVGFileParser::registerMovementNode() {
 	
 	SvgCncContext& cwp	= pathHandler->getSvgCncContext();
 	const bool ucs		= cwp.useColourScheme();
-	SFP_ADD_SEP(wxString::Format("Parse next Movement Node"));
-	SFP_LOG_INF(wxString::Format("Use Colour Scheme    : %s", ucs ? "Yes" : "No"));
+	SFP_ADD_SEP(wxString::Format("Parse next Movement Node\n"));
+	SFP_LOG_INF(wxString::Format("Use Colour Scheme    : %s\n", ucs ? "Yes" : "No"));
 	
 	if ( ucs == true ) {
 		
@@ -642,8 +642,8 @@ bool SVGFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
-	SFP_ADD_SEP("Start SVG file parsing")
-	SFP_LOG_INF(wxString::Format("File name: '%s'", fileName))
+	SFP_ADD_SEP("Start SVG file parsing\n")
+	SFP_LOG_INF(wxString::Format("File name: '%s'\n", fileName))
 	
 	wxXmlDocument doc;
 	{
@@ -717,19 +717,19 @@ bool SVGFileParser::postprocess() {
 	const double svgMaxY	= to_mm.convert(rn.getViewbox().getMaxY());
 	
 	// --------------------------------------------------------
-	auto check_1_Less_2 = [&](double d1, double d2, const char* msg) {
-		if ( d1 > d2 ) {
-			SFP_LOG_ERR(wxString::Format("%s %12.3lf > %12.3lf", msg, d1, d2));
-		}
+	auto check_1_Less_2 = [&](double d1, double d2, const char* msg)
+	{
+		if ( d1 > d2 ) 
+			SFP_LOG_ERR(wxString::Format("%s %12.3lf > %12.3lf\n", msg, d1, d2));
 	};
 	
-	SFP_ADD_SEP("Boundings:");
-	SFP_LOG_INF(wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf", cncDistX, cncDistY));
-	SFP_LOG_INF(wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf", svgDistX, svgDistY));
-	SFP_LOG_INF(wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf", cncMinX, cncMinY));
-	SFP_LOG_INF(wxString::Format(" SVG min      x, y  [mm]: %12.3lf, %12.3lf", svgMinX, svgMinY));
-	SFP_LOG_INF(wxString::Format(" CNC max      x, y  [mm]: %12.3lf, %12.3lf", cncMaxX, cncMaxY));
-	SFP_LOG_INF(wxString::Format(" SVG max      x, y  [mm]: %12.3lf, %12.3lf", svgMaxX, svgMaxY));
+	SFP_ADD_SEP("Boundings:\n");
+	SFP_LOG_INF(wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf\n", cncDistX, cncDistY));
+	SFP_LOG_INF(wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf\n", svgDistX, svgDistY));
+	SFP_LOG_INF(wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf\n", cncMinX,  cncMinY));
+	SFP_LOG_INF(wxString::Format(" SVG min      x, y  [mm]: %12.3lf, %12.3lf\n", svgMinX,  svgMinY));
+	SFP_LOG_INF(wxString::Format(" CNC max      x, y  [mm]: %12.3lf, %12.3lf\n", cncMaxX,  cncMaxY));
+	SFP_LOG_INF(wxString::Format(" SVG max      x, y  [mm]: %12.3lf, %12.3lf\n", svgMaxX,  svgMaxY));
 
 	check_1_Less_2(cncDistX, svgDistX, " CNC distance X out of range:  ");
 	check_1_Less_2(cncDistY, svgDistY, " CNC distance Y out of range:  ");
@@ -740,11 +740,13 @@ bool SVGFileParser::postprocess() {
 	
 	const bool ret = APP_PROXY::parsingSynopsisTraceHasErrorEntries() == false;
 	
-	if ( ret == false ) {
-		SFP_ADD_SEP("Post Processing Error Summary:");
+	if ( ret == false )
+	{
+		SFP_ADD_SEP("Post Processing Error Summary:\n");
 		std::cerr << "SVG post processing decteced error(s). For more details please visit the parsing synopsis trace\n";
 	}
-	else {
+	else 
+	{
 		if ( APP_PROXY::parsingSynopsisTraceHasWarnEntries() == true )
 		cnc::cex1 << "SVG post processing decteced warnig(s). For more details please visit the parsing synopsis trace\n";
 	}

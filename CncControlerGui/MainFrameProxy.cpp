@@ -1,4 +1,4 @@
-#include "CncParsingSynopsisTrace.h"
+#include "CncLoggerProxy.h"
 #include "MainFrame.h"
 #include "MainFrameProxy.h"
 
@@ -124,34 +124,28 @@
 	{ return THE_APP->m_miOpenGLContextObserver; }
 
 	void APP_PROXY::parsingSynopsisTraceAddSeparator(const wxString& entry)
-	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addSeparator(entry); }
+	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addSeparator(entry); }
 
 	void APP_PROXY::parsingSynopsisTraceAddEntry(const char type, const wxString& info)
-	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addEntry(type, info); }
+	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addEntry(type, info); }
 
 	void APP_PROXY::parsingSynopsisTraceAddInfo(const wxString& info)
-	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addInfo(info); }
+	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addInfo(info); }
 
 	void APP_PROXY::parsingSynopsisTraceAddWarning(const wxString& info)
-	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addWarning(info); }
+	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addWarning(info); }
 
 	void APP_PROXY::parsingSynopsisTraceAddError(const wxString& info)
-	{ if ( THE_APP->getParsingSynopsisTrace() ) THE_APP->getParsingSynopsisTrace()->addError(info); }
+	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addError(info); }
 
-	bool APP_PROXY::parsingSynopsisTraceHasDebugEntries() { 
-		CncParsingSynopsisTrace* pst = THE_APP->getParsingSynopsisTrace(); 
-		return pst ? pst->hasDebugEntries() : false; 
-	}
+	bool APP_PROXY::parsingSynopsisTraceHasDebugEntries() 
+	{ CncParserSynopsisProxy* pst = THE_APP->getParserSynopsisProxy(); return pst ? pst->hasDebugEntries() : false; }
 
-	bool APP_PROXY::parsingSynopsisTraceHasWarnEntries() {
-		CncParsingSynopsisTrace* pst = THE_APP->getParsingSynopsisTrace(); 
-		return pst ? pst->hasWarnEntries(): false; 
-	}
+	bool APP_PROXY::parsingSynopsisTraceHasWarnEntries() 
+	{ CncParserSynopsisProxy* pst = THE_APP->getParserSynopsisProxy(); return pst ? pst->hasWarnEntries(): false; }
 
-	bool APP_PROXY::parsingSynopsisTraceHasErrorEntries() {
-		CncParsingSynopsisTrace* pst = THE_APP->getParsingSynopsisTrace(); 
-		return pst ? pst->hasErrorEntries(): false; 
-	}
+	bool APP_PROXY::parsingSynopsisTraceHasErrorEntries() 
+	{ CncParserSynopsisProxy* pst = THE_APP->getParserSynopsisProxy(); return pst ? pst->hasErrorEntries(): false; }
 
 	int APP_PROXY::showReferencePositionDlg(wxString msg)
 	{ return THE_APP->showReferencePositionDlg(msg); }

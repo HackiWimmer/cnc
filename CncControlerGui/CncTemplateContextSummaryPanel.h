@@ -14,9 +14,13 @@ class CncTemplateContextSummaryPanel : public CncTemplateContextSummaryPanelBase
 		LoggerRegister			loggerRegister;
 		CncExtLoggerListCtrl*	summary;
 		CncExtLoggerListCtrl*	list;
-		CncExtLoggerListCtrl*	analysis;
+		CncExtLoggerListCtrl*	analysisOverall;
+		CncExtLoggerListCtrl*	analysisLimit;
+		CncExtLoggerListCtrl*	analysisMovement;
 		CncExtLoggerListCtrl*	tryRunLogger;
+		CncExtLoggerListCtrl*	parsingSynopsis;
 		
+		void selectPage(CncExtLoggerListCtrl* page) const;
 		
 	protected:
 		virtual void onSaveCurrentList(wxCommandEvent& event);
@@ -27,9 +31,11 @@ class CncTemplateContextSummaryPanel : public CncTemplateContextSummaryPanelBase
 		virtual ~CncTemplateContextSummaryPanel();
 		
 		void update();
-		void selectTryRun();
+		void selectTryRun()							const { selectPage(tryRunLogger); }
+		void selectParsingSynopsis()				const { selectPage(parsingSynopsis); }
 		
-		CncExtLoggerListCtrl* getTryRunLogger() { return tryRunLogger; }
+		CncExtLoggerListCtrl* getTryRunLogger()		const { return tryRunLogger; }
+		CncExtLoggerListCtrl* getParsingSynopsis()	const { return parsingSynopsis; }
 		
 };
 

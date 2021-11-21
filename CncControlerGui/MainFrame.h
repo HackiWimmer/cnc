@@ -50,6 +50,7 @@ class GamepadThread;
 
 class SerialThread;
 class SerialThreadStub;
+
 class CncStartupLoggerProxy;
 class CncStandardLoggerProxy;
 class CncMsgHistoryLoggerProxy;
@@ -57,13 +58,13 @@ class CncTraceProxy;
 class CncLoggerView;
 class CncLoggerListCtrl;
 class CncTryRunLoggerProxy;
+class CncParserSynopsisProxy;
 
 class CncSourceEditor;
 class CncOutboundEditor;
 class CncFilePreviewWnd;
 class CncFilePreview;
 class CncReferencePosition;
-class CncParsingSynopsisTrace;
 class CncMonitorVSplitterWindow;
 class CncMonitorHSplitterWindow;
 class CncTemplateObserver;
@@ -164,6 +165,8 @@ class MainFrameBase : public MainFrameBClass {
 		CncLoggerView*				loggerView;
 		CncTraceProxy* 				tmpTraceInfo;
 		CncMsgHistoryLoggerProxy*	controllerMsgHistory;
+		CncTryRunLoggerProxy*		tryRunLoggerProxy;
+		CncParserSynopsisProxy*		parserSynopsisProxy;
 		
 		virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
 		
@@ -172,11 +175,13 @@ class MainFrameBase : public MainFrameBClass {
 		virtual ~MainFrameBase();
 		
 		// global trace controls
-		CncStandardLoggerProxy* 	getLogger() 			{ return logger; }
-		CncStartupLoggerProxy* 		getStartupTrace() 		{ return startupTrace; }
-		CncLoggerView*				getLoggerView()			{ return loggerView; }
-		CncTraceProxy* 				getTrace() 				{ return tmpTraceInfo; }
-		CncMsgHistoryLoggerProxy*	getCtrlMessageHistory() { return controllerMsgHistory; }
+		CncStandardLoggerProxy* 	getLogger() 				{ return logger; }
+		CncStartupLoggerProxy* 		getStartupTrace() 			{ return startupTrace; }
+		CncLoggerView*				getLoggerView()				{ return loggerView; }
+		CncTraceProxy* 				getTrace() 					{ return tmpTraceInfo; }
+		CncMsgHistoryLoggerProxy*	getCtrlMessageHistory()		{ return controllerMsgHistory; }
+		CncTryRunLoggerProxy*		getTryRunLogger()			{ return tryRunLoggerProxy; }
+		CncParserSynopsisProxy*		getParserSynopsisProxy()	{ return parserSynopsisProxy; }
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -636,8 +641,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		SerialThread* serialThread;
 		wxCriticalSection pSerialThreadCS;
 		
-		CncTryRunLoggerProxy*	tryRunLoggerProxy;
-
 		CncSpeedPlayground*	cncSpeedPlayground;
 		
 		CncControl* getCncControl() 						{ return cnc; }
@@ -646,7 +649,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		CncGCodeSequenceListCtrl* getGCodeSequenceList() 	{ return gCodeSequenceList; }
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
-		CncParsingSynopsisTrace* getParsingSynopsisTrace();
 		
 		void updateReferencePosition(RefPosResult* parameter);
 		

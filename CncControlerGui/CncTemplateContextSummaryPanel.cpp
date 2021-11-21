@@ -14,7 +14,11 @@ CncTemplateContextSummaryPanel::CncTemplateContextSummaryPanel(wxWindow* parent)
 , loggerRegister						()
 , summary								(NULL)
 , list									(NULL)
-, analysis								(NULL)
+, analysisOverall						(NULL)
+, analysisLimit							(NULL)
+, analysisMovement						(NULL)
+, tryRunLogger							(NULL)
+, parsingSynopsis						(NULL)
 ///////////////////////////////////////////////////////////////////
 {
 	summary = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
@@ -25,13 +29,25 @@ CncTemplateContextSummaryPanel::CncTemplateContextSummaryPanel(wxWindow* parent)
 	GblFunc::replaceControl(m_listPlaceholder, list);
 	loggerRegister.push_back(list);
 	
-	analysis = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
-	GblFunc::replaceControl(m_analysisPlaceholder, analysis);
-	loggerRegister.push_back(analysis);
+	analysisOverall = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_analysisPlaceholder, analysisOverall);
+	loggerRegister.push_back(analysisOverall);
+	
+	analysisLimit = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_analysisLimitPlaceholder, analysisLimit);
+	loggerRegister.push_back(analysisLimit);
+	
+	analysisMovement = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_analysisMovementPlaceholder, analysisMovement);
+	loggerRegister.push_back(analysisMovement);
 	
 	tryRunLogger = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
 	GblFunc::replaceControl(m_tryRunLoggerPlaceholder, tryRunLogger);
 	loggerRegister.push_back(tryRunLogger);
+	
+	parsingSynopsis = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_parsingSynopsisPlaceholder, parsingSynopsis);
+	loggerRegister.push_back(parsingSynopsis);
 	
 }
 ///////////////////////////////////////////////////////////////////
@@ -41,16 +57,22 @@ CncTemplateContextSummaryPanel::~CncTemplateContextSummaryPanel() {
 	
 	wxDELETE(summary);
 	wxDELETE(list);
-	wxDELETE(analysis);
+	wxDELETE(analysisOverall);
+	wxDELETE(analysisLimit);
+	wxDELETE(analysisMovement);
 	wxDELETE(tryRunLogger);
+	wxDELETE(parsingSynopsis);
 }
 ///////////////////////////////////////////////////////////////////
-void CncTemplateContextSummaryPanel::selectTryRun() {
+void CncTemplateContextSummaryPanel::selectPage(CncExtLoggerListCtrl* page) const {
 ///////////////////////////////////////////////////////////////////
-	const int sel = m_loggerBook->FindPage(tryRunLogger->GetParent());
-	
-	if ( sel != wxNOT_FOUND )
-		m_loggerBook->SetSelection(sel);
+	if ( page != NULL )
+	{
+		const int sel = m_loggerBook->FindPage(page->GetParent());
+		
+		if ( sel != wxNOT_FOUND )
+			m_loggerBook->SetSelection(sel);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncTemplateContextSummaryPanel::update() {
@@ -74,29 +96,28 @@ void CncTemplateContextSummaryPanel::update() {
 	THE_CONTEXT->templateContext->analizeContextEntries(result);
 	const bool ok = THE_CONTEXT->templateContext->isValid();
 	
-	{
-		summary->clearAll();
-		
-		std::stringstream ss;
-		THE_CONTEXT->templateContext->traceTo(ss, 0);
-		
-		if ( ok == false )	summary->addErrorEntry(ss.str().c_str());
-		else				summary->addInfoEntry(ss.str().c_str());
-	}
-	{
-		list->clearAll();
-		
-		std::stringstream ss;
-		THE_CONTEXT->templateContext->traceContextEntriesTo(ss);
-		list->add(ss.str().c_str());
-	}
-	{
-		analysis->clearAll();
-		
-		std::stringstream ss;
-		ss << result;
-		analysis->add(ss.str().c_str());
-	}
+	std::stringstream ss;
+	
+	// 
+	ss.str() = "";
+	summary->clearAll();
+	THE_CONTEXT->templateContext->traceTo(ss, 0);
+	
+	if ( ok == false )	summary->addErrorEntry(ss.str().c_str());
+	else				summary->addInfoEntry(ss.str().c_str());
+	
+	//
+	ss.str() = "";
+	list->clearAll();
+	THE_CONTEXT->templateContext->traceContextEntriesTo(ss);
+	list->add(ss.str().c_str());
+	
+	//
+	ss.str() = "";
+	analysisOverall->clearAll();
+	ss << result;
+	analysisOverall->add(ss.str().c_str());
+	
 	
 	
 	

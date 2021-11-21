@@ -116,16 +116,6 @@ class CncPreprocessorBase : public wxPanel
 {
 protected:
     wxListbook* m_listbookPreProcessor;
-    wxPanel* m_panelParsingSynopsis;
-    wxPanel* m_plParsingSynopsis;
-    wxBitmapButton* m_bmpButton304911;
-    wxStaticText* m_staticText61381422;
-    wxBitmapToggleButton* m_btConnectOperatingTrace4;
-    wxBitmapButton* m_btClearOperatingTrace105;
-    wxBitmapButton* m_btClearOperatingTrace116;
-    wxBitmapButton* m_btClearOperatingTrace7;
-    wxStaticLine* m_staticLine275;
-    wxPanel* m_motionSynopsisPlaceholder;
     wxPanel* m_panelOperatingTrace;
     wxPanel* m_plOperatingTrace;
     wxBitmapButton* m_bmpButton304910;
@@ -180,11 +170,6 @@ protected:
     wxTextCtrl* m_selectedClientIds;
 
 protected:
-    virtual void onDetachParsingSynopsisView(wxCommandEvent& event) { event.Skip(); }
-    virtual void connectParsingSynopis(wxCommandEvent& event) { event.Skip(); }
-    virtual void copyParsingSynopis(wxCommandEvent& event) { event.Skip(); }
-    virtual void saveParsingSynopsis(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearParsingSynopis(wxCommandEvent& event) { event.Skip(); }
     virtual void onDetachOperatingTraceView(wxCommandEvent& event) { event.Skip(); }
     virtual void connectOperatingTrace(wxCommandEvent& event) { event.Skip(); }
     virtual void copyOperatingTrace(wxCommandEvent& event) { event.Skip(); }
@@ -207,16 +192,6 @@ protected:
     virtual void onMoveSequenceEntryLast(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    wxBitmapButton* GetBmpButton304911() { return m_bmpButton304911; }
-    wxStaticText* GetStaticText61381422() { return m_staticText61381422; }
-    wxBitmapToggleButton* GetBtConnectOperatingTrace4() { return m_btConnectOperatingTrace4; }
-    wxBitmapButton* GetBtClearOperatingTrace105() { return m_btClearOperatingTrace105; }
-    wxBitmapButton* GetBtClearOperatingTrace116() { return m_btClearOperatingTrace116; }
-    wxBitmapButton* GetBtClearOperatingTrace7() { return m_btClearOperatingTrace7; }
-    wxStaticLine* GetStaticLine275() { return m_staticLine275; }
-    wxPanel* GetMotionSynopsisPlaceholder() { return m_motionSynopsisPlaceholder; }
-    wxPanel* GetPlParsingSynopsis() { return m_plParsingSynopsis; }
-    wxPanel* GetPanelParsingSynopsis() { return m_panelParsingSynopsis; }
     wxBitmapButton* GetBmpButton304910() { return m_bmpButton304910; }
     wxStaticText* GetStaticText6138142() { return m_staticText6138142; }
     wxBitmapToggleButton* GetBtConnectOperatingTrace() { return m_btConnectOperatingTrace; }
