@@ -98,28 +98,29 @@ void CncTemplateContextSummaryPanel::update() {
 	
 	std::stringstream ss;
 	
-	// 
-	ss.str() = "";
+	// summary
+	ss.str("");
 	summary->clearAll();
 	THE_CONTEXT->templateContext->traceTo(ss, 0);
 	
 	if ( ok == false )	summary->addErrorEntry(ss.str().c_str());
 	else				summary->addInfoEntry(ss.str().c_str());
 	
-	//
-	ss.str() = "";
+	// overall analysis
+	ss.str("");
+	analysisOverall->clearAll();
+	ss << result;
+	if ( ok == false )	analysisOverall->addErrorEntry(ss.str().c_str());
+	else				analysisOverall->addInfoEntry(ss.str().c_str());
+	
+	
+	
+	
+	// list all entries
+	ss.str("");
 	list->clearAll();
 	THE_CONTEXT->templateContext->traceContextEntriesTo(ss);
 	list->add(ss.str().c_str());
-	
-	//
-	ss.str() = "";
-	analysisOverall->clearAll();
-	ss << result;
-	analysisOverall->add(ss.str().c_str());
-	
-	
-	
 	
 	
 	

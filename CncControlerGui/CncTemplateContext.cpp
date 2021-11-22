@@ -12,6 +12,7 @@ CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
 , path					("")
 , toolTotList			("")
 , toolSelList			("")
+, runCount				(0)
 , validRunCount			(0)
 , bounderySpace			(bs)
 , bounderies			()
@@ -69,7 +70,7 @@ bool CncTemplateContext::init(const wxString& path, const wxString& name) {
 	return wxFileName::Exists(getFileName());
 }
 //////////////////////////////////////////////////////////////
-void CncTemplateContext::registerBounderies(const CncDoubleBounderies& b) {
+void CncTemplateContext::registerBounderies(const CncDoubleBoundaries& b) {
 //////////////////////////////////////////////////////////////
 	bounderies = b;
 	updateGui(false);
@@ -88,7 +89,7 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 //////////////////////////////////////////////////////////////
 	const wxString prefix(' ', indent);
 	
-	auto traceBound = [&](const CncDoubleBounderies& b) {
+	auto traceBound = [&](const CncDoubleBoundaries& b) {
 		return wxString::Format("(%.3lf, %.3lf)(%.3lf, %.3lf)(%.3lf, %.3lf)"
 								, b.xMin, b.xMax
 								, b.yMin, b.yMax
@@ -101,6 +102,7 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 	o	<< prefix << "Name                    : " << fn.GetFullName()				<< std::endl
 		<< prefix << "Path                    : " << fn.GetPath()					<< std::endl
 		<< prefix << "Valid                   : " << (isValid() ? "Yes" : "No" )	<< std::endl
+		<< prefix << "Total run count         : " << runCount						<< std::endl
 		<< prefix << "Valid run count         : " << validRunCount					<< std::endl
 		<< prefix << "Errors                  : " << hasErrors()					<< std::endl
 		<< prefix << "Tool Tot. List          : " << toolTotList					<< std::endl
@@ -108,6 +110,13 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 		<< prefix << "Tool Sel Count          : " << getToolSelCount()				<< std::endl
 		<< prefix << "Bounderies         [mm] : " << traceBound(bounderies)			<< std::endl
 	;
+	
+	if ( hasErrors() )
+	{
+		// additional error infos from ContextInterface
+		o << " \n\nAdditional error info:\n";
+		traceErrorInfoTo(o);
+	}
 	
 	o << std::endl;
 }

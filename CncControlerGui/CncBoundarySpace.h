@@ -55,10 +55,10 @@ class CncBoundarySpace {
 		CncDoubleDistance		calculateRefPosition;
 		
 		// without harware reference
-		CncDoubleBounderies		boundLogically;
+		CncDoubleBoundaries		boundLogically;
 		
 		// harware normalized
-		CncDoubleBounderies		boundPhysically;
+		CncDoubleBoundaries		boundPhysically;
 		
 		CncRefPositionMode		refPostionMode;
 		CncDoubleOffset 		measurementOffset;

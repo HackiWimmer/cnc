@@ -31,6 +31,7 @@ class CncTemplateContextSummaryPanel : public CncTemplateContextSummaryPanelBase
 		virtual ~CncTemplateContextSummaryPanel();
 		
 		void update();
+		void selectSummary()						const { selectPage(summary); }
 		void selectTryRun()							const { selectPage(tryRunLogger); }
 		void selectParsingSynopsis()				const { selectPage(parsingSynopsis); }
 		

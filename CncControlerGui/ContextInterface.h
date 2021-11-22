@@ -17,7 +17,7 @@ class ContextInterface
 		static const int ERR_NO_ERROR						= 0;
 		static const int ERR_GENERAL						= 1;
 		static const int ERR_LIMIT							= 2;
-		static const int ERR_MOVE_WITHOUT_SPINDLE			= 3;
+		static const int ERR_MOVE_WITHOUT_SPINDLE			= 4;
 		
 		struct Entry
 		{

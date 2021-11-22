@@ -1742,23 +1742,6 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
     
     flexGridSizer6842->Add(m_summaryPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_plContextList = new wxPanel(m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_plContextListImgIndex;
-    m_plContextListImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database@2x")));
-    m_loggerBook->AddPage(m_plContextList, _("Template CTX\nBase List"), false, m_plContextListImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer684 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer684->SetFlexibleDirection( wxBOTH );
-    flexGridSizer684->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer684->AddGrowableCol(0);
-    flexGridSizer684->AddGrowableRow(0);
-    m_plContextList->SetSizer(flexGridSizer684);
-    
-    m_listPlaceholder = new wxPanel(m_plContextList, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plContextList, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_listPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
-    
-    flexGridSizer684->Add(m_listPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
     m_plContextAnalysisOverall = new wxPanel(m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_plContextAnalysisOverallImgIndex;
     m_plContextAnalysisOverallImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database@2x")));
@@ -1843,6 +1826,23 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
     m_tryRunLoggerPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
     flexGridSizer68442572->Add(m_tryRunLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_plContextList = new wxPanel(m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_plContextListImgIndex;
+    m_plContextListImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database@2x")));
+    m_loggerBook->AddPage(m_plContextList, _("Template CTX\nBase List"), false, m_plContextListImgIndex);
+    
+    wxFlexGridSizer* flexGridSizer684 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer684->SetFlexibleDirection( wxBOTH );
+    flexGridSizer684->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer684->AddGrowableCol(0);
+    flexGridSizer684->AddGrowableRow(0);
+    m_plContextList->SetSizer(flexGridSizer684);
+    
+    m_listPlaceholder = new wxPanel(m_plContextList, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plContextList, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_listPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
+    
+    flexGridSizer684->Add(m_listPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     SetName(wxT("CncTemplateContextSummaryPanelBase"));
     SetSize(wxDLG_UNIT(this, wxSize(700,800)));

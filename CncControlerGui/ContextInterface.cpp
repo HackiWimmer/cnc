@@ -36,17 +36,21 @@ const char* ContextInterface::Entry::getTypeAsString(Type t) {
 std::ostream& ContextInterface::Result::traceTo(std::ostream &o) const {
 //////////////////////////////////////////////////////////
 	o	<< "Summary:\n"
-		<< wxString::Format(" Min/Max F Value      [mm/min] : %6ld, %6ld\n", 			( sum.minF != Result::minD ? sum.minF : 0 ), sum.maxF)
-		<< wxString::Format(" Min/Max S Value       [U/min] : %6ld, %6ld\n",			( sum.minS != Result::minD ? sum.minS : 0 ), sum.maxS)
-		<< wxString::Format(" Limit Summary                 : %14s\n",					sum.limitStates.getValueAsReadableString())
-		<< wxString::Format(" Total Distance X         [mm] : %14.3lf\n",				double(sum.lenX) * THE_CONFIG->getDisplayFactX())
-		<< wxString::Format(" Total Distance Y         [mm] : %14.3lf\n",				double(sum.lenY) * THE_CONFIG->getDisplayFactY())
-		<< wxString::Format(" Total Distance Z         [mm] : %14.3lf\n",				double(sum.lenZ) * THE_CONFIG->getDisplayFactZ())
+		<< wxString::Format(" Min/Max F Value      [mm/min] : %6ld, %6ld\n", 		( sum.minF != Result::minD ? sum.minF : 0 ), sum.maxF)
+		<< wxString::Format(" Min/Max S Value       [U/min] : %6ld, %6ld\n",		( sum.minS != Result::minD ? sum.minS : 0 ), sum.maxS)
+		<< wxString::Format(" Total Distance X         [mm] : %14.3lf\n",			double(sum.lenX) * THE_CONFIG->getDisplayFactX())
+		<< wxString::Format(" Total Distance Y         [mm] : %14.3lf\n",			double(sum.lenY) * THE_CONFIG->getDisplayFactY())
+		<< wxString::Format(" Total Distance Z         [mm] : %14.3lf\n",			double(sum.lenZ) * THE_CONFIG->getDisplayFactZ())
 	;
 	o	<< "Distances without Spindle = OFF\n"
-		<< wxString::Format(" Total Distance X          [mm] : %14.3lf\n",				double(err.lenX) * THE_CONFIG->getDisplayFactX())
-		<< wxString::Format(" Total Distance Y          [mm] : %14.3lf\n",				double(err.lenY) * THE_CONFIG->getDisplayFactY())
-		<< wxString::Format(" Total Distance Z          [mm] : %14.3lf\n",				double(err.lenZ) * THE_CONFIG->getDisplayFactZ())
+		<< wxString::Format(" Total Distance X         [mm] : %14.3lf\n",			double(err.lenX) * THE_CONFIG->getDisplayFactX())
+		<< wxString::Format(" Total Distance Y         [mm] : %14.3lf\n",			double(err.lenY) * THE_CONFIG->getDisplayFactY())
+		<< wxString::Format(" Total Distance Z         [mm] : %14.3lf\n",			double(err.lenZ) * THE_CONFIG->getDisplayFactZ())
+	;
+	o	<< "Limit switch info\n"
+		<< wxString::Format(" Limit X            [min, max] : %14s\n",				wxString::Format("%d, %d", sum.limitStates.xMin(), sum.limitStates.xMax()))
+		<< wxString::Format(" Limit Y            [min, max] : %14s\n",				wxString::Format("%d, %d", sum.limitStates.yMin(), sum.limitStates.yMax()))
+		<< wxString::Format(" Limit Z            [min, max] : %14s\n",				wxString::Format("%d, %d", sum.limitStates.zMin(), sum.limitStates.zMax()))
 	;
 	
 	return o;
@@ -148,6 +152,8 @@ std::ostream& ContextInterface::traceErrorInfoTo(std::ostream &ostr) const {
 	}
 	else
 	{
+		CNC_CEX3_FUNCT_A("errorFlags=%d", errorFlags)
+		
 		if ( errorFlags & ERR_LIMIT )
 			ostr << "Error: One ore more limit switches reached during the run!\n";
 			

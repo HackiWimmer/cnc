@@ -716,6 +716,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		bool processManualMove(const CncMoveDefinition& md);
 		
+		void openTemplateContextView();
+		
 		friend class MainFrameProxy;
 		friend class CncMsgHistoryLoggerProxy;
 		friend class CncLoggerListCtrl;

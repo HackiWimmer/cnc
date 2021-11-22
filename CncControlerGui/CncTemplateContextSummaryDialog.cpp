@@ -10,6 +10,15 @@ CncTemplateContextSummaryDialog::CncTemplateContextSummaryDialog(wxWindow* paren
 ///////////////////////////////////////////////////////////////////
 {
 	swapControl();
+	
+	if ( parent )
+	{
+		wxSize size(parent->GetClientSize());
+		size.Scale(0.8, 0.8);
+		SetClientSize(size);
+		
+		CentreOnParent();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 CncTemplateContextSummaryDialog::~CncTemplateContextSummaryDialog() {

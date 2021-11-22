@@ -444,8 +444,6 @@ protected:
     wxListbook* m_loggerBook;
     wxPanel* m_plSummary;
     wxPanel* m_summaryPlaceholder;
-    wxPanel* m_plContextList;
-    wxPanel* m_listPlaceholder;
     wxPanel* m_plContextAnalysisOverall;
     wxPanel* m_analysisPlaceholder;
     wxPanel* m_plContextAnalysisLimit;
@@ -456,6 +454,8 @@ protected:
     wxPanel* m_parsingSynopsisPlaceholder;
     wxPanel* m_plTryRunLogger;
     wxPanel* m_tryRunLoggerPlaceholder;
+    wxPanel* m_plContextList;
+    wxPanel* m_listPlaceholder;
 
 protected:
     virtual void onCopyCurrentList(wxCommandEvent& event) { event.Skip(); }
@@ -468,8 +468,6 @@ public:
     wxStaticLine* GetStaticLine719() { return m_staticLine719; }
     wxPanel* GetSummaryPlaceholder() { return m_summaryPlaceholder; }
     wxPanel* GetPlSummary() { return m_plSummary; }
-    wxPanel* GetListPlaceholder() { return m_listPlaceholder; }
-    wxPanel* GetPlContextList() { return m_plContextList; }
     wxPanel* GetAnalysisPlaceholder() { return m_analysisPlaceholder; }
     wxPanel* GetPlContextAnalysisOverall() { return m_plContextAnalysisOverall; }
     wxPanel* GetAnalysisLimitPlaceholder() { return m_analysisLimitPlaceholder; }
@@ -480,6 +478,8 @@ public:
     wxPanel* GetPlParsingSynopsis() { return m_plParsingSynopsis; }
     wxPanel* GetTryRunLoggerPlaceholder() { return m_tryRunLoggerPlaceholder; }
     wxPanel* GetPlTryRunLogger() { return m_plTryRunLogger; }
+    wxPanel* GetListPlaceholder() { return m_listPlaceholder; }
+    wxPanel* GetPlContextList() { return m_plContextList; }
     wxListbook* GetLoggerBook() { return m_loggerBook; }
     CncTemplateContextSummaryPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,800), long style = wxTAB_TRAVERSAL);
     virtual ~CncTemplateContextSummaryPanelBase();

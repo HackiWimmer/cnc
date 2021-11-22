@@ -18,10 +18,11 @@ class CncTemplateContext : public ContextInterface {
 		wxString					path;
 		wxString					toolTotList;
 		wxString					toolSelList;
+		unsigned int				runCount;
 		unsigned int				validRunCount;
 		
 		CncBoundarySpace*			bounderySpace;
-		CncDoubleBounderies			bounderies;
+		CncDoubleBoundaries			bounderies;
 		
 	protected:
 		
@@ -40,12 +41,14 @@ class CncTemplateContext : public ContextInterface {
 		bool				init(const wxString& pathFileName);
 		bool				init(const wxString& path, const wxString& name);
 		
+		void				registerRun()							{ runCount++; updateGui(false); }
 		void				resetValidRuns()						{ validRunCount = 0; }
 		void				registerValidRun()						{ validRunCount++; updateGui(false); }
 		bool				hasValidRuns()					const	{ return validRunCount > 0; }
-		unsigned int		getValidunCount()				const	{ return validRunCount; }
+		unsigned int		getValidRunCount()				const	{ return validRunCount; }
+		unsigned int		getRunCount()					const	{ return runCount; }
 		
-		void				registerBounderies(const CncDoubleBounderies& b);
+		void				registerBounderies(const CncDoubleBoundaries& b);
 		bool				hasBounderies()					const	{ return bounderies.hasBounderies(); }
 		
 		const wxString&		getName()						const	{ return name; }

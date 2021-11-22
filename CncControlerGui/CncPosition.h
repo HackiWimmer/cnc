@@ -508,7 +508,7 @@ class CncBounderies : public CncPosition<T>::Watermarks {
 
 // ----------------------------------------------------------------------
 typedef CncBounderies<int32_t> 	CncLongBounderies;
-typedef CncBounderies<double> 	CncDoubleBounderies;
+typedef CncBounderies<double> 	CncDoubleBoundaries;
 typedef CncBounderies<float> 	CncFloatBounderies;
 
 #endif

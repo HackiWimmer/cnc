@@ -584,19 +584,7 @@ void CncSecureCtrlPanel::onTryRunSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onTemplateContextSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	//THE_TPL_CTX->traceTo(cnc::cex1, 3);
-	//cnc::cex1 << THE_TPL_CTX->getLastLogInfo() << std::endl;
-	std::stringstream ss;
-	THE_TPL_CTX->traceTo(ss, 0);
-	
-	if ( ss.tellp() > 0 )
-	{
-		CncMessageDialog dlg(this, ss.str().c_str(), "Current context", "Template Context");
-		dlg.SetSize(800, 900);
-		dlg.CenterOnParent();
-		dlg.setWordWrap(false);
-		dlg.ShowModal();
-	}
+	THE_APP->openTemplateContextView();
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onToggleTouchpadPane(wxCommandEvent& event) {

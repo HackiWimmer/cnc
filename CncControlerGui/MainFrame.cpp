@@ -4558,88 +4558,6 @@ void MainFrame::displayPositionSituation(int type, const wxString& m, const wxSt
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	
-	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false )
-	{
-		displayPositionSituation(	wxICON_ERROR,
-									"Validate positions failed\n", 
-									"CNC Position check . . . ", 
-									"The run command will be aborted!"
-		);
-		
-		setReferencePosEnforceFlag(true);
-		return false;
-	}
-	
-	cnc->evaluateLimitState();
-	if ( cnc->isALimitSwitchActive() )
-	{
-		// always return false to reconfigure zero in this sitiuation
-		std::clog << "MainFrame::checkIfRunCanBeProcessed(): Limit switch detected" << std::endl;
-		return false;
-	}
-	
-	return (confirm == true ? showConfigSummaryAndConfirmRun() : true);
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::checkReferencePositionState() {
-///////////////////////////////////////////////////////////////////
-	const CncTemplateFormat tf = getCurrentTemplateFormat();
-	if ( tf == TplManual || tf == TplTest )
-		return true;
-		
-	const CncDoublePosition refPos(CncStartPositionResolver::getReferencePosition());
-	const bool refPosValid	= isReferenceStateValid();
-	const bool zero			= ( cnc->getCurAppPosMetric() != refPos );
-	
-	if ( refPosValid == false ) {
-		wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n");
-		
-		const int ret = showReferencePositionDlg(msg);
-		if ( ret == wxID_OK && zero == false ) {
-			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
-			
-			// Safety: Always return false in this case because this will
-			// stop the currently started run. 
-			return false;
-		}
-	}
-	
-	if ( zero ) {
-		wxASSERT( cnc != NULL );
-		
-		bool openDlg = false;
-		switch ( THE_CONFIG->getRunConfirmationModeAsChar() ) {
-			// Always
-			case 'A':	openDlg = true; break;
-			// Serial Port only
-			case 'S': 	openDlg = !cnc->isEmulator(); break;
-			// Never
-			default:	openDlg = false;
-		}
-		
-		CncStartPositionResolver dlg(this);
-		int ret = wxID_OK;
-		
-		if ( openDlg == true ) 	ret = dlg.ShowModal();
-		else 					ret = dlg.resolve("M[xyz]");
-
-		if ( ret == wxID_OK ) {
-			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
-		}
-		else {
-			//Always return false in this case because this will
-			// stop the currently started run. 
-			return false;
-		}
-	}
-	
-	return true;
-}
-///////////////////////////////////////////////////////////////////
 bool MainFrame::showConfigSummaryAndConfirmRun() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
@@ -4813,8 +4731,277 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+bool MainFrame::checkReferencePositionState() {
+///////////////////////////////////////////////////////////////////
+	const CncTemplateFormat tf = getCurrentTemplateFormat();
+	if ( tf == TplManual || tf == TplTest )
+		return true;
+		
+	const CncDoublePosition refPos(CncStartPositionResolver::getReferencePosition());
+	const bool refPosValid	= isReferenceStateValid();
+	const bool zero			= ( cnc->getCurAppPosMetric() != refPos );
+	
+	if ( refPosValid == false )
+	{
+		const wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n");
+		
+		const int ret = showReferencePositionDlg(msg);
+		if ( ret == wxID_OK && zero == false )
+		{
+			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
+			
+			// Safety: Always return false in this case because this will
+			// stop the currently started run. 
+			return false;
+		}
+	}
+	
+	if ( zero )
+	{
+		wxASSERT( cnc != NULL );
+		
+		bool openDlg = false;
+		switch ( THE_CONFIG->getRunConfirmationModeAsChar() )
+		{
+			// Always
+			case 'A':	openDlg = true; break;
+			// Serial Port only
+			case 'S': 	openDlg = !cnc->isEmulator(); break;
+			// Never
+			default:	openDlg = false;
+		}
+		
+		CncStartPositionResolver dlg(this);
+		int ret = wxID_OK;
+		
+		if ( openDlg == true ) 	ret = dlg.ShowModal();
+		else 					ret = dlg.resolve("M[xyz]");
+
+		if ( ret == wxID_OK )
+		{
+			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
+		}
+		else
+		{
+			// Always return false in this case because this will
+			// stop the currently started run. 
+			return false;
+		}
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cnc);
+	
+	if ( isInterrupted() == true )
+	{
+		CNC_CERR_FUNCT_A(": Run aborted - Interrupt detected!")
+		return false;
+	}
+		
+	// checks against teh loaded template
+	const CncTemplateFormat tf = getCurrentTemplateFormat();
+	const wxString fn (getCurrentTemplatePathFileName());
+	
+	if ( tf != TplManual && tf != TplTest )
+	{
+		if ( fn.IsEmpty() == true )
+		{
+			CNC_CERR_FUNCT_A("No template loaded!")
+			return false;
+		}
+	}
+	
+	//
+	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false )
+	{
+		displayPositionSituation(	wxICON_ERROR,
+									"Validate positions failed\n", 
+									"CNC Position check . . . ", 
+									"The run command will be aborted!"
+		);
+		
+		setReferencePosEnforceFlag(true);
+		
+		CNC_CERR_FUNCT_A("Position validation failed!")
+		return false;
+	}
+	
+	if ( cnc->isReadyToRun() == false ) 
+	{
+		CNC_CERR_FUNCT_A("Controller isn't ready to run: Run was rejected!")
+		return false;
+	}
+	
+	// may be this is already done by cnc->isReadyToRun()
+	cnc->evaluateLimitState();
+	if ( cnc->isALimitSwitchActive() )
+	{
+		// always return false to reconfigure zero in this situation
+		CNC_CERR_FUNCT_A("Limit switch detected")
+		return false;
+	}
+	
+	return (confirm == true ? showConfigSummaryAndConfirmRun() : true);
+}
+///////////////////////////////////////////////////////////////////
 bool MainFrame::processTemplateWrapper(bool confirm) {
 ///////////////////////////////////////////////////////////////////
+	try 
+	{
+		wxASSERT(cnc);
+		
+		//-----------------------------------------------------------------
+		// all mandatory checks from here on . . . 
+		
+		// do this first and return true if it failed to start a second loop 
+		// on demand that's much better as the runs starts immediately after 
+		// the reference position setup and in secure mode it is essential to
+		// stop here because there no modal dialogue.
+		if ( checkReferencePositionState() == false )
+			return true;
+		
+		// corresponding error messages are already displayed
+		if ( checkIfRunCanBeProcessed(confirm) == false )
+		{
+			MainFrame::Notification notification;
+			notification.location	= MainFrame::Notification::Location::NL_MonitorView;
+			notification.type		= 'E';
+			notification.title		= "Check if run can be processed";
+			notification.message	= "Mandatory Checks failed . . . ";
+			displayNotification(notification);
+			return false;
+		}
+		
+		//-----------------------------------------------------------------
+		// deactivate all relevant behaviours from here on . . . 
+		
+		CncRunEventFilter cef;
+		
+		// deactivate idle requests
+		CNC_TRANSACTION_LOCK_RET_ON_ERROR(false)
+		
+		// Deactivate observer
+		CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
+		
+		// it's very import to deactivate the notifications during a run
+		// because instead every config change (sc()) will release a notification
+		// this will be the case for example if the SVG path handler changes
+		// the z -axis values . . .
+		// as a result the processing slows down significantly.
+		CncConfig::NotificationDeactivator cfgNotDeactivation;
+		
+		//-----------------------------------------------------------------
+		// prepare all relevant settings from here on . . . 
+		
+		serialSpyPanel->clearSerialSpyBeforNextRun();
+		
+		THE_CONTEXT->resetProcessing();
+		THE_CONTEXT->initPreparationPhase();
+		THE_CONTEXT->setAllowEventHandling(true);
+		
+		cnc->resetSetterMap();
+		cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
+		cnc->enableProbeMode(THE_CONTEXT->isProbeMode());
+		
+		decorateOutboundSaveControls(false);
+		cncPreprocessor->clearAll();
+		
+		if ( getCurrentTemplateFormat() == TplManual )
+		{
+			if ( cncManuallyMoveCoordPanel->shouldClearMontionMonitor() )
+				clearMotionMonitor();
+		}
+		else
+		{
+			cncManuallyMoveCoordPanel->resetClearViewState();
+		}
+		
+		const wxString probeMode(THE_CONTEXT->isProbeMode() ? "ON" :"OFF");
+		
+		// restart the trace timer using the previous time-out value
+		m_traceTimer->Start(-1);
+		
+		//-----------------------------------------------------------------
+		// process template . . . 
+		
+			// *********************
+			
+			CNC_CLOG_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) started . . .", wxDateTime::UNow().FormatISOTime(), probeMode))
+			
+			// This instance starts and stops the speed monitor
+			CncSpeedMonitorRunner smr(speedMonitor);
+			
+			THE_TPL_CTX->registerRun();
+			const bool ret = processTemplateIntern();
+			
+			// *********************
+
+		//-----------------------------------------------------------------
+		// post settings from here on . . . 
+		
+		// try to switch the spindle off 
+		// may be the template <CncParameterBlock Spindle="Off"/>
+		// has not already done this
+		cnc->switchSpindleOff(true);
+		
+		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
+		
+		// refresh some periphery
+		motionMonitor->updateMonitorAndOptions();
+		statisticsPane->updateReplayPane();
+		
+		// refresh boundaries
+		CncDoubleBoundaries bounds;
+		bounds.setMinBound(cnc->getMinPositionsMetric());
+		bounds.setMaxBound(cnc->getMaxPositionsMetric());
+		THE_TPL_CTX->registerBounderies(bounds);
+		
+		if ( inboundFileParser )
+		{
+			const Trigger::EndRun endRun(ret);
+			inboundFileParser->deligateTrigger(endRun);
+		}
+		
+		//-----------------------------------------------------------------
+		// post statements from here on . . . 
+		// prepare final statements
+		if ( ret == false )
+		{
+			wxString hint("not successfully");
+			CNC_CEX1_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint))
+			lock.setErrorMode();
+			
+			THE_TPL_CTX->resetValidRuns();
+			decorateTryRunState(cncError);
+		} 
+		else
+		{
+			CNC_CLOG_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode))
+			THE_TPL_CTX->registerValidRun();
+			decorateTryRunState(cncOk);
+		}
+		
+		return ret;
+	}
+	catch (const CncInterruption& ex) 
+	{
+		CncInterruption nex(ex);
+		nex.addCatchLocation(CNC_LOG_FUNCT);
+		handleCncInterruptException(nex);
+	}
+	catch (...) 
+	{
+		handleUnhandledException(CNC_LOG_FUNCT);
+	}
+	
+	return false;
+	
+	#warning
+	/*
 	try 
 	{
 		wxASSERT(cnc);
@@ -4849,7 +5036,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
 		cnc->enableProbeMode(THE_CONTEXT->isProbeMode());
 		
-		// restart the trace timer using the previous timeout value
+		// restart the trace timer using the previous time-out value
 		m_traceTimer->Start(-1);
 		
 		MainFrame::Notification notification;
@@ -4938,7 +5125,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			decorateTryRunState(cncOk);
 		}
 		
-		CncDoubleBounderies bounds;
+		CncDoubleBoundaries bounds;
 		bounds.setMinBound(cnc->getMinPositionsMetric());
 		bounds.setMaxBound(cnc->getMaxPositionsMetric());
 		THE_TPL_CTX->registerBounderies(bounds);
@@ -4965,6 +5152,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	}
 	
 	return false;
+	*/
 }
 ///////////////////////////////////////////////////////////////////
 // don't call this method directly, instead use processTemplateWrapper
@@ -6748,43 +6936,95 @@ void MainFrame::rcTryRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc->tryRunAvailable() )
 	{
-		const unsigned int prevValidCount = THE_CONTEXT->templateContext->getValidunCount();
+		const unsigned int prevRunCount			= THE_CONTEXT->templateContext->getRunCount();
+		const unsigned int prevValidRunCount	= THE_CONTEXT->templateContext->getValidRunCount();
+		
+		wxString finalMessage("Try run was successful");
+		bool ret = false;
 		
 		// streamer redirect section
 		{
 			StdStreamRedirector srd(getTryRunLogger());
 			
-			cnc::cex1 << "Try run started: " << wxDateTime::Now().FormatISOTime() << std::endl;
+			CNC_CLOG_FUNCT_A("Try run started: %s", wxDateTime::Now().FormatISOTime())
+			
 			cnc->switchRunMode(CncControl::RunMode::M_TryRun);
-			rcRun();
+			ret = processTemplateWrapper();
 			cnc->switchRunMode(CncControl::RunMode::M_RealRun);
+			
+			// error handling 
+			if ( ret == false && THE_CONTEXT->templateContext->getRunCount() <= prevRunCount )
+			{
+				// in this case processTemplate() fails before the run was started by previous checks
+				// no further checks necessary here . . . 
+				finalMessage.assign("Try run was failed");
+			}
+			else
+			{
+				if ( THE_CONTEXT->templateContext->getRunCount() > prevRunCount ) 
+				{
+					// only if a new run was registered
+					if ( (prevValidRunCount + 1) != THE_CONTEXT->templateContext->getValidRunCount() )
+					{
+						// the valid count was not increased
+						finalMessage.assign("Try run was failed");
+						ret           = false;
+					}
+				}
+				else
+				{
+					// in this case normally the reference position check failed and 
+					// a second loop was initiated
+					finalMessage.clear();
+					ret = true;
+				}
+			}
+			
+			// display processing info on try run logger
+			if ( finalMessage.IsEmpty() == false )
+			{
+				if ( ret == false )	{ CNC_CERR_FUNCT_A(finalMessage) }
+				else				{ CNC_CLOG_FUNCT_A(finalMessage) }
+			}
 		}
 		
-		// error handling 
-		if ( (prevValidCount + 1) != THE_CONTEXT->templateContext->getValidunCount() )
+		// display processing info on standard logger
+		if ( ret == false )
 		{
 			decorateTryRunState(cncError);
-			
-			m_listbookSource->SetSelection(SourceBookSelection::VAL::CONTEXT);
-			contextSummaryPanel->selectTryRun();
-			
-			cnc::cex1 << "Try run was failed" << std::endl;
-			
-			if ( THE_CONTEXT->secureModeInfo.isActive )
-			{
-				CncTemplateContextSummaryDialog dlg(this);
-				dlg.update();
-				dlg.ShowModal();
-			}
+			CNC_CERR_FUNCT_A(finalMessage)
+			openTemplateContextView();
 		}
 		else
 		{
-			decorateTryRunState(cncOk);
-			std::clog << "Try run was successful" << std::endl; 
+			if ( finalMessage.IsEmpty() == false )
+			{
+				decorateTryRunState(cncOk);
+				CNC_CLOG_FUNCT_A(finalMessage)
+			}
+			else
+			{
+				decorateTryRunState(cncUnknown);
+			}
 		}
 	}
 	
 	motionMonitor->update(true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openTemplateContextView() {
+///////////////////////////////////////////////////////////////////
+	// always do this, because the CncTemplateContextSummaryDialog 
+	// swap these controls
+	m_listbookSource->SetSelection(SourceBookSelection::VAL::CONTEXT);
+	contextSummaryPanel->selectSummary();
+
+	if ( THE_CONTEXT->secureModeInfo.isActive )
+	{
+		CncTemplateContextSummaryDialog dlg(this);
+		dlg.update();
+		dlg.ShowModal();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateTryRunState(CncState state) {
@@ -6846,11 +7086,9 @@ void MainFrame::rcRun() {
 	
 	if ( isDebugMode == true )
 	{
-		
-		// check if the cuurent port is a cnc and no emulator port
+		// check if the current port is a cnc and no emulator port
 		if ( cnc->getPortType() == CncPORT )
 		{
-			
 			wxString msg("Do you really want to debug a COM port?");
 			wxMessageDialog dlg(this, msg, _T("Port Check . . . "), 
 			                    wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
@@ -6867,7 +7105,6 @@ void MainFrame::rcRun() {
 	}
 	else
 	{
-		
 		if ( THE_CONTEXT->secureModeInfo.isActive == false ) 
 			perspectiveHandler.ensureRunPerspectiveMinimal();
 	}
@@ -7731,8 +7968,8 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 	long duration = 0;
 
 	// loop
-	for ( unsigned int i=0; i<loopCount; i++) {
-		
+	for ( unsigned int i=0; i<loopCount; i++)
+	{
 		bool ret = processTemplateWrapper( i == 0 );
 		duration += THE_CONTEXT->timestamps.getTotalDurationMillis();
 
@@ -7746,7 +7983,7 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 		waitActive(5);
 	}
 	
-	// sumary
+	// summary
 	cnc::trc.logInfoMessage("");
 	std::clog << wxString::Format("Loop Repeat Test Sumary: Count: % 6d [#]; AVG Duration: % 10ld [ms]", loopCount, duration / loopCount) << std::endl;
 	SetTitle(title);
