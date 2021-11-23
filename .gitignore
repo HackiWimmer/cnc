@@ -16,9 +16,6 @@ CncControllerTest/Doxyfile/**
 EnvSetupTest/Release/**
 EnvSetupTest/Debug/**
 
-wxSVG/Release/**
-wxSVG/Debug/**
-
 #*.exe
 #*.txt
 #*.bat
