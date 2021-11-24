@@ -18,14 +18,13 @@
 									CNC_VERSION_INDEX_NUM, \
 									CNC_VERSION_BUILD_NUM)
 									
-									
 	#define CNC_VERSION_LONG_STR    wxString::Format("%d.%d.%d (%d) [%2d.%2d.%4d %2d:%2d:%2d]", \
 									CNC_VERSION_MAJOR_NUM, \
 									CNC_VERSION_MINOR_NUM, \
 									CNC_VERSION_INDEX_NUM, \
 									CNC_VERSION_BUILD_NUM, \
 									CNC_BUILD_DAY_INT, \
-									CNC_BUILD_DAY_INT, \
+									CNC_BUILD_MONTH_INT, \
 									CNC_BUILD_YEAR_INT, \
 									CNC_BUILD_HOUR_INT, \
 									CNC_BUILD_MIN_INT, \
@@ -33,10 +32,9 @@
 									
 // ----------------------------------------------------------------
 
-
 ////////////////////////////////////////////////////////////////////
-namespace VersionInfo {
-	
+namespace VersionInfo 
+{
 	const wxString major				= CNC_VERSION_MAJOR_STR;
 	const wxString minor				= CNC_VERSION_MINOR_STR;
 	const wxString index				= CNC_VERSION_INDEX_STR;
@@ -47,8 +45,8 @@ namespace VersionInfo {
 };
 
 ////////////////////////////////////////////////////////////////////
-namespace PortSelector {
-	
+namespace PortSelector 
+{
 	const wxString BMP_PS_CONNECTED		= "BMP_PS_CONNECTED";
 	const wxString BMP_PS_AVAILABLE		= "BMP_PS_AVAILABLE";
 	const wxString BMP_PS_ACCESS_DENIED	= "BMP_PS_ACCESS_DENIED";
@@ -56,8 +54,8 @@ namespace PortSelector {
 };
 
 ////////////////////////////////////////////////////////////////////
-struct GlobalConstStringDatabase {
-	
+struct GlobalConstStringDatabase 
+{
 	#ifdef DEBUG
 		const wxString buildFlag		= wxString("d");
 	#else
@@ -85,7 +83,6 @@ struct GlobalConstStringDatabase {
 	const wxString moveSeqRefFormat		= wxString("%+08ld");
 	const wxString gcodeSeqRefFormat	= wxString("%+08ld");
 	const wxString vertexTraceFormat	= wxString("%+08ld");
-	
 };
 
 #endif

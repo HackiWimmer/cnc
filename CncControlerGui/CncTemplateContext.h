@@ -48,7 +48,7 @@ class CncTemplateContext : public ContextInterface {
 		unsigned int		getValidRunCount()				const	{ return validRunCount; }
 		unsigned int		getRunCount()					const	{ return runCount; }
 		
-		void				registerBounderies(const CncDoubleBoundaries& b);
+		void				registerBoundaries(const CncDoubleBoundaries& b);
 		bool				hasBounderies()					const	{ return bounderies.hasBounderies(); }
 		
 		const wxString&		getName()						const	{ return name; }

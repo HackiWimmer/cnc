@@ -743,7 +743,7 @@ bool SVGFileParser::postprocess() {
 	if ( ret == false )
 	{
 		SFP_ADD_SEP("Post Processing Error Summary:\n");
-		std::cerr << "SVG post processing decteced error(s). For more details please visit the parsing synopsis trace\n";
+		cnc::cex1 << "SVG post processing decteced error(s). For more details please visit the parsing synopsis trace\n";
 	}
 	else 
 	{

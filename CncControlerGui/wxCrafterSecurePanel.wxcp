@@ -6407,7 +6407,7 @@
                       }, {
                        "type": "string",
                        "m_label": "Name:",
-                       "m_value": "m_btTryRunSec"
+                       "m_value": "m_btDryRunSec"
                       }, {
                        "type": "multi-string",
                        "m_label": "Tooltip:",
@@ -6451,7 +6451,7 @@
                       }, {
                        "type": "string",
                        "m_label": "Label:",
-                       "m_value": "Try Run . . ."
+                       "m_value": "Dry Run . . ."
                       }, {
                        "type": "bool",
                        "m_label": "Default Button",
@@ -6474,7 +6474,7 @@
                        "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
                        "m_eventClass": "wxCommandEvent",
                        "m_eventHandler": "wxCommandEventHandler",
-                       "m_functionNameAndSignature": "onTryRunSec(wxCommandEvent& event)",
+                       "m_functionNameAndSignature": "onDryRunSec(wxCommandEvent& event)",
                        "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
                        "m_noBody": false
                       }],
@@ -16054,7 +16054,7 @@
           }, {
            "type": "string",
            "m_label": "Name:",
-           "m_value": "m_plTryRunLogger"
+           "m_value": "m_plDryRunLogger"
           }, {
            "type": "multi-string",
            "m_label": "Tooltip:",
@@ -16098,7 +16098,7 @@
           }, {
            "type": "string",
            "m_label": "Label:",
-           "m_value": "TryRun \\nLogger"
+           "m_value": "Dry Run \\nLogger"
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
@@ -16182,7 +16182,7 @@
               }, {
                "type": "string",
                "m_label": "Name:",
-               "m_value": "m_tryRunLoggerPlaceholder"
+               "m_value": "m_dryRunLoggerPlaceholder"
               }, {
                "type": "multi-string",
                "m_label": "Tooltip:",

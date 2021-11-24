@@ -17,7 +17,7 @@ class CncTemplateContextSummaryPanel : public CncTemplateContextSummaryPanelBase
 		CncExtLoggerListCtrl*	analysisOverall;
 		CncExtLoggerListCtrl*	analysisLimit;
 		CncExtLoggerListCtrl*	analysisMovement;
-		CncExtLoggerListCtrl*	tryRunLogger;
+		CncExtLoggerListCtrl*	dryRunLogger;
 		CncExtLoggerListCtrl*	parsingSynopsis;
 		
 		void selectPage(CncExtLoggerListCtrl* page) const;
@@ -32,10 +32,10 @@ class CncTemplateContextSummaryPanel : public CncTemplateContextSummaryPanelBase
 		
 		void update();
 		void selectSummary()						const { selectPage(summary); }
-		void selectTryRun()							const { selectPage(tryRunLogger); }
+		void selectDryRun()							const { selectPage(dryRunLogger); }
 		void selectParsingSynopsis()				const { selectPage(parsingSynopsis); }
 		
-		CncExtLoggerListCtrl* getTryRunLogger()		const { return tryRunLogger; }
+		CncExtLoggerListCtrl* getDryRunLogger()		const { return dryRunLogger; }
 		CncExtLoggerListCtrl* getParsingSynopsis()	const { return parsingSynopsis; }
 		
 };

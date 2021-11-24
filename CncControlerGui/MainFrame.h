@@ -57,7 +57,7 @@ class CncMsgHistoryLoggerProxy;
 class CncTraceProxy;
 class CncLoggerView;
 class CncLoggerListCtrl;
-class CncTryRunLoggerProxy;
+class CncDryRunLoggerProxy;
 class CncParserSynopsisProxy;
 
 class CncSourceEditor;
@@ -107,6 +107,19 @@ struct RefPosResult;
 	wxDECLARE_EVENT(wxEVT_DISPATCH_ALL,							wxThreadEvent);
 ////////////////////////////////////////////////////////////////////
 
+	#define CNC_RESULT_OK_STR				"OK"
+	#define CNC_RESULT_WARNING_STR			"WARNING"
+	#define CNC_RESULT_ERROR_STR			"ERROR"
+	
+	#define REGISTER_LAST_FILLED_LOGGER_ROW \
+		{ THE_APP->getLoggerView()->logLastFilledPosition(LoggerSelection::VAL::CNC); }
+			
+	#define SET_RESULT_FOR_REGISTERED_LOGGER_ROW(result) \
+		{THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, result); }
+
+	#define SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW(result) \
+		{ THE_APP->getLoggerView()->changeResultForLastFilledPosition(LoggerSelection::VAL::CNC, result); }
+		
 ////////////////////////////////////////////////////////////////////
 // global definitions
 namespace CncApp {
@@ -165,7 +178,7 @@ class MainFrameBase : public MainFrameBClass {
 		CncLoggerView*				loggerView;
 		CncTraceProxy* 				tmpTraceInfo;
 		CncMsgHistoryLoggerProxy*	controllerMsgHistory;
-		CncTryRunLoggerProxy*		tryRunLoggerProxy;
+		CncDryRunLoggerProxy*		dryRunLoggerProxy;
 		CncParserSynopsisProxy*		parserSynopsisProxy;
 		
 		virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
@@ -180,7 +193,7 @@ class MainFrameBase : public MainFrameBClass {
 		CncLoggerView*				getLoggerView()				{ return loggerView; }
 		CncTraceProxy* 				getTrace() 					{ return tmpTraceInfo; }
 		CncMsgHistoryLoggerProxy*	getCtrlMessageHistory()		{ return controllerMsgHistory; }
-		CncTryRunLoggerProxy*		getTryRunLogger()			{ return tryRunLoggerProxy; }
+		CncDryRunLoggerProxy*		getDryRunLogger()			{ return dryRunLoggerProxy; }
 		CncParserSynopsisProxy*		getParserSynopsisProxy()	{ return parserSynopsisProxy; }
 };
 
@@ -189,7 +202,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-		virtual void rcTryRun(wxCommandEvent& event);
+		virtual void rcDryRun(wxCommandEvent& event);
 		virtual void onPodiumManagement(wxCommandEvent& event);
 		virtual void onResetView(wxCommandEvent& event);
 		virtual void onToggleFlyPathes(wxCommandEvent& event);
@@ -674,7 +687,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool connectSerialPortDialog();
 		void selectPort();
 		
-		void decorateTryRunState(CncState state);
+		void decorateDryRunState(CncState state);
 		
 		void decorateProbeMode(bool probeMode);
 		void decorateSecureDlgChoice(bool useDlg);

@@ -156,8 +156,8 @@ void CncLoggerView::initialize() {
 	traceInfoBar->SetShowHideEffects(wxSHOW_EFFECT_ROLL_TO_TOP, wxSHOW_EFFECT_ROLL_TO_BOTTOM);
 	traceInfoBar->SetEffectDuration(10);
 	
-	if ( loggerLists.size() == 0 ) {
-		
+	if ( loggerLists.size() == 0 )
+	{
 		CncLoggerListCtrl* startup = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
 		GblFunc::replaceControl(m_startupLoggerPlaceholder, startup);
 		loggerLists.push_back(startup);
@@ -390,6 +390,22 @@ void CncLoggerView::logCurrentPosition(LoggerSelection::VAL id) {
 	loggerLists.at(id)->logRowNumber();
 }
 /////////////////////////////////////////////////////////////////////
+void CncLoggerView::logLastFilledPosition(LoggerSelection::VAL id) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+	
+	loggerLists.at(id)->logLastFilledRowNumber();
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::changeTextColour(LoggerSelection::VAL id, const wxColour& col) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+	
+	loggerLists.at(id)->changeTextColour(col);
+}
+/////////////////////////////////////////////////////////////////////
 void CncLoggerView::changeTextAttr(LoggerSelection::VAL id, const wxTextAttr& ta) {
 /////////////////////////////////////////////////////////////////////
 	if ( loggerLists.size() != MaxLoggerCount )
@@ -406,13 +422,31 @@ void CncLoggerView::changeResult(LoggerSelection::VAL id, const wxString& text, 
 	loggerLists.at(id)->changeResult(text, row);
 }
 /////////////////////////////////////////////////////////////////////
-void CncLoggerView::changeResultForLoggedPosition(LoggerSelection::VAL id, const wxString& text) {
+void CncLoggerView::changeResultForLoggedPosition(LoggerSelection::VAL id, const wxString& result) {
 /////////////////////////////////////////////////////////////////////
 	if ( loggerLists.size() != MaxLoggerCount )
 		return;
 	
 	if ( loggerLists.at(id)->getLoggedRowNumber() > 0 )
-		loggerLists.at(id)->changeResult(text);
+		loggerLists.at(id)->changeResult(result, loggerLists.at(id)->getLoggedRowNumber());
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::changeResultForLastPosition(LoggerSelection::VAL id, const wxString& result) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+	
+	loggerLists.at(id)->logRowNumber();
+	loggerLists.at(id)->changeResult(result);
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::changeResultForLastFilledPosition(LoggerSelection::VAL id, const wxString& result) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+	
+	loggerLists.at(id)->logLastFilledRowNumber();
+	loggerLists.at(id)->changeResult(result, loggerLists.at(id)->getLoggedRowNumber());
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::add(LoggerSelection::VAL id, const char c) {
@@ -429,6 +463,14 @@ void CncLoggerView::add(LoggerSelection::VAL id, const wxString& text) {
 		return;
 		
 	loggerLists.at(id)->add(text);
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::add(LoggerSelection::VAL id, const wxString& text, const wxString& result) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+		
+	loggerLists.at(id)->add(text, result);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::add(const char c) {

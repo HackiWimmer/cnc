@@ -25,7 +25,6 @@ class LoggerStreamBuf : public std::streambuf {
 		static wxString 	startupBuffer;
 		static wxTextAttr 	defaultAttr;
 		
-		///////////////////////////////////////////////////////////
 		LoggerStreamBuf(char t, CncTextCtrl* c, const wxTextAttr& ta);
 		virtual ~LoggerStreamBuf() {}
 		
@@ -34,9 +33,24 @@ class LoggerStreamBuf : public std::streambuf {
 		void setTextAttr(const wxTextAttr& ta);
 		void setTextControl(CncTextCtrl* c);
 		
+		void highlightStyle();
+		void normalizeStyle(const wxTextAttr& ta);
+		
 		const wxTextAttr& getTextAttr() 	const 	{ return textAttr; }
 		CncTextCtrl* getTextControl()		const 	{ return ctl; }
 		void ungregisterTextControl() 				{ ctl = NULL; }
+};
+
+///////////////////////////////////////////////////////////
+class StreamBufferHighlighter {
+	
+	private:
+		const std::ostream& os;
+		wxTextAttr			ta;
+		
+	public:
+		StreamBufferHighlighter(const std::ostream& o);
+		~StreamBufferHighlighter();
 };
 
 ///////////////////////////////////////////////////////////

@@ -115,7 +115,7 @@ protected:
     wxButton* m_rcStopSec;
     wxStaticLine* m_staticLine654;
     wxButton* m_btTemplateContextSec;
-    wxButton* m_btTryRunSec;
+    wxButton* m_btDryRunSec;
     wxStaticLine* m_staticLine656;
     wxStaticText* m_staticText90;
     wxButton* m_btnEmergenyStopSec;
@@ -154,7 +154,7 @@ protected:
     virtual void onPauseSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onStopSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onTemplateContextSec(wxCommandEvent& event) { event.Skip(); }
-    virtual void onTryRunSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onDryRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onEmergencySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onSerialSpySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onRequestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
@@ -234,7 +234,7 @@ public:
     wxButton* GetRcStopSec() { return m_rcStopSec; }
     wxStaticLine* GetStaticLine654() { return m_staticLine654; }
     wxButton* GetBtTemplateContextSec() { return m_btTemplateContextSec; }
-    wxButton* GetBtTryRunSec() { return m_btTryRunSec; }
+    wxButton* GetBtDryRunSec() { return m_btDryRunSec; }
     wxStaticLine* GetStaticLine656() { return m_staticLine656; }
     wxStaticText* GetStaticText90() { return m_staticText90; }
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
@@ -452,8 +452,8 @@ protected:
     wxPanel* m_analysisMovementPlaceholder;
     wxPanel* m_plParsingSynopsis;
     wxPanel* m_parsingSynopsisPlaceholder;
-    wxPanel* m_plTryRunLogger;
-    wxPanel* m_tryRunLoggerPlaceholder;
+    wxPanel* m_plDryRunLogger;
+    wxPanel* m_dryRunLoggerPlaceholder;
     wxPanel* m_plContextList;
     wxPanel* m_listPlaceholder;
 
@@ -476,8 +476,8 @@ public:
     wxPanel* GetPlContextAnalysisMovement() { return m_plContextAnalysisMovement; }
     wxPanel* GetParsingSynopsisPlaceholder() { return m_parsingSynopsisPlaceholder; }
     wxPanel* GetPlParsingSynopsis() { return m_plParsingSynopsis; }
-    wxPanel* GetTryRunLoggerPlaceholder() { return m_tryRunLoggerPlaceholder; }
-    wxPanel* GetPlTryRunLogger() { return m_plTryRunLogger; }
+    wxPanel* GetDryRunLoggerPlaceholder() { return m_dryRunLoggerPlaceholder; }
+    wxPanel* GetPlDryRunLogger() { return m_plDryRunLogger; }
     wxPanel* GetListPlaceholder() { return m_listPlaceholder; }
     wxPanel* GetPlContextList() { return m_plContextList; }
     wxListbook* GetLoggerBook() { return m_loggerBook; }

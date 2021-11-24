@@ -11,6 +11,10 @@ class CncStartupLoggerProxy : public CncTextCtrl  {
 		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
 		virtual ~CncStartupLoggerProxy();
 		
+		virtual bool setTextColour(const wxColour& col);
+		virtual void appendChar(char c, const wxColour& col, int sourceId);
+		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
+
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);
@@ -26,6 +30,10 @@ class CncStandardLoggerProxy : public CncTextCtrl  {
 		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
 		virtual ~CncStandardLoggerProxy();
 		
+		virtual bool setTextColour(const wxColour& col);
+		virtual void appendChar(char c, const wxColour& col, int sourceId);
+		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
+		
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);
@@ -34,18 +42,22 @@ class CncStandardLoggerProxy : public CncTextCtrl  {
 };
 
 // --------------------------------------------------------------
-class CncTryRunLoggerProxy : public CncTextCtrl  {
+class CncDryRunLoggerProxy : public CncTextCtrl  {
 	
 	public:
-		CncTryRunLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		CncDryRunLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
 		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
-		virtual ~CncTryRunLoggerProxy();
+		virtual ~CncDryRunLoggerProxy();
 		
+		virtual bool setTextColour(const wxColour& col);
+		virtual void appendChar(char c, const wxColour& col, int sourceId);
+		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
+
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);
 		
-		wxDECLARE_NO_COPY_CLASS(CncTryRunLoggerProxy);
+		wxDECLARE_NO_COPY_CLASS(CncDryRunLoggerProxy);
 };
 
 // --------------------------------------------------------------
@@ -56,6 +68,10 @@ class CncParserSynopsisProxy : public CncTextCtrl  {
 		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
 		virtual ~CncParserSynopsisProxy();
 		
+		virtual bool setTextColour(const wxColour& col);
+		virtual void appendChar(char c, const wxColour& col, int sourceId);
+		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
+
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);
@@ -84,6 +100,10 @@ class CncMsgHistoryLoggerProxy : public CncTextCtrl  {
 		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
 		virtual ~CncMsgHistoryLoggerProxy();
 		
+		virtual bool setTextColour(const wxColour& col);
+		virtual void appendChar(char c, const wxColour& col, int sourceId);
+		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
+
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);
@@ -100,6 +120,11 @@ class CncTraceProxy : public CncTextCtrl  {
 		virtual ~CncTraceProxy();
 		
 		virtual void Clear();
+		
+		virtual bool setTextColour(const wxColour& col);
+		virtual void appendChar(char c, const wxColour& col, int sourceId);
+		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
+
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);

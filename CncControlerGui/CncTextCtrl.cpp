@@ -5,10 +5,11 @@
 CncTextCtrl::CncTextCtrl(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
 						 long style, const wxValidator &validator, const wxString &name)
 : wxTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
-, overflowTimer(new wxTimer())
-, lineBuffer{}
-, index(0)
-, loggedPos(0L)
+, overflowTimer		(new wxTimer())
+, lineBuffer		{}
+, index				(0)
+, loggedPos			(0L)
+, lastSourceID		(NO_SOUREC_ID)
 //////////////////////////////////////////////////////////////
 {
 	overflowTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncTextCtrl::onOverflowTimer), NULL, this);
@@ -76,6 +77,25 @@ void CncTextCtrl::onOverflowTimer(wxTimerEvent& event) {
 	flushLineBuffer();
 	
 	//event.Skip(); 
+}
+//////////////////////////////////////////////////////////////
+void CncTextCtrl::appendChar(char c, const wxColour& col, int sourceId) {
+//////////////////////////////////////////////////////////////
+	setTextColour(col);
+	AppendChar(c);
+}
+//////////////////////////////////////////////////////////////
+void CncTextCtrl::appendChar(char c, const wxTextAttr& style, int sourceId) {
+//////////////////////////////////////////////////////////////
+	SetDefaultStyle(style);
+	AppendChar(c);
+}
+//////////////////////////////////////////////////////////////
+bool CncTextCtrl::setTextColour(const wxColour& col) {
+//////////////////////////////////////////////////////////////
+	wxTextAttr style = GetDefaultStyle();
+	style.SetTextColour(col);
+	return SetDefaultStyle(style);
 }
 //////////////////////////////////////////////////////////////
 bool CncTextCtrl::SetDefaultStyle(const wxTextAttr& style) {

@@ -47,7 +47,7 @@ CncControl::CncControl(CncPortType pt)
 , runMode							(M_RealRun)
 , serialPort						(NULL)
 , realRunSerial						(NULL)
-, tryRunSerial						(NULL)
+, dryRunSerial						(NULL)
 , zeroAppPos						(0,0,0)
 , startAppPos						(0,0,0)
 , curAppPos							(0,0,0)
@@ -86,7 +86,7 @@ CncControl::CncControl(CncPortType pt)
 	{
 		// only in this case create a try run serial
 		// for all other serials this isn't necessary 
-		tryRunSerial = new SerialEmulatorNULL(this);
+		dryRunSerial = new SerialEmulatorNULL(this);
 	}
 	
 	serialPort->enableSpyOutput();
@@ -104,22 +104,22 @@ CncControl::~CncControl() {
 	disconnect();
 
 	cncDELETE(realRunSerial);
-	cncDELETE(tryRunSerial);
+	cncDELETE(dryRunSerial);
 }
 //////////////////////////////////////////////////////////////////
 void CncControl::switchRunMode(RunMode m) {
 //////////////////////////////////////////////////////////////////
-	if ( m == M_TryRun && tryRunSerial != NULL )
+	if ( m == M_DryRun && dryRunSerial != NULL )
 	{
-		serialPort = tryRunSerial;
+		serialPort = dryRunSerial;
 		serialPort->setContextInterface(THE_CONTEXT->templateContext);
 		
-		connect("TryRun");
+		connect("DryRun");
 		setup(true);
 	}
 	else
 	{
-		const bool switchBack = ( serialPort == tryRunSerial );
+		const bool switchBack = ( serialPort == dryRunSerial );
 		if ( switchBack == true )
 			disconnect();
 		
@@ -339,7 +339,7 @@ bool CncControl::setup(bool doReset) {
 	wxASSERT(serialPort);
 	wxASSERT(THE_CONFIG);
 	
-	// always reset the map here to definitly reinitianlize the controller
+	// always reset the map here to definitely reinitialize the controller
 	resetSetterMap();
 	
 	if ( serialPort->isConnected() == false ) 
@@ -348,20 +348,32 @@ bool CncControl::setup(bool doReset) {
 	// init setup
 	processSetter(PID_SEPARATOR, SEPARARTOR_SETUP);
 	
-	// reste controller on demand
-	if ( doReset == true ) {
-		if ( reset() == false ) {
-			std::cerr << " CncControl::setup: reset controller failed!\n";
+	// reset controller on demand
+	if ( doReset == true )
+	{
+		if ( reset() == false )
+		{
+			CNC_CERR_FUNCT_A(" CncControl::setup: reset controller failed!\n");
 			return false;
 		}
 		
 		// Firmware check
 		std::stringstream ss;
 		processCommand(CMD_PRINT_VERSION, ss);
-		std::cout << " Firmware check . . . [Available: " << ss.str() << "; Required: " << FIRMWARE_VERSION << "] . . .";
 		
-		if ( wxString(FIRMWARE_VERSION) == ss.str().c_str() )	std::clog << " OK" << std::endl;
-		else													cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
+		std::cout << " Firmware check . . . [Available: " << ss.str() << "; Required: " << FIRMWARE_VERSION << "] . . .";
+		REGISTER_LAST_FILLED_LOGGER_ROW
+		
+		if ( wxString(FIRMWARE_VERSION) == ss.str().c_str() )
+		{
+			std::cout << std::endl;
+			SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_OK_STR )
+		}
+		else
+		{ 
+			cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
+			SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_WARNING_STR )
+		}
 	}
 	
 	// always switch the tool off - safety - but may be already done by reset();
@@ -370,13 +382,14 @@ bool CncControl::setup(bool doReset) {
 	// evaluate limit states
 	evaluateLimitState();
 	
-	THE_APP->getLoggerView()->logCurrentPosition(LoggerSelection::VAL::CNC);
-	std::cout << " Starting controller initialization . . ." << std::endl;
+	std::cout << " Starting controller initialization . . .\n";
+	REGISTER_LAST_FILLED_LOGGER_ROW
 	
 	// setup probe mode
-	if ( enableProbeMode(THE_CONTEXT->isProbeMode()) == false ) {
-		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "Error");
-		std::cerr << " CncControl::setup: Probe mode configuration failed!\n";
+	if ( enableProbeMode(THE_CONTEXT->isProbeMode()) == false )
+	{
+		SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
+		CNC_CERR_FUNCT_A(" Probe mode configuration failed!\n")
 		return false;
 	}
 	
@@ -417,9 +430,10 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_FEEDRATE_H,			FLT_FACT * (THE_CONFIG->getPitchH() / THE_CONFIG->getStepsH())));
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_H,	THE_CONFIG->getHighPulsWidthH()));
 	
-	if ( processSetterList(setup) == false) {
-		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "Error");
-		std::cerr << " CncControl::setup: Calling processSetterList() failed!\n";
+	if ( processSetterList(setup) == false)
+	{
+		SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_ERROR_STR)
+		CNC_CERR_FUNCT_A(" Calling processSetterList() failed!\n");
 		return false;
 	}
 	
@@ -429,19 +443,21 @@ bool CncControl::setup(bool doReset) {
 	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
 	changeCurrentSpindleSpeed_U_MIN(THE_CONFIG->getSpindleSpeedDefault());
 	
-	THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "OK");
+	SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_OK_STR )
 	serialPort->notifySetupSuccesfullyFinsihed();
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
 long CncControl::convertDoubleToCtrlLong(unsigned char id, float f) { 
 ///////////////////////////////////////////////////////////////////
-	if ( f <= MIN_LONG / FLT_FACT ) {
+	if ( f <= MIN_LONG / FLT_FACT )
+	{
 		std::cerr << "CncControl::convertDoubleToCtrlLong(): Invalid double value: '" << f << "' for PID: " << ArduinoPIDs::getPIDLabel(id) << std::endl;
 		return MIN_LONG; 
 	}
 		
-	if ( f >= MAX_LONG / FLT_FACT ) {
+	if ( f >= MAX_LONG / FLT_FACT )
+	{
 		std::cerr << "CncControl::convertDoubleToCtrlLong(): Invalid double value: '" << f << "' for PID: " << ArduinoPIDs::getPIDLabel(id) << std::endl;
 		return MAX_LONG; 
 	}
@@ -468,11 +484,11 @@ bool CncControl::disconnect() {
 		}
 		
 		std::cout << " Disconnecting serial port . . .\n";
-		THE_APP->getLoggerView()->logCurrentPosition(LoggerSelection::VAL::CNC);
+		REGISTER_LAST_FILLED_LOGGER_ROW
 		
 		serialPort->disconnect();
 		
-		THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, "OK");
+		SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_OK_STR )
 	}
 	
 	CncSpindleSound::deactivate();
@@ -497,16 +513,17 @@ bool CncControl::connect(const char * portName) {
 	bool ret = serialPort->connect(portName);
 	if ( ret == true )
 	{
-		std::cout << " . . . Connection established -";
-		std::clog << " OK" << std::endl;
+	
+		std::clog << " . . . Connection established\n";
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR )
 		
 		const bool withSound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && serialPort->getPortType() == CncPORT_EMU_ARDUINO );
 		CncSpindleSound::activate(withSound);
 	}
 	else
 	{
-		std::cout << " . . . Connection refused -";
-		std::cerr << " ERROR" << std::endl;
+		std::cerr << " . . . Connection refused\n";
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
 	}
 	
 	return ret;
@@ -772,8 +789,17 @@ bool CncControl::reset() {
 	
 	std::cout << " Try to reset the controller . . .\n";
 	bool ret = processCommand(CMD_RESET_CONTROLLER, std::cerr);
-	if ( ret == true )  { std::clog << " Controller reseted - OK\n"; } 
-	else 				{ std::cerr << " Controller reset failed\n"; return false; }
+	if ( ret == true ) 
+	{ 
+		std::clog << " Controller successfully reseted\n";
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR)
+	} 
+	else
+	{ 
+		std::cerr << " Controller reset failed\n";
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
+		return false; 
+	}
 	
 	// do this after the controller is reseted, 
 	// because setZeroPos will determine a new controller position on demand
@@ -1181,12 +1207,14 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			if ( ctrlPowerState != CPS_ON && ctrlPowerState != prevCtrlPowerState ) {
 				std::cerr	<< "Wrong Controller Power State!"
 							<< std::endl
-							<< "It changed from '"
+							<< " It changed from '"
 							<< getCtrlPowerStateAsStr(prevCtrlPowerState)
 							<< "' to '" 
 							<< getCtrlPowerStateAsStr(ctrlPowerState)
 							<< "'" 
 							<< std::endl;
+							
+				SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
 			}
 			
 			if ( THE_APP->GetHeartbeatState() ) {

@@ -368,7 +368,7 @@ void CncSecureCtrlPanel::setPortSelection(const wxString& portName) {
 	
 	
 	#warning only a dev setup
-	if ( true )
+	if ( false )
 	{
 		wxMouseEvent event;
 		THE_APP->dclickHeartbeatState(event);
@@ -577,9 +577,9 @@ void CncSecureCtrlPanel::onReferenceSet(wxCommandEvent& event) {
 	m_leftBook->SetSelection(PAGE_RUN);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::onTryRunSec(wxCommandEvent& event) {
+void CncSecureCtrlPanel::onDryRunSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	THE_APP->rcTryRun(event);
+	THE_APP->rcDryRun(event);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onTemplateContextSec(wxCommandEvent& event) {

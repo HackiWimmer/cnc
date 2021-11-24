@@ -22,6 +22,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 				wxListItemAttr	listItemAttr;
 				
 				LoggerEntry();
+				explicit LoggerEntry(const wxListItemAttr& a); 
 				LoggerEntry(const wxString& t, const wxString& r, const wxListItemAttr& a);
 		};
 		
@@ -58,6 +59,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		virtual int 			OnGetItemColumnImage(long item, long column) const;
 		virtual wxString 		OnGetItemText(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
+		virtual wxListItemAttr* OnGetItemColumnAttr(long item, long column) const; 
 		
 	protected:
 		
@@ -80,9 +82,11 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		void setShowOnDemand(bool s) 	{ showOnDemand = s; }
 		
 		void logRowNumber(long rn=wxNOT_FOUND);
+		void logLastFilledRowNumber();
 		long getLoggedRowNumber();
 		
 		void changeTextAttr(const wxTextAttr& ta);
+		void changeTextColour(const wxColour& col);
 		void changeResult(const wxString& text, long item=wxNOT_FOUND);
 		
 		void popImmediatelyMode();
@@ -94,8 +98,10 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		void next();
 		void add(const char c);
 		void add(const wxString& text);
-		
 		void add(const wxString& text, const wxListItemAttr& lia);
+		
+		void add(const wxString& text, const wxString& result);
+		void add(const wxString& text, const wxString& result, const wxListItemAttr& lia);
 		
 		bool writeToFile(const wxFileName& fn, bool allRows=false);
 		bool copyToClipboard(bool allRows=false);
@@ -128,7 +134,8 @@ class CncExtLoggerListCtrl : public CncLoggerListCtrl {
 		bool hasWarnEntries()	const	{ return bWarnEntries;  }
 		bool hasErrorEntries()	const 	{ return bErrorEntries; }
 		
-		virtual void clearAll() {
+		virtual void clearAll()
+		{
 			bDebugEntries	=  false;
 			bWarnEntries	=  false;
 			bErrorEntries	=  false;

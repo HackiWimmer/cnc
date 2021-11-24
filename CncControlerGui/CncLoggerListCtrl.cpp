@@ -26,6 +26,14 @@ CncLoggerListCtrl::LoggerEntry::LoggerEntry()
 {}
 
 /////////////////////////////////////////////////////////////
+CncLoggerListCtrl::LoggerEntry::LoggerEntry(const wxListItemAttr& a)
+: text			()
+, result		()
+, listItemAttr	(a)
+/////////////////////////////////////////////////////////////
+{}
+
+/////////////////////////////////////////////////////////////
 CncLoggerListCtrl::LoggerEntry::LoggerEntry(const wxString& t, const wxString& r, const wxListItemAttr& a)
 : text			(t)
 , result		(r)
@@ -80,11 +88,14 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 	AppendColumn("B",	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
 	AppendColumn("C",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	
+	SetBackgroundColour(wxColour(32, 32, 32));
+	SetTextColour(wxColour(255, 255, 255).ChangeLightness(80));
+	
+	// this font/item attribute is only the default font if this
+	// list is used from a logger proxy as well as ostreambuf 
+	// it will be overruled
 	wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
 	SetFont(font);
-	
-	SetBackgroundColour(wxColour(32, 32, 32));
-	SetTextColour(wxColour(255, 255, 255));
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
@@ -156,8 +167,19 @@ void CncLoggerListCtrl::clearAll() {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::next() {
 /////////////////////////////////////////////////////////////
-	entries.push_back(std::move(LoggerEntry("", "", defaultItemAttr)));
+	if ( entries.size() == 0 )	entries.push_back(std::move(LoggerEntry(defaultItemAttr)));
+	else						entries.push_back(std::move(LoggerEntry(entries.back().listItemAttr)));
+	
 	updateContent();
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::changeTextColour(const wxColour& col) {
+/////////////////////////////////////////////////////////////
+	if ( entries.size() == 0 )
+		next();
+		
+	wxListItemAttr& lia = entries.back().listItemAttr;
+	lia.SetTextColour(col);
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::changeTextAttr(const wxTextAttr& ta) {
@@ -168,7 +190,17 @@ void CncLoggerListCtrl::changeTextAttr(const wxTextAttr& ta) {
 	wxListItemAttr& lia = entries.back().listItemAttr;
 	lia.SetTextColour(ta.GetTextColour());
 	
-	//updateContent();
+	if ( ta.HasFont() )
+	{
+		wxFont f = lia.GetFont();
+		f.SetWeight			(ta.GetFontWeight());
+		f.SetStyle			(ta.GetFontStyle());
+		f.SetUnderlined		(ta.GetFontUnderlined());
+		f.SetStrikethrough	(ta.GetFontStrikethrough());
+		f.SetPointSize		(ta.GetFontSize());
+		
+		lia.SetFont(f);
+	}
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::changeResult(const wxString& text, long item) {
@@ -189,9 +221,23 @@ void CncLoggerListCtrl::logRowNumber(long rn) {
 	const long size = (long)entries.size();
 	
 	if 		( size == 0 )		{ loggedRowNumber = wxNOT_FOUND; }
-	else if ( rn > size -1 )	{ loggedRowNumber = wxNOT_FOUND; }
+	else if ( rn > size - 1 )	{ loggedRowNumber = wxNOT_FOUND; }
 	else if ( rn < 0 ) 			{ loggedRowNumber = entries.size() - 1; }
 	else						{ loggedRowNumber = rn; }
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::logLastFilledRowNumber() {
+/////////////////////////////////////////////////////////////
+	loggedRowNumber = entries.size() - 1;
+	for ( auto it = entries.rbegin(); it != entries.rend(); ++it )
+	{
+		if ( it->text.IsEmpty() == false )
+			break;
+		
+		loggedRowNumber--;
+	}
+	
+	//wxMessageBox(wxString::Format("%ld   %ld",(long)entries.size(), loggedRowNumber));
 }
 /////////////////////////////////////////////////////////////
 long CncLoggerListCtrl::getLoggedRowNumber() {
@@ -221,33 +267,29 @@ void CncLoggerListCtrl::add(const wxString& text) {
 	if ( entries.size() == 0 )
 		next();
 	
-	add(text, entries.back().listItemAttr);
-	
-	/*
-	if ( entries.size() == 0 )
-		next();
-	
-	const wxChar delimiter = '\n';
-	wxStringTokenizer lines(text, wxString("\n"));
-	while ( lines.HasMoreTokens() )
-	{
-		const wxString token = lines.GetNextToken();
-		
-		if ( token.Len() > 0 )
-		{
-			wxString& text = entries.back().text;
-			text.append(token);
-		}
-		
-		if ( lines.GetLastDelimiter() == delimiter )
-			next();
-	}
-	
-	updateContent();
-*/
+	add(text, wxEmptyString, entries.back().listItemAttr);
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::add(const wxString& text, const wxListItemAttr& lia) {
+/////////////////////////////////////////////////////////////
+	if ( text.IsEmpty() )
+		return;
+		
+	if ( entries.size() == 0 )
+		next();
+		
+	add(text, wxEmptyString, lia);
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::add(const wxString& text, const wxString& result) {
+/////////////////////////////////////////////////////////////
+	if ( entries.size() == 0 )
+		next();
+	
+	add(text, result, entries.back().listItemAttr);
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::add(const wxString& text, const wxString& result, const wxListItemAttr& lia) {
 /////////////////////////////////////////////////////////////
 	if ( text.IsEmpty() )
 		return;
@@ -273,7 +315,9 @@ void CncLoggerListCtrl::add(const wxString& text, const wxListItemAttr& lia) {
 			next();
 	}
 	
-	//entries.push_back(std::move(LoggerEntry(text, "", lia)));
+	if ( result.IsEmpty() == false )
+		entries.back().result.assign(result);
+	
 	updateContent();
 }
 /////////////////////////////////////////////////////////////
@@ -316,12 +360,23 @@ wxString CncLoggerListCtrl::OnGetItemText(long item, long column) const {
 /////////////////////////////////////////////////////////////
 wxListItemAttr* CncLoggerListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
-	if ( isItemValid(item) == true ) {
+	if ( isItemValid(item) == true ) 
 		return (wxListItemAttr*)(&entries.at(item).listItemAttr);
+	
+	// this indicates to use the default style
+	return NULL;
+}
+/////////////////////////////////////////////////////////////
+wxListItemAttr* CncLoggerListCtrl::OnGetItemColumnAttr(long item, long column) const {
+/////////////////////////////////////////////////////////////
+	if ( isItemValid(item) == true ) 
+	{
+		if ( column != COL_LNR )
+			return (wxListItemAttr*)(&entries.at(item).listItemAttr);
 	}
 	
 	// this indicates to use the default style
-	return NULL;//(wxListItemAttr*)(&defaultItemAttr);
+	return NULL;
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::updateContent() {

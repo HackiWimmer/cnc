@@ -32,42 +32,49 @@
 	#define CNC_SRC_PATH_FILE			__FILE__
 	#define CNC_SRC_FILE				wxFileName(__FILE__).GetFullName()
 
+	#define CNC_LOG_A(...)				wxString::Format(wxString::Format(__VA_ARGS__))
 	#define CNC_LOG_LOCATION			wxString::Format("%s: %s: Line %d", 	CNC_SRC_FILE, __PRETTY_FUNCTION__, __LINE__)
 	#define CNC_LOG_LOCATION_A(...)		wxString::Format("%s: %s: Line %d: %s", CNC_SRC_FILE, __PRETTY_FUNCTION__, __LINE__, wxString::Format(__VA_ARGS__))
 	#define CNC_LOG_FUNCT				wxString::Format( "%s", 				__PRETTY_FUNCTION__ )
 	#define CNC_LOG_FUNCT_A(...)		wxString::Format( "%s: %s",				__PRETTY_FUNCTION__, wxString::Format(__VA_ARGS__))
 	#define CNC_LOG_FUNCT_B(...)		wxString::Format( "%s: %s",				__FUNCTION__, wxString::Format(__VA_ARGS__))
 	
+	#define CNC_COUT_A(...)				std::cout << CNC_LOG_A(__VA_ARGS__)								<< std::endl;
 	#define CNC_COUT_LOCATION			std::cout << CNC_LOG_LOCATION									<< std::endl;
 	#define CNC_COUT_LOCATION_A(...)	std::cout << CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__))	<< std::endl;
 	#define CNC_COUT_FUNCT 				std::cout << CNC_LOG_FUNCT										<< std::endl;
 	#define CNC_COUT_FUNCT_A(...)		std::cout << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
 	#define CNC_COUT_FUNCT_B(...)		std::cout << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
 	
+	#define CNC_CLOG_A(...)				std::clog << CNC_LOG_A(__VA_ARGS__)								<< std::endl;
 	#define CNC_CLOG_LOCATION			std::clog << CNC_LOG_LOCATION									<< std::endl;
 	#define CNC_CLOG_LOCATION_A(...)	std::clog << CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__))	<< std::endl;
 	#define CNC_CLOG_FUNCT 				std::clog << CNC_LOG_FUNCT										<< std::endl;
 	#define CNC_CLOG_FUNCT_A(...)		std::clog << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
 	#define CNC_CLOG_FUNCT_B(...)		std::clog << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
 	
+	#define CNC_CERR_A(...)				std::cerr << CNC_LOG_A(__VA_ARGS__)								<< std::endl;
 	#define CNC_CERR_LOCATION			std::cerr << CNC_LOG_LOCATION									<< std::endl;
 	#define CNC_CERR_LOCATION_A(...)	std::cerr << CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__))	<< std::endl;
 	#define CNC_CERR_FUNCT 				std::cerr << CNC_LOG_FUNCT										<< std::endl;
 	#define CNC_CERR_FUNCT_A(...)		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
 	#define CNC_CERR_FUNCT_B(...)		std::cerr << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
 	
+	#define CNC_CEX1_A(...)				cnc::cex1 << CNC_LOG_A(__VA_ARGS__)								<< std::endl;
 	#define CNC_CEX1_LOCATION			cnc::cex1 << CNC_LOG_LOCATION									<< std::endl;
 	#define CNC_CEX1_LOCATION_A(...)	cnc::cex1 << CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__))	<< std::endl;
 	#define CNC_CEX1_FUNCT 				cnc::cex1 << CNC_LOG_FUNCT										<< std::endl;
 	#define CNC_CEX1_FUNCT_A(...)		cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
 	#define CNC_CEX1_FUNCT_B(...)		cnc::cex1 << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
 	
+	#define CNC_CEX2_A(...)				cnc::cex2 << CNC_LOG_A(__VA_ARGS__)								<< std::endl;
 	#define CNC_CEX2_LOCATION			cnc::cex2 << CNC_LOG_LOCATION									<< std::endl;
 	#define CNC_CEX2_LOCATION_A(...)	cnc::cex2 << CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__))	<< std::endl;
 	#define CNC_CEX2_FUNCT 				cnc::cex2 << CNC_LOG_FUNCT										<< std::endl;
 	#define CNC_CEX2_FUNCT_A(...)		cnc::cex2 << CNC_LOG_FUNCT_A(wxString::Format(__VA_ARGS__))		<< std::endl;
 	#define CNC_CEX2_FUNCT_B(...)		cnc::cex2 << CNC_LOG_FUNCT_B(wxString::Format(__VA_ARGS__))		<< std::endl;
 
+	#define CNC_CEX3_A(...)				cnc::cex3 << CNC_LOG_A(__VA_ARGS__)								<< std::endl;
 	#define CNC_CEX3_LOCATION			cnc::cex3 << CNC_LOG_LOCATION									<< std::endl;
 	#define CNC_CEX3_LOCATION_A(...)	cnc::cex3 << CNC_LOG_LOCATION_A(wxString::Format(__VA_ARGS__))	<< std::endl;
 	#define CNC_CEX3_FUNCT 				cnc::cex3 << CNC_LOG_FUNCT										<< std::endl;

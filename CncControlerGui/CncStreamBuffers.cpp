@@ -11,16 +11,18 @@ const char* 	CncSerialSpyStream::hLine			= "------------------------------------
 const char* 	CncSerialSpyStream::mLine			= "***********************************************\n";
 
 ///////////////////////////////////////////////////////////
-namespace StartupBuffer {
-	
+namespace StartupBuffer 
+{
 	//-------------------------------------------------------------------------
-	void append(LoggerStreamBuf::Type t, const char* text) {
+	void append(LoggerStreamBuf::Type t, const char* text)
+	{
 		if ( text == NULL )
 			return;
 			
 		wxString msg(text);
 		wxString result;
-		for ( unsigned int i = 0; i < msg.length(); i++ ) {
+		for ( unsigned int i = 0; i < msg.length(); i++ )
+		{
 			result.append((char)t);
 			result.append(msg[i]);
 		}
@@ -29,7 +31,8 @@ namespace StartupBuffer {
 	}
 	
 	//-------------------------------------------------------------------------
-	bool trace(CncLoggerView* ctl) {
+	bool trace(CncLoggerView* ctl)
+	{
 		if ( ctl == NULL )
 			return false;
 		
@@ -40,9 +43,10 @@ namespace StartupBuffer {
 		
 		//wxTextAttr ta(ctl->GetDefaultStyle());
 		wxTextAttr ta;
-		for ( unsigned int i = 0; i < LoggerStreamBuf::startupBuffer.length(); i++ ) {
-			
-			if ( i % 2 == 0 ) {
+		for ( unsigned int i = 0; i < LoggerStreamBuf::startupBuffer.length(); i++ )
+		{
+			if ( i % 2 == 0 )
+			{
 				// over all format chars
 				switch ( (int)LoggerStreamBuf::startupBuffer[i] ) {
 					
@@ -57,7 +61,9 @@ namespace StartupBuffer {
 					default:							ta.SetTextColour(wxColour(192, 192, 192));
 				}
 				
-			} else {
+			} 
+			else
+			{
 				// over all text chars
 				ctl->changeTextAttr(LoggerSelection::VAL::STARTUP, ta);
 				ctl->add(LoggerSelection::VAL::STARTUP, (char)(LoggerStreamBuf::startupBuffer[i]));
@@ -68,6 +74,110 @@ namespace StartupBuffer {
 		return containsLogOrErr;
 	}
 };
+
+///////////////////////////////////////////////////////////
+StreamBufferHighlighter::StreamBufferHighlighter(const std::ostream& o)
+: os	(o)
+, ta	()
+///////////////////////////////////////////////////////////
+{ 
+	LoggerStreamBuf* b = reinterpret_cast<LoggerStreamBuf*>(os.rdbuf());
+	ta = b->getTextAttr();
+	b->highlightStyle();
+}
+///////////////////////////////////////////////////////////
+StreamBufferHighlighter::~StreamBufferHighlighter() {
+///////////////////////////////////////////////////////////
+	LoggerStreamBuf* b = reinterpret_cast<LoggerStreamBuf*>(os.rdbuf());
+	b->normalizeStyle(ta);
+}
+
+
+///////////////////////////////////////////////////////////
+LoggerStreamBuf::LoggerStreamBuf(char t, CncTextCtrl* c, const wxTextAttr& ta) 
+: type		(t)
+, ctl		(c)
+, textAttr	(ta)
+///////////////////////////////////////////////////////////
+{
+	textAttr.SetFont(wxFont(9, 
+							wxFONTFAMILY_MODERN, 
+							wxFONTSTYLE_NORMAL, 
+							wxFONTWEIGHT_NORMAL, 
+							false, 
+							wxT("Consolas")
+							)
+	);
+}
+///////////////////////////////////////////////////////////
+void LoggerStreamBuf::setTextAttr(const wxTextAttr& ta) {
+///////////////////////////////////////////////////////////
+	//textAttr.Apply(ta);
+	textAttr = ta;
+}
+///////////////////////////////////////////////////////////
+void LoggerStreamBuf::setTextControl(CncTextCtrl* c) {
+///////////////////////////////////////////////////////////
+	wxASSERT(c);
+	ctl = c;
+}
+///////////////////////////////////////////////////////////
+void LoggerStreamBuf::highlightStyle() {
+///////////////////////////////////////////////////////////
+	// possible types and attributes
+	// enum Type { STD = 'C', LOG = 'L', ERR = 'E', EX1 = '1', EX2 = '2', EX3 = '3', TRC = 'T', MSG = 'M', SPY = 'S' };
+	
+	// textAttr.SetTextColour(textAttr.GetTextColour().ChangeLightness(150));
+	// textAttr.SetFontWeight(wxFONTWEIGHT_BOLD);
+	// textAttr.SetFontStyle(wxFONTSTYLE_ITALIC);
+	// textAttr.SetFontUnderlined(true);
+	// textAttr.SetFontStrikethrough(true);
+	// textAttr.SetFontSize(textAttr.GetFontSize() + 2);
+	
+	switch ( type )
+	{
+		case Type::STD:	//textAttr.SetTextColour(textAttr.GetTextColour().ChangeLightness(150));
+						//textAttr.SetFontWeight(wxFONTWEIGHT_LIGHT);
+						//textAttr.SetFontUnderlined(true);
+						textAttr.SetFontStyle(wxFONTSTYLE_ITALIC);
+						break;
+					
+		case Type::LOG:	textAttr.SetFontWeight(wxFONTWEIGHT_BOLD);
+						break;
+					
+		default:		textAttr.SetFontWeight(wxFONTWEIGHT_BOLD);
+	}
+	
+	if ( ctl )
+		ctl->SetDefaultStyle(textAttr);
+}
+///////////////////////////////////////////////////////////
+void LoggerStreamBuf::normalizeStyle(const wxTextAttr& ta) {
+///////////////////////////////////////////////////////////
+	textAttr = ta;
+	
+	if ( ctl )
+		ctl->SetDefaultStyle(textAttr);
+}
+///////////////////////////////////////////////////////////
+int LoggerStreamBuf::overflow(int c) {
+///////////////////////////////////////////////////////////
+	if ( ctl != NULL ) 
+	{
+		//ctl->SetDefaultStyle(textAttr);
+		//ctl->setTextColour(textAttr.GetTextColour());
+		//ctl->AppendChar((char)c);
+		ctl->appendChar((char)c, textAttr.GetTextColour(), (int)type);
+	}
+	else
+	{
+		startupBuffer.append(type);
+		startupBuffer.append((wxChar)c);
+	}
+	
+	// return something different from EOF
+	return 0;
+}
 
 ///////////////////////////////////////////////////////////
 CncCoutBuf::CncCoutBuf(CncTextCtrl* c) 
@@ -93,7 +203,7 @@ CncClogBuf::~CncClogBuf() {
 
 ///////////////////////////////////////////////////////////////////
 CncCerrBuf::CncCerrBuf(CncTextCtrl* c) 
-: LoggerStreamBuf(LoggerStreamBuf::Type::ERR, c, wxTextAttr(wxColour(255, 64, 64)))
+: LoggerStreamBuf(LoggerStreamBuf::Type::ERR, c, wxTextAttr(wxColour(255, 89, 89).ChangeLightness(80)))
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -104,7 +214,7 @@ CncCerrBuf::~CncCerrBuf() {
 
 ///////////////////////////////////////////////////////////////////
 CncCex1Buf::CncCex1Buf(CncTextCtrl* c) 
-: LoggerStreamBuf(LoggerStreamBuf::Type::EX1, c, wxTextAttr(wxColour(255, 201, 14)))
+: LoggerStreamBuf(LoggerStreamBuf::Type::EX1, c, wxTextAttr(wxColour(255, 201, 14).ChangeLightness(64)))
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -115,7 +225,7 @@ CncCex1Buf::~CncCex1Buf() {
 
 ///////////////////////////////////////////////////////////////////
 CncCex2Buf::CncCex2Buf(CncTextCtrl* c) 
-: LoggerStreamBuf(LoggerStreamBuf::Type::EX2, c, wxTextAttr(wxColour(  0, 128, 192)))
+: LoggerStreamBuf(LoggerStreamBuf::Type::EX2, c, wxTextAttr(wxColour(  0, 128, 192).ChangeLightness(80)))
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -126,49 +236,13 @@ CncCex2Buf:: ~CncCex2Buf() {
 
 ///////////////////////////////////////////////////////////////////
 CncCex3Buf::CncCex3Buf(CncTextCtrl* c) 
-: LoggerStreamBuf(LoggerStreamBuf::Type::EX3, c, wxTextAttr(wxColour(192, 192, 192)))
+: LoggerStreamBuf(LoggerStreamBuf::Type::EX3, c, wxTextAttr(wxColour(192, 192, 192).ChangeLightness(64)))
 ///////////////////////////////////////////////////////////////////
 {
 }
 ///////////////////////////////////////////////////////////////////
 CncCex3Buf::~CncCex3Buf() {
 ///////////////////////////////////////////////////////////////////
-}
-
-
-///////////////////////////////////////////////////////////
-LoggerStreamBuf::LoggerStreamBuf(char t, CncTextCtrl* c, const wxTextAttr& ta) 
-: type(t)
-, ctl(c)
-, textAttr(ta)
-///////////////////////////////////////////////////////////
-{
-}
-///////////////////////////////////////////////////////////
-void LoggerStreamBuf::setTextAttr(const wxTextAttr& ta) {
-///////////////////////////////////////////////////////////
-	textAttr.Apply(ta);
-}
-///////////////////////////////////////////////////////////
-void LoggerStreamBuf::setTextControl(CncTextCtrl* c) {
-	wxASSERT(c);
-	ctl = c;
-}
-///////////////////////////////////////////////////////////
-int LoggerStreamBuf::overflow(int c) {
-///////////////////////////////////////////////////////////
-	if ( ctl != NULL ) {
-		ctl->SetDefaultStyle(textAttr);
-		ctl->AppendChar((char)c);
-		
-	} else {
-		startupBuffer.append(type);
-		startupBuffer.append((wxChar)c);
-		
-	}
-	
-	// return something different from EOF
-	return 0;
 }
 
 ///////////////////////////////////////////////////////////

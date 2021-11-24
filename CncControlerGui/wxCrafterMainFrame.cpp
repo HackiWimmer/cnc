@@ -175,9 +175,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auibarMain->AddSeparator();
     
-    m_rcTryRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncTryRun")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_rcTryRun->SetToolTip(_("Try Run - Release"));
-    m_auibarMain->AddControl(m_rcTryRun);
+    m_rcDryRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("CncDryRun")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcDryRun->SetToolTip(_("Try Run - Release"));
+    m_auibarMain->AddControl(m_rcDryRun);
     
     m_auibarMain->AddSeparator();
     
@@ -6154,7 +6154,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_rcNextBreakpoint->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
     m_rcNextStep->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextStep), NULL, this);
     m_rcFinish->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcFinish), NULL, this);
-    m_rcTryRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcTryRun), NULL, this);
+    m_rcDryRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDryRun), NULL, this);
     m_rcSecureDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcSecureDlg), NULL, this);
     m_rcRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
@@ -6416,7 +6416,7 @@ MainFrameBClass::~MainFrameBClass()
     m_rcNextBreakpoint->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
     m_rcNextStep->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextStep), NULL, this);
     m_rcFinish->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcFinish), NULL, this);
-    m_rcTryRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcTryRun), NULL, this);
+    m_rcDryRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDryRun), NULL, this);
     m_rcSecureDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcSecureDlg), NULL, this);
     m_rcRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPause->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);

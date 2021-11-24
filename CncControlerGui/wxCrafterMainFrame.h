@@ -99,7 +99,7 @@ protected:
     wxBitmapButton* m_rcNextBreakpoint;
     wxBitmapButton* m_rcNextStep;
     wxBitmapButton* m_rcFinish;
-    wxBitmapButton* m_rcTryRun;
+    wxBitmapButton* m_rcDryRun;
     wxBitmapButton* m_rcSecureDlg;
     wxBitmapButton* m_rcRun;
     wxBitmapButton* m_rcPause;
@@ -782,7 +782,7 @@ protected:
     virtual void rcNextBreakpoint(wxCommandEvent& event) { event.Skip(); }
     virtual void rcNextStep(wxCommandEvent& event) { event.Skip(); }
     virtual void rcFinish(wxCommandEvent& event) { event.Skip(); }
-    virtual void rcTryRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void rcDryRun(wxCommandEvent& event) { event.Skip(); }
     virtual void rcSecureDlg(wxCommandEvent& event) { event.Skip(); }
     virtual void rcRun(wxCommandEvent& event) { event.Skip(); }
     virtual void rcPause(wxCommandEvent& event) { event.Skip(); }
@@ -1022,7 +1022,7 @@ public:
     wxBitmapButton* GetRcNextBreakpoint() { return m_rcNextBreakpoint; }
     wxBitmapButton* GetRcNextStep() { return m_rcNextStep; }
     wxBitmapButton* GetRcFinish() { return m_rcFinish; }
-    wxBitmapButton* GetRcTryRun() { return m_rcTryRun; }
+    wxBitmapButton* GetRcDryRun() { return m_rcDryRun; }
     wxBitmapButton* GetRcSecureDlg() { return m_rcSecureDlg; }
     wxBitmapButton* GetRcRun() { return m_rcRun; }
     wxBitmapButton* GetRcPause() { return m_rcPause; }

@@ -70,7 +70,7 @@ bool CncTemplateContext::init(const wxString& path, const wxString& name) {
 	return wxFileName::Exists(getFileName());
 }
 //////////////////////////////////////////////////////////////
-void CncTemplateContext::registerBounderies(const CncDoubleBoundaries& b) {
+void CncTemplateContext::registerBoundaries(const CncDoubleBoundaries& b) {
 //////////////////////////////////////////////////////////////
 	bounderies = b;
 	updateGui(false);

@@ -10,6 +10,8 @@ class CncTextCtrl : public wxTextCtrl  {
 	private:
 		static const unsigned int MAX_LINE_BUFFER_SIZE 				= 1024;
 		static const unsigned int DEFAULT_OVERFLOW_PERIOD_VALUE 	=  800;
+		
+		static const unsigned int NO_SOUREC_ID					 	=   -1;
 
 		wxTimer* 			overflowTimer;
 		char				lineBuffer[MAX_LINE_BUFFER_SIZE];
@@ -19,6 +21,9 @@ class CncTextCtrl : public wxTextCtrl  {
 		inline size_t flushLineBuffer();
 		
 	protected:
+		
+		int					lastSourceID;
+		
 		virtual void onOverflowTimer(wxTimerEvent& event);
 		
 	public:
@@ -27,6 +32,10 @@ class CncTextCtrl : public wxTextCtrl  {
 					long style=0, const wxValidator &validator=wxDefaultValidator, const wxString 
 					&name=wxTextCtrlNameStr);
 		virtual ~CncTextCtrl();
+		
+		virtual bool setTextColour(const wxColour& col);
+		virtual void appendChar(char c, const wxColour& col, int sourceId);
+		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
 		
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);

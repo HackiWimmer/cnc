@@ -618,16 +618,16 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer657->Add(m_btTemplateContextSec, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     m_btTemplateContextSec->SetMinSize(wxSize(30,80));
     
-    m_btTryRunSec = new wxButton(m_rpRun, wxID_ANY, _("Try Run . . ."), wxDefaultPosition, wxDLG_UNIT(m_rpRun, wxSize(-1,-1)), 0);
+    m_btDryRunSec = new wxButton(m_rpRun, wxID_ANY, _("Dry Run . . ."), wxDefaultPosition, wxDLG_UNIT(m_rpRun, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btTryRunSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncRun")), wxLEFT);
-    m_btTryRunSec->SetBitmapMargins(2,2);
+    m_btDryRunSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncRun")), wxLEFT);
+    m_btDryRunSec->SetBitmapMargins(2,2);
     #endif
-    wxFont m_btTryRunSecFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_btTryRunSec->SetFont(m_btTryRunSecFont);
+    wxFont m_btDryRunSecFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btDryRunSec->SetFont(m_btDryRunSecFont);
     
-    flexGridSizer657->Add(m_btTryRunSec, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_btTryRunSec->SetMinSize(wxSize(-1,80));
+    flexGridSizer657->Add(m_btDryRunSec, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_btDryRunSec->SetMinSize(wxSize(-1,80));
     
     m_staticLine656 = new wxStaticLine(m_rpRun, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_rpRun, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -869,7 +869,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_rcPauseSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onPauseSec), NULL, this);
     m_rcStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
     m_btTemplateContextSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTemplateContextSec), NULL, this);
-    m_btTryRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryRunSec), NULL, this);
+    m_btDryRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onDryRunSec), NULL, this);
     m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_btSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_resolveLimit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRequestResolveLimitStates), NULL, this);
@@ -900,7 +900,7 @@ CncSecureCtrlPanelBase::~CncSecureCtrlPanelBase()
     m_rcPauseSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onPauseSec), NULL, this);
     m_rcStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onStopSec), NULL, this);
     m_btTemplateContextSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTemplateContextSec), NULL, this);
-    m_btTryRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTryRunSec), NULL, this);
+    m_btDryRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onDryRunSec), NULL, this);
     m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
     m_btSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_resolveLimit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRequestResolveLimitStates), NULL, this);
@@ -1810,22 +1810,22 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
     
     flexGridSizer6844257->Add(m_parsingSynopsisPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_plTryRunLogger = new wxPanel(m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_plTryRunLoggerImgIndex;
-    m_plTryRunLoggerImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-globals@2x")));
-    m_loggerBook->AddPage(m_plTryRunLogger, _("TryRun \nLogger"), false, m_plTryRunLoggerImgIndex);
+    m_plDryRunLogger = new wxPanel(m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_plDryRunLoggerImgIndex;
+    m_plDryRunLoggerImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-globals@2x")));
+    m_loggerBook->AddPage(m_plDryRunLogger, _("Dry Run \nLogger"), false, m_plDryRunLoggerImgIndex);
     
     wxFlexGridSizer* flexGridSizer68442572 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer68442572->SetFlexibleDirection( wxBOTH );
     flexGridSizer68442572->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer68442572->AddGrowableCol(0);
     flexGridSizer68442572->AddGrowableRow(0);
-    m_plTryRunLogger->SetSizer(flexGridSizer68442572);
+    m_plDryRunLogger->SetSizer(flexGridSizer68442572);
     
-    m_tryRunLoggerPlaceholder = new wxPanel(m_plTryRunLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plTryRunLogger, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_tryRunLoggerPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_dryRunLoggerPlaceholder = new wxPanel(m_plDryRunLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plDryRunLogger, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_dryRunLoggerPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     
-    flexGridSizer68442572->Add(m_tryRunLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer68442572->Add(m_dryRunLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_plContextList = new wxPanel(m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_plContextListImgIndex;

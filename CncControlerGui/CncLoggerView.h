@@ -25,26 +25,31 @@ class CncLoggerView : public CncLoggerViewBase {
 		
 		void initialize();
 		
-		void popImmediatelyMode				(LoggerSelection::VAL id);
-		void popProcessMode					(LoggerSelection::VAL id);
-		void pushUpdateMode					(LoggerSelection::VAL id);
+		void popImmediatelyMode					(LoggerSelection::VAL id);
+		void popProcessMode						(LoggerSelection::VAL id);
+		void pushUpdateMode						(LoggerSelection::VAL id);
 		
-		void select							(LoggerSelection::VAL id);
-		void clear							(LoggerSelection::VAL id);
-		void logCurrentPosition				(LoggerSelection::VAL id);
-		void setErrorFlag					(LoggerSelection::VAL id, bool flag);
-		void changeTextAttr					(LoggerSelection::VAL id, const wxTextAttr& ta);
-		void changeResult					(LoggerSelection::VAL id, const wxString& text, long int row);
-		void changeResultForLoggedPosition	(LoggerSelection::VAL id, const wxString& text);
-		void add							(LoggerSelection::VAL id, const char c);
-		void add							(LoggerSelection::VAL id, const wxString& text);
-		void add							(const char c);
-		void add							(const wxString& text);
+		void select								(LoggerSelection::VAL id);
+		void clear								(LoggerSelection::VAL id);
+		void logCurrentPosition					(LoggerSelection::VAL id);
+		void logLastFilledPosition				(LoggerSelection::VAL id);
+		void setErrorFlag						(LoggerSelection::VAL id, bool flag);
+		void changeTextAttr						(LoggerSelection::VAL id, const wxTextAttr& ta);
+		void changeTextColour					(LoggerSelection::VAL id, const wxColour& col);
+		void changeResult						(LoggerSelection::VAL id, const wxString& text, long int row);
+		void changeResultForLoggedPosition		(LoggerSelection::VAL id, const wxString& result);
+		void changeResultForLastPosition		(LoggerSelection::VAL id, const wxString& result);
+		void changeResultForLastFilledPosition	(LoggerSelection::VAL id, const wxString& result);
+		void add								(LoggerSelection::VAL id, const char c);
+		void add								(LoggerSelection::VAL id, const wxString& text);
+		void add								(LoggerSelection::VAL id, const wxString& text, const wxString& result);
+		void add								(const char c);
+		void add								(const wxString& text);
 		
 		void clearTrace();
-		void changeTextAttr					(const wxTextAttr& ta);
-		void trace							(const char c);
-		void trace							(const wxString& text);
+		void changeTextAttr						(const wxTextAttr& ta);
+		void trace								(const char c);
+		void trace								(const wxString& text);
 		
 		void openTraceHistory();
 		

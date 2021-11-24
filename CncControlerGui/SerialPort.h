@@ -338,13 +338,13 @@ class Serial {
 		
 	public:
 	
-		//Initialize Serial communication without an acitiv connection 
+		//Initialize Serial communication without an active connection 
 		Serial(CncControl* cnc);
 		//Close the connection
 		virtual ~Serial();
 		// get the connection state
 		virtual bool isConnected() { return connected; }
-		// gets a string represntation of ret
+		// gets a string representation of ret
 		static const char* decodeContollerResult(int ret);
 		// returns the class name
 		virtual const char* getClassName() { return "SerialPort"; } 

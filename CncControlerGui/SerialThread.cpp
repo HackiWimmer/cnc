@@ -29,12 +29,94 @@ WireEndPoint* 		WIRE_END_PTR_FOR_ARDUINO_ENV	= NULL;
 
 
 ///////////////////////////////////////////////////////////////////
-struct SerialInterruptException : public std::system_error {
+struct SerialInterruptException : public std::system_error 
+{
 	SerialInterruptException(const wxString& msg)
 	: std::system_error(EIO, std::generic_category(), msg.c_str())
 	{}
 };
 ///////////////////////////////////////////////////////////////////
+struct LimitRegister
+{
+	class PinCtrl
+	{
+		private:
+			bool		state;
+			AE::PinName	pin;
+			
+		public:
+			PinCtrl(bool s, AE::PinName p)
+			: state(s)
+			, pin(p)
+			{
+				SerialThread::digitalWrite(pin, (s == false ? PL_LOW : PL_HIGH) );
+			}
+			
+			bool switchLow()
+			{
+				if ( state != PL_LOW )
+				{
+					state = PL_LOW;
+					SerialThread::digitalWrite(pin, PL_LOW);
+				}
+				return state;
+			}
+			
+			bool switchHigh()
+			{
+				if ( state != PL_HIGH )
+				{
+					state = PL_HIGH;
+					SerialThread::digitalWrite(pin, PL_HIGH);
+				}
+				return state;
+			}
+			
+			void setState(bool s)
+			{ 
+				state = s;
+				SerialThread::digitalWrite(pin, (s == false ? PL_LOW : PL_HIGH) ); 
+			}
+			
+			bool getState() const { return state; }
+	};
+	
+	PinCtrl xMin	= PinCtrl(LimitSwitch::LIMIT_SWITCH_OFF, (AE::PinName)PIN_X_MIN_LIMIT);
+	PinCtrl xMax	= PinCtrl(LimitSwitch::LIMIT_SWITCH_OFF, (AE::PinName)PIN_X_MAX_LIMIT);
+	PinCtrl yMin	= PinCtrl(LimitSwitch::LIMIT_SWITCH_OFF, (AE::PinName)PIN_Y_MIN_LIMIT);
+	PinCtrl yMax	= PinCtrl(LimitSwitch::LIMIT_SWITCH_OFF, (AE::PinName)PIN_Y_MAX_LIMIT);
+	PinCtrl zMin	= PinCtrl(LimitSwitch::LIMIT_SWITCH_OFF, (AE::PinName)PIN_Z_MIN_LIMIT);
+	PinCtrl zMax	= PinCtrl(LimitSwitch::LIMIT_SWITCH_OFF, (AE::PinName)PIN_Z_MAX_LIMIT);
+	
+	void resetAll(bool state)
+	{
+		xMin.setState(state);
+		xMax.setState(state);
+		yMin.setState(state);
+		yMax.setState(state);
+		zMin.setState(state);
+		zMax.setState(state);
+	}
+	
+	void switchOnMinX()  { xMin.switchLow();  }
+	void switchOnMaxX()  { xMax.switchLow();  }
+	void switchOffMinX() { xMin.switchHigh(); }
+	void switchOffMaxX() { xMax.switchHigh(); }
+	void switchOffAllX() { switchOffMinX(), switchOffMaxX(); }
+	
+	void switchOnMinY()  { yMin.switchLow();  }
+	void switchOnMaxY()  { yMax.switchLow();  }
+	void switchOffMinY() { yMin.switchHigh(); }
+	void switchOffMaxY() { yMax.switchHigh(); }
+	void switchOffAllY() { switchOffMinY(), switchOffMaxY(); }
+	
+	void switchOnMinZ()  { zMin.switchLow();  }
+	void switchOnMaxZ()  { zMax.switchLow();  }
+	void switchOffMinZ() { zMin.switchHigh(); }
+	void switchOffMaxZ() { zMax.switchHigh(); }
+	void switchOffAllZ() { switchOffMinZ(), switchOffMaxZ(); }
+	
+} GblLimitRegister;
 
 ///////////////////////////////////////////////////////////////////
 SerialThread*	SerialThread::theSerialThread() { return SERIAL_THREAD; }
@@ -65,7 +147,10 @@ SerialThread::SerialThread(MainFrame *handler)
 , ctl2app			( new SerialCircularBuffer())
 , app				( new SerialEndPoint(ctl2app, app2ctl))
 , ctl				( new SerialEndPoint(app2ctl, ctl2app))
+, minBound			( new CncLongPosition())
+, maxBound			( new CncLongPosition())
 , i2cStates 		{'\0', '\0'}
+
 ///////////////////////////////////////////////////////////////////
 {
 	// Info:
@@ -77,6 +162,8 @@ SerialThread::SerialThread(MainFrame *handler)
 	SERIAL_END_PTR_FOR_ARDUINO_ENV 	= ctl;
 	WIRE_END_PTR_FOR_ARDUINO_ENV	= master;
 	ARDUINO_DATA_STORE				= arduinoDataStore;
+	
+	GblLimitRegister.resetAll(LimitSwitch::LIMIT_SWITCH_OFF);
 }
 ///////////////////////////////////////////////////////////////////
 SerialThread::~SerialThread() {
@@ -98,6 +185,8 @@ SerialThread::~SerialThread() {
 	wxDELETE ( app2ctl );
 	wxDELETE ( ctl2app );
 	wxDELETE ( arduinoDataStore );
+	wxDELETE ( minBound );
+	wxDELETE ( maxBound );
 
 	pHandler->serialThread 			= NULL;
 }
@@ -105,6 +194,30 @@ SerialThread::~SerialThread() {
 void SerialThread::stop() {
 ///////////////////////////////////////////////////////////////////
 	exit = true;
+}
+////////////////////////////////////////////////////////////////////
+void SerialThread::setHardwareOffset(const CncBoundarySpace::HardwareOriginOffset* hwo, int32_t maxX, int32_t maxY, int32_t maxZ) {
+////////////////////////////////////////////////////////////////////
+	if ( hwo == NULL )
+		return;
+		
+	// evaluate hardware origin as vertex
+	int32_t originX = hwo->getAsStepsX();
+	int32_t originY = hwo->getAsStepsY();
+	int32_t originZ = hwo->getAsStepsZ();
+	
+	publishMessage('I', wxString::Format("%ld, %ld, %ld", originX, originY, originZ), "");
+	
+	// The Z origin has to be corrected from max to min because 
+	// the hardware reference is located at min(x), min(y) and max(z)
+	originZ -= maxZ;
+	
+	wxCriticalSectionLocker enter(pHandler->pSerialThreadCS);
+	
+	minBound->setXYZ(originX,        originY,        originZ       );
+	maxBound->setXYZ(originX + maxX, originY + maxY, originZ + maxZ);
+	
+	GblLimitRegister.resetAll(LimitSwitch::LIMIT_SWITCH_OFF);
 }
 ////////////////////////////////////////////////////////////////////
 bool SerialThread::transferData(AE::TransferData& td) {
@@ -604,23 +717,43 @@ void SerialThread::ardoTraceStepperDir(char sid, int32_t dir) {
 	if ( ARDUINO_DATA_STORE == NULL )
 		return; 
 		
-	switch ( sid ) {
-		case 'X': ARDUINO_DATA_STORE->traceInfo.stepperDirX = dir; break;
-		case 'Y': ARDUINO_DATA_STORE->traceInfo.stepperDirY = dir; break;
-		case 'Z': ARDUINO_DATA_STORE->traceInfo.stepperDirZ = dir; break;
+	switch ( sid ) 
+	{
+		case 'X':	ARDUINO_DATA_STORE->traceInfo.stepperDirX = dir; break;
+		case 'Y':	ARDUINO_DATA_STORE->traceInfo.stepperDirY = dir; break;
+		case 'Z':	ARDUINO_DATA_STORE->traceInfo.stepperDirZ = dir; break;
 		
-		case 'H': ARDUINO_DATA_STORE->traceInfo.stepperDirH = dir; break;
+		case 'H':	ARDUINO_DATA_STORE->traceInfo.stepperDirH = dir; break;
 	}
 }
 ////////////////////////////////////////////////////////////////////
 void SerialThread::ardoTraceStepperPos(char sid, int32_t pos) {
 ////////////////////////////////////////////////////////////////////
-	switch ( sid ) {
-		case 'X': ARDUINO_DATA_STORE->traceInfo.stepperPosX = pos; break;
-		case 'Y': ARDUINO_DATA_STORE->traceInfo.stepperPosY = pos; break;
-		case 'Z': ARDUINO_DATA_STORE->traceInfo.stepperPosZ = pos; break;
+	switch ( sid ) 
+	{
+		case 'X':	ARDUINO_DATA_STORE->traceInfo.stepperPosX = pos;
 		
-		case 'H': ARDUINO_DATA_STORE->traceInfo.stepperPosH = pos; break;
+					if      ( pos <= theSerialThread()->minBound->getX() )	GblLimitRegister.switchOnMinX();
+					else if ( pos >= theSerialThread()->maxBound->getX() )	GblLimitRegister.switchOnMaxX();
+					else													GblLimitRegister.switchOffAllX();
+					break;
+					
+		case 'Y':	ARDUINO_DATA_STORE->traceInfo.stepperPosY = pos; 
+		
+					if      ( pos <= theSerialThread()->minBound->getY() )	GblLimitRegister.switchOnMinY();
+					else if ( pos >= theSerialThread()->maxBound->getY() )	GblLimitRegister.switchOnMaxY();
+					else													GblLimitRegister.switchOffAllY();
+					break;
+					
+		case 'Z':	ARDUINO_DATA_STORE->traceInfo.stepperPosZ = pos; 
+		
+					if      ( pos <= theSerialThread()->minBound->getZ() )	GblLimitRegister.switchOnMinZ();
+					else if ( pos >= theSerialThread()->maxBound->getZ() )	GblLimitRegister.switchOnMaxZ();
+					else													GblLimitRegister.switchOffAllZ();
+					break;
+		
+		case 'H':	ARDUINO_DATA_STORE->traceInfo.stepperPosH = pos;
+					break;
 	}
 }
 ////////////////////////////////////////////////////////////////////
@@ -629,9 +762,10 @@ void SerialThread::ardoTraceSpeed(char sid, int32_t val) {
 	if ( ARDUINO_DATA_STORE == NULL )
 		return; 
 		
-	switch ( sid ) {
-		case 'C': ARDUINO_DATA_STORE->traceInfo.cfgSpeed_MM_SEC = val; break;
-		case 'M': ARDUINO_DATA_STORE->traceInfo.msdSpeed_MM_SEC = val; break;
+	switch ( sid ) 
+	{
+		case 'C':	ARDUINO_DATA_STORE->traceInfo.cfgSpeed_MM_SEC = val; break;
+		case 'M':	ARDUINO_DATA_STORE->traceInfo.msdSpeed_MM_SEC = val; break;
 	}
 }
 ////////////////////////////////////////////////////////////////////

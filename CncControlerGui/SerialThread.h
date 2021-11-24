@@ -4,6 +4,8 @@
 #include <wx/thread.h>
 #include <wx/event.h>
 #include "SerialEvent.h"
+#include "CncPosition.h"
+#include "CncBoundarySpace.h"
 #include "OSD/CncTimeFunctions.h"
 
 typedef void (wxEvtHandler::*SerialEventFunction)(SerialEvent&);
@@ -57,6 +59,9 @@ class SerialThread : public wxThread {
 		SerialEndPoint* 			app;
 		SerialEndPoint* 			ctl;
 		
+		CncLongPosition*			minBound;
+		CncLongPosition*			maxBound;
+		
 		unsigned char 				i2cStates[I2C_BYTE_COUNT];
 
 		virtual ExitCode Entry();
@@ -84,6 +89,8 @@ class SerialThread : public wxThread {
 		SerialEndPoint* 			getSerialAppEndPoint() 			{ return app; }
 		WireEndPoint* 				getWireSlaveEndPoint() 			{ return slave; }
 		SerialAdminChannelSender*	getAdminChannelSenderEndPoint() { return adminSender; }
+		
+		void						setHardwareOffset(const CncBoundarySpace::HardwareOriginOffset* hwo, int32_t maxX, int32_t maxY, int32_t maxZ);
 		
 		
 		static SerialThread*		theSerialThread();

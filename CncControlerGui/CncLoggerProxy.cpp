@@ -18,6 +18,34 @@ CncStartupLoggerProxy::~CncStartupLoggerProxy() {
 //////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////
+void CncStartupLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		setTextColour(col);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getLoggerView()->add(LoggerSelection::VAL::STARTUP, c);
+}
+//////////////////////////////////////////////////////////////
+void CncStartupLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		SetDefaultStyle(style);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getLoggerView()->add(LoggerSelection::VAL::STARTUP, c);
+}
+//////////////////////////////////////////////////////////////
+bool CncStartupLoggerProxy::setTextColour(const wxColour& col) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getLoggerView()->changeTextColour(LoggerSelection::VAL::STARTUP, col);
+	return true;
+}
+//////////////////////////////////////////////////////////////
 bool CncStartupLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
 //////////////////////////////////////////////////////////////
 	THE_APP->getLoggerView()->changeTextAttr(LoggerSelection::VAL::STARTUP, style);
@@ -48,6 +76,34 @@ CncStandardLoggerProxy::~CncStandardLoggerProxy() {
 //////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////
+void CncStandardLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		setTextColour(col);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getLoggerView()->add(LoggerSelection::VAL::CNC, c);
+}
+//////////////////////////////////////////////////////////////
+void CncStandardLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		SetDefaultStyle(style);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getLoggerView()->add(LoggerSelection::VAL::CNC, c);
+}
+//////////////////////////////////////////////////////////////
+bool CncStandardLoggerProxy::setTextColour(const wxColour& col) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getLoggerView()->changeTextColour(LoggerSelection::VAL::CNC, col);
+	return true;
+}
+//////////////////////////////////////////////////////////////
 bool CncStandardLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
 //////////////////////////////////////////////////////////////
 	THE_APP->getLoggerView()->changeTextAttr(LoggerSelection::VAL::CNC, style);
@@ -66,31 +122,59 @@ void CncStandardLoggerProxy::AppendText(const wxString &text) {
 
 
 //////////////////////////////////////////////////////////////
-CncTryRunLoggerProxy::CncTryRunLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
+CncDryRunLoggerProxy::CncDryRunLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
 												long style, const wxValidator &validator, const wxString &name)
 : CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
 //////////////////////////////////////////////////////////////
 {
 }
 //////////////////////////////////////////////////////////////
-CncTryRunLoggerProxy::~CncTryRunLoggerProxy() {
+CncDryRunLoggerProxy::~CncDryRunLoggerProxy() {
 //////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////
-bool CncTryRunLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
+void CncDryRunLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
 //////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getTryRunLogger()->changeTextAttr(style);
+	if ( lastSourceID != sourceId )
+	{
+		setTextColour(col);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getTemplateContextSummary()->getDryRunLogger()->add(c);
+}
+//////////////////////////////////////////////////////////////
+void CncDryRunLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		SetDefaultStyle(style);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getTemplateContextSummary()->getDryRunLogger()->add(c);
+}
+//////////////////////////////////////////////////////////////
+bool CncDryRunLoggerProxy::setTextColour(const wxColour& col) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getDryRunLogger()->changeTextAttr(col);
 	return true;
 }
 //////////////////////////////////////////////////////////////
-void CncTryRunLoggerProxy::AppendChar(char c) {
+bool CncDryRunLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
 //////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getTryRunLogger()->add(c);
+	THE_APP->getTemplateContextSummary()->getDryRunLogger()->changeTextAttr(style);
+	return true;
 }
 //////////////////////////////////////////////////////////////
-void CncTryRunLoggerProxy::AppendText(const wxString &text) {
+void CncDryRunLoggerProxy::AppendChar(char c) {
 //////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getTryRunLogger()->add(text);
+	THE_APP->getTemplateContextSummary()->getDryRunLogger()->add(c);
+}
+//////////////////////////////////////////////////////////////
+void CncDryRunLoggerProxy::AppendText(const wxString &text) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getDryRunLogger()->add(text);
 }
 
 
@@ -143,6 +227,34 @@ void CncParserSynopsisProxy::addEntry(const char type, const wxString& entry) {
 	}
 }
 //////////////////////////////////////////////////////////////
+void CncParserSynopsisProxy::appendChar(char c, const wxColour& col, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		setTextColour(col);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->add(c);
+}
+//////////////////////////////////////////////////////////////
+void CncParserSynopsisProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		SetDefaultStyle(style);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->add(c);
+}
+//////////////////////////////////////////////////////////////
+bool CncParserSynopsisProxy::setTextColour(const wxColour& col) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->changeTextAttr(col);
+	return true;
+}
+//////////////////////////////////////////////////////////////
 bool CncParserSynopsisProxy::SetDefaultStyle(const wxTextAttr& style) {
 //////////////////////////////////////////////////////////////
 	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->changeTextAttr(style);
@@ -170,6 +282,34 @@ CncMsgHistoryLoggerProxy::CncMsgHistoryLoggerProxy(wxWindow *parent, wxWindowID 
 //////////////////////////////////////////////////////////////
 CncMsgHistoryLoggerProxy::~CncMsgHistoryLoggerProxy() {
 //////////////////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////////////////
+void CncMsgHistoryLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		setTextColour(col);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getCtrlMsgHistoryList()->add(c);
+}
+//////////////////////////////////////////////////////////////
+void CncMsgHistoryLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		SetDefaultStyle(style);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getCtrlMsgHistoryList()->add(c);
+}
+//////////////////////////////////////////////////////////////
+bool CncMsgHistoryLoggerProxy::setTextColour(const wxColour& col) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getCtrlMsgHistoryList()->changeTextAttr(col);
+	return true;
 }
 //////////////////////////////////////////////////////////////
 bool CncMsgHistoryLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
@@ -204,6 +344,34 @@ CncTraceProxy::~CncTraceProxy() {
 void CncTraceProxy::Clear() {
 //////////////////////////////////////////////////////////////
 	THE_APP->getLoggerView()->clearTrace();
+}
+//////////////////////////////////////////////////////////////
+void CncTraceProxy::appendChar(char c, const wxColour& col, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		setTextColour(col);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getLoggerView()->add(c);
+}
+//////////////////////////////////////////////////////////////
+void CncTraceProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
+//////////////////////////////////////////////////////////////
+	if ( lastSourceID != sourceId )
+	{
+		SetDefaultStyle(style);
+		lastSourceID = sourceId;
+	}
+	
+	THE_APP->getLoggerView()->add(c);
+}
+//////////////////////////////////////////////////////////////
+bool CncTraceProxy::setTextColour(const wxColour& col) {
+//////////////////////////////////////////////////////////////
+	THE_APP->getLoggerView()->changeTextAttr(col);
+	return true;
 }
 //////////////////////////////////////////////////////////////
 bool CncTraceProxy::SetDefaultStyle(const wxTextAttr& style) {

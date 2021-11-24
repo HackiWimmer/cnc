@@ -17,7 +17,7 @@ CncTemplateContextSummaryPanel::CncTemplateContextSummaryPanel(wxWindow* parent)
 , analysisOverall						(NULL)
 , analysisLimit							(NULL)
 , analysisMovement						(NULL)
-, tryRunLogger							(NULL)
+, dryRunLogger							(NULL)
 , parsingSynopsis						(NULL)
 ///////////////////////////////////////////////////////////////////
 {
@@ -41,9 +41,9 @@ CncTemplateContextSummaryPanel::CncTemplateContextSummaryPanel(wxWindow* parent)
 	GblFunc::replaceControl(m_analysisMovementPlaceholder, analysisMovement);
 	loggerRegister.push_back(analysisMovement);
 	
-	tryRunLogger = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
-	GblFunc::replaceControl(m_tryRunLoggerPlaceholder, tryRunLogger);
-	loggerRegister.push_back(tryRunLogger);
+	dryRunLogger = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_dryRunLoggerPlaceholder, dryRunLogger);
+	loggerRegister.push_back(dryRunLogger);
 	
 	parsingSynopsis = new CncExtLoggerListCtrl(this, wxLC_SINGLE_SEL);
 	GblFunc::replaceControl(m_parsingSynopsisPlaceholder, parsingSynopsis);
@@ -60,7 +60,7 @@ CncTemplateContextSummaryPanel::~CncTemplateContextSummaryPanel() {
 	wxDELETE(analysisOverall);
 	wxDELETE(analysisLimit);
 	wxDELETE(analysisMovement);
-	wxDELETE(tryRunLogger);
+	wxDELETE(dryRunLogger);
 	wxDELETE(parsingSynopsis);
 }
 ///////////////////////////////////////////////////////////////////

@@ -425,9 +425,9 @@ void GLContextCncPathBase::drawHardwareBox() {
 	float originZ = THE_BOUNDS->getHardwareOffset().getAsStepsZ() / THE_CONFIG->getDispFactZ3D();
 	
 	// evaluate hardware dimensions as vertex
-	float maxX    = THE_CONFIG->getMaxDimensionStepsX()  / THE_CONFIG->getDispFactX3D();
-	float maxY    = THE_CONFIG->getMaxDimensionStepsY()  / THE_CONFIG->getDispFactY3D();
-	float maxZ    = THE_CONFIG->getMaxDimensionStepsZ()  / THE_CONFIG->getDispFactZ3D();
+	float maxX    = THE_CONFIG->getMaxDimensionStepsX() / THE_CONFIG->getDispFactX3D();
+	float maxY    = THE_CONFIG->getMaxDimensionStepsY() / THE_CONFIG->getDispFactY3D();
+	float maxZ    = THE_CONFIG->getMaxDimensionStepsZ() / THE_CONFIG->getDispFactZ3D();
 
 	// The Z origin has to be corrected from max to min because 
 	// the hardware reference is located at min(x), min(y) and max(z)

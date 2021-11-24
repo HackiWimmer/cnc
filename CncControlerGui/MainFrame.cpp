@@ -422,7 +422,7 @@ MainFrameBase::MainFrameBase(wxWindow* parent)
 , loggerView			( new CncLoggerView				(this))
 , tmpTraceInfo			( new CncTraceProxy				(this))
 , controllerMsgHistory	( new CncMsgHistoryLoggerProxy	(this))
-, tryRunLoggerProxy		( new CncTryRunLoggerProxy		(this))
+, dryRunLoggerProxy		( new CncDryRunLoggerProxy		(this))
 , parserSynopsisProxy	( new CncParserSynopsisProxy	(this))
 ////////////////////////////////////////////////////////////////////
 {
@@ -442,7 +442,7 @@ MainFrameBase::MainFrameBase(wxWindow* parent)
 	startupTrace		->Show(false);
 	tmpTraceInfo		->Show(false);
 	controllerMsgHistory->Show(false);
-	tryRunLoggerProxy	->Show(false);
+	dryRunLoggerProxy	->Show(false);
 	parserSynopsisProxy	->Show(false);
 	
 	GblFunc::replaceControl(m_loggerViewPlaceholder, loggerView);
@@ -469,7 +469,7 @@ MainFrameBase::~MainFrameBase() {
 	
 	// clear
 	cncDELETE( parserSynopsisProxy );
-	cncDELETE( tryRunLoggerProxy );
+	cncDELETE( dryRunLoggerProxy );
 	cncDELETE( controllerMsgHistory );
 	cncDELETE( tmpTraceInfo );
 	cncDELETE( startupTrace );
@@ -1073,7 +1073,7 @@ void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
 	registerGuiControl(secureCtrlPanel->GetBtConnectSec());
 	registerGuiControl(secureCtrlPanel->GetBtResetSec());
-	registerGuiControl(secureCtrlPanel->GetBtTryRunSec());
+	registerGuiControl(secureCtrlPanel->GetBtDryRunSec());
 	registerGuiControl(secureCtrlPanel->GetBtTemplateContextSec());
 	registerGuiControl(secureCtrlPanel->GetBtHardwareRefSec());
 	
@@ -1288,7 +1288,12 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 	cnc::trc.logInfoMessage("Test function 1");
 	
 	wxStandardPaths& x = wxStandardPaths::Get();
+	for ( int i= 1; i< 1000; i++ )
+	{
+	
 	CNC_CLOG_FUNCT_A(x.GetExecutablePath())
+
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -1318,7 +1323,7 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
 	
-	contextSummaryPanel->selectTryRun();
+	contextSummaryPanel->selectDryRun();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -2987,12 +2992,12 @@ bool MainFrame::connectSerialPort() {
 	
 	// this has to be done after enableControls(), otherwise the state can
 	// no be reproduced after the next disableControls()!
-	secureCtrlPanel->GetBtTryRunSec()->Enable(cnc->tryRunAvailable());
-	secureCtrlPanel->GetBtTemplateContextSec()->Enable(cnc->tryRunAvailable());
+	secureCtrlPanel->GetBtDryRunSec()->Enable(cnc->dryRunAvailable());
+	secureCtrlPanel->GetBtTemplateContextSec()->Enable(cnc->dryRunAvailable());
 	
 	if ( cnc->isEmulator() == true )
 		simulateHardwareReference();
-	
+		
 	if ( ret == true && cnc->canProcessIdle() )
 	{
 		m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
@@ -3159,7 +3164,8 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	
 	decorateSecureDlgChoice(setup.secureDlg);
 	
-	if ( cncPreprocessor != NULL ) {
+	if ( cncPreprocessor != NULL ) 
+	{
 		cncPreprocessor->enablePathListEntries(setup.pathListEntries);
 		cncPreprocessor->enableMoveSequences(setup.moveSequences);
 		cncPreprocessor->enableOperatingTrace(setup.operatingTrace);
@@ -3722,7 +3728,7 @@ bool MainFrame::openFile(int sourcePageToSelect) {
 	selectMainBookSourcePanel(sourcePageToSelect);
 	
 	THE_TPL_CTX->reset();
-	decorateTryRunState(cncUnknown);
+	decorateDryRunState(cncUnknown);
 	
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) 
@@ -4929,8 +4935,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		// process template . . . 
 		
 			// *********************
-			
-			CNC_CLOG_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) started . . .", wxDateTime::UNow().FormatISOTime(), probeMode))
+			StreamBufferHighlighter sbh(cnc::cex1);
+			CNC_CLOG_A(wxString::Format("\n~~~ %s - Processing(probe mode = %s) started ~~~", wxDateTime::UNow().FormatISOTime(), probeMode))
 			
 			// This instance starts and stops the speed monitor
 			CncSpeedMonitorRunner smr(speedMonitor);
@@ -4958,7 +4964,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		CncDoubleBoundaries bounds;
 		bounds.setMinBound(cnc->getMinPositionsMetric());
 		bounds.setMaxBound(cnc->getMaxPositionsMetric());
-		THE_TPL_CTX->registerBounderies(bounds);
+		THE_TPL_CTX->registerBoundaries(bounds);
 		
 		if ( inboundFileParser )
 		{
@@ -4971,18 +4977,26 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		// prepare final statements
 		if ( ret == false )
 		{
+			StreamBufferHighlighter sbh(cnc::cex1);
+			
 			wxString hint("not successfully");
-			CNC_CEX1_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint))
+			CNC_CEX1_A(wxString::Format("=== %s - Processing(probe mode = %s) finished %s ===", wxDateTime::UNow().FormatISOTime(), probeMode, hint))
+			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_WARNING_STR)
+			
 			lock.setErrorMode();
 			
 			THE_TPL_CTX->resetValidRuns();
-			decorateTryRunState(cncError);
+			decorateDryRunState(cncError);
 		} 
 		else
 		{
-			CNC_CLOG_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode))
+			StreamBufferHighlighter sbh(std::clog);
+			
+			CNC_CLOG_A(wxString::Format("=== %s - Processing(probe mode = %s) finished successfully ===", wxDateTime::UNow().FormatISOTime(), probeMode))
+			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR )
+			
 			THE_TPL_CTX->registerValidRun();
-			decorateTryRunState(cncOk);
+			decorateDryRunState(cncOk);
 		}
 		
 		return ret;
@@ -4999,160 +5013,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	}
 	
 	return false;
-	
-	#warning
-	/*
-	try 
-	{
-		wxASSERT(cnc);
-		if ( isInterrupted() == true )
-		{
-			CNC_CERR_FUNCT_A(": Run aborted - Interrupt detected!")
-			return false;
-		}
-		
-		THE_CONTEXT->resetProcessing();
-		THE_CONTEXT->initPreparationPhase();
-		
-		serialSpyPanel->clearSerialSpyBeforNextRun();
-		
-		CncRunEventFilter cef;
-		
-		// deactivate idle requests
-		CNC_TRANSACTION_LOCK_RET_ON_ERROR(false)
-		
-		// Deactivate observer
-		CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
-		
-		// it's very import to deactivate the notifications during a run
-		// because instead every config change (sc()) will release a notification
-		// this will be the case for example if the SVG path handler changes
-		// the z -axis values . . .
-		// as a result the processing slows down significantly.
-		CncConfig::NotificationDeactivator cfgNotDeactivation;
-		
-		THE_CONTEXT->setAllowEventHandling(true);
-		cnc->resetSetterMap();
-		cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
-		cnc->enableProbeMode(THE_CONTEXT->isProbeMode());
-		
-		// restart the trace timer using the previous time-out value
-		m_traceTimer->Start(-1);
-		
-		MainFrame::Notification notification;
-		
-		const CncTemplateFormat tf = getCurrentTemplateFormat();
-		const wxString fn (getCurrentTemplatePathFileName());
-		
-		if ( tf != TplManual && tf != TplTest )
-		{
-			if ( fn.IsEmpty() == true )
-			{
-				notification.location	= MainFrame::Notification::Location::NL_MonitorView;
-				notification.type		= 'W';
-				notification.title		= "Run Template";
-				notification.message	= "No template loaded . . . ";
-				displayNotification(notification);
-				return false;
-			}
-		}
-		
-		// do this before the clearing operations below, 
-		// because then the ref pos correction will be also removed
-		// as well as the previous drawing
-		if ( checkReferencePositionState() == false )
-			return false;
-		
-		wxASSERT( cncManuallyMoveCoordPanel );
-		bool clearMM = true;
-		
-		if ( tf == TplManual )  clearMM = cncManuallyMoveCoordPanel->shouldClearMontionMonitor();
-		else  					cncManuallyMoveCoordPanel->resetClearViewState();
-		
-		if ( clearMM )  
-			clearMotionMonitor();
-			
-		decorateOutboundSaveControls(false);
-		cncPreprocessor->clearAll();
-		
-		bool ret = true;
-		
-		if ( cnc->isReadyToRun() == false ) 
-		{
-			CNC_CERR_FUNCT_A(": Controller isn't ready to run: Run was rejected!")
-			ret = false;
-		}
-		
-		if ( ret == true )
-			ret = checkIfRunCanBeProcessed(confirm);
-			
-		if ( ret == true )
-		{
-			// This instance starts and stops the speed monitor
-			CncSpeedMonitorRunner smr(speedMonitor);
-			ret = processTemplateIntern();
-			
-			// refresh some periphery
-			motionMonitor->updateMonitorAndOptions();
-			statisticsPane->updateReplayPane();
-		}
-		else
-		{
-			CNC_CERR_FUNCT_A(": checkIfRunCanBeProcessed() failed")
-		}
-		
-		// try to switch the spindle off 
-		// may be the template <CncParameterBlock Spindle="Off"/>
-		// has not already done this
-		cnc->switchSpindleOff(true);
-		
-		// prepare final statements
-		const wxString probeMode(THE_CONTEXT->isProbeMode() ? "ON" :"OFF");
-		
-		if ( ret == false)
-		{
-			wxString hint("not successfully");
-			CNC_CEX1_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint))
-			lock.setErrorMode();
-			
-			THE_TPL_CTX->resetValidRuns();
-			decorateTryRunState(cncError);
-		} 
-		else
-		{
-			CNC_CLOG_FUNCT_A(wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode))
-			THE_TPL_CTX->registerValidRun();
-			decorateTryRunState(cncOk);
-		}
-		
-		CncDoubleBoundaries bounds;
-		bounds.setMinBound(cnc->getMinPositionsMetric());
-		bounds.setMaxBound(cnc->getMaxPositionsMetric());
-		THE_TPL_CTX->registerBounderies(bounds);
-		
-		if ( inboundFileParser )
-		{
-			const Trigger::EndRun endRun(ret);
-			inboundFileParser->deligateTrigger(endRun);
-		}
-		
-		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
-		
-		return ret;
-	}
-	catch (const CncInterruption& ex) 
-	{
-		CncInterruption nex(ex);
-		nex.addCatchLocation(CNC_LOG_FUNCT);
-		handleCncInterruptException(nex);
-	}
-	catch (...) 
-	{
-		handleUnhandledException(CNC_LOG_FUNCT);
-	}
-	
-	return false;
-	*/
 }
 ///////////////////////////////////////////////////////////////////
 // don't call this method directly, instead use processTemplateWrapper
@@ -6932,9 +6792,9 @@ void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 		m_debuggerPropertyManagerGrid->SelectPage(0);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::rcTryRun(wxCommandEvent& event) {
+void MainFrame::rcDryRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( cnc->tryRunAvailable() )
+	if ( cnc->dryRunAvailable() )
 	{
 		const unsigned int prevRunCount			= THE_CONTEXT->templateContext->getRunCount();
 		const unsigned int prevValidRunCount	= THE_CONTEXT->templateContext->getValidRunCount();
@@ -6944,11 +6804,11 @@ void MainFrame::rcTryRun(wxCommandEvent& event) {
 		
 		// streamer redirect section
 		{
-			StdStreamRedirector srd(getTryRunLogger());
+			StdStreamRedirector srd(getDryRunLogger());
 			
 			CNC_CLOG_FUNCT_A("Try run started: %s", wxDateTime::Now().FormatISOTime())
 			
-			cnc->switchRunMode(CncControl::RunMode::M_TryRun);
+			cnc->switchRunMode(CncControl::RunMode::M_DryRun);
 			ret = processTemplateWrapper();
 			cnc->switchRunMode(CncControl::RunMode::M_RealRun);
 			
@@ -6991,7 +6851,7 @@ void MainFrame::rcTryRun(wxCommandEvent& event) {
 		// display processing info on standard logger
 		if ( ret == false )
 		{
-			decorateTryRunState(cncError);
+			decorateDryRunState(cncError);
 			CNC_CERR_FUNCT_A(finalMessage)
 			openTemplateContextView();
 		}
@@ -6999,12 +6859,12 @@ void MainFrame::rcTryRun(wxCommandEvent& event) {
 		{
 			if ( finalMessage.IsEmpty() == false )
 			{
-				decorateTryRunState(cncOk);
+				decorateDryRunState(cncOk);
 				CNC_CLOG_FUNCT_A(finalMessage)
 			}
 			else
 			{
-				decorateTryRunState(cncUnknown);
+				decorateDryRunState(cncUnknown);
 			}
 		}
 	}
@@ -7027,7 +6887,7 @@ void MainFrame::openTemplateContextView() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::decorateTryRunState(CncState state) {
+void MainFrame::decorateDryRunState(CncState state) {
 ///////////////////////////////////////////////////////////////////
 	wxString bmpName;
 	
@@ -8992,7 +8852,8 @@ void MainFrame::updateHardwareReference() {
 	double dy = 0.0;
 	double dz = 0.0;
 	
-	if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) {
+	if ( THE_BOUNDS->getHardwareOffset().isValid() == true ) 
+	{
 		dx = THE_BOUNDS->getHardwareOffset().getAsMetricX();
 		dy = THE_BOUNDS->getHardwareOffset().getAsMetricY();
 		dz = THE_BOUNDS->getHardwareOffset().getAsMetricZ();
@@ -9001,6 +8862,16 @@ void MainFrame::updateHardwareReference() {
 	m_hardwareOffsetX->ChangeValue(wxString::Format("%.3lf", dx));
 	m_hardwareOffsetY->ChangeValue(wxString::Format("%.3lf", dy));
 	m_hardwareOffsetZ->ChangeValue(wxString::Format("%.3lf", dz));
+	
+	if ( serialThread != NULL )
+	{
+		serialThread->setHardwareOffset(&THE_BOUNDS->getHardwareOffset(), 
+										THE_CONFIG->getMaxDimensionStepsX(),
+										THE_CONFIG->getMaxDimensionStepsY(),
+										THE_CONFIG->getMaxDimensionStepsZ()
+		);
+	}
+
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::simulateHardwareReference(float offsetFact) {
@@ -9038,11 +8909,14 @@ void MainFrame::simulateHardwareReference(float offsetFact) {
 		}
 		
 		// fake a physical hardware reference
-		CNC_CEX1_FUNCT_A("\n No physical hardware support available for the connected port." \
-						 "\n A default hardware reference will be simply simulated for any test purpose.")
+		CNC_CEX2_A(	" No physical hardware support available for the connected port." \
+					"\n A default hardware reference will be simply simulated for any test purpose.")
 						 
 		if ( cnc->simulateHardwareReference(offsetFact) == true )
+		{
 			motionMonitor->clear();
+			updateHardwareReference();
+		}
 	}
 }
 /////////////////////////////////////////////////////////////////////

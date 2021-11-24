@@ -50,7 +50,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		virtual void onOpenConfigurationDlgSec(wxCommandEvent& event);
 		virtual void onOpenConfigurationFileSec(wxCommandEvent& event);
 		virtual void onTemplateContextSec(wxCommandEvent& event);
-		virtual void onTryRunSec(wxCommandEvent& event);
+		virtual void onDryRunSec(wxCommandEvent& event);
 		virtual void onEditTemplateSec(wxCommandEvent& event);
 		virtual void onTestFunction1Sec(wxCommandEvent& event);
 		virtual void onTestFunction2Sec(wxCommandEvent& event);
