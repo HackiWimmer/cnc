@@ -87,7 +87,11 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		
 		void changeTextAttr(const wxTextAttr& ta);
 		void changeTextColour(const wxColour& col);
-		void changeResult(const wxString& text, long item=wxNOT_FOUND);
+		
+		void changeResult						(const wxString& result, long item = wxNOT_FOUND);
+		void changeResultForLoggedPosition		(const wxString& result);
+		void changeResultForLastPosition		(const wxString& result);
+		void changeResultForLastFilledPosition	(const wxString& result);
 		
 		void popImmediatelyMode();
 		void popProcessMode();

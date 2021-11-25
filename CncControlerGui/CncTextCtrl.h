@@ -3,7 +3,6 @@
 
 #include <wx/timer.h>
 #include <wx/textctrl.h>
-#include "OSD/CncTimeFunctions.h"
 
 class CncTextCtrl : public wxTextCtrl  {
 	
@@ -11,8 +10,6 @@ class CncTextCtrl : public wxTextCtrl  {
 		static const unsigned int MAX_LINE_BUFFER_SIZE 				= 1024;
 		static const unsigned int DEFAULT_OVERFLOW_PERIOD_VALUE 	=  800;
 		
-		static const unsigned int NO_SOUREC_ID					 	=   -1;
-
 		wxTimer* 			overflowTimer;
 		char				lineBuffer[MAX_LINE_BUFFER_SIZE];
 		unsigned int		index;
@@ -21,8 +18,6 @@ class CncTextCtrl : public wxTextCtrl  {
 		inline size_t flushLineBuffer();
 		
 	protected:
-		
-		int					lastSourceID;
 		
 		virtual void onOverflowTimer(wxTimerEvent& event);
 		

@@ -16,6 +16,9 @@ class CncLoggerView : public CncLoggerViewBase {
 		
 		virtual bool Enable(bool enable = true);
 		
+		CncLoggerListCtrl* getLoggerListCtrl(LoggerSelection::VAL id) const;
+		CncTraceCtrl* getTraceCtrl() const;
+		
 		bool doShowLoggerOnCommand() const	{ return m_btLoggerOnDemand->GetValue(); }
 		void setShowOnDemandState(bool s)	{ m_btLoggerOnDemand->SetValue(s); }
 		void setSecureMode(bool state);
@@ -31,15 +34,9 @@ class CncLoggerView : public CncLoggerViewBase {
 		
 		void select								(LoggerSelection::VAL id);
 		void clear								(LoggerSelection::VAL id);
-		void logCurrentPosition					(LoggerSelection::VAL id);
-		void logLastFilledPosition				(LoggerSelection::VAL id);
 		void setErrorFlag						(LoggerSelection::VAL id, bool flag);
 		void changeTextAttr						(LoggerSelection::VAL id, const wxTextAttr& ta);
 		void changeTextColour					(LoggerSelection::VAL id, const wxColour& col);
-		void changeResult						(LoggerSelection::VAL id, const wxString& text, long int row);
-		void changeResultForLoggedPosition		(LoggerSelection::VAL id, const wxString& result);
-		void changeResultForLastPosition		(LoggerSelection::VAL id, const wxString& result);
-		void changeResultForLastFilledPosition	(LoggerSelection::VAL id, const wxString& result);
 		void add								(LoggerSelection::VAL id, const char c);
 		void add								(LoggerSelection::VAL id, const wxString& text);
 		void add								(LoggerSelection::VAL id, const wxString& text, const wxString& result);

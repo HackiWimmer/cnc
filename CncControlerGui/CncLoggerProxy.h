@@ -3,13 +3,22 @@
 
 #include "CncTextCtrl.h"
 
+class CncLoggerListCtrl;
+
 // --------------------------------------------------------------
-class CncStartupLoggerProxy : public CncTextCtrl  {
+class CncLoggerProxy : public CncTextCtrl {
 	
+	protected:
+		static const unsigned int NO_SOUREC_ID =   -1;
+		
+		int lastSourceID;
+
 	public:
-		CncStartupLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		CncLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
 		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
-		virtual ~CncStartupLoggerProxy();
+		virtual ~CncLoggerProxy();
+		
+		virtual CncLoggerListCtrl* getListCtrl() const = 0;
 		
 		virtual bool setTextColour(const wxColour& col);
 		virtual void appendChar(char c, const wxColour& col, int sourceId);
@@ -18,63 +27,74 @@ class CncStartupLoggerProxy : public CncTextCtrl  {
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);
+		
+		wxDECLARE_NO_COPY_CLASS(CncLoggerProxy);
+};
+
+// --------------------------------------------------------------
+class CncStartupLoggerProxy : public CncLoggerProxy {
+	
+	public:
+		CncStartupLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		                      long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr)
+		: CncLoggerProxy(parent, wxID_ANY, value, pos, size, style, validator, name)
+		{}
+		
+		virtual ~CncStartupLoggerProxy()
+		{}
+		
+		virtual CncLoggerListCtrl* getListCtrl() const;
 		
 		wxDECLARE_NO_COPY_CLASS(CncStartupLoggerProxy);
 };
 
 // --------------------------------------------------------------
-class CncStandardLoggerProxy : public CncTextCtrl  {
+class CncStandardLoggerProxy : public CncLoggerProxy {
 	
 	public:
 		CncStandardLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
-		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
-		virtual ~CncStandardLoggerProxy();
+		                       long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr)
+		: CncLoggerProxy(parent, wxID_ANY, value, pos, size, style, validator, name)
+		{}
 		
-		virtual bool setTextColour(const wxColour& col);
-		virtual void appendChar(char c, const wxColour& col, int sourceId);
-		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
+		virtual ~CncStandardLoggerProxy()
+		{}
 		
-		virtual bool SetDefaultStyle(const wxTextAttr& style);
-		virtual void AppendChar(char c);
-		virtual void AppendText(const wxString &text);
+		virtual CncLoggerListCtrl* getListCtrl() const;
 		
 		wxDECLARE_NO_COPY_CLASS(CncStandardLoggerProxy);
 };
 
 // --------------------------------------------------------------
-class CncDryRunLoggerProxy : public CncTextCtrl  {
+class CncDryRunLoggerProxy : public CncLoggerProxy {
 	
 	public:
 		CncDryRunLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
-		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
-		virtual ~CncDryRunLoggerProxy();
+		                     long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr)
+		: CncLoggerProxy(parent, wxID_ANY, value, pos, size, style, validator, name)
+		{}
 		
-		virtual bool setTextColour(const wxColour& col);
-		virtual void appendChar(char c, const wxColour& col, int sourceId);
-		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
-
-		virtual bool SetDefaultStyle(const wxTextAttr& style);
-		virtual void AppendChar(char c);
-		virtual void AppendText(const wxString &text);
+		virtual ~CncDryRunLoggerProxy()
+		{}
+		
+		virtual CncLoggerListCtrl* getListCtrl() const;
 		
 		wxDECLARE_NO_COPY_CLASS(CncDryRunLoggerProxy);
 };
 
 // --------------------------------------------------------------
-class CncParserSynopsisProxy : public CncTextCtrl  {
+class CncParserSynopsisProxy : public CncLoggerProxy  {
 	
 	public:
 		CncParserSynopsisProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
-		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
-		virtual ~CncParserSynopsisProxy();
+		                       long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr)
+		: CncLoggerProxy(parent, wxID_ANY, value, pos, size, style, validator, name)
+		{}
 		
-		virtual bool setTextColour(const wxColour& col);
-		virtual void appendChar(char c, const wxColour& col, int sourceId);
-		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
-
-		virtual bool SetDefaultStyle(const wxTextAttr& style);
-		virtual void AppendChar(char c);
-		virtual void AppendText(const wxString &text);
+		virtual ~CncParserSynopsisProxy()
+		{}
+		
+		virtual CncLoggerListCtrl* getListCtrl() const;
 		
 		void addEntry(const char type, const wxString& entry);
 		void addInfo(const wxString& entry)							{ addEntry('I', entry); }
@@ -93,20 +113,18 @@ class CncParserSynopsisProxy : public CncTextCtrl  {
 };
 
 // --------------------------------------------------------------
-class CncMsgHistoryLoggerProxy : public CncTextCtrl  {
+class CncMsgHistoryLoggerProxy : public CncLoggerProxy  {
 	
 	public:
 		CncMsgHistoryLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
-		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
-		virtual ~CncMsgHistoryLoggerProxy();
+		                         long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr)
+		: CncLoggerProxy(parent, wxID_ANY, value, pos, size, style, validator, name)
+		{}
 		
-		virtual bool setTextColour(const wxColour& col);
-		virtual void appendChar(char c, const wxColour& col, int sourceId);
-		virtual void appendChar(char c, const wxTextAttr& style, int sourceId);
-
-		virtual bool SetDefaultStyle(const wxTextAttr& style);
-		virtual void AppendChar(char c);
-		virtual void AppendText(const wxString &text);
+		virtual ~CncMsgHistoryLoggerProxy()
+		{}
+		
+		virtual CncLoggerListCtrl* getListCtrl() const;
 		
 		wxDECLARE_NO_COPY_CLASS(CncMsgHistoryLoggerProxy);
 };
@@ -114,9 +132,14 @@ class CncMsgHistoryLoggerProxy : public CncTextCtrl  {
 // --------------------------------------------------------------
 class CncTraceProxy : public CncTextCtrl  {
 	
+	protected:
+		static const unsigned int NO_SOUREC_ID =   -1;
+		
+		int lastSourceID;
+		
 	public:
 		CncTraceProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
-		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
+		              long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
 		virtual ~CncTraceProxy();
 		
 		virtual void Clear();

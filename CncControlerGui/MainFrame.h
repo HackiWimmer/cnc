@@ -107,19 +107,6 @@ struct RefPosResult;
 	wxDECLARE_EVENT(wxEVT_DISPATCH_ALL,							wxThreadEvent);
 ////////////////////////////////////////////////////////////////////
 
-	#define CNC_RESULT_OK_STR				"OK"
-	#define CNC_RESULT_WARNING_STR			"WARNING"
-	#define CNC_RESULT_ERROR_STR			"ERROR"
-	
-	#define REGISTER_LAST_FILLED_LOGGER_ROW \
-		{ THE_APP->getLoggerView()->logLastFilledPosition(LoggerSelection::VAL::CNC); }
-			
-	#define SET_RESULT_FOR_REGISTERED_LOGGER_ROW(result) \
-		{THE_APP->getLoggerView()->changeResultForLoggedPosition(LoggerSelection::VAL::CNC, result); }
-
-	#define SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW(result) \
-		{ THE_APP->getLoggerView()->changeResultForLastFilledPosition(LoggerSelection::VAL::CNC, result); }
-		
 ////////////////////////////////////////////////////////////////////
 // global definitions
 namespace CncApp {

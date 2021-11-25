@@ -51,6 +51,19 @@ CncLoggerView::~CncLoggerView() {
 	wxDELETE( traceInfoBar );
 }
 /////////////////////////////////////////////////////////////////
+CncLoggerListCtrl* CncLoggerView::getLoggerListCtrl(LoggerSelection::VAL id) const {
+/////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return NULL;
+	
+	return loggerLists.at(id);
+}
+/////////////////////////////////////////////////////////////////
+CncTraceCtrl* CncLoggerView::getTraceCtrl() const {
+/////////////////////////////////////////////////////////////////
+	return traceCtrl;
+}
+/////////////////////////////////////////////////////////////////
 void CncLoggerView::setSecureMode(bool state) {
 /////////////////////////////////////////////////////////////////
 	if ( state == true ) 
@@ -382,22 +395,6 @@ void CncLoggerView::setErrorFlag(LoggerSelection::VAL id, bool flag) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void CncLoggerView::logCurrentPosition(LoggerSelection::VAL id) {
-/////////////////////////////////////////////////////////////////////
-	if ( loggerLists.size() != MaxLoggerCount )
-		return;
-	
-	loggerLists.at(id)->logRowNumber();
-}
-/////////////////////////////////////////////////////////////////////
-void CncLoggerView::logLastFilledPosition(LoggerSelection::VAL id) {
-/////////////////////////////////////////////////////////////////////
-	if ( loggerLists.size() != MaxLoggerCount )
-		return;
-	
-	loggerLists.at(id)->logLastFilledRowNumber();
-}
-/////////////////////////////////////////////////////////////////////
 void CncLoggerView::changeTextColour(LoggerSelection::VAL id, const wxColour& col) {
 /////////////////////////////////////////////////////////////////////
 	if ( loggerLists.size() != MaxLoggerCount )
@@ -412,41 +409,6 @@ void CncLoggerView::changeTextAttr(LoggerSelection::VAL id, const wxTextAttr& ta
 		return;
 	
 	loggerLists.at(id)->changeTextAttr(ta);
-}
-/////////////////////////////////////////////////////////////////////
-void CncLoggerView::changeResult(LoggerSelection::VAL id, const wxString& text, long int row) {
-/////////////////////////////////////////////////////////////////////
-	if ( loggerLists.size() != MaxLoggerCount )
-		return;
-	
-	loggerLists.at(id)->changeResult(text, row);
-}
-/////////////////////////////////////////////////////////////////////
-void CncLoggerView::changeResultForLoggedPosition(LoggerSelection::VAL id, const wxString& result) {
-/////////////////////////////////////////////////////////////////////
-	if ( loggerLists.size() != MaxLoggerCount )
-		return;
-	
-	if ( loggerLists.at(id)->getLoggedRowNumber() > 0 )
-		loggerLists.at(id)->changeResult(result, loggerLists.at(id)->getLoggedRowNumber());
-}
-/////////////////////////////////////////////////////////////////////
-void CncLoggerView::changeResultForLastPosition(LoggerSelection::VAL id, const wxString& result) {
-/////////////////////////////////////////////////////////////////////
-	if ( loggerLists.size() != MaxLoggerCount )
-		return;
-	
-	loggerLists.at(id)->logRowNumber();
-	loggerLists.at(id)->changeResult(result);
-}
-/////////////////////////////////////////////////////////////////////
-void CncLoggerView::changeResultForLastFilledPosition(LoggerSelection::VAL id, const wxString& result) {
-/////////////////////////////////////////////////////////////////////
-	if ( loggerLists.size() != MaxLoggerCount )
-		return;
-	
-	loggerLists.at(id)->logLastFilledRowNumber();
-	loggerLists.at(id)->changeResult(result, loggerLists.at(id)->getLoggedRowNumber());
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::add(LoggerSelection::VAL id, const char c) {

@@ -5,12 +5,46 @@
 #include <cfloat>
 #include <limits>
 #include <map>
+#include <stack>
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
 
 #include "CncPosition.h"
 #include "CncStreamBuffers.h"
+#include "CncLoggerProxy.h"
+#include "CncLoggerListCtrl.h"
 #include "StdStreamRedirector.h"
+
+// -------------------------------------------------------------------
+namespace cnc
+{
+	extern CncBasicLogStream							cex1;
+	extern CncBasicLogStream							cex2;
+	extern CncBasicLogStream							cex3;
+	
+	extern CncTraceLogStream							trc;
+	extern CncMsgLogStream								msg;
+	extern CncSerialSpyStream							spy;
+	
+	typedef std::stack<CncLoggerProxy*> LoggerProxyRedirectStack;
+	extern LoggerProxyRedirectStack						loggerProxyRedirectStack;
+}
+
+// -------------------------------------------------------------------
+// ....
+
+	#define CNC_RESULT_OK_STR				"OK"
+	#define CNC_RESULT_WARNING_STR			"WARNING"
+	#define CNC_RESULT_ERROR_STR			"ERROR"
+	
+	#define REGISTER_LAST_FILLED_LOGGER_ROW \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->logLastFilledRowNumber(); }
+			
+	#define SET_RESULT_FOR_REGISTERED_LOGGER_ROW(result) \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLoggedPosition(result); }
+
+	#define SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW(result) \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLastFilledPosition(result); }
 
 // -------------------------------------------------------------------
 // global strings
@@ -148,21 +182,13 @@ static struct ClientIds {
 typedef bool CncSpindlePowerState;
 
 // -------------------------------------------------------------------
-namespace cnc {
-	
+namespace cnc
+{
 	typedef std::vector<long>							LongValues;
 	typedef std::vector<float>							FloatValues;
 	typedef std::vector<double>							DoubleValues;
 	typedef std::vector<int32_t> 						SetterValueList;
 	typedef std::map<unsigned long, unsigned long> 		LineNumberTranslater;
-	
-	extern CncBasicLogStream							cex1;
-	extern CncBasicLogStream							cex2;
-	extern CncBasicLogStream							cex3;
-	
-	extern CncTraceLogStream							trc;
-	extern CncMsgLogStream								msg;
-	extern CncSerialSpyStream							spy;
 	
 	const char RAPID_SPEED_CHAR 						= 'R';
 	const char WORK_SPEED_CHAR							= 'W';

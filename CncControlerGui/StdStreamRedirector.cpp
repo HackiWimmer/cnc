@@ -1,12 +1,16 @@
+#include "CncCommon.h"
 #include "StdStreamRedirector.h"
 
 //////////////////////////////////////////////////
+/*
 namespace cnc 
 {
 	extern CncBasicLogStream cex1;
 	extern CncBasicLogStream cex2;
 	extern CncBasicLogStream cex3;
+	extern 
 }
+*/
 //////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
@@ -56,11 +60,19 @@ StdStreamRedirector::StdStreamRedirector(CncTextCtrl* ctl)
 		psbufCex3 = new CncCex3Buf(ctl);
 		sbOldCex3 = (CncCex3Buf*)cnc::cex3.rdbuf();
 		cnc::cex3.rdbuf(psbufCex3);
+		
+		// it is assumed here that ale stream have the same logger proxy.
+		// put the previous logger based on the sbOldCout->getTextControl() on the stack
+		CncLoggerProxy* clp = reinterpret_cast<CncLoggerProxy*>(ctl);
+		cnc::loggerProxyRedirectStack.push(clp);
 	}
 }
 //////////////////////////////////////////////////
 StdStreamRedirector::~StdStreamRedirector() {
 //////////////////////////////////////////////////
+	// remove the current logger proxy from the stack again
+	cnc::loggerProxyRedirectStack.pop();
+	
 	// restore
 	if ( psbufCout )
 	{

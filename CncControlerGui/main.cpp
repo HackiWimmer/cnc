@@ -1,4 +1,5 @@
 #include <sstream>
+#include <stack>
 #include <wx/app.h>
 #include <wx/log.h>
 #include <wx/image.h>
@@ -35,6 +36,26 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 };
 
 ///////////////////////////////////////////////////////////////////
+namespace cnc 
+{
+	CncBasicLogStream	cex1;
+	CncBasicLogStream	cex2;
+	CncBasicLogStream	cex3;
+	
+	CncSerialSpyStream	spy;
+	CncMsgLogStream		msg;
+	CncTraceLogStream	trc;
+	
+	LoggerProxyRedirectStack loggerProxyRedirectStack;
+};
+
+///////////////////////////////////////////////////////////////////////////
+namespace GlobalStreamRedirection
+{
+	enum State { UNKNOWN, PREINSTALLED, INSTALLED };
+	
+	State state = UNKNOWN;
+	
 	// redirect std::cout
 	CncCoutBuf*  psbufCout;
 	std::streambuf *sbOldCout;
@@ -71,29 +92,11 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 	CncCspyBuf*  psbufCspy;
 	std::streambuf *sbOldCspy;
 
-	namespace cnc 
-	{
-		CncBasicLogStream	cex1;
-		CncBasicLogStream	cex2;
-		CncBasicLogStream	cex3;
-		
-		CncSerialSpyStream	spy;
-		CncMsgLogStream		msg;
-		CncTraceLogStream	trc;
-	};
-	
-///////////////////////////////////////////////////////////////////////////
-namespace GlobalStreamRedirection {
-	
-	enum State { UNKNOWN, PREINSTALLED, INSTALLED };
-	
-	State streamRedirectionState = UNKNOWN;
-	
 	///////////////////////////////////////////////////////////////////
 	void preInstall() 
 	///////////////////////////////////////////////////////////////////
 	{
-		if ( streamRedirectionState != UNKNOWN )
+		if ( GlobalStreamRedirection::state != UNKNOWN )
 			return;
 		
 		//redirect std::cout
@@ -126,14 +129,14 @@ namespace GlobalStreamRedirection {
 		sbOldCex3 = cnc::cex3.rdbuf();
 		cnc::cex3.rdbuf(psbufCex3);
 		
-		streamRedirectionState = PREINSTALLED;
+		GlobalStreamRedirection::state = PREINSTALLED;
 	}
 		
 	///////////////////////////////////////////////////////////////////
 	void install(MainFrame* mainFrame) 
 	///////////////////////////////////////////////////////////////////
 	{
-		if ( streamRedirectionState != PREINSTALLED )
+		if ( GlobalStreamRedirection::state != PREINSTALLED )
 			return;
 			
 		// perform startup trace
@@ -146,6 +149,8 @@ namespace GlobalStreamRedirection {
 		psbufCex1->setTextControl(mainFrame->getLogger());
 		psbufCex2->setTextControl(mainFrame->getLogger());
 		psbufCex3->setTextControl(mainFrame->getLogger());
+		
+		cnc::loggerProxyRedirectStack.push(mainFrame->getLogger());
 		
 		// redirect trace buffer
 		psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
@@ -162,17 +167,17 @@ namespace GlobalStreamRedirection {
 		sbOldCspy = cnc::spy.rdbuf();
 		cnc::spy.rdbuf(psbufCspy);
 		
-		streamRedirectionState = INSTALLED;
+		GlobalStreamRedirection::state = INSTALLED;
 	}
 		
 	///////////////////////////////////////////////////////////////////
 	void reset() 
 	///////////////////////////////////////////////////////////////////
 	{
-		if ( streamRedirectionState != INSTALLED )
+		if ( GlobalStreamRedirection::state != INSTALLED )
 			return;
 			
-		streamRedirectionState = UNKNOWN;
+		GlobalStreamRedirection::state = UNKNOWN;
 			
 		// un-register text controls
 		psbufCout->ungregisterTextControl();
@@ -212,7 +217,12 @@ namespace GlobalStreamRedirection {
 		APPEND_LOCATION_TO_STACK_TRACE_FILE;
 	}
 };
-void GlobalStreamRedirectionReset() { GlobalStreamRedirection::reset(); }
+
+///////////////////////////////////////////////////////////////////
+void GlobalStreamRedirectionReset() {
+///////////////////////////////////////////////////////////////////
+	GlobalStreamRedirection::reset(); 
+}
 	
 ///////////////////////////////////////////////////////////////////
 class MainLogger : public wxLog {

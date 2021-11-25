@@ -203,7 +203,7 @@ void CncLoggerListCtrl::changeTextAttr(const wxTextAttr& ta) {
 	}
 }
 /////////////////////////////////////////////////////////////
-void CncLoggerListCtrl::changeResult(const wxString& text, long item) {
+void CncLoggerListCtrl::changeResult(const wxString& result, long item) {
 /////////////////////////////////////////////////////////////
 	if ( entries.size() == 0 )
 		return;
@@ -212,8 +212,26 @@ void CncLoggerListCtrl::changeResult(const wxString& text, long item) {
 		item = entries.size() - 1;
 		
 	LoggerEntry& le = entries.at(item);
-	le.result.assign(text);
+	le.result.assign(result);
 	updateContent();
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::changeResultForLoggedPosition(const wxString& result) {
+/////////////////////////////////////////////////////////////////////
+	if ( getLoggedRowNumber() > 0 )
+		changeResult(result, getLoggedRowNumber());
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::changeResultForLastPosition(const wxString& result) {
+/////////////////////////////////////////////////////////////////////
+	logRowNumber();
+	changeResult(result);
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::changeResultForLastFilledPosition(const wxString& result) {
+/////////////////////////////////////////////////////////////////////
+	logLastFilledRowNumber();
+	changeResult(result, getLoggedRowNumber());
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::logRowNumber(long rn) {

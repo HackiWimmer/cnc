@@ -1,4 +1,5 @@
 #include "OSD/CncAsyncKeyboardState.h"
+#include "OSD/CncTimeFunctions.h"
 #include "CncTextCtrl.h"
 
 //////////////////////////////////////////////////////////////
@@ -9,7 +10,6 @@ CncTextCtrl::CncTextCtrl(wxWindow *parent, wxWindowID id, const wxString &value,
 , lineBuffer		{}
 , index				(0)
 , loggedPos			(0L)
-, lastSourceID		(NO_SOUREC_ID)
 //////////////////////////////////////////////////////////////
 {
 	overflowTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncTextCtrl::onOverflowTimer), NULL, this);

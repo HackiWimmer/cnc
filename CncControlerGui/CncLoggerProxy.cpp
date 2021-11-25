@@ -6,19 +6,21 @@
 #include "CncLoggerView.h"
 #include "CncLoggerProxy.h"
 
+
 //////////////////////////////////////////////////////////////
-CncStartupLoggerProxy::CncStartupLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-												long style, const wxValidator &validator, const wxString &name)
-: CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
+CncLoggerProxy::CncLoggerProxy( wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
+								long style, const wxValidator &validator, const wxString &name)
+: CncTextCtrl		(parent, wxID_ANY, value, pos, size, style, validator, name)
+, lastSourceID		(NO_SOUREC_ID)
 //////////////////////////////////////////////////////////////
 {
 }
 //////////////////////////////////////////////////////////////
-CncStartupLoggerProxy::~CncStartupLoggerProxy() {
+CncLoggerProxy::~CncLoggerProxy() {
 //////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////
-void CncStartupLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
+void CncLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
 //////////////////////////////////////////////////////////////
 	if ( lastSourceID != sourceId )
 	{
@@ -26,10 +28,12 @@ void CncStartupLoggerProxy::appendChar(char c, const wxColour& col, int sourceId
 		lastSourceID = sourceId;
 	}
 	
-	THE_APP->getLoggerView()->add(LoggerSelection::VAL::STARTUP, c);
+	CncLoggerListCtrl* lc = getListCtrl();
+	wxASSERT( lc )
+	lc->add(c);
 }
 //////////////////////////////////////////////////////////////
-void CncStartupLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
+void CncLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
 //////////////////////////////////////////////////////////////
 	if ( lastSourceID != sourceId )
 	{
@@ -37,158 +41,53 @@ void CncStartupLoggerProxy::appendChar(char c, const wxTextAttr& style, int sour
 		lastSourceID = sourceId;
 	}
 	
-	THE_APP->getLoggerView()->add(LoggerSelection::VAL::STARTUP, c);
+	CncLoggerListCtrl* lc = getListCtrl();
+	wxASSERT( lc )
+	lc->add(c);
 }
 //////////////////////////////////////////////////////////////
-bool CncStartupLoggerProxy::setTextColour(const wxColour& col) {
+bool CncLoggerProxy::setTextColour(const wxColour& col) {
 //////////////////////////////////////////////////////////////
-	THE_APP->getLoggerView()->changeTextColour(LoggerSelection::VAL::STARTUP, col);
-	return true;
-}
-//////////////////////////////////////////////////////////////
-bool CncStartupLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getLoggerView()->changeTextAttr(LoggerSelection::VAL::STARTUP, style);
-	return true;
-}
-//////////////////////////////////////////////////////////////
-void CncStartupLoggerProxy::AppendChar(char c) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getLoggerView()->add(LoggerSelection::VAL::STARTUP, c);
-}
-//////////////////////////////////////////////////////////////
-void CncStartupLoggerProxy::AppendText(const wxString &text) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getLoggerView()->add(LoggerSelection::VAL::STARTUP, text);
-}
-
-
-
-//////////////////////////////////////////////////////////////
-CncStandardLoggerProxy::CncStandardLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-													long style, const wxValidator &validator, const wxString &name)
-: CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
-//////////////////////////////////////////////////////////////
-{
-}
-//////////////////////////////////////////////////////////////
-CncStandardLoggerProxy::~CncStandardLoggerProxy() {
-//////////////////////////////////////////////////////////////
-}
-//////////////////////////////////////////////////////////////
-void CncStandardLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
-//////////////////////////////////////////////////////////////
-	if ( lastSourceID != sourceId )
-	{
-		setTextColour(col);
-		lastSourceID = sourceId;
-	}
+	CncLoggerListCtrl* lc = getListCtrl();
+	wxASSERT( lc )
+	lc->changeTextColour(col);
 	
-	THE_APP->getLoggerView()->add(LoggerSelection::VAL::CNC, c);
+	return true;
 }
 //////////////////////////////////////////////////////////////
-void CncStandardLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
+bool CncLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
 //////////////////////////////////////////////////////////////
-	if ( lastSourceID != sourceId )
-	{
-		SetDefaultStyle(style);
-		lastSourceID = sourceId;
-	}
+	CncLoggerListCtrl* lc = getListCtrl();
+	wxASSERT( lc )
+	lc->changeTextAttr(style);
 	
-	THE_APP->getLoggerView()->add(LoggerSelection::VAL::CNC, c);
-}
-//////////////////////////////////////////////////////////////
-bool CncStandardLoggerProxy::setTextColour(const wxColour& col) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getLoggerView()->changeTextColour(LoggerSelection::VAL::CNC, col);
 	return true;
 }
 //////////////////////////////////////////////////////////////
-bool CncStandardLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
+void CncLoggerProxy::AppendChar(char c) {
 //////////////////////////////////////////////////////////////
-	THE_APP->getLoggerView()->changeTextAttr(LoggerSelection::VAL::CNC, style);
-	return true;
+	CncLoggerListCtrl* lc = getListCtrl();
+	wxASSERT( lc )
+	lc->add(c);
 }
 //////////////////////////////////////////////////////////////
-void CncStandardLoggerProxy::AppendChar(char c) {
+void CncLoggerProxy::AppendText(const wxString &text) {
 //////////////////////////////////////////////////////////////
-	THE_APP->getLoggerView()->add(LoggerSelection::VAL::CNC, c);
-}
-//////////////////////////////////////////////////////////////
-void CncStandardLoggerProxy::AppendText(const wxString &text) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getLoggerView()->add(LoggerSelection::VAL::CNC, text);
+	CncLoggerListCtrl* lc = getListCtrl();
+	wxASSERT( lc )
+	lc->add(text);
 }
 
 
 //////////////////////////////////////////////////////////////
-CncDryRunLoggerProxy::CncDryRunLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-												long style, const wxValidator &validator, const wxString &name)
-: CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
+CncLoggerListCtrl* CncStartupLoggerProxy::getListCtrl()		const { return THE_APP->getLoggerView()->getLoggerListCtrl(LoggerSelection::VAL::STARTUP); }
+CncLoggerListCtrl* CncStandardLoggerProxy::getListCtrl()	const { return THE_APP->getLoggerView()->getLoggerListCtrl(LoggerSelection::VAL::CNC); }
+CncLoggerListCtrl* CncDryRunLoggerProxy::getListCtrl()		const { return THE_APP->getTemplateContextSummary()->getDryRunLogger(); }
+CncLoggerListCtrl* CncParserSynopsisProxy::getListCtrl()	const { return THE_APP->getTemplateContextSummary()->getParsingSynopsis(); }
+CncLoggerListCtrl* CncMsgHistoryLoggerProxy::getListCtrl()	const { return THE_APP->getCtrlMsgHistoryList(); }
 //////////////////////////////////////////////////////////////
-{
-}
-//////////////////////////////////////////////////////////////
-CncDryRunLoggerProxy::~CncDryRunLoggerProxy() {
-//////////////////////////////////////////////////////////////
-}
-//////////////////////////////////////////////////////////////
-void CncDryRunLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
-//////////////////////////////////////////////////////////////
-	if ( lastSourceID != sourceId )
-	{
-		setTextColour(col);
-		lastSourceID = sourceId;
-	}
-	
-	THE_APP->getTemplateContextSummary()->getDryRunLogger()->add(c);
-}
-//////////////////////////////////////////////////////////////
-void CncDryRunLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
-//////////////////////////////////////////////////////////////
-	if ( lastSourceID != sourceId )
-	{
-		SetDefaultStyle(style);
-		lastSourceID = sourceId;
-	}
-	
-	THE_APP->getTemplateContextSummary()->getDryRunLogger()->add(c);
-}
-//////////////////////////////////////////////////////////////
-bool CncDryRunLoggerProxy::setTextColour(const wxColour& col) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getDryRunLogger()->changeTextAttr(col);
-	return true;
-}
-//////////////////////////////////////////////////////////////
-bool CncDryRunLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getDryRunLogger()->changeTextAttr(style);
-	return true;
-}
-//////////////////////////////////////////////////////////////
-void CncDryRunLoggerProxy::AppendChar(char c) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getDryRunLogger()->add(c);
-}
-//////////////////////////////////////////////////////////////
-void CncDryRunLoggerProxy::AppendText(const wxString &text) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getDryRunLogger()->add(text);
-}
 
 
-//////////////////////////////////////////////////////////////
-CncParserSynopsisProxy::CncParserSynopsisProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-												long style, const wxValidator &validator, const wxString &name)
-: CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
-//////////////////////////////////////////////////////////////
-{
-}
-//////////////////////////////////////////////////////////////
-CncParserSynopsisProxy::~CncParserSynopsisProxy() {
-//////////////////////////////////////////////////////////////
-}
 //////////////////////////////////////////////////////////////////
 bool CncParserSynopsisProxy::hasDebugEntries() const { 
 //////////////////////////////////////////////////////////////////
@@ -226,107 +125,8 @@ void CncParserSynopsisProxy::addEntry(const char type, const wxString& entry) {
 		default:	logger->addInfoEntry(entry);
 	}
 }
-//////////////////////////////////////////////////////////////
-void CncParserSynopsisProxy::appendChar(char c, const wxColour& col, int sourceId) {
-//////////////////////////////////////////////////////////////
-	if ( lastSourceID != sourceId )
-	{
-		setTextColour(col);
-		lastSourceID = sourceId;
-	}
-	
-	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->add(c);
-}
-//////////////////////////////////////////////////////////////
-void CncParserSynopsisProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
-//////////////////////////////////////////////////////////////
-	if ( lastSourceID != sourceId )
-	{
-		SetDefaultStyle(style);
-		lastSourceID = sourceId;
-	}
-	
-	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->add(c);
-}
-//////////////////////////////////////////////////////////////
-bool CncParserSynopsisProxy::setTextColour(const wxColour& col) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->changeTextAttr(col);
-	return true;
-}
-//////////////////////////////////////////////////////////////
-bool CncParserSynopsisProxy::SetDefaultStyle(const wxTextAttr& style) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->changeTextAttr(style);
-	return true;
-}
-//////////////////////////////////////////////////////////////
-void CncParserSynopsisProxy::AppendChar(char c) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->add(c);
-}
-//////////////////////////////////////////////////////////////
-void CncParserSynopsisProxy::AppendText(const wxString &text) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getTemplateContextSummary()->getParsingSynopsis()->add(text);
-}
 
 
-//////////////////////////////////////////////////////////////
-CncMsgHistoryLoggerProxy::CncMsgHistoryLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
-													long style, const wxValidator &validator, const wxString &name)
-: CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
-//////////////////////////////////////////////////////////////
-{
-}
-//////////////////////////////////////////////////////////////
-CncMsgHistoryLoggerProxy::~CncMsgHistoryLoggerProxy() {
-//////////////////////////////////////////////////////////////
-}
-//////////////////////////////////////////////////////////////
-void CncMsgHistoryLoggerProxy::appendChar(char c, const wxColour& col, int sourceId) {
-//////////////////////////////////////////////////////////////
-	if ( lastSourceID != sourceId )
-	{
-		setTextColour(col);
-		lastSourceID = sourceId;
-	}
-	
-	THE_APP->getCtrlMsgHistoryList()->add(c);
-}
-//////////////////////////////////////////////////////////////
-void CncMsgHistoryLoggerProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
-//////////////////////////////////////////////////////////////
-	if ( lastSourceID != sourceId )
-	{
-		SetDefaultStyle(style);
-		lastSourceID = sourceId;
-	}
-	
-	THE_APP->getCtrlMsgHistoryList()->add(c);
-}
-//////////////////////////////////////////////////////////////
-bool CncMsgHistoryLoggerProxy::setTextColour(const wxColour& col) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getCtrlMsgHistoryList()->changeTextAttr(col);
-	return true;
-}
-//////////////////////////////////////////////////////////////
-bool CncMsgHistoryLoggerProxy::SetDefaultStyle(const wxTextAttr& style) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getCtrlMsgHistoryList()->changeTextAttr(style);
-	return true;
-}
-//////////////////////////////////////////////////////////////
-void CncMsgHistoryLoggerProxy::AppendChar(char c) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getCtrlMsgHistoryList()->add(c);
-}
-//////////////////////////////////////////////////////////////
-void CncMsgHistoryLoggerProxy::AppendText(const wxString &text) {
-//////////////////////////////////////////////////////////////
-	THE_APP->getCtrlMsgHistoryList()->add(text);
-}
 
 
 /////////////////////////////////////////////////////////////
