@@ -10,14 +10,17 @@ class ContextInterface
 {
 	private:
 		
-		bool isEntryListValid() const;
+		bool isEntryListValid();
 		
 	protected:
 		
-		static const int ERR_NO_ERROR						= 0;
-		static const int ERR_GENERAL						= 1;
-		static const int ERR_LIMIT							= 2;
-		static const int ERR_MOVE_WITHOUT_SPINDLE			= 4;
+		static const int ERR_NO_ERROR						=   0;
+		static const int ERR_INVALID_LIST_SIZE				=   1;
+		static const int ERR_INVALID_LIST_BEG				=   2;
+		static const int ERR_INVALID_LIST_END				=   4;
+		static const int ERR_GENERAL						=   8;
+		static const int ERR_LIMIT							=  16;
+		static const int ERR_MOVE_WITHOUT_SPINDLE			=  32;
 		
 		struct Entry
 		{
@@ -110,8 +113,8 @@ class ContextInterface
 		
 		bool analizeContextEntries(Result& result);
 		
-		bool filterAllLimitEntries(std::ostream& o) const;
-		bool filterAllMovesWithoutSpindle(std::ostream& o) const;
+		bool filterAllLimitEntries(std::ostream& o);
+		bool filterAllMovesWithoutSpindle(std::ostream& o);
 
 		std::ostream& traceErrorInfoTo(std::ostream &ostr) const;
 		std::ostream& traceContextEntriesTo(std::ostream &ostr) const;

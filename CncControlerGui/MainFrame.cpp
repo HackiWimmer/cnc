@@ -1625,28 +1625,34 @@ void MainFrame::onTraceTimer(wxTimerEvent& event) {
 	static unsigned int callCounter = 0;
 	const CncNanoTimestamp tr = CncTimeFunctions::getNanoTimestamp();
 	
-	switch ( callCounter ) {
-		case 0: {
+	switch ( callCounter ) 
+	{
+		case 0:
+		{
 					callCounter = 1;
 					updateAppPositionControls();
 					THE_CONTEXT->timestamps.measuredDurations.md1.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
 					break;
 		}
-		case 1: {
+		case 1:
+		{
 					callCounter = 2;
 					updateCtlPositionControls();
 					THE_CONTEXT->timestamps.measuredDurations.md2.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
 					break;
 		}
-		case 2: {
+		case 2: 
+		{
 					callCounter = 3;
 					updateSpeedControls();
 					THE_CONTEXT->timestamps.measuredDurations.md3.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
 					break;
 		}
-		case 3: {
+		case 3: 
+		{
 					callCounter = 0;
-					if ( isProcessing() ) {
+					if ( isProcessing() )
+					{
 						statisticsPane->logStatistics(false);
 						THE_CONTEXT->timestamps.measuredDurations.md4.add((long)(CncTimeFunctions::getNanoTimestamp()  - tr));
 					}
@@ -1806,7 +1812,8 @@ void MainFrame::updateCtlPositionControls() {
 	const CncLongPosition pos	= cnc->getCurCtlPos();
 	
 	// update position
-	switch ( unit ) {
+	switch ( unit ) 
+	{
 		case CncSteps:	// update controller position
 						m_xAxisCtl->ChangeValue(wxString::Format("%8ld", pos.getX()));
 						m_yAxisCtl->ChangeValue(wxString::Format("%8ld", pos.getY()));
@@ -1841,7 +1848,8 @@ void MainFrame::updateSpeedControls() {
 	speedMonitor->update();
 	
 	// Realtime speed values
-	if ( THE_CONTEXT->isProbeMode() == false && THE_CONTEXT->canSpeedMonitoring() ) {
+	if ( THE_CONTEXT->isProbeMode() == false && THE_CONTEXT->canSpeedMonitoring() )
+	{
 		
 		if ( m_speedPanel->IsShownOnScreen() )
 			m_speedPanel->Refresh();
@@ -1849,7 +1857,8 @@ void MainFrame::updateSpeedControls() {
 		const double dValue = cnc->getRealtimeFeedSpeed_MM_MIN();
 		m_realtimeFeedSpeed->ChangeValue(dValue >= 0.0 ? wxString::Format("%.1lf", dValue) : _maxSpeedLabel);
 	} 
-	else {
+	else
+	{
 		m_realtimeFeedSpeed->ChangeValue(_maxSpeedLabel);
 	}
 }
@@ -6794,19 +6803,25 @@ void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcDryRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// do this already here, because this is true a part of processTemplateWrapper(), 
+	// but is makes a clearer work flow if the state is checked before anything is started 
+	if ( checkReferencePositionState() == false )
+		return;
+	
 	if ( cnc->dryRunAvailable() )
 	{
 		const unsigned int prevRunCount			= THE_CONTEXT->templateContext->getRunCount();
 		const unsigned int prevValidRunCount	= THE_CONTEXT->templateContext->getValidRunCount();
 		
-		wxString finalMessage("Try run was successful");
+		const wxString starMessage (wxString::Format("~~~ Dry run started: %s", wxDateTime::Now().FormatISOTime()));
+		wxString       finalMessage(                 "=== Dry run was successful");
 		bool ret = false;
 		
+		CNC_CLOG_A(starMessage)
 		// streamer redirect section
 		{
 			StdStreamRedirector srd(getDryRunLogger());
-			
-			CNC_CLOG_FUNCT_A("Try run started: %s", wxDateTime::Now().FormatISOTime())
+			CNC_CLOG_A(starMessage)
 			
 			cnc->switchRunMode(CncControl::RunMode::M_DryRun);
 			ret = processTemplateWrapper();
@@ -6817,7 +6832,7 @@ void MainFrame::rcDryRun(wxCommandEvent& event) {
 			{
 				// in this case processTemplate() fails before the run was started by previous checks
 				// no further checks necessary here . . . 
-				finalMessage.assign("Try run was failed");
+				finalMessage.assign("=== Dry run was failed");
 			}
 			else
 			{
@@ -6827,7 +6842,7 @@ void MainFrame::rcDryRun(wxCommandEvent& event) {
 					if ( (prevValidRunCount + 1) != THE_CONTEXT->templateContext->getValidRunCount() )
 					{
 						// the valid count was not increased
-						finalMessage.assign("Try run was failed");
+						finalMessage.assign("=== Dry run was failed");
 						ret           = false;
 					}
 				}
@@ -6843,8 +6858,8 @@ void MainFrame::rcDryRun(wxCommandEvent& event) {
 			// display processing info on try run logger
 			if ( finalMessage.IsEmpty() == false )
 			{
-				if ( ret == false )	{ CNC_CERR_FUNCT_A(finalMessage) }
-				else				{ CNC_CLOG_FUNCT_A(finalMessage) }
+				if ( ret == false )	{ CNC_CERR_A(finalMessage); SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_ERROR_STR ) }
+				else				{ CNC_CLOG_A(finalMessage); SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR ) }
 			}
 		}
 		
@@ -6852,7 +6867,9 @@ void MainFrame::rcDryRun(wxCommandEvent& event) {
 		if ( ret == false )
 		{
 			decorateDryRunState(cncError);
-			CNC_CERR_FUNCT_A(finalMessage)
+			CNC_CERR_A(finalMessage)
+			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
+			
 			openTemplateContextView();
 		}
 		else
@@ -6860,7 +6877,8 @@ void MainFrame::rcDryRun(wxCommandEvent& event) {
 			if ( finalMessage.IsEmpty() == false )
 			{
 				decorateDryRunState(cncOk);
-				CNC_CLOG_FUNCT_A(finalMessage)
+				CNC_CLOG_A(finalMessage)
+				SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR )
 			}
 			else
 			{

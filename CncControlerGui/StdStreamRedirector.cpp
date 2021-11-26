@@ -62,7 +62,9 @@ StdStreamRedirector::StdStreamRedirector(CncTextCtrl* ctl)
 		cnc::cex3.rdbuf(psbufCex3);
 		
 		// it is assumed here that ale stream have the same logger proxy.
-		// put the previous logger based on the sbOldCout->getTextControl() on the stack
+		// put the new logger proxy on the stack
+		wxASSERT( cnc::loggerProxyRedirectStack.size() < 1 );
+		
 		CncLoggerProxy* clp = reinterpret_cast<CncLoggerProxy*>(ctl);
 		cnc::loggerProxyRedirectStack.push(clp);
 	}
@@ -72,6 +74,7 @@ StdStreamRedirector::~StdStreamRedirector() {
 //////////////////////////////////////////////////
 	// remove the current logger proxy from the stack again
 	cnc::loggerProxyRedirectStack.pop();
+	wxASSERT( cnc::loggerProxyRedirectStack.size() < 1 );
 	
 	// restore
 	if ( psbufCout )

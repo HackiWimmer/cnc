@@ -31,21 +31,42 @@ namespace cnc
 }
 
 // -------------------------------------------------------------------
-// ....
+// Logger result macros
 
 	#define CNC_RESULT_OK_STR				"OK"
 	#define CNC_RESULT_WARNING_STR			"WARNING"
 	#define CNC_RESULT_ERROR_STR			"ERROR"
 	
+	#define REGISTER_NEXT_LOGGER_ROW \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->logNextRowNumber(); }
+		
 	#define REGISTER_LAST_FILLED_LOGGER_ROW \
 		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->logLastFilledRowNumber(); }
 			
 	#define SET_RESULT_FOR_REGISTERED_LOGGER_ROW(result) \
 		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLoggedPosition(result); }
-
+		
+	#define SET_RESULT_FOR_REGISTERED_LOGGER_ROW_OK \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLoggedPosition(CNC_RESULT_OK_STR); }
+		
+	#define SET_RESULT_FOR_REGISTERED_LOGGER_ROW_WARNING \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLoggedPosition(CNC_RESULT_WARNING_STR); }
+		
+	#define SET_RESULT_FOR_REGISTERED_LOGGER_ROW_ERROR \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLoggedPosition(CNC_RESULT_ERROR_STR); }
+		
 	#define SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW(result) \
 		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLastFilledPosition(result); }
-
+		
+	#define SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_OK \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLastFilledPosition(CNC_RESULT_OK_STR); }
+		
+	#define SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_WARNING \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLastFilledPosition(CNC_RESULT_WARNING_STR); }
+		
+	#define SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_ERROR \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLastFilledPosition(CNC_RESULT_ERROR_STR); }
+		
 // -------------------------------------------------------------------
 // global strings
 	#define _maxSpeedLabel				"<MAX>"

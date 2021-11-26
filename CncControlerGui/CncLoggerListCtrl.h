@@ -81,9 +81,10 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		void setJoinTheAppState(bool s)	{ joinTheApp = s; }
 		void setShowOnDemand(bool s) 	{ showOnDemand = s; }
 		
-		void logRowNumber(long rn=wxNOT_FOUND);
+		long getLoggedRowNumber() const;
+		void logRowNumber(long rn = wxNOT_FOUND);
 		void logLastFilledRowNumber();
-		long getLoggedRowNumber();
+		void logNextRowNumber();
 		
 		void changeTextAttr(const wxTextAttr& ta);
 		void changeTextColour(const wxColour& col);

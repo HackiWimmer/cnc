@@ -275,28 +275,39 @@ bool CncArduinoController::isReadyToRun() {
   CNC_CONTROLLER_LOG_FUNCTION();
   bool ret = true;
 
-  if ( READ_EXT_INNTERRUPT_PIN == EXTERNAL_INTERRRUPT_ON ) {
+  if ( READ_EXT_INNTERRUPT_PIN == EXTERNAL_INTERRRUPT_ON )
+  {
     LastErrorCodes::clear(); 
     ArduinoMainLoop::pushMessage(MT_ERROR, E_INTERRUPT); 
     ret = false; 
   }
 
-  if ( X->isReadyToRun() == false ) { 
+  if ( READ_IS_CTRL_POWERED_PIN == POWER_STATE_OFF )
+  {
+    ArduinoMainLoop::pushMessage(MT_ERROR, E_POWER_OFF, "X");  
+    ret = false; 
+  }
+
+  if ( X->isReadyToRun() == false )
+  { 
     ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_READY_TO_RUN, "X");    
     ret = false; 
   }
   
-  if ( Y->isReadyToRun() == false ){ 
+  if ( Y->isReadyToRun() == false )
+  { 
     ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_READY_TO_RUN, "Y");    
     ret = false; 
   }
   
-  if ( Z->isReadyToRun() == false ) { 
+  if ( Z->isReadyToRun() == false )
+  { 
     ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_READY_TO_RUN, "Z");
     ret = false; 
   }
 
-  if ( isReadyToRender() == false) {
+  if ( isReadyToRender() == false) 
+  {
     // message already created by class ArduinoPositionRenderer
     ret = false;
   }

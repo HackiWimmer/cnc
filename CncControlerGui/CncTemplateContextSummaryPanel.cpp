@@ -92,6 +92,8 @@ void CncTemplateContextSummaryPanel::update() {
 	
 	// -------------------------------------------------------------
 	// update main lists
+	
+	// first analize to get demand information available
 	ContextInterface::Result result;
 	THE_CONTEXT->templateContext->analizeContextEntries(result);
 	const bool ok = THE_CONTEXT->templateContext->isValid();
@@ -113,18 +115,23 @@ void CncTemplateContextSummaryPanel::update() {
 	if ( ok == false )	analysisOverall->addErrorEntry(ss.str().c_str());
 	else				analysisOverall->addInfoEntry(ss.str().c_str());
 	
-	
-	
-	
 	// list all entries
 	ss.str("");
 	list->clearAll();
 	THE_CONTEXT->templateContext->traceContextEntriesTo(ss);
 	list->add(ss.str().c_str());
 	
+	// limit
+	ss.str("");
+	analysisLimit->clearAll();
+	THE_CONTEXT->templateContext->filterAllLimitEntries(ss);
+	analysisLimit->add(ss.str().c_str());
 	
-	
-	
+	// movement
+	ss.str("");
+	analysisMovement->clearAll();
+	THE_CONTEXT->templateContext->filterAllMovesWithoutSpindle(ss);
+	analysisMovement->add(ss.str().c_str());
 }
 ///////////////////////////////////////////////////////////////////
 void CncTemplateContextSummaryPanel::onCopyCurrentList(wxCommandEvent& event) {

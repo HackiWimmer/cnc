@@ -152,15 +152,25 @@ std::ostream& ContextInterface::traceErrorInfoTo(std::ostream &ostr) const {
 	}
 	else
 	{
-		CNC_CEX3_FUNCT_A("errorFlags=%d", errorFlags)
-		
+		if ( errorFlags & ERR_GENERAL )
+			ostr << "Error: General error!\n";
+			
+		if ( errorFlags & ERR_INVALID_LIST_SIZE )
+			ostr << "Error: Invalid context list size!\n";
+			
+		if ( errorFlags & ERR_INVALID_LIST_BEG )
+			ostr << "Error: Invalid context list begin!\n";
+			
+		if ( errorFlags & ERR_INVALID_LIST_END )
+			ostr << "Error: Invalid context list end!\n";
+			
 		if ( errorFlags & ERR_LIMIT )
 			ostr << "Error: One ore more limit switches reached during the run!\n";
 			
 		if ( errorFlags & ERR_MOVE_WITHOUT_SPINDLE )
 			ostr << "Error: One ore more movements detected as work path performed with Spindle = OFF!\n";
 			
-			// add more on demand
+		// add more on demand
 	}
 	
 	return ostr;
@@ -169,8 +179,6 @@ std::ostream& ContextInterface::traceErrorInfoTo(std::ostream &ostr) const {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyBeginRun() {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	errorFlags					= ERR_NO_ERROR;
 	currentEntry 				= ContextInterface::Entry();
 	
@@ -182,8 +190,6 @@ void ContextInterface::notifyBeginRun() {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyEndRun() {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	currentEntry.lastType		= ContextInterface::Entry::Type::END;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
@@ -191,8 +197,6 @@ void ContextInterface::notifyEndRun() {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyClientId(long id) {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	currentEntry.lastType		= ContextInterface::Entry::Type::CID;
 	currentEntry.clientId		= id;
 	currentEntry.resetMovement();
@@ -201,8 +205,6 @@ void ContextInterface::notifyClientId(long id) {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyLimit(const CncInterface::ILS::States& s) {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	currentEntry.lastType			= ContextInterface::Entry::Type::LIMIT;
 	currentEntry.limitStates		= s;
 	currentEntry.resetMovement();
@@ -211,8 +213,6 @@ void ContextInterface::notifyLimit(const CncInterface::ILS::States& s) {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyMove(unsigned char cmd, int32_t dx, int32_t dy, int32_t dz) {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	currentEntry.lastType			= ContextInterface::Entry::Type::MOVE;
 	currentEntry.moveCmd			= cmd;
 	currentEntry.moveDx				= dx;
@@ -223,8 +223,6 @@ void ContextInterface::notifyMove(unsigned char cmd, int32_t dx, int32_t dy, int
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifySpindleOn() {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	currentEntry.lastType			= ContextInterface::Entry::Type::SPINDLE;
 	currentEntry.spindleState		= SPINDLE_STATE_ON;
 	currentEntry.resetMovement();
@@ -233,8 +231,6 @@ void ContextInterface::notifySpindleOn() {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifySpindleOff() {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	currentEntry.lastType			= ContextInterface::Entry::Type::SPINDLE;
 	currentEntry.spindleState		= SPINDLE_STATE_OFF;
 	currentEntry.resetMovement();
@@ -243,8 +239,6 @@ void ContextInterface::notifySpindleOff() {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTupleValue s) {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	currentEntry.lastType			= ContextInterface::Entry::Type::SPEED_S;
 	currentEntry.spindleTupleVal	= s;
 	currentEntry.resetMovement();
@@ -253,33 +247,33 @@ void ContextInterface::notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTup
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTupleValue s) {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	
 	currentEntry.lastType			= ContextInterface::Entry::Type::SPEED_F;
 	currentEntry.speedTupleVal		= s;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
 }
 ////////////////////////////////////////////////////////////////////
-bool ContextInterface::isEntryListValid() const {
+bool ContextInterface::isEntryListValid() {
 ////////////////////////////////////////////////////////////////////
 	if ( contextInterfaceEntries.size() < 2 )
-		{ CNC_CERR_FUNCT_A("Invalid size"); return false; }
+		{ errorFlags |= ERR_INVALID_LIST_SIZE; return false; }
 	
 	if ( contextInterfaceEntries.front().lastType != Entry::Type::START )
-		{ CNC_CERR_FUNCT_A("Invalid first entry"); return false; }
+		{ errorFlags |= ERR_INVALID_LIST_BEG; return false; }
 	
 	if ( contextInterfaceEntries.back().lastType != Entry::Type::END )
-		{ CNC_CERR_FUNCT_A("Invalid last entry"); return false; }
+		{ errorFlags |= ERR_INVALID_LIST_END; return false; }
 		
 	return true;
 }
 ////////////////////////////////////////////////////////////////////
-bool ContextInterface::filterAllLimitEntries(std::ostream& o) const {
+bool ContextInterface::filterAllLimitEntries(std::ostream& o) {
 ////////////////////////////////////////////////////////////////////
 	if ( isEntryListValid() == false )
+	{
+		o << "The underling list is not valid\n";
 		return false;
-		
+	}
 	// --------------------------------------------------------------
 	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
 	{
@@ -292,11 +286,14 @@ bool ContextInterface::filterAllLimitEntries(std::ostream& o) const {
 	return true;
 }
 ////////////////////////////////////////////////////////////////////
-bool ContextInterface::filterAllMovesWithoutSpindle(std::ostream& o) const {
+bool ContextInterface::filterAllMovesWithoutSpindle(std::ostream& o) {
 ////////////////////////////////////////////////////////////////////
 	if ( isEntryListValid() == false )
+	{
+		o << "The underling list is not valid\n";
 		return false;
-		
+	}
+	
 	// --------------------------------------------------------------
 	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
 	{
@@ -313,10 +310,7 @@ bool ContextInterface::filterAllMovesWithoutSpindle(std::ostream& o) const {
 bool ContextInterface::analizeContextEntries(Result& result) {
 ////////////////////////////////////////////////////////////////////
 	if ( isEntryListValid() == false )
-	{
-		errorFlags |= ERR_GENERAL;
 		return false;
-	}
 		
 	// --------------------------------------------------------------
 	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )

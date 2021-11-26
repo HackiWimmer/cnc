@@ -305,6 +305,7 @@ void ArduinoErrorCodes::init() {
 	
 	errorCodes[E_LIMIT_SWITCH_ACTIVE]                = "Limit switch active";
 	errorCodes[E_RMDR_INVALID_STP_POINTER]           = "ArduinoPositionRenderer: Invalid stepper pointers";
+	errorCodes[E_POWER_OFF]                          = "Power is off";
 	
 	errorCodes[E_INTERRUPT]                          = "Interrupt received";
 	errorCodes[E_TOTAL_COUNT]                        = "Total error count";

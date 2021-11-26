@@ -190,6 +190,7 @@
       <File Name="Gl3DOptionPane.cpp"/>
       <File Name="3D/CncGLCanvas.cpp"/>
       <VirtualDirectory Name="Base">
+        <File Name="3D/GLHelperModel.cpp"/>
         <File Name="3D/GLGuidePath.cpp"/>
         <File Name="3D/GLGuidePath.h"/>
         <File Name="3D/GLCommon.cpp"/>
@@ -529,7 +530,6 @@
       <File Name="CircularBuffer.h"/>
       <File Name="PointAbs.h"/>
       <File Name="LinearFunc.h"/>
-      <File Name="CommandTemplates.h"/>
       <File Name="StdStreamRedirector.h"/>
       <File Name="GlobalStrings.h"/>
       <File Name="sha1.cpp"/>

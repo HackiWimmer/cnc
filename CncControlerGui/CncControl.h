@@ -12,7 +12,6 @@
 #include <wx/panel.h>
 #include <wx/dcclient.h>
 #include <wx/pen.h>
-#include "CommandTemplates.h"
 #include "CncPathListManager.h"
 #include "CncCommon.h"
 #include "PenHandler.h"

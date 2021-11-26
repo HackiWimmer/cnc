@@ -270,6 +270,7 @@ typedef bool SpindleState;
 
   const unsigned char E_LIMIT_SWITCH_ACTIVE               =  51;
   const unsigned char E_RMDR_INVALID_STP_POINTER          =  52;
+  const unsigned char E_POWER_OFF                         =  53;
 
   const unsigned char E_PURE_TEXT_VALUE_ERROR             = 252;
   const unsigned char E_INTERRUPT                         = 253;

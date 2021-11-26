@@ -208,7 +208,7 @@ void CncLoggerListCtrl::changeResult(const wxString& result, long item) {
 	if ( entries.size() == 0 )
 		return;
 		
-	if ( item < 0 )
+	if ( item < 0 || item > (long)entries.size() - 1 )
 		item = entries.size() - 1;
 		
 	LoggerEntry& le = entries.at(item);
@@ -254,11 +254,17 @@ void CncLoggerListCtrl::logLastFilledRowNumber() {
 		
 		loggedRowNumber--;
 	}
-	
-	//wxMessageBox(wxString::Format("%ld   %ld",(long)entries.size(), loggedRowNumber));
 }
 /////////////////////////////////////////////////////////////
-long CncLoggerListCtrl::getLoggedRowNumber() {
+void CncLoggerListCtrl::logNextRowNumber() {
+/////////////////////////////////////////////////////////////
+	loggedRowNumber = entries.size();
+	
+	if ( entries.back().text.IsEmpty() )
+		loggedRowNumber = entries.size() - 1;
+}
+/////////////////////////////////////////////////////////////
+long CncLoggerListCtrl::getLoggedRowNumber() const {
 /////////////////////////////////////////////////////////////
 	return loggedRowNumber;
 }

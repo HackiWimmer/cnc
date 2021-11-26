@@ -10,51 +10,24 @@ namespace GLI {
 		
 		public:
 			////////////////////////////////////////////
-			ModelScale()
-			: _step(0.1f), _scale(1.0f)
-			{}
+			ModelScale();
+			explicit ModelScale(float f);
+			explicit ModelScale(const ModelScale& ms);
 			
-			explicit ModelScale(float f)
-			: _step(0.1f), _scale(f)
-			{}
+			~ModelScale();
 			
-			explicit ModelScale(const ModelScale& ms)
-			: _step(ms.getStepWidth()), _scale(ms.getScaleFactor())
-			{}
-			
-			~ModelScale() 
-			{}
-			
-			////////////////////////////////////////////
 			const float getStepWidth()		const	{ return _step; }
 			const float getScaleFactor()	const	{ return _scale; }
 
-			void resetScale()						{ _scale = 1.0; }
-			void setScale(float scale)				{ _scale = std::max(_minScaleFactor, std::min(scale,_maxScaleFactor)); }
-			void incScale(float s=0.0) 				{ _scale = std::min(_scale + (s ? s : _step), _maxScaleFactor); }
-			void decScale(float s=0.0)				{ _scale = std::max(_scale - (s ? s : _step), _minScaleFactor); }
+			void resetScale();
+			void setScale(float scale);
+			void incScale(float s=0.0);
+			void decScale(float s=0.0);
 			
-			void setScaleByRatio(float ratio)
-			{
-				if      ( cnc::fltCmp::eq(ratio, 0.0) )		setScale( 1.0 );
-				else if ( ratio < 0.0 )						setScale( (-1)/ratio * _minScaleFactor );
-				else if ( ratio > 0.0 )						setScale( ratio      * _maxScaleFactor + 1.0 );
-			}
+			void setScaleByRatio(float ratio);
+			float getScaleRatio() const;
 			
-			float getScaleRatio() const
-			{
-				const float posDist = +(_maxScaleFactor - 1.0);
-				const float negDist = -(1.0 - _minScaleFactor);
-				
-				float ret = 1.0;
-				if      ( cnc::fltCmp::eq(_scale, 1.0) )	ret = 0.0;
-				else if ( _scale < 1.0 )					ret = _scale/negDist;
-				else if ( _scale > 1.0)						ret = _scale/posDist;
-				
-				return ret;
-			}
-			
-			void setStepWidth(float f) 			{ _step = ( f >= _minScaleFactor && f <= 0.50f  ? f : _step); } 
+			void setStepWidth(float f);
 			
 			static float getMinScaleFactor()	{ return _minScaleFactor; }
 			static float getMaxScaleFactor()	{ return _maxScaleFactor; }

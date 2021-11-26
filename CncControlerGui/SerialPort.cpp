@@ -969,20 +969,24 @@ bool Serial::popSerial() {
 	{
 		const bool ret = evaluateResultWrapper(sfi, std::cout);
 		
-		if ( ret == false ) {
+		if ( ret == false )
+		{
+			REGISTER_NEXT_LOGGER_ROW
 			std::cerr   << "Error while processing 'Serial::popSerial()': "											<< std::endl
 						<< " Serial CMD = " << ArduinoCMDs::getCMDLabel((const unsigned char)lastFetchResult.cmd)	<< std::endl
 						<< " Serial RET = " << ArduinoPIDs::getPIDLabel((const unsigned char)lastFetchResult.ret)	<< std::endl
 			;
-			
+			SET_RESULT_FOR_REGISTERED_LOGGER_ROW_ERROR
 			return false;
 		}
 		
-		if ( counter++ > 64 ) {
+		if ( counter++ > 64 )
+		{
+			REGISTER_NEXT_LOGGER_ROW
 			std::cerr   << "Error while processing 'Serial::popSerial()': "											<< std::endl
 						<< "Max count of fetch durations reached!"													<< std::endl
 			;
-			
+			SET_RESULT_FOR_REGISTERED_LOGGER_ROW_ERROR
 			return false;
 		}
 		
@@ -2056,12 +2060,14 @@ bool Serial::decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi) {
 	if ( pid == PID_XYZ_POS || pid == PID_XYZ_POS_MAJOR || pid == PID_XYZ_POS_DETAIL )
 		size = sizeof(sfi.Mc.result);
 
-	if ( (sfi.Mc.bytes = readDataUntilSizeAvailable(sfi.Mc.result, size)) <= 0 ) {
+	if ( (sfi.Mc.bytes = readDataUntilSizeAvailable(sfi.Mc.result, size)) <= 0 ) 
+	{
 		std::cerr << "ERROR while reading position value(s). Nothing available" << std::endl;
 		return false;
 	}
 	
-	if ( sfi.Mc.bytes%4 != 0 ) {
+	if ( sfi.Mc.bytes%4 != 0 ) 
+	{
 		std::cerr << "ERROR while reading position value(s). Result can't broken down to int32_t values. Byte count: " << sfi.Mc.bytes << std::endl;
 		return false;
 	}
@@ -2073,18 +2079,24 @@ bool Serial::decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi) {
 	ci.posType 	= pid;
 
 	sfi.Mc.p = sfi.Mc.result;
-	for (int i=0; i<sfi.Mc.bytes; i+=LONG_BUF_SIZE) {
+	for (int i=0; i<sfi.Mc.bytes; i+=LONG_BUF_SIZE) 
+	{
 		memcpy(&sfi.Mc.value, sfi.Mc.p, LONG_BUF_SIZE);
 		
-		if ( pid == PID_XYZ_POS || pid == PID_XYZ_POS_MAJOR || pid == PID_XYZ_POS_DETAIL ) {
-			switch (i) {
+		if ( pid == PID_XYZ_POS || pid == PID_XYZ_POS_MAJOR || pid == PID_XYZ_POS_DETAIL )
+		{
+			switch (i) 
+			{
 				case  0:	ci.xCtrlPos  = sfi.Mc.value; 			break;
 				case  4:	ci.yCtrlPos  = sfi.Mc.value; 			break;
 				case  8:	ci.zCtrlPos  = sfi.Mc.value; 			break;
 				case 12:	ci.feedSpeed = sfi.Mc.value/FLT_FACT; 	break;
 			}
-		} else {
-			switch ( pid ) {
+		} 
+		else 
+		{
+			switch ( pid ) 
+			{
 				case PID_X_POS: ci.xCtrlPos = sfi.Mc.value; break;
 				case PID_Y_POS: ci.yCtrlPos = sfi.Mc.value; break;
 				case PID_Z_POS: ci.zCtrlPos = sfi.Mc.value; break;
@@ -2381,9 +2393,6 @@ void Serial::serialCommandUnlockCallback() {
 ///////////////////////////////////////////////////////////////////
 	if ( flagPrependPause == true )
 	{
-		#warning
-		CNC_PRINT_FUNCT
-		
 		flagPrependPause = false;
 		sendSignal(SIG_PAUSE);
 	}

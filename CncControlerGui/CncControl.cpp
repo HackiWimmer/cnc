@@ -35,8 +35,6 @@
 #include "MainFrame.h"
 #include "CncControl.h"
 
-static CommandTemplates CMDTPL;
-
 #define CNC_PRINT_INTERACTIVE_FUNCT_A(msg) //CNC_PRINT_FUNCT_A(msg)
 
 ///////////////////////////////////////////////////////////////////
@@ -367,12 +365,12 @@ bool CncControl::setup(bool doReset) {
 		if ( wxString(FIRMWARE_VERSION) == ss.str().c_str() )
 		{
 			std::cout << std::endl;
-			SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_OK_STR )
+			SET_RESULT_FOR_REGISTERED_LOGGER_ROW_OK
 		}
 		else
 		{ 
 			cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
-			SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_WARNING_STR )
+			SET_RESULT_FOR_REGISTERED_LOGGER_ROW_WARNING
 		}
 	}
 	
@@ -388,7 +386,7 @@ bool CncControl::setup(bool doReset) {
 	// setup probe mode
 	if ( enableProbeMode(THE_CONTEXT->isProbeMode()) == false )
 	{
-		SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
+		SET_RESULT_FOR_REGISTERED_LOGGER_ROW_ERROR
 		CNC_CERR_FUNCT_A(" Probe mode configuration failed!\n")
 		return false;
 	}
@@ -432,7 +430,7 @@ bool CncControl::setup(bool doReset) {
 	
 	if ( processSetterList(setup) == false)
 	{
-		SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_ERROR_STR)
+		SET_RESULT_FOR_REGISTERED_LOGGER_ROW_ERROR
 		CNC_CERR_FUNCT_A(" Calling processSetterList() failed!\n");
 		return false;
 	}
@@ -443,7 +441,7 @@ bool CncControl::setup(bool doReset) {
 	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
 	changeCurrentSpindleSpeed_U_MIN(THE_CONFIG->getSpindleSpeedDefault());
 	
-	SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_OK_STR )
+	SET_RESULT_FOR_REGISTERED_LOGGER_ROW_OK
 	serialPort->notifySetupSuccesfullyFinsihed();
 	return true;
 }
@@ -488,7 +486,7 @@ bool CncControl::disconnect() {
 		
 		serialPort->disconnect();
 		
-		SET_RESULT_FOR_REGISTERED_LOGGER_ROW( CNC_RESULT_OK_STR )
+		SET_RESULT_FOR_REGISTERED_LOGGER_ROW_OK
 	}
 	
 	CncSpindleSound::deactivate();
@@ -515,7 +513,7 @@ bool CncControl::connect(const char * portName) {
 	{
 	
 		std::clog << " . . . Connection established\n";
-		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR )
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_OK
 		
 		const bool withSound = ( THE_CONFIG->getSimulateMillingWithSoundFlag() && serialPort->getPortType() == CncPORT_EMU_ARDUINO );
 		CncSpindleSound::activate(withSound);
@@ -523,7 +521,7 @@ bool CncControl::connect(const char * portName) {
 	else
 	{
 		std::cerr << " . . . Connection refused\n";
-		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_ERROR
 	}
 	
 	return ret;
@@ -556,6 +554,10 @@ bool CncControl::popSerial(bool dispatchUserEvents) {
 		const bool ret = serialPort->popSerial();
 	
 	THE_CONTEXT->setAllowEventHandling(prev);
+	
+	// catch up held back events on demand and things like 
+	// the motion monitor update
+	dispatchEventQueue();
 	
 	if ( isSpyOutputOn() )
 		cnc::spy.addDebugEntry(CNC_LOG_FUNCT_A(": after popSerial()"));
@@ -726,22 +728,22 @@ bool CncControl::isReadyToRun() {
 	}
 	
 	if ( isCommandActive() == true ) {
-		notification.message	= "The controller is bussy!";
+		notification.message	= "The controller is busy!";
 		THE_APP->displayNotification(notification);
 		return false;
 	}
 	
-	if ( THE_CONTEXT->hasHardware() && ctrlPowerState == CPS_OFF ) {
-		notification.message	= "The power state is off";
-		THE_APP->displayNotification(notification);
-		return false;
-	}
+	// all relevant micro controller states have to be fresh 
+	// queried by getter(PID_QUERY_READY_TO_RUN), otherwise
+	// if local application variables or members are used here, 
+	// there state isn't correct especially in the case of dry run!!!
 	
 	// query the serial port
 	std::vector<int32_t> list;
 	getSerial()->processGetter(PID_QUERY_READY_TO_RUN, list);
 		
-	if ( list.size() != 1 ) {
+	if ( list.size() != 1 )
+	{
 		std::cerr << "CncControl::isReadyToRun: Unable due to the corresponding state of the serial port:" << std::endl;
 		return false;
 	}
@@ -792,12 +794,12 @@ bool CncControl::reset() {
 	if ( ret == true ) 
 	{ 
 		std::clog << " Controller successfully reseted\n";
-		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR)
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_OK
 	} 
 	else
 	{ 
 		std::cerr << " Controller reset failed\n";
-		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_ERROR
 		return false; 
 	}
 	
@@ -1065,21 +1067,25 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 	// motion monitor
 	static CncLongPosition prevPos;
 	
-	if ( pos != prevPos ) {
-		
+	if ( pos != prevPos )
+	{
 		if ( THE_APP->getMotionMonitor() )
 			THE_APP->getMotionMonitor()->appendVertex(getClientId(), getConfiguredSpeedMode(), pos);
 		
 		prevPos.set(pos);
 		
-		if ( THE_CONFIG->getInterruptByPosOutOfRangeFlag() == true ) {
-			if ( isPositionOutOfRange(pos, true) == true ) {
+		if ( THE_CONFIG->getInterruptByPosOutOfRangeFlag() == true )
+		{
+			if ( isPositionOutOfRange(pos, true) == true )
+			{
 				interrupt("Position Out Of Range");
 				updatePreview3D();
 			}
 		} 
-		else {
-			if ( isPositionOutOfRange(pos, false) == true ) {
+		else 
+		{
+			if ( isPositionOutOfRange(pos, false) == true )
+			{
 				positionOutOfRangeFlag = true;
 				updatePreview3D();
 			}
@@ -1165,7 +1171,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	if ( dispatchEventQueue() == false )
 		return false;
 	
-	switch ( ci.infoType ) {
+	switch ( ci.infoType ) 
+	{
 		// --------------------------------------------------------
 		case CITDefault:
 		{
@@ -1204,7 +1211,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			}
 			
 			// Check against previous to get a single message per change 
-			if ( ctrlPowerState != CPS_ON && ctrlPowerState != prevCtrlPowerState ) {
+			if ( ctrlPowerState != CPS_ON && ctrlPowerState != prevCtrlPowerState )
+			{
 				std::cerr	<< "Wrong Controller Power State!"
 							<< std::endl
 							<< " It changed from '"
@@ -1214,10 +1222,11 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 							<< "'" 
 							<< std::endl;
 							
-				SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_ERROR_STR )
+				SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_ERROR
 			}
 			
-			if ( THE_APP->GetHeartbeatState() ) {
+			if ( THE_APP->GetHeartbeatState() )
+			{
 				static bool flag = false;
 				if ( flag )	{ flag = false; THE_APP->GetHeartbeatState()->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART")); }
 				else		{ flag = true;  THE_APP->GetHeartbeatState()->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_PLUS")); }
@@ -1228,19 +1237,23 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			
 			lastCncHeartbeatValue = ci.heartbeatValue;
 			
-			if ( ci.limitState == true ) {
+			if ( ci.limitState == true ) 
+			{
 				CncInterface::ILS::States ls(ci.limitStateValue);
 				displayLimitStates(ls);
 				ss << " : " << ls.getValueAsString();
 				ss << " (" << (int)ci.limitStateValue << ")";
 			}
 			
-			if ( ci.supportState == true ) {
+			if ( ci.supportState == true ) 
+			{
 				CncInterface::ISP::States sp(ci.supportStateValue);
 				displaySupportStates(sp);
 				ss << " : " << sp.getValueAsString();
 				ss << " (" << (int)ci.supportStateValue << ")";
-			} else {
+			}
+			else
+			{
 				displayUnknownSupportStates();
 			}
 			
