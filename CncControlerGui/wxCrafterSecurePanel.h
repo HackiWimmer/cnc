@@ -120,6 +120,7 @@ protected:
     wxStaticText* m_staticText90;
     wxButton* m_btnEmergenyStopSec;
     wxPanel* m_rpCtrl;
+    wxToggleButton* m_btToggleHeartbeats;
     wxButton* m_btSerialSpy;
     wxButton* m_resolveLimit;
     wxPanel* m_rpPodium;
@@ -156,6 +157,7 @@ protected:
     virtual void onTemplateContextSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onDryRunSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onEmergencySec(wxCommandEvent& event) { event.Skip(); }
+    virtual void onToggleHeartbeatsSec(wxCommandEvent& event) { event.Skip(); }
     virtual void onSerialSpySec(wxCommandEvent& event) { event.Skip(); }
     virtual void onRequestResolveLimitStates(wxCommandEvent& event) { event.Skip(); }
     virtual void onOpenConfigurationDlgSec(wxCommandEvent& event) { event.Skip(); }
@@ -239,6 +241,7 @@ public:
     wxStaticText* GetStaticText90() { return m_staticText90; }
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
     wxPanel* GetRpRun() { return m_rpRun; }
+    wxToggleButton* GetBtToggleHeartbeats() { return m_btToggleHeartbeats; }
     wxButton* GetBtSerialSpy() { return m_btSerialSpy; }
     wxButton* GetResolveLimit() { return m_resolveLimit; }
     wxPanel* GetRpCtrl() { return m_rpCtrl; }

@@ -381,13 +381,14 @@ void ArduinoDigitalPins::init() {
 	
 	pins[PIN_EXTERNAL_INTERRUPT]    = "EXTERNAL INTERRUPT PIN";
 	
-	pins[PIN_H_MOVE_UP]             = "MOVE PODIUM UP PIN";
-	pins[PIN_H_MOVE_DOWN]           = "MOVE PODIUM DOWN PIN";
-
 	pins[PIN_H_DIR]                 = "MOVE PODIUM DIR PIN";
 	pins[PIN_H_STP]                 = "MOVE PODIUM STEP PIN";
 	pins[PIN_LED_PODIUM]            = "PODIUM LED PIN";
-	pins[PIN_ENABLE_PODIUM]         = "PODIUM ENABLE PIN";
+	
+	pins[PIN_ENABLE_PODIUM_A]       = "PODIUM CORNER A ENABLE PIN";
+	pins[PIN_ENABLE_PODIUM_B]       = "PODIUM CORNER B ENABLE PIN";
+	pins[PIN_ENABLE_PODIUM_C]       = "PODIUM CORNER C ENABLE PIN";
+	pins[PIN_ENABLE_PODIUM_D]       = "PODIUM CORNER D ENABLE PIN";
 	
 	pins[PIN_TOUCH_CONTACT]         = "TOUCH CONTACT PIN";
 	
@@ -396,6 +397,8 @@ void ArduinoDigitalPins::init() {
 	
 	pins[PIN_INTERRUPT_LED_ID]      = "INTERRUPT LED PIN";
 	pins[PIN_IS_SPINDEL_OVRLD_ID]   = "SPINDLE OVERLOAD PIN";
+	pins[PIN_H_MOVE_UP_ID]          = "MOVE PODIUM UP PIN";
+	pins[PIN_H_MOVE_DOWN_ID]        = "MOVE PODIUM DOWN PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoDigitalPins::getPinLabel(unsigned int id) {

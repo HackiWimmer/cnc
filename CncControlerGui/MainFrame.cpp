@@ -180,8 +180,7 @@ CncTransactionLockBase::CncTransactionLockBase(MainFrame* p)
 ////////////////////////////////////////////////////////////////////
 {
 	wxASSERT(parent);
-	parent->m_serialTimer->Stop();
-	parent->decorateIdleState(parent->m_serialTimer->IsRunning());
+	parent->stopSerialTimer();
 	
 	referenceCounter++;
 }
@@ -194,7 +193,7 @@ CncTransactionLockBase::~CncTransactionLockBase() {
 		referenceCounter--;
 	
 	if ( parent->isInterrupted() == false ) 
-		parent->m_serialTimer->Start();
+		parent->startSerialTimer();
 }
 ////////////////////////////////////////////////////////////////////
 bool CncTransactionLockBase::waitUntilCncIsAvailable() {
@@ -492,6 +491,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , canClose								(true)
 , evaluatePositions						(true)
 , ignoreDirControlEvents				(false)
+, idleBitmapState						(false)
 , toolState								()
 , runConfirmationInfo					(RunConfirmationInfo::Wait)
 , interactiveTransactionLock			(NULL)
@@ -776,6 +776,24 @@ void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
 		}
 	}
 	*/ 
+}
+////////////////////////////////////////////////////////////////////////////
+bool MainFrame::startSerialTimer(bool notify) {
+////////////////////////////////////////////////////////////////////////////
+	const bool ret = m_serialTimer->Start();
+	
+	if ( notify )
+		decorateIdleState();
+	
+	return ret;
+}
+////////////////////////////////////////////////////////////////////////////
+void MainFrame::stopSerialTimer(bool notify) {
+////////////////////////////////////////////////////////////////////////////
+	m_serialTimer->Stop();
+	
+	if ( notify )
+		decorateIdleState();
 }
 ////////////////////////////////////////////////////////////////////////////
 void MainFrame::onConfigurationUpdated(wxCommandEvent& event) {
@@ -1676,8 +1694,11 @@ void MainFrame::onSerialTimer(wxTimerEvent& event) {
 	// idle handling
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
 		
+		// to avoid flicker during this short time
+		const bool forceDecorateIdleState = false;
+		
 		// stop the time to avoid overlapping idle request
-		m_serialTimer->Stop();
+		stopSerialTimer(forceDecorateIdleState);
 		
 		// it's very import to deactivate the notifications during idle processing
 		// because instead every config change (sc()) will release a notification
@@ -1693,16 +1714,17 @@ void MainFrame::onSerialTimer(wxTimerEvent& event) {
 		if ( ret == false )
 		{
 			CNC_CERR_FUNCT_A(": Error while processing sendIdleMessage()!")
-			m_serialTimer->Stop();
+			stopSerialTimer();
 			m_miRqtIdleMessages->Check(false);
+			
 		}
 		
 		// reconstructed the previous event handling mode
 		THE_CONTEXT->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
 		
-		// restart due to the previous Stop() command
-		if ( ret == true )
-			m_serialTimer->Start();
+		// restart due to the previous stopSerialTimer()
+		if ( ret == true )	startSerialTimer(forceDecorateIdleState);
+		else				decorateIdleState();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1925,7 +1947,7 @@ void MainFrame::onGamepadThreadHeartbeat(GamepadEvent& event) {
 		
 	m_gamepadThreadHeartbeat->SetBitmap(wxBitmap(img.Rotate90()));
 	m_gamepadThreadHeartbeat->Refresh();
-	m_gamepadThreadHeartbeat->Update();
+	//m_gamepadThreadHeartbeat->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onGamepadThreadUpadte(GamepadEvent& event) {
@@ -1978,7 +2000,6 @@ void MainFrame::onSerialThreadHeartbeat(SerialEvent& event) {
 		
 	m_serialThreadHeartbeat->SetBitmap(wxBitmap(img.Rotate90()));
 	m_serialThreadHeartbeat->Refresh();
-	m_serialThreadHeartbeat->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onSerialThreadMessage(SerialEvent& event) {
@@ -2205,7 +2226,7 @@ void MainFrame::handleCommonException() {
 	#warning may be do more here
 	
 	// stop idle request
-	m_serialTimer->Stop();
+	stopSerialTimer();
 	
 	disconnectSerialPort();
 	
@@ -2927,7 +2948,7 @@ bool MainFrame::connectSerialPort() {
 	monitorViewInfobar->Dismiss();
 	
 	CncRunAnimationControl rac(this);
-	m_serialTimer->Stop();
+	stopSerialTimer();
 	
 	THE_BOUNDS->resetHardwareOffset();
 	updateHardwareReference();
@@ -2978,7 +2999,7 @@ bool MainFrame::connectSerialPort() {
 			decorateSpindleState(cnc->getSpindlePowerState());
 			
 			m_connect->SetBitmap(bmpC);
-			m_serialTimer->Start();
+			startSerialTimer();
 			
 			secureCtrlPanel->notifyConnection(true, lastPortName);
 		}
@@ -3960,8 +3981,10 @@ void MainFrame::removeTemplateFromButton(wxCommandEvent& event) {
 		                wxYES|wxNO|wxCANCEL|wxICON_QUESTION|wxCENTRE);
 	
 	int ret = dlg.ShowModal();
-	if ( ret == wxID_YES ) {
-		if ( wxRemoveFile(fn) == false ) {
+	if ( ret == wxID_YES )
+	{
+		if ( wxRemoveFile(fn) == false )
+		{
 			std::cerr << "MainFrame::removeTemplateFromButton: failed!" << std::endl;
 			return;
 		}
@@ -5392,9 +5415,13 @@ void MainFrame::requestTimestamp(wxCommandEvent& event) {
 	cnc->processCommand(CMD_PRINT_TIMESTAMP, ss);
 	cnc::trc.logInfoMessage(ss);
 }
+
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestHeartbeat(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// this function request a single heartbeat
+	// a continuous processing is handles by 
+	// toggleIdleRequests(wxCommandEvent& event)
 	wxASSERT(cnc);
 	CNC_TRANSACTION_LOCK
 
@@ -6036,11 +6063,15 @@ void MainFrame::selectMonitorBookTemplatePanel() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectParsingSynopsisTrace() {
 ///////////////////////////////////////////////////////////////////
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::PREPOCESSOR_PANAL);
+	m_listbookSource->SetSelection(SourceBookSelection::VAL::CONTEXT);
+	contextSummaryPanel->selectParsingSynopsis();
 	
-	wxASSERT(cncPreprocessor);
-	cncPreprocessor->select(PreProcessorSelection::VAL::PARSING_SYNOPSIS);
+	if ( THE_CONTEXT->secureModeInfo.isActive )
+	{
+		CncTemplateContextSummaryDialog dlg(this);
+		dlg.update();
+		dlg.ShowModal();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
@@ -7067,30 +7098,34 @@ void MainFrame::rcReset(wxCommandEvent& event) {
 	setReferencePosEnforceFlag(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::decorateSpindleState(CncSpindlePowerState state) {
+void MainFrame::decorateSpindleState(CncSpindlePowerState state, bool force) {
 ///////////////////////////////////////////////////////////////////
-	// decorate the test environment
-	m_testSpindlePowerBtn->SetLabel          (state == SPINDLE_STATE_OFF ? "Switch Spindle 'On'"       : "Switch Spindle 'Off'");
-
-	m_testToolPowerState->SetLabel           (state == SPINDLE_STATE_OFF ? "Spindle is switched 'Off'" : "Spindle is switched 'On'");
-	m_testToolPowerState->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128)       : *wxGREEN);
-	m_testToolPowerState->SetForegroundColour(state == SPINDLE_STATE_OFF ? *wxWHITE                    : *wxBLACK);
-	
-	m_testToolPowerState->Refresh(true);
-	m_testToolPowerState->Update();
-	
-	if ( m_testToolPowerState->GetParent() ) {
-		m_testToolPowerState->GetParent()->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128) : *wxGREEN);
-		m_testToolPowerState->GetParent()->Refresh(true);
-		m_testToolPowerState->GetParent()->Update();
-	}
-	
 	// decorate the tool info bitmap
 	if ( state == SPINDLE_STATE_ON )	toolState.setState(CncToolStateControl::green);
 	else 								toolState.setState(CncToolStateControl::red);
 	
 	// decorate motion monitor
 	motionMonitor->setSpindlePowerState(state);
+	
+	if ( m_testCaseBook->IsShownOnScreen() || force )
+	{
+		// decorate the test environment
+		m_testSpindlePowerBtn->SetLabel          (state == SPINDLE_STATE_OFF ? "Switch Spindle 'On'"       : "Switch Spindle 'Off'");
+
+		m_testToolPowerState->SetLabel           (state == SPINDLE_STATE_OFF ? "Spindle is switched 'Off'" : "Spindle is switched 'On'");
+		m_testToolPowerState->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128)       : *wxGREEN);
+		m_testToolPowerState->SetForegroundColour(state == SPINDLE_STATE_OFF ? *wxWHITE                    : *wxBLACK);
+		
+		m_testToolPowerState->Refresh(true);
+		m_testToolPowerState->Update();
+		
+		if ( m_testToolPowerState->GetParent() )
+		{
+			m_testToolPowerState->GetParent()->SetBackgroundColour(state == SPINDLE_STATE_OFF ? wxColour(255,128,128) : *wxGREEN);
+			m_testToolPowerState->GetParent()->Refresh(true);
+			m_testToolPowerState->GetParent()->Update();
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
@@ -7361,7 +7396,7 @@ void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 		case TestBookSelection::VAL::INTERVAL:	break;
 		
 		case TestBookSelection::VAL::TOOL:		if ( cnc != NULL )
-													decorateSpindleState(cnc->getSpindlePowerState());
+													decorateSpindleState(cnc->getSpindlePowerState(), true);
 													
 												break;
 												
@@ -8316,25 +8351,58 @@ void MainFrame::cncMainViewChanged(wxNotebookEvent& event) {
 	activateGamepadNotificationsOnDemand(true);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::decorateIdleState(bool state) {
+void MainFrame::notifyControllerHeartbeat() {
 /////////////////////////////////////////////////////////////////////
-	if ( state == false )
-		m_heartbeatState->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_INACTIVE"));
-		
-	m_heartbeatState->Refresh();
+	// here the idle state indirect always true, because this function
+	// call is trigger by the corresponding micro controller feedback
 	
-	// in case the state is true, here is nothing to do, because this state will be handled by 
-	// SerialControllerCallback(const ContollerInfo& ci) and ci == CITHeartbeat
+	// flag is needed to toggle the bitmap
+	if ( idleBitmapState )	{ idleBitmapState = false; m_heartbeatState->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART")); }
+	else					{ idleBitmapState = true;  m_heartbeatState->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_PLUS")); }
+	
+	m_heartbeatState->Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::decorateIdleState() {
+/////////////////////////////////////////////////////////////////////
+	//CNC_PRINT_FUNCT_A("  isIdleStateActive()=%d %d %d",  isIdleStateActive(),  m_miRqtIdleMessages->IsChecked(), m_serialTimer->IsRunning())
+
+	const bool isActive = isIdleStateActive();
+	const wxString btnLabel( isActive ? "Turn Off\nController Heartbeats" : "Turn On\nController Heartbeats");
+	secureCtrlPanel->GetBtToggleHeartbeats()->SetLabel(btnLabel);
+	secureCtrlPanel->GetBtToggleHeartbeats()->SetValue(isActive);
+	
+	if ( isActive == false )
+	{
+		// all other states are handles by notifyControllerHeartbeat()
+		m_heartbeatState->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_INACTIVE"));
+		m_heartbeatState->Refresh();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+bool MainFrame::isIdleStateActive() const {
+/////////////////////////////////////////////////////////////////////
+	return ( m_miRqtIdleMessages->IsChecked() && m_serialTimer->IsRunning() );
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleIdleRequests(bool state) {
+/////////////////////////////////////////////////////////////////////
+	if ( state )	startSerialTimer();
+	else			stopSerialTimer();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::dclickHeartbeatState(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( m_miRqtIdleMessages->IsEnabled() == false )
+		return;
+		
+	toggleIdleRequests(!isIdleStateActive());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::toggleIdleRequests(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	const bool state = event.IsChecked();
-	
-	if ( state )	m_serialTimer->Start();
-	else			m_serialTimer->Stop();
-	
-	decorateIdleState(m_serialTimer->IsRunning());
+	m_miRqtIdleMessages->Check(event.IsChecked());
+	toggleIdleRequests(m_miRqtIdleMessages->IsChecked());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::openSessionDialog(wxCommandEvent& event) {
@@ -8640,19 +8708,6 @@ void MainFrame::showOSEnvironment(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( cncOsEnvDialog && cncOsEnvDialog->IsShownOnScreen() == false )
 		cncOsEnvDialog->Show();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::dclickHeartbeatState(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( m_miRqtIdleMessages->IsEnabled() == false )
-		return;
-		
-	const bool state = m_serialTimer->IsRunning();
-	if ( state )	m_serialTimer->Stop();
-	else			m_serialTimer->Start();
-	
-	m_miRqtIdleMessages->Check(m_serialTimer->IsRunning());
-	decorateIdleState(m_serialTimer->IsRunning());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::showStacktraceStore(wxCommandEvent& event) {

@@ -30,16 +30,10 @@ bool ArduinoPodiumManager::enable(Mode m) {
     case M_CornerABCD: es[A] = es[B] = es[C] = es[D] = ENABLE_STATE_ON;  break;
   }
 
-  #warning change this to real four pins
-  const char pinEnableStepperA = PIN_ENABLE_PODIUM;
-  const char pinEnableStepperB = PIN_ENABLE_PODIUM;
-  const char pinEnableStepperC = PIN_ENABLE_PODIUM;
-  const char pinEnableStepperD = PIN_ENABLE_PODIUM;
-  
-  AE::digitalWrite(pinEnableStepperA, es[A]);
-  AE::digitalWrite(pinEnableStepperB, es[B]);
-  AE::digitalWrite(pinEnableStepperC, es[C]);
-  AE::digitalWrite(pinEnableStepperD, es[D]);
+  AE::digitalWrite(PIN_ENABLE_PODIUM_A, es[A]);
+  AE::digitalWrite(PIN_ENABLE_PODIUM_B, es[B]);
+  AE::digitalWrite(PIN_ENABLE_PODIUM_C, es[C]);
+  AE::digitalWrite(PIN_ENABLE_PODIUM_D, es[D]);
       
   AE::delayMicroseconds(100);
   return true;

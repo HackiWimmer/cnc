@@ -163,15 +163,15 @@
     const unsigned char PIN_SPINDEL_SPEED_INF               =  44;
     const unsigned char PIN_SPINDEL_SUPPORT                 =  45;
     
-    const unsigned char PIN_ENABLE_PODIUM                   =  46;
+    //const unsigned char PIN_                              =  46;
     const unsigned char PIN_LED_PODIUM                      =  47;
     const unsigned char PIN_H_STP                           =  48;
     const unsigned char PIN_H_DIR                           =  49;
     
-    const unsigned char PIN_H_MOVE_DOWN                     =  50;
-    const unsigned char PIN_H_MOVE_UP                       =  51;
-    //const unsigned char PIN_                              =  52;
-    //const unsigned char PIN_                              =  53;
+    const unsigned char PIN_ENABLE_PODIUM_A                 =  50;
+    const unsigned char PIN_ENABLE_PODIUM_B                 =  51;
+    const unsigned char PIN_ENABLE_PODIUM_C                 =  52;
+    const unsigned char PIN_ENABLE_PODIUM_D                 =  53;
 
     #define PIN_INTERRUPT_LED                            AE::PN_A0   
     const unsigned char PIN_INTERRUPT_LED_ID                =   0;
@@ -180,46 +180,46 @@
     const unsigned char PIN_IS_SPINDEL_OVRLD_ID              =  1;
 
     //#define PIN_                                       AE::PN_A2   
-    //const unsigned char PIN_IS_                            =  2;
+    //const unsigned char PIN_                               =  2;
 
     //#define PIN_                                       AE::PN_A3   
-    //const unsigned char PIN_IS_                            =  3;
+    //const unsigned char PIN_                               =  3;
 
     //#define PIN_                                       AE::PN_A4   
-    //const unsigned char PIN_IS_                            =  4;
+    //const unsigned char PIN_                               =  4;
     
     //#define PIN_                                       AE::PN_A5   
-    //const unsigned char PIN_IS_                            =  5;
+    //const unsigned char PIN_                               =  5;
 
     //#define PIN_                                       AE::PN_A6   
-    //const unsigned char PIN_IS_                            =  6;
+    //const unsigned char PIN_                               =  6;
 
     //#define PIN_                                       AE::PN_A7   
-    //const unsigned char PIN_IS_                           =  7;
+    //const unsigned char PIN_                               =  7;
 
     //#define PIN_                                       AE::PN_A8   
-    //const unsigned char PIN_IS_                            =  8;
+    //const unsigned char PIN_                               =  8;
 
     //#define PIN_                                       AE::PN_A9   
-    //const unsigned char PIN_IS_                            =  9;
+    //const unsigned char PIN_                               =  9;
 
     //#define PIN_                                      AE::PN_A10   
-    //const unsigned char PIN_IS_                           =  10;
+    //const unsigned char PIN_                              =  10;
 
     //#define PIN_                                      AE::PN_A11   
-    //const unsigned char PIN_IS_                           =  11;
+    //const unsigned char PIN_                              =  11;
 
-    //#define PIN_                                      AE::PN_A12   
-    //const unsigned char PIN_IS_                           =  12;
+    #define PIN_H_MOVE_DOWN                             AE::PN_A12   
+    const unsigned char PIN_H_MOVE_DOWN_ID                  =  12;
 
-    //#define PIN_                                      AE::PN_A13   
-    //const unsigned char PIN_IS_                           =  13;
+    #define PIN_H_MOVE_UP                               AE::PN_A13   
+    const unsigned char PIN_H_MOVE_UP_ID                    =  13;
 
     //#define PIN_                                      AE::PN_A14   
-    //const unsigned char PIN_IS_                           =  14;
+    //const unsigned char PIN_                              =  14;
 
     //#define PIN_                                      AE::PN_A15   
-    //const unsigned char PIN_IS_                           =  15;
+    //const unsigned char PIN_                              =  15;
     
     #define READ_LMT_PIN_H_MIN                            ( AE::digitalRead(PIN_H_MIN_LIMIT) ) 
     #define READ_LMT_PIN_H_MAX                            ( AE::digitalRead(PIN_H_MAX_LIMIT) )

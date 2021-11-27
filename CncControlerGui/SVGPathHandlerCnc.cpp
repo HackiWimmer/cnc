@@ -231,7 +231,7 @@ if ( false ) {
 	#warning zDepth - performing more checks here?
 	//if ( zTarget > ....)
 	
-	// first, move to surface and reset the watermaks to reinitalize the Z depth
+	// first, move to surface and reset the watermarks to re-initialize the Z depth
 	moveZAxisToLogicalTop();
 	curRunPosition.resetWatermarksToCurrentPos();
 	
@@ -370,7 +370,8 @@ bool SVGPathHandlerCnc::moveXYToStartPos(CncSpeedMode m) {
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveXYToPos(const MoveParameter& mp) {
 ///////////////////////////////////////////////////////////////////
-	if ( mp.pos == NULL ) {
+	if ( mp.pos == NULL )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid position!\n");
 		return false;
 	}
@@ -381,9 +382,10 @@ bool SVGPathHandlerCnc::moveXYToPos(const MoveParameter& mp) {
 	if ( isXYEqual(curRunPosition, pos) )
 		return true;
 	
-	// first move to top if not alreay done - on demand
-	if ( mp.zToTop == true ) {
-		if ( moveZAxisToLogicalTop() == false )
+	// first move to top if not already done - on demand
+	if ( mp.zToTop == true )
+	{
+		if ( moveZAxisToLogicalTop(mp.mode) == false )
 			return false;
 	}
 	
@@ -409,11 +411,12 @@ bool SVGPathHandlerCnc::moveXYToPos(const MoveParameter& mp) {
 	return onPhysicallyExecute(plm);
 }
 ///////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::moveZAxisToLogicalTop() {
+bool SVGPathHandlerCnc::moveZAxisToLogicalTop(CncSpeedMode m) {
 ///////////////////////////////////////////////////////////////////
 	const double zTopRefValue = THE_BOUNDS->getSurfaceOffset() + THE_CONFIG->getSurefaceOffset();
 	
-	if ( cnc::dblCompare(curRunPosition.getZ(), zTopRefValue) == false ) {
+	if ( cnc::dblCompare(curRunPosition.getZ(), zTopRefValue) == false )
+	{
 		const double zDist	= zTopRefValue - curRunPosition.getZ();
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_LOGICAL_TOP);
 		
@@ -423,8 +426,8 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop() {
 		initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 		initialEntry.entryTarget		= curRunPosition;
 		initialEntry.clientId			= clientID;
-		initialEntry.feedSpeedMode		= CncSpeedWork;
-		initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentWorkSpeed_MM_MIN();
+		initialEntry.feedSpeedMode		= m;
+		initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentSpeed_MM_MIN(m);
 		initialEntry.spindleState		= currentCncContext.getCurrentSpindleState();
 		initialEntry.spindleSpeed_U_MIN	= currentCncContext.getCurrentSpindleSpeed_U_MIN();
 		
@@ -443,7 +446,8 @@ bool SVGPathHandlerCnc::moveZAxisToSurface() {
 	const double zSureface = THE_BOUNDS->getSurfaceOffset();
 	
 	// perform the move - on demand
-	if ( cnc::dblCompare(curRunPosition.getZ(), zSureface) == false ) {
+	if ( cnc::dblCompare(curRunPosition.getZ(), zSureface) == false )
+	{
 		const double zDist	= (-1) * fabs(curRunPosition.getZ() - zSureface);
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_TO_SUREFACE);
 		
@@ -565,7 +569,8 @@ bool SVGPathHandlerCnc::finishWork() {
 	const bool ret = moveXYToPos(mp);
 	
 	//svg output handling only
-	if ( ret == true ) {
+	if ( ret == true )
+	{
 		CncDoublePosition::Watermarks xyMax;
 		xyMax = cncControl->getWaterMarksMetric();
 	}

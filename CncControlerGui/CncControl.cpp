@@ -928,7 +928,7 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(float value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
-	// always reset the realtime speed value, but don't
+	// always reset the real-time speed value, but don't
 	// use MAX_FEED_SPEED_VALUE here because it is declared as MIN_LONG
 	// realtimeFeedSpeed_MM_MIN = MAX_FEED_SPEED_VALUE;
 	realtimeFeedSpeed_MM_MIN = 0.0;
@@ -941,8 +941,7 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	if ( value <= 0.0 )			value = 0.0;
 	if ( value > maxValue )		value = maxValue;
 	
-	bool somethingChanged 	= false;
-	bool force				= configuredSpeedModePreviewFlag;
+	bool force = configuredSpeedModePreviewFlag;
 	
 	// always reset
 	configuredSpeedModePreviewFlag = false;
@@ -951,17 +950,13 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 	if ( configuredSpeedMode != s || force == true )
 	{
 		configuredSpeedMode	= s;
-		somethingChanged	= true;
-		
-		const Trigger::SpeedChange tr(configuredSpeedMode, configuredFeedSpeed_MM_MIN);
-		processTrigger(tr);
+		force				= true;
 	}
 	
-	// avoid the setter below if nothing will change
+	// avoid the setter below if nothing is/will change(d)
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false || force == true )
 	{
 		configuredFeedSpeed_MM_MIN	= value;
-		somethingChanged			= true;
 		
 		const int32_t val = configuredFeedSpeed_MM_MIN * FLT_FACT / 60;
 		const char mode   = cnc::getCncSpeedTypeAsCharacter(configuredSpeedMode);
@@ -973,13 +968,15 @@ bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(float value, CncSpeedMode s) {
 			return false;
 		}
 		
+		const Trigger::SpeedChange tr(configuredSpeedMode, configuredFeedSpeed_MM_MIN);
+		processTrigger(tr);
+		
 		ContextInterface* ci = getSerial()->getContextInterface();
 		if ( ci != NULL )
 			ci->notifyStepperSpeed(PID_SPEED_MM_SEC, eVal);
-	}
-	
-	if ( somethingChanged == true )
+			
 		speedMemory_MM_MIN[configuredSpeedMode] = configuredFeedSpeed_MM_MIN;
+	}
 	
 	return true;
 }
@@ -1225,16 +1222,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_ERROR
 			}
 			
-			if ( THE_APP->GetHeartbeatState() )
-			{
-				static bool flag = false;
-				if ( flag )	{ flag = false; THE_APP->GetHeartbeatState()->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART")); }
-				else		{ flag = true;  THE_APP->GetHeartbeatState()->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_PLUS")); }
-				
-				THE_APP->GetHeartbeatState()->GetParent()->Refresh();
-				THE_APP->GetHeartbeatState()->GetParent()->Update();
-			}
-			
+			THE_APP->notifyControllerHeartbeat();
 			lastCncHeartbeatValue = ci.heartbeatValue;
 			
 			if ( ci.limitState == true ) 

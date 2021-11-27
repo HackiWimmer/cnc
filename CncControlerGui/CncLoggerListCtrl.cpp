@@ -310,7 +310,10 @@ void CncLoggerListCtrl::add(const wxString& text, const wxString& result) {
 	if ( entries.size() == 0 )
 		next();
 	
-	add(text, result, entries.back().listItemAttr);
+	#warning
+	
+	wxListItemAttr lia(entries.back().listItemAttr);
+	add(text, result, lia);
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::add(const wxString& text, const wxString& result, const wxListItemAttr& lia) {
@@ -320,6 +323,8 @@ void CncLoggerListCtrl::add(const wxString& text, const wxString& result, const 
 		
 	if ( entries.size() == 0 )
 		next();
+		
+	entries.back().listItemAttr = lia;
 		
 	const wxChar delimiter = '\n';
 	wxStringTokenizer lines(text, wxString("\n"));
@@ -331,8 +336,6 @@ void CncLoggerListCtrl::add(const wxString& text, const wxString& result, const 
 		{
 			wxString& text = entries.back().text;
 			text.append(token);
-			
-			entries.back().listItemAttr = lia;
 		}
 		
 		if ( lines.GetLastDelimiter() == delimiter )
@@ -514,12 +517,14 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 	line.MakeUpper();
 	
 	// ---------------------------------------------------
-	if ( line.StartsWith('[') == true ) {
+	if ( line.StartsWith('[') == true )
+	{
 		line.assign(line.BeforeFirst(']'));
 		line.assign(line.AfterFirst('['));
 	} 
 	// ---------------------------------------------------
-	else if ( line.Contains("LINE") == true ) {
+	else if ( line.Contains("LINE") == true )
+	{
 		int p = line.Find("LINE");
 		bool start = false;
 		wxString ln;
@@ -539,7 +544,8 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 		
 	}
 	// ---------------------------------------------------
-	else if ( line.Contains("FILE:") == true ) {
+	else if ( line.Contains("FILE:") == true ) 
+	{
 		wxStringTokenizer words(rawLine, " \t");
 		while ( words.HasMoreTokens() ) {
 			const wxString token = words.GetNextToken();
@@ -553,13 +559,15 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 		}
 	}
 	// ---------------------------------------------------
-	else if ( line.Contains("PARSING SYNOPSIS TRACE") == true ) {
+	else if ( line.Contains("PARSING SYNOPSIS TRACE") == true )
+	{
 		THE_APP->selectParsingSynopsisTrace();
 		return;
 	}
 	
 	// try to select the evaluated line number - on demand
-	if ( lineNumber > 0 && line.ToLong(&lineNumber) == true ) {
+	if ( lineNumber > 0 && line.ToLong(&lineNumber) == true )
+	{
 		if ( CNC_READY )
 			THE_APP->selectSourceControlLineNumber(lineNumber - 1);
 	}

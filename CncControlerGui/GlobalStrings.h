@@ -18,7 +18,7 @@
 									CNC_VERSION_INDEX_NUM, \
 									CNC_VERSION_BUILD_NUM)
 									
-	#define CNC_VERSION_LONG_STR    wxString::Format("%d.%d.%d (%d) [%2d.%2d.%4d %2d:%2d:%2d]", \
+	#define CNC_VERSION_LONG_STR    wxString::Format("%d.%d.%d (%d) [%02d.%02d.%04d %02d:%02d:%02d]", \
 									CNC_VERSION_MAJOR_NUM, \
 									CNC_VERSION_MINOR_NUM, \
 									CNC_VERSION_INDEX_NUM, \

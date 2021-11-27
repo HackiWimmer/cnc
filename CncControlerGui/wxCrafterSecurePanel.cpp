@@ -665,6 +665,14 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     wxBoxSizer* boxSizer641 = new wxBoxSizer(wxVERTICAL);
     m_rpCtrl->SetSizer(boxSizer641);
     
+    m_btToggleHeartbeats = new wxToggleButton(m_rpCtrl, wxID_ANY, _("Request\nHeartbeats"), wxDefaultPosition, wxDLG_UNIT(m_rpCtrl, wxSize(-1,-1)), 0);
+    wxFont m_btToggleHeartbeatsFont(16, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_btToggleHeartbeats->SetFont(m_btToggleHeartbeatsFont);
+    m_btToggleHeartbeats->SetValue(true);
+    
+    boxSizer641->Add(m_btToggleHeartbeats, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_btToggleHeartbeats->SetMinSize(wxSize(-1,80));
+    
     m_btSerialSpy = new wxButton(m_rpCtrl, wxID_ANY, _("Open\nSerial Spy"), wxDefaultPosition, wxDLG_UNIT(m_rpCtrl, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-find_and_replace")), wxLEFT);
@@ -871,6 +879,7 @@ CncSecureCtrlPanelBase::CncSecureCtrlPanelBase(wxWindow* parent, wxWindowID id, 
     m_btTemplateContextSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTemplateContextSec), NULL, this);
     m_btDryRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onDryRunSec), NULL, this);
     m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
+    m_btToggleHeartbeats->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onToggleHeartbeatsSec), NULL, this);
     m_btSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_resolveLimit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRequestResolveLimitStates), NULL, this);
     m_btConfigDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onOpenConfigurationDlgSec), NULL, this);
@@ -902,6 +911,7 @@ CncSecureCtrlPanelBase::~CncSecureCtrlPanelBase()
     m_btTemplateContextSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onTemplateContextSec), NULL, this);
     m_btDryRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onDryRunSec), NULL, this);
     m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onEmergencySec), NULL, this);
+    m_btToggleHeartbeats->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onToggleHeartbeatsSec), NULL, this);
     m_btSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onSerialSpySec), NULL, this);
     m_resolveLimit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onRequestResolveLimitStates), NULL, this);
     m_btConfigDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncSecureCtrlPanelBase::onOpenConfigurationDlgSec), NULL, this);

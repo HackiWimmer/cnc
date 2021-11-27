@@ -226,10 +226,11 @@ bool CncArduinoController::evaluatePodiumSwitches() {
   if ( PIN_H_MOVE_UP == 0 || PIN_H_MOVE_DOWN == 0 )
     return true;
 
-  const bool btUp   = ( AE::digitalRead(PIN_H_MOVE_UP)    == PODIUM_SWITCH_ON );
-  const bool btDown = ( AE::digitalRead(PIN_H_MOVE_DOWN)  == PODIUM_SWITCH_ON );
+  const bool btUp   = ( AE::analogRead(PIN_H_MOVE_UP)    == PODIUM_SWITCH_ON );
+  const bool btDown = ( AE::analogRead(PIN_H_MOVE_DOWN)  == PODIUM_SWITCH_ON );
   
-  if ( btUp == PL_HIGH || btDown == PL_HIGH ) { 
+  if ( btUp == PL_HIGH || btDown == PL_HIGH )
+  { 
     byte b = movePodium(btUp ? +1 : -1, CncArduinoController::stopMovePodiumBySwitch);  
     return b == RET_OK;
   }
@@ -588,7 +589,7 @@ byte CncArduinoController::movePodium(int32_t stepDir, stopPodiumHardware_funct 
 
   // Create this instance to enable the podium stepper pin and release the brake.
   // The corresponding dtor will inverse this again
-  PodiumEnabler pe;
+  ArduinoPodiumEnabler pe;
 
   const int32_t maxSpeedDelay = 1100;
   const int32_t minSpeedDelay =  150;
@@ -663,10 +664,10 @@ bool CncArduinoController::stopMovePodiumBySwitch(CncArduinoController* ctrl) {
   if ( PIN_H_MOVE_UP == 0 || PIN_H_MOVE_DOWN == 0 )
     return false;
 
-  if ( AE::digitalRead(PIN_H_MOVE_UP)   == PODIUM_SWITCH_ON )
+  if ( AE::analogRead(PIN_H_MOVE_UP)   == PODIUM_SWITCH_ON )
     return false;
     
-  if ( AE::digitalRead(PIN_H_MOVE_DOWN) == PODIUM_SWITCH_ON )
+  if ( AE::analogRead(PIN_H_MOVE_DOWN) == PODIUM_SWITCH_ON )
     return false;
 
   return true;

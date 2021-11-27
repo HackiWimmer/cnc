@@ -689,7 +689,9 @@ void ArduinoMainLoop::setup() {
 
   LastErrorCodes::clear(); 
 
+  // --------------------------------------------------------------------------------------------------------------
   // digital pins
+  
   AE::pinMode(PIN_X_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,              PL_LOW);
   AE::pinMode(PIN_Y_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,              PL_LOW);
   AE::pinMode(PIN_Z_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,              PL_LOW);
@@ -706,7 +708,11 @@ void ArduinoMainLoop::setup() {
 
   AE::pinMode(PIN_EXTERNAL_INTERRUPT,   PM_INPUT);   AE::digitalWrite(PIN_EXTERNAL_INTERRUPT, EXTERNAL_INTERRRUPT_OFF);
 
-  AE::pinMode(PIN_ENABLE_PODIUM,        PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM,      PL_LOW);
+  AE::pinMode(PIN_ENABLE_PODIUM_A,      PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_A,    PL_LOW);
+  AE::pinMode(PIN_ENABLE_PODIUM_B,      PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_B,    PL_LOW);
+  AE::pinMode(PIN_ENABLE_PODIUM_C,      PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_C,    PL_LOW);
+  AE::pinMode(PIN_ENABLE_PODIUM_D,      PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_D,    PL_LOW);
+  
   AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,     ENABLE_STATE_OFF);
   AE::pinMode(PIN_ENABLE_SPINDLE,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_SPINDLE,     SPINDLE_STATE_OFF);
 
@@ -724,12 +730,6 @@ void ArduinoMainLoop::setup() {
   if ( PIN_H_DIR != 0 ) 
     { AE::pinMode(PIN_H_DIR,            PM_OUTPUT);  AE::digitalWrite(PIN_H_DIR,              PL_LOW); }
 
-  if ( PIN_H_MOVE_UP != 0 ) 
-    { AE::pinMode(PIN_H_MOVE_UP,        PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_UP,          PODIUM_SWITCH_OFF); }
-    
-  if ( PIN_H_MOVE_DOWN != 0 ) 
-    { AE::pinMode(PIN_H_MOVE_DOWN,      PM_OUTPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,        PODIUM_SWITCH_OFF); }
-
   if ( PIN_IS_CTRL_POWERED > 0 )  
      { AE::pinMode(PIN_IS_CTRL_POWERED, PM_INPUT);   AE::digitalWrite(PIN_IS_CTRL_POWERED,    POWER_STATE_OFF); }
      
@@ -745,15 +745,24 @@ void ArduinoMainLoop::setup() {
   if ( PIN_SPINDEL_SUPPORT > 0 )
     { AE::pinMode(PIN_SPINDEL_SUPPORT,  PM_OUTPUT);  AE::digitalWrite(PIN_SPINDEL_SUPPORT,    PL_LOW); }
 
+  // --------------------------------------------------------------------------------------------------------------
+  // analog pins
   if ( PIN_INTERRUPT_LED > 0 )
     { AE::pinMode(PIN_INTERRUPT_LED,    PM_OUTPUT);  AE::analogWrite(PIN_INTERRUPT_LED,       ANALOG_LOW); }
 
   if ( PIN_SPINDEL_SPEED_INF > 0 )
     { AE::pinMode(PIN_SPINDEL_SPEED_INF,PM_OUTPUT);  AE::analogWrite(PIN_SPINDEL_SPEED_INF,   ANALOG_LOW); }
     
+  if ( PIN_H_MOVE_UP != 0 ) 
+    { AE::pinMode(PIN_H_MOVE_UP,        PM_INPUT);  AE::digitalWrite(PIN_H_MOVE_UP,           PODIUM_SWITCH_OFF); }
+    
+  if ( PIN_H_MOVE_DOWN != 0 ) 
+    { AE::pinMode(PIN_H_MOVE_DOWN,      PM_INPUT);  AE::digitalWrite(PIN_H_MOVE_DOWN,         PODIUM_SWITCH_OFF); }
 
-  // analog pins
 
+  // --------------------------------------------------------------------------------------------------------------
+  // further init routines
+  
   reset();
   controller->evaluateI2CAvailable();
 

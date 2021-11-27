@@ -291,7 +291,7 @@ typedef bool SpindleState;
   #define INVERSED_INCREMENT_DIRECTION                   1
 
   #define ANALOG_LOW                                     0
-  #define ANALOG_HIGH                                    255
+  #define ANALOG_HIGH                                    1023
 
   #define FORCE                                          true
   

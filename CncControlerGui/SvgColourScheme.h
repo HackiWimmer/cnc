@@ -26,6 +26,7 @@ class SvgColourDecoder {
 		
 		bool matchesWhite() 		const;
 		bool matchesBlack()			const;
+		bool matchesRed()			const; 
 		bool matchesBlue()			const; 
 		bool matchesGray()			const; 
 		

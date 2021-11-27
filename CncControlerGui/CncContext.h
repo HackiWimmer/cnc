@@ -40,6 +40,7 @@ struct CncContext {
 		bool	onlineUpdateDrawPane		= true;
 		bool	allowEventHandling			= true;
 		bool	hardwareFlag				= false;
+		bool	requestIdleState			= false;
 		
 		int		updateInterval				= 100;
 		

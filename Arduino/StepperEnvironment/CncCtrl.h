@@ -52,18 +52,8 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
         int getRemainingSeconds() const;
     };
 
-    class PodiumEnabler {
-      public:
-        PodiumEnabler()  { PodiumEnabler::enable();  }
-        ~PodiumEnabler() { PodiumEnabler::disable(); }
-
-        static void enable(bool state = true) { AE::digitalWrite(PIN_ENABLE_PODIUM, state); AE::delayMicroseconds(100); }
-        static void disable()                 { PodiumEnabler::enable(false); }
-        
-        static bool isEnabled()               { return AE::digitalRead(PIN_ENABLE_PODIUM); }
-    };
-
-    struct InteractiveMove {
+    struct InteractiveMove 
+    {
       bool      active  = false;
       int8_t    valueX  = 0;
       int8_t    valueY  = 0;

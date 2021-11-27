@@ -32,7 +32,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		bool					debugState;
 
 		// 
-		bool					moveZAxisToLogicalTop();
+		bool					moveZAxisToLogicalTop(CncSpeedMode m = CncSpeedWork);
 		bool					moveZAxisToSurface();
 		bool					moveZAxisNextStepDown(double zTarget);
 		bool					moveXYToStartPos(CncSpeedMode m);

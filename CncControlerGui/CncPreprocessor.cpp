@@ -22,8 +22,8 @@ class CncOperatingTrace : public CncExtLoggerListCtrl {
 		{}
 		
 		typedef wxListItemAttr LIA;
-		void addMovSeqSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(128, 128, 255), GetFont()); tokenAndAdd(s, lia); }
-		void addPthLstSep	(const wxString& s) { const LIA lia(*wxBLACK, wxColour(255, 140, 198), GetFont()); tokenAndAdd(s, lia); }
+		void addMovSeqSep	(const wxString& s) { const LIA lia(*wxWHITE, wxColour(100, 100, 255), GetFont()); tokenAndAdd(s, lia); }
+		void addPthLstSep	(const wxString& s) { const LIA lia(*wxWHITE, wxColour(255, 100, 150), GetFont()); tokenAndAdd(s, lia); }
 };
 
 // ----------------------------------------------------------------------------

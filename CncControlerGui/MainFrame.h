@@ -554,7 +554,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void releaseControllerSetupFromConfig();
 		void notifyConfigUpdate();
 		void changeCrossingThickness();
-		void decorateSpindleState(CncSpindlePowerState state);
+		void decorateSpindleState(CncSpindlePowerState state, bool force = false);
 		
 		//////////////////////////////////////////////////////////////////////////////////
 #		ifdef __WXMSW__
@@ -682,7 +682,10 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void decorateGamepadState(bool state);
 		
-		void decorateIdleState(bool state);
+		void decorateIdleState();
+		void notifyControllerHeartbeat();
+		void toggleIdleRequests(bool state);
+		bool isIdleStateActive() const;
 		
 		void enableSourceEditorMenuItems(bool enable);
 		
@@ -718,6 +721,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void openTemplateContextView();
 		
+		bool startSerialTimer(bool notify = true);
+		void stopSerialTimer(bool notify = true);
+		
 		friend class MainFrameProxy;
 		friend class CncMsgHistoryLoggerProxy;
 		friend class CncLoggerListCtrl;
@@ -736,6 +742,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncSerialSpyPanel;
 		friend class CncSecureCtrlPanel;
 
+		friend class CncControl;
+		friend class CncControl;
 		friend class GamepadThread;
 		friend class SerialThread;
 		friend class SerialThreadStub;
@@ -757,10 +765,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 	private:
 		// Member variables
-		bool 							isDebugMode;
-		bool 							canClose;
-		bool 							evaluatePositions;
-		bool 							ignoreDirControlEvents;
+		bool							isDebugMode;
+		bool							canClose;
+		bool							evaluatePositions;
+		bool							ignoreDirControlEvents;
+		bool							idleBitmapState;
 		
 		CncToolStateControl				toolState;
 		RunConfirmationInfo  			runConfirmationInfo;

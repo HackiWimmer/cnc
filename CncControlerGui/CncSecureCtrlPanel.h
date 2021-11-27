@@ -47,6 +47,7 @@ class CncSecureCtrlPanel	: public CncSecureCtrlPanelBase
 		CncReferenceEvaluation* getReferencePanel() const { return referencePanel; }
 		
 	protected:
+		virtual void onToggleHeartbeatsSec(wxCommandEvent& event);
 		virtual void onOpenConfigurationDlgSec(wxCommandEvent& event);
 		virtual void onOpenConfigurationFileSec(wxCommandEvent& event);
 		virtual void onTemplateContextSec(wxCommandEvent& event);

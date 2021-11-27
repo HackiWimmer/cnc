@@ -36,6 +36,7 @@ bool SvgColourDecoder::matchesWhite() const {
 	
 	return ( r && g && b );
 }
+
 //////////////////////////////////////////////////////////////////
 bool SvgColourDecoder::matchesBlack() const {
 //////////////////////////////////////////////////////////////////
@@ -44,6 +45,15 @@ bool SvgColourDecoder::matchesBlack() const {
 	const bool b = currentTest.Blue()	<  16;
 	
 	return ( r && g && b );
+}
+//////////////////////////////////////////////////////////////////
+bool SvgColourDecoder::matchesRed() const {
+//////////////////////////////////////////////////////////////////
+	const bool r = currentTest.Red();
+	const bool g = currentTest.Green();
+	const bool b = currentTest.Blue();
+	
+	return ( r > b && b == g);
 }
 //////////////////////////////////////////////////////////////////
 bool SvgColourDecoder::matchesBlue() const {
