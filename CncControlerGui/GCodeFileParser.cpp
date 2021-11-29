@@ -154,23 +154,33 @@ bool GCodeFileParser::spool() {
 //////////////////////////////////////////////////////////////////
 	if ( pathHandler->isPathListUsed() == false )
 		return true;
+		
+	pathHandler->resetWorkflow();
 	
 	// over all commands
 	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
 	CncAutoFreezer caf(ctrl);
 	
 	programEnd = false;
-	for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it) {
-		
-		if ( performBlock(*it) == false ) {
+	bool failed = false;
+	
+	CNC_CEX2_A("Start spooling parsed GCode commands (entries=%zu)", gCodeSequence.size())
+	
+	for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it)
+	{
+		if ( performBlock(*it) == false )
+		{
 			std::cerr << CNC_LOG_FUNCT_A(" performBlock() failed!\n");
+			failed = true;
 			break;
 		}
 		
-		if ( programEnd == true ) {
+		if ( programEnd == true )
+		{
 			const long remaining = std::distance(it, gCodeSequence.end());
 			
-			if ( remaining > 1 ) {
+			if ( remaining > 1 )
+			{
 				std::cout	<< "Info: Program end detected at line " 
 							<< ClientIds::lineNumber(it->clientID)
 							<< ", but still " 
@@ -186,7 +196,10 @@ bool GCodeFileParser::spool() {
 			ctrl->addBlock(*it);
 	}
 	
-	return true;
+	if ( failed == true )
+		return false;
+	
+	return pathHandler->spoolWorkflow();
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::postprocess() {

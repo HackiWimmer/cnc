@@ -62,15 +62,18 @@ bool SVGParserBase::evaluatePath(const wxString& data) {
 	
 	int sPos = -1;
 	wxString token;
-	for (unsigned int i=0; i<data.Length(); i++ ) {
+	for (unsigned int i=0; i<data.Length(); i++ )
+	{
 		
 		if ( data[i] == '-' || data[i] == '+' || data[i] == 'e' || data[i] == 'E' ) 
 			continue;
 			
-		if ( isalpha(data[i]) && sPos < 0 ) {
+		if ( isalpha(data[i]) && sPos < 0 )
+		{
 			sPos = i;
 		}
-		else if ( isalpha(data[i]) ) {
+		else if ( isalpha(data[i]) )
+		{
 			token.assign(data.SubString(sPos, i - 1));
 			token.Trim(true).Trim(false);
 			
@@ -80,7 +83,8 @@ bool SVGParserBase::evaluatePath(const wxString& data) {
 			sPos = i;
 		} 
 		
-		if ( i == data.Length() - 1 ) {
+		if ( i == data.Length() - 1 )
+		{
 			token.assign(data.SubString(sPos, i));
 			token.Trim(true).Trim(false);
 			
@@ -116,13 +120,16 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 	unsigned int commandCounter	=  0;
 	int parameterCount			= -1;
 
-	for (unsigned int i=sPos; i<para.Length(); i++) {
+	for (unsigned int i=sPos; i<para.Length(); i++)
+	{
 		
-		if ( i == 0 ) {
+		if ( i == 0 )
+		{
 			c = para[0].GetValue();
 			sPos++;
 			
-			if ( (parameterCount = getCommandParaCount(c) ) < 0 ) {
+			if ( (parameterCount = getCommandParaCount(c) ) < 0 )
+			{
 				std::cerr	<< CNC_LOG_FUNCT 
 							<< "Not known command: "
 							<< c << std::endl
@@ -130,19 +137,23 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 				return false;
 			}
 		}
-		else {
+		else
+		{
 			// list of possible separators
-			if ( para[i] == ' ' || para[i] == ',' || para[i] == '-' || para[i] == '+' ) {
+			if ( para[i] == ' ' || para[i] == ',' || para[i] == '-' || para[i] == '+' )
+			{
 				
 				// handle exponential presentation - i is always > 0
 				if ( (para[i] == '-' || para[i] == '+') && ( para[i-1] == 'e' || para[i-1] == 'E') ) 
 					continue;
 				
-				if ( i != sPos ) {
+				if ( i != sPos )
+				{
 					token.assign(para.SubString(sPos, i - 1));
 					token.ToDouble(&values[valueCounter++]);
 
-					if ( valueCounter == MAX_PARAMETER_VALUES ) {
+					if ( valueCounter == MAX_PARAMETER_VALUES )
+					{
 						std::cerr	<< CNC_LOG_FUNCT 
 									<< ": Max parameters count reached for: " 
 									<< para.c_str() 
@@ -156,13 +167,15 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 				else									sPos = i + 1;
 				
 			}
-			else if ( i == para.Length() - 1 ) {
+			else if ( i == para.Length() - 1 )
+			{
 				token.assign(para.SubString(sPos, i));
 				token.ToDouble(&values[valueCounter++]);
 			}
 		}
 		
-		if ( (int)valueCounter ==  parameterCount ) {
+		if ( (int)valueCounter ==  parameterCount )
+		{
 			commandCounter++;
 			if ( commandCounter == 2 && ( c == 'm' || c == 'M' ) ) {
 				// M - 1 = L or m - 1 = l
@@ -181,7 +194,8 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 	}
 	
 	const bool ret = (valueCounter == 0);
-	if ( ret == false ) {
+	if ( ret == false )
+	{
 		std::cerr	<< CNC_LOG_FUNCT_A(":") 								<< std::endl
 					<< "Parameters count error in: "	<< para.c_str()		<< std::endl
 					<< "Defined parameter count: "		<< parameterCount 

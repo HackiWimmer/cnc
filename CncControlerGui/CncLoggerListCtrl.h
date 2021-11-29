@@ -20,9 +20,11 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 				wxString 		text;
 				wxString 		result;
 				wxListItemAttr	listItemAttr;
+				wxDateTime		timestamp;
 				
 				LoggerEntry();
-				explicit LoggerEntry(const wxListItemAttr& a); 
+				explicit LoggerEntry(const wxListItemAttr& a);
+				LoggerEntry(const wxString& t, const wxListItemAttr& a);
 				LoggerEntry(const wxString& t, const wxString& r, const wxListItemAttr& a);
 		};
 		
@@ -31,6 +33,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		Entries					entries;
 		UpdateMode				updateMode;
 		UpdateMode				updateModePreviously;
+		wxString				currentIndent;
 		bool					canScroll;
 		bool					sizeChanged;
 		bool					joinTheApp;
@@ -68,9 +71,10 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 	public:
 		
 		static const int 		COL_LNR 			= 0;
-		static const int 		COL_TXT 			= 1;
-		static const int 		COL_RET 			= 2;
-		static const int 		TOTAL_COL_COUNT		= 3;
+		static const int 		COL_TIM 			= 1;
+		static const int 		COL_TXT 			= 2;
+		static const int 		COL_RET 			= 3;
+		static const int 		TOTAL_COL_COUNT		= 4;
 		static const int		COL_STRECH			= COL_TXT;
 		
 		CncLoggerListCtrl(wxWindow *parent, long style);
@@ -111,6 +115,13 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		bool writeToFile(const wxFileName& fn, bool allRows=false);
 		bool copyToClipboard(bool allRows=false);
 		bool openAsTextView(bool allRows=false);
+		
+		void incCurrentIndent();
+		void decCurrentIndent();
+		void setCurrentIndent(unsigned int i);
+		unsigned int getCurrentIndent() const { return currentIndent.Length(); }
+		
+		void displayTimeColumn(bool show);
 		
 		wxDECLARE_NO_COPY_CLASS(CncLoggerListCtrl);
 		wxDECLARE_EVENT_TABLE();

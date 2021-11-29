@@ -62,7 +62,7 @@ bool SvgColourDecoder::matchesBlue() const {
 	const bool g = currentTest.Green();
 	const bool b = currentTest.Blue();
 	
-	return ( b > r && r == g);
+	return ( b > r && b >= g);
 }
 //////////////////////////////////////////////////////////////////
 bool SvgColourDecoder::matchesGray() const {
@@ -77,7 +77,7 @@ bool SvgColourDecoder::matchesGray() const {
 	const bool g = currentTest.Green();
 	const bool b = currentTest.Blue();
 	
-	return ( r == g && g == b );
+	return ( r == g && r >= b );
 }
 //////////////////////////////////////////////////////////////////
 bool SvgColourDecoder::setColour(const wxColour& col) {
@@ -94,24 +94,28 @@ bool SvgColourDecoder::setColour(const wxString& str) {
 		return false;
 		
 	// ----------------------------------------------------------
-	if ( str.StartsWith("#") ) {
+	if ( str.StartsWith("#") )
+	{
 		// #d70000 or #80d380
 		unsigned int r, g, b;
 		if ( sscanf(str.AfterFirst('#').SubString(0, 6), "%02x%02x%02x", &r, &g, &b) == 3 )
 			currentTest = wxColour(r, g, b);
 	}
 	// ----------------------------------------------------------
-	else if ( str.StartsWith("rgb") ) {
+	else if ( str.StartsWith("rgb") )
+	{
 		// rgb(153,68,0)
 		unsigned int r, g, b;
 		if ( sscanf(str.AfterFirst('(').BeforeLast(')'), "%d,%d,%d", &r, &g, &b) == 3 )
 			currentTest = wxColour(r, g, b);
 	}
 	// ----------------------------------------------------------
-	else if ( str.StartsWith("hsl") ) {
+	else if ( str.StartsWith("hsl") )
+	{
 		// hsl(240,100%,50%)
 		// ------------------------------------------------------
-		auto decodeToken = [](const wxString& t) {
+		auto decodeToken = [](const wxString& t)
+		{
 			unsigned int ret = 0;
 			
 			if ( t.IsEmpty() == false ) {
@@ -126,10 +130,12 @@ bool SvgColourDecoder::setColour(const wxString& str) {
 		unsigned int counter = 0;
 		
 		wxStringTokenizer values(str.AfterFirst('(').BeforeLast(')'), ",");
-		while ( values.HasMoreTokens() ) {
+		while ( values.HasMoreTokens() )
+		{
 			const wxString token(values.GetNextToken());
 			
-			switch ( counter ) {
+			switch ( counter )
+			{
 				case 0:	r = decodeToken(token); counter++;	break;
 				case 1:	g = decodeToken(token); counter++;	break;
 				case 2:	b = decodeToken(token); counter++;	break;
@@ -141,7 +147,8 @@ bool SvgColourDecoder::setColour(const wxString& str) {
 			currentTest = wxColour(r, g, b);
 	}
 	// ----------------------------------------------------------
-	else {
+	else
+	{
 		// searching as name
 		currentTest = wxTheColourDatabase->Find(str);
 	}

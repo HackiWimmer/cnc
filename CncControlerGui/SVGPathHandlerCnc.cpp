@@ -8,6 +8,7 @@
 #include "CncContext.h"
 #include "CncBoundarySpace.h"
 #include "CncPathListRunner.h"
+#include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
 #include "FileParser.h"
 #include "SVGPathHandlerCnc.h"
@@ -161,8 +162,15 @@ bool SVGPathHandlerCnc::activateNextPath(long clientID) {
 	CTX_ADD_SEP(wxString::Format("Run next Path:"));
 	
 	nextPath = true;
-	if ( currentCncContext.isGuidePath() )	pathListMgr.initNextGuidePath(CncPathListManager::GuideType::HELP_PATH);
-	else									pathListMgr.initNextCncPath();
+	if ( currentCncContext.isGuidePath() )
+	{
+		if ( currentCncContext.isZeroPosPath() )	pathListMgr.initNextGuidePath(CncPathListManager::GuideType::REFPOS_PATH);
+		else										pathListMgr.initNextGuidePath(CncPathListManager::GuideType::HELP_PATH);
+	}
+	else
+	{
+		pathListMgr.initNextCncPath();
+	}
 	
 	pathListMgr.normalizeLinkedEntry(clientID, CncSpeedWork, currentCncContext.getCurrentWorkSpeed_MM_MIN());
 	
@@ -180,48 +188,65 @@ bool SVGPathHandlerCnc::runCurrentPath() {
 	// performModifications() will generate a new one on demand.
 	resetGuidePath();
 	
-	bool ret			= true;
-	const bool hasMod	= currentCncContext.hasPathModifications();
+	const bool hasMod = currentCncContext.hasPathModifications();
+	
 	CTX_LOG_INF(wxString::Format("Has Modifications    : %s",	hasMod ? "Yes" : "No"));
 	
-	if ( hasMod ) {
+	if ( hasMod )
+	{
 		if ( performModifications() == false )
 			return false;
 	}
 	
 	CTX_LOG_INF(wxString::Format("Initial Run Position : %s",	cnc::dblFormat(curRunPosition)));
 
-if ( false ) {
-	std::cout << std::endl;
-	std::cout << "curRunPosition  : " << cnc::dblFormat(curRunPosition) << std::endl;
-	std::cout << "ctl Position    : " << cnc::dblFormat(cncControl->getCurCtlPosMetric()) << std::endl;
-	std::cout << "currentPos      : " << cnc::dblFormat(currentPos) << std::endl;
-	std::cout << "startPos        : " << cnc::dblFormat(startPos) << std::endl;
-}
-
+	if ( false )
+	{
+		std::cout << std::endl;
+		std::cout << "curRunPosition  : " << cnc::dblFormat(curRunPosition) << std::endl;
+		std::cout << "ctl Position    : " << cnc::dblFormat(cncControl->getCurCtlPosMetric()) << std::endl;
+		std::cout << "currentPos      : " << cnc::dblFormat(currentPos) << std::endl;
+		std::cout << "startPos        : " << cnc::dblFormat(startPos) << std::endl;
+	}
+	
+	// -------------------------------------------------------------
 	// determine current Z target position value
-	const double zSureface	= THE_BOUNDS->getSurfaceOffset();
+	const double zSurface	= THE_BOUNDS->getSurfaceOffset();
 	double zTarget			= curRunPosition.getZ();
 	
-	switch ( currentCncContext.getCurrentZDepthMode() ) {
+	switch ( currentCncContext.getCurrentZDepthMode() )
+	{
 		case 'z':	zTarget = curRunPosition.getZ() + currentCncContext.getCurrentZDepth();
 					break;
 					
-		case 'Z':	zTarget = zSureface + currentCncContext.getCurrentZDepth();
+		case 'Z':	zTarget = zSurface + currentCncContext.getCurrentZDepth();
 					break;
 					
 		default:	std::cerr << CNC_LOG_FUNCT_A(" Invalid ZDepth mode\n");
 	}
 	
-	// display guide pathes on demand
-	if ( guidePath ) {
-		publishGuidePath(*guidePath, zSureface);
-		
-		if ( guidePath->getGuideType() == CncPathListManager::GuideType::ORIG_PATH )
-			publishGuidePath(*guidePath, zTarget);
-			
-		if ( guidePath->getGuideType() != CncPathListManager::GuideType::ORIG_PATH )
+	// -------------------------------------------------------------
+	// display extra guide paths (e. g. for inner outer path modification)
+	// on demand
+	if ( guidePath )
+	{
+		// publish the zero ref triangle on demand ...
+		if ( currentCncContext.isZeroPosPath() )
+		{
+			processGuidePath(*guidePath, zSurface);
+			//... and skip the "original one"
 			return true;
+		}
+		
+		// this will publish the guide path in general on the upper surface
+		processGuidePath(*guidePath, zSurface);
+		
+		// for the original ones do it ones more on the lower surface
+		// otherwise return here which will only display the guide path
+		// and skip the "original one"
+		const bool b = guidePath->getGuideType() == CncPathListManager::GuideType::ORIG_PATH;
+		if ( b )	processGuidePath(*guidePath, zTarget);
+		else		return true;
 	}
 	
 	// perform some checks
@@ -236,21 +261,24 @@ if ( false ) {
 	curRunPosition.resetWatermarksToCurrentPos();
 	
 	// second, process path
-	if ( pathListMgr.getExecRecommendation() == CncPathListManager::ExeRecomm::ER_HELIX ) {
-		
+	bool ret = true;
+	if ( pathListMgr.getExecRecommendation() == CncPathListManager::ExeRecomm::ER_HELIX )
+	{
 		cncControl->initNextDuration();
 
-		if ( processHelix(zTarget) == false ) {
+		if ( processHelix(zTarget) == false )
+		{
 			std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": processHelix() failed! \n"));
 			return false;
 		}
 	}
-	else {
-		
+	else 
+	{
 		unsigned int cntDurations	= 0;
-		unsigned int maxDurations	= abs((zTarget - zSureface ) / currentCncContext.getCurrentZMaxFeedStep() ) + 2;
+		unsigned int maxDurations	= abs((zTarget - zSurface ) / currentCncContext.getCurrentZMaxFeedStep() ) + 2;
 		
-		do {
+		do
+		{
 			cncControl->initNextDuration();
 			
 			ret = repeatCurrentPath(zTarget);
@@ -259,7 +287,7 @@ if ( false ) {
 				
 			// avoid endless loops
 			if ( cntDurations++ > maxDurations ) {
-				std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": The max. amound of crossings a reached. The path will be stopped here! \n"));
+				std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": The max. amount of crossings a reached. The path will be stopped here! \n"));
 				
 				ret = false;
 				break;
@@ -301,7 +329,7 @@ bool SVGPathHandlerCnc::processHelix(double zTarget) {
 		return false;
 		
 	// spool current path
-	if ( onPhysicallyExecute(pathListMgr) == false )
+	if ( processCncPath(pathListMgr) == false )
 		return false;
 		
 	// update position information
@@ -335,7 +363,7 @@ bool SVGPathHandlerCnc::repeatCurrentPath(double zTarget) {
 		return false;
 	
 	// spool current path
-	if ( onPhysicallyExecute(pathListMgr) == false )
+	if ( processCncPath(pathListMgr) == false )
 		return false;
 		
 	// update position information
@@ -408,7 +436,7 @@ bool SVGPathHandlerCnc::moveXYToPos(const MoveParameter& mp) {
 	plm.addEntryRel(dx, dy, 0.0);
 	
 	curRunPosition += {dx, dy, 0.0};
-	return onPhysicallyExecute(plm);
+	return processCncPath(plm);
 }
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveZAxisToLogicalTop(CncSpeedMode m) {
@@ -435,7 +463,7 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop(CncSpeedMode m) {
 		plm.addEntryRel(0.0, 0.0, zDist);
 		
 		curRunPosition += {0.0, 0.0, zDist};
-		return onPhysicallyExecute(plm);
+		return processCncPath(plm);
 	}
 	
 	return true;
@@ -466,7 +494,7 @@ bool SVGPathHandlerCnc::moveZAxisToSurface() {
 		plm.addEntryRel(0.0, 0.0, zDist);
 		
 		curRunPosition += {0.0, 0.0, zDist};
-		return onPhysicallyExecute(plm);
+		return processCncPath(plm);
 	}
 	
 	return true;
@@ -524,7 +552,7 @@ bool SVGPathHandlerCnc::moveZAxisNextStepDown(double zTarget) {
 		plm.addEntryRel(0.0, 0.0, zDist);
 		
 		curRunPosition += {0.0, 0.0, zDist};
-		return onPhysicallyExecute(plm);
+		return processCncPath(plm);
 	}
 	
 	return true;
@@ -534,7 +562,10 @@ bool SVGPathHandlerCnc::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL(CNC_LOG_FUNCT);
 	
-	if ( PathHandlerBase::prepareWork() == false ) {
+	
+	
+	if ( PathHandlerBase::prepareWork() == false ) 
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::prepareWork() failed!\n");
 		return false;
 	}
@@ -641,10 +672,44 @@ bool SVGPathHandlerCnc::performModifications() {
 			break;
 		}
 		// --------------------------------------------------------
+		case CncPM_Guide:
+		{
+			// create a guide path based on the current path
+			registerGuidePath(new CncPathListManager(pathListMgr));
+			guidePath->changeToGuideType(CncPathListManager::HELP_PATH);
+			
+			break;
+		}
+		// --------------------------------------------------------
+		case CncPM_ZeroRef:
+		{
+			// check the zero reference pos conditions
+			CncDoublePosition zeroRefPos;
+			if ( pathListMgr.isRightTriangle(zeroRefPos) )
+			{
+				// create a guide path based on the current path
+				registerGuidePath(new CncPathListManager(pathListMgr));
+				guidePath->changeToGuideType(CncPathListManager::GuideType::REFPOS_PATH);
+				
+				#warning use zeroRefPos
+				//setSvgRefPosOffset(-30,-30);
+			}
+			else
+			{
+				// otherwise reset the path modification type 
+				// CncPM_Center see this path as normal cnc path
+				currentCncContext.setPathModification(CncPM_None);
+			}
+			
+			break;
+		}
+		// --------------------------------------------------------
 		case CncPM_Center:
 		case CncPM_None:
 		{
-			// nothing to do here
+			// nothing to do here. Furthermore, normally for these cases 
+			// the function isn't called  . . . 
+			break;
 		}
 	}
 	

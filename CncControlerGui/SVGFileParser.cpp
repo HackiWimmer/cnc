@@ -274,34 +274,40 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 	wxString s, unitW, unitH;
 	int sPos = -1;
 	s = w;
-	for ( int i=0; i<(int)s.Length();i++ ) {
+	for ( int i=0; i<(int)s.Length();i++ )
+	{
 		if ( s[i] == ' ' || s[i] == '\t' )
 			continue;
 		
-		if ( isalpha(s[i]) && sPos < 0 ) {
+		if ( isalpha(s[i]) && sPos < 0 )
+		{
 			sPos = i;
 			s.SubString(0, i - 1).ToDouble(&width);
 			unitW = s.SubString(i, s.Length() -1);
 		}
 	}
-	if ( sPos == -1 ) {
+	if ( sPos == -1 )
+	{
 			s.SubString(0, s.Length() - 1).ToDouble(&width);
 			unitW = "px";
 	}
 
 	sPos = -1;
 	s = h;
-	for ( int i=0; i<(int)s.Length();i++ ) {
+	for ( int i=0; i<(int)s.Length();i++ )
+	{
 		if ( s[i] == ' ' || s[i] == '\t' )
 			continue;
 		
-		if ( isalpha(s[i]) && sPos < 0 ) {
+		if ( isalpha(s[i]) && sPos < 0 )
+		{
 			sPos = i;
 			s.SubString(0, i - 1).ToDouble(&height);
 			unitH = s.SubString(i, s.Length() -1);
 		}
 	}
-	if ( sPos == -1 ) {
+	if ( sPos == -1 )
+	{
 			s.SubString(0, s.Length() - 1).ToDouble(&height);
 			unitH = "px";
 	}
@@ -361,8 +367,8 @@ void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 	svgUserAgent.setNodeType(child->GetName());
 	svgUserAgent.addXMLAttributes(attr);
 	
-	SvgCncContext& cwp = pathHandler->getSvgCncContext();
-	cwp.setCurrentLineNumber(getCurrentLineNumber());
+	SvgCncContext& csc = pathHandler->getSvgCncContext();
+	csc.setCurrentLineNumber(getCurrentLineNumber());
 	
 	// ----------------------------------------------------------
 	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
@@ -377,34 +383,37 @@ void SVGFileParser::registerMovementNode() {
 	static SvgColourAttributeDecoder	cad;
 	static SvgColourDecoder				cs;
 	
-	SvgCncContext& cwp	= pathHandler->getSvgCncContext();
-	const bool ucs		= cwp.useColourScheme();
+	SvgCncContext& csc	= pathHandler->getSvgCncContext();
+	const bool ucs		= csc.useColourScheme();
 	SFP_ADD_SEP(wxString::Format("Parse next Movement Node\n"));
 	SFP_LOG_INF(wxString::Format("Use Colour Scheme    : %s\n", ucs ? "Yes" : "No"));
 	
-	if ( ucs == true ) {
-		
+	if ( ucs == true )
+	{
 		const wxString& style = svgUserAgent.getCurrentAttribute("style", "");
-		if ( style.IsEmpty() == false ) {
+		if ( style.IsEmpty() == false )
+		{
 			cad.reset();
 			cad.decode(style);
-			cwp.setFillColour(cad.getFillColour());
-			cwp.setStrokeColour(cad.getStrokeColour());
+			csc.setFillColour(cad.getFillColour());
+			csc.setStrokeColour(cad.getStrokeColour());
 		}
 		
 		const wxString& fill = svgUserAgent.getCurrentAttribute("fill", "");
-		if ( fill.IsEmpty() == false ) {
+		if ( fill.IsEmpty() == false )
+		{
 			cs.setColour(fill);
-			cwp.setFillColour(cs.getColour());
+			csc.setFillColour(cs.getColour());
 		}
 		
 		const wxString& stroke = svgUserAgent.getCurrentAttribute("stroke", "");
-		if ( stroke.IsEmpty() == false ) {
+		if ( stroke.IsEmpty() == false )
+		{
 			cs.setColour(stroke);
-			cwp.setStrokeColour(cs.getColour());
+			csc.setStrokeColour(cs.getColour());
 		}
 		
-		cwp.determineColourEffects();
+		csc.determineColourEffects();
 	}
 }
 //////////////////////////////////////////////////////////////////
@@ -424,13 +433,21 @@ bool SVGFileParser::spool() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
-	const UserAgentVector& uav = svgUserAgent.getList();
-	pathHandler->prepareWork();
+	pathHandler->resetWorkflow();
+	
+	if ( pathHandler->prepareWork() == false )
+	{
+		CNC_CERR_FUNCT_A("pathHandler->prepareWork() failed");
+		return false;
+	}
 	
 	SvgCncContextSummary sumCtx;
-	
-	// over all stored pathes
-	for ( auto itUav = uav.begin(); itUav != uav.end(); ++itUav ) {
+	const UserAgentVector& uav = svgUserAgent.getList();
+
+	// over all stored paths
+	CNC_CEX2_A("Start spooling parsed svg paths (entries=%zu)", uav.size())
+	for ( auto itUav = uav.begin(); itUav != uav.end(); ++itUav )
+	{
 		const SVGUserAgentInfo& uai = *itUav;
 		
 		// ----------------------------------------------------------------------
@@ -458,10 +475,11 @@ bool SVGFileParser::spool() {
 		pathHandler->setSvgCncContext(uai.cncParameters);
 		
 		// important! the current node name has to be set before setCurrentLineNumer() 
-		// to get a correct result in this overlaoded function
+		// to get a correct result in this overloaded function
 		currentNodeName.assign(uai.nodeName);
 		
-		if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
+		if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true )
+		{
 			registerNextDebugNode(uai.nodeName);
 			
 			DcmItemList dil;
@@ -473,8 +491,8 @@ bool SVGFileParser::spool() {
 			appendDebugValuePath(dil);
 		}
 		
-		if ( performPath(uai) == false ) {
-			
+		if ( performPath(uai) == false )
+		{
 			// in this case to stop here is valid
 			if ( THE_CONTEXT->processingInfo->getStopFlag() == true )
 				return true;
@@ -495,7 +513,13 @@ bool SVGFileParser::spool() {
 	THE_TPL_CTX->registerToolTotList(sumCtx.getToolTotList());
 	THE_TPL_CTX->registerToolSelList(sumCtx.getToolSelList());
 	
-	return pathHandler->finishWork();
+	if ( pathHandler->finishWork() == false )
+	{
+		CNC_CERR_FUNCT_A("pathHandler->finishWork() failed");
+		return false;
+	}
+	
+	return pathHandler->spoolWorkflow();
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::performPath(const SVGUserAgentInfo& uai) {
@@ -503,34 +527,39 @@ bool SVGFileParser::performPath(const SVGUserAgentInfo& uai) {
 	bool isSymbol = false;
 	
 	// Skip this special symbol generally
-	if ( uai.isMemberOfSymbol("CncHelperGrid") ) {
+	if ( uai.isMemberOfSymbol("CncHelperGrid") )
+	{
 		return true;
-		
+	} 
 	// check if symbol to skip directly path processing
-	} else if ( uai.isMemberOfSymbol() ) {
+	else if ( uai.isMemberOfSymbol() ) 
+	{
 		isSymbol = true;
-		
+	}
 	// First prepare element
-	} else {
-		
+	else
+	{
 		// always reset the svg matrix
 		pathHandler->getSvgTransformMatrix().unchanged();
 		
-		if ( uai.hasTransform() ) {
+		if ( uai.hasTransform() )
+		{
 			// transform collected transformations
 			if ( prepareTransformMatrix(uai) == false )
 				return false;
 		}
 	} 
 	
-	if ( isSymbol == false ) {
+	if ( isSymbol == false )
+	{
 		// spool this path directly
 		if ( spoolPath(uai) == false )
 			return false;
 	}
 	
 	// spool this path by id (use directive)
-	if ( performPathByIds(uai) == false ) {
+	if ( performPathByIds(uai) == false )
+	{
 		std::cerr << "SVGFileParser::performPathByIds: Failed" << std::endl;
 		return false;
 	}
@@ -552,16 +581,19 @@ bool SVGFileParser::performPathByIds(const SVGUserAgentInfo& uai) {
 //////////////////////////////////////////////////////////////////
 	DoubleStringMap ids = uai.ids;
 	
-	for ( auto itIds = ids.begin(); itIds != ids.end(); ++itIds ) {
+	for ( auto itIds = ids.begin(); itIds != ids.end(); ++itIds )
+	{
 		// over all use directives
 		UseDirectiveVector& udv = svgUserAgent.getUseInfoVector();
 
-		for ( auto it=udv.begin(); it!=udv.end(); ++it ) {
+		for ( auto it=udv.begin(); it!=udv.end(); ++it )
+		{
 			UseDirective& ud = *it;
 			//cout << ud.id << endl;
 			
 			// if current path matches this the current use directive
-			if ( ud.id == itIds->first ) {
+			if ( ud.id == itIds->first )
+			{
 				if ( performUse(uai, ud) == false )
 					return false;
 			}
@@ -612,10 +644,12 @@ bool SVGFileParser::spoolPath(const SVGUserAgentInfo& uai, const wxString& trans
 		return false;
 	
 	const PathInfoVector& pil = uai.getPathInfoList();
-	for ( auto itPiv = pil.cbegin(); itPiv != pil.cend(); ++itPiv ) {
+	for ( auto itPiv = pil.cbegin(); itPiv != pil.cend(); ++itPiv )
+	{
 		const PathInfo& pi = *itPiv;
 		
-		if ( pathHandler->processCommand_2DXY(itPiv->cmd, itPiv->cnt, itPiv->values) == false ) {
+		if ( pathHandler->processCommand_2DXY(itPiv->cmd, itPiv->cnt, itPiv->values) == false )
+		{
 			uai.debug(pi, std::cerr);
 			std::cerr << CNC_LOG_FUNCT_A(": failed") << std::endl;
 			return false;
@@ -803,7 +837,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 	
 	// -----------------------------------------------------------
 	// entry point
-	while ( child ) {
+	while ( child )
+	{
 		bool nodeConsidered = false;
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overloaded functions
@@ -812,7 +847,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		registerXMLNode(child);
 		
 		// ----------------------------------------------------------
-		if ( currentNodeName.IsSameAs("PATH", false) ) {
+		if ( currentNodeName.IsSameAs("PATH", false) )
+		{
 			nodeConsidered  = true;
 			
 			registerMovementNode();
@@ -825,14 +861,16 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 				return false;
 		}
 		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("SYMBOL", false) ) {
+		else if ( currentNodeName.IsSameAs("SYMBOL", false) )
+		{
 			nodeConsidered  = true;
 			
 			ADD_ATTR_ID
 			ADD_ATTR_TRANSFORM
 		}
 		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("G", false) ) {
+		else if ( currentNodeName.IsSameAs("G", false) )
+		{
 			nodeConsidered  = true;
 			
 			ADD_ATTR_ID
@@ -847,7 +885,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		else if ( currentNodeName.IsSameAs("POLYLINE",	false) )	{ nodeConsidered  = true; ADD_BASIC_SHAPE(convertPolylineToPathData) }
 		else if ( currentNodeName.IsSameAs("RECT",		false) )	{ nodeConsidered  = true; ADD_BASIC_SHAPE(convertRectToPathData)     }
 		// ----------------------------------------------------------
-		else if ( currentNodeName.IsSameAs("USE", false) ) {
+		else if ( currentNodeName.IsSameAs("USE", false) )
+		{
 			nodeConsidered  = true; 
 			registerNextDebugNode(currentNodeName);
 			
@@ -857,7 +896,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			udv.push_back(svgUserAgent.evaluateUseDirective(ud));
 		}
 		// ----------------------------------------------------------
-		else if ( currentNodeName.StartsWith("Cnc") ) { 
+		else if ( currentNodeName.StartsWith("Cnc") )
+		{ 
 			nodeConsidered  = true; 
 			
 			if ( processCncParameter(child) == false )
@@ -876,7 +916,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			return false;
 		
 		// close the id, transform and style attribute (on demand)
-		if ( last != NULL ) {
+		if ( last != NULL )
+		{
 			if ( nodeConsidered == true ) {
 				if ( last->HasAttribute("id") )			svgUserAgent.removeId(last->GetAttribute("id"));
 				if ( last->HasAttribute("transform") )	svgUserAgent.removeLastTransform();

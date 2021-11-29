@@ -7,14 +7,14 @@
 /**
  * CncPathListManager is a wrapper around an underlying list of CncPatListEntries. 
  * The underlying list can be a cnc path or a guide path. 
- * The warper is used to maintaine the underlying list.
+ * The wrapper is used to maintain the underlying list.
  */
  
 class CncPathListManager {
 		
 	public:
 		enum PathType	{ PT_CNC_PATH, PT_GUIDE_PATH };
-		enum GuideType	{ NO_GUIDE_PATH, HELP_PATH, ORIG_PATH };
+		enum GuideType	{ NO_GUIDE_PATH, REFPOS_PATH, HELP_PATH, ORIG_PATH };
 		enum JoinType	{ jtSquare, jtRound, jtMiter };
 		enum EndType	{ etClosedPolygon, etClosedLine, etOpenButt, etOpenSquare, etOpenRound };
 		enum ExeRecomm	{ ER_STAIRS, ER_HELIX };
@@ -32,7 +32,6 @@ class CncPathListManager {
 		ExeRecomm				executionRecommend;
 		
 		CncDoublePosition		notNormalizeStartDistance;
-		CncDoublePosition		referencePos;	// reference position - from where we are coming
 		
 		double 					minPosX;
 		double 					minPosY;
@@ -90,10 +89,10 @@ class CncPathListManager {
 		static EndType				transform(ClipperLib::EndType et);
 		
 		bool						getTargetPos(CncDoublePosition& ret)	const;
+		bool						isRightTriangle(CncDoublePosition& ret)	const;
 		
 		const CncDoublePosition&	getStartPos()				const;
 		const CncDoublePosition&	getNorNormalizedStartDist()	const	{ return notNormalizeStartDistance; }
-		const CncDoublePosition&	getReferencePos()			const	{ return referencePos; }
 		
 		ExeRecomm					getExecRecommendation()		const	{ return executionRecommend; }
 		

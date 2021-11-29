@@ -28,6 +28,11 @@ class CncLoggerView : public CncLoggerViewBase {
 		
 		void initialize();
 		
+		void incCurrentIndent					(LoggerSelection::VAL id);
+		void decCurrentIndent					(LoggerSelection::VAL id);
+		void setCurrentIndent					(LoggerSelection::VAL id, unsigned int i);
+		unsigned int getCurrentIndent			(LoggerSelection::VAL id) const;
+		
 		void popImmediatelyMode					(LoggerSelection::VAL id);
 		void popProcessMode						(LoggerSelection::VAL id);
 		void pushUpdateMode						(LoggerSelection::VAL id);

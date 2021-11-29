@@ -255,7 +255,6 @@ bool SvgCncContextBase::replaceVariables(const wxString& in, wxString& out) {
 //////////////////////////////////////////////////////////////////
 SvgCncContext::SvgCncContext()
 : SvgCncContextBase			()
-, guidePath					(false)
 , isUseColouScheme			(false)
 , currentZMaxFeedStep		(0.0)
 , currentZDepth				(0.0)
@@ -296,7 +295,6 @@ SvgCncContext& SvgCncContext::operator= (const SvgCncContext& scc) {
 	
 	reconstruct();
 
-	guidePath					= scc.isGuidePath();
 	isUseColouScheme			= scc.useColourScheme();
 	currentZMaxFeedStep			= scc.getCurrentZMaxFeedStep();
 	currentZDepth				= scc.getCurrentZDepth();
@@ -340,8 +338,11 @@ void SvgCncContext::traceTo(std::ostream& o, unsigned int indent) const {
 		wxString name;
 		
 		name.assign("Is Guide Path");
-		o	 << wxString::Format("%s  --> %s%s = %s\n", prefix, name, wxString(' ', fillTo - name.length()), (guidePath ? "Yes" : "No"));
-
+		o	 << wxString::Format("%s  --> %s%s = %s\n", prefix, name, wxString(' ', fillTo - name.length()), (isGuidePath() ? "Yes" : "No"));
+		
+		name.assign("Is Zero Ref Path");
+		o	 << wxString::Format("%s  --> %s%s = %s\n", prefix, name, wxString(' ', fillTo - name.length()), (isZeroPosPath() ? "Yes" : "No"));
+		
 		name.assign("Use Colour Scheme");
 		o	 << wxString::Format("%s  --> %s%s = %s\n", prefix, name, wxString(' ', fillTo - name.length()), (isUseColouScheme ? "Yes" : "No"));
 		
@@ -679,10 +680,12 @@ bool SvgCncContext::hasPathModifications() const {
 	switch ( pathModification ) {
 		case CncPM_Pocket:
 		case CncPM_Inner:
-		case CncPM_Outer:				return true; 
+		case CncPM_Outer:
+		case CncPM_Guide:
+		case CncPM_ZeroRef:		return true; 
 		
 		case CncPM_Center:
-		case CncPM_None:				return false;
+		case CncPM_None:		return false;
 	}
 	
 	return false;
@@ -690,7 +693,8 @@ bool SvgCncContext::hasPathModifications() const {
 //////////////////////////////////////////////////////////////////
 bool SvgCncContext::hasPathRules() const {
 //////////////////////////////////////////////////////////////////
-	switch ( pathRule ) {
+	switch ( pathRule )
+	{
 		case CncPR_EnsureClockwise:
 		case CncPR_EnsureCounterClockwise:
 		case CncPR_Reverse:				return true; 
@@ -945,11 +949,14 @@ double SvgCncContext::getToolDiameter(const wxString& id) const {
 //////////////////////////////////////////////////////////////////
 const char* SvgCncContext::getPathModificationTypeAsStr() const {
 //////////////////////////////////////////////////////////////////
-	switch ( pathModification ) {
+	switch ( pathModification )
+	{
 		case CncPM_Pocket:				return "Pocket";
 		case CncPM_Center:				return "Center";
 		case CncPM_Inner:				return "Inner";
 		case CncPM_Outer:				return "Outer";
+		case CncPM_ZeroRef:				return "ZeroRef";
+		case CncPM_Guide:				return "Guide";
 		case CncPM_None:				return "None";
 	}
 	
@@ -958,7 +965,8 @@ const char* SvgCncContext::getPathModificationTypeAsStr() const {
 //////////////////////////////////////////////////////////////////
 const char* SvgCncContext::getPathRuleTypeAsStr() const {
 //////////////////////////////////////////////////////////////////
-	switch ( pathRule ) {
+	switch ( pathRule )
+	{
 		case CncPR_EnsureClockwise:			return "EnsureCW";
 		case CncPR_EnsureCounterClockwise:	return "EnsureCCW";
 		case CncPR_Reverse:					return "Reverse"; 
@@ -1006,60 +1014,73 @@ void SvgCncContext::determineColourEffects() {
 //////////////////////////////////////////////////////////////////
 	// reset
 	pathModification	= CncPM_Center;
-	guidePath			= false;
 	
 	if ( useColourScheme() == true ) {
 		
-		CTX_LOG_INF(wxString::Format("Stroke matches (Black, Gray; Blue) == (%s, %s, %s)" 
+		CTX_LOG_INF(wxString::Format("Stroke matches (Black, Gray, Blue, Red) == (%s, %s, %s, %s)\n" 
 										, (strokeColourDecoder.matchesBlack() ?	"true" : "false") 
 										, (strokeColourDecoder.matchesGray()  ?	"true" : "false")
 										, (strokeColourDecoder.matchesBlue()  ?	"true" : "false")
+										, (strokeColourDecoder.matchesRed()   ?	"true" : "false")
 		));
 
-		CTX_LOG_INF(wxString::Format("Fill   matches (Black, Gray, Blue) == (%s, %s, %s)" 
+		CTX_LOG_INF(wxString::Format("Fill   matches (Black, Gray, Blue, Red) == (%s, %s, %s, %s)\n" 
 										, (fillColourDecoder.matchesBlack() ?	"true" : "false") 
 										, (fillColourDecoder.matchesGray()  ?	"true" : "false")
 										, (fillColourDecoder.matchesBlue()  ?	"true" : "false")
+										, (fillColourDecoder.matchesRed()   ?	"true" : "false")
 		));
 
 		// ----------------------------------------------------------
-		if ( strokeColourDecoder.matchesBlack() ) {
-			if ( fillColourDecoder.matchesWhite() ) {
+		if ( strokeColourDecoder.matchesBlack() )
+		{
+			if ( fillColourDecoder.matchesWhite() )
+			{
 				// interior cut
 				pathModification = CncPM_Inner;
 			}
-			else if ( fillColourDecoder.matchesBlack() ) {
+			else if ( fillColourDecoder.matchesBlack() )
+			{
 				// exterior cut
 				pathModification = CncPM_Outer;
 			}
-			else if ( fillColourDecoder.matchesBlue() ) {
+			else if ( fillColourDecoder.matchesBlue() )
+			{
 				// guide
-				pathModification	= CncPM_None;
-				guidePath			= true;
+				pathModification	= CncPM_Guide;
 			}
 		}
 		// ----------------------------------------------------------
-		else if ( strokeColourDecoder.matchesGray() ) {
-			if ( fillColourDecoder.matchesWhite() ) {
+		else if ( strokeColourDecoder.matchesGray() )
+		{
+			if ( fillColourDecoder.matchesWhite() )
+			{
 				// on line cut
 				pathModification = CncPM_Center;
 			}
-			else if ( fillColourDecoder.matchesGray() ) {
+			else if ( fillColourDecoder.matchesGray() )
+			{
 				// pocketing cut
 				pathModification = CncPM_Pocket;
 			}
-			else if ( fillColourDecoder.matchesBlue() ) {
+			else if ( fillColourDecoder.matchesBlue() )
+			{
 				// guide
-				pathModification	= CncPM_None;
-				guidePath			= true;
+				pathModification	= CncPM_Guide;
 			}
 		}
 		// ----------------------------------------------------------
-		else if ( strokeColourDecoder.matchesBlue() ) {
-			// guide
-				pathModification	= CncPM_None;
-				guidePath			= true;
+		else if ( fillColourDecoder.matchesRed() )
+		{
+			pathModification	= CncPM_ZeroRef;
 		}
+		// ----------------------------------------------------------
+		else if ( strokeColourDecoder.matchesBlue() )
+		{
+			// guide
+			pathModification	= CncPM_Guide;
+		}
+		// ----------------------------------------------------------
 	}
 }
 //////////////////////////////////////////////////////////////////

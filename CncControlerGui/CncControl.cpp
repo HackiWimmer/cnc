@@ -2675,7 +2675,10 @@ bool CncControl::sendIdleMessage() {
 		return false;
 		
 	if ( getSerial()->isCommandActive() == true )
-		return false;
+	{
+		CNC_CEX1_A(" A idle request is skipped because a other command is still active")
+		return true;
+	}
 	
 	return getSerial()->processIdle();
 }
@@ -2683,7 +2686,7 @@ bool CncControl::sendIdleMessage() {
 void CncControl::addGuidePath(const CncPathListManager& plm, double zOffset) {
 ///////////////////////////////////////////////////////////////////
 	// first release the trigger
-	const Trigger::GuidePath tr(&plm);
+	const Trigger::GuidePath tr(plm);
 	processTrigger(tr);
 	
 	// do this last because appendGuidPath and follows use std::move(plm)

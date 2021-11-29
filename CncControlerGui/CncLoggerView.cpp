@@ -171,16 +171,50 @@ void CncLoggerView::initialize() {
 	
 	if ( loggerLists.size() == 0 )
 	{
-		CncLoggerListCtrl* startup = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
+		CncLoggerListCtrl* startup = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL);
+		startup->displayTimeColumn(true);
 		GblFunc::replaceControl(m_startupLoggerPlaceholder, startup);
 		loggerLists.push_back(startup);
 
 		CncLoggerListCtrl* standard = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
 		standard->setJoinTheAppState(true);
 		standard->setShowOnDemand(m_btLoggerOnDemand->GetValue());
+		standard->displayTimeColumn(true);
 		GblFunc::replaceControl(m_standardLoggerPlaceholder, standard);
 		loggerLists.push_back(standard);
 	}
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::incCurrentIndent(LoggerSelection::VAL id) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+		
+	loggerLists.at(id)->incCurrentIndent();
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::decCurrentIndent(LoggerSelection::VAL id) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+		
+	loggerLists.at(id)->decCurrentIndent();
+}
+/////////////////////////////////////////////////////////////////////
+void CncLoggerView::setCurrentIndent(LoggerSelection::VAL id, unsigned int i) {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return;
+	
+	loggerLists.at(id)->setCurrentIndent(i);
+}
+/////////////////////////////////////////////////////////////////////
+unsigned int CncLoggerView::getCurrentIndent(LoggerSelection::VAL id) const {
+/////////////////////////////////////////////////////////////////////
+	if ( loggerLists.size() != MaxLoggerCount )
+		return 0;
+		
+	return loggerLists.at(id)->getCurrentIndent();
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::clearTrace() {

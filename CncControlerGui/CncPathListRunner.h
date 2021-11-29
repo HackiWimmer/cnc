@@ -6,7 +6,83 @@
 
 class CncMoveSequence;
 class FileParser;
+class CncPathListRunner;
 
+///////////////////////////////////////////////////////////////////
+struct WorflowEntry
+{
+	WorflowEntry() {}
+	virtual ~WorflowEntry() {}
+	virtual bool process(CncPathListRunner* plr) = 0;
+};
+///////////////////////////////////////////////////////////////////
+struct WorflowSetupRunEntry : public WorflowEntry
+{
+	bool trace;
+	explicit WorflowSetupRunEntry(bool t) : trace (t) {}
+	virtual bool process(CncPathListRunner* plr);
+};
+///////////////////////////////////////////////////////////////////
+struct WorflowTriggerBeginRunEntry : public WorflowEntry
+{
+	Trigger::BeginRun tr;
+	
+	explicit WorflowTriggerBeginRunEntry(const Trigger::BeginRun& t) : tr (t) {}
+	virtual bool process(CncPathListRunner* plr);
+};
+///////////////////////////////////////////////////////////////////
+struct WorflowTriggerEndRunEntry : public WorflowEntry
+{
+	Trigger::EndRun tr;
+	
+	explicit WorflowTriggerEndRunEntry(const Trigger::EndRun& t) : tr (t) {}
+	virtual bool process(CncPathListRunner* plr);
+};
+///////////////////////////////////////////////////////////////////
+struct WorflowTriggerNextPathEntry : public WorflowEntry
+{
+	Trigger::NextPath tr;
+	
+	explicit WorflowTriggerNextPathEntry(const Trigger::NextPath& t) : tr (t) {}
+	virtual bool process(CncPathListRunner* plr);
+};
+///////////////////////////////////////////////////////////////////
+struct WorflowTriggerSpeedChangeEntry : public WorflowEntry
+{
+	Trigger::SpeedChange tr;
+	
+	explicit WorflowTriggerSpeedChangeEntry(const Trigger::SpeedChange& t) : tr (t) {}
+	virtual bool process(CncPathListRunner* plr);
+};
+///////////////////////////////////////////////////////////////////
+struct WorflowTriggerGuidePtahEntry : public WorflowEntry
+{
+	Trigger::GuidePath tr;
+	
+	explicit WorflowTriggerGuidePtahEntry(const Trigger::GuidePath& t) : tr (t) {}
+	virtual bool process(CncPathListRunner* plr);
+};
+///////////////////////////////////////////////////////////////////
+struct WorflowCncEntry : public WorflowEntry
+{
+	CncPathListManager plm;
+	
+	explicit WorflowCncEntry(const CncPathListManager& p) : plm (p) {}
+	virtual bool process(CncPathListRunner* plr);
+};
+///////////////////////////////////////////////////////////////////
+struct WorflowGuideEntry : public WorflowEntry
+{
+	CncPathListManager plm;
+	double zOffset = 0.0;
+	
+	explicit WorflowGuideEntry(const CncPathListManager& p, double z) : plm (p), zOffset(z) {}
+	virtual bool process(CncPathListRunner* plr);
+};
+
+typedef std::vector<WorflowEntry*> WorkFlowList;
+
+///////////////////////////////////////////////////////////////////
 class CncPathListRunner {
 	
 	private:
@@ -158,6 +234,7 @@ class CncPathListRunner {
 		};
 		
 		// ---------------------------------------------------
+		WorkFlowList		workflowList;
 		CncMoveSequence*	currentSequence;
 		Interface*			currentInterface;
 		Setup				setup;
@@ -187,27 +264,54 @@ class CncPathListRunner {
 		
 		bool checkContent(const CncPathListEntry& curr);
 		
+
+
+
+
+		void autoSetup(bool trace);
+		bool publishGuidePath(const CncPathListManager& plm, double zOffset=0.0);
+		bool publishCncPath(const CncPathListManager&plm);
+		
+		void executeTrigger(const Trigger::BeginRun& tr)	{ currentInterface->processTrigger(tr); }
+		void executeTrigger(const Trigger::EndRun& tr)		{ currentInterface->processTrigger(tr); }
+		void executeTrigger(const Trigger::NextPath& tr)	{ currentInterface->processTrigger(tr); }
+		void executeTrigger(const Trigger::SpeedChange& tr)	{ currentInterface->processTrigger(tr); }
+		void executeTrigger(const Trigger::GuidePath& tr)	{ currentInterface->processTrigger(tr); }
+		
+		friend WorflowSetupRunEntry;
+		friend WorflowTriggerBeginRunEntry;
+		friend WorflowTriggerEndRunEntry;
+		friend WorflowTriggerNextPathEntry;
+		friend WorflowTriggerSpeedChangeEntry;
+		friend WorflowTriggerGuidePtahEntry;
+		friend WorflowCncEntry;
+		friend WorflowGuideEntry;
+		
 	public:
 		
 		explicit CncPathListRunner(CncControl* cnc);
 		~CncPathListRunner();
 		
-		void autoSetup(bool trace);
-
 		void logMeasurementStart();
 		void logMeasurementEnd();
 		
-		bool publishGuidePath(const CncPathListManager& plm, double zOffset=0.0);
-		bool onPhysicallyExecute(const CncPathListManager& plm);
+		bool spoolWorkflow();
+		void resetWorkflow();
 		
-		void processTrigger(const Trigger::BeginRun& tr)	{ currentInterface->processTrigger(tr); }
-		void processTrigger(const Trigger::EndRun& tr)		{ currentInterface->processTrigger(tr); }
-		void processTrigger(const Trigger::NextPath& tr)	{ currentInterface->processTrigger(tr); }
-		void processTrigger(const Trigger::SpeedChange& tr)	{ currentInterface->processTrigger(tr); }
-		void processTrigger(const Trigger::GuidePath& tr)	{ currentInterface->processTrigger(tr); }
+		bool processGuidePath(const CncPathListManager& plm, double zOffset=0.0)
+		{ workflowList.push_back(new WorflowGuideEntry(plm, zOffset)); return true; }
 		
+		bool processCncPath(const CncPathListManager& plm)
+		{ workflowList.push_back(new WorflowCncEntry(plm)); return true; }
+		
+		void processTrigger(const Trigger::BeginRun& tr)	{ workflowList.push_back(new WorflowTriggerBeginRunEntry   (tr)); }
+		void processTrigger(const Trigger::EndRun& tr)		{ workflowList.push_back(new WorflowTriggerEndRunEntry     (tr)); }
+		void processTrigger(const Trigger::NextPath& tr)	{ workflowList.push_back(new WorflowTriggerNextPathEntry   (tr)); }
+		void processTrigger(const Trigger::SpeedChange& tr)	{ workflowList.push_back(new WorflowTriggerSpeedChangeEntry(tr)); }
+		void processTrigger(const Trigger::GuidePath& tr)	{ workflowList.push_back(new WorflowTriggerGuidePtahEntry  (tr)); }
 		
 		static bool test() { return Move::test(); }
 };
+
 
 #endif

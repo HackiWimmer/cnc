@@ -189,7 +189,6 @@ class SvgCncContext : public SvgCncContextBase {
 		
 	protected:
 		
-		bool					guidePath;
 		bool					isUseColouScheme;
 		
 		double					currentZMaxFeedStep;
@@ -258,6 +257,7 @@ class SvgCncContext : public SvgCncContextBase {
 		
 		CncPathModificationType	getPathModificationType()					const	{ return pathModification; }
 		const char* 			getPathModificationTypeAsStr()				const;
+		void					setPathModification(CncPathModificationType pm)		{ pathModification = pm; }
 		
 		CncPathRuleType			getPathRuleType()							const	{ return pathRule; }
 		const char* 			getPathRuleTypeAsStr()						const;
@@ -270,7 +270,8 @@ class SvgCncContext : public SvgCncContextBase {
 		bool					hasPathModifications()						const;
 		bool					hasPathRules()								const;
 		
-		bool					isGuidePath()								const	{ return guidePath; }
+		bool					isGuidePath()								const	{ return pathModification == CncPM_Guide; }
+		bool					isZeroPosPath()								const	{ return pathModification == CncPM_ZeroRef; }
 		bool					isCurrentZDepthValid()						const	{ return isCurrentZDepthAbs() || isCurrentZDepthRel(); }
 		bool					isCurrentZDepthAbs()						const	{ return currentZDepthMode == 'Z'; }
 		bool					isCurrentZDepthRel()						const	{ return currentZDepthMode == 'z'; }

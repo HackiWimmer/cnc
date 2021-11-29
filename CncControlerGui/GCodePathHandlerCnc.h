@@ -31,6 +31,9 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		virtual bool			initNextPath();
 		virtual bool			prepareWorkImpl();
 		virtual bool			finishWorkImpl();
+		
+		virtual void			resetWorkflow() { CncPathListRunner::resetWorkflow(); }
+		virtual bool			spoolWorkflow() { return CncPathListRunner::spoolWorkflow(); }
 };
 
 #endif

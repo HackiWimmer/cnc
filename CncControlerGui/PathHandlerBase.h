@@ -61,10 +61,6 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		CncCurveLib::LastControlPoint 	lastQuadraticControlPoint;
 		CncCurveLib::LastControlPoint 	lastCubicControlPoint;
 		
-		virtual bool onPhysicallyClientIdChange(long idx, const CncPathListEntry& cpe) 			{  cnc::cex1 << "PathHandlerBase::onPhysicallyClientIdChange() " 	<< std::endl; return false; }
-		virtual bool onPhysicallySpeedChange(unsigned long idx, const CncPathListEntry& cpe) 	{  cnc::cex1 << "PathHandlerBase::onPhysicallySpeedChange() " 		<< std::endl; return false; }
-		virtual bool onPhysicallyMove(unsigned long idx, const CncPathListEntry& cpe) 			{  cnc::cex1 << "PathHandlerBase::onPhysicallyMove() " 				<< std::endl; return false; }
-		
 		// trace functions
 		void traceFunctionCall(const char* fn);
 		void traceCurrentPosition();
@@ -139,7 +135,6 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		
 		// processing
 		bool processCommand_2DXY(char c, unsigned int count, const double values[]);
-		
 		bool isNextPath()  { return nextPath;  }
 
 		virtual bool prepareWork();
@@ -148,8 +143,11 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		virtual bool runCurrentPath();
 		virtual bool finishWork();
 		
-		virtual void logMeasurementStart()	{}
-		virtual void logMeasurementEnd() 	{}
+		virtual void resetWorkflow()			{  CNC_CEX1_FUNCT_A("Implement this within inherited classes") }
+		virtual bool spoolWorkflow()			{  CNC_CEX1_FUNCT_A("Implement this within inherited classes"); return false; }
+		
+		virtual void logMeasurementStart()		{}
+		virtual void logMeasurementEnd() 		{}
 		
 		virtual void processWait(int64_t microseconds);
 		
@@ -158,7 +156,7 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		// get path representations
 		void tracePathList(std::ostream &ostr);
 		
-		// path analytics
+		// path analytic
 		double getCurrentPathLength() 			{ return pathListMgr.getTotalDistance(); }
 		double getTotalLength() 				{ return totalLength; }
 		bool isPathClosed() 					{ return pathListMgr.isPathClosed(); }

@@ -1017,16 +1017,12 @@ bool Serial::processIdle() {
 	lastFetchResult.init(cmd);
 	if ( writeData(cmd) )
 	{
-		
 		SerialFetchInfo sfi(lastFetchResult.cmd);
 		sfi.fetchTimeout = 1000;
 
 		const bool ret = evaluateResultWrapper(sfi, std::cout);
 		if ( ret == false )
-		{
-			//std::cerr << "Error while processing idle: " << std::endl;
-			//std::cerr << "Request \"Error Info\" for more details." << std::endl;
-		}
+			CNC_CERR_FUNCT_A("ERROR: evaluateResultWrapper() failed");
 		
 		return ret;
 	}

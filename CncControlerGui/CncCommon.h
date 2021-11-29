@@ -37,6 +37,15 @@ namespace cnc
 	#define CNC_RESULT_WARNING_STR			"WARNING"
 	#define CNC_RESULT_ERROR_STR			"ERROR"
 	
+	#define INC_LOGGER_INDENT \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->incCurrentIndent(); }
+		
+	#define DEC_LOGGER_INDENT \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->decCurrentIndent(); }
+		
+	#define SET_LOGGER_INDENT(indent) \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->setCurrentIndent(indent); }
+		
 	#define REGISTER_NEXT_LOGGER_ROW \
 		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->logNextRowNumber(); }
 		
@@ -188,7 +197,7 @@ static struct ClientIds {
 	enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};
 	enum CncSpeedMode				{ CncSpeedWork = 0, CncSpeedRapid = 1, CncSpeedMax = 2, CncSpeedUserDefined = 3 }; // dont change the values
 	enum CncPortType				{ CncPORT, CncPORT_EMU_ARDUINO, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
-	enum CncPathModificationType	{ CncPM_None=0, CncPM_Inner, CncPM_Outer, CncPM_Center, CncPM_Pocket };
+	enum CncPathModificationType	{ CncPM_None=0, CncPM_Inner, CncPM_Outer, CncPM_Center, CncPM_Pocket, CncPM_Guide, CncPM_ZeroRef };
 	enum CncPathRuleType 			{ CncPR_None=0, CncPR_EnsureClockwise, CncPR_EnsureCounterClockwise, CncPR_Reverse };
 	enum CncClipperCornerType		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
 	enum CncStepSensitivity			{ FINEST = 1, FINE = 20 , MEDIUM = 50, ROUGH = 80, ROUGHEST = 100 };
@@ -487,52 +496,77 @@ class CncBoolSwitch
 
 //-----------------------------------------------------------------
 class CncPathListManager;
-namespace Trigger {
-	
-	struct ParameterSet {
-		
+namespace Trigger 
+{
+	struct ParameterSet
+	{
 		std::string fullFileName;
 		
-		struct Source {
+		struct Source
+		{
 			wxString fileName;
 			wxString fileType;
 		} SRC;
 
-		struct Setup {
+		struct Setup
+		{
 			float hardwareResX	= 0.0;
 			float hardwareResY	= 0.0;
 			float hardwareResZ	= 0.0;
 			 
 		} SET;
 		
-		struct Process {
+		struct Process
+		{
 			std::string user;
 			 
 		} PRC;
 	};
 	
-	struct BeginRun {
+	struct BeginRun 
+	{
 		const Trigger::ParameterSet parameter;
 		
 		BeginRun(const Trigger::ParameterSet& ps)
 		: parameter(ps)
 		{}
+		
+		BeginRun(const BeginRun&) = default;
+		BeginRun& operator= (const BeginRun&) = default;
+
+		BeginRun(BeginRun&&) = default;
+		BeginRun& operator= (BeginRun&&) = default;
 	};
 	
-	struct EndRun {
+	struct EndRun 
+	{
 		const bool succcess = false;
 		
 		explicit EndRun(bool s)
 		: succcess(s)
 		{}
+		
+		EndRun(const EndRun&) = default;
+		EndRun& operator= (const EndRun&) = default;
+
+		EndRun(EndRun&&) = default;
+		EndRun& operator= (EndRun&&) = default;
 	};
 	
-	struct NextPath {
+	struct NextPath 
+	{
 		NextPath()
 		{}
+		
+		NextPath(const NextPath&) = default;
+		NextPath& operator= (const NextPath&) = default;
+
+		NextPath(NextPath&&) = default;
+		NextPath& operator= (NextPath&&) = default;
 	};
 	
-	struct SpeedChange {
+	struct SpeedChange 
+	{
 		const CncSpeedMode	currentSpeedMode;
 		const double		currentSpeedValue;
 		
@@ -541,14 +575,26 @@ namespace Trigger {
 		, currentSpeedValue(sv)
 		{}
 		
+		SpeedChange(const SpeedChange&) = default;
+		SpeedChange& operator= (const SpeedChange&) = default;
+
+		SpeedChange(SpeedChange&&) = default;
+		SpeedChange& operator= (SpeedChange&&) = default;
 	};
 	
-	struct GuidePath {
-		const CncPathListManager* plm;
+	struct GuidePath 
+	{
+		const CncPathListManager& plm;
 		
-		GuidePath(const CncPathListManager* m)
+		GuidePath(const CncPathListManager& m)
 		: plm(m)
 		{}
+		
+		GuidePath(const GuidePath&) = default;
+		GuidePath& operator= (const GuidePath&) = default;
+
+		GuidePath(GuidePath&&) = default;
+		GuidePath& operator= (GuidePath&&) = default;
 	};
 };
 

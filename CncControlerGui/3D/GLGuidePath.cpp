@@ -12,8 +12,9 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
 {
 	if ( plm.getPathType() == CncPathListManager::PathType::PT_GUIDE_PATH ) {
 		
-		// determine parameteres
-		switch ( plm.getGuideType() ) {
+		// determine parameters
+		switch ( plm.getGuideType() )
+		{
 			case CncPathListManager::GuideType::HELP_PATH:
 			{
 				guideColour	= wxColour(  0, 162, 232, defAlphaDimmedUp);
@@ -24,6 +25,12 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
 			{
 				guideColour	= wxColour(  0, 162, 232, defAlphaDimmedUp);
 				guideStyle	= wxPENSTYLE_DOT;
+				break;
+			}
+			case CncPathListManager::GuideType::REFPOS_PATH:
+			{
+				guideColour	= wxColour(255,   0,   0, defAlphaDimmedUp);
+				guideStyle	= wxPENSTYLE_SOLID;
 				break;
 			}
 			case CncPathListManager::GuideType::NO_GUIDE_PATH:
@@ -37,8 +44,10 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
 		}
 		
 		// fill guide path list
-		if ( isValid() ) {
-			for (auto it = plm.cbegin(); it != plm.cend(); ++it) {
+		if ( isValid() )
+		{
+			for (auto it = plm.cbegin(); it != plm.cend(); ++it)
+			{
 				
 				const CncPathListEntry& entry =  *it;
 				if ( entry.isPositionChange() != true )

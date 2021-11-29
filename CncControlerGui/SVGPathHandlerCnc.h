@@ -95,6 +95,9 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		virtual bool			finishCurrentPath();
 		virtual bool			runCurrentPath();
 		virtual bool			finishWork();
+		
+		virtual void			resetWorkflow() { CncPathListRunner::resetWorkflow(); }
+		virtual bool			spoolWorkflow() { return CncPathListRunner::spoolWorkflow(); }
 };
 
 #endif

@@ -22,6 +22,7 @@ CncLoggerListCtrl::LoggerEntry::LoggerEntry()
 : text			()
 , result		()
 , listItemAttr	(defaultItemAttr)
+, timestamp		(wxDateTime::UNow())
 /////////////////////////////////////////////////////////////
 {}
 
@@ -30,6 +31,16 @@ CncLoggerListCtrl::LoggerEntry::LoggerEntry(const wxListItemAttr& a)
 : text			()
 , result		()
 , listItemAttr	(a)
+, timestamp		(wxDateTime::UNow())
+/////////////////////////////////////////////////////////////
+{}
+
+/////////////////////////////////////////////////////////////
+CncLoggerListCtrl::LoggerEntry::LoggerEntry(const wxString& t, const wxListItemAttr& a)
+: text			(t)
+, result		()
+, listItemAttr	(a)
+, timestamp		(wxDateTime::UNow())
 /////////////////////////////////////////////////////////////
 {}
 
@@ -38,6 +49,7 @@ CncLoggerListCtrl::LoggerEntry::LoggerEntry(const wxString& t, const wxString& r
 : text			(t)
 , result		(r)
 , listItemAttr	(a)
+, timestamp		(wxDateTime::UNow())
 /////////////////////////////////////////////////////////////
 {}
 
@@ -69,6 +81,7 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 , entries					() 
 , updateMode				(UM_Normal)
 , updateModePreviously		(UM_Normal)
+, currentIndent				()
 , canScroll					(true)
 , sizeChanged				(false)
 , joinTheApp				(false)
@@ -85,8 +98,9 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 	
 	// add columns
 	AppendColumn("A",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("B",	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
-	AppendColumn("C",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("B",	wxLIST_FORMAT_RIGHT, 	0);
+	AppendColumn("C",	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
+	AppendColumn("D",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	
 	SetBackgroundColour(wxColour(32, 32, 32));
 	SetTextColour(wxColour(255, 255, 255).ChangeLightness(80));
@@ -165,10 +179,41 @@ void CncLoggerListCtrl::clearAll() {
 	Refresh();
 }
 /////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::incCurrentIndent() {
+/////////////////////////////////////////////////////////////
+	currentIndent.append(' ');
+	
+	if ( entries.size() > 0 )
+	{
+		if ( entries.back().text.IsEmpty() )
+			entries.back().text.assign(currentIndent);
+	}
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::decCurrentIndent() {
+/////////////////////////////////////////////////////////////
+	if ( currentIndent.length() > 0 )
+	{
+		if ( entries.size() > 0 )
+		{
+			if ( entries.back().text.IsSameAs(currentIndent) )
+				entries.back().text.RemoveLast();
+		}
+		
+		currentIndent.RemoveLast();
+	}
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::setCurrentIndent(unsigned int i) {
+/////////////////////////////////////////////////////////////
+	i = std::min(i, 16u);
+	currentIndent.assign(wxString(i, ' '));
+}
+/////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::next() {
 /////////////////////////////////////////////////////////////
-	if ( entries.size() == 0 )	entries.push_back(std::move(LoggerEntry(defaultItemAttr)));
-	else						entries.push_back(std::move(LoggerEntry(entries.back().listItemAttr)));
+	if ( entries.size() == 0 )	entries.push_back(std::move(LoggerEntry(currentIndent, defaultItemAttr)));
+	else						entries.push_back(std::move(LoggerEntry(currentIndent, entries.back().listItemAttr)));
 	
 	updateContent();
 }
@@ -280,8 +325,9 @@ void CncLoggerListCtrl::add(const char c) {
 	}
 	else
 	{
-		wxString& text = entries.back().text;
-		text.append(c);
+		entries.back().timestamp = wxDateTime::UNow();
+		entries.back().text.append(c);
+		
 		updateContent();
 	}
 }
@@ -310,10 +356,14 @@ void CncLoggerListCtrl::add(const wxString& text, const wxString& result) {
 	if ( entries.size() == 0 )
 		next();
 	
-	#warning
+	// In some circumstances it make scene to create a copy here
+	// for more details see add(const wxString& text, const wxString& result, const wxListItemAttr& lia)
+	// but ith the current implementation of add(...) this isn't necessary
 	
-	wxListItemAttr lia(entries.back().listItemAttr);
-	add(text, result, lia);
+	//wxListItemAttr lia(entries.back().listItemAttr);
+	//add(text, result, lia);
+	
+	add(text, result, entries.back().listItemAttr);
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::add(const wxString& text, const wxString& result, const wxListItemAttr& lia) {
@@ -323,8 +373,13 @@ void CncLoggerListCtrl::add(const wxString& text, const wxString& result, const 
 		
 	if ( entries.size() == 0 )
 		next();
-		
+	
+	// lia could be a self assignment and furthermore if lia is a reference of entries.back().listItemAttr
+	// this can't be part of the while loop, because the reference becomes invalid if a call of next
+	// create a new back() element. After the implementation of next copies the wxListAttr to the new element,
+	// a initialization before the loop is completely adequate 
 	entries.back().listItemAttr = lia;
+	entries.back().timestamp    = wxDateTime::UNow();
 		
 	const wxChar delimiter = '\n';
 	wxStringTokenizer lines(text, wxString("\n"));
@@ -352,7 +407,8 @@ void CncLoggerListCtrl::tokenAndAdd(const wxString& text, const wxListItemAttr& 
 /////////////////////////////////////////////////////////////
 	wxStringTokenizer lines(text, "\n");
 	
-	while ( lines.HasMoreTokens() ) {
+	while ( lines.HasMoreTokens() )
+	{
 		const wxString& token = lines.GetNextToken();
 		entries.push_back(std::move(LoggerEntry(token, "", lia)));
 		next();
@@ -362,6 +418,12 @@ void CncLoggerListCtrl::tokenAndAdd(const wxString& text, const wxListItemAttr& 
 bool CncLoggerListCtrl::isItemValid(long item) const {
 /////////////////////////////////////////////////////////////
 	return item >= 0 && item < (long)(entries.size());
+}
+/////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::displayTimeColumn(bool show) { 
+/////////////////////////////////////////////////////////////
+	SetColumnWidth(COL_TIM, show ? 100 : 0); 
+	updateColumnWidth(COL_STRECH);
 }
 /////////////////////////////////////////////////////////////
 int CncLoggerListCtrl::OnGetItemColumnImage(long item, long column) const {
@@ -375,11 +437,22 @@ wxString CncLoggerListCtrl::OnGetItemText(long item, long column) const {
 		return _("");
 	
 	const LoggerEntry& le = entries.at(item);
-	
-	switch ( column ) {
+	switch ( column ) 
+	{
 		case COL_LNR:	return wxString::Format("%06ld",	item + 1);
 		case COL_TXT:	return wxString::Format("%s",		le.text);
 		case COL_RET:	return wxString::Format("%s",		le.result);
+		case COL_TIM:
+		{
+			if ( GetColumnWidth(COL_TIM) > 0 )
+			{
+				if ( !le.text.IsEmpty() )
+					return wxString::Format("%s.%03d",
+											le.timestamp.FormatISOTime(), 
+											le.timestamp.GetMillisecond()
+					);
+			}
+		}
 	}
 	
 	return _("");

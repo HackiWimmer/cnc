@@ -34,7 +34,7 @@ bool GCodePathHandlerCnc::finishWorkImpl() {
 bool GCodePathHandlerCnc::initNextPath() {
 //////////////////////////////////////////////////////////////////
 	// execute already existing path list
-	if ( onPhysicallyExecute(pathListMgr) == false )
+	if ( processCncPath(pathListMgr) == false )
 		return false;
 
 	// default processing

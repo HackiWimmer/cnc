@@ -1309,9 +1309,9 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 	for ( int i= 1; i< 1000; i++ )
 	{
 	
-	CNC_CLOG_FUNCT_A(x.GetExecutablePath())
-
+		CNC_CLOG_FUNCT_A(x.GetExecutablePath())
 	}
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -1340,8 +1340,6 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
-	
-	contextSummaryPanel->selectDryRun();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -4224,16 +4222,15 @@ void MainFrame::activateGamepadNotifications(bool state) {
 	if ( gamepadThread == NULL )
 		return;
 		
-	if ( state == false ) {
-		
-		if ( gamepadThread->IsRunning() ) {
+	if ( state == false )
+	{
+		if ( gamepadThread->IsRunning() )
 			gamepadThread->Pause();
-		}
 	}
-	else {
-		if ( gamepadThread->IsPaused() ) {
+	else
+	{
+		if ( gamepadThread->IsPaused() )
 			gamepadThread->Resume();
-		}
 	}
 	
 	decorateGamepadState(gamepadThread->IsRunning());
@@ -4248,6 +4245,7 @@ bool MainFrame::processBinaryTemplate() {
 		
 	inboundFileParser = new BinaryFileParser(getCurrentTemplatePathFileName().c_str(), new BinaryPathHandlerCnc(cnc));
 	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
+	
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -4967,8 +4965,9 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		// process template . . . 
 		
 			// *********************
-			StreamBufferHighlighter sbh(cnc::cex1);
-			CNC_CLOG_A(wxString::Format("\n~~~ %s - Processing(probe mode = %s) started ~~~", wxDateTime::UNow().FormatISOTime(), probeMode))
+			StreamBufferHighlighter sbh(std::clog);
+			CNC_CLOG_A(wxString::Format("\n~~~ Processing(probe mode = %s) started ~~~", probeMode))
+			INC_LOGGER_INDENT
 			
 			// This instance starts and stops the speed monitor
 			CncSpeedMonitorRunner smr(speedMonitor);
@@ -4976,6 +4975,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			THE_TPL_CTX->registerRun();
 			const bool ret = processTemplateIntern();
 			
+			DEC_LOGGER_INDENT
 			// *********************
 
 		//-----------------------------------------------------------------
@@ -5012,7 +5012,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			StreamBufferHighlighter sbh(cnc::cex1);
 			
 			wxString hint("not successfully");
-			CNC_CEX1_A(wxString::Format("=== %s - Processing(probe mode = %s) finished %s ===", wxDateTime::UNow().FormatISOTime(), probeMode, hint))
+			CNC_CEX1_A(wxString::Format("=== Processing(probe mode = %s) finished %s ===", probeMode, hint))
 			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_WARNING_STR)
 			
 			lock.setErrorMode();
@@ -5024,7 +5024,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		{
 			StreamBufferHighlighter sbh(std::clog);
 			
-			CNC_CLOG_A(wxString::Format("=== %s - Processing(probe mode = %s) finished successfully ===", wxDateTime::UNow().FormatISOTime(), probeMode))
+			CNC_CLOG_A(wxString::Format("=== Processing(probe mode = %s) finished successfully ===", probeMode))
 			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR )
 			
 			THE_TPL_CTX->registerValidRun();
@@ -7861,11 +7861,13 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 	dlg.SetTextValidator(wxFILTER_DIGITS);
 	
 	unsigned int loopCount = 0;
-	if ( dlg.ShowModal() == wxID_OK  ) {
+	if ( dlg.ShowModal() == wxID_OK  )
+	{
 		wxString s = dlg.GetValue();
 		s.Trim(true).Trim(false);
 		
-		if ( s.IsEmpty() == false ) {
+		if ( s.IsEmpty() == false )
+		{
 			long num;
 			s.ToLong(&num);
 			if ( num > 0 && num < 10000 )
@@ -7891,7 +7893,10 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 		cnc::trc.logInfoMessage(info);
 
 		if ( ret == false )
-			break;
+		{
+			CNC_CERR_FUNCT_A("Call of processTemplateWrapper() failed")
+			//break;
+		}
 			
 		waitActive(5);
 	}
@@ -8949,7 +8954,8 @@ void MainFrame::updateHardwareReference() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::simulateHardwareReference(float offsetFact) {
 /////////////////////////////////////////////////////////////////////
-	if ( false )
+	#warning reactivate simulateHardwareReference
+	if ( true )
 	{
 		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
 	}

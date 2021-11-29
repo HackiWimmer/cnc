@@ -11,15 +11,28 @@
 #include "CncPathListInterface.h"
 #include "CncPathListRunner.h"
 
-// debug only
-namespace DebugPLR {
-	bool trace		= false;
-	bool tracePitch = false;
-};
+///////////////////////////////////////////////////////////////////
+#warning evaluate why WorflowTriggerNextPathEntry::process() crashes
+
+bool WorflowSetupRunEntry          ::process(CncPathListRunner* plr)	{ plr->autoSetup(trace);   return true; } 
+bool WorflowTriggerBeginRunEntry   ::process(CncPathListRunner* plr)	{ plr->processTrigger(tr); return true; }
+bool WorflowTriggerEndRunEntry     ::process(CncPathListRunner* plr)	{ plr->processTrigger(tr); return true; }
+bool WorflowTriggerNextPathEntry   ::process(CncPathListRunner* plr)	{ /*plr->processTrigger(tr);*/ return true; } 
+bool WorflowTriggerSpeedChangeEntry::process(CncPathListRunner* plr)	{ plr->processTrigger(tr); return true; }
+bool WorflowTriggerGuidePtahEntry  ::process(CncPathListRunner* plr)	{ plr->processTrigger(tr); return true; } 
+bool WorflowCncEntry               ::process(CncPathListRunner* plr)	{ return plr->publishCncPath(plm); }
+bool WorflowGuideEntry             ::process(CncPathListRunner* plr)	{ return plr->publishGuidePath(plm, zOffset); }
 
 ////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::maxXYPitchRadians	= CncPathListRunner::Move::degree2Radians(15);
 float CncPathListRunner::Move::maxZPitchRadians		= CncPathListRunner::Move::degree2Radians(15);
+
+	// debug only
+	namespace DebugPLR 
+	{
+		bool trace		= false;
+		bool tracePitch = false;
+	};
 
 ////////////////////////////////////////////////////////////////////
 CncPathListRunner::Move::Move(double dX, double dY, double dZ)
@@ -207,7 +220,8 @@ bool CncPathListRunner::Move::test() {
 
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::CncPathListRunner(CncControl* cnc) 
-: currentSequence		(NULL)
+: workflowList			()
+, currentSequence		(NULL)
 , currentInterface		(new CncCtrl(cnc))
 , setup					()
 //////////////////////////////////////////////////////////////////
@@ -220,6 +234,7 @@ CncPathListRunner::~CncPathListRunner() {
 //////////////////////////////////////////////////////////////////
 	destroyMoveSequence();
 	wxDELETE(currentInterface);
+	resetWorkflow();
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListRunner::changePathListRunnerInterfaceImpl(const wxString& portName) {
@@ -271,6 +286,30 @@ void CncPathListRunner::traceSetup() {
 	
 	cpp->addOperatingTraceSeparator("Current Setup");
 	cpp->addOperatingTrace(ss);
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListRunner::resetWorkflow() {
+//////////////////////////////////////////////////////////////////
+	for ( auto workflowEntry : workflowList )
+		delete workflowEntry;
+	
+	workflowList.clear();
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::spoolWorkflow() {
+//////////////////////////////////////////////////////////////////
+	CNC_CEX2_A("Start spooling path list workflow(entries=%ld)", (long)workflowList.size())
+	
+	for ( auto workflowEntry : workflowList )
+	{
+		//CNC_CEX3_FUNCT_A("%s", typeid(workflowEntry).name() )
+		if ( workflowEntry && workflowEntry->process(this) == false )
+		{
+			return false;
+		}
+	}
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListRunner::logMeasurementStart() {
@@ -772,7 +811,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
+bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
 	if ( plm.getPathList().size() == 0 )
 		return true;

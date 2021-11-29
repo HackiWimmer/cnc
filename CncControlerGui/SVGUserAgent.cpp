@@ -67,10 +67,12 @@ void SVGUserAgent::displayUseDirective() {
 		
 	DcmItemList rows;
 	
-	for ( auto it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 ) {
+	for ( auto it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 )
+	{
 		UseDirective& ud = *it1;
 		wxString data;
-		for ( auto it2 = ud.attributes.begin(); it2 != ud.attributes.end(); ++it2 ) {
+		for ( auto it2 = ud.attributes.begin(); it2 != ud.attributes.end(); ++it2 ) 
+		{
 			data << it2->first;
 			data << "=";
 			data << it2->second;
@@ -79,7 +81,8 @@ void SVGUserAgent::displayUseDirective() {
 		DataControlModel::addKeyValueRow(rows, ud.id, data);
 	}
 	
-	for ( auto it = rows.begin(); it != rows.end(); ++it ) {
+	for ( auto it = rows.begin(); it != rows.end(); ++it )
+	{
 		oCtl.useDirectiveList->AppendItem(*it);
 	}
 }
@@ -341,7 +344,8 @@ const UserAgentVector& SVGUserAgent::getList() {
 UseDirective& SVGUserAgent::evaluateUseDirective(UseDirective& ud) {
 /////////////////////////////////////////////////////////
 	// search xlink:href, fill ud.id and remove xlink:href key from map
-	if ( auto it = ud.attributes.find("xlink:href"); it != ud.attributes.end() ) {
+	if ( auto it = ud.attributes.find("xlink:href"); it != ud.attributes.end() )
+	{
 		ud.id = it->second.substr(1);
 		ud.attributes.erase(it);
 	} 
@@ -352,7 +356,8 @@ UseDirective& SVGUserAgent::evaluateUseDirective(UseDirective& ud) {
 bool SVGUserAgent::addPathElement(char c, unsigned int count, double values[]) {
 /////////////////////////////////////////////////////////
 	SVGUserAgentInfo& sua = getCurentUserAgent();
-	if ( sua.lineNumber > 0 ) {
+	if ( sua.lineNumber > 0 )
+	{
 		sua.pathInfoList.push_back(std::move(PathInfo(c, count, values)));
 		return true;
 	}
@@ -362,8 +367,8 @@ bool SVGUserAgent::addPathElement(char c, unsigned int count, double values[]) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::displayDetailInfo(unsigned int pos) {
 /////////////////////////////////////////////////////////
-	if ( oCtl.detailInfo != NULL ) {
-		
+	if ( oCtl.detailInfo != NULL )
+	{
 		const SVGUserAgentInfo& sua = getUserAgent(pos);
 		DcmItemList rows;
 		sua.getDetails(rows);
@@ -381,14 +386,16 @@ bool SVGUserAgent::expand() {
 /////////////////////////////////////////////////////////
 	displayUseDirective();
 	
-	// first fill the inbount path list
-	if ( oCtl.inboundPathList != NULL ) {
-		for ( auto it=userAgent.begin(); it != userAgent.end(); ++it) {
-			
+	// first fill the inbound path list
+	if ( oCtl.inboundPathList != NULL ) 
+	{
+		for ( auto it=userAgent.begin(); it != userAgent.end(); ++it)
+		{
 			DcmItemList rows;
 			wxString val(it->nodeName);
 			
-			if ( it->elementId.IsEmpty() == false ) {
+			if ( it->elementId.IsEmpty() == false )
+			{
 				val.append(",  id = ");
 				val.append(it->elementId);
 			}
@@ -400,7 +407,8 @@ bool SVGUserAgent::expand() {
 		}
 		
 		// fill the detail list for the first item
-		if ( oCtl.inboundPathList->GetItemCount() > 0 ) {
+		if ( oCtl.inboundPathList->GetItemCount() > 0 )
+		{
 			oCtl.inboundPathList->Select(oCtl.inboundPathList->RowToItem(0));
 			
 			if ( oCtl.detailInfo != NULL )

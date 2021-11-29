@@ -68,7 +68,6 @@ CncPathListManager::CncPathListManager()
 , defaultEntry				()
 , executionRecommend		(ER_STAIRS)
 , notNormalizeStartDistance	(0.0, 0.0, 0.0)
-, referencePos				(0.0, 0.0, 0.0)
 , minPosX					(0.0)
 , minPosY					(0.0)
 , minPosZ					(0.0)
@@ -95,7 +94,6 @@ CncPathListManager::CncPathListManager(const CncPathListEntry& initialEntry)
 , defaultEntry				()
 , executionRecommend		(ER_STAIRS)
 , notNormalizeStartDistance	(0.0, 0.0, 0.0)
-, referencePos				(0.0, 0.0, 0.0)
 , minPosX					(0.0)
 , minPosY					(0.0)
 , minPosZ					(0.0)
@@ -142,7 +140,6 @@ CncPathListManager::CncPathListManager(CncPathListManager& plm)
 , defaultEntry				(plm.getDefaultEntry())
 , executionRecommend		(plm.getExecRecommendation())
 , notNormalizeStartDistance	(plm.getNorNormalizedStartDist())
-, referencePos				(plm.getReferencePos())
 , minPosX					(plm.getMinPosX())
 , minPosY					(plm.getMinPosY())
 , minPosZ					(plm.getMinPosZ())
@@ -166,7 +163,6 @@ CncPathListManager& CncPathListManager::operator=(const CncPathListManager& plm)
 		guideType 				= plm.getGuideType();
 		defaultEntry			= plm.getDefaultEntry();
 		executionRecommend		= plm.getExecRecommendation();
-		referencePos			= plm.getReferencePos();
 		minPosX					= plm.getMinPosX();
 		minPosY					= plm.getMinPosY();
 		minPosZ					= plm.getMinPosZ();
@@ -228,11 +224,6 @@ auto CncPathListManager::crLastPosEntryIterator() const {
 	return it;
 }
 //////////////////////////////////////////////////////////////////
-void CncPathListManager::setReferencePos(const CncDoublePosition& p) { 
-//////////////////////////////////////////////////////////////////
-	referencePos = p; 
-}
-//////////////////////////////////////////////////////////////////
 bool CncPathListManager::hasMovement() const { 
 //////////////////////////////////////////////////////////////////
 	return cFirstPosEntryIterator() != cend(); 
@@ -279,7 +270,6 @@ void CncPathListManager::initNextCncPath() {
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::initNextPath(const CncPathListEntry& initialEntry) {
 //////////////////////////////////////////////////////////////////
-	referencePos			= CncPathListEntry::ZeroTarget;
 	totalDistance			= 0.0;
 	
 	clear();
@@ -290,7 +280,6 @@ void CncPathListManager::initNextPath(const CncPathListEntry& initialEntry) {
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::initNextPath(bool linked) {
 //////////////////////////////////////////////////////////////////
-	referencePos			= CncPathListEntry::ZeroTarget;
 	totalDistance			= 0.0;
 	
 	CncPathListEntry cpe;
@@ -316,7 +305,8 @@ void CncPathListManager::initNextPath(bool linked) {
 void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 	// additionally calculate length and distance
-	if ( cpe.hasPositionChange() ) {
+	if ( cpe.hasPositionChange() )
+	{
 		totalDistance += sqrt(  pow(cpe.entryDistance.getX(), 2)
 							  + pow(cpe.entryDistance.getY(), 2)
 							  + pow(cpe.entryDistance.getZ(), 2)
@@ -325,7 +315,7 @@ void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 		cpe.totalDistance = totalDistance;
 	}
 
-	// addionally determine fences
+	// additionally determine fences
 	minPosX = std::min(minPosX, cpe.entryTarget.getX());
 	minPosY = std::min(minPosY, cpe.entryTarget.getY());
 	minPosZ = std::min(minPosZ, cpe.entryTarget.getZ());
@@ -338,7 +328,8 @@ void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 	cpe.listIndex = (long)getPathList().size();
 	
 	// store
-	switch ( pathType ) {
+	switch ( pathType )
+	{
 		case PT_CNC_PATH: 		pathList.push_back(std::move(cpe));
 								break;
 								
@@ -526,9 +517,7 @@ void CncPathListManager::init(const CncDoublePosition& p) {
 	// first clear the content
 	clear();
 	
-	setReferencePos(p);
-	
-	// .. and the create the fist entry based on the given 
+	// .. and then create the first entry based on the given 
 	// current position
 	CncPathListEntry initialEntry;
 	initialEntry.content			= CncPathListEntry::CONT_POSITION;
@@ -596,6 +585,17 @@ bool CncPathListManager::getTargetPos(CncDoublePosition& ret) const {
 		
 	ret = itLast->entryTarget;
 	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::isRightTriangle(CncDoublePosition& ret) const {
+//////////////////////////////////////////////////////////////////
+
+	#warning !!!
+	//wxMessageBox(CNC_LOG_FUNCT);
+	//cnc::cex3 << (*this) << std::endl;
+
+
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -1039,7 +1039,6 @@ bool CncPathListManager::normalizeStartPosDistance() {
 //////////////////////////////////////////////////////////////////
 std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {
 //////////////////////////////////////////////////////////////////
-	const CncDoublePosition& rp = getReferencePos();
 	const CncDoublePosition& sp = getStartPos();
 	
 	ostr 	<< "CncPathListInfo entries : " << getPathList().size()											<< std::endl
@@ -1048,7 +1047,6 @@ std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {
 			<< " Total Distance         : " << cnc::dblFormat1(getTotalDistance()) 							<< std::endl
 			<< " Min Pos (x, y, z)      : " << cnc::dblFormat3(getMinPosX(), getMinPosY(), getMinPosZ())	<< std::endl
 			<< " Max Pos (x, y, z)      : " << cnc::dblFormat3(getMaxPosX(), getMaxPosY(), getMaxPosZ())	<< std::endl
-			<< " Reference Pos          : " << cnc::dblFormat3(rp.getX(),    rp.getY(),    rp.getZ())		<< std::endl
 			<< " Start Pos              : " << cnc::dblFormat3(sp.getX(),    sp.getY(),    sp.getZ())		<< std::endl
 			<< " Entries                : " << std::endl
 			;
