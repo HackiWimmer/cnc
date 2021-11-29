@@ -733,6 +733,7 @@ protected:
     wxMenu* m_menuTest;
     wxMenuItem* m_miUnitTestFramework;
     wxMenuItem* m_menuItem3361;
+    wxMenuItem* m_miProcessDirectoryTest;
     wxMenuItem* m_miLoopRepeatTest;
     wxMenuItem* m_menuItem4684;
     wxMenuItem* m_miTest1;
@@ -979,6 +980,7 @@ protected:
     virtual void openPositionStorage(wxCommandEvent& event) { event.Skip(); }
     virtual void traceAllCameraDevices(wxCommandEvent& event) { event.Skip(); }
     virtual void unitTestFramework(wxCommandEvent& event) { event.Skip(); }
+    virtual void processDirectoryTest(wxCommandEvent& event) { event.Skip(); }
     virtual void loopRepeatTest(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction1(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction2(wxCommandEvent& event) { event.Skip(); }

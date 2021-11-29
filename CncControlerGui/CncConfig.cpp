@@ -1190,9 +1190,10 @@ const wxString& CncConfig::getHexEditorTool(wxString& ret)			{ PROPERTY(CncAppli
 const wxString& CncConfig::getVeuszPlotterTool(wxString& ret)		{ PROPERTY(CncApplication_Tool_VEUSZ_PLOTTER)			ret.assign(p->GetValue().GetString()); return ret; }
 const wxString& CncConfig::getPyCamTool(wxString& ret)				{ PROPERTY(CncApplication_Tool_PY_CAM)					ret.assign(p->GetValue().GetString()); return ret; }
 const wxString& CncConfig::getDefaultSpeedModeXYZ(wxString& ret)	{ PROPERTY(CncConfig_DEF_SPEED_MODE_XYZ)				ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getDefaultPort(wxString& ret)			{ PROPERTY(CncApplication_Com_DEFALT_PORT)				ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getDefaultTplDir(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_DIRECTORY)			ret.assign(p->GetValue().GetString()); return ret; }
-const wxString& CncConfig::getDefaultTplFile(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFALT_FILE)				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultPort(wxString& ret)			{ PROPERTY(CncApplication_Com_DEFAULT_PORT)				ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultTestTplDir(wxString& ret)		{ PROPERTY(CncApplication_Tpl_DEFAULT_TEST_DIRECTORY)	ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultTplDir(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFAULT_DIRECTORY)		ret.assign(p->GetValue().GetString()); return ret; }
+const wxString& CncConfig::getDefaultTplFile(wxString& ret)			{ PROPERTY(CncApplication_Tpl_DEFAULT_FILE)				ret.assign(p->GetValue().GetString()); return ret; }
 const wxString& CncConfig::getRunConfirmationMode(wxString& ret)	{ PROPERTY(CncApplication_CONFIRMATION_MODE)			ret.assign(p->GetValue().GetString()); return ret; }
 
 ////////////////////////////////////////////////////////////////////////

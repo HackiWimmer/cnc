@@ -5872,7 +5872,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_menuTest->AppendSeparator();
     
-    m_miLoopRepeatTest = new wxMenuItem(m_menuTest, wxID_ANY, _("Loop Repeat Test [Run]"), wxT(""), wxITEM_NORMAL);
+    m_miProcessDirectoryTest = new wxMenuItem(m_menuTest, wxID_ANY, _("Test: Process Directory [Run]"), wxT(""), wxITEM_NORMAL);
+    m_miProcessDirectoryTest->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")));
+    m_menuTest->Append(m_miProcessDirectoryTest);
+    
+    m_miLoopRepeatTest = new wxMenuItem(m_menuTest, wxID_ANY, _("Test: Repeat current Template [Run]"), wxT(""), wxITEM_NORMAL);
     m_miLoopRepeatTest->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")));
     m_menuTest->Append(m_miLoopRepeatTest);
     
@@ -6368,6 +6372,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miPositionStorage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openPositionStorage), NULL, this);
     this->Connect(m_miCameraDevices->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::traceAllCameraDevices), NULL, this);
     this->Connect(m_miUnitTestFramework->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::unitTestFramework), NULL, this);
+    this->Connect(m_miProcessDirectoryTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::processDirectoryTest), NULL, this);
     this->Connect(m_miLoopRepeatTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loopRepeatTest), NULL, this);
     this->Connect(m_miTest1->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction1), NULL, this);
     this->Connect(m_miTest2->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction2), NULL, this);
@@ -6630,6 +6635,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miPositionStorage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openPositionStorage), NULL, this);
     this->Disconnect(m_miCameraDevices->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::traceAllCameraDevices), NULL, this);
     this->Disconnect(m_miUnitTestFramework->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::unitTestFramework), NULL, this);
+    this->Disconnect(m_miProcessDirectoryTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::processDirectoryTest), NULL, this);
     this->Disconnect(m_miLoopRepeatTest->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loopRepeatTest), NULL, this);
     this->Disconnect(m_miTest1->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction1), NULL, this);
     this->Disconnect(m_miTest2->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction2), NULL, this);

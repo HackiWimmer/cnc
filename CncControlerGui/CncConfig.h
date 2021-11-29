@@ -418,6 +418,7 @@ const double getCurZDistance() 							{ return 0.0 /*getWorkpieceThickness()*/ +
 		const wxString& getPyCamTool(wxString& ret);
 		const wxString& getDefaultSpeedModeXYZ(wxString& ret);
 		const wxString& getDefaultPort(wxString& ret);
+		const wxString& getDefaultTestTplDir(wxString& ret);
 		const wxString& getDefaultTplDir(wxString& ret);
 		const wxString& getDefaultTplFile(wxString& ret);
 		const wxString& getRunConfirmationMode(wxString& ret);

@@ -97,10 +97,10 @@ CncLoggerListCtrl::CncLoggerListCtrl(wxWindow *parent, long style)
 	next();
 	
 	// add columns
-	AppendColumn("A",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("B",	wxLIST_FORMAT_RIGHT, 	0);
-	AppendColumn("C",	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
-	AppendColumn("D",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("A",	wxLIST_FORMAT_RIGHT, 	60);				// number
+	AppendColumn("B",	wxLIST_FORMAT_RIGHT, 	 0);				// time-stamp
+	AppendColumn("C",	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);	// text
+	AppendColumn("D",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);	// result
 	
 	SetBackgroundColour(wxColour(32, 32, 32));
 	SetTextColour(wxColour(255, 255, 255).ChangeLightness(80));
@@ -181,13 +181,13 @@ void CncLoggerListCtrl::clearAll() {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::incCurrentIndent() {
 /////////////////////////////////////////////////////////////
-	currentIndent.append(' ');
-	
 	if ( entries.size() > 0 )
 	{
-		if ( entries.back().text.IsEmpty() )
-			entries.back().text.assign(currentIndent);
+		if ( entries.back().text.IsSameAs(currentIndent) )
+			entries.back().text.append(' ');
 	}
+	
+	currentIndent.append(' ');
 }
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::decCurrentIndent() {

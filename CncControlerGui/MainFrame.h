@@ -189,6 +189,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void processDirectoryTest(wxCommandEvent& event);
 		virtual void rcDryRun(wxCommandEvent& event);
 		virtual void onPodiumManagement(wxCommandEvent& event);
 		virtual void onResetView(wxCommandEvent& event);
@@ -932,6 +933,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void initializeGamepadThread();
 		void initializeSerialThread();
 		bool initializeLruMenu();
+		
+		bool openTemplateFile(const wxFileName& fn);
 		bool openInitialTemplateFile();
 		
 		void createAnimationControl();

@@ -2676,7 +2676,7 @@ bool CncControl::sendIdleMessage() {
 		
 	if ( getSerial()->isCommandActive() == true )
 	{
-		CNC_CEX1_A(" A idle request is skipped because a other command is still active")
+		CNC_CEX1_A("A idle request is skipped because a other command is still active")
 		return true;
 	}
 	

@@ -2785,6 +2785,20 @@ bool MainFrame::initializeLruMenu() {
 	return lruFileView->load(lruStore);
 }
 ///////////////////////////////////////////////////////////////////
+bool MainFrame::openTemplateFile(const wxFileName& fn) {
+///////////////////////////////////////////////////////////////////
+	if ( fn.Exists() == false ) 
+		return false; 
+	
+	m_inputFileName->SetValue(fn.GetFullName());
+	m_inputFileName->SetHint(fn.GetFullPath());
+	
+	const bool ret = openFile();
+	prepareAndShowMonitorTemplatePreview(true);
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
 bool MainFrame::openInitialTemplateFile() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT ( lruFileView != NULL );
@@ -2798,23 +2812,17 @@ bool MainFrame::openInitialTemplateFile() {
 	wxFileName fn;
 	if ( value.length() > 0 ) 	fn.Assign(value);
 	else 						fn.Assign(lruFileView->getFileName(0));
-
-	if ( fn.Exists() ) {
-		m_inputFileName->SetValue(fn.GetFullName());
-		m_inputFileName->SetHint(fn.GetFullPath());
-		
-		openFile();
-		prepareAndShowMonitorTemplatePreview(true);
-		
-	} else {
+	
+	const bool ret = openTemplateFile(fn);
+	if ( ret == false )
+	{
 		THE_CONFIG->getDefaultTplDir(value);
 		fileView->openDirectory(value);
 		
 		selectMainBookSourcePanel();
-		return false; 
 	}
 	
-	return true;
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateUnit() {
@@ -4966,7 +4974,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		
 			// *********************
 			StreamBufferHighlighter sbh(std::clog);
-			CNC_CLOG_A(wxString::Format("\n~~~ Processing(probe mode = %s) started ~~~", probeMode))
+			CNC_CLOG_A(wxString::Format("~~~ Processing(probe mode = %s) started ~~~", probeMode))
 			INC_LOGGER_INDENT
 			
 			// This instance starts and stops the speed monitor
@@ -7019,6 +7027,7 @@ void MainFrame::rcRun() {
 	}
 	
 	// process
+	CNC_CLOG_A("")
 	processTemplateWrapper();
 	
 	// restore the interval
@@ -7854,6 +7863,52 @@ void MainFrame::selectPositionSpyContent(wxCommandEvent& event) {
 	clearPositionSpy();
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::processDirectoryTest(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxString dirName; THE_CONFIG->getDefaultTestTplDir(dirName);
+	dirName.append(wxFileName::GetPathSeparator());
+	
+	wxDir dir(dirName);
+	if ( !dir.IsOpened() )
+	{
+		CNC_CERR_FUNCT_A("Can't open '%s'", dirName)
+		return;
+	}
+	
+	wxString filename;
+	bool cont = dir.GetFirst(&filename);
+	while ( cont )
+	{
+		bool error = false;
+		wxFileName fn(dirName, filename);
+		
+		CNC_CLOG_A("\n~~~ Start Test for '%s'", fn.GetFullPath())
+		INC_LOGGER_INDENT
+		
+		if ( openTemplateFile(fn) )
+		{
+			if ( processTemplateWrapper() == false )
+			{
+				// the errors are already present
+				//CNC_CERR_A("Error while processing '%s'", fn.GetFullPath())
+				error = true;
+			}
+		}
+		else
+		{
+			CNC_CERR_A("Error while open '%s'", fn.GetFullPath())
+			error = true;
+		}
+		
+		DEC_LOGGER_INDENT
+		if ( error )	CNC_CERR_A("=== Finish Test with errors for '%s'", fn.GetFullPath())
+		else			CNC_CLOG_A("=== Finish Test successfully for '%s'", fn.GetFullPath())
+		
+		cont = dir.GetNext(&filename);
+	}
+
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxTextEntryDialog dlg(this, "Loop Repeat Test:", "Loop count . . .", "");
@@ -7885,6 +7940,9 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 	// loop
 	for ( unsigned int i=0; i<loopCount; i++)
 	{
+		if ( cnc && cnc->isInterrupted() )
+			break;
+
 		bool ret = processTemplateWrapper( i == 0 );
 		duration += THE_CONTEXT->timestamps.getTotalDurationMillis();
 
@@ -7897,7 +7955,7 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 			CNC_CERR_FUNCT_A("Call of processTemplateWrapper() failed")
 			//break;
 		}
-			
+		
 		waitActive(5);
 	}
 	

@@ -134,7 +134,7 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			prop = port->AppendChild( new wxStringProperty("Default port", NEXT_PROP_ID, ""));
 			prop->Enable(true);
 			prop->SetHelpString("");
-			registerProperty(CncApplication_Com_DEFALT_PORT, prop);
+			registerProperty(CncApplication_Com_DEFAULT_PORT, prop);
 		}
 		collapse(port);
 		
@@ -148,13 +148,13 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			prop = tpl->AppendChild( new wxDirProperty("Default directory", NEXT_PROP_ID, ""));
 			prop->Enable(true);
 			prop->SetHelpString("");
-			registerProperty(CncApplication_Tpl_DEFALT_DIRECTORY, prop);
+			registerProperty(CncApplication_Tpl_DEFAULT_DIRECTORY, prop);
 			
 			//...............
 			prop = tpl->AppendChild( new wxFileProperty("Default template", NEXT_PROP_ID, ""));
 			prop->Enable(true);
 			prop->SetHelpString("");
-			registerProperty(CncApplication_Tpl_DEFALT_FILE, prop);
+			registerProperty(CncApplication_Tpl_DEFAULT_FILE, prop);
 		}
 		collapse(tpl);
 
@@ -225,5 +225,18 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			registerProperty(CncApplication_Tool_PY_CAM, prop);
 		}
 		collapse(tools);
+		
+		//...................
+		wxPGProperty* test = NULL;
+		curCatLabel.assign("Test");
+		test = root->AppendChild( new wxPropertyCategory(curCatLabel));
+		registerCategory(curCatLabel, test);
+		{
+			//...............
+			prop = test->AppendChild( new wxDirProperty("Default test templates directory", NEXT_PROP_ID, ""));
+			prop->Enable(true);
+			prop->SetHelpString("");
+			registerProperty(CncApplication_Tpl_DEFAULT_TEST_DIRECTORY, prop);
+		}
 	}
 }
