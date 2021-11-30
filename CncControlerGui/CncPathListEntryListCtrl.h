@@ -2,7 +2,7 @@
 #define CNC_PATH_LIST_ENTRY_LIST_CTRL_H
 
 #include <vector>
-#include "CncPathListEntry.h"
+#include "CncPathListManager.h"
 #include "CncLargeScaleListCtrl.h"
 
 class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
@@ -60,6 +60,7 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		CncPathListEntryListCtrl(wxWindow *parent, long style);
 		virtual ~CncPathListEntryListCtrl();
 		
+		void addPathListEntries(const CncPathListManager& cpm);
 		void addPathListEntry(const CncPathListEntry& cpe);
 		void clearAll();
 

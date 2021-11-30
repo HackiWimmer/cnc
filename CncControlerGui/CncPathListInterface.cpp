@@ -2,6 +2,7 @@
 #include "MainFrameProxy.h"
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "CncMoveSequence.h"
 #include "CncFileNameService.h"
 #include "CncMotionMonitor.h"
 #include "CncPathListInterface.h"
@@ -186,7 +187,6 @@ bool CncPathListFileStore::save(const wxString& fileName) {
 	}
 	
 	std::ofstream ofs (fileName.c_str().AsChar(), std::ofstream::out);
-	
 	if ( ofs.good() ) {
 			
 			ofs	<< headerStream	.str()
@@ -215,4 +215,5 @@ void CncPathListFileStore::processTrigger(const Trigger::EndRun& tr) {
 ////////////////////////////////////////////////////////////////////
 	save(CncFileNameService::getCncPathListFileStoreDefFileName());
 }
+
 

@@ -4,24 +4,57 @@
 #include "CncContext.h"
 #include "CncConfig.h"
 #include "FileParser.h"
+#include "CncControl.h"
 #include "CncMotionMonitor.h"
 #include "CncAutoFreezer.h"
 #include "CncPreprocessor.h"
 #include "CncMoveSequence.h"
 #include "CncPathListInterface.h"
+#include "CncPathListInterfaceCnc.h"
 #include "CncPathListRunner.h"
 
 ///////////////////////////////////////////////////////////////////
-#warning evaluate why WorflowTriggerNextPathEntry::process() crashes
 
-bool WorflowSetupRunEntry          ::process(CncPathListRunner* plr)	{ plr->autoSetup(trace);   return true; } 
-bool WorflowTriggerBeginRunEntry   ::process(CncPathListRunner* plr)	{ plr->processTrigger(tr); return true; }
-bool WorflowTriggerEndRunEntry     ::process(CncPathListRunner* plr)	{ plr->processTrigger(tr); return true; }
-bool WorflowTriggerNextPathEntry   ::process(CncPathListRunner* plr)	{ /*plr->processTrigger(tr);*/ return true; } 
-bool WorflowTriggerSpeedChangeEntry::process(CncPathListRunner* plr)	{ plr->processTrigger(tr); return true; }
-bool WorflowTriggerGuidePtahEntry  ::process(CncPathListRunner* plr)	{ plr->processTrigger(tr); return true; } 
-bool WorflowCncEntry               ::process(CncPathListRunner* plr)	{ return plr->publishCncPath(plm); }
-bool WorflowGuideEntry             ::process(CncPathListRunner* plr)	{ return plr->publishGuidePath(plm, zOffset); }
+
+bool CncPathListRunner::WorkflowTriggerBeginRunEntry   ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
+bool CncPathListRunner::WorkflowTriggerEndRunEntry     ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
+bool CncPathListRunner::WorkflowTriggerNextPathEntry   ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
+bool CncPathListRunner::WorkflowTriggerSpeedChangeEntry::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
+bool CncPathListRunner::WorkflowTriggerGuidePtahEntry  ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
+bool CncPathListRunner::WorkflowSetupRunEntry          ::process(CncPathListRunner* plr)	{ plr->autoSetup(trace);   return true; }
+bool CncPathListRunner::WorkflowCncEntry               ::process(CncPathListRunner* plr)	{ return plr->publishCncPath(plm); }
+bool CncPathListRunner::WorkflowGuideEntry             ::process(CncPathListRunner* plr)	{ return plr->publishGuidePath(plm, zOffset); }
+
+void CncPathListRunner::WorkflowTriggerBeginRunEntry   ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
+void CncPathListRunner::WorkflowTriggerEndRunEntry     ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
+void CncPathListRunner::WorkflowTriggerNextPathEntry   ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
+void CncPathListRunner::WorkflowTriggerSpeedChangeEntry::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
+void CncPathListRunner::WorkflowTriggerGuidePtahEntry  ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
+void CncPathListRunner::WorkflowSetupRunEntry          ::traceTo(std::ostream& o)	const	{ o << "Setup(...)"									<< std::endl; }
+void CncPathListRunner::WorkflowCncEntry               ::traceTo(std::ostream& o)	const	{ o << "CncEntry("	<< plm.firstClientID() << ")"	<< std::endl; }
+void CncPathListRunner::WorkflowGuideEntry             ::traceTo(std::ostream& o)	const	{ o << "GuideEntry("<< plm.firstClientID() << ")"	<< std::endl; }
+
+////////////////////////////////////////////////////////////////////
+bool CncPathListRunner::WorkflowEntry::shiftTargetImpl(CncPathListManager& plm, const CncDoubleDistance dist) {
+////////////////////////////////////////////////////////////////////
+	
+	#warning !!!!
+	for ( auto& ple : plm )
+	{
+		ple.entryTarget.decX(dist.getX());
+		ple.entryTarget.decY(dist.getY());
+		ple.entryTarget.decZ(dist.getZ());
+		
+		ple.entryDistance.setX(-dist.getX());
+		ple.entryDistance.setY(-dist.getY());
+		ple.entryDistance.setZ(-dist.getZ());
+		
+		break;
+	}
+
+	
+	return true;
+}
 
 ////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::maxXYPitchRadians	= CncPathListRunner::Move::degree2Radians(15);
@@ -222,7 +255,7 @@ bool CncPathListRunner::Move::test() {
 CncPathListRunner::CncPathListRunner(CncControl* cnc) 
 : workflowList			()
 , currentSequence		(NULL)
-, currentInterface		(new CncCtrl(cnc))
+, currentInterface		(new CncPathListInterfaceCnc(cnc))
 , setup					()
 //////////////////////////////////////////////////////////////////
 {
@@ -243,7 +276,7 @@ void CncPathListRunner::changePathListRunnerInterfaceImpl(const wxString& portNa
 	
 	if		( portName.IsSameAs(_portPreProcMonitor) )	installInterface(new CncPathListMonitor());
 	else if	( portName.IsSameAs(_portPreProcFile) )		installInterface(new CncPathListFileStore());
-	else												installInterface(new CncCtrl(THE_APP->getCncControl()));
+	else												installInterface(new CncPathListInterfaceCnc(THE_APP->getCncControl()));
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::installInterface(CncPathListRunner::Interface* iface) {
@@ -288,6 +321,23 @@ void CncPathListRunner::traceSetup() {
 	cpp->addOperatingTrace(ss);
 }
 //////////////////////////////////////////////////////////////////
+bool CncPathListRunner::processGuidePath(const CncPathListManager& plm, double zOffset) {
+////////////////////////////////////////////////////////////////// 
+	workflowList.push_back(new WorkflowGuideEntry(plm, zOffset)); 
+	return true; 
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::processCncPath(const CncPathListManager& plm) { 
+//////////////////////////////////////////////////////////////////
+	workflowList.push_back(new WorkflowCncEntry(plm));
+	
+	// if the corresponding gui list isn't connected this call 
+	// does nothing and returns only
+	THE_APP->getCncPreProcessor()->addPathListEntries(plm);
+	
+	return true; 
+}
+//////////////////////////////////////////////////////////////////
 void CncPathListRunner::resetWorkflow() {
 //////////////////////////////////////////////////////////////////
 	for ( auto workflowEntry : workflowList )
@@ -298,13 +348,42 @@ void CncPathListRunner::resetWorkflow() {
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::spoolWorkflow() {
 //////////////////////////////////////////////////////////////////
-	CNC_CEX2_A("Start spooling path list workflow(entries=%ld)", (long)workflowList.size())
-	
+	CNC_CEX2_A("Start analyzing path list workflow(entries=%zu)", workflowList.size())
+
+#warning !!!!
+	//return true;
+/*
+	const CncDoubleDistance dist(30.0, 30.0, 0.0);
 	for ( auto workflowEntry : workflowList )
 	{
-		//CNC_CEX3_FUNCT_A("%s", typeid(workflowEntry).name() )
-		if ( workflowEntry && workflowEntry->process(this) == false )
+		workflowEntry->shiftTarget(dist);
+		break;
+	}
+*/
+
+//workflowList.begin()->shiftTarget(dist);
+
+
+
+	
+	// over all workflow entries
+	for ( auto workflowEntry : workflowList )
+	{
+		//workflowEntry->traceTo(cnc::cex3);
+		
+		if ( workflowEntry->isEndRunTrigger() )
 		{
+			// try to switch the spindle off 
+			// may be the template <CncParameterBlock Spindle="Off"/>
+			// has not already done this
+			const bool force = true;
+			currentInterface->processSpindleStateSwitch(SPINDLE_STATE_OFF, force);
+		}
+		
+		if ( workflowEntry->process(this) == false )
+		{
+			std::stringstream ss; workflowEntry->traceTo(ss);
+			CNC_CERR_FUNCT_A("Error while processing: %s", ss.str().c_str());
 			return false;
 		}
 	}
@@ -816,7 +895,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 	if ( plm.getPathList().size() == 0 )
 		return true;
 	
-	// forward guide pathes
+	// forward guide paths
 	if ( plm.getPathType() == CncPathListManager::PathType::PT_GUIDE_PATH )
 		return publishGuidePath(plm, 0.0);
 	
@@ -824,7 +903,8 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 	
 	autoSetup(false);
 	
-	if ( setup.trace == true ) {
+	if ( setup.trace == true )
+	{
 		std::stringstream ss; ss << plm << std::endl;
 		cpp->addOperatingTracePthLstSep("Next CncPathListManager\n");
 		cpp->addOperatingTrace(ss);
@@ -838,8 +918,8 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 	// Main loop over all path list manager cnc entries
 	auto beg = plm.cbegin();
 	auto end = plm.cend();
-	for ( auto it = beg; it != end; ++it) {
-		
+	for ( auto it = beg; it != end; ++it)
+	{
 		const CncPathListEntry& curr = *it;
 		const CncPathListEntry* next = it + 1 != end ? &(*(it + 1)) : NULL;
 
@@ -853,10 +933,6 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 			return false;
 		}
 		
-		// if the corresponding gui list isn't connected this call 
-		// does nothing and returns only
-		THE_APP->getCncPreProcessor()->addPathListEntry(curr);
-
 		// ----------------------------------------------------------
 		if ( curr.isNothingChanged() == true ) {
 			continue;

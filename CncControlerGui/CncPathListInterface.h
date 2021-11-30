@@ -11,7 +11,8 @@ class CncPathListMonitor : public CncPathListRunner::Interface {
 	
 	protected:
 		
-		struct Current {
+		struct Current 
+		{
 			CncDoublePosition	monitorPos			= {0.0, 0.0, 0.0};
 			bool				spindleState		= false;
 			double				spindleSpeed		= 0.0;
@@ -44,7 +45,7 @@ class CncPathListMonitor : public CncPathListRunner::Interface {
 		virtual void processClientIDChange(long cid)									;
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		;
 		virtual bool processToolChange(double diameter)									{ return true; }
-		virtual bool processSpindleStateSwitch(bool on)									{ current.spindleState = on; return true; }
+		virtual bool processSpindleStateSwitch(bool on, bool force=false)				{ current.spindleState = on; return true; }
 		virtual bool processSpindleSpeedChange(double value_U_MIN)						{ current.spindleSpeed = value_U_MIN; return true; }
 		virtual bool processMoveSequence(CncMoveSequence& msq)							;
 		virtual bool processPathListEntry(const CncPathListEntry& ple)					;
@@ -54,7 +55,6 @@ class CncPathListMonitor : public CncPathListRunner::Interface {
 		virtual void processTrigger(const Trigger::NextPath& tr)						{}
 		virtual void processTrigger(const Trigger::SpeedChange& tr)						{}
 		virtual void processTrigger(const Trigger::GuidePath& tr)						{}
-
 };
 
 // -------------------------------------------------------------------------------------

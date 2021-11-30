@@ -203,6 +203,14 @@ void CncPreprocessor::addPathListEntry(const CncPathListEntry& cpe) {
 	pathListEntries->addPathListEntry(cpe);
 }
 //////////////////////////////////////////////////////////////////
+void CncPreprocessor::addPathListEntries(const CncPathListManager& cpm) {
+//////////////////////////////////////////////////////////////////
+	if ( m_btConnectPathListEntries->GetValue() == false )
+		return;
+	
+	pathListEntries->addPathListEntries(cpm);
+}
+//////////////////////////////////////////////////////////////////
 void CncPreprocessor::addOperatingTrace(const wxString& s) {
 //////////////////////////////////////////////////////////////////
 	if ( useOperatingTrace == false )

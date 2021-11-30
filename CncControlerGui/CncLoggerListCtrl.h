@@ -119,7 +119,7 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		void incCurrentIndent();
 		void decCurrentIndent();
 		void setCurrentIndent(unsigned int i);
-		unsigned int getCurrentIndent() const { return currentIndent.Length(); }
+		unsigned int getCurrentIndent() const { return currentIndent.length(); }
 		
 		void displayTimeColumn(bool show);
 		

@@ -521,6 +521,12 @@ namespace Trigger
 			std::string user;
 			 
 		} PRC;
+		
+		std::ostream& traceTo(std::ostream &ostr) const;
+		friend std::ostream &operator<< (std::ostream &ostr, const ParameterSet &p)
+		{
+			return p.traceTo(ostr);
+		}
 	};
 	
 	struct BeginRun 
@@ -536,14 +542,23 @@ namespace Trigger
 
 		BeginRun(BeginRun&&) = default;
 		BeginRun& operator= (BeginRun&&) = default;
+		
+		friend std::ostream &operator<< (std::ostream &ostr, const BeginRun &t) 
+		{
+			ostr << "Trigger::BeginRun(";
+			ostr << t.parameter;
+			ostr << ")";
+			
+			return ostr;
+		}
 	};
 	
 	struct EndRun 
 	{
-		const bool succcess = false;
+		const bool success = false;
 		
 		explicit EndRun(bool s)
-		: succcess(s)
+		: success(s)
 		{}
 		
 		EndRun(const EndRun&) = default;
@@ -551,6 +566,15 @@ namespace Trigger
 
 		EndRun(EndRun&&) = default;
 		EndRun& operator= (EndRun&&) = default;
+		
+		friend std::ostream &operator<< (std::ostream &ostr, const EndRun &t) 
+		{
+			ostr << "Trigger::EndRun(success=";
+			ostr << t.success;
+			ostr << ")";
+			
+			return ostr;
+		}
 	};
 	
 	struct NextPath 
@@ -563,6 +587,12 @@ namespace Trigger
 
 		NextPath(NextPath&&) = default;
 		NextPath& operator= (NextPath&&) = default;
+		
+		friend std::ostream &operator<< (std::ostream &ostr, const NextPath &t) 
+		{
+			ostr << "Trigger::NextPath()";
+			return ostr;
+		}
 	};
 	
 	struct SpeedChange 
@@ -580,6 +610,16 @@ namespace Trigger
 
 		SpeedChange(SpeedChange&&) = default;
 		SpeedChange& operator= (SpeedChange&&) = default;
+		
+		friend std::ostream &operator<< (std::ostream &ostr, const SpeedChange &t) 
+		{
+			ostr << "Trigger::SpeedChange(Speed=";
+			ostr << t.currentSpeedMode;
+			ostr << t.currentSpeedValue;
+			ostr << ")";
+			
+			return ostr;
+		}
 	};
 	
 	struct GuidePath 
@@ -595,6 +635,12 @@ namespace Trigger
 
 		GuidePath(GuidePath&&) = default;
 		GuidePath& operator= (GuidePath&&) = default;
+		
+		std::ostream& traceTo(std::ostream &ostr) const;
+		friend std::ostream &operator<< (std::ostream &ostr, const GuidePath &t) 
+		{
+			return t.traceTo(ostr);
+		}
 	};
 };
 

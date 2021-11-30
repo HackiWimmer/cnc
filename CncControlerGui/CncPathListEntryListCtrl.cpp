@@ -396,5 +396,14 @@ void CncPathListEntryListCtrl::addPathListEntry(const CncPathListEntry& cpe) {
 	pathLists.push_back(cpe);
 	SetItemCount(pathLists.size());
 }
+/////////////////////////////////////////////////////////////
+void CncPathListEntryListCtrl::addPathListEntries(const CncPathListManager& cpm) {
+/////////////////////////////////////////////////////////////
+	for ( auto it = cpm.cbegin(); it != cpm.cend(); ++it)
+	{
+		const CncPathListEntry& cpe = *it;
+		addPathListEntry(cpe);
+	}
+}
 
 

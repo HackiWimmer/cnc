@@ -4,7 +4,7 @@
 #include "wxCrafterMotionMonitor.h"
 #include "CncCommon.h"
 #include "CncMoveSequence.h"
-#include "CncPathListEntry.h"
+#include "CncPathListManager.h"
 
 class CncPathListEntryListCtrl;
 class CncMoveSequenceListCtrl;
@@ -48,6 +48,7 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void clearAll();
 		
 		void clearPathListEntries();
+		void addPathListEntries(const CncPathListManager& cpm);
 		void addPathListEntry(const CncPathListEntry& cpe);
 		
 		void clearMoveSequences();

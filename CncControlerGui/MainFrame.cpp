@@ -4190,6 +4190,7 @@ bool MainFrame::processVirtualTemplate() {
 	ps.SET.hardwareResY	= THE_CONFIG->getDisplayFactY();
 	ps.SET.hardwareResZ	= THE_CONFIG->getDisplayFactZ();
 	ps.PRC.user			= "Hacki Wimmer";
+	
 	const Trigger::BeginRun begRun(ps);
 	
 	wxASSERT( cnc );
@@ -4898,6 +4899,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	{
 		wxASSERT(cnc);
 		
+		wxDateTime tsStart(wxDateTime::UNow());
+		
 		//-----------------------------------------------------------------
 		// all mandatory checks from here on . . . 
 		
@@ -4989,11 +4992,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		//-----------------------------------------------------------------
 		// post settings from here on . . . 
 		
-		// try to switch the spindle off 
-		// may be the template <CncParameterBlock Spindle="Off"/>
-		// has not already done this
-		cnc->switchSpindleOff(true);
-		
 		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
 		
 		// refresh some periphery
@@ -5006,11 +5004,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		bounds.setMaxBound(cnc->getMaxPositionsMetric());
 		THE_TPL_CTX->registerBoundaries(bounds);
 		
-		if ( inboundFileParser )
-		{
-			const Trigger::EndRun endRun(ret);
-			inboundFileParser->deligateTrigger(endRun);
-		}
+		const wxTimeSpan elapsed = wxDateTime::UNow().Subtract(tsStart);
+		const wxString timeInfo(wxString::Format("total time: %s", elapsed.Format("%H:%M:%S.%l")));
 		
 		//-----------------------------------------------------------------
 		// post statements from here on . . . 
@@ -5020,7 +5015,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			StreamBufferHighlighter sbh(cnc::cex1);
 			
 			wxString hint("not successfully");
-			CNC_CEX1_A(wxString::Format("=== Processing(probe mode = %s) finished %s ===", probeMode, hint))
+			CNC_CEX1_A(wxString::Format("=== Processing(probe mode = %s) finished %s, %s ===", probeMode, hint, timeInfo))
 			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_WARNING_STR)
 			
 			lock.setErrorMode();
@@ -5032,7 +5027,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		{
 			StreamBufferHighlighter sbh(std::clog);
 			
-			CNC_CLOG_A(wxString::Format("=== Processing(probe mode = %s) finished successfully ===", probeMode))
+			CNC_CLOG_A(wxString::Format("=== Processing(probe mode = %s) finished successfully, %s ===", probeMode, timeInfo))
 			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR )
 			
 			THE_TPL_CTX->registerValidRun();
@@ -7865,6 +7860,67 @@ void MainFrame::selectPositionSpyContent(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::processDirectoryTest(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	// ----------------------------------------------------------
+	class AllFiles : public wxDirTraverser {
+		
+		public:
+		
+			unsigned int cntTotalDirs;
+			unsigned int cntTotalFiles;
+			unsigned int cntFailed;
+
+			// --------------------------------------------------
+			AllFiles() 
+			: wxDirTraverser()
+			, cntTotalDirs	(0)
+			, cntTotalFiles	(0)
+			, cntFailed		(0)
+			{}
+			// --------------------------------------------------
+			virtual ~AllFiles()
+			{}
+			// --------------------------------------------------
+			virtual wxDirTraverseResult OnDir(const wxString& dirname)
+			{
+				cntTotalDirs++;
+				return wxDIR_CONTINUE;
+			}
+			// --------------------------------------------------
+			virtual wxDirTraverseResult OnFile(const wxString& filename)
+			{
+				bool error = false;
+				wxFileName fn(filename);
+				
+				CNC_CLOG_A("\n~~~ Start Test for '%s'", fn.GetFullPath())
+				INC_LOGGER_INDENT
+				
+				if ( THE_APP->openTemplateFile(fn) )
+				{
+					if ( THE_APP->processTemplateWrapper() == false )
+					{
+						// the errors are already present
+						//CNC_CERR_A("Error while processing '%s'", fn.GetFullPath())
+						cntFailed++;
+						error = true;
+					}
+				}
+				else
+				{
+					CNC_CERR_A("Error while open '%s'", fn.GetFullPath())
+					cntFailed++;
+					error = true;
+				}
+				
+				DEC_LOGGER_INDENT
+				if ( error )	CNC_CERR_A("=== Finish Test with errors for '%s'",  fn.GetFullPath())
+				else			CNC_CLOG_A("=== Finish Test successfully for '%s'", fn.GetFullPath())
+				
+				cntTotalFiles++;
+				return wxDIR_CONTINUE;
+			}
+	};
+	
+	// ----------------------------------------------------------
 	wxString dirName; THE_CONFIG->getDefaultTestTplDir(dirName);
 	dirName.append(wxFileName::GetPathSeparator());
 	
@@ -7875,37 +7931,18 @@ void MainFrame::processDirectoryTest(wxCommandEvent& event) {
 		return;
 	}
 	
-	wxString filename;
-	bool cont = dir.GetFirst(&filename);
-	while ( cont )
-	{
-		bool error = false;
-		wxFileName fn(dirName, filename);
-		
-		CNC_CLOG_A("\n~~~ Start Test for '%s'", fn.GetFullPath())
-		INC_LOGGER_INDENT
-		
-		if ( openTemplateFile(fn) )
-		{
-			if ( processTemplateWrapper() == false )
-			{
-				// the errors are already present
-				//CNC_CERR_A("Error while processing '%s'", fn.GetFullPath())
-				error = true;
-			}
-		}
-		else
-		{
-			CNC_CERR_A("Error while open '%s'", fn.GetFullPath())
-			error = true;
-		}
-		
-		DEC_LOGGER_INDENT
-		if ( error )	CNC_CERR_A("=== Finish Test with errors for '%s'", fn.GetFullPath())
-		else			CNC_CLOG_A("=== Finish Test successfully for '%s'", fn.GetFullPath())
-		
-		cont = dir.GetNext(&filename);
-	}
+	AllFiles allFiles;
+	dir.Traverse(allFiles);
+	
+	CNC_CEX2_A("Test execution Summary: *********************************************")
+	INC_LOGGER_INDENT
+	
+	CNC_CEX2_A("Total count test cases: %4u", allFiles.cntTotalFiles)
+	CNC_CEX2_A("          Successfully: %4u", allFiles.cntTotalFiles - allFiles.cntFailed)
+	CNC_CEX2_A("                Failed: %4u", allFiles.cntFailed)
+	
+	DEC_LOGGER_INDENT
+	CNC_CEX2_A("*********************************************************************")
 
 }
 /////////////////////////////////////////////////////////////////////

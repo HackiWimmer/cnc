@@ -433,12 +433,18 @@ bool SVGFileParser::spool() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
-	pathHandler->resetWorkflow();
+	// -----------------------------------------------------------
+	auto triggerEnd = [&](bool success)
+	{
+		const Trigger::EndRun endRun(success);
+		deligateTrigger(endRun);
+		return success;
+	};
 	
 	if ( pathHandler->prepareWork() == false )
 	{
 		CNC_CERR_FUNCT_A("pathHandler->prepareWork() failed");
-		return false;
+		return triggerEnd(false);
 	}
 	
 	SvgCncContextSummary sumCtx;
@@ -495,7 +501,7 @@ bool SVGFileParser::spool() {
 		{
 			// in this case to stop here is valid
 			if ( THE_CONTEXT->processingInfo->getStopFlag() == true )
-				return true;
+				return triggerEnd(true);
 				
 			std::cerr	<< CNC_LOG_FUNCT << ": Failed" 
 						<< std::endl
@@ -503,11 +509,11 @@ bool SVGFileParser::spool() {
 						<< ", Node Type: " << uai.nodeName 
 						<< std::endl
 						;
-			return false;
+			return triggerEnd(false);
 		}
 		
 		if ( evaluateDebugState() == false )
-			return false;
+			return triggerEnd(false);
 	}
 	
 	THE_TPL_CTX->registerToolTotList(sumCtx.getToolTotList());
@@ -516,9 +522,10 @@ bool SVGFileParser::spool() {
 	if ( pathHandler->finishWork() == false )
 	{
 		CNC_CERR_FUNCT_A("pathHandler->finishWork() failed");
-		return false;
+		return triggerEnd(false);;
 	}
 	
+	triggerEnd(true);
 	return pathHandler->spoolWorkflow();
 }
 //////////////////////////////////////////////////////////////////

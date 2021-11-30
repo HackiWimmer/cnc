@@ -108,7 +108,8 @@ void GCodeFileParser::logMeasurementEnd() {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
-	if ( pathHandler->prepareWork() == false ) {
+	if ( pathHandler->prepareWork() == false ) 
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": pathHandler->prepareWork() failed!\n");
 		return false;
 	}
@@ -125,15 +126,19 @@ bool GCodeFileParser::preprocess() {
 	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
 	ctrl->clearAll();
 	
-	if ( input.IsOk() ) {
-		while( input.IsOk() && !input.Eof() ) {
+	if ( input.IsOk() )
+	{
+		while( input.IsOk() && !input.Eof() )
+		{
 			wxString line = text.ReadLine();
 			line.Trim(false).Trim(true);
 			
 			incCurrentLineNumber();
 			
-			if ( line.IsEmpty() == false ) {
-				if ( processBlock(line, gcb) == false ) {
+			if ( line.IsEmpty() == false )
+			{
+				if ( processBlock(line, gcb) == false )
+				{
 					std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": Failed! Line number: %ld\n", getCurrentLineNumber()));
 					return false;
 				}
@@ -152,10 +157,16 @@ bool GCodeFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::spool() {
 //////////////////////////////////////////////////////////////////
+	// -----------------------------------------------------------
+	auto triggerEnd = [&](bool success)
+	{
+		const Trigger::EndRun endRun(success);
+		deligateTrigger(endRun);
+		return success;
+	};
+
 	if ( pathHandler->isPathListUsed() == false )
-		return true;
-		
-	pathHandler->resetWorkflow();
+		return triggerEnd(true);
 	
 	// over all commands
 	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
@@ -197,8 +208,9 @@ bool GCodeFileParser::spool() {
 	}
 	
 	if ( failed == true )
-		return false;
-	
+		return triggerEnd(false);
+		
+	triggerEnd(true);
 	return pathHandler->spoolWorkflow();
 }
 //////////////////////////////////////////////////////////////////

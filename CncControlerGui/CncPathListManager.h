@@ -138,6 +138,8 @@ class CncPathListManager {
 		auto	crLastPosEntryIterator()							const;
 		bool	hasMovement()										const;
 		
+		long	firstClientID()										const;
+		
 		void	init(const CncDoublePosition& p);
 		
 		void	changeToGuideType(GuideType gt = ORIG_PATH);

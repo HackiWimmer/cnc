@@ -1,6 +1,7 @@
 #include <functional>
 #include <wx/filename.h>
 #include "ArduinoEnvWrapper.h"
+#include "CncPathListManager.h"
 #include "CncConfig.h"
 #include "CncCommon.h"
 
@@ -13,6 +14,20 @@ namespace cnc
 	const char* USER_DEFIND_SPEED_CHAR_DESC		= "Userdefined speed";
 };
 
+//////////////////////////////////////////////////////////////
+std::ostream& Trigger::ParameterSet::traceTo(std::ostream &ostr) const {
+//////////////////////////////////////////////////////////////
+	ostr << "Trigger::ParameterSet";
+	return ostr;
+}
+//////////////////////////////////////////////////////////////
+std::ostream& Trigger::GuidePath::traceTo(std::ostream &ostr) const {
+//////////////////////////////////////////////////////////////
+	ostr << "Trigger::GuidePath(";
+	ostr << plm.firstClientID();
+	ostr << ")";
+	return ostr;
+}
 //////////////////////////////////////////////////////////////
 int16_t cnc::cvnSpindleSpeed_U_MIN_ToRaw(double value) {
 //////////////////////////////////////////////////////////////

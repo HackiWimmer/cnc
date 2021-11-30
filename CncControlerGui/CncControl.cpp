@@ -1706,9 +1706,9 @@ bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool al
 	                             alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::switchSpindleState(bool on) {
+bool CncControl::switchSpindleState(bool on, bool force) {
 ///////////////////////////////////////////////////////////////////
-	return on ? switchSpindleOn() : switchSpindleOff();
+	return on ? switchSpindleOn() : switchSpindleOff(force);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::switchSpindleOn() {
@@ -2564,9 +2564,11 @@ bool CncControl::manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool a
 ///////////////////////////////////////////////////////////////////
 	bool ret = true;
 	
-	if ( x != 0 || y != 0 || z != 0 ) {
+	if ( x != 0 || y != 0 || z != 0 )
+	{
 		ret = false;
-		if ( prepareSimpleMove(false) == true ) {
+		if ( prepareSimpleMove(false) == true )
+		{
 			ret = moveRelLinearStepsXYZ(x, y, z, alreadyRendered );
 			
 			if ( limitStates.hasLimit() ) {
