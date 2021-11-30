@@ -2182,8 +2182,156 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 	return sendSerialControllerCallback(ci);
 }
 ///////////////////////////////////////////////////////////////////
+bool Serial::processMoveImage(const CncMoveSequenceImage& moveImage) {
+///////////////////////////////////////////////////////////////////
+	if ( isConnected() == false )
+	{
+		CNC_CERR_FUNCT_A("ERROR: Not connected");
+		return false;
+	}
+	
+	if ( moveImage.isValid() == false )
+	{
+		CNC_CERR_FUNCT_A("Invalid move image: This command will be rejected:")
+		return true;
+	}
+	
+	const CncMoveSequence::FlushResult& result = moveImage.getFlushResult();
+	
+	// empty move sequence nothing to do 
+	if ( result.flushedSize == 0 )
+		return true;
+	
+	SerialCommandLocker scl(this, result.type);
+	if ( scl.lock(cncControl) == false )
+	{
+		CNC_CERR_FUNCT_A("Serial is currently in fetching mode: This command will be rejected:")
+		return true;
+	}
+	
+	// runtime check 
+	if ( writeMoveSequenceRawCallback( result.buffer, result.flushedSize) == false )
+	{
+		CNC_CERR_FUNCT_A("writeMoveSequenceRawCallback failed")
+		return false;
+	}
+	
+	// runtime check - should not appear, because result.flushedSize is checked above
+	if ( moveImage.getPortionIndex().size() == 0 )
+	{
+		CNC_CERR_FUNCT_A("Empty portion")
+		return false;
+	}
+	
+	unsigned int totalFlushedSize	= result.flushedSize;
+	unsigned int currentFlushedSize	= moveImage.getPortionIndex().size() > 0 ? *(moveImage.getPortionIndex().begin()) : 0;
+	unsigned char* moveSequence 	= result.buffer;
+	moveCommand[0] 					= moveSequence[0];
+	
+	// to provide a time and pos reference for the speed calculation
+	logMeasurementRefTs(cncControl->getCurAppPos());
+	
+	// over all portions
+	for ( auto it = moveImage.getPortionIndex().begin(); it != moveImage.getPortionIndex().end(); ++it )
+	{
+		const unsigned int portionCounter = std::distance(moveImage.getPortionIndex().begin(), it);
+		
+		if ( traceSpyInfo && spyWrite )
+			cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]; portion=%u",	moveSequence[0],
+																						ArduinoCMDs::getCMDLabel(moveSequence[0]),
+																						portionCounter + 1
+									 ));
+		// notify
+		if ( cncControl->SerialCallback() == false )
+			return false;
+			
+		const unsigned int portionStart		= *it;
+		const unsigned int portionLength	= (unsigned int)moveSequence[portionStart];
+		const unsigned int portionTotLength	= portionLength + 1;
+		
+		const unsigned int writeStart		= portionCounter > 0 ? portionStart  : 0;
+		const unsigned int writeLength		= portionCounter > 0 ? portionTotLength : portionStart + portionTotLength;
+		
+		if ( false )
+		{
+			std::cout << "portionCounter: " << portionCounter << std::endl;
+			std::cout << " - portion : "    << portionStart << "->" << portionLength << std::endl;
+			std::clog << " - write   : "    << writeStart   << "->" << writeLength   << std::endl;
+		}
+			
+		// write ....
+		lastFetchResult.init(moveSequence[0], portionCounter);
+		if ( writeData(moveSequence + writeStart, writeLength) )
+		{
+			currentFlushedSize += portionTotLength; 
+			
+			SerialFetchInfo sfi(lastFetchResult.cmd);
+			sfi.fetchTimeout 		= 3000;
+			sfi.Msc.size 			= 3;
+			sfi.Msc.value1			= result.sequenceData.targetX;
+			sfi.Msc.value2			= result.sequenceData.targetY;
+			sfi.Msc.value3			= result.sequenceData.targetZ;
+			
+			// evaluate handshake
+			bool handshake = evaluateResultWrapper(sfi, std::cout);
+			if ( handshake == false )
+			{
+				CNC_CERR_FUNCT_A("Invalid handshake: portion counter: ", portionCounter)
+				cncControl->SerialCallback();
+				return false;
+			}
+			
+			if ( lastFetchResult.ret != RET_MORE && lastFetchResult.ret != RET_OK )
+			{
+				std::clog << "SERIAL::processMoveSequence(" << portionCounter << "): lastFetchResult.ret != RET_MORE | RET OK" << std::endl;
+				break;
+			}
+			
+			// notify
+			if ( cncControl->SerialCallback() == false )
+				return false;
+			
+		}
+		else
+		{
+			std::cerr << "SERIAL::processMoveSequence(" << portionCounter << "): Unable to write data" << std::endl;
+			cncControl->SerialCallback();
+			return false;
+		}
+	}// for
+	
+	// final quality check
+	if ( totalFlushedSize != currentFlushedSize )
+	{
+		std::cerr << CNC_LOG_FUNCT << ": totalFlushedSize != currentFlushedSize"	<< std::endl;
+		std::cerr << " - totalFlushedSize            : " << totalFlushedSize 		<< std::endl;
+		std::cerr << " - currentFlushedSize          : " << currentFlushedSize		<< std::endl;
+		return false;
+	}
+	
+	// latest log this move
+	logMeasurementLastTs();
+	
+	if ( contextInterface != NULL )
+	{
+		contextInterface->notifyMove(	result.type, 
+										result.sequenceData.lengthX, 
+										result.sequenceData.lengthY, 
+										result.sequenceData.lengthZ
+		);
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
+	CncMoveSequenceImage moveImage(sequence);
+	return processMoveImage(moveImage);
+	
+	
+	#warning remove this 
+	/*
 	if ( isConnected() == false )
 	{
 		CNC_CERR_FUNCT_A("ERROR: Not connected");
@@ -2317,11 +2465,17 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 	logMeasurementLastTs();
 	
 	if ( contextInterface != NULL )
-		contextInterface->notifyMove(sequence.getType(), sequence.getLengthX(), sequence.getLengthY(), sequence.getLengthZ());
+	{
+		contextInterface->notifyMove(	result.type, 
+										result.sequenceData.lengthX, 
+										result.sequenceData.lengthY, 
+										result.sequenceData.lengthZ
+		);
+	}
 	
 	return true;
+	*/
 }
-
 ///////////////////////////////////////////////////////////////////
 bool Serial::serializeSetter(SerialFetchInfo& sfi, const unsigned char* buffer, unsigned int nbByte) { 
 ///////////////////////////////////////////////////////////////////

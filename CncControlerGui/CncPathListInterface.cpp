@@ -24,12 +24,14 @@ CncPathListMonitor::~CncPathListMonitor() {
 bool CncPathListMonitor::dispatchEventQueue() {
 ////////////////////////////////////////////////////////////////////
 	// Event handling, enables the interrupt functionallity
-	static       CncMilliTimestamp tsLastDispatch   = 0;
+	static CncMilliTimestamp tsLastDispatch   = 0;
 
-	if ( THE_CONTEXT->isAllowEventHandling() ) {
+	if ( THE_CONTEXT->isAllowEventHandling() )
+	{
 		const CncMilliTimespan timespanEvent = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getMilliTimestamp(), tsLastDispatch);
 		
-		if ( timespanEvent >= THE_CONTEXT->getUpdateInterval() ) {
+		if ( timespanEvent >= THE_CONTEXT->getUpdateInterval() )
+		{
 			APP_PROXY::getMotionMonitor()->update(true);
 			APP_PROXY::dispatchAll();
 			tsLastDispatch = CncTimeFunctions::getMilliTimestamp();
@@ -45,16 +47,20 @@ CncLongPosition CncPathListMonitor::getPositionSteps() const {
 	return THE_CONFIG->convertMetricToSteps(ret, current.monitorPos);
 }
 ////////////////////////////////////////////////////////////////////
-void CncPathListMonitor::publishGuidePath(const CncPathListManager& plm, double zOffset) {
+bool CncPathListMonitor::processGuidePath(const CncPathListManager& plm, double zOffset) {
 ////////////////////////////////////////////////////////////////////
 	APP_PROXY::getMotionMonitor()->appendGuidPath(plm, zOffset);
 	dispatchEventQueue();
+	
+	return true;
 }
 ////////////////////////////////////////////////////////////////////
-void CncPathListMonitor::processClientIDChange(long cid) { 
+bool  CncPathListMonitor::processClientIDChange(long cid) { 
 ////////////////////////////////////////////////////////////////////
 	current.clientId = cid;
 	dispatchEventQueue();
+	
+	return true;
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListMonitor::processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m) { 
@@ -70,7 +76,8 @@ bool CncPathListMonitor::processMoveSequence(CncMoveSequence& msq) {
 	CncLongPosition ps;
 	THE_CONFIG->convertMetricToSteps(ps, current.monitorPos);
 	
-	for ( auto it = msq.const_begin(); it != msq.const_end(); ++it ) {
+	for ( auto it = msq.const_begin(); it != msq.const_end(); ++it )
+	{
 		const CncMoveSequence::SequencePoint& sp = *it;
 		
 		ps.inc(sp.x, sp.y, sp.z);

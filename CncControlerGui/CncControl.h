@@ -271,6 +271,7 @@ class CncControl {
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
 		
+		bool processMoveImage(const CncMoveSequenceImage& moveImage);
 		bool processMoveSequence(CncMoveSequence& moveSequence);
 		
 		bool processGetter(unsigned char pid, GetterValues& ret);

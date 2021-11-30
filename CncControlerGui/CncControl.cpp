@@ -592,6 +592,15 @@ bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool already
 	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
+bool CncControl::processMoveImage(const CncMoveSequenceImage& moveImage) {
+///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() == true )
+		return false;
+
+	wxASSERT(serialPort);
+	return serialPort->processMoveImage(moveImage);
+}
+///////////////////////////////////////////////////////////////////
 bool CncControl::processMoveSequence(CncMoveSequence& moveSequence) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() == true )

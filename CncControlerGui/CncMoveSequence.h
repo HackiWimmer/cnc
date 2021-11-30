@@ -6,18 +6,21 @@
 #include "OSD/CncTimeFunctions.h"
 #include "CncCommon.h"
 
+//////////////////////////////////////////////////////////////////////////////////////////////
 class CncMoveSequence {
 
 	public:
 
 		// -------------------------------------------------------------------------------
-		struct SequencePoint {
+		struct SequencePoint 
+		{
 			int32_t x;
 			int32_t y;
 			int32_t z;
 			long 	clientID;
 
-			struct Parameter {
+			struct Parameter 
+			{
 				unsigned char 	type			= 0;
 				unsigned int 	necessarySize	= 0;
 			} param;
@@ -86,7 +89,8 @@ class CncMoveSequence {
 		};
 
 		// -------------------------------------------------------------------------------
-		struct SequenceData {
+		struct SequenceData 
+		{
 			int32_t impulseCount 	= 0;
 
 			int32_t lengthX			= 0;
@@ -97,12 +101,14 @@ class CncMoveSequence {
 			int32_t targetY			= 0;
 			int32_t targetZ			= 0;
 
-			void reset() {
+			void reset() 
+			{
 				lengthX	= lengthY = lengthZ	= 0;
 				targetX = targetY = targetZ = 0;
 			}
 
-			void add(int32_t dx, int32_t dy, int32_t dz) {
+			void add(int32_t dx, int32_t dy, int32_t dz) 
+			{
 				const int32_t DX = ArdoObj::absolute(dx);
 				const int32_t DY = ArdoObj::absolute(dy);
 				const int32_t DZ = ArdoObj::absolute(dz);
@@ -176,7 +182,9 @@ class CncMoveSequence {
 			
 		};
 
-		struct FlushResult {
+		struct FlushResult 
+		{
+			unsigned char	type			= '\0';
 			unsigned char* 	buffer			= NULL;
 			unsigned int 	bufferSize		= 0;
 			unsigned int 	flushedSize		= 0;
@@ -184,13 +192,9 @@ class CncMoveSequence {
 			bool 			more			= false;
 			SequenceData	sequenceData;
 
-			void reset() {
-				buffer						= NULL;
-				bufferSize					= 0;
-				flushedCount				= 0;
-				more						= false;
-
-				sequenceData.reset();
+			void reset() 
+			{
+				*this = FlushResult();
 			}
 		};
 
@@ -259,6 +263,46 @@ class CncMoveSequence {
 		
 		unsigned int 			flushData(FlushResult& result);
 		unsigned int 			flushPoint(const SequencePoint& p, unsigned char* sequenceBuffer);
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+class CncMoveSequenceImage {
+	
+	public: 
+		CncMoveSequenceImage(CncMoveSequence& sequence)
+		: valid			(false)
+		, type			('\0')
+		, result		()
+		, portionIndex	()
+		{
+			
+			if ( sequence.flush(result) == false )
+			{
+				CNC_CERR_FUNCT_A("sequence.flush failed")
+				return;
+			}
+			
+			portionIndex = sequence.getPortionIndex();
+			
+			valid = true;
+		}
+		
+		~CncMoveSequenceImage()
+		{}
+		
+		bool									isValid()			const { return valid; }
+		unsigned char							getType()			const { return type; }
+		const CncMoveSequence::FlushResult&		getFlushResult()	const { return result; }
+		const CncMoveSequence::PortionIndex&	getPortionIndex()	const { return portionIndex; }
+		
+	private:
+		
+		bool							valid;
+		unsigned char					type;
+		CncMoveSequence::FlushResult	result;
+		CncMoveSequence::PortionIndex	portionIndex;
+		
+		CncMoveSequenceImage();
 };
 
 #endif

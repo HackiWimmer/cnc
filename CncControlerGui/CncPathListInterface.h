@@ -33,6 +33,9 @@ class CncPathListMonitor : public CncPathListRunner::Interface {
 		CncPathListMonitor();
 		virtual ~CncPathListMonitor();
 		
+		virtual bool spoolInstructions()												{ return true; }
+		virtual void resetInstructions()												{}
+		
 		virtual CncLongPosition   getPositionSteps()  const								;
 		virtual CncDoublePosition getPositionMetric() const								{ return current.monitorPos; }
 		
@@ -40,9 +43,8 @@ class CncPathListMonitor : public CncPathListRunner::Interface {
 		virtual void logMeasurementEnd()												{ tsMeasurementLast  = CncTimeFunctions::getNanoTimestamp(); }
 		virtual bool isInterrupted()													{ return false; }
 		
-		virtual void publishGuidePath(const CncPathListManager& plm, double zOffset);
-		
-		virtual void processClientIDChange(long cid)									;
+		virtual bool processGuidePath(const CncPathListManager& plm, double zOffset);
+		virtual bool processClientIDChange(long cid)									;
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		;
 		virtual bool processToolChange(double diameter)									{ return true; }
 		virtual bool processSpindleStateSwitch(bool on, bool force=false)				{ current.spindleState = on; return true; }

@@ -398,6 +398,7 @@ class Serial {
 		bool processUpdateInteractiveMove(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, int modifySpeed=0);
 		
 		bool processMoveSequence(CncMoveSequence& moveSequence);
+		bool processMoveImage(const CncMoveSequenceImage& moveImage);
 		
 		bool resolveLimits(unsigned int size, const int32_t (&values)[3]);
 		

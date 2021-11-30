@@ -15,7 +15,6 @@
 
 ///////////////////////////////////////////////////////////////////
 
-
 bool CncPathListRunner::WorkflowTriggerBeginRunEntry   ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
 bool CncPathListRunner::WorkflowTriggerEndRunEntry     ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
 bool CncPathListRunner::WorkflowTriggerNextPathEntry   ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
@@ -365,6 +364,7 @@ bool CncPathListRunner::spoolWorkflow() {
 
 
 
+	currentInterface->resetInstructions();
 	
 	// over all workflow entries
 	for ( auto workflowEntry : workflowList )
@@ -388,7 +388,7 @@ bool CncPathListRunner::spoolWorkflow() {
 		}
 	}
 	
-	return true;
+	return currentInterface->spoolInstructions();
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListRunner::logMeasurementStart() {
@@ -1006,7 +1006,7 @@ bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm, double z
 	if ( plm.getPathType() != CncPathListManager::PathType::PT_GUIDE_PATH )
 		return false;
 		
-	currentInterface->publishGuidePath(plm, zOffset);
+	currentInterface->processGuidePath(plm, zOffset);
 	return true;
 }
 //////////////////////////////////////////////////////////////////

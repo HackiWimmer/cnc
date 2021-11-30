@@ -83,6 +83,7 @@ class CncPathListRunner {
 			virtual bool process(CncPathListRunner* plr);
 			virtual void traceTo(std::ostream& o) const;
 		};
+		
 		// ---------------------------------------------------
 		struct WorkflowCncEntry : public WorkflowEntry
 		{
@@ -93,6 +94,7 @@ class CncPathListRunner {
 			virtual void traceTo(std::ostream& o) const;
 			virtual bool shiftTarget(const CncDoubleDistance dist) { return shiftTargetImpl(plm, dist); }
 		};
+		
 		// ---------------------------------------------------
 		struct WorkflowGuideEntry : public WorkflowEntry
 		{
@@ -183,13 +185,15 @@ class CncPathListRunner {
 				virtual CncLongPosition   getPositionSteps()  const								= 0;
 				virtual CncDoublePosition getPositionMetric() const								= 0;
 				
+				virtual bool spoolInstructions()												= 0;
+				virtual void resetInstructions()												= 0;
+		
 				virtual void logMeasurementStart()												= 0;
 				virtual void logMeasurementEnd()												= 0;
 				virtual bool isInterrupted()													= 0;
 				
-				virtual void publishGuidePath(const CncPathListManager& plm, double zOffset)	= 0;
-				
-				virtual void processClientIDChange(long cid)									= 0;
+				virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)	= 0;
+				virtual bool processClientIDChange(long cid)									= 0;
 				virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		= 0;
 				virtual bool processToolChange(double diameter)									= 0;
 				virtual bool processSpindleStateSwitch(bool on, bool force=false)				= 0;

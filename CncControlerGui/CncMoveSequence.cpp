@@ -229,9 +229,10 @@ bool CncMoveSequence::flush(FlushResult& result) {
 		return 0;
 
 	result.reset();
+	result.type = getType();
 
-	if ( getCount() > 0 ) {
-
+	if ( getCount() > 0 )
+	{
 		const unsigned int flushedCount = flushData(result);
 		if ( flushedCount == 0 )
 			return false;
@@ -241,8 +242,8 @@ bool CncMoveSequence::flush(FlushResult& result) {
 			return false;
 
 		result.bufferSize	= getBufferSize();
-		result.flushedSize 	= flushedSize;
 		result.buffer		= (unsigned char*)getBuffer();
+		result.flushedSize 	= flushedSize;
 		result.flushedCount	= flushedCount;
 		result.more			= hasMore();
 	}
