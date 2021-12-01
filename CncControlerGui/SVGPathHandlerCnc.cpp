@@ -9,14 +9,16 @@
 #include "CncBoundarySpace.h"
 #include "CncPathListRunner.h"
 #include "GlobalFunctions.h"
-#include "MainFrameProxy.h"
+#include "MainFrame.h"
 #include "FileParser.h"
 #include "SVGPathHandlerCnc.h"
 
-#define CTX_ADD_SEP(msg)	APP_PROXY::parsingSynopsisTraceAddSeparator(wxString::Format("[LN: %8ld]: %s", getSvgCncContext().getCurrentLineNumber(), msg));
-#define CTX_LOG_INF(msg)	APP_PROXY::parsingSynopsisTraceAddInfo     (wxString::Format("[LN: %8ld]: %s", getSvgCncContext().getCurrentLineNumber(), msg));
-#define CTX_LOG_WAR(msg)	APP_PROXY::parsingSynopsisTraceAddWarning  (wxString::Format("[LN: %8ld]: %s", getSvgCncContext().getCurrentLineNumber(), msg));
-#define CTX_LOG_ERR(msg)	APP_PROXY::parsingSynopsisTraceAddError    (wxString::Format("[LN: %8ld]: %s", getSvgCncContext().getCurrentLineNumber(), msg));
+//////////////////////////////////////////////////////////////////
+
+#define CTX_ADD_SEP(msg)	THE_CONTEXT->addParsingSynopisSeparator(wxString::Format("[LN: %8ld]: %s", getSvgCncContext().getCurrentLineNumber(), msg));
+#define CTX_LOG_INF(msg)	THE_CONTEXT->addParsingSynopisInfo     (wxString::Format("[LN: %8ld]: %s", getSvgCncContext().getCurrentLineNumber(), msg));
+#define CTX_LOG_WAR(msg)	THE_CONTEXT->addParsingSynopisWarning  (wxString::Format("[LN: %8ld]: %s", getSvgCncContext().getCurrentLineNumber(), msg));
+#define CTX_LOG_ERR(msg)	THE_CONTEXT->addParsingSynopisError    (wxString::Format("[LN: %8ld]: %s", getSvgCncContext().getCurrentLineNumber(), msg));
 
 //////////////////////////////////////////////////////////////////
 class CncPathListEntry;

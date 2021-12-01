@@ -249,6 +249,15 @@ bool CncPathListRunner::Move::test() {
 	return true;
 }
 
+//////////////////////////////////////////////////////////////////
+
+#define CHECK_AND_PERFORM_PROCESSING_STATE \
+	if ( checkAndPerfromProcessingState() == false ) \
+	{ \
+		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed") \
+		return false; \
+	}
+
 
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::CncPathListRunner(CncControl* cnc) 
@@ -347,7 +356,7 @@ void CncPathListRunner::resetWorkflow() {
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::spoolWorkflow() {
 //////////////////////////////////////////////////////////////////
-	CNC_CEX2_A("Start analyzing path list workflow(entries=%zu)", workflowList.size())
+	CNC_CEX2_A("Start analyzing path list workflow (entries=%zu)", workflowList.size())
 
 #warning !!!!
 	//return true;
@@ -363,14 +372,13 @@ bool CncPathListRunner::spoolWorkflow() {
 //workflowList.begin()->shiftTarget(dist);
 
 
-
+	// prepare the cnc instructions container
+	// it will be re-filled by the loop below
 	currentInterface->resetInstructions();
 	
 	// over all workflow entries
 	for ( auto workflowEntry : workflowList )
 	{
-		//workflowEntry->traceTo(cnc::cex3);
-		
 		if ( workflowEntry->isEndRunTrigger() )
 		{
 			// try to switch the spindle off 
@@ -386,8 +394,11 @@ bool CncPathListRunner::spoolWorkflow() {
 			CNC_CERR_FUNCT_A("Error while processing: %s", ss.str().c_str());
 			return false;
 		}
+		
+		CHECK_AND_PERFORM_PROCESSING_STATE
 	}
 	
+	// process all collected cnc instructions
 	return currentInterface->spoolInstructions();
 }
 //////////////////////////////////////////////////////////////////
@@ -503,7 +514,8 @@ bool CncPathListRunner::publishMoveSequence() {
 	if ( setup.optAnalyse == false )
 		return true;
 
-	if ( currentSequence == NULL ) {
+	if ( currentSequence == NULL )
+	{
 		std::cerr << "CncPathListRunner::publishMoveSequence(): Invalid Sequence!" << std::endl;
 		return false;
 	}
@@ -513,7 +525,8 @@ bool CncPathListRunner::publishMoveSequence() {
 	// if the corresponding list isn't connected this call does nothing and returns only
 	cpp->addMoveSequence(*currentSequence);
 	
-	if ( setup.trace == true ) {
+	if ( setup.trace == true ) 
+	{
 		std::stringstream ss; 
 		currentSequence->outputOperator(ss, currentInterface->getPositionSteps());
 		
@@ -521,8 +534,10 @@ bool CncPathListRunner::publishMoveSequence() {
 		cpp->addOperatingTrace(ss);
 	}
 		
-	if ( currentSequence->getCount() == 0 ) {
-		if ( setup.trace == true ) {
+	if ( currentSequence->getCount() == 0 )
+	{
+		if ( setup.trace == true )
+		{
 			const char* msg = "Call of publishMoveSequence(): Empty CncMoveSequence, nothing was published.";
 			cpp->addOperatingTraceMovSeqSep(msg);
 		}
@@ -530,11 +545,7 @@ bool CncPathListRunner::publishMoveSequence() {
 		return true;
 	}
 	
-	if ( checkAndPerfromProcessingState() == false )
-	{
-		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
-		return false;
-	}
+	CHECK_AND_PERFORM_PROCESSING_STATE
 	
 	currentInterface->processClientIDChange(currentSequence->getLastClientId());
 	const bool ret = currentInterface->processMoveSequence(*currentSequence);
@@ -590,11 +601,7 @@ bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr
 		return false;
 	}
 	
-	if ( checkAndPerfromProcessingState() == false )
-	{
-		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
-		return false;
-	}
+	CHECK_AND_PERFORM_PROCESSING_STATE
 	
 	return currentInterface->processFeedSpeedChange(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
 }
@@ -616,11 +623,7 @@ bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) 
 		THE_APP->getCncPreProcessor()->addOperatingTraceSeparator(msg);
 	}
 	
-	if ( checkAndPerfromProcessingState() == false )
-	{
-		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
-		return false;
-	}
+	CHECK_AND_PERFORM_PROCESSING_STATE
 	
 	if ( currentInterface->processSpindleStateSwitch(curr.spindleState) == false ) {
 		std::cerr << CNC_LOG_FUNCT_A(": processSpindleStateSwitch() failed!\n");
@@ -659,11 +662,7 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 												curr.entryTarget.getY(), 
 												curr.entryTarget.getZ());
 	
-	if ( checkAndPerfromProcessingState() == false )
-	{
-		CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
-		return false;
-	}
+	CHECK_AND_PERFORM_PROCESSING_STATE
 	
 	return currentInterface->processPathListEntry(curr);
 }
@@ -927,11 +926,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		if ( isInterrupted()   == true )	return false;
 		if ( checkDebugState() == false )	return false;
 		
-		if ( checkAndPerfromProcessingState() == false )
-		{
-			CNC_CERR_FUNCT_A(": checkAndPerfromProcessingState() failed")
-			return false;
-		}
+		CHECK_AND_PERFORM_PROCESSING_STATE
 		
 		// ----------------------------------------------------------
 		if ( curr.isNothingChanged() == true ) {

@@ -99,12 +99,15 @@ class CncParserSynopsisProxy : public CncLoggerProxy  {
 		void addEntry(const char type, const wxString& entry);
 		void addInfo(const wxString& entry)							{ addEntry('I', entry); }
 		void addWarning(const wxString& entry)						{ addEntry('W', entry); }
+		void addDebug(const wxString& entry)						{ addEntry('D', entry); }
 		void addError(const wxString& entry)						{ addEntry('E', entry); }
 		void addSeparator(const wxString& entry="")					{ addEntry('S', entry); }
 		
-		bool hasDebugEntries()	const;
-		bool hasWarnEntries()	const;
-		bool hasErrorEntries()	const;
+		bool hasInfoEntries()		const;
+		bool hasNonInfoEntries()	const;
+		bool hasDebugEntries()		const;
+		bool hasWarnEntries()		const;
+		bool hasErrorEntries()		const;
 		
 		void popProcessMode();
 		void pushUpdateMode();

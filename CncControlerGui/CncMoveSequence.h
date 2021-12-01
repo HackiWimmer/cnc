@@ -103,8 +103,11 @@ class CncMoveSequence {
 
 			void reset() 
 			{
+				*this = SequenceData();
+				/*
 				lengthX	= lengthY = lengthZ	= 0;
 				targetX = targetY = targetZ = 0;
+				*/
 			}
 
 			void add(int32_t dx, int32_t dy, int32_t dz) 
@@ -191,7 +194,7 @@ class CncMoveSequence {
 			unsigned int 	flushedCount	= 0;
 			bool 			more			= false;
 			SequenceData	sequenceData;
-
+			
 			void reset() 
 			{
 				*this = FlushResult();
@@ -269,36 +272,17 @@ class CncMoveSequence {
 class CncMoveSequenceImage {
 	
 	public: 
-		CncMoveSequenceImage(CncMoveSequence& sequence)
-		: valid			(false)
-		, type			('\0')
-		, result		()
-		, portionIndex	()
-		{
-			
-			if ( sequence.flush(result) == false )
-			{
-				CNC_CERR_FUNCT_A("sequence.flush failed")
-				return;
-			}
-			
-			portionIndex = sequence.getPortionIndex();
-			
-			valid = true;
-		}
-		
-		~CncMoveSequenceImage()
-		{}
+		CncMoveSequenceImage(CncMoveSequence& sequence);
+		~CncMoveSequenceImage();
 		
 		bool									isValid()			const { return valid; }
-		unsigned char							getType()			const { return type; }
 		const CncMoveSequence::FlushResult&		getFlushResult()	const { return result; }
 		const CncMoveSequence::PortionIndex&	getPortionIndex()	const { return portionIndex; }
 		
 	private:
 		
 		bool							valid;
-		unsigned char					type;
+		unsigned char*					bufferCopy;
 		CncMoveSequence::FlushResult	result;
 		CncMoveSequence::PortionIndex	portionIndex;
 		

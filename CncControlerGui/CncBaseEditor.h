@@ -125,7 +125,8 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		struct Styles {
 			// Define used fonts
-			wxFont defaultFont		= wxFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+			//wxFont defaultFont		= wxFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+			wxFont defaultFont		= wxFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
 			wxFont staticFont  		= wxSystemSettings::GetFont(wxSYS_ANSI_FIXED_FONT);
 			
 			//define colours

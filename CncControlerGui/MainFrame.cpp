@@ -5010,13 +5010,15 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		//-----------------------------------------------------------------
 		// post statements from here on . . . 
 		// prepare final statements
-		if ( ret == false )
+		if ( ret == false || THE_CONTEXT->parsingSynopsisHasErrorEntries() )
 		{
-			StreamBufferHighlighter sbh(cnc::cex1);
+			if ( THE_CONTEXT->parsingSynopsisHasErrorEntries() )
+				CNC_CERR_A("Error(s) detected. For more details please visit the parsing synopsis trace")
 			
-			wxString hint("not successfully");
-			CNC_CEX1_A(wxString::Format("=== Processing(probe mode = %s) finished %s, %s ===", probeMode, hint, timeInfo))
-			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_WARNING_STR)
+			StreamBufferHighlighter sbh(std::cerr);
+			
+			CNC_CERR_A(wxString::Format("=== Processing(probe mode = %s) finished not successfully, %s ===", probeMode, timeInfo))
+			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_ERROR
 			
 			lock.setErrorMode();
 			
@@ -5025,13 +5027,28 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		} 
 		else
 		{
-			StreamBufferHighlighter sbh(std::clog);
-			
-			CNC_CLOG_A(wxString::Format("=== Processing(probe mode = %s) finished successfully, %s ===", probeMode, timeInfo))
-			SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW( CNC_RESULT_OK_STR )
-			
-			THE_TPL_CTX->registerValidRun();
-			decorateDryRunState(cncOk);
+			if ( THE_CONTEXT->parsingSynopsisHasNonInfoEntries() )
+			{
+				CNC_CEX1_A("Warnings(s) detected. For more details please visit the parsing synopsis trace")
+				
+				StreamBufferHighlighter sbh(cnc::cex1);
+				
+				CNC_CEX1_A(wxString::Format("=== Processing(probe mode = %s) finished with warnings, %s ===", probeMode, timeInfo))
+				SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_WARNING
+				
+				THE_TPL_CTX->registerValidRun();
+				decorateDryRunState(cncWarning);
+			}
+			else
+			{
+				StreamBufferHighlighter sbh(std::clog);
+				
+				CNC_CLOG_A(wxString::Format("=== Processing(probe mode = %s) finished successfully, %s ===", probeMode, timeInfo))
+				SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_OK
+				
+				THE_TPL_CTX->registerValidRun();
+				decorateDryRunState(cncOk);
+			}
 		}
 		
 		return ret;

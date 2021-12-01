@@ -123,30 +123,6 @@
 	wxMenuItem* APP_PROXY::GetMiOpenGLContextObserver()
 	{ return THE_APP->m_miOpenGLContextObserver; }
 
-	void APP_PROXY::parsingSynopsisTraceAddSeparator(const wxString& entry)
-	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addSeparator(entry); }
-
-	void APP_PROXY::parsingSynopsisTraceAddEntry(const char type, const wxString& info)
-	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addEntry(type, info); }
-
-	void APP_PROXY::parsingSynopsisTraceAddInfo(const wxString& info)
-	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addInfo(info); }
-
-	void APP_PROXY::parsingSynopsisTraceAddWarning(const wxString& info)
-	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addWarning(info); }
-
-	void APP_PROXY::parsingSynopsisTraceAddError(const wxString& info)
-	{ if ( THE_APP->getParserSynopsisProxy() ) THE_APP->getParserSynopsisProxy()->addError(info); }
-
-	bool APP_PROXY::parsingSynopsisTraceHasDebugEntries() 
-	{ CncParserSynopsisProxy* pst = THE_APP->getParserSynopsisProxy(); return pst ? pst->hasDebugEntries() : false; }
-
-	bool APP_PROXY::parsingSynopsisTraceHasWarnEntries() 
-	{ CncParserSynopsisProxy* pst = THE_APP->getParserSynopsisProxy(); return pst ? pst->hasWarnEntries(): false; }
-
-	bool APP_PROXY::parsingSynopsisTraceHasErrorEntries() 
-	{ CncParserSynopsisProxy* pst = THE_APP->getParserSynopsisProxy(); return pst ? pst->hasErrorEntries(): false; }
-
 	int APP_PROXY::showReferencePositionDlg(wxString msg)
 	{ return THE_APP->showReferencePositionDlg(msg); }
 

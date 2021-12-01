@@ -267,14 +267,16 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	unsigned char* pSize    = pPointer + 1;
 
 	// -------------------------------------------------------------
-	auto flushInt32 = [&](int32_t value) {
+	auto flushInt32 = [&](int32_t value) 
+	{
 		memcpy(pPointer, &value, sizeof(int32_t));
 		byteCount += sizeof(int32_t);
 		pPointer  += sizeof(int32_t);
 	};
 
 	// -------------------------------------------------------------
-	auto flushHeader = [&]() {
+	auto flushHeader = [&]() 
+	{
 		// HEADER - CMD
 		moveSequenceBuffer[byteCount] = moveCmd;
 		byteCount++;
@@ -301,14 +303,16 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	};
 
 	// -------------------------------------------------------------
-	auto updateHeaderSize = [&] (int32_t value) {
+	auto updateHeaderSize = [&] (int32_t value) 
+	{
 		//int32_t length = htonl(value);
 		int32_t length = value;
 		memcpy(pSize, &length, sizeof(int32_t));
 	};
 
 	// -------------------------------------------------------------
-	auto flushPortionSize = [&] (unsigned char value) {
+	auto flushPortionSize = [&] (unsigned char value) 
+	{
 		// log index
 		portionIndex.push_back(byteCount);
 		// copy value
@@ -318,7 +322,8 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	};
 
 	// -------------------------------------------------------------
-	auto updatePortionSize = [&] (unsigned int offset, unsigned char value) {
+	auto updatePortionSize = [&] (unsigned int offset, unsigned char value) 
+	{
 		// copy value
 		const unsigned char s = ( portionIndex.size() == 1 ? value - offset : value );
 		
@@ -335,12 +340,14 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	// init the first portion
 	flushPortionSize(0);
 
-	for ( auto it = sequence.begin(); it != sequence.end(); ++it ) {
+	for ( auto it = sequence.begin(); it != sequence.end(); ++it ) 
+	{
 		SequencePoint& sp = *it;
 		sp.determineParameters(moveCmd);
 		
 		// switch portion
-		if ( portionSize + sp.param.necessarySize > maxSerialSize ) {
+		if ( portionSize + sp.param.necessarySize > maxSerialSize )
+		{
 			// update current portion
 			updatePortionSize(byteOffset, portionSize);
 			// init next portion
@@ -358,7 +365,8 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 		pPointer  	+= fs;
 
 		// error handling
-		if ( byteCount > moveSequenceBufferSize - getPointSize() ) {
+		if ( byteCount > moveSequenceBufferSize - getPointSize() )
+		{
 			std::cerr << "CncMoveSequence::flush(): The max buffer size is reached!" << std::endl;
 			std::cerr << " - byteCount : " 									<< byteCount << std::endl;
 			std::cerr << " - moveSequenceBufferSize - getPointSize() : "	<< moveSequenceBufferSize - getPointSize() << std::endl;
@@ -390,7 +398,8 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	moveSequenceFlushedSize = byteCount;
 
 	// debug
-	if ( false ) {
+	if ( false )
+	{
 		std::cout << "byteOffset              : " << byteOffset					<< std::endl;
 		std::cout << "byteCount               : " << byteCount					<< std::endl;
 		std::cout << "flushedCount            : " << flushed					<< std::endl;
@@ -399,7 +408,8 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 
 		// debug portion index
 		std::cout << "   ";
-		for ( auto it = getPortionIndex().begin(); it != getPortionIndex().end(); ++it ) {
+		for ( auto it = getPortionIndex().begin(); it != getPortionIndex().end(); ++it )
+		{
 			std::cout << *it << "=" << (int)moveSequenceBuffer[*it] << ", ";
 
 			if ( it != getPortionIndex().begin() && std::distance(getPortionIndex().begin(), it) % 10 == 0 )
@@ -556,4 +566,46 @@ std::ostream& CncMoveSequence::outputOperator(std::ostream &ostr, const CncLongP
 	
 	return ostr;
 }
-
+///////////////////////////////////////////////////////////////////
+CncMoveSequenceImage::CncMoveSequenceImage(CncMoveSequence& sequence)
+: valid			(false)
+, bufferCopy	(NULL)
+, result		()
+, portionIndex	()
+///////////////////////////////////////////////////////////////////
+{
+	if ( sequence.flush(result) == false )
+	{
+		CNC_CERR_FUNCT_A("sequence.flush(...) failed")
+		portionIndex.clear();
+		return;
+	}
+	
+	// It is necessary to create a deep copy of the sequence byte buffer.
+	// This is done outside of the FlushResult structure,
+	// because the corresponding buffer is normally handled
+	// by the move sequence itself and this class is managed as part of a 
+	// container where the original sequence isn't no longer available.
+	//
+	// And last but not least, it is the main reason of CncMoveSequenceImage
+	// to provide a minimal copy of the original MoveSequence.
+	bufferCopy = new unsigned char[result.bufferSize];
+	memcpy(bufferCopy, result.buffer, result.bufferSize);
+	result.buffer = bufferCopy;
+	
+	// for the portion index the move systematic is much sufficient
+	portionIndex = std::move(sequence.getPortionIndex());
+	
+	//... all other move sequence date isn't necessary to copy or move,
+	// because it isn't further needed.
+	
+	valid = true;
+}
+///////////////////////////////////////////////////////////////////
+CncMoveSequenceImage::~CncMoveSequenceImage() {
+///////////////////////////////////////////////////////////////////
+	portionIndex.clear();
+	
+	if ( bufferCopy != NULL )
+		delete []bufferCopy;
+}

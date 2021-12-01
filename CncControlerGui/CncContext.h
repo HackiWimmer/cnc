@@ -109,6 +109,18 @@ struct CncContext {
 		CncContext& setOnlineUpdateDrawPane(bool b) 					{ onlineUpdateDrawPane=b; return *this; }
 		CncContext& setAllowEventHandling(bool b) 						{ allowEventHandling=b; return *this; }
 		CncContext& setUpdateInterval(int i) 							{ updateInterval=i; return *this; }
+		
+		void addParsingSynopisSeparator	(const wxString& m) const;
+		void addParsingSynopisInfo		(const wxString& m) const;
+		void addParsingSynopisWarning	(const wxString& m) const;
+		void addParsingSynopisDebug		(const wxString& m) const;
+		void addParsingSynopisError		(const wxString& m) const;
+		
+		bool parsingSynopsisHasInfoEntries()    const;
+		bool parsingSynopsisHasNonInfoEntries() const;
+		bool parsingSynopsisHasDebugEntries()   const;
+		bool parsingSynopsisHasWarningEntries() const;
+		bool parsingSynopsisHasErrorEntries()   const;
 };
 
 #endif

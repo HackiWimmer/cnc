@@ -2306,6 +2306,7 @@ bool Serial::processMoveImage(const CncMoveSequenceImage& moveImage) {
 		std::cerr << CNC_LOG_FUNCT << ": totalFlushedSize != currentFlushedSize"	<< std::endl;
 		std::cerr << " - totalFlushedSize            : " << totalFlushedSize 		<< std::endl;
 		std::cerr << " - currentFlushedSize          : " << currentFlushedSize		<< std::endl;
+		
 		return false;
 	}
 	

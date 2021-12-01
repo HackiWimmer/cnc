@@ -189,8 +189,9 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual void logMeasurementEnd();
 		virtual bool isInterrupted();
 		
-		// todo
-		
+	#define XXXXX
+	#ifdef XXXXX
+	
 		virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)	{ cncInstructions.push_back(new CncGuidPathInstruction(plm, zOffset));		return true; }
 		virtual bool processClientIDChange(long cid)									{ cncInstructions.push_back(new CncClientIDInstruction(cid));				return true; }
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ cncInstructions.push_back(new CncFeedSpeedInstruction(value_MM_MIN, m));	return true; }
@@ -199,8 +200,9 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual bool processSpindleSpeedChange(double value_U_MIN)						{ cncInstructions.push_back(new CncSpindleSpeedInstruction(value_U_MIN));	return true; }
 		virtual bool processMoveSequence(CncMoveSequence& msq)							{ cncInstructions.push_back(new CncMovSeqInstruction(msq));					return true; }
 		virtual bool processPathListEntry(const CncPathListEntry& ple)					{ cncInstructions.push_back(new CncPathListInstruction(ple));				return true; }
-		
-		/*
+	
+	#else
+	
 		virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)	{ return executeGuidePath(plm, zOffset); }
 		virtual bool processClientIDChange(long cid)									{ return executeClientIDChange( cid); }
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ return executeFeedSpeedChange(value_MM_MIN, m); }
@@ -209,7 +211,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual bool processSpindleSpeedChange(double value_U_MIN)						{ return executeSpindleSpeedChange(value_U_MIN); }
 		virtual bool processMoveSequence(CncMoveSequence& msq)							{ return executeMoveSequence(msq); }
 		virtual bool processPathListEntry(const CncPathListEntry& ple)					{ return executePathListEntry(ple); }
-		*/
+	
+	#endif
 		virtual void processTrigger(const Trigger::BeginRun& tr)						{ cncInstructions.push_back(new InstructionTriggerBeginRun     (tr)); }
 		virtual void processTrigger(const Trigger::EndRun& tr)							{ cncInstructions.push_back(new InstructionTriggerEndRun       (tr)); }
 		virtual void processTrigger(const Trigger::NextPath& tr)						{ cncInstructions.push_back(new InstructionTriggerNextPath     (tr)); }

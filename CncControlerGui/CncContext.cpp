@@ -1,6 +1,6 @@
 #include <wx/app.h>
 #include "GlobalFunctions.h"
-#include "MainFrameProxy.h"
+#include "MainFrame.h"
 #include "CncAnchorInfo.h"
 #include "CncGamepadFilter.h"
 #include "CncTemplateContext.h"
@@ -57,8 +57,8 @@ void CncContext::setProbeMode(bool state) {
 ////////////////////////////////////////////////////////////////////////
 	probeMode = state;
 	
-	if ( APP_PROXY::isAppPointerAvailable() == true )
-		APP_PROXY::decorateProbeMode(probeMode);
+	if ( THE_APP )
+		THE_APP->decoratePosSpyConnectButton(probeMode);
 }
 ////////////////////////////////////////////////////////////////////////
 const std::ostream& CncContext::traceVersionInfo(std::ostream& os) const {
@@ -116,3 +116,16 @@ void CncContext::resetProcessing() {
 ////////////////////////////////////////////////////////////////////////
 	processingInfo->reset();
 }
+////////////////////////////////////////////////////////////////////////
+void CncContext::addParsingSynopisSeparator	(const wxString& m) const { THE_APP->getParserSynopsisProxy()->addSeparator(m); }
+void CncContext::addParsingSynopisInfo		(const wxString& m) const { THE_APP->getParserSynopsisProxy()->addInfo(m);      }
+void CncContext::addParsingSynopisWarning	(const wxString& m) const { THE_APP->getParserSynopsisProxy()->addWarning(m);   }
+void CncContext::addParsingSynopisDebug		(const wxString& m) const { THE_APP->getParserSynopsisProxy()->addDebug(m);     }
+void CncContext::addParsingSynopisError		(const wxString& m) const { THE_APP->getParserSynopsisProxy()->addError(m);     }
+
+bool CncContext::parsingSynopsisHasInfoEntries()    const { return THE_APP->getParserSynopsisProxy()->hasInfoEntries();    }
+bool CncContext::parsingSynopsisHasNonInfoEntries() const { return THE_APP->getParserSynopsisProxy()->hasNonInfoEntries(); }
+bool CncContext::parsingSynopsisHasDebugEntries()   const { return THE_APP->getParserSynopsisProxy()->hasDebugEntries();   }
+bool CncContext::parsingSynopsisHasWarningEntries() const { return THE_APP->getParserSynopsisProxy()->hasWarnEntries();    }
+bool CncContext::parsingSynopsisHasErrorEntries()   const { return THE_APP->getParserSynopsisProxy()->hasErrorEntries();   }
+////////////////////////////////////////////////////////////////////////

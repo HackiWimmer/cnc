@@ -22,7 +22,7 @@ class ContextInterface
 		static const int ERR_LIMIT							=  16;
 		static const int ERR_MOVE_WITHOUT_SPINDLE			=  32;
 		
-		struct Entry
+		struct ProcessEntry
 		{
 			enum Type { UNKNOWN = -1, START, END, CID, LIMIT, MOVE, SPINDLE, SPEED_F, SPEED_S };
 			
@@ -45,7 +45,7 @@ class ContextInterface
 			bool hasMovement() const { return ( moveDx != 0 || moveDy || moveDz ); }
 			
 			std::ostream& traceTo(std::ostream &ostr) const;
-			friend std::ostream &operator<< (std::ostream &ostr, const Entry &e) 
+			friend std::ostream &operator<< (std::ostream &ostr, const ProcessEntry &e) 
 			{
 				return e.traceTo(ostr);
 			}
@@ -53,14 +53,15 @@ class ContextInterface
 			static const char* getTypeAsString(Type t);
 		};
 		
-		typedef std::vector<Entry> ContextEntries;
+		typedef std::vector<ProcessEntry> ContextEntries;
+		
 		ContextEntries		contextInterfaceEntries;
-		Entry				currentEntry;
+		ProcessEntry		currentEntry;
 		int					errorFlags;
 		
 	public:
 	
-		struct Result
+		struct ProcessResult
 		{
 			static const ArdoObj::SpeedTupleValue	minD  = std::numeric_limits<int32_t>::max();
 			static const ArdoObj::SpeedTupleValue	maxD  = 0;
@@ -85,7 +86,7 @@ class ContextInterface
 			} err;
 			
 			std::ostream& traceTo(std::ostream &o) const;
-			friend std::ostream &operator<< (std::ostream &o, const Result &r) 
+			friend std::ostream &operator<< (std::ostream &o, const ProcessResult &r) 
 			{
 				return r.traceTo(o);
 			}
@@ -111,7 +112,7 @@ class ContextInterface
 		virtual void notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTupleValue s);
 		virtual void notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTupleValue s);
 		
-		bool analizeContextEntries(Result& result);
+		bool analizeContextEntries(ProcessResult& result);
 		
 		bool filterAllLimitEntries(std::ostream& o);
 		bool filterAllMovesWithoutSpindle(std::ostream& o);

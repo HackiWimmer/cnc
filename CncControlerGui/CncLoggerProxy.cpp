@@ -87,22 +87,12 @@ CncLoggerListCtrl* CncParserSynopsisProxy::getListCtrl()	const { return THE_APP-
 CncLoggerListCtrl* CncMsgHistoryLoggerProxy::getListCtrl()	const { return THE_APP->getCtrlMsgHistoryList(); }
 //////////////////////////////////////////////////////////////
 
+bool CncParserSynopsisProxy::hasInfoEntries()				const { return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasInfoEntries();    }
+bool CncParserSynopsisProxy::hasNonInfoEntries()			const { return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasNonInfoEntries(); }
+bool CncParserSynopsisProxy::hasDebugEntries()				const { return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasDebugEntries();   }
+bool CncParserSynopsisProxy::hasWarnEntries()				const { return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasWarnEntries();    }
+bool CncParserSynopsisProxy::hasErrorEntries()				const { return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasErrorEntries();   }
 
-//////////////////////////////////////////////////////////////////
-bool CncParserSynopsisProxy::hasDebugEntries() const { 
-//////////////////////////////////////////////////////////////////
-	return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasDebugEntries(); 
-}
-//////////////////////////////////////////////////////////////////
-bool CncParserSynopsisProxy::hasWarnEntries() const {
-//////////////////////////////////////////////////////////////////
-	return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasWarnEntries(); 
-}
-//////////////////////////////////////////////////////////////////
-bool CncParserSynopsisProxy::hasErrorEntries() const { 
-//////////////////////////////////////////////////////////////////
-	return THE_APP->getTemplateContextSummary()->getParsingSynopsis()->hasErrorEntries(); 
-}
 //////////////////////////////////////////////////////////////////
 void CncParserSynopsisProxy::popProcessMode() {
 //////////////////////////////////////////////////////////////////
@@ -120,6 +110,7 @@ void CncParserSynopsisProxy::addEntry(const char type, const wxString& entry) {
 	switch ( type )
 	{
 		case 'W':	logger->addWarnEntry(entry);	break;
+		case 'D':	logger->addDebugEntry(entry);	break;
 		case 'E':	logger->addErrorEntry(entry);	break;
 		case 'S':	logger->addSeparator(entry);	break;
 		default:	logger->addInfoEntry(entry);

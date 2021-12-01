@@ -14,7 +14,7 @@
 	}
 	
 ////////////////////////////////////////////////////////////////////
-const char* ContextInterface::Entry::getTypeAsString(Type t) {
+const char* ContextInterface::ProcessEntry::getTypeAsString(Type t) {
 ////////////////////////////////////////////////////////////////////
 	switch ( t )
 	{
@@ -33,11 +33,11 @@ const char* ContextInterface::Entry::getTypeAsString(Type t) {
 }
 
 //////////////////////////////////////////////////////////
-std::ostream& ContextInterface::Result::traceTo(std::ostream &o) const {
+std::ostream& ContextInterface::ProcessResult::traceTo(std::ostream &o) const {
 //////////////////////////////////////////////////////////
 	o	<< "Summary:\n"
-		<< wxString::Format(" Min/Max F Value      [mm/min] : %6ld, %6ld\n", 		( sum.minF != Result::minD ? sum.minF : 0 ), sum.maxF)
-		<< wxString::Format(" Min/Max S Value       [U/min] : %6ld, %6ld\n",		( sum.minS != Result::minD ? sum.minS : 0 ), sum.maxS)
+		<< wxString::Format(" Min/Max F Value      [mm/min] : %6ld, %6ld\n", 		( sum.minF != ProcessResult::minD ? sum.minF : 0 ), sum.maxF)
+		<< wxString::Format(" Min/Max S Value       [U/min] : %6ld, %6ld\n",		( sum.minS != ProcessResult::minD ? sum.minS : 0 ), sum.maxS)
 		<< wxString::Format(" Total Distance X         [mm] : %14.3lf\n",			double(sum.lenX) * THE_CONFIG->getDisplayFactX())
 		<< wxString::Format(" Total Distance Y         [mm] : %14.3lf\n",			double(sum.lenY) * THE_CONFIG->getDisplayFactY())
 		<< wxString::Format(" Total Distance Z         [mm] : %14.3lf\n",			double(sum.lenZ) * THE_CONFIG->getDisplayFactZ())
@@ -57,7 +57,7 @@ std::ostream& ContextInterface::Result::traceTo(std::ostream &o) const {
 };
 
 ////////////////////////////////////////////////////////////////////
-std::ostream& ContextInterface::Entry::traceTo(std::ostream &ostr) const {
+std::ostream& ContextInterface::ProcessEntry::traceTo(std::ostream &ostr) const {
 ////////////////////////////////////////////////////////////////////
 	// ------------------------------------------------------------
 	auto displayType= [&]()
@@ -180,9 +180,9 @@ std::ostream& ContextInterface::traceErrorInfoTo(std::ostream &ostr) const {
 void ContextInterface::notifyBeginRun() {
 //////////////////////////////////////////////////////////////
 	errorFlags					= ERR_NO_ERROR;
-	currentEntry 				= ContextInterface::Entry();
+	currentEntry 				= ContextInterface::ProcessEntry();
 	
-	currentEntry.lastType		= ContextInterface::Entry::Type::START;
+	currentEntry.lastType		= ContextInterface::ProcessEntry::Type::START;
 	
 	contextInterfaceEntries.clear();
 	contextInterfaceEntries.push_back(currentEntry);
@@ -190,14 +190,14 @@ void ContextInterface::notifyBeginRun() {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyEndRun() {
 //////////////////////////////////////////////////////////////
-	currentEntry.lastType		= ContextInterface::Entry::Type::END;
+	currentEntry.lastType		= ContextInterface::ProcessEntry::Type::END;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
 }
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyClientId(long id) {
 //////////////////////////////////////////////////////////////
-	currentEntry.lastType		= ContextInterface::Entry::Type::CID;
+	currentEntry.lastType		= ContextInterface::ProcessEntry::Type::CID;
 	currentEntry.clientId		= id;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
@@ -205,7 +205,7 @@ void ContextInterface::notifyClientId(long id) {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyLimit(const CncInterface::ILS::States& s) {
 //////////////////////////////////////////////////////////////
-	currentEntry.lastType			= ContextInterface::Entry::Type::LIMIT;
+	currentEntry.lastType			= ContextInterface::ProcessEntry::Type::LIMIT;
 	currentEntry.limitStates		= s;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
@@ -213,7 +213,7 @@ void ContextInterface::notifyLimit(const CncInterface::ILS::States& s) {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyMove(unsigned char cmd, int32_t dx, int32_t dy, int32_t dz) {
 //////////////////////////////////////////////////////////////
-	currentEntry.lastType			= ContextInterface::Entry::Type::MOVE;
+	currentEntry.lastType			= ContextInterface::ProcessEntry::Type::MOVE;
 	currentEntry.moveCmd			= cmd;
 	currentEntry.moveDx				= dx;
 	currentEntry.moveDy				= dy;
@@ -223,7 +223,7 @@ void ContextInterface::notifyMove(unsigned char cmd, int32_t dx, int32_t dy, int
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifySpindleOn() {
 //////////////////////////////////////////////////////////////
-	currentEntry.lastType			= ContextInterface::Entry::Type::SPINDLE;
+	currentEntry.lastType			= ContextInterface::ProcessEntry::Type::SPINDLE;
 	currentEntry.spindleState		= SPINDLE_STATE_ON;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
@@ -231,7 +231,7 @@ void ContextInterface::notifySpindleOn() {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifySpindleOff() {
 //////////////////////////////////////////////////////////////
-	currentEntry.lastType			= ContextInterface::Entry::Type::SPINDLE;
+	currentEntry.lastType			= ContextInterface::ProcessEntry::Type::SPINDLE;
 	currentEntry.spindleState		= SPINDLE_STATE_OFF;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
@@ -239,7 +239,7 @@ void ContextInterface::notifySpindleOff() {
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTupleValue s) {
 //////////////////////////////////////////////////////////////
-	currentEntry.lastType			= ContextInterface::Entry::Type::SPEED_S;
+	currentEntry.lastType			= ContextInterface::ProcessEntry::Type::SPEED_S;
 	currentEntry.spindleTupleVal	= s;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
@@ -247,7 +247,7 @@ void ContextInterface::notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTup
 //////////////////////////////////////////////////////////////
 void ContextInterface::notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTupleValue s) {
 //////////////////////////////////////////////////////////////
-	currentEntry.lastType			= ContextInterface::Entry::Type::SPEED_F;
+	currentEntry.lastType			= ContextInterface::ProcessEntry::Type::SPEED_F;
 	currentEntry.speedTupleVal		= s;
 	currentEntry.resetMovement();
 	contextInterfaceEntries.push_back(currentEntry);
@@ -258,10 +258,10 @@ bool ContextInterface::isEntryListValid() {
 	if ( contextInterfaceEntries.size() < 2 )
 		{ errorFlags |= ERR_INVALID_LIST_SIZE; return false; }
 	
-	if ( contextInterfaceEntries.front().lastType != Entry::Type::START )
+	if ( contextInterfaceEntries.front().lastType != ProcessEntry::Type::START )
 		{ errorFlags |= ERR_INVALID_LIST_BEG; return false; }
 	
-	if ( contextInterfaceEntries.back().lastType != Entry::Type::END )
+	if ( contextInterfaceEntries.back().lastType != ProcessEntry::Type::END )
 		{ errorFlags |= ERR_INVALID_LIST_END; return false; }
 		
 	return true;
@@ -277,9 +277,9 @@ bool ContextInterface::filterAllLimitEntries(std::ostream& o) {
 	// --------------------------------------------------------------
 	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
 	{
-		const Entry& entry	= *it;
+		const ProcessEntry& entry	= *it;
 		
-		if ( entry.lastType == Entry::Type::LIMIT )
+		if ( entry.lastType == ProcessEntry::Type::LIMIT )
 			TRACE_ENTRY(o);
 	}
 	
@@ -297,7 +297,7 @@ bool ContextInterface::filterAllMovesWithoutSpindle(std::ostream& o) {
 	// --------------------------------------------------------------
 	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
 	{
-		const Entry& entry	= *it;
+		const ProcessEntry& entry = *it;
 		const bool b = entry.hasMovement() && entry.spindleState == SPINDLE_STATE_OFF && ArdoObj::SpeedTuple::decodeMode(entry.speedTupleVal) != 'R';
 		
 		if ( b )
@@ -307,7 +307,7 @@ bool ContextInterface::filterAllMovesWithoutSpindle(std::ostream& o) {
 	return true;
 }
 ////////////////////////////////////////////////////////////////////
-bool ContextInterface::analizeContextEntries(Result& result) {
+bool ContextInterface::analizeContextEntries(ProcessResult& result) {
 ////////////////////////////////////////////////////////////////////
 	if ( isEntryListValid() == false )
 		return false;
@@ -316,17 +316,17 @@ bool ContextInterface::analizeContextEntries(Result& result) {
 	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
 	{
 		//const size_t index	= std::distance(contextInterfaceEntries.begin(), it) + 1;
-		const Entry& entry	= *it;
+		const ProcessEntry& entry	= *it;
 		
 		// min / max F
-		if ( entry.lastType == Entry::Type::SPEED_F )
+		if ( entry.lastType == ProcessEntry::Type::SPEED_F )
 		{
 			result.sum.minF = std::min(result.sum.minF, ArdoObj::SpeedTuple::decodeValue_MMMin(entry.speedTupleVal));
 			result.sum.maxF = std::max(result.sum.maxF, ArdoObj::SpeedTuple::decodeValue_MMMin(entry.speedTupleVal));
 		}
 		
 		// min / max S
-		if ( entry.lastType == Entry::Type::SPEED_S )
+		if ( entry.lastType == ProcessEntry::Type::SPEED_S )
 		{
 			result.sum.minS = std::min(result.sum.minS, cnc::cnvSpidleSpeedRaw_To_U_MIN(ArdoObj::SpindleTuple::decodeValue(entry.spindleTupleVal)));
 			result.sum.maxS = std::max(result.sum.maxS, cnc::cnvSpidleSpeedRaw_To_U_MIN(ArdoObj::SpindleTuple::decodeValue(entry.spindleTupleVal)));

@@ -50,15 +50,6 @@ class MainFrameProxy {
 		static bool connectSerialPort();
 		static bool isProcessing();
 
-		static void parsingSynopsisTraceAddSeparator(const wxString& entry);
-		static void parsingSynopsisTraceAddEntry(const char type, const wxString& entry);
-		static void parsingSynopsisTraceAddInfo(const wxString& info);
-		static void parsingSynopsisTraceAddWarning(const wxString& entry);
-		static void parsingSynopsisTraceAddError(const wxString& entry);
-		static bool parsingSynopsisTraceHasDebugEntries();
-		static bool parsingSynopsisTraceHasWarnEntries();
-		static bool parsingSynopsisTraceHasErrorEntries();
-		
 		static bool startStepwiseMovement(CncLinearDirection x, CncLinearDirection y, CncLinearDirection z);
 		static bool startInteractiveMove(CncInteractiveMoveDriver imd);
 		static bool updateInteractiveMove();

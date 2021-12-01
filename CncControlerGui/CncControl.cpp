@@ -442,6 +442,10 @@ bool CncControl::setup(bool doReset) {
 	changeCurrentSpindleSpeed_U_MIN(THE_CONFIG->getSpindleSpeedDefault());
 	
 	SET_RESULT_FOR_REGISTERED_LOGGER_ROW_OK
+	
+	StreamBufferHighlighter sbh(std::clog);
+	CNC_CLOG_A("Ready to go . . .")
+	
 	serialPort->notifySetupSuccesfullyFinsihed();
 	return true;
 }

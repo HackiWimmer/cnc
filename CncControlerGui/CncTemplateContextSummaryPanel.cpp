@@ -94,7 +94,7 @@ void CncTemplateContextSummaryPanel::update() {
 	// update main lists
 	
 	// first analize to get demand information available
-	ContextInterface::Result result;
+	ContextInterface::ProcessResult result;
 	THE_CONTEXT->templateContext->analizeContextEntries(result);
 	const bool ok = THE_CONTEXT->templateContext->isValid();
 	

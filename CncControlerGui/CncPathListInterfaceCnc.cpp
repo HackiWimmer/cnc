@@ -1,4 +1,6 @@
 #include "CncControl.h"
+#include "CncControl.h"
+#include "MainFrame.h"
 #include "CncPathListInterfaceCnc.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -18,19 +20,19 @@ bool CncPathListInterfaceCnc::InstructionTriggerSpeedChange		::process(CncPathLi
 bool CncPathListInterfaceCnc::InstructionTriggerGuidePath		::process(CncPathListInterfaceCnc* i)	{ i->executeTrigger(tr); return true; }
 
 #warning todo
-void CncPathListInterfaceCnc::CncMovSeqInstruction				::traceTo(std::ostream& o) const		{ ; } // todo
-void CncPathListInterfaceCnc::CncPathListInstruction			::traceTo(std::ostream& o) const		{ ; }
-void CncPathListInterfaceCnc::CncGuidPathInstruction			::traceTo(std::ostream& o) const		{ ; }
-void CncPathListInterfaceCnc::CncClientIDInstruction			::traceTo(std::ostream& o) const		{ ; }
-void CncPathListInterfaceCnc::CncFeedSpeedInstruction			::traceTo(std::ostream& o) const		{ ; }
-void CncPathListInterfaceCnc::CncToolChangeInstruction			::traceTo(std::ostream& o) const		{ ; }
-void CncPathListInterfaceCnc::CncSpindleStateInstruction		::traceTo(std::ostream& o) const		{ ; }
-void CncPathListInterfaceCnc::CncSpindleSpeedInstruction		::traceTo(std::ostream& o) const		{ ; }
-void CncPathListInterfaceCnc::InstructionTriggerBeginRun		::traceTo(std::ostream& o) const		{ o << tr 			<< std::endl; }
-void CncPathListInterfaceCnc::InstructionTriggerEndRun			::traceTo(std::ostream& o) const		{ o << tr 			<< std::endl; }
-void CncPathListInterfaceCnc::InstructionTriggerNextPath		::traceTo(std::ostream& o) const		{ o << tr 			<< std::endl; }
-void CncPathListInterfaceCnc::InstructionTriggerSpeedChange		::traceTo(std::ostream& o) const		{ o << tr 			<< std::endl; }
-void CncPathListInterfaceCnc::InstructionTriggerGuidePath		::traceTo(std::ostream& o) const		{ o << tr 			<< std::endl; }
+void CncPathListInterfaceCnc::CncMovSeqInstruction				::traceTo(std::ostream& o) const		{ o << "MovSeq"							<< std::endl; } // todo
+void CncPathListInterfaceCnc::CncPathListInstruction			::traceTo(std::ostream& o) const		{ o << "PathList"						<< std::endl; }
+void CncPathListInterfaceCnc::CncGuidPathInstruction			::traceTo(std::ostream& o) const		{ o << "Guide"							<< std::endl; }
+void CncPathListInterfaceCnc::CncClientIDInstruction			::traceTo(std::ostream& o) const		{ o << "ClientID(" << cid << ")"		<< std::endl; }
+void CncPathListInterfaceCnc::CncFeedSpeedInstruction			::traceTo(std::ostream& o) const		{ o << "F(" << value_MM_MIN << ")"		<< std::endl; }
+void CncPathListInterfaceCnc::CncToolChangeInstruction			::traceTo(std::ostream& o) const		{ o << "ToolChange(" << diameter << ")"	<< std::endl; }
+void CncPathListInterfaceCnc::CncSpindleStateInstruction		::traceTo(std::ostream& o) const		{ o << "Spindle(" << on << ")"			<< std::endl; }
+void CncPathListInterfaceCnc::CncSpindleSpeedInstruction		::traceTo(std::ostream& o) const		{ o << "S(" << value_U_MIN << ")"		<< std::endl; }
+void CncPathListInterfaceCnc::InstructionTriggerBeginRun		::traceTo(std::ostream& o) const		{ o << tr 								<< std::endl; }
+void CncPathListInterfaceCnc::InstructionTriggerEndRun			::traceTo(std::ostream& o) const		{ o << tr 								<< std::endl; }
+void CncPathListInterfaceCnc::InstructionTriggerNextPath		::traceTo(std::ostream& o) const		{ o << tr 								<< std::endl; }
+void CncPathListInterfaceCnc::InstructionTriggerSpeedChange		::traceTo(std::ostream& o) const		{ o << tr 								<< std::endl; }
+void CncPathListInterfaceCnc::InstructionTriggerGuidePath		::traceTo(std::ostream& o) const		{ o << tr 								<< std::endl; }
 
 ////////////////////////////////////////////////////////////////////
 
@@ -50,15 +52,18 @@ CncPathListInterfaceCnc::~CncPathListInterfaceCnc() {
 ////////////////////////////////////////////////////////////////////
 bool CncPathListInterfaceCnc::spoolInstructions() {
 ////////////////////////////////////////////////////////////////////
-	CNC_CEX2_A("Start processing cnc instructions(entries=%zu)", cncInstructions.size())
+	CNC_CEX2_A("Start processing cnc instructions (entries=%zu)", cncInstructions.size())
 	
 	for ( auto instruction : cncInstructions )
 	{
 		if ( instruction->process(this) == false )
 		{
-			CNC_CERR_FUNCT_A("Error while processing: .... ")
+			std::stringstream ss; instruction->traceTo(ss);
+			CNC_CERR_FUNCT_A("Error while processing: %s", ss.str().c_str())
 			return false;
 		}
+		
+		THE_APP->evaluateAndPerformProcessingState();
 	}
 	
 	return true;

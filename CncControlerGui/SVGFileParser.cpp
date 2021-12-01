@@ -146,15 +146,11 @@ bool SVGFileFormatter::convert(SVGFileFormatter::Mode m, const wxString& ofn) {
 	return true;
 }
 
-
-
-
-
 //////////////////////////////////////////////////////////////////
-#define SFP_ADD_SEP(msg)	APP_PROXY::parsingSynopsisTraceAddSeparator(wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define SFP_LOG_INF(msg)	APP_PROXY::parsingSynopsisTraceAddInfo     (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define SFP_LOG_WAR(msg)	APP_PROXY::parsingSynopsisTraceAddWarning  (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define SFP_LOG_ERR(msg)	APP_PROXY::parsingSynopsisTraceAddError    (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_ADD_SEP(msg)	THE_CONTEXT->addParsingSynopisSeparator(wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_INF(msg)	THE_CONTEXT->addParsingSynopisInfo     (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_WAR(msg)	THE_CONTEXT->addParsingSynopisWarning  (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_ERR(msg)	THE_CONTEXT->addParsingSynopisError    (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
 
 //////////////////////////////////////////////////////////////////
 class svgUserAgent;
@@ -761,7 +757,7 @@ bool SVGFileParser::postprocess() {
 	auto check_1_Less_2 = [&](double d1, double d2, const char* msg)
 	{
 		if ( d1 > d2 ) 
-			SFP_LOG_ERR(wxString::Format("%s %12.3lf > %12.3lf\n", msg, d1, d2));
+			SFP_LOG_WAR(wxString::Format("%s %12.3lf > %12.3lf\n", msg, d1, d2));
 	};
 	
 	SFP_ADD_SEP("Boundings:\n");
@@ -779,20 +775,7 @@ bool SVGFileParser::postprocess() {
 	check_1_Less_2(cncMaxX,  svgMaxX,  " CNC max bound X out of range: ");
 	check_1_Less_2(cncMaxY,  svgMaxY,  " CNC max bound Y out of range: ");
 	
-	const bool ret = APP_PROXY::parsingSynopsisTraceHasErrorEntries() == false;
-	
-	if ( ret == false )
-	{
-		SFP_ADD_SEP("Post Processing Error Summary:\n");
-		cnc::cex1 << "SVG post processing decteced error(s). For more details please visit the parsing synopsis trace\n";
-	}
-	else 
-	{
-		if ( APP_PROXY::parsingSynopsisTraceHasWarnEntries() == true )
-		cnc::cex1 << "SVG post processing decteced warnig(s). For more details please visit the parsing synopsis trace\n";
-	}
-	
-	
+	const bool ret = THE_CONTEXT->parsingSynopsisHasErrorEntries() == false;
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
