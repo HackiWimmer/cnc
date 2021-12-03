@@ -21,8 +21,8 @@ bool CncPathListInterfaceCnc::InstructionTriggerGuidePath		::process(CncPathList
 
 #warning todo
 void CncPathListInterfaceCnc::CncMovSeqInstruction				::traceTo(std::ostream& o) const		{ o << "MovSeq"							<< std::endl; } // todo
-void CncPathListInterfaceCnc::CncPathListInstruction			::traceTo(std::ostream& o) const		{ o << "PathList"						<< std::endl; }
-void CncPathListInterfaceCnc::CncGuidPathInstruction			::traceTo(std::ostream& o) const		{ o << "Guide"							<< std::endl; }
+void CncPathListInterfaceCnc::CncPathListInstruction			::traceTo(std::ostream& o) const		{ o << "PathList"						<< std::endl; } // todo
+void CncPathListInterfaceCnc::CncGuidPathInstruction			::traceTo(std::ostream& o) const		{ o << "Guide"							<< std::endl; } // todo
 void CncPathListInterfaceCnc::CncClientIDInstruction			::traceTo(std::ostream& o) const		{ o << "ClientID(" << cid << ")"		<< std::endl; }
 void CncPathListInterfaceCnc::CncFeedSpeedInstruction			::traceTo(std::ostream& o) const		{ o << "F(" << value_MM_MIN << ")"		<< std::endl; }
 void CncPathListInterfaceCnc::CncToolChangeInstruction			::traceTo(std::ostream& o) const		{ o << "ToolChange(" << diameter << ")"	<< std::endl; }
@@ -38,17 +38,44 @@ void CncPathListInterfaceCnc::InstructionTriggerGuidePath		::traceTo(std::ostrea
 
 ////////////////////////////////////////////////////////////////////
 CncPathListInterfaceCnc::CncPathListInterfaceCnc(CncControl* cc)
-: Interface			(IT_CncControl)
-, cnc				(cc)
-, cncInstructions	()
+: Interface				(IT_CncControl)
+, cnc					(cc)
+, currentAddPosition	(0.0, 0.0, 0.0)
+, cncInstructions		()
 ////////////////////////////////////////////////////////////////////
 { 
 	wxASSERT ( cnc != NULL ); 
+	cncInstructions.reserve(1024);
 }
 ////////////////////////////////////////////////////////////////////
 CncPathListInterfaceCnc::~CncPathListInterfaceCnc() {
 ////////////////////////////////////////////////////////////////////
 }
+
+////////////////////////////////////////////////////////////////////
+
+void CncPathListInterfaceCnc::logMeasurementStart()												{ cnc->startSerialMeasurement(); }
+void CncPathListInterfaceCnc::logMeasurementEnd()												{ cnc->stopSerialMeasurement(); }
+bool CncPathListInterfaceCnc::isInterrupted()													{ return cnc->isInterrupted(); }
+bool CncPathListInterfaceCnc::executeClientIDChange(long cid)									{ cnc->setClientId(cid); return true; }
+bool CncPathListInterfaceCnc::executeToolChange(double diameter)								{ return true; }
+bool CncPathListInterfaceCnc::executeSpindleStateSwitch(bool on, bool force)					{ return cnc->switchSpindleState(on, force); }
+bool CncPathListInterfaceCnc::executeSpindleSpeedChange(double value_U_MIN)						{ return cnc->changeCurrentSpindleSpeed_U_MIN(value_U_MIN); }
+bool CncPathListInterfaceCnc::executeMoveSequence(CncMoveSequence& seq)							{ return cnc->processMoveSequence(seq); }
+bool CncPathListInterfaceCnc::executeMoveImage(const CncMoveSequenceImage& img)					{ return cnc->processMoveImage(img); }
+
+void CncPathListInterfaceCnc::executeTrigger(const Trigger::BeginRun& tr)						{ cnc->processTrigger(tr); }
+void CncPathListInterfaceCnc::executeTrigger(const Trigger::EndRun& tr)							{ cnc->processTrigger(tr); }
+void CncPathListInterfaceCnc::executeTrigger(const Trigger::NextPath& tr)						{ cnc->processTrigger(tr); }
+void CncPathListInterfaceCnc::executeTrigger(const Trigger::SpeedChange& tr)					{ cnc->processTrigger(tr); }
+void CncPathListInterfaceCnc::executeTrigger(const Trigger::GuidePath& tr)						{ cnc->processTrigger(tr); }
+
+bool CncPathListInterfaceCnc::executeGuidePath(const CncPathListManager& plm, double zOffset)	{ cnc->addGuidePath(plm, zOffset); return true; }
+void CncPathListInterfaceCnc::setCurrentPositionMetric(double px, double py, double pz)			{ currentAddPosition.setXYZ(px, py, pz); }
+void CncPathListInterfaceCnc::setCurrentPositionMetric(const CncDoublePosition& pos)			{currentAddPosition.set(pos); }
+CncDoublePosition CncPathListInterfaceCnc::getCurrentPositionMetric() const						{ return currentAddPosition; }
+CncLongPosition CncPathListInterfaceCnc::getCurrentPositionSteps() const						{ CncLongPosition ret; return THE_CONFIG->convertMetricToSteps(ret, currentAddPosition); }
+
 ////////////////////////////////////////////////////////////////////
 bool CncPathListInterfaceCnc::spoolInstructions() {
 ////////////////////////////////////////////////////////////////////
@@ -77,71 +104,9 @@ void CncPathListInterfaceCnc::resetInstructions() {
 	cncInstructions.clear();
 }
 ////////////////////////////////////////////////////////////////////
-CncLongPosition CncPathListInterfaceCnc::getPositionSteps()  const { 
-////////////////////////////////////////////////////////////////////
-	return cnc->getCurCtlPos(); 
-}
-////////////////////////////////////////////////////////////////////
-CncDoublePosition CncPathListInterfaceCnc::getPositionMetric() const { 
-////////////////////////////////////////////////////////////////////
-	return cnc->getCurCtlPosMetric(); 
-}
-////////////////////////////////////////////////////////////////////
-void CncPathListInterfaceCnc::logMeasurementStart() { 
-////////////////////////////////////////////////////////////////////
-	cnc->startSerialMeasurement(); 
-}
-////////////////////////////////////////////////////////////////////
-void CncPathListInterfaceCnc::logMeasurementEnd() { 
-////////////////////////////////////////////////////////////////////
-	cnc->stopSerialMeasurement();  
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::isInterrupted() { 
-////////////////////////////////////////////////////////////////////
-	return cnc->isInterrupted();  
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executeGuidePath(const CncPathListManager& plm, double zOffset) { 
-////////////////////////////////////////////////////////////////////
-	cnc->addGuidePath(plm, zOffset);
-	return true;
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executeClientIDChange(long cid) { 
-////////////////////////////////////////////////////////////////////
-	cnc->setClientId(cid);
-	return true;
-}
-////////////////////////////////////////////////////////////////////
 bool CncPathListInterfaceCnc::executeFeedSpeedChange(double value_MM_MIN, CncSpeedMode m) { 
 ////////////////////////////////////////////////////////////////////
 	return cnc->changeCurrentFeedSpeedXYZ_MM_MIN(value_MM_MIN, m); 
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executeToolChange(double diameter) { 
-////////////////////////////////////////////////////////////////////
-	return true; 
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executeSpindleStateSwitch(bool on, bool force) { 
-////////////////////////////////////////////////////////////////////
-	return cnc->switchSpindleState(on, force); 
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executeSpindleSpeedChange(double value_U_MIN) { 
-////////////////////////////////////////////////////////////////////
-	return cnc->changeCurrentSpindleSpeed_U_MIN(value_U_MIN); 
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executeMoveSequence(CncMoveSequence& seq) { 
-////////////////////////////////////////////////////////////////////
-	return cnc->processMoveSequence(seq); 
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executeMoveImage(const CncMoveSequenceImage& img) { 
-////////////////////////////////////////////////////////////////////
-	return cnc->processMoveImage(img); 
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListInterfaceCnc::executePathListEntry(const CncPathListEntry& ple) { 
@@ -149,31 +114,6 @@ bool CncPathListInterfaceCnc::executePathListEntry(const CncPathListEntry& ple) 
 	return cnc->moveAbsLinearMetricXYZ(	ple.entryTarget.getX(),
 										ple.entryTarget.getY(),
 										ple.entryTarget.getZ(),
-										ple.alreadyRendered); 
+										ple.alreadyRendered
+	); 
 }
-////////////////////////////////////////////////////////////////////
-void CncPathListInterfaceCnc::executeTrigger(const Trigger::BeginRun& tr) { 
-////////////////////////////////////////////////////////////////////
-	cnc->processTrigger(tr); 
-}
-////////////////////////////////////////////////////////////////////
-void CncPathListInterfaceCnc::executeTrigger(const Trigger::EndRun& tr) { 
-////////////////////////////////////////////////////////////////////
-	cnc->processTrigger(tr); 
-}
-////////////////////////////////////////////////////////////////////
-void CncPathListInterfaceCnc::executeTrigger(const Trigger::NextPath& tr) { 
-////////////////////////////////////////////////////////////////////
-	cnc->processTrigger(tr); 
-}
-////////////////////////////////////////////////////////////////////
-void CncPathListInterfaceCnc::executeTrigger(const Trigger::SpeedChange& tr) { 
-////////////////////////////////////////////////////////////////////
-	cnc->processTrigger(tr); 
-}
-////////////////////////////////////////////////////////////////////
-void CncPathListInterfaceCnc::executeTrigger(const Trigger::GuidePath& tr) { 
-////////////////////////////////////////////////////////////////////
-	cnc->processTrigger(tr); 
-}
-

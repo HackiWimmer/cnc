@@ -41,10 +41,36 @@ bool CncPathListMonitor::dispatchEventQueue() {
 	return true;
 }
 ////////////////////////////////////////////////////////////////////
-CncLongPosition CncPathListMonitor::getPositionSteps() const {
+CncLongPosition CncPathListMonitor::getCurrentPositionSteps() const {
 ////////////////////////////////////////////////////////////////////
 	CncLongPosition ret;
 	return THE_CONFIG->convertMetricToSteps(ret, current.monitorPos);
+}
+////////////////////////////////////////////////////////////////////
+void CncPathListMonitor::setCurrentPositionMetric(double px, double py, double pz) {
+////////////////////////////////////////////////////////////////////
+	current.monitorPos.setXYZ(px, py, pz);
+	
+	APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, 
+												current.speedMode,
+												getCurrentPositionSteps()
+	);
+	
+	notifyNextPostion();
+	dispatchEventQueue();
+}
+////////////////////////////////////////////////////////////////////
+void CncPathListMonitor::setCurrentPositionMetric(const CncDoublePosition& pos) {
+////////////////////////////////////////////////////////////////////
+	current.monitorPos.set(pos);
+	
+	APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, 
+												current.speedMode,
+												getCurrentPositionSteps()
+	);
+	
+	notifyNextPostion();
+	dispatchEventQueue();
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListMonitor::processGuidePath(const CncPathListManager& plm, double zOffset) {
@@ -73,31 +99,38 @@ bool CncPathListMonitor::processFeedSpeedChange(double value_MM_MIN, CncSpeedMod
 ////////////////////////////////////////////////////////////////////
 bool CncPathListMonitor::processMoveSequence(CncMoveSequence& msq) {
 ////////////////////////////////////////////////////////////////////
-	CncLongPosition ps;
-	THE_CONFIG->convertMetricToSteps(ps, current.monitorPos);
-	
-	for ( auto it = msq.const_begin(); it != msq.const_end(); ++it )
-	{
-		const CncMoveSequence::SequencePoint& sp = *it;
-		
-		ps.inc(sp.x, sp.y, sp.z);
-		THE_CONFIG->convertStepsToMetric(current.monitorPos, ps);
-		
-		APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, ps);
-		notifyNextPostion();
-		dispatchEventQueue();
-	}
-	
+// Nothing to do here, because position management is already done by
+// setCurrentPostionMetric(...)
+//
+//	CncLongPosition ps;
+//	THE_CONFIG->convertMetricToSteps(ps, current.monitorPos);
+//	
+//	for ( auto it = msq.const_begin(); it != msq.const_end(); ++it )
+//	{
+//		const CncMoveSequence::SequencePoint& sp = *it;
+//		
+//		ps.inc(sp.x, sp.y, sp.z);
+//		THE_CONFIG->convertStepsToMetric(current.monitorPos, ps);
+//		
+//		APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, ps);
+//		notifyNextPostion();
+//		dispatchEventQueue();
+//	}
+
 	return true;
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListMonitor::processPathListEntry(const CncPathListEntry& ple) {
 ////////////////////////////////////////////////////////////////////
-	current.monitorPos = ple.entryTarget;
-	APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, getPositionSteps());
-	notifyNextPostion();
-	dispatchEventQueue();
-	
+// Nothing to do here, because position management is already done by
+// setCurrentPostionMetric(...)
+//
+//	current.monitorPos = ple.entryTarget;
+//	
+//	APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, getCurrentPositionSteps());
+//	notifyNextPostion();
+//	dispatchEventQueue();
+
 	return true;
 }
 

@@ -31,7 +31,8 @@ class CncControl {
 		
 		enum RunMode				{ M_DryRun, M_RealRun };
 		
-		static const char* getCtrlPowerStateAsStr(const CtrlPowerState cps) {
+		static const char* getCtrlPowerStateAsStr(const CtrlPowerState cps) 
+		{
 			switch ( cps ) {
 				case CPS_ON:				return "ON";
 				case CPS_OFF:				return "OFF";
@@ -44,8 +45,8 @@ class CncControl {
 		
 	private:
 		
-		struct CncSpeedMemory : public std::map<CncSpeedMode, float> {
-			
+		struct CncSpeedMemory : public std::map<CncSpeedMode, float> 
+		{
 			public:
 				CncSpeedMemory() {
 					(*this)[CncSpeedRapid]			= THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
@@ -55,8 +56,8 @@ class CncControl {
 				}
 		};
 		
-		struct InteractiveMoveInfo {
-			
+		struct InteractiveMoveInfo 
+		{
 			CncInteractiveMoveDriver	driver;
 			CncStepSensitivity			stepSensitivity;
 			
@@ -69,11 +70,9 @@ class CncControl {
 			void reset()			{ *this = InteractiveMoveInfo(); }
 		};
 		
-		long	 					currentClientId;
-		InteractiveMoveInfo			currentInteractiveMoveInfo;
-		
 		///////////////////////////////////////////////////////////////////
-		struct SetterTuple {
+		struct SetterTuple 
+		{
 			unsigned char 	pid;
 			cnc::SetterValueList values;
 			
@@ -91,7 +90,9 @@ class CncControl {
 		};
 		typedef std::vector<SetterTuple> Setters;
 		
-		SetterMap 				setterMap;
+		long	 					currentClientId;
+		InteractiveMoveInfo			currentInteractiveMoveInfo;
+		SetterMap 					setterMap;
 		
 		void appendToSetterMap(unsigned char pid, const cnc::SetterValueList& values);
 		bool dispatchEventQueue();
@@ -135,7 +136,7 @@ class CncControl {
 		// ctrl power state
 		CtrlPowerState			ctrlPowerState;
 		// tool power state
-		bool					spindlePowerState;
+		CncSpindlePowerState	spindlePowerState;
 		// Artificially Step Delay
 		unsigned int			stepDelay;
 		// heartbeat value
@@ -150,10 +151,6 @@ class CncControl {
 		//struct timeb endTime, startTime;
 		// Flag to indicatate if a positions check aplies
 		bool positionCheck;
-		//sets a value into the given text control
-		void setValue(wxTextCtrl *ctl, int32_t val);
-		void setValue(wxTextCtrl *ctl, double val);
-		void setValue(wxTextCtrl *ctl, const char* t);
 		
 		// Limit management
 		void displayLimitState(wxWindow* ctl, bool value);
@@ -178,11 +175,13 @@ class CncControl {
 		
 	public:
 		
-		struct DimensionXYPlane {
+		struct DimensionXYPlane 
+		{
 			double dimensionX;
 			double dimensionY;
 			
-			struct {
+			struct
+			{
 				CncLongPosition p1;
 				CncLongPosition p2;
 				CncLongPosition p3;
@@ -268,12 +267,6 @@ class CncControl {
 		// getter list wrapper
 		bool displayGetterList(const PidList& pidlist);
 		
-		// wrapper
-		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
-		
-		bool processMoveImage(const CncMoveSequenceImage& moveImage);
-		bool processMoveSequence(CncMoveSequence& moveSequence);
-		
 		bool processGetter(unsigned char pid, GetterValues& ret);
 		bool processMovePodium(int32_t steps, bool exact);
 		
@@ -281,12 +274,14 @@ class CncControl {
 		double getPodiumDistanceMetric();
 		
 		// Zero positioning
+		void setZeroPosX(int32_t x, int32_t y, int32_t z);
 		void setZeroPosX(int32_t v);
 		void setZeroPosY(int32_t v);
 		void setZeroPosZ(int32_t v);
 		
 		void setZeroPos(bool x, bool y, bool z);
 		void setZeroPos();
+
 		// Start positioning
 		void setStartPos();
 		// Move from current position
@@ -303,6 +298,9 @@ class CncControl {
 		bool moveAbsMetricZ(double z);
 		bool moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendered);
 		bool moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
+		
+		bool processMoveImage(const CncMoveSequenceImage& moveImage);
+		bool processMoveSequence(CncMoveSequence& moveSequence);
 		
 		bool correctLimitPositions();
 		bool resolveLimits(bool x, bool y, bool z);

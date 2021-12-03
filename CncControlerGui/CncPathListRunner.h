@@ -20,6 +20,8 @@ class CncPathListRunner {
 			virtual void traceTo(std::ostream& o) const		= 0;
 			
 			virtual bool isEndRunTrigger() const 					{ return false; }
+			virtual bool hasPlm() const 							{ return false; }
+			
 			virtual bool shiftTarget(const CncDoubleDistance dist)	{ return true; }
 			
 			protected:
@@ -93,6 +95,7 @@ class CncPathListRunner {
 			virtual bool process(CncPathListRunner* plr);
 			virtual void traceTo(std::ostream& o) const;
 			virtual bool shiftTarget(const CncDoubleDistance dist) { return shiftTargetImpl(plm, dist); }
+			virtual bool hasPlm() const 							{ return true; }
 		};
 		
 		// ---------------------------------------------------
@@ -105,6 +108,7 @@ class CncPathListRunner {
 			virtual bool process(CncPathListRunner* plr);
 			virtual void traceTo(std::ostream& o) const;
 			virtual bool shiftTarget(const CncDoubleDistance dist) { return shiftTargetImpl(plm, dist); }
+			virtual bool hasPlm() const 							{ return true; }
 		};
 		
 		typedef std::vector<WorkflowEntry*> WorkFlowList;
@@ -182,30 +186,32 @@ class CncPathListRunner {
 				virtual ~Interface()
 				{}
 				
-				virtual CncLongPosition   getPositionSteps()  const								= 0;
-				virtual CncDoublePosition getPositionMetric() const								= 0;
-				
-				virtual bool spoolInstructions()												= 0;
-				virtual void resetInstructions()												= 0;
+				virtual CncLongPosition		getCurrentPositionSteps()  const							= 0;
+				virtual CncDoublePosition	getCurrentPositionMetric() const							= 0;
+				virtual void				setCurrentPositionMetric(double px, double py, double pz)	= 0;
+				virtual void				setCurrentPositionMetric(const CncDoublePosition& pos)		= 0;
+
+				virtual bool spoolInstructions()														= 0;
+				virtual void resetInstructions()														= 0;
 		
-				virtual void logMeasurementStart()												= 0;
-				virtual void logMeasurementEnd()												= 0;
-				virtual bool isInterrupted()													= 0;
+				virtual void logMeasurementStart()														= 0;
+				virtual void logMeasurementEnd()														= 0;
+				virtual bool isInterrupted()															= 0;
 				
-				virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)	= 0;
-				virtual bool processClientIDChange(long cid)									= 0;
-				virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		= 0;
-				virtual bool processToolChange(double diameter)									= 0;
-				virtual bool processSpindleStateSwitch(bool on, bool force=false)				= 0;
-				virtual bool processSpindleSpeedChange(double value_U_MIN)						= 0;
-				virtual bool processMoveSequence(CncMoveSequence& msq)							= 0;
-				virtual bool processPathListEntry(const CncPathListEntry& ple)					= 0;
+				virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)			= 0;
+				virtual bool processClientIDChange(long cid)											= 0;
+				virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)				= 0;
+				virtual bool processToolChange(double diameter)											= 0;
+				virtual bool processSpindleStateSwitch(bool on, bool force=false)						= 0;
+				virtual bool processSpindleSpeedChange(double value_U_MIN)								= 0;
+				virtual bool processMoveSequence(CncMoveSequence& msq)									= 0;
+				virtual bool processPathListEntry(const CncPathListEntry& ple)							= 0;
 				
-				virtual void processTrigger(const Trigger::BeginRun& tr)						= 0;
-				virtual void processTrigger(const Trigger::EndRun& tr)							= 0;
-				virtual void processTrigger(const Trigger::NextPath& tr)						= 0;
-				virtual void processTrigger(const Trigger::SpeedChange& tr)						= 0;
-				virtual void processTrigger(const Trigger::GuidePath& tr)						= 0;
+				virtual void processTrigger(const Trigger::BeginRun& tr)								= 0;
+				virtual void processTrigger(const Trigger::EndRun& tr)									= 0;
+				virtual void processTrigger(const Trigger::NextPath& tr)								= 0;
+				virtual void processTrigger(const Trigger::SpeedChange& tr)								= 0;
+				virtual void processTrigger(const Trigger::GuidePath& tr)								= 0;
 		};
 		
 		virtual void changePathListRunnerInterfaceImpl(const wxString& portName);
@@ -235,7 +241,8 @@ class CncPathListRunner {
 		bool initializeNextMoveSequence(long nextClientId);
 		bool initializeNextMoveSequence(double value_MM_MIN, char mode, long nextClientId);
 		bool finalizeCurrMoveSequence(long nextClientId);
-		bool addSequenceEntryFromValues(double dx, double dy, double dz);
+		bool addSequenceEntryFromAbsValues(double px, double py, double pz);
+		bool addSequenceEntryFromRelValues(double dx, double dy, double dz);
 		bool addSequenceEntryFromEntry(const CncPathListEntry* e);
 		
 		// don't call this functions directly. use initializeNextMoveSequence() 

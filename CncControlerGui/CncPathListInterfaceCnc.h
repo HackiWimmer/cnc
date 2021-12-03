@@ -154,6 +154,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		typedef std::vector<CncInstruction*> CncInstructionList;
 		
 		CncControl*			cnc;
+		CncDoublePosition	currentAddPosition;
 		CncInstructionList	cncInstructions;
 		
 		// ---------------------------------------------------
@@ -182,8 +183,10 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual bool spoolInstructions();
 		virtual void resetInstructions();
 		
-		virtual CncLongPosition   getPositionSteps()  const;
-		virtual CncDoublePosition getPositionMetric() const;
+		virtual CncLongPosition		getCurrentPositionSteps()  const;
+		virtual CncDoublePosition	getCurrentPositionMetric() const;
+		virtual void				setCurrentPositionMetric(double px, double py, double pz);
+		virtual void				setCurrentPositionMetric(const CncDoublePosition& pos);
 		
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();

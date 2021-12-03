@@ -364,7 +364,8 @@ bool FileParser::process() {
 	THE_CONTEXT->timestamps.logPreTimeEnd();
 	
 	// second: spooling
-	if ( THE_CONTEXT->processingInfo->processMore() && ret == true ) {
+	if ( THE_CONTEXT->processingInfo->processMore() && ret == true )
+	{
 		initNextRunPhase(CncProcessingInfo::RP_Spool);
 		
 		THE_CONTEXT->timestamps.logSerialTimeStart();
@@ -376,7 +377,8 @@ bool FileParser::process() {
 		THE_CONTEXT->timestamps.logSerialTimeEnd();
 	} 
 	
-	if ( ret == true ) {
+	if ( ret == true )
+	{
 		THE_CONTEXT->timestamps.logPostTimeStart();
 		ret = postprocess();
 		THE_CONTEXT->timestamps.logPostTimeEnd();
@@ -386,7 +388,8 @@ bool FileParser::process() {
 	if ( inboundSourceControl )
 		inboundSourceControl->gotoBegin();
 	
-	if ( debuggerConfigurationPropertyGrid != NULL ) {
+	if ( debuggerConfigurationPropertyGrid != NULL )
+	{
 		debuggerConfigurationPropertyGrid->Refresh();
 		debuggerConfigurationPropertyGrid->Update();
 	}

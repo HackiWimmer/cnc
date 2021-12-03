@@ -61,29 +61,32 @@ bool Serial::test() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = false;
 	
-	if ( false ) {
+	if ( false ) 
+	{
 		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
-		cms.addMetricPosXYZ( +200,  +0,   0);
+		cms.addMetricRelXYZ( +200,  +0,   0);
 
 		return processMoveSequence(cms);
 	}
 
-	if ( true ) {
+	if ( true ) 
+	{
 		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
 		
 		float q = 1.0;
-		for ( auto i=0; i<5; i++) {
+		for ( auto i=0; i<5; i++) 
+		{
 			for ( auto j=0; j<10; j++) 
-				cms.addMetricPosXYZ( q * +10, q *  +10,   0);
+				cms.addMetricRelXYZ( q * +10, q *  +10,   0);
 			
 			for ( auto j=0; j<10; j++) 
-				cms.addMetricPosXYZ( q * +10, q *  -10,   0);
+				cms.addMetricRelXYZ( q * +10, q *  -10,   0);
 				
 			for ( auto j=0; j<10; j++) 
-				cms.addMetricPosXYZ( q * -10, q *  -10,   0);
+				cms.addMetricRelXYZ( q * -10, q *  -10,   0);
 				
 			for ( auto j=0; j<10; j++) 
-				cms.addMetricPosXYZ( q * -10, q * +10,   0);
+				cms.addMetricRelXYZ( q * -10, q * +10,   0);
 				
 			q -= 0.1;
 		}
@@ -91,24 +94,26 @@ bool Serial::test() {
 		return processMoveSequence(cms);
 	}
 
-	if ( true ) {
+	if ( true ) 
+	{
 		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
-		cms.addMetricPosXYZ(+0,   +0, +10);
-		cms.addMetricPosXYZ(+10, +20,  +0);
-		cms.addMetricPosXYZ(+0,   +0, -10);
+		cms.addMetricRelXYZ(+0,   +0, +10);
+		cms.addMetricRelXYZ(+10, +20,  +0);
+		cms.addMetricRelXYZ(+0,   +0, -10);
 
 
-		cms.addMetricPosXYZ( +50,  +20,   0);
-		cms.addMetricPosXYZ( +20,  +10,   0);
-		cms.addMetricPosXYZ( +20,   -5,   0);
-		cms.addMetricPosXYZ( +15,   -3,   0);
-		cms.addMetricPosXYZ( +10,   -2,   0);
-		cms.addMetricPosXYZ( +20,  +10,   0);
+		cms.addMetricRelXYZ( +50,  +20,   0);
+		cms.addMetricRelXYZ( +20,  +10,   0);
+		cms.addMetricRelXYZ( +20,   -5,   0);
+		cms.addMetricRelXYZ( +15,   -3,   0);
+		cms.addMetricRelXYZ( +10,   -2,   0);
+		cms.addMetricRelXYZ( +20,  +10,   0);
 
 		return processMoveSequence(cms);
 	}
 	
-	if ( true ) {
+	if ( true )
+	{
 		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
 		
 		bool fOneB  = true;
@@ -116,57 +121,64 @@ bool Serial::test() {
 		bool fInt16 = false;
 		bool fInt32 = false;
 		
-		for ( int i = 0; i <50; i++ ) {
+		for ( int i = 0; i <50; i++ )
+		{
 			// one byte values
-			if ( fOneB ) {
-				cms.addStepPosXYZ(+1, -1, +1);
-				cms.addStepPosXYZ(-1, +1,  0);
-				cms.addStepPosXYZ(+1,  0,  0);
-				cms.addStepPosXYZ( 0, -1,  0);
-				cms.addStepPosXYZ( 0,  0, +1);
+			if ( fOneB ) 
+			{
+				cms.addMetricRelXYZ(+1, -1, +1);
+				cms.addMetricRelXYZ(-1, +1,  0);
+				cms.addMetricRelXYZ(+1,  0,  0);
+				cms.addMetricRelXYZ( 0, -1,  0);
+				cms.addMetricRelXYZ( 0,  0, +1);
 			}
 			
 			// int8_t values
-			if ( fInt8 ) {
-				cms.addStepPosXYZ(+11, -12, +13);
-				cms.addStepPosXYZ(-11,  12,   0);
-				cms.addStepPosXYZ(-11,   0,   0);
-				cms.addStepPosXYZ(  0,  12,   0);
-				cms.addStepPosXYZ(  0,   0, -13);
+			if ( fInt8 )
+			{
+				cms.addMetricRelXYZ(+11, -12, +13);
+				cms.addMetricRelXYZ(-11,  12,   0);
+				cms.addMetricRelXYZ(-11,   0,   0);
+				cms.addMetricRelXYZ(  0,  12,   0);
+				cms.addMetricRelXYZ(  0,   0, -13);
 			}
 			
 			// int16_t values
-			if ( fInt16 ) {
-				cms.addStepPosXYZ(+1000, +2000, +30);
-				cms.addStepPosXYZ(+1000, +2000,   0);
-				cms.addStepPosXYZ(-1000,     0,   0);
-				cms.addStepPosXYZ(    0, -2000,   0);
-				cms.addStepPosXYZ(    0,     0, -30);
+			if ( fInt16 )
+			{
+				cms.addMetricRelXYZ(+1000, +2000, +30);
+				cms.addMetricRelXYZ(+1000, +2000,   0);
+				cms.addMetricRelXYZ(-1000,     0,   0);
+				cms.addMetricRelXYZ(    0, -2000,   0);
+				cms.addMetricRelXYZ(    0,     0, -30);
 			}
 			
 			// int32_t values
-			if ( fInt32 ) {
-				cms.addStepPosXYZ(+100000, +200000, +30);
-				cms.addStepPosXYZ(+100000, +200000,   0);
-				cms.addStepPosXYZ(-100000,       0,   0);
-				cms.addStepPosXYZ(      0, -200000,   0);
-				cms.addStepPosXYZ(      0,     0,   -30);
+			if ( fInt32 )
+			{
+				cms.addMetricRelXYZ(+100000, +200000, +30);
+				cms.addMetricRelXYZ(+100000, +200000,   0);
+				cms.addMetricRelXYZ(-100000,       0,   0);
+				cms.addMetricRelXYZ(      0, -200000,   0);
+				cms.addMetricRelXYZ(      0,     0,   -30);
 			}
 		}
 		
 		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
 		ret = processMoveSequence(cms);
 	}
-	else {
+	else 
+	{
 		CncMoveSequence cms(CMD_MOVE_SEQUENCE);
 		
-		for ( int i = 0; i < 500; i++ ) {
+		for ( int i = 0; i < 500; i++ ) 
+		{
 			// one byte values
-			cms.addStepPosXYZ(+1, -1, +1);
-			cms.addStepPosXYZ(-1, +1,  0);
-			cms.addStepPosXYZ(+1,  0,  0);
-			cms.addStepPosXYZ( 0, -1,  0);
-			cms.addStepPosXYZ( 0,  0, +1);
+			cms.addMetricRelXYZ(+1, -1, +1);
+			cms.addMetricRelXYZ(-1, +1,  0);
+			cms.addMetricRelXYZ(+1,  0,  0);
+			cms.addMetricRelXYZ( 0, -1,  0);
+			cms.addMetricRelXYZ( 0,  0, +1);
 		}
 		
 		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
@@ -178,7 +190,6 @@ bool Serial::test() {
 
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
-//: SerialOSD()
 : connected								(false)
 , readBuffer							()
 , totalDistanceSteps					{0L, 0L, 0L, 0L}
@@ -2329,153 +2340,6 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
 	CncMoveSequenceImage moveImage(sequence);
 	return processMoveImage(moveImage);
-	
-	
-	#warning remove this 
-	/*
-	if ( isConnected() == false )
-	{
-		CNC_CERR_FUNCT_A("ERROR: Not connected");
-		return false;
-	}
-	
-	// empty move sequence nothing to do 
-	if ( sequence.getCount() == 0 )
-		return true;
-	
-	SerialCommandLocker scl(this, sequence.getType());
-	if ( scl.lock(cncControl) == false )
-	{
-		std::clog << "SERIAL::processMoveSequence(): Serial is currently in fetching mode: This command will be rejected:" << std::endl;
-		return true;
-	}
-	
-	// Always log the start position
-	if ( cncControl->SerialCallback() == false )
-		return false;
-		
-	// create move sequence write buffer
-	CncMoveSequence::FlushResult result;
-	if ( sequence.flush(result) == false )
-	{
-		std::clog << "SERIAL::processMoveSequence(): sequence.flush failed" << std::endl;
-		return false;
-	}
-	
-	// runtime check 
-	if ( writeMoveSequenceRawCallback( result.buffer, result.flushedSize) == false )
-	{
-		std::clog << "SERIAL::processMoveSequence(): writeMoveSequenceRawCallback failed" << std::endl;
-		return false;
-	}
-	
-	// runtime check - should not appear, because sequence.getCount() is checked above
-	if ( sequence.getPortionIndex().size() == 0 )
-	{
-		std::cerr << "SERIAL::processMoveSequence(): empty portion" << std::endl;
-		return false;
-	}
-	
-	unsigned int totalFlushedSize	= sequence.getFlushedSize();
-	unsigned int currentFlushedSize	= sequence.getPortionIndex().size() > 0 ? *(sequence.getPortionIndex().begin()) : 0;
-	unsigned char* moveSequence 	= result.buffer;
-	moveCommand[0] 					= moveSequence[0];
-	
-	// to provide a time and pos reference for the speed calculation
-	logMeasurementRefTs(cncControl->getCurAppPos());
-	
-	// over all portions
-	for ( auto it = sequence.getPortionIndex().begin(); it != sequence.getPortionIndex().end(); ++it )
-	{
-		const unsigned int portionCounter = std::distance(sequence.getPortionIndex().begin(), it);
-		
-		if ( traceSpyInfo && spyWrite )
-			cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]; portion=%u",	moveSequence[0],
-																						ArduinoCMDs::getCMDLabel(moveSequence[0]),
-																						portionCounter + 1
-									 ));
-		// notify
-		if ( cncControl->SerialCallback() == false )
-			return false;
-		
-		const unsigned int portionStart		= *it;
-		const unsigned int portionLength	= (unsigned int)moveSequence[portionStart];
-		const unsigned int portionTotLength	= portionLength + 1;
-		
-		const unsigned int writeStart		= portionCounter > 0 ? portionStart  : 0;
-		const unsigned int writeLength		= portionCounter > 0 ? portionTotLength : portionStart + portionTotLength;
-		
-		if ( false )
-		{
-			std::cout << "portionCounter: " << portionCounter << std::endl;
-			std::cout << " - portion : "    << portionStart << "->" << portionLength << std::endl;
-			std::clog << " - write   : "    << writeStart   << "->" << writeLength   << std::endl;
-		}
-		 
-		// write ....
-		lastFetchResult.init(moveSequence[0], portionCounter);
-		if ( writeData(moveSequence + writeStart, writeLength) )
-		{
-			currentFlushedSize += portionTotLength; 
-			
-			SerialFetchInfo sfi(lastFetchResult.cmd);
-			sfi.fetchTimeout 		= 3000;
-			sfi.Msc.size 			= 3;
-			sfi.Msc.value1			= result.sequenceData.targetX;
-			sfi.Msc.value2			= result.sequenceData.targetY;
-			sfi.Msc.value3			= result.sequenceData.targetZ;
-			
-			// evaluate handshake
-			bool handshake = evaluateResultWrapper(sfi, std::cout);
-			if ( handshake == false )
-			{
-				std::cerr << "SERIAL::processMoveSequence(" << portionCounter << "): Invalid handshake" << std::endl;
-				cncControl->SerialCallback();
-				return false;
-			}
-			
-			if ( lastFetchResult.ret != RET_MORE && lastFetchResult.ret != RET_OK )
-			{
-				std::clog << "SERIAL::processMoveSequence(" << portionCounter << "): lastFetchResult.ret != RET_MORE | RET OK" << std::endl;
-				break;
-			}
-			
-			// notify
-			if ( cncControl->SerialCallback() == false )
-				return false;
-			
-		}
-		else
-		{
-			std::cerr << "SERIAL::processMoveSequence(" << portionCounter << "): Unable to write data" << std::endl;
-			cncControl->SerialCallback();
-			return false;
-		}
-	} // for
-	
-	// final quality check
-	if ( totalFlushedSize != currentFlushedSize )
-	{
-		std::cerr << "SERIAL::processMoveSequence(final): totalFlushedSize != currentFlushedSize" << std::endl;
-		std::cerr << " - totalFlushedSize            : " << totalFlushedSize 	<< std::endl;
-		std::cerr << " - currentFlushedSize          : " << currentFlushedSize 	<< std::endl;
-		return false;
-	}
-	
-	// latest log this move
-	logMeasurementLastTs();
-	
-	if ( contextInterface != NULL )
-	{
-		contextInterface->notifyMove(	result.type, 
-										result.sequenceData.lengthX, 
-										result.sequenceData.lengthY, 
-										result.sequenceData.lengthZ
-		);
-	}
-	
-	return true;
-	*/
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::serializeSetter(SerialFetchInfo& sfi, const unsigned char* buffer, unsigned int nbByte) { 

@@ -147,7 +147,9 @@ class CncMatrix4x4 {
 	private:
 		T mat[16];
 	
-	void resetMat() {
+	void resetMat() 
+	{
+		// create a unit matrix
 		memset(mat, 0, 16 * sizeof(T));
 		
 		mat[V11] = (T)1;
@@ -170,11 +172,13 @@ class CncMatrix4x4 {
 			resetMat();
 		}
 		
-		void set(const MatIdx mi, T val) {
+		void set(const MatIdx mi, T val) 
+		{
 			mat[mi] = val;
 		}
 		
-		void set(const MatVec mv, const CncVector<T>& v) {
+		void set(const MatVec mv, const CncVector<T>& v) 
+		{
 			unsigned short mi = 0 + mv * 4;
 			
 			mat[mi + 0] = v.getX();
@@ -182,16 +186,116 @@ class CncMatrix4x4 {
 			mat[mi + 2] = v.getZ();
 			mat[mi + 3] = v.getW();
 		}
-
-		T get(const MatIdx mi) const { 
+		
+		T get(const MatIdx mi) const 
+		{ 
 			return mat[mi]; 
 		}
 		
-		const T* get() const { 
+		const T* get() const 
+		{ 
 			return mat; 
 		}
 		
-		friend std::ostream &operator<< (std::ostream &ostr, const CncMatrix4x4<T> &m) {
+		void transform(T& x, T& y, T& z)
+		{
+			const T X = x;
+			const T Y = y;
+			const T Z = z;
+			const T W = (T)1;
+			
+			x = mat[V11] * X + mat[V12] * Y + mat[V13] * Z + mat[V14] * W; 
+			y = mat[V21] * X + mat[V22] * Y + mat[V23] * Z + mat[V24] * W;
+			z = mat[V31] * X + mat[V32] * Y + mat[V33] * Z + mat[V34] * W;
+			//T w = mat[V41] * X + mat[V42] * Y + mat[V43] * Z + mat[V44] * W;
+		}
+		
+		const CncMatrix4x4<T>& multiply(const CncMatrix4x4<T>& m)
+		{
+			mat[V11] = mat[V11] * m.get(V11) + mat[V12] * m.get(V21) + mat[V13] * m.get(V31) + mat[V14] * m.get(V41);
+			mat[V21] = mat[V21] * m.get(V11) + mat[V22] * m.get(V21) + mat[V23] * m.get(V31) + mat[V24] * m.get(V41);
+			mat[V31] = mat[V31] * m.get(V11) + mat[V32] * m.get(V21) + mat[V33] * m.get(V31) + mat[V34] * m.get(V41);
+			mat[V41] = mat[V41] * m.get(V11) + mat[V42] * m.get(V21) + mat[V43] * m.get(V31) + mat[V44] * m.get(V41);
+			
+			mat[V12] = mat[V11] * m.get(V12) + mat[V12] * m.get(V22) + mat[V13] * m.get(V32) + mat[V14] * m.get(V42);
+			mat[V22] = mat[V21] * m.get(V12) + mat[V22] * m.get(V22) + mat[V23] * m.get(V32) + mat[V24] * m.get(V42);
+			mat[V32] = mat[V31] * m.get(V12) + mat[V32] * m.get(V22) + mat[V33] * m.get(V32) + mat[V34] * m.get(V42);
+			mat[V42] = mat[V41] * m.get(V12) + mat[V42] * m.get(V22) + mat[V43] * m.get(V32) + mat[V44] * m.get(V42);
+			
+			mat[V13] = mat[V11] * m.get(V13) + mat[V12] * m.get(V23) + mat[V13] * m.get(V33) + mat[V14] * m.get(V43);
+			mat[V23] = mat[V21] * m.get(V13) + mat[V22] * m.get(V23) + mat[V23] * m.get(V33) + mat[V24] * m.get(V43);
+			mat[V33] = mat[V31] * m.get(V13) + mat[V32] * m.get(V23) + mat[V33] * m.get(V33) + mat[V34] * m.get(V43);
+			mat[V43] = mat[V41] * m.get(V13) + mat[V42] * m.get(V23) + mat[V43] * m.get(V33) + mat[V44] * m.get(V43);
+			
+			mat[V14] = mat[V11] * m.get(V14) + mat[V12] * m.get(V24) + mat[V13] * m.get(V34) + mat[V14] * m.get(V44);
+			mat[V24] = mat[V21] * m.get(V14) + mat[V22] * m.get(V24) + mat[V23] * m.get(V34) + mat[V24] * m.get(V44);
+			mat[V34] = mat[V31] * m.get(V14) + mat[V32] * m.get(V24) + mat[V33] * m.get(V34) + mat[V34] * m.get(V44);
+			mat[V44] = mat[V41] * m.get(V14) + mat[V42] * m.get(V24) + mat[V43] * m.get(V34) + mat[V44] * m.get(V44);
+			
+			return *this;
+		}
+		
+		const CncMatrix4x4<T>& setTranslation(T x, T y, T z)
+		{
+			CncMatrix4x4<T> m;
+			
+			m.set(V14, x);
+			m.set(V24, y);
+			m.set(V33, z);
+			
+			return this->multiply(m);
+		}
+		
+		const CncMatrix4x4<T>& setRotationAxisX(double aDegree)
+		{
+			CncMatrix4x4<T> m;
+			
+			const float angle = aDegree * CNC_VECTOR_PI / 180;
+			const float COS   = cos(angle);
+			const float SIN   = sin(angle);
+			
+			m.set(V22, +COS);
+			m.set(V23, -SIN);
+			m.set(V32, +SIN);
+			m.set(V33, +COS);
+			
+			return this->multiply(m);
+		}
+		
+		const CncMatrix4x4<T>& setRotationAxisY(double aDegree)
+		{
+			CncMatrix4x4<T> m;
+			
+			const float angle = aDegree * CNC_VECTOR_PI / 180;
+			const float COS   = cos(angle);
+			const float SIN   = sin(angle);
+			
+			m.set(V11, +COS);
+			m.set(V13, +SIN);
+			m.set(V21, -SIN);
+			m.set(V33, +COS);
+			
+			return this->multiply(m);
+		}
+		
+		const CncMatrix4x4<T>& setRotationAxisZ(double aDegree)
+		{
+			CncMatrix4x4<T> m;
+			
+			const float angle = aDegree * CNC_VECTOR_PI / 180;
+			const float COS   = cos(angle);
+			const float SIN   = sin(angle);
+			
+			m.set(V11, +COS);
+			m.set(V12, -SIN);
+			m.set(V21, +SIN);
+			m.set(V22, +COS);
+			
+			return this->multiply(m);
+		}
+		
+		friend std::ostream &operator<< (std::ostream &ostr, const CncMatrix4x4<T> &m) 
+		{
 			
 			for (int r = 0; r < 4; r++ ) {
 				ostr << "| ";
@@ -209,7 +313,8 @@ class CncMatrix4x4 {
 			return ostr;
 		}
 		
-		static void traceRawMatrix(std::ostream &ostr, T m[]) {
+		static void traceRawMatrix(std::ostream &ostr, T m[]) 
+		{
 			if ( m == NULL )
 				return;
 				

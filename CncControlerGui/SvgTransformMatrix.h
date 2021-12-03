@@ -8,12 +8,13 @@
 
 typedef std::vector<double> TransformParameterList;
 
-class SVGTransformMatrix {
+class SVGTransformMatrix
+{
 	
 	private:
 		
-		struct DecomposedValues {
-			
+		struct DecomposedValues 
+		{
 			double scaleX = 0.0;
 			double scaleY = 0.0;
 			double rotate = 0.0;
@@ -33,13 +34,16 @@ class SVGTransformMatrix {
 		void decomposeMatrix(DecomposedValues& ret) const;
 		
 		/////////////////////////////////////////////////////////
-		int evaluateTransformParameters(wxString& pStr, TransformParameterList & p) {
+		int evaluateTransformParameters(const wxString& pStr, TransformParameterList & p) 
+		{
 			p.clear();
 			
 			wxStringTokenizer tokenizer(pStr, " ,");
-			while ( tokenizer.HasMoreTokens() ) {
+			while ( tokenizer.HasMoreTokens() ) 
+			{
 				wxString s = tokenizer.GetNextToken();
-				if ( s.IsEmpty() == false ) {
+				if ( s.IsEmpty() == false )
+				{
 					double d;
 					s.ToDouble(&d);
 					p.push_back(d);
@@ -50,12 +54,14 @@ class SVGTransformMatrix {
 		}
 		
 		/////////////////////////////////////////////////////////
-		bool performTransform(const wxString& cmd, TransformParameterList parameters) {
+		bool performTransform(const wxString& cmd, TransformParameterList parameters) 
+		{
 			SVGTransformMatrix tmp;
-			bool ret = false;
+			bool ret   = false;
 			bool trace = false;
 			
-			if ( trace ) std::clog << cmd.c_str() << std::endl;
+			if ( trace ) 
+				std::clog << cmd.c_str() << std::endl;
 			
 			if (      cmd == "translate" ) 	ret = tmp.translate (parameters);
 			else if ( cmd == "scale" )		ret = tmp.scale     (parameters);
@@ -63,20 +69,26 @@ class SVGTransformMatrix {
 			else if ( cmd == "skewX" ) 		ret = tmp.skewX     (parameters);
 			else if ( cmd == "skewY" ) 		ret = tmp.skewY     (parameters);
 			else if ( cmd == "matrix" )		ret = tmp.matrix    (parameters);
-			else {
-				std::cerr << "SVGTransformMatrix::performTransform: " << cmd.c_str() << " is currently not supported" << std::endl;
+			else 
+			{
+				CNC_CERR_FUNCT_A("%s is currently not supported",cmd.c_str())
 			}
 			
-			if ( ret == true ) {
+			if ( ret == true )
+			{
 				multiply(tmp);
 			
-				if ( trace ) std::clog << *this;
+				if ( trace ) 
+					std::clog << *this;
 			}
 			
-			if ( ret == false ) {
-				std::cerr << "SVGTransformMatrix::performTransform: Failed" << std::endl;
+			if ( ret == false )
+			{
+				std::cerr << CNC_LOG_FUNCT << std::endl;
 				std::cerr << "Command: " << cmd.c_str() << std::endl;
-				for (TransformParameterList::iterator it=parameters.begin(); it!=parameters.end(); ++it) {
+				
+				for (auto it=parameters.begin(); it!=parameters.end(); ++it)
+				{
 					std::cerr << " Para  : " << *it << std::endl;
 				}
 			}
@@ -175,24 +187,28 @@ class SVGTransformer {
 		
 		/////////////////////////////////////////////////////////
 		void transformPoint(wxRealPoint& p) { transformPoint(p.x, p.y); }
-		void transformPoint(double& x, double& y) {
+		void transformPoint(double& x, double& y) 
+		{
 			matrix.transform(x, y);
 		}
 		
 		/////////////////////////////////////////////////////////
 		const wxRealPoint& transform(const wxRealPoint& p) { return transform(p.x, p.y); }
-		const wxRealPoint& transform(double x, double y) {
+		const wxRealPoint& transform(double x, double y) 
+		{
 			return matrix.transform(x, y);
 		}
 		
 		/////////////////////////////////////////////////////////
-		void applyUnchanged() { 
+		void applyUnchanged() 
+		{ 
 			matrix.unchanged(); 
 		}
 		
 		/////////////////////////////////////////////////////////
 		void applyTranslate(double xy) { applyTranslate(xy, xy); }
-		void applyTranslate(double x, double y) {
+		void applyTranslate(double x, double y) 
+		{
 			helper.unchanged();
 			helper.translate(x, y);
 			matrix.multiply(helper);
@@ -200,7 +216,8 @@ class SVGTransformer {
 		
 		/////////////////////////////////////////////////////////
 		void applyScale(double xy) { applyScale(xy, xy); }
-		void applyScale(double x, double y) {
+		void applyScale(double x, double y) 
+		{
 			helper.unchanged();
 			helper.scale(x, y);
 			matrix.multiply(helper);
@@ -209,28 +226,32 @@ class SVGTransformer {
 		/////////////////////////////////////////////////////////
 		void applyRotate(double a) { applyRotate(a, 0.0, 0.0); }
 		void applyRotate(double a, double xy) { applyRotate(a, xy, xy); }
-		void applyRotate(double a, double x, double y) {
+		void applyRotate(double a, double x, double y) 
+		{
 			helper.unchanged();
 			helper.rotate(a, x, y);
 			matrix.multiply(helper);
 		}
 		
 		/////////////////////////////////////////////////////////
-		void applySkewX(double a) {
+		void applySkewX(double a) 
+		{
 			helper.unchanged();
 			helper.skewX(a);
 			matrix.multiply(helper);
 		}
 		
 		/////////////////////////////////////////////////////////
-		void applySkewY(double a) {
+		void applySkewY(double a) 
+		{
 			helper.unchanged();
 			helper.skewX(a);
 			matrix.multiply(helper);
 		}
 		
 		/////////////////////////////////////////////////////////
-		void applyMatrix(double a, double b, double c, double d, double e, double f) {
+		void applyMatrix(double a, double b, double c, double d, double e, double f) 
+		{
 			helper.unchanged();
 			helper.matrix(a, b, c, d, e, f);
 			matrix.multiply(helper);

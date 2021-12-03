@@ -1,4 +1,5 @@
 #include <fstream>
+#include <wx/clipbrd.h>
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "CncContext.h"
@@ -72,7 +73,7 @@ CncPositionStorageView::CncPositionStorageView(wxWindow* parent)
 		addStorage(STORE::TRIGGER_PH_LST_RUN);
 	}
 	{
-		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "MoveSequence Add as in32_t";
+		OverviewItemInfo oi; oi.format = OFMT::LONG, oi.label = "MoveSequence Add as int32_t";
 		oi.help = 	"The position will traced at the point ......."; 
 		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_MOV_SEQ_ADD );
 		addStorage(STORE::TRIGGER_MOV_SEQ_ADD);
@@ -83,7 +84,6 @@ CncPositionStorageView::CncPositionStorageView(wxWindow* parent)
 		overview.push_back(oi); wxASSERT( overview.size() == STORE::TRIGGER_SERIAL_NULL );
 		addStorage(STORE::TRIGGER_SERIAL_NULL);
 	}
-
 	
 	
 	// -------------------------------------------------------------
@@ -104,9 +104,9 @@ CncPositionStorageView::CncPositionStorageView(wxWindow* parent)
 	// -------------------------------------------------------------
 	// setup detail gui . . . 
 	m_details->AppendColumn("#", wxLIST_FORMAT_RIGHT,  60);
-	m_details->AppendColumn("X", wxLIST_FORMAT_RIGHT, 100);
-	m_details->AppendColumn("Y", wxLIST_FORMAT_RIGHT, 100);
-	m_details->AppendColumn("Z", wxLIST_FORMAT_RIGHT, 100);
+	m_details->AppendColumn("Abs X", wxLIST_FORMAT_RIGHT, 100);
+	m_details->AppendColumn("Abs Y", wxLIST_FORMAT_RIGHT, 100);
+	m_details->AppendColumn("Abs Z", wxLIST_FORMAT_RIGHT, 100);
 } 
 ////////////////////////////////////////////////////////////////////
 CncPositionStorageView::~CncPositionStorageView() {
@@ -233,11 +233,13 @@ bool CncPositionStorageView::addMove(uint8_t sid, int32_t dx, int32_t dy, int32_
 bool CncPositionStorageView::addMove(uint8_t sid, double dx, double dy, double dz) {
 ////////////////////////////////////////////////////////////////////
 	auto it = storage.find(sid);
-	if ( it == storage.end() ) {
+	if ( it == storage.end() ) 
+	{
 		std::cerr	<< CNC_LOG_FUNCT << " storage with id '"
 					<< sid
 					<< "' did not exists!"
-					<< std::endl;
+					<< std::endl
+		;
 		return false;
 	}
 	
@@ -289,7 +291,7 @@ void CncPositionStorageView::onOverviewItemSelected(wxListEvent& event) {
 	if ( isItemValid(item) == false )
 		return;
 		
-	// highlight seleted item
+	// highlight selected item
 	m_overview->SetItemTextColour(item, *wxYELLOW);
 		
 	m_helpText->ChangeValue(overview.at(item).help);
@@ -332,7 +334,8 @@ void CncPositionStorageView::updateDetails() {
 	m_detailsType->ChangeValue(OverviewItemInfo::getFormatAsString(format));
 	
 	m_details->DeleteAllItems();
-	for ( auto it= l.begin(); it != l.end(); ++it ) {
+	for ( auto it= l.begin(); it != l.end(); ++it ) 
+	{
 		const long item = std::distance(l.begin(), it);
 		
 		m_details->InsertItem(item, wxString::Format("% 8ld", item), 0);
@@ -348,10 +351,43 @@ void CncPositionStorageView::updateDetails() {
 ////////////////////////////////////////////////////////////////////
 void CncPositionStorageView::onCopyDetails(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////
-
-	CNC_PRINT_LOCATION
-
-
+	long sid; m_detailsSid->GetValue().ToLong(&sid);
+	
+	auto it = storage.find((uint8_t)sid);
+	if ( it == storage.end() ) 
+	{
+		std::cerr	<< CNC_LOG_FUNCT << " storage with id '"
+					<< sid
+					<< "' did not exists!"
+					<< std::endl
+		;
+		return;
+	}
+	
+	// Write the content of entries to the clipboard
+	if ( wxTheClipboard->Open() )
+	{
+		OverviewItemInfo::Format format = overview.at(sid2Item(sid)).format;
+		DetailList& l = it->second;
+		wxString tmp;
+		
+		std::stringstream ss;
+		for (auto it = l.begin(); it != l.end(); ++it )
+			ss << it->trace(tmp, format) << std::endl;
+		
+		// This data objects are held by the clipboard,
+		// so do not delete them in the app.
+		if ( wxTheClipboard->SetData( new wxTextDataObject(ss.str().c_str()) ) == false )
+		{
+			std::cerr	<< CNC_LOG_FUNCT << " copy to clipboard failed! '"
+						<< sid
+						<< "'"
+						<< std::endl
+			;
+		}
+		
+		wxTheClipboard->Close();
+	}
 }
 ////////////////////////////////////////////////////////////////////
 void CncPositionStorageView::onSaveDetails(wxCommandEvent& event) {
@@ -359,24 +395,27 @@ void CncPositionStorageView::onSaveDetails(wxCommandEvent& event) {
 	long sid; m_detailsSid->GetValue().ToLong(&sid);
 	
 	auto it = storage.find((uint8_t)sid);
-	if ( it == storage.end() ) {
+	if ( it == storage.end() ) 
+	{
 		std::cerr	<< CNC_LOG_FUNCT << " storage with id '"
 					<< sid
 					<< "' did not exists!"
-					<< std::endl;
+					<< std::endl
+		;
 		return;
 	}
 	
 	wxFileName fnCSV(CncFileNameService::getTempFileName("csv"));
 	std::ofstream outCSV(fnCSV.GetFullPath().c_str().AsChar(), std::ofstream::out);
-	if ( !outCSV.good() ) {
+	if ( !outCSV.good() ) 
+	{
 		std::cerr	<< CNC_LOG_FUNCT << " Can't create file: '" 
 					<< fnCSV.GetFullPath()
 					<< "'"
-					<< std::endl;
+					<< std::endl
+		;
 		return;
 	}
-	CNC_PRINT_LOCATION
 	
 	OverviewItemInfo::Format format = overview.at(sid2Item(sid)).format;
 	DetailList& l = it->second;
@@ -394,11 +433,13 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 	long sid; m_detailsSid->GetValue().ToLong(&sid);
 	
 	auto it = storage.find((uint8_t)sid);
-	if ( it == storage.end() ) {
+	if ( it == storage.end() )
+	{
 		std::cerr	<< CNC_LOG_FUNCT << " storage with id '"
 					<< sid
 					<< "' did not exists!"
-					<< std::endl;
+					<< std::endl
+		;
 		return;
 	}
 	
@@ -420,14 +461,16 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 	wxFileName fnCSV(CncFileNameService::getTempFileName("csv"));
 	
 	// -------------------------------------------------------------
-	// perform csv an bounderies
+	// perform csv an boundaries
 	{
 		std::ofstream outCSV(fnCSV.GetFullPath().c_str().AsChar(), std::ofstream::out);
-		if ( !outCSV.good() ) {
+		if ( !outCSV.good() ) 
+		{
 			std::cerr	<< CNC_LOG_FUNCT << " Can't create file: '" 
 						<< fnCSV.GetFullPath()
 						<< "'"
-						<< std::endl;
+						<< std::endl
+			;
 			return;
 		}
 		
@@ -438,13 +481,14 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 		typedef OverviewItemInfo::Format FMT;
 		
 		wxString tmp;
-		for (auto it = l.begin(); it != l.end(); ++it ) {
-			
+		for (auto it = l.begin(); it != l.end(); ++it ) 
+		{
 			minX = std::min(minX, it->pos.getX()); maxX = std::max(maxX, it->pos.getX());
 			minY = std::min(minY, it->pos.getY()); maxY = std::max(maxY, it->pos.getY());
 			minZ = std::min(minZ, it->pos.getZ()); maxZ = std::max(maxZ, it->pos.getZ());
 			
-			switch ( format ) {
+			switch ( format ) 
+			{
 				case FMT::DOUBLE:	outCSV	<< wxString::Format("%lf,0,%lf,0,%lf", 
 																it->pos.getX(), 
 																it->pos.getY(), 
@@ -557,11 +601,13 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 		vt.append("To('..')\n");
 		
 		std::ofstream outVSZ(fnVSZ.GetFullPath().c_str().AsChar(), std::ofstream::out);
-		if ( !outVSZ.good() ) {
+		if ( !outVSZ.good() ) 
+		{
 			std::cerr	<< CNC_LOG_FUNCT << " Can't create file: '" 
 						<< fnVSZ.GetFullPath()
 						<< "'"
-						<< std::endl;
+						<< std::endl
+			;
 			return;
 		}
 		
@@ -574,15 +620,18 @@ void CncPositionStorageView::onExportDetails(wxCommandEvent& event) {
 	
 	// -------------------------------------------------------------
 	// export
+	CNC_PRINT_LOCATION
 	GblFunc::executeExternalProgram(exportTool, fnVSZ.GetFullPath(), true);
 }
 ////////////////////////////////////////////////////////////////////
 void CncPositionStorageView::onActivateWindow(wxActivateEvent& event) {
 ////////////////////////////////////////////////////////////////////
+	/*
 	if ( event.GetActive() == true )
 		m_activationTimer->Start(100, true);
 	
 	event.Skip();
+	*/
 }
 ////////////////////////////////////////////////////////////////////
 void CncPositionStorageView::onActivationTimer(wxTimerEvent& event) {

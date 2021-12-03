@@ -175,21 +175,29 @@ unsigned int CncMoveSequence::determineSafeBufferSize() const {
 	return ( headerSize + dataSize + ( portionCount * 1 ) );
 }
 ///////////////////////////////////////////////////////////////////
-void CncMoveSequence::addMetricPosXYZ(double dx, double dy, double dz) {
+void CncMoveSequence::addMetricRelXYZ(double dx, double dy, double dz) {
 ///////////////////////////////////////////////////////////////////
-	// using the flow converter here to avoid to loos the reset 
+	// using the flow converter here to avoid to loss the reset 
 	// while still round the values
+	#warning !!! why
+	/*
 	static CncFlowPositionConverter flowCnv;
 	
-	// add givven movements
+	// add given movements
 	flowCnv.set(dx, dy, dz);
 	
 	// the the converted values
 	const CncLongPosition& p = flowCnv.get();
 	addStepPosXYZ(p.getX(), p.getY(), p.getZ());
+	*/
+	
+	addStepRelXYZ(	THE_CONFIG->convertMetricToStepsX(dx), 
+					THE_CONFIG->convertMetricToStepsY(dy), 
+					THE_CONFIG->convertMetricToStepsZ(dz)
+	);
 }
 ///////////////////////////////////////////////////////////////////
-void CncMoveSequence::addStepPosXYZ(int32_t dx, int32_t dy, int32_t dz)  {
+void CncMoveSequence::addStepRelXYZ(int32_t dx, int32_t dy, int32_t dz)  {
 ///////////////////////////////////////////////////////////////////
 	if ( isValid() == false )
 		return;

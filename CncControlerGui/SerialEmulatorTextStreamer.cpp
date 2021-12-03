@@ -353,6 +353,6 @@ void SerialEmulatorTextStreamer::finalizeFile(const Trigger::EndRun& tr) {
 void SerialEmulatorTextStreamer::processTrigger(const Trigger::GuidePath& tr) {
 ///////////////////////////////////////////////////////////////////
 	Serial::processTrigger(tr);
-	#warning processTrigger(const Trigger::GuidePath& tr) impl. missing 
+	#warning todo processTrigger(const Trigger::GuidePath& tr) impl. missing 
 }
 

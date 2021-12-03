@@ -65,7 +65,7 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 		 << ")"												<< ", "
 		 
 		 << "("
-		 << (spindleState ? "ON" : "OFF")					<< " "
+		 << (spindleState ? " ON" : "OFF")					<< " "
 		 << cnc::dblFormat1(spindleSpeed_U_MIN)
 		 << ")"												<< ", "
 		 

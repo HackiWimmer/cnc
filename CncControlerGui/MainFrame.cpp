@@ -621,7 +621,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	defaultSpeedSlider->setToolTipWindow(m_defaultSpeedSliderValue);
 	
 	toolState.setControl(GetToolState());
-	
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -1319,27 +1318,37 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 	cnc::trc.logDebugMessage("Test function 2");
 	THE_CONTEXT->templateContext->traceContextEntriesTo(cnc::cex3);
 }
+#include "CncVector.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	cnc::trc.logWarningMessage("Test function 3");
+	CncDoubleMatrix4x4 m;
+	m.setTranslation(1.0, 1.0, 0.0);
+	m.setRotationAxisZ(90.0);
 	
-	CncTemplateContextSummaryDialog dlg(this);
-	dlg.update();
-	dlg.ShowModal();
-
+	double x = 1.0, y = 0.0, z = 0.0;
 	
-	/*
-	THE_CONTEXT->templateContext->analizeContextEntries(cnc::cex2);
+	m.transform(x, y, z);
+	CNC_CEX3_A("%lf, %lf, %lf", x, y, z)
 	
-	if ( THE_CONTEXT->templateContext->hasErrors() )
-		THE_CONTEXT->templateContext->traceErrorInfoTo(std::cerr);
-		*/
+	
+	//std::cex3 << m << std::endl;
 }
+#include "CncFlowPositionConverter.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
+	
+	CncFlowPositionConverter flowCnv;
+	
+	CncDoublePosition pos(0.565, 1.12, -12.45);
+	// add given movements
+	flowCnv.set(pos.getX(), pos.getY(), pos.getZ());
+	
+	// the the converted values
+	const CncLongPosition& p = flowCnv.get();
+	CNC_CLOG_A("%ld, %ld, %ld    -    %ld, %ld, %ld", p.getX(), p.getY(), p.getZ(), (int32_t)round(pos.getX() * THE_CONFIG->getCalculationFactX() ), (int32_t)round(pos.getY() * THE_CONFIG->getCalculationFactY() ), (int32_t)round(pos.getZ() * THE_CONFIG->getCalculationFactZ() ));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -2093,7 +2102,8 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		
 		gamepadThread->stop();
 		
-		while ( true ) {
+		while ( true )
+		{
 			{ // was the ~GamepadThread() function executed?
 				wxCriticalSectionLocker enter(pGamepadThreadCS);
 				if ( !gamepadThread ) 
@@ -2117,7 +2127,8 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		
 		serialThread->stop();
 		
-		while ( true ) {
+		while ( true )
+		{
 			{ // was the ~GamepadThread() function executed?
 				wxCriticalSectionLocker enter(pSerialThreadCS);
 				if ( !serialThread ) 

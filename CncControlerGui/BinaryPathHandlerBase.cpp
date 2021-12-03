@@ -176,7 +176,7 @@ bool BinaryPathHandlerHumanReadableView::displaySetter(const unsigned char* buff
 	if ( CncCommandDecoder::decodeSetter(buffer, nbBytes, si) == false )
 		return false;
 		
-	readableContent << wxString::Format("\n//%s\ncnc->exec('S', '%u', ", ArduinoPIDs::getPIDLabel(si.pid), si.pid);
+	readableContent << wxString::Format("\n//%s\ncnc->exec('SET', '%u', ", ArduinoPIDs::getPIDLabel(si.pid), si.pid);
 	
 	readableContent << "[";
 	cnc::traceSetterValueList(readableContent, si.pid, si.values, 1);

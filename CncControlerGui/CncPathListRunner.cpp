@@ -40,15 +40,19 @@ bool CncPathListRunner::WorkflowEntry::shiftTargetImpl(CncPathListManager& plm, 
 	#warning !!!!
 	for ( auto& ple : plm )
 	{
-		ple.entryTarget.decX(dist.getX());
-		ple.entryTarget.decY(dist.getY());
-		ple.entryTarget.decZ(dist.getZ());
-		
-		ple.entryDistance.setX(-dist.getX());
-		ple.entryDistance.setY(-dist.getY());
-		ple.entryDistance.setZ(-dist.getZ());
-		
-		break;
+		if ( ple.hasPositionChange() )
+		{
+			ple.entryTarget.decX(dist.getX());
+			ple.entryTarget.decY(dist.getY());
+			ple.entryTarget.decZ(dist.getZ());
+			
+			ple.entryDistance.setX(-dist.getX());
+			ple.entryDistance.setY(-dist.getY());
+			ple.entryDistance.setZ(-dist.getZ());
+			
+			cnc::cex3 << plm << std::endl;
+			break;
+		}
 	}
 
 	
@@ -269,6 +273,7 @@ CncPathListRunner::CncPathListRunner(CncControl* cnc)
 {
 	autoSetup(false);
 	initializeNextMoveSequence(CLIENT_ID.INVALID);
+	workflowList.reserve(1024);
 }
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::~CncPathListRunner() {
@@ -358,18 +363,21 @@ bool CncPathListRunner::spoolWorkflow() {
 //////////////////////////////////////////////////////////////////
 	CNC_CEX2_A("Start analyzing path list workflow (entries=%zu)", workflowList.size())
 
-#warning !!!!
-	//return true;
-/*
-	const CncDoubleDistance dist(30.0, 30.0, 0.0);
-	for ( auto workflowEntry : workflowList )
+	#warning !!!!
+	if ( false )
 	{
-		workflowEntry->shiftTarget(dist);
-		break;
+		for ( auto workflowEntry : workflowList )
+		{
+			
+			if ( workflowEntry->hasPlm() )
+			{
+				const CncDoublePosition zeroExt(-37.244, -34.673, 0.0);
+				const CncDoubleDistance dist(zeroExt - currentInterface->getCurrentPositionMetric());
+				workflowEntry->shiftTarget(dist);
+				break;
+			}
+		}
 	}
-*/
-
-//workflowList.begin()->shiftTarget(dist);
 
 
 	// prepare the cnc instructions container
@@ -469,10 +477,25 @@ bool CncPathListRunner::initializeNextMoveSequence(double value_MM_MIN, char mod
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::addSequenceEntryFromValues(double dx, double dy, double dz) {
+bool CncPathListRunner::addSequenceEntryFromAbsValues(double px, double py, double pz) {
+//////////////////////////////////////////////////////////////////
+	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, px, py, pz);
+	
+	const double dx = px - currentInterface->getCurrentPositionMetric().getX();
+	const double dy = py - currentInterface->getCurrentPositionMetric().getY();
+	const double dz = pz - currentInterface->getCurrentPositionMetric().getZ();
+	
+	currentSequence->addMetricRelXYZ(dx, dy, dz);
+	
+	currentInterface->setCurrentPositionMetric(px, py, pz);
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::addSequenceEntryFromRelValues(double dx, double dy, double dz) {
 //////////////////////////////////////////////////////////////////
 	PositionStorage::addMove(PositionStorage::TRIGGER_PH_LST_RUN, dx, dy, dz);
-	currentSequence->addMetricPosXYZ(dx, dy, dz);
+	currentSequence->addMetricRelXYZ(dx, dy, dz);
 	
 	return true;
 }
@@ -481,22 +504,29 @@ bool CncPathListRunner::addSequenceEntryFromEntry(const CncPathListEntry* e) {
 //////////////////////////////////////////////////////////////////
 	if ( e == NULL )
 		return false;
-		
+	
+	/*
 	PositionStorage::addMove(PositionStorage::TRIGGER_PH_LST_RUN, 
 										e->entryDistance.getX(), 
 										e->entryDistance.getY(), 
 										e->entryDistance.getZ());
 										
-	currentSequence->addMetricPosXYZ(	e->entryDistance.getX(),
+	currentSequence->addMetricRelXYZ(	e->entryDistance.getX(),
 										e->entryDistance.getY(),
 										e->entryDistance.getZ());
-	return true;
+	*/
+	
+	const double px = e->entryTarget.getX();
+	const double py = e->entryTarget.getY();
+	const double pz = e->entryTarget.getZ();
+
+	return addSequenceEntryFromAbsValues(px, py, pz);
 }
 //////////////////////////////////////////////////////////////////
 // don't call this functions directly. use initializeNextMoveSequence() 
 // or finalizeCurrMoveSequence() instead
 bool CncPathListRunner::destroyMoveSequence() {
-//////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////
 	bool ret = true;
 	
 	if ( currentSequence != NULL && currentSequence->getCount() > 0 ) {
@@ -528,7 +558,7 @@ bool CncPathListRunner::publishMoveSequence() {
 	if ( setup.trace == true ) 
 	{
 		std::stringstream ss; 
-		currentSequence->outputOperator(ss, currentInterface->getPositionSteps());
+		currentSequence->outputOperator(ss, currentInterface->getCurrentPositionSteps());
 		
 		cpp->addOperatingTraceMovSeqSep("Try to publish next CncMoveSequence");
 		cpp->addOperatingTrace(ss);
@@ -655,14 +685,14 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 		cpp->addOperatingTraceMovSeqSep("Next PhysicallyMoveRaw");
 		cpp->addOperatingTrace(ss);
 	}
-
+	
+	CHECK_AND_PERFORM_PROCESSING_STATE
+	
 	// Important: Move absolute to avoid a error propagation
 	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, 
 												curr.entryTarget.getX(), 
 												curr.entryTarget.getY(), 
 												curr.entryTarget.getZ());
-	
-	CHECK_AND_PERFORM_PROCESSING_STATE
 	
 	return currentInterface->processPathListEntry(curr);
 }
@@ -735,6 +765,11 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	double cx = curr->entryDistance.getX();
 	double cy = curr->entryDistance.getY();
 	double cz = curr->entryDistance.getZ();
+	
+	// initialize position
+	double px = curr->entryTarget.getX() - cx;
+	double py = curr->entryTarget.getY() - cy;
+	double pz = curr->entryTarget.getZ() - cz;
 	
 	long nextClientID 				= CLIENT_ID.INVALID;
 	bool finalizeCurrentSequence	= false;
@@ -880,8 +915,14 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	if ( setup.optSkipEmptyMoves == true && isEmptyMove(cx, cy, cz) )
 		return true;
 
+	// finalize absolute position
+	px += cx;
+	py += cy;
+	pz += cz;
+
 	// add the current distance
-	addSequenceEntryFromValues(cx, cy, cz);
+	addSequenceEntryFromAbsValues(px, py, pz);
+	//addSequenceEntryFromRelValues(cx, cy, cz);
 	
 	if ( finalizeCurrentSequence == true )
 		return finalizeCurrMoveSequence(nextClientID);

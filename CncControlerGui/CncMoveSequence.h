@@ -218,16 +218,16 @@ class CncMoveSequence {
 		long					getFirstClientId() const;
 		long					getLastClientId() const;
 		void					addClientId(long cid);
-
+		
 		CncNanoTimestamp		getReference() const								{ return reference; }
 
-		void 					addMetricPosXYZ(double dx, double dy, double dz);
+		void 					addMetricRelXYZ(double dx, double dy, double dz);
 		
-		void 					addStepPosXYZ (int32_t dx, int32_t dy, int32_t dz);
-		void 					addStepPosXY  (int32_t dx, int32_t dy)				{ addStepPosXYZ(dx, dy,  0); }
-		void 					addStepPosX   (int32_t dx)							{ addStepPosXYZ(dx,  0,  0); }
-		void 					addStepPosY   (int32_t dy)							{ addStepPosXYZ( 0, dy,  0); }
-		void 					addStepPosZ   (int32_t dz)							{ addStepPosXYZ( 0,  0, dz); }
+		void 					addStepRelXYZ (int32_t dx, int32_t dy, int32_t dz);
+		void 					addStepRelXY  (int32_t dx, int32_t dy)				{ addStepRelXYZ(dx, dy,  0); }
+		void 					addStepRelX   (int32_t dx)							{ addStepRelXYZ(dx,  0,  0); }
+		void 					addStepRelY   (int32_t dy)							{ addStepRelXYZ( 0, dy,  0); }
+		void 					addStepRelZ   (int32_t dz)							{ addStepRelXYZ( 0,  0, dz); }
 
 		bool 					hasMore() const 									{ return getCount() > 0; }
 		unsigned int 			getCount() const;

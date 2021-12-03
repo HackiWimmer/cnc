@@ -277,20 +277,27 @@ bool SVGTransformMatrix::performTransformAsStringList(const wxString& ts) {
 	wxString cmd, param;
 	
 	wxStringTokenizer tokenizerClips(ts, "()");
-	while ( tokenizerClips.HasMoreTokens() ) {
-		if ( (++tokenCount)%2 != 0 ) { 
+	while ( tokenizerClips.HasMoreTokens() ) 
+	{
+		if ( (++tokenCount)%2 != 0 ) 
+		{ 
 			cmd = tokenizerClips.GetNextToken().Trim(true).Trim(false);
 			if ( cmd != "" ) 
 				ret = false;
-		} else {
-			if ( cmd != "" ) {
+		}
+		else
+		{
+			if ( cmd != "" )
+			{
 				param = tokenizerClips.GetNextToken().Trim(true).Trim(false);
 				
-				if ( param.IsEmpty() == false ) {
+				if ( param.IsEmpty() == false )
+				{
 					++transformCount;
 					
 					TransformParameterList parameters;
-					if ( evaluateTransformParameters(param, parameters)	> 0 ) {
+					if ( evaluateTransformParameters(param, parameters)	> 0 )
+					{
 						ret = performTransform(cmd, parameters);
 						if ( ret == false ) {
 							break;
@@ -301,7 +308,8 @@ bool SVGTransformMatrix::performTransformAsStringList(const wxString& ts) {
 		}
 	}
 	
-	if ( ret == false ) { 
+	if ( ret == false )
+	{ 
 		std::cerr << "SVGTransformMatrix::performTransformAsStringList: Parse error"<< std::endl;
 		std::cerr << "List      : " << ts.c_str() << std::endl;
 		std::cerr << "Command   : " << cmd.c_str() << std::endl;

@@ -23,7 +23,7 @@ CncCommandDecoder::MoveSequenceRecreator::MoveSequenceRecreator(CncMoveSequence*
 void CncCommandDecoder::MoveSequenceRecreator::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( moveSequence != NULL );
-	moveSequence->addStepPosXYZ(dx, dy, dz);
+	moveSequence->addStepRelXYZ(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
 void CncCommandDecoder::MoveSequenceRecreator::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& seqInfo) {

@@ -36,8 +36,10 @@ class CncPathListMonitor : public CncPathListRunner::Interface {
 		virtual bool spoolInstructions()												{ return true; }
 		virtual void resetInstructions()												{}
 		
-		virtual CncLongPosition   getPositionSteps()  const								;
-		virtual CncDoublePosition getPositionMetric() const								{ return current.monitorPos; }
+		virtual CncLongPosition		getCurrentPositionSteps()  const					;
+		virtual CncDoublePosition	getCurrentPositionMetric() const					{ return current.monitorPos; }
+		virtual void				setCurrentPositionMetric(double px, double py, double pz);
+		virtual void				setCurrentPositionMetric(const CncDoublePosition& pos);
 		
 		virtual void logMeasurementStart()												{ tsMeasurementStart = CncTimeFunctions::getNanoTimestamp(); }
 		virtual void logMeasurementEnd()												{ tsMeasurementLast  = CncTimeFunctions::getNanoTimestamp(); }
