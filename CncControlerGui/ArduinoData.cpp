@@ -196,7 +196,7 @@ AE::PinName AE::ArduinoData::convertPinName(const char type, int name) {
 	if ( type == 'D' ) 
 		return name >= minDPinIndex && name <= maxDPinIndex ? (PinName)name : PN_NULL;
 	
-	// Here we talking about analog pins, there are defined
+	// Here we talking about analogue pins, there are defined
 	//  #ifndef SKETCH_COMPILE
 	//     PN_A0 = 54, PN_A1 = 55, ...
 	

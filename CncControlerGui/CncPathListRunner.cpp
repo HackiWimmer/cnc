@@ -34,32 +34,6 @@ void CncPathListRunner::WorkflowCncEntry               ::traceTo(std::ostream& o
 void CncPathListRunner::WorkflowGuideEntry             ::traceTo(std::ostream& o)	const	{ o << "GuideEntry("<< plm.firstClientID() << ")"	<< std::endl; }
 
 ////////////////////////////////////////////////////////////////////
-bool CncPathListRunner::WorkflowEntry::shiftTargetImpl(CncPathListManager& plm, const CncDoubleDistance dist) {
-////////////////////////////////////////////////////////////////////
-	
-	#warning !!!!
-	for ( auto& ple : plm )
-	{
-		if ( ple.hasPositionChange() )
-		{
-			ple.entryTarget.decX(dist.getX());
-			ple.entryTarget.decY(dist.getY());
-			ple.entryTarget.decZ(dist.getZ());
-			
-			ple.entryDistance.setX(-dist.getX());
-			ple.entryDistance.setY(-dist.getY());
-			ple.entryDistance.setZ(-dist.getZ());
-			
-			cnc::cex3 << plm << std::endl;
-			break;
-		}
-	}
-
-	
-	return true;
-}
-
-////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::maxXYPitchRadians	= CncPathListRunner::Move::degree2Radians(15);
 float CncPathListRunner::Move::maxZPitchRadians		= CncPathListRunner::Move::degree2Radians(15);
 
@@ -266,6 +240,7 @@ bool CncPathListRunner::Move::test() {
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::CncPathListRunner(CncControl* cnc) 
 : workflowList			()
+, transformationMatrix	()
 , currentSequence		(NULL)
 , currentInterface		(new CncPathListInterfaceCnc(cnc))
 , setup					()
@@ -274,6 +249,13 @@ CncPathListRunner::CncPathListRunner(CncControl* cnc)
 	autoSetup(false);
 	initializeNextMoveSequence(CLIENT_ID.INVALID);
 	workflowList.reserve(1024);
+	
+	#warning !!!! onaly a test
+	//transformationMatrix.setTranslation(-37.244, -34.673, 0.0);
+	//transformationMatrix.setScaling(0.5);
+	//transformationMatrix.setRotationAxisX(30);
+	//transformationMatrix.setRotationAxisY(30);
+	//transformationMatrix.setRotationAxisZ(30);
 }
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::~CncPathListRunner() {
@@ -362,24 +344,7 @@ void CncPathListRunner::resetWorkflow() {
 bool CncPathListRunner::spoolWorkflow() {
 //////////////////////////////////////////////////////////////////
 	CNC_CEX2_A("Start analyzing path list workflow (entries=%zu)", workflowList.size())
-
-	#warning !!!!
-	if ( false )
-	{
-		for ( auto workflowEntry : workflowList )
-		{
-			
-			if ( workflowEntry->hasPlm() )
-			{
-				const CncDoublePosition zeroExt(-37.244, -34.673, 0.0);
-				const CncDoubleDistance dist(zeroExt - currentInterface->getCurrentPositionMetric());
-				workflowEntry->shiftTarget(dist);
-				break;
-			}
-		}
-	}
-
-
+	
 	// prepare the cnc instructions container
 	// it will be re-filled by the loop below
 	currentInterface->resetInstructions();
@@ -477,50 +442,36 @@ bool CncPathListRunner::initializeNextMoveSequence(double value_MM_MIN, char mod
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::addSequenceEntryFromAbsValues(double px, double py, double pz) {
-//////////////////////////////////////////////////////////////////
-	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, px, py, pz);
-	
-	const double dx = px - currentInterface->getCurrentPositionMetric().getX();
-	const double dy = py - currentInterface->getCurrentPositionMetric().getY();
-	const double dz = pz - currentInterface->getCurrentPositionMetric().getZ();
-	
-	currentSequence->addMetricRelXYZ(dx, dy, dz);
-	
-	currentInterface->setCurrentPositionMetric(px, py, pz);
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool CncPathListRunner::addSequenceEntryFromRelValues(double dx, double dy, double dz) {
-//////////////////////////////////////////////////////////////////
-	PositionStorage::addMove(PositionStorage::TRIGGER_PH_LST_RUN, dx, dy, dz);
-	currentSequence->addMetricRelXYZ(dx, dy, dz);
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
 bool CncPathListRunner::addSequenceEntryFromEntry(const CncPathListEntry* e) {
 //////////////////////////////////////////////////////////////////
 	if ( e == NULL )
 		return false;
-	
-	/*
-	PositionStorage::addMove(PositionStorage::TRIGGER_PH_LST_RUN, 
-										e->entryDistance.getX(), 
-										e->entryDistance.getY(), 
-										e->entryDistance.getZ());
-										
-	currentSequence->addMetricRelXYZ(	e->entryDistance.getX(),
-										e->entryDistance.getY(),
-										e->entryDistance.getZ());
-	*/
 	
 	const double px = e->entryTarget.getX();
 	const double py = e->entryTarget.getY();
 	const double pz = e->entryTarget.getZ();
 
 	return addSequenceEntryFromAbsValues(px, py, pz);
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::addSequenceEntryFromAbsValues(double px, double py, double pz) {
+//////////////////////////////////////////////////////////////////
+
+	transformationMatrix.transform(px, py, pz);
+
+	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, px, py, pz);
+	
+	const double dx = px - currentInterface->getCurrentPositionMetric().getX();
+	const double dy = py - currentInterface->getCurrentPositionMetric().getY();
+	const double dz = pz - currentInterface->getCurrentPositionMetric().getZ();
+	
+	// update sequence
+	currentSequence->addMetricRelXYZ(dx, dy, dz);
+	
+	// update position
+	currentInterface->setCurrentPositionMetric(px, py, pz);
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 // don't call this functions directly. use initializeNextMoveSequence() 

@@ -294,6 +294,17 @@ class CncMatrix4x4 {
 			return this->multiply(m);
 		}
 		
+		const CncMatrix4x4<T>& setScaling(double factor)
+		{
+			CncMatrix4x4<T> m;
+			
+			m.set(V11, factor);
+			m.set(V22, factor);
+			m.set(V33, factor);
+			
+			return this->multiply(m);
+		}
+		
 		friend std::ostream &operator<< (std::ostream &ostr, const CncMatrix4x4<T> &m) 
 		{
 			

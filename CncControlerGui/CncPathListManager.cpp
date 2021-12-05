@@ -598,13 +598,45 @@ bool CncPathListManager::getTargetPos(CncDoublePosition& ret) const {
 //////////////////////////////////////////////////////////////////
 bool CncPathListManager::isRightTriangle(CncDoublePosition& ret) const {
 //////////////////////////////////////////////////////////////////
-
-	#warning !!!
-	//wxMessageBox(CNC_LOG_FUNCT);
-	//cnc::cex3 << (*this) << std::endl;
-
-
-	return true;
+	// non closed can be an triangle
+	if ( isPathClosed() == false )
+		return false;
+	
+	// not enough points for an triangle
+	if ( clipperPath.size() < 4 )
+		return false;
+		
+	// using the clipper path to search for a right angle 
+	// because it contains only positions
+	
+	bool findRightAngle = false;
+	for ( auto it = clipperPath.begin() + 2; it != clipperPath.end(); ++it )
+	{
+		const ClipperLib::IntPoint p1 = *(it - 2 );
+		const ClipperLib::IntPoint p2 = *(it - 1 );
+		const ClipperLib::IntPoint p3 = *(it - 0 );
+		
+		const float dx1 = ClipperLib::transform(p2.X - p1.X);
+		const float dx2 = ClipperLib::transform(p3.X - p2.X);
+		const float dy1 = ClipperLib::transform(p2.Y - p1.Y);
+		const float dy2 = ClipperLib::transform(p3.Y - p2.Y);
+		
+		const float a1 = atan2(dx1, dy1);
+		const float a2 = atan2(dx2, dy2);
+		
+		// is it 90' ?
+		if ( cnc::fltCmp::eq(fabs(a1 -a2), PI /2.0) )
+		{
+			//cnc::cex3 << "a1 - a2; " << (a1 - a2) << ", " << (a1 - a2) * 180 / PI << std::endl;
+			//cnc::cex3 << wxString::Format("%ld, %ld, %ld\n", p2.X, p2.Y, p2.Z);
+			
+			ret = ClipperLib::asCncDoublePosition(p2);
+			findRightAngle = true;
+			break;
+		}
+	}
+	
+	return findRightAngle;
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::changeToGuideType(GuideType gt) {

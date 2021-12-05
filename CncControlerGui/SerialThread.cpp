@@ -147,8 +147,8 @@ SerialThread::SerialThread(MainFrame *handler)
 , ctl2app			( new SerialCircularBuffer())
 , app				( new SerialEndPoint(ctl2app, app2ctl))
 , ctl				( new SerialEndPoint(app2ctl, ctl2app))
-, minBound			( new CncLongPosition())
-, maxBound			( new CncLongPosition())
+, minBound			( new CncLongPosition(std::numeric_limits<std::int32_t>::min(), std::numeric_limits<std::int32_t>::min(), std::numeric_limits<std::int32_t>::min()))
+, maxBound			( new CncLongPosition(std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max(), std::numeric_limits<std::int32_t>::max()))
 , i2cStates 		{'\0', '\0'}
 
 ///////////////////////////////////////////////////////////////////

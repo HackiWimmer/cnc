@@ -61,6 +61,7 @@ bool CncPathListInterfaceCnc::executeClientIDChange(long cid)									{ cnc->set
 bool CncPathListInterfaceCnc::executeToolChange(double diameter)								{ return true; }
 bool CncPathListInterfaceCnc::executeSpindleStateSwitch(bool on, bool force)					{ return cnc->switchSpindleState(on, force); }
 bool CncPathListInterfaceCnc::executeSpindleSpeedChange(double value_U_MIN)						{ return cnc->changeCurrentSpindleSpeed_U_MIN(value_U_MIN); }
+bool CncPathListInterfaceCnc::executeFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ return cnc->changeCurrentFeedSpeedXYZ_MM_MIN(value_MM_MIN, m); }
 bool CncPathListInterfaceCnc::executeMoveSequence(CncMoveSequence& seq)							{ return cnc->processMoveSequence(seq); }
 bool CncPathListInterfaceCnc::executeMoveImage(const CncMoveSequenceImage& img)					{ return cnc->processMoveImage(img); }
 
@@ -102,11 +103,6 @@ void CncPathListInterfaceCnc::resetInstructions() {
 		delete instruction;
 		
 	cncInstructions.clear();
-}
-////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executeFeedSpeedChange(double value_MM_MIN, CncSpeedMode m) { 
-////////////////////////////////////////////////////////////////////
-	return cnc->changeCurrentFeedSpeedXYZ_MM_MIN(value_MM_MIN, m); 
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListInterfaceCnc::executePathListEntry(const CncPathListEntry& ple) { 

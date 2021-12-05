@@ -695,6 +695,7 @@ bool SVGPathHandlerCnc::performModifications() {
 				
 				#warning use zeroRefPos
 				//setSvgRefPosOffset(-30,-30);
+				cnc::cex3 << CNC_LOG_FUNCT << "; " << zeroRefPos << std::endl;
 			}
 			else
 			{

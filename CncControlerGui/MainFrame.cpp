@@ -9066,11 +9066,14 @@ void MainFrame::updateHardwareReference() {
 	
 	if ( serialThread != NULL )
 	{
-		serialThread->setHardwareOffset(&THE_BOUNDS->getHardwareOffset(), 
-										THE_CONFIG->getMaxDimensionStepsX(),
-										THE_CONFIG->getMaxDimensionStepsY(),
-										THE_CONFIG->getMaxDimensionStepsZ()
-		);
+		if ( THE_BOUNDS->hasHardwareOffset() == true ) 
+		{
+			serialThread->setHardwareOffset(&THE_BOUNDS->getHardwareOffset(), 
+											THE_CONFIG->getMaxDimensionStepsX(),
+											THE_CONFIG->getMaxDimensionStepsY(),
+											THE_CONFIG->getMaxDimensionStepsZ()
+			);
+		}
 	}
 
 }

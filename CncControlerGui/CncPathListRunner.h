@@ -1,6 +1,7 @@
 #ifndef CNC_PATH_LIST_RUNNER_H
 #define CNC_PATH_LIST_RUNNER_H
 
+#include "CncVector.h"
 #include "CncPathListManager.h"
 
 class CncMoveSequence;
@@ -20,12 +21,6 @@ class CncPathListRunner {
 			virtual void traceTo(std::ostream& o) const		= 0;
 			
 			virtual bool isEndRunTrigger() const 					{ return false; }
-			virtual bool hasPlm() const 							{ return false; }
-			
-			virtual bool shiftTarget(const CncDoubleDistance dist)	{ return true; }
-			
-			protected:
-				bool shiftTargetImpl(CncPathListManager& plm, const CncDoubleDistance dist);
 		};
 		
 		// ---------------------------------------------------
@@ -94,8 +89,6 @@ class CncPathListRunner {
 			explicit WorkflowCncEntry(const CncPathListManager& p) : plm (p) {}
 			virtual bool process(CncPathListRunner* plr);
 			virtual void traceTo(std::ostream& o) const;
-			virtual bool shiftTarget(const CncDoubleDistance dist) { return shiftTargetImpl(plm, dist); }
-			virtual bool hasPlm() const 							{ return true; }
 		};
 		
 		// ---------------------------------------------------
@@ -107,8 +100,6 @@ class CncPathListRunner {
 			explicit WorkflowGuideEntry(const CncPathListManager& p, double z) : plm (p), zOffset(z) {}
 			virtual bool process(CncPathListRunner* plr);
 			virtual void traceTo(std::ostream& o) const;
-			virtual bool shiftTarget(const CncDoubleDistance dist) { return shiftTargetImpl(plm, dist); }
-			virtual bool hasPlm() const 							{ return true; }
 		};
 		
 		typedef std::vector<WorkflowEntry*> WorkFlowList;
@@ -222,6 +213,7 @@ class CncPathListRunner {
 		
 		// ---------------------------------------------------
 		WorkFlowList		workflowList;
+		CncDoubleMatrix4x4	transformationMatrix;
 		CncMoveSequence*	currentSequence;
 		Interface*			currentInterface;
 		Setup				setup;
@@ -242,7 +234,6 @@ class CncPathListRunner {
 		bool initializeNextMoveSequence(double value_MM_MIN, char mode, long nextClientId);
 		bool finalizeCurrMoveSequence(long nextClientId);
 		bool addSequenceEntryFromAbsValues(double px, double py, double pz);
-		bool addSequenceEntryFromRelValues(double dx, double dy, double dz);
 		bool addSequenceEntryFromEntry(const CncPathListEntry* e);
 		
 		// don't call this functions directly. use initializeNextMoveSequence() 
