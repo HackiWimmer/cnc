@@ -4,6 +4,7 @@
   <object class="wxBitmap" name="16-info@2x">bitmaps\CodeLite\16-info@2x.png</object>
   <object class="wxBitmap" name="16-sort">bitmaps\CodeLite\16-sort.png</object>
   <object class="wxBitmap" name="16-sort@2x">bitmaps\CodeLite\16-sort@2x.png</object>
+  <object class="wxBitmap" name="24-error@2x">bitmaps\CodeLite\24-error@2x.png</object>
   <object class="wxBitmap" name="lift">bitmaps\lift.png</object>
   <object class="wxBitmap" name="podiumRelativeDown">bitmaps\podiumRelativeDown.png</object>
   <object class="wxBitmap" name="podiumRelativeUp">bitmaps\podiumRelativeUp.png</object>

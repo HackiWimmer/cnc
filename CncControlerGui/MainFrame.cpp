@@ -725,21 +725,25 @@ MainFrame::~MainFrame() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onGlobalKeyDownHook(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( refPositionDlg && refPositionDlg->IsShownOnScreen() ) {
+	if ( refPositionDlg && refPositionDlg->IsShownOnScreen() )
+	{
 		wxPostEvent(refPositionDlg, event);
 		event.Skip(false);
 		return;
 	}
 	
-	if ( podiumManagementDlg && podiumManagementDlg->IsShownOnScreen() ) {
+	if ( podiumManagementDlg && podiumManagementDlg->IsShownOnScreen() )
+	{
 		wxPostEvent(podiumManagementDlg, event);
 		event.Skip(false);
 		return;
 	}
 	
-	if ( motionMonitor && motionMonitor->IsShownOnScreen() ) {
+	if ( motionMonitor && motionMonitor->IsShownOnScreen() )
+	{
 		// This is necessary to avoid the default notebook key handling
-		if ( motionMonitor->HasFocus() ) {
+		if ( motionMonitor->HasFocus() )
+		{
 			motionMonitor->onKeyDown(event);
 			event.Skip(false);
 			return;
@@ -2191,14 +2195,25 @@ void MainFrame::dispatchTimerEvents() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::dispatchAll() {
 ///////////////////////////////////////////////////////////////////
-	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
-	if ( evtLoop == NULL )
+	// this has to be done before SafeYield of the MainFrame
+	// because otherwise it has no effect
+	if ( podiumManagementDlg->IsShownOnScreen() )
+	{
+		// this dialogue is opened modal.
+		// therefore, nothing more to do in the main event loop 
+		// and we can return in this case 
+		podiumManagementDlg->dispatchAll();
 		return;
-	
+	}
+
 	/*
 	Please note: This is the fastest version, but evtLoop->Yield() is better then the code below, 
 	it also considers timer events, aui-handling etc.
 	
+	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
+	if ( evtLoop == NULL )
+		return;
+
 	while ( evtLoop->Pending() )
 		evtLoop->Dispatch();
 	*/
@@ -2214,7 +2229,6 @@ void MainFrame::dispatchAll() {
 	*/
 	
 	// the following code is the best compromise, but aui handling isn't perfect
-	
 	//if ( wxTheApp->HasPendingEvents() )
 		//wxTheApp->ProcessPendingEvents();
 	
@@ -2223,6 +2237,7 @@ void MainFrame::dispatchAll() {
 		evtLoop->Dispatch();
 	}
 	*/
+	
 	
 	// Since wxWidgets 3.1.x: This is the best compromise 
 	//wxTheApp->Yield();
@@ -3450,10 +3465,15 @@ void MainFrame::onPodiumManagement(wxCommandEvent& event) {
 	CncGamepadFilter gf(THE_CONTEXT->gamepadFilterInstance, filter);
 	
 	CncIdleCheckDeactivator icd(this);
+	
+	enableControls(false);
+	
 	podiumManagementDlg->ShowModal();
 	waitActive(500);
 	
 	applyPodiumDistance();
+	
+	enableControls(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectUnit(wxCommandEvent& event) {

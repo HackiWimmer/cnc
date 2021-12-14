@@ -1042,6 +1042,9 @@ void CncSecureGesturesPanel::setValueByRatio(float ratio, float angle) {
 /////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onMouse(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////
+	if ( IsEnabled() == false )
+		return;
+		
 	event.Skip();
 	
 	if ( event.LeftDClick() )
@@ -1092,6 +1095,9 @@ void CncSecureGesturesPanel::onMouse(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onPan(wxPanGestureEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( IsEnabled() == false )
+		return;
+
 	event.StopPropagation();
 	
 	if ( event.IsGestureEnd() )
@@ -1148,16 +1154,25 @@ void CncSecureGesturesPanel::onPan(wxPanGestureEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onZoom(wxZoomGestureEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( IsEnabled() == false )
+		return;
+
 	// currently only implemented to disable all gesture events
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onRotate(wxRotateGestureEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( IsEnabled() == false )
+		return;
+
 	// currently only implemented to disable all gesture events
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onTwoFingerTap(wxTwoFingerTapEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( IsEnabled() == false )
+		return;
+
 	if ( event.IsGestureStart() )
 	{
 		if ( type == T_SWITCH )
@@ -1167,6 +1182,9 @@ void CncSecureGesturesPanel::onTwoFingerTap(wxTwoFingerTapEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onLongPress(wxLongPressEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( IsEnabled() == false )
+		return;
+		
 /*
 	if ( event.IsGestureStart() )
 		std::cout << "Long Press gesture started\n";
@@ -1180,6 +1198,9 @@ void CncSecureGesturesPanel::onLongPress(wxLongPressEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onPressAndTap(wxPressAndTapEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( IsEnabled() == false )
+		return;
+		
 /*
 	if ( event.IsGestureStart() )
 		std::cout << "Press and Tap gesture started\n";

@@ -9,6 +9,7 @@
 CncPodiumManagement::CncPodiumManagement(wxWindow* parent)
 : CncPodiumManagementBase					(parent)
 , CncPodiumMgmtMovement::CallbackInterface	()
+, enabled									(true)
 , movement									(NULL)
 ///////////////////////////////////////////////////////////////////
 {
@@ -22,9 +23,17 @@ CncPodiumManagement::~CncPodiumManagement() {
 	wxDELETE(movement);
 }
 ///////////////////////////////////////////////////////////////////
+void CncPodiumManagement::dispatchAll() {
+///////////////////////////////////////////////////////////////////
+	//CNC_PRINT_LOCATION
+	
+	wxTheApp->SafeYield(this, true);
+}
+///////////////////////////////////////////////////////////////////
 void CncPodiumManagement::podiumNotifyEnable(bool state) {
 ///////////////////////////////////////////////////////////////////
-	m_btClose->Enable(state);
+	enabled = state;
+	m_btClose->Enable(enabled);
 }
 ///////////////////////////////////////////////////////////////////
 void CncPodiumManagement::podiumNotifyInit(bool state) {
@@ -38,8 +47,8 @@ void CncPodiumManagement::podiumNotifyClose(bool state) {
 void CncPodiumManagement::showInfo() {
 ///////////////////////////////////////////////////////////////////
 	wxRichToolTip tip(	"Additional information", 
-						"While this dialog is shown, the corresponding hardware buttons are active."
-					  );
+						"While this dialogue is shown, the corresponding hardware buttons are active."
+	);
 	
 	tip.SetIcon(wxICON_INFORMATION);
 	tip.SetTipKind(wxTipKind_TopLeft);
@@ -62,6 +71,9 @@ void CncPodiumManagement::onInit(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncPodiumManagement::onClose(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( enabled == false )
+		return;
+	
 	movement->close();
 	Show(false);
 }

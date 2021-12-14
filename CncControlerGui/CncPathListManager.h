@@ -65,6 +65,7 @@ class CncPathListManager {
 		void					resetStatistics();
 		
 		auto 					firstPosEntryIterator();
+		auto 					lastPosEntryIterator();
 		
 	public:
 		
@@ -155,7 +156,9 @@ class CncPathListManager {
 		
 		bool	roundXYCorners			(double toolDiameter);
 		
-		bool	normalizeStartPosDistance();
+		bool	normalizeStartPosDistance(const CncDoublePosition& pos = {0.0, 0.0, 0.0});
+		bool	normalizeStartPos(const CncDoublePosition& pos = {0.0, 0.0, 0.0});
+		bool	normalizeEndPos(const CncDoublePosition& pos = {0.0, 0.0, 0.0});
 		size_t	normalizeLinkedEntry(long clientId, CncSpeedMode mode, double feedSpeed_MM_MIN);
 		
 		bool	ensureDirection(CncDirection d);

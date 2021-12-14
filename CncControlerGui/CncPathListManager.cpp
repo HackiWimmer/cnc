@@ -198,6 +198,19 @@ auto CncPathListManager::firstPosEntryIterator() {
 	return it;
 }
 //////////////////////////////////////////////////////////////////
+auto CncPathListManager::lastPosEntryIterator() {
+//////////////////////////////////////////////////////////////////
+	auto it = rbegin();
+	while ( it != rend() ) {
+		if ( it->isPositionChange() )
+			break;
+			
+		it++;
+	}
+	
+	return it;
+}
+//////////////////////////////////////////////////////////////////
 auto CncPathListManager::cFirstPosEntryIterator() const {
 //////////////////////////////////////////////////////////////////
 	auto it = cbegin();
@@ -1066,15 +1079,64 @@ bool CncPathListManager::processXYPocket(double toolDiameter) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListManager::normalizeStartPosDistance() {
+bool CncPathListManager::normalizeStartPosDistance(const CncDoublePosition& pos) {
 //////////////////////////////////////////////////////////////////
 	auto it = firstPosEntryIterator();
 	if ( it == end() )
 		return false;
 
 	notNormalizeStartDistance = it->entryDistance;
-	it->entryDistance.setXYZ(0.0, 0.0, 0.0);
+	it->entryDistance.set(pos);
 	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::normalizeStartPos(const CncDoublePosition& pos) {
+//////////////////////////////////////////////////////////////////
+	auto it = firstPosEntryIterator();
+	if ( it == end() )
+		return false;
+	
+	const double transX	= pos.getX();
+	const double transY	= pos.getY();
+	const double dist	= sqrt(transX * transX + transY * transY);
+	
+	#warning sign or not sign????
+	it->entryTarget.setXYZ(	pos.getX(),
+							pos.getY(),
+							it->entryTarget.getZ() - pos.getZ()
+	);
+	
+	it->totalDistance += dist;
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::normalizeEndPos(const CncDoublePosition& pos) {
+//////////////////////////////////////////////////////////////////
+	auto it = lastPosEntryIterator();
+	if ( it == rend() )
+		return false;
+		
+	const long ciSuffix = it->clientId - (( it->clientId / 10 ) * 10);
+	
+	if ( ciSuffix == 9/*CO::FINALIZE_TEMPLATE*/ )
+	{
+		const double transX	= pos.getX();
+		const double transY	= pos.getY();
+		const double dist	= sqrt(transX * transX + transY * transY);
+		
+		#warning sign or not sign????
+		it->entryTarget.setXYZ(	pos.getX(),
+								pos.getY(),
+								it->entryTarget.getZ() - pos.getZ()
+		);
+		
+		it->totalDistance += dist;
+		
+		return true;
+	}
+	
+	return false;
 }
 //////////////////////////////////////////////////////////////////
 std::ostream& CncPathListManager::outputOperator(std::ostream &ostr) const {

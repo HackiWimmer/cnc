@@ -172,6 +172,7 @@ void ArduinoPIDs::init() {
 	pids[PID_X_POS]                           .setup("X Pos", "steps");
 	pids[PID_Y_POS]                           .setup("Y Pos", "steps");
 	pids[PID_Z_POS]                           .setup("Z Pos", "steps");
+	pids[PID_H_POS]                           .setup("H Pos", "steps");
 
 	pids[PID_AXIS]                            .setup("Stepper Axis", "");
 	pids[PID_COMMON]                          .setup("Common", "");

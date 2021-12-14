@@ -476,7 +476,7 @@ class CncControl {
 		bool				isIdleActive()    									const	{ return getSerial()->isIdleActive(); }
 		bool				serialDataAvailable()								const	{ return getSerial()->dataAvailable(); }
 		void				setSpyMode(Serial::SypMode sm)								{ getSerial()->setSpyMode(sm); }
-		void				addGuidePath(const CncPathListManager& plm, double zOffset);
+		bool				addGuidePath(const CncPathListManager& plm);
 		void				updatePreview3D();
 		bool 				sendIdleMessage();
 		

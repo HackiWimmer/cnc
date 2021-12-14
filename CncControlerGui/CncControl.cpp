@@ -361,7 +361,7 @@ bool CncControl::setup(bool doReset) {
 	{
 		if ( reset() == false )
 		{
-			CNC_CERR_FUNCT_A(" CncControl::setup: reset controller failed!\n");
+			CNC_CERR_FUNCT_A("reset controller failed!\n");
 			return false;
 		}
 		
@@ -1286,7 +1286,12 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			bool syncAndPostAppPosToo = ci.synchronizeAppPos == true;
 			
 			// update controller position
-			switch ( ci.posType ) {
+			switch ( ci.posType ) 
+			{
+				case PID_H_POS: 		// nothing more to do here
+										// CNC_CLOG_FUNCT_A("%ld", ci.hCtrlPos)
+										break;
+										
 				case PID_X_POS: 		curCtlPos.setX(ci.xCtrlPos); 
 										if ( syncAndPostAppPosToo ) 
 											curAppPos.setX(ci.xCtrlPos);
@@ -1883,12 +1888,6 @@ bool CncControl::moveToPos(const CncLongPosition& pos) {
 	}
 	return ret;
 }
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelStepsZ(int32_t z) {
 ///////////////////////////////////////////////////////////////////
@@ -1906,8 +1905,6 @@ bool CncControl::moveRelMetricZ(double z) {
 	
 	return moveRelStepsZ((int32_t)wxRound(sZ));
 }
-
-
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
@@ -1927,8 +1924,6 @@ bool CncControl::moveRelLinearMetricXY(double x1, double y1, bool alreadyRendere
 	                            (int32_t)sY1,
 	                            alreadyRendered);
 }
-
-
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
@@ -1950,9 +1945,6 @@ bool CncControl::moveRelLinearMetricXYZ(double x1, double y1, double z1, bool al
 	                             (int32_t)sZ1,
 	                             alreadyRendered);
 }
-
-
-
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveAbsLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
@@ -1961,12 +1953,6 @@ bool CncControl::moveAbsLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool 
 	                             z1 - curAppPos.getZ(),
 	                             alreadyRendered);
 }
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveAbsMetricZ(double z) {
 ///////////////////////////////////////////////////////////////////
@@ -1996,20 +1982,6 @@ bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool al
 	                             (int32_t)sZ1 - curAppPos.getZ(),
 	                             alreadyRendered);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////
 bool CncControl::switchSpindleState(bool on, bool force) {
 ///////////////////////////////////////////////////////////////////
@@ -3023,7 +2995,7 @@ bool CncControl::sendIdleMessage() {
 	return getSerial()->processIdle();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::addGuidePath(const CncPathListManager& plm, double zOffset) {
+bool CncControl::addGuidePath(const CncPathListManager& plm) {
 ///////////////////////////////////////////////////////////////////
 	// first release the trigger
 	const Trigger::GuidePath tr(plm);
@@ -3031,7 +3003,9 @@ void CncControl::addGuidePath(const CncPathListManager& plm, double zOffset) {
 	
 	// do this last because appendGuidPath and follows use std::move(plm)
 	if ( THE_APP->getMotionMonitor() )
-		THE_APP->getMotionMonitor()->appendGuidPath(plm, zOffset);
+		THE_APP->getMotionMonitor()->appendGuidPath(plm);
+		
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::resetPodiumDistance() {

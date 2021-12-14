@@ -26,7 +26,8 @@ class SvgCncContextBase {
 			Z_TO_SUREFACE		= 3,
 			Z_NEXT_STEP_DOWN	= 4,
 			
-			FINALIZE_PATH		= 9
+			FINALIZE_PATH		= 8,
+			FINALIZE_TEMPLATE	= 9
 		};
 		
 	private:

@@ -27,13 +27,10 @@ class SVGPathHandlerBase : public PathHandlerBase {
 		SVGRootNode				svgRootNode;
 		SVGTransformMatrix 		currentSvgTransformMatrix;
 		SvgCncContext			currentCncContext;
-		CncDoublePosition		svgZeroPosOffset;
 		
 		virtual void 			transform(double& xAbs, double& yAbs);
 		virtual bool 			callback(const CncCurveLib::Point& p);
 		virtual bool 			processLinearMove(bool alreadyRendered);
-		
-		void					setSvgRefPosOffset(double xOffset, double yOffset);
 		
 	private:
 		

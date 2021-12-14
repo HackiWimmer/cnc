@@ -162,6 +162,7 @@ CncArduinoController::~CncArduinoController() {
   delete X; X = NULL;
   delete Y; Y = NULL;
   delete Z; Z = NULL;
+  delete H; H = NULL;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::printConfig() {
@@ -564,7 +565,8 @@ byte CncArduinoController::process(const ArduinoCmdDecoderMovePodium::Result& mv
   // first set generally 
   podiumStillOpenSteps = ArdoObj::absolute(mv.dh);
   
-  switch ( mv.cmd ) {
+  switch ( mv.cmd )
+  {
     case CMD_MOVE_PODIUM_EXACT:
           ret = movePodium(mv.dh, CncArduinoController::stopMovePodiumExact);
           break;
@@ -582,7 +584,8 @@ byte CncArduinoController::movePodium(int32_t stepDir, stopPodiumHardware_funct 
   if ( stopFunct == NULL )
     return RET_ERROR;
 
-  if ( H->setDirection(stepDir) == false ) {
+  if ( H->setDirection(stepDir) == false ) 
+  {
     ArduinoMainLoop::pushMessage(MT_ERROR, E_PODIUM_DIR_CHANGE_FAILED, CMD_MOVE_PODIUM);
     return RET_ERROR;
   }
@@ -594,9 +597,11 @@ byte CncArduinoController::movePodium(int32_t stepDir, stopPodiumHardware_funct 
   const int32_t maxSpeedDelay = 1100;
   const int32_t minSpeedDelay =  150;
   uint32_t      curSpeedDelay = maxSpeedDelay;
-  
-  while ( stopFunct(this) == false ) {
 
+  setPosReplyState(true);
+  
+  while ( stopFunct(this) == false ) 
+  {
     byte retValue = checkRuntimeEnv();
     if ( retValue != RET_OK )
       return retValue;
@@ -606,17 +611,24 @@ byte CncArduinoController::movePodium(int32_t stepDir, stopPodiumHardware_funct 
     podiumStillOpenSteps--;
 
     // slow down the podium movement
-    if ( curSpeedDelay >= minSpeedDelay ) {
+    if ( curSpeedDelay >= minSpeedDelay ) 
+    {
       AE::delayMicroseconds(curSpeedDelay);
       curSpeedDelay--;
     }
     
-    if ( b != RET_OK ) {
+    if ( b != RET_OK ) 
+    {
       ArduinoMainLoop::pushMessage(MT_ERROR, E_PODIUM_MOVE_FAILED, CMD_MOVE_PODIUM);
       return b;
     }
-  }
 
+    if ( podiumStillOpenSteps % 8 == 0 )
+      sendCurrentPositions(PID_H_POS, true);
+      
+  }
+  setPosReplyState(false);
+  
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -987,7 +999,11 @@ void CncArduinoController::sendCurrentPositions(unsigned char pid, bool force) {
   {
     posReplyCounter = 0;
 
-    switch ( pid ) {
+    switch ( pid ) 
+    {
+      case PID_H_POS: ArduinoMainLoop::writeLongValue(pid, H->getPosition());
+                      break;
+
       case PID_X_POS: ArduinoMainLoop::writeLongValue(pid, X->getPosition());
                       break;
                       
@@ -1232,7 +1248,9 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
     
     case PID_QUERY_READY_TO_RUN:          writeGetterValue1(PID_QUERY_READY_TO_RUN,           (int32_t)isReadyToRun()); break;
     case PID_ENABLE_STEPPERS:             writeGetterValue1(PID_ENABLE_STEPPERS,              (int32_t)getEnableStepperPinState()); break;
-    
+
+    case PID_PODIUM_POS:
+    case PID_H_POS:                       writeGetterValue1(PID_H_POS,                        H->getPosition()); break;
     
     case PID_X_POS:                       writeGetterValue1(PID_X_POS,                        X->getPosition()); break;
     case PID_Y_POS:                       writeGetterValue1(PID_Y_POS,                        Y->getPosition()); break;
@@ -1244,8 +1262,6 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
     case PID_LIMIT:                       writeLimitGetter(); break;
 
     case PID_TOUCH_CONTACT_STATE:         writeGetterValue1(PID_TOUCH_CONTACT_STATE,          (int32_t)(AE::digitalRead(PIN_TOUCH_CONTACT) == PL_LOW)); break;
-    
-    case PID_PODIUM_POS:                  writeGetterValue1(PID_PODIUM_POS,                   H->getPosition()); break;
     
     default:                              writeGetterValue1(PID_UNKNOWN, 0);
                                       

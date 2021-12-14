@@ -76,7 +76,7 @@ class CncMotionMonitor : public CncGlCanvas
 		void clear();
 		void appendVertex(const GLI::VerticeLongData& vd);
 		void appendVertex(long clientId, CncSpeedMode sm, const CncLongPosition& pos);
-		void appendGuidPath(const CncPathListManager& plm, double zOffset);
+		void appendGuidPath(const CncPathListManager& plm);
 		
 		void centreViewport();
 		void resetRotation();

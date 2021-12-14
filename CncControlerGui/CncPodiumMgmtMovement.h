@@ -29,6 +29,7 @@ class CncPodiumMgmtMovement	: public CncPodiumMgmtMovementBase
 		void setCallbackInterface(CallbackInterface* inf) { caller = inf; }
 		
 	protected:
+    virtual void onPodiumRelativeStop(wxCommandEvent& event);
 	
 		virtual void onLeftDownDistance(wxMouseEvent& event);
 		virtual void onPodiumRelativeDown(wxCommandEvent& event);

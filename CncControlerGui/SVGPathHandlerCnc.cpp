@@ -592,9 +592,10 @@ bool SVGPathHandlerCnc::finishWork() {
 	if ( PathHandlerBase::finishWork() == false )
 		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::finishWork() failed!\n");
 	
+	#warning !!!!
 	CncDoublePosition p(0.0, 0.0, 0.0);
 	MoveParameter mp;
-	mp.idOffset = CO::START_POS;
+	mp.idOffset = CO::FINALIZE_TEMPLATE;
 	mp.mode		= CncSpeedRapid;
 	mp.zToTop	= true;
 	mp.pos		= &p;
@@ -693,9 +694,12 @@ bool SVGPathHandlerCnc::performModifications() {
 				registerGuidePath(new CncPathListManager(pathListMgr));
 				guidePath->changeToGuideType(CncPathListManager::GuideType::REFPOS_PATH);
 				
-				#warning use zeroRefPos
-				//setSvgRefPosOffset(-30,-30);
-				cnc::cex3 << CNC_LOG_FUNCT << "; " << zeroRefPos << std::endl;
+				CncDoubleDistance offset(zeroRefPos);
+				offset.invertX();
+				offset.invertY();
+				
+				// modify path list runner transformation matrix
+				setTranslation(offset);
 			}
 			else
 			{

@@ -7,7 +7,7 @@
 
 bool CncPathListInterfaceCnc::CncMovSeqInstruction				::process(CncPathListInterfaceCnc* i)	{ return i->executeMoveImage(img); }
 bool CncPathListInterfaceCnc::CncPathListInstruction			::process(CncPathListInterfaceCnc* i)	{ return i->executePathListEntry(ple); }
-bool CncPathListInterfaceCnc::CncGuidPathInstruction			::process(CncPathListInterfaceCnc* i)	{ return i->executeGuidePath(plm, zOffset); }
+bool CncPathListInterfaceCnc::CncGuidPathInstruction			::process(CncPathListInterfaceCnc* i)	{ return i->executeGuidePath(plm); }
 bool CncPathListInterfaceCnc::CncClientIDInstruction			::process(CncPathListInterfaceCnc* i)	{ return i->executeClientIDChange(cid); }
 bool CncPathListInterfaceCnc::CncFeedSpeedInstruction			::process(CncPathListInterfaceCnc* i)	{ return i->executeFeedSpeedChange(value_MM_MIN, mode); }
 bool CncPathListInterfaceCnc::CncToolChangeInstruction			::process(CncPathListInterfaceCnc* i)	{ return i->executeToolChange(diameter); }
@@ -71,9 +71,10 @@ void CncPathListInterfaceCnc::executeTrigger(const Trigger::NextPath& tr)						{
 void CncPathListInterfaceCnc::executeTrigger(const Trigger::SpeedChange& tr)					{ cnc->processTrigger(tr); }
 void CncPathListInterfaceCnc::executeTrigger(const Trigger::GuidePath& tr)						{ cnc->processTrigger(tr); }
 
-bool CncPathListInterfaceCnc::executeGuidePath(const CncPathListManager& plm, double zOffset)	{ cnc->addGuidePath(plm, zOffset); return true; }
+bool CncPathListInterfaceCnc::executeGuidePath(const CncPathListManager& plm)					{ cnc->addGuidePath(plm); return true; }
+
 void CncPathListInterfaceCnc::setCurrentPositionMetric(double px, double py, double pz)			{ currentAddPosition.setXYZ(px, py, pz); }
-void CncPathListInterfaceCnc::setCurrentPositionMetric(const CncDoublePosition& pos)			{currentAddPosition.set(pos); }
+void CncPathListInterfaceCnc::setCurrentPositionMetric(const CncDoublePosition& pos)			{ currentAddPosition.set(pos); }
 CncDoublePosition CncPathListInterfaceCnc::getCurrentPositionMetric() const						{ return currentAddPosition; }
 CncLongPosition CncPathListInterfaceCnc::getCurrentPositionSteps() const						{ CncLongPosition ret; return THE_CONFIG->convertMetricToSteps(ret, currentAddPosition); }
 

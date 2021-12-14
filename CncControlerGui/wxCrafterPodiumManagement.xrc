@@ -3,9 +3,9 @@
   <object class="wxDialog" name="CncPodiumManagementBase">
     <title>Cnc Podium Management</title>
     <centered>1</centered>
-    <style>wxDEFAULT_DIALOG_STYLE</style>
+    <style>wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP</style>
     <object class="wxFlexGridSizer">
-      <minsize>540,500</minsize>
+      <minsize>540,600</minsize>
       <cols>1</cols>
       <rows>1</rows>
       <vgap>0</vgap>
@@ -194,7 +194,7 @@
         <option>1</option>
         <object class="wxFlexGridSizer">
           <cols>1</cols>
-          <rows>4</rows>
+          <rows>5</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols>0</growablecols>
@@ -286,6 +286,18 @@
               <size>-1,80</size>
               <style>wxBU_AUTODRAW</style>
               <bg>wxSYS_COLOUR_INFOBK</bg>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>2</border>
+            <minsize>-1,80</minsize>
+            <object class="wxBitmapButton" name="m_btRelativeStop">
+              <bitmap>bitmaps/CodeLite/24-error@2x.png</bitmap>
+              <size>-1,80</size>
+              <style>wxBU_AUTODRAW</style>
+              <bg>#FF8080</bg>
               <default>0</default>
             </object>
           </object>

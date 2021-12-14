@@ -8,7 +8,6 @@ SVGPathHandlerBase::SVGPathHandlerBase()
 , svgRootNode					()
 , currentSvgTransformMatrix		()
 , currentCncContext				()
-, svgZeroPosOffset				({0.0, 0.0, 0.0})
 //////////////////////////////////////////////////////////////////
 {
 	unitCalculator.changeInputUnit(Unit::px);
@@ -16,11 +15,6 @@ SVGPathHandlerBase::SVGPathHandlerBase()
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerBase::~SVGPathHandlerBase() {
 //////////////////////////////////////////////////////////////////
-}
-//////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::setSvgRefPosOffset(double xOffset, double yOffset) {
-//////////////////////////////////////////////////////////////////
-	svgZeroPosOffset.setXYZ(xOffset, yOffset, 0.0);
 }
 //////////////////////////////////////////////////////////////////
 SvgCncContext& SVGPathHandlerBase::getSvgCncContext() {
@@ -77,8 +71,8 @@ bool SVGPathHandlerBase::processLinearMove(const LinearMoveParam& param) {
 		transform(newPosAbsX, newPosAbsY);
 	
 	//  . . . then convert the input unit to mm . . .
-	newPosAbsX = unitCalculator.convert(newPosAbsX) + svgZeroPosOffset.getX();
-	newPosAbsY = unitCalculator.convert(newPosAbsY) + svgZeroPosOffset.getY();
+	newPosAbsX = unitCalculator.convert(newPosAbsX);
+	newPosAbsY = unitCalculator.convert(newPosAbsY);
 	
 	// . . . and append
 	const CncPathListEntry& cpe = pathListMgr.addEntryAbs(newPosAbsX, newPosAbsY, param.absZ, param.alreadyRendered);

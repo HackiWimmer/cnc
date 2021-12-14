@@ -20,7 +20,8 @@ class CncPathListRunner {
 			virtual bool process(CncPathListRunner* plr)	= 0;
 			virtual void traceTo(std::ostream& o) const		= 0;
 			
-			virtual bool isEndRunTrigger() const 					{ return false; }
+			virtual CncPathListManager* getPLM()					{ return NULL; }
+			virtual bool isEndRunTrigger()			const			{ return false; }
 		};
 		
 		// ---------------------------------------------------
@@ -89,15 +90,16 @@ class CncPathListRunner {
 			explicit WorkflowCncEntry(const CncPathListManager& p) : plm (p) {}
 			virtual bool process(CncPathListRunner* plr);
 			virtual void traceTo(std::ostream& o) const;
+			
+			virtual CncPathListManager* getPLM()			{ return &plm; }
 		};
 		
 		// ---------------------------------------------------
 		struct WorkflowGuideEntry : public WorkflowEntry
 		{
 			CncPathListManager plm;
-			double zOffset = 0.0;
 			
-			explicit WorkflowGuideEntry(const CncPathListManager& p, double z) : plm (p), zOffset(z) {}
+			explicit WorkflowGuideEntry(const CncPathListManager& p) : plm (p) {}
 			virtual bool process(CncPathListRunner* plr);
 			virtual void traceTo(std::ostream& o) const;
 		};
@@ -189,7 +191,7 @@ class CncPathListRunner {
 				virtual void logMeasurementEnd()														= 0;
 				virtual bool isInterrupted()															= 0;
 				
-				virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)			= 0;
+				virtual bool processGuidePath(const CncPathListManager& plm)							= 0;
 				virtual bool processClientIDChange(long cid)											= 0;
 				virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)				= 0;
 				virtual bool processToolChange(double diameter)											= 0;
@@ -246,7 +248,7 @@ class CncPathListRunner {
 		// ---------------------------------------------------
 		// workflow interface
 		void autoSetup(bool trace);
-		bool publishGuidePath(const CncPathListManager& plm, double zOffset=0.0);
+		bool publishGuidePath(const CncPathListManager& plm);
 		bool publishCncPath(const CncPathListManager&plm);
 		
 		void executeTrigger(const Trigger::BeginRun& tr)	{ currentInterface->processTrigger(tr); }
@@ -254,6 +256,10 @@ class CncPathListRunner {
 		void executeTrigger(const Trigger::NextPath& tr)	{ currentInterface->processTrigger(tr); }
 		void executeTrigger(const Trigger::SpeedChange& tr)	{ currentInterface->processTrigger(tr); }
 		void executeTrigger(const Trigger::GuidePath& tr)	{ currentInterface->processTrigger(tr); }
+		
+	protected:
+		
+		void setTranslation(const CncDoubleDistance& offset);
 		
 	public:
 		

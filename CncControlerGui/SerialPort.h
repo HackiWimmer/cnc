@@ -150,6 +150,7 @@ struct ContollerInfo {
 	int32_t xCtrlPos					= 0;
 	int32_t yCtrlPos					= 0;
 	int32_t zCtrlPos					= 0;
+	int32_t hCtrlPos					= 0;
 	
 	double feedSpeed					= MIN_LONG;
 	

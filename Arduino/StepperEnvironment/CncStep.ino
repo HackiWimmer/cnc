@@ -284,7 +284,7 @@ template<> byte CncArduinoStepper<PESIMISTIC>::finalizeStep() {
   if ( stepPhase == false )
     return RET_OK;
 
-  const int32_t  tpPuls = highPulsWidth - ArdoTs::timespan(tsStartStep);
+  const int32_t  tpPuls = highPulsWidth;// - ArdoTs::timespan(tsStartStep);
 
   // guarantee the min. pulse width
   if ( tpPuls > 0 ) CNC_STEPPER_DELAY_MICROS(tpPuls);

@@ -197,6 +197,11 @@ class CncMatrix4x4 {
 			return mat; 
 		}
 		
+		bool	hasTranslation()	const { return ( mat[14] != T(0) || mat[24] != T(0) || mat[44] != T(0) ); }
+		const T getTranslationX()	const { return mat[14]; }
+		const T getTranslationY()	const { return mat[24]; }
+		const T getTranslationZ()	const { return mat[34]; }
+		
 		void transform(T& x, T& y, T& z)
 		{
 			const T X = x;
@@ -241,7 +246,7 @@ class CncMatrix4x4 {
 			
 			m.set(V14, x);
 			m.set(V24, y);
-			m.set(V33, z);
+			m.set(V34, z);
 			
 			return this->multiply(m);
 		}

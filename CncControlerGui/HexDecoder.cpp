@@ -378,7 +378,8 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 	
 	// command specific handling
 	wxString value;
-	switch ( cmd ) {
+	switch ( cmd ) 
+	{
 		case CMD_GETTER:
 		{
 			if ( readNextHexBytes(restToken, 1, value) == false ) 
@@ -418,8 +419,10 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 			ret.more << "Size = ";
 			ret.more << size;
 			
-			if ( size > 0 && size < 4 ) {
-				const char* label = (size == 1 ? "Z" : "XYZ");
+			if ( size > 0 && size < 4 ) 
+			{
+				const char* axis  = (cmd == CMD_MOVE_PODIUM || cmd == CMD_MOVE_PODIUM_EXACT ? "H" : "Z" );
+				const char* label = (size == 1 ? axis : "XYZ");
 				
 				for ( int i = 0; i < size; i++ ) {
 					if ( readNextHexBytes(restToken, 4, value) == false ) return;
@@ -498,6 +501,17 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 			
 			break;
 		}
+		
+		case CMD_POP_TRANSACTION:
+		{
+			ret.more << wxString::Format("<Pop Transaction without further content>");
+			break;
+		}
+		case CMD_PUSH_TRANSACTION:
+		{
+			ret.more << wxString::Format("<Push Transaction without further content>");
+			break;
+		}
 		case SIG_INTERRUPPT:
 		case SIG_HALT:
 		case SIG_PAUSE:
@@ -527,12 +541,13 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 	const int BYTE_STRING_LEN = 2;
 	// ----------------------------------------------------------------------
 	wxString tmpRet;
-	auto lastInboundBytes = [&](int byteCount) {
-		
+	auto lastInboundBytes = [&](int byteCount) 
+	{
 		if ( (int)ret.inbound.prev.length() >= byteCount * BYTE_STRING_LEN ) {
 			tmpRet.assign(ret.inbound.prev.Right(byteCount * BYTE_STRING_LEN));
 			
-			switch ( byteCount ) {
+			switch ( byteCount ) 
+			{
 				case 2: return reorderHexInt16String(tmpRet);
 				case 4: return reorderHexInt32String(tmpRet);
 			}
@@ -545,9 +560,11 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 	};
 	
 	// ----------------------------------------------------------------------
-	auto inboundByteAtIndex = [&](int idx) {
+	auto inboundByteAtIndex = [&](int idx) 
+	{
 		if ( idx > 0 )	tmpRet.assign(ret.inbound.prev.Mid((idx - 1) * BYTE_STRING_LEN, BYTE_STRING_LEN));
 		else			tmpRet.assign("00");
+		
 		return tmpRet;
 	};
 	
@@ -641,6 +658,13 @@ void SpyHexDecoder::decodeInbound(SpyHexDecoder::Details& ret) {
 					break;
 				}
 				
+				case PID_H_POS:
+				{
+					if ( index == 0x06 ) 
+						ret.more.assign(wxString::Format("Pos = %ld", (long)decodeHexValueAsInt32( lastInboundBytes(4) )));
+					break;
+				}
+				// ...........................................................
 				// more PIDs on demand
 				default:	;
 			}

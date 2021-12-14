@@ -1,3 +1,5 @@
+#include <wx/gdicmn.h>
+#include <wx/richtooltip.h>
 #include "MainFrame.h"
 #include "GlobalFunctions.h"
 #include "CncControl.h"
@@ -100,6 +102,7 @@ void CncPodiumMgmtMovement::enable(bool state) {
 ///////////////////////////////////////////////////////////////////
 	m_btRelativeUp	->Enable(state);
 	m_btRelativeDown->Enable(state);
+	interactiveMove	->Enable(state);
 	
 	if ( caller )
 		caller->podiumNotifyEnable(state);
@@ -130,8 +133,10 @@ void CncPodiumMgmtMovement::process() {
 	}
 	
 	const bool testOnly = false;
-	if ( testOnly ) {
-		switch ( direction ) {
+	if ( testOnly ) 
+	{
+		switch ( direction )
+		{
 			case CncNegDir:		std::cout << "Neg:   " << (int32_t)direction << std::endl; break;
 			case CncPosDir:		std::cout << "Pos:   " << (int32_t)direction << std::endl; break;
 			case CncNoneDir:	std::cout << "Quite: " << std::endl; break;
@@ -148,6 +153,12 @@ void CncPodiumMgmtMovement::process() {
 								break;
 								
 			case CncNoneDir:	ret = cnc->sendQuitMove();
+								
+								// remove all inbound remnants to have a clear situation 
+								// before the next movement
+								THE_APP->waitActive(500);
+								cnc->popSerial(true);
+								
 								break;
 		}
 		
@@ -188,7 +199,8 @@ bool CncPodiumMgmtMovement::close() {
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
 		ret = false;
 	}
-	else {
+	else
+ {
 		
 		// remove the remains form the async move commands
 		if ( cnc->popSerial() == false ) {
@@ -239,8 +251,21 @@ int32_t CncPodiumMgmtMovement::evaluateStepsToMove() {
 ///////////////////////////////////////////////////////////////////
 void CncPodiumMgmtMovement::onPodiumRelativeUp(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	const int32_t stm = evaluateStepsToMove();
+	if ( stm == 0 )
+	{
+		wxRichToolTip tip("Information missing", "No distance information available!");
+		
+		tip.SetIcon(wxICON_ERROR);
+		tip.SetTipKind(wxTipKind_TopLeft);
+		tip.ShowFor(m_moveRelative);
+		
+		return;
+	}
+	
 	CncControl* cnc = THE_APP->getCncControl();
-	if ( cnc == NULL ) {
+	if ( cnc == NULL )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
 		return;
 	}
@@ -248,7 +273,7 @@ void CncPodiumMgmtMovement::onPodiumRelativeUp(wxCommandEvent& event) {
 	enable(false);
 	
 		const bool exact = true;
-		if ( cnc->processMovePodium(evaluateStepsToMove() * (+1), exact) == false )
+		if ( cnc->processMovePodium(stm * (+1), exact) == false )
 			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodium() failed !") << std::endl;
 	
 	enable(true);
@@ -256,23 +281,65 @@ void CncPodiumMgmtMovement::onPodiumRelativeUp(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncPodiumMgmtMovement::onPodiumRelativeDown(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	const int32_t stm = evaluateStepsToMove();
+	if ( stm == 0 )
+	{
+		wxRichToolTip tip("Information missing", "No distance information available!");
+		
+		tip.SetIcon(wxICON_ERROR);
+		tip.SetTipKind(wxTipKind_TopLeft);
+		tip.ShowFor(m_moveRelative);
+		
+		return;
+	}
+	
 	CncControl* cnc = THE_APP->getCncControl();
-	if ( cnc == NULL ) {
+	if ( cnc == NULL ) 
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
 		return;
 	}
 	
 	enable(false);
+	
 		const bool exact = true;
-		if ( cnc->processMovePodium(evaluateStepsToMove() * (-1), exact) == false )
+		if ( cnc->processMovePodium(stm * (-1), exact) == false )
 			std::cerr  << CNC_LOG_FUNCT_A(": processMovePodium() failed !") << std::endl;
 	
 	enable(true);
 }
 ///////////////////////////////////////////////////////////////////
+void CncPodiumMgmtMovement::onPodiumRelativeStop(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//CNC_PRINT_LOCATION
+	
+	CncControl* cnc = THE_APP->getCncControl();
+	if ( cnc == NULL ) 
+	{
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
+		return;
+	}
+	
+	if ( cnc->isConnected() == false )
+	{
+		std::cerr << CNC_LOG_FUNCT_A(": Not connected!") << std::endl;
+		return;
+	}
+	
+	cnc->sendQuitMove();
+	
+	// remove all inbound remnants to have a clear situation 
+	// before the next movement
+	THE_APP->waitActive(500);
+	cnc->popSerial(true);
+								
+	enable(true);
+}
+///////////////////////////////////////////////////////////////////
 void CncPodiumMgmtMovement::onLeftDownDistance(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->secureModeInfo.isActive == true ) {
+	if ( THE_CONTEXT->secureModeInfo.isActive == true )
+	{
 		event.Skip(false);
 		
 		CncSecureNumpadDialog dlg(this, CncSecureNumpad::Type::DOUBLE, 3, -100.0, 100.0);
@@ -288,3 +355,4 @@ void CncPodiumMgmtMovement::onLeftDownDistance(wxMouseEvent& event) {
 	
 	event.Skip();
 }
+

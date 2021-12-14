@@ -252,9 +252,9 @@ void CncMotionMonitor::normalizeAllSelectionEffects() {
 	monitor->reconstruct(opt);
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::appendGuidPath(const CncPathListManager& plm, double zOffset) {
+void CncMotionMonitor::appendGuidPath(const CncPathListManager& plm) {
 //////////////////////////////////////////////////
-	GLGuidePath gp(plm, zOffset);
+	GLGuidePath gp(plm);
 	monitor->addGuidePath(gp);
 }
 //////////////////////////////////////////////////

@@ -174,11 +174,12 @@ typedef bool SpindleState;
   const unsigned char PID_X_POS                           =  67;
   const unsigned char PID_Y_POS                           =  68;
   const unsigned char PID_Z_POS                           =  69;
+  const unsigned char PID_H_POS                           =  70;
   
-  const unsigned char PID_STEP_PIN                        =  70;
-  const unsigned char PID_DIR_PIN                         =  71;
-  const unsigned char PID_ENABLE_STEPPERS                 =  72;
-  const unsigned char PID_PODIUM_POS                      =  73;
+  const unsigned char PID_STEP_PIN                        =  75;
+  const unsigned char PID_DIR_PIN                         =  76;
+  const unsigned char PID_ENABLE_STEPPERS                 =  77;
+  const unsigned char PID_PODIUM_POS                      =  78;
 
   const unsigned char PID_INC_DIRECTION_VALUE_X           =  80;
   const unsigned char PID_INC_DIRECTION_VALUE_Y           =  81;

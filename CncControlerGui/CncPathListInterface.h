@@ -45,7 +45,7 @@ class CncPathListMonitor : public CncPathListRunner::Interface {
 		virtual void logMeasurementEnd()												{ tsMeasurementLast  = CncTimeFunctions::getNanoTimestamp(); }
 		virtual bool isInterrupted()													{ return false; }
 		
-		virtual bool processGuidePath(const CncPathListManager& plm, double zOffset);
+		virtual bool processGuidePath(const CncPathListManager& plm);
 		virtual bool processClientIDChange(long cid)									;
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		;
 		virtual bool processToolChange(double diameter)									{ return true; }

@@ -13,6 +13,8 @@ class CncPodiumManagement	: public CncPodiumManagementBase
 		CncPodiumManagement(wxWindow* parent);
 		virtual ~CncPodiumManagement();
 		
+		void dispatchAll();
+		
 	protected:
 		virtual void onLefDownInfo(wxMouseEvent& event);
 		virtual void onInit(wxInitDialogEvent& event);
@@ -24,6 +26,8 @@ class CncPodiumManagement	: public CncPodiumManagementBase
 		virtual void podiumNotifyClose(bool state);
 		
 	private:
+	
+		bool					enabled;
 		CncPodiumMgmtMovement*	movement;
 		
 		void showInfo();

@@ -3,7 +3,7 @@
 #include "GLGuidePath.h"
 
 ///////////////////////////////////////////////////////////////////
-GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
+GLGuidePath::GLGuidePath(const CncPathListManager& plm)
 : std::vector<CncDoublePosition>	()
 , guideColour						(wxNullColour)
 , guideStyle						(wxPENSTYLE_INVALID)
@@ -48,12 +48,11 @@ GLGuidePath::GLGuidePath(const CncPathListManager& plm, double zOffset)
 		{
 			for (auto it = plm.cbegin(); it != plm.cend(); ++it)
 			{
-				
 				const CncPathListEntry& entry =  *it;
 				if ( entry.isPositionChange() != true )
 					continue;
 					
-				const double zv = entry.entryTarget.getZ() + zOffset;
+				const double zv = entry.entryTarget.getZ();
 				
 				const double x  = ( entry.entryTarget.getX() * THE_CONFIG->getCalculationFactX() ) / THE_CONFIG->getDispFactX3D(); 
 				const double y  = ( entry.entryTarget.getY() * THE_CONFIG->getCalculationFactY() ) / THE_CONFIG->getDispFactY3D(); 

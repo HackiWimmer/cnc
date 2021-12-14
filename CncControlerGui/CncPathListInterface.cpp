@@ -73,9 +73,9 @@ void CncPathListMonitor::setCurrentPositionMetric(const CncDoublePosition& pos) 
 	dispatchEventQueue();
 }
 ////////////////////////////////////////////////////////////////////
-bool CncPathListMonitor::processGuidePath(const CncPathListManager& plm, double zOffset) {
+bool CncPathListMonitor::processGuidePath(const CncPathListManager& plm) {
 ////////////////////////////////////////////////////////////////////
-	APP_PROXY::getMotionMonitor()->appendGuidPath(plm, zOffset);
+	APP_PROXY::getMotionMonitor()->appendGuidPath(plm);
 	dispatchEventQueue();
 	
 	return true;

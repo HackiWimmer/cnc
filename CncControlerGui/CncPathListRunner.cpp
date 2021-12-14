@@ -22,7 +22,7 @@ bool CncPathListRunner::WorkflowTriggerSpeedChangeEntry::process(CncPathListRunn
 bool CncPathListRunner::WorkflowTriggerGuidePtahEntry  ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
 bool CncPathListRunner::WorkflowSetupRunEntry          ::process(CncPathListRunner* plr)	{ plr->autoSetup(trace);   return true; }
 bool CncPathListRunner::WorkflowCncEntry               ::process(CncPathListRunner* plr)	{ return plr->publishCncPath(plm); }
-bool CncPathListRunner::WorkflowGuideEntry             ::process(CncPathListRunner* plr)	{ return plr->publishGuidePath(plm, zOffset); }
+bool CncPathListRunner::WorkflowGuideEntry             ::process(CncPathListRunner* plr)	{ return plr->publishGuidePath(plm); }
 
 void CncPathListRunner::WorkflowTriggerBeginRunEntry   ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
 void CncPathListRunner::WorkflowTriggerEndRunEntry     ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
@@ -249,13 +249,6 @@ CncPathListRunner::CncPathListRunner(CncControl* cnc)
 	autoSetup(false);
 	initializeNextMoveSequence(CLIENT_ID.INVALID);
 	workflowList.reserve(1024);
-	
-	#warning !!!! onaly a test
-	//transformationMatrix.setTranslation(-37.244, -34.673, 0.0);
-	//transformationMatrix.setScaling(0.5);
-	//transformationMatrix.setRotationAxisX(30);
-	//transformationMatrix.setRotationAxisY(30);
-	//transformationMatrix.setRotationAxisZ(30);
 }
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::~CncPathListRunner() {
@@ -316,9 +309,44 @@ void CncPathListRunner::traceSetup() {
 	cpp->addOperatingTrace(ss);
 }
 //////////////////////////////////////////////////////////////////
+void CncPathListRunner::setTranslation(const CncDoubleDistance& offset) {
+//////////////////////////////////////////////////////////////////
+	// only for testing
+	//transformationMatrix.setTranslation(-37.244, -34.673, 0.0);
+	//transformationMatrix.setScaling(0.5);
+	//transformationMatrix.setRotationAxisX(30);
+	//transformationMatrix.setRotationAxisY(30);
+	//transformationMatrix.setRotationAxisZ(30);
+	
+	transformationMatrix.setTranslation(offset.getX(), offset.getY(), offset.getZ());
+}
+//////////////////////////////////////////////////////////////////
 bool CncPathListRunner::processGuidePath(const CncPathListManager& plm, double zOffset) {
 ////////////////////////////////////////////////////////////////// 
-	workflowList.push_back(new WorkflowGuideEntry(plm, zOffset)); 
+	// first process the given zOffset additionally
+	transformationMatrix.setTranslation(0.0, 0.0, zOffset);
+	
+	// The owner of this pointer will be later the workflow list below
+	// Therefore, don't delete this here in this context
+	WorkflowGuideEntry* we = new WorkflowGuideEntry(plm);
+	
+	// Transform all guide paths
+	for (auto it = we->plm.begin(); it != we->plm.end(); ++it)
+	{
+		CncPathListEntry& entry =  *it;
+		
+		if ( entry.isPositionChange() != true )
+			continue;
+			
+		double px = entry.entryTarget.getX();
+		double py = entry.entryTarget.getY();
+		double pz = entry.entryTarget.getZ();
+		
+		transformationMatrix.transform(px, py, pz);
+		entry.entryTarget.setXYZ(px, py, pz); 
+	}
+
+	workflowList.push_back(we); 
 	return true; 
 }
 //////////////////////////////////////////////////////////////////
@@ -344,6 +372,45 @@ void CncPathListRunner::resetWorkflow() {
 bool CncPathListRunner::spoolWorkflow() {
 //////////////////////////////////////////////////////////////////
 	CNC_CEX2_A("Start analyzing path list workflow (entries=%zu)", workflowList.size())
+	
+	// normalize start ans end position regarding a translation
+	if ( transformationMatrix.hasTranslation() )
+	{
+		// find first entry with path information
+		for ( auto workflowEntry : workflowList )
+		{
+			if ( workflowEntry->getPLM() != NULL )
+			{
+				const double transX	= transformationMatrix.getTranslationX();
+				const double transY	= transformationMatrix.getTranslationY();
+				const CncDoublePosition p(transX, transY, 0.0);
+				
+				if ( workflowEntry->getPLM()->normalizeStartPos(p) )
+				{
+					cnc::cex3 << *(workflowEntry->getPLM()) << std::endl;
+					break;
+				}
+			}
+		}
+		
+		// find last entry with path information
+		for ( auto it = workflowList.rbegin(); it != workflowList.rend(); ++it )
+		{
+			WorkflowEntry* workflowEntry = *it;
+			if ( workflowEntry->getPLM() != NULL )
+			{
+				const double transX	= transformationMatrix.getTranslationX();
+				const double transY	= transformationMatrix.getTranslationY();
+				const CncDoublePosition p(transX, transY, 0.0);
+				
+				if ( workflowEntry->getPLM()->normalizeEndPos(p) )
+				{
+					cnc::cex2 << *(workflowEntry->getPLM()) << std::endl;
+					break;
+				}
+			}
+		}
+	}
 	
 	// prepare the cnc instructions container
 	// it will be re-filled by the loop below
@@ -888,7 +955,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 	
 	// forward guide paths
 	if ( plm.getPathType() == CncPathListManager::PathType::PT_GUIDE_PATH )
-		return publishGuidePath(plm, 0.0);
+		return publishGuidePath(plm);
 	
 	CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 	
@@ -985,7 +1052,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm, double zOffset) {
+bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
 	if ( plm.getPathList().size() == 0 )
 		return true;
@@ -993,7 +1060,7 @@ bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm, double z
 	if ( plm.getPathType() != CncPathListManager::PathType::PT_GUIDE_PATH )
 		return false;
 		
-	currentInterface->processGuidePath(plm, zOffset);
+	currentInterface->processGuidePath(plm);
 	return true;
 }
 //////////////////////////////////////////////////////////////////

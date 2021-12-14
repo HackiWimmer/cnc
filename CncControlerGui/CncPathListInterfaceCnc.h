@@ -44,9 +44,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		struct CncGuidPathInstruction : public CncInstruction
 		{
 			CncPathListManager	plm;
-			double				zOffset;
 			
-			explicit CncGuidPathInstruction(const CncPathListManager& m, double o) : plm (m), zOffset(o) {}
+			explicit CncGuidPathInstruction(const CncPathListManager& m) : plm (m) {}
 			virtual bool process(CncPathListInterfaceCnc* i);
 			virtual void traceTo(std::ostream& o) const;
 		};
@@ -159,7 +158,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		
 		// ---------------------------------------------------
 		// instruction interface
-		bool executeGuidePath(const CncPathListManager& plm, double zOffset);
+		bool executeGuidePath(const CncPathListManager& plm);
 		bool executeClientIDChange(long cid);
 		bool executeFeedSpeedChange(double value_MM_MIN, CncSpeedMode m);
 		bool executeToolChange(double diameter);
@@ -195,7 +194,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 	#define XXXXX
 	#ifdef XXXXX
 	
-		virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)	{ cncInstructions.push_back(new CncGuidPathInstruction(plm, zOffset));		return true; }
+		virtual bool processGuidePath(const CncPathListManager& plm)					{ cncInstructions.push_back(new CncGuidPathInstruction(plm));				return true; }
 		virtual bool processClientIDChange(long cid)									{ cncInstructions.push_back(new CncClientIDInstruction(cid));				return true; }
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ cncInstructions.push_back(new CncFeedSpeedInstruction(value_MM_MIN, m));	return true; }
 		virtual bool processToolChange(double diameter)									{ cncInstructions.push_back(new CncToolChangeInstruction(diameter));		return true; }
