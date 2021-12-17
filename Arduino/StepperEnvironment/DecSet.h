@@ -19,18 +19,20 @@ class ArduinoCmdDecoderSetter : public ArduinoCmdDecoderBase {
 
   public:
    
-    struct Values {
+    struct Values 
+    {
       bool     isFloat  = false;
       int32_t  l        =   0;
 
-      int32_t asInt32() const { return l; }
-      bool    asBool()  const { return l != 0; }
-      float   asFloat() const { return (float)(l) / FLT_FACT; }
+      int32_t asInt32()                       const { return l; }
+      bool    asBool()                        const { return l != 0; }
+      float   asFloat(int32_t fact=FLT_FACT)  const { return (float)(l) / fact; }
       
-      void  reset()         { *this = Values();  }
+      void    reset()                               { *this = Values();  }
     };
 
-    struct Result {
+    struct Result 
+    {
       byte      pid         = PID_UNKNOWN;
       byte      valueCount  = 0;
       

@@ -34,7 +34,13 @@ bool ArduinoPodiumManager::enable(Mode m) {
   AE::digitalWrite(PIN_ENABLE_PODIUM_B, es[B]);
   AE::digitalWrite(PIN_ENABLE_PODIUM_C, es[C]);
   AE::digitalWrite(PIN_ENABLE_PODIUM_D, es[D]);
-      
-  AE::delayMicroseconds(100);
+
+  // CL57T 4.0: "ENA signal requires advance DIR signal minimum 200ms in single pulse mode"
+  // 
+  // Experiments have shown that 500 ms isn't long enough to be definitly save here. 
+  // If the period is to short steps will be lost without any error information. 
+  // It's very importent to wait long enough here!!!
+  AE::delay(800);
+  
   return true;
 }

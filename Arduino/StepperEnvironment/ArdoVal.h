@@ -379,6 +379,7 @@ typedef bool SpindleState;
   const int8_t    MAX_MOVE_CMD_SIZE                      = 16;
     
   const int16_t   FLT_FACT                               = 1000;
+  const int32_t   FEEDRATE_FACT                          = int32_t(FLT_FACT) * 100;
   const int32_t   MIN_LONG                               = -2147483648L;
   const int32_t   MAX_LONG                               = +2147483647L;
 

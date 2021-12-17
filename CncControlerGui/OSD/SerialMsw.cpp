@@ -317,7 +317,10 @@ void SerialMsw::displayErrorInfo(DWORD lastError, const wxString& context) {
 	if ( lastError != 0 )
 	{
 		wxString errorMessage;
-		CNC_CERR_FUNCT_A("%s: Error Message: '%s'", context, evaluateErrorInfo(errorMessage, lastError))
+		wxString text(evaluateErrorInfo(errorMessage, lastError));
+		text.Replace("\n", " ");
+		
+		CNC_CERR_FUNCT_A("%s:\n Error Message:\n %s", context, text)
 	}
 }
 

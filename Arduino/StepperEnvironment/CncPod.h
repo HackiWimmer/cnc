@@ -18,10 +18,10 @@ class ArduinoPodiumManager {
 
   public:
 
-    static bool isEnabledCornerA()   { return AE::digitalRead(PIN_ENABLE_PODIUM_A); }
-    static bool isEnabledCornerB()   { return AE::digitalRead(PIN_ENABLE_PODIUM_B); }
-    static bool isEnabledCornerC()   { return AE::digitalRead(PIN_ENABLE_PODIUM_C); }
-    static bool isEnabledCornerD()   { return AE::digitalRead(PIN_ENABLE_PODIUM_D); }
+    static bool isEnabledCornerA()   { return AE::digitalRead(PIN_ENABLE_PODIUM_A) == ENABLE_STATE_ON; }
+    static bool isEnabledCornerB()   { return AE::digitalRead(PIN_ENABLE_PODIUM_B) == ENABLE_STATE_ON; }
+    static bool isEnabledCornerC()   { return AE::digitalRead(PIN_ENABLE_PODIUM_C) == ENABLE_STATE_ON; }
+    static bool isEnabledCornerD()   { return AE::digitalRead(PIN_ENABLE_PODIUM_D) == ENABLE_STATE_ON; }
 
     static bool isEnabled()          { return ( isEnabledCornerA() && isEnabledCornerB() && isEnabledCornerC() && isEnabledCornerD() ); }
     

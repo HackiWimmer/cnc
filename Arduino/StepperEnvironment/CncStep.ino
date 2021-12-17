@@ -23,19 +23,21 @@
   stepPhase = (value == PL_HIGH);
     
 
-namespace StepperParameter {
-  
+namespace StepperParameter 
+{
   template <class T>
-  void print(unsigned char pid, T value, int8_t indent=2) {
+  void print(unsigned char pid, T value, int8_t indent=2) 
+  {
     for (auto i=0; i<indent; i++) Serial.print(BLANK1); \
     Serial.print(pid);   Serial.print(TEXT_SEPARATOR); \
     Serial.print(value); Serial.write(TEXT_CLOSE);
   }
   
-  void print(unsigned char pid, float value, int8_t indent=2) {
+  void print(unsigned char pid, float value, int8_t presion=3, int8_t indent=2) 
+  {
     for (auto i=0; i<indent; i++) Serial.print(BLANK1); \
-    Serial.print(pid);      Serial.print(TEXT_SEPARATOR); \
-    Serial.print(value, 3); Serial.write(TEXT_CLOSE);
+    Serial.print(pid);            Serial.print(TEXT_SEPARATOR); \
+    Serial.print(value, presion); Serial.write(TEXT_CLOSE);
   }
 };
 
@@ -85,7 +87,7 @@ template<bool IMPL> void  CncArduinoStepper<IMPL>::printConfig() {
   Serial.print(PID_AXIS); Serial.print(TEXT_SEPARATOR); Serial.print(axisLabel); Serial.write(TEXT_CLOSE);
 
     StepperParameter::print(PID_PULSE_WIDTH_HIGH,                 highPulsWidth);
-    StepperParameter::print(PID_FEEDRATE,                         getFeedrate());
+    StepperParameter::print(PID_FEEDRATE,                         getFeedrate(), 5);
     StepperParameter::print(PID_STEP_PIN,                         getStepPin());
     StepperParameter::print(PID_DIR_PIN,                          getDirectionPin());
     StepperParameter::print(pidIncrementDirectionValue,           getIncrementDirectionValue());
@@ -100,12 +102,14 @@ template<bool IMPL> bool CncArduinoStepper<IMPL>::isReadyToRun() {
   
   bool ret = true;
 
-  if ( interrupted == true ) {
+  if ( interrupted == true ) 
+  {
     ArduinoMainLoop::pushMessage(MT_ERROR, E_INTERRUPT);
     ret = false;
   }
 
-  if ( readLimitState() != LimitSwitch::LIMIT_UNSET ) {
+  if ( readLimitState() != LimitSwitch::LIMIT_UNSET ) 
+  {
     ArduinoMainLoop::pushMessage(MT_ERROR, E_LIMIT_SWITCH_ACTIVE);
     ret = false;
   }
@@ -133,12 +137,13 @@ template<bool IMPL> bool CncArduinoStepper<IMPL>::resolveLimit() {
     const int8_t  ls   = readLimitState();
     const int32_t step = ( ls == LimitSwitch::LIMIT_MIN ? +1 : ( ls == LimitSwitch::LIMIT_MAX ? -1 : 0 ) );
 
-    if ( step != 0 ) {
-      
+    if ( step != 0 ) 
+    {
       short cnt  = 0;
       setDirection(step);
       
-      while ( readLmtPins() == LimitSwitch::LIMIT_SWITCH_ON ) {
+      while ( readLmtPins() == LimitSwitch::LIMIT_SWITCH_ON ) 
+      {
         performStep();
 
         if ( ( ++cnt * feedrate ) > 12.0 ) // max mm - a typical sensor diameter
@@ -168,8 +173,8 @@ template<bool IMPL> bool CncArduinoStepper<IMPL>::isLimitPinRelevant() {
 /////////////////////////////////////////////////////////////////////////////
   if ( readLmtPins() == LimitSwitch::LIMIT_SWITCH_ON ) {
 
-    switch ( stepDirection ) {
-
+    switch ( stepDirection ) 
+    {
       case SD_UNKNOWN:  // unclear sitiuation avoid movement!
                         controller->sendCurrentLimitStates(FORCE);
                         controller->broadcastInterrupt();
@@ -206,7 +211,8 @@ template<bool IMPL> bool CncArduinoStepper<IMPL>::setDirection(const StepDirecti
   
   stepDirection = sd;
 
-  if ( controller->isProbeMode() == OFF ) {
+  if ( controller->isProbeMode() == OFF ) 
+  {
     // The functions get(In/De)crementDirectionValue() switches the physical direction of "stepDirection".
     // The rest of the stepper logic isn't affected because this is to overrule the stepper cabling only
     // and the physical min and max position staying unchanged
@@ -238,7 +244,8 @@ template<> byte CncArduinoStepper<PESIMISTIC>::initiateStep() {
   if ( isInterrupted() )
     return RET_INTERRUPT;
   
-  if ( stepDirection == SD_UNKNOWN ) {
+  if ( stepDirection == SD_UNKNOWN )
+  {
     controller->broadcastInterrupt();
     return RET_INTERRUPT;
   }
@@ -276,15 +283,16 @@ template<> byte CncArduinoStepper<PESIMISTIC>::finalizeStep() {
   if ( isInterrupted() )
     return RET_INTERRUPT;
 
-  if ( stepDirection == SD_UNKNOWN ) {
+  if ( stepDirection == SD_UNKNOWN )
+  {
     controller->broadcastInterrupt();
     return RET_INTERRUPT;
   }
   
   if ( stepPhase == false )
-    return RET_OK;
+    return RET_ERROR;
 
-  const int32_t  tpPuls = highPulsWidth;// - ArdoTs::timespan(tsStartStep);
+  const int32_t tpPuls = highPulsWidth- ArdoTs::timespan(tsStartStep);
 
   // guarantee the min. pulse width
   if ( tpPuls > 0 ) CNC_STEPPER_DELAY_MICROS(tpPuls);

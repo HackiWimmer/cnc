@@ -409,18 +409,18 @@ bool CncControl::setup(bool doReset) {
 	Setters setup;
 	
 	cnc::SetterValueList accelList;
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getPitchX() / THE_CONFIG->getStepsX()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getPitchY() / THE_CONFIG->getStepsY()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getPitchZ() / THE_CONFIG->getStepsZ()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthX()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthY()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getHighPulsWidthZ()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getAccelFunctParamA()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getAccelFunctParamB()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getAccelFunctParamC() /60.0));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getDeaccelFunctParamA()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getDeaccelFunctParamB()));
-	accelList.push_back(FLT_FACT * (float)(THE_CONFIG->getDeaccelFunctParamC() / 60.0));
+	accelList.push_back(FEEDRATE_FACT	* (float)(THE_CONFIG->getPitchX() / THE_CONFIG->getStepsX()));
+	accelList.push_back(FEEDRATE_FACT	* (float)(THE_CONFIG->getPitchY() / THE_CONFIG->getStepsY()));
+	accelList.push_back(FEEDRATE_FACT	* (float)(THE_CONFIG->getPitchZ() / THE_CONFIG->getStepsZ()));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getHighPulsWidthX()));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getHighPulsWidthY()));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getHighPulsWidthZ()));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getAccelFunctParamA()));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getAccelFunctParamB()));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getAccelFunctParamC() /60.0));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getDeaccelFunctParamA()));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getDeaccelFunctParamB()));
+	accelList.push_back(FLT_FACT		* (float)(THE_CONFIG->getDeaccelFunctParamC() / 60.0));
 	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, THE_CONFIG->getReplyThresholdSteps()));
@@ -435,7 +435,7 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Z, dirValueZ));
 	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_H, dirValueH));
 	
-	setup.push_back(SetterTuple(PID_FEEDRATE_H,			FLT_FACT * (THE_CONFIG->getPitchH() / THE_CONFIG->getStepsH())));
+	setup.push_back(SetterTuple(PID_FEEDRATE_H,			FEEDRATE_FACT * (float)(THE_CONFIG->getPitchH() / THE_CONFIG->getStepsH())));
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_H,	THE_CONFIG->getHighPulsWidthH()));
 	
 	if ( processSetterList(setup) == false)
@@ -1289,7 +1289,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			switch ( ci.posType ) 
 			{
 				case PID_H_POS: 		// nothing more to do here
-										// CNC_CLOG_FUNCT_A("%ld", ci.hCtrlPos)
+										//CNC_CLOG_FUNCT_A("%ld", ci.hCtrlPos)
 										break;
 										
 				case PID_X_POS: 		curCtlPos.setX(ci.xCtrlPos); 
@@ -1367,10 +1367,12 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 	}
 	
 	// -----------------------------------------------------------
-	auto format = [](wxString& s) {
+	auto format = [](wxString& s) 
+	{
 		if ( s.Last() == '\n' ) 
 			s = s.BeforeLast('\n').Trim();
 		
+		s.Trim();
 		return s;
 	};
 	

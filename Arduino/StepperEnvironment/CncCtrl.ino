@@ -168,8 +168,10 @@ CncArduinoController::~CncArduinoController() {
 void CncArduinoController::printConfig() {
 /////////////////////////////////////////////////////////////////////////////////////
   int limitState = -1, supportState = -1;
-  if ( isI2CAvailable() == true ) {
-    if ( ArduinoMainLoop::readI2CSlave(lastI2CData) ) {
+  if ( isI2CAvailable() == true ) 
+  {
+    if ( ArduinoMainLoop::readI2CSlave(lastI2CData) ) 
+    {
       limitState   = (int)lastI2CData.limitState;
       supportState = (int)lastI2CData.supportState;
     }
@@ -232,7 +234,7 @@ bool CncArduinoController::evaluatePodiumSwitches() {
   
   if ( btUp == PL_HIGH || btDown == PL_HIGH )
   { 
-    byte b = movePodium(btUp ? +1 : -1, CncArduinoController::stopMovePodiumBySwitch);  
+    byte b = movePodium(CMD_MOVE_PODIUM,  btUp ? +1 : -1, CncArduinoController::stopMovePodiumBySwitch);  
     return b == RET_OK;
   }
 
@@ -434,9 +436,9 @@ void CncArduinoController::setupAccelProfile(const ArduinoCmdDecoderSetter::Resu
     
   } else {  
 
-    X->setFeedrate(st.values[0].asFloat());
-    Y->setFeedrate(st.values[1].asFloat());
-    Z->setFeedrate(st.values[2].asFloat());
+    X->setFeedrate(st.values[0].asFloat(FEEDRATE_FACT));
+    Y->setFeedrate(st.values[1].asFloat(FEEDRATE_FACT));
+    Z->setFeedrate(st.values[2].asFloat(FEEDRATE_FACT));
 
     X->setHighPulseWidth(round(st.values[3].asFloat()));
     Y->setHighPulseWidth(round(st.values[4].asFloat()));
@@ -563,26 +565,35 @@ byte CncArduinoController::process(const ArduinoCmdDecoderMovePodium::Result& mv
   byte ret = RET_ERROR;
 
   // first set generally 
-  podiumStillOpenSteps = ArdoObj::absolute(mv.dh);
+  podiumStillOpenSteps = ArdoObj::absolute(mv.dh);  
   
   switch ( mv.cmd )
   {
     case CMD_MOVE_PODIUM_EXACT:
-          ret = movePodium(mv.dh, CncArduinoController::stopMovePodiumExact);
+          podiumStillOpenSteps = ArdoObj::absolute(mv.dh);  
+          ret = movePodium(mv.cmd, mv.dh, CncArduinoController::stopMovePodiumExact);
           break;
           
     case CMD_MOVE_PODIUM:
-          ret = movePodium(mv.dh, CncArduinoController::stopMovePodiumBySignal);
+          podiumStillOpenSteps = MAX_LONG;  
+          ret = movePodium(mv.cmd, mv.dh, CncArduinoController::stopMovePodiumBySignal);
           break;
   }
 
   return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::movePodium(int32_t stepDir, stopPodiumHardware_funct stopFunct) {
+byte CncArduinoController::movePodium(unsigned char cmd, int32_t stepDir, stopPodiumHardware_funct stopFunct) {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( stopFunct == NULL )
     return RET_ERROR;
+
+  if ( podiumStillOpenSteps <= 0 )
+    return RET_ERROR;
+
+  // Create this instance to enable the podium stepper pin and release the brake.
+  // The corresponding dtor will inverse this again
+  ArduinoPodiumEnabler pe;
 
   if ( H->setDirection(stepDir) == false ) 
   {
@@ -590,43 +601,80 @@ byte CncArduinoController::movePodium(int32_t stepDir, stopPodiumHardware_funct 
     return RET_ERROR;
   }
 
-  // Create this instance to enable the podium stepper pin and release the brake.
-  // The corresponding dtor will inverse this again
-  ArduinoPodiumEnabler pe;
+  // ------------------------------------------------------------------------------- 
+  // Determine acceleration
+  const uint32_t maxSpeedDelay = cmd == CMD_MOVE_PODIUM_EXACT ? 1100 : 1000;
+  const uint32_t minSpeedDelay = cmd == CMD_MOVE_PODIUM_EXACT ?   10 :  500;
+  
+  const uint32_t difSpeedDelay = maxSpeedDelay - minSpeedDelay;
+  uint32_t       curSpeedDelay = maxSpeedDelay;
 
-  const int32_t maxSpeedDelay = 1100;
-  const int32_t minSpeedDelay =  150;
-  uint32_t      curSpeedDelay = maxSpeedDelay;
+  // attention: down counter
+  int32_t p1 = podiumStillOpenSteps - difSpeedDelay;
+  int32_t p2 = difSpeedDelay;
 
+  if ( p1 < 0 || p2 > p1 )
+    p1 = p2 = podiumStillOpenSteps / 2;    
+
+  // ------------------------------------------------------------------------------- 
+  // run ...
   setPosReplyState(true);
+  sendCurrentPositions(PID_H_POS, true);
   
   while ( stopFunct(this) == false ) 
   {
+    // ---------------------------------------------------------------------------
+    // error message already published on demand
     byte retValue = checkRuntimeEnv();
     if ( retValue != RET_OK )
       return retValue;
+
+    if ( ArduinoPodiumManager::isEnabled() == false )
+    {
+      ArduinoMainLoop::pushMessage(MT_ERROR, E_STEPPER_NOT_ENABLED, ARDO_LOG_FUNCT);
+      return RET_ERROR;
+    }
     
-    const byte b = H->performStep();
+    // ---------------------------------------------------------------------------
+    {
+      byte b = H->initiateStep();
+      if ( b != RET_OK ) 
+      {
+        ArduinoMainLoop::pushMessage(MT_ERROR, E_PODIUM_MOVE_FAILED, ARDO_LOG_FUNCT);
+        return b;
+      }
+    }
     
+    // ---------------------------------------------------------------------------
+    if ( podiumStillOpenSteps > p1 )
+    {
+      if ( curSpeedDelay >= minSpeedDelay ) 
+        curSpeedDelay--;
+    }
+    else if ( podiumStillOpenSteps < p2 )
+    {
+      if ( curSpeedDelay <= maxSpeedDelay ) 
+        curSpeedDelay++;
+    }
+     
+    AE::delayMicroseconds(curSpeedDelay);
     podiumStillOpenSteps--;
-
-    // slow down the podium movement
-    if ( curSpeedDelay >= minSpeedDelay ) 
+    
+    // ---------------------------------------------------------------------------
     {
-      AE::delayMicroseconds(curSpeedDelay);
-      curSpeedDelay--;
+      byte b = H->finalizeStep();
+      if ( b != RET_OK ) 
+      {
+        ArduinoMainLoop::pushMessage(MT_ERROR, E_PODIUM_MOVE_FAILED, ARDO_LOG_FUNCT);
+        return b;
+      }
     }
     
-    if ( b != RET_OK ) 
-    {
-      ArduinoMainLoop::pushMessage(MT_ERROR, E_PODIUM_MOVE_FAILED, CMD_MOVE_PODIUM);
-      return b;
-    }
-
     if ( podiumStillOpenSteps % 8 == 0 )
       sendCurrentPositions(PID_H_POS, true);
-      
   }
+
+  sendCurrentPositions(PID_H_POS, true);
   setPosReplyState(false);
   
   return RET_OK;
@@ -1322,7 +1370,7 @@ byte CncArduinoController::process(const ArduinoCmdDecoderSetter::Result& st) {
     case PID_PODIUM_POS:              H->setPosition(st.values[0].asInt32());                 break;
 
     case PID_PULSE_WIDTH_HIGH_H:      H->setHighPulseWidth(st.values[0].asInt32());           break;
-    case PID_FEEDRATE_H:              H->setFeedrate(st.values[0].asFloat());                 break;
+    case PID_FEEDRATE_H:              H->setFeedrate(st.values[0].asFloat(FEEDRATE_FACT));    break;
 
     default:                          AML::pushMessage(MT_ERROR, E_INVALID_PARAM_ID, st.pid);
                                       return RET_ERROR;

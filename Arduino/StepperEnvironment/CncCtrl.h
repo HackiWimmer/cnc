@@ -133,7 +133,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
     byte                moveUntilContact    (int32_t dx, int32_t dy, int32_t dz);
     byte                moveUntilLimitIsFree(int32_t dx, int32_t dy, int32_t dz);
 
-    byte                movePodium(int32_t stepDir, stopPodiumHardware_funct stopFunct);
+    byte                movePodium(unsigned char cmd, int32_t stepDir, stopPodiumHardware_funct stopFunct);
     static bool         stopMovePodiumExact(CncArduinoController* ctrl);
     static bool         stopMovePodiumBySignal(CncArduinoController* ctrl);
     static bool         stopMovePodiumBySwitch(CncArduinoController* ctrl);

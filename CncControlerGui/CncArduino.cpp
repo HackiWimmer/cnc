@@ -275,10 +275,9 @@ class ArduinoErrorCodesInitializer {
 /////////////////////////////////////////////////////////////////////////
 void ArduinoErrorCodes::init() {
 /////////////////////////////////////////////////////////////////////////
-	for (int i=0; i<MAX_ERROR_CODES -1;i++){
+	for (int i=0; i<MAX_ERROR_CODES -1;i++)
 		errorCodes[i]  = "Unknown error code: ";
-	}
-
+	
 	errorCodes[E_NO_ERROR]                           = "Current Error Count";
 	errorCodes[E_UNKNOW_COMMAND]                     = "Arduino::loop(): Unknown Command";
 	errorCodes[E_INVALID_PARAM_ID]                   = "Arduino::setValue(): Invalid parameter ID"; 
@@ -287,19 +286,19 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_GETTER_ID_NOT_FOUND]                = "Arduino::getValue(): Can't read getter id";
 	errorCodes[E_INVALID_GETTER_ID]                  = "Arduino::getValue(): Getter id not known"; 
 	errorCodes[E_INVALID_GETTER_LIST_COUNT]          = "Arduino::getValues(): Getter list count not available";
-	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Can't read a int32_t value from Serial: invalid size: ";
+	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Can't read a int32_t value from Serial: invalid size";
 	errorCodes[E_OTHER_MOVE_CMD_ACTIVE]              = "Arduino::decodeMove(): Move rejected because a other move statement is currently active";
 	errorCodes[E_INVALID_MOVE_SEQUENCE]              = "Arduino::decodeMoveSequence(): Invalid byte chain";
-	errorCodes[E_INVALID_PARAM_SIZE]                 = "Arduino::decodeMoveSequence(): Can't read size (int32_t) from Serial: invalid size: ";
+	errorCodes[E_INVALID_PARAM_SIZE]                 = "Arduino::decodeMoveSequence(): Can't read size (int32_t) from Serial: invalid size";
 	errorCodes[E_AVOID_READY_TO_RUN]                 = "Arduino::avoidReadyToRun == true";
 	
 	errorCodes[E_INVALID_TRANSACTION_STATE]          = "Arduino::processPodium: Invalid Transaction state";
 	errorCodes[E_PODIUM_DIR_CHANGE_FAILED]           = "Arduino::processPodium: Direction change failed";
 	errorCodes[E_PODIUM_MOVE_FAILED]                 = "Arduino::processPodium: Move failed";
 	
-	errorCodes[E_STEPPER_NOT_ENABLED]                = "Arduino::stepAxisXYZ: Stepper not enabled";
-	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::stepAxisXYZ: Stepper not initialized";
-	errorCodes[E_SPINDLE_NOT_ENALED]                 = "Arduino::stepAxisXYZ: Spindle not enabled";
+	errorCodes[E_STEPPER_NOT_ENABLED]                = "Arduino::checkEnv: Stepper not enabled";
+	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::checkEnv: Stepper not initialized";
+	errorCodes[E_SPINDLE_NOT_ENALED]                 = "Arduino::checkEnv: Spindle not enabled";
 	
 	errorCodes[E_STEPPER_PULS_WIDTH_TO_LARGE]        = "Arduino::recalcDriverConfig(): Value to large";
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";

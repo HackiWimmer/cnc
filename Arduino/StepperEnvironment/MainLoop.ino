@@ -420,7 +420,7 @@ void ArduinoMainLoop::writeGetterValue(unsigned char pid, int32_t val1) {
 /////////////////////////////////////////////////////////////////////////////////////
   SWB.init();
   SWB.put(RET_SOH);
-  SWB.put(PID_GETTER);
+  SWB.put(PID_GETTER);  
   SWB.put(pid);
   SWB.put((unsigned char)1);
   SWB.put(val1);
@@ -485,6 +485,7 @@ void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid) {
 void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, const unsigned char exText) {
 /////////////////////////////////////////////////////////////////////////////////////
   startMessage(type, eid);
+    Serial.write("| Context: ");
     Serial.write(exText);
   finalizeMessage();
 }
@@ -492,6 +493,7 @@ void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, cons
 void ArduinoMainLoop::pushMessage(const char type, const unsigned char eid, const char* exText) {
 /////////////////////////////////////////////////////////////////////////////////////
   startMessage(type, eid);
+    Serial.write("| Context: ");
     Serial.write(exText);
   finalizeMessage();
 }
@@ -691,7 +693,6 @@ void ArduinoMainLoop::setup() {
 
   // --------------------------------------------------------------------------------------------------------------
   // digital pins
-  
   AE::pinMode(PIN_X_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_X_STP,              PL_LOW);
   AE::pinMode(PIN_Y_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Y_STP,              PL_LOW);
   AE::pinMode(PIN_Z_STP,                PM_OUTPUT);  AE::digitalWrite(PIN_Z_STP,              PL_LOW);
@@ -708,15 +709,23 @@ void ArduinoMainLoop::setup() {
 
   AE::pinMode(PIN_EXTERNAL_INTERRUPT,   PM_INPUT);   AE::digitalWrite(PIN_EXTERNAL_INTERRUPT, EXTERNAL_INTERRRUPT_OFF);
 
-  AE::pinMode(PIN_ENABLE_PODIUM_A,      PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_A,    PL_LOW);
-  AE::pinMode(PIN_ENABLE_PODIUM_B,      PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_B,    PL_LOW);
-  AE::pinMode(PIN_ENABLE_PODIUM_C,      PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_C,    PL_LOW);
-  AE::pinMode(PIN_ENABLE_PODIUM_D,      PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_D,    PL_LOW);
-  
   AE::pinMode(PIN_ENABLE_STEPPER,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_STEPPER,     ENABLE_STATE_OFF);
   AE::pinMode(PIN_ENABLE_SPINDLE,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_SPINDLE,     SPINDLE_STATE_OFF);
 
-  AE::pinMode(PIN_LED_PODIUM,           PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODIUM,         PL_LOW);
+  if ( PIN_ENABLE_PODIUM_A != 0 ) 
+    AE::pinMode(PIN_ENABLE_PODIUM_A,    PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_A,    ENABLE_STATE_OFF);
+    
+  if ( PIN_ENABLE_PODIUM_B != 0 ) 
+    AE::pinMode(PIN_ENABLE_PODIUM_B,    PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_B,    ENABLE_STATE_OFF);
+    
+  if ( PIN_ENABLE_PODIUM_C != 0 ) 
+    AE::pinMode(PIN_ENABLE_PODIUM_C,    PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_C,    ENABLE_STATE_OFF);
+    
+  if ( PIN_ENABLE_PODIUM_D != 0 ) 
+    AE::pinMode(PIN_ENABLE_PODIUM_D,    PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_D,    ENABLE_STATE_OFF);
+  
+  if ( PIN_LED_PODIUM != 0 ) 
+    AE::pinMode(PIN_LED_PODIUM,         PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODIUM,         PL_LOW);
 
   if ( PIN_H_MIN_LIMIT != 0 ) 
     { AE::pinMode(PIN_H_MIN_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MIN_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF); }
