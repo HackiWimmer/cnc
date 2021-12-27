@@ -713,19 +713,19 @@ void ArduinoMainLoop::setup() {
   AE::pinMode(PIN_ENABLE_SPINDLE,       PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_SPINDLE,     SPINDLE_STATE_OFF);
 
   if ( PIN_ENABLE_PODIUM_A != 0 ) 
-    AE::pinMode(PIN_ENABLE_PODIUM_A,    PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_A,    ENABLE_STATE_OFF);
+    { AE::pinMode(PIN_ENABLE_PODIUM_A,  PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_A,    ENABLE_STATE_OFF); }
     
   if ( PIN_ENABLE_PODIUM_B != 0 ) 
-    AE::pinMode(PIN_ENABLE_PODIUM_B,    PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_B,    ENABLE_STATE_OFF);
+    { AE::pinMode(PIN_ENABLE_PODIUM_B,  PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_B,    ENABLE_STATE_OFF); }
     
   if ( PIN_ENABLE_PODIUM_C != 0 ) 
-    AE::pinMode(PIN_ENABLE_PODIUM_C,    PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_C,    ENABLE_STATE_OFF);
+    { AE::pinMode(PIN_ENABLE_PODIUM_C,  PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_C,    ENABLE_STATE_OFF); }
     
   if ( PIN_ENABLE_PODIUM_D != 0 ) 
-    AE::pinMode(PIN_ENABLE_PODIUM_D,    PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_D,    ENABLE_STATE_OFF);
+    { AE::pinMode(PIN_ENABLE_PODIUM_D,  PM_OUTPUT);  AE::digitalWrite(PIN_ENABLE_PODIUM_D,    ENABLE_STATE_OFF); }
   
   if ( PIN_LED_PODIUM != 0 ) 
-    AE::pinMode(PIN_LED_PODIUM,         PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODIUM,         PL_LOW);
+    { AE::pinMode(PIN_LED_PODIUM,       PM_OUTPUT);  AE::digitalWrite(PIN_LED_PODIUM,         PL_LOW); }
 
   if ( PIN_H_MIN_LIMIT != 0 ) 
     { AE::pinMode(PIN_H_MIN_LIMIT,      PM_INPUT);   AE::digitalWrite(PIN_H_MIN_LIMIT,        LimitSwitch::LIMIT_SWITCH_OFF); }

@@ -37,6 +37,13 @@ bool SerialCommandLocker::lock(CncControl* cnc) {
 	// error situation
 	if ( lockedCommand != CMD_INVALID ) {
 		
+		// return false will block <command>. therefore, in case of POP_SERIAL 
+		// it isn't necessary publish POP_SERIAL again, because the running <lockedCommand>
+		// runs until the serial is empty.
+		if ( command == CMD_POP_SERIAL && lockedCommand == CMD_POP_SERIAL )
+			return false;
+			
+		// for all other cases display the following info message:
 		std::cerr 	<< "Try to lock command: '" 
 					<< ArduinoCMDs::getCMDLabel(command) 
 					<< "', but '" 
@@ -44,6 +51,7 @@ bool SerialCommandLocker::lock(CncControl* cnc) {
 					<< "' is still active. Therefore, the '" 
 					<< ArduinoCMDs::getCMDLabel(command) 
 					<< "' operation will be rejected!" << std::endl;
+					
 		return false;
 	}
 	

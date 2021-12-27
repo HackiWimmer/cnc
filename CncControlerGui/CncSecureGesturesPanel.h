@@ -385,6 +385,9 @@ class CncSecureGesturesPanel : public wxPanel
 		virtual bool Layout();
 		virtual bool Enable(bool enable=true);
 		
+		void setShowRange(bool b)						{ displayRange = b; }
+		void setShowRatio(bool b)						{ displayRatio = b; }
+		
 		void init()										{ reset(); }
 		void update()									{ calculateDimensions(); applyPosChange(false); }
 		
@@ -453,6 +456,9 @@ class CncSecureGesturesPanel : public wxPanel
 		wxTimer*			observerTimer;
 		
 		wxDateTime			observerTs;
+		
+		bool				displayRange;
+		bool				displayRatio;
 		
 		bool				behaviorChanged; 
 		wxOrientation		orientation;

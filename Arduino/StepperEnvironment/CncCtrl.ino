@@ -152,9 +152,6 @@ CncArduinoController::CncArduinoController()
 , interactiveMove               ()
 {  
   ArduinoPositionRenderer::setupSteppers(X, Y, Z);
-
-  #warning - remove this again if the podium limit switches for H are installed
-  CncAxisH::doConsiderLimitPins(false);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 CncArduinoController::~CncArduinoController() {
@@ -365,7 +362,17 @@ bool CncArduinoController::processHeartbeat() {
   const bool zMin = READ_LMT_PIN_Z_MIN == LimitSwitch::LIMIT_SWITCH_ON;
   const bool zMax = READ_LMT_PIN_Z_MAX == LimitSwitch::LIMIT_SWITCH_ON;
 
-  CncInterface::ILS::States ls( xMin, xMax, yMin, yMax,zMin, zMax );   
+  const bool hMin = READ_LMT_PIN_H_MIN == LimitSwitch::LIMIT_SWITCH_ON;
+  const bool hMax = READ_LMT_PIN_H_MAX == LimitSwitch::LIMIT_SWITCH_ON;
+
+  #warning
+  if ( hMin )
+    PRINT_DEBUG_VALUE1("hMin", hMin);
+  
+  if ( hMax )
+    PRINT_DEBUG_VALUE1("hMax", hMax);
+
+  CncInterface::ILS::States ls(xMin, xMax, yMin, yMax, zMin, zMax);   
   limitState = ls.getValue();
 
   ArduinoMainLoop::sendHeartbeat(limitState, supportState);
@@ -535,16 +542,6 @@ byte CncArduinoController::acceptTransaction(byte cmd) {
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-byte CncArduinoController::activatePodiumHardware(byte cmd) {
-/////////////////////////////////////////////////////////////////////////////////////
-  podiumHardwareState = ( cmd == CMD_ACTIVATE_PODIUM_HW ? ON : OFF );
-  ARDO_DEBUG_MESSAGE('S', podiumHardwareState == ON ? "Switch Podium Harware 'ON'" : "Switch Podium Harware 'OFF'")
-
-  AE::digitalWrite(PIN_LED_PODIUM, podiumHardwareState ? PL_HIGH : PL_LOW);
-   
-  return RET_OK;
-}
-/////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::acceptGetter() {
 /////////////////////////////////////////////////////////////////////////////////////
   return decodeGetter();  
@@ -560,12 +557,31 @@ byte CncArduinoController::acceptPodiumMove(byte cmd) {
   return decodeMovePodium(cmd);    
 }
 /////////////////////////////////////////////////////////////////////////////////////
+byte CncArduinoController::activatePodiumHardware(byte cmd) {
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( cmd == CMD_ACTIVATE_PODIUM_HW )
+  {
+    podiumHardwareState = ON;
+    ArduinoPodiumManager::enable();
+    AE::digitalWrite(PIN_LED_PODIUM, PL_HIGH);
+  }
+  else
+  {
+    podiumHardwareState = OFF;
+    ArduinoPodiumManager::disable();
+    AE::digitalWrite(PIN_LED_PODIUM, PL_LOW);  
+  }
+
+  ARDO_DEBUG_MESSAGE('S', podiumHardwareState == ON ? "Switch Podium Harware 'ON'" : "Switch Podium Harware 'OFF'")
+  return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
 byte CncArduinoController::process(const ArduinoCmdDecoderMovePodium::Result& mv) {
 /////////////////////////////////////////////////////////////////////////////////////
   byte ret = RET_ERROR;
 
   // first set generally 
-  podiumStillOpenSteps = ArdoObj::absolute(mv.dh);  
+  podiumStillOpenSteps = 0;  
   
   switch ( mv.cmd )
   {
@@ -591,10 +607,6 @@ byte CncArduinoController::movePodium(unsigned char cmd, int32_t stepDir, stopPo
   if ( podiumStillOpenSteps <= 0 )
     return RET_ERROR;
 
-  // Create this instance to enable the podium stepper pin and release the brake.
-  // The corresponding dtor will inverse this again
-  ArduinoPodiumEnabler pe;
-
   if ( H->setDirection(stepDir) == false ) 
   {
     ArduinoMainLoop::pushMessage(MT_ERROR, E_PODIUM_DIR_CHANGE_FAILED, CMD_MOVE_PODIUM);
@@ -604,7 +616,7 @@ byte CncArduinoController::movePodium(unsigned char cmd, int32_t stepDir, stopPo
   // ------------------------------------------------------------------------------- 
   // Determine acceleration
   const uint32_t maxSpeedDelay = cmd == CMD_MOVE_PODIUM_EXACT ? 1100 : 1000;
-  const uint32_t minSpeedDelay = cmd == CMD_MOVE_PODIUM_EXACT ?   10 :  500;
+  const uint32_t minSpeedDelay = cmd == CMD_MOVE_PODIUM_EXACT ?    1 :   10;
   
   const uint32_t difSpeedDelay = maxSpeedDelay - minSpeedDelay;
   uint32_t       curSpeedDelay = maxSpeedDelay;
@@ -669,8 +681,9 @@ byte CncArduinoController::movePodium(unsigned char cmd, int32_t stepDir, stopPo
         return b;
       }
     }
-    
-    if ( podiumStillOpenSteps % 8 == 0 )
+
+    // 512 * 2 mm / 1600 = 0.64 mm
+    if ( podiumStillOpenSteps % 512 == 0 )
       sendCurrentPositions(PID_H_POS, true);
   }
 

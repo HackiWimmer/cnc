@@ -107,6 +107,8 @@ CncSecureGesturesPanel::CncSecureGesturesPanel(wxWindow* parent, wxOrientation o
 , updateTimer			(new wxTimer(this, updateTimerId))
 , observerTimer			(new wxTimer(this, observerTimerId))
 , observerTs			(wxDateTime::UNow())
+, displayRange			(true)
+, displayRatio			(true)
 , behaviorChanged		(true)
 , orientation			(o)
 , type					(t)
@@ -255,9 +257,6 @@ void CncSecureGesturesPanel::startTimer() {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::stopTimer() {
 ///////////////////////////////////////////////////////////////////
-	//CNC_CEX1_FUNCT_A("U:%d, O:%d, S:%d", updateTimer->IsRunning(), observerTimer->IsRunning(), (int) state )
-	//GblFunc::stacktrace(cnc::cex2);
-	
 	observerTimer->Stop();
 	updateTimer->Stop();
 	state = S_INACTIVE;
@@ -265,15 +264,11 @@ void CncSecureGesturesPanel::stopTimer() {
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onShow(wxShowEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	//CNC_PRINT_FUNCT_A(":ID=%d", callbackId)
-	
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::onInitPanel(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	//CNC_PRINT_FUNCT_A(":ID=%d", callbackId)
-	
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
@@ -465,8 +460,11 @@ void CncSecureGesturesPanel::onPaint(wxPaintEvent& WXUNUSED(event)) {
 			break;
 	}
 	
-	dc.DrawLabel(wxString::Format("%+2d",		lastEvent->data.range),			rangeRect, rangeAlign);
-	dc.DrawLabel(wxString::Format("%+.1lf%",	lastEvent->data.ratio * 100 ),	ratioRect, ratioAlign);
+	if ( displayRange == true )
+		dc.DrawLabel(wxString::Format("%+2d",		lastEvent->data.range),			rangeRect, rangeAlign);
+	
+	if ( displayRatio == true )
+		dc.DrawLabel(wxString::Format("%+.1lf%",	lastEvent->data.ratio * 100 ),	ratioRect, ratioAlign);
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureGesturesPanel::calculateDimensions() {
@@ -806,12 +804,6 @@ void CncSecureGesturesPanel::applyPosChange(bool useTimer) {
 	
 	if ( useTimer == true )
 	{
-		/*
-		const bool zero = (	cnc::dblCmp::eq(translatedDistance.m_x, double(zeroPt.x)) && 
-							cnc::dblCmp::eq(translatedDistance.m_y, double(zeroPt.y)) 
-		);
-		*/
-		
 		const bool zero = lastEvent->data.isZero();
 		
 		if ( zero )	reset();

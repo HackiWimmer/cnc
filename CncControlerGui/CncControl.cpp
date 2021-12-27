@@ -1370,14 +1370,14 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 	auto format = [](wxString& s) 
 	{
 		if ( s.Last() == '\n' ) 
-			s = s.BeforeLast('\n').Trim();
-		
+			s = s.BeforeLast('\n');
+			
 		s.Trim();
 		return s;
 	};
 	
-	switch ( type ) {
-		
+	switch ( type )
+	{
 		case 'W':	cnc::msg.logWarning(now.Format("Warning Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logWarning(msg);
 					cnc::cex1 << "Received the following CNC Controller Warning: '" << format(msg) << "'\n";
@@ -1392,7 +1392,7 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 					cnc::msg.logDebug(msg);
 					cnc::cex1 << "Serial Remote Debug: " << msg;
 					break;
-
+					
 		default:	cnc::msg.logInfo(now.Format("Info Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logInfo(msg);
 					std::cout << "Received the following CNC Controller Information: '" << format(msg) << "'\n";

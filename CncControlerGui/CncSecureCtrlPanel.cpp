@@ -186,7 +186,6 @@ void CncSecureCtrlPanel::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 		{
 			if ( isShownOnScreen == true )
 			{
-
 				// is a interactive move active?
 				if ( THE_APP->isInteractiveMoveActive() == false )
 				{
@@ -296,9 +295,10 @@ void CncSecureCtrlPanel::onLeftBookPageChanged(int oldSel) {
 	switch ( oldSel )
 	{
 		case PAGE_PODIUM:	THE_APP->applyPodiumDistance();
-							CncIdleCheckDeactivator::activate(true);
 							podiumPanel->close();
 							THE_APP->waitActive(500);
+							
+							CncIdleCheckDeactivator::activate(true);
 							break;
 	}
 	
@@ -306,6 +306,7 @@ void CncSecureCtrlPanel::onLeftBookPageChanged(int oldSel) {
 	switch ( newSel ) 
 	{
 		case PAGE_PODIUM:	CncIdleCheckDeactivator::activate(false);
+		
 							THE_APP->resetPodiumDistance();
 							podiumPanel->init();
 							break;

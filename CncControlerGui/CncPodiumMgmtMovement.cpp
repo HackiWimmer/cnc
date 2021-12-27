@@ -18,6 +18,7 @@ CncPodiumMgmtMovement::CncPodiumMgmtMovement(wxWindow* parent)
 	interactiveMove = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_BUTTON, CncSecureGesturesPanel::Mode::M_BOTH, 1);
 	GblFunc::replaceControl(m_intactiveMovePlaceholder, interactiveMove);
 	interactiveMove->SetBackgroundColour(*wxYELLOW);
+	interactiveMove->setShowRatio(false);
 	
 	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	val.SetRange(0.0, THE_CONFIG->getMaxDimensionH());
@@ -38,28 +39,44 @@ CncPodiumMgmtMovement::~CncPodiumMgmtMovement() {
 ///////////////////////////////////////////////////////////////////
 void CncPodiumMgmtMovement::onInteractiveMove(CncSecureGesturesPanelEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( IsShownOnScreen() == false )
-		return;
-
+	if ( false )
+	{
+		// debug only
+		cnc::cex2 << event << std::endl;
+	}
+	
 	const CncLinearDirection prevDirection = direction;
 	
-	// stop ....
+	// ------------------------------------------------------------
+	// always stop on demand ...
 	if ( event.data.isZero() )
 	{
 		if ( prevDirection != CncNoneDir )
-		{		
+		{
 			direction = CncNoneDir;
 			return process();
 		}
 	}
 	
+	// do nothing more in this case
+	if ( IsShownOnScreen() == false )
+		return;
+	
+	// ------------------------------------------------------------
+	auto determineDir = [&]() 
+	{
+		if ( event.data.range == 0 )	direction = CncNoneDir;
+		else							direction = event.data.range < 0 ? CncNegDir : CncPosDir;
+	};
+	
+	// ------------------------------------------------------------
 	switch ( event.GetId() )
 	{
 		case CncSecureGesturesPanelEvent::Id::CSGP_STARTING:
 		{
 			if ( prevDirection != CncNoneDir )
 			{
-				// stop ....
+				// stop ...
 				direction = CncNoneDir;
 				process();
 			}
@@ -67,32 +84,28 @@ void CncPodiumMgmtMovement::onInteractiveMove(CncSecureGesturesPanelEvent& event
 			break;
 		}
 		case CncSecureGesturesPanelEvent::Id::CSGP_POS_CHANGED:
+		case CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD:
 		{
-			auto determineDir = [&]() {
-				if ( event.data.range == 0 )	direction = CncNoneDir;
-				else							direction = event.data.range < 0 ? CncNegDir : CncPosDir;
-			};
+			determineDir();
 			
-			if ( prevDirection != CncNoneDir )
+			if ( prevDirection != direction )
 			{
-				determineDir();
+				const CncLinearDirection evalDirection = direction;
 				
-				if ( prevDirection != direction )
+				// stop on demand ...
+				if ( prevDirection != CncNoneDir )
 				{
-					// stop ....
 					direction = CncNoneDir;
+					process();
+				}
+				
+				if ( evalDirection != CncNoneDir )
+				{
+					direction = evalDirection;
 					process();
 				}
 			}
 			
-			determineDir();
-			if ( direction != prevDirection )
-				process();
-			
-			break;
-		}
-		case CncSecureGesturesPanelEvent::Id::CSGP_POS_HELD:
-		{
 			break;
 		}
 	}
@@ -119,6 +132,17 @@ void CncPodiumMgmtMovement::reset() {
 ///////////////////////////////////////////////////////////////////
 void CncPodiumMgmtMovement::process() {
 ///////////////////////////////////////////////////////////////////
+	// ------------------------------------------------------------
+	auto debug = [&]()
+	{
+		switch ( direction )
+		{
+			case CncNegDir:		std::cout << "Neg:   " << (int32_t)direction << std::endl; break;
+			case CncPosDir:		std::cout << "Pos:   " << (int32_t)direction << std::endl; break;
+			case CncNoneDir:	std::cout << "Quite: " << std::endl; break;
+		}
+	};
+
 	CncControl* cnc = THE_APP->getCncControl();
 	if ( cnc == NULL ) 
 	{
@@ -135,19 +159,17 @@ void CncPodiumMgmtMovement::process() {
 	const bool testOnly = false;
 	if ( testOnly ) 
 	{
-		switch ( direction )
-		{
-			case CncNegDir:		std::cout << "Neg:   " << (int32_t)direction << std::endl; break;
-			case CncPosDir:		std::cout << "Pos:   " << (int32_t)direction << std::endl; break;
-			case CncNoneDir:	std::cout << "Quite: " << std::endl; break;
-		}
+		debug();
 	}
 	else
 	{
+		//debug();
+		
 		const bool exact = false;
 		bool ret = true;
 		
-		switch ( direction ) {
+		switch ( direction )
+		{
 			case CncNegDir:
 			case CncPosDir:		ret = cnc->processMovePodium((int32_t)direction, exact);
 								break;
@@ -156,9 +178,9 @@ void CncPodiumMgmtMovement::process() {
 								
 								// remove all inbound remnants to have a clear situation 
 								// before the next movement
-								THE_APP->waitActive(500);
-								cnc->popSerial(true);
-								
+								interactiveMove->Enable(false);
+									cnc->popSerial(true);
+								interactiveMove->Enable(true);
 								break;
 		}
 		
@@ -172,13 +194,16 @@ bool CncPodiumMgmtMovement::init() {
 	CncControl* cnc = THE_APP->getCncControl();
 	bool ret = true;
 	
-	if ( cnc == NULL ) {
+	if ( cnc == NULL )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
 		ret = false;
 	}
 
-	if ( ret == true ) {
-		if ( cnc->processCommand(CMD_ACTIVATE_PODIUM_HW, std::cout) == false ) {
+	if ( ret == true ) 
+	{
+		if ( cnc->processCommand(CMD_ACTIVATE_PODIUM_HW, std::cout) == false )
+		{
 			std::cerr << CNC_LOG_FUNCT_A(": Can't activate podium hardware!") << std::endl;
 			ret = false;
 		}
@@ -195,13 +220,13 @@ bool CncPodiumMgmtMovement::close() {
 	CncControl* cnc = THE_APP->getCncControl();
 	bool ret = true;
 	
-	if ( cnc == NULL ) {
+	if ( cnc == NULL )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": Invalid cnc control!") << std::endl;
 		ret = false;
 	}
 	else
- {
-		
+	{
 		// remove the remains form the async move commands
 		if ( cnc->popSerial() == false ) {
 			std::cerr << CNC_LOG_FUNCT_A(": Call popSerial() failed!") << std::endl;
@@ -342,7 +367,9 @@ void CncPodiumMgmtMovement::onLeftDownDistance(wxMouseEvent& event) {
 	{
 		event.Skip(false);
 		
-		CncSecureNumpadDialog dlg(this, CncSecureNumpad::Type::DOUBLE, 3, -100.0, 100.0);
+		const double maxDim = THE_CONFIG->getMaxDimensionH();
+		
+		CncSecureNumpadDialog dlg(this, CncSecureNumpad::Type::DOUBLE, 3, -maxDim, +maxDim);
 		dlg.setValue(m_moveRelative->GetValue());
 		dlg.setInfo("Distance:");
 		dlg.Center(wxCENTRE_ON_SCREEN);
