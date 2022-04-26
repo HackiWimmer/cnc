@@ -1,3 +1,6 @@
+-IC:\@Development\@Projekte\c++\CNCGuiController\CncControllerTest
+-IC:\@Development\wxWidgets-3.1.5\lib\gcc_dll\mswu
+-IC:\@Development\wxWidgets-3.1.5\include
 -IC:\msys64\mingw64\include\c++\9.2.0
 -IC:\msys64\mingw64\include\c++\9.2.0\x86_64-w64-mingw32
 -IC:\msys64\mingw64\include\c++\9.2.0\backward
@@ -5,9 +8,6 @@
 -IC:\msys64\mingw64\include
 -IC:\msys64\mingw64\lib\gcc\x86_64-w64-mingw32\9.2.0\include-fixed
 -IC:\msys64\mingw64\x86_64-w64-mingw32\include
--IC:\@Development\@Projekte\c++\CNCGuiController\CncControllerTest
--IC:\@Development\wxWidgets-3.1.5\lib\gcc_dll\mswu
--IC:\@Development\wxWidgets-3.1.5\include
 -DwxDEBUG_LEVEL=0
 -D_UNICODE
 -DHAVE_W32API_H

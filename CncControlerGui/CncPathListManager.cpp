@@ -938,10 +938,11 @@ bool CncPathListManager::processXYOffset(double offset, JoinType jt, EndType et)
 	}
 	
 	if ( points == 0 ) {
-		std::cerr << CNC_LOG_FUNCT_A("Too much (inner) offset for the underlying path, therefore the resulted path is empty!\n");
+		std::cerr << CNC_LOG_FUNCT_A("Too much (inner) offset for the underlying path, therefore the resulted path is empty! Line: %ld\n", CLIENT_ID.lineNumber(firstClientID()));
 	}
 	
-	return points != 0;
+	const bool beToterant = true;
+	return beToterant ? true : points != 0;
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListManager::processXYPocket(double toolDiameter) {

@@ -37,6 +37,7 @@ struct CncPathListEntry {
 		TYPE_POSITION	= CONT_POSITION,
 		TYPE_TOOL		= CONT_TOOL
 	};
+
 	
 	static int  transform(Type t) { return (int)t;  }
 	static Type transform(int i)  { return (Type)i; }

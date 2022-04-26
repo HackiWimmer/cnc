@@ -373,7 +373,7 @@ bool CncPathListRunner::spoolWorkflow() {
 //////////////////////////////////////////////////////////////////
 	CNC_CEX2_A("Start analyzing path list workflow (entries=%zu)", workflowList.size())
 	
-	// normalize start ans end position regarding a translation
+	// normalize start and end position regarding a translation
 	if ( transformationMatrix.hasTranslation() )
 	{
 		// find first entry with path information
@@ -387,7 +387,7 @@ bool CncPathListRunner::spoolWorkflow() {
 				
 				if ( workflowEntry->getPLM()->normalizeStartPos(p) )
 				{
-					cnc::cex3 << *(workflowEntry->getPLM()) << std::endl;
+					//cnc::cex3 << *(workflowEntry->getPLM()) << std::endl;
 					break;
 				}
 			}
@@ -405,7 +405,7 @@ bool CncPathListRunner::spoolWorkflow() {
 				
 				if ( workflowEntry->getPLM()->normalizeEndPos(p) )
 				{
-					cnc::cex2 << *(workflowEntry->getPLM()) << std::endl;
+					//cnc::cex2 << *(workflowEntry->getPLM()) << std::endl;
 					break;
 				}
 			}

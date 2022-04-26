@@ -177,15 +177,17 @@ bool SVGUserAgent::initNextCncMacroNode(const SvgCncContextMacro& cwm) {
 	bool ret = false;
 	
 	// collect this macro;
-	if ( cwm.hasParameter(cwm.MACRO_IDENTIFIER) == true ) {
+	if ( cwm.hasParameter(cwm.MACRO_IDENTIFIER) == true ) 
+	{
 		const wxString& id(cwm.getParameterAsString(cwm.MACRO_IDENTIFIER, ""));
-		if ( id.IsEmpty() == false ) {
+		if ( id.IsEmpty() == false ) 
+		{
 			collectedMacros[id] = cwm;
 			ret = true;
 		}
 	}
 	
-	// copy the following lists - why ????
+	// copy the following list - why ????
 	sua.styleList		= collectedStyles;
 	
 	userAgent.push_back(std::move(sua));

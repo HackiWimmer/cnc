@@ -126,6 +126,9 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 	setupStyle();
 	Enable(hasEditMode());
 	
+	const SvgCncContext			ctx;
+	const SvgCncContextMacro	mac;
+
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncMacroBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterResetBlockNodeName));
@@ -134,8 +137,25 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 	svgBlockTypes.add(wxString::Format("%s/>",				SvgNodeTemplates::CncParameterPrintBlockNodeName));
 	svgBlockTypes.add(wxString::Format("%s x=\"1.0\"/>",	SvgNodeTemplates::CncVariablesBlockNodeName));
 	
-	const SvgCncContext			ctx;
-	const SvgCncContextMacro	mac;
+	svgBlockTypes.add(
+		wxString::Format(	"%s " \
+							"%s=\"Yes\" " \
+							"%s=\"T_300=[3.00];T_600=[6.0]\" " \
+							"%s=\"T_300\" " \
+							"%s=\"R+1500\" " \
+							"%s=\"W+1500\" " \
+							"%s=\"S+15000\" " \
+							"/>",
+							SvgNodeTemplates::CncParameterBlockNodeName,
+							ctx.ID_COLOUR_SCHEME,
+							ctx.ID_TOOL_LIST,
+							ctx.ID_TOOL_SEL,
+							ctx.ID_RAPID_SPEED,
+							ctx.ID_WORK_SPEED,
+							ctx.ID_SPINDLE_SPEED
+		)
+	);
+	
 	cncBlockParameters.add(wxString::Format("%s=\"MacroName\"",					mac.MACRO_IDENTIFIER));
 	cncBlockParameters.add(wxString::Format("%s=\"T_300=[3.00];T_600=[6.0]\"",	ctx.ID_TOOL_LIST));
 	cncBlockParameters.add(wxString::Format("%s=\"T_300\"",						ctx.ID_TOOL_SEL));
