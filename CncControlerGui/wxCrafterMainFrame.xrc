@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxFrame" name="MainFrameBClass">
-    <title>CNC Controller</title>
+    <title>
+      <![CDATA[CNC Controller]]>
+    </title>
     <centered>1</centered>
     <style>wxDEFAULT_FRAME_STYLE</style>
     <size>1600,1000</size>

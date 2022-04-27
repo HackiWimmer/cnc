@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERCONTEXTOBSERVER_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERCONTEXTOBSERVER_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -37,6 +38,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncOpenGLContextObserverBase : public wxFrame
 {
@@ -58,27 +60,87 @@ protected:
     wxTimer* m_continuousTimer;
 
 protected:
-    virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
-    virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
-    virtual void onContinuousTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onCloseWindow(wxCloseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onStartupTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onContinuousTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxTextCtrl* GetInfoText() { return m_infoText; }
-    wxStaticBitmap* GetBmpHeartbeat() { return m_bmpHeartbeat; }
-    wxPanel* GetCurrentContextListPlaceholder() { return m_currentContextListPlaceholder; }
-    wxPanel* GetPanelCurrent() { return m_panelCurrent; }
-    wxPanel* GetAllContextListPlaceholder() { return m_allContextListPlaceholder; }
-    wxPanel* GetPanelRegistered() { return m_panelRegistered; }
-    wxPanel* GetHistoryInfoPlaceholder() { return m_historyInfoPlaceholder; }
-    wxPanel* GetSplitterPage48() { return m_splitterPage48; }
-    wxTextCtrl* GetHistoryDetailInfo() { return m_historyDetailInfo; }
-    wxPanel* GetSplitterPage52() { return m_splitterPage52; }
-    wxSplitterWindow* GetSplitter44() { return m_splitter44; }
-    wxPanel* GetPanelHistory() { return m_panelHistory; }
-    wxNotebook* GetNotebookContextInformation() { return m_notebookContextInformation; }
-    wxTimer* GetStartupTimer() { return m_startupTimer; }
-    wxTimer* GetContinuousTimer() { return m_continuousTimer; }
-    CncOpenGLContextObserverBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("OpenGL Context Observer . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(900,600), long style = wxFRAME_FLOAT_ON_PARENT|wxCAPTION|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxCLOSE_BOX|wxSTAY_ON_TOP);
+    wxTextCtrl* GetInfoText()
+    {
+	return m_infoText;
+    }
+    wxStaticBitmap* GetBmpHeartbeat()
+    {
+	return m_bmpHeartbeat;
+    }
+    wxPanel* GetCurrentContextListPlaceholder()
+    {
+	return m_currentContextListPlaceholder;
+    }
+    wxPanel* GetPanelCurrent()
+    {
+	return m_panelCurrent;
+    }
+    wxPanel* GetAllContextListPlaceholder()
+    {
+	return m_allContextListPlaceholder;
+    }
+    wxPanel* GetPanelRegistered()
+    {
+	return m_panelRegistered;
+    }
+    wxPanel* GetHistoryInfoPlaceholder()
+    {
+	return m_historyInfoPlaceholder;
+    }
+    wxPanel* GetSplitterPage48()
+    {
+	return m_splitterPage48;
+    }
+    wxTextCtrl* GetHistoryDetailInfo()
+    {
+	return m_historyDetailInfo;
+    }
+    wxPanel* GetSplitterPage52()
+    {
+	return m_splitterPage52;
+    }
+    wxSplitterWindow* GetSplitter44()
+    {
+	return m_splitter44;
+    }
+    wxPanel* GetPanelHistory()
+    {
+	return m_panelHistory;
+    }
+    wxNotebook* GetNotebookContextInformation()
+    {
+	return m_notebookContextInformation;
+    }
+    wxTimer* GetStartupTimer()
+    {
+	return m_startupTimer;
+    }
+    wxTimer* GetContinuousTimer()
+    {
+	return m_continuousTimer;
+    }
+    CncOpenGLContextObserverBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("OpenGL Context Observer . . ."),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(900, 600),
+        long style = wxFRAME_FLOAT_ON_PARENT | wxCAPTION | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxMINIMIZE_BOX |
+            wxCLOSE_BOX | wxSTAY_ON_TOP);
     virtual ~CncOpenGLContextObserverBase();
 };
 

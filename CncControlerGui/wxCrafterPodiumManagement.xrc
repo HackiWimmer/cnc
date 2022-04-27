@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxDialog" name="CncPodiumManagementBase">
-    <title>Cnc Podium Management</title>
+    <title>
+      <![CDATA[Cnc Podium Management]]>
+    </title>
     <centered>1</centered>
-    <style>wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP</style>
+    <style>wxDEFAULT_DIALOG_STYLE</style>
     <object class="wxFlexGridSizer">
-      <minsize>540,600</minsize>
+      <minsize>540,500</minsize>
       <cols>1</cols>
       <rows>1</rows>
       <vgap>0</vgap>
@@ -194,7 +196,7 @@
         <option>1</option>
         <object class="wxFlexGridSizer">
           <cols>1</cols>
-          <rows>5</rows>
+          <rows>4</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols>0</growablecols>
@@ -293,11 +295,11 @@
             <flag>wxALL|wxEXPAND</flag>
             <border>2</border>
             <minsize>-1,80</minsize>
-            <object class="wxBitmapButton" name="m_btRelativeStop">
-              <bitmap>bitmaps/CodeLite/24-error@2x.png</bitmap>
+            <object class="wxBitmapButton" name="m_btRelativeDown1">
+              <bitmap>bitmaps/podiumRelativeDown.png</bitmap>
               <size>-1,80</size>
               <style>wxBU_AUTODRAW</style>
-              <bg>#FF8080</bg>
+              <bg>wxSYS_COLOUR_INFOBK</bg>
               <default>0</default>
             </object>
           </object>

@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERLCDPANEL_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERLCDPANEL_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -33,6 +34,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncLCDPositionPanelBase : public wxPanel
 {
@@ -67,42 +69,145 @@ protected:
     wxTimer* m_startupTimer;
 
 protected:
-    virtual void onPaint(wxPaintEvent& event) { event.Skip(); }
-    virtual void onSize(wxSizeEvent& event) { event.Skip(); }
-    virtual void onChangePositionType(wxCommandEvent& event) { event.Skip(); }
-    virtual void onUpdateTimer(wxTimerEvent& event) { event.Skip(); }
-    virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onPaint(wxPaintEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSize(wxSizeEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onChangePositionType(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onUpdateTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onStartupTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxStaticText* GetStaticText7() { return m_staticText7; }
-    wxPanel* GetPanel58() { return m_panel58; }
-    wxPanel* GetLcdPlaceholderF() { return m_lcdPlaceholderF; }
-    wxStaticText* GetUnitW() { return m_unitW; }
-    wxPanel* GetPanel70() { return m_panel70; }
-    wxStaticText* GetStaticText74() { return m_staticText74; }
-    wxPanel* GetPanel582() { return m_panel582; }
-    wxPanel* GetLcdPlaceholderS() { return m_lcdPlaceholderS; }
-    wxStaticText* GetUnitW8() { return m_unitW8; }
-    wxPanel* GetPanel706() { return m_panel706; }
-    wxStaticText* GetStaticText72() { return m_staticText72; }
-    wxPanel* GetPanel54() { return m_panel54; }
-    wxPanel* GetLcdPlaceholderX() { return m_lcdPlaceholderX; }
-    wxStaticText* GetUnitX() { return m_unitX; }
-    wxPanel* GetPanel72() { return m_panel72; }
-    wxStaticText* GetStaticText725() { return m_staticText725; }
-    wxPanel* GetPanel62() { return m_panel62; }
-    wxPanel* GetLcdPlaceholderY() { return m_lcdPlaceholderY; }
-    wxStaticText* GetUnitY() { return m_unitY; }
-    wxPanel* GetPanel74() { return m_panel74; }
-    wxStaticText* GetStaticText7258() { return m_staticText7258; }
-    wxPanel* GetPanel66() { return m_panel66; }
-    wxPanel* GetLcdPlaceholderZ() { return m_lcdPlaceholderZ; }
-    wxStaticText* GetUnitZ() { return m_unitZ; }
-    wxPanel* GetPanel76() { return m_panel76; }
-    wxComboBox* GetCbPosTYpe() { return m_cbPosTYpe; }
-    wxTimer* GetUpdateTimer() { return m_updateTimer; }
-    wxTimer* GetStartupTimer() { return m_startupTimer; }
-    CncLCDPositionPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,280), long style = wxTAB_TRAVERSAL);
+    wxStaticText* GetStaticText7()
+    {
+	return m_staticText7;
+    }
+    wxPanel* GetPanel58()
+    {
+	return m_panel58;
+    }
+    wxPanel* GetLcdPlaceholderF()
+    {
+	return m_lcdPlaceholderF;
+    }
+    wxStaticText* GetUnitW()
+    {
+	return m_unitW;
+    }
+    wxPanel* GetPanel70()
+    {
+	return m_panel70;
+    }
+    wxStaticText* GetStaticText74()
+    {
+	return m_staticText74;
+    }
+    wxPanel* GetPanel582()
+    {
+	return m_panel582;
+    }
+    wxPanel* GetLcdPlaceholderS()
+    {
+	return m_lcdPlaceholderS;
+    }
+    wxStaticText* GetUnitW8()
+    {
+	return m_unitW8;
+    }
+    wxPanel* GetPanel706()
+    {
+	return m_panel706;
+    }
+    wxStaticText* GetStaticText72()
+    {
+	return m_staticText72;
+    }
+    wxPanel* GetPanel54()
+    {
+	return m_panel54;
+    }
+    wxPanel* GetLcdPlaceholderX()
+    {
+	return m_lcdPlaceholderX;
+    }
+    wxStaticText* GetUnitX()
+    {
+	return m_unitX;
+    }
+    wxPanel* GetPanel72()
+    {
+	return m_panel72;
+    }
+    wxStaticText* GetStaticText725()
+    {
+	return m_staticText725;
+    }
+    wxPanel* GetPanel62()
+    {
+	return m_panel62;
+    }
+    wxPanel* GetLcdPlaceholderY()
+    {
+	return m_lcdPlaceholderY;
+    }
+    wxStaticText* GetUnitY()
+    {
+	return m_unitY;
+    }
+    wxPanel* GetPanel74()
+    {
+	return m_panel74;
+    }
+    wxStaticText* GetStaticText7258()
+    {
+	return m_staticText7258;
+    }
+    wxPanel* GetPanel66()
+    {
+	return m_panel66;
+    }
+    wxPanel* GetLcdPlaceholderZ()
+    {
+	return m_lcdPlaceholderZ;
+    }
+    wxStaticText* GetUnitZ()
+    {
+	return m_unitZ;
+    }
+    wxPanel* GetPanel76()
+    {
+	return m_panel76;
+    }
+    wxComboBox* GetCbPosTYpe()
+    {
+	return m_cbPosTYpe;
+    }
+    wxTimer* GetUpdateTimer()
+    {
+	return m_updateTimer;
+    }
+    wxTimer* GetStartupTimer()
+    {
+	return m_startupTimer;
+    }
+    CncLCDPositionPanelBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(500, 280),
+        long style = wxTAB_TRAVERSAL);
     virtual ~CncLCDPositionPanelBase();
 };
 

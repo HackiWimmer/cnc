@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERTOOLMAGAZINE_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERTOOLMAGAZINE_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -37,6 +38,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncToolMagazineBase : public wxPanel
 {
@@ -75,50 +77,177 @@ protected:
     wxButton* m_btToolMagazineCancle;
 
 protected:
-    virtual void selectedTool(wxListEvent& event) { event.Skip(); }
-    virtual void clickUseDefaultTool(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectDefaultToolMappedTo(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectType(wxCommandEvent& event) { event.Skip(); }
-    virtual void removeTool(wxCommandEvent& event) { event.Skip(); }
-    virtual void duplicateTool(wxCommandEvent& event) { event.Skip(); }
-    virtual void addTool(wxCommandEvent& event) { event.Skip(); }
-    virtual void editTool(wxCommandEvent& event) { event.Skip(); }
-    virtual void cancel(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectedTool(wxListEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void clickUseDefaultTool(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectDefaultToolMappedTo(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectType(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void removeTool(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void duplicateTool(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void addTool(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void editTool(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void cancel(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxListCtrl* GetToolMagazine() { return m_toolMagazine; }
-    wxStaticLine* GetStaticLine4628() { return m_staticLine4628; }
-    wxStaticText* GetStaticText5046() { return m_staticText5046; }
-    wxStaticText* GetStaticText5056() { return m_staticText5056; }
-    wxCheckBox* GetCbDefaultToolUsage() { return m_cbDefaultToolUsage; }
-    wxStaticText* GetStaticText5058() { return m_staticText5058; }
-    wxComboBox* GetCbDefaultMappedTo() { return m_cbDefaultMappedTo; }
-    wxStaticLine* GetStaticLine5048() { return m_staticLine5048; }
-    wxStaticText* GetStaticText5050() { return m_staticText5050; }
-    wxStaticText* GetStaticText4609() { return m_staticText4609; }
-    wxTextCtrl* GetToolMagazineId() { return m_toolMagazineId; }
-    wxStaticText* GetStaticText5072() { return m_staticText5072; }
-    wxStaticText* GetStaticText4613() { return m_staticText4613; }
-    wxComboBox* GetToolMagazineType() { return m_toolMagazineType; }
-    wxStaticText* GetStaticText5074() { return m_staticText5074; }
-    wxStaticText* GetStaticText4617() { return m_staticText4617; }
-    wxTextCtrl* GetToolMagazineDiameter() { return m_toolMagazineDiameter; }
-    wxStaticText* GetStaticText5076() { return m_staticText5076; }
-    wxStaticText* GetStaticText5064() { return m_staticText5064; }
-    wxTextCtrl* GetToolMagazineLength() { return m_toolMagazineLength; }
-    wxStaticText* GetStaticText5078() { return m_staticText5078; }
-    wxStaticText* GetStaticText5068() { return m_staticText5068; }
-    wxTextCtrl* GetToolMagazineOffset() { return m_toolMagazineOffset; }
-    wxStaticText* GetStaticText5080() { return m_staticText5080; }
-    wxStaticText* GetStaticText4638() { return m_staticText4638; }
-    wxTextCtrl* GetToolMagazineComment() { return m_toolMagazineComment; }
-    wxStaticText* GetStaticText5082() { return m_staticText5082; }
-    wxButton* GetBtToolMagazineRemove() { return m_btToolMagazineRemove; }
-    wxButton* GetBtToolMagazineDuplicate() { return m_btToolMagazineDuplicate; }
-    wxButton* GetBtToolMagazineAdd() { return m_btToolMagazineAdd; }
-    wxButton* GetBtToolMagazineEdit() { return m_btToolMagazineEdit; }
-    wxButton* GetBtToolMagazineCancle() { return m_btToolMagazineCancle; }
-    CncToolMagazineBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    wxListCtrl* GetToolMagazine()
+    {
+	return m_toolMagazine;
+    }
+    wxStaticLine* GetStaticLine4628()
+    {
+	return m_staticLine4628;
+    }
+    wxStaticText* GetStaticText5046()
+    {
+	return m_staticText5046;
+    }
+    wxStaticText* GetStaticText5056()
+    {
+	return m_staticText5056;
+    }
+    wxCheckBox* GetCbDefaultToolUsage()
+    {
+	return m_cbDefaultToolUsage;
+    }
+    wxStaticText* GetStaticText5058()
+    {
+	return m_staticText5058;
+    }
+    wxComboBox* GetCbDefaultMappedTo()
+    {
+	return m_cbDefaultMappedTo;
+    }
+    wxStaticLine* GetStaticLine5048()
+    {
+	return m_staticLine5048;
+    }
+    wxStaticText* GetStaticText5050()
+    {
+	return m_staticText5050;
+    }
+    wxStaticText* GetStaticText4609()
+    {
+	return m_staticText4609;
+    }
+    wxTextCtrl* GetToolMagazineId()
+    {
+	return m_toolMagazineId;
+    }
+    wxStaticText* GetStaticText5072()
+    {
+	return m_staticText5072;
+    }
+    wxStaticText* GetStaticText4613()
+    {
+	return m_staticText4613;
+    }
+    wxComboBox* GetToolMagazineType()
+    {
+	return m_toolMagazineType;
+    }
+    wxStaticText* GetStaticText5074()
+    {
+	return m_staticText5074;
+    }
+    wxStaticText* GetStaticText4617()
+    {
+	return m_staticText4617;
+    }
+    wxTextCtrl* GetToolMagazineDiameter()
+    {
+	return m_toolMagazineDiameter;
+    }
+    wxStaticText* GetStaticText5076()
+    {
+	return m_staticText5076;
+    }
+    wxStaticText* GetStaticText5064()
+    {
+	return m_staticText5064;
+    }
+    wxTextCtrl* GetToolMagazineLength()
+    {
+	return m_toolMagazineLength;
+    }
+    wxStaticText* GetStaticText5078()
+    {
+	return m_staticText5078;
+    }
+    wxStaticText* GetStaticText5068()
+    {
+	return m_staticText5068;
+    }
+    wxTextCtrl* GetToolMagazineOffset()
+    {
+	return m_toolMagazineOffset;
+    }
+    wxStaticText* GetStaticText5080()
+    {
+	return m_staticText5080;
+    }
+    wxStaticText* GetStaticText4638()
+    {
+	return m_staticText4638;
+    }
+    wxTextCtrl* GetToolMagazineComment()
+    {
+	return m_toolMagazineComment;
+    }
+    wxStaticText* GetStaticText5082()
+    {
+	return m_staticText5082;
+    }
+    wxButton* GetBtToolMagazineRemove()
+    {
+	return m_btToolMagazineRemove;
+    }
+    wxButton* GetBtToolMagazineDuplicate()
+    {
+	return m_btToolMagazineDuplicate;
+    }
+    wxButton* GetBtToolMagazineAdd()
+    {
+	return m_btToolMagazineAdd;
+    }
+    wxButton* GetBtToolMagazineEdit()
+    {
+	return m_btToolMagazineEdit;
+    }
+    wxButton* GetBtToolMagazineCancle()
+    {
+	return m_btToolMagazineCancle;
+    }
+    CncToolMagazineBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(-1, -1),
+        long style = wxTAB_TRAVERSAL);
     virtual ~CncToolMagazineBase();
 };
 

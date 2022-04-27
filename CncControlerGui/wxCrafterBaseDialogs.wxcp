@@ -126,7 +126,6 @@
 			"m_events":	[{
 					"m_eventName":	"wxEVT_SIZE",
 					"m_eventClass":	"wxSizeEvent",
-					"m_eventHandler":	"wxSizeEventHandler",
 					"m_functionNameAndSignature":	"onSize(wxSizeEvent& event)",
 					"m_description":	"Process a wxEVT_SIZE event",
 					"m_noBody":	false
@@ -151,6 +150,10 @@
 							"type":	"string",
 							"m_label":	"Style:",
 							"m_value":	""
+						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
 						}, {
 							"type":	"string",
 							"m_label":	"# Columns:",
@@ -245,7 +248,6 @@
 							"m_events":	[{
 									"m_eventName":	"wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED",
 									"m_eventClass":	"wxListbookEvent",
-									"m_eventHandler":	"wxListbookEventHandler",
 									"m_functionNameAndSignature":	"onSelectListBook(wxListbookEvent& event)",
 									"m_description":	"The page selection was changed",
 									"m_noBody":	false
@@ -352,6 +354,10 @@
 													"type":	"string",
 													"m_label":	"Style:",
 													"m_value":	""
+												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
 												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
@@ -465,6 +471,10 @@
 															"type":	"string",
 															"m_label":	"Style:",
 															"m_value":	""
+														}, {
+															"type":	"bool",
+															"m_label":	"Keep as a class member",
+															"m_value":	false
 														}, {
 															"type":	"string",
 															"m_label":	"# Columns:",
@@ -644,6 +654,10 @@
 																	"m_value":	"0"
 																}, {
 																	"type":	"bool",
+																	"m_label":	"Enable Spell Checking",
+																	"m_value":	false
+																}, {
+																	"type":	"bool",
 																	"m_label":	"Auto Complete Directories:",
 																	"m_value":	false
 																}, {
@@ -806,6 +820,10 @@
 																	"m_value":	"0"
 																}, {
 																	"type":	"bool",
+																	"m_label":	"Enable Spell Checking",
+																	"m_value":	false
+																}, {
+																	"type":	"bool",
 																	"m_label":	"Auto Complete Directories:",
 																	"m_value":	false
 																}, {
@@ -921,6 +939,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"1"
@@ -1014,7 +1036,6 @@
 													"m_events":	[{
 															"m_eventName":	"wxEVT_COMMAND_LIST_ITEM_SELECTED",
 															"m_eventClass":	"wxListEvent",
-															"m_eventHandler":	"wxListEventHandler",
 															"m_functionNameAndSignature":	"selectOSEnvironmentItem(wxListEvent& event)",
 															"m_description":	"The item has been selected",
 															"m_noBody":	false
@@ -1040,6 +1061,10 @@
 															"type":	"string",
 															"m_label":	"Style:",
 															"m_value":	""
+														}, {
+															"type":	"bool",
+															"m_label":	"Keep as a class member",
+															"m_value":	false
 														}, {
 															"type":	"string",
 															"m_label":	"# Columns:",
@@ -1086,6 +1111,10 @@
 																	"type":	"string",
 																	"m_label":	"Style:",
 																	"m_value":	""
+																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
 																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
@@ -1265,6 +1294,10 @@
 																			"m_value":	"0"
 																		}, {
 																			"type":	"bool",
+																			"m_label":	"Enable Spell Checking",
+																			"m_value":	false
+																		}, {
+																			"type":	"bool",
 																			"m_label":	"Auto Complete Directories:",
 																			"m_value":	false
 																		}, {
@@ -1425,6 +1458,10 @@
 																			"type":	"string",
 																			"m_label":	"Max Length:",
 																			"m_value":	"0"
+																		}, {
+																			"type":	"bool",
+																			"m_label":	"Enable Spell Checking",
+																			"m_value":	false
 																		}, {
 																			"type":	"bool",
 																			"m_label":	"Auto Complete Directories:",
@@ -1618,6 +1655,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"1"
@@ -1711,7 +1752,6 @@
 													"m_events":	[{
 															"m_eventName":	"wxEVT_COMMAND_LIST_ITEM_SELECTED",
 															"m_eventClass":	"wxListEvent",
-															"m_eventHandler":	"wxListEventHandler",
 															"m_functionNameAndSignature":	"selectAppEnvironmentItem(wxListEvent& event)",
 															"m_description":	"The item has been selected",
 															"m_noBody":	false
@@ -1737,6 +1777,10 @@
 															"type":	"string",
 															"m_label":	"Style:",
 															"m_value":	""
+														}, {
+															"type":	"bool",
+															"m_label":	"Keep as a class member",
+															"m_value":	false
 														}, {
 															"type":	"string",
 															"m_label":	"# Columns:",
@@ -1783,6 +1827,10 @@
 																	"type":	"string",
 																	"m_label":	"Style:",
 																	"m_value":	""
+																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
 																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
@@ -1962,6 +2010,10 @@
 																			"m_value":	"0"
 																		}, {
 																			"type":	"bool",
+																			"m_label":	"Enable Spell Checking",
+																			"m_value":	false
+																		}, {
+																			"type":	"bool",
 																			"m_label":	"Auto Complete Directories:",
 																			"m_value":	false
 																		}, {
@@ -2122,6 +2174,10 @@
 																			"type":	"string",
 																			"m_label":	"Max Length:",
 																			"m_value":	"0"
+																		}, {
+																			"type":	"bool",
+																			"m_label":	"Enable Spell Checking",
+																			"m_value":	false
 																		}, {
 																			"type":	"bool",
 																			"m_label":	"Auto Complete Directories:",
@@ -2315,6 +2371,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"1"
@@ -2424,7 +2484,6 @@
 													"m_events":	[{
 															"m_eventName":	"wxEVT_COMMAND_RADIOBOX_SELECTED",
 															"m_eventClass":	"wxCommandEvent",
-															"m_eventHandler":	"wxCommandEventHandler",
 															"m_functionNameAndSignature":	"sortModules(wxCommandEvent& event)",
 															"m_description":	"Process a wxEVT_COMMAND_RADIOBOX_SELECTED event, when a radiobutton is clicked.",
 															"m_noBody":	false
@@ -2498,7 +2557,6 @@
 													"m_events":	[{
 															"m_eventName":	"wxEVT_COMMAND_LIST_ITEM_SELECTED",
 															"m_eventClass":	"wxListEvent",
-															"m_eventHandler":	"wxListEventHandler",
 															"m_functionNameAndSignature":	"selectModulesItem(wxListEvent& event)",
 															"m_description":	"The item has been selected",
 															"m_noBody":	false
@@ -2524,6 +2582,10 @@
 															"type":	"string",
 															"m_label":	"Style:",
 															"m_value":	""
+														}, {
+															"type":	"bool",
+															"m_label":	"Keep as a class member",
+															"m_value":	false
 														}, {
 															"type":	"string",
 															"m_label":	"# Columns:",
@@ -2703,6 +2765,10 @@
 																	"m_value":	"0"
 																}, {
 																	"type":	"bool",
+																	"m_label":	"Enable Spell Checking",
+																	"m_value":	false
+																}, {
+																	"type":	"bool",
 																	"m_label":	"Auto Complete Directories:",
 																	"m_value":	false
 																}, {
@@ -2863,6 +2929,10 @@
 																	"type":	"string",
 																	"m_label":	"Max Length:",
 																	"m_value":	"0"
+																}, {
+																	"type":	"bool",
+																	"m_label":	"Enable Spell Checking",
+																	"m_value":	false
 																}, {
 																	"type":	"bool",
 																	"m_label":	"Auto Complete Directories:",
@@ -3027,6 +3097,10 @@
 																	"m_value":	"0"
 																}, {
 																	"type":	"bool",
+																	"m_label":	"Enable Spell Checking",
+																	"m_value":	false
+																}, {
+																	"type":	"bool",
 																	"m_label":	"Auto Complete Directories:",
 																	"m_value":	false
 																}, {
@@ -3189,6 +3263,10 @@
 																	"m_value":	"0"
 																}, {
 																	"type":	"bool",
+																	"m_label":	"Enable Spell Checking",
+																	"m_value":	false
+																}, {
+																	"type":	"bool",
 																	"m_label":	"Auto Complete Directories:",
 																	"m_value":	false
 																}, {
@@ -3303,6 +3381,10 @@
 													"type":	"string",
 													"m_label":	"Style:",
 													"m_value":	""
+												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
 												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
@@ -3495,6 +3577,10 @@
 									"m_label":	"Style:",
 									"m_value":	""
 								}, {
+									"type":	"bool",
+									"m_label":	"Keep as a class member",
+									"m_value":	false
+								}, {
 									"type":	"string",
 									"m_label":	"# Columns:",
 									"m_value":	"1"
@@ -3607,6 +3693,10 @@
 											"type":	"string",
 											"m_label":	"Style:",
 											"m_value":	""
+										}, {
+											"type":	"bool",
+											"m_label":	"Keep as a class member",
+											"m_value":	false
 										}, {
 											"type":	"string",
 											"m_label":	"# Columns:",
@@ -3722,7 +3812,6 @@
 											"m_events":	[{
 													"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 													"m_eventClass":	"wxCommandEvent",
-													"m_eventHandler":	"wxCommandEventHandler",
 													"m_functionNameAndSignature":	"onRefresh(wxCommandEvent& event)",
 													"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 													"m_noBody":	false
@@ -3817,7 +3906,6 @@
 											"m_events":	[{
 													"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 													"m_eventClass":	"wxCommandEvent",
-													"m_eventHandler":	"wxCommandEventHandler",
 													"m_functionNameAndSignature":	"onClose(wxCommandEvent& event)",
 													"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 													"m_noBody":	false
@@ -3940,14 +4028,12 @@
 			"m_events":	[{
 					"m_eventName":	"wxEVT_INIT_DIALOG",
 					"m_eventClass":	"wxInitDialogEvent",
-					"m_eventHandler":	"wxInitDialogEventHandler",
 					"m_functionNameAndSignature":	"initDialog(wxInitDialogEvent& event)",
 					"m_description":	"A wxInitDialogEvent is sent as a dialog or panel is being initialised. Handlers for this event can transfer data to the window.\nThe default handler calls wxWindow::TransferDataToWindow",
 					"m_noBody":	false
 				}, {
 					"m_eventName":	"wxEVT_SHOW",
 					"m_eventClass":	"wxShowEvent",
-					"m_eventHandler":	"wxShowEventHandler",
 					"m_functionNameAndSignature":	"show(wxShowEvent& event)",
 					"m_description":	"Process a wxEVT_SHOW event",
 					"m_noBody":	false
@@ -3980,7 +4066,6 @@
 					"m_events":	[{
 							"m_eventName":	"wxEVT_TIMER",
 							"m_eventClass":	"wxTimerEvent",
-							"m_eventHandler":	"wxTimerEventHandler",
 							"m_functionNameAndSignature":	"observeTimer(wxTimerEvent& event)",
 							"m_description":	"Process a timer event",
 							"m_noBody":	false
@@ -4014,7 +4099,6 @@
 					"m_events":	[{
 							"m_eventName":	"wxEVT_TIMER",
 							"m_eventClass":	"wxTimerEvent",
-							"m_eventHandler":	"wxTimerEventHandler",
 							"m_functionNameAndSignature":	"startupTimer(wxTimerEvent& event)",
 							"m_description":	"Process a timer event",
 							"m_noBody":	false
@@ -4040,6 +4124,10 @@
 							"type":	"string",
 							"m_label":	"Style:",
 							"m_value":	""
+						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
 						}, {
 							"type":	"choice",
 							"m_label":	"Orientation:",
@@ -4067,6 +4155,10 @@
 									"type":	"string",
 									"m_label":	"Style:",
 									"m_value":	""
+								}, {
+									"type":	"bool",
+									"m_label":	"Keep as a class member",
+									"m_value":	false
 								}, {
 									"type":	"string",
 									"m_label":	"# Columns:",
@@ -4184,6 +4276,10 @@
 											"type":	"string",
 											"m_label":	"Style:",
 											"m_value":	""
+										}, {
+											"type":	"bool",
+											"m_label":	"Keep as a class member",
+											"m_value":	false
 										}, {
 											"type":	"string",
 											"m_label":	"# Columns:",
@@ -4380,6 +4476,10 @@
 													"type":	"string",
 													"m_label":	"Style:",
 													"m_value":	""
+												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
 												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
@@ -4666,14 +4766,12 @@
 			"m_events":	[{
 					"m_eventName":	"wxEVT_INIT_DIALOG",
 					"m_eventClass":	"wxInitDialogEvent",
-					"m_eventHandler":	"wxInitDialogEventHandler",
 					"m_functionNameAndSignature":	"onInitDialog(wxInitDialogEvent& event)",
 					"m_description":	"A wxInitDialogEvent is sent as a dialog or panel is being initialised. Handlers for this event can transfer data to the window.\nThe default handler calls wxWindow::TransferDataToWindow",
 					"m_noBody":	false
 				}, {
 					"m_eventName":	"wxEVT_CLOSE_WINDOW",
 					"m_eventClass":	"wxCloseEvent",
-					"m_eventHandler":	"wxCloseEventHandler",
 					"m_functionNameAndSignature":	"onCloseDinalog(wxCloseEvent& event)",
 					"m_description":	"Process a close event. This event applies to wxFrame and wxDialog classes",
 					"m_noBody":	false
@@ -4698,6 +4796,10 @@
 							"type":	"string",
 							"m_label":	"Style:",
 							"m_value":	""
+						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
 						}, {
 							"type":	"string",
 							"m_label":	"# Columns:",
@@ -4744,6 +4846,10 @@
 									"type":	"string",
 									"m_label":	"Style:",
 									"m_value":	""
+								}, {
+									"type":	"bool",
+									"m_label":	"Keep as a class member",
+									"m_value":	false
 								}, {
 									"type":	"string",
 									"m_label":	"# Columns:",
@@ -4861,6 +4967,10 @@
 											"type":	"string",
 											"m_label":	"Style:",
 											"m_value":	""
+										}, {
+											"type":	"bool",
+											"m_label":	"Keep as a class member",
+											"m_value":	false
 										}, {
 											"type":	"string",
 											"m_label":	"# Columns:",
@@ -5127,6 +5237,10 @@
 									"m_label":	"Style:",
 									"m_value":	""
 								}, {
+									"type":	"bool",
+									"m_label":	"Keep as a class member",
+									"m_value":	false
+								}, {
 									"type":	"string",
 									"m_label":	"# Columns:",
 									"m_value":	"2"
@@ -5241,7 +5355,6 @@
 									"m_events":	[{
 											"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 											"m_eventClass":	"wxCommandEvent",
-											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"onIgnore(wxCommandEvent& event)",
 											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 											"m_noBody":	false
@@ -5336,7 +5449,6 @@
 									"m_events":	[{
 											"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 											"m_eventClass":	"wxCommandEvent",
-											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"onConnect(wxCommandEvent& event)",
 											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 											"m_noBody":	false
@@ -5458,7 +5570,6 @@
 			"m_events":	[{
 					"m_eventName":	"wxEVT_INIT_DIALOG",
 					"m_eventClass":	"wxInitDialogEvent",
-					"m_eventHandler":	"wxInitDialogEventHandler",
 					"m_functionNameAndSignature":	"onInitDilaog(wxInitDialogEvent& event)",
 					"m_description":	"A wxInitDialogEvent is sent as a dialog or panel is being initialised. Handlers for this event can transfer data to the window.\nThe default handler calls wxWindow::TransferDataToWindow",
 					"m_noBody":	false
@@ -5483,6 +5594,10 @@
 							"type":	"string",
 							"m_label":	"Style:",
 							"m_value":	""
+						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
 						}, {
 							"type":	"string",
 							"m_label":	"# Columns:",
@@ -5635,6 +5750,10 @@
 									"m_label":	"Style:",
 									"m_value":	""
 								}, {
+									"type":	"bool",
+									"m_label":	"Keep as a class member",
+									"m_value":	false
+								}, {
 									"type":	"string",
 									"m_label":	"# Columns:",
 									"m_value":	"2"
@@ -5749,7 +5868,6 @@
 									"m_events":	[{
 											"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 											"m_eventClass":	"wxCommandEvent",
-											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"onClose(wxCommandEvent& event)",
 											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 											"m_noBody":	false
@@ -5889,6 +6007,10 @@
 							"type":	"string",
 							"m_label":	"Style:",
 							"m_value":	""
+						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
 						}, {
 							"type":	"string",
 							"m_label":	"# Columns:",
@@ -6109,7 +6231,6 @@
 			"m_events":	[{
 					"m_eventName":	"wxEVT_SHOW",
 					"m_eventClass":	"wxShowEvent",
-					"m_eventHandler":	"wxShowEventHandler",
 					"m_functionNameAndSignature":	"onShow(wxShowEvent& event)",
 					"m_description":	"Process a wxEVT_SHOW event",
 					"m_noBody":	false
@@ -6134,6 +6255,10 @@
 							"type":	"string",
 							"m_label":	"Style:",
 							"m_value":	""
+						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
 						}, {
 							"type":	"string",
 							"m_label":	"# Columns:",
@@ -6246,6 +6371,10 @@
 											"type":	"string",
 											"m_label":	"Style:",
 											"m_value":	""
+										}, {
+											"type":	"bool",
+											"m_label":	"Keep as a class member",
+											"m_value":	false
 										}, {
 											"type":	"string",
 											"m_label":	"# Columns:",
@@ -6505,21 +6634,18 @@
 											"m_events":	[{
 													"m_eventName":	"wxEVT_LEFT_DOWN",
 													"m_eventClass":	"wxMouseEvent",
-													"m_eventHandler":	"wxMouseEventHandler",
 													"m_functionNameAndSignature":	"onStartMove(wxMouseEvent& event)",
 													"m_description":	"Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
 													"m_noBody":	false
 												}, {
 													"m_eventName":	"wxEVT_LEFT_UP",
 													"m_eventClass":	"wxMouseEvent",
-													"m_eventHandler":	"wxMouseEventHandler",
 													"m_functionNameAndSignature":	"onStopMove(wxMouseEvent& event)",
 													"m_description":	"Process a wxEVT_LEFT_UP event.",
 													"m_noBody":	false
 												}, {
 													"m_eventName":	"wxEVT_MOTION",
 													"m_eventClass":	"wxMouseEvent",
-													"m_eventHandler":	"wxMouseEventHandler",
 													"m_functionNameAndSignature":	"onMotion(wxMouseEvent& event)",
 													"m_description":	"Process a wxEVT_MOTION event",
 													"m_noBody":	false
@@ -6545,6 +6671,10 @@
 													"type":	"string",
 													"m_label":	"Style:",
 													"m_value":	""
+												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
 												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
@@ -6660,7 +6790,6 @@
 													"m_events":	[{
 															"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 															"m_eventClass":	"wxCommandEvent",
-															"m_eventHandler":	"wxCommandEventHandler",
 															"m_functionNameAndSignature":	"onMinMax(wxCommandEvent& event)",
 															"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 															"m_noBody":	false
@@ -6755,7 +6884,6 @@
 													"m_events":	[{
 															"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 															"m_eventClass":	"wxCommandEvent",
-															"m_eventHandler":	"wxCommandEventHandler",
 															"m_functionNameAndSignature":	"onCloseFromButton(wxCommandEvent& event)",
 															"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 															"m_noBody":	false
@@ -6904,7 +7032,6 @@
 							"m_events":	[{
 									"m_eventName":	"wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED",
 									"m_eventClass":	"wxNotebookEvent",
-									"m_eventHandler":	"wxNotebookEventHandler",
 									"m_functionNameAndSignature":	"onViewBookChanged(wxNotebookEvent& event)",
 									"m_description":	"The page selection was changed",
 									"m_noBody":	false
@@ -7011,6 +7138,10 @@
 													"type":	"string",
 													"m_label":	"Style:",
 													"m_value":	""
+												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
 												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
@@ -7124,6 +7255,10 @@
 																	"m_label":	"Style:",
 																	"m_value":	""
 																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
+																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
 																	"m_value":	"1"
@@ -7169,6 +7304,10 @@
 																			"type":	"string",
 																			"m_label":	"Style:",
 																			"m_value":	""
+																		}, {
+																			"type":	"bool",
+																			"m_label":	"Keep as a class member",
+																			"m_value":	false
 																		}, {
 																			"type":	"string",
 																			"m_label":	"# Columns:",
@@ -7359,7 +7498,6 @@
 																			"m_events":	[{
 																					"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																					"m_eventClass":	"wxCommandEvent",
-																					"m_eventHandler":	"wxCommandEventHandler",
 																					"m_functionNameAndSignature":	"onAttachPage1(wxCommandEvent& event)",
 																					"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																					"m_noBody":	false
@@ -7473,6 +7611,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"1"
@@ -7585,6 +7727,10 @@
 																	"m_label":	"Style:",
 																	"m_value":	""
 																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
+																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
 																	"m_value":	"1"
@@ -7630,6 +7776,10 @@
 																			"type":	"string",
 																			"m_label":	"Style:",
 																			"m_value":	""
+																		}, {
+																			"type":	"bool",
+																			"m_label":	"Keep as a class member",
+																			"m_value":	false
 																		}, {
 																			"type":	"string",
 																			"m_label":	"# Columns:",
@@ -7820,7 +7970,6 @@
 																			"m_events":	[{
 																					"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																					"m_eventClass":	"wxCommandEvent",
-																					"m_eventHandler":	"wxCommandEventHandler",
 																					"m_functionNameAndSignature":	"onAttachPage2(wxCommandEvent& event)",
 																					"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																					"m_noBody":	false
@@ -7934,6 +8083,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"1"
@@ -8046,6 +8199,10 @@
 																	"m_label":	"Style:",
 																	"m_value":	""
 																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
+																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
 																	"m_value":	"1"
@@ -8091,6 +8248,10 @@
 																			"type":	"string",
 																			"m_label":	"Style:",
 																			"m_value":	""
+																		}, {
+																			"type":	"bool",
+																			"m_label":	"Keep as a class member",
+																			"m_value":	false
 																		}, {
 																			"type":	"string",
 																			"m_label":	"# Columns:",
@@ -8281,7 +8442,6 @@
 																			"m_events":	[{
 																					"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																					"m_eventClass":	"wxCommandEvent",
-																					"m_eventHandler":	"wxCommandEventHandler",
 																					"m_functionNameAndSignature":	"onAttachPage3(wxCommandEvent& event)",
 																					"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																					"m_noBody":	false
@@ -8395,6 +8555,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"1"
@@ -8507,6 +8671,10 @@
 																	"m_label":	"Style:",
 																	"m_value":	""
 																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
+																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
 																	"m_value":	"1"
@@ -8552,6 +8720,10 @@
 																			"type":	"string",
 																			"m_label":	"Style:",
 																			"m_value":	""
+																		}, {
+																			"type":	"bool",
+																			"m_label":	"Keep as a class member",
+																			"m_value":	false
 																		}, {
 																			"type":	"string",
 																			"m_label":	"# Columns:",
@@ -8742,7 +8914,6 @@
 																			"m_events":	[{
 																					"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																					"m_eventClass":	"wxCommandEvent",
-																					"m_eventHandler":	"wxCommandEventHandler",
 																					"m_functionNameAndSignature":	"onAttachPage4(wxCommandEvent& event)",
 																					"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																					"m_noBody":	false
@@ -8840,6 +9011,10 @@
 											"type":	"string",
 											"m_label":	"Style:",
 											"m_value":	""
+										}, {
+											"type":	"bool",
+											"m_label":	"Keep as a class member",
+											"m_value":	false
 										}, {
 											"type":	"string",
 											"m_label":	"# Columns:",
@@ -8944,6 +9119,10 @@
 													"m_value":	"0"
 												}, {
 													"type":	"bool",
+													"m_label":	"Enable Spell Checking",
+													"m_value":	false
+												}, {
+													"type":	"bool",
 													"m_label":	"Auto Complete Directories:",
 													"m_value":	false
 												}, {
@@ -9031,6 +9210,10 @@
 													"m_value":	"0"
 												}, {
 													"type":	"bool",
+													"m_label":	"Enable Spell Checking",
+													"m_value":	false
+												}, {
+													"type":	"bool",
 													"m_label":	"Auto Complete Directories:",
 													"m_value":	false
 												}, {
@@ -9116,6 +9299,10 @@
 													"type":	"string",
 													"m_label":	"Max Length:",
 													"m_value":	"0"
+												}, {
+													"type":	"bool",
+													"m_label":	"Enable Spell Checking",
+													"m_value":	false
 												}, {
 													"type":	"bool",
 													"m_label":	"Auto Complete Directories:",
@@ -9249,14 +9436,12 @@
 			"m_events":	[{
 					"m_eventName":	"wxEVT_CLOSE_WINDOW",
 					"m_eventClass":	"wxCloseEvent",
-					"m_eventHandler":	"wxCloseEventHandler",
 					"m_functionNameAndSignature":	"onCloseWindow(wxCloseEvent& event)",
 					"m_description":	"Process a close event. This event applies to wxFrame and wxDialog classes",
 					"m_noBody":	false
 				}, {
 					"m_eventName":	"wxEVT_ACTIVATE",
 					"m_eventClass":	"wxActivateEvent",
-					"m_eventHandler":	"wxActivateEventHandler",
 					"m_functionNameAndSignature":	"onActivateWindow(wxActivateEvent& event)",
 					"m_description":	"Process a wxEVT_ACTIVATE event",
 					"m_noBody":	false
@@ -9281,6 +9466,10 @@
 							"type":	"string",
 							"m_label":	"Style:",
 							"m_value":	""
+						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
 						}, {
 							"type":	"string",
 							"m_label":	"# Columns:",
@@ -9477,6 +9666,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"1"
@@ -9522,6 +9715,10 @@
 															"type":	"string",
 															"m_label":	"Style:",
 															"m_value":	""
+														}, {
+															"type":	"bool",
+															"m_label":	"Keep as a class member",
+															"m_value":	false
 														}, {
 															"type":	"string",
 															"m_label":	"# Columns:",
@@ -9691,7 +9888,6 @@
 															"m_events":	[{
 																	"m_eventName":	"wxEVT_COMMAND_LIST_ITEM_SELECTED",
 																	"m_eventClass":	"wxListEvent",
-																	"m_eventHandler":	"wxListEventHandler",
 																	"m_functionNameAndSignature":	"onOverviewItemSelected(wxListEvent& event)",
 																	"m_description":	"The item has been selected",
 																	"m_noBody":	false
@@ -9850,6 +10046,10 @@
 																	"m_value":	"0"
 																}, {
 																	"type":	"bool",
+																	"m_label":	"Enable Spell Checking",
+																	"m_value":	false
+																}, {
+																	"type":	"bool",
 																	"m_label":	"Auto Complete Directories:",
 																	"m_value":	false
 																}, {
@@ -9949,6 +10149,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"1"
@@ -9995,6 +10199,10 @@
 															"m_label":	"Style:",
 															"m_value":	""
 														}, {
+															"type":	"bool",
+															"m_label":	"Keep as a class member",
+															"m_value":	false
+														}, {
 															"type":	"string",
 															"m_label":	"# Columns:",
 															"m_value":	"3"
@@ -10040,6 +10248,10 @@
 																	"type":	"string",
 																	"m_label":	"Style:",
 																	"m_value":	""
+																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
 																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
@@ -10372,6 +10584,10 @@
 																	"m_label":	"Style:",
 																	"m_value":	""
 																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
+																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
 																	"m_value":	"1"
@@ -10492,7 +10708,6 @@
 																	"m_events":	[{
 																			"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																			"m_eventClass":	"wxCommandEvent",
-																			"m_eventHandler":	"wxCommandEventHandler",
 																			"m_functionNameAndSignature":	"onExportDetails(wxCommandEvent& event)",
 																			"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																			"m_noBody":	false
@@ -10574,7 +10789,6 @@
 																	"m_events":	[{
 																			"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																			"m_eventClass":	"wxCommandEvent",
-																			"m_eventHandler":	"wxCommandEventHandler",
 																			"m_functionNameAndSignature":	"onSaveDetails(wxCommandEvent& event)",
 																			"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																			"m_noBody":	false
@@ -10656,7 +10870,6 @@
 																	"m_events":	[{
 																			"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																			"m_eventClass":	"wxCommandEvent",
-																			"m_eventHandler":	"wxCommandEventHandler",
 																			"m_functionNameAndSignature":	"onCopyDetails(wxCommandEvent& event)",
 																			"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																			"m_noBody":	false
@@ -10752,6 +10965,10 @@
 															"m_label":	"Style:",
 															"m_value":	""
 														}, {
+															"type":	"bool",
+															"m_label":	"Keep as a class member",
+															"m_value":	false
+														}, {
 															"type":	"string",
 															"m_label":	"# Columns:",
 															"m_value":	"3"
@@ -10797,6 +11014,10 @@
 																	"type":	"string",
 																	"m_label":	"Style:",
 																	"m_value":	""
+																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
 																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
@@ -10976,6 +11197,10 @@
 																			"m_value":	"0"
 																		}, {
 																			"type":	"bool",
+																			"m_label":	"Enable Spell Checking",
+																			"m_value":	false
+																		}, {
+																			"type":	"bool",
 																			"m_label":	"Auto Complete Directories:",
 																			"m_value":	false
 																		}, {
@@ -11136,6 +11361,10 @@
 																			"type":	"string",
 																			"m_label":	"Max Length:",
 																			"m_value":	"0"
+																		}, {
+																			"type":	"bool",
+																			"m_label":	"Enable Spell Checking",
+																			"m_value":	false
 																		}, {
 																			"type":	"bool",
 																			"m_label":	"Auto Complete Directories:",
@@ -11300,6 +11529,10 @@
 																			"m_value":	"0"
 																		}, {
 																			"type":	"bool",
+																			"m_label":	"Enable Spell Checking",
+																			"m_value":	false
+																		}, {
+																			"type":	"bool",
 																			"m_label":	"Auto Complete Directories:",
 																			"m_value":	false
 																		}, {
@@ -11429,7 +11662,6 @@
 					"m_events":	[{
 							"m_eventName":	"wxEVT_TIMER",
 							"m_eventClass":	"wxTimerEvent",
-							"m_eventHandler":	"wxTimerEventHandler",
 							"m_functionNameAndSignature":	"onActivationTimer(wxTimerEvent& event)",
 							"m_description":	"Process a timer event",
 							"m_noBody":	false

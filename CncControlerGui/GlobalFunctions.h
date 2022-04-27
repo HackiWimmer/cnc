@@ -17,6 +17,8 @@ class GblFunc {
 		static void cloneAttributes(wxWindow* source, wxWindow* target);
 		static void freeze(wxWindow* wnd, bool state);
 		
+		static int fixListBookBmpVisibleBug(wxWindow* lb);
+		
 		static bool replaceSizer(wxSizer* oldSizer, wxSizer* newSizer);
 
 		static const std::ostream& 	stacktraceOnlyApp(std::ostream& o, bool lastOnly);

@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERTEMPLATEOBSERVER_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERTEMPLATEOBSERVER_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -37,6 +38,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncTemplateObserverBase : public wxPanel
 {
@@ -57,27 +59,85 @@ protected:
     wxTimer* m_observeTimer;
 
 protected:
-    virtual void changeObservationMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void openTemplateExtern(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearTrace(wxCommandEvent& event) { event.Skip(); }
-    virtual void observe(wxTimerEvent& event) { event.Skip(); }
+    virtual void changeObservationMode(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void openTemplateExtern(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void clearTrace(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void observe(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxCheckBox* GetObservationMode() { return m_observationMode; }
-    wxStaticText* GetStaticText6553() { return m_staticText6553; }
-    wxRadioBox* GetActionSelection() { return m_actionSelection; }
-    wxBitmapButton* GetBtOpenExtern() { return m_btOpenExtern; }
-    wxStaticLine* GetStaticLine28() { return m_staticLine28; }
-    wxStaticText* GetStaticText7386() { return m_staticText7386; }
-    wxTextCtrl* GetCurTemplateTimestamp() { return m_curTemplateTimestamp; }
-    wxStaticText* GetStaticText6527() { return m_staticText6527; }
-    wxTextCtrl* GetLastTimestamp() { return m_lastTimestamp; }
-    wxButton* GetButton6532() { return m_button6532; }
-    wxTextCtrl* GetObserverTrace() { return m_observerTrace; }
-    wxTextCtrl* GetCurTemplateName() { return m_curTemplateName; }
-    wxTextCtrl* GetCurTemplateSize() { return m_curTemplateSize; }
-    wxTimer* GetObserveTimer() { return m_observeTimer; }
-    CncTemplateObserverBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    wxCheckBox* GetObservationMode()
+    {
+	return m_observationMode;
+    }
+    wxStaticText* GetStaticText6553()
+    {
+	return m_staticText6553;
+    }
+    wxRadioBox* GetActionSelection()
+    {
+	return m_actionSelection;
+    }
+    wxBitmapButton* GetBtOpenExtern()
+    {
+	return m_btOpenExtern;
+    }
+    wxStaticLine* GetStaticLine28()
+    {
+	return m_staticLine28;
+    }
+    wxStaticText* GetStaticText7386()
+    {
+	return m_staticText7386;
+    }
+    wxTextCtrl* GetCurTemplateTimestamp()
+    {
+	return m_curTemplateTimestamp;
+    }
+    wxStaticText* GetStaticText6527()
+    {
+	return m_staticText6527;
+    }
+    wxTextCtrl* GetLastTimestamp()
+    {
+	return m_lastTimestamp;
+    }
+    wxButton* GetButton6532()
+    {
+	return m_button6532;
+    }
+    wxTextCtrl* GetObserverTrace()
+    {
+	return m_observerTrace;
+    }
+    wxTextCtrl* GetCurTemplateName()
+    {
+	return m_curTemplateName;
+    }
+    wxTextCtrl* GetCurTemplateSize()
+    {
+	return m_curTemplateSize;
+    }
+    wxTimer* GetObserveTimer()
+    {
+	return m_observeTimer;
+    }
+    CncTemplateObserverBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(500, 300),
+        long style = wxTAB_TRAVERSAL);
     virtual ~CncTemplateObserverBase();
 };
 

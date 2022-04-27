@@ -6,551 +6,629 @@
 
 #include "wxCrafterGamePort.h"
 
-
 // Declare the bitmap loading function
 extern void wxC81CCInitBitmapResources();
 
 static bool bBitmapLoaded = false;
 
-
-CncGamepadControllerStateBase::CncGamepadControllerStateBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+CncGamepadControllerStateBase::CncGamepadControllerStateBase(wxWindow* parent,
+    wxWindowID id,
+    const wxPoint& pos,
+    const wxSize& size,
+    long style)
     : wxPanel(parent, id, pos, size, style)
 {
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC81CCInitBitmapResources();
-        bBitmapLoaded = true;
+    if(!bBitmapLoaded) {
+	// We need to initialise the default bitmap handler
+	wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+	wxC81CCInitBitmapResources();
+	bBitmapLoaded = true;
     }
-    
+
     wxFlexGridSizer* flexGridSizer5802 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer5802->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5802->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5802->SetFlexibleDirection(wxBOTH);
+    flexGridSizer5802->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer5802->AddGrowableCol(0);
     flexGridSizer5802->AddGrowableRow(0);
     this->SetSizer(flexGridSizer5802);
-    
+
     wxFlexGridSizer* flexGridSizer5821 = new wxFlexGridSizer(1, 3, 0, 0);
-    flexGridSizer5821->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5821->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5821->SetFlexibleDirection(wxBOTH);
+    flexGridSizer5821->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer5821->AddGrowableCol(0);
     flexGridSizer5821->AddGrowableRow(0);
-    
-    flexGridSizer5802->Add(flexGridSizer5821, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_listbook7478 = new wxListbook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLB_DEFAULT|wxBK_DEFAULT);
+
+    flexGridSizer5802->Add(flexGridSizer5821, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_listbook7478 = new wxListbook(
+        this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxLB_DEFAULT | wxBK_DEFAULT);
     m_listbook7478->SetName(wxT("m_listbook7478"));
     wxImageList* m_listbook7478_il = new wxImageList(16, 16);
     m_listbook7478->AssignImageList(m_listbook7478_il);
-    
-    flexGridSizer5821->Add(m_listbook7478, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_panel7480 = new wxPanel(m_listbook7478, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook7478, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+
+    flexGridSizer5821->Add(m_listbook7478, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_panel7480 = new wxPanel(
+        m_listbook7478, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook7478, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     int m_panel7480ImgIndex;
     m_panel7480ImgIndex = m_listbook7478_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("color-swatch")));
     m_listbook7478->AddPage(m_panel7480, _("Gamepad\nInterface State"), false, m_panel7480ImgIndex);
-    
+
     wxFlexGridSizer* flexGridSizer6042 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer6042->SetFlexibleDirection( wxBOTH );
-    flexGridSizer6042->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer6042->SetFlexibleDirection(wxBOTH);
+    flexGridSizer6042->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer6042->AddGrowableCol(0);
     flexGridSizer6042->AddGrowableRow(0);
     m_panel7480->SetSizer(flexGridSizer6042);
-    
-    m_splitter190 = new wxSplitterWindow(m_panel7480, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7480, wxSize(-1,-1)), wxSP_3D);
+
+    m_splitter190 = new wxSplitterWindow(
+        m_panel7480, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7480, wxSize(-1, -1)), wxSP_3D);
     m_splitter190->SetSashGravity(0.6);
     m_splitter190->SetMinimumPaneSize(10);
-    
-    flexGridSizer6042->Add(m_splitter190, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_spTrace = new wxPanel(m_splitter190, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter190, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    
+
+    flexGridSizer6042->Add(m_splitter190, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_spTrace = new wxPanel(
+        m_splitter190, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter190, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+
     wxFlexGridSizer* flexGridSizer200 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer200->SetFlexibleDirection( wxBOTH );
-    flexGridSizer200->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer200->SetFlexibleDirection(wxBOTH);
+    flexGridSizer200->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer200->AddGrowableCol(0);
     flexGridSizer200->AddGrowableRow(0);
     m_spTrace->SetSizer(flexGridSizer200);
-    
-    m_gamepadTrace = new wxTextCtrl(m_spTrace, wxID_ANY, wxT("Gamepad state not available"), wxDefaultPosition, wxDLG_UNIT(m_spTrace, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE);
+
+    m_gamepadTrace = new wxTextCtrl(m_spTrace, wxID_ANY, wxT("Gamepad state not available"), wxDefaultPosition,
+        wxDLG_UNIT(m_spTrace, wxSize(-1, -1)), wxTE_READONLY | wxTE_MULTILINE);
     m_gamepadTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_CAPTIONTEXT));
     m_gamepadTrace->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_gamepadTraceFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_gamepadTrace->SetFont(m_gamepadTraceFont);
-    
-    flexGridSizer200->Add(m_gamepadTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
+
+    flexGridSizer200->Add(m_gamepadTrace, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     wxFlexGridSizer* flexGridSizer206 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer206->SetFlexibleDirection( wxBOTH );
-    flexGridSizer206->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer200->Add(flexGridSizer206, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_spHistory = new wxPanel(m_splitter190, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter190, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    flexGridSizer206->SetFlexibleDirection(wxBOTH);
+    flexGridSizer206->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer200->Add(flexGridSizer206, 1, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_spHistory = new wxPanel(
+        m_splitter190, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter190, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     m_splitter190->SplitHorizontally(m_spTrace, m_spHistory, 0);
-    
+
     wxFlexGridSizer* flexGridSizer202 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer202->SetFlexibleDirection( wxBOTH );
-    flexGridSizer202->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer202->SetFlexibleDirection(wxBOTH);
+    flexGridSizer202->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer202->AddGrowableCol(0);
     flexGridSizer202->AddGrowableRow(1);
     m_spHistory->SetSizer(flexGridSizer202);
-    
-    m_staticText204 = new wxStaticText(m_spHistory, wxID_ANY, _("Gamepad Commad history:"), wxDefaultPosition, wxDLG_UNIT(m_spHistory, wxSize(-1,-1)), 0);
+
+    m_staticText204 = new wxStaticText(m_spHistory, wxID_ANY, _("Gamepad Commad history:"), wxDefaultPosition,
+        wxDLG_UNIT(m_spHistory, wxSize(-1, -1)), 0);
     wxFont m_staticText204Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText204->SetFont(m_staticText204Font);
-    
+
     flexGridSizer202->Add(m_staticText204, 0, wxALL, WXC_FROM_DIP(1));
-    
+
     wxFlexGridSizer* flexGridSizer207 = new wxFlexGridSizer(2, 2, 0, 0);
-    flexGridSizer207->SetFlexibleDirection( wxBOTH );
-    flexGridSizer207->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer207->SetFlexibleDirection(wxBOTH);
+    flexGridSizer207->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer207->AddGrowableCol(0);
     flexGridSizer207->AddGrowableRow(0);
-    
-    flexGridSizer202->Add(flexGridSizer207, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_gamepadCmdHistoryPlaceholder = new wxPanel(m_spHistory, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_spHistory, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+
+    flexGridSizer202->Add(flexGridSizer207, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_gamepadCmdHistoryPlaceholder =
+        new wxPanel(m_spHistory, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_spHistory, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     m_gamepadCmdHistoryPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer207->Add(m_gamepadCmdHistoryPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
+
+    flexGridSizer207->Add(m_gamepadCmdHistoryPlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     wxFlexGridSizer* flexGridSizer209 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer209->SetFlexibleDirection( wxBOTH );
-    flexGridSizer209->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer207->Add(flexGridSizer209, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_btClearHistory = new wxButton(m_spHistory, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_spHistory, wxSize(26,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
+    flexGridSizer209->SetFlexibleDirection(wxBOTH);
+    flexGridSizer209->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer207->Add(flexGridSizer209, 1, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_btClearHistory =
+        new wxButton(m_spHistory, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_spHistory, wxSize(26, 26)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btClearHistory->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
-    m_btClearHistory->SetBitmapMargins(2,2);
-    #endif
+    m_btClearHistory->SetBitmapMargins(2, 2);
+#endif
     m_btClearHistory->SetToolTip(_("ClearHistory"));
-    
+
     flexGridSizer209->Add(m_btClearHistory, 0, wxALL, WXC_FROM_DIP(1));
-    m_btClearHistory->SetMinSize(wxSize(26,26));
-    
-    m_panel7482 = new wxPanel(m_listbook7478, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook7478, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_btClearHistory->SetMinSize(wxSize(26, 26));
+
+    m_panel7482 = new wxPanel(
+        m_listbook7478, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook7478, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     int m_panel7482ImgIndex;
     m_panel7482ImgIndex = m_listbook7478_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("system-run-3")));
     m_listbook7478->AddPage(m_panel7482, _("SCP Toolkit\nService Trace"), false, m_panel7482ImgIndex);
-    
+
     wxFlexGridSizer* flexGridSizer232 = new wxFlexGridSizer(4, 1, 0, 0);
-    flexGridSizer232->SetFlexibleDirection( wxBOTH );
-    flexGridSizer232->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer232->SetFlexibleDirection(wxBOTH);
+    flexGridSizer232->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer232->AddGrowableCol(0);
     flexGridSizer232->AddGrowableRow(3);
     m_panel7482->SetSizer(flexGridSizer232);
-    
-    m_staticText234 = new wxStaticText(m_panel7482, wxID_ANY, _("SCP Toolkit"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), 0);
+
+    m_staticText234 = new wxStaticText(
+        m_panel7482, wxID_ANY, _("SCP Toolkit"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), 0);
     wxFont m_staticText234Font(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText234->SetFont(m_staticText234Font);
-    
+
     flexGridSizer232->Add(m_staticText234, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_staticText236 = new wxStaticText(m_panel7482, wxID_ANY, _("Windows utility to support Sony DualShock PS3/4 wireless controller."), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), 0);
+
+    m_staticText236 = new wxStaticText(m_panel7482, wxID_ANY,
+        _("Windows utility to support Sony DualShock PS3/4 wireless controller."), wxDefaultPosition,
+        wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), 0);
     wxFont m_staticText236Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText236->SetFont(m_staticText236Font);
-    
+
     flexGridSizer232->Add(m_staticText236, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_staticLine271 = new wxStaticLine(m_panel7482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer232->Add(m_staticLine271, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
+
+    m_staticLine271 = new wxStaticLine(
+        m_panel7482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer232->Add(m_staticLine271, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     wxFlexGridSizer* flexGridSizer246 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer246->SetFlexibleDirection( wxBOTH );
-    flexGridSizer246->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer246->SetFlexibleDirection(wxBOTH);
+    flexGridSizer246->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer246->AddGrowableCol(0);
     flexGridSizer246->AddGrowableRow(0);
-    
-    flexGridSizer232->Add(flexGridSizer246, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_gamepadServiceTrace = new wxTextCtrl(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE);
+
+    flexGridSizer232->Add(flexGridSizer246, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_gamepadServiceTrace = new wxTextCtrl(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition,
+        wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxTE_READONLY | wxTE_MULTILINE);
     m_gamepadServiceTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_CAPTIONTEXT));
     m_gamepadServiceTrace->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_gamepadServiceTraceFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    wxFont m_gamepadServiceTraceFont(
+        10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_gamepadServiceTrace->SetFont(m_gamepadServiceTraceFont);
-    
-    flexGridSizer246->Add(m_gamepadServiceTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
+
+    flexGridSizer246->Add(m_gamepadServiceTrace, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     wxFlexGridSizer* flexGridSizer6026 = new wxFlexGridSizer(18, 1, 0, 0);
-    flexGridSizer6026->SetFlexibleDirection( wxBOTH );
-    flexGridSizer6026->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer246->Add(flexGridSizer6026, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(0));
-    
-    m_btQueryGamepadService = new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32,32)), 0);
-    #if wxVERSION_NUMBER >= 2904
+    flexGridSizer6026->SetFlexibleDirection(wxBOTH);
+    flexGridSizer6026->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer246->Add(flexGridSizer6026, 1, wxALL | wxEXPAND | wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(0));
+
+    m_btQueryGamepadService =
+        new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32, 32)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btQueryGamepadService->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-question-2 (2)")), wxLEFT);
-    m_btQueryGamepadService->SetBitmapMargins(2,2);
-    #endif
+    m_btQueryGamepadService->SetBitmapMargins(2, 2);
+#endif
     m_btQueryGamepadService->SetToolTip(_("Query the underlying Service"));
-    
+
     flexGridSizer6026->Add(m_btQueryGamepadService, 0, wxALL, WXC_FROM_DIP(0));
-    m_btQueryGamepadService->SetMinSize(wxSize(32,32));
-    
-    m_staticText23889 = new wxStaticText(m_panel7482, wxID_ANY, _("Query"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxALIGN_CENTRE);
-    wxFont m_staticText23889Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_btQueryGamepadService->SetMinSize(wxSize(32, 32));
+
+    m_staticText23889 = new wxStaticText(
+        m_panel7482, wxID_ANY, _("Query"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxALIGN_CENTRE);
+    wxFont m_staticText23889Font(
+        7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText23889->SetFont(m_staticText23889Font);
-    
-    flexGridSizer6026->Add(m_staticText23889, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticLine60512 = new wxStaticLine(m_panel7482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer6026->Add(m_staticLine60512, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btStartGamepadService = new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32,32)), 0);
-    #if wxVERSION_NUMBER >= 2904
+
+    flexGridSizer6026->Add(m_staticText23889, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticLine60512 = new wxStaticLine(
+        m_panel7482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer6026->Add(m_staticLine60512, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_btStartGamepadService =
+        new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32, 32)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btStartGamepadService->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("system-run-3")), wxLEFT);
-    m_btStartGamepadService->SetBitmapMargins(2,2);
-    #endif
+    m_btStartGamepadService->SetBitmapMargins(2, 2);
+#endif
     m_btStartGamepadService->SetToolTip(_("Start the underlying Service"));
-    
+
     flexGridSizer6026->Add(m_btStartGamepadService, 0, wxALL, WXC_FROM_DIP(0));
-    m_btStartGamepadService->SetMinSize(wxSize(32,32));
-    
-    m_staticText2388910 = new wxStaticText(m_panel7482, wxID_ANY, _("Start"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxALIGN_CENTRE);
-    wxFont m_staticText2388910Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_btStartGamepadService->SetMinSize(wxSize(32, 32));
+
+    m_staticText2388910 = new wxStaticText(
+        m_panel7482, wxID_ANY, _("Start"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxALIGN_CENTRE);
+    wxFont m_staticText2388910Font(
+        7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText2388910->SetFont(m_staticText2388910Font);
-    
-    flexGridSizer6026->Add(m_staticText2388910, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_btStopGamepadService1 = new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32,32)), 0);
-    #if wxVERSION_NUMBER >= 2904
+
+    flexGridSizer6026->Add(m_staticText2388910, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_btStopGamepadService1 =
+        new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32, 32)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btStopGamepadService1->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-x-close")), wxLEFT);
-    m_btStopGamepadService1->SetBitmapMargins(2,2);
-    #endif
+    m_btStopGamepadService1->SetBitmapMargins(2, 2);
+#endif
     m_btStopGamepadService1->SetToolTip(_("Stop the underlying Service"));
-    
+
     flexGridSizer6026->Add(m_btStopGamepadService1, 0, wxALL, WXC_FROM_DIP(0));
-    m_btStopGamepadService1->SetMinSize(wxSize(32,32));
-    
-    m_staticText2388 = new wxStaticText(m_panel7482, wxID_ANY, _("Stop"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_btStopGamepadService1->SetMinSize(wxSize(32, 32));
+
+    m_staticText2388 = new wxStaticText(
+        m_panel7482, wxID_ANY, _("Stop"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxALIGN_CENTRE);
     wxFont m_staticText2388Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText2388->SetFont(m_staticText2388Font);
-    
-    flexGridSizer6026->Add(m_staticText2388, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticLine60514 = new wxStaticLine(m_panel7482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer6026->Add(m_staticLine60514, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btSCPDriverInstaller = new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32,32)), 0);
-    #if wxVERSION_NUMBER >= 2904
+
+    flexGridSizer6026->Add(m_staticText2388, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticLine60514 = new wxStaticLine(
+        m_panel7482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer6026->Add(m_staticLine60514, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_btSCPDriverInstaller =
+        new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32, 32)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btSCPDriverInstaller->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxLEFT);
-    m_btSCPDriverInstaller->SetBitmapMargins(2,2);
-    #endif
+    m_btSCPDriverInstaller->SetBitmapMargins(2, 2);
+#endif
     m_btSCPDriverInstaller->SetToolTip(_("Open the SCP Toolkit Driver Installer"));
-    
+
     flexGridSizer6026->Add(m_btSCPDriverInstaller, 0, wxALL, WXC_FROM_DIP(0));
-    m_btSCPDriverInstaller->SetMinSize(wxSize(32,32));
-    
-    m_staticText238 = new wxStaticText(m_panel7482, wxID_ANY, _("Install"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_btSCPDriverInstaller->SetMinSize(wxSize(32, 32));
+
+    m_staticText238 = new wxStaticText(m_panel7482, wxID_ANY, _("Install"), wxDefaultPosition,
+        wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxALIGN_CENTRE);
     wxFont m_staticText238Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText238->SetFont(m_staticText238Font);
-    
-    flexGridSizer6026->Add(m_staticText238, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_btSCPSettings = new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32,32)), 0);
-    #if wxVERSION_NUMBER >= 2904
+
+    flexGridSizer6026->Add(m_staticText238, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_btSCPSettings =
+        new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32, 32)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btSCPSettings->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxLEFT);
-    m_btSCPSettings->SetBitmapMargins(2,2);
-    #endif
+    m_btSCPSettings->SetBitmapMargins(2, 2);
+#endif
     m_btSCPSettings->SetToolTip(_("Open the SCP Toolkit Settings"));
-    
+
     flexGridSizer6026->Add(m_btSCPSettings, 0, wxALL, WXC_FROM_DIP(0));
-    m_btSCPSettings->SetMinSize(wxSize(32,32));
-    
-    m_staticText2385 = new wxStaticText(m_panel7482, wxID_ANY, _("Settings"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_btSCPSettings->SetMinSize(wxSize(32, 32));
+
+    m_staticText2385 = new wxStaticText(m_panel7482, wxID_ANY, _("Settings"), wxDefaultPosition,
+        wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxALIGN_CENTRE);
     wxFont m_staticText2385Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText2385->SetFont(m_staticText2385Font);
-    
+
     flexGridSizer6026->Add(m_staticText2385, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_btSCPMonitor = new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32,32)), 0);
-    #if wxVERSION_NUMBER >= 2904
+
+    m_btSCPMonitor =
+        new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32, 32)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btSCPMonitor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxLEFT);
-    m_btSCPMonitor->SetBitmapMargins(2,2);
-    #endif
+    m_btSCPMonitor->SetBitmapMargins(2, 2);
+#endif
     m_btSCPMonitor->SetToolTip(_("Open the SCP Toolkit Monitor"));
-    
+
     flexGridSizer6026->Add(m_btSCPMonitor, 0, wxALL, WXC_FROM_DIP(0));
-    m_btSCPMonitor->SetMinSize(wxSize(32,32));
-    
-    m_staticText2386 = new wxStaticText(m_panel7482, wxID_ANY, _("Monitor"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_btSCPMonitor->SetMinSize(wxSize(32, 32));
+
+    m_staticText2386 = new wxStaticText(m_panel7482, wxID_ANY, _("Monitor"), wxDefaultPosition,
+        wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxALIGN_CENTRE);
     wxFont m_staticText2386Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText2386->SetFont(m_staticText2386Font);
-    
-    flexGridSizer6026->Add(m_staticText2386, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticLine6051 = new wxStaticLine(m_panel7482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer6026->Add(m_staticLine6051, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btClearGamepadServiceTrace = new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32,32)), 0);
-    #if wxVERSION_NUMBER >= 2904
+
+    flexGridSizer6026->Add(m_staticText2386, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticLine6051 = new wxStaticLine(
+        m_panel7482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer6026->Add(m_staticLine6051, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_btClearGamepadServiceTrace =
+        new wxButton(m_panel7482, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(32, 32)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btClearGamepadServiceTrace->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("clean")), wxLEFT);
-    m_btClearGamepadServiceTrace->SetBitmapMargins(2,2);
-    #endif
+    m_btClearGamepadServiceTrace->SetBitmapMargins(2, 2);
+#endif
     m_btClearGamepadServiceTrace->SetToolTip(_("Clear the trace"));
-    
-    flexGridSizer6026->Add(m_btClearGamepadServiceTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_btClearGamepadServiceTrace->SetMinSize(wxSize(32,32));
-    
-    m_staticText23867 = new wxStaticText(m_panel7482, wxID_ANY, _("Clear"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1,-1)), wxALIGN_CENTRE);
-    wxFont m_staticText23867Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+
+    flexGridSizer6026->Add(m_btClearGamepadServiceTrace, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+    m_btClearGamepadServiceTrace->SetMinSize(wxSize(32, 32));
+
+    m_staticText23867 = new wxStaticText(
+        m_panel7482, wxID_ANY, _("Clear"), wxDefaultPosition, wxDLG_UNIT(m_panel7482, wxSize(-1, -1)), wxALIGN_CENTRE);
+    wxFont m_staticText23867Font(
+        7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText23867->SetFont(m_staticText23867Font);
-    
-    flexGridSizer6026->Add(m_staticText23867, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
+
+    flexGridSizer6026->Add(m_staticText23867, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
     SetName(wxT("CncGamepadControllerStateBase"));
-    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
+    SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
+    if(GetSizer()) {
+	GetSizer()->Fit(this);
     }
     // Connect events
-    m_btClearHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::onClearHistory), NULL, this);
-    m_btQueryGamepadService->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::queryGamepadService), NULL, this);
-    m_btStartGamepadService->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::startGamepadService), NULL, this);
-    m_btStopGamepadService1->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::stopGamepadService), NULL, this);
-    m_btSCPDriverInstaller->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::scpDriverInstaller), NULL, this);
-    m_btSCPSettings->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::scpSettings), NULL, this);
-    m_btSCPMonitor->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::scpMonitor), NULL, this);
-    m_btClearGamepadServiceTrace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::clearGamepadServiceTrace), NULL, this);
-    
+    m_btClearHistory->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::onClearHistory, this);
+    m_btQueryGamepadService->Bind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::queryGamepadService, this);
+    m_btStartGamepadService->Bind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::startGamepadService, this);
+    m_btStopGamepadService1->Bind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::stopGamepadService, this);
+    m_btSCPDriverInstaller->Bind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::scpDriverInstaller, this);
+    m_btSCPSettings->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::scpSettings, this);
+    m_btSCPMonitor->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::scpMonitor, this);
+    m_btClearGamepadServiceTrace->Bind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::clearGamepadServiceTrace, this);
 }
 
 CncGamepadControllerStateBase::~CncGamepadControllerStateBase()
 {
-    m_btClearHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::onClearHistory), NULL, this);
-    m_btQueryGamepadService->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::queryGamepadService), NULL, this);
-    m_btStartGamepadService->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::startGamepadService), NULL, this);
-    m_btStopGamepadService1->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::stopGamepadService), NULL, this);
-    m_btSCPDriverInstaller->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::scpDriverInstaller), NULL, this);
-    m_btSCPSettings->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::scpSettings), NULL, this);
-    m_btSCPMonitor->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::scpMonitor), NULL, this);
-    m_btClearGamepadServiceTrace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::clearGamepadServiceTrace), NULL, this);
-    
+    m_btClearHistory->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::onClearHistory, this);
+    m_btQueryGamepadService->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::queryGamepadService, this);
+    m_btStartGamepadService->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::startGamepadService, this);
+    m_btStopGamepadService1->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::stopGamepadService, this);
+    m_btSCPDriverInstaller->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::scpDriverInstaller, this);
+    m_btSCPSettings->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::scpSettings, this);
+    m_btSCPMonitor->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::scpMonitor, this);
+    m_btClearGamepadServiceTrace->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncGamepadControllerStateBase::clearGamepadServiceTrace, this);
 }
 
-CncGamepadSpyBase::CncGamepadSpyBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+CncGamepadSpyBase::CncGamepadSpyBase(wxWindow* parent,
+    wxWindowID id,
+    const wxPoint& pos,
+    const wxSize& size,
+    long style)
     : wxPanel(parent, id, pos, size, style)
 {
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC81CCInitBitmapResources();
-        bBitmapLoaded = true;
+    if(!bBitmapLoaded) {
+	// We need to initialise the default bitmap handler
+	wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+	wxC81CCInitBitmapResources();
+	bBitmapLoaded = true;
     }
     this->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
-    
+
     wxFlexGridSizer* flexGridSizer280 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer280->SetFlexibleDirection( wxBOTH );
-    flexGridSizer280->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer280->SetFlexibleDirection(wxBOTH);
+    flexGridSizer280->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer280->AddGrowableCol(0);
     flexGridSizer280->AddGrowableRow(0);
     flexGridSizer280->AddGrowableRow(1);
     this->SetSizer(flexGridSizer280);
-    
-    m_modeBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBK_DEFAULT);
+
+    m_modeBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
     m_modeBook->SetName(wxT("m_modeBook"));
     m_modeBook->SetEffect(wxSHOW_EFFECT_NONE);
-    
-    flexGridSizer280->Add(m_modeBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_panelInactive = new wxPanel(m_modeBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_modeBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+
+    flexGridSizer280->Add(m_modeBook, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_panelInactive =
+        new wxPanel(m_modeBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_modeBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     m_modeBook->AddPage(m_panelInactive, _("Page"), false);
-    
+
     wxFlexGridSizer* flexGridSizer318 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer318->SetFlexibleDirection( wxBOTH );
-    flexGridSizer318->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer318->SetFlexibleDirection(wxBOTH);
+    flexGridSizer318->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer318->AddGrowableCol(0);
     flexGridSizer318->AddGrowableRow(0);
     m_panelInactive->SetSizer(flexGridSizer318);
-    
-    m_panel320 = new wxPanel(m_panelInactive, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelInactive, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+
+    m_panel320 = new wxPanel(
+        m_panelInactive, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelInactive, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     m_panel320->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
-    
-    flexGridSizer318->Add(m_panel320, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
+
+    flexGridSizer318->Add(m_panel320, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
     wxFlexGridSizer* flexGridSizer323 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer323->SetFlexibleDirection( wxBOTH );
-    flexGridSizer323->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer323->SetFlexibleDirection(wxBOTH);
+    flexGridSizer323->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer323->AddGrowableCol(0);
     flexGridSizer323->AddGrowableRow(0);
     m_panel320->SetSizer(flexGridSizer323);
-    
+
     wxFlexGridSizer* flexGridSizer296 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer296->SetFlexibleDirection( wxBOTH );
-    flexGridSizer296->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer296->SetFlexibleDirection(wxBOTH);
+    flexGridSizer296->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer296->AddGrowableCol(0);
     flexGridSizer296->AddGrowableRow(0);
-    
-    flexGridSizer323->Add(flexGridSizer296, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
-    
-    m_staticBitmap317 = new wxStaticBitmap(m_panel320, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad_disabled")), wxDefaultPosition, wxDLG_UNIT(m_panel320, wxSize(-1,-1)), 0 );
-    
+
+    flexGridSizer323->Add(
+        flexGridSizer296, 1, wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+
+    m_staticBitmap317 =
+        new wxStaticBitmap(m_panel320, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad_disabled")),
+            wxDefaultPosition, wxDLG_UNIT(m_panel320, wxSize(-1, -1)), 0);
+
     flexGridSizer296->Add(m_staticBitmap317, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_panelGUI = new wxPanel(m_modeBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_modeBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+
+    m_panelGUI =
+        new wxPanel(m_modeBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_modeBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     m_modeBook->AddPage(m_panelGUI, _("Page"), false);
-    
+
     wxBoxSizer* boxSizer315 = new wxBoxSizer(wxHORIZONTAL);
     m_panelGUI->SetSizer(boxSizer315);
-    
-    m_staticBitmap3171 = new wxStaticBitmap(m_panelGUI, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad_disabled")), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), 0 );
-    
-    boxSizer315->Add(m_staticBitmap3171, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(3));
-    
+
+    m_staticBitmap3171 =
+        new wxStaticBitmap(m_panelGUI, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad_disabled")),
+            wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), 0);
+
+    boxSizer315->Add(m_staticBitmap3171, 0, wxALL | wxALIGN_CENTER, WXC_FROM_DIP(3));
+
     wxFlexGridSizer* flexGridSizer290 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer290->SetFlexibleDirection( wxBOTH );
-    flexGridSizer290->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer290->SetFlexibleDirection(wxBOTH);
+    flexGridSizer290->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer290->AddGrowableCol(0);
     flexGridSizer290->AddGrowableRow(2);
-    
-    boxSizer315->Add(flexGridSizer290, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
+
+    boxSizer315->Add(flexGridSizer290, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     wxFlexGridSizer* flexGridSizer324 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer324->SetFlexibleDirection( wxBOTH );
-    flexGridSizer324->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer290->Add(flexGridSizer324, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticBitmap326 = new wxStaticBitmap(m_panelGUI, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mouse_white")), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), 0 );
-    
+    flexGridSizer324->SetFlexibleDirection(wxBOTH);
+    flexGridSizer324->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer290->Add(flexGridSizer324, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticBitmap326 = new wxStaticBitmap(m_panelGUI, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mouse_white")),
+        wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), 0);
+
     flexGridSizer324->Add(m_staticBitmap326, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_staticText300 = new wxStaticText(m_panelGUI, wxID_ANY, _("Mouse Info:"), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), 0);
+
+    m_staticText300 = new wxStaticText(
+        m_panelGUI, wxID_ANY, _("Mouse Info:"), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), 0);
     m_staticText300->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     wxFont m_staticText300Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText300->SetFont(m_staticText300Font);
-    
-    flexGridSizer324->Add(m_staticText300, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_staticLine312 = new wxStaticLine(m_panelGUI, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer290->Add(m_staticLine312, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_mouseState = new wxStaticText(m_panelGUI, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), wxST_NO_AUTORESIZE);
+
+    flexGridSizer324->Add(m_staticText300, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_staticLine312 = new wxStaticLine(
+        m_panelGUI, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer290->Add(m_staticLine312, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_mouseState = new wxStaticText(
+        m_panelGUI, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), wxST_NO_AUTORESIZE);
     m_mouseState->SetBackgroundColour(wxColour(wxT("rgb(64,64,64)")));
     m_mouseState->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     wxFont m_mouseStateFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_mouseState->SetFont(m_mouseStateFont);
-    
-    flexGridSizer290->Add(m_mouseState, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
+
+    flexGridSizer290->Add(m_mouseState, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     wxFlexGridSizer* flexGridSizer292 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer292->SetFlexibleDirection( wxBOTH );
-    flexGridSizer292->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer292->SetFlexibleDirection(wxBOTH);
+    flexGridSizer292->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer292->AddGrowableCol(0);
     flexGridSizer292->AddGrowableRow(2);
-    
-    boxSizer315->Add(flexGridSizer292, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
+
+    boxSizer315->Add(flexGridSizer292, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     wxFlexGridSizer* flexGridSizer327 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer327->SetFlexibleDirection( wxBOTH );
-    flexGridSizer327->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer292->Add(flexGridSizer327, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticBitmap329 = new wxStaticBitmap(m_panelGUI, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("keyboard_white")), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), 0 );
-    
+    flexGridSizer327->SetFlexibleDirection(wxBOTH);
+    flexGridSizer327->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer292->Add(flexGridSizer327, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticBitmap329 =
+        new wxStaticBitmap(m_panelGUI, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("keyboard_white")),
+            wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), 0);
+
     flexGridSizer327->Add(m_staticBitmap329, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_staticText302 = new wxStaticText(m_panelGUI, wxID_ANY, _("Keyboard Info:"), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), 0);
+
+    m_staticText302 = new wxStaticText(
+        m_panelGUI, wxID_ANY, _("Keyboard Info:"), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), 0);
     m_staticText302->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     wxFont m_staticText302Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText302->SetFont(m_staticText302Font);
-    
-    flexGridSizer327->Add(m_staticText302, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_staticLine304 = new wxStaticLine(m_panelGUI, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer292->Add(m_staticLine304, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_keyState = new wxStaticText(m_panelGUI, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1,-1)), wxST_NO_AUTORESIZE);
+
+    flexGridSizer327->Add(m_staticText302, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_staticLine304 = new wxStaticLine(
+        m_panelGUI, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer292->Add(m_staticLine304, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_keyState = new wxStaticText(
+        m_panelGUI, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelGUI, wxSize(-1, -1)), wxST_NO_AUTORESIZE);
     m_keyState->SetBackgroundColour(wxColour(wxT("rgb(64,64,64)")));
     m_keyState->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     wxFont m_keyStateFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_keyState->SetFont(m_keyStateFont);
-    
-    flexGridSizer292->Add(m_keyState, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_panelCNC = new wxPanel(m_modeBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_modeBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+
+    flexGridSizer292->Add(m_keyState, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_panelCNC =
+        new wxPanel(m_modeBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_modeBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     m_modeBook->AddPage(m_panelCNC, _("Page"), false);
-    
+
     wxFlexGridSizer* flexGridSizer330 = new wxFlexGridSizer(1, 3, 0, 0);
-    flexGridSizer330->SetFlexibleDirection( wxBOTH );
-    flexGridSizer330->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer330->SetFlexibleDirection(wxBOTH);
+    flexGridSizer330->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer330->AddGrowableCol(2);
     flexGridSizer330->AddGrowableRow(0);
     m_panelCNC->SetSizer(flexGridSizer330);
-    
-    m_staticBitmap31712 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad_disabled")), wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1,-1)), 0 );
-    
-    flexGridSizer330->Add(m_staticBitmap31712, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(3));
-    
+
+    m_staticBitmap31712 =
+        new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad_disabled")),
+            wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1, -1)), 0);
+
+    flexGridSizer330->Add(m_staticBitmap31712, 0, wxALL | wxALIGN_CENTER, WXC_FROM_DIP(3));
+
     wxFlexGridSizer* flexGridSizer332 = new wxFlexGridSizer(2, 2, 0, 0);
-    flexGridSizer332->SetFlexibleDirection( wxBOTH );
-    flexGridSizer332->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer330->Add(flexGridSizer332, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
-    
-    m_gpBmp1 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_all-small")), wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1,-1)), 0 );
+    flexGridSizer332->SetFlexibleDirection(wxBOTH);
+    flexGridSizer332->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer330->Add(
+        flexGridSizer332, 1, wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+
+    m_gpBmp1 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_all-small")),
+        wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1, -1)), 0);
     m_gpBmp1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    
+
     flexGridSizer332->Add(m_gpBmp1, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_gpBmp2 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_updown-small")), wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1,-1)), 0 );
+
+    m_gpBmp2 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_updown-small")),
+        wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1, -1)), 0);
     m_gpBmp2->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    
+
     flexGridSizer332->Add(m_gpBmp2, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_gpBmp3 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lstick_all-small")), wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1,-1)), 0 );
+
+    m_gpBmp3 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lstick_all-small")),
+        wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1, -1)), 0);
     m_gpBmp3->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    
+
     flexGridSizer332->Add(m_gpBmp3, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_gpBmp4 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")), wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1,-1)), 0 );
+
+    m_gpBmp4 = new wxStaticBitmap(m_panelCNC, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")),
+        wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1, -1)), 0);
     m_gpBmp4->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    
+
     flexGridSizer332->Add(m_gpBmp4, 0, wxALL, WXC_FROM_DIP(2));
-    
+
     wxFlexGridSizer* flexGridSizer275 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer275->SetFlexibleDirection( wxBOTH );
-    flexGridSizer275->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer275->SetFlexibleDirection(wxBOTH);
+    flexGridSizer275->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer275->AddGrowableCol(0);
     flexGridSizer275->AddGrowableCol(1);
     flexGridSizer275->AddGrowableRow(0);
-    
-    flexGridSizer330->Add(flexGridSizer275, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_dirXYPlaceholder = new wxPanel(m_panelCNC, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+
+    flexGridSizer330->Add(flexGridSizer275, 1, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_dirXYPlaceholder =
+        new wxPanel(m_panelCNC, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     m_dirXYPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer275->Add(m_dirXYPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_dirZPlaceholder = new wxPanel(m_panelCNC, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+
+    flexGridSizer275->Add(m_dirXYPlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_dirZPlaceholder =
+        new wxPanel(m_panelCNC, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelCNC, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     m_dirZPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    
-    flexGridSizer275->Add(m_dirZPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_modeText = new wxStaticText(this, wxID_ANY, _("Not connected"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,20)), wxALIGN_CENTRE);
+
+    flexGridSizer275->Add(m_dirZPlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_modeText = new wxStaticText(
+        this, wxID_ANY, _("Not connected"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, 20)), wxALIGN_CENTRE);
     m_modeText->SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
     m_modeText->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     wxFont m_modeTextFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_modeText->SetFont(m_modeTextFont);
-    
-    flexGridSizer280->Add(m_modeText, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(0));
-    m_modeText->SetMinSize(wxSize(-1,20));
-    
+
+    flexGridSizer280->Add(m_modeText, 0, wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(0));
+    m_modeText->SetMinSize(wxSize(-1, 20));
+
     SetBackgroundColour(wxColour(wxT("rgb(32,32,32)")));
     SetName(wxT("CncGamepadSpyBase"));
-    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
+    SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
+    if(GetSizer()) {
+	GetSizer()->Fit(this);
     }
 }
 
@@ -563,65 +641,64 @@ ImageLibGamepadSpy::ImageLibGamepadSpy()
     , m_imagesWidth(16)
     , m_imagesHeight(16)
 {
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC81CCInitBitmapResources();
-        bBitmapLoaded = true;
+    if(!bBitmapLoaded) {
+	// We need to initialise the default bitmap handler
+	wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+	wxC81CCInitBitmapResources();
+	bBitmapLoaded = true;
     }
-    
+
     {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_XY"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_XY"), bmp));
-        }
+	wxBitmap bmp;
+	wxIcon icn;
+	bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_XY"));
+	if(bmp.IsOk()) {
+	    if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+		icn.CopyFromBitmap(bmp);
+		this->Add(icn);
+	    }
+	    m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_XY"), bmp));
+	}
     }
-    
+
     {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_Z"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_Z"), bmp));
-        }
+	wxBitmap bmp;
+	wxIcon icn;
+	bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_Z"));
+	if(bmp.IsOk()) {
+	    if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+		icn.CopyFromBitmap(bmp);
+		this->Add(icn);
+	    }
+	    m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_Z"), bmp));
+	}
     }
-    
+
     {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STICK_LEFT"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_STICK_LEFT"), bmp));
-        }
+	wxBitmap bmp;
+	wxIcon icn;
+	bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STICK_LEFT"));
+	if(bmp.IsOk()) {
+	    if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+		icn.CopyFromBitmap(bmp);
+		this->Add(icn);
+	    }
+	    m_bitmaps.insert(std::make_pair(wxT("BMP_STICK_LEFT"), bmp));
+	}
     }
-    
+
     {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STICK_RIGHT"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_STICK_RIGHT"), bmp));
-        }
+	wxBitmap bmp;
+	wxIcon icn;
+	bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STICK_RIGHT"));
+	if(bmp.IsOk()) {
+	    if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+		icn.CopyFromBitmap(bmp);
+		this->Add(icn);
+	    }
+	    m_bitmaps.insert(std::make_pair(wxT("BMP_STICK_RIGHT"), bmp));
+	}
     }
-    
 }
 
 ImageLibGamepadSpy::~ImageLibGamepadSpy()
@@ -633,65 +710,64 @@ ImageLibGamepadCommand::ImageLibGamepadCommand()
     , m_imagesWidth(16)
     , m_imagesHeight(16)
 {
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC81CCInitBitmapResources();
-        bBitmapLoaded = true;
+    if(!bBitmapLoaded) {
+	// We need to initialise the default bitmap handler
+	wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+	wxC81CCInitBitmapResources();
+	bBitmapLoaded = true;
     }
-    
+
     {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_START"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_START"), bmp));
-        }
+	wxBitmap bmp;
+	wxIcon icn;
+	bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_START"));
+	if(bmp.IsOk()) {
+	    if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+		icn.CopyFromBitmap(bmp);
+		this->Add(icn);
+	    }
+	    m_bitmaps.insert(std::make_pair(wxT("BMP_START"), bmp));
+	}
     }
-    
+
     {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STOP"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_STOP"), bmp));
-        }
+	wxBitmap bmp;
+	wxIcon icn;
+	bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STOP"));
+	if(bmp.IsOk()) {
+	    if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+		icn.CopyFromBitmap(bmp);
+		this->Add(icn);
+	    }
+	    m_bitmaps.insert(std::make_pair(wxT("BMP_STOP"), bmp));
+	}
     }
-    
+
     {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_UPDATE"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_UPDATE"), bmp));
-        }
+	wxBitmap bmp;
+	wxIcon icn;
+	bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_UPDATE"));
+	if(bmp.IsOk()) {
+	    if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+		icn.CopyFromBitmap(bmp);
+		this->Add(icn);
+	    }
+	    m_bitmaps.insert(std::make_pair(wxT("BMP_UPDATE"), bmp));
+	}
     }
-    
+
     {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_UPDATE_WITH_CONTENT"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_UPDATE_WITH_CONTENT"), bmp));
-        }
+	wxBitmap bmp;
+	wxIcon icn;
+	bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_UPDATE_WITH_CONTENT"));
+	if(bmp.IsOk()) {
+	    if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())) {
+		icn.CopyFromBitmap(bmp);
+		this->Add(icn);
+	    }
+	    m_bitmaps.insert(std::make_pair(wxT("BMP_UPDATE_WITH_CONTENT"), bmp));
+	}
     }
-    
 }
 
 ImageLibGamepadCommand::~ImageLibGamepadCommand()

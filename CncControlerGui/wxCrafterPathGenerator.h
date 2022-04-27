@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERPATHGENERATOR_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERPATHGENERATOR_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -23,7 +24,7 @@
 #include <wx/arrstr.h>
 #include <wx/notebook.h>
 #include <wx/imaglist.h>
-#include "OSD/webviewOSD.h"
+#include <wx/webview.h>
 #include <wx/stattext.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
@@ -46,6 +47,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class PathGeneratorFrameBase : public wxFrame
 {
@@ -143,82 +145,300 @@ protected:
     wxCheckBox* m_autoGenerate;
 
 protected:
-    virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
-    virtual void onSize(wxSizeEvent& event) { event.Skip(); }
-    virtual void onActivate(wxActivateEvent& event) { event.Skip(); }
-    virtual void onMaximize(wxMaximizeEvent& event) { event.Skip(); }
-    virtual void onShow(wxShowEvent& event) { event.Skip(); }
-    virtual void mainShashPositionChanged( wxSplitterEvent& event) { event.Skip(); }
-    virtual void mainShashPositionChanging( wxSplitterEvent& event) { event.Skip(); }
-    virtual void toogleTreeSize(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateTreeSearch(wxCommandEvent& event) { event.Skip(); }
-    virtual void keyDownTreeSearch(wxKeyEvent& event) { event.Skip(); }
-    virtual void treeSearch(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectTemplateTree(wxTreeEvent& event) { event.Skip(); }
-    virtual void selectPathSelector(wxCommandEvent& event) { event.Skip(); }
-    virtual void pgMainBookChanged(wxNotebookEvent& event) { event.Skip(); }
-    #if wxUSE_WEBVIEW
-    #endif // wxUSE_WEBVIEW
-    virtual void selectEditMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void updatePreview(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectDisplayMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void generatePath(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearView(wxCommandEvent& event) { event.Skip(); }
-    virtual void relaceEditControlSelection(wxCommandEvent& event) { event.Skip(); }
-    virtual void copyPath(wxCommandEvent& event) { event.Skip(); }
-    virtual void saveTemplate(wxCommandEvent& event) { event.Skip(); }
-    virtual void toogleSize(wxCommandEvent& event) { event.Skip(); }
-    virtual void onCloseWindowFromButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void propertyChanged(wxPropertyGridEvent& event) { event.Skip(); }
-    virtual void propertyChanging(wxPropertyGridEvent& event) { event.Skip(); }
-    virtual void checkAutoGenerate(wxCommandEvent& event) { event.Skip(); }
+    virtual void onCloseWindow(wxCloseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSize(wxSizeEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onActivate(wxActivateEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onMaximize(wxMaximizeEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onShow(wxShowEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void mainShashPositionChanged(wxSplitterEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void mainShashPositionChanging(wxSplitterEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void toogleTreeSize(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateTreeSearch(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void keyDownTreeSearch(wxKeyEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void treeSearch(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectTemplateTree(wxTreeEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectPathSelector(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void pgMainBookChanged(wxNotebookEvent& event)
+    {
+	event.Skip();
+    }
+#if wxUSE_WEBVIEW
+#endif // wxUSE_WEBVIEW
+    virtual void selectEditMode(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updatePreview(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectDisplayMode(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void generatePath(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void clearView(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void relaceEditControlSelection(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void copyPath(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void saveTemplate(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void toogleSize(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCloseWindowFromButton(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void propertyChanged(wxPropertyGridEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void propertyChanging(wxPropertyGridEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void checkAutoGenerate(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxButton* GetBtPGMinimizeTree() { return m_btPGMinimizeTree; }
-    wxTextCtrl* GetTreeSearchText() { return m_treeSearchText; }
-    wxButton* GetBtSearchTree() { return m_btSearchTree; }
-    wxTreeCtrl* GetTemplateTree() { return m_templateTree; }
-    wxPanel* GetLeftMainSplitterPage() { return m_leftMainSplitterPage; }
-    wxComboBox* GetPgPathSelector() { return m_pgPathSelector; }
-    wxWebView* GetPgPreview() { return m_pgPreview; }
-    wxPanel* GetPgPreviewPage() { return m_pgPreviewPage; }
-    wxTextCtrl* GetAditionalCode() { return m_aditionalCode; }
-    wxPanel* GetPgAdditionalCodePage() { return m_pgAdditionalCodePage; }
-    wxTextCtrl* GetAdditionalInfo() { return m_additionalInfo; }
-    wxPanel* GetPgAdditionalInfoPage() { return m_pgAdditionalInfoPage; }
-    wxNotebook* GetPgMainBook() { return m_pgMainBook; }
-    wxPanel* GetSplitterPage2936() { return m_splitterPage2936; }
-    wxStaticText* GetStaticText3401() { return m_staticText3401; }
-    wxTextCtrl* GetCurrentTemplate() { return m_currentTemplate; }
-    wxStaticText* GetStaticText33892() { return m_staticText33892; }
-    wxComboBox* GetCbEditMode() { return m_cbEditMode; }
-    wxButton* GetUpdatePreview() { return m_updatePreview; }
-    wxStaticText* GetStaticText3389() { return m_staticText3389; }
-    wxComboBox* GetCbDisplayMode() { return m_cbDisplayMode; }
-    wxTextCtrl* GetGeneratedPreview() { return m_generatedPreview; }
-    wxPanel* GetPanelPreview() { return m_panelPreview; }
-    wxTextCtrl* GetGeneratedResult() { return m_generatedResult; }
-    wxPanel* GetPanelResult() { return m_panelResult; }
-    wxTextCtrl* GetProcessInfo() { return m_processInfo; }
-    wxPanel* GetPanelInfo() { return m_panelInfo; }
-    wxToolbook* GetTbOutput() { return m_tbOutput; }
-    wxPanel* GetSplitterPage2940() { return m_splitterPage2940; }
-    wxSplitterWindow* GetSplitter2932() { return m_splitter2932; }
-    wxPanel* GetSplitterPage3189() { return m_splitterPage3189; }
-    wxButton* GetBtPGGenerate() { return m_btPGGenerate; }
-    wxButton* GetBtPGClear() { return m_btPGClear; }
-    wxButton* GetBtPGReplaceEdit() { return m_btPGReplaceEdit; }
-    wxButton* GetBtPGCopy() { return m_btPGCopy; }
-    wxButton* GetBtPGSave() { return m_btPGSave; }
-    wxButton* GetBtPGMinimize() { return m_btPGMinimize; }
-    wxButton* GetBtPGClose() { return m_btPGClose; }
-    wxPropertyGridManager* GetPgParameterMgr() { return m_pgParameterMgr; }
-    wxCheckBox* GetAutoGenerate() { return m_autoGenerate; }
-    wxPanel* GetSplitterPage3193() { return m_splitterPage3193; }
-    wxSplitterWindow* GetSplitter3185() { return m_splitter3185; }
-    wxPanel* GetRightMainSplitterPage() { return m_rightMainSplitterPage; }
-    wxSplitterWindow* GetMainSplitter() { return m_mainSplitter; }
-    PathGeneratorFrameBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("SVG Path Generator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1600,750), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
+    wxButton* GetBtPGMinimizeTree()
+    {
+	return m_btPGMinimizeTree;
+    }
+    wxTextCtrl* GetTreeSearchText()
+    {
+	return m_treeSearchText;
+    }
+    wxButton* GetBtSearchTree()
+    {
+	return m_btSearchTree;
+    }
+    wxTreeCtrl* GetTemplateTree()
+    {
+	return m_templateTree;
+    }
+    wxPanel* GetLeftMainSplitterPage()
+    {
+	return m_leftMainSplitterPage;
+    }
+    wxComboBox* GetPgPathSelector()
+    {
+	return m_pgPathSelector;
+    }
+    wxWebView* GetPgPreview()
+    {
+	return m_pgPreview;
+    }
+    wxPanel* GetPgPreviewPage()
+    {
+	return m_pgPreviewPage;
+    }
+    wxTextCtrl* GetAditionalCode()
+    {
+	return m_aditionalCode;
+    }
+    wxPanel* GetPgAdditionalCodePage()
+    {
+	return m_pgAdditionalCodePage;
+    }
+    wxTextCtrl* GetAdditionalInfo()
+    {
+	return m_additionalInfo;
+    }
+    wxPanel* GetPgAdditionalInfoPage()
+    {
+	return m_pgAdditionalInfoPage;
+    }
+    wxNotebook* GetPgMainBook()
+    {
+	return m_pgMainBook;
+    }
+    wxPanel* GetSplitterPage2936()
+    {
+	return m_splitterPage2936;
+    }
+    wxStaticText* GetStaticText3401()
+    {
+	return m_staticText3401;
+    }
+    wxTextCtrl* GetCurrentTemplate()
+    {
+	return m_currentTemplate;
+    }
+    wxStaticText* GetStaticText33892()
+    {
+	return m_staticText33892;
+    }
+    wxComboBox* GetCbEditMode()
+    {
+	return m_cbEditMode;
+    }
+    wxButton* GetUpdatePreview()
+    {
+	return m_updatePreview;
+    }
+    wxStaticText* GetStaticText3389()
+    {
+	return m_staticText3389;
+    }
+    wxComboBox* GetCbDisplayMode()
+    {
+	return m_cbDisplayMode;
+    }
+    wxTextCtrl* GetGeneratedPreview()
+    {
+	return m_generatedPreview;
+    }
+    wxPanel* GetPanelPreview()
+    {
+	return m_panelPreview;
+    }
+    wxTextCtrl* GetGeneratedResult()
+    {
+	return m_generatedResult;
+    }
+    wxPanel* GetPanelResult()
+    {
+	return m_panelResult;
+    }
+    wxTextCtrl* GetProcessInfo()
+    {
+	return m_processInfo;
+    }
+    wxPanel* GetPanelInfo()
+    {
+	return m_panelInfo;
+    }
+    wxToolbook* GetTbOutput()
+    {
+	return m_tbOutput;
+    }
+    wxPanel* GetSplitterPage2940()
+    {
+	return m_splitterPage2940;
+    }
+    wxSplitterWindow* GetSplitter2932()
+    {
+	return m_splitter2932;
+    }
+    wxPanel* GetSplitterPage3189()
+    {
+	return m_splitterPage3189;
+    }
+    wxButton* GetBtPGGenerate()
+    {
+	return m_btPGGenerate;
+    }
+    wxButton* GetBtPGClear()
+    {
+	return m_btPGClear;
+    }
+    wxButton* GetBtPGReplaceEdit()
+    {
+	return m_btPGReplaceEdit;
+    }
+    wxButton* GetBtPGCopy()
+    {
+	return m_btPGCopy;
+    }
+    wxButton* GetBtPGSave()
+    {
+	return m_btPGSave;
+    }
+    wxButton* GetBtPGMinimize()
+    {
+	return m_btPGMinimize;
+    }
+    wxButton* GetBtPGClose()
+    {
+	return m_btPGClose;
+    }
+    wxPropertyGridManager* GetPgParameterMgr()
+    {
+	return m_pgParameterMgr;
+    }
+    wxCheckBox* GetAutoGenerate()
+    {
+	return m_autoGenerate;
+    }
+    wxPanel* GetSplitterPage3193()
+    {
+	return m_splitterPage3193;
+    }
+    wxSplitterWindow* GetSplitter3185()
+    {
+	return m_splitter3185;
+    }
+    wxPanel* GetRightMainSplitterPage()
+    {
+	return m_rightMainSplitterPage;
+    }
+    wxSplitterWindow* GetMainSplitter()
+    {
+	return m_mainSplitter;
+    }
+    PathGeneratorFrameBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("SVG Path Generator"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(1600, 750),
+        long style = wxDEFAULT_FRAME_STYLE | wxFRAME_FLOAT_ON_PARENT);
     virtual ~PathGeneratorFrameBase();
 };
 

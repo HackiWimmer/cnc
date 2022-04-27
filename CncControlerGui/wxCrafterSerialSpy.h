@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERSERIALSPY_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERSERIALSPY_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -42,6 +43,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncSerialSpyPanelBase : public wxPanel
 {
@@ -70,44 +72,143 @@ protected:
     wxStaticText* m_staticText9539;
 
 protected:
-    virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectSerialSpyMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void onLiveDecoding(wxCommandEvent& event) { event.Skip(); }
-    virtual void onLiveDebug(wxCommandEvent& event) { event.Skip(); }
-    virtual void onAutoScrolling(wxCommandEvent& event) { event.Skip(); }
-    virtual void onAutoColumnSize(wxCommandEvent& event) { event.Skip(); }
-    virtual void openSpyDetailWindow(wxCommandEvent& event) { event.Skip(); }
-    virtual void onUpdateIntervalSlider(wxScrollEvent& event) { event.Skip(); }
+    virtual void enableSerialSpy(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void markSerialSpy(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void clearSerialSpy(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectSerialSpyMode(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onLiveDecoding(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onLiveDebug(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onAutoScrolling(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onAutoColumnSize(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void openSpyDetailWindow(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onUpdateIntervalSlider(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxBitmapToggleButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
-    wxButton* GetMarkSerialSpy() { return m_MarkSerialSpy; }
-    wxStaticLine* GetStaticLine9487() { return m_staticLine9487; }
-    wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
-    wxStaticLine* GetStaticLine94873() { return m_staticLine94873; }
-    wxComboBox* GetCbSerialSpyMode() { return m_cbSerialSpyMode; }
-    wxStaticLine* GetStaticLine9489() { return m_staticLine9489; }
-    wxBitmapToggleButton* GetLiveDecoding() { return m_liveDecoding; }
-    wxBitmapToggleButton* GetLiveDebug() { return m_liveDebug; }
-    wxBitmapToggleButton* GetAutoScroling() { return m_autoScroling; }
-    wxBitmapToggleButton* GetAutoColumnSizing() { return m_autoColumnSizing; }
-    wxBitmapToggleButton* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
-    wxBitmapToggleButton* GetClearSerialSpyBeforNextRun() { return m_clearSerialSpyBeforNextRun; }
-    wxStaticLine* GetStaticLine9495() { return m_staticLine9495; }
-    wxBitmapButton* GetOpenDetails() { return m_openDetails; }
-    wxPanel* GetPanel9492() { return m_panel9492; }
-    wxPanel* GetSerialSpyPlaceholder() { return m_serialSpyPlaceholder; }
-    wxInfoBar* GetInfobar() { return m_infobar; }
-    wxStaticLine* GetStaticLine9537() { return m_staticLine9537; }
-    wxStaticText* GetStaticText9524() { return m_staticText9524; }
-    wxSlider* GetSliderUpdateInterval() { return m_sliderUpdateInterval; }
-    wxStaticText* GetStaticText9539() { return m_staticText9539; }
-    CncSerialSpyPanelBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    wxBitmapToggleButton* GetEnableSerialSpy()
+    {
+	return m_enableSerialSpy;
+    }
+    wxButton* GetMarkSerialSpy()
+    {
+	return m_MarkSerialSpy;
+    }
+    wxStaticLine* GetStaticLine9487()
+    {
+	return m_staticLine9487;
+    }
+    wxButton* GetClearSerialSpy()
+    {
+	return m_clearSerialSpy;
+    }
+    wxStaticLine* GetStaticLine94873()
+    {
+	return m_staticLine94873;
+    }
+    wxComboBox* GetCbSerialSpyMode()
+    {
+	return m_cbSerialSpyMode;
+    }
+    wxStaticLine* GetStaticLine9489()
+    {
+	return m_staticLine9489;
+    }
+    wxBitmapToggleButton* GetLiveDecoding()
+    {
+	return m_liveDecoding;
+    }
+    wxBitmapToggleButton* GetLiveDebug()
+    {
+	return m_liveDebug;
+    }
+    wxBitmapToggleButton* GetAutoScroling()
+    {
+	return m_autoScroling;
+    }
+    wxBitmapToggleButton* GetAutoColumnSizing()
+    {
+	return m_autoColumnSizing;
+    }
+    wxBitmapToggleButton* GetClearSerialSpyOnConnect()
+    {
+	return m_clearSerialSpyOnConnect;
+    }
+    wxBitmapToggleButton* GetClearSerialSpyBeforNextRun()
+    {
+	return m_clearSerialSpyBeforNextRun;
+    }
+    wxStaticLine* GetStaticLine9495()
+    {
+	return m_staticLine9495;
+    }
+    wxBitmapButton* GetOpenDetails()
+    {
+	return m_openDetails;
+    }
+    wxPanel* GetPanel9492()
+    {
+	return m_panel9492;
+    }
+    wxPanel* GetSerialSpyPlaceholder()
+    {
+	return m_serialSpyPlaceholder;
+    }
+    wxInfoBar* GetInfobar()
+    {
+	return m_infobar;
+    }
+    wxStaticLine* GetStaticLine9537()
+    {
+	return m_staticLine9537;
+    }
+    wxStaticText* GetStaticText9524()
+    {
+	return m_staticText9524;
+    }
+    wxSlider* GetSliderUpdateInterval()
+    {
+	return m_sliderUpdateInterval;
+    }
+    wxStaticText* GetStaticText9539()
+    {
+	return m_staticText9539;
+    }
+    CncSerialSpyPanelBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(500, 300),
+        long style = wxTAB_TRAVERSAL);
     virtual ~CncSerialSpyPanelBase();
 };
-
 
 class ImageLibSpy : public wxImageList
 {
@@ -119,19 +220,19 @@ protected:
     int m_imagesWidth;
     int m_imagesHeight;
 
-
 protected:
-
 public:
     ImageLibSpy();
-    const wxBitmap& Bitmap(const wxString &name) const {
-        if ( !m_bitmaps.count(name + m_resolution) )
-            return wxNullBitmap;
-        return m_bitmaps.find(name + m_resolution)->second;
+    const wxBitmap& Bitmap(const wxString& name) const
+    {
+	if(!m_bitmaps.count(name + m_resolution))
+	    return wxNullBitmap;
+	return m_bitmaps.find(name + m_resolution)->second;
     }
 
-    void SetBitmapResolution(const wxString &res = wxEmptyString) {
-        m_resolution = res;
+    void SetBitmapResolution(const wxString& res = wxEmptyString)
+    {
+	m_resolution = res;
     }
 
     virtual ~ImageLibSpy();

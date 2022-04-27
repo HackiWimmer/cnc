@@ -10,7 +10,7 @@
 # --------------------------------------------------------------------------------
 
 	modify <wxWidgets-?.?.?>\build\msw\makefile.gcc					- add gcode parts
-	modify <wxWidgets-?.?.?>\include\wx\stcstc.h					- add gcode parts
+	modify <wxWidgets-?.?.?>\include\wx\stc\stc.h					- add gcode parts
 	modify <wxWidgets-?.?.?>\src\stc\scintilla\src\Catalog.cxx		- add gcode parts
 	modify <wxWidgets-?.?.?>\src\stc\scintilla\include\SciLexer.h	- add gcode parts
 
@@ -82,7 +82,7 @@
  
 	# same as descibed for the wx lib above, but with the samples dir
 
-	cd <wxDir>/build/samples
+	cd <wxDir>/samples
 
 	# may be: (Under some circumstances, while compiling on multiple cores, you may receive compilation error at the very beginning about missing setup.h file. 
 	# To overcome this issue, generate this file first with setup_h tag at the end of build parameters: )

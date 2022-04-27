@@ -176,7 +176,7 @@ void clAuiDockArt::DrawCaption(wxDC& dc, wxWindow* window, const wxString& text,
 		int caption_offset = 0;
 		if (pane.icon.IsOk()) {
 			DrawIcon(gdc, tmpRect, pane);
-			caption_offset += pane.icon.GetWidth() + 3;
+			caption_offset += pane.icon.GetDefaultSize().GetWidth() + 3;
 		} 
 		else {
 			caption_offset = 3;

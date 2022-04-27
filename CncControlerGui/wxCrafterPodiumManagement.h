@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERPODIUMMANAGEMENT_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERPODIUMMANAGEMENT_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -37,6 +38,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncPodiumManagementBase : public wxDialog
 {
@@ -51,24 +53,64 @@ protected:
     wxButton* m_btClose;
 
 protected:
-    virtual void onShow(wxShowEvent& event) { event.Skip(); }
-    virtual void onInit(wxInitDialogEvent& event) { event.Skip(); }
-    virtual void onLefDownInfo(wxMouseEvent& event) { event.Skip(); }
-    virtual void onClose(wxCommandEvent& event) { event.Skip(); }
+    virtual void onShow(wxShowEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onInit(wxInitDialogEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onLefDownInfo(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onClose(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxStaticBitmap* GetStaticBitmap9569() { return m_staticBitmap9569; }
-    wxPanel* GetPanelPicture() { return m_panelPicture; }
-    wxStaticLine* GetStaticLine9571() { return m_staticLine9571; }
-    wxPanel* GetPanelMovementPlaceholder() { return m_panelMovementPlaceholder; }
-    wxStaticLine* GetStaticLine9554() { return m_staticLine9554; }
-    wxStaticBitmap* GetInfo() { return m_info; }
-    wxButton* GetBtClose() { return m_btClose; }
-    wxPanel* GetBasePanel() { return m_basePanel; }
-    CncPodiumManagementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Podium Management"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP);
+    wxStaticBitmap* GetStaticBitmap9569()
+    {
+	return m_staticBitmap9569;
+    }
+    wxPanel* GetPanelPicture()
+    {
+	return m_panelPicture;
+    }
+    wxStaticLine* GetStaticLine9571()
+    {
+	return m_staticLine9571;
+    }
+    wxPanel* GetPanelMovementPlaceholder()
+    {
+	return m_panelMovementPlaceholder;
+    }
+    wxStaticLine* GetStaticLine9554()
+    {
+	return m_staticLine9554;
+    }
+    wxStaticBitmap* GetInfo()
+    {
+	return m_info;
+    }
+    wxButton* GetBtClose()
+    {
+	return m_btClose;
+    }
+    wxPanel* GetBasePanel()
+    {
+	return m_basePanel;
+    }
+    CncPodiumManagementBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("Cnc Podium Management"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(-1, -1),
+        long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncPodiumManagementBase();
 };
-
 
 class CncPodiumMgmtMovementBase : public wxPanel
 {
@@ -81,27 +123,69 @@ protected:
     wxStaticText* m_staticText9611;
     wxTextCtrl* m_moveRelative;
     wxBitmapButton* m_btRelativeUp;
-    wxBitmapButton* m_btRelativeStop;
+    wxBitmapButton* m_btRelativeDown1;
     wxBitmapButton* m_btRelativeDown;
 
 protected:
-    virtual void onLeftDownDistance(wxMouseEvent& event) { event.Skip(); }
-    virtual void onPodiumRelativeUp(wxCommandEvent& event) { event.Skip(); }
-    virtual void onPodiumRelativeStop(wxCommandEvent& event) { event.Skip(); }
-    virtual void onPodiumRelativeDown(wxCommandEvent& event) { event.Skip(); }
+    virtual void onLeftDownDistance(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onPodiumRelativeUp(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onPodiumRelativeDown(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxTextCtrl* GetTextCtrl9604() { return m_textCtrl9604; }
-    wxPanel* GetIntactiveMovePlaceholder() { return m_intactiveMovePlaceholder; }
-    wxStaticLine* GetStaticLine9622() { return m_staticLine9622; }
-    wxTextCtrl* GetTextCtrl96042() { return m_textCtrl96042; }
-    wxStaticText* GetStaticText9624() { return m_staticText9624; }
-    wxStaticText* GetStaticText9611() { return m_staticText9611; }
-    wxTextCtrl* GetMoveRelative() { return m_moveRelative; }
-    wxBitmapButton* GetBtRelativeUp() { return m_btRelativeUp; }
-    wxBitmapButton* GetBtRelativeStop() { return m_btRelativeStop; }
-    wxBitmapButton* GetBtRelativeDown() { return m_btRelativeDown; }
-    CncPodiumMgmtMovementBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    wxTextCtrl* GetTextCtrl9604()
+    {
+	return m_textCtrl9604;
+    }
+    wxPanel* GetIntactiveMovePlaceholder()
+    {
+	return m_intactiveMovePlaceholder;
+    }
+    wxStaticLine* GetStaticLine9622()
+    {
+	return m_staticLine9622;
+    }
+    wxTextCtrl* GetTextCtrl96042()
+    {
+	return m_textCtrl96042;
+    }
+    wxStaticText* GetStaticText9624()
+    {
+	return m_staticText9624;
+    }
+    wxStaticText* GetStaticText9611()
+    {
+	return m_staticText9611;
+    }
+    wxTextCtrl* GetMoveRelative()
+    {
+	return m_moveRelative;
+    }
+    wxBitmapButton* GetBtRelativeUp()
+    {
+	return m_btRelativeUp;
+    }
+    wxBitmapButton* GetBtRelativeDown1()
+    {
+	return m_btRelativeDown1;
+    }
+    wxBitmapButton* GetBtRelativeDown()
+    {
+	return m_btRelativeDown;
+    }
+    CncPodiumMgmtMovementBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(-1, -1),
+        long style = wxTAB_TRAVERSAL);
     virtual ~CncPodiumMgmtMovementBase();
 };
 

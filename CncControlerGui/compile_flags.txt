@@ -1,11 +1,11 @@
 -IC:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui
 -IC:\@Development\boost_1_77_0
 -IC:\msys64\mingw64\include
--IC:\@Development\wxsvg-1.5.22\include
+-IC:\@Development\wxsvg-1.5.23\include
 -IC:\@Development\opencv\build\include
 -IC:\@Development\openvg
--IC:\@Development\wxWidgets-3.1.5\lib\gcc_dll\mswu
--IC:\@Development\wxWidgets-3.1.5\include
+-IC:\@Development\wxWidgets-3.1.6\lib\gcc_dll\mswu
+-IC:\@Development\wxWidgets-3.1.6\include
 -IC:\msys64\mingw64\include\c++\9.2.0
 -IC:\msys64\mingw64\include\c++\9.2.0\x86_64-w64-mingw32
 -IC:\msys64\mingw64\include\c++\9.2.0\backward
@@ -14,9 +14,10 @@
 -IC:\msys64\mingw64\x86_64-w64-mingw32\include
 -DwxDEBUG_LEVEL=0
 -D_UNICODE
--D__WXMSW__
 -DWXUSINGDLL
 -D_FILE_OFFSET_BITS=64
+-D__WXMSW__
+-DwxUSE_DEBUGREPORT=1
 -DBOOST_STACKTRACE_USE_BACKTRACE
 -DHAVE_W32API_H
 -DwxUSE_DPI_AWARE_MANIFEST=2

@@ -13,6 +13,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../CncControlerGui/CncSecureCtrlPanel.cpp"/>
+    <File Name="../CncControlerGui/CncSecureCtrlPanel.h"/>
     <File Name="../CncControlerGui/test.cpp"/>
     <File Name="../CncControlerGui/test.h"/>
     <File Name="main.cpp"/>

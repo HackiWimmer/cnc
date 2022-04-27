@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERMESSAGEDIALOG_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERMESSAGEDIALOG_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -35,6 +36,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncMessageDialogBase : public wxDialog
 {
@@ -46,17 +48,46 @@ protected:
     wxButton* m_btClose;
 
 protected:
-    virtual void onInitDialog(wxInitDialogEvent& event) { event.Skip(); }
-    virtual void onWordWrap(wxCommandEvent& event) { event.Skip(); }
-    virtual void close(wxCommandEvent& event) { event.Skip(); }
+    virtual void onInitDialog(wxInitDialogEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onWordWrap(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void close(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxStaticBitmap* GetStaticBitmap7188() { return m_staticBitmap7188; }
-    wxStaticText* GetHeadline() { return m_headline; }
-    wxBitmapToggleButton* GetBtToggleWordWrap() { return m_btToggleWordWrap; }
-    wxStyledTextCtrl* GetMessage() { return m_message; }
-    wxButton* GetBtClose() { return m_btClose; }
-    CncMessageDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Message Dialog"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    wxStaticBitmap* GetStaticBitmap7188()
+    {
+	return m_staticBitmap7188;
+    }
+    wxStaticText* GetHeadline()
+    {
+	return m_headline;
+    }
+    wxBitmapToggleButton* GetBtToggleWordWrap()
+    {
+	return m_btToggleWordWrap;
+    }
+    wxStyledTextCtrl* GetMessage()
+    {
+	return m_message;
+    }
+    wxButton* GetBtClose()
+    {
+	return m_btClose;
+    }
+    CncMessageDialogBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("Cnc Message Dialog"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(500, 300),
+        long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
     virtual ~CncMessageDialogBase();
 };
 

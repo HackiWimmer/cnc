@@ -431,7 +431,8 @@ class MainApp : public wxApp {
 			APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Entry . . .");
 			
 			//setlocale(LC_NUMERIC, "");
-			wxLocale(LC_NUMERIC);
+			//wxLocale(wxLANGUAGE_DEFAULT, LC_NUMERIC);
+			wxLocale(wxLANGUAGE_DEFAULT, wxLOCALE_LOAD_DEFAULT);
 			
 			// Add the common image handlers
 			wxInitAllImageHandlers();

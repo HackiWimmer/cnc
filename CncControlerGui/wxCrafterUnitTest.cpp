@@ -6,152 +6,162 @@
 
 #include "wxCrafterUnitTest.h"
 
-
 // Declare the bitmap loading function
 extern void wxC83AAInitBitmapResources();
 
 static bool bBitmapLoaded = false;
 
-
-CncUnitTestsBase::CncUnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+CncUnitTestsBase::CncUnitTestsBase(wxWindow* parent,
+    wxWindowID id,
+    const wxString& title,
+    const wxPoint& pos,
+    const wxSize& size,
+    long style)
     : wxDialog(parent, id, title, pos, size, style)
 {
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC83AAInitBitmapResources();
-        bBitmapLoaded = true;
+    if(!bBitmapLoaded) {
+	// We need to initialise the default bitmap handler
+	wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+	wxC83AAInitBitmapResources();
+	bBitmapLoaded = true;
     }
-    
+
     wxFlexGridSizer* flexGridSizer3344 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer3344->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3344->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3344->SetFlexibleDirection(wxBOTH);
+    flexGridSizer3344->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer3344->AddGrowableCol(0);
     flexGridSizer3344->AddGrowableRow(1);
     this->SetSizer(flexGridSizer3344);
-    
+
     wxFlexGridSizer* flexGridSizer3355 = new wxFlexGridSizer(1, 5, 0, 0);
-    flexGridSizer3355->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3355->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3355->SetFlexibleDirection(wxBOTH);
+    flexGridSizer3355->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer3355->AddGrowableCol(1);
     flexGridSizer3355->AddGrowableRow(0);
-    
-    flexGridSizer3344->Add(flexGridSizer3355, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_staticText3357 = new wxStaticText(this, wxID_ANY, _("Tests:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+
+    flexGridSizer3344->Add(flexGridSizer3355, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_staticText3357 =
+        new wxStaticText(this, wxID_ANY, _("Tests:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
     wxFont m_staticText3357Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText3357Font.SetWeight(wxFONTWEIGHT_BOLD);
     m_staticText3357->SetFont(m_staticText3357Font);
-    
+
     flexGridSizer3355->Add(m_staticText3357, 0, wxALL, WXC_FROM_DIP(5));
-    
+
     wxArrayString m_unitTestSelectorArr;
-    m_unitTestSelector = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_unitTestSelectorArr, wxCB_READONLY);
-    
-    flexGridSizer3355->Add(m_unitTestSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btUnitTestClear = new wxButton(this, wxID_ANY, _("Clear"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,28)), 0);
-    #if wxVERSION_NUMBER >= 2904
+    m_unitTestSelector = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)),
+        m_unitTestSelectorArr, wxCB_READONLY);
+
+    flexGridSizer3355->Add(m_unitTestSelector, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_btUnitTestClear =
+        new wxButton(this, wxID_ANY, _("Clear"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, 28)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btUnitTestClear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
-    m_btUnitTestClear->SetBitmapMargins(2,2);
-    #endif
-    
+    m_btUnitTestClear->SetBitmapMargins(2, 2);
+#endif
+
     flexGridSizer3355->Add(m_btUnitTestClear, 0, wxALL, WXC_FROM_DIP(0));
-    m_btUnitTestClear->SetMinSize(wxSize(-1,28));
-    
-    m_btUnitTestRun = new wxButton(this, wxID_ANY, _("Run . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,28)), 0);
-    #if wxVERSION_NUMBER >= 2904
+    m_btUnitTestClear->SetMinSize(wxSize(-1, 28));
+
+    m_btUnitTestRun =
+        new wxButton(this, wxID_ANY, _("Run . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, 28)), 0);
+#if wxVERSION_NUMBER >= 2904
     m_btUnitTestRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-dll")), wxLEFT);
-    m_btUnitTestRun->SetBitmapMargins(2,2);
-    #endif
+    m_btUnitTestRun->SetBitmapMargins(2, 2);
+#endif
     m_btUnitTestRun->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
     wxFont m_btUnitTestRunFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_btUnitTestRunFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_btUnitTestRun->SetFont(m_btUnitTestRunFont);
-    
-    flexGridSizer3355->Add(m_btUnitTestRun, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
-    m_btUnitTestRun->SetMinSize(wxSize(-1,28));
-    
-    m_testResultStreamPlaceholder = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RICH2|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL);
+
+    flexGridSizer3355->Add(m_btUnitTestRun, 0, wxALL | wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    m_btUnitTestRun->SetMinSize(wxSize(-1, 28));
+
+    m_testResultStreamPlaceholder =
+        new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)),
+            wxTE_RICH2 | wxTE_READONLY | wxTE_MULTILINE | wxALWAYS_SHOW_SB | wxHSCROLL | wxVSCROLL);
     m_testResultStreamPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_testResultStreamPlaceholder->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_testResultStreamPlaceholderFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    wxFont m_testResultStreamPlaceholderFont(
+        10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_testResultStreamPlaceholder->SetFont(m_testResultStreamPlaceholderFont);
-    
-    flexGridSizer3344->Add(m_testResultStreamPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
+
+    flexGridSizer3344->Add(m_testResultStreamPlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     wxFlexGridSizer* flexGridSizer3370 = new wxFlexGridSizer(1, 3, 0, 0);
-    flexGridSizer3370->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3370->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3370->SetFlexibleDirection(wxBOTH);
+    flexGridSizer3370->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer3370->AddGrowableCol(0);
     flexGridSizer3370->AddGrowableRow(0);
-    
-    flexGridSizer3344->Add(flexGridSizer3370, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_unitTestStatus = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,20)), 0);
-    wxFont m_unitTestStatusFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+
+    flexGridSizer3344->Add(flexGridSizer3370, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_unitTestStatus =
+        new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, 20)), 0);
+    wxFont m_unitTestStatusFont(
+        10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_unitTestStatus->SetFont(m_unitTestStatusFont);
-    
-    flexGridSizer3370->Add(m_unitTestStatus, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_unitTestStatus->SetMinSize(wxSize(-1,20));
-    
-    m_unitTestFreezeOutput = new wxCheckBox(this, wxID_ANY, _("Freeze"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+
+    flexGridSizer3370->Add(m_unitTestStatus, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+    m_unitTestStatus->SetMinSize(wxSize(-1, 20));
+
+    m_unitTestFreezeOutput =
+        new wxCheckBox(this, wxID_ANY, _("Freeze"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
     m_unitTestFreezeOutput->SetValue(false);
     m_unitTestFreezeOutput->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
     wxFont m_unitTestFreezeOutputFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_unitTestFreezeOutputFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_unitTestFreezeOutput->SetFont(m_unitTestFreezeOutputFont);
     m_unitTestFreezeOutput->SetToolTip(_("Freeze output while running"));
-    
+
     flexGridSizer3370->Add(m_unitTestFreezeOutput, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_unitTestAutoRun = new wxCheckBox(this, wxID_ANY, _("Auto Run"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+
+    m_unitTestAutoRun =
+        new wxCheckBox(this, wxID_ANY, _("Auto Run"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
     m_unitTestAutoRun->SetValue(true);
     m_unitTestAutoRun->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
     wxFont m_unitTestAutoRunFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_unitTestAutoRunFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_unitTestAutoRun->SetFont(m_unitTestAutoRunFont);
     m_unitTestAutoRun->SetToolTip(_("Run directly on select a test"));
-    
+
     flexGridSizer3370->Add(m_unitTestAutoRun, 0, wxALL, WXC_FROM_DIP(5));
-    
+
     m_unitTestStartupTimer = new wxTimer;
     m_unitTestStartupTimer->Start(300, true);
-    
+
     SetName(wxT("CncUnitTestsBase"));
-    SetMinClientSize(wxSize(300,300));
-    SetSize(800,600);
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
+    SetMinClientSize(wxSize(300, 300));
+    SetSize(wxDLG_UNIT(this, wxSize(800, 600)));
+    if(GetSizer()) {
+	GetSizer()->Fit(this);
     }
     if(GetParent()) {
-        CentreOnParent(wxBOTH);
+	CentreOnParent(wxBOTH);
     } else {
-        CentreOnScreen(wxBOTH);
+	CentreOnScreen(wxBOTH);
     }
-#if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(this)) {
-        wxPersistenceManager::Get().RegisterAndRestore(this);
+	wxPersistenceManager::Get().RegisterAndRestore(this);
     } else {
-        wxPersistenceManager::Get().Restore(this);
+	wxPersistenceManager::Get().Restore(this);
     }
-#endif
     // Connect events
-    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncUnitTestsBase::onShow), NULL, this);
-    m_unitTestSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncUnitTestsBase::selectTest), NULL, this);
-    m_btUnitTestClear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUnitTestsBase::clearView), NULL, this);
-    m_unitTestStartupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncUnitTestsBase::onStartupTimer), NULL, this);
-    
+    this->Bind(wxEVT_SHOW, &CncUnitTestsBase::onShow, this);
+    m_unitTestSelector->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &CncUnitTestsBase::selectTest, this);
+    m_btUnitTestClear->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncUnitTestsBase::clearView, this);
+    m_unitTestStartupTimer->Bind(wxEVT_TIMER, &CncUnitTestsBase::onStartupTimer, this);
 }
 
 CncUnitTestsBase::~CncUnitTestsBase()
 {
-    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncUnitTestsBase::onShow), NULL, this);
-    m_unitTestSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncUnitTestsBase::selectTest), NULL, this);
-    m_btUnitTestClear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUnitTestsBase::clearView), NULL, this);
-    m_unitTestStartupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncUnitTestsBase::onStartupTimer), NULL, this);
-    
-    m_unitTestStartupTimer->Stop();
-    wxDELETE( m_unitTestStartupTimer );
+    this->Unbind(wxEVT_SHOW, &CncUnitTestsBase::onShow, this);
+    m_unitTestSelector->Unbind(wxEVT_COMMAND_COMBOBOX_SELECTED, &CncUnitTestsBase::selectTest, this);
+    m_btUnitTestClear->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncUnitTestsBase::clearView, this);
+    m_unitTestStartupTimer->Unbind(wxEVT_TIMER, &CncUnitTestsBase::onStartupTimer, this);
 
+    m_unitTestStartupTimer->Stop();
+    wxDELETE(m_unitTestStartupTimer);
 }

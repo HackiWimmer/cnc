@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERBASEDIALOGS_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERBASEDIALOGS_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -48,6 +49,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncOSEnvironmentDialogBase : public wxDialog
 {
@@ -92,58 +94,200 @@ protected:
     wxButton* m_btClose;
 
 protected:
-    virtual void onSize(wxSizeEvent& event) { event.Skip(); }
-    virtual void onSelectListBook(wxListbookEvent& event) { event.Skip(); }
-    virtual void selectOSEnvironmentItem(wxListEvent& event) { event.Skip(); }
-    virtual void selectAppEnvironmentItem(wxListEvent& event) { event.Skip(); }
-    virtual void sortModules(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectModulesItem(wxListEvent& event) { event.Skip(); }
-    virtual void onRefresh(wxCommandEvent& event) { event.Skip(); }
-    virtual void onClose(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSize(wxSizeEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSelectListBook(wxListbookEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectOSEnvironmentItem(wxListEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectAppEnvironmentItem(wxListEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void sortModules(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void selectModulesItem(wxListEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onRefresh(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onClose(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxListCtrl* GetCncContextListPlaceholder() { return m_cncContextListPlaceholder; }
-    wxStaticText* GetStaticText72944() { return m_staticText72944; }
-    wxTextCtrl* GetCncContextPara() { return m_cncContextPara; }
-    wxStaticText* GetStaticText72966() { return m_staticText72966; }
-    wxTextCtrl* GetCncContextValue() { return m_cncContextValue; }
-    wxPanel* GetPanelContext() { return m_panelContext; }
-    wxListCtrl* GetOsEnvironmentList() { return m_osEnvironmentList; }
-    wxStaticText* GetStaticText7294() { return m_staticText7294; }
-    wxTextCtrl* GetOsEnvParam() { return m_osEnvParam; }
-    wxStaticText* GetStaticText7296() { return m_staticText7296; }
-    wxTextCtrl* GetOsEnvValue() { return m_osEnvValue; }
-    wxStaticText* GetStaticText174() { return m_staticText174; }
-    wxPanel* GetPanelOSEnvironment() { return m_panelOSEnvironment; }
-    wxListCtrl* GetAppEnvironmentList() { return m_appEnvironmentList; }
-    wxStaticText* GetStaticText72942() { return m_staticText72942; }
-    wxTextCtrl* GetAppEnvParam() { return m_appEnvParam; }
-    wxStaticText* GetStaticText72964() { return m_staticText72964; }
-    wxTextCtrl* GetAppEnvValue() { return m_appEnvValue; }
-    wxStaticText* GetStaticText1741() { return m_staticText1741; }
-    wxPanel* GetPaneAppEnvironment() { return m_paneAppEnvironment; }
-    wxRadioBox* GetModulesSortedBy() { return m_modulesSortedBy; }
-    wxListCtrl* GetModuleList() { return m_moduleList; }
-    wxStaticText* GetStaticText7315() { return m_staticText7315; }
-    wxTextCtrl* GetModAddress() { return m_modAddress; }
-    wxStaticText* GetStaticText7319() { return m_staticText7319; }
-    wxTextCtrl* GetModName() { return m_modName; }
-    wxStaticText* GetStaticText7323() { return m_staticText7323; }
-    wxTextCtrl* GetModVersion() { return m_modVersion; }
-    wxStaticText* GetStaticText7327() { return m_staticText7327; }
-    wxTextCtrl* GetModPath() { return m_modPath; }
-    wxPanel* GetPanelModules() { return m_panelModules; }
-    wxStaticText* GetStaticText7990() { return m_staticText7990; }
-    wxListCtrl* GetVersionInfoList() { return m_versionInfoList; }
-    wxPanel* GetPanelVersions() { return m_panelVersions; }
-    wxListbook* GetListbook() { return m_listbook; }
-    wxStaticLine* GetStaticLine7334() { return m_staticLine7334; }
-    wxButton* GetBtRefresh() { return m_btRefresh; }
-    wxButton* GetBtClose() { return m_btClose; }
-    CncOSEnvironmentDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Application Environment"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,600), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP|wxRESIZE_BORDER);
+    wxListCtrl* GetCncContextListPlaceholder()
+    {
+	return m_cncContextListPlaceholder;
+    }
+    wxStaticText* GetStaticText72944()
+    {
+	return m_staticText72944;
+    }
+    wxTextCtrl* GetCncContextPara()
+    {
+	return m_cncContextPara;
+    }
+    wxStaticText* GetStaticText72966()
+    {
+	return m_staticText72966;
+    }
+    wxTextCtrl* GetCncContextValue()
+    {
+	return m_cncContextValue;
+    }
+    wxPanel* GetPanelContext()
+    {
+	return m_panelContext;
+    }
+    wxListCtrl* GetOsEnvironmentList()
+    {
+	return m_osEnvironmentList;
+    }
+    wxStaticText* GetStaticText7294()
+    {
+	return m_staticText7294;
+    }
+    wxTextCtrl* GetOsEnvParam()
+    {
+	return m_osEnvParam;
+    }
+    wxStaticText* GetStaticText7296()
+    {
+	return m_staticText7296;
+    }
+    wxTextCtrl* GetOsEnvValue()
+    {
+	return m_osEnvValue;
+    }
+    wxStaticText* GetStaticText174()
+    {
+	return m_staticText174;
+    }
+    wxPanel* GetPanelOSEnvironment()
+    {
+	return m_panelOSEnvironment;
+    }
+    wxListCtrl* GetAppEnvironmentList()
+    {
+	return m_appEnvironmentList;
+    }
+    wxStaticText* GetStaticText72942()
+    {
+	return m_staticText72942;
+    }
+    wxTextCtrl* GetAppEnvParam()
+    {
+	return m_appEnvParam;
+    }
+    wxStaticText* GetStaticText72964()
+    {
+	return m_staticText72964;
+    }
+    wxTextCtrl* GetAppEnvValue()
+    {
+	return m_appEnvValue;
+    }
+    wxStaticText* GetStaticText1741()
+    {
+	return m_staticText1741;
+    }
+    wxPanel* GetPaneAppEnvironment()
+    {
+	return m_paneAppEnvironment;
+    }
+    wxRadioBox* GetModulesSortedBy()
+    {
+	return m_modulesSortedBy;
+    }
+    wxListCtrl* GetModuleList()
+    {
+	return m_moduleList;
+    }
+    wxStaticText* GetStaticText7315()
+    {
+	return m_staticText7315;
+    }
+    wxTextCtrl* GetModAddress()
+    {
+	return m_modAddress;
+    }
+    wxStaticText* GetStaticText7319()
+    {
+	return m_staticText7319;
+    }
+    wxTextCtrl* GetModName()
+    {
+	return m_modName;
+    }
+    wxStaticText* GetStaticText7323()
+    {
+	return m_staticText7323;
+    }
+    wxTextCtrl* GetModVersion()
+    {
+	return m_modVersion;
+    }
+    wxStaticText* GetStaticText7327()
+    {
+	return m_staticText7327;
+    }
+    wxTextCtrl* GetModPath()
+    {
+	return m_modPath;
+    }
+    wxPanel* GetPanelModules()
+    {
+	return m_panelModules;
+    }
+    wxStaticText* GetStaticText7990()
+    {
+	return m_staticText7990;
+    }
+    wxListCtrl* GetVersionInfoList()
+    {
+	return m_versionInfoList;
+    }
+    wxPanel* GetPanelVersions()
+    {
+	return m_panelVersions;
+    }
+    wxListbook* GetListbook()
+    {
+	return m_listbook;
+    }
+    wxStaticLine* GetStaticLine7334()
+    {
+	return m_staticLine7334;
+    }
+    wxButton* GetBtRefresh()
+    {
+	return m_btRefresh;
+    }
+    wxButton* GetBtClose()
+    {
+	return m_btClose;
+    }
+    CncOSEnvironmentDialogBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("Cnc Application Environment"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(500, 600),
+        long style = wxDEFAULT_DIALOG_STYLE | wxSTAY_ON_TOP | wxRESIZE_BORDER);
     virtual ~CncOSEnvironmentDialogBase();
 };
-
 
 class CncConnectProgressBase : public wxDialog
 {
@@ -157,23 +301,60 @@ protected:
     wxStaticText* m_observeCounterLabel;
 
 protected:
-    virtual void initDialog(wxInitDialogEvent& event) { event.Skip(); }
-    virtual void show(wxShowEvent& event) { event.Skip(); }
-    virtual void observeTimer(wxTimerEvent& event) { event.Skip(); }
-    virtual void startupTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void initDialog(wxInitDialogEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void show(wxShowEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void observeTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void startupTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxTimer* GetObserveTimer() { return m_observeTimer; }
-    wxTimer* GetStartupTimer() { return m_startupTimer; }
-    wxStaticBitmap* GetStaticBitmap5593() { return m_staticBitmap5593; }
-    wxStaticText* GetStaticText55891() { return m_staticText55891; }
-    wxStaticText* GetPortName() { return m_portName; }
-    wxPanel* GetConnectActivityPanel() { return m_connectActivityPanel; }
-    wxStaticText* GetObserveCounterLabel() { return m_observeCounterLabel; }
-    CncConnectProgressBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Serial Connect Progress"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxSTAY_ON_TOP|wxCAPTION);
+    wxTimer* GetObserveTimer()
+    {
+	return m_observeTimer;
+    }
+    wxTimer* GetStartupTimer()
+    {
+	return m_startupTimer;
+    }
+    wxStaticBitmap* GetStaticBitmap5593()
+    {
+	return m_staticBitmap5593;
+    }
+    wxStaticText* GetStaticText55891()
+    {
+	return m_staticText55891;
+    }
+    wxStaticText* GetPortName()
+    {
+	return m_portName;
+    }
+    wxPanel* GetConnectActivityPanel()
+    {
+	return m_connectActivityPanel;
+    }
+    wxStaticText* GetObserveCounterLabel()
+    {
+	return m_observeCounterLabel;
+    }
+    CncConnectProgressBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("CNC Serial Connect Progress"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(-1, -1),
+        long style = wxSTAY_ON_TOP | wxCAPTION);
     virtual ~CncConnectProgressBase();
 };
-
 
 class CncUsbConnectionDetectedBase : public wxDialog
 {
@@ -186,22 +367,56 @@ protected:
     wxButton* m_connect;
 
 protected:
-    virtual void onInitDialog(wxInitDialogEvent& event) { event.Skip(); }
-    virtual void onCloseDinalog(wxCloseEvent& event) { event.Skip(); }
-    virtual void onIgnore(wxCommandEvent& event) { event.Skip(); }
-    virtual void onConnect(wxCommandEvent& event) { event.Skip(); }
+    virtual void onInitDialog(wxInitDialogEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCloseDinalog(wxCloseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onIgnore(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onConnect(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxStaticBitmap* GetStaticBitmap5919() { return m_staticBitmap5919; }
-    wxStaticText* GetStaticText5921() { return m_staticText5921; }
-    wxStaticText* GetPortName() { return m_portName; }
-    wxStaticLine* GetStaticLine262() { return m_staticLine262; }
-    wxButton* GetIgnore() { return m_ignore; }
-    wxButton* GetConnect() { return m_connect; }
-    CncUsbConnectionDetectedBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("New controller connection is available . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,-1), long style = wxDEFAULT_DIALOG_STYLE);
+    wxStaticBitmap* GetStaticBitmap5919()
+    {
+	return m_staticBitmap5919;
+    }
+    wxStaticText* GetStaticText5921()
+    {
+	return m_staticText5921;
+    }
+    wxStaticText* GetPortName()
+    {
+	return m_portName;
+    }
+    wxStaticLine* GetStaticLine262()
+    {
+	return m_staticLine262;
+    }
+    wxButton* GetIgnore()
+    {
+	return m_ignore;
+    }
+    wxButton* GetConnect()
+    {
+	return m_connect;
+    }
+    CncUsbConnectionDetectedBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("New controller connection is available . . ."),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(400, -1),
+        long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncUsbConnectionDetectedBase();
 };
-
 
 class CncLastProcessingTimestampSummaryBase : public wxDialog
 {
@@ -210,16 +425,32 @@ protected:
     wxButton* m_btClose;
 
 protected:
-    virtual void onInitDilaog(wxInitDialogEvent& event) { event.Skip(); }
-    virtual void onClose(wxCommandEvent& event) { event.Skip(); }
+    virtual void onInitDilaog(wxInitDialogEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onClose(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxListCtrl* GetTsSummary() { return m_tsSummary; }
-    wxButton* GetBtClose() { return m_btClose; }
-    CncLastProcessingTimestampSummaryBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Last Processing Timestamp Summary"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
+    wxListCtrl* GetTsSummary()
+    {
+	return m_tsSummary;
+    }
+    wxButton* GetBtClose()
+    {
+	return m_btClose;
+    }
+    CncLastProcessingTimestampSummaryBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("Last Processing Timestamp Summary"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(-1, -1),
+        long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncLastProcessingTimestampSummaryBase();
 };
-
 
 class CncAutoProgressDialogBase : public wxDialog
 {
@@ -227,13 +458,19 @@ protected:
     wxAnimationCtrl* m_animationCtrl;
 
 protected:
-
 public:
-    wxAnimationCtrl* GetAnimationCtrl() { return m_animationCtrl; }
-    CncAutoProgressDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT(""), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxSTAY_ON_TOP);
+    wxAnimationCtrl* GetAnimationCtrl()
+    {
+	return m_animationCtrl;
+    }
+    CncAutoProgressDialogBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = wxT(""),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(-1, -1),
+        long style = wxSTAY_ON_TOP);
     virtual ~CncAutoProgressDialogBase();
 };
-
 
 class CncExternalViewBoxBase : public wxDialog
 {
@@ -268,51 +505,172 @@ protected:
     wxTextCtrl* m_statusTextRight;
 
 protected:
-    virtual void onShow(wxShowEvent& event) { event.Skip(); }
-    virtual void onStartMove(wxMouseEvent& event) { event.Skip(); }
-    virtual void onStopMove(wxMouseEvent& event) { event.Skip(); }
-    virtual void onMotion(wxMouseEvent& event) { event.Skip(); }
-    virtual void onMinMax(wxCommandEvent& event) { event.Skip(); }
-    virtual void onCloseFromButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void onViewBookChanged(wxNotebookEvent& event) { event.Skip(); }
-    virtual void onAttachPage1(wxCommandEvent& event) { event.Skip(); }
-    virtual void onAttachPage2(wxCommandEvent& event) { event.Skip(); }
-    virtual void onAttachPage3(wxCommandEvent& event) { event.Skip(); }
-    virtual void onAttachPage4(wxCommandEvent& event) { event.Skip(); }
+    virtual void onShow(wxShowEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onStartMove(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onStopMove(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onMotion(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onMinMax(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCloseFromButton(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onViewBookChanged(wxNotebookEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onAttachPage1(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onAttachPage2(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onAttachPage3(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onAttachPage4(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxStaticBitmap* GetStaticBitmap85() { return m_staticBitmap85; }
-    wxStaticText* GetWindowTitle() { return m_windowTitle; }
-    wxPanel* GetMoveArea() { return m_moveArea; }
-    wxButton* GetBtMinMax() { return m_btMinMax; }
-    wxButton* GetBtClose() { return m_btClose; }
-    wxPanel* GetCaption() { return m_caption; }
-    wxStaticLine* GetStaticLine259() { return m_staticLine259; }
-    wxStaticText* GetStaticText93() { return m_staticText93; }
-    wxButton* GetButton2501() { return m_button2501; }
-    wxPanel* GetPlaceholder1() { return m_placeholder1; }
-    wxPanel* GetPage1() { return m_page1; }
-    wxStaticText* GetStaticText935() { return m_staticText935; }
-    wxButton* GetButton250() { return m_button250; }
-    wxPanel* GetPlaceholder2() { return m_placeholder2; }
-    wxPanel* GetPage2() { return m_page2; }
-    wxStaticText* GetStaticText93510() { return m_staticText93510; }
-    wxButton* GetButton2502() { return m_button2502; }
-    wxPanel* GetPlaceholder3() { return m_placeholder3; }
-    wxPanel* GetPage3() { return m_page3; }
-    wxStaticText* GetStaticText9351015() { return m_staticText9351015; }
-    wxButton* GetButton2503() { return m_button2503; }
-    wxPanel* GetPlaceholder4() { return m_placeholder4; }
-    wxPanel* GetPage4() { return m_page4; }
-    wxSimplebook* GetViewBook() { return m_viewBook; }
-    wxTextCtrl* GetStatusTextLeft() { return m_statusTextLeft; }
-    wxTextCtrl* GetStatusTextMid() { return m_statusTextMid; }
-    wxTextCtrl* GetStatusTextRight() { return m_statusTextRight; }
-    wxPanel* GetStatus() { return m_status; }
-    CncExternalViewBoxBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("no caption available"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxSTAY_ON_TOP);
+    wxStaticBitmap* GetStaticBitmap85()
+    {
+	return m_staticBitmap85;
+    }
+    wxStaticText* GetWindowTitle()
+    {
+	return m_windowTitle;
+    }
+    wxPanel* GetMoveArea()
+    {
+	return m_moveArea;
+    }
+    wxButton* GetBtMinMax()
+    {
+	return m_btMinMax;
+    }
+    wxButton* GetBtClose()
+    {
+	return m_btClose;
+    }
+    wxPanel* GetCaption()
+    {
+	return m_caption;
+    }
+    wxStaticLine* GetStaticLine259()
+    {
+	return m_staticLine259;
+    }
+    wxStaticText* GetStaticText93()
+    {
+	return m_staticText93;
+    }
+    wxButton* GetButton2501()
+    {
+	return m_button2501;
+    }
+    wxPanel* GetPlaceholder1()
+    {
+	return m_placeholder1;
+    }
+    wxPanel* GetPage1()
+    {
+	return m_page1;
+    }
+    wxStaticText* GetStaticText935()
+    {
+	return m_staticText935;
+    }
+    wxButton* GetButton250()
+    {
+	return m_button250;
+    }
+    wxPanel* GetPlaceholder2()
+    {
+	return m_placeholder2;
+    }
+    wxPanel* GetPage2()
+    {
+	return m_page2;
+    }
+    wxStaticText* GetStaticText93510()
+    {
+	return m_staticText93510;
+    }
+    wxButton* GetButton2502()
+    {
+	return m_button2502;
+    }
+    wxPanel* GetPlaceholder3()
+    {
+	return m_placeholder3;
+    }
+    wxPanel* GetPage3()
+    {
+	return m_page3;
+    }
+    wxStaticText* GetStaticText9351015()
+    {
+	return m_staticText9351015;
+    }
+    wxButton* GetButton2503()
+    {
+	return m_button2503;
+    }
+    wxPanel* GetPlaceholder4()
+    {
+	return m_placeholder4;
+    }
+    wxPanel* GetPage4()
+    {
+	return m_page4;
+    }
+    wxSimplebook* GetViewBook()
+    {
+	return m_viewBook;
+    }
+    wxTextCtrl* GetStatusTextLeft()
+    {
+	return m_statusTextLeft;
+    }
+    wxTextCtrl* GetStatusTextMid()
+    {
+	return m_statusTextMid;
+    }
+    wxTextCtrl* GetStatusTextRight()
+    {
+	return m_statusTextRight;
+    }
+    wxPanel* GetStatus()
+    {
+	return m_status;
+    }
+    CncExternalViewBoxBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("no caption available"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(800, 600),
+        long style = wxSTAY_ON_TOP);
     virtual ~CncExternalViewBoxBase();
 };
-
 
 class CncPositionStorageViewBase : public wxFrame
 {
@@ -342,39 +700,134 @@ protected:
     wxTimer* m_activationTimer;
 
 protected:
-    virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
-    virtual void onActivateWindow(wxActivateEvent& event) { event.Skip(); }
-    virtual void onOverviewItemSelected(wxListEvent& event) { event.Skip(); }
-    virtual void onExportDetails(wxCommandEvent& event) { event.Skip(); }
-    virtual void onSaveDetails(wxCommandEvent& event) { event.Skip(); }
-    virtual void onCopyDetails(wxCommandEvent& event) { event.Skip(); }
-    virtual void onActivationTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onCloseWindow(wxCloseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onActivateWindow(wxActivateEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onOverviewItemSelected(wxListEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onExportDetails(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSaveDetails(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCopyDetails(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onActivationTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxStaticText* GetStaticText245() { return m_staticText245; }
-    wxListCtrl* GetOverview() { return m_overview; }
-    wxStaticText* GetStaticText2451() { return m_staticText2451; }
-    wxTextCtrl* GetHelpText() { return m_helpText; }
-    wxPanel* GetSplitterPageOverview() { return m_splitterPageOverview; }
-    wxStaticText* GetStaticText241() { return m_staticText241; }
-    wxListCtrl* GetDetails() { return m_details; }
-    wxStaticText* GetStaticText233() { return m_staticText233; }
-    wxStaticLine* GetStaticLine235() { return m_staticLine235; }
-    wxBitmapButton* GetBtExport() { return m_btExport; }
-    wxBitmapButton* GetBtSave() { return m_btSave; }
-    wxBitmapButton* GetBtCopy() { return m_btCopy; }
-    wxStaticLine* GetStaticLine239() { return m_staticLine239; }
-    wxStaticText* GetStaticText217() { return m_staticText217; }
-    wxTextCtrl* GetDetailsSid() { return m_detailsSid; }
-    wxStaticText* GetStaticText221() { return m_staticText221; }
-    wxTextCtrl* GetDetailsType() { return m_detailsType; }
-    wxStaticText* GetStaticText225() { return m_staticText225; }
-    wxTextCtrl* GetDetailsEntries() { return m_detailsEntries; }
-    wxStaticLine* GetStaticLine237() { return m_staticLine237; }
-    wxPanel* GetSplitterPageStorage() { return m_splitterPageStorage; }
-    wxSplitterWindow* GetSplitter189() { return m_splitter189; }
-    wxTimer* GetActivationTimer() { return m_activationTimer; }
-    CncPositionStorageViewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Position Storage - Path Evaluator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(540,400), long style = wxDEFAULT_FRAME_STYLE);
+    wxStaticText* GetStaticText245()
+    {
+	return m_staticText245;
+    }
+    wxListCtrl* GetOverview()
+    {
+	return m_overview;
+    }
+    wxStaticText* GetStaticText2451()
+    {
+	return m_staticText2451;
+    }
+    wxTextCtrl* GetHelpText()
+    {
+	return m_helpText;
+    }
+    wxPanel* GetSplitterPageOverview()
+    {
+	return m_splitterPageOverview;
+    }
+    wxStaticText* GetStaticText241()
+    {
+	return m_staticText241;
+    }
+    wxListCtrl* GetDetails()
+    {
+	return m_details;
+    }
+    wxStaticText* GetStaticText233()
+    {
+	return m_staticText233;
+    }
+    wxStaticLine* GetStaticLine235()
+    {
+	return m_staticLine235;
+    }
+    wxBitmapButton* GetBtExport()
+    {
+	return m_btExport;
+    }
+    wxBitmapButton* GetBtSave()
+    {
+	return m_btSave;
+    }
+    wxBitmapButton* GetBtCopy()
+    {
+	return m_btCopy;
+    }
+    wxStaticLine* GetStaticLine239()
+    {
+	return m_staticLine239;
+    }
+    wxStaticText* GetStaticText217()
+    {
+	return m_staticText217;
+    }
+    wxTextCtrl* GetDetailsSid()
+    {
+	return m_detailsSid;
+    }
+    wxStaticText* GetStaticText221()
+    {
+	return m_staticText221;
+    }
+    wxTextCtrl* GetDetailsType()
+    {
+	return m_detailsType;
+    }
+    wxStaticText* GetStaticText225()
+    {
+	return m_staticText225;
+    }
+    wxTextCtrl* GetDetailsEntries()
+    {
+	return m_detailsEntries;
+    }
+    wxStaticLine* GetStaticLine237()
+    {
+	return m_staticLine237;
+    }
+    wxPanel* GetSplitterPageStorage()
+    {
+	return m_splitterPageStorage;
+    }
+    wxSplitterWindow* GetSplitter189()
+    {
+	return m_splitter189;
+    }
+    wxTimer* GetActivationTimer()
+    {
+	return m_activationTimer;
+    }
+    CncPositionStorageViewBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("Cnc Position Storage - Path Evaluator"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(540, 400),
+        long style = wxDEFAULT_FRAME_STYLE);
     virtual ~CncPositionStorageViewBase();
 };
 

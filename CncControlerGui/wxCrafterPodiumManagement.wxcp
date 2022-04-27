@@ -126,14 +126,12 @@
 			"m_events":	[{
 					"m_eventName":	"wxEVT_SHOW",
 					"m_eventClass":	"wxShowEvent",
-					"m_eventHandler":	"wxShowEventHandler",
 					"m_functionNameAndSignature":	"onShow(wxShowEvent& event)",
 					"m_description":	"Process a wxEVT_SHOW event",
 					"m_noBody":	false
 				}, {
 					"m_eventName":	"wxEVT_INIT_DIALOG",
 					"m_eventClass":	"wxInitDialogEvent",
-					"m_eventHandler":	"wxInitDialogEventHandler",
 					"m_functionNameAndSignature":	"onInit(wxInitDialogEvent& event)",
 					"m_description":	"A wxInitDialogEvent is sent as a dialog or panel is being initialised. Handlers for this event can transfer data to the window.\nThe default handler calls wxWindow::TransferDataToWindow",
 					"m_noBody":	false
@@ -158,6 +156,10 @@
 							"type":	"string",
 							"m_label":	"Style:",
 							"m_value":	""
+						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
 						}, {
 							"type":	"string",
 							"m_label":	"# Columns:",
@@ -271,6 +273,10 @@
 											"m_label":	"Style:",
 											"m_value":	""
 										}, {
+											"type":	"bool",
+											"m_label":	"Keep as a class member",
+											"m_value":	false
+										}, {
 											"type":	"string",
 											"m_label":	"# Columns:",
 											"m_value":	"1"
@@ -316,6 +322,10 @@
 													"type":	"string",
 													"m_label":	"Style:",
 													"m_value":	""
+												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
 												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
@@ -428,6 +438,10 @@
 																	"type":	"string",
 																	"m_label":	"Style:",
 																	"m_value":	""
+																}, {
+																	"type":	"bool",
+																	"m_label":	"Keep as a class member",
+																	"m_value":	false
 																}, {
 																	"type":	"string",
 																	"m_label":	"# Columns:",
@@ -750,6 +764,10 @@
 													"m_label":	"Style:",
 													"m_value":	""
 												}, {
+													"type":	"bool",
+													"m_label":	"Keep as a class member",
+													"m_value":	false
+												}, {
 													"type":	"string",
 													"m_label":	"# Columns:",
 													"m_value":	"2"
@@ -847,7 +865,6 @@
 													"m_events":	[{
 															"m_eventName":	"wxEVT_LEFT_DOWN",
 															"m_eventClass":	"wxMouseEvent",
-															"m_eventHandler":	"wxMouseEventHandler",
 															"m_functionNameAndSignature":	"onLefDownInfo(wxMouseEvent& event)",
 															"m_description":	"Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
 															"m_noBody":	false
@@ -942,7 +959,6 @@
 													"m_events":	[{
 															"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 															"m_eventClass":	"wxCommandEvent",
-															"m_eventHandler":	"wxCommandEventHandler",
 															"m_functionNameAndSignature":	"onClose(wxCommandEvent& event)",
 															"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 															"m_noBody":	false
@@ -1061,6 +1077,10 @@
 							"m_label":	"Style:",
 							"m_value":	""
 						}, {
+							"type":	"bool",
+							"m_label":	"Keep as a class member",
+							"m_value":	false
+						}, {
 							"type":	"string",
 							"m_label":	"# Columns:",
 							"m_value":	"1"
@@ -1107,6 +1127,10 @@
 									"m_label":	"Style:",
 									"m_value":	""
 								}, {
+									"type":	"bool",
+									"m_label":	"Keep as a class member",
+									"m_value":	false
+								}, {
 									"type":	"string",
 									"m_label":	"# Columns:",
 									"m_value":	"1"
@@ -1152,6 +1176,10 @@
 											"type":	"string",
 											"m_label":	"Style:",
 											"m_value":	""
+										}, {
+											"type":	"bool",
+											"m_label":	"Keep as a class member",
+											"m_value":	false
 										}, {
 											"type":	"string",
 											"m_label":	"# Columns:",
@@ -1254,6 +1282,10 @@
 													"type":	"string",
 													"m_label":	"Max Length:",
 													"m_value":	"0"
+												}, {
+													"type":	"bool",
+													"m_label":	"Enable Spell Checking",
+													"m_value":	false
 												}, {
 													"type":	"bool",
 													"m_label":	"Auto Complete Directories:",
@@ -1422,6 +1454,10 @@
 									"m_label":	"Style:",
 									"m_value":	""
 								}, {
+									"type":	"bool",
+									"m_label":	"Keep as a class member",
+									"m_value":	false
+								}, {
 									"type":	"string",
 									"m_label":	"# Columns:",
 									"m_value":	"1"
@@ -1525,6 +1561,10 @@
 											"m_value":	"0"
 										}, {
 											"type":	"bool",
+											"m_label":	"Enable Spell Checking",
+											"m_value":	false
+										}, {
+											"type":	"bool",
 											"m_label":	"Auto Complete Directories:",
 											"m_value":	false
 										}, {
@@ -1554,6 +1594,10 @@
 											"type":	"string",
 											"m_label":	"Style:",
 											"m_value":	""
+										}, {
+											"type":	"bool",
+											"m_label":	"Keep as a class member",
+											"m_value":	false
 										}, {
 											"type":	"string",
 											"m_label":	"# Columns:",
@@ -1808,6 +1852,10 @@
 													"m_value":	"0"
 												}, {
 													"type":	"bool",
+													"m_label":	"Enable Spell Checking",
+													"m_value":	false
+												}, {
+													"type":	"bool",
 													"m_label":	"Auto Complete Directories:",
 													"m_value":	false
 												}, {
@@ -1818,7 +1866,6 @@
 											"m_events":	[{
 													"m_eventName":	"wxEVT_LEFT_DOWN",
 													"m_eventClass":	"wxMouseEvent",
-													"m_eventHandler":	"wxMouseEventHandler",
 													"m_functionNameAndSignature":	"onLeftDownDistance(wxMouseEvent& event)",
 													"m_description":	"Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
 													"m_noBody":	false
@@ -1901,7 +1948,6 @@
 									"m_events":	[{
 											"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 											"m_eventClass":	"wxCommandEvent",
-											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"onPodiumRelativeUp(wxCommandEvent& event)",
 											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 											"m_noBody":	false
@@ -2058,7 +2104,6 @@
 									"m_events":	[{
 											"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 											"m_eventClass":	"wxCommandEvent",
-											"m_eventHandler":	"wxCommandEventHandler",
 											"m_functionNameAndSignature":	"onPodiumRelativeDown(wxCommandEvent& event)",
 											"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 											"m_noBody":	false

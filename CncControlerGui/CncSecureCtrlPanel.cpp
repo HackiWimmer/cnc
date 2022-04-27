@@ -32,6 +32,9 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 , pageVector									()
 /////////////////////////////////////////////////////////////////////
 {
+	GblFunc::fixListBookBmpVisibleBug(m_leftBook);
+	GblFunc::fixListBookBmpVisibleBug(m_listbookManuallyMove);
+
 	// ---------------------------------------------------------------
 	auto setPageWidth = [&](wxWindow* page, int width){
 		int pos = m_rightBook->FindPage(page);

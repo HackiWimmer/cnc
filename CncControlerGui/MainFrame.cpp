@@ -615,6 +615,15 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 		m_listbookSetupConfig->GetListView()->SetFont(font);
 		m_listbookReferences->GetListView()->SetFont(font);
 		m_testCaseBook->GetListView()->SetFont(font);
+		
+		GblFunc::fixListBookBmpVisibleBug(m_notebookConfig);
+		GblFunc::fixListBookBmpVisibleBug(m_listbookMonitor);
+		GblFunc::fixListBookBmpVisibleBug(m_listbookPostProcessor);
+		GblFunc::fixListBookBmpVisibleBug(m_listbookManallyMotionControl);
+		GblFunc::fixListBookBmpVisibleBug(m_listbookSource);
+		GblFunc::fixListBookBmpVisibleBug(m_listbookSetupConfig);
+		GblFunc::fixListBookBmpVisibleBug(m_listbookReferences);
+		GblFunc::fixListBookBmpVisibleBug(m_testCaseBook);
 	}
 	
 	defaultSpeedSlider->showValue(true);

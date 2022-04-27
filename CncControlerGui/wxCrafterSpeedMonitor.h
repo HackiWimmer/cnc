@@ -7,6 +7,7 @@
 #ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERSPEEDMONITOR_BASE_CLASSES_H
 #define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTERSPEEDMONITOR_BASE_CLASSES_H
 
+// clang-format off
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/xrc/xh_bmp.h>
@@ -48,6 +49,7 @@
 #define WXC_FROM_DIP(x) x
 #endif
 
+// clang-format on
 
 class CncSpeedMonitorBase : public wxPanel
 {
@@ -95,71 +97,251 @@ protected:
     wxSlider* m_sliderRecordResolutionV;
 
 protected:
-    virtual void onToggleConnection(wxCommandEvent& event) { event.Skip(); }
-    virtual void onToggleMeasurePointsAxis(wxCommandEvent& event) { event.Skip(); }
-    virtual void onToggleConfiguredAxis(wxCommandEvent& event) { event.Skip(); }
-    virtual void onToggleReceivedSpeedAxis(wxCommandEvent& event) { event.Skip(); }
-    virtual void onToggleAbsRelMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void onClear(wxCommandEvent& event) { event.Skip(); }
-    virtual void onSave(wxCommandEvent& event) { event.Skip(); }
-    virtual void onChangeDisplayCompression(wxScrollEvent& event) { event.Skip(); }
-    virtual void onChangeRecordResolution(wxScrollEvent& event) { event.Skip(); }
-    virtual void onSize(wxSizeEvent& event) { event.Skip(); }
-    virtual void onPaint(wxPaintEvent& event) { event.Skip(); }
-    virtual void onMouseMotion(wxMouseEvent& event) { event.Skip(); }
-    virtual void onLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void onLeftUp(wxMouseEvent& event) { event.Skip(); }
-    virtual void onPaintLeftAxis(wxPaintEvent& event) { event.Skip(); }
-    virtual void onPaintRightAxis(wxPaintEvent& event) { event.Skip(); }
-    virtual void onChangeScrollBarH(wxScrollEvent& event) { event.Skip(); }
-    virtual void onChangeScrollBarV(wxScrollEvent& event) { event.Skip(); }
+    virtual void onToggleConnection(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onToggleMeasurePointsAxis(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onToggleConfiguredAxis(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onToggleReceivedSpeedAxis(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onToggleAbsRelMode(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onClear(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSave(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onChangeDisplayCompression(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onChangeRecordResolution(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSize(wxSizeEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onPaint(wxPaintEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onMouseMotion(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onLeftDown(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onLeftUp(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onPaintLeftAxis(wxPaintEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onPaintRightAxis(wxPaintEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onChangeScrollBarH(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onChangeScrollBarV(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxBitmapToggleButton* GetBtToggleConnectionH() { return m_btToggleConnectionH; }
-    wxStaticLine* GetStaticLine75573() { return m_staticLine75573; }
-    wxBitmapToggleButton* GetBtToggleMeasurePointsAxisH() { return m_btToggleMeasurePointsAxisH; }
-    wxBitmapToggleButton* GetBtToggleConfiguredAxisH() { return m_btToggleConfiguredAxisH; }
-    wxBitmapToggleButton* GetBtToggleReceivedSpeedAxisH() { return m_btToggleReceivedSpeedAxisH; }
-    wxBitmapToggleButton* GetBtToggleAbsRelModeH() { return m_btToggleAbsRelModeH; }
-    wxStaticLine* GetStaticLine7557() { return m_staticLine7557; }
-    wxBitmapButton* GetBtClearH() { return m_btClearH; }
-    wxBitmapButton* GetBtSaveH() { return m_btSaveH; }
-    wxStaticLine* GetStaticLine755732() { return m_staticLine755732; }
-    wxStaticText* GetStaticText753431() { return m_staticText753431; }
-    wxSlider* GetSliderTimeCompressionH() { return m_sliderTimeCompressionH; }
-    wxStaticText* GetStaticText7534() { return m_staticText7534; }
-    wxSlider* GetSliderRecordResolutionH() { return m_sliderRecordResolutionH; }
-    wxPanel* GetDarwingAreaH() { return m_darwingAreaH; }
-    wxPanel* GetLeftAxisH() { return m_leftAxisH; }
-    wxPanel* GetRightAxisH() { return m_rightAxisH; }
-    wxScrollBar* GetScrollBarH() { return m_scrollBarH; }
-    wxPanel* GetPanel401() { return m_panel401; }
-    wxPanel* GetHorizontalPanel() { return m_horizontalPanel; }
-    wxBitmapToggleButton* GetBtToggleConnectionV() { return m_btToggleConnectionV; }
-    wxStaticLine* GetStaticLine75573317() { return m_staticLine75573317; }
-    wxBitmapToggleButton* GetBtToggleMeasurePointsAxisV() { return m_btToggleMeasurePointsAxisV; }
-    wxBitmapToggleButton* GetBtToggleConfiguredAxisV() { return m_btToggleConfiguredAxisV; }
-    wxBitmapToggleButton* GetBtToggleReceivedSpeedAxisV() { return m_btToggleReceivedSpeedAxisV; }
-    wxBitmapToggleButton* GetBtToggleAbsRelModeV() { return m_btToggleAbsRelModeV; }
-    wxStaticLine* GetStaticLine7557721() { return m_staticLine7557721; }
-    wxBitmapButton* GetBtClearV() { return m_btClearV; }
-    wxBitmapButton* GetBtSaveV() { return m_btSaveV; }
-    wxPanel* GetDarwingAreaV() { return m_darwingAreaV; }
-    wxPanel* GetTopAxisV() { return m_topAxisV; }
-    wxPanel* GetBottomAxisV() { return m_bottomAxisV; }
-    wxScrollBar* GetScrollBarV() { return m_scrollBarV; }
-    wxPanel* GetPanel4011() { return m_panel4011; }
-    wxStaticText* GetStaticText75341230() { return m_staticText75341230; }
-    wxSlider* GetSliderTimeCompressionV() { return m_sliderTimeCompressionV; }
-    wxStaticLine* GetStaticLine755733() { return m_staticLine755733; }
-    wxStaticText* GetStaticText753412() { return m_staticText753412; }
-    wxSlider* GetSliderRecordResolutionV() { return m_sliderRecordResolutionV; }
-    wxPanel* GetVerticalPanel() { return m_verticalPanel; }
-    wxSimplebook* GetDrawingAreaBook() { return m_drawingAreaBook; }
-    CncSpeedMonitorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,300), long style = wxTAB_TRAVERSAL);
+    wxBitmapToggleButton* GetBtToggleConnectionH()
+    {
+	return m_btToggleConnectionH;
+    }
+    wxStaticLine* GetStaticLine75573()
+    {
+	return m_staticLine75573;
+    }
+    wxBitmapToggleButton* GetBtToggleMeasurePointsAxisH()
+    {
+	return m_btToggleMeasurePointsAxisH;
+    }
+    wxBitmapToggleButton* GetBtToggleConfiguredAxisH()
+    {
+	return m_btToggleConfiguredAxisH;
+    }
+    wxBitmapToggleButton* GetBtToggleReceivedSpeedAxisH()
+    {
+	return m_btToggleReceivedSpeedAxisH;
+    }
+    wxBitmapToggleButton* GetBtToggleAbsRelModeH()
+    {
+	return m_btToggleAbsRelModeH;
+    }
+    wxStaticLine* GetStaticLine7557()
+    {
+	return m_staticLine7557;
+    }
+    wxBitmapButton* GetBtClearH()
+    {
+	return m_btClearH;
+    }
+    wxBitmapButton* GetBtSaveH()
+    {
+	return m_btSaveH;
+    }
+    wxStaticLine* GetStaticLine755732()
+    {
+	return m_staticLine755732;
+    }
+    wxStaticText* GetStaticText753431()
+    {
+	return m_staticText753431;
+    }
+    wxSlider* GetSliderTimeCompressionH()
+    {
+	return m_sliderTimeCompressionH;
+    }
+    wxStaticText* GetStaticText7534()
+    {
+	return m_staticText7534;
+    }
+    wxSlider* GetSliderRecordResolutionH()
+    {
+	return m_sliderRecordResolutionH;
+    }
+    wxPanel* GetDarwingAreaH()
+    {
+	return m_darwingAreaH;
+    }
+    wxPanel* GetLeftAxisH()
+    {
+	return m_leftAxisH;
+    }
+    wxPanel* GetRightAxisH()
+    {
+	return m_rightAxisH;
+    }
+    wxScrollBar* GetScrollBarH()
+    {
+	return m_scrollBarH;
+    }
+    wxPanel* GetPanel401()
+    {
+	return m_panel401;
+    }
+    wxPanel* GetHorizontalPanel()
+    {
+	return m_horizontalPanel;
+    }
+    wxBitmapToggleButton* GetBtToggleConnectionV()
+    {
+	return m_btToggleConnectionV;
+    }
+    wxStaticLine* GetStaticLine75573317()
+    {
+	return m_staticLine75573317;
+    }
+    wxBitmapToggleButton* GetBtToggleMeasurePointsAxisV()
+    {
+	return m_btToggleMeasurePointsAxisV;
+    }
+    wxBitmapToggleButton* GetBtToggleConfiguredAxisV()
+    {
+	return m_btToggleConfiguredAxisV;
+    }
+    wxBitmapToggleButton* GetBtToggleReceivedSpeedAxisV()
+    {
+	return m_btToggleReceivedSpeedAxisV;
+    }
+    wxBitmapToggleButton* GetBtToggleAbsRelModeV()
+    {
+	return m_btToggleAbsRelModeV;
+    }
+    wxStaticLine* GetStaticLine7557721()
+    {
+	return m_staticLine7557721;
+    }
+    wxBitmapButton* GetBtClearV()
+    {
+	return m_btClearV;
+    }
+    wxBitmapButton* GetBtSaveV()
+    {
+	return m_btSaveV;
+    }
+    wxPanel* GetDarwingAreaV()
+    {
+	return m_darwingAreaV;
+    }
+    wxPanel* GetTopAxisV()
+    {
+	return m_topAxisV;
+    }
+    wxPanel* GetBottomAxisV()
+    {
+	return m_bottomAxisV;
+    }
+    wxScrollBar* GetScrollBarV()
+    {
+	return m_scrollBarV;
+    }
+    wxPanel* GetPanel4011()
+    {
+	return m_panel4011;
+    }
+    wxStaticText* GetStaticText75341230()
+    {
+	return m_staticText75341230;
+    }
+    wxSlider* GetSliderTimeCompressionV()
+    {
+	return m_sliderTimeCompressionV;
+    }
+    wxStaticLine* GetStaticLine755733()
+    {
+	return m_staticLine755733;
+    }
+    wxStaticText* GetStaticText753412()
+    {
+	return m_staticText753412;
+    }
+    wxSlider* GetSliderRecordResolutionV()
+    {
+	return m_sliderRecordResolutionV;
+    }
+    wxPanel* GetVerticalPanel()
+    {
+	return m_verticalPanel;
+    }
+    wxSimplebook* GetDrawingAreaBook()
+    {
+	return m_drawingAreaBook;
+    }
+    CncSpeedMonitorBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(600, 300),
+        long style = wxTAB_TRAVERSAL);
     virtual ~CncSpeedMonitorBase();
 };
-
 
 class CncSpeedPlaygroundBase : public wxFrame
 {
@@ -279,147 +461,566 @@ protected:
     wxTimer* m_continuousTimer;
 
 protected:
-    virtual void onActivate(wxActivateEvent& event) { event.Skip(); }
-    virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
-    virtual void onRun(wxCommandEvent& event) { event.Skip(); }
-    virtual void onClearLogger(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateValueF(wxCommandEvent& event) { event.Skip(); }
-    virtual void onValKeyDown(wxKeyEvent& event) { event.Skip(); }
-    virtual void changeSliderF(wxScrollEvent& event) { event.Skip(); }
-    virtual void updateValueX(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeSliderX(wxScrollEvent& event) { event.Skip(); }
-    virtual void updateValueY(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeSliderY(wxScrollEvent& event) { event.Skip(); }
-    virtual void updateValueZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeSliderZ(wxScrollEvent& event) { event.Skip(); }
-    virtual void updateTriggerI1(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateTriggerF1(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateTriggerI2(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateTriggerF2(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateTriggerI3(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateTriggerF3(wxCommandEvent& event) { event.Skip(); }
-    virtual void enableSpecialSpeedDisplayHeight(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateSpecialSpeedDisplayHeightValue(wxCommandEvent& event) { event.Skip(); }
-    virtual void enableSpecialAccelDisplayWidth(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateSpecialAccelDisplayWidthValue(wxCommandEvent& event) { event.Skip(); }
-    virtual void onChangeDisplayType(wxCommandEvent& event) { event.Skip(); }
-    virtual void onTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onActivate(wxActivateEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCloseWindow(wxCloseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onRun(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onClearLogger(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateValueF(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onValKeyDown(wxKeyEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void changeSliderF(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateValueX(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void changeSliderX(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateValueY(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void changeSliderY(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateValueZ(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void changeSliderZ(wxScrollEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateTriggerI1(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateTriggerF1(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateTriggerI2(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateTriggerF2(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateTriggerI3(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateTriggerF3(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void enableSpecialSpeedDisplayHeight(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateSpecialSpeedDisplayHeightValue(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void enableSpecialAccelDisplayWidth(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void updateSpecialAccelDisplayWidthValue(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onChangeDisplayType(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
-    wxButton* GetButton2618() { return m_button2618; }
-    wxStaticLine* GetStaticLine263() { return m_staticLine263; }
-    wxButton* GetButton261() { return m_button261; }
-    wxPanel* GetTollbarPanel() { return m_tollbarPanel; }
-    wxStaticText* GetStaticText108() { return m_staticText108; }
-    wxStaticLine* GetStaticLine110() { return m_staticLine110; }
-    wxStaticText* GetStaticText652() { return m_staticText652; }
-    wxTextCtrl* GetValF() { return m_valF; }
-    wxStaticText* GetStaticText694() { return m_staticText694; }
-    wxStaticText* GetStaticMinF() { return m_staticMinF; }
-    wxSlider* GetSliderF() { return m_sliderF; }
-    wxStaticText* GetStaticMaxF() { return m_staticMaxF; }
-    wxStaticText* GetStaticText65() { return m_staticText65; }
-    wxTextCtrl* GetValX() { return m_valX; }
-    wxStaticText* GetStaticText69() { return m_staticText69; }
-    wxStaticText* GetStaticMinX() { return m_staticMinX; }
-    wxSlider* GetSliderX() { return m_sliderX; }
-    wxStaticText* GetStaticMaxX() { return m_staticMaxX; }
-    wxStaticText* GetStaticText658() { return m_staticText658; }
-    wxTextCtrl* GetValY() { return m_valY; }
-    wxStaticText* GetStaticText6910() { return m_staticText6910; }
-    wxStaticText* GetStaticMinY() { return m_staticMinY; }
-    wxSlider* GetSliderY() { return m_sliderY; }
-    wxStaticText* GetStaticMaxY() { return m_staticMaxY; }
-    wxStaticText* GetStaticText65814() { return m_staticText65814; }
-    wxTextCtrl* GetValZ() { return m_valZ; }
-    wxStaticText* GetStaticText691016() { return m_staticText691016; }
-    wxStaticText* GetStaticMinZ() { return m_staticMinZ; }
-    wxSlider* GetSliderZ() { return m_sliderZ; }
-    wxStaticText* GetStaticMaxZ() { return m_staticMaxZ; }
-    wxStaticText* GetStaticText313() { return m_staticText313; }
-    wxStaticLine* GetStaticLine14126() { return m_staticLine14126; }
-    wxStaticText* GetStaticText318() { return m_staticText318; }
-    wxTextCtrl* GetEbSpecialTriggerImpluse1() { return m_ebSpecialTriggerImpluse1; }
-    wxStaticText* GetStaticText320() { return m_staticText320; }
-    wxTextCtrl* GetEbSpecialTriggerSpeed1() { return m_ebSpecialTriggerSpeed1; }
-    wxStaticText* GetStaticText326() { return m_staticText326; }
-    wxStaticText* GetStaticText3188() { return m_staticText3188; }
-    wxTextCtrl* GetEbSpecialTriggerImpluse2() { return m_ebSpecialTriggerImpluse2; }
-    wxStaticText* GetStaticText32010() { return m_staticText32010; }
-    wxTextCtrl* GetEbSpecialTriggerSpeed2() { return m_ebSpecialTriggerSpeed2; }
-    wxStaticText* GetStaticText32613() { return m_staticText32613; }
-    wxStaticText* GetStaticText318815() { return m_staticText318815; }
-    wxTextCtrl* GetEbSpecialTriggerImpluse3() { return m_ebSpecialTriggerImpluse3; }
-    wxStaticText* GetStaticText3201018() { return m_staticText3201018; }
-    wxTextCtrl* GetEbSpecialTriggerSpeed3() { return m_ebSpecialTriggerSpeed3; }
-    wxStaticText* GetStaticText3261320() { return m_staticText3261320; }
-    wxStaticText* GetStaticText14711() { return m_staticText14711; }
-    wxStaticLine* GetStaticLine1412() { return m_staticLine1412; }
-    wxStaticText* GetStaticText230385() { return m_staticText230385; }
-    wxTextCtrl* GetValAA() { return m_valAA; }
-    wxStaticText* GetStaticText23038() { return m_staticText23038; }
-    wxTextCtrl* GetValAB() { return m_valAB; }
-    wxStaticText* GetStaticText23010() { return m_staticText23010; }
-    wxTextCtrl* GetValAC() { return m_valAC; }
-    wxStaticText* GetStaticText230103() { return m_staticText230103; }
-    wxStaticText* GetStaticText1471() { return m_staticText1471; }
-    wxStaticLine* GetStaticLine14122() { return m_staticLine14122; }
-    wxStaticText* GetStaticText23036() { return m_staticText23036; }
-    wxTextCtrl* GetValDA() { return m_valDA; }
-    wxStaticText* GetStaticText2303() { return m_staticText2303; }
-    wxTextCtrl* GetValDB() { return m_valDB; }
-    wxStaticText* GetStaticText230() { return m_staticText230; }
-    wxTextCtrl* GetValDC() { return m_valDC; }
-    wxStaticText* GetStaticText2304() { return m_staticText2304; }
-    wxStaticText* GetStaticText147() { return m_staticText147; }
-    wxStaticLine* GetStaticLine141() { return m_staticLine141; }
-    wxCheckBox* GetCbWithAcceleration() { return m_cbWithAcceleration; }
-    wxCheckBox* GetCbSpeedRelative() { return m_cbSpeedRelative; }
-    wxCheckBox* GetCbEnhancedTracing() { return m_cbEnhancedTracing; }
-    wxCheckBox* GetCbRealtime() { return m_cbRealtime; }
-    wxCheckBox* GetCbSpecialSpeedDisplayHeight() { return m_cbSpecialSpeedDisplayHeight; }
-    wxTextCtrl* GetEbSpecialSpeedDisplayHeightValue() { return m_ebSpecialSpeedDisplayHeightValue; }
-    wxStaticText* GetStaticText302() { return m_staticText302; }
-    wxCheckBox* GetCbSpecialAccelDisplayWidth() { return m_cbSpecialAccelDisplayWidth; }
-    wxTextCtrl* GetEbSpecialAccelDisplayWidthValue() { return m_ebSpecialAccelDisplayWidthValue; }
-    wxStaticText* GetStaticText3025() { return m_staticText3025; }
-    wxPanel* GetPanel98() { return m_panel98; }
-    wxStaticLine* GetStaticLine294() { return m_staticLine294; }
-    wxStaticText* GetStaticText195() { return m_staticText195; }
-    wxBitmapToggleButton* GetBtExpandImpulse() { return m_btExpandImpulse; }
-    wxPanel* GetPanelStreach() { return m_panelStreach; }
-    wxStaticText* GetStaticText246() { return m_staticText246; }
-    wxComboBox* GetCbDisplayTypeV() { return m_cbDisplayTypeV; }
-    wxStaticLine* GetStaticLine204() { return m_staticLine204; }
-    wxPanel* GetAccelerationDiagramPlaceholder() { return m_accelerationDiagramPlaceholder; }
-    wxPanel* GetDeaccelerationDiagramPlaceholder() { return m_deaccelerationDiagramPlaceholder; }
-    wxPanel* GetSplTopPage() { return m_splTopPage; }
-    wxStaticText* GetStaticText198() { return m_staticText198; }
-    wxStaticLine* GetStaticLine202() { return m_staticLine202; }
-    wxTextCtrl* GetLoggerPlaceholder() { return m_loggerPlaceholder; }
-    wxPanel* GetSplitterPageLogger() { return m_splitterPageLogger; }
-    wxStaticText* GetStaticText114() { return m_staticText114; }
-    wxStaticLine* GetStaticLine116() { return m_staticLine116; }
-    wxListCtrl* GetListCtrlTestData() { return m_listCtrlTestData; }
-    wxPanel* GetPanel169() { return m_panel169; }
-    wxStaticText* GetStaticText161() { return m_staticText161; }
-    wxListCtrl* GetListCtrlAxisX() { return m_listCtrlAxisX; }
-    wxStaticText* GetStaticText1612733() { return m_staticText1612733; }
-    wxListCtrl* GetListCtrlAxisY() { return m_listCtrlAxisY; }
-    wxStaticText* GetStaticText16127() { return m_staticText16127; }
-    wxListCtrl* GetListCtrlAxisZ() { return m_listCtrlAxisZ; }
-    wxPanel* GetPanelAxes() { return m_panelAxes; }
-    wxToolbook* GetNbCalculations() { return m_nbCalculations; }
-    wxPanel* GetSplitterPageParameter() { return m_splitterPageParameter; }
-    wxSplitterWindow* GetSplitterBottom() { return m_splitterBottom; }
-    wxPanel* GetSplBottomPage() { return m_splBottomPage; }
-    wxSplitterWindow* GetMainSplitter() { return m_mainSplitter; }
-    wxPanel* GetPanel283() { return m_panel283; }
-    wxStaticText* GetStaticText278() { return m_staticText278; }
-    wxTextCtrl* GetLastTimestamp() { return m_lastTimestamp; }
-    wxPanel* GetStatusPanel() { return m_statusPanel; }
-    wxTimer* GetContinuousTimer() { return m_continuousTimer; }
-    CncSpeedPlaygroundBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Speed & Acceleration Playground"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1000,1200), long style = wxDEFAULT_FRAME_STYLE);
+    wxButton* GetButton2618()
+    {
+	return m_button2618;
+    }
+    wxStaticLine* GetStaticLine263()
+    {
+	return m_staticLine263;
+    }
+    wxButton* GetButton261()
+    {
+	return m_button261;
+    }
+    wxPanel* GetTollbarPanel()
+    {
+	return m_tollbarPanel;
+    }
+    wxStaticText* GetStaticText108()
+    {
+	return m_staticText108;
+    }
+    wxStaticLine* GetStaticLine110()
+    {
+	return m_staticLine110;
+    }
+    wxStaticText* GetStaticText652()
+    {
+	return m_staticText652;
+    }
+    wxTextCtrl* GetValF()
+    {
+	return m_valF;
+    }
+    wxStaticText* GetStaticText694()
+    {
+	return m_staticText694;
+    }
+    wxStaticText* GetStaticMinF()
+    {
+	return m_staticMinF;
+    }
+    wxSlider* GetSliderF()
+    {
+	return m_sliderF;
+    }
+    wxStaticText* GetStaticMaxF()
+    {
+	return m_staticMaxF;
+    }
+    wxStaticText* GetStaticText65()
+    {
+	return m_staticText65;
+    }
+    wxTextCtrl* GetValX()
+    {
+	return m_valX;
+    }
+    wxStaticText* GetStaticText69()
+    {
+	return m_staticText69;
+    }
+    wxStaticText* GetStaticMinX()
+    {
+	return m_staticMinX;
+    }
+    wxSlider* GetSliderX()
+    {
+	return m_sliderX;
+    }
+    wxStaticText* GetStaticMaxX()
+    {
+	return m_staticMaxX;
+    }
+    wxStaticText* GetStaticText658()
+    {
+	return m_staticText658;
+    }
+    wxTextCtrl* GetValY()
+    {
+	return m_valY;
+    }
+    wxStaticText* GetStaticText6910()
+    {
+	return m_staticText6910;
+    }
+    wxStaticText* GetStaticMinY()
+    {
+	return m_staticMinY;
+    }
+    wxSlider* GetSliderY()
+    {
+	return m_sliderY;
+    }
+    wxStaticText* GetStaticMaxY()
+    {
+	return m_staticMaxY;
+    }
+    wxStaticText* GetStaticText65814()
+    {
+	return m_staticText65814;
+    }
+    wxTextCtrl* GetValZ()
+    {
+	return m_valZ;
+    }
+    wxStaticText* GetStaticText691016()
+    {
+	return m_staticText691016;
+    }
+    wxStaticText* GetStaticMinZ()
+    {
+	return m_staticMinZ;
+    }
+    wxSlider* GetSliderZ()
+    {
+	return m_sliderZ;
+    }
+    wxStaticText* GetStaticMaxZ()
+    {
+	return m_staticMaxZ;
+    }
+    wxStaticText* GetStaticText313()
+    {
+	return m_staticText313;
+    }
+    wxStaticLine* GetStaticLine14126()
+    {
+	return m_staticLine14126;
+    }
+    wxStaticText* GetStaticText318()
+    {
+	return m_staticText318;
+    }
+    wxTextCtrl* GetEbSpecialTriggerImpluse1()
+    {
+	return m_ebSpecialTriggerImpluse1;
+    }
+    wxStaticText* GetStaticText320()
+    {
+	return m_staticText320;
+    }
+    wxTextCtrl* GetEbSpecialTriggerSpeed1()
+    {
+	return m_ebSpecialTriggerSpeed1;
+    }
+    wxStaticText* GetStaticText326()
+    {
+	return m_staticText326;
+    }
+    wxStaticText* GetStaticText3188()
+    {
+	return m_staticText3188;
+    }
+    wxTextCtrl* GetEbSpecialTriggerImpluse2()
+    {
+	return m_ebSpecialTriggerImpluse2;
+    }
+    wxStaticText* GetStaticText32010()
+    {
+	return m_staticText32010;
+    }
+    wxTextCtrl* GetEbSpecialTriggerSpeed2()
+    {
+	return m_ebSpecialTriggerSpeed2;
+    }
+    wxStaticText* GetStaticText32613()
+    {
+	return m_staticText32613;
+    }
+    wxStaticText* GetStaticText318815()
+    {
+	return m_staticText318815;
+    }
+    wxTextCtrl* GetEbSpecialTriggerImpluse3()
+    {
+	return m_ebSpecialTriggerImpluse3;
+    }
+    wxStaticText* GetStaticText3201018()
+    {
+	return m_staticText3201018;
+    }
+    wxTextCtrl* GetEbSpecialTriggerSpeed3()
+    {
+	return m_ebSpecialTriggerSpeed3;
+    }
+    wxStaticText* GetStaticText3261320()
+    {
+	return m_staticText3261320;
+    }
+    wxStaticText* GetStaticText14711()
+    {
+	return m_staticText14711;
+    }
+    wxStaticLine* GetStaticLine1412()
+    {
+	return m_staticLine1412;
+    }
+    wxStaticText* GetStaticText230385()
+    {
+	return m_staticText230385;
+    }
+    wxTextCtrl* GetValAA()
+    {
+	return m_valAA;
+    }
+    wxStaticText* GetStaticText23038()
+    {
+	return m_staticText23038;
+    }
+    wxTextCtrl* GetValAB()
+    {
+	return m_valAB;
+    }
+    wxStaticText* GetStaticText23010()
+    {
+	return m_staticText23010;
+    }
+    wxTextCtrl* GetValAC()
+    {
+	return m_valAC;
+    }
+    wxStaticText* GetStaticText230103()
+    {
+	return m_staticText230103;
+    }
+    wxStaticText* GetStaticText1471()
+    {
+	return m_staticText1471;
+    }
+    wxStaticLine* GetStaticLine14122()
+    {
+	return m_staticLine14122;
+    }
+    wxStaticText* GetStaticText23036()
+    {
+	return m_staticText23036;
+    }
+    wxTextCtrl* GetValDA()
+    {
+	return m_valDA;
+    }
+    wxStaticText* GetStaticText2303()
+    {
+	return m_staticText2303;
+    }
+    wxTextCtrl* GetValDB()
+    {
+	return m_valDB;
+    }
+    wxStaticText* GetStaticText230()
+    {
+	return m_staticText230;
+    }
+    wxTextCtrl* GetValDC()
+    {
+	return m_valDC;
+    }
+    wxStaticText* GetStaticText2304()
+    {
+	return m_staticText2304;
+    }
+    wxStaticText* GetStaticText147()
+    {
+	return m_staticText147;
+    }
+    wxStaticLine* GetStaticLine141()
+    {
+	return m_staticLine141;
+    }
+    wxCheckBox* GetCbWithAcceleration()
+    {
+	return m_cbWithAcceleration;
+    }
+    wxCheckBox* GetCbSpeedRelative()
+    {
+	return m_cbSpeedRelative;
+    }
+    wxCheckBox* GetCbEnhancedTracing()
+    {
+	return m_cbEnhancedTracing;
+    }
+    wxCheckBox* GetCbRealtime()
+    {
+	return m_cbRealtime;
+    }
+    wxCheckBox* GetCbSpecialSpeedDisplayHeight()
+    {
+	return m_cbSpecialSpeedDisplayHeight;
+    }
+    wxTextCtrl* GetEbSpecialSpeedDisplayHeightValue()
+    {
+	return m_ebSpecialSpeedDisplayHeightValue;
+    }
+    wxStaticText* GetStaticText302()
+    {
+	return m_staticText302;
+    }
+    wxCheckBox* GetCbSpecialAccelDisplayWidth()
+    {
+	return m_cbSpecialAccelDisplayWidth;
+    }
+    wxTextCtrl* GetEbSpecialAccelDisplayWidthValue()
+    {
+	return m_ebSpecialAccelDisplayWidthValue;
+    }
+    wxStaticText* GetStaticText3025()
+    {
+	return m_staticText3025;
+    }
+    wxPanel* GetPanel98()
+    {
+	return m_panel98;
+    }
+    wxStaticLine* GetStaticLine294()
+    {
+	return m_staticLine294;
+    }
+    wxStaticText* GetStaticText195()
+    {
+	return m_staticText195;
+    }
+    wxBitmapToggleButton* GetBtExpandImpulse()
+    {
+	return m_btExpandImpulse;
+    }
+    wxPanel* GetPanelStreach()
+    {
+	return m_panelStreach;
+    }
+    wxStaticText* GetStaticText246()
+    {
+	return m_staticText246;
+    }
+    wxComboBox* GetCbDisplayTypeV()
+    {
+	return m_cbDisplayTypeV;
+    }
+    wxStaticLine* GetStaticLine204()
+    {
+	return m_staticLine204;
+    }
+    wxPanel* GetAccelerationDiagramPlaceholder()
+    {
+	return m_accelerationDiagramPlaceholder;
+    }
+    wxPanel* GetDeaccelerationDiagramPlaceholder()
+    {
+	return m_deaccelerationDiagramPlaceholder;
+    }
+    wxPanel* GetSplTopPage()
+    {
+	return m_splTopPage;
+    }
+    wxStaticText* GetStaticText198()
+    {
+	return m_staticText198;
+    }
+    wxStaticLine* GetStaticLine202()
+    {
+	return m_staticLine202;
+    }
+    wxTextCtrl* GetLoggerPlaceholder()
+    {
+	return m_loggerPlaceholder;
+    }
+    wxPanel* GetSplitterPageLogger()
+    {
+	return m_splitterPageLogger;
+    }
+    wxStaticText* GetStaticText114()
+    {
+	return m_staticText114;
+    }
+    wxStaticLine* GetStaticLine116()
+    {
+	return m_staticLine116;
+    }
+    wxListCtrl* GetListCtrlTestData()
+    {
+	return m_listCtrlTestData;
+    }
+    wxPanel* GetPanel169()
+    {
+	return m_panel169;
+    }
+    wxStaticText* GetStaticText161()
+    {
+	return m_staticText161;
+    }
+    wxListCtrl* GetListCtrlAxisX()
+    {
+	return m_listCtrlAxisX;
+    }
+    wxStaticText* GetStaticText1612733()
+    {
+	return m_staticText1612733;
+    }
+    wxListCtrl* GetListCtrlAxisY()
+    {
+	return m_listCtrlAxisY;
+    }
+    wxStaticText* GetStaticText16127()
+    {
+	return m_staticText16127;
+    }
+    wxListCtrl* GetListCtrlAxisZ()
+    {
+	return m_listCtrlAxisZ;
+    }
+    wxPanel* GetPanelAxes()
+    {
+	return m_panelAxes;
+    }
+    wxToolbook* GetNbCalculations()
+    {
+	return m_nbCalculations;
+    }
+    wxPanel* GetSplitterPageParameter()
+    {
+	return m_splitterPageParameter;
+    }
+    wxSplitterWindow* GetSplitterBottom()
+    {
+	return m_splitterBottom;
+    }
+    wxPanel* GetSplBottomPage()
+    {
+	return m_splBottomPage;
+    }
+    wxSplitterWindow* GetMainSplitter()
+    {
+	return m_mainSplitter;
+    }
+    wxPanel* GetPanel283()
+    {
+	return m_panel283;
+    }
+    wxStaticText* GetStaticText278()
+    {
+	return m_staticText278;
+    }
+    wxTextCtrl* GetLastTimestamp()
+    {
+	return m_lastTimestamp;
+    }
+    wxPanel* GetStatusPanel()
+    {
+	return m_statusPanel;
+    }
+    wxTimer* GetContinuousTimer()
+    {
+	return m_continuousTimer;
+    }
+    CncSpeedPlaygroundBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("CNC Speed & Acceleration Playground"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(1000, 1200),
+        long style = wxDEFAULT_FRAME_STYLE);
     virtual ~CncSpeedPlaygroundBase();
 };
 

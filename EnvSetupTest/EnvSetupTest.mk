@@ -5,6 +5,7 @@
 ## Release
 ProjectName            :=EnvSetupTest
 ConfigurationName      :=Release
+WorkspaceConfiguration :=Release
 WorkspacePath          :=C:/@Development/@Projekte/c++/CNCGuiController
 ProjectPath            :=C:/@Development/@Projekte/c++/CNCGuiController/EnvSetupTest
 IntermediateDirectory  :=$(ConfigurationName)
@@ -13,7 +14,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=20/09/2021
+Date                   :=27/04/2022
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/msys64/mingw64/bin/g++.exe
 SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
@@ -27,6 +28,7 @@ OutputSwitch           :=-o
 LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
+OutputDirectory        :=$(IntermediateDirectory)
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
 Preprocessors          :=$(PreprocessorSwitch)NDEBUG 
 ObjectSwitch           :=-o 
@@ -47,7 +49,7 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/msys64/mi
 
 ##
 ## Common variables
-## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
+## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overridden using an environment variable
 ##
 AR       := C:/msys64/mingw64/bin/ar.exe rcu
 CXX      := C:/msys64/mingw64/bin/g++.exe
@@ -62,7 +64,7 @@ AS       := C:/msys64/mingw64/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files\CodeLite
-Objects0=$(IntermediateDirectory)/win_resources.rc$(ObjectSuffix) $(IntermediateDirectory)/MainDialog.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) $(IntermediateDirectory)/main.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel_bitmaps.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_CncSecureCtrlPanel.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_test.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix) $(IntermediateDirectory)/MainDialog.cpp$(ObjectSuffix) $(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) $(IntermediateDirectory)/win_resources.rc$(ObjectSuffix) 
 
 
 
@@ -93,13 +95,29 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/win_resources.rc$(ObjectSuffix): win_resources.rc
-	$(RcCompilerName) -i "C:/@Development/@Projekte/c++/CNCGuiController/EnvSetupTest/win_resources.rc" $(RcCmpOptions)   $(ObjectSwitch)$(IntermediateDirectory)/win_resources.rc$(ObjectSuffix) $(RcIncludePath)
-$(IntermediateDirectory)/MainDialog.cpp$(ObjectSuffix): MainDialog.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/MainDialog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/MainDialog.cpp$(DependSuffix) -MM MainDialog.cpp
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/EnvSetupTest/MainDialog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/MainDialog.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/MainDialog.cpp$(PreprocessSuffix): MainDialog.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/MainDialog.cpp$(PreprocessSuffix) MainDialog.cpp
+$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel_bitmaps.cpp$(ObjectSuffix): ../CncControlerGui/wxCrafterSecurePanel_bitmaps.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel_bitmaps.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel_bitmaps.cpp$(DependSuffix) -MM ../CncControlerGui/wxCrafterSecurePanel_bitmaps.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/wxCrafterSecurePanel_bitmaps.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel_bitmaps.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel_bitmaps.cpp$(PreprocessSuffix): ../CncControlerGui/wxCrafterSecurePanel_bitmaps.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel_bitmaps.cpp$(PreprocessSuffix) ../CncControlerGui/wxCrafterSecurePanel_bitmaps.cpp
+
+$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel.cpp$(ObjectSuffix): ../CncControlerGui/wxCrafterSecurePanel.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel.cpp$(DependSuffix) -MM ../CncControlerGui/wxCrafterSecurePanel.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/wxCrafterSecurePanel.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel.cpp$(PreprocessSuffix): ../CncControlerGui/wxCrafterSecurePanel.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_wxCrafterSecurePanel.cpp$(PreprocessSuffix) ../CncControlerGui/wxCrafterSecurePanel.cpp
+
+$(IntermediateDirectory)/up_CncControlerGui_CncSecureCtrlPanel.cpp$(ObjectSuffix): ../CncControlerGui/CncSecureCtrlPanel.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_CncSecureCtrlPanel.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_CncSecureCtrlPanel.cpp$(DependSuffix) -MM ../CncControlerGui/CncSecureCtrlPanel.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncSecureCtrlPanel.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_CncSecureCtrlPanel.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_CncControlerGui_CncSecureCtrlPanel.cpp$(PreprocessSuffix): ../CncControlerGui/CncSecureCtrlPanel.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_CncSecureCtrlPanel.cpp$(PreprocessSuffix) ../CncControlerGui/CncSecureCtrlPanel.cpp
+
+$(IntermediateDirectory)/up_CncControlerGui_test.cpp$(ObjectSuffix): ../CncControlerGui/test.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_test.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_test.cpp$(DependSuffix) -MM ../CncControlerGui/test.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/test.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_test.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_CncControlerGui_test.cpp$(PreprocessSuffix): ../CncControlerGui/test.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_test.cpp$(PreprocessSuffix) ../CncControlerGui/test.cpp
 
 $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix): wxcrafter_bitmaps.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(DependSuffix) -MM wxcrafter_bitmaps.cpp
@@ -107,11 +125,11 @@ $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix): wxcrafter_bitmaps
 $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(PreprocessSuffix): wxcrafter_bitmaps.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(PreprocessSuffix) wxcrafter_bitmaps.cpp
 
-$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix): wxcrafter.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/wxcrafter.cpp$(DependSuffix) -MM wxcrafter.cpp
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/EnvSetupTest/wxcrafter.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/wxcrafter.cpp$(PreprocessSuffix): wxcrafter.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/wxcrafter.cpp$(PreprocessSuffix) wxcrafter.cpp
+$(IntermediateDirectory)/MainDialog.cpp$(ObjectSuffix): MainDialog.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/MainDialog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/MainDialog.cpp$(DependSuffix) -MM MainDialog.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/EnvSetupTest/MainDialog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/MainDialog.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/MainDialog.cpp$(PreprocessSuffix): MainDialog.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/MainDialog.cpp$(PreprocessSuffix) MainDialog.cpp
 
 $(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/main.cpp$(DependSuffix) -MM main.cpp
@@ -119,6 +137,14 @@ $(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp
 $(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.cpp$(PreprocessSuffix) main.cpp
 
+$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix): wxcrafter.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/wxcrafter.cpp$(DependSuffix) -MM wxcrafter.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/EnvSetupTest/wxcrafter.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/wxcrafter.cpp$(PreprocessSuffix): wxcrafter.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/wxcrafter.cpp$(PreprocessSuffix) wxcrafter.cpp
+
+$(IntermediateDirectory)/win_resources.rc$(ObjectSuffix): win_resources.rc
+	$(RcCompilerName) -i "C:/@Development/@Projekte/c++/CNCGuiController/EnvSetupTest/win_resources.rc" $(RcCmpOptions)   $(ObjectSwitch)$(IntermediateDirectory)/win_resources.rc$(ObjectSuffix) $(RcIncludePath)
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
 ##
