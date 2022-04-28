@@ -40,7 +40,7 @@ CncSummaryListCtrl::CncSummaryListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibSummary().Bitmap("BMP_TYPE_GCODE"));		// 2
 	imageList->Add(ImageLibSummary().Bitmap("BMP_TYPE_SVG"));		// 3
 	
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);

@@ -133,7 +133,7 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibSpy().Bitmap("BMP_RET_ERROR"));
 	imageList->Add(ImageLibSpy().Bitmap("BMP_MARKER"));
 	imageList->Add(ImageLibSpy().Bitmap("BMP_DEBUG"));
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
 	startRefreshInterval();
 }

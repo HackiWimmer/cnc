@@ -55,7 +55,7 @@ CncMessageListCtrl::CncMessageListCtrl(wxWindow *parent, long style)
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
 	//imageList->Add(ImageLibPosSpy().Bitmap("BMP_PID_MAJOR"));			// 0
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	wxFont boldFont(font); 		boldFont.MakeBold();
 	wxFont boldItalic(font); 	boldItalic.MakeItalic();

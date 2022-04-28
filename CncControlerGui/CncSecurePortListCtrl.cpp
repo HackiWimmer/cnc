@@ -48,7 +48,7 @@ CncSecurePortListCtrl::CncSecurePortListCtrl(wxWindow *parent, CncSecureCtrlPane
 	imageList->Add(ImageLibPortSelector().Bitmap(PortSelector::BMP_PS_AVAILABLE));
 	imageList->Add(ImageLibPortSelector().Bitmap(PortSelector::BMP_PS_ACCESS_DENIED));
 	imageList->Add(ImageLibPortSelector().Bitmap(PortSelector::BMP_PS_UNKNOWN));
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 }
 /////////////////////////////////////////////////////////////////////
 CncSecurePortListCtrl::~CncSecurePortListCtrl() {

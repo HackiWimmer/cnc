@@ -89,7 +89,7 @@ CncArduinoPinsListCtrl::CncArduinoPinsListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibPins().Bitmap("BMP_ANALOG"));
 	imageList->Add(ImageLibPins().Bitmap("BMP_INPUT"));
 	imageList->Add(ImageLibPins().Bitmap("BMP_OUTPUT"));
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	// build up data structure
 	for ( unsigned int i=AE::minDPinIndex; i<=AE::maxDPinIndex; i++ )

@@ -70,7 +70,7 @@ CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_USER_DEFINED"));	// 5
 	imageList->Add(ImageLibPosSpy().Bitmap("BMP_POS"));					// 6
 	
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	wxFont majorPosFont(font);
 	majorPosFont.MakeBold();

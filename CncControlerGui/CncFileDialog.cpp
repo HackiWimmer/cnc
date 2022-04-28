@@ -22,7 +22,7 @@ CncFileDialogLRUList::CncFileDialogLRUList(wxWindow *parent)
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
 	imageList->Add(ImageLibFile().Bitmap("BMP_LRU_FILE"));
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 }
 /////////////////////////////////////////////////////////////
 CncFileDialogLRUList::~CncFileDialogLRUList() {

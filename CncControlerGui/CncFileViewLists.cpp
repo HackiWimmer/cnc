@@ -60,7 +60,7 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 	imageList->RemoveAll();
 	imageList->Add(ImageLibFile().Bitmap("BMP_LRU_FILE"));
 	imageList->Add(ImageLibFile().Bitmap("BMP_LRU_FILE_SELECTED"));
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	popupMenu = new wxMenu("");
 	popupMenu->Append(miSaveLruListEntry,	wxT("Save LRU List [ctrl + S]"));
@@ -544,7 +544,7 @@ CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibFile().Bitmap("BMP_ERROR"));
 	imageList->Add(ImageLibFile().Bitmap("BMP_FILE_SELECTED"));
 	
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	eventTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncFileViewListCtrl::onEventTimer), NULL, this);
 }

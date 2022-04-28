@@ -55,7 +55,7 @@ CncVertexTrace::DataListCtrl::DataListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibMotionVertex().Bitmap("BMP_DATA"));	// 0
 	imageList->Add(ImageLibMotionVertex().Bitmap("BMP_DATA"));	// 1
 	
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	dataItemAttr.SetBackgroundColour(GetBackgroundColour());
 	dataItemAttr.SetFont(font);
@@ -257,7 +257,7 @@ CncVertexTrace::IndexListCtrl::IndexListCtrl(wxWindow *parent, long style)
 	imageList->RemoveAll();
 	imageList->Add(ImageLibMotionVertex().Bitmap("BMP_INDEX"));	// 0
 	
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	indexItemAttr.SetBackgroundColour(GetBackgroundColour());
 	indexItemAttr.SetFont(font);

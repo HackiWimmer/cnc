@@ -60,7 +60,7 @@ CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibSetterList().Bitmap("BMP_SETTER_VALUE"));		// 0
 	imageList->Add(ImageLibSetterList().Bitmap("BMP_SETTER_SEPARATOR"));	// 1
 	
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);

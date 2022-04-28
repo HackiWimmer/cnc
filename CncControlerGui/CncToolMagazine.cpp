@@ -34,7 +34,7 @@ CncToolMagazine::CncToolMagazine(wxWindow* parent)
 	imageList->RemoveAll();
 	imageList->Add(ImageLibConfig().Bitmap("BMP_TOOL_MAGAZINE_ENTRY"));
 	
-	m_toolMagazine->SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	m_toolMagazine->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	m_toolMagazine->AppendColumn("", 			wxLIST_FORMAT_RIGHT , 24);
 	m_toolMagazine->AppendColumn("ID", 			wxLIST_FORMAT_RIGHT , wxLIST_AUTOSIZE);
 	m_toolMagazine->AppendColumn("Type", 		wxLIST_FORMAT_CENTER, wxLIST_AUTOSIZE);

@@ -49,7 +49,7 @@ CncGamepadCommadHistoryListCtrl::CncGamepadCommadHistoryListCtrl(wxWindow *paren
 	imageList->Add(ImageLibGamepadCommand().Bitmap("BMP_STOP"));
 	imageList->Add(ImageLibGamepadCommand().Bitmap("BMP_UPDATE"));
 	imageList->Add(ImageLibGamepadCommand().Bitmap("BMP_UPDATE_WITH_CONTENT"));
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 	
 	SetItemCount(commands.size());
 }

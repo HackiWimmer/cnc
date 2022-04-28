@@ -61,7 +61,7 @@ CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibPathList().Bitmap("BMP_POSITION"));		// 3
 	imageList->Add(ImageLibPathList().Bitmap("BMP_POS_OPTIMIZED"));	// 4
 
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
