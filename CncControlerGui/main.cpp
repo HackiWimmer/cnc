@@ -365,16 +365,13 @@ class MainApp : public wxApp {
 					
 					{
 						wxMemoryDC mdc(bmp);
-						mdc.SetFont(wxFontInfo(18).FaceName("Helvetica").Bold());
+						mdc.SetFont(wxFontInfo(11).FaceName("Helvetica").Bold());
 						mdc.SetTextForeground(wxColor(255,255,255));
-						mdc.DrawText(globalStrings.programVersion, {50,235});
+						mdc.DrawText(globalStrings.programVersionShort, {50,235});
 						
-						/*
-						//todo
 						mdc.SetFont(wxFontInfo(9).FaceName("Helvetica").Italic().Bold());
 						mdc.SetTextForeground(wxColor(0,174,239));
-						mdc.DrawText(_copyRight, {12,338});
-						*/
+						mdc.DrawText(globalStrings.copyRight, {12,338});
 						
 						bmp = mdc.GetAsBitmap();
 					}

@@ -1534,7 +1534,7 @@ void MainFrame::traceBoostVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
-	out << globalStrings.programVersion << std::endl;
+	out << globalStrings.programVersionLong << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceOpenCvVersion(std::ostream& out) {
@@ -2757,7 +2757,7 @@ void MainFrame::initialize(void) {
 	
 	perspectiveHandler.setupUserPerspectives();
 	
-	this->SetTitle(wxString(globalStrings.programTitel) + " " + globalStrings.programVersion);
+	this->SetTitle(globalStrings.programVersionLong);
 	
 	// setup cnc port selector box
 	decoratePortSelector();
@@ -2923,7 +2923,7 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
 	wxUnusedVar(event);
 	wxAboutDialogInfo info;
 	info.SetName(globalStrings.programTitel);
-	info.SetVersion(globalStrings.programVersion);
+	info.SetVersion(globalStrings.programVersionOnly);
 	info.SetLicence(_("GPL v2 or later"));
 	info.AddDeveloper("Hacki Wimmmer");
 	info.SetDescription(description);

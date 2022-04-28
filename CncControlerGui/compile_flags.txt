@@ -1,5 +1,5 @@
 -IC:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui
--IC:\@Development\boost_1_77_0
+-IC:\@Development\boost_1_79_0
 -IC:\msys64\mingw64\include
 -IC:\@Development\wxsvg-1.5.23\include
 -IC:\@Development\opencv\build\include

@@ -72,7 +72,9 @@ struct GlobalConstStringDatabase
 	const wxString programTitel			= wxString(CNC_DESCRIPTION_STR);
 	const wxString copyRight			= wxString(CNC_COPYRIGHT_STR);
 	const wxString versionNumber		= VersionInfo::number;
-	const wxString programVersion		= wxString(wxString::Format("%s.%s - %s", programTitel, CNC_VERSION_LONG_STR, buildFlag));
+	const wxString programVersionOnly	= wxString(wxString::Format("%s - %s", CNC_VERSION_STR, buildFlag));
+	const wxString programVersionShort	= wxString(wxString::Format("%s.%s - %s", programTitel, CNC_VERSION_STR, buildFlag));
+	const wxString programVersionLong	= wxString(wxString::Format("%s.%s - %s", programTitel, CNC_VERSION_LONG_STR, buildFlag));
 	
 	// config
 	const wxString renderSelectorFormat = wxString("%0.3lf mm - %u PPI");

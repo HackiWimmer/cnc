@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="CncControllerGui" InternalType="GUI" Version="11000">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
+    </Plugin>
+  </Plugins>
   <VirtualDirectory Name="src">
     <File Name="CncUnitTests.cpp"/>
     <File Name="CncUnitTests.h"/>
     <File Name="PathGeneratorFrame.cpp"/>
     <File Name="PathGeneratorFrame.h"/>
   </VirtualDirectory>
-  <Plugins>
-    <Plugin Name="qmake">
-      <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
-    </Plugin>
-  </Plugins>
   <VirtualDirectory Name="@ini">
     <File Name="CncControllerLruStore.ini"/>
     <File Name="CncController.ini"/>
@@ -890,7 +890,7 @@
     <Configuration Name="Release" CompilerType="MinGW 64bit ( MSYS2 64bit )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g1;-fpic;-O3;-std=c++2a;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="C:/@Development/boost_1_77_0"/>
+        <IncludePath Value="C:/@Development/boost_1_79_0"/>
         <IncludePath Value="C:/msys64/mingw64/include"/>
         <IncludePath Value="C:/@Development/wxsvg-1.5.23/include"/>
         <IncludePath Value="C:/@Development/opencv/build/include"/>
