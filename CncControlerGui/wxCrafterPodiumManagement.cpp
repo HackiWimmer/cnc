@@ -210,7 +210,7 @@ CncPodiumMgmtMovementBase::CncPodiumMgmtMovementBase(wxWindow* parent,
 
     flexGridSizer9618->Add(m_staticLine9622, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
-    wxFlexGridSizer* flexGridSizer95431 = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer95431 = new wxFlexGridSizer(5, 1, 0, 0);
     flexGridSizer95431->SetFlexibleDirection(wxBOTH);
     flexGridSizer95431->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer95431->AddGrowableCol(0);

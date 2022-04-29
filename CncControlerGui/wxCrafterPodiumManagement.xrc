@@ -196,7 +196,7 @@
         <option>1</option>
         <object class="wxFlexGridSizer">
           <cols>1</cols>
-          <rows>4</rows>
+          <rows>5</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols>0</growablecols>

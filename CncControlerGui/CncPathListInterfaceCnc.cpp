@@ -19,9 +19,9 @@ bool CncPathListInterfaceCnc::InstructionTriggerNextPath		::process(CncPathListI
 bool CncPathListInterfaceCnc::InstructionTriggerSpeedChange		::process(CncPathListInterfaceCnc* i)	{ i->executeTrigger(tr); return true; }
 bool CncPathListInterfaceCnc::InstructionTriggerGuidePath		::process(CncPathListInterfaceCnc* i)	{ i->executeTrigger(tr); return true; }
 
-#warning todo
+#warning todo impl. better traces for MovSeq, MovSeq and Guide
 void CncPathListInterfaceCnc::CncMovSeqInstruction				::traceTo(std::ostream& o) const		{ o << "MovSeq"							<< std::endl; } // todo
-void CncPathListInterfaceCnc::CncPathListInstruction			::traceTo(std::ostream& o) const		{ o << "PathList"						<< std::endl; } // todo
+void CncPathListInterfaceCnc::CncPathListInstruction			::traceTo(std::ostream& o) const		{ o << "MovSeq"						<< std::endl; } // todo
 void CncPathListInterfaceCnc::CncGuidPathInstruction			::traceTo(std::ostream& o) const		{ o << "Guide"							<< std::endl; } // todo
 void CncPathListInterfaceCnc::CncClientIDInstruction			::traceTo(std::ostream& o) const		{ o << "ClientID(" << cid << ")"		<< std::endl; }
 void CncPathListInterfaceCnc::CncFeedSpeedInstruction			::traceTo(std::ostream& o) const		{ o << "F(" << value_MM_MIN << ")"		<< std::endl; }

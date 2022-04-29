@@ -27,7 +27,8 @@ class StackTrace {
 
 STACKTRACE_DB StackTrace::Database;
 
-
+//-------------------------------------------------------------
+// this is only an experiment
 bool GblFunc::replaceSizer(wxSizer* oldSizer, wxSizer* newSizer) {
 	
 	// only a test, currently this cashes
@@ -55,6 +56,8 @@ bool GblFunc::replaceSizer(wxSizer* oldSizer, wxSizer* newSizer) {
 	
 	return true;
 }
+//-------------------------------------------------------------
+
 
 ///////////////////////////////////////////////////////////////////
 int GblFunc::fixListBookBmpVisibleBug(wxWindow* lb) {
@@ -62,6 +65,9 @@ int GblFunc::fixListBookBmpVisibleBug(wxWindow* lb) {
 // Hack to make images visible 
 //
 ///////////////////////////////////////////////////////////////////
+	#warning function can be completly removed
+	return -1;
+	
 	if ( lb == NULL )
 		return -1;
 	

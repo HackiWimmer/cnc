@@ -738,9 +738,9 @@
     <Configuration Name="Debug" CompilerType="gcc.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-pg;-g;-O0;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="C:/@Development/boost_1_71_0"/>
+        <IncludePath Value="C:/@Development/boost_1_79_0"/>
         <IncludePath Value="C:/msys64/mingw64/include"/>
-        <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.23/include"/>
         <Preprocessor Value="DEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
