@@ -857,19 +857,41 @@ CncAutoProgressDialogBase::CncAutoProgressDialogBase(wxWindow* parent,
     }
     SetIcons(app_icons);
 
-    wxFlexGridSizer* flexGridSizer79 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer79 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer79->SetFlexibleDirection(wxBOTH);
     flexGridSizer79->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer79->AddGrowableCol(0);
     flexGridSizer79->AddGrowableRow(0);
     this->SetSizer(flexGridSizer79);
 
+    m_context = new wxTextCtrl(this, wxID_ANY, wxT("Progress . . ."), wxDefaultPosition,
+        wxDLG_UNIT(this, wxSize(-1, -1)), wxTE_READONLY | wxTE_CENTRE | wxBORDER_NONE);
+    m_context->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+#if wxVERSION_NUMBER >= 3000
+    m_context->SetHint(wxT(""));
+#endif
+
+    flexGridSizer79->Add(m_context, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     m_animationCtrl = new wxAnimationCtrl(
         this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDLG_UNIT(this, wxSize(40, 40)), wxAC_DEFAULT_STYLE);
     m_animationCtrl->SetInactiveBitmap(wxNullBitmap);
 
-    flexGridSizer79->Add(m_animationCtrl, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer79->Add(m_animationCtrl, 0, wxALL | wxALIGN_CENTER, WXC_FROM_DIP(5));
     m_animationCtrl->SetMinSize(wxSize(40, 40));
+
+    m_infoText = new wxTextCtrl(
+        this, wxID_ANY, wxT("???"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxTE_CENTRE | wxBORDER_NONE);
+    wxFont m_infoTextFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_infoText->SetFont(m_infoTextFont);
+#if wxVERSION_NUMBER >= 3000
+    m_infoText->SetHint(wxT(""));
+#endif
+
+    flexGridSizer79->Add(m_infoText, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_continuousTimer = new wxTimer;
+    m_continuousTimer->Start(500, false);
 
     SetName(wxT("CncAutoProgressDialogBase"));
     SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
@@ -881,10 +903,16 @@ CncAutoProgressDialogBase::CncAutoProgressDialogBase(wxWindow* parent,
     } else {
 	CentreOnScreen(wxBOTH);
     }
+    // Connect events
+    m_continuousTimer->Bind(wxEVT_TIMER, &CncAutoProgressDialogBase::onContinuousTimer, this);
 }
 
 CncAutoProgressDialogBase::~CncAutoProgressDialogBase()
 {
+    m_continuousTimer->Unbind(wxEVT_TIMER, &CncAutoProgressDialogBase::onContinuousTimer, this);
+
+    m_continuousTimer->Stop();
+    wxDELETE(m_continuousTimer);
 }
 
 CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent,

@@ -748,7 +748,7 @@ void CncBaseEditor::setupDefaultStyle() {
 	SetWrapMode(wxSTC_WRAP_NONE);
 	
 	// Enable line numbers
-	SetMarginWidth(MARGIN_LINE_NUMBERS, 		35);
+	SetMarginWidth(MARGIN_LINE_NUMBERS, 		48);
 	SetMarginType(MARGIN_LINE_NUMBERS, 			wxSTC_MARGIN_NUMBER);
 	SetMarginSensitive(MARGIN_LINE_NUMBERS, 	true);
 	

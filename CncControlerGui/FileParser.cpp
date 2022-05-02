@@ -359,6 +359,10 @@ bool FileParser::process() {
 	
 	// first: preprocessing
 	initNextRunPhase(CncProcessingInfo::RP_Preprocesser);
+	
+	if ( THE_CONTEXT->isCncTransactionActive() )
+		CNC_CEX2_A("Start Preprocessing")
+		
 	THE_CONTEXT->timestamps.logPreTimeStart();
 	bool ret = preprocess();
 	THE_CONTEXT->timestamps.logPreTimeEnd();
@@ -367,6 +371,9 @@ bool FileParser::process() {
 	if ( THE_CONTEXT->processingInfo->processMore() && ret == true )
 	{
 		initNextRunPhase(CncProcessingInfo::RP_Spool);
+		
+		if ( THE_CONTEXT->isCncTransactionActive() )
+			CNC_CEX2_A("Start Spooling")
 		
 		THE_CONTEXT->timestamps.logSerialTimeStart();
 		logMeasurementStart();
@@ -380,6 +387,10 @@ bool FileParser::process() {
 	if ( ret == true )
 	{
 		THE_CONTEXT->timestamps.logPostTimeStart();
+		
+		if ( THE_CONTEXT->isCncTransactionActive() )
+			CNC_CEX2_A("Start Postprocessing")
+			
 		ret = postprocess();
 		THE_CONTEXT->timestamps.logPostTimeEnd();
 	}
@@ -419,8 +430,10 @@ void FileParser::initNextRunPhase(CncProcessingInfo::RunPhase p) {
 //////////////////////////////////////////////////////////////////
 	THE_CONTEXT->processingInfo->setCurrentRunPhase(p);
 	
-	if ( debuggerConfigurationPropertyGrid != NULL && THE_CONTEXT->processingInfo->getCurrentDebugState() ) {
-		switch ( p ) {
+	if ( debuggerConfigurationPropertyGrid != NULL && THE_CONTEXT->processingInfo->getCurrentDebugState() ) 
+	{
+		switch ( p ) 
+		{
 			case CncProcessingInfo::RP_Preprocesser:
 				if ( debugControls.config.shouldDebugPreprocessing() == false )
 					return;

@@ -455,13 +455,33 @@ public:
 class CncAutoProgressDialogBase : public wxDialog
 {
 protected:
+    wxTextCtrl* m_context;
     wxAnimationCtrl* m_animationCtrl;
+    wxTextCtrl* m_infoText;
+    wxTimer* m_continuousTimer;
 
 protected:
+    virtual void onContinuousTimer(wxTimerEvent& event)
+    {
+	event.Skip();
+    }
+
 public:
+    wxTextCtrl* GetContext()
+    {
+	return m_context;
+    }
     wxAnimationCtrl* GetAnimationCtrl()
     {
 	return m_animationCtrl;
+    }
+    wxTextCtrl* GetInfoText()
+    {
+	return m_infoText;
+    }
+    wxTimer* GetContinuousTimer()
+    {
+	return m_continuousTimer;
     }
     CncAutoProgressDialogBase(wxWindow* parent,
         wxWindowID id = wxID_ANY,

@@ -37,6 +37,9 @@ namespace cnc
 	#define CNC_RESULT_WARNING_STR			"WARNING"
 	#define CNC_RESULT_ERROR_STR			"ERROR"
 	
+	#define FORCE_LOGGER_UPDATE \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->forceUpdate(); }
+		
 	#define INC_LOGGER_INDENT \
 		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->incCurrentIndent(); }
 		

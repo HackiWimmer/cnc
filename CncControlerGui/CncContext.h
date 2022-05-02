@@ -41,6 +41,7 @@ struct CncContext {
 		bool	allowEventHandling			= true;
 		bool	hardwareFlag				= false;
 		bool	requestIdleState			= false;
+		bool	cncTransactionState			= false;
 		
 		int		updateInterval				= 100;
 		
@@ -78,6 +79,10 @@ struct CncContext {
 		bool isGtkOS()											const	{ return os == WXGTK; }
 		OSType getOSType()										const	{ return os; }
 		const char* getOSTypeAsString();
+		
+		void registerCncTransaction()									{ cncTransactionState = true; }
+		void unregisterCncTransaction()									{ cncTransactionState = false; }
+		bool isCncTransactionActive()							const	{ return cncTransactionState; }
 		
 		void setCurrentToolDiameter(double d )							{ currentToolDiameter = fabs(d); }
 		double getCurrentToolDiameter()							const	{ return currentToolDiameter; }

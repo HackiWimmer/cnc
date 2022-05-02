@@ -123,6 +123,8 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		
 		void displayTimeColumn(bool show);
 		
+		void forceUpdate();
+		
 		wxDECLARE_NO_COPY_CLASS(CncLoggerListCtrl);
 		wxDECLARE_EVENT_TABLE();
 };

@@ -13,8 +13,9 @@ extern GlobalConstStringDatabase globalStrings;
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncGCodeSequenceListCtrl, CncLargeScaledListCtrl)
-	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncGCodeSequenceListCtrl::onSelectListItem)
-	EVT_LIST_ITEM_ACTIVATED(wxID_ANY, 	CncGCodeSequenceListCtrl::onActivateListItem)
+	EVT_PAINT				(			CncGCodeSequenceListCtrl::onPaint			)
+	EVT_LIST_ITEM_SELECTED	(wxID_ANY, 	CncGCodeSequenceListCtrl::onSelectListItem	)
+	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 	CncGCodeSequenceListCtrl::onActivateListItem)
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
@@ -130,10 +131,21 @@ void CncGCodeSequenceListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////
 	// currently nothing todo
 }
+//////////////////////////////////////////////////
+void CncGCodeSequenceListCtrl::onPaint(wxPaintEvent& event) {
+//////////////////////////////////////////////////
+	SetItemCount(gcodes.size());
+	
+	event.Skip();
+}
 /////////////////////////////////////////////////////////////
 void CncGCodeSequenceListCtrl::addBlock(const GCodeBlock& gcb) {
-	gcodes.push_back(gcb);
-	SetItemCount(gcodes.size());
+/////////////////////////////////////////////////////////////
+	gcodes.push_back(std::move(gcb));
+	
+	// To minimize the performance impact of SetItemCount(...)
+	// for latge list content, it will be called ones at onPaint(...).
+	//SetItemCount(gcodes.size());
 }
 /////////////////////////////////////////////////////////////
 bool CncGCodeSequenceListCtrl::searchReference(const wxString& what) {

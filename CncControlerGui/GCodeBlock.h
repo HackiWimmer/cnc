@@ -1,10 +1,11 @@
 #ifndef GCODE_BLOCK_H
 #define GCODE_BLOCK_H
 
-#include "CncUnitCalculator.h"
 #include "DataControlModel.h"
 #include "CncUnitCalculator.h"
+#include "CncUnitCalculator.h"
 #include "CncPosition.h"
+#include "CncCommon.h"
 #include "GCodeField.h"
 #include "GCodeCommands.h"
 
@@ -36,7 +37,7 @@ class GCodeBlock {
 		enum GCodePlaneSelect	{GC_XY_PLANE, GC_ZX_PLANE, GC_YZ_PLANE};
 		
 		/////////////////////////////////////////////////////////////
-		long				clientID		= -1;
+		long				clientID		= CLIENT_ID.INVALID;
 		
 		char 				cmdCode			= INVALID_GCODE_COMMAND_CMD;
 		long		 		cmdNumber		= INVALID_GCODE_COMMAND_NUM;
@@ -71,6 +72,8 @@ class GCodeBlock {
 		double 				p				= INVALID_GCODE_FIELD_VALUE;
 		
 		double 				h				= INVALID_GCODE_FIELD_VALUE;
+		
+		double 				t				= INVALID_GCODE_FIELD_VALUE;
 
 		/////////////////////////////////////////////////////
 		void reInit();
@@ -118,8 +121,14 @@ class GCodeBlock {
 		
 		const bool hasH() const		{ return h != INVALID_GCODE_FIELD_VALUE; }
 		
+		const bool hasT() const		{ return t != INVALID_GCODE_FIELD_VALUE; }
+
 		const bool hasMoveCmd() const { 
-			return (hasOneOf_XYZ() || hasI() || hasJ()); 
+			return ( hasOneOf_XYZ() || hasI() || hasJ() ); 
+		}
+		
+		const bool hasAnyParameter() const { 
+			return ( hasOneOf_XYZ() || hasI() || hasJ() || hasS() || hasE() || hasF() || hasP() || hasH() || hasT() ); 
 		}
 		
 		const bool hasCmdSubNumber() const { 

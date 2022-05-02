@@ -7,6 +7,7 @@
 #include "CncControl.h"
 #include "CncMotionMonitor.h"
 #include "CncAutoFreezer.h"
+#include "CncAutoProgressDialog.h"
 #include "CncPreprocessor.h"
 #include "CncMoveSequence.h"
 #include "CncPathListInterface.h"
@@ -372,6 +373,7 @@ void CncPathListRunner::resetWorkflow() {
 bool CncPathListRunner::spoolWorkflow() {
 //////////////////////////////////////////////////////////////////
 	CNC_CEX2_A("Start analyzing path list workflow (entries=%zu)", workflowList.size())
+	FORCE_LOGGER_UPDATE
 	
 	// normalize start and end position regarding a translation
 	if ( transformationMatrix.hasTranslation() )
@@ -416,9 +418,26 @@ bool CncPathListRunner::spoolWorkflow() {
 	// it will be re-filled by the loop below
 	currentInterface->resetInstructions();
 	
+	CncAutoProgressDialog progressDlg(THE_APP->getMotionMonitor(), "Prepare Cnc Instructions");
+	progressDlg.Show();
+
+	CNC_CEX2_A("Start processing path list workflow (entries=%zu)", workflowList.size())
+	FORCE_LOGGER_UPDATE
+	
+	const long modVal = (long)( workflowList.size() / 1000 );
+	long distance = 0;
+	
 	// over all workflow entries
 	for ( auto workflowEntry : workflowList )
 	{
+		if ( modVal > 0 && (distance++) % modVal == 0 )
+		{
+			// from time to time update the progress
+			// to keep a good usage feeling
+			const double val = workflowList.size() ? ((double)distance / workflowList.size()) * 100 : 0.0;
+			UPDATE_PROGRESS_DLG(wxString::Format("%.1lf %%", val));
+		}
+
 		if ( workflowEntry->isEndRunTrigger() )
 		{
 			// try to switch the spindle off 
@@ -437,6 +456,10 @@ bool CncPathListRunner::spoolWorkflow() {
 		
 		CHECK_AND_PERFORM_PROCESSING_STATE
 	}
+	
+	FORCE_LOGGER_UPDATE
+	
+	progressDlg.Hide();
 	
 	// process all collected cnc instructions
 	return currentInterface->spoolInstructions();

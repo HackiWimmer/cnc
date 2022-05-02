@@ -6,8 +6,10 @@
 #include <wx/xml/xml.h>
 #include "CncSourceEditor.h"
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "MainFrame.h"
 #include "CncAutoFreezer.h"
+#include "CncAutoProgressDialog.h"
 #include "CncGCodeSequenceListCtrl.h"
 #include "GCodePathHandlerBase.h"
 #include "GCodeFileParser.h"
@@ -63,8 +65,19 @@ bool GCodeFileParser::displayMessage(std::stringstream& ss, int type) {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::displayUnhandledBlockCommand(GCodeBlock& gcb, const char* additionalInfo) {
 //////////////////////////////////////////////////////////////////
+	const GCodeField field(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber);
+	
+	if ( gcb.cmdNumber >= 20 && gcb.cmdNumber <= 30)
+		return true; // skip all SD card commands
+
+	if ( GCodeCommands::canBeIgnored(field) )
+		return true; // skip such commands
+
 	std::stringstream ss;
-	ss << "Not handled GCode command: " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber);
+	ss	<< "Not handled GCode command: " 
+		<< field
+	;
+	
 	if ( additionalInfo != NULL )
 		ss << " [" << additionalInfo << "]";
 		
@@ -73,8 +86,14 @@ bool GCodeFileParser::displayUnhandledBlockCommand(GCodeBlock& gcb, const char* 
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::displayUnsupportedBlockCommand(const GCodeField& field, const char* additionalInfo) {
 //////////////////////////////////////////////////////////////////
+	if ( GCodeCommands::canBeIgnored(field) )
+		return true; // skip such commands
+		
 	std::stringstream ss;
-	ss << "Not supported GCode block command: " << field;
+	ss	<< "Not supported GCode block command: " 
+		<< field
+	;
+	
 	if ( additionalInfo != NULL )
 		ss << " [" << additionalInfo << "]";
 		
@@ -83,8 +102,14 @@ bool GCodeFileParser::displayUnsupportedBlockCommand(const GCodeField& field, co
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::displayUnhandledParameter(const GCodeField& field, const char* additionalInfo) {
 //////////////////////////////////////////////////////////////////
+	if ( GCodeCommands::canBeIgnored(field) )
+		return true; // skip such commands
+
 	std::stringstream ss;
-	ss << "Not supported GCode parameter: " << field.getCmd();
+	ss	<< "Not supported GCode parameter: "
+		<< field.getCmd()
+	;
+	
 	if ( additionalInfo != NULL )
 		ss << " [" << additionalInfo << "]";
 		
@@ -105,55 +130,7 @@ void GCodeFileParser::logMeasurementEnd() {
 //////////////////////////////////////////////////////////////////
 	pathHandler->logMeasurementEnd();
 }
-//////////////////////////////////////////////////////////////////
-bool GCodeFileParser::preprocess() {
-//////////////////////////////////////////////////////////////////
-	if ( pathHandler->prepareWork() == false ) 
-	{
-		std::cerr << CNC_LOG_FUNCT_A(": pathHandler->prepareWork() failed!\n");
-		return false;
-	}
-	
-	setDefaultParameters();
-	
-	// read the file content
-	wxFileInputStream input(fileName);
-	wxTextInputStream text(input, wxT("\x09"), wxConvUTF8 );
-	
-	setCurrentLineNumber(0);
-	GCodeBlock gcb;
-	
-	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
-	ctrl->clearAll();
-	
-	if ( input.IsOk() )
-	{
-		while( input.IsOk() && !input.Eof() )
-		{
-			wxString line = text.ReadLine();
-			line.Trim(false).Trim(true);
-			
-			incCurrentLineNumber();
-			
-			if ( line.IsEmpty() == false )
-			{
-				if ( processBlock(line, gcb) == false )
-				{
-					std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": Failed! Line number: %ld\n", getCurrentLineNumber()));
-					return false;
-				}
-				
-				if ( evaluateDebugState() == false )
-					return false;
-			}
-			
-			if ( programEnd == true )
-				break;
-		}
-	}
-	
-	return true;
-}
+
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::spool() {
 //////////////////////////////////////////////////////////////////
@@ -168,24 +145,49 @@ bool GCodeFileParser::spool() {
 	if ( pathHandler->isPathListUsed() == false )
 		return triggerEnd(true);
 	
-	// over all commands
+	// prepare . . . 
 	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
 	CncAutoFreezer caf(ctrl);
 	
-	programEnd = false;
+	programEnd  = false;
 	bool failed = false;
 	
-	CNC_CEX2_A("Start spooling parsed GCode commands (entries=%zu)", gCodeSequence.size())
+	CncAutoProgressDialog progressDlg(THE_APP->getMotionMonitor(), "Preprocessing GCode");
+	progressDlg.Show();
 	
+	// over all collected gcode commands
+	CNC_CEX2_A("Run parsed GCode commands (entries=%zu)", gCodeSequence.size())
+	FORCE_LOGGER_UPDATE
+	
+	const long modVal = (long)( gCodeSequence.size() / 1000 );
 	for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it)
 	{
-		if ( performBlock(*it) == false )
+		const long distance = std::distance(gCodeSequence.begin(), it);
+		if ( modVal > 0 && distance % modVal == 0 )
 		{
-			std::cerr << CNC_LOG_FUNCT_A(" performBlock() failed!\n");
+			// from time to time update the progress
+			// to keep a good usage feeling
+			const double val = gCodeSequence.size() ? ((double)distance / gCodeSequence.size()) * 100 : 0.0;
+			UPDATE_PROGRESS_DLG(wxString::Format("%.1lf %%", val));
+		}
+		
+		GCodeBlock& gcb = (*it);
+		
+		// reconstruct the line number to be right also during the spooling
+		// e. g. in case of error messages etc.
+		setCurrentLineNumber(gcb.clientID / CLIENT_ID.TPL_FACTOR);
+
+		if ( performBlock(gcb) == false )
+		{
+			std::cerr << CNC_LOG_FUNCT_A(" performBlock() failed at line %ld !\n", ClientIds::lineNumber(gcb.clientID));
+			gcb.trace(std::cerr);
+			gcb.traceMore(std::cerr);
+			
 			failed = true;
 			break;
 		}
 		
+		// error handling
 		if ( programEnd == true )
 		{
 			const long remaining = std::distance(it, gCodeSequence.end());
@@ -193,7 +195,7 @@ bool GCodeFileParser::spool() {
 			if ( remaining > 1 )
 			{
 				std::cout	<< "Info: Program end detected at line " 
-							<< ClientIds::lineNumber(it->clientID)
+							<< ClientIds::lineNumber(gcb.clientID)
 							<< ", but still " 
 							<< remaining 
 							<< " GCode blocks remaining \n"
@@ -204,14 +206,93 @@ bool GCodeFileParser::spool() {
 		}
 		
 		if ( THE_APP->isDisplayParserDetails() == true )
-			ctrl->addBlock(*it);
+			ctrl->addBlock(gcb);
 	}
 	
+	progressDlg.Hide();
+	FORCE_LOGGER_UPDATE
+	
+	// finalize . . .
 	if ( failed == true )
 		return triggerEnd(false);
 		
 	triggerEnd(true);
 	return pathHandler->spoolWorkflow();
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParser::preprocess() {
+//////////////////////////////////////////////////////////////////
+	if ( pathHandler->prepareWork() == false ) 
+	{
+		std::cerr << CNC_LOG_FUNCT_A(": pathHandler->prepareWork() failed!\n");
+		return false;
+	}
+	
+	setDefaultParameters();
+	setCurrentLineNumber(0);
+	GCodeBlock gcb;
+	
+	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
+	ctrl->clearAll();
+	
+	std::string line;
+	std::ifstream file (fileName.c_str().AsChar());
+	
+	// get length of file
+	struct stat stat_buf;
+	int rc = stat(fileName.c_str(), &stat_buf);
+	long totalLength = rc == 0 ? stat_buf.st_size : -1;
+	
+	// read the file content
+	if ( file.is_open() )
+	{
+		UPDATE_PROGRESS_DLG("");
+		
+		const long modVal = (long)( totalLength / 1000 );
+		
+		// over all file lines
+		while ( getline (file, line) )
+		{
+			incCurrentLineNumber();
+			
+			if ( modVal > 0 && getCurrentLineNumber() % modVal == 0 )
+			{
+				// from time to time update the progress
+				// to keep a good usage feeling
+				const double val = ((double)file.tellg() / totalLength) * 100;
+				UPDATE_PROGRESS_DLG(wxString::Format("%.1lf %%", val));
+			}
+			
+			// for all lines with content
+			if ( line.length() > 0 )
+			{
+				// strip it to the essential information
+				wxString gcodeLine(line);
+				gcodeLine.Trim(false).Trim(true);
+				
+				// process the gcode line
+				if ( processBlock(gcodeLine, gcb) == false )
+				{
+					std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": Failed! Line number: %ld\n", getCurrentLineNumber()));
+					return false;
+				}
+				
+				if ( evaluateProcessingState() == false )
+					return false;
+
+				if ( evaluateDebugState() == false )
+					return false;
+			}
+			
+			if ( programEnd == true )
+				break;
+		}
+		
+		file.close();
+	}
+	
+	FORCE_LOGGER_UPDATE
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::postprocess() {
@@ -227,53 +308,98 @@ bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
 	gcb.reInit();
 	gcb.block = block;
 	
+	bool blockCmdAvialable = false;
+	
 	wxStringTokenizer tokenizerBlank(block, " \t");
-	while ( tokenizerBlank.HasMoreTokens() ) {
-		wxString token = tokenizerBlank.GetNextToken();
+	while ( tokenizerBlank.HasMoreTokens() )
+	{
+		const wxString token = tokenizerBlank.GetNextToken();
 		
 		if ( token.IsEmpty() )
 			continue;
 			
 		if ( isalpha(token[0]) == false )
 			continue;
-			
-		GCodeField nextField(token);
-	
-		if ( gcb.isValid() && GCodeCommands::isBlockCommand(nextField.getCmd()) ) {
-			if ( prepareBlock(gcb) == false )
-				return false;
-				
-			if ( programEnd == true )
-				return true;
-			
-			gcb.reInit();
-		} 
 		
-		processField(nextField, gcb);
+		// the valid gcode token processing starts form here on
+		GCodeField nextField(token);
+		
+		if ( GCodeCommands::isBlockCommand(nextField.getCmd()) )
+		{
+			if ( blockCmdAvialable == true ) 
+			{
+				// in this case contains the current gcode file line
+				// a second block command and the collected fields 
+				// (cmd + parameters) have to be performed 
+				if ( prepareBlock(gcb) == false )
+					return false;
+					
+				gcb.reInit();
+				
+				// now the next block command can be collected . . .
+			}
+			
+			if ( GCodeCommands::isRegistered(nextField) == true )
+			{
+				// (re)setup the gcb block command structure
+				gcb.cmdCode 		= nextField.getCmd();
+				gcb.cmdNumber 		= nextField.getNum();
+				gcb.cmdSubNumber	= nextField.getSubNum();
+				gcb.nodeName		= nextField.getToken();
+				
+				// if something goes wrong reset the gcb structure
+				blockCmdAvialable = gcb.isValid();
+				if ( blockCmdAvialable == false )
+				{
+					displayUnsupportedBlockCommand(nextField);
+					gcb.reInit();
+				}
+				else
+				{
+					if ( GCodeCommands::isStandaloneCommand(nextField) )
+					{
+						// in this case all further tokens are content of such commands
+						// e. g. M117 <message token A message token B .....>
+						// and content are already part of gcb.block
+						
+						// break and not return here to call prepareBlock(gcb);
+						// after the while loop
+						break;
+					}
+				}
+			}
+			else
+			{
+				displayUnsupportedBlockCommand(nextField);
+				continue;
+			}
+		}
+		else
+		{
+			// if the gcode token isn't a block command
+			// process it as parameter
+			processField(nextField, gcb);
+			
+			// processField() == false is already handled and 
+			// has no further impact in this routine
+		}
 		
 		if ( evaluateProcessingState() == false )
 			return false;
+			
+		if ( programEnd == true )
+			return true;
 	}
 	
+	// processes the collected g cpode tokens
+	// (cmd + parameters)
 	return prepareBlock(gcb);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
-	if ( GCodeCommands::isBlockCommand(field.getCmd()) ) {
-		if ( GCodeCommands::isRegistered(field) == true ) {
-			gcb.cmdCode 		= field.getCmd();
-			gcb.cmdNumber 		= field.getNum();
-			gcb.cmdSubNumber	= field.getSubNum();
-			gcb.nodeName		= field.getToken();
-			return true;
-		} else {
-			displayUnsupportedBlockCommand(field);
-			return false;
-		}
-	}
-	
-	switch ( field.getCmd() ) {
+	switch ( field.getCmd() ) 
+	{
 		case 'X':	gcb.x 			= gcb.ensureUnit(field.getValue());
 					return true; 
 					
@@ -298,8 +424,7 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 		case 'F':	gcb.f 			= field.getValue();
 					return true; 
 					
-		case 'T':	//displayMessage(wxString::Format("Tool change prepared: ID: %.0lf", field.getValue()), wxICON_INFORMATION);
-					setNextToolID(field.getValue());
+		case 'T':	gcb.t			= field.getValue();
 					return true;
 					
 		case 'P':	gcb.p 			= field.getValue();
@@ -320,65 +445,62 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::prepareBlock(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
+	// first initialize the client id context
 	gcb.clientID = getCurrentLineNumber() * CLIENT_ID.TPL_FACTOR;
 	
-	if ( gcb.isValid() == false && gcb.hasMoveCmd() == true ) {
-		gcb.copyPrevCmdToCmd();
-	}
-	
-	if ( gcb.isValid() == false ) {
-		if ( gcb.hasMoveCmd() ) {
-			std::cerr << "GCodeFileParser::prepareBlock: Invalid GCode block:" << std::endl;
-			std::cerr << " Command:     " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber) << std::endl;
-			std::cerr << " Block:       " << gcb  << std::endl;
-			std::cerr << " Line number: " << getCurrentLineNumber() << std::endl;
-		} 
-		
-		return true;
-	}
-	
 	// work with intermediate step on demand
-	if ( pathHandler->isPathListUsed() ) {
+	if ( pathHandler->isPathListUsed() )
+	{
 		gCodeSequence.push_back(gcb);
 		
-		// in this case stop here 
+		// in this case the processing stops here.
+		// performBlock() will be called later while
+		// spooling the gCodeSequence list
 		return true;
 	}
 	
-	// this is only done withou a path list - see above
-	// Normaly for previews etc.
-	if ( THE_APP->isDisplayParserDetails() == true ) {
-		CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
-		ctrl->addBlock(gcb);
-	}
+	// this is only done without a path list - see above
+	// Normally for previews etc.
+	if ( THE_APP->isDisplayParserDetails() == true ) 
+		THE_APP->getGCodeSequenceList()->addBlock(gcb);
 	
 	return performBlock(gcb);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
-	//gcb.trace(std::clog);
-	bool ret = false;
-	
-	// check the new path trigger and init it before 
+	// check the new path trigger and initialize it before 
 	// calling initNextClientId()
 	if ( gcb.cmdCode == 'G' && gcb.cmdNumber == 0 )
 		pathHandler->initNextPath();
 	
 	initNextClientId(gcb.clientID);
 	
-	// always do this
-	pathHandler->processParameterEFS(gcb);
+	// first detect tool changes
+	if ( THE_CONFIG->getCurrentToolId() != int(gcb.t) )
+		setNextToolID(gcb.t);
 	
-	switch ( gcb.cmdCode ) {
-		case 'G':	ret = processG(gcb);	break;
-		case 'M':	ret = processM(gcb);	break;
-		//....
-		default: 	return displayUnhandledBlockCommand(gcb);
+	// then setup these parameters
+	bool ret = false;
+	if ( ( ret = pathHandler->processParameterEFS(gcb) ) == true )
+	{
+		// then process the block command if any exits
+		if ( gcb.isValid() == true )
+		{
+			switch ( gcb.cmdCode )
+			{
+				case 'G':	ret = processG(gcb);	break;
+				case 'M':	ret = processM(gcb);	break;
+				//....
+				default: 	return displayUnhandledBlockCommand(gcb);
+			}
+		}
+		// else do nothing more
 	}
 	
-	// perform debug information 
-	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
+	// the perform debug information on demand
+	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true )
+	{
 		registerNextDebugNode(GCodeCommands::explainGCodeCommand(gcb.nodeName)); 
 		
 		static DcmItemList rows;
@@ -393,7 +515,8 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
-	switch ( gcb.cmdNumber ) {
+	switch ( gcb.cmdNumber ) 
+	{
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case 0: 	// GC_G: Rapid Linear Move
 		{
@@ -470,12 +593,18 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 		} //....................................................
 		case 42: 	// GC_G: Cutter Compensation (Right) on
 		{	
-			if ( gcb.hasCmdSubNumber() == false ) {
+			if ( gcb.hasCmdSubNumber() == false ) 
+			{
 				pathHandler->setCutterCompensationMode(GCodePathHandlerBase::CC_STATIC_RIGHT);
-			} else  {
-				if ( gcb.cmdSubNumber == 1L ) { // G42.1
+			}
+			else
+			{
+				if ( gcb.cmdSubNumber == 1L ) 
+				{ // G42.1
 					pathHandler->setCutterCompensationMode(GCodePathHandlerBase::CC_DYNAMIC_RIGHT);
-				} else {
+				}
+				else
+				{
 					return false;
 				}
 			}
@@ -484,9 +613,11 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 		} //....................................................
 		case 43: 	// GC_G: Tool length offset
 		{
-			if ( gcb.hasH() ) {
+			if ( gcb.hasH() ) 
+			{
 				int id = (int)gcb.h;
-				if ( id > 0 ) {
+				if ( id > 0 ) 
+				{
 					pathHandler->setToolLengthOffsetId(id);
 					return true;
 				}
@@ -501,12 +632,16 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 		} //
 		case 90: 	// GC_G: Absolute Positioning:
 		{
-			if ( gcb.cmdSubNumber == 1L ) { // G90.1
+			if ( gcb.cmdSubNumber == 1L ) 
+			{ // G90.1
 				gcb.posModeIJ = GCodeBlock::GC_Absolute;
-			} else {
+			} 
+			else
+			{
 				gcb.posModeXYZ = GCodeBlock::GC_Absolute;
 				gcb.posModeIJ  = GCodeBlock::GC_Absolute;
 			}
+			
 			return true;
 		} //....................................................
 		case 91:	// GC_G: Set To Relative Positioning:
@@ -536,12 +671,12 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processM(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
-	switch ( gcb.cmdNumber ) {
+	switch ( gcb.cmdNumber ) 
+	{
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case  0:		// GC_M_StopOrUnconditionalStop
 		case  1:		// GC_M_SleepOrConditionalStop
 		case  2:		// GC_M_ProgramEnd
-		case 30:		// GC_M_ProgramEnd
 		{
 			programEnd = true; 
 			return true;
@@ -565,33 +700,45 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		case 6:		// GC_M_ToolChange
 		{
 			// a tool change isn't yet supported
-			// a correponding message will be display by setNextToolID(....)
+			// a corresponding message will be display by setNextToolID(....)
 			return true;
 		}
 		case 7:		// GC_M_MistCoolantOn
 		{
 			// mist coolant isn't yet supported
-			// the command will skiped silent
+			// the command will skipped silent
 			return true;
 		}
 		case 8:		// GC_M_FloodCoolantOn
 		{
 			// float coolant isn't yet supported
-			// the command will skiped silent
+			// the command will skipped silent
 			return true;
 		}
 		case 9:		// GC_M_CoolantOff
 		{
 			// coolant isn't yet supported
-			// the command will skiped silent
+			// the command will skipped silent
 			return true;
 		} //....................................................
 		
-		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
-		default: {
-			if ( gcb.cmdNumber > 30 )
-				return true; // skip all SD card commands
+		case 117:	// Marlin: Set LCD Message
+		{
+			const CncProcessingInfo::RunPhase curRunPhase = THE_CONTEXT->processingInfo->getCurrentRunPhase();
+			if ( curRunPhase == CncProcessingInfo::RunPhase::RP_Spool )
+			{
+				std::cout	<< "GCode Marlin LCD Message: "
+							<< gcb.block
+							<< std::endl;
+				;
+			}
 			
+			return true;
+		}
+		
+		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
+		default: 
+		{
 			return displayUnhandledBlockCommand(gcb);
 		}
 	}

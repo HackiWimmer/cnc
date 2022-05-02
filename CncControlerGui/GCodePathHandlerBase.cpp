@@ -62,6 +62,10 @@ bool GCodePathHandlerBase::processParameterEFS(GCodeBlock& gcb) {
 	
 	if ( gcb.hasS() )
 		s = changeCurrentSpindleSpeed(gcb.getCurrentSpindleSpeed());
+		
+	if ( e == false )	std::cerr << CNC_LOG_FUNCT_A(": E failed!\n");
+	if ( f == false )	std::cerr << CNC_LOG_FUNCT_A(": F failed!\n");
+	if ( s == false )	std::cerr << CNC_LOG_FUNCT_A(": S failed!\n");
 
 	return e && f && s;
 }

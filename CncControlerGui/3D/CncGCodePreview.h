@@ -9,8 +9,6 @@
 #include "3D/VerticeData.h"
 #include "3D/GLContextGCodePreview.h"
 
-class CncAutoProgressDialog;
-
 ////////////////////////////////////////////////////////////
 class CncGCodePreview : public CncGlCanvas {
 
@@ -37,14 +35,11 @@ class CncGCodePreview : public CncGlCanvas {
 		void onSize(wxSizeEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
 		
-		void setProgressDialog(CncAutoProgressDialog* dlg) { progressDialog = dlg; }
-		
 	protected:
 		
-		CncAutoProgressDialog* progressDialog;
-		wxString previewName;
-		GLContextGCodePreview* preview;
-		double maxDimension;
+		wxString				previewName;
+		GLContextGCodePreview*	preview;
+		double					maxDimension;
 		
 	private:
 		void appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);

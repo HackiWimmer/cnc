@@ -19,8 +19,8 @@ class CncGCodePreview;
 typedef std::vector<GCodeBlock> GCodeSequence;
 
 /////////////////////////////////////////////////////////////////////
-class GCodeFileParser : public FileParser {
-	
+class GCodeFileParser : public FileParser 
+{
 	protected:
 		GCodePathHandlerBase* pathHandler;
 		GCodeSequence gCodeSequence;

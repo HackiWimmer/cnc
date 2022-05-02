@@ -7,8 +7,8 @@
 #include "3D/GLInclude.h"
 
 ///////////////////////////////////////////////////
-class CncGlCanvas : public wxGLCanvas {
-		
+class CncGlCanvas : public wxGLCanvas 
+{
 	public:
 		CncGlCanvas(wxWindow *parent, int *attribList = NULL);
 		virtual ~CncGlCanvas();

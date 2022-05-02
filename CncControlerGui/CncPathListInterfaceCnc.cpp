@@ -21,7 +21,7 @@ bool CncPathListInterfaceCnc::InstructionTriggerGuidePath		::process(CncPathList
 
 #warning todo impl. better traces for MovSeq, MovSeq and Guide
 void CncPathListInterfaceCnc::CncMovSeqInstruction				::traceTo(std::ostream& o) const		{ o << "MovSeq"							<< std::endl; } // todo
-void CncPathListInterfaceCnc::CncPathListInstruction			::traceTo(std::ostream& o) const		{ o << "MovSeq"						<< std::endl; } // todo
+void CncPathListInterfaceCnc::CncPathListInstruction			::traceTo(std::ostream& o) const		{ o << "MovSeq"							<< std::endl; } // todo
 void CncPathListInterfaceCnc::CncGuidPathInstruction			::traceTo(std::ostream& o) const		{ o << "Guide"							<< std::endl; } // todo
 void CncPathListInterfaceCnc::CncClientIDInstruction			::traceTo(std::ostream& o) const		{ o << "ClientID(" << cid << ")"		<< std::endl; }
 void CncPathListInterfaceCnc::CncFeedSpeedInstruction			::traceTo(std::ostream& o) const		{ o << "F(" << value_MM_MIN << ")"		<< std::endl; }
@@ -82,6 +82,7 @@ CncLongPosition CncPathListInterfaceCnc::getCurrentPositionSteps() const						{ 
 bool CncPathListInterfaceCnc::spoolInstructions() {
 ////////////////////////////////////////////////////////////////////
 	CNC_CEX2_A("Start processing cnc instructions (entries=%zu)", cncInstructions.size())
+	FORCE_LOGGER_UPDATE
 	
 	for ( auto instruction : cncInstructions )
 	{
@@ -92,7 +93,8 @@ bool CncPathListInterfaceCnc::spoolInstructions() {
 			return false;
 		}
 		
-		THE_APP->evaluateAndPerformProcessingState();
+		if ( THE_APP->evaluateAndPerformProcessingState() == false )
+			return false;
 	}
 	
 	return true;

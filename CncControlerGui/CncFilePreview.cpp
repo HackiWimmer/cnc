@@ -86,11 +86,11 @@ bool CncFilePreview::loadFile() {
 	}
 	
 	bool ret = false;
-	if ( m_previewBook->GetSelection() == (int)GCODE_TAB_PAGE ) {
+	if ( m_previewBook->GetSelection() == (int)GCODE_TAB_PAGE )
+	{
 		
 		//if ( IsShownOnScreen() ) {
-			CncAutoProgressDialog progressDlg(this);
-			gcodePreview->setProgressDialog(&progressDlg);
+			CncAutoProgressDialog progressDlg(this, "Loading File");
 			progressDlg.Show();
 		//}
 		
@@ -103,9 +103,11 @@ bool CncFilePreview::loadFile() {
 		
 		gcodePreview->Refresh();
 		
-	} else if ( m_previewBook->GetSelection() == (int)SVG_TAB_PAGE ) {
-		
+	}
+	else if ( m_previewBook->GetSelection() == (int)SVG_TAB_PAGE )
+	{
 		ret = svgPreview->loadFile(lastFileName, "Cnc File Preview:" );
+		
 		if ( ret == true )	svgPreview->update();
 		else				svgPreview->clear();
 	}

@@ -6,7 +6,7 @@
 	// the rest appears automatically
 	#define CNC_VERSION_MAJOR_VAL    0
 	#define CNC_VERSION_MINOR_VAL    9
-	#define CNC_VERSION_INDEX_VAL    2
+	#define CNC_VERSION_INDEX_VAL    3
 	// -----------------------------------------------------------------------------------------------------------------
 	
 	#define STR_HELPER(x) #x
@@ -92,7 +92,7 @@
 	
 	#define CNC_COMPANY_STR                     "Hacki Wimmer"
 	#define CNC_DESCRIPTION_STR                 "Woodworking CNC Controller"
-	#define CNC_COPYRIGHT_STR                   "invented by Hacki Wimmer 2016 - 2021"
+	#define CNC_COPYRIGHT_STR                   "invented by Hacki Wimmer 2016 - 2022"
 	#define CNC_PROGNAME_STR                    "CncControllerGui.exe"
 	#define CNC_PRODUCTNAME_STR                 CNC_DESCRIPTION_STR
 	

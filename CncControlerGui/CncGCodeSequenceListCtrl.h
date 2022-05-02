@@ -39,6 +39,8 @@ class CncGCodeSequenceListCtrl : public CncLargeScaledListCtrl {
 		
 		void addBlock(const GCodeBlock& gcb);
 		
+		void onPaint(wxPaintEvent& event);
+		
 		void onSelectListItem(wxListEvent& event);
 		void onActivateListItem(wxListEvent& event);
 		

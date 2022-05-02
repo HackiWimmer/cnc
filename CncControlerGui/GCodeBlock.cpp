@@ -1,17 +1,23 @@
 #include <iostream>
 #include <sstream>
+#include "CncCommon.h"
 #include "GCodeBlock.h"
 
 //////////////////////////////////////////////////////////////////
 int GCodeBlock::removeComments(wxString& block, bool& openComment) {
 //////////////////////////////////////////////////////////////////
 	int s = wxNOT_FOUND;
-	if ( openComment == true ) {
-		if ( ( s = block.find(')')) != wxNOT_FOUND ) {
-			block = block.Remove(0, s);
+	if ( openComment == true )
+	{
+		if ( ( s = block.find(')')) != wxNOT_FOUND ) 
+		{
+			block = block.Remove(0, s + 1);
 			openComment = false;
+			
 			return block.length();
-		} else {
+		} 
+		else
+		{
 			block.clear();
 			return 0;
 		}
@@ -25,16 +31,20 @@ int GCodeBlock::removeComments(wxString& block, bool& openComment) {
 		block = block.SubString(0, s-1);
 
 	s = wxNOT_FOUND;
-	while ( (s = block.find('(')) != wxNOT_FOUND ) {
-		
+	while ( (s = block.find('(')) != wxNOT_FOUND ) 
+	{
 		int e = block.find(')');
-		if ( e != wxNOT_FOUND ) {
+		if ( e != wxNOT_FOUND )
+		{
 			block = block.Remove(s, e - s + 1);
-		} else {
+		} 
+		else
+		{
 			openComment = true;
 			block = block.substr(0, s);
 		}
 	}
+	
 	return block.length();
 }
 
@@ -42,9 +52,10 @@ int GCodeBlock::removeComments(wxString& block, bool& openComment) {
 void GCodeBlock::reInit() {
 //////////////////////////////////////////////////////////////////
 	// block header parameters
-	if ( GCodeCommands::isModal(cmdCode, cmdNumber, cmdSubNumber) == true ) {
+	if ( GCodeCommands::isModal(cmdCode, cmdNumber, cmdSubNumber) == true )
 		copyCmdToPrevCmd();
-	}
+	
+	const bool valid = isValid();
 	
 	cmdCode				= INVALID_GCODE_COMMAND_CMD;
 	cmdNumber			= INVALID_GCODE_COMMAND_NUM;
@@ -53,17 +64,21 @@ void GCodeBlock::reInit() {
 	nodeName.clear();
 	block.clear();
 	
-	// block body parameters
-	x 				= INVALID_GCODE_FIELD_VALUE;
-	y 				= INVALID_GCODE_FIELD_VALUE;
-	z 				= INVALID_GCODE_FIELD_VALUE;
-	f 				= INVALID_GCODE_FIELD_VALUE;
-	s 				= INVALID_GCODE_FIELD_VALUE;
-	i 				= INVALID_GCODE_FIELD_VALUE;
-	j 				= INVALID_GCODE_FIELD_VALUE;
-	//....
-	
-	// keep e, s, etc.
+	if ( valid == true )
+	{
+		// reset parameters
+		x 				= INVALID_GCODE_FIELD_VALUE;
+		y 				= INVALID_GCODE_FIELD_VALUE;
+		z 				= INVALID_GCODE_FIELD_VALUE;
+		f 				= INVALID_GCODE_FIELD_VALUE;
+		s 				= INVALID_GCODE_FIELD_VALUE;
+		i 				= INVALID_GCODE_FIELD_VALUE;
+		j 				= INVALID_GCODE_FIELD_VALUE;
+		//....
+		
+		// always keep e, s, etc. because they can occur 
+		// without block command
+	}
 }
 //////////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream &ostr, const GCodeBlock& a) {
@@ -91,6 +106,8 @@ const wxString GCodeBlock::getCmdAsString(wxString& ret) const {
 //////////////////////////////////////////////////////////////////
 const std::ostream& GCodeBlock::trace(std::ostream &ostr) const {
 //////////////////////////////////////////////////////////////////
+	ostr << wxString::Format("[%ld]: ", clientID / CLIENT_ID.TPL_FACTOR);
+	
 	wxString cmd;
 	ostr << getCmdAsString(cmd);
 	
@@ -140,12 +157,15 @@ const std::ostream& GCodeBlock::traceMore(std::ostream& ostr) const{
 		ostr << ( j != INVALID_GCODE_FIELD_VALUE ? wxString::Format("J=%lf", j) : "");
 	}
 	
-	/*
 	if ( hasOneOf_SEF() ) {
 		ostr << ( s != INVALID_GCODE_FIELD_VALUE ? wxString::Format("S=%lf", s) : "") << ", ";
 		ostr << ( e != INVALID_GCODE_FIELD_VALUE ? wxString::Format("E=%lf", e) : "");
 	}
-	*/
+	
+	if ( hasT() ) {
+		ostr << ( t != INVALID_GCODE_FIELD_VALUE ? wxString::Format("T=%lf", e) : "");
+	}
+	
 	return ostr;
 }
 //////////////////////////////////////////////////////////////////

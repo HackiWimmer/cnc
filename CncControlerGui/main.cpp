@@ -369,8 +369,8 @@ class MainApp : public wxApp {
 						mdc.SetTextForeground(wxColor(255,255,255));
 						mdc.DrawText(globalStrings.programVersionShort, {50,235});
 						
-						mdc.SetFont(wxFontInfo(9).FaceName("Helvetica").Italic().Bold());
-						mdc.SetTextForeground(wxColor(0,174,239));
+						mdc.SetFont(wxFontInfo(8).FaceName("Helvetica").Italic().Bold());
+						mdc.SetTextForeground(wxColor(134,162,200));
 						mdc.DrawText(globalStrings.copyRight, {12,338});
 						
 						bmp = mdc.GetAsBitmap();

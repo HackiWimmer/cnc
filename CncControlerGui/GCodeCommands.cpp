@@ -11,10 +11,11 @@ class CommandStoreInitializer {
 	
 	private:
 	
-		int ig = CMD_DESRIPTION_INVALID_GROUP;
+		int ig = CmdDescription::GROUP_INVALID;
 		
 		//////////////////////////////////////////////////////////////////
-		inline void registerCommand(const GCodeField& field, const char type, const int group, const bool modal, const char* desc) {
+		inline void registerCommand(const GCodeField& field, const char type, const int group, const bool modal, const char* desc)
+		{
 			CmdDescription cd;
 			cd.type 		= type;
 			cd.group		= group;
@@ -26,73 +27,95 @@ class CommandStoreInitializer {
 		}
 		
 		//////////////////////////////////////////////////////////////////
-		inline void registerMCommands() {
+		inline void registerMCommands() 
+		{
+			const char C = CmdDescription::TYPE_COMMAND;
+			const char S = CmdDescription::TYPE_STANDALONE_COMMAND;
+			const char I = CmdDescription::TYPE_IGNORE;
+			
 			// GCode M Commands
-			registerCommand(GCodeField("M00"), 		'C', ig,	false, "Stop Or Unconditional Stop");
-			registerCommand(GCodeField("M01"), 		'C', ig,	false, "Sleep Or Conditional Stop");
-			registerCommand(GCodeField("M02"), 		'C', ig,	false, "Program End");
-			registerCommand(GCodeField("M03"), 		'C', ig,	false, "Spindle On Clockwise");
-			registerCommand(GCodeField("M04"), 		'C', ig,	false, "Spindle On Counter Clockwise");
-			registerCommand(GCodeField("M05"), 		'C', ig,	false, "Spindle Off");
-			registerCommand(GCodeField("M06"), 		'C', ig,	false, "Tool Change");
-			registerCommand(GCodeField("M07"), 		'C', ig,	false, "Mist Coolant On");
-			registerCommand(GCodeField("M08"), 		'C', ig,	false, "Flood Coolant On");
-			registerCommand(GCodeField("M09"), 		'C', ig,	false, "Coolant Off");
+			registerCommand(GCodeField("M00"),		C, ig,	false, "Stop Or Unconditional Stop");
+			registerCommand(GCodeField("M01"),		C, ig,	false, "Sleep Or Conditional Stop");
+			registerCommand(GCodeField("M02"),		C, ig,	false, "Program End");
+			registerCommand(GCodeField("M03"),		C, ig,	false, "Spindle On Clockwise");
+			registerCommand(GCodeField("M04"),		C, ig,	false, "Spindle On Counter Clockwise");
+			registerCommand(GCodeField("M05"),		C, ig,	false, "Spindle Off");
+			registerCommand(GCodeField("M06"),		C, ig,	false, "Tool Change");
+			registerCommand(GCodeField("M07"),		C, ig,	false, "Mist Coolant On");
+			registerCommand(GCodeField("M08"),		C, ig,	false, "Flood Coolant On");
+			registerCommand(GCodeField("M09"),		C, ig,	false, "Coolant Off");
 			
-			registerCommand(GCodeField("M30"), 		'C', ig,	false, "Program End And Rewind");
+			registerCommand(GCodeField("M30"),		C, ig,	false, "Program End And Rewind");
+			
+			registerCommand(GCodeField("M82"),		I, ig,	false, "Marlin: E Absolute");
+			registerCommand(GCodeField("M84"),		I, ig,	false, "Marlin: Disable Steppers");
+			registerCommand(GCodeField("M104"),		I, ig,	false, "Marlin: Set Hotend Temperature");
+			registerCommand(GCodeField("M105"),		I, ig,	false, "Marlin: Report Temperatures");
+			registerCommand(GCodeField("M106"),		I, ig,	false, "Marlin: Set Fan Speed");
+			registerCommand(GCodeField("M107"),		I, ig,	false, "Marlin: Fan Off");
+			registerCommand(GCodeField("M109"),		I, ig,	false, "Marlin: Wait for Hotend Temperature");
+			registerCommand(GCodeField("M117"),		S, ig,	false, "Marlin: Set LCD Message");
+			registerCommand(GCodeField("M140"),		I, ig,	false, "Marlin: Set Bed Temperature");
+			registerCommand(GCodeField("M190"),		I, ig,	false, "Marlin: Wait for Bed Temperature");
 		}
 		
 		//////////////////////////////////////////////////////////////////
-		inline void registerGCommands() {
+		inline void registerGCommands() 
+		{
+			const char C = CmdDescription::TYPE_COMMAND;
+
 			// GCode G Commands
-			registerCommand(GCodeField("G00"), 		'C', 1,		true,  "Rapid Linear Move");
-			registerCommand(GCodeField("G01"), 		'C', 1,		true,  "Linear Move");
-			registerCommand(GCodeField("G02"), 		'C', 1,		true,  "Controlled Arc Move Clockwise");
-			registerCommand(GCodeField("G03"), 		'C', 1,		true,  "Controlled Arc Move Counter Clockwise");
-			registerCommand(GCodeField("G04"), 		'C', 0,		false, "Dwell");
+			registerCommand(GCodeField("G00"),		C, 1,		true,  "Rapid Linear Move");
+			registerCommand(GCodeField("G01"),		C, 1,		true,  "Linear Move");
+			registerCommand(GCodeField("G02"),		C, 1,		true,  "Controlled Arc Move Clockwise");
+			registerCommand(GCodeField("G03"),		C, 1,		true,  "Controlled Arc Move Counter Clockwise");
+			registerCommand(GCodeField("G04"),		C, 0,		false, "Dwell");
 			
-			registerCommand(GCodeField("G17"), 		'C', 2,		false, "XY Plane Select");
-			registerCommand(GCodeField("G18"), 		'C', 2,		false, "ZX Plane Select");
-			registerCommand(GCodeField("G19"), 		'C', 2,		false, "YZ Plane Select");
+			registerCommand(GCodeField("G17"),		C, 2,		false, "XY Plane Select");
+			registerCommand(GCodeField("G18"),		C, 2,		false, "ZX Plane Select");
+			registerCommand(GCodeField("G19"),		C, 2,		false, "YZ Plane Select");
 			
-			registerCommand(GCodeField("G20"), 		'C', 6,		false, "Set Units To Inches");
-			registerCommand(GCodeField("G21"), 		'C', 6,		false, "Set Units To Millimeters");
-			registerCommand(GCodeField("G28"), 		'C', 0,		false, "Move To Origin");
+			registerCommand(GCodeField("G20"),		C, 6,		false, "Set Units To Inches");
+			registerCommand(GCodeField("G21"),		C, 6,		false, "Set Units To Millimeters");
+			registerCommand(GCodeField("G28"),		C, 0,		false, "Move To Origin");
 			
-			registerCommand(GCodeField("G30"), 		'C', 0,		false, "Zero Return");
+			registerCommand(GCodeField("G30"),		C, 0,		false, "Zero Return");
 			
-			registerCommand(GCodeField("G40"), 		'C', 0,		false, "Cutter Compensation off");
-			registerCommand(GCodeField("G41"), 		'C', 0,		false, "Cutter Compensation on - static left");
-			registerCommand(GCodeField("G41.1"), 	'C', 0,		false, "Cutter Compensation on - dynamic left");
-			registerCommand(GCodeField("G42"), 		'C', 0,		false, "Cutter Compensation on - static right");
-			registerCommand(GCodeField("G42.1"), 	'C', 0,		false, "Cutter Compensation on - dynamic right");
+			registerCommand(GCodeField("G40"),		C, 0,		false, "Cutter Compensation off");
+			registerCommand(GCodeField("G41"),		C, 0,		false, "Cutter Compensation on - static left");
+			registerCommand(GCodeField("G41.1"),	C, 0,		false, "Cutter Compensation on - dynamic left");
+			registerCommand(GCodeField("G42"),		C, 0,		false, "Cutter Compensation on - static right");
+			registerCommand(GCodeField("G42.1"),	C, 0,		false, "Cutter Compensation on - dynamic right");
 			
-			registerCommand(GCodeField("G43"),	 	'C', 0,		false, "Tool Length offset");
+			registerCommand(GCodeField("G43"),	 	C, 0,		false, "Tool Length offset");
 			
-			registerCommand(GCodeField("G80"),	 	'C', 0,		false, "Cancel Canned Cycle");
+			registerCommand(GCodeField("G80"),	 	C, 0,		false, "Cancel Canned Cycle");
 			
-			registerCommand(GCodeField("G90"), 		'C', 3,		false, "Absolute Positioning");
-			registerCommand(GCodeField("G91"), 		'C', 3,		false, "Relative Positioning");
-			registerCommand(GCodeField("G90.1"), 	'C', 4,		false, "Arc Center Absolute Mode");
-			registerCommand(GCodeField("G91.1"), 	'C', 4,		false, "Arc Center Releativ Mode");
-			registerCommand(GCodeField("G92"), 		'C', 0,		false, "Set Position");
+			registerCommand(GCodeField("G90"),		C, 3,		false, "Absolute Positioning");
+			registerCommand(GCodeField("G91"),		C, 3,		false, "Relative Positioning");
+			registerCommand(GCodeField("G90.1"),	C, 4,		false, "Arc Center Absolute Mode");
+			registerCommand(GCodeField("G91.1"),	C, 4,		false, "Arc Center Releativ Mode");
+			registerCommand(GCodeField("G92"),		C, 0,		false, "Set Position");
 		}
 		
 		//////////////////////////////////////////////////////////////////
-		inline void registerParameters() {
-			// GCode Parameters
-			registerCommand(GCodeField("X"), 		'P', ig,	false, "Coordinate");
-			registerCommand(GCodeField("Y"), 		'P', ig,	false, "Coordinate");
-			registerCommand(GCodeField("Z"), 		'P', ig,	false, "Coordinate");
-			registerCommand(GCodeField("I"), 		'P', ig,	false, "Coordinate");
-			registerCommand(GCodeField("J"), 		'P', ig,	false, "Coordinate");
+		inline void registerParameters() 
+		{
+			const char P = CmdDescription::TYPE_PARAMETER;
 			
-			registerCommand(GCodeField("N"), 		'P', ig,	false, "Line number");
-			registerCommand(GCodeField("S"), 		'P', ig,	false, "Spindle speed setup");
-			registerCommand(GCodeField("F"), 		'P', ig,	false, "Feed rate");
-			registerCommand(GCodeField("T"), 		'P', ig,	false, "Tool ID");
-			registerCommand(GCodeField("E"), 		'P', ig,	false, "Extruder value");
-			registerCommand(GCodeField("T"), 		'P', ig,	false, "Tool ID");
+			// GCode Parameters
+			registerCommand(GCodeField("X"),		P, ig,	false, "Coordinate");
+			registerCommand(GCodeField("Y"),		P, ig,	false, "Coordinate");
+			registerCommand(GCodeField("Z"),		P, ig,	false, "Coordinate");
+			registerCommand(GCodeField("I"),		P, ig,	false, "Coordinate");
+			registerCommand(GCodeField("J"),		P, ig,	false, "Coordinate");
+			
+			registerCommand(GCodeField("N"),		P, ig,	false, "Line number");
+			registerCommand(GCodeField("S"),		P, ig,	false, "Spindle speed setup");
+			registerCommand(GCodeField("F"),		P, ig,	false, "Feed rate");
+			registerCommand(GCodeField("T"),		P, ig,	false, "Tool ID");
+			registerCommand(GCodeField("E"),		P, ig,	false, "Extruder value");
+			registerCommand(GCodeField("T"),		P, ig,	false, "Tool ID");
 		}
 	
 	public:
@@ -193,15 +216,14 @@ const char* GCodeCommands::explainGCodeCommand(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
 const bool GCodeCommands::isRegistered(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
-	CommandStore::iterator it = GCodeCommands::commandStore.find(field);
-	if ( it != GCodeCommands::commandStore.end() ) {
-		return true;
-	}
-	return false;
+	auto it = GCodeCommands::commandStore.find(field);
+	return it != GCodeCommands::commandStore.end();
 }
 //////////////////////////////////////////////////////////////////
 const bool GCodeCommands::isBlockCommand(const GCodeField& field) {
-	switch ( field.getCmd() ) {
+//////////////////////////////////////////////////////////////////
+	switch ( field.getCmd() ) 
+	{
 		case 'G':
 		case 'M': return true;
 		default:;
@@ -209,30 +231,53 @@ const bool GCodeCommands::isBlockCommand(const GCodeField& field) {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
+const bool GCodeCommands::isStandaloneCommand(const GCodeField& field) {
+//////////////////////////////////////////////////////////////////
+	if ( isBlockCommand(field) )
+	{
+		auto it = GCodeCommands::commandStore.find(field);
+		if ( it != GCodeCommands::commandStore.end() )
+			return (*it).second.type == CmdDescription::TYPE_STANDALONE_COMMAND;
+	}
+	
+	return false;
+}
+//////////////////////////////////////////////////////////////////
 const bool GCodeCommands::isParameter(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
+	// reduce gcode field to the pure command  letter in this case
 	GCodeField f(field.getCmd());
-	CommandStore::iterator it = GCodeCommands::commandStore.find(f);
-	if ( it != GCodeCommands::commandStore.end() ) {
-		return (*it).second.type == 'P';
-	}
+	auto it = GCodeCommands::commandStore.find(f);
+	
+	if ( it != GCodeCommands::commandStore.end() )
+		return (*it).second.type == CmdDescription::TYPE_PARAMETER;
+
+	return false;
+}
+//////////////////////////////////////////////////////////////////
+const bool GCodeCommands::canBeIgnored(const GCodeField& field) {
+//////////////////////////////////////////////////////////////////
+	auto it = GCodeCommands::commandStore.find(field);
+	if ( it != GCodeCommands::commandStore.end() )
+		return (*it).second.type == CmdDescription::TYPE_IGNORE;
+
 	return false;
 }
 //////////////////////////////////////////////////////////////////
 const CmdDescription* GCodeCommands::getCmdDescription(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
-	CommandStore::iterator it = GCodeCommands::commandStore.find(field);
-	if ( it != GCodeCommands::commandStore.end() ) {
+	auto it = GCodeCommands::commandStore.find(field);
+	if ( it != GCodeCommands::commandStore.end() ) 
 		return &(*it).second;
-	}
+	
 	return NULL;
 }
 //////////////////////////////////////////////////////////////////
 const bool GCodeCommands::isModal(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
-	CommandStore::iterator it = GCodeCommands::commandStore.find(field);
-	if ( it != GCodeCommands::commandStore.end() ) {
+	auto it = GCodeCommands::commandStore.find(field);
+	if ( it != GCodeCommands::commandStore.end() )
 		return ((*it).second).modal;
-	}
+	
 	return false;
 }

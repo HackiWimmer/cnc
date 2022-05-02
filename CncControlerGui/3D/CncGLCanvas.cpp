@@ -190,6 +190,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 			my = event.GetY();
 			
 			context->reshapeRelative(dx, dy);
+			update();
 		}
 		
 		// reset move mode

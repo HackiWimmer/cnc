@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	262,
+		"m_objCounter":	267,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxC3105InitBitmapResources",
 		"m_bitmapsFile":	"wxCrafterBaseDialogs_bitmaps.cpp",
@@ -6018,7 +6018,7 @@
 						}, {
 							"type":	"string",
 							"m_label":	"# Rows:",
-							"m_value":	"1"
+							"m_value":	"3"
 						}, {
 							"type":	"string",
 							"m_label":	"Growable columns:",
@@ -6026,7 +6026,7 @@
 						}, {
 							"type":	"string",
 							"m_label":	"Growable rows:",
-							"m_value":	"0"
+							"m_value":	"0,1,2"
 						}, {
 							"type":	"string",
 							"m_label":	"Horizontal gap:",
@@ -6038,13 +6038,104 @@
 						}],
 					"m_events":	[],
 					"m_children":	[{
+							"m_type":	4406,
+							"proportion":	0,
+							"border":	1,
+							"gbSpan":	"1,1",
+							"gbPosition":	"0,0",
+							"m_styles":	["wxTE_READONLY", "wxTE_CENTRE", "wxBORDER_NONE"],
+							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+							"m_properties":	[{
+									"type":	"winid",
+									"m_label":	"ID:",
+									"m_winid":	"wxID_ANY"
+								}, {
+									"type":	"string",
+									"m_label":	"Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Name:",
+									"m_value":	"m_context"
+								}, {
+									"type":	"multi-string",
+									"m_label":	"Tooltip:",
+									"m_value":	""
+								}, {
+									"type":	"colour",
+									"m_label":	"Bg Colour:",
+									"colour":	"ButtonHighlight"
+								}, {
+									"type":	"colour",
+									"m_label":	"Fg Colour:",
+									"colour":	"<Default>"
+								}, {
+									"type":	"font",
+									"m_label":	"Font:",
+									"m_value":	""
+								}, {
+									"type":	"bool",
+									"m_label":	"Hidden",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Disabled",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Focused",
+									"m_value":	false
+								}, {
+									"type":	"string",
+									"m_label":	"Class Name:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Include File:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Style:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Value:",
+									"m_value":	"Progress . . . ,,,,,,,,äääääääääääääää"
+								}, {
+									"type":	"string",
+									"m_label":	"Text Hint",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Max Length:",
+									"m_value":	"0"
+								}, {
+									"type":	"bool",
+									"m_label":	"Enable Spell Checking",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Auto Complete Directories:",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Auto Complete Files:",
+									"m_value":	false
+								}],
+							"m_events":	[],
+							"m_children":	[]
+						}, {
 							"m_type":	4519,
 							"proportion":	0,
 							"border":	5,
 							"gbSpan":	"1,1",
 							"gbPosition":	"0,0",
 							"m_styles":	["wxAC_DEFAULT_STYLE"],
-							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER"],
 							"m_properties":	[{
 									"type":	"winid",
 									"m_label":	"ID:",
@@ -6116,7 +6207,131 @@
 								}],
 							"m_events":	[],
 							"m_children":	[]
+						}, {
+							"m_type":	4406,
+							"proportion":	0,
+							"border":	5,
+							"gbSpan":	"1,1",
+							"gbPosition":	"0,0",
+							"m_styles":	["wxTE_CENTRE", "wxBORDER_NONE"],
+							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+							"m_properties":	[{
+									"type":	"winid",
+									"m_label":	"ID:",
+									"m_winid":	"wxID_ANY"
+								}, {
+									"type":	"string",
+									"m_label":	"Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Minimum Size:",
+									"m_value":	"-1,-1"
+								}, {
+									"type":	"string",
+									"m_label":	"Name:",
+									"m_value":	"m_infoText"
+								}, {
+									"type":	"multi-string",
+									"m_label":	"Tooltip:",
+									"m_value":	""
+								}, {
+									"type":	"colour",
+									"m_label":	"Bg Colour:",
+									"colour":	"<Default>"
+								}, {
+									"type":	"colour",
+									"m_label":	"Fg Colour:",
+									"colour":	"<Default>"
+								}, {
+									"type":	"font",
+									"m_label":	"Font:",
+									"m_value":	"9,normal, bold, swiss, 0, Segoe UI"
+								}, {
+									"type":	"bool",
+									"m_label":	"Hidden",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Disabled",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Focused",
+									"m_value":	false
+								}, {
+									"type":	"string",
+									"m_label":	"Class Name:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Include File:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Style:",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Value:",
+									"m_value":	"???"
+								}, {
+									"type":	"string",
+									"m_label":	"Text Hint",
+									"m_value":	""
+								}, {
+									"type":	"string",
+									"m_label":	"Max Length:",
+									"m_value":	"0"
+								}, {
+									"type":	"bool",
+									"m_label":	"Enable Spell Checking",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Auto Complete Directories:",
+									"m_value":	false
+								}, {
+									"type":	"bool",
+									"m_label":	"Auto Complete Files:",
+									"m_value":	false
+								}],
+							"m_events":	[],
+							"m_children":	[]
 						}]
+				}, {
+					"m_type":	4483,
+					"proportion":	0,
+					"border":	5,
+					"gbSpan":	"1,1",
+					"gbPosition":	"0,0",
+					"m_styles":	[],
+					"m_sizerFlags":	[],
+					"m_properties":	[{
+							"type":	"string",
+							"m_label":	"Name:",
+							"m_value":	"m_continuousTimer"
+						}, {
+							"type":	"integer",
+							"m_label":	"Interval",
+							"m_value":	500
+						}, {
+							"type":	"bool",
+							"m_label":	"Start the timer",
+							"m_value":	true
+						}, {
+							"type":	"bool",
+							"m_label":	"One Shot Timer",
+							"m_value":	false
+						}],
+					"m_events":	[{
+							"m_eventName":	"wxEVT_TIMER",
+							"m_eventClass":	"wxTimerEvent",
+							"m_functionNameAndSignature":	"onContinuousTimer(wxTimerEvent& event)",
+							"m_description":	"Process a timer event",
+							"m_noBody":	false
+						}],
+					"m_children":	[]
 				}]
 		}, {
 			"m_type":	4421,

@@ -6,23 +6,30 @@
 #include "GCodeField.h"
 
 ////////////////////////////////////////////////////////////////
-#define CMD_DESRIPTION_INVALID_TYPE 			'\0'
-#define CMD_DESRIPTION_INVALID_GROUP 			-1
+struct CmdDescription 
+{
+	static const int GROUP_INVALID				= -1;
 
-struct CmdDescription {
-	// \0=unknown, C=Command, P=Paramaeter
-	char 		type			= CMD_DESRIPTION_INVALID_TYPE;
-	int			group			= CMD_DESRIPTION_INVALID_GROUP;
-	bool 		modal			= false;
-	wxString 	description		= wxT("");
+	static const char TYPE_INVALID				= '\0';
+	static const char TYPE_PARAMETER			= 'P';
+	static const char TYPE_COMMAND				= 'C';
+	static const char TYPE_STANDALONE_COMMAND	= 'S';
+	static const char TYPE_IGNORE				= '-';
+
+	char 		type							= TYPE_INVALID;
+	int			group							= GROUP_INVALID;
+	bool 		modal							= false;
+	wxString 	description						= wxT("");
 	
 	//Corresponding field
-	GCodeField 	field			= GCodeField("");
+	GCodeField 	field							= GCodeField("");
 };
 
 ////////////////////////////////////////////////////////////////
 typedef std::map<GCodeField, CmdDescription, GCodeFieldComparer> CommandStore;
-class GCodeCommands {
+
+class GCodeCommands 
+{
 	private:
 		static wxString returnValue;
 		
@@ -46,9 +53,19 @@ class GCodeCommands {
 		static const bool isBlockCommand(char cmd) { GCodeField field(cmd); return isBlockCommand(field); };
 		
 		////////////////////////////////////////////////////////////////
+		static const bool isStandaloneCommand(const GCodeField& field);
+		static const bool isStandaloneCommand(const char* cmd) { GCodeField field(cmd[0]); return isStandaloneCommand(field); }
+		static const bool isStandaloneCommand(char cmd) { GCodeField field(cmd); return isStandaloneCommand(field); };
+
+		////////////////////////////////////////////////////////////////
 		static const bool isParameter(const GCodeField& field);
 		static const bool isParameter(const char* cmd) { GCodeField field(cmd[0]); return isParameter(field); }
 		static const bool isParameter(char cmd) { GCodeField field(cmd); return isParameter(field); };
+		
+		////////////////////////////////////////////////////////////////
+		static const bool canBeIgnored(const GCodeField& field);
+		static const bool canBeIgnored(const char* cmd) { GCodeField field(cmd[0]); return canBeIgnored(field); }
+		static const bool canBeIgnored(char cmd) { GCodeField field(cmd); return canBeIgnored(field); };
 		
 		////////////////////////////////////////////////////////////////
 		static const CmdDescription* getCmdDescription(const GCodeField& field);
@@ -63,7 +80,6 @@ class GCodeCommands {
 		////////////////////////////////////////////////////////////////
 		// Command store
 		static CommandStore commandStore;
-	
 };
 
 #endif

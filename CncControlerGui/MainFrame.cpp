@@ -249,16 +249,20 @@ CncTransactionLock::CncTransactionLock(MainFrame* p)
 				
 		}
 		
+		THE_CONTEXT->registerCncTransaction();
+		
 		parent->cncTransactionLockCallback(this);
 	}
-	else {
+	else 
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": State isn't OK\n");
 	}
 }
 ////////////////////////////////////////////////////////////////////
 CncTransactionLock::~CncTransactionLock() {
 ////////////////////////////////////////////////////////////////////
-	if ( isOk() ) {
+	if ( isOk() ) 
+	{
 		if ( waitUntilCncIsAvailable() )
 			parent->cncTransactionReleaseCallback(this);
 			
@@ -270,8 +274,11 @@ CncTransactionLock::~CncTransactionLock() {
 			if ( parent->cnc->isSpyOutputOn() )
 				cnc::spy.addMarker("Transaction released . . . ");
 		}
+		
+		THE_CONTEXT->unregisterCncTransaction();
 	}
-	else {
+	else 
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": State isn't OK\n");
 	}
 }
@@ -1312,18 +1319,13 @@ CncTouchBlockDetector::Result MainFrame::processXYZTouch(const CncTouchBlockDete
 	motionMonitor->update();
 	return result;
 }
+#include "CncAutoProgressDialog.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	wxStandardPaths& x = wxStandardPaths::Get();
-	for ( int i= 1; i< 1000; i++ )
-	{
-	
-		CNC_CLOG_FUNCT_A(x.GetExecutablePath())
-	}
-
+	FORCE_LOGGER_UPDATE
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {

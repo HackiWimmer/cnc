@@ -512,17 +512,24 @@ void CncLoggerListCtrl::updateContent() {
 	}
 }
 //////////////////////////////////////////////////
+void CncLoggerListCtrl::forceUpdate() {
+//////////////////////////////////////////////////
+	SetItemCount(entries.size());
+	
+	if ( GetItemCount() > 0 && IsShownOnScreen() == true )
+	{
+		ensureVisible(GetItemCount() - 1);
+		Refresh();
+		
+		THE_APP->dispatchAll();
+	}
+}
+//////////////////////////////////////////////////
 void CncLoggerListCtrl::onDisplayTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////
 	if ( anyUpdate == true ) 
 	{
-		SetItemCount(entries.size());
-		
-		if ( GetItemCount() > 0 && IsShownOnScreen() == true )
-		{
-			ensureVisible(GetItemCount() - 1);
-			Refresh();
-		}
+		forceUpdate();
 		anyUpdate = false;
 	}
 }
