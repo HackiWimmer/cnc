@@ -28,7 +28,7 @@ CncGCodeSequenceListCtrl::CncGCodeSequenceListCtrl(wxWindow *parent, long style)
 {
 	// add colums
 	AppendColumn("ClientId", 		wxLIST_FORMAT_LEFT,  wxLIST_AUTOSIZE);
-	AppendColumn("Cmd", 			wxLIST_FORMAT_LEFT,  40);
+	AppendColumn("Cmd", 			wxLIST_FORMAT_LEFT,  48);
 	AppendColumn("X", 				wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
 	AppendColumn("Y", 				wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
 	AppendColumn("Z", 				wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
@@ -144,7 +144,7 @@ void CncGCodeSequenceListCtrl::addBlock(const GCodeBlock& gcb) {
 	gcodes.push_back(std::move(gcb));
 	
 	// To minimize the performance impact of SetItemCount(...)
-	// for latge list content, it will be called ones at onPaint(...).
+	// for large list content, it will be called ones at onPaint(...).
 	//SetItemCount(gcodes.size());
 }
 /////////////////////////////////////////////////////////////

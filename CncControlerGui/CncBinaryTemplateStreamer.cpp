@@ -125,12 +125,14 @@ void CncBinaryTemplateStreamer::write_uint32_t(OutputStream& o, const uint32_t v
 bool CncBinaryTemplateStreamer::prepareDataContainer(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
 	dc.signature = fileSignatureRef;
-	if ( evaluateSourceContent(dc) == false ) {
+	if ( evaluateSourceContent(dc) == false )
+	{
 		std::cerr << "CncBinaryTemplateStreamer::prepareDataContainer(): evaluate source content failed" << std::endl;
 		return false;
 	}
 
-	if ( evaluateDataHeader(dc) == false ) {
+	if ( evaluateDataHeader(dc) == false )
+	{
 		std::cerr << "CncBinaryTemplateStreamer::prepareDataContainer(): evaluate data header failed" << std::endl;
 		return false;
 	}
@@ -159,7 +161,8 @@ bool CncBinaryTemplateStreamer::appendFileHeader(DataContainer& dc) {
 	write_uint32_t(fileStream, dc.dataHeaderOffset);
 	write_uint32_t(fileStream, dc.dataBodyOffset);
 
-	if ( false ) {
+	if ( false )
+	{
 		std::cout << "CncBinaryTemplateStreamer::appendFileHeader: source content offset: " << dc.sourceContentOffset << std::endl;
 		std::cout << "CncBinaryTemplateStreamer::appendFileHeader: data header offset   : " << dc.dataHeaderOffset << std::endl;
 		std::cout << "CncBinaryTemplateStreamer::appendFileHeader: data body offset     : " << dc.dataBodyOffset << std::endl;
@@ -170,7 +173,8 @@ bool CncBinaryTemplateStreamer::appendFileHeader(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
 bool CncBinaryTemplateStreamer::appendFileSource(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
-	if ( dc.sourceContent == NULL ) {
+	if ( dc.sourceContent == NULL )
+	{
 		std::cerr << "CncBinaryTemplateStreamer::appendFileSource(): Empty content" << std::endl;
 		return false;
 	}

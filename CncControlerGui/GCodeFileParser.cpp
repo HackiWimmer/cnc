@@ -130,95 +130,6 @@ void GCodeFileParser::logMeasurementEnd() {
 //////////////////////////////////////////////////////////////////
 	pathHandler->logMeasurementEnd();
 }
-
-//////////////////////////////////////////////////////////////////
-bool GCodeFileParser::spool() {
-//////////////////////////////////////////////////////////////////
-	// -----------------------------------------------------------
-	auto triggerEnd = [&](bool success)
-	{
-		const Trigger::EndRun endRun(success);
-		deligateTrigger(endRun);
-		return success;
-	};
-
-	if ( pathHandler->isPathListUsed() == false )
-		return triggerEnd(true);
-	
-	// prepare . . . 
-	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
-	CncAutoFreezer caf(ctrl);
-	
-	programEnd  = false;
-	bool failed = false;
-	
-	CncAutoProgressDialog progressDlg(THE_APP->getMotionMonitor(), "Preprocessing GCode");
-	progressDlg.Show();
-	
-	// over all collected gcode commands
-	CNC_CEX2_A("Run parsed GCode commands (entries=%zu)", gCodeSequence.size())
-	FORCE_LOGGER_UPDATE
-	
-	const long modVal = (long)( gCodeSequence.size() / 1000 );
-	for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it)
-	{
-		const long distance = std::distance(gCodeSequence.begin(), it);
-		if ( modVal > 0 && distance % modVal == 0 )
-		{
-			// from time to time update the progress
-			// to keep a good usage feeling
-			const double val = gCodeSequence.size() ? ((double)distance / gCodeSequence.size()) * 100 : 0.0;
-			UPDATE_PROGRESS_DLG(wxString::Format("%.1lf %%", val));
-		}
-		
-		GCodeBlock& gcb = (*it);
-		
-		// reconstruct the line number to be right also during the spooling
-		// e. g. in case of error messages etc.
-		setCurrentLineNumber(gcb.clientID / CLIENT_ID.TPL_FACTOR);
-
-		if ( performBlock(gcb) == false )
-		{
-			std::cerr << CNC_LOG_FUNCT_A(" performBlock() failed at line %ld !\n", ClientIds::lineNumber(gcb.clientID));
-			gcb.trace(std::cerr);
-			gcb.traceMore(std::cerr);
-			
-			failed = true;
-			break;
-		}
-		
-		// error handling
-		if ( programEnd == true )
-		{
-			const long remaining = std::distance(it, gCodeSequence.end());
-			
-			if ( remaining > 1 )
-			{
-				std::cout	<< "Info: Program end detected at line " 
-							<< ClientIds::lineNumber(gcb.clientID)
-							<< ", but still " 
-							<< remaining 
-							<< " GCode blocks remaining \n"
-				;
-			}
-			
-			break;
-		}
-		
-		if ( THE_APP->isDisplayParserDetails() == true )
-			ctrl->addBlock(gcb);
-	}
-	
-	progressDlg.Hide();
-	FORCE_LOGGER_UPDATE
-	
-	// finalize . . .
-	if ( failed == true )
-		return triggerEnd(false);
-		
-	triggerEnd(true);
-	return pathHandler->spoolWorkflow();
-}
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
@@ -248,7 +159,7 @@ bool GCodeFileParser::preprocess() {
 	{
 		UPDATE_PROGRESS_DLG("");
 		
-		const long modVal = (long)( totalLength / 1000 );
+		const long modVal = (long)( totalLength / 100 );
 		
 		// over all file lines
 		while ( getline (file, line) )
@@ -292,12 +203,104 @@ bool GCodeFileParser::preprocess() {
 	}
 	
 	FORCE_LOGGER_UPDATE
+	
 	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParser::spool() {
+//////////////////////////////////////////////////////////////////
+	// -----------------------------------------------------------
+	auto triggerEnd = [&](bool success)
+	{
+		const Trigger::EndRun endRun(success);
+		deligateTrigger(endRun);
+		return success;
+	};
+
+	bool failed = false;
+	if ( pathHandler->isPathListUsed() == true )
+	{
+		// prepare . . . 
+		CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
+		CncAutoFreezer caf(ctrl);
+		
+		programEnd  = false;
+		
+		CncAutoProgressDialog progressDlg(THE_APP->getMotionMonitor(), "Preprocessing GCode");
+		progressDlg.Show();
+		
+		// over all collected gcode commands
+		CNC_CEX2_A("Run parsed GCode commands (entries=%zu)", gCodeSequence.size())
+		FORCE_LOGGER_UPDATE
+		
+		const long modVal = (long)( gCodeSequence.size() / 100 );
+		for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it)
+		{
+			const long distance = std::distance(gCodeSequence.begin(), it);
+			if ( modVal > 0 && distance % modVal == 0 )
+			{
+				// from time to time update the progress
+				// to keep a good usage feeling
+				const double val = gCodeSequence.size() ? ((double)distance / gCodeSequence.size()) * 100 : 0.0;
+				UPDATE_PROGRESS_DLG(wxString::Format("%.1lf %%", val));
+			}
+			
+			GCodeBlock& gcb = (*it);
+			
+			// reconstruct the line number to be right also during the spooling
+			// e. g. in case of error messages etc.
+			setCurrentLineNumber(gcb.clientID / CLIENT_ID.TPL_FACTOR);
+
+			if ( performBlock(gcb) == false )
+			{
+				std::cerr << CNC_LOG_FUNCT_A(" performBlock() failed at line %ld !\n", ClientIds::lineNumber(gcb.clientID));
+				gcb.trace(std::cerr);
+				gcb.traceMore(std::cerr);
+				
+				failed = true;
+				break;
+			}
+			
+			// error handling
+			if ( programEnd == true )
+			{
+				const long remaining = std::distance(it, gCodeSequence.end());
+				
+				if ( remaining > 1 )
+				{
+					std::cout	<< "Info: Program end detected at line " 
+								<< ClientIds::lineNumber(gcb.clientID)
+								<< ", but still " 
+								<< remaining 
+								<< " GCode blocks remaining \n"
+					;
+				}
+				
+				break;
+			}
+			
+			if ( THE_APP->isDisplayParserDetails() == true )
+				ctrl->addBlock(gcb);
+		}
+		
+		progressDlg.Hide();
+	}
+	FORCE_LOGGER_UPDATE
+	
+	// finalize . . .
+	if ( failed == true)
+		return triggerEnd(false);
+		
+	if ( pathHandler->finishWork() == false )
+		return false;
+		
+	FORCE_LOGGER_UPDATE
+	return triggerEnd(true);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
-	return pathHandler->finishWork();
+	return pathHandler->spoolWorkflow();
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
@@ -389,6 +392,15 @@ bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
 			
 		if ( programEnd == true )
 			return true;
+	}
+	
+	// handle modal block command
+	if ( gcb.isValid() == false )
+	{
+		// if the current gcode block did not contain a command and 
+		// the previous gcb block is modal us the previous command
+		if ( GCodeCommands::isModal(gcb.prevCmdCode, gcb.prevCmdNumber, gcb.prevCmdSubNumber) )
+			gcb.copyPrevCmdToCmd();
 	}
 	
 	// processes the collected g cpode tokens
@@ -495,8 +507,11 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 				default: 	return displayUnhandledBlockCommand(gcb);
 			}
 		}
-		// else do nothing more
+		// else do nothing more because this can be a gcode line
+		// like >T1< only without any command, such parameters will be kept
+		// for the next gcode block - see also reInit()
 	}
+	// else do nothing more, errors already handled
 	
 	// the perform debug information on demand
 	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true )

@@ -16,7 +16,8 @@ class GCodeBlock {
 	
 	private:
 		/////////////////////////////////////////////////////
-		inline double getMoveRelative(double thisValue, double currentAxisValue) {
+		inline double getMoveRelative(double thisValue, double currentAxisValue) 
+		{
 			if ( thisValue == INVALID_GCODE_FIELD_VALUE )
 				return 0.0d;
 			
@@ -24,7 +25,8 @@ class GCodeBlock {
 		}
 		
 		/////////////////////////////////////////////////////
-		inline double getMoveAbsolute(double thisValue, double currentAxisValue) {
+		inline double getMoveAbsolute(double thisValue, double currentAxisValue)
+		{
 			if ( thisValue == INVALID_GCODE_FIELD_VALUE )
 				return currentAxisValue;
 				
@@ -82,13 +84,15 @@ class GCodeBlock {
 		static int removeComments(wxString& block, bool& openComment);
 		
 		/////////////////////////////////////////////////////
-		void copyPrevCmdToCmd() {
+		void copyPrevCmdToCmd() 
+		{
 			cmdCode			= prevCmdCode;
 			cmdNumber		= prevCmdNumber;
 			cmdSubNumber	= prevCmdSubNumber;
 		}
 		/////////////////////////////////////////////////////
-		void copyCmdToPrevCmd() {
+		void copyCmdToPrevCmd() 
+		{
 			prevCmdCode 		= cmdCode;
 			prevCmdNumber 		= cmdNumber;
 			prevCmdSubNumber 	= cmdSubNumber;
@@ -123,15 +127,18 @@ class GCodeBlock {
 		
 		const bool hasT() const		{ return t != INVALID_GCODE_FIELD_VALUE; }
 
-		const bool hasMoveCmd() const { 
+		const bool hasMoveCmd() const 
+		{ 
 			return ( hasOneOf_XYZ() || hasI() || hasJ() ); 
 		}
 		
-		const bool hasAnyParameter() const { 
+		const bool hasAnyParameter() const 
+		{ 
 			return ( hasOneOf_XYZ() || hasI() || hasJ() || hasS() || hasE() || hasF() || hasP() || hasH() || hasT() ); 
 		}
 		
-		const bool hasCmdSubNumber() const { 
+		const bool hasCmdSubNumber() const 
+		{ 
 			return cmdSubNumber != INVALID_GCODE_COMMAND_NUM; 
 		}
 		
@@ -148,7 +155,8 @@ class GCodeBlock {
 		const double getYMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(y, curPos.getY()); }
 		const double getZMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(z, curPos.getZ()); }
 		
-		const double ensureUnit(double value) {
+		const double ensureUnit(double value) 
+		{
 			if ( unit == Unit::in )
 				return value * CncUnitCalculatorBase::getFact_in2mm();
 			
@@ -157,7 +165,8 @@ class GCodeBlock {
 		}
 		
 		//////////////////////////////////////////////////////////////////
-		const double getCurrentFeedSpeed() {
+		const double getCurrentFeedSpeed() 
+		{
 			if ( hasF() )
 				return f;
 				
@@ -165,7 +174,8 @@ class GCodeBlock {
 		}
 		
 		//////////////////////////////////////////////////////////////////
-		const double getCurrentSpindleSpeed() {
+		const double getCurrentSpindleSpeed() 
+		{
 			if ( hasS() )
 				return s;
 				
@@ -185,16 +195,20 @@ class GCodeBlock {
 		
 		//////////////////////////////////////////////////////////////////
 		const char* getUnitAsString() const { return CncUnitCalculatorBase::getUnitAsStr(unit); }
-		const char* getPositioningAsString(GCodePositioning p) const {
-			switch (p) {
+		const char* getPositioningAsString(GCodePositioning p) const 
+		{
+			switch (p) 
+			{
 				case GC_Relative: 	return "relative";
 				case GC_Absolute:	return "absolute";
 			}
 			return "???";
 		}
 		
-		const char* getPlaneAsString() const {
-			switch (plane) {
+		const char* getPlaneAsString() const 
+		{
+			switch (plane) 
+			{
 				case GC_XY_PLANE: 	return "XY";
 				case GC_ZX_PLANE:	return "ZX";
 				case GC_YZ_PLANE:	return "YZ";

@@ -97,9 +97,9 @@ const wxString GCodeBlock::getCmdAsString(wxString& ret) const {
 //////////////////////////////////////////////////////////////////
 	ret.clear();
 	
-	cmdCode			== INVALID_GCODE_COMMAND_CMD ? ret << "?" : ret << cmdCode;
-	cmdNumber		== INVALID_GCODE_COMMAND_NUM ? ret << "-" : ret << cmdNumber;
-	cmdSubNumber	== INVALID_GCODE_COMMAND_NUM ? ret << ""  : ret << cmdSubNumber;
+	cmdCode			== INVALID_GCODE_COMMAND_CMD ? ret << "?"	: ret << cmdCode;
+	cmdNumber		== INVALID_GCODE_COMMAND_NUM ? ret << "00"	: ret << cmdNumber;
+	cmdSubNumber	== INVALID_GCODE_COMMAND_NUM ? ret << ".0"	: ret << cmdSubNumber;
 	
 	return ret;
 }
@@ -111,7 +111,8 @@ const std::ostream& GCodeBlock::trace(std::ostream &ostr) const {
 	wxString cmd;
 	ostr << getCmdAsString(cmd);
 	
-	if ( hasMoveCmd() ) {
+	if ( hasMoveCmd() )
+	{
 		ostr << ":";
 		ostr << *this;
 	}
@@ -129,18 +130,21 @@ const DcmItemList& GCodeBlock::trace(DcmItemList& rows) const {
 	DataControlModel::addKeyValueRow(rows, "Positioning IJ", 	getPositioningAsString(posModeIJ));
 	DataControlModel::addKeyValueRow(rows, "Plane", 			getPlaneAsString());
 	
-	if ( hasOneOf_XYZ() ) {
+	if ( hasOneOf_XYZ() ) 
+	{
 		DataControlModel::addKeyValueRow(rows, "X", ( x != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", x) : "-"));
 		DataControlModel::addKeyValueRow(rows, "Y", ( y != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", y) : "-"));
 		DataControlModel::addKeyValueRow(rows, "Z", ( z != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", z) : "-"));
 	}
 	
-	if ( hasOneOf_IJ() ) {
+	if ( hasOneOf_IJ() )
+	{
 		DataControlModel::addKeyValueRow(rows, "I", ( i != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", i) : "-"));
 		DataControlModel::addKeyValueRow(rows, "J", ( j != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", j) : "-"));
 	}
 	
-	if ( hasOneOf_SEF() ) {
+	if ( hasOneOf_SEF() ) 
+	{
 		DataControlModel::addKeyValueRow(rows, "S", ( s != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", s) : "-"));
 		DataControlModel::addKeyValueRow(rows, "E", ( e != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", e) : "-"));
 		DataControlModel::addKeyValueRow(rows, "F", ( f != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", f) : "-"));
@@ -152,19 +156,11 @@ const DcmItemList& GCodeBlock::trace(DcmItemList& rows) const {
 //////////////////////////////////////////////////////////////////
 const std::ostream& GCodeBlock::traceMore(std::ostream& ostr) const{
 //////////////////////////////////////////////////////////////////
-	if ( hasOneOf_IJ() ) {
-		ostr << ( i != INVALID_GCODE_FIELD_VALUE ? wxString::Format("I=%lf", i) : "") << ", ";
-		ostr << ( j != INVALID_GCODE_FIELD_VALUE ? wxString::Format("J=%lf", j) : "");
-	}
-	
-	if ( hasOneOf_SEF() ) {
-		ostr << ( s != INVALID_GCODE_FIELD_VALUE ? wxString::Format("S=%lf", s) : "") << ", ";
-		ostr << ( e != INVALID_GCODE_FIELD_VALUE ? wxString::Format("E=%lf", e) : "");
-	}
-	
-	if ( hasT() ) {
-		ostr << ( t != INVALID_GCODE_FIELD_VALUE ? wxString::Format("T=%lf", e) : "");
-	}
+	if ( hasI() )	ostr << ( i != INVALID_GCODE_FIELD_VALUE ? wxString::Format("I=%lf, ", i)		: "");
+	if ( hasJ() )	ostr << ( j != INVALID_GCODE_FIELD_VALUE ? wxString::Format("J=%lf, ", j)		: "");
+	if ( hasS() )	ostr << ( s != INVALID_GCODE_FIELD_VALUE ? wxString::Format("S=%lf, ", s)		: "");
+	if ( hasE() )	ostr << ( e != INVALID_GCODE_FIELD_VALUE ? wxString::Format("E=%lf, ", e)		: "");
+	if ( hasT() )	ostr << ( t != INVALID_GCODE_FIELD_VALUE ? wxString::Format("T=%ld, ", (long)t)	: "");
 	
 	return ostr;
 }

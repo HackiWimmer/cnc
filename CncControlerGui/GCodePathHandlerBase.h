@@ -28,6 +28,9 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		virtual bool		prepareWork(); 
 		virtual bool		finishWork();
 		
+		virtual void		resetWorkflow()	{ }
+		virtual bool		spoolWorkflow()	{ return true; }
+		
 		bool				processRapidLinearMove(GCodeBlock& gcb);
 		bool				processLinearMove(GCodeBlock& gcb);
 		bool				processArcMove(GCodeBlock& gcb, bool sweep);

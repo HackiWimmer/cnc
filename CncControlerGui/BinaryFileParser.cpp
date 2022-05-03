@@ -39,13 +39,15 @@ BinaryFileParser::~BinaryFileParser() {
 //////////////////////////////////////////////////////////////////
 bool BinaryFileParser::checkFileSignature(unsigned char* fileSignature) {
 //////////////////////////////////////////////////////////////////
-	if ( fileSignature == NULL ) {
+	if ( fileSignature == NULL ) 
+	{
 		std::cerr << "BinaryFileParser::checkFileSignature(); Empty file signature" << std::endl;
 		return false;
 	}
 	
 	wxString fs((char*)fileSignature);
-	if ( fs != fileSignatureRef ) {
+	if ( fs != fileSignatureRef ) 
+	{
 		std::cerr << "Required: " << fileSignatureRef 	<< std::endl;
 		std::cerr << "Received: " << fileSignature 		<< std::endl;
 		return false;
@@ -86,7 +88,8 @@ bool BinaryFileParser::read_unit32_t(InputStream& is, uint32_t& ret) {
 	const short size = sizeof(uint32_t);
 	unsigned char buffer[size];
 
-	if ( readBytes(is, buffer, size) != size ) {
+	if ( readBytes(is, buffer, size) != size ) 
+	{
     	std::cerr << "BinaryFileParser::read_unit32_t(): Error while reading an uin32_t value" << std::endl;
     	// more details are already published
 		return false;
@@ -98,29 +101,35 @@ bool BinaryFileParser::read_unit32_t(InputStream& is, uint32_t& ret) {
 //////////////////////////////////////////////////////////////////
 unsigned int BinaryFileParser::readBytes(InputStream& is, unsigned char* buffer, unsigned int nbBytes) {
 //////////////////////////////////////////////////////////////////
-	if ( buffer == NULL ) {
+	if ( buffer == NULL ) 
+	{
 		std::cerr << "BinaryFileParser::readBytes(): Invalid buffer" << std::endl;
 		return false;
 	}
 
 	is.read((char*)buffer, nbBytes);
 
-    if ( !is.good() ) {
-    	std::cerr << "BinaryFileParser::readBytes(): Error while reading : Required bytes = "
-    	          << nbBytes << ". But only " << is.gcount() << " bytes could be read"
-    	          << std::endl;
+	if ( !is.good() ) 
+	{
+		std::cerr << "BinaryFileParser::readBytes(): Error while reading : Required bytes = "
+				  << nbBytes 
+				  << ". But only " 
+				  << is.gcount() 
+				  << " bytes could be read"
+				  << std::endl
+		;
 
-    	return -1;
+		return -1;
 	}
 
 	return nbBytes;
 }
-
 //////////////////////////////////////////////////////////////////
 unsigned int BinaryFileParser::readDataBlock(InputStream& is) {
 //////////////////////////////////////////////////////////////////
 	uint32_t len;
-	if ( read_unit32_t(is, len) == false ) {
+	if ( read_unit32_t(is, len) == false )
+	{
 		std::cerr << "BinaryFileParser::readDataBlock(): Error while reading length information" << std::endl;
 		// more details are already published
 		return -1;
@@ -129,7 +138,8 @@ unsigned int BinaryFileParser::readDataBlock(InputStream& is) {
 	unsigned char* buffer = new unsigned char[len];
 	len = readBytes(is, buffer, len);
 	
-	if ( len > 0 ) {
+	if ( len > 0 )
+	{
 		if ( pathHandler != NULL )
 			pathHandler->processCommand(buffer, len);
 	}
@@ -226,13 +236,15 @@ bool BinaryFileParser::preprocess() {
 	inputStream.seekg(0, inputStream.beg);
 
 	unsigned char fileSignature[lenFileSignature + 1];
-	if ( readBytes(inputStream, fileSignature, lenFileSignature) < lenFileSignature ) {
+	if ( readBytes(inputStream, fileSignature, lenFileSignature) < lenFileSignature )
+	{
 		std::cerr << "Error while reading file signature: File '" << outputFileName << "'" << std::endl;
 		return false;
 	}
 	fileSignature[lenFileSignature] = '\0';
 	
-	if ( checkFileSignature(fileSignature) == false ) {
+	if ( checkFileSignature(fileSignature) == false )
+	{
 		std::cerr << "Invalid file signature: File '" << outputFileName << "'" << std::endl;
 		return false;
 	}
@@ -240,7 +252,8 @@ bool BinaryFileParser::preprocess() {
 	// ..........................................................................................
 	// determine version
 	uint32_t version = 0;
-	if ( read_unit32_t(inputStream, version) == false) {
+	if ( read_unit32_t(inputStream, version) == false) 
+	{
 		std::cerr << "BinaryFileParser::preprocess(): Error while reading version" << std::endl;
 		return false;
 	}

@@ -424,7 +424,7 @@ bool CncPathListRunner::spoolWorkflow() {
 	CNC_CEX2_A("Start processing path list workflow (entries=%zu)", workflowList.size())
 	FORCE_LOGGER_UPDATE
 	
-	const long modVal = (long)( workflowList.size() / 1000 );
+	const long modVal = (long)( workflowList.size() / 100 );
 	long distance = 0;
 	
 	// over all workflow entries
@@ -1089,17 +1089,30 @@ bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::checkContent(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.clientId > 0 ) {
-		if ( curr.hasPositionChange() ) {
-			if ( cnc::dblCmp::nu(curr.totalDistance) == true)  {
-				std::cout << CNC_LOG_FUNCT_A(": Warning: pos change with distance = 0!\n");
-				std::cout << curr << std::endl;
-				// warning only check more . . .
+	if ( curr.clientId > 0 ) 
+	{
+		if ( curr.hasPositionChange() ) 
+		{
+			if ( cnc::dblCmp::nu(curr.totalDistance) == true) 
+			{
+				// typically this occurs at beginning. current position = zero
+				// an the pos change instruction is move to zero
+				const bool b1 = curr.entryDistance.isEqual(CncPathListEntry::NoDistance);
+				const bool b2 = curr.entryTarget.isEqual(CncPathListEntry::ZeroTarget);
+				
+				if ( b1 == false || b2 == false )
+				{
+					std::cout << CNC_LOG_FUNCT_A(": Warning: pos change with distance = 0!\n");
+					std::cout << curr << std::endl;
+					// warning only check more . . .
+				}
 			}
 		}
 		
-		if ( curr.hasSpeedChange() ) {
-			if ( cnc::dblCmp::nu(curr.totalDistance) != true)  {
+		if ( curr.hasSpeedChange() ) 
+		{
+			if ( cnc::dblCmp::nu(curr.totalDistance) != true) 
+			{
 				std::cout << CNC_LOG_FUNCT_A(": Error: Feed speed change combined with a pos change!\n");
 				std::cerr << curr << std::endl;
 				

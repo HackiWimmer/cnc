@@ -14,6 +14,7 @@ extern GlobalConstStringDatabase globalStrings;
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncPathListEntryListCtrl, CncLargeScaledListCtrl)
+	EVT_PAINT(							CncPathListEntryListCtrl::onPaint)
 	EVT_SIZE(							CncPathListEntryListCtrl::onSize)
 	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncPathListEntryListCtrl::onSelectListItem)
 	EVT_LIST_ITEM_ACTIVATED(wxID_ANY, 	CncPathListEntryListCtrl::onActivateListItem)
@@ -390,11 +391,21 @@ void CncPathListEntryListCtrl::clearAll() {
 	pathLists.clear();
 	clear();
 }
+//////////////////////////////////////////////////
+void CncPathListEntryListCtrl::onPaint(wxPaintEvent& event) {
+//////////////////////////////////////////////////
+	SetItemCount(pathLists.size());
+	
+	event.Skip();
+}
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::addPathListEntry(const CncPathListEntry& cpe) {
 /////////////////////////////////////////////////////////////
 	pathLists.push_back(cpe);
-	SetItemCount(pathLists.size());
+	
+	// To minimize the performance impact of SetItemCount(...)
+	// for large list content, it will be called ones at onPaint(...).
+	//SetItemCount(pathLists.size());
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::addPathListEntries(const CncPathListManager& cpm) {

@@ -27,6 +27,7 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 
 		void updateColumnWidth();
 		
+		void onPaint(wxPaintEvent& event);
 		void onSize(wxSizeEvent& event);
 		void onSelectListItem(wxListEvent& event);
 		void onActivateListItem(wxListEvent& event);

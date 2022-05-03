@@ -120,8 +120,8 @@ class CommandStoreInitializer {
 	
 	public:
 		//////////////////////////////////////////////////////////////////
-		CommandStoreInitializer() {
-			
+		CommandStoreInitializer() 
+		{
 			registerMCommands();
 			registerGCommands();
 			registerParameters();
@@ -143,9 +143,10 @@ const char* GCodeCommands::getGCodeHelpHint(wxString& curLine) {
 		return "";
 		
 	wxString cmd;
-	for ( unsigned int i=0; i< curLine.length(); i++) {
-		
-		if ( isalpha(curLine[i]) ) {
+	for ( unsigned int i=0; i< curLine.length(); i++) 
+	{
+		if ( isalpha(curLine[i]) )
+		{
 			cmd = curLine.Mid(i);
 			break;
 		}
@@ -177,7 +178,8 @@ const char* GCodeCommands::explainGCodeParameter(const GCodeField& field) {
 	
 	GCodeField f(field.getCmd());
 	const CmdDescription* cd = getCmdDescription(f);
-	if ( cd != NULL ) {
+	if ( cd != NULL ) 
+	{
 		returnValue += wxString::Format(" > %s", cd->description);
 		return returnValue.c_str();
 	}
@@ -197,15 +199,19 @@ const char* GCodeCommands::explainGCodeCommand(const GCodeField& field) {
 	returnValue  = "GCode: ";
 	returnValue += field.getCmd();
 	
-	if ( field.getNum() != INVALID_GCODE_FIELD_NUM ) {
+	if ( field.getNum() != INVALID_GCODE_FIELD_NUM ) 
+	{
 		if ( field.hasSubNum() ) 	returnValue += wxString::Format("%i.%i > ",field.getNum(), field.getSubNum());
 		else 						returnValue += wxString::Format("%i > ",field.getNum());
-	} else {
+	}
+	else
+	{
 		returnValue += "? > ";
 	}
 	
 	const CmdDescription* cd = getCmdDescription(field);
-	if ( cd != NULL ) {
+	if ( cd != NULL )
+	{
 		returnValue += cd->description;
 		return returnValue.c_str();
 	}

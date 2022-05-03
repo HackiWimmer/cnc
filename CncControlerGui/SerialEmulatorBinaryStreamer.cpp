@@ -17,8 +17,8 @@ SerialEmulatorBinaryStreamer::~SerialEmulatorBinaryStreamer() {
 bool SerialEmulatorBinaryStreamer::isOutputAsTemplateAvailable() {
 ///////////////////////////////////////////////////////////////////
 	//std::cout << CNC_LOG_FUNCT_A("\n %s\n exists == %d\n", getPortName(), wxFile::Exists(getPortName()));
-
-	switch ( inboundFormat ) {
+	switch ( inboundFormat ) 
+	{
 		case TplBinary:
 		case TplUnknown:
 		case TplTest:		return false;
@@ -69,7 +69,8 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Trigger::BeginRun& tr) {
 	
 	inboundFormat = cnc::getTemplateFormatFromExtention(ps.SRC.fileType);
 	
-	if ( initNextSourceTemplateFileName(ps) == false) {
+	if ( initNextSourceTemplateFileName(ps) == false)
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": initNextSourceTemplateFileName failed\n");
 		disconnect();
 	}
