@@ -5,12 +5,14 @@
 
 ////////////////////////////////////////////
 GLI::GLCncPath::GLCncPath(const wxString& instanceName) 
-: vectiesBuffer(instanceName)
-, minVecties(FLT_MAX, FLT_MAX, FLT_MAX)
-, maxVecties(FLT_MIN, FLT_MIN, FLT_MIN)
-, virtualEnd(-1)
-, publishNotifications(true)
-, callbacks()
+: vectiesBuffer			(instanceName)
+, minVecties			(FLT_MAX, FLT_MAX, FLT_MAX)
+, maxVecties			(FLT_MIN, FLT_MIN, FLT_MIN)
+, minObjVecties			(FLT_MAX, FLT_MAX, FLT_MAX)
+, maxObjVecties			(FLT_MIN, FLT_MIN, FLT_MIN)
+, virtualEnd			(-1)
+, publishNotifications	(true)
+, callbacks				()
 ////////////////////////////////////////////
 {
 }
@@ -21,10 +23,13 @@ GLI::GLCncPath::~GLCncPath() {
 ////////////////////////////////////////////
 void GLI::GLCncPath::clear() {
 ////////////////////////////////////////////
-	// reset boundings
+	// reset bounding
 	minVecties.set(-1L, FLT_MAX, FLT_MAX, FLT_MAX);
 	maxVecties.set(-1L, FLT_MIN, FLT_MIN, FLT_MIN);
 	
+	minObjVecties.set(-1L, FLT_MAX, FLT_MAX, FLT_MAX);
+	maxObjVecties.set(-1L, FLT_MIN, FLT_MIN, FLT_MIN);
+
 	vectiesBuffer.resetBuffers();
 	updateVirtualEnd();
 }
@@ -38,6 +43,17 @@ void GLI::GLCncPath::appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex)
 	maxVecties.setX(std::max(vertex.getX(), maxVecties.getX()));
 	maxVecties.setY(std::max(vertex.getY(), maxVecties.getY()));
 	maxVecties.setZ(std::max(vertex.getZ(), maxVecties.getZ()));
+	
+	if ( vertex.getType() == cnc::WORK_SPEED_CHAR )
+	{
+		minObjVecties.setX(std::min(vertex.getX(), minObjVecties.getX()));
+		minObjVecties.setY(std::min(vertex.getY(), minObjVecties.getY()));
+		minObjVecties.setZ(std::min(vertex.getZ(), minObjVecties.getZ()));
+		
+		maxObjVecties.setX(std::max(vertex.getX(), maxObjVecties.getX()));
+		maxObjVecties.setY(std::max(vertex.getY(), maxObjVecties.getY()));
+		maxObjVecties.setZ(std::max(vertex.getZ(), maxObjVecties.getZ()));
+	}
 	
 	vectiesBuffer.appendVertex(vertex);
 	updateVirtualEnd();
@@ -171,7 +187,7 @@ const float GLI::GLCncPath::getAutoScaleFact() const {
 	return std::max(getMinScaleFact(), ret) * 1.1;
 }
 ////////////////////////////////////////////
-const GLI::BoundBox& GLI::GLCncPath::getBoundBox() {
+const GLI::BoundBox& GLI::GLCncPath::evaluateBoundBox(const GLCncPathVertices& min, const GLCncPathVertices& max) {
 ////////////////////////////////////////////
 	static GLI::BoundBox bBox;
 	bBox.clear();
@@ -180,9 +196,9 @@ const GLI::BoundBox& GLI::GLCncPath::getBoundBox() {
 	if ( vectiesBuffer.getVertexCount() < 3 )
 		return bBox;
 	
-	const float x = minVecties.getX(), X = maxVecties.getX();
-	const float y = minVecties.getY(), Y = maxVecties.getY();
-	const float z = minVecties.getZ(), Z = maxVecties.getZ();
+	const float x = min.getX(), X = max.getX();
+	const float y = min.getY(), Y = max.getY();
+	const float z = min.getZ(), Z = max.getZ();
 	
 	// bottom - push_back(BoundBoxLine)
 	bBox.push_back(std::make_pair(GLCncPathVertices(x,y,z), GLCncPathVertices(X,y,z)));
@@ -204,5 +220,13 @@ const GLI::BoundBox& GLI::GLCncPath::getBoundBox() {
 	
 	return bBox;
 }
-
-
+////////////////////////////////////////////
+const GLI::BoundBox& GLI::GLCncPath::getBoundBox() {
+////////////////////////////////////////////
+	return evaluateBoundBox(minVecties, maxVecties);
+}
+////////////////////////////////////////////
+const GLI::BoundBox& GLI::GLCncPath::getObjectBoundBox() {
+////////////////////////////////////////////
+	return evaluateBoundBox(minObjVecties, maxObjVecties);
+}

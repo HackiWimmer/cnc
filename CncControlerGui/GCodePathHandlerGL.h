@@ -29,6 +29,9 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		virtual bool			prepareWorkImpl();
 		virtual bool			finishWorkImpl();
 		
+		virtual void			resetWorkflow()	{ }
+		virtual bool			spoolWorkflow()	{ return true; }
+		
 	private:
 		
 		CncGCodePreview*		glControl;

@@ -204,7 +204,8 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		void drawGuidePathes();
 		void drawHardwareBox();
-		void drawBoundBox();
+		void drawTotalBoundBox();
+		void drawObjectBoundBox();
 		void drawRuler();
 		void drawHighlightEffects();
 		void drawDirectionCone();

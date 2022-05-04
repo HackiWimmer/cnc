@@ -99,37 +99,37 @@ bool CncPathListMonitor::processFeedSpeedChange(double value_MM_MIN, CncSpeedMod
 ////////////////////////////////////////////////////////////////////
 bool CncPathListMonitor::processMoveSequence(CncMoveSequence& msq) {
 ////////////////////////////////////////////////////////////////////
-// Nothing to do here, because position management is already done by
-// setCurrentPostionMetric(...)
-//
-//	CncLongPosition ps;
-//	THE_CONFIG->convertMetricToSteps(ps, current.monitorPos);
-//	
-//	for ( auto it = msq.const_begin(); it != msq.const_end(); ++it )
-//	{
-//		const CncMoveSequence::SequencePoint& sp = *it;
-//		
-//		ps.inc(sp.x, sp.y, sp.z);
-//		THE_CONFIG->convertStepsToMetric(current.monitorPos, ps);
-//		
-//		APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, ps);
-//		notifyNextPostion();
-//		dispatchEventQueue();
-//	}
+	// Nothing to do here, because position management is already done by
+	// setCurrentPositionMetric(...)
+	//
+	//	CncLongPosition ps;
+	//	THE_CONFIG->convertMetricToSteps(ps, current.monitorPos);
+	//	
+	//	for ( auto it = msq.const_begin(); it != msq.const_end(); ++it )
+	//	{
+	//		const CncMoveSequence::SequencePoint& sp = *it;
+	//		
+	//		ps.inc(sp.x, sp.y, sp.z);
+	//		THE_CONFIG->convertStepsToMetric(current.monitorPos, ps);
+	//		
+	//		APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, ps);
+	//		notifyNextPostion();
+	//		dispatchEventQueue();
+	//	}
 
 	return true;
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListMonitor::processPathListEntry(const CncPathListEntry& ple) {
 ////////////////////////////////////////////////////////////////////
-// Nothing to do here, because position management is already done by
-// setCurrentPostionMetric(...)
-//
-//	current.monitorPos = ple.entryTarget;
-//	
-//	APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, getCurrentPositionSteps());
-//	notifyNextPostion();
-//	dispatchEventQueue();
+	// Nothing to do here, because position management is already done by
+	// setCurrentPositionMetric(...)
+	//
+	//	current.monitorPos = ple.entryTarget;
+	//	
+	//	APP_PROXY::getMotionMonitor()->appendVertex(current.clientId, current.speedMode, getCurrentPositionSteps());
+	//	notifyNextPostion();
+	//	dispatchEventQueue();
 
 	return true;
 }

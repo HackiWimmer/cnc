@@ -52,7 +52,8 @@ void GL3DOptionPane::propertyChanged(wxPropertyGridEvent& event) {
 	motionMonitor->getContextOptions().showRuler			= m_pgPropDrawRuler->GetValue().GetBool();
 	motionMonitor->getContextOptions().showHelpLines		= m_pgPropDrawHelpLines->GetValue().GetBool();
 	motionMonitor->getContextOptions().showGuidePathes		= m_pgPropDrawGuidePathes->GetValue().GetBool();
-	motionMonitor->getContextOptions().showBoundBox			= m_pgPropDrawBoundBox->GetValue().GetBool();
+	motionMonitor->getContextOptions().showTotalBoundBox	= m_pgPropDrawTotalBoundBox->GetValue().GetBool();
+	motionMonitor->getContextOptions().showObjectBoundBox	= m_pgPropDrawObjectBoundBox->GetValue().GetBool();
 	motionMonitor->getContextOptions().helpLines3D_XYPlane	= m_pgPropHLXYPlane->GetValue().GetBool();
 	motionMonitor->getContextOptions().helpLines3D_XZPlane	= m_pgPropHLXZPlane->GetValue().GetBool();
 	motionMonitor->getContextOptions().helpLines3D_YZPlane	= m_pgPropHLYZPlane->GetValue().GetBool();
@@ -63,7 +64,8 @@ void GL3DOptionPane::propertyChanged(wxPropertyGridEvent& event) {
 	motionMonitor->getContextOptions().workColour 			= ((wxSystemColourProperty*)m_pgPropWorkColour)->GetVal().m_colour;
 	motionMonitor->getContextOptions().userColour 			= ((wxSystemColourProperty*)m_pgPropUserColour)->GetVal().m_colour;
 	motionMonitor->getContextOptions().maxColour 			= ((wxSystemColourProperty*)m_pgPropMaxColour)->GetVal().m_colour;
-	motionMonitor->getContextOptions().boundBoxColour		= ((wxSystemColourProperty*)m_pgPropBoundBoxColour)->GetVal().m_colour;
+	motionMonitor->getContextOptions().totBoundBoxColour	= ((wxSystemColourProperty*)m_pgPropTotalBoundBoxColour)->GetVal().m_colour;
+	motionMonitor->getContextOptions().objBoundBoxColour	= ((wxSystemColourProperty*)m_pgPropObjectBoundBoxColour)->GetVal().m_colour;
 	
 	// draw type
 	switch ( m_pgPropDrawType->GetValue().GetInteger() ) {
@@ -71,7 +73,7 @@ void GL3DOptionPane::propertyChanged(wxPropertyGridEvent& event) {
 		case 1:	motionMonitor->setDrawType(GLContextCncPathBase::DrawType::DT_LINE_STRIP);	break;
 	}
 	
-	// other oiptions
+	// other options
 	motionMonitor->enableSmoothing(m_pgPropSmoothing->GetValue().GetBool());
 	motionMonitor->setZoom((float)m_pgPropZoom->GetValue().GetDouble());
 	
@@ -88,17 +90,19 @@ void GL3DOptionPane::notifyChange(GLContextOptions& options) {
 	m_pgPropDrawRuler->SetValue(options.showRuler);
 	m_pgPropDrawHelpLines->SetValue(options.showHelpLines);
 	m_pgPropDrawGuidePathes->SetValue(options.showGuidePathes);
-	m_pgPropDrawBoundBox->SetValue(options.showBoundBox);
+	m_pgPropDrawTotalBoundBox->SetValue(options.showTotalBoundBox);
+	m_pgPropDrawObjectBoundBox->SetValue(options.showObjectBoundBox);
 	m_pgPropHLXYPlane->SetValue(options.helpLines3D_XYPlane);
 	m_pgPropHLXZPlane->SetValue(options.helpLines3D_XZPlane);
 	m_pgPropHLYZPlane->SetValue(options.helpLines3D_YZPlane);
 	m_pgPropRulerOffset->SetValue((int)options.rulerOriginOffsetAbs);
 	
-	// update all colors
+	// update all colours
 	m_pgPropFlyAlpha->SetValue((int)options.rapidAlpha); 
 	m_pgPropFlyColour->SetValue(wxVariant(wxColourPropertyValue(options.rapidColour))); 
 	m_pgPropWorkColour->SetValue(wxVariant(wxColourPropertyValue(options.workColour))); 
-	m_pgPropBoundBoxColour->SetValue(wxVariant(wxColourPropertyValue(options.boundBoxColour)));
+	m_pgPropTotalBoundBoxColour->SetValue(wxVariant(wxColourPropertyValue(options.totBoundBoxColour)));
+	m_pgPropObjectBoundBoxColour->SetValue(wxVariant(wxColourPropertyValue(options.objBoundBoxColour)));
 	m_pgPropUserColour->SetValue(wxVariant(wxColourPropertyValue(options.userColour)));
 	m_pgPropMaxColour->SetValue(wxVariant(wxColourPropertyValue(options.maxColour)));
 }

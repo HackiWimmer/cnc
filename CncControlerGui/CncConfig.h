@@ -313,7 +313,8 @@ class CncConfig {
 		const bool getInverseCtrlDirectionYFlag();
 		const bool getInverseCtrlDirectionZFlag();
 		const bool getPreProcessorAnalyseFlag();
-		const bool getPreProcessoSkipEmptyFlag();
+		const bool getPreProcessorSkipGCodeFlag();
+		const bool getPreProcessorSkipEmptyFlag();
 		const bool getPreProcessorCombineMovesFlag();
 		const bool getPreProcessorUseOperatingTrace();
 		const bool getPreProcessorCntPathListEntries();

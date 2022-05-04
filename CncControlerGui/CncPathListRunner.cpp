@@ -281,9 +281,12 @@ bool CncPathListRunner::installInterface(CncPathListRunner::Interface* iface) {
 //////////////////////////////////////////////////////////////////
 void CncPathListRunner::autoSetup(bool trace) {
 //////////////////////////////////////////////////////////////////
-	setup.optAnalyse		= THE_CONFIG->getPreProcessorAnalyseFlag();
+	// do not automatically configure setup.optAnalyse
+	// it has to be set individual by the corresponding path handlers
+	//setup.optAnalyse		= THE_CONFIG->getPreProcessorAnalyseFlag();
+	
 	setup.optCombineMoves 	= THE_CONFIG->getPreProcessorCombineMovesFlag();
-	setup.optSkipEmptyMoves = THE_CONFIG->getPreProcessoSkipEmptyFlag();
+	setup.optSkipEmptyMoves = THE_CONFIG->getPreProcessorSkipEmptyFlag();
 	setup.trace				= THE_CONFIG->getPreProcessorUseOperatingTrace();
 	
 	typedef CncPathListRunner::Move Move;
@@ -424,7 +427,7 @@ bool CncPathListRunner::spoolWorkflow() {
 	CNC_CEX2_A("Start processing path list workflow (entries=%zu)", workflowList.size())
 	FORCE_LOGGER_UPDATE
 	
-	const long modVal = (long)( workflowList.size() / 100 );
+	const long modVal = workflowList.size() > 100 ? (long)( workflowList.size() / 100 ) : 1;
 	long distance = 0;
 	
 	// over all workflow entries
@@ -546,7 +549,6 @@ bool CncPathListRunner::addSequenceEntryFromEntry(const CncPathListEntry* e) {
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::addSequenceEntryFromAbsValues(double px, double py, double pz) {
 //////////////////////////////////////////////////////////////////
-
 	transformationMatrix.transform(px, py, pz);
 
 	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, px, py, pz);
@@ -730,10 +732,13 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 	CHECK_AND_PERFORM_PROCESSING_STATE
 	
 	// Important: Move absolute to avoid a error propagation
-	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, 
-												curr.entryTarget.getX(), 
-												curr.entryTarget.getY(), 
-												curr.entryTarget.getZ());
+	double px = curr.entryTarget.getX();
+	double py = curr.entryTarget.getY();
+	double pz = curr.entryTarget.getZ();
+	transformationMatrix.transform(px, py, pz);
+	
+	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, px, py, pz);
+	currentInterface->setCurrentPositionMetric(px, py, pz);
 	
 	return currentInterface->processPathListEntry(curr);
 }
@@ -1052,14 +1057,14 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		// position change
 		if ( curr.hasPositionChange() == true ) {
 			
-			if ( setup.optAnalyse == false ) {
-				
+			if ( setup.optAnalyse == false ) 
+			{
 				if ( onPhysicallyMoveRaw(curr) == false )
 					return false;
 			}
-			else {
-				
-				// Note: this call may be increments it
+			else 
+			{
+				// Note: this call may be increments (it)
 				if ( onPhysicallyMoveAnalysed(it, plm.cend()) == false ) {
 					return false;
 				}

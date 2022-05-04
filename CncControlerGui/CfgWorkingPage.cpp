@@ -11,8 +11,10 @@
 ////////////////////////////////////////////////////////////////////////
 extern GlobalConstStringDatabase globalStrings;
 
-namespace Cnc {
-	namespace Config {
+namespace Cnc 
+{
+	namespace Config 
+	{
 		extern wxPropertyGridManager*	globlSetupGrid;
 		
 		extern bool compare(const wxPGProperty& prop, const wxString& propId);
@@ -43,6 +45,10 @@ void CncConfig::pgChangedWorkingCfgPage(wxPropertyGridEvent& event) {
 		wxPGProperty* p = getProperty(CncWork_Ctl_PRE_PROSSOR_ANALYSE); 
 		wxASSERT(p); 
 		const bool analyse = p->GetValue().GetBool();
+		
+		p = getProperty(CncWork_Ctl_PRE_PROSSOR_SKIP_GCODE);
+		wxASSERT(p); 
+		p->Enable(analyse);
 		
 		p = getProperty(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY); 
 		wxASSERT(p); 
@@ -161,6 +167,13 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_ANALYSE, prop);
 			{
 				wxPGProperty* parent = prop;
+				//...............
+				prop = parent->AppendChild( new wxBoolProperty("Skip GCode", NEXT_PROP_ID, true));
+				prop->Enable(true);
+				prop->SetHelpString(_T(""));
+				prop->SetEditor( wxT("CheckBox") );
+				CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_SKIP_GCODE, prop);
+				
 				//...................
 				const double begPitch = 0.1, endPitch = 100.0, sizPitch = CncCfgSliderProperty::calcSteps(begPitch, endPitch, 0.1);
 				prop = parent->AppendChild(new CncCfgSliderProperty("Max XY Pitch", NEXT_PROP_ID, 15.0, begPitch, endPitch, sizPitch));

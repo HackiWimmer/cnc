@@ -281,9 +281,15 @@ void GL3DDrawPane::toggleHardwareBox() {
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
-void GL3DDrawPane::toggleBoundBox() {
+void GL3DDrawPane::toggleTotalBoundBox() {
 /////////////////////////////////////////////////////////////////////
-	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showBoundBox);
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showTotalBoundBox);
+	motionMonitor->updateMonitorAndOptions();
+}
+/////////////////////////////////////////////////////////////////////
+void GL3DDrawPane::toggleObjectBoundBox() {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showObjectBoundBox);
 	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////

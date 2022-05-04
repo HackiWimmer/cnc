@@ -14,8 +14,8 @@
 #include "CncCommon.h"
 
 /////////////////////////////////////////////////////////////////
-struct GLContextOptions {
-	
+struct GLContextOptions
+{
 	// .........................................................
 	// options
 	
@@ -28,7 +28,8 @@ struct GLContextOptions {
 	bool showMillingCutter				= true;
 	bool showPosMarker					= true;
 	bool showFlyPath					= true;
-	bool showBoundBox					= true;
+	bool showTotalBoundBox				= true;
+	bool showObjectBoundBox				= true;
 	bool showHardwareBox				= true;
 	bool showRuler						= true;
 	bool showHelpLines					= true;
@@ -41,8 +42,9 @@ struct GLContextOptions {
 	unsigned int rulerOriginOffsetAbs	= 10;
 	unsigned int rapidAlpha				= 64;
 		
-	wxColour hardwareBoxColour			= wxColour(255,   0,  0);
-	wxColour boundBoxColour				= wxColour(185, 127, 87);
+	wxColour hardwareBoxColour			= wxColour(255,   0,   0);
+	wxColour totBoundBoxColour			= wxColour(185, 127,  87);
+	wxColour objBoundBoxColour			= wxColour(112, 146, 190);
 	wxColour rapidColour				= *wxYELLOW;
 	wxColour workColour					= *wxWHITE;
 	wxColour maxColour					= *wxBLUE;

@@ -564,18 +564,16 @@ bool SVGPathHandlerCnc::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL(CNC_LOG_FUNCT);
 	
-	
-	
 	if ( PathHandlerBase::prepareWork() == false ) 
 	{
 		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::prepareWork() failed!\n");
 		return false;
 	}
 	
-	// add the file parser to the runner setup
-	// the rest is already set by ctor CncPathListRunner(cnc)
-	CncPathListRunner::Setup& setup = getSetup();
-	setup.fileParser = fileParser;
+	// the rest of the setup is already set by CncPathListRunner::autoSetup(...)
+	CncPathListRunner::Setup& setup	= getSetup();
+	setup.optAnalyse				= THE_CONFIG->getPreProcessorAnalyseFlag();
+	setup.fileParser				= fileParser;
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();

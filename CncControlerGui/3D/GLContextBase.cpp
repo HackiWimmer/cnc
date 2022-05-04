@@ -703,6 +703,8 @@ void GLContextBase::reshapePosToCenterIfOutOfFocus(int px, int py) {
 //////////////////////////////////////////////////
 	if ( associatedCanvas == NULL )
 		return;
+		
+	static int occurrenceCounter = 0;
 
 	const wxSize wSize = associatedCanvas->GetClientSize();
 	const int brd = std::max(wSize.GetWidth(), wSize.GetHeight()) * 0.1;
@@ -711,7 +713,16 @@ void GLContextBase::reshapePosToCenterIfOutOfFocus(int px, int py) {
 	const bool by = py > brd && py < wSize.GetHeight() - brd;
 	
 	if ( !bx || !by )
+	{
+		if ( (++occurrenceCounter) == 3 )
+		{
+			// shrink the view if out of focus occurs to often
+			getModelScale().decScale();
+			occurrenceCounter = 0;
+		}
+		
 		reshapePosToCenter(px, py);
+	}
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::reshapeViewMode() {
@@ -880,7 +891,8 @@ void GLContextBase::setFrontCatchingMode(FrontCatchingMode mode) {
 ////////////////////////////////////////////////////////////////
 const char* GLContextBase::getFrontCatchingModeAsStr(FrontCatchingMode mode) {
 ////////////////////////////////////////////////////////////////
-	switch ( mode ) {
+	switch ( mode )
+	{
 		case FCM_OFF:				return "Off";
 		case FCM_KEEP_IN_FRAME:		return "Keep always in frame";
 		case FCM_ALWAYS_CENTRED:	return "Keep always centred";
@@ -984,7 +996,7 @@ bool GLContextBase::keepVisible(GLdouble px, GLdouble py, GLdouble pz) {
 	if ( associatedCanvas == NULL )
 		return false;
 		
-	if ( frontCatchingMode < 1 )
+	if ( frontCatchingMode == FCM_OFF )
 		return true;
 		
 	GLint		curGlViewport	[ 4];
@@ -998,11 +1010,13 @@ bool GLContextBase::keepVisible(GLdouble px, GLdouble py, GLdouble pz) {
 	GLdouble winX, winY, winZ;
 	gluProject(px, py, pz, curGlModelview, curGlProjection, curGlViewport, &winX, &winY, &winZ);
 	
-	switch ( frontCatchingMode ) {
-		case 2: 	reshapePosToCenter(winX, winY);
-					break;
-					
-		default:	reshapePosToCenterIfOutOfFocus(winX, winY);
+	switch ( frontCatchingMode ) 
+	{
+		case FCM_ALWAYS_CENTRED:	reshapePosToCenter(winX, winY);
+									break;
+									
+		case  FCM_KEEP_IN_FRAME:
+		default:					reshapePosToCenterIfOutOfFocus(winX, winY);
 	}
 	
 	return true;

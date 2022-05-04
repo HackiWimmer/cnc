@@ -1295,15 +1295,27 @@ GL3DOptionPaneBase::GL3DOptionPaneBase(wxWindow* parent,
     m_pgCatBoundBox = m_pgMgr3543->Append(new wxPropertyCategory(_("Bound Box")));
     m_pgCatBoundBox->SetHelpString(wxT(""));
 
-    m_pgPropDrawBoundBox =
-        m_pgMgr3543->AppendIn(m_pgCatBoundBox, new wxBoolProperty(_("Show Bound Box"), wxPG_LABEL, 1));
-    m_pgPropDrawBoundBox->SetHelpString(wxT(""));
-    m_pgPropDrawBoundBox->SetEditor(wxT("CheckBox"));
+    m_pgPropDrawTotalBoundBox =
+        m_pgMgr3543->AppendIn(m_pgCatBoundBox, new wxBoolProperty(_("Show Overall Bound Box"), wxPG_LABEL, 1));
+    m_pgPropDrawTotalBoundBox->SetHelpString(wxT(""));
+    m_pgPropDrawTotalBoundBox->SetEditor(wxT("CheckBox"));
 
-    m_pgPropBoundBoxColour = m_pgMgr3543->AppendIn(m_pgCatBoundBox, new wxSystemColourProperty(_("Colour")));
-    m_pgPropBoundBoxColour->SetValueToUnspecified();
-    m_pgPropBoundBoxColour->SetHelpString(wxT(""));
-    m_pgPropBoundBoxColour->SetEditor(wxT("TextCtrlAndButton"));
+    m_pgPropDrawObjectBoundBox =
+        m_pgMgr3543->AppendIn(m_pgCatBoundBox, new wxBoolProperty(_("Show Object Bound Box"), wxPG_LABEL, 1));
+    m_pgPropDrawObjectBoundBox->SetHelpString(wxT(""));
+    m_pgPropDrawObjectBoundBox->SetEditor(wxT("CheckBox"));
+
+    m_pgPropTotalBoundBoxColour =
+        m_pgMgr3543->AppendIn(m_pgCatBoundBox, new wxSystemColourProperty(_("Colour Total BB")));
+    m_pgPropTotalBoundBoxColour->SetValueToUnspecified();
+    m_pgPropTotalBoundBoxColour->SetHelpString(wxT(""));
+    m_pgPropTotalBoundBoxColour->SetEditor(wxT("TextCtrlAndButton"));
+
+    m_pgPropObjectBoundBoxColour =
+        m_pgMgr3543->AppendIn(m_pgCatBoundBox, new wxSystemColourProperty(_("Colour Object BB")));
+    m_pgPropObjectBoundBoxColour->SetValueToUnspecified();
+    m_pgPropObjectBoundBoxColour->SetHelpString(wxT(""));
+    m_pgPropObjectBoundBoxColour->SetEditor(wxT("TextCtrlAndButton"));
 
     m_pgCatRenderOptions = m_pgMgr3543->Append(new wxPropertyCategory(_("Render Options")));
     m_pgCatRenderOptions->SetHelpString(wxT(""));
@@ -1721,15 +1733,25 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     flexGridSizer363->Add(m_btnHardwareBox, 0, wxALL, WXC_FROM_DIP(1));
     m_btnHardwareBox->SetMinSize(wxSize(26, 26));
 
-    m_btnBoundBox = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26, 26)), 0);
+    m_btnTotalBoundBox = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26, 26)), 0);
 #if wxVERSION_NUMBER >= 2904
-    m_btnBoundBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncBoundbox")), wxLEFT);
-    m_btnBoundBox->SetBitmapMargins(2, 2);
+    m_btnTotalBoundBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncBoundbox")), wxLEFT);
+    m_btnTotalBoundBox->SetBitmapMargins(2, 2);
 #endif
-    m_btnBoundBox->SetToolTip(_("Toggle: Show Boundbox"));
+    m_btnTotalBoundBox->SetToolTip(_("Toggle: Show Total Boundbox"));
 
-    flexGridSizer363->Add(m_btnBoundBox, 0, wxALL, WXC_FROM_DIP(1));
-    m_btnBoundBox->SetMinSize(wxSize(26, 26));
+    flexGridSizer363->Add(m_btnTotalBoundBox, 0, wxALL, WXC_FROM_DIP(1));
+    m_btnTotalBoundBox->SetMinSize(wxSize(26, 26));
+
+    m_btnObjectBoundBox = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26, 26)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_btnObjectBoundBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("boundbox")), wxLEFT);
+    m_btnObjectBoundBox->SetBitmapMargins(2, 2);
+#endif
+    m_btnObjectBoundBox->SetToolTip(_("Toggle: Show Object Boundbox"));
+
+    flexGridSizer363->Add(m_btnObjectBoundBox, 0, wxALL, WXC_FROM_DIP(1));
+    m_btnObjectBoundBox->SetMinSize(wxSize(26, 26));
 
     m_staticLine3721 =
         new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxLI_HORIZONTAL);
@@ -2112,7 +2134,8 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     }
     // Connect events
     m_btnHardwareBox->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleHardwareBox, this);
-    m_btnBoundBox->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleBoundBox, this);
+    m_btnTotalBoundBox->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleTotalBoundBox, this);
+    m_btnObjectBoundBox->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleObjectBoundBox, this);
     m_btnOrigin->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleOrigin, this);
     m_btnGuidePathes->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleGuidePathes, this);
     m_btnRuler->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleRuler, this);
@@ -2139,7 +2162,8 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
 GL3DDrawPaneBase::~GL3DDrawPaneBase()
 {
     m_btnHardwareBox->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleHardwareBox, this);
-    m_btnBoundBox->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleBoundBox, this);
+    m_btnTotalBoundBox->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleTotalBoundBox, this);
+    m_btnObjectBoundBox->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleObjectBoundBox, this);
     m_btnOrigin->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleOrigin, this);
     m_btnGuidePathes->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleGuidePathes, this);
     m_btnRuler->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleRuler, this);

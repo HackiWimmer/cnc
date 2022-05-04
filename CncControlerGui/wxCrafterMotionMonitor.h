@@ -725,8 +725,10 @@ protected:
     wxPGProperty* m_pgPropHLXZPlane;
     wxPGProperty* m_pgPropHLYZPlane;
     wxPGProperty* m_pgCatBoundBox;
-    wxPGProperty* m_pgPropDrawBoundBox;
-    wxPGProperty* m_pgPropBoundBoxColour;
+    wxPGProperty* m_pgPropDrawTotalBoundBox;
+    wxPGProperty* m_pgPropDrawObjectBoundBox;
+    wxPGProperty* m_pgPropTotalBoundBoxColour;
+    wxPGProperty* m_pgPropObjectBoundBoxColour;
     wxPGProperty* m_pgCatRenderOptions;
     wxPGProperty* m_pgPropSmoothing;
     wxCheckBox* m_cbAutoUpdate;
@@ -936,7 +938,8 @@ class GL3DDrawPaneBase : public wxPanel
 {
 protected:
     wxButton* m_btnHardwareBox;
-    wxButton* m_btnBoundBox;
+    wxButton* m_btnTotalBoundBox;
+    wxButton* m_btnObjectBoundBox;
     wxStaticLine* m_staticLine3721;
     wxButton* m_btnOrigin;
     wxButton* m_btnGuidePathes;
@@ -982,7 +985,11 @@ protected:
     {
 	event.Skip();
     }
-    virtual void onToggleBoundBox(wxCommandEvent& event)
+    virtual void onToggleTotalBoundBox(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onToggleObjectBoundBox(wxCommandEvent& event)
     {
 	event.Skip();
     }
@@ -1076,9 +1083,13 @@ public:
     {
 	return m_btnHardwareBox;
     }
-    wxButton* GetBtnBoundBox()
+    wxButton* GetBtnTotalBoundBox()
     {
-	return m_btnBoundBox;
+	return m_btnTotalBoundBox;
+    }
+    wxButton* GetBtnObjectBoundBox()
+    {
+	return m_btnObjectBoundBox;
     }
     wxStaticLine* GetStaticLine3721()
     {

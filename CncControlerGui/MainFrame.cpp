@@ -7376,7 +7376,7 @@ void MainFrame::onRefreshMonitor(wxCommandEvent& event) {
 void MainFrame::onToggleBoundBox(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(drawPane3D);
-	drawPane3D->toggleBoundBox();
+	drawPane3D->toggleTotalBoundBox();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onToggleHardwareBox(wxCommandEvent& event) {
@@ -9112,6 +9112,7 @@ void MainFrame::updateHardwareReference() {
 void MainFrame::simulateHardwareReference(float offsetFact) {
 /////////////////////////////////////////////////////////////////////
 	#warning reactivate simulateHardwareReference
+	//if ( THE_CONTEXT->hasHardware() )
 	if ( true )
 	{
 		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");

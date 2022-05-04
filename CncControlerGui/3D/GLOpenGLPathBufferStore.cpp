@@ -1,7 +1,6 @@
 #define __STDC_FORMAT_MACROS 1
 #include <inttypes.h>
 
-#include "CncCommon.h"
 #include "GLCommon.h"
 #include "GlobalFunctions.h"
 #include "3D/GLContextCncPathBase.h"
@@ -175,7 +174,8 @@ GLOpenGLPathBuffer::GLOpenGLPathBuffer(const GLOpenGLPathBuffer& b)
 	// are already initialized
 	// generateBuffers();
 	
-	if ( GL_ERROR_TRACE_LEVEL > 0 ) {
+	if ( GL_ERROR_TRACE_LEVEL > 0 )
+	{
 		std::stringstream ss;
 		ss << "Create new GLOpenGLPathBuffer: ";
 		traceParameters(ss);
@@ -642,7 +642,7 @@ bool GLOpenGLPathBuffer::changeColourForClientID(long clientId, const char type)
 
 
 
-GLOpenGLPathBuffer::CncVertex GLOpenGLPathBufferStore::defaultVertex('R', -1, 0.0, 0.0, 0.0);
+GLOpenGLPathBuffer::CncVertex GLOpenGLPathBufferStore::defaultVertex(cnc::RAPID_SPEED_CHAR, CLIENT_ID.INVALID, 0.0, 0.0, 0.0);
 
 /////////////////////////////////////////////////////////////
 GLOpenGLPathBufferStore::GLOpenGLPathBufferStore(const wxString& instanceName)
@@ -800,7 +800,7 @@ bool GLOpenGLPathBufferStore::getDirVertex(GLOpenGLPathBuffer::CncVertex& ret, u
 	if ( initialized == false )
 		return false;
 	
-	GLOpenGLPathBuffer::CncVertex v0('R', CLIENT_ID.INVALID, 0.0, 0.0, 0.0);
+	GLOpenGLPathBuffer::CncVertex v0(cnc::RAPID_SPEED_CHAR, CLIENT_ID.INVALID, 0.0, 0.0, 0.0);
 	
 	if ( idx > 0 && idx < getVertexCount() ) {
 		

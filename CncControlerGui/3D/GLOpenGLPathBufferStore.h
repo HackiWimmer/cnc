@@ -13,6 +13,7 @@
 #include <wx/string.h>
 #include <wx/colour.h>
 
+#include "CncCommon.h"
 #include "3D/GLInclude.h"
 #include "3D/GLCommon.h"
 
@@ -30,7 +31,7 @@ class GLOpenGLPathBuffer {
 		typedef GLfloat vertex_type;
 		typedef GLubyte colour_type;
 
-		enum DisplayType { DT_DOTS = GL_POINTS, DT_STRIPS = GL_LINE_STRIP};
+		enum DisplayType { DT_DOTS = GL_POINTS, DT_STRIPS = GL_LINE_STRIP };
 		
 		static const unsigned int	CncVertexAxisValueCount 		= 3;
 		static const unsigned int		CncVertexAxisX 				= 0;
@@ -97,7 +98,8 @@ class GLOpenGLPathBuffer {
 		static void dimUpColours();
 		
 		//-----------------------------------------------------
-		struct CncVertex {
+		struct CncVertex 
+		{
 			private:
 				// with respect to the openGl buffer alignment 
 				// don't change the following variable order
@@ -106,8 +108,8 @@ class GLOpenGLPathBuffer {
 
 				// specify additional data from here on . . . 
 				//clientID as wells as type isn't edible after creation!
-				char type 		= 'R';
-				long clientID 	= -1;
+				char type 		= cnc::RAPID_SPEED_CHAR;
+				long clientID 	= CLIENT_ID.INVALID;
 				
 			protected:
 				
@@ -142,8 +144,8 @@ class GLOpenGLPathBuffer {
 				
 				//-------------------------------------------------
 				CncVertex()
-				: type('R')
-				, clientID(-1)
+				: type			(cnc::RAPID_SPEED_CHAR)
+				, clientID		(CLIENT_ID.INVALID)
 				{
 					memset(vertex,  0, CncVertexAxisValueCount   * sizeof(vertex_type));
 					initializeVertexColour();

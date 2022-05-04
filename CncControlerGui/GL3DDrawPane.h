@@ -1,3 +1,4 @@
+
 #ifndef GL3DDRAWPANE_H
 #define GL3DDRAWPANE_H
 
@@ -5,8 +6,8 @@
 #include "wxCrafterMotionMonitor.h"
 
 class GL3DDrawPane : public GL3DDrawPaneBase 
-                          , GLContextOptions::Callback
-						  , CncMotionMonitor::Callback
+                   , public GLContextOptions::Callback
+                   , public CncMotionMonitor::Callback
 {
 	public:
 		GL3DDrawPane(wxWindow* parent);
@@ -33,7 +34,8 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		
 		void toggleOptionPane();
 		void toggleHardwareBox();
-		void toggleBoundBox();
+		void toggleTotalBoundBox();
+		void toggleObjectBoundBox();
 		void toggleFlyPathes();
 		void toggleGuidePathes();
 		void toggleHelpLines();
@@ -43,7 +45,8 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		void toggleMillingCutter();
 		
 		bool stateHardwareBox()								 const { return motionMonitor->getContextOptions().showHardwareBox;   }
-		bool stateBoundBox()								 const { return motionMonitor->getContextOptions().showBoundBox;      }
+		bool stateTotalBoundBox()							 const { return motionMonitor->getContextOptions().showTotalBoundBox; }
+		bool stateObjectBoundBox()							 const { return motionMonitor->getContextOptions().showObjectBoundBox;}
 		bool stateFlyPathes()								 const { return motionMonitor->getContextOptions().showFlyPath;       }
 		bool stateGuidePathes()								 const { return motionMonitor->getContextOptions().showGuidePathes;   }
 		bool stateHelpLines()								 const { return motionMonitor->getContextOptions().showHelpLines;     }
@@ -57,14 +60,14 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		void refreshMonitor();
 		
 	protected:
-		
 		virtual void onResetView(wxCommandEvent& event)				{ resetView();            }
 		virtual void onShowMillingCutter(wxCommandEvent& event)		{ toggleMillingCutter();  }
 		virtual void onToggleHardwareBox(wxCommandEvent& event)		{ toggleHardwareBox();    }
 		virtual void onClearMonitor(wxCommandEvent& event)			{ clearMonitor();         }
 		virtual void onRefreshMonitor(wxCommandEvent& event)		{ refreshMonitor();       }
 		virtual void onToggleGuidePathes(wxCommandEvent& event)		{ toggleGuidePathes();    }
-		virtual void onToggleBoundBox(wxCommandEvent& event)		{ toggleBoundBox();       }
+		virtual void onToggleTotalBoundBox(wxCommandEvent& event)	{ toggleTotalBoundBox();  }
+		virtual void onToggleObjectBoundBox(wxCommandEvent& event)	{ toggleObjectBoundBox(); }
 		virtual void onToggleFlyPathes(wxCommandEvent& event)		{ toggleFlyPathes();      }
 		virtual void onToggleHelpLines(wxCommandEvent& event)		{ toggleHelpLines();      }
 		virtual void onToggleOrigin(wxCommandEvent& event)			{ toggleOrigin();         }

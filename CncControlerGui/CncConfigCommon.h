@@ -111,6 +111,7 @@
 	#define CncWork_Ctl_PRE_PROSSOR_MAX_XY_PITCH			"CncWork_Controller|PRE_PROSSOR_MAX_XY_PITCH"
 	#define CncWork_Ctl_PRE_PROSSOR_MAX_Z_PITCH				"CncWork_Controller|PRE_PROSSOR_MAX_Z_PITCH"
 	#define CncWork_Ctl_PRE_PROSSOR_ANALYSE					"CncWork_Controller|PRE_PROSSOR_ANALYSE"
+	#define CncWork_Ctl_PRE_PROSSOR_SKIP_GCODE				"CncWork_Controller|PRE_PROSSOR_SKIP_GCODE"
 	#define CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY				"CncWork_Controller|PRE_PROSSOR_SKIP_EMPTY"
 	#define CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES			"CncWork_Controller|PRE_PROSSOR_COMBINE_MOVES"
 	#define CncWork_Ctl_PRE_PROSSOR_USE_OPERATING_TRACE		"CncWork_Controller|PRE_PROSSOR_USE_OPERATING_TRACE"

@@ -17,9 +17,13 @@ GCodePathHandlerCnc::~GCodePathHandlerCnc() {
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::prepareWorkImpl() {
 //////////////////////////////////////////////////////////////////
-	// add the file parser to the runner setup
-	// the rest is already set by ctor CncPathListRunner(cnc)
+	const bool b  = THE_CONFIG->getPreProcessorAnalyseFlag() 
+				 && THE_CONFIG->getPreProcessorSkipGCodeFlag() == false
+	;
+	
+	// the rest of the setup is already set by CncPathListRunner::autoSetup(...)
 	CncPathListRunner::Setup& setup = getSetup();
+	setup.optAnalyse				= b;
 	setup.fileParser				= fileParser;
 
 	return true;

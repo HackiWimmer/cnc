@@ -501,9 +501,9 @@ void GLContextCncPathBase::drawHardwareBox() {
 	glDisable(GL_LINE_STIPPLE);
 }
 /////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::drawBoundBox() {
+void GLContextCncPathBase::drawTotalBoundBox() {
 /////////////////////////////////////////////////////////////////
-	if ( options.showBoundBox == false )
+	if ( options.showTotalBoundBox == false )
 		return; 
 		
 	// ensure the right model
@@ -513,11 +513,37 @@ void GLContextCncPathBase::drawBoundBox() {
 	glLineStipple(1, 0xAAAA);
 	glEnable(GL_LINE_STIPPLE);
 	
-	glColor4ub(options.boundBoxColour.Red(), options.boundBoxColour.Green(), options.boundBoxColour.Blue(), 255);
+	glColor4ub(options.totBoundBoxColour.Red(), options.totBoundBoxColour.Green(), options.totBoundBoxColour.Blue(), 255);
 	
 	BoundBox bb = cncPath.getBoundBox();
-	for ( BoundBox::iterator it=bb.begin(); it!=bb.end(); ++it ) {
+	for ( BoundBox::iterator it=bb.begin(); it!=bb.end(); ++it )
+	{
+		glBegin(GL_LINES);
+			glVertex3f(std::get<0>(*it).getX(), std::get<0>(*it).getY(), std::get<0>(*it).getZ());
+			glVertex3f(std::get<1>(*it).getX(), std::get<1>(*it).getY(), std::get<1>(*it).getZ());
+		glEnd();
+	}
+	
+	glDisable(GL_LINE_STIPPLE);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawObjectBoundBox() {
+/////////////////////////////////////////////////////////////////
+	if ( options.showObjectBoundBox == false )
+		return; 
 		
+	// ensure the right model
+	glMatrixMode(GL_MODELVIEW);
+	typedef GLI::BoundBox BoundBox;
+	
+	glLineStipple(3, 0xAAAA);
+	glEnable(GL_LINE_STIPPLE);
+	
+	glColor4ub(options.objBoundBoxColour.Red(), options.objBoundBoxColour.Green(), options.objBoundBoxColour.Blue(), 255);
+	
+	BoundBox bb = cncPath.getObjectBoundBox();
+	for ( BoundBox::iterator it=bb.begin(); it!=bb.end(); ++it )
+	{
 		glBegin(GL_LINES);
 			glVertex3f(std::get<0>(*it).getX(), std::get<0>(*it).getY(), std::get<0>(*it).getZ());
 			glVertex3f(std::get<1>(*it).getX(), std::get<1>(*it).getY(), std::get<1>(*it).getZ());
@@ -929,6 +955,7 @@ void GLContextCncPathBase::determineModel() {
 	drawHighlightEffects();
 	
 	drawAnchorPoints();
-	drawBoundBox();
+	drawTotalBoundBox();
+	drawObjectBoundBox();
 	drawHardwareBox();
 }

@@ -1115,7 +1115,8 @@ const bool CncConfig::getInverseCtrlDirectionXFlag()				{ PROPERTY(CncWork_Ctl_I
 const bool CncConfig::getInverseCtrlDirectionYFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Y)				return p->GetValue().GetBool(); }
 const bool CncConfig::getInverseCtrlDirectionZFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Z)				return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorAnalyseFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_ANALYSE)					return p->GetValue().GetBool(); }
-const bool CncConfig::getPreProcessoSkipEmptyFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY)				return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorSkipGCodeFlag()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_SKIP_GCODE)				return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorSkipEmptyFlag()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY)				return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCombineMovesFlag()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES)			return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorUseOperatingTrace()			{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_USE_OPERATING_TRACE)		return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCntPathListEntries()			{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES)	return p->GetValue().GetBool(); }

@@ -246,6 +246,7 @@ namespace GLI {
 			const GLCncPathVertices& getMax() const { return maxVecties; }
 			
 			const BoundBox& getBoundBox();
+			const BoundBox& getObjectBoundBox();
 			
 			const float getMinScaleFact()  const;
 			const float getAutoScaleFact() const;
@@ -264,15 +265,19 @@ namespace GLI {
 		
 		private:
 			GLOpenGLPathBufferStore					vectiesBuffer;
-			GLCncPathVertices 						minVecties;
-			GLCncPathVertices 						maxVecties;
+			GLCncPathVertices						minVecties;
+			GLCncPathVertices						maxVecties;
+			
+			GLCncPathVertices						minObjVecties;
+			GLCncPathVertices						maxObjVecties;
 			
 			long 									virtualEnd;
 			
 			bool									publishNotifications;
 			std::vector<GLI::GLCncPath::Callback*> 	callbacks;
+
+			inline const BoundBox& evaluateBoundBox(const GLCncPathVertices& min, const GLCncPathVertices& max);
 			
-			////////////////////////////////////////////
 			inline void updateVirtualEnd() { setVirtualEnd(vectiesBuffer.getVertexCount()); }
 			
 			////////////////////////////////////////////

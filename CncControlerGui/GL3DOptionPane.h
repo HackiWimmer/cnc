@@ -21,9 +21,7 @@ class GL3DOptionPane : public GL3DOptionPaneBase
 		void setMotionMonitor(CncMotionMonitor* m);
 		
 	protected:
-    virtual void resetModelPostion(wxCommandEvent& event);
-		CncMotionMonitor* motionMonitor;
-		
+		virtual void resetModelPostion(wxCommandEvent& event);
 		virtual void autoCameraRotationAnticlockwise(wxCommandEvent& event);
 		virtual void autoCameraRotationClockwise(wxCommandEvent& event);
 		virtual void cameraRotationChanged(wxScrollEvent& event);
@@ -40,5 +38,6 @@ class GL3DOptionPane : public GL3DOptionPaneBase
 		virtual void propertyChanged(wxPropertyGridEvent& event);
 		virtual void propertyChanging(wxPropertyGridEvent& event);
 		
+		CncMotionMonitor* motionMonitor;
 };
 #endif // GL3DOPTIONPANE_H
