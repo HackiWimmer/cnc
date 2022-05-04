@@ -32,9 +32,6 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 , pageVector									()
 /////////////////////////////////////////////////////////////////////
 {
-	GblFunc::fixListBookBmpVisibleBug(m_leftBook);
-	GblFunc::fixListBookBmpVisibleBug(m_listbookManuallyMove);
-
 	// ---------------------------------------------------------------
 	auto setPageWidth = [&](wxWindow* page, int width){
 		int pos = m_rightBook->FindPage(page);
@@ -84,46 +81,6 @@ CncSecureCtrlPanel::CncSecureCtrlPanel(wxWindow* parent)
 	GblFunc::replaceControl(m_interactiveTouchpadXYZ, interactiveTouchpadXYZ);
 	interactiveTouchpadXYZ->setCallbackId(CallbackID_TPXY);
 	interactiveTouchpadXYZ->SetBackgroundColour(wxColour(255, 255, 184));
-	
-	#warning only a dev setup
-	if ( false )
-	{
-				CncSecureGesturesPanel* panelQ1 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_POSITIVE, 10);
-				GblFunc::replaceControl(m_panelQ1, panelQ1);
-				panelQ1->setCallbackId(6001);
-				panelQ1->SetBackgroundColour(wxColour(  0, 128,  0));
-				panelQ1->init();
-				
-				CncSecureGesturesPanel* panelQ2 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_NEGATIVE, 10);
-				GblFunc::replaceControl(m_panelQ2, panelQ2);
-				panelQ2->setCallbackId(6002);
-				panelQ2->SetBackgroundColour(wxColour(  0, 128,  0));
-				panelQ2->init();
-				
-				CncSecureGesturesPanel* panelQ3 = new CncSecureGesturesPanel(this, wxHORIZONTAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 10);
-				GblFunc::replaceControl(m_panelQ3, panelQ3);
-				panelQ3->setCallbackId(6003);
-				panelQ3->SetBackgroundColour(wxColour(  0, 128,  0));
-				panelQ3->init();
-				
-				CncSecureGesturesPanel* panelQ4 = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_POSITIVE, 10);
-				GblFunc::replaceControl(m_panelQ4, panelQ4);
-				panelQ4->setCallbackId(6004);
-				panelQ4->SetBackgroundColour(wxColour(  0, 128,  0));
-				panelQ4->init();
-				
-				CncSecureGesturesPanel* panelQ5 = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_NEGATIVE, 10);
-				GblFunc::replaceControl(m_panelQ5, panelQ5);
-				panelQ5->setCallbackId(6005);
-				panelQ5->SetBackgroundColour(wxColour(  0, 128,  0));
-				panelQ5->init();
-				
-				CncSecureGesturesPanel* panelQ6 = new CncSecureGesturesPanel(this, wxVERTICAL, CncSecureGesturesPanel::Type::T_SWITCH, CncSecureGesturesPanel::Mode::M_BOTH, 10);
-				GblFunc::replaceControl(m_panelQ6, panelQ6);
-				panelQ6->setCallbackId(6006);
-				panelQ6->SetBackgroundColour(wxColour(  0, 128,  0));
-				panelQ6->init();
-	}
 	
 	podiumPanel = new CncPodiumMgmtMovement(this); 
 	GblFunc::replaceControl(m_podiumPlaceholder, podiumPanel);
@@ -368,15 +325,6 @@ void CncSecureCtrlPanel::setPortSelection(const wxString& portName) {
 	{
 		THE_APP->GetPortSelector()->SetStringSelection(portName);
 		THE_APP->selectPort();
-	}
-	
-	
-	#warning only a dev setup
-	if ( false )
-	{
-		wxMouseEvent event;
-		THE_APP->dclickHeartbeatState(event);
-		THE_APP->serialSpyPanel->enableSerialSpy(true);
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -625,10 +573,10 @@ void CncSecureCtrlPanel::onToggleHeartbeatsSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::activate(bool b) {
 /////////////////////////////////////////////////////////////////////
-	if ( b ) {
-		if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) {
+	if ( b ) 
+	{
+		if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) 
 			tryToProvideTemplate();
-		}
 		
 		const int sel = PAGE_CONNECT;
 		m_leftBook->SetSelection(sel);
@@ -636,22 +584,13 @@ void CncSecureCtrlPanel::activate(bool b) {
 		
 		THE_APP->GetSecureSplitterMainV()->SetSashPosition(pageVector.at(sel).width);
 		performRightHeadline();
-		
-		
-		
-		#warning only a dev setup
-		//notifyResetMonitorView();
-		
-		wxCommandEvent event;
-		//onSerialSpySec(event);
-		
 	}
-	else {
+	else 
+	{
 
 	}
 	
 	//..
-	
 }
 
 

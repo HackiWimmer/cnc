@@ -58,34 +58,6 @@ bool GblFunc::replaceSizer(wxSizer* oldSizer, wxSizer* newSizer) {
 }
 //-------------------------------------------------------------
 
-
-///////////////////////////////////////////////////////////////////
-int GblFunc::fixListBookBmpVisibleBug(wxWindow* lb) {
-//
-// Hack to make images visible 
-//
-///////////////////////////////////////////////////////////////////
-	#warning function can be completly removed
-	return -1;
-	
-	if ( lb == NULL )
-		return -1;
-	
-	wxListbook* listBook = static_cast<wxListbook*>(lb);
-	wxImageList* imgListOld = listBook->GetImageList();
-	
-	const wxSize size = imgListOld->GetSize();
-    wxImageList* imgListNew = new wxImageList(size.GetWidth(), size.GetHeight());
-	
-	const int count = imgListOld->GetImageCount();
-	for (int i = 0; i<count; i++ )
-		imgListNew->Add(imgListOld->GetBitmap(i));
-	
-	listBook->AssignImageList(imgListNew);
-	
-	return count;
-}
-
 ///////////////////////////////////////////////////////////////////
 void GblFunc::swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl) {
 ///////////////////////////////////////////////////////////////////

@@ -32,8 +32,6 @@ class CncReferencePosition	: public CncReferencePositionBase
 		
 		void					setMessage(const wxString& msg);
 		
-		void					hitKey(int keyCode, int modifier = wxMOD_NONE );
-		
 		const RefPosResult&		getResult(RefPosResult& result)	const { return referencePanel->getResult(result); } 
 		bool					isReferenceStateValid()			const { return referencePanel->isReferenceStateValid(); }
 		

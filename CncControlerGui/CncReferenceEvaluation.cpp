@@ -39,8 +39,6 @@ CncReferenceEvaluation::CncReferenceEvaluation(wxWindow* parent)
 		extCameraPreview->setupView(CncExternalViewBox::Default::VIEW1, cameraCapture, "External Camera Preview . . . ");
 	}
 	
-	GblFunc::fixListBookBmpVisibleBug(m_notebookEvalMode);
-	
 	// default value
 	setMode(CncRefPositionMode::CncRM_Mode5);
 	m_notebookEvalMode->SetSelection(SEL_BY_EYE);

@@ -174,28 +174,6 @@ void CncReferencePosition::onSetCtrlFocus(wxFocusEvent& event) {
 	Refresh();
 }
 ///////////////////////////////////////////////////////////////////
-void CncReferencePosition::hitKey(int keyCode, int modifier) {
-///////////////////////////////////////////////////////////////////
-	#warning Is this longer necessary ? (Nov 2021)
-	/*
-	wxWindow* focusWnd = wxWindow::FindFocus();
-	
-	wxUIActionSimulator uai;
-	// Special redirect for this control to keep the default wxTextControl 
-	// handling for cursor left and right 
-	if ( focusWnd == m_touchDiameter ) {
-		if ( keyCode == WXK_LEFT )
-			keyCode = WXK_UP;
-		
-		if ( keyCode == WXK_RIGHT )
-			keyCode = WXK_DOWN;
-	}
-	
-	uai.KeyDown(keyCode, modifier);
-	uai.KeyUp(keyCode, modifier);
-	*/
-}
-///////////////////////////////////////////////////////////////////
 void CncReferencePosition::shiftStepSensitivity() {
 ///////////////////////////////////////////////////////////////////
 	const int sel = m_rbStepSensitivity->GetSelection();
