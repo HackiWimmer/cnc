@@ -9420,7 +9420,7 @@ State</label>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>2</border>
-                                            <object class="wxPanel" name="m_leftTplPrevirePlaceholder">
+                                            <object class="wxPanel" name="m_leftTplPreviewPlaceholder">
                                               <style>wxTAB_TRAVERSAL</style>
                                               <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
                                             </object>
@@ -9442,7 +9442,7 @@ State</label>
                                           <growablerows>0</growablerows>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
-                                            <object class="wxPanel" name="m_rightTplPrevirePlaceholder">
+                                            <object class="wxPanel" name="m_rightTplPreviewPlaceholder">
                                               <style>wxTAB_TRAVERSAL</style>
                                               <bg>wxSYS_COLOUR_BTNSHADOW</bg>
                                             </object>

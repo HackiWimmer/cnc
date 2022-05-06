@@ -97,14 +97,27 @@ void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 //////////////////////////////////////////////////
 	switch ( event.GetKeyCode() ) {
 		
-		case 'C':	preview->centreViewport();
-					Refresh(false);
+		case 'C':	centreViewport();
 					break;
 					
-		case 'R':	preview->resetViewport();
-					Refresh(false);
+		case 'R':	resetViewport();
 					break;
 	}
+}
+//////////////////////////////////////////////////
+void CncGCodePreview::centreViewport() {
+//////////////////////////////////////////////////
+	preview->centreViewport();
+	Refresh(false);
+}
+//////////////////////////////////////////////////
+void CncGCodePreview::resetViewport() {
+//////////////////////////////////////////////////
+	
+	std::cout << CNC_LOG_FUNCT << std::endl;
+	
+	preview->resetViewport();
+	Refresh(true);
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::clear() {

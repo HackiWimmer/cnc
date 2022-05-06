@@ -640,9 +640,9 @@ protected:
     wxStaticLine* m_staticLine10023;
     wxSimplebook* m_securePreviewBook;
     wxPanel* m_panelTemplate;
-    wxPanel* m_leftTplPrevirePlaceholder;
+    wxPanel* m_leftTplPreviewPlaceholder;
     wxPanel* m_panelPreview;
-    wxPanel* m_rightTplPrevirePlaceholder;
+    wxPanel* m_rightTplPreviewPlaceholder;
     wxPanel* m_panelCamera;
     wxPanel* m_panelCameraPreviewPlaceholder;
     wxPanel* m_cncGamepadSpy;
@@ -3965,17 +3965,17 @@ public:
     {
 	return m_staticLine10023;
     }
-    wxPanel* GetLeftTplPrevirePlaceholder()
+    wxPanel* GetLeftTplPreviewPlaceholder()
     {
-	return m_leftTplPrevirePlaceholder;
+	return m_leftTplPreviewPlaceholder;
     }
     wxPanel* GetPanelTemplate()
     {
 	return m_panelTemplate;
     }
-    wxPanel* GetRightTplPrevirePlaceholder()
+    wxPanel* GetRightTplPreviewPlaceholder()
     {
-	return m_rightTplPrevirePlaceholder;
+	return m_rightTplPreviewPlaceholder;
     }
     wxPanel* GetPanelPreview()
     {

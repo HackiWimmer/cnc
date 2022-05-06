@@ -1382,16 +1382,20 @@ void MainFrame::activateSecureMode(bool state) {
 	wxASSERT( scp != NULL );
 	
 	//-------------------------------------------------------------
-	auto swapControls = [&]() {
+	auto swapControls = [&]()
+	{
 		GblFunc::swapControls(drawPane3D->GetDrawPanePanel(),		m_secMonitorPlaceholder);
 		GblFunc::swapControls(getLoggerView(),						m_secLoggerPlaceholder);
 		GblFunc::swapControls(lruFileView,							scp->GetLruFilePlaceholder());
 		GblFunc::swapControls(transferFileView->getFileView(),		scp->GetTransferDirPlaceholder());
-		GblFunc::swapControls(mainFilePreview,						m_leftTplPrevirePlaceholder);
-		GblFunc::swapControls(monitorFilePreview,					m_rightTplPrevirePlaceholder);
+		GblFunc::swapControls(mainFilePreview,						m_leftTplPreviewPlaceholder);
+		GblFunc::swapControls(monitorFilePreview,					m_rightTplPreviewPlaceholder);
 		GblFunc::swapControls(cncLCDPositionPanel,					m_cncOverviewsPlaceholder);
 		GblFunc::swapControls(gamepadSpy,							m_secGamepadPlaceholder);
 		GblFunc::swapControls(m_scrollWinPredefinedPositions,		scp->GetPredefinedPositionsPlaceholder());
+		
+		//mainFilePreview->normalizeView();
+		//monitorFilePreview->normalizeView();
 	};
 	
 	// log the state
@@ -1431,13 +1435,13 @@ void MainFrame::activateSecureMode(bool state) {
 		
 		cncExtViewBoxCluster->hideAll();
 		
-		swapControls();
-		
 		// default show the preview of loaded template
 		m_securePreviewBook->SetSelection(SecurePreviewBookSelection::VAL::RIGHT_PREVIEW);
 		
-	} else {
-		
+		swapControls();
+	} 
+	else 
+	{
 		lruFileView->setBigTheme(false);
 		transferFileView->getFileView()->setBigTheme(false);
 		

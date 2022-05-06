@@ -1,10 +1,11 @@
 #include "MainFrame.h"
+#include "wxCrafterImages.h"
 #include "GlobalStrings.h"
 #include "GlobalFunctions.h"
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "CncContext.h"
-#include "wxCrafterImages.h"
+#include "CncFilePreview.h"
 #include "CncTemplateContext.h"
 #include "CncMessageDialog.h"
 #include "CncSecureManuallyMovePanel.h"
@@ -571,10 +572,12 @@ void CncSecureCtrlPanel::onToggleHeartbeatsSec(wxCommandEvent& event) {
 	THE_APP->toggleIdleRequests(event);
 }
 /////////////////////////////////////////////////////////////////////
-void CncSecureCtrlPanel::activate(bool b) {
+void CncSecureCtrlPanel::activate(bool activating) {
 /////////////////////////////////////////////////////////////////////
-	if ( b ) 
+	if ( activating ) 
 	{
+		// the secure mode will be activated
+		
 		if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) 
 			tryToProvideTemplate();
 		
@@ -587,10 +590,16 @@ void CncSecureCtrlPanel::activate(bool b) {
 	}
 	else 
 	{
-
+		// the secure mode will be deactivated
+		// ...
 	}
 	
-	//..
+	// This has to be done independently from activate, because
+	// it has to be done in both directions to eliminate 
+	// view modifications and fit a good presentation isf the view
+	// swaps from "secure" to "normal" and back
+	THE_APP->mainFilePreview->normalizeView();
+	THE_APP->monitorFilePreview->normalizeView();
+	
+	// ... define more here 
 }
-
-

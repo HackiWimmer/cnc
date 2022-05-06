@@ -84,7 +84,7 @@
 				}, {
 					"type":	"virtualFolderPicker",
 					"m_label":	"Virtual Folder:",
-					"m_path":	"CncControlerGui"
+					"m_path":	""
 				}, {
 					"type":	"choice",
 					"m_label":	"Centre:",
@@ -58057,7 +58057,7 @@
 																																}, {
 																																	"type":	"string",
 																																	"m_label":	"Name:",
-																																	"m_value":	"m_leftTplPrevirePlaceholder"
+																																	"m_value":	"m_leftTplPreviewPlaceholder"
 																																}, {
 																																	"type":	"multi-string",
 																																	"m_label":	"Tooltip:",
@@ -58258,7 +58258,7 @@
 																																}, {
 																																	"type":	"string",
 																																	"m_label":	"Name:",
-																																	"m_value":	"m_rightTplPrevirePlaceholder"
+																																	"m_value":	"m_rightTplPreviewPlaceholder"
 																																}, {
 																																	"type":	"multi-string",
 																																	"m_label":	"Tooltip:",

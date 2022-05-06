@@ -27,6 +27,9 @@ class CncGCodePreview : public CncGlCanvas {
 		void initColours();
 		void clear();
 		
+		void centreViewport();
+		void resetViewport();
+		
 		void pushProcessMode();
 		void popProcessMode();
 

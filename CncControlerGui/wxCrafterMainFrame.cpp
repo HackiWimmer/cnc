@@ -6379,11 +6379,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     flexGridSizer10001->AddGrowableRow(0);
     m_panelTemplate->SetSizer(flexGridSizer10001);
 
-    m_leftTplPrevirePlaceholder = new wxPanel(
+    m_leftTplPreviewPlaceholder = new wxPanel(
         m_panelTemplate, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTemplate, wxSize(-1, -1)), wxTAB_TRAVERSAL);
-    m_leftTplPrevirePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_leftTplPreviewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
 
-    flexGridSizer10001->Add(m_leftTplPrevirePlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(2));
+    flexGridSizer10001->Add(m_leftTplPreviewPlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(2));
 
     m_panelPreview = new wxPanel(m_securePreviewBook, wxID_ANY, wxDefaultPosition,
         wxDLG_UNIT(m_securePreviewBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);
@@ -6396,11 +6396,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     flexGridSizer10003->AddGrowableRow(0);
     m_panelPreview->SetSizer(flexGridSizer10003);
 
-    m_rightTplPrevirePlaceholder = new wxPanel(
+    m_rightTplPreviewPlaceholder = new wxPanel(
         m_panelPreview, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelPreview, wxSize(-1, -1)), wxTAB_TRAVERSAL);
-    m_rightTplPrevirePlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
+    m_rightTplPreviewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
 
-    flexGridSizer10003->Add(m_rightTplPrevirePlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer10003->Add(m_rightTplPreviewPlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
 
     m_panelCamera = new wxPanel(m_securePreviewBook, wxID_ANY, wxDefaultPosition,
         wxDLG_UNIT(m_securePreviewBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);
