@@ -166,6 +166,10 @@ class CncMotionMonitor : public CncGlCanvas
 		
 		void setSpindlePowerState(CncSpindlePowerState state)	{ monitor->setSpindlePowerState(state); Refresh(); }
 		
+		bool makeHardwareSpaceVisible();
+		bool makeWorkingSpaceVisible();
+		bool makeCompleteVisible(const CncDoubleBoundaries& box);
+		
 	protected:
 		GLContextCncPathBase* 		monitor;
 		wxTimer 					cameraRotationTimer;

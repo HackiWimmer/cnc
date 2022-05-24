@@ -204,6 +204,7 @@ class SerialEmulatorNULL  : public wxEvtHandler,
 		CncNanoTimestamp 	tsMoveStart;
 		uint64_t			usToSleep;
 		
+		bool				ignoreLimitViolations;
 		bool				interactiveMove;
 		bool				stepperEnableState;
 		
@@ -309,6 +310,10 @@ class SerialEmulatorNULL  : public wxEvtHandler,
 		inline bool evaluateLimitStateX();
 		inline bool evaluateLimitStateY();
 		inline bool evaluateLimitStateZ();
+		
+		inline void setLimitStateX(int32_t v);
+		inline void setLimitStateY(int32_t v);
+		inline void setLimitStateZ(int32_t v);
 		
 		void setFeedSpeed_MMMin(double value)			{ cfgFeedSpeed_MMMin = value;     }
 		double getFeedSpeed_MMMin()						{ return cfgFeedSpeed_MMMin;      }

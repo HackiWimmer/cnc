@@ -260,7 +260,7 @@ protected:
     wxButton* m_btEvaluateDimensionZAxis;
     wxButton* m_btEvaluateDimensionXYPlane;
     wxPanel* m_SummaryPanel;
-    wxTextCtrl* m_bounderiesSummary;
+    wxTextCtrl* m_boundariesSummary;
     wxPanel* m_mainBookManually;
     wxPanel* m_panelTemplateManually;
     wxButton* m_btDetachManuallyTemplate;
@@ -2449,9 +2449,9 @@ public:
     {
 	return m_hardwareDimensionsPanel;
     }
-    wxTextCtrl* GetBounderiesSummary()
+    wxTextCtrl* GetBoundariesSummary()
     {
-	return m_bounderiesSummary;
+	return m_boundariesSummary;
     }
     wxPanel* GetSummaryPanel()
     {

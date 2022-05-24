@@ -46,6 +46,7 @@
 #include "CncGamepadControllerState.h"
 #include "SerialThread.h"
 #include "CncMillingSoundController.h"
+#include "CncSimuHwDimensionSetup.h"
 #include "CncExceptions.h"
 #include "CncTextCtrl.h"
 #include "CncLoggerProxy.h"
@@ -1316,7 +1317,7 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	FORCE_LOGGER_UPDATE
+	motionMonitor->makeHardwareSpaceVisible();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -2253,7 +2254,7 @@ void MainFrame::dispatchAll() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::handleCommonException() {
 ///////////////////////////////////////////////////////////////////
-	#warning may be do more here
+	//TODO: May be do more here
 	
 	// stop idle request
 	stopSerialTimer();
@@ -3064,8 +3065,8 @@ bool MainFrame::connectSerialPort() {
 	secureCtrlPanel->GetBtTemplateContextSec()->Enable(cnc->dryRunAvailable());
 	
 	if ( cnc->isEmulator() == true )
-		simulateHardwareReference();
-		
+		simulateHardwareReference(true);
+	
 	if ( ret == true && cnc->canProcessIdle() )
 	{
 		m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
@@ -4897,7 +4898,6 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 		}
 	}
 	
-	//
 	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false )
 	{
 		displayPositionSituation(	wxICON_ERROR,
@@ -6092,10 +6092,12 @@ void MainFrame::selectMainBookTestPanel() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookCncPanel() {
 ///////////////////////////////////////////////////////////////////
-	if ( cncExtViewBoxCluster->isViewDetached(CncExternalViewBoxCluster::Node::EVB_Monitor) == true ) {
+	if ( cncExtViewBoxCluster->isViewDetached(CncExternalViewBoxCluster::Node::EVB_Monitor) == true )
+	{
 		cncExtViewBoxCluster->bringViewOnTop(CncExternalViewBoxCluster::Node::EVB_Monitor);
 	}
-	else {
+	else 
+	{
 		m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
 		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 	}
@@ -6103,18 +6105,17 @@ void MainFrame::selectMonitorBookCncPanel() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookTemplatePanel() {
 ///////////////////////////////////////////////////////////////////
-	if ( m_externFileManagerPreview->IsChecked() == false ) {
-		
+	if ( m_externFileManagerPreview->IsChecked() == false ) 
+	{
 		m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
-		
-	} else {
-		
+	}
+	else
+	{
 		selectMonitorBookCncPanel();
 		
 		cncExtMainPreview->selectView(CncExternalViewBox::Preview::TEMPLATE);
 		if ( cncExtMainPreview->IsShownOnScreen() == false )
 			cncExtMainPreview->Show();
-		
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -9095,67 +9096,39 @@ void MainFrame::updateHardwareReference() {
 		if ( THE_BOUNDS->hasHardwareOffset() == true ) 
 		{
 			serialThread->setHardwareOffset(&THE_BOUNDS->getHardwareOffset(), 
-											THE_CONFIG->getMaxDimensionStepsX(),
-											THE_CONFIG->getMaxDimensionStepsY(),
-											THE_CONFIG->getMaxDimensionStepsZ()
+											THE_BOUNDS->getMaxDimensionStepsX(),
+											THE_BOUNDS->getMaxDimensionStepsY(),
+											THE_BOUNDS->getMaxDimensionStepsZ()
 			);
 		}
 	}
 
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::simulateHardwareReference(float offsetFact) {
+void MainFrame::simulateHardwareReference(bool defaultBehaviour) {
 /////////////////////////////////////////////////////////////////////
-	#warning reactivate simulateHardwareReference
-	//if ( THE_CONTEXT->hasHardware() )
-	if ( true )
+	if ( false )
 	{
 		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
+		return;
+	}
+
+	CncSimuHwDimensionSetup dlg(this);
+	if ( defaultBehaviour == false )
+	{
+		selectMonitorBookCncPanel();
+		dlg.ShowModal();
 	}
 	else
 	{
-		if ( offsetFact < 0.0f )
-		{
-			const wxString msg(	"Offset factor (% of max dimension):\n" \
-								"New Hardware Reference:\n" \
-								" X = 0 - <maxDim(X)> * (     factor )\n" \
-								" Y = 0 - <maxDim(Y)> * (     factor )\n" \
-								" Z = 0 + <maxDim(Z)> * ( 1 - factor )\n" \
-								"Range: [0.0001 ... 0.9999]"
-			);
-		
-			wxTextEntryDialog dlg(this, msg, "Simulate a Hardware Reference:", "0.5");
-			dlg.SetMaxLength(6);
-			dlg.SetTextValidator(wxFILTER_NUMERIC);
-				
-			if ( dlg.ShowModal() == wxID_OK  ) 
-			{
-				wxString s = dlg.GetValue();
-				s.Trim(true).Trim(false);
-				if ( s.IsEmpty() == false ) 
-				{
-					double f; s.ToDouble(&f);
-					offsetFact = float(f);
-				}
-			}
-		}
-		
-		// fake a physical hardware reference
-		CNC_CEX2_A(	" No physical hardware support available for the connected port." \
-					"\n A default hardware reference will be simply simulated for any test purpose.")
-						 
-		if ( cnc->simulateHardwareReference(offsetFact) == true )
-		{
-			motionMonitor->clear();
-			updateHardwareReference();
-		}
+		dlg.processDefault();
 	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( cnc->isEmulator() == true )
-		return simulateHardwareReference(-1.0f);
+		return simulateHardwareReference(false);
 	
 	// evaluate the physical hardware reference
 	wxString msg("Do you really want to evaluate the hardware reference position?\n\n");
@@ -9201,9 +9174,9 @@ void MainFrame::onResetHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::updateHardwareDimensions() {
 /////////////////////////////////////////////////////////////////////
-	m_hardwareDimensionX->ChangeValue(wxString::Format("%.3lf", THE_CONFIG->getMaxDimensionX()));
-	m_hardwareDimensionY->ChangeValue(wxString::Format("%.3lf", THE_CONFIG->getMaxDimensionY()));
-	m_hardwareDimensionZ->ChangeValue(wxString::Format("%.3lf", THE_CONFIG->getMaxDimensionZ()));
+	m_hardwareDimensionX->ChangeValue(wxString::Format("%.3lf", THE_BOUNDS->getMaxDimensionMetricX()));
+	m_hardwareDimensionY->ChangeValue(wxString::Format("%.3lf", THE_BOUNDS->getMaxDimensionMetricY()));
+	m_hardwareDimensionZ->ChangeValue(wxString::Format("%.3lf", THE_BOUNDS->getMaxDimensionMetricZ()));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {

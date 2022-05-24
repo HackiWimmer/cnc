@@ -51,13 +51,17 @@ class CncBoundarySpace {
 	
 	private:
 		
+		int32_t					maxDimensionX;
+		int32_t					maxDimensionY;
+		int32_t					maxDimensionZ;
+		
 		HardwareOriginOffset	hardwareOffset;
 		CncDoubleDistance		calculateRefPosition;
 		
-		// without harware reference
+		// without hardware reference
 		CncDoubleBoundaries		boundLogically;
 		
-		// harware normalized
+		// hardware normalized
 		CncDoubleBoundaries		boundPhysically;
 		
 		CncRefPositionMode		refPostionMode;
@@ -87,6 +91,23 @@ class CncBoundarySpace {
 		bool					isPositionInside(const CncLongPosition& p)		const;
 		bool					isPositionInside(const CncDoublePosition& p)	const;
 		
+		void 					setMaxDimensionStepsX(int32_t v);
+		void 					setMaxDimensionStepsY(int32_t v);
+		void 					setMaxDimensionStepsZ(int32_t v);
+		
+		void 					setMaxDimensionMetricX(double v);
+		void 					setMaxDimensionMetricY(double v);
+		void 					setMaxDimensionMetricZ(double v);
+
+		int32_t					getMaxDimensionStepsX() const							{ return maxDimensionX; }
+		int32_t					getMaxDimensionStepsY() const							{ return maxDimensionY; }
+		int32_t					getMaxDimensionStepsZ() const							{ return maxDimensionZ; }
+		
+		double					getMaxDimensionMetric()  const;
+		double					getMaxDimensionMetricX() const;
+		double					getMaxDimensionMetricY() const;
+		double					getMaxDimensionMetricZ() const;
+		
 		int32_t					getMinStepsX() const;
 		int32_t					getMinStepsY() const;
 		int32_t					getMinStepsZ() const;
@@ -108,7 +129,13 @@ class CncBoundarySpace {
 
 		const CncLongPosition	getCalculatedRefPositionSteps()					const;
 		const CncDoublePosition	getCalculatedRefPositionMetric()				const;
-
+		
+		const CncDoubleBoundaries& getLogicallyBoundaries()						const	{ return boundLogically;  }
+		const CncDoubleBoundaries& getPhysicallyBoundaries()					const	{ return boundPhysically; }
+		
+		const CncLongBoundaries& getLogicallyBoundariesAsSteps()						const;
+		const CncLongBoundaries& getPhysicallyBoundariesAsSteps()						const;
+		
 		void					setRefPositionMode(CncRefPositionMode rpm)				{ refPostionMode		= rpm;		calculate(); }
 		void					setWorkpieceThickness(double wpt)						{ workpieceThickness	= wpt;		calculate(); }
 		void					setMeasurementOffset(CncDoubleOffset ofs)				{ measurementOffset		= ofs;		calculate(); }

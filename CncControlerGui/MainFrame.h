@@ -60,6 +60,7 @@ class CncLoggerListCtrl;
 class CncDryRunLoggerProxy;
 class CncParserSynopsisProxy;
 
+class CncSimuHwDimensionSetup;
 class CncSourceEditor;
 class CncOutboundEditor;
 class CncFilePreviewWnd;
@@ -655,7 +656,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		int isPortNameAvailable(const wxString& portName, bool exact=false);
 		
-		void simulateHardwareReference(float offsetFact=0.01);
+		void updateHardwareReference();
 		
 		bool setTemplateName(const wxString& pathFile);
 		bool setTemplateName(const wxFileName& pathFile);
@@ -754,6 +755,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncSecureManuallyMovePanel;
 		
 		friend class CncPathListRunner;
+		
+		friend class CncSimuHwDimensionSetup;
 
 		// to remove . . .
 			friend class CncFileView;
@@ -901,7 +904,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		const wxString& getCurrentTemplateFileName();
 		const wxString& getCurrentTemplatePathFileName();
 		
-		void updateHardwareReference();
+		void simulateHardwareReference(bool defaultBehaviour);
 		void updateHardwareDimensions();
 		
 		bool saveTemplateOnDemand(bool force);

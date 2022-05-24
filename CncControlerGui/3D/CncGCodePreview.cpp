@@ -79,8 +79,8 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 void CncGCodePreview::onSize(wxSizeEvent& event) {
 //////////////////////////////////////////////////
-	// noting to do, in this caes the onPaint() even
-	// is also fired
+	// noting to do, 
+	// in this case the onPaint() event is also fired
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::onEraseBackground(wxEraseEvent& event) {
@@ -102,6 +102,11 @@ void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 					
 		case 'R':	resetViewport();
 					break;
+					
+		case 'W':
+		case 'H':	preview->reshapeCompleteVisible();
+					Refresh();
+					break;
 	}
 }
 //////////////////////////////////////////////////
@@ -113,9 +118,6 @@ void CncGCodePreview::centreViewport() {
 //////////////////////////////////////////////////
 void CncGCodePreview::resetViewport() {
 //////////////////////////////////////////////////
-	
-	std::cout << CNC_LOG_FUNCT << std::endl;
-	
 	preview->resetViewport();
 	Refresh(true);
 }
@@ -136,12 +138,15 @@ void CncGCodePreview::setMaxDimension(double maxDim) {
 //////////////////////////////////////////////////
 void CncGCodePreview::pushProcessMode() {
 //////////////////////////////////////////////////
-	preview->getOptions().showPosMarker = false;
+	preview->getOptions().showPosMarker   = false;
+	preview->getOptions().showHardwareBox = false;
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::popProcessMode() {
 //////////////////////////////////////////////////
 	preview->getOptions().showPosMarker = false;
+
+	preview->reshapeCompleteVisible();
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {

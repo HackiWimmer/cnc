@@ -119,10 +119,11 @@ class CncLimitStates {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		const bool hasLimit() const 
-		{
-			return (xMinLimit || xMaxLimit || yMinLimit || yMaxLimit || zMinLimit || zMaxLimit);
-		}
+		const bool hasLimit()  const	{ return (hasXLimit() || hasYLimit() || hasZLimit() ); }
+		const bool hasXLimit() const	{ return (xMinLimit || xMaxLimit ); }
+		const bool hasYLimit() const	{ return (yMinLimit || yMaxLimit ); }
+		const bool hasZLimit() const	{ return (zMinLimit || zMaxLimit ); }
+
 		///////////////////////////////////////////////////////////////////
 		const bool isXLimitStateValid() const { return !( xMinLimit == true && xMaxLimit == true ); }
 		const bool isYLimitStateValid() const { return !( yMinLimit == true && yMaxLimit == true ); }

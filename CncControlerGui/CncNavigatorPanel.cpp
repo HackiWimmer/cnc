@@ -256,15 +256,15 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	const int 			C 			= 2;
 	const int 			hlLightness	= config.speedByAmplitude ? 135 - 100 * current.amplitude : 100;
 	
-	// draw bounderies
-	auto drawBounderies = [&](bool draw) {
+	// draw boundaries
+	auto drawBoundaries = [&](bool draw) {
 		if ( draw == true ) {
 			dc.SetPen(wxPen(*wxWHITE, 1, wxSOLID));
 			dc.DrawRectangle(navRectangle);
 		}
 	};
 	
-	// draw center
+	// draw centre
 	auto drawCenter = [&](bool draw) {
 		if ( draw == true ) {
 			dc.SetPen(wxPen(*wxRED, 1, wxSOLID));
@@ -571,7 +571,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	const wxPen penH		= current.acitvated ? wxPen(config.activatedColour, borderSize, wxSOLID) : wxPen(config.highlightColour, borderSize, wxSOLID);
 	const wxPen penD		= wxPen(config.defaultColour, borderSize, wxSOLID);
 	
-	drawBounderies(config.margin >= 1);
+	drawBoundaries(config.margin >= 1);
 	moveOrigin();
 	
 	drawCenter(false);
@@ -605,7 +605,7 @@ void CncNavigatorPanel::onMouse(wxMouseEvent& event) {
 	const int minY = navRectangle.GetY();
 	const int maxY = minX + navRectangle.GetHeight();
 	
-	// check bounderies
+	// check boundaries
 	if ( x < minX || x > maxX || y < minY || y > maxY ) {
 		current.acitvated = false;
 		current.direction = UD;

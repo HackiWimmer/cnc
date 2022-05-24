@@ -288,6 +288,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncSimuHwDimensionSetup.h"/>
+      <File Name="CncSimuHwDimensionSetup.cpp"/>
       <File Name="CncPodiumManagement.cpp"/>
       <File Name="CncPodiumManagement.h"/>
       <File Name="CncPodiumMgmtMovement.cpp"/>

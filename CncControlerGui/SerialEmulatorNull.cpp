@@ -30,6 +30,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , lastSentLS							()
 , tsMoveStart							(0LL)
 , usToSleep								(0LL)
+, ignoreLimitViolations					(true)
 , interactiveMove						(false)
 , stepperEnableState					(false)
 , interactiveX							(0L)
@@ -162,17 +163,17 @@ bool SerialEmulatorNULL::evaluateLimitStateX() {
 	
 	if ( curEmulatorPos.getX() <= min )
 	{
-		limitStates.setXLimit(LimitSwitch::LIMIT_MIN);
-		ret = true;
+		setLimitStateX(LimitSwitch::LIMIT_MIN);
+		ret = limitStates.hasXLimit();
 	}
 	else if ( curEmulatorPos.getX() >= max )
 	{
-		limitStates.setXLimit(LimitSwitch::LIMIT_MAX);
-		ret = true;
+		setLimitStateX(LimitSwitch::LIMIT_MAX);
+		ret = limitStates.hasXLimit();
 	}
 	
 	if ( ret == false )
-		limitStates.setXLimit(LimitSwitch::LIMIT_UNSET);
+		setLimitStateX(LimitSwitch::LIMIT_UNSET);
 	
 	return ret;
 }
@@ -186,17 +187,17 @@ bool SerialEmulatorNULL::evaluateLimitStateY() {
 	
 	if ( curEmulatorPos.getY() <= min )
 	{
-		limitStates.setYLimit(LimitSwitch::LIMIT_MIN);
-		ret = true;
+		setLimitStateY(LimitSwitch::LIMIT_MIN);
+		ret = limitStates.hasYLimit();
 	}
 	else if ( curEmulatorPos.getY() >= max )
 	{
-		limitStates.setYLimit(LimitSwitch::LIMIT_MAX);
-		ret = true;
+		setLimitStateY(LimitSwitch::LIMIT_MAX);
+		ret = limitStates.hasYLimit();
 	}
 	
 	if ( ret == false )
-		limitStates.setYLimit(LimitSwitch::LIMIT_UNSET);
+		setLimitStateY(LimitSwitch::LIMIT_UNSET);
 		
 	return ret;
 }
@@ -210,19 +211,55 @@ bool SerialEmulatorNULL::evaluateLimitStateZ() {
 	
 	if ( curEmulatorPos.getZ() <= min )
 	{
-		limitStates.setZLimit(LimitSwitch::LIMIT_MIN);
-		ret = true;
+		setLimitStateZ(LimitSwitch::LIMIT_MIN);
+		ret = limitStates.hasZLimit();
 	}
 	else if ( curEmulatorPos.getZ() >= max )
 	{
-		limitStates.setZLimit(LimitSwitch::LIMIT_MAX);
-		ret = true;
+		setLimitStateZ(LimitSwitch::LIMIT_MAX);
+		ret = limitStates.hasZLimit();
 	}
 	
 	if ( ret == false )
-		limitStates.setZLimit(LimitSwitch::LIMIT_UNSET);
+		setLimitStateZ(LimitSwitch::LIMIT_UNSET);
 		
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::setLimitStateX(int32_t v) {
+///////////////////////////////////////////////////////////////////
+	if ( ignoreLimitViolations == true )
+	{
+		if ( v != LimitSwitch::LIMIT_UNSET )
+			return;
+
+	}
+	
+	limitStates.setXLimit(v);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::setLimitStateY(int32_t v) {
+///////////////////////////////////////////////////////////////////
+	if ( ignoreLimitViolations == true )
+	{
+		if ( v != LimitSwitch::LIMIT_UNSET )
+			return;
+
+	}
+	
+	limitStates.setYLimit(v);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::setLimitStateZ(int32_t v) {
+///////////////////////////////////////////////////////////////////
+	if ( ignoreLimitViolations == true )
+	{
+		if ( v != LimitSwitch::LIMIT_UNSET )
+			return;
+
+	}
+	
+	limitStates.setZLimit(v);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::isReadyToRun() {
@@ -896,9 +933,9 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 		
 	if ( lastCommand.cmd == CMD_MOVE_UNTIL_LIMIT_IS_FREE )
 	{
-		if ( x != 0 ) limitStates.setLimitX(LimitSwitch::LIMIT_UNSET);
-		if ( y != 0 ) limitStates.setLimitY(LimitSwitch::LIMIT_UNSET);
-		if ( z != 0 ) limitStates.setLimitZ(LimitSwitch::LIMIT_UNSET);
+		if ( x != 0 ) setLimitStateX(LimitSwitch::LIMIT_UNSET);
+		if ( y != 0 ) setLimitStateY(LimitSwitch::LIMIT_UNSET);
+		if ( z != 0 ) setLimitStateZ(LimitSwitch::LIMIT_UNSET);
 		
 		x = y = z = 0;
 	}
@@ -1146,21 +1183,27 @@ void SerialEmulatorNULL::notifyMovePartAfter() {
 		\
 		if ( newPos >= max ) \
 		{ \
-			d = max - curEmulatorPos.get##axis(); \
-			limitStates.setLimit##axis(LimitSwitch::LIMIT_MAX); \
-			lastCommand.ret = RET_LIMIT; \
+			setLimitState##axis(LimitSwitch::LIMIT_MAX); \
+			if ( limitStates.has##axis##Limit() ) \
+			{ \
+				d = max - curEmulatorPos.get##axis(); \
+				lastCommand.ret = RET_LIMIT; \
+			} \
 		\
 		} \
 		else if ( newPos <= min ) \
 		{ \
-			d = min - curEmulatorPos.get##axis(); \
-			limitStates.setLimit##axis(LimitSwitch::LIMIT_MIN); \
-			lastCommand.ret = RET_LIMIT; \
+			setLimitState##axis(LimitSwitch::LIMIT_MIN); \
+			if ( limitStates.has##axis##Limit() ) \
+			{ \
+				d = min - curEmulatorPos.get##axis(); \
+				lastCommand.ret = RET_LIMIT; \
+			} \
 		\
 		} \
 		else \
 		{ \
-			limitStates.setLimit##axis(LimitSwitch::LIMIT_UNSET); \
+			setLimitState##axis(LimitSwitch::LIMIT_UNSET); \
 		} \
 		\
 		curEmulatorPos.inc##axis(d); \

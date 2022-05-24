@@ -218,7 +218,7 @@ bool GLContextCncPathBase::SetCurrent(const wxGLCanvas &win) const {
 	bool ret = true;
 	if ( isContextSwitch == true ) {
 		
-		// standard procedere
+		// standard procedure
 		ret = wxGLContext::SetCurrent(win);
 		
 		// log the canvas
@@ -357,11 +357,12 @@ void GLContextCncPathBase::drawGuidePathes() {
 	if ( options.showGuidePathes == false )
 		return; 
 	
-	for ( auto it = guidePathes.begin(); it != guidePathes.end(); ++it ) {
+	for ( auto it = guidePathes.begin(); it != guidePathes.end(); ++it ) 
+	{
 		const GLGuidePath& gp = *it;
 		
-		if ( gp.size() > 0 ) {
-			
+		if ( gp.size() > 0 )
+		{
 			glMatrixMode(GL_MODELVIEW);
 			
 			bool stripple = false;
@@ -399,7 +400,8 @@ void GLContextCncPathBase::drawGuidePathes() {
 			
 			glBegin(GL_LINE_LOOP);
 				
-				for ( auto itGp = gp.begin(); itGp != gp.end(); ++itGp ) {
+				for ( auto itGp = gp.begin(); itGp != gp.end(); ++itGp ) 
+				{
 					const CncDoublePosition& p1 = *itGp;
 					glVertex3f(p1.getX(), p1.getY(), p1.getZ());
 				}
@@ -419,86 +421,146 @@ void GLContextCncPathBase::drawHardwareBox() {
 	if ( THE_BOUNDS->getHardwareOffset().isValid() == false )
 		return;
 		
-	// evaluate hardware origin as vertex
-	float originX = THE_BOUNDS->getHardwareOffset().getAsStepsX() / THE_CONFIG->getDispFactX3D();
-	float originY = THE_BOUNDS->getHardwareOffset().getAsStepsY() / THE_CONFIG->getDispFactY3D();
-	float originZ = THE_BOUNDS->getHardwareOffset().getAsStepsZ() / THE_CONFIG->getDispFactZ3D();
+	// evaluate hardware origin as vertex as point
+	const float originX		= THE_BOUNDS->getHardwareOffset().getAsStepsX() / THE_CONFIG->getDispFactX3D();
+	const float originY		= THE_BOUNDS->getHardwareOffset().getAsStepsY() / THE_CONFIG->getDispFactY3D();
+	const float originZ		= THE_BOUNDS->getHardwareOffset().getAsStepsZ() / THE_CONFIG->getDispFactZ3D();
 	
-	// evaluate hardware dimensions as vertex
-	float maxX    = THE_CONFIG->getMaxDimensionStepsX() / THE_CONFIG->getDispFactX3D();
-	float maxY    = THE_CONFIG->getMaxDimensionStepsY() / THE_CONFIG->getDispFactY3D();
-	float maxZ    = THE_CONFIG->getMaxDimensionStepsZ() / THE_CONFIG->getDispFactZ3D();
+	// evaluate hardware dimensions as distance converted to vertex scale
+	const float maxDistX	= THE_BOUNDS->getMaxDimensionStepsX() / THE_CONFIG->getDispFactX3D();
+	const float maxDistY	= THE_BOUNDS->getMaxDimensionStepsY() / THE_CONFIG->getDispFactY3D();
+	const float maxDistZ    = THE_BOUNDS->getMaxDimensionStepsZ() / THE_CONFIG->getDispFactZ3D();
 
 	// The Z origin has to be corrected from max to min because 
 	// the hardware reference is located at min(x), min(y) and max(z)
-	originZ -= maxZ;
+	const float originZCorr	= originZ - maxDistZ;
 
-	// ensure the right model
-	glMatrixMode(GL_MODELVIEW);
-	glLineStipple(4, 0xAAAA);
-	glEnable(GL_LINE_STIPPLE);
-	
-	glColor4ub(options.hardwareBoxColour.Red(), options.hardwareBoxColour.Green(), options.hardwareBoxColour.Blue(), 255);
-	
 	//-------------------------------------------------------------
-	struct Point { 
+	struct Point 
+	{ 
 		float x = 0.0; 
 		float y = 0.0; 
 		float z = 0.0; 
 		
 		void set(float a, float b, float c)
-		{ x = a; y =b; z = c; }
+			{ x = a; y = b; z = c; }
 		
 	} p1, p2;
+
+	// ensure the right model
+	glMatrixMode(GL_MODELVIEW);
 	
-	//-------------------------------------------------------------
-	auto drawLine = [&](const Point& p1, const Point& p2) {
-		glBegin(GL_LINES);
-			glVertex3f(p1.x, p1.y, p1.z);
-			glVertex3f(p2.x, p2.y, p2.z);
-		glEnd();
-	};
+	// drawing the box
+	glLineStipple(4, 0xAAAA);
+	glEnable(GL_LINE_STIPPLE);
 	
-	// top rect
-	p1.set(originX, originY, originZ); p2.set(originX, originY + maxY, originZ);
-	drawLine(p1, p2);
+		glColor4ub(options.hardwareBoxColour.Red(), options.hardwareBoxColour.Green(), options.hardwareBoxColour.Blue(), 255);
 	
-	p1 = p2; p2.set(originX + maxX, originY + maxY, originZ);
-	drawLine(p1, p2);
-	
-	p1 = p2; p2.set(originX + maxX, originY, originZ);
-	drawLine(p1, p2);
-	
-	p1 = p2; p2.set(originX, originY, originZ);
-	drawLine(p1, p2);
-	
-	// bottom rect
-	p1.set(originX, originY, originZ + maxZ); p2.set(originX, originY + maxY, originZ + maxZ);
-	drawLine(p1, p2);
-	
-	p1 = p2; p2.set(originX + maxX, originY + maxY, originZ + maxZ);
-	drawLine(p1, p2);
-	
-	p1 = p2; p2.set(originX + maxX, originY, originZ + maxZ);
-	drawLine(p1, p2);
-	
-	p1 = p2; p2.set(originX, originY, originZ + maxZ);
-	drawLine(p1, p2);
-	
-	// connection lines (top to bottom)
-	p1.set(originX, originY, originZ); p2.set(originX, originY, originZ + maxZ);
-	drawLine(p1, p2);
-	
-	p1.set(originX, originY + maxY, originZ); p2.set(originX, originY + maxY, originZ + maxZ);
-	drawLine(p1, p2);
-	
-	p1.set(originX + maxX, originY + maxY, originZ); p2.set(originX + maxX, originY + maxY, originZ + maxZ);
-	drawLine(p1, p2);
-	
-	p1.set(originX + maxX, originY, originZ); p2.set(originX + maxX, originY, originZ + maxZ);
-	drawLine(p1, p2);
+		//-------------------------------------------------------------
+		auto drawLine = [&](const Point& p1, const Point& p2) 
+		{
+			glBegin(GL_LINES);
+				glVertex3f(p1.x, p1.y, p1.z);
+				glVertex3f(p2.x, p2.y, p2.z);
+			glEnd();
+			
+			glBegin(GL_POINTS);
+				glVertex3f(p1.x, p1.y, p1.z);
+				glVertex3f(p2.x, p2.y, p2.z);
+			glEnd();
+		};
+		
+		// top rectangle
+		p1.set(originX, originY, originZCorr); p2.set(originX, originY + maxDistY, originZCorr);
+		drawLine(p1, p2);
+		
+		p1 = p2; p2.set(originX + maxDistX, originY + maxDistY, originZCorr);
+		drawLine(p1, p2);
+		
+		p1 = p2; p2.set(originX + maxDistX, originY, originZCorr);
+		drawLine(p1, p2);
+		
+		p1 = p2; p2.set(originX, originY, originZCorr);
+		drawLine(p1, p2);
+		
+		// bottom rectangle
+		p1.set(originX, originY, originZCorr + maxDistZ); p2.set(originX, originY + maxDistY, originZCorr + maxDistZ);
+		drawLine(p1, p2);
+		
+		p1 = p2; p2.set(originX + maxDistX, originY + maxDistY, originZCorr + maxDistZ);
+		drawLine(p1, p2);
+		
+		p1 = p2; p2.set(originX + maxDistX, originY, originZCorr + maxDistZ);
+		drawLine(p1, p2);
+		
+		p1 = p2; p2.set(originX, originY, originZCorr + maxDistZ);
+		drawLine(p1, p2);
+		
+		// connection lines (top to bottom)
+		p1.set(originX, originY, originZCorr); p2.set(originX, originY, originZCorr + maxDistZ);
+		drawLine(p1, p2);
+		
+		p1.set(originX, originY + maxDistY, originZCorr); p2.set(originX, originY + maxDistY, originZCorr + maxDistZ);
+		drawLine(p1, p2);
+		
+		p1.set(originX + maxDistX, originY + maxDistY, originZCorr); p2.set(originX + maxDistX, originY + maxDistY, originZCorr + maxDistZ);
+		drawLine(p1, p2);
+		
+		p1.set(originX + maxDistX, originY, originZCorr); p2.set(originX + maxDistX, originY, originZCorr + maxDistZ);
+		drawLine(p1, p2);
 	
 	glDisable(GL_LINE_STIPPLE);
+	
+	// drawing the hardware reference flag
+	glPushMatrix();
+		
+		const float croneDiameter	= 0.015f;
+		const float croneHight		= 0.085f;
+	
+		float tx, ty, tz;
+		const GLContextBase::ViewMode vm = getViewMode();
+		switch ( vm ) 
+		{
+			case V2D_TOP:
+			case V2D_BOTTOM:
+			case V2D_LEFT:
+			case V2D_RIGHT:
+			case V2D_FRONT:
+			case V2D_REAR:
+			case V3D_ISO1:
+			case V3D_ISO2: 
+			case V3D_ISO3: 
+			case V3D_ISO4:
+			case V2D_CAM_ROT_XY_ZTOP:
+			default:
+				tx = originX + croneDiameter;
+				ty = originY + croneDiameter; 
+				tz = originZ + croneHight * 1.2;
+		}
+		
+		renderBitmapString(tx, ty, tz, GLUT_BITMAP_8_BY_13, "HW Ref");
+		
+		glTranslatef(originX, originY, originZ + croneHight);
+		
+		glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
+		drawSilhouetteCone(croneDiameter, croneHight, 30, 30);
+		
+	glPopMatrix();
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextCncPathBase::getBounderies(CncDoubleBoundaries& ret) const {
+/////////////////////////////////////////////////////////////////
+	if ( cncPath.size() > 3 )
+	{
+		ret.setMinBound(CncDoublePosition(cncPath.getMin().getX(), cncPath.getMin().getY(), cncPath.getMin().getZ()));
+		ret.setMaxBound(CncDoublePosition(cncPath.getMax().getX(), cncPath.getMax().getY(), cncPath.getMax().getZ()));
+	}
+	else
+	{
+		ret.reset();
+	}
+	
+	return ret.hasBoundaries();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawTotalBoundBox() {
@@ -556,7 +618,8 @@ void GLContextCncPathBase::drawObjectBoundBox() {
 void GLContextCncPathBase::drawRuler() {
 /////////////////////////////////////////////////////////////////
 	//...........................................................
-	auto skipIndex = [&](int counter) {
+	auto skipIndex = [&](int counter) 
+	{
 		const float sf = this->getCurrentScaleFactor();
 		
 		// the mod operands below 'm u s t' be even - always
@@ -571,11 +634,12 @@ void GLContextCncPathBase::drawRuler() {
 	};
 	
 	//...........................................................
-	auto drawRulerAxis = [&](const wxColour& colour, const GLI::GLLineCluster& ruler) {
-		
+	auto drawRulerAxis = [&](const wxColour& colour, const GLI::GLLineCluster& ruler) 
+	{
 		glColor4ub(colour.Red(), colour.Green(), colour.Blue(), 64);
 		
-		for ( auto it = ruler.begin(); it != ruler.end(); ++it ) {
+		for ( auto it = ruler.begin(); it != ruler.end(); ++it ) 
+		{
 			const GLI::GLVectiesTuple vt = *it;
 			
 			glBegin(GL_LINES);
@@ -586,16 +650,16 @@ void GLContextCncPathBase::drawRuler() {
 	};
 	
 	//...........................................................
-	auto drawHelpLines = [&](const wxColour& colour, const GLI::GLLineCluster& lines) {
-		
+	auto drawHelpLines = [&](const wxColour& colour, const GLI::GLLineCluster& lines) 
+	{
 		glLineStipple(2, 0x00FF);
 		glEnable(GL_LINE_STIPPLE);
 		
 			glColor4ub(colour.Red(), colour.Green(), colour.Blue(), 32);
 			
 			int counter = 1;
-			for ( auto it = lines.begin(); it != lines.end(); ++it ) {
-				
+			for ( auto it = lines.begin(); it != lines.end(); ++it ) 
+			{
 				if ( skipIndex( counter++ ) == true ) 
 					continue;
 				
@@ -610,13 +674,13 @@ void GLContextCncPathBase::drawRuler() {
 	};
 
 	//...........................................................
-	auto drawRulerLabels = [&](const wxColour& colour, const GLI::GLLabelCluster& lables) {
-		
+	auto drawRulerLabels = [&](const wxColour& colour, const GLI::GLLabelCluster& lables) 
+	{
 		glColor4ub(colour.Red(), colour.Green(), colour.Blue(), 255);
 		
 		int counter = 0;
-		for ( auto it = lables.begin(); it != lables.end(); it++ ) {
-			
+		for ( auto it = lables.begin(); it != lables.end(); it++ ) 
+		{
 			if ( skipIndex( counter++ ) == true ) 
 				continue;
 			

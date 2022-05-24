@@ -9,6 +9,7 @@
 #include "CncContext.h"
 #include "CncPerspective.h"
 #include "CncConfigProperties.h"
+#include "CncBoundarySpace.h"
 #include "wxCrafterImages.h"
 #include "CncConfig.h"
 
@@ -178,7 +179,6 @@ CncConfig::CncConfig(MainFrame* app)
 ////////////////////////////////////////////////////////////////////////
 {
 	registerWindowForConfigNotification(app);
-	init();
 	APPEND_LOCATION_TO_STACK_TRACE_FILE
 }
 ////////////////////////////////////////////////////////////////////////
@@ -198,6 +198,10 @@ void CncConfig::init() {
 	calculateSpeedValues();
 	calculateThresholds();
 	initZAxisValues();
+	
+	THE_BOUNDS->setMaxDimensionMetricX(getMaxDimensionX());
+	THE_BOUNDS->setMaxDimensionMetricY(getMaxDimensionY());
+	THE_BOUNDS->setMaxDimensionMetricZ(getMaxDimensionZ());
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::sc() { 

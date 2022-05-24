@@ -14,15 +14,15 @@ CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
 , toolSelList			("")
 , runCount				(0)
 , validRunCount			(0)
-, bounderySpace			(bs)
-, bounderies			()
+, boundarySpace			(bs)
+, boundaries			()
 //////////////////////////////////////////////////////////////
 {
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::reset() {
 //////////////////////////////////////////////////////////////
-	*this = CncTemplateContext(bounderySpace);
+	*this = CncTemplateContext(boundarySpace);
 	updateGui(false);
 }
 //////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ bool CncTemplateContext::init(const wxString& path, const wxString& name) {
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::registerBoundaries(const CncDoubleBoundaries& b) {
 //////////////////////////////////////////////////////////////
-	bounderies = b;
+	boundaries = b;
 	updateGui(false);
 }
 //////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 		<< prefix << "Tool Tot. List          : " << toolTotList					<< std::endl
 		<< prefix << "Tool Sel. List          : " << toolSelList					<< std::endl
 		<< prefix << "Tool Sel Count          : " << getToolSelCount()				<< std::endl
-		<< prefix << "Bounderies         [mm] : " << traceBound(bounderies)			<< std::endl
+		<< prefix << "Boundaries         [mm] : " << traceBound(boundaries)			<< std::endl
 	;
 	
 	if ( hasErrors() )

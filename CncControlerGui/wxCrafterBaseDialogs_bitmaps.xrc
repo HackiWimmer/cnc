@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-cog">bitmaps\16-cog.png</object>
+  <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
@@ -18,16 +20,24 @@
   <object class="wxBitmap" name="24-connected@2x">bitmaps\24-connected@2x.png</object>
   <object class="wxBitmap" name="24-help@2x">bitmaps\24-help@2x.png</object>
   <object class="wxBitmap" name="24-home@2x">bitmaps\24-home@2x.png</object>
+  <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
+  <object class="wxBitmap" name="asm">bitmaps\asm.png</object>
   <object class="wxBitmap" name="aui-minimize">bitmaps\aui-minimize.png</object>
   <object class="wxBitmap" name="aui-minimize@2x">bitmaps\aui-minimize@2x.png</object>
   <object class="wxBitmap" name="cart">bitmaps\cart.png</object>
+  <object class="wxBitmap" name="centered">bitmaps\centered.png</object>
   <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
+  <object class="wxBitmap" name="hardwarebox">bitmaps\hardwarebox.png</object>
   <object class="wxBitmap" name="info">bitmaps\info.png</object>
   <object class="wxBitmap" name="loading-throb">bitmaps\loading-throb.gif</object>
   <object class="wxBitmap" name="package-link">bitmaps\package-link.png</object>
   <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
   <object class="wxBitmap" name="refresh">bitmaps\refresh.png</object>
+  <object class="wxBitmap" name="sector1">bitmaps\sector1.png</object>
+  <object class="wxBitmap" name="sector2">bitmaps\sector2.png</object>
+  <object class="wxBitmap" name="sector3">bitmaps\sector3.png</object>
+  <object class="wxBitmap" name="sector4">bitmaps\sector4.png</object>
   <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>
   <object class="wxBitmap" name="view-statistics">bitmaps\view-statistics.png</object>

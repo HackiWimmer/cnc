@@ -1,4 +1,5 @@
 #include "MainFrame.h"
+#include "CncBoundarySpace.h"
 #include "CncManuallyMoveCoordinates.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -72,9 +73,9 @@ void CncManuallyMoveCoordinates::updateUnit() {
 ///////////////////////////////////////////////////////////////////
 	const wxString unit(THE_APP->GetUnit()->GetValue());
 	
-	double xLimit = +THE_CONFIG->getMaxDimensionX() * 0.95; // [mm]
-	double yLimit = +THE_CONFIG->getMaxDimensionY() * 0.95; // [mm]
-	double zLimit = +THE_CONFIG->getMaxDimensionZ() * 0.95; // [mm]
+	double xLimit = +THE_BOUNDS->getMaxDimensionMetricX() * 0.95; // [mm]
+	double yLimit = +THE_BOUNDS->getMaxDimensionMetricY() * 0.95; // [mm]
+	double zLimit = +THE_BOUNDS->getMaxDimensionMetricZ() * 0.95; // [mm]
 	
 	auto setCommon = [&](double fact) {
 		double value; m_metricCommon->GetValue().ToDouble(&value);

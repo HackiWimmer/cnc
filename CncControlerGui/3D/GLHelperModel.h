@@ -18,6 +18,10 @@ namespace GLI {
 			
 			const float getStepWidth()		const	{ return _step; }
 			const float getScaleFactor()	const	{ return _scale; }
+			
+			bool canScale()					const;
+			bool canIncScale()				const;
+			bool canDecScale()				const;
 
 			void resetScale();
 			void setScale(float scale);

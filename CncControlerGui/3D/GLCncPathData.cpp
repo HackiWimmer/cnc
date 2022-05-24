@@ -192,7 +192,7 @@ const GLI::BoundBox& GLI::GLCncPath::evaluateBoundBox(const GLCncPathVertices& m
 	static GLI::BoundBox bBox;
 	bBox.clear();
 	
-	// a bound box of 2 or less points didn't make sense
+	// a bound box of 3 or less points didn't make sense
 	if ( vectiesBuffer.getVertexCount() < 3 )
 		return bBox;
 	

@@ -93,6 +93,8 @@ class GLContextCncPathBase : public GLContextBase {
 		virtual wxString getNormalizedClientIdOfPos(float x, float y, float z);
 		virtual long getPositionWithinBuffer(float x, float y, float z);
 		
+		virtual bool getBounderies(CncDoubleBoundaries& ret) const;
+		
 		void clearPathData();
 		void appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex);
 		void reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt);

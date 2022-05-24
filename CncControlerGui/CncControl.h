@@ -305,7 +305,6 @@ class CncControl {
 		bool correctLimitPositions();
 		bool resolveLimits(bool x, bool y, bool z);
 		bool evaluateHardwareReference();
-		bool simulateHardwareReference(float offsetFact=0.5f);
 		
 		bool evaluateHardwareDimensionsXYPlane(DimensionXYPlane& result);
 		bool evaluateHardwareDimensionsZAxis(DimensionZAxis& result);

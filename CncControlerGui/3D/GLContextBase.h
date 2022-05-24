@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <vector>
+#include <wx/layout.h>
 #include <wx/colour.h>
 
 #include "3D/GLViewPort.h"
@@ -11,6 +12,7 @@
 #include "3D/GLGuidePath.h"
 #include "3D/GLInclude.h"
 
+#include "CncPosition.h"
 #include "CncCommon.h"
 
 /////////////////////////////////////////////////////////////////
@@ -18,13 +20,12 @@ struct GLContextOptions
 {
 	// .........................................................
 	// options
-	
 	bool autoScale						= true;
 	bool blending						= true;
 	bool probeMode						= false;
 	
 	bool showOrigin						= true;
-	bool showViewPortBounderies			= true;
+	bool showViewPortBoundaries			= true;
 	bool showMillingCutter				= true;
 	bool showPosMarker					= true;
 	bool showFlyPath					= true;
@@ -42,7 +43,7 @@ struct GLContextOptions
 	unsigned int rulerOriginOffsetAbs	= 10;
 	unsigned int rapidAlpha				= 64;
 		
-	wxColour hardwareBoxColour			= wxColour(255,   0,   0);
+	wxColour hardwareBoxColour			= wxColour(255, 128, 255);
 	wxColour totBoundBoxColour			= wxColour(185, 127,  87);
 	wxColour objBoundBoxColour			= wxColour(112, 146, 190);
 	wxColour rapidColour				= *wxYELLOW;
@@ -136,6 +137,7 @@ class GLContextBase : public wxGLContext {
 			double getAsMetricY(float scaleFactor);
 			double getAsMetricZ(float scaleFactor);
 		};
+		
 
 		// common 
 		void clearGuidePathes();
@@ -168,11 +170,18 @@ class GLContextBase : public wxGLContext {
 		void reshapeRelative(int dx, int dy);
 		void reshape();
 		void reshapeViewMode();
+		void reshapeBestOrigion(const CncDoubleBoundaries& box);
+		void reshapePosToCenter(const CncLongBoundaries& box);
+		void reshapePosToCenter(const CncDoubleBoundaries& box);
 		void reshapePosToCenter(int px, int py);
 		void reshapePosToCenterIfOutOfFocus(int px, int py);
+		void reshapeCompleteVisible(const CncDoubleBoundaries& box);
+		void reshapeCompleteVisible();
 		
-		int getLastReshapeX();
-		int getLastReshapeY();
+		int getLastReshapeX()			const;
+		int getLastReshapeY()			const;
+		int getCurrentWindowWidth()		const;
+		int getCurrentWindowHeight()	const; 
 		
 		void setFrontCatchingMode(FrontCatchingMode mode);
 		const char* getFrontCatchingModeAsStr(FrontCatchingMode mode);
@@ -235,7 +244,11 @@ class GLContextBase : public wxGLContext {
 		bool logWinCoordsToVertex(int winX, int winY);
 		void delWinCoordsToVertex();
 		
+		bool isVertexVisible(const CncDoublePosition& p);
 		bool isVertexVisible(GLdouble px, GLdouble py, GLdouble pz);
+		bool isBoxVisible(const CncDoubleBoundaries& box);
+
+		bool makeCompleteVisible(const CncDoubleBoundaries& box);
 		bool keepVisible(GLdouble px, GLdouble py, GLdouble pz);
 		
 		const MouseVertexInfo& getCurrentMouseVertexInfo() { return currentMouseVertexInfo; }
@@ -254,12 +267,16 @@ class GLContextBase : public wxGLContext {
 		
 		void setSpindlePowerState(CncSpindlePowerState state);
 		
+		virtual bool getBounderies(CncDoubleBoundaries& ret) const;
+		
 	protected:
 		
 		////////////////////////////////////////////////////
-		class CoordOrginInfo {
+		class CoordOrginInfo
+		{
 			public:
-				struct Colours {
+				struct Colours 
+				{
 					wxColour x, y, z;
 					
 					Colours() 
@@ -273,6 +290,50 @@ class GLContextBase : public wxGLContext {
 				CoordOrginInfo() 
 				: colours(), length(0.25f)
 				{}
+		};
+		
+		////////////////////////////////////////////////////
+		class FeedbackBuffer
+		{
+			private:
+				
+				GLenum			type;
+				GLContextBase*	context;
+				GLint 			size;
+				GLint			count;
+				GLfloat*		buffer;
+				GLint			prevMode;
+				
+				int getEntrySize()
+				{
+					const int k = 4; // rgb mode
+					
+					switch ( type )
+					{
+						case GL_2D:					return 2;
+						case GL_3D:					return 3;
+						case GL_3D_COLOR:			return 3 + k;
+						case GL_3D_COLOR_TEXTURE:	return 7 + k;
+						case GL_4D_COLOR_TEXTURE:	return 8 + k;
+					}
+					
+					return -1;
+				}
+				
+			public:
+				
+				FeedbackBuffer(GLenum t, GLContextBase* ctx);
+				~FeedbackBuffer();
+				
+				GLenum getType()	{ return type; }
+				GLint getSize()		{ return size; }
+				
+				void  activate();
+				GLint deactivate();
+				
+				bool checkIfAllFeedbackPointsAreVisible();
+				void traceFeedbackBuffer(std::ostream& out);
+				void traceFeedbackBufferRaw(std::ostream& out);
 		};
 		
 		wxGLCanvas*				associatedCanvas;
@@ -328,17 +389,36 @@ class GLContextBase : public wxGLContext {
 		 
 		void drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp=true);
 		void drawSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
+		
+		void drawSilhouetteCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp=true);
+		
+		void drawFeedbackVertices();
+		
+		void drawAdditionalThings();
+		
 		void traceOpenGLMatrix(std::ostream &ostr, int id);
+		
+		CncLongPosition evaluateWindowCoordinates(double px, double py, double pz) const ;
+		CncLongPosition evaluateWindowCoordinates(const CncDoublePosition& p) const;
+		
+		int getVertextMostlyInDirection(wxEdge direction, const CncDoublePositionVector& v);
+		int getCornerIdxMostlyInDirection(wxEdge direction, const CncDoubleBoundaries& b);
+		
+		wxPoint determineBestOrigin(const CncDoubleBoundaries& b);
+		
+		void traceBoundariesInfos(std::ostream& o, const CncDoubleBoundaries& box);
 		
 	private:
 		
 		static const wxGLCanvas* currentCanvas;
 		
-		GLuint theTexture;
+		typedef std::vector<CncDoublePosition> FeedbackVectices;
 		
-		void determineViewPortBounderies();
+		GLuint 				theTexture;
+		FeedbackVectices	feedbackVertices;
+		
+		void determineViewPortBoundaries();
 		void drawMillingCutter(CncDimensions d, float x, float y, float z);
-
 };
 
 #endif

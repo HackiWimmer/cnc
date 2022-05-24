@@ -33,6 +33,8 @@
 #include <wx/frame.h>
 #include <wx/splitter.h>
 #include <wx/bmpbuttn.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -849,6 +851,273 @@ public:
         const wxSize& size = wxSize(540, 400),
         long style = wxDEFAULT_FRAME_STYLE);
     virtual ~CncPositionStorageViewBase();
+};
+
+class CncSimuHwDimensionSetupBase : public wxDialog
+{
+protected:
+    wxListbook* m_lbContext;
+    wxPanel* m_panel271;
+    wxStaticText* m_staticText298;
+    wxStaticText* m_stMaxDimX;
+    wxTextCtrl* m_tcMaxDimX;
+    wxStaticText* m_stMaxDimUnixX;
+    wxBitmapButton* m_btCpXFromConfig;
+    wxStaticText* m_stMaxDimY;
+    wxTextCtrl* m_tcMaxDimY;
+    wxStaticText* m_stMaxDimUnixXY;
+    wxBitmapButton* m_btCpYFromConfig;
+    wxStaticText* m_stMaxDimZ;
+    wxTextCtrl* m_tcMaxDimZ;
+    wxStaticText* m_stMaxDimUnixZ;
+    wxBitmapButton* m_btCpZFromConfig;
+    wxPanel* m_panel272;
+    wxStaticText* m_staticText2981;
+    wxStaticText* m_stRefPosOffsetX;
+    wxTextCtrl* m_tcRefPosOffsetX;
+    wxStaticText* m_stRefPosOffsetUnitX;
+    wxStaticText* m_stRefPosOffsetY;
+    wxTextCtrl* m_tcRefPosOffsetY;
+    wxStaticText* m_stRefPosOffsetUnitY;
+    wxStaticText* m_stRefPosOffsetZ;
+    wxTextCtrl* m_tcRefPosOffsetZ;
+    wxStaticText* m_stRefPosOffsetUnitZ;
+    wxStaticLine* m_staticLine324;
+    wxStaticText* m_staticText343;
+    wxStaticText* m_staticText331;
+    wxBitmapButton* m_btRefCentered;
+    wxBitmapButton* m_btRefSector1;
+    wxBitmapButton* m_btRefSector2;
+    wxBitmapButton* m_btRefSector4;
+    wxBitmapButton* m_btRefSector3;
+    wxStaticText* m_staticText341;
+    wxComboBox* m_cbDefaultZ;
+    wxStaticLine* m_staticLine279;
+    wxButton* m_btCancel;
+    wxButton* m_btOk;
+
+protected:
+    virtual void onInitDialog(wxInitDialogEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCloseWindow(wxCloseEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onUpdateTextValues(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onTakeOverFromConfigMaxDimX(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onTakeOverFromConfigMaxDimY(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onTakeOverFromConfigMaxDimZ(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onRefCentered(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onRefSector1(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onRefSector2(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onRefSector4(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onRefSector3(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSelectZLocation(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCancel(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onOk(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+
+public:
+    wxStaticText* GetStaticText298()
+    {
+	return m_staticText298;
+    }
+    wxStaticText* GetStMaxDimX()
+    {
+	return m_stMaxDimX;
+    }
+    wxTextCtrl* GetTcMaxDimX()
+    {
+	return m_tcMaxDimX;
+    }
+    wxStaticText* GetStMaxDimUnixX()
+    {
+	return m_stMaxDimUnixX;
+    }
+    wxBitmapButton* GetBtCpXFromConfig()
+    {
+	return m_btCpXFromConfig;
+    }
+    wxStaticText* GetStMaxDimY()
+    {
+	return m_stMaxDimY;
+    }
+    wxTextCtrl* GetTcMaxDimY()
+    {
+	return m_tcMaxDimY;
+    }
+    wxStaticText* GetStMaxDimUnixXY()
+    {
+	return m_stMaxDimUnixXY;
+    }
+    wxBitmapButton* GetBtCpYFromConfig()
+    {
+	return m_btCpYFromConfig;
+    }
+    wxStaticText* GetStMaxDimZ()
+    {
+	return m_stMaxDimZ;
+    }
+    wxTextCtrl* GetTcMaxDimZ()
+    {
+	return m_tcMaxDimZ;
+    }
+    wxStaticText* GetStMaxDimUnixZ()
+    {
+	return m_stMaxDimUnixZ;
+    }
+    wxBitmapButton* GetBtCpZFromConfig()
+    {
+	return m_btCpZFromConfig;
+    }
+    wxPanel* GetPanel271()
+    {
+	return m_panel271;
+    }
+    wxStaticText* GetStaticText2981()
+    {
+	return m_staticText2981;
+    }
+    wxStaticText* GetStRefPosOffsetX()
+    {
+	return m_stRefPosOffsetX;
+    }
+    wxTextCtrl* GetTcRefPosOffsetX()
+    {
+	return m_tcRefPosOffsetX;
+    }
+    wxStaticText* GetStRefPosOffsetUnitX()
+    {
+	return m_stRefPosOffsetUnitX;
+    }
+    wxStaticText* GetStRefPosOffsetY()
+    {
+	return m_stRefPosOffsetY;
+    }
+    wxTextCtrl* GetTcRefPosOffsetY()
+    {
+	return m_tcRefPosOffsetY;
+    }
+    wxStaticText* GetStRefPosOffsetUnitY()
+    {
+	return m_stRefPosOffsetUnitY;
+    }
+    wxStaticText* GetStRefPosOffsetZ()
+    {
+	return m_stRefPosOffsetZ;
+    }
+    wxTextCtrl* GetTcRefPosOffsetZ()
+    {
+	return m_tcRefPosOffsetZ;
+    }
+    wxStaticText* GetStRefPosOffsetUnitZ()
+    {
+	return m_stRefPosOffsetUnitZ;
+    }
+    wxStaticLine* GetStaticLine324()
+    {
+	return m_staticLine324;
+    }
+    wxStaticText* GetStaticText343()
+    {
+	return m_staticText343;
+    }
+    wxStaticText* GetStaticText331()
+    {
+	return m_staticText331;
+    }
+    wxBitmapButton* GetBtRefCentered()
+    {
+	return m_btRefCentered;
+    }
+    wxBitmapButton* GetBtRefSector1()
+    {
+	return m_btRefSector1;
+    }
+    wxBitmapButton* GetBtRefSector2()
+    {
+	return m_btRefSector2;
+    }
+    wxBitmapButton* GetBtRefSector4()
+    {
+	return m_btRefSector4;
+    }
+    wxBitmapButton* GetBtRefSector3()
+    {
+	return m_btRefSector3;
+    }
+    wxStaticText* GetStaticText341()
+    {
+	return m_staticText341;
+    }
+    wxComboBox* GetCbDefaultZ()
+    {
+	return m_cbDefaultZ;
+    }
+    wxPanel* GetPanel272()
+    {
+	return m_panel272;
+    }
+    wxListbook* GetLbContext()
+    {
+	return m_lbContext;
+    }
+    wxStaticLine* GetStaticLine279()
+    {
+	return m_staticLine279;
+    }
+    wxButton* GetBtCancel()
+    {
+	return m_btCancel;
+    }
+    wxButton* GetBtOk()
+    {
+	return m_btOk;
+    }
+    CncSimuHwDimensionSetupBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("Simulate Hardware Reference and Dimensions"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(-1, -1),
+        long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~CncSimuHwDimensionSetupBase();
 };
 
 #endif

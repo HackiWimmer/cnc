@@ -5,6 +5,9 @@
 #include <ctgmath>
 #include <iostream>
 
+#include <list>
+#include <stack>
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> 
 class CncXYDimension 
@@ -37,6 +40,7 @@ class CncXYDimension
 		
 };
 
+typedef CncXYDimension<int16_t>	CncXYIntDimension;
 typedef CncXYDimension<int32_t>	CncXYLongDimension;
 typedef CncXYDimension<double>	CncXYDoubleDimension;
 typedef CncXYDimension<float>	CncXYFloatDimension;
@@ -66,6 +70,7 @@ class CncZDimension {
 		
 };
 
+typedef CncZDimension<int16_t>	CncZIntDimension;
 typedef CncZDimension<int32_t>	CncZLongDimension;
 typedef CncZDimension<double>	CncZDoubleDimension;
 typedef CncZDimension<float>	CncZFloatDimension;
@@ -479,30 +484,93 @@ class CncPosition
 };
 
 // ----------------------------------------------------------------------
-typedef CncPosition<int32_t>	CncLongPosition;
-typedef CncPosition<double>		CncDoublePosition;
-typedef CncPosition<float>		CncFloatPosition;
+typedef CncPosition<int16_t>			CncIntPosition;
+typedef CncPosition<int32_t>			CncLongPosition;
+typedef CncPosition<double>				CncDoublePosition;
+typedef CncPosition<float>				CncFloatPosition;
 
-#define CncDistance				CncPosition
-typedef CncPosition<int32_t>	CncLongDistance;
-typedef CncPosition<double>		CncDoubleDistance;
-typedef CncPosition<float>		CncFloatPosition;
+typedef std::vector<CncIntPosition>		CncIntPositionVector;
+typedef std::vector<CncLongPosition>	CncLongPositionVector;
+typedef std::vector<CncDoublePosition>	CncDoublePositionVector;
+typedef std::vector<CncFloatPosition>	CncFloatPositionVector;
 
-#define CncOffset				CncPosition
-typedef CncPosition<int32_t>	CncLongOffset;
-typedef CncPosition<double>		CncDoubleOffset;
-typedef CncPosition<float>		CncFloatOffset;
+typedef std::list<CncIntPosition>		CncIntPositionList;
+typedef std::list<CncLongPosition>		CncLongPositionList;
+typedef std::list<CncDoublePosition>	CncDoublePositionList;
+typedef std::list<CncFloatPosition>		CncFloatPositionList;
+
+typedef std::stack<CncIntPosition>		CncIntPositionStack;
+typedef std::stack<CncLongPosition>		CncLongPositionStack;
+typedef std::stack<CncDoublePosition>	CncDoublePositionStack;
+typedef std::stack<CncFloatPosition>	CncFloatPositionStack;
+
+#define CncDistance						CncPosition
+typedef CncPosition<int16_t>			CncIntDistance;
+typedef CncPosition<int32_t>			CncLongDistance;
+typedef CncPosition<double>				CncDoubleDistance;
+typedef CncPosition<float>				CncFloatPosition;
+
+typedef std::vector<CncIntDistance>		CncIntDistanceVector;
+typedef std::vector<CncLongDistance>	CncLongDistanceVector;
+typedef std::vector<CncDoubleDistance>	CncDoubleDistanceVector;
+typedef std::vector<CncFloatPosition>	CncFloatDistanceVector;
+
+typedef std::list<CncIntDistance>		CncIntDistanceList;
+typedef std::list<CncLongDistance>		CncLongDistanceList;
+typedef std::list<CncDoubleDistance>	CncDoubleDistanceList;
+typedef std::list<CncFloatPosition>		CncFloatDistanceList;
+
+typedef std::stack<CncIntDistance>		CncIntDistanceStack;
+typedef std::stack<CncLongDistance>		CncLongDistanceStack;
+typedef std::stack<CncDoubleDistance>	CncDoubleDistanceStack;
+typedef std::stack<CncFloatPosition>	CncFloatDistanceStack;
+
+#define CncOffset						CncPosition
+typedef CncPosition<int16_t>			CncIntOffset;
+typedef CncPosition<int32_t>			CncLongOffset;
+typedef CncPosition<double>				CncDoubleOffset;
+typedef CncPosition<float>				CncFloatOffset;
+
+typedef std::vector<CncIntOffset>		CncIntOffsetVector;
+typedef std::vector<CncLongOffset>		CncLongOffsetVector;
+typedef std::vector<CncDoubleOffset>	CncDoubleOffsetVector;
+typedef std::vector<CncFloatOffset>		CncFloatOffsetVector;
+
+typedef std::list<CncIntOffset>			CncIntDistanceList;
+typedef std::list<CncLongOffset>		CncLongDistanceList;
+typedef std::list<CncDoubleOffset>		CncDoubleDistancList;
+typedef std::list<CncFloatOffset>		CncFloatDistanceList;
+
+typedef std::stack<CncIntOffset>		CncIntDistanceStack;
+typedef std::stack<CncLongOffset>		CncLongDistanceStack;
+typedef std::stack<CncDoubleOffset>		CncDoubleDistancStack;
+typedef std::stack<CncFloatOffset>		CncFloatDistanceStack;
 
 // ----------------------------------------------------------------------
+//
 template <class T>
-class CncBounderies : public CncPosition<T>::Watermarks 
+class CncBoundaries : public CncPosition<T>::Watermarks 
 {
-	public: 
-		CncBounderies<T>()
+	public:
+		
+		typedef std::vector<CncPosition<T>> Corners;
+		
+		CncBoundaries<T>()
 		: CncPosition<T>::Watermarks()
 		{}
 		
-		explicit CncBounderies<T>(const CncBounderies<T>& b)
+		CncBoundaries<T>(const CncPosition<T>& minBound, const CncPosition<T>& maxBound)
+		: CncPosition<T>::Watermarks()
+		{
+			this->xMin = minBound.getX();
+			this->yMin = minBound.getY();
+			this->zMin = minBound.getZ();
+			this->xMax = maxBound.getX();
+			this->yMax = maxBound.getY();
+			this->zMax = maxBound.getZ();
+		}
+		
+		explicit CncBoundaries<T>(const CncBoundaries<T>& b)
 		: CncPosition<T>::Watermarks()
 		{
 			this->xMin = b.xMin;
@@ -513,7 +581,7 @@ class CncBounderies : public CncPosition<T>::Watermarks
 			this->zMax = b.zMax;
 		}
 		
-		explicit CncBounderies<T>(const typename CncPosition<T>::Watermarks& w)
+		explicit CncBoundaries<T>(const typename CncPosition<T>::Watermarks& w)
 		: CncPosition<T>::Watermarks()
 		{
 			this->xMin = w.xMin;
@@ -524,9 +592,9 @@ class CncBounderies : public CncPosition<T>::Watermarks
 			this->zMax = w.zMax;
 		}
 		
-		bool hasBounderies()												const;
-		bool fits(const CncBounderies<T> b)									const;
-		bool fitsInside(const CncBounderies<T> b)							const;
+		bool hasBoundaries()												const;
+		bool fits(const CncBoundaries<T> b)									const;
+		bool fitsInside(const CncBoundaries<T> b)							const;
 		bool fitsInside(const CncPosition<T> p)								const;
 		bool fitsInside(const typename CncPosition<T>::Watermarks w)		const;
 		
@@ -535,15 +603,91 @@ class CncBounderies : public CncPosition<T>::Watermarks
 		
 		CncPosition<T> getMinBound()										const;
 		CncPosition<T> getMaxBound()										const;
+		CncPosition<T> getCentre()											const;
+		
+		T getMaxDistanceX()													const;
+		T getMaxDistanceY()													const;
+		T getMaxDistanceZ()													const;
+		
+		//       pTD-------------pTC
+		//       /|               |
+		//      / |              /|
+		//     / pBD------------/pBC
+		//    /  /             / /
+		//  pTA-/-----------pTB /
+		//   | /             | /
+		//   |/              |/
+		//  pBA-------------pBB
+		
+		enum CornerArea	{ CA_ALL, CA_BOTTOM, CA_TOP };
+		enum CornerID	
+		{ 
+			CI_PbA = 0, CI_PbB = 1, CI_PbC = 2, CI_PbD = 3, 
+			CI_PtA = 4, CI_PtB = 5, CI_PtC = 6, CI_PtD = 7,
+			CI_UNKNOWN = 100
+		 };
+		
+		CncPosition<T> getPbA() const;
+		CncPosition<T> getPbB() const;
+		CncPosition<T> getPbC() const;
+		CncPosition<T> getPbD() const;
+		
+		CncPosition<T> getPtA() const;
+		CncPosition<T> getPtB() const;
+		CncPosition<T> getPtC() const;
+		CncPosition<T> getPtD() const;
+		
+		CncPosition<T> getCorner(CornerID id) const;
+		CncPosition<T> getCorner(CornerArea ca, unsigned int idx) const;
+		
+		CncBoundaries<T>::Corners& getAllCorners(CncBoundaries<T>::Corners& ret, CornerArea ca = CA_ALL) const;
+		
+		bool			isCornerIndexValid(CornerArea ca, unsigned int idx) const;
+		unsigned int	getCornerIndex(CornerArea ca, CornerID id) const ;
+		CornerID		getCornerID(CornerArea ca, unsigned int idx) const;
+		const char*		getCornerName(CornerArea ca, unsigned int idx) const;
+		const char*		getCornerName(CornerID id) const;
+		
+		float getOriginRatioX() const;
+		float getOriginRatioY() const;
+		float getOriginRatioZ() const;
 		
 		void setMinBound(CncPosition<T> p);
 		void setMaxBound(CncPosition<T> p);
 		void shift(CncPosition<T> p);
+		
+		void multiply(T factor);
+		void multiply(T fX, T fY, T fZ);
+		
+		void divide(T divisor);
+		void divide(T dX, T dY, T dZ);
+		
+		void trace(std::ostream& o) const;
+		
+		friend std::ostream &operator<< (std::ostream &o, const CncBoundaries<T> &b) {
+			b.trace(o);
+			return o;
+		}
 };
 
 // ----------------------------------------------------------------------
-typedef CncBounderies<int32_t> 	CncLongBounderies;
-typedef CncBounderies<double> 	CncDoubleBoundaries;
-typedef CncBounderies<float> 	CncFloatBounderies;
+typedef CncBoundaries<int16_t>				CncIntBoundaries;
+typedef CncBoundaries<int32_t>				CncLongBoundaries;
+typedef CncBoundaries<double>				CncDoubleBoundaries;
+typedef CncBoundaries<float>				CncFloatBoundaries;
 
+typedef std::vector<CncIntBoundaries>		CncIntBoundariesVector;
+typedef std::vector<CncLongBoundaries>		CncLongBoundariesVector;
+typedef std::vector<CncDoubleBoundaries>	CncDoubleBoundariesVector;
+typedef std::vector<CncFloatBoundaries>		CncFloatBoundariesVector;
+
+typedef std::list<CncIntBoundaries>			CncIntBoundariesList;
+typedef std::list<CncLongBoundaries>		CncLongBoundariesList;
+typedef std::list<CncDoubleBoundaries>		CncDoubleBoundariesList;
+typedef std::list<CncFloatBoundaries>		CncFloatBoundariesList;
+
+typedef std::stack<CncIntBoundaries>		CncIntBoundariesStack;
+typedef std::stack<CncLongBoundaries>		CncLongBoundariesStack;
+typedef std::stack<CncDoubleBoundaries>		CncDoubleBoundariesStack;
+typedef std::stack<CncFloatBoundaries>		CncFloatBoundariesStack;
 #endif

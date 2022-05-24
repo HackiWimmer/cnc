@@ -21,8 +21,8 @@ class CncTemplateContext : public ContextInterface {
 		unsigned int				runCount;
 		unsigned int				validRunCount;
 		
-		CncBoundarySpace*			bounderySpace;
-		CncDoubleBoundaries			bounderies;
+		CncBoundarySpace*			boundarySpace;
+		CncDoubleBoundaries			boundaries;
 		
 	protected:
 		
@@ -49,7 +49,7 @@ class CncTemplateContext : public ContextInterface {
 		unsigned int		getRunCount()					const	{ return runCount; }
 		
 		void				registerBoundaries(const CncDoubleBoundaries& b);
-		bool				hasBounderies()					const	{ return bounderies.hasBounderies(); }
+		bool				hasBoundaries()					const	{ return boundaries.hasBoundaries(); }
 		
 		const wxString&		getName()						const	{ return name; }
 		const wxString&		getPath()						const	{ return path; }

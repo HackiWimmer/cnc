@@ -19213,7 +19213,7 @@
 																												}, {
 																													"type":	"string",
 																													"m_label":	"Name:",
-																													"m_value":	"m_bounderiesSummary"
+																													"m_value":	"m_boundariesSummary"
 																												}, {
 																													"type":	"multi-string",
 																													"m_label":	"Tooltip:",

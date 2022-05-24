@@ -69,7 +69,8 @@ const wxPoint GLViewPort::evaluatePreDefPositions(GLViewPort::PreDefPos pdp, int
 	// (INT_MAX, INT_MAX) is a alias for the window centre
 	wxPoint ret(INT_MAX, INT_MAX);
 
-	switch ( pdp ) {
+	switch ( pdp )
+	{
 		case VPDP_TopLeft:		ret.x = margin;
 								ret.y = wndSizeH - margin;
 								break;

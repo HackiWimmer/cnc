@@ -150,8 +150,8 @@ void CncZView::updateView(double val) {
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() == false )
 		return;
 	
-	if ( cnc::dblCompare(maxValue, THE_CONFIG->getMaxDimensionZ() * scale) == false ) {
-		maxValue = THE_CONFIG->getMaxDimensionZ() * scale;
+	if ( cnc::dblCompare(maxValue, THE_BOUNDS->getMaxDimensionMetricZ() * scale) == false ) {
+		maxValue = THE_BOUNDS->getMaxDimensionMetricZ() * scale;
 		resetWaterMarks();
 		refresh(RT_ALL);
 	}

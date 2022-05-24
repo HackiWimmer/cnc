@@ -1059,15 +1059,15 @@ bool CncControl::isPositionOutOfRange(const CncLongPosition& pos, bool trace) {
 		CncLongPosition::Watermarks wm;
 		pos.getWatermarks(wm);
 		
-		if ( (wm.xMax - wm.xMin)/THE_CONFIG->getCalculationFactX() > THE_CONFIG->getMaxDimensionX() ) error = true;
-		if ( (wm.yMax - wm.yMin)/THE_CONFIG->getCalculationFactY() > THE_CONFIG->getMaxDimensionY() ) error = true;
-		if ( (wm.zMax - wm.zMin)/THE_CONFIG->getCalculationFactZ() > THE_CONFIG->getMaxDimensionZ() ) error = true;
+		if ( (wm.xMax - wm.xMin)/THE_CONFIG->getCalculationFactX() > THE_BOUNDS->getMaxDimensionMetricX() ) error = true;
+		if ( (wm.yMax - wm.yMin)/THE_CONFIG->getCalculationFactY() > THE_BOUNDS->getMaxDimensionMetricY() ) error = true;
+		if ( (wm.zMax - wm.zMin)/THE_CONFIG->getCalculationFactZ() > THE_BOUNDS->getMaxDimensionMetricZ() ) error = true;
 	
 		if ( error == true && trace == true ) {
 			std::cerr << "Position out of range!" << std::endl;
-			std::cerr << " Max valid X dimension: " << THE_CONFIG->getMaxDimensionX() << std::endl;
-			std::cerr << " Max valid Y dimension: " << THE_CONFIG->getMaxDimensionY() << std::endl;
-			std::cerr << " Max valid Z dimension: " << THE_CONFIG->getMaxDimensionZ() << std::endl;
+			std::cerr << " Max valid X dimension: " << THE_BOUNDS->getMaxDimensionMetricX() << std::endl;
+			std::cerr << " Max valid Y dimension: " << THE_BOUNDS->getMaxDimensionMetricY() << std::endl;
+			std::cerr << " Max valid Z dimension: " << THE_BOUNDS->getMaxDimensionMetricZ() << std::endl;
 			std::cerr << " Pos: " << pos << std::endl;
 			std::cerr << " Min Watermark: " << wm.xMin << "," << wm.yMin << "," << wm.zMin << "," << std::endl;
 			std::cerr << " Max Watermark: " << wm.xMax << "," << wm.yMax << "," << wm.zMax << "," << std::endl;
@@ -2295,7 +2295,7 @@ bool CncControl::moveXToMinLimit() {
 // However, the PC and controller positions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -THE_CONFIG->getMaxDimensionX() - getCurCtlPosMetricX();
+	const double distance = -THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true )
@@ -2314,7 +2314,7 @@ bool CncControl::moveXToMaxLimit() {
 // However, the PC and controller positions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +THE_CONFIG->getMaxDimensionX() - getCurCtlPosMetricX();
+	const double distance = +THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -2331,7 +2331,7 @@ bool CncControl::moveYToMinLimit() {
 // However, the PC and controller positions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -THE_CONFIG->getMaxDimensionY() - getCurCtlPosMetricY();
+	const double distance = -THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -2348,7 +2348,7 @@ bool CncControl::moveYToMaxLimit() {
 // However, the PC and controller positions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +THE_CONFIG->getMaxDimensionY() - getCurCtlPosMetricY();
+	const double distance = +THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true )
@@ -2367,7 +2367,7 @@ bool CncControl::moveZToMinLimit() {
 // However, the PC and controller positions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -THE_CONFIG->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	const double distance = -THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true )
@@ -2386,7 +2386,7 @@ bool CncControl::moveZToMaxLimit() {
 // However, the PC and controller positions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +THE_CONFIG->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	const double distance = +THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true )
@@ -2403,7 +2403,7 @@ bool CncControl::moveZToMaxLimit() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + THE_CONFIG->getMaxDimensionX() - getCurCtlPosMetricX();
+	const double distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true )
@@ -2411,7 +2411,7 @@ bool CncControl::moveXToMid() {
 		ret = moveRelLinearMetricXY(distance, 0.0, true);
 		
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(-THE_CONFIG->getMaxDimensionX() / 2, 0.0, true);
+			ret = moveRelLinearMetricXY(-THE_BOUNDS->getMaxDimensionMetricX() / 2, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -2419,7 +2419,7 @@ bool CncControl::moveXToMid() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveYToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + THE_CONFIG->getMaxDimensionY() - getCurCtlPosMetricY();
+	const double distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true )
@@ -2427,7 +2427,7 @@ bool CncControl::moveYToMid() {
 		ret = moveRelLinearMetricXY(0.0, distance, true);
 		
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(0.0, -THE_CONFIG->getMaxDimensionY() / 2, true);
+			ret = moveRelLinearMetricXY(0.0, -THE_BOUNDS->getMaxDimensionMetricY() / 2, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -2435,7 +2435,7 @@ bool CncControl::moveYToMid() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + THE_CONFIG->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	const double distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true )
@@ -2443,7 +2443,7 @@ bool CncControl::moveZToMid() {
 		ret = moveRelMetricZ(distance);
 		
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelMetricZ(-THE_CONFIG->getMaxDimensionZ() / 2);
+			ret = moveRelMetricZ(-THE_BOUNDS->getMaxDimensionMetricZ() / 2);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -2601,6 +2601,8 @@ bool CncControl::convertPositionToHardwareCoordinate(const CncDoublePosition& po
 	
 	return b;
 }
+
+/*
 ///////////////////////////////////////////////////////////////////
 bool CncControl::simulateHardwareReference(float offsetFact) {
 ///////////////////////////////////////////////////////////////////
@@ -2608,9 +2610,9 @@ bool CncControl::simulateHardwareReference(float offsetFact) {
 	offsetFact = std::max(0.00001f, offsetFact);
 	
 	CncLongPosition fakedHwRefPos(curCtlPos);
-	fakedHwRefPos.setX( (-1) * wxRound(THE_CONFIG->getMaxDimensionStepsX() *       offsetFact ));
-	fakedHwRefPos.setY( (-1) * wxRound(THE_CONFIG->getMaxDimensionStepsY() *       offsetFact ));
-	fakedHwRefPos.setZ( (+1) * wxRound(THE_CONFIG->getMaxDimensionStepsZ() * ( 1 - offsetFact )));
+	fakedHwRefPos.setX( (-1) * wxRound(THE_BOUNDS->getMaxDimensionStepsX() *       offsetFact ));
+	fakedHwRefPos.setY( (-1) * wxRound(THE_BOUNDS->getMaxDimensionStepsY() *       offsetFact ));
+	fakedHwRefPos.setZ( (+1) * wxRound(THE_BOUNDS->getMaxDimensionStepsZ() * ( 1 - offsetFact )));
 	
 	const bool ret = fakedHwRefPos != curCtlPos;
 	if ( ret )
@@ -2625,6 +2627,41 @@ bool CncControl::simulateHardwareReference(float offsetFact) {
 	
 	return ret;
 }
+*/
+/*
+///////////////////////////////////////////////////////////////////
+bool CncControl::simulateHardwareReference(const CncDoubleOffset& offset) {
+///////////////////////////////////////////////////////////////////
+	const CncLongOffset o
+	(
+		THE_CONFIG->convertMetricToStepsX(offset.getX()),
+		THE_CONFIG->convertMetricToStepsY(offset.getY()),
+		THE_CONFIG->convertMetricToStepsZ(offset.getZ())
+	);
+	
+	return simulateHardwareReference(o);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::simulateHardwareReference(const CncLongOffset& offset) {
+///////////////////////////////////////////////////////////////////
+	CncLongPosition fakedHwRefPos(curCtlPos);
+	fakedHwRefPos.setX(offset.getX());
+	fakedHwRefPos.setY(offset.getY());
+	fakedHwRefPos.setZ(offset.getZ());
+	
+	const bool ret = fakedHwRefPos != curCtlPos;
+	if ( ret )
+	{
+		THE_BOUNDS->setHardwareOffset(fakedHwRefPos);
+		THE_BOUNDS->setHardwareOffsetValid(true); 
+	}
+	
+	return ret;
+}
+*/
+
+
+
 ///////////////////////////////////////////////////////////////////
 bool CncControl::evaluateHardwareReference() {
 ///////////////////////////////////////////////////////////////////

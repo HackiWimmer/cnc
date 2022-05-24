@@ -2754,7 +2754,7 @@ Summary</label>
                                       <growablerows>0</growablerows>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxEXPAND</flag>
-                                        <object class="wxTextCtrl" name="m_bounderiesSummary">
+                                        <object class="wxTextCtrl" name="m_boundariesSummary">
                                           <style>wxTE_READONLY|wxTE_MULTILINE</style>
                                           <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                           <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>

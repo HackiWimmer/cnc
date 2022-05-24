@@ -1991,15 +1991,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     flexGridSizer9646->AddGrowableRow(0);
     m_SummaryPanel->SetSizer(flexGridSizer9646);
 
-    m_bounderiesSummary = new wxTextCtrl(m_SummaryPanel, wxID_ANY, wxT(""), wxDefaultPosition,
+    m_boundariesSummary = new wxTextCtrl(m_SummaryPanel, wxID_ANY, wxT(""), wxDefaultPosition,
         wxDLG_UNIT(m_SummaryPanel, wxSize(-1, -1)), wxTE_READONLY | wxTE_MULTILINE);
-    m_bounderiesSummary->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_bounderiesSummary->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_bounderiesSummaryFont(
+    m_boundariesSummary->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_boundariesSummary->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_boundariesSummaryFont(
         9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-    m_bounderiesSummary->SetFont(m_bounderiesSummaryFont);
+    m_boundariesSummary->SetFont(m_boundariesSummaryFont);
 
-    flexGridSizer9646->Add(m_bounderiesSummary, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer9646->Add(m_boundariesSummary, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
 
     m_mainBookManually = new wxPanel(
         m_mainViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainViewBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);

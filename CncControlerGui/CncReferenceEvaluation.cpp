@@ -637,11 +637,13 @@ void CncReferenceEvaluation::setEnforceFlag(bool s) {
 	const int refMode = (int)getReferenceMode();
 	
 	wxBitmap bmp(ImageLib24().Bitmap( valid ? "BMP_TRAFFIC_LIGHT_GREEN" : "BMP_TRAFFIC_LIGHT_RED")); 
+	
 	const wxString mod(wxString::Format("Reference position mode: %s [%d]", cnc::getReferenceModeAsString(getReferenceMode()), ( valid ? refMode : -1 ) ));
 	const wxString tip(wxString::Format("Reference position state: %s\n%s", ( valid ? "Valid" : "Invalid" ), mod));
 	
-	// display ref pos mode too
-	if ( valid == true ) {
+	// display reference position mode too
+	if ( valid == true ) 
+	{
 		const wxFont font(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
 		wxMemoryDC mdc(bmp);
 		mdc.SetFont(font);
@@ -649,6 +651,8 @@ void CncReferenceEvaluation::setEnforceFlag(bool s) {
 		mdc.DrawText(wxString::Format("%d", refMode), {5, 1});
 		bmp = mdc.GetAsBitmap();
 	}
+	
+	THE_BOUNDS->setRefPositionMode(getReferenceMode());
 	
 	THE_APP->GetRefPosState()->SetToolTip(tip);
 	THE_APP->GetRefPosState()->SetBitmap(bmp);

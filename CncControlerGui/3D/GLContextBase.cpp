@@ -2,9 +2,11 @@
 #include <sstream>
 #include <wx/tokenzr.h>
 #include "wxCrafterImages.h"
+#include "MainFrame.h"
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "CncVector.h"
+#include "CncBoundarySpace.h"
 #include "3D/GLCommon.h"
 #include "3D/GLContextBase.h"
 
@@ -39,6 +41,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name)
 , cameraPos					()
 , spindlePowerState			(SPINDLE_STATE_OFF)
 , theTexture				(0)
+, feedbackVertices			()
 {
 /////////////////////////////////////////////////////////////////
 	// With respect to the GTK implementation SetCurrent() isn't 
@@ -109,7 +112,7 @@ bool GLContextBase::init() {
 	initBufferStore();
 	initContext();
 	
-	// call the initalization only one time
+	// call the initialization only one time
 	if ( initialized == true )
 		return true;
 	
@@ -117,6 +120,115 @@ bool GLContextBase::init() {
 	initialized = true;
 
 	return true;
+}
+/////////////////////////////////////////////////////////////////
+CncLongPosition GLContextBase::evaluateWindowCoordinates(double px, double py, double pz) const {
+/////////////////////////////////////////////////////////////////
+	GLint		curGlViewport	[ 4];
+	GLdouble	curGlModelview	[16];
+	GLdouble	curGlProjection	[16];
+	
+	glGetDoublev ( GL_MODELVIEW_MATRIX,		curGlModelview  );
+	glGetDoublev ( GL_PROJECTION_MATRIX,	curGlProjection );
+	glGetIntegerv( GL_VIEWPORT,				curGlViewport   );
+	
+	GLdouble winX, winY, winZ;
+	if ( gluProject(	px, py, pz, 
+						curGlModelview, curGlProjection, curGlViewport, 
+						&winX, &winY, &winZ) 
+		== GLU_FALSE )
+	{
+		 std::cerr << CNC_LOG_FUNCT_A(": Call of gluProject() failed");
+		 
+		 // any default in this case
+		 return CncLongPosition();
+	}
+	
+	return CncLongPosition(round(winX), round(winY), round(winZ));
+}
+/////////////////////////////////////////////////////////////////
+CncLongPosition GLContextBase::evaluateWindowCoordinates(const CncDoublePosition& p) const {
+/////////////////////////////////////////////////////////////////
+	return evaluateWindowCoordinates(p.getX(), p.getY(), p.getZ());
+}
+/////////////////////////////////////////////////////////////////
+int GLContextBase::getVertextMostlyInDirection(wxEdge direction, const CncDoublePositionVector& v) {
+/////////////////////////////////////////////////////////////////
+	long minX = LONG_MAX, maxX = LONG_MIN;
+	long minY = LONG_MAX, maxY = LONG_MIN;
+	
+	int index = -1;
+	
+	for ( auto it = v.begin(); it != v.end(); ++it )
+	{
+		const CncDoublePosition&	pv = (*it);
+		const CncLongPosition 		pw(evaluateWindowCoordinates(pv));
+		
+		const long winX(pw.getX());
+		const long winY(pw.getY());
+		
+		switch ( direction )
+		{
+			case wxLeft:	if ( winX < minX ) { minX = winX; index = std::distance(v.begin(), it); } break;
+			case wxRight:	if ( winX > maxX ) { maxX = winX; index = std::distance(v.begin(), it); } break;
+			
+			case wxTop:		if ( winY > maxY ) { maxY = winY; index = std::distance(v.begin(), it); } break;
+			case wxBottom:	if ( winY < minY ) { minY = winY; index = std::distance(v.begin(), it); } break;
+			
+			default:		;
+		}
+	}
+	
+	return index;
+}
+/////////////////////////////////////////////////////////////////
+int GLContextBase::getCornerIdxMostlyInDirection(wxEdge direction, const CncDoubleBoundaries& b) {
+/////////////////////////////////////////////////////////////////
+	CncDoubleBoundaries::Corners corners;
+	b.getAllCorners(corners, CncDoubleBoundaries::CornerArea::CA_ALL);
+	
+	return getVertextMostlyInDirection(direction, corners);
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::getBounderies(CncDoubleBoundaries& ret) const {
+/////////////////////////////////////////////////////////////////
+	// inherited classes have to provide a real bound box
+	// here nop further path information available
+	ret.reset();
+	return ret.hasBoundaries();
+}
+/////////////////////////////////////////////////////////////////
+wxPoint GLContextBase::determineBestOrigin(const CncDoubleBoundaries& box) {
+/////////////////////////////////////////////////////////////////
+	const wxSize cs = associatedCanvas->GetClientSize();
+	
+	const int ix1 = getCornerIdxMostlyInDirection(wxLeft,	box);
+	const int ix2 = getCornerIdxMostlyInDirection(wxRight,	box);
+	const int iy1 = getCornerIdxMostlyInDirection(wxTop, 	box);
+	const int iy2 = getCornerIdxMostlyInDirection(wxBottom,	box);
+
+	const CncDoublePosition px1 = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, ix1);
+	const CncDoublePosition px2 = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, ix2);
+	const CncDoublePosition py1 = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, iy1);
+	const CncDoublePosition py2 = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, iy2);
+	
+	const double totalX = fabs(px1.getX()) + fabs(px2.getX());
+	const double totalY = fabs(py1.getY()) + fabs(py2.getY());
+	
+	const bool bx = cnc::dblCmp::nu(totalX) == false;
+	const bool by = cnc::dblCmp::nu(totalY) == false;
+	
+	if ( bx && by )
+	{
+		const float xRatio = fabs(px1.getX()) / totalX;
+		const float yRatio = fabs(py1.getY()) / totalY;
+	
+		wxPoint ret(xRatio * cs.GetWidth(), cs.GetHeight() - (yRatio * cs.GetHeight()));
+		if ( ret.x != 0 && ret.y != 0 )
+			return ret;
+	}
+	
+	return viewPort->evaluatePreDefPositions(convertViewMode(viewMode), cs.GetWidth(), cs.GetHeight());
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::setSpindlePowerState(CncSpindlePowerState state) {
@@ -132,6 +244,18 @@ void GLContextBase::enableSmoothing(bool enable) {
 bool GLContextBase::isSmoothingEnabled() {
 /////////////////////////////////////////////////////////////////
 	return (bool)glIsEnabled(GL_LINE_SMOOTH);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawSilhouetteCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp) {
+/////////////////////////////////////////////////////////////////
+	GLUquadricObj* quadric = gluNewQuadric();
+	gluQuadricTexture(quadric, GL_TRUE);
+	gluQuadricDrawStyle(quadric, GLU_SILHOUETTE);
+	
+	if ( bottomUp == true )		gluCylinder(quadric, radius, 0.0, height, slices, stacks);
+	else						gluCylinder(quadric, 0.0, radius, height, slices, stacks);
+	
+	gluDeleteQuadric(quadric);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp) {
@@ -157,7 +281,7 @@ void GLContextBase::drawSolidCylinder(GLdouble radius, GLdouble height, GLint sl
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z) {
 /////////////////////////////////////////////////////////////////
-	const double maxDim			= THE_CONFIG->getMaxDimension();
+	const double maxDim			= THE_BOUNDS->getMaxDimensionMetric();
 	const float toolDiameter	= THE_CONTEXT->getCurrentToolDiameter();
 	const float toolRadius		= toolDiameter / 2.0	/ maxDim;
 	const float refRadius		=  1.0					/ maxDim;
@@ -218,8 +342,10 @@ void GLContextBase::drawMillingCutter(CncDimensions d, float x, float y, float z
 /////////////////////////////////////////////////////////////////
 GLViewPort::PreDefPos GLContextBase::convertViewMode(GLContextBase::ViewMode newMode) {
 /////////////////////////////////////////////////////////////////
-	if ( modelType == ModelType::MT_RIGHT_HAND ) {
-		switch ( newMode ) {
+	if ( modelType == ModelType::MT_RIGHT_HAND ) 
+	{
+		switch ( newMode ) 
+		{
 			case V2D_TOP:				return GLViewPort::PreDefPos::VPDP_BottomLeft;
 			case V2D_BOTTOM:			return GLViewPort::PreDefPos::VPDP_BottomRight;
 			case V2D_LEFT:				return GLViewPort::PreDefPos::VPDP_BottomRight; 
@@ -234,8 +360,11 @@ GLViewPort::PreDefPos GLContextBase::convertViewMode(GLContextBase::ViewMode new
 			
 			case V2D_CAM_ROT_XY_ZTOP:	return GLViewPort::PreDefPos::VPDP_Center;
 		}
-	} else {
-		switch ( newMode ) {
+	} 
+	else
+	{
+		switch ( newMode ) 
+		{
 			case V2D_TOP:				return GLViewPort::PreDefPos::VPDP_TopLeft;
 			case V2D_BOTTOM:			return GLViewPort::PreDefPos::VPDP_TopRight;
 			case V2D_LEFT:				return GLViewPort::PreDefPos::VPDP_BottomRight; 
@@ -257,7 +386,8 @@ GLViewPort::PreDefPos GLContextBase::convertViewMode(GLContextBase::ViewMode new
 /////////////////////////////////////////////////////////////////
 const char* GLContextBase::getViewModeAsString() {
 /////////////////////////////////////////////////////////////////
-	switch ( viewMode ) {
+	switch ( viewMode ) 
+	{
 		case V2D_TOP:			return "Top";
 		case V2D_BOTTOM:		return "Bottom";
 		case V2D_LEFT:			return "Left"; 
@@ -315,7 +445,7 @@ void GLContextBase::resetViewport() {
 	reshapeViewMode();
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::determineViewPortBounderies() {
+void GLContextBase::determineViewPortBoundaries() {
 /////////////////////////////////////////////////////////////////
 	// ensure the right matrix
 	glMatrixMode(GL_MODELVIEW);
@@ -439,8 +569,8 @@ void GLContextBase::drawCoordinateOrigin() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawCrossHair(float x, float y, float z) {
 /////////////////////////////////////////////////////////////////
-	if ( isViewMode2D() ) {
-
+	if ( isViewMode2D() ) 
+	{
 		glLineStipple(2, 0xAAAA);
 		glEnable(GL_LINE_STIPPLE);
 		glColor3ub (255, 201, 14);
@@ -449,7 +579,8 @@ void GLContextBase::drawCrossHair(float x, float y, float z) {
 			// view the given position like a cross hair
 			// over the following planes
 			
-			switch ( viewMode ) {
+			switch ( viewMode ) 
+			{
 				case V2D_TOP:
 				case V2D_BOTTOM:
 							// xy plane
@@ -487,8 +618,9 @@ void GLContextBase::drawCrossHair(float x, float y, float z) {
 		glEnd();
 		glDisable(GL_LINE_STIPPLE);
 			
-	} else {
-		
+	}
+	else
+	{
 		glColor3ub (255, 201, 14);
 		glBegin(GL_LINES);
 
@@ -498,7 +630,6 @@ void GLContextBase::drawCrossHair(float x, float y, float z) {
 			glVertex3f(x, y, +1.0f);
 
 		glEnd();
-		
 	}
 }
 /////////////////////////////////////////////////////////////////
@@ -517,6 +648,46 @@ void GLContextBase::drawMovePosition(float x, float y, float z) {
 	const CncDimensions dim = isViewMode3D() ? CncDimension3D : CncDimension2D;
 	if ( options.showMillingCutter )  
 		drawMillingCutter(dim, x, y, z);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawAdditionalThings() {
+/////////////////////////////////////////////////////////////////
+	// draw additional things
+	/*
+	glPushMatrix();
+	
+		if ( options.showViewPortBoundaries == true )
+		{
+			determineViewPortBoundaries();
+			
+			if ( GL_COMMON_CHECK_ERROR > 0 )
+				return;
+		}
+			
+	glPopMatrix();
+	*/
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawFeedbackVertices() {
+/////////////////////////////////////////////////////////////////
+	if ( feedbackVertices.size() == 0 )
+		return;
+		
+	// ensure the right matrix
+	glMatrixMode(GL_MODELVIEW);
+	//glColor3f (1.0, 0.0, 0.0);
+	
+	// draw a point for each entry
+	glPassThrough(42.0);
+	glBegin(GL_POINTS);
+	
+		for ( auto it = feedbackVertices.begin(); it != feedbackVertices.end(); ++it)
+		{
+			const CncDoublePosition& p = (*it);
+			glVertex3f(p.getX(), p.getY(), p.getZ());
+		}
+		
+	glEnd();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawTeapot(void) {
@@ -608,8 +779,8 @@ void GLContextBase::determineCameraPosition() {
 	const float eye3DY = 5.0;
 	const float eye3DZ = 5.0;
 	
-	switch( viewMode ) {
-		
+	switch( viewMode )
+	{
 		// 2D views - static eye positions
 		case V2D_TOP:			cameraPos.setEyePos(    0.0,     0.0, +eye2DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_YTOP); break;
 		case V2D_BOTTOM:		cameraPos.setEyePos(    0.0,     0.0, -eye2DZ); cameraPos.setUpPos(GLI::CameraPosition::UpType::CUT_YTOP); break;
@@ -634,7 +805,8 @@ void GLContextBase::determineCameraPosition() {
 				   cameraPos.getCenterX(), cameraPos.getCenterY(), cameraPos.getCenterZ(),
 				   cameraPos.getUpX(),     cameraPos.getUpY(),     cameraPos.getUpZ());
 				   
-		if ( associatedCanvas != NULL && associatedCanvas->IsShownOnScreen() ) {
+		if ( associatedCanvas != NULL && associatedCanvas->IsShownOnScreen() )
+		{
 			if ( GL_COMMON_CHECK_ERROR > 0 )
 				std::cerr << CNC_LOG_FUNCT_A(": gluLookAt failed\n");
 		}
@@ -642,7 +814,7 @@ void GLContextBase::determineCameraPosition() {
 	glMatrixMode(GL_MODELVIEW);
 }
 /////////////////////////////////////////////////////////////////
-int GLContextBase::getLastReshapeX() { 
+int GLContextBase::getLastReshapeX() const { 
 /////////////////////////////////////////////////////////////////
 	if ( viewPort == NULL )
 		return 0;
@@ -650,12 +822,28 @@ int GLContextBase::getLastReshapeX() {
 	return viewPort->getCurrentOriginX(); 
 }
 /////////////////////////////////////////////////////////////////
-int GLContextBase::getLastReshapeY() { 
+int GLContextBase::getLastReshapeY() const {  
 /////////////////////////////////////////////////////////////////
 	if ( viewPort == NULL )
 		return 0;
 		
 	return viewPort->getCurrentOriginY(); 
+}
+/////////////////////////////////////////////////////////////////
+int GLContextBase::getCurrentWindowWidth() const { 
+/////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL )
+		return 0;
+		
+	return viewPort->getCurrentWindowWidth(); 
+}
+/////////////////////////////////////////////////////////////////
+int GLContextBase::getCurrentWindowHeight() const { 
+/////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL )
+		return 0;
+		
+	return viewPort->getCurrentWindowHeight(); 
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::reshape() {
@@ -685,6 +873,49 @@ void GLContextBase::reshapeRelative(int dx, int dy) {
 	const int py 	= getLastReshapeY() + dy;
 	
 	reshapeAbsolute(px, py);
+}
+//////////////////////////////////////////////////
+void GLContextBase::reshapePosToCenter(const CncLongBoundaries& box) {
+//////////////////////////////////////////////////
+	reshapePosToCenter
+	(
+		box.getCentre().getX(),
+		box.getCentre().getY()
+	);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::reshapeBestOrigion(const CncDoubleBoundaries& box) {
+/////////////////////////////////////////////////////////////////
+	const wxPoint o = determineBestOrigin(box);
+	reshapeAbsolute(o.x, o.y);
+}
+//////////////////////////////////////////////////
+void GLContextBase::reshapePosToCenter(const CncDoubleBoundaries& box) {
+//////////////////////////////////////////////////
+	GLdouble winX, winY, winZ;
+	
+	// ----------------------------------------------------------
+	auto evalWinPos = [&](GLdouble px, GLdouble py, GLdouble pz)
+	{
+		GLint		curGlViewport	[ 4];
+		GLdouble	curGlModelview	[16];
+		GLdouble	curGlProjection	[16];
+		
+		glGetDoublev ( GL_MODELVIEW_MATRIX,		curGlModelview  );
+		glGetDoublev ( GL_PROJECTION_MATRIX,	curGlProjection );
+		glGetIntegerv( GL_VIEWPORT,				curGlViewport   );
+		
+		gluProject(px, py, pz, curGlModelview, curGlProjection, curGlViewport, &winX, &winY, &winZ);
+	};
+	
+	evalWinPos
+	(
+		box.getCentre().getX(),
+		box.getCentre().getY(),
+		box.getCentre().getZ()
+	);
+	
+	reshapePosToCenter(winX, winY);
 }
 //////////////////////////////////////////////////
 void GLContextBase::reshapePosToCenter(int px, int py) {
@@ -740,6 +971,20 @@ void GLContextBase::reshapeViewMode() {
 	
 	determineViewPort(cs.GetWidth(), cs.GetHeight(), origin.x, origin.y);
 	determineProjection(cs.GetWidth(), cs.GetHeight());
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::reshapeCompleteVisible() {
+/////////////////////////////////////////////////////////////////
+	CncDoubleBoundaries b;
+	
+	if ( getBounderies(b) )
+		reshapeCompleteVisible(b);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::reshapeCompleteVisible(const CncDoubleBoundaries& box) {
+/////////////////////////////////////////////////////////////////
+	if ( box.hasBoundaries() )
+		makeCompleteVisible(box);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::setAutoScaling(bool as) {
@@ -800,6 +1045,9 @@ void GLContextBase::display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	wxASSERT ( viewPort != NULL );
 	
+	GLint renderMode;
+	glGetIntegerv(GL_RENDER_MODE, &renderMode);
+	
 	// first determine camera
 	determineCameraPosition();
 	
@@ -807,6 +1055,9 @@ void GLContextBase::display() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity(); 
 	
+		if ( GL_COMMON_CHECK_ERROR > 0 )
+			return;
+		
 		// scale
 		const float sf = getCurrentScaleFactor();
 		glScalef(sf, sf, sf);
@@ -822,50 +1073,52 @@ void GLContextBase::display() {
 		if ( GL_COMMON_CHECK_ERROR > 0 )
 			return;
 		
-		// draw the scene
-		determineModel();
-		if ( GL_COMMON_CHECK_ERROR > 0 ) 
-			return;
+		if ( renderMode == GL_RENDER )
+		{
+			// draw the scene
+			determineModel();
 			
-		// draw the crosshair or whatever defined
-		if ( options.showPosMarker ) {
-			markCurrentPosition();
+			if ( GL_COMMON_CHECK_ERROR > 0 ) 
+				return;
+		
+			// draw the cross-hair or whatever defined
+			if ( options.showPosMarker ) 
+			{
+				markCurrentPosition();
+				if ( GL_COMMON_CHECK_ERROR > 0 )
+					return;
+			}
+		
+			// draw coordinate origin, use a separate matrix to keep the size constant
+			glPushMatrix();
+				
+				if ( options.showOrigin == true )
+				{
+					drawCoordinateOrigin();
+					if ( GL_COMMON_CHECK_ERROR > 0 )
+						return;
+				}
+				
+			glPopMatrix();
+	
+			// draw mouse cross-hair
+			if ( currentMouseVertexInfo.valid == true )
+				drawMousePosition();
+		
 			if ( GL_COMMON_CHECK_ERROR > 0 )
 				return;
+			
+			// draw additional things
+			drawAdditionalThings();
+			
+			// for testing only
+			//drawFeedbackVertices();
+		}
+		else if ( renderMode == GL_FEEDBACK )
+		{
+			drawFeedbackVertices();
 		}
 		
-		// draw coordinate origin
-		glPushMatrix();
-			
-			if ( options.showOrigin == true ) {
-				drawCoordinateOrigin();
-				if ( GL_COMMON_CHECK_ERROR > 0 )
-					return;
-			}
-			
-		glPopMatrix();
-	
-		// draw mouse crosshair
-		if ( currentMouseVertexInfo.valid == true )
-			drawMousePosition();
-
-		if ( GL_COMMON_CHECK_ERROR > 0 )
-			return;
-			
-		// draw additional things
-		/*
-		glPushMatrix();
-		
-			if ( options.showViewPortBounderies == true ) {
-				determineViewPortBounderies();
-				
-				if ( GL_COMMON_CHECK_ERROR > 0 )
-					return;
-			}
-				
-		glPopMatrix();
-		*/
-	
 	glFlush();
 	GL_COMMON_CHECK_ERROR;
 }
@@ -951,7 +1204,8 @@ bool GLContextBase::convertWinCoordsToVertex(int winX, int winY, GLdouble& vecX,
 	
 	// try to evaluate the z part on demand if possible;
 	GLboolean dt; glGetBooleanv(GL_DEPTH_TEST, &dt);
-	if ( dt == GL_TRUE ) {
+	if ( dt == GL_TRUE ) 
+	{
 		glReadPixels(winX, (int)y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
 		GL_COMMON_CHECK_ERROR;
 	}
@@ -959,33 +1213,6 @@ bool GLContextBase::convertWinCoordsToVertex(int winX, int winY, GLdouble& vecX,
 	const bool ret = gluUnProject(x, y, z, curGlModelview, curGlProjection, curGlViewport, &vecX, &vecY, &vecZ) == GLU_TRUE;
 	vecZ *= -1;
 	return ret;
-}
-/////////////////////////////////////////////////////////////////
-bool GLContextBase::isVertexVisible(GLdouble px, GLdouble py, GLdouble pz) {
-/////////////////////////////////////////////////////////////////
-	if ( viewPort == NULL )
-		return false;
-		
-	if ( associatedCanvas == NULL )
-		return false;
-		
-	GLint		curGlViewport	[ 4];
-	GLdouble	curGlModelview	[16];
-	GLdouble	curGlProjection	[16];
-	
-	glGetDoublev ( GL_MODELVIEW_MATRIX,		curGlModelview  );
-	glGetDoublev ( GL_PROJECTION_MATRIX,	curGlProjection );
-	glGetIntegerv( GL_VIEWPORT,				curGlViewport   );
-	
-	GLdouble winX, winY, winZ;
-	gluProject(px, py, pz, curGlModelview, curGlProjection, curGlViewport, &winX, &winY, &winZ);
-	
-	const wxSize wSize = associatedCanvas->GetClientSize();
-	const int brd = 0;
-	const bool bx = px > brd && px < wSize.GetWidth()  - brd;
-	const bool by = py > brd && py < wSize.GetHeight() - brd;
-	
-	return bx && by;
 }
 /////////////////////////////////////////////////////////////////
 bool GLContextBase::keepVisible(GLdouble px, GLdouble py, GLdouble pz) {
@@ -1015,11 +1242,168 @@ bool GLContextBase::keepVisible(GLdouble px, GLdouble py, GLdouble pz) {
 		case FCM_ALWAYS_CENTRED:	reshapePosToCenter(winX, winY);
 									break;
 									
-		case  FCM_KEEP_IN_FRAME:
+		case FCM_KEEP_IN_FRAME:
 		default:					reshapePosToCenterIfOutOfFocus(winX, winY);
 	}
 	
 	return true;
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::isBoxVisible(const CncDoubleBoundaries& box) {
+/////////////////////////////////////////////////////////////////
+	// box has always already aligned to DispFact*3D
+	if ( viewPort == NULL )
+		return false;
+		
+	if ( associatedCanvas == NULL )
+		return false;
+	
+	const wxSize cs = associatedCanvas->GetClientSize();
+	
+	CncDoubleBoundaries::Corners corners;
+	box.getAllCorners(corners, CncDoubleBoundaries::CornerArea::CA_ALL);
+	
+	for ( auto it = corners.begin(); it != corners.end(); ++it )
+	{
+		const CncDoublePosition& pv = (*it);
+		const CncLongPosition pw(evaluateWindowCoordinates(pv));
+		
+		if ( pw.getX() < 0 || pw.getX() > cs.GetWidth() )
+			return false;
+			
+		if ( pw.getY() < 0 || pw.getY() > cs.GetHeight() )
+			return false;
+	}
+		
+	return true;
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::isVertexVisible(const CncDoublePosition& p) {
+/////////////////////////////////////////////////////////////////
+	return isVertexVisible(p.getX(), p.getY(), p.getZ());
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::isVertexVisible(GLdouble px, GLdouble py, GLdouble pz) {
+/////////////////////////////////////////////////////////////////
+	// box has always already aligned to DispFact*3D
+	if ( viewPort == NULL )
+		return false;
+		
+	if ( associatedCanvas == NULL )
+		return false;
+	
+	FeedbackBuffer fb(GL_3D, this);
+	
+	feedbackVertices.push_back(CncDoublePosition(px, py, pz));
+	display();
+	feedbackVertices.clear();
+	
+	fb.deactivate();
+	return fb.checkIfAllFeedbackPointsAreVisible();
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
+/////////////////////////////////////////////////////////////////
+	// box has always already aligned to DispFact*3D
+	
+	if ( viewPort == NULL )
+		return false;
+		
+	if ( associatedCanvas == NULL )
+		return false;
+		
+	// after a reshape always display
+	reshapeBestOrigion(box);
+	display();
+	
+	//traceBoundariesInfos(std::clog, box);
+	
+	// zoom in or out to the best shape to get corner 2 visible - if possible
+	bool result = isBoxVisible(box);
+	if ( result == false )
+	{
+		// try to zoom out 
+		while ( modelScale.canDecScale() )
+		{
+			reshape();
+			display();
+			
+			result = isBoxVisible(box);
+			if ( result == true )
+			{
+				break;
+			}
+			
+			const float stepWidth = modelScale.getScaleFactor() <= 1.0 ? modelScale.getStepWidth() / 8 : modelScale.getStepWidth();
+			modelScale.decScale(stepWidth);
+		}
+	
+		// the box can't scaled completely visible
+		if ( result == false )
+			;
+	}
+	else
+	{
+		// try to zoom in 
+		while ( modelScale.canIncScale() )
+		{
+			const float stepWidth = modelScale.getScaleFactor() <= 1.0 ? modelScale.getStepWidth() / 8 : modelScale.getStepWidth();
+			modelScale.incScale(stepWidth);
+			
+			reshape();
+			display();
+			
+			result = isBoxVisible(box);
+			if ( result == false )
+			{
+				modelScale.decScale(stepWidth);
+				break;
+			}
+		}
+	}
+
+	return true;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::traceBoundariesInfos(std::ostream& o, const CncDoubleBoundaries& box) {
+/////////////////////////////////////////////////////////////////
+	CncDoubleBoundaries::Corners corners;
+	box.getAllCorners(corners, CncDoubleBoundaries::CornerArea::CA_ALL);
+	
+	const wxSize cs = associatedCanvas->GetClientSize();
+	o << "Window w / h: " << cs.GetWidth() << " / " << cs.GetHeight() << std::endl;
+	
+	auto evalVisiblity = [cs](const CncLongPosition& p)
+	{
+		if ( p.getX() < 0 || p.getX() > cs.GetWidth() )
+			return false;
+			
+		if ( p.getY() < 0 || p.getY() > cs.GetHeight() )
+			return false;
+			
+		return true;
+	};	
+	
+	for ( auto it = corners.begin(); it != corners.end(); ++it )
+	{
+		const int distance = std::distance(corners.begin(), it);
+		const CncDoublePosition& pv = (*it);
+		const CncLongPosition pw(evaluateWindowCoordinates(pv));
+		
+		o	<< box.getCornerName(CncDoubleBoundaries::CornerArea::CA_ALL, distance) << ": "
+			<< std::fixed << std::setw(10) << std::setprecision(6) << std::setfill(' ')
+			<< pv
+			<< " --> winCoord: "
+			<< std::fixed << std::setw(10) << std::setfill(' ')
+			<< pw.getX() 
+			<< ", " 
+			<< std::fixed << std::setw(10) << std::setfill(' ')
+			<< pw.getY() 
+			<< " -> visible: " 
+			<< evalVisiblity(pw)
+			<< std::endl
+		;
+	}
 }
 /////////////////////////////////////////////////////////////////
 GLuint GLContextBase::LoadBMP(const wxImage& img) {
@@ -1078,7 +1462,8 @@ void GLContextBase::drawBox(GLfloat size, GLenum type) {
 	
 	glBindTexture(GL_TEXTURE_2D, theTexture);
 	
-	for (i = 5; i >= 0; i--) {
+	for (i = 5; i >= 0; i--)
+	{
 		glBegin(type);
 			glNormal3fv(&n[i][0]);
 			glTexCoord2f(0.0, 0.0); glVertex3fv(&v[faces[i][0]][0]);
@@ -1088,3 +1473,197 @@ void GLContextBase::drawBox(GLfloat size, GLenum type) {
 		glEnd();
 	}
 }
+
+
+
+/////////////////////////////////////////////////////////////////
+GLContextBase::FeedbackBuffer::FeedbackBuffer(GLenum t, GLContextBase* ctx)
+: type		(t)
+, context	(ctx)
+, size		(1024)
+, count		(0)
+, buffer	(new GLfloat[size])
+, prevMode	(-1)
+/////////////////////////////////////////////////////////////////
+{
+	glFeedbackBuffer(size, type, buffer);
+	activate();
+}
+/////////////////////////////////////////////////////////////////
+GLContextBase::FeedbackBuffer::~FeedbackBuffer() {
+/////////////////////////////////////////////////////////////////
+	deactivate();
+	delete buffer;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::FeedbackBuffer::activate() {
+/////////////////////////////////////////////////////////////////
+	glGetIntegerv(GL_RENDER_MODE, &prevMode);
+
+	if ( prevMode != GL_FEEDBACK)
+		glRenderMode(GL_FEEDBACK);
+	
+	count = 0;
+	
+	GL_COMMON_CHECK_ERROR;
+}
+/////////////////////////////////////////////////////////////////
+GLint GLContextBase::FeedbackBuffer::deactivate() {
+/////////////////////////////////////////////////////////////////
+	GLint mode;
+	glGetIntegerv(GL_RENDER_MODE, &mode);
+
+	if ( mode != GL_FEEDBACK )
+		return 0;
+	
+	GLint ret = 0;
+	
+	if ( prevMode > 0 )
+		ret = glRenderMode(prevMode);
+		
+	prevMode = -1;
+	
+	if ( GL_COMMON_CHECK_ERROR > 0 )
+		return 0;
+		
+	count = ret;
+	
+	if ( true )
+		//traceFeedbackBufferRaw(std::cout);
+		traceFeedbackBuffer(std::cout);
+	
+	return ret;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::FeedbackBuffer::traceFeedbackBufferRaw(std::ostream& out) {
+/////////////////////////////////////////////////////////////////
+	out << std::endl;
+	for ( GLint i = 0; i< count; i++ )
+	{
+		out << wxString::Format("% 4d: %4.2f\n", i, buffer[i]);
+	}
+	
+	out << std::endl;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::FeedbackBuffer::traceFeedbackBuffer(std::ostream& out) {
+/////////////////////////////////////////////////////////////////
+	// ----------------------------------------------------------
+	const int ENTRY_SIZE = getEntrySize();
+	auto printVertexInfo = [ENTRY_SIZE](std::ostream& o, GLint c, GLint& r, GLfloat *b)
+	{
+		o << "  ";
+		
+		for (int i = 0; i < ENTRY_SIZE; i++)
+		{
+			o << wxString::Format("%4.2f ", b[c - r]);
+			r--;
+		}
+		
+		o << std::endl;
+	};
+	
+	if ( count <= 0 )
+		return;
+	
+	// ----------------------------------------------------------
+	out << std::endl;
+	
+	GLint	rest = count;
+	while ( rest > 0 ) 
+	{
+		out << wxString::Format("%04d > ", count - rest);
+		const GLfloat token = buffer[count - rest]; 
+		
+		rest--;
+		
+		if ( token == GL_PASS_THROUGH_TOKEN )
+		{
+			out << "GL_PASS_THROUGH_TOKEN " << wxString::Format("  %4.2f\n", buffer[count - rest]);
+			rest--;
+		}
+		else if ( token == GL_POINT_TOKEN )
+		{
+			out << "GL_POINT_TOKEN\n";
+			printVertexInfo (out, count, rest, buffer);
+		}
+		else if ( token == GL_LINE_TOKEN ) 
+		{
+			out << "GL_LINE_TOKEN\n";
+			printVertexInfo (out, count, rest, buffer);
+			printVertexInfo (out, count, rest, buffer);
+		}
+		else if ( token == GL_LINE_RESET_TOKEN )
+		{
+			out << "GL_LINE_RESET_TOKEN\n";
+			printVertexInfo (out, count, rest, buffer);
+			printVertexInfo (out, count, rest, buffer);
+		}
+	}
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::FeedbackBuffer::checkIfAllFeedbackPointsAreVisible() {
+/////////////////////////////////////////////////////////////////
+	// An empty buffer never contains any visible point
+	if ( count == 0 )
+		return false;
+	
+	if ( context == NULL )
+		return false;
+	
+	if ( false )
+	{
+		std::cout	<< "XYWH: " 
+					<< context->getLastReshapeX()			<< ", " 
+					<< context->getLastReshapeY()			<< ", " 
+					<< context->getCurrentWindowWidth()		<< ", " 
+					<< context->getCurrentWindowHeight()	<< std::endl
+		; 
+	}
+	
+	const int	ENTRY_SIZE		= getEntrySize();
+	int			pointCounter	= 0;
+	GLint		rest			= count;
+	
+	// over all feedback buffer entries
+	while ( rest >= 0 ) 
+	{
+		const GLfloat token = buffer[ count - rest ]; 
+		rest--;
+		
+		if ( token == GL_POINT_TOKEN )
+		{
+			pointCounter++;
+			
+			float x = -1.0, y = -1.0;//, z;
+			for ( int i = 0; i < ENTRY_SIZE; i++ ) 
+			{
+				switch ( i )
+				{
+					case 0: x = buffer[count - rest]; break;
+					case 1: y = buffer[count - rest]; break;
+					//case 2: z = buffer[count - rest]; break;
+				}
+				
+				rest--;
+			}
+			
+			// x, y, z are delivered in window coordinates (feedback buffer standard)
+			// check if x and y outside the current available window frame
+			// if true the the current point was clipped (not visible)
+			if ( x < float(0) )									return false;
+			if ( x > float(context->getCurrentWindowWidth()) )	return false;
+			
+			if ( y < float(0) )									return false;
+			if ( y > float(context->getCurrentWindowHeight()) )	return false;
+		}
+		else if ( token == GL_PASS_THROUGH_TOKEN )	{ rest = rest - 1;				}
+		else if ( token == GL_LINE_TOKEN )			{ rest = rest - 2 * ENTRY_SIZE;	}
+		else if ( token == GL_LINE_RESET_TOKEN )	{ rest = rest - 2 * ENTRY_SIZE;	}
+	}
+	
+	// It's also an error if no point found
+	return pointCounter > 0;
+}
+
+

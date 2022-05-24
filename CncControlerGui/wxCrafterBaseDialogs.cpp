@@ -862,9 +862,11 @@ CncAutoProgressDialogBase::CncAutoProgressDialogBase(wxWindow* parent,
     flexGridSizer79->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer79->AddGrowableCol(0);
     flexGridSizer79->AddGrowableRow(0);
+    flexGridSizer79->AddGrowableRow(1);
+    flexGridSizer79->AddGrowableRow(2);
     this->SetSizer(flexGridSizer79);
 
-    m_context = new wxTextCtrl(this, wxID_ANY, wxT("Progress . . ."), wxDefaultPosition,
+    m_context = new wxTextCtrl(this, wxID_ANY, wxT("Progress . . . ,,,,,,,,äääääääääääääää"), wxDefaultPosition,
         wxDLG_UNIT(this, wxSize(-1, -1)), wxTE_READONLY | wxTE_CENTRE | wxBORDER_NONE);
     m_context->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
 #if wxVERSION_NUMBER >= 3000
@@ -1602,4 +1604,407 @@ CncPositionStorageViewBase::~CncPositionStorageViewBase()
 
     m_activationTimer->Stop();
     wxDELETE(m_activationTimer);
+}
+
+CncSimuHwDimensionSetupBase::CncSimuHwDimensionSetupBase(wxWindow* parent,
+    wxWindowID id,
+    const wxString& title,
+    const wxPoint& pos,
+    const wxSize& size,
+    long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if(!bBitmapLoaded) {
+	// We need to initialise the default bitmap handler
+	wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+	wxC3105InitBitmapResources();
+	bBitmapLoaded = true;
+    }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+	wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("hardwarebox"));
+	wxIcon icn;
+	icn.CopyFromBitmap(iconBmp);
+	app_icons.AddIcon(icn);
+    }
+    SetIcons(app_icons);
+
+    wxFlexGridSizer* flexGridSizer269 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer269->SetFlexibleDirection(wxBOTH);
+    flexGridSizer269->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer269->AddGrowableCol(0);
+    flexGridSizer269->AddGrowableRow(0);
+    flexGridSizer269->SetMinSize(500, 360);
+    this->SetSizer(flexGridSizer269);
+
+    m_lbContext = new wxListbook(
+        this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxLB_DEFAULT | wxBK_DEFAULT);
+    m_lbContext->SetName(wxT("m_lbContext"));
+    wxImageList* m_lbContext_il = new wxImageList(16, 16);
+    m_lbContext->AssignImageList(m_lbContext_il);
+
+    flexGridSizer269->Add(m_lbContext, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_panel271 =
+        new wxPanel(m_lbContext, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_lbContext, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+    int m_panel271ImgIndex;
+    m_panel271ImgIndex = m_lbContext_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("asm")));
+    m_lbContext->AddPage(m_panel271, _("Max\nDimension"), false, m_panel271ImgIndex);
+
+    wxFlexGridSizer* flexGridSizer280 = new wxFlexGridSizer(4, 1, 0, 0);
+    flexGridSizer280->SetFlexibleDirection(wxBOTH);
+    flexGridSizer280->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    m_panel271->SetSizer(flexGridSizer280);
+
+    m_staticText298 = new wxStaticText(m_panel271, wxID_ANY, _("Define max hardware dimentions:"), wxDefaultPosition,
+        wxDLG_UNIT(m_panel271, wxSize(-1, -1)), 0);
+    wxFont m_staticText298Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText298->SetFont(m_staticText298Font);
+
+    flexGridSizer280->Add(m_staticText298, 0, wxALL, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer281 = new wxFlexGridSizer(0, 4, 0, 0);
+    flexGridSizer281->SetFlexibleDirection(wxBOTH);
+    flexGridSizer281->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer280->Add(flexGridSizer281, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_stMaxDimX = new wxStaticText(
+        m_panel271, wxID_ANY, _("Max dimension X Axis:"), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), 0);
+
+    flexGridSizer281->Add(m_stMaxDimX, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_tcMaxDimX = new wxTextCtrl(
+        m_panel271, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), wxTE_RIGHT);
+#if wxVERSION_NUMBER >= 3000
+    m_tcMaxDimX->SetHint(wxT(""));
+#endif
+
+    flexGridSizer281->Add(m_tcMaxDimX, 0, wxALL, WXC_FROM_DIP(1));
+
+    m_stMaxDimUnixX =
+        new wxStaticText(m_panel271, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), 0);
+
+    flexGridSizer281->Add(m_stMaxDimUnixX, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_btCpXFromConfig = new wxBitmapButton(m_panel271, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-cog")),
+        wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btCpXFromConfig->SetToolTip(_("Take over from configuration"));
+
+    flexGridSizer281->Add(m_btCpXFromConfig, 0, wxALL, WXC_FROM_DIP(1));
+
+    wxFlexGridSizer* flexGridSizer2812xxx = new wxFlexGridSizer(0, 4, 0, 0);
+    flexGridSizer2812xxx->SetFlexibleDirection(wxBOTH);
+    flexGridSizer2812xxx->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer280->Add(flexGridSizer2812xxx, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_stMaxDimY = new wxStaticText(
+        m_panel271, wxID_ANY, _("Max dimension Y Axis:"), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), 0);
+
+    flexGridSizer2812xxx->Add(m_stMaxDimY, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_tcMaxDimY = new wxTextCtrl(
+        m_panel271, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), wxTE_RIGHT);
+#if wxVERSION_NUMBER >= 3000
+    m_tcMaxDimY->SetHint(wxT(""));
+#endif
+
+    flexGridSizer2812xxx->Add(m_tcMaxDimY, 0, wxALL, WXC_FROM_DIP(1));
+
+    m_stMaxDimUnixXY =
+        new wxStaticText(m_panel271, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), 0);
+
+    flexGridSizer2812xxx->Add(m_stMaxDimUnixXY, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_btCpYFromConfig = new wxBitmapButton(m_panel271, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-cog")),
+        wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btCpYFromConfig->SetToolTip(_("Take over from configuration"));
+
+    flexGridSizer2812xxx->Add(m_btCpYFromConfig, 0, wxALL, WXC_FROM_DIP(1));
+
+    wxFlexGridSizer* flexGridSizer28126 = new wxFlexGridSizer(0, 4, 0, 0);
+    flexGridSizer28126->SetFlexibleDirection(wxBOTH);
+    flexGridSizer28126->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer280->Add(flexGridSizer28126, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_stMaxDimZ = new wxStaticText(
+        m_panel271, wxID_ANY, _("Max dimension Z Axis:"), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), 0);
+
+    flexGridSizer28126->Add(m_stMaxDimZ, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_tcMaxDimZ = new wxTextCtrl(
+        m_panel271, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), wxTE_RIGHT);
+#if wxVERSION_NUMBER >= 3000
+    m_tcMaxDimZ->SetHint(wxT(""));
+#endif
+
+    flexGridSizer28126->Add(m_tcMaxDimZ, 0, wxALL, WXC_FROM_DIP(1));
+
+    m_stMaxDimUnixZ =
+        new wxStaticText(m_panel271, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), 0);
+
+    flexGridSizer28126->Add(m_stMaxDimUnixZ, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_btCpZFromConfig = new wxBitmapButton(m_panel271, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-cog")),
+        wxDefaultPosition, wxDLG_UNIT(m_panel271, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btCpZFromConfig->SetToolTip(_("Take over from configuration"));
+
+    flexGridSizer28126->Add(m_btCpZFromConfig, 0, wxALL, WXC_FROM_DIP(1));
+
+    m_panel272 =
+        new wxPanel(m_lbContext, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_lbContext, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+    int m_panel272ImgIndex;
+    m_panel272ImgIndex = m_lbContext_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("abb-import")));
+    m_lbContext->AddPage(m_panel272, _("Hwardare\nReference"), true, m_panel272ImgIndex);
+
+    wxFlexGridSizer* flexGridSizer299 = new wxFlexGridSizer(6, 1, 0, 0);
+    flexGridSizer299->SetFlexibleDirection(wxBOTH);
+    flexGridSizer299->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    m_panel272->SetSizer(flexGridSizer299);
+
+    m_staticText2981 = new wxStaticText(m_panel272, wxID_ANY,
+        _("Define hardware reference position\n-relative to the current origin:"), wxDefaultPosition,
+        wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+    wxFont m_staticText2981Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText2981->SetFont(m_staticText2981Font);
+
+    flexGridSizer299->Add(m_staticText2981, 0, wxALL, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer2812 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer2812->SetFlexibleDirection(wxBOTH);
+    flexGridSizer2812->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer299->Add(flexGridSizer2812, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_stRefPosOffsetX = new wxStaticText(
+        m_panel272, wxID_ANY, _("Offset X Axis:"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+
+    flexGridSizer2812->Add(m_stRefPosOffsetX, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_tcRefPosOffsetX = new wxTextCtrl(
+        m_panel272, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxTE_RIGHT);
+#if wxVERSION_NUMBER >= 3000
+    m_tcRefPosOffsetX->SetHint(wxT(""));
+#endif
+
+    flexGridSizer2812->Add(m_tcRefPosOffsetX, 0, wxALL, WXC_FROM_DIP(1));
+
+    m_stRefPosOffsetUnitX =
+        new wxStaticText(m_panel272, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+
+    flexGridSizer2812->Add(m_stRefPosOffsetUnitX, 0, wxALL, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer28127 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer28127->SetFlexibleDirection(wxBOTH);
+    flexGridSizer28127->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer299->Add(flexGridSizer28127, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_stRefPosOffsetY = new wxStaticText(
+        m_panel272, wxID_ANY, _("Offset Y Axis:"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+
+    flexGridSizer28127->Add(m_stRefPosOffsetY, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_tcRefPosOffsetY = new wxTextCtrl(
+        m_panel272, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxTE_RIGHT);
+#if wxVERSION_NUMBER >= 3000
+    m_tcRefPosOffsetY->SetHint(wxT(""));
+#endif
+
+    flexGridSizer28127->Add(m_tcRefPosOffsetY, 0, wxALL, WXC_FROM_DIP(1));
+
+    m_stRefPosOffsetUnitY =
+        new wxStaticText(m_panel272, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+
+    flexGridSizer28127->Add(m_stRefPosOffsetUnitY, 0, wxALL, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer281211 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer281211->SetFlexibleDirection(wxBOTH);
+    flexGridSizer281211->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer299->Add(flexGridSizer281211, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_stRefPosOffsetZ = new wxStaticText(
+        m_panel272, wxID_ANY, _("Offset Z Axis:"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+
+    flexGridSizer281211->Add(m_stRefPosOffsetZ, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_tcRefPosOffsetZ = new wxTextCtrl(
+        m_panel272, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxTE_RIGHT);
+#if wxVERSION_NUMBER >= 3000
+    m_tcRefPosOffsetZ->SetHint(wxT(""));
+#endif
+
+    flexGridSizer281211->Add(m_tcRefPosOffsetZ, 0, wxALL, WXC_FROM_DIP(1));
+
+    m_stRefPosOffsetUnitZ =
+        new wxStaticText(m_panel272, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+
+    flexGridSizer281211->Add(m_stRefPosOffsetUnitZ, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_staticLine324 = new wxStaticLine(
+        m_panel272, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer299->Add(m_staticLine324, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    wxFlexGridSizer* flexGridSizer332 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer332->SetFlexibleDirection(wxBOTH);
+    flexGridSizer332->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer299->Add(flexGridSizer332, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_staticText343 = new wxStaticText(
+        m_panel272, wxID_ANY, _("Default Setups:"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+    wxFont m_staticText343Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText343->SetFont(m_staticText343Font);
+
+    flexGridSizer332->Add(m_staticText343, 0, wxALL, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer325 = new wxFlexGridSizer(1, 6, 0, 0);
+    flexGridSizer325->SetFlexibleDirection(wxBOTH);
+    flexGridSizer325->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer332->Add(flexGridSizer325, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_staticText331 = new wxStaticText(
+        m_panel272, wxID_ANY, _("XY Default:"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(70, -1)), 0);
+
+    flexGridSizer325->Add(m_staticText331, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_btRefCentered = new wxBitmapButton(m_panel272, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("centered")),
+        wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btRefCentered->SetToolTip(_("centered"));
+
+    flexGridSizer325->Add(m_btRefCentered, 0, wxALL, WXC_FROM_DIP(2));
+
+    m_btRefSector1 = new wxBitmapButton(m_panel272, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("sector1")),
+        wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btRefSector1->SetToolTip(_("Xmin, Ymin"));
+
+    flexGridSizer325->Add(m_btRefSector1, 0, wxALL, WXC_FROM_DIP(2));
+
+    m_btRefSector2 = new wxBitmapButton(m_panel272, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("sector2")),
+        wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btRefSector2->SetToolTip(_("Xmax, Ymin"));
+
+    flexGridSizer325->Add(m_btRefSector2, 0, wxALL, WXC_FROM_DIP(2));
+
+    m_btRefSector4 = new wxBitmapButton(m_panel272, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("sector4")),
+        wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btRefSector4->SetToolTip(_("Xmax, Ymax"));
+
+    flexGridSizer325->Add(m_btRefSector4, 0, wxALL, WXC_FROM_DIP(2));
+
+    m_btRefSector3 = new wxBitmapButton(m_panel272, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("sector3")),
+        wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btRefSector3->SetToolTip(_("Xmin, Ymax"));
+
+    flexGridSizer325->Add(m_btRefSector3, 0, wxALL, WXC_FROM_DIP(2));
+
+    wxFlexGridSizer* flexGridSizer333 = new wxFlexGridSizer(1, 4, 0, 0);
+    flexGridSizer333->SetFlexibleDirection(wxBOTH);
+    flexGridSizer333->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer332->Add(flexGridSizer333, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_staticText341 = new wxStaticText(
+        m_panel272, wxID_ANY, _("Z Default:"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(70, -1)), 0);
+
+    flexGridSizer333->Add(m_staticText341, 0, wxALL, WXC_FROM_DIP(5));
+
+    wxArrayString m_cbDefaultZArr;
+    m_cbDefaultZArr.Add(_("bottom"));
+    m_cbDefaultZArr.Add(_("centre"));
+    m_cbDefaultZArr.Add(_("top"));
+    m_cbDefaultZ = new wxComboBox(
+        m_panel272, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), m_cbDefaultZArr, 0);
+#if wxVERSION_NUMBER >= 3000
+    m_cbDefaultZ->SetHint(wxT(""));
+#endif
+    m_cbDefaultZ->SetSelection(2);
+
+    flexGridSizer333->Add(m_cbDefaultZ, 0, wxALL, WXC_FROM_DIP(2));
+
+    m_staticLine279 =
+        new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer269->Add(m_staticLine279, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer273 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer273->SetFlexibleDirection(wxBOTH);
+    flexGridSizer273->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer269->Add(flexGridSizer273, 1, wxALL | wxEXPAND | wxALIGN_RIGHT, WXC_FROM_DIP(1));
+
+    m_btCancel = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
+
+    flexGridSizer273->Add(m_btCancel, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_btOk = new wxButton(this, wxID_ANY, _("OK"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
+
+    flexGridSizer273->Add(m_btOk, 0, wxALL, WXC_FROM_DIP(5));
+
+    SetName(wxT("CncSimuHwDimensionSetupBase"));
+    SetMinClientSize(wxSize(500, 360));
+    SetSize(wxDLG_UNIT(this, wxSize(-1, -1)));
+    if(GetSizer()) {
+	GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+	CentreOnParent(wxBOTH);
+    } else {
+	CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    this->Bind(wxEVT_INIT_DIALOG, &CncSimuHwDimensionSetupBase::onInitDialog, this);
+    this->Bind(wxEVT_CLOSE_WINDOW, &CncSimuHwDimensionSetupBase::onCloseWindow, this);
+    m_tcMaxDimX->Bind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_btCpXFromConfig->Bind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onTakeOverFromConfigMaxDimX, this);
+    m_tcMaxDimY->Bind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_btCpYFromConfig->Bind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onTakeOverFromConfigMaxDimY, this);
+    m_tcMaxDimZ->Bind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_btCpZFromConfig->Bind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onTakeOverFromConfigMaxDimZ, this);
+    m_tcRefPosOffsetX->Bind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_tcRefPosOffsetY->Bind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_tcRefPosOffsetZ->Bind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_btRefCentered->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefCentered, this);
+    m_btRefSector1->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefSector1, this);
+    m_btRefSector2->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefSector2, this);
+    m_btRefSector4->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefSector4, this);
+    m_btRefSector3->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefSector3, this);
+    m_cbDefaultZ->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &CncSimuHwDimensionSetupBase::onSelectZLocation, this);
+    m_btCancel->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onCancel, this);
+    m_btOk->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onOk, this);
+}
+
+CncSimuHwDimensionSetupBase::~CncSimuHwDimensionSetupBase()
+{
+    this->Unbind(wxEVT_INIT_DIALOG, &CncSimuHwDimensionSetupBase::onInitDialog, this);
+    this->Unbind(wxEVT_CLOSE_WINDOW, &CncSimuHwDimensionSetupBase::onCloseWindow, this);
+    m_tcMaxDimX->Unbind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_btCpXFromConfig->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onTakeOverFromConfigMaxDimX, this);
+    m_tcMaxDimY->Unbind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_btCpYFromConfig->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onTakeOverFromConfigMaxDimY, this);
+    m_tcMaxDimZ->Unbind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_btCpZFromConfig->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onTakeOverFromConfigMaxDimZ, this);
+    m_tcRefPosOffsetX->Unbind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_tcRefPosOffsetY->Unbind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_tcRefPosOffsetZ->Unbind(wxEVT_COMMAND_TEXT_UPDATED, &CncSimuHwDimensionSetupBase::onUpdateTextValues, this);
+    m_btRefCentered->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefCentered, this);
+    m_btRefSector1->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefSector1, this);
+    m_btRefSector2->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefSector2, this);
+    m_btRefSector4->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefSector4, this);
+    m_btRefSector3->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onRefSector3, this);
+    m_cbDefaultZ->Unbind(wxEVT_COMMAND_COMBOBOX_SELECTED, &CncSimuHwDimensionSetupBase::onSelectZLocation, this);
+    m_btCancel->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onCancel, this);
+    m_btOk->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncSimuHwDimensionSetupBase::onOk, this);
 }

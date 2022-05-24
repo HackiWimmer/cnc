@@ -9,6 +9,7 @@
 #include "CncContext.h"
 #include "CncConfig.h"
 #include "CncCommon.h"
+#include "CncBoundarySpace.h"
 #include "MainFrame.h"
 #include "GlobalStrings.h"
 #include "CncMotionMonitor.h"
@@ -171,9 +172,9 @@ void CncMotionMonitor::createRuler(const GLContextBase::ModelType mt) {
 	monitor->getRulerZ().clear();
 
 	// setup
-	const double dimX = THE_CONFIG->getMaxDimensionX();
-	const double dimY = THE_CONFIG->getMaxDimensionY();
-	const double dimZ = THE_CONFIG->getMaxDimensionZ();
+	const double dimX = THE_BOUNDS->getMaxDimensionMetricX();
+	const double dimY = THE_BOUNDS->getMaxDimensionMetricY();
+	const double dimZ = THE_BOUNDS->getMaxDimensionMetricZ();
 	
 	CncMetricRulerSetup mrs;
 	
@@ -290,7 +291,8 @@ void CncMotionMonitor::appendVertex(long id, CncSpeedMode sm, float x, float y, 
 //////////////////////////////////////////////////
 	static GLOpenGLPathBuffer::CncVertex vertex;
 
-	if ( activateContext(monitor, true) == true ) {
+	if ( activateContext(monitor, true) == true ) 
+	{
 		const char sc = cnc::getCncSpeedTypeAsCharacter(sm);
 		monitor->appendPathData(vertex.set(sc, id, x, y, z)); 
 	}
@@ -369,7 +371,7 @@ void CncMotionMonitor::performMouseCoordAndToolTip() {
 //////////////////////////////////////////////////
 	GLContextBase::MouseVertexInfo mvi = context->getCurrentMouseVertexInfo();
 	
-	const double maxDim = THE_CONFIG->getMaxDimension();
+	const double maxDim = THE_BOUNDS->getMaxDimensionMetric();
 	
 	const double tx		= mvi.getAsMetricX(1.0);
 	const double ty		= mvi.getAsMetricY(1.0);
@@ -447,6 +449,14 @@ void CncMotionMonitor::onKeyDown(int keyCode) {
 							onPaint();
 							break;
 							
+		case 'W':			makeWorkingSpaceVisible();
+							onPaint();
+							break;
+							
+		case 'H':			makeHardwareSpaceVisible();
+							onPaint();
+							break;
+
 		case '0':			monitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_OFF);
 							onPaint();
 							break;
@@ -633,4 +643,46 @@ void CncMotionMonitor::onLongPress(wxLongPressEvent& event) {
 void CncMotionMonitor::onPressAndTap(wxPressAndTapEvent& event) {
 //////////////////////////////////////////////////
 	// currently only implemented to disable all gesture events
+}
+//////////////////////////////////////////////////
+bool CncMotionMonitor::makeCompleteVisible(const CncDoubleBoundaries& box) { 
+//////////////////////////////////////////////////
+	const bool ret = monitor->makeCompleteVisible(box); 
+	onPaint();
+	
+	return ret;
+}
+//////////////////////////////////////////////////
+bool CncMotionMonitor::makeWorkingSpaceVisible() {
+//////////////////////////////////////////////////
+	CncDoubleBoundaries b(THE_BOUNDS->getLogicallyBoundaries());
+	b.multiply(
+		THE_CONFIG->getCalculationFactX(), 
+		THE_CONFIG->getCalculationFactY(), 
+		THE_CONFIG->getCalculationFactZ()
+	);
+	b.divide(
+		THE_CONFIG->getDispFactX3D(), 
+		THE_CONFIG->getDispFactY3D(), 
+		THE_CONFIG->getDispFactZ3D()
+	);
+
+	return makeCompleteVisible(b);
+}
+//////////////////////////////////////////////////
+bool CncMotionMonitor::makeHardwareSpaceVisible() {
+//////////////////////////////////////////////////
+	CncDoubleBoundaries b(THE_BOUNDS->getPhysicallyBoundaries());
+	b.multiply(
+		THE_CONFIG->getCalculationFactX(), 
+		THE_CONFIG->getCalculationFactY(), 
+		THE_CONFIG->getCalculationFactZ()
+	);
+	b.divide(
+		THE_CONFIG->getDispFactX3D(), 
+		THE_CONFIG->getDispFactY3D(), 
+		THE_CONFIG->getDispFactZ3D()
+	);
+
+	return makeCompleteVisible(b);
 }
