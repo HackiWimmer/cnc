@@ -2001,9 +2001,19 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
 
     flexGridSizer316->Add(m_staticLine32511, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
+    m_3D_Trace = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26, 26)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_3D_Trace->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-information (2)")), wxLEFT);
+    m_3D_Trace->SetBitmapMargins(2, 2);
+#endif
+    m_3D_Trace->SetToolTip(_("Normalize view"));
+
+    flexGridSizer316->Add(m_3D_Trace, 0, wxALL, WXC_FROM_DIP(1));
+    m_3D_Trace->SetMinSize(wxSize(26, 26));
+
     m_3D_Reset = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26, 26)), 0);
 #if wxVERSION_NUMBER >= 2904
-    m_3D_Reset->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_reload")), wxLEFT);
+    m_3D_Reset->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("zoom-fit-best-4")), wxLEFT);
     m_3D_Reset->SetBitmapMargins(2, 2);
 #endif
     m_3D_Reset->SetToolTip(_("Normalize view"));
@@ -2146,6 +2156,7 @@ GL3DDrawPaneBase::GL3DDrawPaneBase(wxWindow* parent, wxWindowID id, const wxPoin
     m_btnRefresh->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onRefreshMonitor, this);
     m_btnClear->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onClearMonitor, this);
     m_optionDlg->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleOptionPane, this);
+    m_3D_Trace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onTraceInformation, this);
     m_3D_Reset->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onResetView, this);
     m_3D_Top->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onShowFromTop, this);
     m_3D_Bottom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onShowFromBottom, this);
@@ -2174,6 +2185,7 @@ GL3DDrawPaneBase::~GL3DDrawPaneBase()
     m_btnRefresh->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onRefreshMonitor, this);
     m_btnClear->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onClearMonitor, this);
     m_optionDlg->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onToggleOptionPane, this);
+    m_3D_Trace->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onTraceInformation, this);
     m_3D_Reset->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onResetView, this);
     m_3D_Top->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onShowFromTop, this);
     m_3D_Bottom->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &GL3DDrawPaneBase::onShowFromBottom, this);

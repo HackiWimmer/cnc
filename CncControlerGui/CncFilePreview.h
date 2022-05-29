@@ -3,6 +3,7 @@
 
 #include "3D/CncGCodePreview.h"
 #include "CncSvgControl.h"
+#include "CncPosition.h"
 #include "wxCrafterFileView.h"
 
 class CncFilePreview : public CncFilePreviewBase
@@ -23,6 +24,7 @@ class CncFilePreview : public CncFilePreviewBase
 		friend class CncFilePreviewWnd;
 		
 	private:
+		CncTemplateFormat	tplFormat;
 		CncGCodePreview* 	gcodePreview;
 		CncSvgViewer* 		svgPreview;
 		wxString			previewName;
@@ -52,6 +54,8 @@ class CncFilePreview : public CncFilePreviewBase
 		const char* getErrorHtmlPage(const wxString& errorInfo);
 		
 		void activate3DPerspectiveButton(wxButton* bt);
+		
+		bool evaluateMetricBoundaries() const;
 };
 
 #endif // CNCFILEPREVIEW_H

@@ -5142,7 +5142,6 @@ bool MainFrame::processTemplateIntern() {
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() )
 	{
-		
 		case TplBinary:
 			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
@@ -7075,6 +7074,12 @@ void MainFrame::rcRun() {
 		if ( THE_CONTEXT->secureModeInfo.isActive == false ) 
 			perspectiveHandler.ensureRunPerspectiveMinimal();
 	}
+	
+	
+	// if template boundaries available prepare the motion monitor 
+	// to the best size (scale) and origin placement
+	if ( THE_TPL_CTX->getBoundaries().hasBoundaries() ) 
+		motionMonitor->makeCompleteVisibleMetric(THE_TPL_CTX->getBoundaries());
 	
 	// process
 	CNC_CLOG_A("")

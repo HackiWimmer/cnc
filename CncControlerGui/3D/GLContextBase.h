@@ -203,7 +203,7 @@ class GLContextBase : public wxGLContext {
 		void resetViewport();
 		
 		virtual float getMaxScaleFactor();
-		virtual float getCurrentScaleFactor();
+		virtual float getCurrentScaleFactor() const;
 
 		// view mode
 		void setViewMode(GLContextBase::ViewMode newMode, bool force=false);
@@ -268,6 +268,7 @@ class GLContextBase : public wxGLContext {
 		void setSpindlePowerState(CncSpindlePowerState state);
 		
 		virtual bool getBounderies(CncDoubleBoundaries& ret) const;
+		virtual std::ostream& traceInformation(std::ostream& o) const;
 		
 	protected:
 		
@@ -361,8 +362,6 @@ class GLContextBase : public wxGLContext {
 		
 		CncSpindlePowerState	spindlePowerState;
 		
-		virtual float getAutoScaleFactor() { return 1.0; }
-		
 		virtual void drawMousePosition();
 		virtual void drawMovePosition(float x, float y, float z);
 		virtual void drawCrossHair(float x, float y, float z);
@@ -406,7 +405,7 @@ class GLContextBase : public wxGLContext {
 		
 		wxPoint determineBestOrigin(const CncDoubleBoundaries& b);
 		
-		void traceBoundariesInfos(std::ostream& o, const CncDoubleBoundaries& box);
+		void traceBoundariesInfos(std::ostream& o, const CncDoubleBoundaries& box) const;
 		
 	private:
 		

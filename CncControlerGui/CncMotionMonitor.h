@@ -61,6 +61,9 @@ class CncMotionMonitor : public CncGlCanvas
 		CncMotionMonitor(wxWindow *parent, int *attribList = NULL);
 		virtual ~CncMotionMonitor();
 		
+		std::ostream& traceInformation(std::ostream& o) const;
+		void traceInformation();
+		
 		virtual bool Show(bool show);
 		virtual void update(bool force=false);
 		
@@ -168,7 +171,7 @@ class CncMotionMonitor : public CncGlCanvas
 		
 		bool makeHardwareSpaceVisible();
 		bool makeWorkingSpaceVisible();
-		bool makeCompleteVisible(const CncDoubleBoundaries& box);
+		bool makeCompleteVisibleMetric(const CncDoubleBoundaries& box);
 		
 	protected:
 		GLContextCncPathBase* 		monitor;
@@ -198,6 +201,8 @@ class CncMotionMonitor : public CncGlCanvas
 		void onPressAndTap(wxPressAndTapEvent& event);
 		
 		void performMouseCoordAndToolTip();
+		
+		bool makeCompleteVisible(const CncDoubleBoundaries& box);
 		
 	private:
 		

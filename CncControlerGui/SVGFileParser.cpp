@@ -242,30 +242,10 @@ bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) 
 	return svgUserAgent.addPathElement(c, count, values);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::determineUnit(const wxString& uw, const wxString& uh, Unit& u) {
-//////////////////////////////////////////////////////////////////
-	Unit unitW = Unit::px; 
-	Unit unitH = Unit::px; 
-
-	if ( CncUnitCalculatorBase::determineUnit(uw, unitW) == false )
-		return false;
-		
-	if ( CncUnitCalculatorBase::determineUnit(uh, unitH) == false )
-		return false;
-		
-	if ( unitW == unitH ) {
-		u = unitH;
-		return true;
-	}
-		
-	std::cerr << "unitW(" << unitW << ") != unitH(" << unitH << ")" << std::endl;
-	return false;
-}
-//////////////////////////////////////////////////////////////////
 bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const wxString& vb) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
-	
+	/*
 	double width=0, height=0;
 	wxString s, unitW, unitH;
 	int sPos = -1;
@@ -311,8 +291,10 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 	Unit unit;
 	if ( determineUnit(unitW, unitH, unit) == false )
 		return false;
-	
+		
 	SVGRootNode svgRootNode(width, height, unit, vb);
+	*/
+	SVGRootNode svgRootNode = evaluateSVGRootNode(w, h, vb);
 	
 	std::stringstream ss; ss << svgRootNode;
 	APP_PROXY::GetSvgRootNode()->ChangeValue(ss.str());
@@ -1039,4 +1021,116 @@ void SVGFileParser::evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm)
 void SVGFileParser::initNextPath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
 	svgUserAgent.initNextPath(pathHandler->getSvgCncContext(), data);
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::evaluateMetricSize(const wxString& fileName, CncXYDoubleDimension& size) {
+//////////////////////////////////////////////////////////////////
+	size.reset();
+	
+	wxXmlDocument doc;
+	{
+		CncStringLogger tmpLogger;
+		if ( !doc.Load(fileName) ) 
+		{
+			wxMessageBox(tmpLogger.GetBuffer(), CNC_LOG_FUNCT, wxICON_ERROR);
+			return false;
+		}
+	}
+	
+	// Start processing the XML file.
+	if ( doc.GetRoot()->GetName().Upper() != "SVG") {
+		std::cerr << CNC_LOG_FUNCT << ": Can't evaluate svg tag\n";
+		return false;
+	}
+	
+	const wxString w = doc.GetRoot()->GetAttribute("width");
+	const wxString h = doc.GetRoot()->GetAttribute("height");
+	const wxString v = doc.GetRoot()->GetAttribute("viewBox");
+	
+	SVGRootNode svgRootNode = evaluateSVGRootNode(w, h, v);
+	
+	const double widthMM  = svgRootNode.getWidth_MM();
+	const double heightMM = svgRootNode.getHeight_MM();
+	
+	if ( cnc::dblCmp::nu(widthMM) && cnc::dblCmp::nu(heightMM) )
+	{
+		std::cerr << CNC_LOG_A(": Invalid SVG Root node evaluation\n");
+		return false;
+	}
+	
+	size.setH(widthMM);
+	size.setW(heightMM);
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+SVGRootNode SVGFileParser::evaluateSVGRootNode(const wxString& w, const wxString& h, const wxString& vb) {
+//////////////////////////////////////////////////////////////////
+	double width=0, height=0;
+	wxString s, unitW, unitH;
+	int sPos = -1;
+	s = w;
+	for ( int i=0; i<(int)s.Length();i++ )
+	{
+		if ( s[i] == ' ' || s[i] == '\t' )
+			continue;
+		
+		if ( isalpha(s[i]) && sPos < 0 )
+		{
+			sPos = i;
+			s.SubString(0, i - 1).ToDouble(&width);
+			unitW = s.SubString(i, s.Length() -1);
+		}
+	}
+	if ( sPos == -1 )
+	{
+			s.SubString(0, s.Length() - 1).ToDouble(&width);
+			unitW = "px";
+	}
+
+	sPos = -1;
+	s = h;
+	for ( int i=0; i<(int)s.Length();i++ )
+	{
+		if ( s[i] == ' ' || s[i] == '\t' )
+			continue;
+		
+		if ( isalpha(s[i]) && sPos < 0 )
+		{
+			sPos = i;
+			s.SubString(0, i - 1).ToDouble(&height);
+			unitH = s.SubString(i, s.Length() -1);
+		}
+	}
+	if ( sPos == -1 )
+	{
+			s.SubString(0, s.Length() - 1).ToDouble(&height);
+			unitH = "px";
+	}
+	
+	Unit unit;
+	if ( determineUnit(unitW, unitH, unit) == false )
+		return SVGRootNode(0, 0, Unit::mm, "0,0,0,0");
+	
+	return SVGRootNode(width, height, unit, vb);
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::determineUnit(const wxString& uw, const wxString& uh, Unit& u) {
+//////////////////////////////////////////////////////////////////
+	Unit unitW = Unit::px; 
+	Unit unitH = Unit::px; 
+
+	if ( CncUnitCalculatorBase::determineUnit(uw, unitW) == false )
+		return false;
+		
+	if ( CncUnitCalculatorBase::determineUnit(uh, unitH) == false )
+		return false;
+		
+	if ( unitW == unitH ) {
+		u = unitH;
+		return true;
+	}
+		
+	std::cerr << "unitW(" << unitW << ") != unitH(" << unitH << ")" << std::endl;
+	return false;
 }

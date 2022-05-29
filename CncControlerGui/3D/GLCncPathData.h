@@ -248,9 +248,6 @@ namespace GLI {
 			const BoundBox& getBoundBox();
 			const BoundBox& getObjectBoundBox();
 			
-			const float getMinScaleFact()  const;
-			const float getAutoScaleFact() const;
-
 			void createVertexArray()											{ vectiesBuffer.createVertexArray(); }
 			void destroyVertexArray()											{ vectiesBuffer.destroyVertexArray(); }
 			

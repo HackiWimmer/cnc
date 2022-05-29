@@ -58,8 +58,10 @@ class GL3DDrawPane : public GL3DDrawPaneBase
 		void resetView();
 		void clearMonitor();
 		void refreshMonitor();
+		void traceInformation();
 		
 	protected:
+		virtual void onTraceInformation(wxCommandEvent& event)		{ traceInformation();     }
 		virtual void onResetView(wxCommandEvent& event)				{ resetView();            }
 		virtual void onShowMillingCutter(wxCommandEvent& event)		{ toggleMillingCutter();  }
 		virtual void onToggleHardwareBox(wxCommandEvent& event)		{ toggleHardwareBox();    }

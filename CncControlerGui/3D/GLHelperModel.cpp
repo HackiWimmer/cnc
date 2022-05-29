@@ -59,7 +59,7 @@ void GLI::ModelScale::incScale(float s) {
 		if ( cnc::fltCmp::lt(_scale, 1.0) )	s = _step / 5;
 		else								s = _step;
 	}
-
+	
 	_scale = std::min(_scale + fabs(s), _maxScaleFactor); 
 }
 ///////////////////////////////////////////////////
@@ -87,9 +87,10 @@ float GLI::ModelScale::getScaleRatio() const {
 	const float negDist = -(1.0 - _minScaleFactor);
 	
 	float ret = 1.0;
+	
 	if      ( cnc::fltCmp::eq(_scale, 1.0) )	ret = 0.0;
-	else if ( _scale < 1.0 )					ret = _scale/negDist;
-	else if ( _scale > 1.0)						ret = _scale/posDist;
+	else if ( _scale < 1.0 )					ret = _scale / negDist;
+	else if ( _scale > 1.0)						ret = _scale / posDist;
 	
 	return ret;
 }

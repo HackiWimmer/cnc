@@ -5,6 +5,7 @@
 #include <wx/filename.h>
 #include <wx/dcmemory.h>
 #include "CncStringLogger.h"
+#include "SVGFileParser.h"
 #include "CncSvgControl.h"
 
 BEGIN_EVENT_TABLE(CncSvgViewer, SVG_VIEWER_CLASS_PARENT)
@@ -170,6 +171,19 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 							<< tmpLogger.GetBuffer()
 							<< std::endl;
 			}
+			else
+			{
+				CncXYDoubleDimension size;
+				if ( SVGFileParser::evaluateMetricSize(filename, size) )
+				{
+					boundaries.setMinBound(CncDoublePosition(0, 0, 0));
+					boundaries.setMaxBound(CncDoublePosition(size.getW(), size.getH(), 0));
+				}
+				else
+				{
+					boundaries.reset();
+				}
+			}
 			
 			Refresh();
 			return ret;
@@ -179,4 +193,9 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 		return false;
 	#endif
 }
-
+//////////////////////////////////////////////////////////////////////////////
+bool CncSvgViewer::getMetricBoundaries(CncDoubleBoundaries& box) {
+//////////////////////////////////////////////////////////////////////////////
+	box = boundaries;
+	return box.hasBoundaries();
+}

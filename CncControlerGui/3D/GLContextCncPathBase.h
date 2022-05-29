@@ -94,6 +94,7 @@ class GLContextCncPathBase : public GLContextBase {
 		virtual long getPositionWithinBuffer(float x, float y, float z);
 		
 		virtual bool getBounderies(CncDoubleBoundaries& ret) const;
+		virtual std::ostream& traceInformation(std::ostream& o) const;
 		
 		void clearPathData();
 		void appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex);
@@ -198,8 +199,6 @@ class GLContextCncPathBase : public GLContextBase {
 		wxColour				rulerColourZ;
 		
 		virtual void initBufferStore();
-		
-		virtual float getAutoScaleFactor() { return ( options.autoScale ? cncPath.getAutoScaleFact() : 1.0); }
 		
 		virtual void determineModel();
 		virtual void markCurrentPosition();

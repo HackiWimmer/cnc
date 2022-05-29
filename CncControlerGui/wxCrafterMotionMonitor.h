@@ -965,6 +965,7 @@ protected:
     wxPanel* m_scalePane3D;
     wxButton* m_optionDlg;
     wxStaticLine* m_staticLine32511;
+    wxButton* m_3D_Trace;
     wxButton* m_3D_Reset;
     wxStaticLine* m_staticLine325112;
     wxButton* m_3D_Top;
@@ -1030,6 +1031,10 @@ protected:
 	event.Skip();
     }
     virtual void onToggleOptionPane(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onTraceInformation(wxCommandEvent& event)
     {
 	event.Skip();
     }
@@ -1190,6 +1195,10 @@ public:
     wxStaticLine* GetStaticLine32511()
     {
 	return m_staticLine32511;
+    }
+    wxButton* Get3D_Trace()
+    {
+	return m_3D_Trace;
     }
     wxButton* Get3D_Reset()
     {

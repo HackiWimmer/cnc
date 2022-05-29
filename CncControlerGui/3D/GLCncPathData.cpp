@@ -162,31 +162,6 @@ void GLI::GLCncPath::decVirtualEndById() {
 	notifyCncPathChanged();
 }
 ////////////////////////////////////////////
-const float GLI::GLCncPath::getMinScaleFact() const {
-////////////////////////////////////////////
-	return 0.1;
-}
-////////////////////////////////////////////
-const float GLI::GLCncPath::getAutoScaleFact() const {
-////////////////////////////////////////////
-	if ( vectiesBuffer.getVertexCount() < 1 )
-		return getMinScaleFact();
-		
-	const float x = minVecties.getX(), X = maxVecties.getX();
-	const float y = minVecties.getY(), Y = maxVecties.getY();
-	const float z = minVecties.getZ(), Z = maxVecties.getZ();
-	
-	const float totalDistX = X - x;
-	const float totalDistY = Y - y;
-	const float totalDistZ = Z - z;
-	
-	// range: -2 >= ret <= 2
-	const float ret = std::max(std::max(totalDistZ, totalDistY), totalDistX);
-	
-	//                                      * 1.1 => 90%
-	return std::max(getMinScaleFact(), ret) * 1.1;
-}
-////////////////////////////////////////////
 const GLI::BoundBox& GLI::GLCncPath::evaluateBoundBox(const GLCncPathVertices& min, const GLCncPathVertices& max) {
 ////////////////////////////////////////////
 	static GLI::BoundBox bBox;

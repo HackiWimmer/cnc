@@ -38,6 +38,8 @@ class CncGCodePreview : public CncGlCanvas {
 		void onSize(wxSizeEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
 		
+		bool getMetricBoundaries(CncDoubleBoundaries& box);
+		
 	protected:
 		
 		wxString				previewName;

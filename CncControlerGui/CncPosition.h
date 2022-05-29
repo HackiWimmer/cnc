@@ -3,6 +3,7 @@
 
 #include <cmath> 
 #include <ctgmath>
+#include <iomanip>
 #include <iostream>
 
 #include <list>
@@ -17,24 +18,44 @@ class CncXYDimension
 		
 	public:
 		CncXYDimension<T>() 
-		: width(0)
+		: width (0)
 		, height(0)
 		{}
+		
 		CncXYDimension<T>(T w, T h) 
-		: width(w)
+		: width (w)
 		, height(h)
 		{}
+		
 		explicit CncXYDimension<T>(const CncXYDimension<T>& cd) 
 		: width(cd.getW())
 		, height(cd.getH())
 		{}
+		
 		virtual ~CncXYDimension<T>() {}
 		
-		T getW() const { return width; }
+		T getW() const { return width;  }
 		T getH() const { return height; }
 		
-		friend std::ostream &operator<< (std::ostream &ostr, const CncXYDimension<T> &a) {
-			ostr << a.getW() << ',' << a.getH();
+		void setW(T w) { width  = w; }
+		void setH(T h) { height = h; }
+		
+		void reset()
+		{
+			*this = CncXYDimension<T>();
+		}
+		
+		friend std::ostream &operator<< (std::ostream &ostr, const CncXYDimension<T> &a) 
+		{
+			const unsigned int	p = ostr.precision();
+			const unsigned int	w = ostr.width();
+			const char			f = ostr.fill();
+			
+			ostr	<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.getW() << ',' 
+					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.getH()
+			;
 			return ostr;
 		}
 		
@@ -47,27 +68,36 @@ typedef CncXYDimension<float>	CncXYFloatDimension;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <typename T> 
-class CncZDimension {
-	
+class CncZDimension 
+{
 	protected:
 		T zDim;
 		
 	public:
 		CncZDimension<T>()
 		: zDim(0)
-		{}		
+		{}
+		
 		explicit CncZDimension<T>(T z)
 		: zDim(z)
 		{}
+		
 		virtual ~CncZDimension<T>() {}
 		
 		T getZ() const { return zDim; }
 		
-		friend std::ostream &operator<< (std::ostream &ostr, const CncZDimension<T> &a) {
-			ostr << a.getZ();
+		friend std::ostream &operator<< (std::ostream &ostr, const CncZDimension<T> &a) 
+		{
+			const unsigned int	p = ostr.precision();
+			const unsigned int	w = ostr.width();
+			const char			f = ostr.fill();
+			
+			ostr	<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.getZ()
+			;
+			
 			return ostr;
 		}
-		
 };
 
 typedef CncZDimension<int16_t>	CncZIntDimension;
@@ -79,7 +109,6 @@ typedef CncZDimension<float>	CncZFloatDimension;
 template <class T>
 class CncPosition 
 {
-	
 	public:
 	
 		////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,8 +170,9 @@ class CncPosition
 		: xMin(0), xMax(0)
 		, yMin(0), yMax(0)
 		, zMin(0), zMax(0)
-		, xPos(0), yPos(0) , zPos(0)
-		, floatingPointEpsilon(0.000001)
+		, xPos(0), yPos(0)
+		, zPos(0)
+		, floatingPointEpsilon	(0.000001)
 		{}
 		
 		////////////////////////////////////////////////////////////////
@@ -150,8 +180,9 @@ class CncPosition
 		: xMin(x), xMax(x)
 		, yMin(y), yMax(y)
 		, zMin(z), zMax(z)
-		, xPos(x), yPos(y), zPos(z)
-		, floatingPointEpsilon(0.000001)
+		, xPos(x), yPos(y)
+		, zPos(z)
+		, floatingPointEpsilon	(0.000001)
 		{}
 		
 		////////////////////////////////////////////////////////////////
@@ -159,8 +190,9 @@ class CncPosition
 		: xMin(cp.getXMin()),   xMax(cp.getXMax())
 		, yMin(cp.getYMin()),   yMax(cp.getYMax())
 		, zMin(cp.getZMin()),   zMax(cp.getZMax())
-		, xPos(cp.getX()),      yPos(cp.getY()),     zPos(cp.getZ())
-		, floatingPointEpsilon(0.000001)
+		, xPos(cp.getX()),      yPos(cp.getY())
+		, zPos(cp.getZ())
+		, floatingPointEpsilon	(0.000001)
 		{}
 		
 		////////////////////////////////////////////////////////////////
@@ -343,14 +375,40 @@ class CncPosition
 		////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const CncPosition<T> &a) 
 		{
-			ostr << a.getX() << ", " << a.getY() << ", " << a.getZ();
+			const unsigned int	p = ostr.precision();
+			const unsigned int	w = ostr.width();
+			const char			f = ostr.fill();
+			
+			ostr	<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.getX() << ", " 
+					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.getY() << ", " 
+					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.getZ()
+			;
+			
 			return ostr;
 		}
 		
 		////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const Watermarks &a) 
 		{
-			ostr << a.xMin << ", " << a.yMin << ", " << a.zMin << " | "<< a.xMax << ", " << a.yMax << ", " << a.zMax;
+			const unsigned int	p = ostr.precision();
+			const unsigned int	w = ostr.width();
+			const char			f = ostr.fill();
+			
+			ostr	<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.xMin << ", " 
+					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.yMin << ", " 
+					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.zMin << " | "
+					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.xMax << ", " 
+					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.yMax << ", " 
+					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+					<< a.zMax;
 			return ostr;
 		}
 		
@@ -592,6 +650,18 @@ class CncBoundaries : public CncPosition<T>::Watermarks
 			this->zMax = w.zMax;
 		}
 		
+		const CncBoundaries<T>& operator= (const CncBoundaries<T>& b) 
+		{
+			this->xMin = b.xMin;
+			this->xMax = b.xMax;
+			this->yMin = b.yMin;
+			this->yMax = b.yMax;
+			this->zMin = b.zMin;
+			this->zMax = b.zMax;
+			
+			return *this;
+		}
+		
 		bool hasBoundaries()												const;
 		bool fits(const CncBoundaries<T> b)									const;
 		bool fitsInside(const CncBoundaries<T> b)							const;
@@ -664,7 +734,8 @@ class CncBoundaries : public CncPosition<T>::Watermarks
 		
 		void trace(std::ostream& o) const;
 		
-		friend std::ostream &operator<< (std::ostream &o, const CncBoundaries<T> &b) {
+		friend std::ostream &operator<< (std::ostream &o, const CncBoundaries<T> &b) 
+		{
 			b.trace(o);
 			return o;
 		}

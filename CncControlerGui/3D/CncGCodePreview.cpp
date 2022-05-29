@@ -161,3 +161,18 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	if ( activateContext(preview, true) == true )
 		preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 
 }
+//////////////////////////////////////////////////
+bool CncGCodePreview::getMetricBoundaries(CncDoubleBoundaries& box) {
+//////////////////////////////////////////////////
+	if ( preview->getBounderies(box) )
+	{
+		box.multiply
+		(
+			maxDimension / THE_CONFIG->getCalculationFactX(), 
+			maxDimension / THE_CONFIG->getCalculationFactY(), 
+			maxDimension / THE_CONFIG->getCalculationFactZ()
+		);
+	}
+	
+	return box.hasBoundaries();
+}

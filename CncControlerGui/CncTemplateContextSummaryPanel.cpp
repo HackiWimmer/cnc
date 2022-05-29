@@ -77,7 +77,8 @@ void CncTemplateContextSummaryPanel::selectPage(CncExtLoggerListCtrl* page) cons
 ///////////////////////////////////////////////////////////////////
 void CncTemplateContextSummaryPanel::update() {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->templateContext->analized() == false )
+	const bool analized = THE_CONTEXT->templateContext->analized();
+	if ( analized == false )
 	{
 		for ( auto it = loggerRegister.begin(); it != loggerRegister.end(); ++it )
 		{
@@ -85,7 +86,11 @@ void CncTemplateContextSummaryPanel::update() {
 			logger->clearAll();
 		}
 		
-		summary->add("Nothing available . . . ");
+		// only preview the summary in this case 
+		// to have the boundaries already available 
+		std::stringstream ss; 
+		THE_CONTEXT->templateContext->traceTo(ss, 0);
+		summary->addInfoEntry(ss.str().c_str());
 		
 		return;
 	}
@@ -93,7 +98,7 @@ void CncTemplateContextSummaryPanel::update() {
 	// -------------------------------------------------------------
 	// update main lists
 	
-	// first analize to get demand information available
+	// first analyzing to get demand information available
 	ContextInterface::ProcessResult result;
 	THE_CONTEXT->templateContext->analizeContextEntries(result);
 	const bool ok = THE_CONTEXT->templateContext->isValid();

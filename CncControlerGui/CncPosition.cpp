@@ -567,10 +567,17 @@ void CncBoundaries<T>::trace(std::ostream& o) const {
 		
 		o	<< getCornerName(CA_ALL, distance) << ": "
 			<< std::fixed << std::setw(10) << std::setprecision(6) << std::setfill(' ')
-			<< p 
+			<< p
 			<< std::endl
 		;
 	}
+	
+	o << wxString::Format("Bound (X)(Y)(Z): (%.3lf, %.3lf)(%.3lf, %.3lf)(%.3lf, %.3lf)\n",
+							this->xMin, this->xMax,
+							this->yMin, this->yMax,
+							this->zMin, this->zMax
+						)
+	;
 }
 
 // Explicit template instantiation

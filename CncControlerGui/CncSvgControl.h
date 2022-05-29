@@ -16,25 +16,30 @@
 	#define SVG_VIEWER_CLASS_PARENT			wxPanel
 #endif
 
+#include "CncPosition.h"
+
 //////////////////////////////////////////////////////////////////////////////
 class CncSvgViewer : public SVG_VIEWER_CLASS_PARENT {
 	
 	public:
 		CncSvgViewer(wxWindow* parent) 
 		: SVG_VIEWER_CLASS_PARENT	(parent)
+		, boundaries				()
 		, canSize					(true)
 		{ 
 			init();
 		}
 		
-		~CncSvgViewer() {
-		}
+		~CncSvgViewer() 
+		{}
 		
 		void setContentSizable(bool state) { canSize = state; }
 		
 		void clear();
 		void update();
 		bool loadFile(const wxString& filename, const char* contextInfo = NULL);
+		
+		bool getMetricBoundaries(CncDoubleBoundaries& box);
 		
 		// It isn't better available currently
 		static const char* versionInfo() { return CNC_SVG_VERSIONFO; }
@@ -53,7 +58,9 @@ class CncSvgViewer : public SVG_VIEWER_CLASS_PARENT {
 	
 	private:
 		
-		bool canSize;
+		CncDoubleBoundaries	boundaries;
+		bool				canSize;
+		
 		void init();
 		
 	wxDECLARE_EVENT_TABLE();

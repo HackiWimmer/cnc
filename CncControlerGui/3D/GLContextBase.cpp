@@ -990,13 +990,13 @@ void GLContextBase::reshapeCompleteVisible(const CncDoubleBoundaries& box) {
 void GLContextBase::setAutoScaling(bool as) {
 /////////////////////////////////////////////////////////////////
 	options.autoScale = as;
-	normalizeScaling();
+	if ( as == true )
+		normalizeScaling();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::normalizeScaling() {
 /////////////////////////////////////////////////////////////////
-	if ( options.autoScale == true )
-		modelScale.resetScale();
+	modelScale.resetScale();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::normalizeRotation() {
@@ -1020,9 +1020,9 @@ float GLContextBase::getMaxScaleFactor() {
 	return scaleFact * modelScale.getMaxScaleFactor();
 }
 /////////////////////////////////////////////////////////////////
-float GLContextBase::getCurrentScaleFactor() {
+float GLContextBase::getCurrentScaleFactor() const {
 /////////////////////////////////////////////////////////////////
-	const float scaleFact = viewPort->getDisplayFactor() * zoom / getAutoScaleFactor();
+	const float scaleFact = viewPort->getDisplayFactor() * zoom;
 	return scaleFact * modelScale.getScaleFactor();
 }
 /////////////////////////////////////////////////////////////////
@@ -1225,7 +1225,7 @@ bool GLContextBase::keepVisible(GLdouble px, GLdouble py, GLdouble pz) {
 		
 	if ( frontCatchingMode == FCM_OFF )
 		return true;
-		
+	
 	GLint		curGlViewport	[ 4];
 	GLdouble	curGlModelview	[16];
 	GLdouble	curGlProjection	[16];
@@ -1274,7 +1274,7 @@ bool GLContextBase::isBoxVisible(const CncDoubleBoundaries& box) {
 		if ( pw.getY() < 0 || pw.getY() > cs.GetHeight() )
 			return false;
 	}
-		
+	
 	return true;
 }
 /////////////////////////////////////////////////////////////////
@@ -1292,6 +1292,21 @@ bool GLContextBase::isVertexVisible(GLdouble px, GLdouble py, GLdouble pz) {
 	if ( associatedCanvas == NULL )
 		return false;
 	
+	const wxSize cs = associatedCanvas->GetClientSize();
+
+	if ( px < 0 || px > cs.GetWidth() )
+		return false;
+		
+	if ( py < 0 || py > cs.GetHeight() )
+		return false;
+	
+	return true;
+
+	//Feedback buffer works currently not reliable!
+	//If GL_POINTS is used only one vertex works currently within the feedback buffer 
+	//this is then replicated as often as there are s points.
+	
+	/*
 	FeedbackBuffer fb(GL_3D, this);
 	
 	feedbackVertices.push_back(CncDoublePosition(px, py, pz));
@@ -1300,16 +1315,22 @@ bool GLContextBase::isVertexVisible(GLdouble px, GLdouble py, GLdouble pz) {
 	
 	fb.deactivate();
 	return fb.checkIfAllFeedbackPointsAreVisible();
+	*/
 }
 /////////////////////////////////////////////////////////////////
 bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
 /////////////////////////////////////////////////////////////////
 	// box has always already aligned to DispFact*3D
-	
 	if ( viewPort == NULL )
 		return false;
 		
 	if ( associatedCanvas == NULL )
+		return false;
+		
+	if ( box.hasBoundaries() == false )
+		return false;
+		
+	if ( options.autoScale == false )
 		return false;
 		
 	// after a reshape always display
@@ -1322,6 +1343,8 @@ bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
 	bool result = isBoxVisible(box);
 	if ( result == false )
 	{
+		unsigned int count = 0;
+		
 		// try to zoom out 
 		while ( modelScale.canDecScale() )
 		{
@@ -1336,6 +1359,9 @@ bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
 			
 			const float stepWidth = modelScale.getScaleFactor() <= 1.0 ? modelScale.getStepWidth() / 8 : modelScale.getStepWidth();
 			modelScale.decScale(stepWidth);
+			
+			count++;
+			//std::cout << "count: " << count << " --> " << modelScale.getScaleFactor() << std::endl;
 		}
 	
 		// the box can't scaled completely visible
@@ -1365,7 +1391,7 @@ bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
 	return true;
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::traceBoundariesInfos(std::ostream& o, const CncDoubleBoundaries& box) {
+void GLContextBase::traceBoundariesInfos(std::ostream& o, const CncDoubleBoundaries& box) const {
 /////////////////////////////////////////////////////////////////
 	CncDoubleBoundaries::Corners corners;
 	box.getAllCorners(corners, CncDoubleBoundaries::CornerArea::CA_ALL);
@@ -1472,6 +1498,14 @@ void GLContextBase::drawBox(GLfloat size, GLenum type) {
 			glTexCoord2f(0.0, 1.0); glVertex3fv(&v[faces[i][3]][0]);
 		glEnd();
 	}
+}
+/////////////////////////////////////////////////////////////////
+std::ostream& GLContextBase::traceInformation(std::ostream& o) const {
+/////////////////////////////////////////////////////////////////
+	o	<< " Zoom factor                     : " << zoom						<< std::endl
+		<< " Scale factor                    : " << getCurrentScaleFactor()		<< std::endl
+	;
+	return o;
 }
 
 
@@ -1665,5 +1699,4 @@ bool GLContextBase::FeedbackBuffer::checkIfAllFeedbackPointsAreVisible() {
 	// It's also an error if no point found
 	return pointCounter > 0;
 }
-
 

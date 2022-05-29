@@ -61,7 +61,6 @@ class SVGFileParser : public SVGParserBase
 		wxXmlNode* 			debugDetail;
 		
 		bool setSVGRootNode(const wxString& w, const wxString& h, const wxString& vb);
-		bool determineUnit (const wxString& uw, const wxString& uh, Unit& u);
 		
 		virtual bool preprocess();
 		virtual bool postprocess();
@@ -92,6 +91,9 @@ class SVGFileParser : public SVGParserBase
 		
 		virtual bool shouldAToolChangeProcessed()								{ return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
 
+		static bool determineUnit(const wxString& uw, const wxString& uh, Unit& u);
+		static SVGRootNode evaluateSVGRootNode(const wxString& w, const wxString& h, const wxString& vb);
+
 	public:
 		SVGFileParser(const wxString& fn, CncControl* cnc);
 		virtual ~SVGFileParser();
@@ -117,6 +119,8 @@ class SVGFileParser : public SVGParserBase
 		virtual void enableUserAgentControls(bool state);
 		
 		virtual void displayUserAgentDetailInfo(unsigned int pos)				{ svgUserAgent.displayDetailInfo(pos); }
+		
+		static bool evaluateMetricSize(const wxString& fileName, CncXYDoubleDimension& size);
 		
 };
 

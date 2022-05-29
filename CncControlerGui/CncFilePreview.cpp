@@ -4,15 +4,17 @@
 #include "GCodeFileParser.h"
 #include "CncFileNameService.h"
 #include "CncAutoProgressDialog.h"
+#include "CncTemplateContext.h"
 #include "CncFilePreview.h"
 
 ///////////////////////////////////////////////////////////////////
 CncFilePreview::CncFilePreview(wxWindow* parent, wxString name)
-: CncFilePreviewBase(parent)
-, gcodePreview(NULL)
-, svgPreview(NULL)
-, previewName(name)
-, lastFileName()
+: CncFilePreviewBase	(parent)
+, tplFormat				(TplUnknown)
+, gcodePreview			(NULL)
+, svgPreview			(NULL)
+, previewName			(name)
+, lastFileName			()
 ///////////////////////////////////////////////////////////////////
 {
 	gcodePreview = new CncGCodePreview(this, name);
@@ -51,7 +53,8 @@ bool CncFilePreview::selectEmptyPreviewIntern() {
 bool CncFilePreview::selectBinaryPreview(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
 	wxString externalFile;
-	if ( BinaryFileParser::extractSourceContentAsFile(fileName, externalFile) == false ) {
+	if ( BinaryFileParser::extractSourceContentAsFile(fileName, externalFile) == false )
+	{
 		std::cerr << "CncFilePreview::selectBinaryPreview(): Can't create preview for file: '"
 				  << fileName
 				  << "'" << std::endl;
@@ -86,7 +89,8 @@ bool CncFilePreview::loadFile() {
 	if ( lastFileName.IsEmpty() )
 		return true;
 	
-	if ( fn.Exists() == false ) {
+	if ( fn.Exists() == false ) 
+	{
 		std::cerr << " CncFilePreview::loadFile(): Invalid file: " << lastFileName << std::endl;
 		return false;
 	}
@@ -94,7 +98,6 @@ bool CncFilePreview::loadFile() {
 	bool ret = false;
 	if ( m_previewBook->GetSelection() == (int)GCODE_TAB_PAGE )
 	{
-		
 		//if ( IsShownOnScreen() ) {
 			CncAutoProgressDialog progressDlg(this, "Loading File");
 			progressDlg.Show();
@@ -118,15 +121,18 @@ bool CncFilePreview::loadFile() {
 		else				svgPreview->clear();
 	}
 	
+	evaluateMetricBoundaries();
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectPreview(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
-	const CncTemplateFormat tf = cnc::getTemplateFormatFromFileName(fileName);
+	tplFormat = cnc::getTemplateFormatFromFileName(fileName);
 	wxString fn(fileName);
 	
-	switch ( tf ) {
+	switch ( tplFormat )
+	{
 		case TplSvg:		selectSVGPreview();
 							break;
 							
@@ -142,7 +148,7 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 							break;
 							
 		default:			std::cerr << "CncFilePreview::selectPreview(): No preview registered for: " 
-									  << cnc::getTemplateFormatAsString(tf)
+									  << cnc::getTemplateFormatAsString(tplFormat)
 									  << std::endl;
 	}
 	
@@ -176,31 +182,33 @@ void CncFilePreview::activate3DPerspectiveButton(wxButton* bt) {
 	m_3D_Perspective3->SetBackgroundColour(inactive);
 	m_3D_Perspective4->SetBackgroundColour(inactive);
 	
-	if ( bt != NULL ) {
+	if ( bt != NULL ) 
 		bt->SetBackgroundColour(active);
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncFilePreview::show3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxButton* bt = (wxButton*)event.GetEventObject();
 	
-	if ( bt == m_3D_Perspective1 ) {
+	if ( bt == m_3D_Perspective1 ) 
+	{
 		activate3DPerspectiveButton(bt);
 		gcodePreview->viewIso1();
-		
-	} else if ( bt == m_3D_Perspective2 ) {
+	}
+	else if ( bt == m_3D_Perspective2 ) 
+	{
 		activate3DPerspectiveButton(bt);
 		gcodePreview->viewIso2();
-		
-	} else if ( bt == m_3D_Perspective3 ) {
+	}
+	else if ( bt == m_3D_Perspective3 ) 
+	{
 		activate3DPerspectiveButton(bt);
 		gcodePreview->viewIso3();
-		
-	} else if ( bt == m_3D_Perspective4 ) {
+	}
+	else if ( bt == m_3D_Perspective4 ) 
+	{
 		activate3DPerspectiveButton(bt);
 		gcodePreview->viewIso4();
-		
 	}
 	
 	Refresh();
@@ -315,4 +323,33 @@ const char* CncFilePreview::getErrorHtmlPage(const wxString& errorInfo) {
 
 	return fn.GetFullPath();
 }
-
+///////////////////////////////////////////////////////////////////
+bool CncFilePreview::evaluateMetricBoundaries() const {
+///////////////////////////////////////////////////////////////////
+	CncDoubleBoundaries box;
+	
+	switch ( tplFormat ) 
+	{
+		case TplSvg:		svgPreview->getMetricBoundaries(box);
+							break;
+							
+		case TplGcode:		gcodePreview->getMetricBoundaries(box);
+							break;
+							
+		case TplBinary:		// not available here, came as inbound svg - see selectPreview()
+							box.reset();
+							break;
+							
+		case TplText:		// not available here, came as default svg - see selectPreview()
+							box.reset();
+							break;
+							
+		default:			std::cerr << CNC_LOG_A(": Missing template type implementation. Last file name: %s\n", lastFileName);
+	}
+	
+	// setup the template context with this preview size information
+	THE_TPL_CTX->registerBoundaries(box);
+	THE_TPL_CTX->updateGui(true);
+	
+	return box.hasBoundaries();
+}

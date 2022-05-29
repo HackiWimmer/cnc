@@ -550,14 +550,11 @@ void GLContextCncPathBase::drawHardwareBox() {
 /////////////////////////////////////////////////////////////////
 bool GLContextCncPathBase::getBounderies(CncDoubleBoundaries& ret) const {
 /////////////////////////////////////////////////////////////////
+	ret.reset();
 	if ( cncPath.size() > 3 )
 	{
 		ret.setMinBound(CncDoublePosition(cncPath.getMin().getX(), cncPath.getMin().getY(), cncPath.getMin().getZ()));
 		ret.setMaxBound(CncDoublePosition(cncPath.getMax().getX(), cncPath.getMax().getY(), cncPath.getMax().getZ()));
-	}
-	else
-	{
-		ret.reset();
 	}
 	
 	return ret.hasBoundaries();
@@ -1022,4 +1019,29 @@ void GLContextCncPathBase::determineModel() {
 	drawTotalBoundBox();
 	drawObjectBoundBox();
 	drawHardwareBox();
+}
+/////////////////////////////////////////////////////////////////
+std::ostream& GLContextCncPathBase::traceInformation(std::ostream& o) const {
+/////////////////////////////////////////////////////////////////
+	GLContextBase::traceInformation(o);
+	
+	auto traceBounds = [&]()
+	{
+		if ( cncPath.size() > 2 )
+		{
+			return wxString::Format("(%.3lf, %.3lf)(%.3lf, %.3lf)(%.3lf, %.3lf)"
+									, cncPath.getMin().getX(), cncPath.getMax().getX()
+									, cncPath.getMin().getY(), cncPath.getMax().getY()
+									, cncPath.getMin().getZ(), cncPath.getMax().getZ()
+								   );
+		}
+		
+		return wxString::Format("n/a");
+	};
+	
+	o	<< " Cnc Path Vertex Count           : " << cncPath.size()			<< std::endl
+		<< " Cnc Path Boundaries    [vertex] : " << traceBounds()			<< std::endl
+	;
+
+	return o;
 }

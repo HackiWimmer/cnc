@@ -99,16 +99,16 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 	
 	wxFileName fn(getFileName());
 	
-	o	<< prefix << "Name                    : " << fn.GetFullName()				<< std::endl
-		<< prefix << "Path                    : " << fn.GetPath()					<< std::endl
-		<< prefix << "Valid                   : " << (isValid() ? "Yes" : "No" )	<< std::endl
-		<< prefix << "Total run count         : " << runCount						<< std::endl
-		<< prefix << "Valid run count         : " << validRunCount					<< std::endl
-		<< prefix << "Errors                  : " << hasErrors()					<< std::endl
-		<< prefix << "Tool Tot. List          : " << toolTotList					<< std::endl
-		<< prefix << "Tool Sel. List          : " << toolSelList					<< std::endl
-		<< prefix << "Tool Sel Count          : " << getToolSelCount()				<< std::endl
-		<< prefix << "Boundaries         [mm] : " << traceBound(boundaries)			<< std::endl
+	o	<< prefix << "Name                      : " << fn.GetFullName()				<< std::endl
+		<< prefix << "Path                      : " << fn.GetPath()					<< std::endl
+		<< prefix << "Valid                     : " << (isValid() ? "Yes" : "No" )	<< std::endl
+		<< prefix << "Total run count           : " << runCount						<< std::endl
+		<< prefix << "Valid run count           : " << validRunCount					<< std::endl
+		<< prefix << "Errors                    : " << hasErrors()					<< std::endl
+		<< prefix << "Tool Tot. List            : " << toolTotList					<< std::endl
+		<< prefix << "Tool Sel. List            : " << toolSelList					<< std::endl
+		<< prefix << "Tool Sel Count            : " << getToolSelCount()			<< std::endl
+		<< prefix << "Boundaries (X)(Y)(Z) [mm] : " << traceBound(boundaries)		<< std::endl
 	;
 	
 	if ( hasErrors() )

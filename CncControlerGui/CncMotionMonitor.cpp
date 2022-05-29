@@ -10,6 +10,7 @@
 #include "CncConfig.h"
 #include "CncCommon.h"
 #include "CncBoundarySpace.h"
+#include "CncMessageDialog.h"
 #include "MainFrame.h"
 #include "GlobalStrings.h"
 #include "CncMotionMonitor.h"
@@ -558,6 +559,8 @@ void CncMotionMonitor::normalizeMonitor() {
 	monitor->normalizeRotation();
 	monitor->normalizeCamera();
 	
+	makeWorkingSpaceVisible();
+	
 	Refresh();
 }
 //////////////////////////////////////////////////
@@ -649,13 +652,12 @@ bool CncMotionMonitor::makeCompleteVisible(const CncDoubleBoundaries& box) {
 //////////////////////////////////////////////////
 	const bool ret = monitor->makeCompleteVisible(box); 
 	onPaint();
-	
 	return ret;
 }
 //////////////////////////////////////////////////
-bool CncMotionMonitor::makeWorkingSpaceVisible() {
+bool CncMotionMonitor::makeCompleteVisibleMetric(const CncDoubleBoundaries& box) { 
 //////////////////////////////////////////////////
-	CncDoubleBoundaries b(THE_BOUNDS->getLogicallyBoundaries());
+	CncDoubleBoundaries b(box);
 	b.multiply(
 		THE_CONFIG->getCalculationFactX(), 
 		THE_CONFIG->getCalculationFactY(), 
@@ -666,8 +668,17 @@ bool CncMotionMonitor::makeWorkingSpaceVisible() {
 		THE_CONFIG->getDispFactY3D(), 
 		THE_CONFIG->getDispFactZ3D()
 	);
-
+	
 	return makeCompleteVisible(b);
+}
+//////////////////////////////////////////////////
+bool CncMotionMonitor::makeWorkingSpaceVisible() {
+//////////////////////////////////////////////////
+	CncDoubleBoundaries b;
+	if ( monitor->getBounderies(b) )	return makeCompleteVisible(b);
+	else								return makeHardwareSpaceVisible();
+		
+	return false;
 }
 //////////////////////////////////////////////////
 bool CncMotionMonitor::makeHardwareSpaceVisible() {
@@ -685,4 +696,58 @@ bool CncMotionMonitor::makeHardwareSpaceVisible() {
 	);
 
 	return makeCompleteVisible(b);
+}
+//////////////////////////////////////////////////
+std::ostream& CncMotionMonitor::traceInformation(std::ostream& o) const {
+//////////////////////////////////////////////////
+	auto traceBoundsMetric = [&]()
+	{
+		CncDoubleBoundaries b;
+		if ( monitor->getBounderies(b) )
+		{
+			b.multiply(
+				THE_CONFIG->getDispFactX3D(), 
+				THE_CONFIG->getDispFactY3D(), 
+				THE_CONFIG->getDispFactZ3D()
+			);
+			b.divide(
+				THE_CONFIG->getCalculationFactX(), 
+				THE_CONFIG->getCalculationFactY(), 
+				THE_CONFIG->getCalculationFactZ()
+			);
+			
+			return wxString::Format("(%.3lf, %.3lf)(%.3lf, %.3lf)(%.3lf, %.3lf)"
+									, b.getMinBound().getX(), b.getMaxBound().getX()
+									, b.getMinBound().getY(), b.getMaxBound().getY()
+									, b.getMinBound().getZ(), b.getMaxBound().getZ()
+								   );
+		}
+		
+		return wxString::Format("n/a");
+	};
+
+	o	<< "Gui:\n"
+		<< " Window size  (width/height)[px] : "  << GetClientSize().GetWidth() << " / " << GetClientSize().GetHeight() << std::endl
+		<< " Cnc Path Boundaries        [mm] : " << traceBoundsMetric()		<< std::endl
+		<< std::endl
+	;
+	
+	o	<< "Context:\n";
+	monitor->traceInformation(o);
+
+	return o;
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::traceInformation() {
+//////////////////////////////////////////////////
+	std::stringstream ss;
+	traceInformation(ss);
+	
+	wxSize s = GetClientSize();
+	s.DecBy(20);
+
+	CncMessageDialog md(this, ss.str().c_str(), "Collected Information", "Cnc Motion Monitor");
+	md.SetClientSize(s);
+	md.CenterOnParent();
+	md.ShowModal();
 }
