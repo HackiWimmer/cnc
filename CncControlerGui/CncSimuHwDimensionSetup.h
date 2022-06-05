@@ -46,11 +46,14 @@ class CncSimuHwDimensionSetup : public CncSimuHwDimensionSetupBase
 		
 		PreviousSetup previousSetup;
 		
-		double	getValue(wxTextCtrl* ctrl, double dfltValue);
+		double	getValue(wxTextCtrl* ctrl, double dfltValue) const;
 		double	evaluateZLocation();
+		
+		bool isSomethingChanged() const;
 		
 		void	cancel();
 		void	apply();
+		void	applyFinally();
 };
 
 #endif // CNCSIMUHWDIMENSIONSETUP_H

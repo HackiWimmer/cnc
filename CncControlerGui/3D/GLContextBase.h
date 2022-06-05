@@ -174,7 +174,7 @@ class GLContextBase : public wxGLContext {
 		void reshapePosToCenter(const CncLongBoundaries& box);
 		void reshapePosToCenter(const CncDoubleBoundaries& box);
 		void reshapePosToCenter(int px, int py);
-		void reshapePosToCenterIfOutOfFocus(int px, int py);
+		void reshapePosToCenterIfOutOfFocus(int px, int py, bool visible);
 		void reshapeCompleteVisible(const CncDoubleBoundaries& box);
 		void reshapeCompleteVisible();
 		
@@ -184,7 +184,8 @@ class GLContextBase : public wxGLContext {
 		int getCurrentWindowHeight()	const; 
 		
 		void setFrontCatchingMode(FrontCatchingMode mode);
-		const char* getFrontCatchingModeAsStr(FrontCatchingMode mode);
+		const char* getFrontCatchingModeAsStr(FrontCatchingMode mode) const;
+		const char* getFrontCatchingModeAsStr() const;
 		
 		void setAutoScaling(bool as);
 		void normalizeScaling();
@@ -388,11 +389,8 @@ class GLContextBase : public wxGLContext {
 		 
 		void drawSolidCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp=true);
 		void drawSolidCylinder(GLdouble radius, GLdouble height, GLint slices, GLint stacks);
-		
 		void drawSilhouetteCone(GLdouble radius, GLdouble height, GLint slices, GLint stacks, bool bottomUp=true);
-		
 		void drawFeedbackVertices();
-		
 		void drawAdditionalThings();
 		
 		void traceOpenGLMatrix(std::ostream &ostr, int id);
@@ -415,6 +413,7 @@ class GLContextBase : public wxGLContext {
 		
 		GLuint 				theTexture;
 		FeedbackVectices	feedbackVertices;
+		int					focusOccurrenceCounter;
 		
 		void determineViewPortBoundaries();
 		void drawMillingCutter(CncDimensions d, float x, float y, float z);

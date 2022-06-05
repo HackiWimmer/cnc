@@ -42,6 +42,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name)
 , spindlePowerState			(SPINDLE_STATE_OFF)
 , theTexture				(0)
 , feedbackVertices			()
+, focusOccurrenceCounter	(0)
 {
 /////////////////////////////////////////////////////////////////
 	// With respect to the GTK implementation SetCurrent() isn't 
@@ -202,32 +203,64 @@ wxPoint GLContextBase::determineBestOrigin(const CncDoubleBoundaries& box) {
 /////////////////////////////////////////////////////////////////
 	const wxSize cs = associatedCanvas->GetClientSize();
 	
-	const int ix1 = getCornerIdxMostlyInDirection(wxLeft,	box);
-	const int ix2 = getCornerIdxMostlyInDirection(wxRight,	box);
-	const int iy1 = getCornerIdxMostlyInDirection(wxTop, 	box);
-	const int iy2 = getCornerIdxMostlyInDirection(wxBottom,	box);
+	// evaluate corners an its vertex and windows location
+	const int ixL = getCornerIdxMostlyInDirection(wxLeft,	box);
+	const int ixR = getCornerIdxMostlyInDirection(wxRight,	box);
+	const int iyT = getCornerIdxMostlyInDirection(wxTop,	box);
+	const int iyB = getCornerIdxMostlyInDirection(wxBottom,	box);
 
-	const CncDoublePosition px1 = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, ix1);
-	const CncDoublePosition px2 = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, ix2);
-	const CncDoublePosition py1 = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, iy1);
-	const CncDoublePosition py2 = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, iy2);
+	const CncDoublePosition pvC  = {0.0, 0.0, 0.0};
+	const CncDoublePosition pvxL = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, ixL);
+	const CncDoublePosition pvxR = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, ixR);
+	const CncDoublePosition pvyT = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, iyT);
+	const CncDoublePosition pvyB = box.getCorner(CncDoubleBoundaries::CornerArea::CA_ALL, iyB);
 	
-	const double totalX = fabs(px1.getX()) + fabs(px2.getX());
-	const double totalY = fabs(py1.getY()) + fabs(py2.getY());
+	const CncLongPosition pwC (evaluateWindowCoordinates(pvC ));
+	const CncLongPosition pwxL(evaluateWindowCoordinates(pvxL));
+	const CncLongPosition pwxR(evaluateWindowCoordinates(pvxR));
+	const CncLongPosition pwyT(evaluateWindowCoordinates(pvyT));
+	const CncLongPosition pwyB(evaluateWindowCoordinates(pvyB));
 	
-	const bool bx = cnc::dblCmp::nu(totalX) == false;
-	const bool by = cnc::dblCmp::nu(totalY) == false;
+	// calculate total distance of X and Y axis
+	const long totalX = pwxR.getX() - pwxL.getX();
+	const long totalY = pwyT.getY() - pwyB.getY();
 	
-	if ( bx && by )
+	// only if both are available
+	if ( totalX != 0 && totalY != 0 )
 	{
-		const float xRatio = fabs(px1.getX()) / totalX;
-		const float yRatio = fabs(py1.getY()) / totalY;
-	
-		wxPoint ret(xRatio * cs.GetWidth(), cs.GetHeight() - (yRatio * cs.GetHeight()));
-		if ( ret.x != 0 && ret.y != 0 )
+		// try to find the best origin
+		const int border = GLViewPort::getDefaultMargin();
+		
+		const bool b1 = cs.GetWidth()  > 2 * border * 1.2;
+		const bool b2 = cs.GetHeight() > 2 * border * 1.2;
+		
+		// only if enough space available
+		if ( b1 && b2 )
+		{
+			// reduce the maximal available space by a border
+			const int width  = cs.GetWidth()  - 2 * border;
+			const int height = cs.GetHeight() - 2 * border;
+			
+			// get the distance of left an to corner to the origin
+			const long dL = abs( pwC.getX() - pwxL.getX() ); 
+			const long dT = abs( pwC.getY() - pwyT.getY() ); 
+			
+			// the the ratio in relation to the total distance
+			float ratioX = float(dL) / float(totalX);
+			float ratioY = float(dT) / float(totalY);
+			
+			//std::clog << "rat x/y : " << ratioX << " / " << ratioY << std::endl;
+			
+			// determine the origin
+			wxPoint ret(border + ratioX * width, 
+						border + height - (ratioY * height)
+			);
+			
 			return ret;
+		}
 	}
 	
+	// default behaviour
 	return viewPort->evaluatePreDefPositions(convertViewMode(viewMode), cs.GetWidth(), cs.GetHeight());
 }
 /////////////////////////////////////////////////////////////////
@@ -930,26 +963,26 @@ void GLContextBase::reshapePosToCenter(int px, int py) {
 	reshapeRelative(dx, dy);
 }
 //////////////////////////////////////////////////
-void GLContextBase::reshapePosToCenterIfOutOfFocus(int px, int py) {
+void GLContextBase::reshapePosToCenterIfOutOfFocus(int px, int py, bool visible) {
 //////////////////////////////////////////////////
 	if ( associatedCanvas == NULL )
 		return;
 		
-	static int occurrenceCounter = 0;
-
 	const wxSize wSize = associatedCanvas->GetClientSize();
 	const int brd = std::max(wSize.GetWidth(), wSize.GetHeight()) * 0.1;
 	
 	const bool bx = px > brd && px < wSize.GetWidth()  - brd;
 	const bool by = py > brd && py < wSize.GetHeight() - brd;
 	
-	if ( !bx || !by )
+	// it's an experiment, but visible seams better at the moment
+	const bool b  = (true ? !visible : !bx || !by);
+	if ( b )
 	{
-		if ( (++occurrenceCounter) == 3 )
+		if ( (++focusOccurrenceCounter) == 3 )
 		{
-			// shrink the view if out of focus occurs to often
+			// shrink the view if out of focus occurs too often
 			getModelScale().decScale();
-			occurrenceCounter = 0;
+			focusOccurrenceCounter = 0;
 		}
 		
 		reshapePosToCenter(px, py);
@@ -1142,7 +1175,12 @@ void GLContextBase::setFrontCatchingMode(FrontCatchingMode mode) {
 												getFrontCatchingModeAsStr(frontCatchingMode)));
 }
 ////////////////////////////////////////////////////////////////
-const char* GLContextBase::getFrontCatchingModeAsStr(FrontCatchingMode mode) {
+const char* GLContextBase::getFrontCatchingModeAsStr() const {
+////////////////////////////////////////////////////////////////
+	return getFrontCatchingModeAsStr(frontCatchingMode);
+}
+////////////////////////////////////////////////////////////////
+const char* GLContextBase::getFrontCatchingModeAsStr(FrontCatchingMode mode) const {
 ////////////////////////////////////////////////////////////////
 	switch ( mode )
 	{
@@ -1242,8 +1280,10 @@ bool GLContextBase::keepVisible(GLdouble px, GLdouble py, GLdouble pz) {
 		case FCM_ALWAYS_CENTRED:	reshapePosToCenter(winX, winY);
 									break;
 									
-		case FCM_KEEP_IN_FRAME:
-		default:					reshapePosToCenterIfOutOfFocus(winX, winY);
+		case FCM_KEEP_IN_FRAME:		reshapePosToCenterIfOutOfFocus(winX, winY, isVertexVisible(CncDoublePosition(px, py, pz)));
+									break;
+									
+		case FCM_OFF:				; // already managed
 	}
 	
 	return true;
@@ -1258,7 +1298,8 @@ bool GLContextBase::isBoxVisible(const CncDoubleBoundaries& box) {
 	if ( associatedCanvas == NULL )
 		return false;
 	
-	const wxSize cs = associatedCanvas->GetClientSize();
+	const int border = 5; // has to be unsigned
+	const wxSize cs  = associatedCanvas->GetClientSize();
 	
 	CncDoubleBoundaries::Corners corners;
 	box.getAllCorners(corners, CncDoubleBoundaries::CornerArea::CA_ALL);
@@ -1268,10 +1309,10 @@ bool GLContextBase::isBoxVisible(const CncDoubleBoundaries& box) {
 		const CncDoublePosition& pv = (*it);
 		const CncLongPosition pw(evaluateWindowCoordinates(pv));
 		
-		if ( pw.getX() < 0 || pw.getX() > cs.GetWidth() )
+		if ( pw.getX() < border || pw.getX() > ( cs.GetWidth() - border ) )
 			return false;
 			
-		if ( pw.getY() < 0 || pw.getY() > cs.GetHeight() )
+		if ( pw.getY() < border || pw.getY() > ( cs.GetHeight() - border ) )
 			return false;
 	}
 	
@@ -1335,6 +1376,7 @@ bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
 		
 	// after a reshape always display
 	reshapeBestOrigion(box);
+	//reshape();
 	display();
 	
 	//traceBoundariesInfos(std::clog, box);
@@ -1343,25 +1385,20 @@ bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
 	bool result = isBoxVisible(box);
 	if ( result == false )
 	{
-		unsigned int count = 0;
-		
 		// try to zoom out 
 		while ( modelScale.canDecScale() )
 		{
 			reshape();
 			display();
 			
+			// stop scaling if the box is complete visible
 			result = isBoxVisible(box);
 			if ( result == true )
-			{
 				break;
-			}
 			
+			// scale
 			const float stepWidth = modelScale.getScaleFactor() <= 1.0 ? modelScale.getStepWidth() / 8 : modelScale.getStepWidth();
 			modelScale.decScale(stepWidth);
-			
-			count++;
-			//std::cout << "count: " << count << " --> " << modelScale.getScaleFactor() << std::endl;
 		}
 	
 		// the box can't scaled completely visible
@@ -1373,15 +1410,18 @@ bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
 		// try to zoom in 
 		while ( modelScale.canIncScale() )
 		{
+			// scale
 			const float stepWidth = modelScale.getScaleFactor() <= 1.0 ? modelScale.getStepWidth() / 8 : modelScale.getStepWidth();
 			modelScale.incScale(stepWidth);
 			
 			reshape();
 			display();
 			
+			// stop scaling if the box is first not complete visible
 			result = isBoxVisible(box);
 			if ( result == false )
 			{
+				// reset last scale
 				modelScale.decScale(stepWidth);
 				break;
 			}
@@ -1502,8 +1542,10 @@ void GLContextBase::drawBox(GLfloat size, GLenum type) {
 /////////////////////////////////////////////////////////////////
 std::ostream& GLContextBase::traceInformation(std::ostream& o) const {
 /////////////////////////////////////////////////////////////////
-	o	<< " Zoom factor                     : " << zoom						<< std::endl
-		<< " Scale factor                    : " << getCurrentScaleFactor()		<< std::endl
+	o	<< " Zoom Factor                     : " << zoom							<< std::endl
+		<< " Scale Factor                    : " << getCurrentScaleFactor()			<< std::endl
+		<< " Front Catching Mode             : " << getFrontCatchingModeAsStr()		<< std::endl
+		
 	;
 	return o;
 }

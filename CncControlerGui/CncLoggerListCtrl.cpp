@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 #include <wx/imaglist.h>
@@ -521,7 +522,12 @@ void CncLoggerListCtrl::forceUpdate() {
 		ensureVisible(GetItemCount() - 1);
 		Refresh();
 		
-		THE_APP->dispatchAll();
+		// Is this really necessary to dispatch the whole event queue? 
+		// I think only timer events in focus here
+		//THE_APP->dispatchAll();
+		
+		// therefore, try this
+		THE_APP->dispatchTimerEvents();
 	}
 }
 //////////////////////////////////////////////////

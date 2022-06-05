@@ -62,6 +62,8 @@ class GLViewPort {
 		
 		bool process();
 		static bool processDefault(int wndSizeW, int wndSizeH);
+		static unsigned int getDefaultMargin() { return margin; }
+		
 	
 	private:
 		

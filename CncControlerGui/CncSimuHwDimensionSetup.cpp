@@ -37,7 +37,7 @@ CncSimuHwDimensionSetup::~CncSimuHwDimensionSetup() {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-double CncSimuHwDimensionSetup::getValue(wxTextCtrl* ctrl, double dfltValue) {
+double CncSimuHwDimensionSetup::getValue(wxTextCtrl* ctrl, double dfltValue) const {
 ///////////////////////////////////////////////////////////////////
 	double v; 
 	if ( ctrl && ctrl->GetValue().ToCDouble(&v) ) 
@@ -64,14 +64,45 @@ void CncSimuHwDimensionSetup::onInitDialog(wxInitDialogEvent& event) {
 	previousSetup.hwoX		= THE_BOUNDS->getHardwareOffset().getAsMetricX();
 	previousSetup.hwoY		= THE_BOUNDS->getHardwareOffset().getAsMetricY();
 	previousSetup.hwoZ		= THE_BOUNDS->getHardwareOffset().getAsMetricZ();
+	
+}
+///////////////////////////////////////////////////////////////////
+bool CncSimuHwDimensionSetup::isSomethingChanged() const {
+///////////////////////////////////////////////////////////////////
+	const double hwoX = getValue(m_tcRefPosOffsetX, THE_BOUNDS->getHardwareOffset().getAsMetricX());
+	const double hwoY = getValue(m_tcRefPosOffsetY, THE_BOUNDS->getHardwareOffset().getAsMetricY());
+	const double hwoZ = getValue(m_tcRefPosOffsetZ, THE_BOUNDS->getHardwareOffset().getAsMetricZ());
+	
+	const double maxX = getValue(m_tcMaxDimX, THE_BOUNDS->getMaxDimensionMetricX());
+	const double maxY = getValue(m_tcMaxDimY, THE_BOUNDS->getMaxDimensionMetricY());
+	const double maxZ = getValue(m_tcMaxDimZ, THE_BOUNDS->getMaxDimensionMetricZ());
+
+	if ( cnc::dblCmp::eq(previousSetup.maxDimX, maxX) == false )	return true;
+	if ( cnc::dblCmp::eq(previousSetup.maxDimY, maxY) == false )	return true;
+	if ( cnc::dblCmp::eq(previousSetup.maxDimZ, maxZ) == false )	return true;
+	if ( cnc::dblCmp::eq(previousSetup.hwoX,    hwoX) == false )	return true;
+	if ( cnc::dblCmp::eq(previousSetup.hwoY,    hwoY) == false )	return true;
+	if ( cnc::dblCmp::eq(previousSetup.hwoZ,    hwoZ) == false )	return true;
+
+	return false;
+}
+///////////////////////////////////////////////////////////////////
+void CncSimuHwDimensionSetup::applyFinally() {
+///////////////////////////////////////////////////////////////////
+	if ( isSomethingChanged() == true )
+	{
+		// fake a physical hardware reference
+		CNC_CEX2_A(	" No physical hardware support available for the connected port." \
+					"\n A default hardware reference will be simply simulated for any test purpose.")
+					
+		apply();
+		
+		//THE_APP->getMotionMonitor()->normalizeMonitor();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::apply() {
 ///////////////////////////////////////////////////////////////////
-	// fake a physical hardware reference
-	CNC_CEX2_A(	" No physical hardware support available for the connected port." \
-				"\n A default hardware reference will be simply simulated for any test purpose.")
-	
 	// first dimensions
 	THE_BOUNDS->setMaxDimensionMetricX(getValue(m_tcMaxDimX, THE_BOUNDS->getMaxDimensionMetricX()));
 	THE_BOUNDS->setMaxDimensionMetricY(getValue(m_tcMaxDimY, THE_BOUNDS->getMaxDimensionMetricY()));
@@ -89,10 +120,12 @@ void CncSimuHwDimensionSetup::apply() {
 		THE_CONFIG->convertMetricToStepsX(z)
 	);
 	
+	
 	THE_BOUNDS->setHardwareOffset(fakedHwRefPos);
 	THE_BOUNDS->setHardwareOffsetValid(true); 
 
 	THE_APP->getMotionMonitor()->clear();
+	//THE_APP->getMotionMonitor()->centreViewport();
 	THE_APP->updateHardwareReference();
 	
 	THE_APP->getMotionMonitor()->makeHardwareSpaceVisible();
@@ -140,7 +173,7 @@ void CncSimuHwDimensionSetup::onCancel(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::onOk(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	apply();
+	applyFinally();
 	EndModal(wxID_OK);
 }
 ///////////////////////////////////////////////////////////////////

@@ -1,6 +1,9 @@
 #include "CncCommon.h"
 #include "GLHelperModel.h"
 
+const float GLI::ModelScale::_minScaleFactor =  0.01;
+const float GLI::ModelScale::_maxScaleFactor = 30.00;
+
 ///////////////////////////////////////////////////
 GLI::ModelScale::ModelScale()
 : _step		(0.1f)

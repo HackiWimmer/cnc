@@ -37,8 +37,8 @@ namespace GLI {
 			static float getMaxScaleFactor()	{ return _maxScaleFactor; }
 			
 		private:
-			static constexpr float _minScaleFactor = 0.01f;
-			static constexpr float _maxScaleFactor = 5.00f;
+			static const float _minScaleFactor;
+			static const float _maxScaleFactor;
 			
 			float _step;
 			float _scale;

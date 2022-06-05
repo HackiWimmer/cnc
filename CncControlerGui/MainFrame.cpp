@@ -2212,6 +2212,19 @@ void MainFrame::dispatchAll() {
 		podiumManagementDlg->dispatchAll();
 		return;
 	}
+	
+	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
+	if ( evtLoop == NULL )
+		return;
+	
+	// This avoids further doings if the current event loop isn't the main one
+	// Otherwise modal dialogues loose teh modal state for example.
+	if ( evtLoop->IsMain() == false )
+		return;
+
+	// Since wxWidgets 3.1.x: This is the best compromise 
+	wxTheApp->SafeYield(this, true);
+	//wxTheApp->Yield();
 
 	/*
 	Please note: This is the fastest version, but evtLoop->Yield() is better then the code below, 
@@ -2244,12 +2257,6 @@ void MainFrame::dispatchAll() {
 		evtLoop->Dispatch();
 	}
 	*/
-	
-	
-	// Since wxWidgets 3.1.x: This is the best compromise 
-	//wxTheApp->Yield();
-	wxTheApp->SafeYield(this, true);
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::handleCommonException() {
@@ -9122,6 +9129,7 @@ void MainFrame::simulateHardwareReference(bool defaultBehaviour) {
 	if ( defaultBehaviour == false )
 	{
 		selectMonitorBookCncPanel();
+		
 		dlg.ShowModal();
 	}
 	else
