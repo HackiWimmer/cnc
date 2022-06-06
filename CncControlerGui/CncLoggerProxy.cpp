@@ -145,7 +145,7 @@ void CncTraceProxy::appendChar(char c, const wxColour& col, int sourceId) {
 		lastSourceID = sourceId;
 	}
 	
-	THE_APP->getLoggerView()->add(c);
+	THE_APP->getLoggerView()->trace(c);
 }
 //////////////////////////////////////////////////////////////
 void CncTraceProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
@@ -156,7 +156,7 @@ void CncTraceProxy::appendChar(char c, const wxTextAttr& style, int sourceId) {
 		lastSourceID = sourceId;
 	}
 	
-	THE_APP->getLoggerView()->add(c);
+	THE_APP->getLoggerView()->trace(c);
 }
 //////////////////////////////////////////////////////////////
 bool CncTraceProxy::setTextColour(const wxColour& col) {

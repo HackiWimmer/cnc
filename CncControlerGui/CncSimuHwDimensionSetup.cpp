@@ -120,12 +120,10 @@ void CncSimuHwDimensionSetup::apply() {
 		THE_CONFIG->convertMetricToStepsX(z)
 	);
 	
-	
 	THE_BOUNDS->setHardwareOffset(fakedHwRefPos);
 	THE_BOUNDS->setHardwareOffsetValid(true); 
 
 	THE_APP->getMotionMonitor()->clear();
-	//THE_APP->getMotionMonitor()->centreViewport();
 	THE_APP->updateHardwareReference();
 	
 	THE_APP->getMotionMonitor()->makeHardwareSpaceVisible();

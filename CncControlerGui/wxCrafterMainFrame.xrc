@@ -10248,18 +10248,8 @@ State</label>
           </help>
         </object>
         <object class="separator"/>
-        <object class="wxMenuItem" name="m_miProcessDirectoryTest">
-          <label>Test: Process Directory [Run]</label>
-          <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-          <help>
-            <![CDATA[]]>
-          </help>
-        </object>
         <object class="wxMenuItem" name="m_miLoopRepeatTest">
-          <label>Test: Repeat current Template [Run]</label>
+          <label>Run Template Test</label>
           <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
           <accel>
             <![CDATA[]]>

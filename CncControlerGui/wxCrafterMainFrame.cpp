@@ -6794,13 +6794,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 
     m_menuTest->AppendSeparator();
 
-    m_miProcessDirectoryTest =
-        new wxMenuItem(m_menuTest, wxID_ANY, _("Test: Process Directory [Run]"), wxT(""), wxITEM_NORMAL);
-    m_miProcessDirectoryTest->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")));
-    m_menuTest->Append(m_miProcessDirectoryTest);
-
-    m_miLoopRepeatTest =
-        new wxMenuItem(m_menuTest, wxID_ANY, _("Test: Repeat current Template [Run]"), wxT(""), wxITEM_NORMAL);
+    m_miLoopRepeatTest = new wxMenuItem(m_menuTest, wxID_ANY, _("Run Template Test"), wxT(""), wxITEM_NORMAL);
     m_miLoopRepeatTest->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")));
     m_menuTest->Append(m_miLoopRepeatTest);
 
@@ -7321,8 +7315,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::openPositionStorage, this, m_miPositionStorage->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::traceAllCameraDevices, this, m_miCameraDevices->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::unitTestFramework, this, m_miUnitTestFramework->GetId());
-    this->Bind(
-        wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::processDirectoryTest, this, m_miProcessDirectoryTest->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::loopRepeatTest, this, m_miLoopRepeatTest->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction1, this, m_miTest1->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction2, this, m_miTest2->GetId());
@@ -7627,8 +7619,6 @@ MainFrameBClass::~MainFrameBClass()
         wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::traceAllCameraDevices, this, m_miCameraDevices->GetId());
     this->Unbind(
         wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::unitTestFramework, this, m_miUnitTestFramework->GetId());
-    this->Unbind(
-        wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::processDirectoryTest, this, m_miProcessDirectoryTest->GetId());
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::loopRepeatTest, this, m_miLoopRepeatTest->GetId());
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction1, this, m_miTest1->GetId());
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction2, this, m_miTest2->GetId());

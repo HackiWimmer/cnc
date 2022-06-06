@@ -95,7 +95,8 @@ void CncGCodePreview::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 //////////////////////////////////////////////////
-	switch ( event.GetKeyCode() ) {
+	switch ( event.GetKeyCode() ) 
+	{
 		
 		case 'C':	centreViewport();
 					break;

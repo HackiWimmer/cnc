@@ -43,13 +43,18 @@ class CncGlCanvas : public wxGLCanvas
 		wxPoint 				lastReshape;
 		bool					alreadyPainted;
 		bool					lastSetCurrent;
-		bool 					mouseMoveMode;
 		
 		void onMouse(wxMouseEvent& event);
 		void view(GLContextBase::ViewMode fm);
 		
 		bool activateContext(GLContextBase* context, bool verbose=false);
 		bool activateContext(GLContextBase* context, const wxGLCanvas &win, bool silent=true);
+		
+	private:
+		
+		bool 					mouseMoveMode;
+		int						mouseMoveX;
+		int						mouseMoveY;
 };
 	
 #endif

@@ -450,12 +450,12 @@ void CncMotionMonitor::onKeyDown(int keyCode) {
 							onPaint();
 							break;
 							
-		case 'W':			makeWorkingSpaceVisible();
-							onPaint();
+		case 'W':			if ( makeWorkingSpaceVisible() == true )	onPaint();
+							else										cnc::trc.logInfo("No working space available");
 							break;
 							
-		case 'H':			makeHardwareSpaceVisible();
-							onPaint();
+		case 'H':			if ( makeHardwareSpaceVisible() == true )	onPaint();
+							else										cnc::trc.logInfo("No hardware space available");
 							break;
 
 		case '0':			monitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_OFF);
@@ -650,13 +650,20 @@ void CncMotionMonitor::onPressAndTap(wxPressAndTapEvent& event) {
 //////////////////////////////////////////////////
 bool CncMotionMonitor::makeCompleteVisible(const CncDoubleBoundaries& box) { 
 //////////////////////////////////////////////////
+	if ( box.hasBoundaries() == false )
+		return false;
+		
 	const bool ret = monitor->makeCompleteVisible(box); 
 	onPaint();
+	
 	return ret;
 }
 //////////////////////////////////////////////////
 bool CncMotionMonitor::makeCompleteVisibleMetric(const CncDoubleBoundaries& box) { 
 //////////////////////////////////////////////////
+	if ( box.hasBoundaries() == false )
+		return false;
+	
 	CncDoubleBoundaries b(box);
 	b.multiply(
 		THE_CONFIG->getCalculationFactX(), 
@@ -683,6 +690,9 @@ bool CncMotionMonitor::makeWorkingSpaceVisible() {
 //////////////////////////////////////////////////
 bool CncMotionMonitor::makeHardwareSpaceVisible() {
 //////////////////////////////////////////////////
+	if ( THE_BOUNDS->hasHardwareOffset() == false )
+		return false;
+		
 	CncDoubleBoundaries b(THE_BOUNDS->getPhysicallyBoundaries());
 	b.multiply(
 		THE_CONFIG->getCalculationFactX(), 
@@ -694,7 +704,7 @@ bool CncMotionMonitor::makeHardwareSpaceVisible() {
 		THE_CONFIG->getDispFactY3D(), 
 		THE_CONFIG->getDispFactZ3D()
 	);
-
+	
 	return makeCompleteVisible(b);
 }
 //////////////////////////////////////////////////

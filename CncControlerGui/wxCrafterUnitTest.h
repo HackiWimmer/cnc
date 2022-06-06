@@ -22,6 +22,12 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/timer.h>
+#include <wx/listbook.h>
+#include <wx/panel.h>
+#include <wx/imaglist.h>
+#include <wx/spinctrl.h>
+#include <wx/filepicker.h>
+#include <wx/statline.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -115,6 +121,90 @@ public:
         const wxSize& size = wxSize(800, 600),
         long style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxSYSTEM_MENU | wxCLOSE_BOX);
     virtual ~CncUnitTestsBase();
+};
+
+class CncTestRunConfigBase : public wxDialog
+{
+protected:
+    wxListbook* m_lbTestCase;
+    wxPanel* m_plLoop;
+    wxStaticText* m_staticText352;
+    wxSpinCtrl* m_loopCount;
+    wxStaticText* m_staticText35;
+    wxCheckBox* m_cbBreakOnError;
+    wxPanel* m_plDir;
+    wxStaticText* m_staticText33;
+    wxDirPickerCtrl* m_dirSelection;
+    wxStaticLine* m_staticLine43;
+    wxButton* m_btCancel;
+    wxButton* m_btRun;
+
+protected:
+    virtual void onCancel(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onRun(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+
+public:
+    wxStaticText* GetStaticText352()
+    {
+	return m_staticText352;
+    }
+    wxSpinCtrl* GetLoopCount()
+    {
+	return m_loopCount;
+    }
+    wxStaticText* GetStaticText35()
+    {
+	return m_staticText35;
+    }
+    wxCheckBox* GetCbBreakOnError()
+    {
+	return m_cbBreakOnError;
+    }
+    wxPanel* GetPlLoop()
+    {
+	return m_plLoop;
+    }
+    wxStaticText* GetStaticText33()
+    {
+	return m_staticText33;
+    }
+    wxDirPickerCtrl* GetDirSelection()
+    {
+	return m_dirSelection;
+    }
+    wxPanel* GetPlDir()
+    {
+	return m_plDir;
+    }
+    wxListbook* GetLbTestCase()
+    {
+	return m_lbTestCase;
+    }
+    wxStaticLine* GetStaticLine43()
+    {
+	return m_staticLine43;
+    }
+    wxButton* GetBtCancel()
+    {
+	return m_btCancel;
+    }
+    wxButton* GetBtRun()
+    {
+	return m_btRun;
+    }
+    CncTestRunConfigBase(wxWindow* parent,
+        wxWindowID id = wxID_ANY,
+        const wxString& title = _("Cnc Test Run Configuration"),
+        const wxPoint& pos = wxDefaultPosition,
+        const wxSize& size = wxSize(500, 300),
+        long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~CncTestRunConfigBase();
 };
 
 #endif

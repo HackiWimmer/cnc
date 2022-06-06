@@ -61,7 +61,8 @@ void CncInfoBar::showMessage(const char type, const wxString& msg) {
 	int timeout  = -1;
 	int flags    = 0;
 	
-	switch ( type ) {
+	switch ( type )
+	{
 		case 'E':	flags	= wxICON_ERROR;
 					timeout = 8000;
 					bgc		= wxColour(255, 170, 170);
@@ -98,14 +99,11 @@ void CncInfoBar::showMessage(const char type, const wxString& msg) {
 }
 
 
-
-
-
-
 //////////////////////////////////////////////////
 void CncMainInfoBar::traceFurther(char type,  const wxString& msg) {
 //////////////////////////////////////////////////
-	switch ( type ) {
+	switch ( type ) 
+	{
 		case 'E':	cnc::trc.logError(msg);
 					break;
 					

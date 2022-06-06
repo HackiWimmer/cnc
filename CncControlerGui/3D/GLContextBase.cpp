@@ -1376,7 +1376,6 @@ bool GLContextBase::makeCompleteVisible(const CncDoubleBoundaries& box) {
 		
 	// after a reshape always display
 	reshapeBestOrigion(box);
-	//reshape();
 	display();
 	
 	//traceBoundariesInfos(std::clog, box);

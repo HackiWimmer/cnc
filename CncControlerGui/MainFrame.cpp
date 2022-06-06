@@ -99,6 +99,7 @@
 #include "CncOpenGLContextObserver.h"
 #include "CncOSEnvironmentDialog.h"
 #include "CncContext.h"
+#include "CncTestRunConfig.h"
 #include "CncManuallyMoveCoordinates.h"
 #include "CncPositionStorageView.h"
 #include "CncLastProcessingTimestampSummary.h"
@@ -4988,6 +4989,11 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		//-----------------------------------------------------------------
 		// prepare all relevant settings from here on . . . 
 		
+		// if template boundaries available prepare the motion monitor 
+		// to the best size (scale) and origin placement
+		if ( THE_TPL_CTX->getBoundaries().hasBoundaries() ) 
+			motionMonitor->makeCompleteVisibleMetric(THE_TPL_CTX->getBoundaries());
+		
 		serialSpyPanel->clearSerialSpyBeforNextRun();
 		
 		THE_CONTEXT->resetProcessing();
@@ -6107,6 +6113,9 @@ void MainFrame::selectMonitorBookCncPanel() {
 		m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
 		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 	}
+	
+	// to release the opengl context switch
+	motionMonitor->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookTemplatePanel() {
@@ -7082,12 +7091,6 @@ void MainFrame::rcRun() {
 			perspectiveHandler.ensureRunPerspectiveMinimal();
 	}
 	
-	
-	// if template boundaries available prepare the motion monitor 
-	// to the best size (scale) and origin placement
-	if ( THE_TPL_CTX->getBoundaries().hasBoundaries() ) 
-		motionMonitor->makeCompleteVisibleMetric(THE_TPL_CTX->getBoundaries());
-	
 	// process
 	CNC_CLOG_A("")
 	processTemplateWrapper();
@@ -7925,148 +7928,10 @@ void MainFrame::selectPositionSpyContent(wxCommandEvent& event) {
 	clearPositionSpy();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::processDirectoryTest(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	// ----------------------------------------------------------
-	class AllFiles : public wxDirTraverser {
-		
-		public:
-		
-			unsigned int cntTotalDirs;
-			unsigned int cntTotalFiles;
-			unsigned int cntFailed;
-
-			// --------------------------------------------------
-			AllFiles() 
-			: wxDirTraverser()
-			, cntTotalDirs	(0)
-			, cntTotalFiles	(0)
-			, cntFailed		(0)
-			{}
-			// --------------------------------------------------
-			virtual ~AllFiles()
-			{}
-			// --------------------------------------------------
-			virtual wxDirTraverseResult OnDir(const wxString& dirname)
-			{
-				cntTotalDirs++;
-				return wxDIR_CONTINUE;
-			}
-			// --------------------------------------------------
-			virtual wxDirTraverseResult OnFile(const wxString& filename)
-			{
-				bool error = false;
-				wxFileName fn(filename);
-				
-				CNC_CLOG_A("\n~~~ Start Test for '%s'", fn.GetFullPath())
-				INC_LOGGER_INDENT
-				
-				if ( THE_APP->openTemplateFile(fn) )
-				{
-					if ( THE_APP->processTemplateWrapper() == false )
-					{
-						// the errors are already present
-						//CNC_CERR_A("Error while processing '%s'", fn.GetFullPath())
-						cntFailed++;
-						error = true;
-					}
-				}
-				else
-				{
-					CNC_CERR_A("Error while open '%s'", fn.GetFullPath())
-					cntFailed++;
-					error = true;
-				}
-				
-				DEC_LOGGER_INDENT
-				if ( error )	CNC_CERR_A("=== Finish Test with errors for '%s'",  fn.GetFullPath())
-				else			CNC_CLOG_A("=== Finish Test successfully for '%s'", fn.GetFullPath())
-				
-				cntTotalFiles++;
-				return wxDIR_CONTINUE;
-			}
-	};
-	
-	// ----------------------------------------------------------
-	wxString dirName; THE_CONFIG->getDefaultTestTplDir(dirName);
-	dirName.append(wxFileName::GetPathSeparator());
-	
-	wxDir dir(dirName);
-	if ( !dir.IsOpened() )
-	{
-		CNC_CERR_FUNCT_A("Can't open '%s'", dirName)
-		return;
-	}
-	
-	AllFiles allFiles;
-	dir.Traverse(allFiles);
-	
-	CNC_CEX2_A("Test execution Summary: *********************************************")
-	INC_LOGGER_INDENT
-	
-	CNC_CEX2_A("Total count test cases: %4u", allFiles.cntTotalFiles)
-	CNC_CEX2_A("          Successfully: %4u", allFiles.cntTotalFiles - allFiles.cntFailed)
-	CNC_CEX2_A("                Failed: %4u", allFiles.cntFailed)
-	
-	DEC_LOGGER_INDENT
-	CNC_CEX2_A("*********************************************************************")
-
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxTextEntryDialog dlg(this, "Loop Repeat Test:", "Loop count . . .", "");
-	dlg.SetMaxLength(8);
-	dlg.SetTextValidator(wxFILTER_DIGITS);
-	
-	unsigned int loopCount = 0;
-	if ( dlg.ShowModal() == wxID_OK  )
-	{
-		wxString s = dlg.GetValue();
-		s.Trim(true).Trim(false);
-		
-		if ( s.IsEmpty() == false )
-		{
-			long num;
-			s.ToLong(&num);
-			if ( num > 0 && num < 10000 )
-				loopCount = (unsigned int)num;
-		}
-	}
-	
-	if ( loopCount == 0 )
-		return;
-		
-	wxString title(GetTitle());
-	wxString info;
-	long duration = 0;
-
-	// loop
-	for ( unsigned int i=0; i<loopCount; i++)
-	{
-		if ( cnc && cnc->isInterrupted() )
-			break;
-
-		bool ret = processTemplateWrapper( i == 0 );
-		duration += THE_CONTEXT->timestamps.getTotalDurationMillis();
-
-		info.Printf("Loop Counter : % 6d [#]; AVG duration: % 10ld [ms]", i + 1, duration / ( i + 1 ));
-		SetTitle(wxString::Format("%s         [%s]", title, info));
-		cnc::trc.logInfoMessage(info);
-
-		if ( ret == false )
-		{
-			CNC_CERR_FUNCT_A("Call of processTemplateWrapper() failed")
-			//break;
-		}
-		
-		waitActive(5);
-	}
-	
-	// summary
-	cnc::trc.logInfoMessage("");
-	std::clog << wxString::Format("Loop Repeat Test Sumary: Count: % 6d [#]; AVG Duration: % 10ld [ms]", loopCount, duration / loopCount) << std::endl;
-	SetTitle(title);
+	CncTestRunConfig dlg(this);
+	dlg.ShowModal();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::refreshSetterList(wxCommandEvent& event) {
@@ -9183,6 +9048,7 @@ void MainFrame::onResetHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	THE_BOUNDS->resetHardwareOffset();
 	updateHardwareReference();
+	motionMonitor->Update();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::updateHardwareDimensions() {

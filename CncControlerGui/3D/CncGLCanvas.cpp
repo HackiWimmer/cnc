@@ -10,6 +10,8 @@ CncGlCanvas::CncGlCanvas(wxWindow *parent, int *attribList)
 , alreadyPainted	(false)
 , lastSetCurrent	(false)
 , mouseMoveMode		(false)
+, mouseMoveX		(0) 
+, mouseMoveY		(0)
 //////////////////////////////////////////////////
 {
 }
@@ -124,34 +126,37 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	if ( event.LeftDown() )
 		this->SetFocusFromKbd();
 		
-	if ( event.RightDown() ) {
+	if ( event.RightDown() )
+	{
 		if ( context->isViewMode2D() )
 			CNC_PRINT_FUNCT
 	}
 
 	// wheel - rotate and scale
 	const int rot = event.GetWheelRotation();
-	if ( rot != 0 ) {
-		if ( event.ControlDown() && event.ShiftDown() ) {
-			
+	if ( rot != 0 )
+	{
+		if ( event.ControlDown() && event.ShiftDown() )
+		{
 			if (rot < 0 )	context->getModelRotation().decAngleX();
 			else			context->getModelRotation().incAngleX();
 		}
-		else if ( event.ShiftDown() ) {
-			
+		else if ( event.ShiftDown() ) 
+		{
 			if (rot < 0 )	context->getModelRotation().decAngleY();
 			else			context->getModelRotation().incAngleY();
 		}
-		else if ( event.ControlDown() ) {
-			
+		else if ( event.ControlDown() ) 
+		{
 			if (rot < 0 )	context->getModelRotation().decAngleZ();
 			else			context->getModelRotation().incAngleZ();
 		}
-		else if ( event.AltDown() ) {
-			
+		else if ( event.AltDown() ) 
+		{
 			context->getModelRotation().reset();
 		}
-		else {
+		else 
+		{
 			if (rot < 0 ) 	decScale();
 			else 			incScale();
 		}
@@ -163,50 +168,51 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	
 	// always do this here! form a first point of view it looks a little bit crazy
 	// because we are within a callback which contains a wxMouseEvent event,
-	// but if the the underlying window was leaved during the move and enter again
+	// but if the the underlying window was left during the move and enter again
 	// the previous event.LeftDown() isn't further present, therefore this . . 
 	if ( wxGetMouseState().LeftIsDown() == false )
 		mouseMoveMode = false;
 
 	// move origin
-	if ( event.ControlDown() == false ) {
-		
-		static int mx = 0, my = 0;
-		
-		if ( event.LeftDown() == true && mouseMoveMode == false ) {
-			mx = event.GetX();
-			my = event.GetY();
+	if ( event.ControlDown() == false ) 
+	{
+		if ( event.LeftDown() == true && mouseMoveMode == false )
+		{
+			mouseMoveX = event.GetX();
+			mouseMoveY = event.GetY();
 			
 			mouseMoveMode = true;
 		}
 		
 		// calculate new origin
-		if ( mouseMoveMode == true ) {
-			const int	 dx = (event.GetX() - mx);
-			const int	 dy = (event.GetY() - my) * -1;
+		if ( mouseMoveMode == true )
+		{
+			const int	 dx = (event.GetX() - mouseMoveX);
+			const int	 dy = (event.GetY() - mouseMoveY) * -1;
 			
 			// re-initialize to be further relative 
-			mx = event.GetX();
-			my = event.GetY();
+			mouseMoveX = event.GetX();
+			mouseMoveY = event.GetY();
 			
 			context->reshapeRelative(dx, dy);
 			update();
 		}
 		
 		// reset move mode
-		if ( event.LeftUp() == true ) {
+		if ( event.LeftUp() == true )
 			mouseMoveMode = false;
-		}
 		
-	// set origin absolute
-	} else {
-		
+	}
+	else
+	{
 		// left button
-		if ( event.LeftIsDown() == true ) {
+		if ( event.LeftIsDown() == true )
+		{
 			// reverse y because the opengl viewport origin (0,0) is at left/bottom
 			const int px = event.GetX();
 			const int py = cs.GetHeight() - event.GetY();
 			
+			// set origin absolute
 			context->reshapeAbsolute(px, py);
 			update();
 		}

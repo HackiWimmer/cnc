@@ -165,3 +165,180 @@ CncUnitTestsBase::~CncUnitTestsBase()
     m_unitTestStartupTimer->Stop();
     wxDELETE(m_unitTestStartupTimer);
 }
+
+CncTestRunConfigBase::CncTestRunConfigBase(wxWindow* parent,
+    wxWindowID id,
+    const wxString& title,
+    const wxPoint& pos,
+    const wxSize& size,
+    long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if(!bBitmapLoaded) {
+	// We need to initialise the default bitmap handler
+	wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+	wxC83AAInitBitmapResources();
+	bBitmapLoaded = true;
+    }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+	wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)"));
+	wxIcon icn;
+	icn.CopyFromBitmap(iconBmp);
+	app_icons.AddIcon(icn);
+    }
+    SetIcons(app_icons);
+
+    wxFlexGridSizer* flexGridSizer20 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer20->SetFlexibleDirection(wxBOTH);
+    flexGridSizer20->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer20->AddGrowableCol(0);
+    flexGridSizer20->AddGrowableRow(0);
+    flexGridSizer20->SetMinSize(500, 300);
+    this->SetSizer(flexGridSizer20);
+
+    wxFlexGridSizer* flexGridSizer21 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer21->SetFlexibleDirection(wxBOTH);
+    flexGridSizer21->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer21->AddGrowableCol(0);
+    flexGridSizer21->AddGrowableRow(0);
+
+    flexGridSizer20->Add(flexGridSizer21, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_lbTestCase = new wxListbook(
+        this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxLB_DEFAULT | wxBK_DEFAULT);
+    m_lbTestCase->SetName(wxT("m_lbTestCase"));
+    wxImageList* m_lbTestCase_il = new wxImageList(16, 16);
+    m_lbTestCase->AssignImageList(m_lbTestCase_il);
+
+    flexGridSizer21->Add(m_lbTestCase, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_plLoop = new wxPanel(
+        m_lbTestCase, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_lbTestCase, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+    int m_plLoopImgIndex;
+    m_plLoopImgIndex = m_lbTestCase_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("ConConnected")));
+    m_lbTestCase->AddPage(m_plLoop, _("Loop\nCurrent Template"), false, m_plLoopImgIndex);
+
+    wxFlexGridSizer* flexGridSizer30 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer30->SetFlexibleDirection(wxBOTH);
+    flexGridSizer30->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer30->AddGrowableCol(0);
+    m_plLoop->SetSizer(flexGridSizer30);
+
+    wxFlexGridSizer* flexGridSizer341 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer341->SetFlexibleDirection(wxBOTH);
+    flexGridSizer341->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer341->AddGrowableCol(1);
+
+    flexGridSizer30->Add(flexGridSizer341, 1, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticText352 = new wxStaticText(
+        m_plLoop, wxID_ANY, _("Loop Count:"), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), 0);
+    wxFont m_staticText352Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText352->SetFont(m_staticText352Font);
+
+    flexGridSizer341->Add(m_staticText352, 0, wxALL, WXC_FROM_DIP(5));
+    m_staticText352->SetMinSize(wxSize(100, -1));
+
+    m_loopCount = new wxSpinCtrl(
+        m_plLoop, wxID_ANY, wxT("3"), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), wxSP_ARROW_KEYS);
+    m_loopCount->SetRange(1, 100);
+    m_loopCount->SetValue(3);
+
+    flexGridSizer341->Add(m_loopCount, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer34 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer34->SetFlexibleDirection(wxBOTH);
+    flexGridSizer34->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer30->Add(flexGridSizer34, 1, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticText35 = new wxStaticText(
+        m_plLoop, wxID_ANY, _("Break on Error:"), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), 0);
+    wxFont m_staticText35Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText35->SetFont(m_staticText35Font);
+
+    flexGridSizer34->Add(m_staticText35, 0, wxALL, WXC_FROM_DIP(5));
+    m_staticText35->SetMinSize(wxSize(100, -1));
+
+    m_cbBreakOnError =
+        new wxCheckBox(m_plLoop, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), 0);
+    m_cbBreakOnError->SetValue(true);
+
+    flexGridSizer34->Add(m_cbBreakOnError, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_plDir = new wxPanel(
+        m_lbTestCase, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_lbTestCase, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+    int m_plDirImgIndex;
+    m_plDirImgIndex = m_lbTestCase_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("CncFolder")));
+    m_lbTestCase->AddPage(m_plDir, _("Process\nDirectory"), false, m_plDirImgIndex);
+
+    wxFlexGridSizer* flexGridSizer31 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer31->SetFlexibleDirection(wxBOTH);
+    flexGridSizer31->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer31->AddGrowableCol(1);
+    m_plDir->SetSizer(flexGridSizer31);
+
+    m_staticText33 = new wxStaticText(
+        m_plDir, wxID_ANY, _("Select a folder:"), wxDefaultPosition, wxDLG_UNIT(m_plDir, wxSize(-1, -1)), 0);
+    wxFont m_staticText33Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText33->SetFont(m_staticText33Font);
+
+    flexGridSizer31->Add(m_staticText33, 0, wxALL, WXC_FROM_DIP(5));
+    m_staticText33->SetMinSize(wxSize(100, -1));
+
+    m_dirSelection = new wxDirPickerCtrl(m_plDir, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition,
+        wxDLG_UNIT(m_plDir, wxSize(-1, -1)), wxDIRP_SMALL | wxDIRP_DEFAULT_STYLE);
+
+    flexGridSizer31->Add(m_dirSelection, 0, wxALL | wxEXPAND, WXC_FROM_DIP(2));
+
+    m_staticLine43 =
+        new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer20->Add(m_staticLine43, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    wxFlexGridSizer* flexGridSizer22 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer22->SetFlexibleDirection(wxBOTH);
+    flexGridSizer22->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer20->Add(flexGridSizer22, 1, wxALL | wxEXPAND | wxALIGN_RIGHT, WXC_FROM_DIP(5));
+
+    m_btCancel = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
+    wxFont m_btCancelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btCancel->SetFont(m_btCancelFont);
+    m_btCancel->SetToolTip(_("Cancel"));
+
+    flexGridSizer22->Add(m_btCancel, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_btRun = new wxButton(this, wxID_ANY, _("Run . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_btRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-cog")), wxLEFT);
+    m_btRun->SetBitmapMargins(2, 2);
+#endif
+    wxFont m_btRunFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btRun->SetFont(m_btRunFont);
+    m_btRun->SetToolTip(_("Run"));
+
+    flexGridSizer22->Add(m_btRun, 0, wxALL, WXC_FROM_DIP(5));
+
+    SetName(wxT("CncTestRunConfigBase"));
+    SetSize(wxDLG_UNIT(this, wxSize(500, 300)));
+    if(GetSizer()) {
+	GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+	CentreOnParent(wxBOTH);
+    } else {
+	CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    m_btCancel->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTestRunConfigBase::onCancel, this);
+    m_btRun->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTestRunConfigBase::onRun, this);
+}
+
+CncTestRunConfigBase::~CncTestRunConfigBase()
+{
+    m_btCancel->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTestRunConfigBase::onCancel, this);
+    m_btRun->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTestRunConfigBase::onRun, this);
+}

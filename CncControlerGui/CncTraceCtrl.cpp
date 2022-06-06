@@ -18,8 +18,10 @@ void CncTraceInfoBar::notifyDisplayTimer() {
 //////////////////////////////////////////////////
 void CncTraceInfoBar::showMessage(const char type, const wxString& msg) {
 //////////////////////////////////////////////////
-	if ( IsShownOnScreen() == false ) {
-		switch ( type ) {
+	if ( IsShownOnScreen() == false )
+	{
+		switch ( type )
+		{
 			case 'W':
 			case 'E':	wxBell();
 						break;
@@ -79,7 +81,8 @@ void CncTraceCtrl::clearTrace(const wxString& timeStamp) {
 //////////////////////////////////////////////////////////////
 	const wxString line(GetValue());
 	
-	if ( line.IsEmpty() == false ) {
+	if ( line.IsEmpty() == false ) 
+	{
 		entries.push_back(std::move(TraceEntry(timeStamp, line)));
 		CncTextCtrl::Clear();
 		

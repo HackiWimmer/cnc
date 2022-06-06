@@ -61,6 +61,7 @@ class CncDryRunLoggerProxy;
 class CncParserSynopsisProxy;
 
 class CncSimuHwDimensionSetup;
+class CncTestRunConfig;
 class CncSourceEditor;
 class CncOutboundEditor;
 class CncFilePreviewWnd;
@@ -190,7 +191,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-		virtual void processDirectoryTest(wxCommandEvent& event);
 		virtual void rcDryRun(wxCommandEvent& event);
 		virtual void onPodiumManagement(wxCommandEvent& event);
 		virtual void onResetView(wxCommandEvent& event);
@@ -757,6 +757,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncPathListRunner;
 		
 		friend class CncSimuHwDimensionSetup;
+		friend class CncTestRunConfig;
 
 		// to remove . . .
 			friend class CncFileView;
