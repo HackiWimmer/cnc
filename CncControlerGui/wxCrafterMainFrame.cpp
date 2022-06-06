@@ -5983,16 +5983,27 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     flexGridSizer10025->Add(m_secureShowHardwareBox, 0, wxALL, WXC_FROM_DIP(0));
     m_secureShowHardwareBox->SetMinSize(wxSize(40, 40));
 
-    m_secureShowBoundBox = new wxButton(
+    m_secureShowTotalBoundBox = new wxButton(
         m_panelMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(40, 40)), 0);
 #if wxVERSION_NUMBER >= 2904
-    m_secureShowBoundBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncBoundbox")), wxLEFT);
-    m_secureShowBoundBox->SetBitmapMargins(0, 0);
+    m_secureShowTotalBoundBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("CncBoundbox")), wxLEFT);
+    m_secureShowTotalBoundBox->SetBitmapMargins(0, 0);
 #endif
-    m_secureShowBoundBox->SetToolTip(_("Show/Hide Bound Box"));
+    m_secureShowTotalBoundBox->SetToolTip(_("Show/Hide Bound Box"));
 
-    flexGridSizer10025->Add(m_secureShowBoundBox, 0, wxALL, WXC_FROM_DIP(0));
-    m_secureShowBoundBox->SetMinSize(wxSize(40, 40));
+    flexGridSizer10025->Add(m_secureShowTotalBoundBox, 0, wxALL, WXC_FROM_DIP(0));
+    m_secureShowTotalBoundBox->SetMinSize(wxSize(40, 40));
+
+    m_secureShowObjectBoundBox = new wxButton(
+        m_panelMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(40, 40)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_secureShowObjectBoundBox->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("boundbox")), wxLEFT);
+    m_secureShowObjectBoundBox->SetBitmapMargins(0, 0);
+#endif
+    m_secureShowObjectBoundBox->SetToolTip(_("Show/Hide Bound Box"));
+
+    flexGridSizer10025->Add(m_secureShowObjectBoundBox, 0, wxALL, WXC_FROM_DIP(0));
+    m_secureShowObjectBoundBox->SetMinSize(wxSize(40, 40));
 
     m_secureShowOrigin = new wxButton(
         m_panelMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(40, 40)), 0);
@@ -6119,7 +6130,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 
     flexGridSizer9867->Add(m_secMonitorPlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
 
-    wxFlexGridSizer* flexGridSizer23118 = new wxFlexGridSizer(20, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer23118 = new wxFlexGridSizer(30, 1, 0, 0);
     flexGridSizer23118->SetFlexibleDirection(wxBOTH);
     flexGridSizer23118->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer23118->AddGrowableCol(0);
@@ -6251,6 +6262,81 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 
     flexGridSizer23118->Add(m_3D_Perspective4Sec, 0, wxALL, WXC_FROM_DIP(0));
     m_3D_Perspective4Sec->SetMinSize(wxSize(40, 40));
+
+    m_staticLine2341225 = new wxStaticLine(
+        m_panelMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer23118->Add(m_staticLine2341225, 0, wxALL | wxEXPAND, WXC_FROM_DIP(2));
+
+    m_staticText10088 = new wxStaticText(m_panelMonitor, wxID_ANY, _("FCM:"), wxDefaultPosition,
+        wxDLG_UNIT(m_panelMonitor, wxSize(-1, -1)), wxALIGN_CENTRE);
+
+    flexGridSizer23118->Add(m_staticText10088, 0, wxALL | wxALIGN_CENTER, WXC_FROM_DIP(5));
+
+    m_frontKeepModeOff = new wxButton(
+        m_panelMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(40, 40)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_frontKeepModeOff->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("display-brightness-off (2)")), wxLEFT);
+    m_frontKeepModeOff->SetBitmapMargins(2, 2);
+#endif
+    m_frontKeepModeOff->SetToolTip(_("Swicht Front Keeping Mode Off"));
+
+    flexGridSizer23118->Add(m_frontKeepModeOff, 0, wxALL, WXC_FROM_DIP(0));
+    m_frontKeepModeOff->SetMinSize(wxSize(40, 40));
+
+    m_frontKeepModeInFrame = new wxButton(
+        m_panelMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(40, 40)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_frontKeepModeInFrame->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("table-border-outline")), wxLEFT);
+    m_frontKeepModeInFrame->SetBitmapMargins(2, 2);
+#endif
+    m_frontKeepModeInFrame->SetToolTip(_("Swicht Front Keeping Mode to 'In Frame'"));
+
+    flexGridSizer23118->Add(m_frontKeepModeInFrame, 0, wxALL, WXC_FROM_DIP(0));
+    m_frontKeepModeInFrame->SetMinSize(wxSize(40, 40));
+
+    m_frontKeepModeCentered = new wxButton(
+        m_panelMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(40, 40)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_frontKeepModeCentered->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("centred")), wxLEFT);
+    m_frontKeepModeCentered->SetBitmapMargins(2, 2);
+#endif
+    m_frontKeepModeCentered->SetToolTip(_("Swicht Front Keeping Mode to 'Centered'"));
+
+    flexGridSizer23118->Add(m_frontKeepModeCentered, 0, wxALL, WXC_FROM_DIP(0));
+    m_frontKeepModeCentered->SetMinSize(wxSize(40, 40));
+
+    m_staticLine2341226 = new wxStaticLine(
+        m_panelMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer23118->Add(m_staticLine2341226, 0, wxALL | wxEXPAND, WXC_FROM_DIP(2));
+
+    m_staticText10087 = new wxStaticText(m_panelMonitor, wxID_ANY, _("SEL:"), wxDefaultPosition,
+        wxDLG_UNIT(m_panelMonitor, wxSize(-1, -1)), wxALIGN_CENTRE);
+
+    flexGridSizer23118->Add(m_staticText10087, 0, wxALL | wxALIGN_CENTER, WXC_FROM_DIP(5));
+
+    m_selectWorkingSpace = new wxButton(
+        m_panelMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(40, 40)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_selectWorkingSpace->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("insert-edit")), wxLEFT);
+    m_selectWorkingSpace->SetBitmapMargins(2, 2);
+#endif
+    m_selectWorkingSpace->SetToolTip(_("Select Working Space"));
+
+    flexGridSizer23118->Add(m_selectWorkingSpace, 0, wxALL, WXC_FROM_DIP(0));
+    m_selectWorkingSpace->SetMinSize(wxSize(40, 40));
+
+    m_selectHardwareSpace = new wxButton(
+        m_panelMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(40, 40)), 0);
+#if wxVERSION_NUMBER >= 2904
+    m_selectHardwareSpace->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("insert-chart")), wxLEFT);
+    m_selectHardwareSpace->SetBitmapMargins(2, 2);
+#endif
+    m_selectHardwareSpace->SetToolTip(_("Select Hardware Space"));
+
+    flexGridSizer23118->Add(m_selectHardwareSpace, 0, wxALL, WXC_FROM_DIP(0));
+    m_selectHardwareSpace->SetMinSize(wxSize(40, 40));
 
     m_staticLine234122 = new wxStaticLine(
         m_panelMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelMonitor, wxSize(-1, -1)), wxLI_HORIZONTAL);
@@ -7214,7 +7300,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     m_btDeactivateSecureRunMode->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onDeactivateSecureRunMode, this);
     m_btCloseSecurePanel->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onCloseSecureRunAuiPane, this);
     m_secureShowHardwareBox->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleHardwareBox, this);
-    m_secureShowBoundBox->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleBoundBox, this);
+    m_secureShowTotalBoundBox->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleTotalBoundBox, this);
+    m_secureShowObjectBoundBox->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleObjectBoundBox, this);
     m_secureShowOrigin->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleOrigin, this);
     m_secureShowGuidePathes->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleGuidePathes, this);
     m_secureShowRuler->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleRuler, this);
@@ -7235,6 +7322,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     m_3D_Perspective2Sec->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::show3D, this);
     m_3D_Perspective3Sec->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::show3D, this);
     m_3D_Perspective4Sec->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::show3D, this);
+    m_frontKeepModeOff->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onKeepFrontModeOff, this);
+    m_frontKeepModeInFrame->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onKeepFrontModeInFrame, this);
+    m_frontKeepModeCentered->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onKeepFrontModeCentred, this);
+    m_selectWorkingSpace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onSelectWorkingSpace, this);
+    m_selectHardwareSpace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onSelectHardwareSpace, this);
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::newTemplate, this, m_miNewTemplate->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::openTemplate, this, m_miOpenTemplate->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::reloadTemplate, this, m_miReloadTemplate->GetId());
@@ -7511,7 +7603,8 @@ MainFrameBClass::~MainFrameBClass()
         wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onDeactivateSecureRunMode, this);
     m_btCloseSecurePanel->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onCloseSecureRunAuiPane, this);
     m_secureShowHardwareBox->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleHardwareBox, this);
-    m_secureShowBoundBox->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleBoundBox, this);
+    m_secureShowTotalBoundBox->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleTotalBoundBox, this);
+    m_secureShowObjectBoundBox->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleObjectBoundBox, this);
     m_secureShowOrigin->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleOrigin, this);
     m_secureShowGuidePathes->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleGuidePathes, this);
     m_secureShowRuler->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onToggleRuler, this);
@@ -7532,6 +7625,11 @@ MainFrameBClass::~MainFrameBClass()
     m_3D_Perspective2Sec->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::show3D, this);
     m_3D_Perspective3Sec->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::show3D, this);
     m_3D_Perspective4Sec->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::show3D, this);
+    m_frontKeepModeOff->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onKeepFrontModeOff, this);
+    m_frontKeepModeInFrame->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onKeepFrontModeInFrame, this);
+    m_frontKeepModeCentered->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onKeepFrontModeCentred, this);
+    m_selectWorkingSpace->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onSelectWorkingSpace, this);
+    m_selectHardwareSpace->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onSelectHardwareSpace, this);
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::newTemplate, this, m_miNewTemplate->GetId());
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::openTemplate, this, m_miOpenTemplate->GetId());
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::reloadTemplate, this, m_miReloadTemplate->GetId());

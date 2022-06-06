@@ -81,6 +81,8 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	monitor->setZoomFactor(zoom);
 	monitor->registerCallback(this);
 	
+	setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_KEEP_IN_FRAME);
+	
 	// deactivate process mode by default
 	popProcessMode();
 	
@@ -458,15 +460,15 @@ void CncMotionMonitor::onKeyDown(int keyCode) {
 							else										cnc::trc.logInfo("No hardware space available");
 							break;
 
-		case '0':			monitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_OFF);
+		case '0':			setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_OFF);
 							onPaint();
 							break;
 							
-		case '1':			monitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_KEEP_IN_FRAME);
+		case '1':			setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_KEEP_IN_FRAME);
 							onPaint();
 							break;
 							
-		case '2':			monitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_ALWAYS_CENTRED);
+		case '2':			setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_ALWAYS_CENTRED);
 							onPaint();
 							break;
 							
@@ -486,6 +488,33 @@ void CncMotionMonitor::onKeyDown(int keyCode) {
 							onPaint();
 							break;
 	}
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::setFrontCatchingMode(GLContextBase::FrontCatchingMode fcm) {
+//////////////////////////////////////////////////
+	static wxColour active  (171, 171, 171);
+	static wxColour inactive(240, 240, 240);
+
+	THE_APP->GetFrontKeepModeInFrame()	->SetBackgroundColour(inactive);
+	THE_APP->GetFrontKeepModeCentered()	->SetBackgroundColour(inactive);
+	THE_APP->GetFrontKeepModeOff()		->SetBackgroundColour(inactive);
+	
+	switch ( fcm )
+	{
+		case GLContextBase::FrontCatchingMode::FCM_KEEP_IN_FRAME:
+					THE_APP->GetFrontKeepModeInFrame()->SetBackgroundColour(active);
+					break;
+					
+		case GLContextBase::FrontCatchingMode::FCM_ALWAYS_CENTRED:
+					THE_APP->GetFrontKeepModeCentered()->SetBackgroundColour(active);
+					break;
+					
+		case GLContextBase::FrontCatchingMode::FCM_OFF:
+					THE_APP->GetFrontKeepModeOff()->SetBackgroundColour(active);
+					break;
+	}
+
+	monitor->setFrontCatchingMode(fcm);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onKeyDown(wxKeyEvent& event) {

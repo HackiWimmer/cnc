@@ -119,12 +119,14 @@
   <object class="wxBitmap" name="arrow-out">bitmaps\arrow-out.png</object>
   <object class="wxBitmap" name="basket-3">bitmaps\basket-3.png</object>
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
+  <object class="wxBitmap" name="boundbox">bitmaps\boundbox.png</object>
   <object class="wxBitmap" name="brick">bitmaps\brick.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bullet-blue">bitmaps\bullet-blue.png</object>
   <object class="wxBitmap" name="bullet-purple">bitmaps\bullet-purple.png</object>
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
   <object class="wxBitmap" name="camera16">bitmaps\camera16.png</object>
+  <object class="wxBitmap" name="centred">bitmaps\centred.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="clear">bitmaps\clear.png</object>
   <object class="wxBitmap" name="close">bitmaps\close.png</object>
@@ -133,6 +135,7 @@
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
   <object class="wxBitmap" name="database-error">bitmaps\database-error.png</object>
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
+  <object class="wxBitmap" name="display-brightness-off (2)">bitmaps\display-brightness-off (2).png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-export-4">bitmaps\document-export-4.png</object>
@@ -167,6 +170,8 @@
   <object class="wxBitmap" name="iconmonstr-next-step-16">bitmaps\RunCtrl\iconmonstr-next-step-16.png</object>
   <object class="wxBitmap" name="iconmonstr-synchronization-8-16">bitmaps\RunCtrl\iconmonstr-synchronization-8-16.png</object>
   <object class="wxBitmap" name="iconmonstr-window-21-16">bitmaps\RunCtrl\iconmonstr-window-21-16.png</object>
+  <object class="wxBitmap" name="insert-chart">bitmaps\insert-chart.png</object>
+  <object class="wxBitmap" name="insert-edit">bitmaps\insert-edit.png</object>
   <object class="wxBitmap" name="keyboard">bitmaps\keyboard.png</object>
   <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
   <object class="wxBitmap" name="network-wireless-full (2)">bitmaps\network-wireless-full (2).png</object>
@@ -189,6 +194,7 @@
   <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
+  <object class="wxBitmap" name="table-border-outline">bitmaps\table-border-outline.png</object>
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
   <object class="wxBitmap" name="table-edit">bitmaps\table-edit.png</object>
   <object class="wxBitmap" name="thread-active">bitmaps\thread-active.png</object>

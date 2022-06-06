@@ -599,7 +599,8 @@ protected:
     wxSimplebook* m_secureMainBook;
     wxPanel* m_panelMonitor;
     wxButton* m_secureShowHardwareBox;
-    wxButton* m_secureShowBoundBox;
+    wxButton* m_secureShowTotalBoundBox;
+    wxButton* m_secureShowObjectBoundBox;
     wxButton* m_secureShowOrigin;
     wxButton* m_secureShowGuidePathes;
     wxButton* m_secureShowRuler;
@@ -624,6 +625,15 @@ protected:
     wxButton* m_3D_Perspective2Sec;
     wxButton* m_3D_Perspective3Sec;
     wxButton* m_3D_Perspective4Sec;
+    wxStaticLine* m_staticLine2341225;
+    wxStaticText* m_staticText10088;
+    wxButton* m_frontKeepModeOff;
+    wxButton* m_frontKeepModeInFrame;
+    wxButton* m_frontKeepModeCentered;
+    wxStaticLine* m_staticLine2341226;
+    wxStaticText* m_staticText10087;
+    wxButton* m_selectWorkingSpace;
+    wxButton* m_selectHardwareSpace;
     wxStaticLine* m_staticLine234122;
     wxStaticLine* m_staticLine9953;
     wxPanel* m_splitterPageLogger;
@@ -1362,7 +1372,11 @@ protected:
     {
 	event.Skip();
     }
-    virtual void onToggleBoundBox(wxCommandEvent& event)
+    virtual void onToggleTotalBoundBox(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onToggleObjectBoundBox(wxCommandEvent& event)
     {
 	event.Skip();
     }
@@ -1431,6 +1445,26 @@ protected:
 	event.Skip();
     }
     virtual void show3D(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onKeepFrontModeOff(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onKeepFrontModeInFrame(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onKeepFrontModeCentred(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSelectWorkingSpace(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onSelectHardwareSpace(wxCommandEvent& event)
     {
 	event.Skip();
     }
@@ -3796,9 +3830,13 @@ public:
     {
 	return m_secureShowHardwareBox;
     }
-    wxButton* GetSecureShowBoundBox()
+    wxButton* GetSecureShowTotalBoundBox()
     {
-	return m_secureShowBoundBox;
+	return m_secureShowTotalBoundBox;
+    }
+    wxButton* GetSecureShowObjectBoundBox()
+    {
+	return m_secureShowObjectBoundBox;
     }
     wxButton* GetSecureShowOrigin()
     {
@@ -3895,6 +3933,42 @@ public:
     wxButton* Get3D_Perspective4Sec()
     {
 	return m_3D_Perspective4Sec;
+    }
+    wxStaticLine* GetStaticLine2341225()
+    {
+	return m_staticLine2341225;
+    }
+    wxStaticText* GetStaticText10088()
+    {
+	return m_staticText10088;
+    }
+    wxButton* GetFrontKeepModeOff()
+    {
+	return m_frontKeepModeOff;
+    }
+    wxButton* GetFrontKeepModeInFrame()
+    {
+	return m_frontKeepModeInFrame;
+    }
+    wxButton* GetFrontKeepModeCentered()
+    {
+	return m_frontKeepModeCentered;
+    }
+    wxStaticLine* GetStaticLine2341226()
+    {
+	return m_staticLine2341226;
+    }
+    wxStaticText* GetStaticText10087()
+    {
+	return m_staticText10087;
+    }
+    wxButton* GetSelectWorkingSpace()
+    {
+	return m_selectWorkingSpace;
+    }
+    wxButton* GetSelectHardwareSpace()
+    {
+	return m_selectHardwareSpace;
     }
     wxStaticLine* GetStaticLine234122()
     {

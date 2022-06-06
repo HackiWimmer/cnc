@@ -8898,7 +8898,7 @@ State</label>
                                               <object class="sizeritem">
                                                 <flag>wxALL</flag>
                                                 <minsize>40,40</minsize>
-                                                <object class="wxButton" name="m_secureShowBoundBox">
+                                                <object class="wxButton" name="m_secureShowTotalBoundBox">
                                                   <label/>
                                                   <style/>
                                                   <size>40,40</size>
@@ -8906,6 +8906,21 @@ State</label>
                                                     <![CDATA[Show/Hide Bound Box]]>
                                                   </tooltip>
                                                   <bitmap>bitmaps/CncBoundbox.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <minsize>40,40</minsize>
+                                                <object class="wxButton" name="m_secureShowObjectBoundBox">
+                                                  <label/>
+                                                  <style/>
+                                                  <size>40,40</size>
+                                                  <tooltip>
+                                                    <![CDATA[Show/Hide Bound Box]]>
+                                                  </tooltip>
+                                                  <bitmap>bitmaps/boundbox.png</bitmap>
                                                   <bitmapposition>wxLEFT</bitmapposition>
                                                   <default>0</default>
                                                 </object>
@@ -9085,7 +9100,7 @@ State</label>
                                             <option>1</option>
                                             <object class="wxFlexGridSizer">
                                               <cols>1</cols>
-                                              <rows>20</rows>
+                                              <rows>30</rows>
                                               <vgap>0</vgap>
                                               <hgap>0</hgap>
                                               <growablecols>0</growablecols>
@@ -9258,6 +9273,111 @@ State</label>
                                                     <![CDATA[Show 3D - ISO4]]>
                                                   </tooltip>
                                                   <bitmap>bitmaps/ViewIso4.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>2</border>
+                                                <object class="wxStaticLine" name="m_staticLine2341225">
+                                                  <style>wxLI_HORIZONTAL</style>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxALIGN_CENTER</flag>
+                                                <border>5</border>
+                                                <object class="wxStaticText" name="m_staticText10088">
+                                                  <label>FCM:</label>
+                                                  <style>wxALIGN_CENTRE</style>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <minsize>40,40</minsize>
+                                                <object class="wxButton" name="m_frontKeepModeOff">
+                                                  <label/>
+                                                  <style/>
+                                                  <size>40,40</size>
+                                                  <tooltip>
+                                                    <![CDATA[Swicht Front Keeping Mode Off]]>
+                                                  </tooltip>
+                                                  <bitmap>bitmaps/display-brightness-off (2).png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <minsize>40,40</minsize>
+                                                <object class="wxButton" name="m_frontKeepModeInFrame">
+                                                  <label/>
+                                                  <style/>
+                                                  <size>40,40</size>
+                                                  <tooltip>
+                                                    <![CDATA[Swicht Front Keeping Mode to 'In Frame']]>
+                                                  </tooltip>
+                                                  <bitmap>bitmaps/table-border-outline.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <minsize>40,40</minsize>
+                                                <object class="wxButton" name="m_frontKeepModeCentered">
+                                                  <label/>
+                                                  <style/>
+                                                  <size>40,40</size>
+                                                  <tooltip>
+                                                    <![CDATA[Swicht Front Keeping Mode to 'Centered']]>
+                                                  </tooltip>
+                                                  <bitmap>bitmaps/centred.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <border>2</border>
+                                                <object class="wxStaticLine" name="m_staticLine2341226">
+                                                  <style>wxLI_HORIZONTAL</style>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxALIGN_CENTER</flag>
+                                                <border>5</border>
+                                                <object class="wxStaticText" name="m_staticText10087">
+                                                  <label>SEL:</label>
+                                                  <style>wxALIGN_CENTRE</style>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <minsize>40,40</minsize>
+                                                <object class="wxButton" name="m_selectWorkingSpace">
+                                                  <label/>
+                                                  <style/>
+                                                  <size>40,40</size>
+                                                  <tooltip>
+                                                    <![CDATA[Select Working Space]]>
+                                                  </tooltip>
+                                                  <bitmap>bitmaps/insert-edit.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <minsize>40,40</minsize>
+                                                <object class="wxButton" name="m_selectHardwareSpace">
+                                                  <label/>
+                                                  <style/>
+                                                  <size>40,40</size>
+                                                  <tooltip>
+                                                    <![CDATA[Select Hardware Space]]>
+                                                  </tooltip>
+                                                  <bitmap>bitmaps/insert-chart.png</bitmap>
                                                   <bitmapposition>wxLEFT</bitmapposition>
                                                   <default>0</default>
                                                 </object>

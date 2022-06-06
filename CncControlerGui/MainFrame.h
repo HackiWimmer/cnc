@@ -191,6 +191,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onKeepFrontModeCentred(wxCommandEvent& event);
+    virtual void onKeepFrontModeInFrame(wxCommandEvent& event);
+    virtual void onKeepFrontModeOff(wxCommandEvent& event);
+    virtual void onSelectHardwareSpace(wxCommandEvent& event);
+    virtual void onSelectWorkingSpace(wxCommandEvent& event);
 		virtual void rcDryRun(wxCommandEvent& event);
 		virtual void onPodiumManagement(wxCommandEvent& event);
 		virtual void onResetView(wxCommandEvent& event);
@@ -202,7 +207,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void onTogglePosMarker(wxCommandEvent& event);
 		virtual void onClearMonitor(wxCommandEvent& event);
 		virtual void onRefreshMonitor(wxCommandEvent& event);
-		virtual void onToggleBoundBox(wxCommandEvent& event);
+		virtual void onToggleTotalBoundBox(wxCommandEvent& event);
+		virtual void onToggleObjectBoundBox(wxCommandEvent& event);
 		virtual void onToggleHardwareBox(wxCommandEvent& event);
 		virtual void onToggleRuler(wxCommandEvent& event);
 		virtual void onExecuteOsk(wxCommandEvent& event);

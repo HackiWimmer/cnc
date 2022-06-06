@@ -952,12 +952,15 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_mainViewInfobar,		mainViewInfobar);
 	GblFunc::replaceControl(m_monitorViewInfobar,	monitorViewInfobar);
 	
-	// Montion Monitor
+	// Motion Monitor
 	motionMonitor = new CncMotionMonitor(this);
 	GblFunc::replaceControl(drawPane3D->GetDrawPane3DPlaceHolder(), motionMonitor);
 	drawPane3D->setMotionMonitor(motionMonitor);
 	optionPane3D->setMotionMonitor(motionMonitor);
 	statisticsPane->setMotionMonitor(motionMonitor);
+	
+	activate3DPerspectiveButton(m_3D_Perspective1Sec);
+	motionMonitorViewPerspective1();
 	
 	// Controllers message history
 	controllersMsgHistoryList = new CncLoggerListCtrl(this, wxLC_SINGLE_SEL); 
@@ -7263,7 +7266,7 @@ void MainFrame::testChangingSpindleSpeed(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
 ///////////////////////////////////////////////////////////////////
-	static wxColour active(171, 171, 171);
+	static wxColour active  (171, 171, 171);
 	static wxColour inactive(240, 240, 240);
 
 	m_3D_TopSec->SetBackgroundColour(inactive);
@@ -7284,42 +7287,87 @@ void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromTop3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxButton* bt = (wxButton*)event.GetEventObject();
+	activate3DPerspectiveButton(bt);
+
 	motionMonitorViewTop();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromBottom3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxButton* bt = (wxButton*)event.GetEventObject();
+	activate3DPerspectiveButton(bt);
+
 	motionMonitorViewBottom();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromFront3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxButton* bt = (wxButton*)event.GetEventObject();
+	activate3DPerspectiveButton(bt);
+
 	motionMonitorViewFront();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromRear3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxButton* bt = (wxButton*)event.GetEventObject();
+	activate3DPerspectiveButton(bt);
+
 	motionMonitorViewRear();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromLeft3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxButton* bt = (wxButton*)event.GetEventObject();
+	activate3DPerspectiveButton(bt);
+
 	motionMonitorViewLeft();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromRight3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxButton* bt = (wxButton*)event.GetEventObject();
+	activate3DPerspectiveButton(bt);
+	
 	motionMonitorViewRight();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::show3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxButton* bt = (wxButton*)event.GetEventObject();
+	activate3DPerspectiveButton(bt);
 	
 	if      ( bt == m_3D_Perspective1Sec )	motionMonitorViewPerspective1();
 	else if ( bt == m_3D_Perspective2Sec )	motionMonitorViewPerspective2();
 	else if ( bt == m_3D_Perspective3Sec )	motionMonitorViewPerspective3();
 	else if ( bt == m_3D_Perspective4Sec )	motionMonitorViewPerspective4();
+	
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onKeepFrontModeCentred(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	motionMonitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_ALWAYS_CENTRED);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onKeepFrontModeInFrame(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	motionMonitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_KEEP_IN_FRAME);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onKeepFrontModeOff(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	motionMonitor->setFrontCatchingMode(GLContextBase::FrontCatchingMode::FCM_OFF);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectHardwareSpace(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	motionMonitor->makeHardwareSpaceVisible();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectWorkingSpace(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	motionMonitor->makeWorkingSpaceVisible();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::motionMonitorViewTop() {
@@ -7384,7 +7432,13 @@ void MainFrame::onRefreshMonitor(wxCommandEvent& event) {
 	drawPane3D->refreshMonitor();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::onToggleBoundBox(wxCommandEvent& event) {
+void MainFrame::onToggleObjectBoundBox(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(drawPane3D);
+	drawPane3D->toggleObjectBoundBox();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onToggleTotalBoundBox(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(drawPane3D);
 	drawPane3D->toggleTotalBoundBox();

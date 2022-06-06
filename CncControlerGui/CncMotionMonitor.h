@@ -173,6 +173,8 @@ class CncMotionMonitor : public CncGlCanvas
 		bool makeWorkingSpaceVisible();
 		bool makeCompleteVisibleMetric(const CncDoubleBoundaries& box);
 		
+		void setFrontCatchingMode(GLContextBase::FrontCatchingMode fcm);
+		
 	protected:
 		GLContextCncPathBase* 		monitor;
 		wxTimer 					cameraRotationTimer;
