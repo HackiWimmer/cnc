@@ -119,15 +119,9 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 	if ( context == NULL )
 		return;
-
-	const wxSize cs = GetClientSize();
-
-	// Since wx 3.1.6 not longer necessary, 
-	// on the contrary even causes problems
-	// Activate the keyboard focus for this frame
-	//if ( event.LeftDown() )
-		//this->SetFocusFromKbd();
 		
+	const wxSize cs = GetClientSize();
+	
 	if ( event.RightDown() )
 	{
 		if ( context->isViewMode2D() )

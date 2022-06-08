@@ -628,7 +628,7 @@ class CncBoundaries : public CncPosition<T>::Watermarks
 			this->zMax = maxBound.getZ();
 		}
 		
-		explicit CncBoundaries<T>(const CncBoundaries<T>& b)
+		CncBoundaries<T>(const CncBoundaries<T>& b)
 		: CncPosition<T>::Watermarks()
 		{
 			this->xMin = b.xMin;
@@ -639,7 +639,7 @@ class CncBoundaries : public CncPosition<T>::Watermarks
 			this->zMax = b.zMax;
 		}
 		
-		explicit CncBoundaries<T>(const typename CncPosition<T>::Watermarks& w)
+		CncBoundaries<T>(const typename CncPosition<T>::Watermarks& w)
 		: CncPosition<T>::Watermarks()
 		{
 			this->xMin = w.xMin;
@@ -662,14 +662,22 @@ class CncBoundaries : public CncPosition<T>::Watermarks
 			return *this;
 		}
 		
-		bool hasBoundaries()												const;
-		bool fits(const CncBoundaries<T> b)									const;
-		bool fitsInside(const CncBoundaries<T> b)							const;
-		bool fitsInside(const CncPosition<T> p)								const;
-		bool fitsInside(const typename CncPosition<T>::Watermarks w)		const;
+		typedef typename CncPosition<T>::Watermarks Watermarks;
 		
-		CncDistance<T> getDistanceToMin(CncPosition<T> p)					const;
-		CncDistance<T> getDistanceToMax(CncPosition<T> p)					const;
+		CncBoundaries<T> normalize()										const;
+		
+		bool hasBoundaries()												const;
+		bool fits(const CncBoundaries<T>& b)								const;
+		bool fitsInside(const CncBoundaries<T>& b)							const;
+		bool fitsInside(const CncPosition<T>& p)							const;
+		bool fitsInside(const typename CncPosition<T>::Watermarks& w)		const;
+		
+		void compare(std::ostream& o, const CncBoundaries<T>& b)			const;
+		void compare(std::ostream& o, const CncPosition<T>& p)				const;
+		void compare(std::ostream& o, const Watermarks& w)					const;
+		
+		CncDistance<T> getDistanceToMin(const CncPosition<T>& p)			const;
+		CncDistance<T> getDistanceToMax(const CncPosition<T>& p)			const;
 		
 		CncPosition<T> getMinBound()										const;
 		CncPosition<T> getMaxBound()										const;
@@ -722,9 +730,9 @@ class CncBoundaries : public CncPosition<T>::Watermarks
 		float getOriginRatioY() const;
 		float getOriginRatioZ() const;
 		
-		void setMinBound(CncPosition<T> p);
-		void setMaxBound(CncPosition<T> p);
-		void shift(CncPosition<T> p);
+		void setMinBound(const CncPosition<T>& p);
+		void setMaxBound(const CncPosition<T>& p);
+		void shift(const CncPosition<T>& p);
 		
 		void multiply(T factor);
 		void multiply(T fX, T fY, T fZ);
@@ -761,4 +769,5 @@ typedef std::stack<CncIntBoundaries>		CncIntBoundariesStack;
 typedef std::stack<CncLongBoundaries>		CncLongBoundariesStack;
 typedef std::stack<CncDoubleBoundaries>		CncDoubleBoundariesStack;
 typedef std::stack<CncFloatBoundaries>		CncFloatBoundariesStack;
+
 #endif

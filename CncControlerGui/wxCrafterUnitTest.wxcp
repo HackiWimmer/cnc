@@ -2368,7 +2368,7 @@
 										}, {
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
-											"m_path":	"bitmaps/16-cog.png"
+											"m_path":	""
 										}, {
 											"type":	"choice",
 											"m_label":	"Direction",

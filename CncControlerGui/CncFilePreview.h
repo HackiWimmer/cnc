@@ -28,7 +28,7 @@ class CncFilePreview : public CncFilePreviewBase
 		CncGCodePreview* 	gcodePreview;
 		CncSvgViewer* 		svgPreview;
 		wxString			previewName;
-		wxString			lastFileName;
+		wxFileName			lastFileName;
 		
 	protected:
 		

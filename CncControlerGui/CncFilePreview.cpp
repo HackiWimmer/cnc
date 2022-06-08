@@ -5,6 +5,9 @@
 #include "CncFileNameService.h"
 #include "CncAutoProgressDialog.h"
 #include "CncTemplateContext.h"
+#include "CncConfig.h"
+#include "CncContext.h"
+#include "CncBoundarySpace.h"
 #include "CncFilePreview.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -37,7 +40,7 @@ void CncFilePreview::normalizeView() {
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectEmptyPreview() {
 ///////////////////////////////////////////////////////////////////
-	return selectPreview("Only_the_extention_is_relevant_here_to_get_an_empty_preview.txt");
+	return selectPreview("Only_the_extention_is_relevant_here_to_get_an_empty_preview.unknown");
 }
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectEmptyPreviewIntern() {
@@ -84,14 +87,12 @@ bool CncFilePreview::selectGCodePreview() {
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::loadFile() {
 ///////////////////////////////////////////////////////////////////
-	wxFileName fn(lastFileName);
-	
-	if ( lastFileName.IsEmpty() )
+	if ( lastFileName.GetFullPath().IsEmpty() )
 		return true;
 	
-	if ( fn.Exists() == false ) 
+	if ( lastFileName.Exists() == false ) 
 	{
-		std::cerr << " CncFilePreview::loadFile(): Invalid file: " << lastFileName << std::endl;
+		std::cerr << CNC_LOG_FUNCT_A(" : Invalid file: %s\n", lastFileName.GetFullPath());
 		return false;
 	}
 	
@@ -106,7 +107,7 @@ bool CncFilePreview::loadFile() {
 		gcodePreview->clear();
 		gcodePreview->Refresh();
 		
-		GCodeFileParser gfp(lastFileName, new GCodePathHandlerGL(gcodePreview));
+		GCodeFileParser gfp(lastFileName.GetFullPath(), new GCodePathHandlerGL(gcodePreview));
 		gfp.setDisplayWarnings(false);
 		ret = gfp.processRelease();
 		
@@ -115,12 +116,13 @@ bool CncFilePreview::loadFile() {
 	}
 	else if ( m_previewBook->GetSelection() == (int)SVG_TAB_PAGE )
 	{
-		ret = svgPreview->loadFile(lastFileName, "Cnc File Preview:" );
+		ret = svgPreview->loadFile(lastFileName.GetFullPath(), "Cnc File Preview:" );
 		
 		if ( ret == true )	svgPreview->update();
 		else				svgPreview->clear();
 	}
 	
+	// always do this, because in case ret == false the boundaries have to be reseted;
 	evaluateMetricBoundaries();
 	
 	return ret;
@@ -147,13 +149,27 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 							fn.assign(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
 							break;
 							
-		default:			std::cerr << "CncFilePreview::selectPreview(): No preview registered for: " 
+		case TplUnknown:	selectEmptyPreviewIntern();
+							fn.assign(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
+							break;
+							
+		default:			selectEmptyPreviewIntern();
+							fn.assign(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
+							
+							std::cerr << "CncFilePreview::selectPreview(): No preview registered for: " 
 									  << cnc::getTemplateFormatAsString(tplFormat)
 									  << std::endl;
 	}
 	
-	lastFileName.assign(fn);
-	return loadFile();
+	// only if file changed (name, time, etc.) to the file
+	wxFileName tmpFn(fn);
+	if ( tmpFn != lastFileName )
+	{
+		lastFileName.Assign(fn);
+		return loadFile();
+	}
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 void CncFilePreview::previewBookChanged(wxNotebookEvent& event) {
@@ -168,7 +184,7 @@ void CncFilePreview::previewBookPaint(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncFilePreview::activate3DPerspectiveButton(wxButton* bt) {
 ///////////////////////////////////////////////////////////////////
-	static wxColour active(171, 171, 171);
+	static wxColour active  (171, 171, 171);
 	static wxColour inactive(240, 240, 240);
 	
 	m_3D_Top->SetBackgroundColour(inactive);
@@ -344,7 +360,12 @@ bool CncFilePreview::evaluateMetricBoundaries() const {
 							box.reset();
 							break;
 							
-		default:			std::cerr << CNC_LOG_A(": Missing template type implementation. Last file name: %s\n", lastFileName);
+		case TplUnknown:	// not available here, came as default svg - see selectPreview()
+							box.reset();
+							break;
+								
+		default:			std::cerr << CNC_LOG_A(": Missing template type implementation. Last file name: %s\n", lastFileName.GetFullPath());
+							box.reset();
 	}
 	
 	// setup the template context with this preview size information

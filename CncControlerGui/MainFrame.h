@@ -847,6 +847,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		NotebookInfo* outboundNbInfo;
 		NotebookInfo* templateNbInfo;
 		
+		wxFileName lastTemplateFileName;
 		wxString lastMonitorPreviewFileName;
 		
 		wxPNGAnimation* pngAnimation;

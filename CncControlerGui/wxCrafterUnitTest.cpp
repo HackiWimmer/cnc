@@ -312,10 +312,6 @@ CncTestRunConfigBase::CncTestRunConfigBase(wxWindow* parent,
     flexGridSizer22->Add(m_btCancel, 0, wxALL, WXC_FROM_DIP(5));
 
     m_btRun = new wxButton(this, wxID_ANY, _("Run . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), 0);
-#if wxVERSION_NUMBER >= 2904
-    m_btRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-cog")), wxLEFT);
-    m_btRun->SetBitmapMargins(2, 2);
-#endif
     wxFont m_btRunFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_btRun->SetFont(m_btRunFont);
     m_btRun->SetToolTip(_("Run"));

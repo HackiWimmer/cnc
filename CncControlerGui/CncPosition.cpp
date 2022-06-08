@@ -27,7 +27,7 @@ bool CncBoundaries<T>::hasBoundaries() const {
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-bool CncBoundaries<T>::fits(const CncBoundaries<T> b) const {
+bool CncBoundaries<T>::fits(const CncBoundaries<T>& b) const {
 ///////////////////////////////////////////////////////////////////////
 	
 	if ( cnc::dblCmp::eq(this->xMin, b.xMin) == false ) return false;
@@ -41,7 +41,7 @@ bool CncBoundaries<T>::fits(const CncBoundaries<T> b) const {
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-bool CncBoundaries<T>::fitsInside(const CncBoundaries<T> b) const {
+bool CncBoundaries<T>::fitsInside(const CncBoundaries<T>& b) const {
 ///////////////////////////////////////////////////////////////////////
 	
 	if ( cnc::dblCmp::ge(this->xMin, b.xMin) == false ) return false;
@@ -55,7 +55,8 @@ bool CncBoundaries<T>::fitsInside(const CncBoundaries<T> b) const {
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-bool CncBoundaries<T>::fitsInside(const CncPosition<T> p) const {
+bool CncBoundaries<T>::fitsInside(const CncPosition<T>& p) const {
+///////////////////////////////////////////////////////////////////////
 	
 	if ( cnc::dblCmp::ge(this->xMin, p.getX()) == false ) return false;
 	if ( cnc::dblCmp::le(this->xMax, p.getX()) == false ) return false;
@@ -68,7 +69,8 @@ bool CncBoundaries<T>::fitsInside(const CncPosition<T> p) const {
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-bool CncBoundaries<T>::fitsInside(const typename CncPosition<T>::Watermarks w) const {
+bool CncBoundaries<T>::fitsInside(const typename CncPosition<T>::Watermarks& w) const {
+///////////////////////////////////////////////////////////////////////
 	
 	if ( cnc::dblCmp::ge(this->xMin, w.xMin) == false ) return false;
 	if ( cnc::dblCmp::le(this->xMax, w.xMax) == false ) return false;
@@ -81,7 +83,46 @@ bool CncBoundaries<T>::fitsInside(const typename CncPosition<T>::Watermarks w) c
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-CncDistance<T> CncBoundaries<T>::getDistanceToMin(CncPosition<T> p) const {
+void CncBoundaries<T>::compare(std::ostream& o, const CncBoundaries<T>& b) const {
+///////////////////////////////////////////////////////////////////////
+	o	<< *this 
+		<< " vs. " 
+		<< std::endl
+		<< b 
+		<< "Fits inside: " 
+		<< fitsInside(b)
+		<< std::endl
+	;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+void CncBoundaries<T>::compare(std::ostream& o, const CncPosition<T>& p) const {
+///////////////////////////////////////////////////////////////////////
+	o	<< *this 
+		<< " vs. " 
+		<< std::endl
+		<< p 
+		<< "Fits inside: " 
+		<< fitsInside(p)
+		<< std::endl
+	;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+void CncBoundaries<T>::compare(std::ostream& o, const Watermarks& w) const {
+///////////////////////////////////////////////////////////////////////
+	o	<< *this 
+		<< " vs. " 
+		<< std::endl
+		<< w 
+		<< "Fits inside: " 
+		<< fitsInside(w)
+		<< std::endl
+	;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+CncDistance<T> CncBoundaries<T>::getDistanceToMin(const CncPosition<T>& p) const {
 ///////////////////////////////////////////////////////////////////////
 	CncDistance<T> ret;
 	
@@ -93,7 +134,7 @@ CncDistance<T> CncBoundaries<T>::getDistanceToMin(CncPosition<T> p) const {
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-CncDistance<T> CncBoundaries<T>::getDistanceToMax(CncPosition<T> p) const {
+CncDistance<T> CncBoundaries<T>::getDistanceToMax(const CncPosition<T>& p) const {
 ///////////////////////////////////////////////////////////////////////
 	CncDistance<T> ret;
 	
@@ -105,7 +146,7 @@ CncDistance<T> CncBoundaries<T>::getDistanceToMax(CncPosition<T> p) const {
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-void CncBoundaries<T>::setMinBound(CncPosition<T> p) {
+void CncBoundaries<T>::setMinBound(const CncPosition<T>& p) {
 ///////////////////////////////////////////////////////////////////////
 	this->xMin = p.getX();
 	this->yMin = p.getY();
@@ -113,7 +154,7 @@ void CncBoundaries<T>::setMinBound(CncPosition<T> p) {
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-void CncBoundaries<T>::setMaxBound(CncPosition<T> p) {
+void CncBoundaries<T>::setMaxBound(const CncPosition<T>& p) {
 ///////////////////////////////////////////////////////////////////////
 	this->xMax = p.getX();
 	this->yMax = p.getY();
@@ -158,7 +199,7 @@ CncPosition<T> CncBoundaries<T>::getCentre() const {
 }
 ///////////////////////////////////////////////////////////////////////
 template <class T>
-void CncBoundaries<T>::shift(CncPosition<T> p) {
+void CncBoundaries<T>::shift(const CncPosition<T>& p) {
 ///////////////////////////////////////////////////////////////////////
 	this->xMin += p.getX();
 	this->xMax += p.getX();
@@ -578,6 +619,21 @@ void CncBoundaries<T>::trace(std::ostream& o) const {
 							this->zMin, this->zMax
 						)
 	;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+CncBoundaries<T> CncBoundaries<T>::normalize() const {
+///////////////////////////////////////////////////////////////////////
+	CncBoundaries<T> ret(*this);
+	
+	const CncPosition<T> p(
+			fabs(this->xMin),
+			fabs(this->yMin),
+			fabs(this->zMin)
+	);
+	
+	ret.shift(p);
+	return ret;
 }
 
 // Explicit template instantiation

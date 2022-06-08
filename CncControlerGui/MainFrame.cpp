@@ -558,6 +558,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , lruStore								(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , outboundNbInfo						(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo						(new NotebookInfo(m_templateNotebook))
+, lastTemplateFileName					()
 , lastMonitorPreviewFileName			(_(""))
 , pngAnimation							(NULL)
 , stcFileContentPopupMenu				(NULL)
@@ -3260,7 +3261,8 @@ void MainFrame::decorateOutboundEditor(const char* fileName) {
 	if ( wxFileName::Exists(url) == false )
 		url.assign("about:blank");
 
-	if ( fileName == NULL ) {
+	if ( fileName == NULL )
+	{
 		outboundEditorSvgView->loadFile(url);
 		m_simpleBookOutBoundEditor->SetSelection(1);
 		
@@ -3270,7 +3272,8 @@ void MainFrame::decorateOutboundEditor(const char* fileName) {
 		return;
 	}
 	
-	if ( wxFileName::Exists(fileName) == false ) {
+	if ( wxFileName::Exists(fileName) == false )
+	{
 		outboundEditorSvgView->loadFile(url);
 		m_simpleBookOutBoundEditor->SetSelection(1);
 		
@@ -3808,9 +3811,20 @@ void MainFrame::selectEditorToolBox(bool fileLoaded) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openFile(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
-	// First select the template page to get the rigth result 
-	// from getCurrentTemplateFormat
+	// First select the template page to get the right result 
+	// from getCurrentTemplateFormat()
 	selectMainBookSourcePanel(sourcePageToSelect);
+	
+	// evaluate if template file was changed
+	wxFileName fn(getCurrentTemplatePathFileName());
+	if ( fn == lastTemplateFileName )
+	{
+		cnc::trc.logInfo("Current template wasn't changed. Use the 'Reload' function to force an opening again.");
+		return true;
+	}
+	
+	// assign last template file name
+	lastTemplateFileName.Assign(getCurrentTemplatePathFileName());
 	
 	THE_TPL_CTX->reset();
 	decorateDryRunState(cncUnknown);
@@ -3846,8 +3860,11 @@ bool MainFrame::openFile(int sourcePageToSelect) {
 		clearMotionMonitor();
 		
 		introduceCurrentFile(sourcePageToSelect);
-		
+
 		THE_TPL_CTX->init(getCurrentTemplatePathFileName());
+		
+		std::clog << "\nTemplate: '" << THE_TPL_CTX->getName() << "' successfully loaded" << std::endl;
+		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_OK
 	}
 	
 	updateFileContentPosition(0, 0);
@@ -3935,17 +3952,20 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 	sourceEditor->setNewTemplateFileName(getCurrentTemplatePathFileName());
 
 	// first save te new template
-	if ( saveFile() == false ) {
+	if ( saveFile() == false ) 
+	{
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
 	} 
 	
 	// then reopen it . . 
-	if ( openFile() == false) {
+	if ( openFile() == false) 
+	{
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
 	} 
-	else {
+	else 
+	{
 		prepareAndShowMonitorTemplatePreview(true);
 	}
 	
@@ -3979,20 +3999,21 @@ void MainFrame::openTemplate() {
 	m_inputFileName->SetHint(openFileDialog.GetPath());
 
 	// then open it . . 
-	if ( openFile() == false ) {
+	if ( openFile() == false )
+	{
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
-		
 	} 
-	else {
+	else 
+	{
 		prepareAndShowMonitorTemplatePreview(true);
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::reloadTemplate(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
-	if ( sourceEditor->IsModified() ) {
-		
+	if ( sourceEditor->IsModified() )
+	{
 		wxString msg("The template was locally modified. Do you really want to reload it?\n");
 		wxMessageDialog dlg(this, msg, _T("Reload template . . . "), 
 		                wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
@@ -4002,6 +4023,8 @@ void MainFrame::reloadTemplate(int sourcePageToSelect) {
 			return;
 	}
 	
+	// do this otherwise openFile() will return without opening the template
+	lastTemplateFileName.Clear();
 	const bool ret = openFile(sourcePageToSelect);
 	
 	if ( ret == true )	prepareAndShowMonitorTemplatePreview(true);
@@ -4896,7 +4919,7 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 		return false;
 	}
 		
-	// checks against teh loaded template
+	// checks against the loaded template
 	const CncTemplateFormat tf = getCurrentTemplateFormat();
 	const wxString fn (getCurrentTemplatePathFileName());
 	
@@ -4909,6 +4932,61 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 		}
 	}
 	
+	// Validate current boundaries
+	if ( THE_TPL_CTX->getBoundaries().hasBoundaries() ) 
+	{
+		// check if template fits with the current hardware information
+		std::stringstream ss;
+		if ( THE_TPL_CTX->fitsIntoCurrentHardwareBoundaries(ss) == false ) 
+		{
+			wxString msg(ss.str().c_str());
+			std::clog << "Boundary Failure . . ." << std::endl;
+			
+			if		( msg.StartsWith("Error") )		std::cerr << msg;
+			else if	( msg.StartsWith("Warning") )	cnc::cex1 << msg;
+			else									std::cout << msg;
+			
+			// if hardware is available interact with the user in this case
+			if ( THE_CONTEXT->hasHardware() )
+			{
+				msg.append("Should this run definitely further processed?");
+				
+				wxMessageDialog dlg(this, msg, _T("Check boundaries . . . "), 
+								wxYES|wxNO|wxICON_WARNING|wxCENTRE);
+			
+				int ret = dlg.ShowModal();
+				if ( ret != wxID_YES )
+				{
+					std::cerr << "Template Run aborted regarding boundary failures" << std::endl;
+					return false;
+				}
+			}
+		}
+	}
+	else
+	{
+		// if hardware is available interact with the user in this case
+		if ( THE_CONTEXT->hasHardware() )
+		{
+			const wxString msg(
+				"There are no boundary information regarding the current template available.\n" \
+				"This may be causes limit switch violations!\n\n" \
+				"Should this run definitely further processed?"
+			);
+			
+			wxMessageDialog dlg(this, msg, _T("Check boundaries . . . "), 
+							wxYES|wxNO|wxICON_WARNING|wxCENTRE);
+		
+			int ret = dlg.ShowModal();
+			if ( ret != wxID_YES )
+			{
+				std::cerr << "Template Run aborted regarding boundary failures" << std::endl;
+				return false;
+			}
+		}
+	}
+
+	// Validate current positions
 	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false )
 	{
 		displayPositionSituation(	wxICON_ERROR,
@@ -4923,6 +5001,7 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 		return false;
 	}
 	
+	// ask controlwer for readiness
 	if ( cnc->isReadyToRun() == false ) 
 	{
 		CNC_CERR_FUNCT_A("Controller isn't ready to run: Run was rejected!")
@@ -4996,7 +5075,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		// to the best size (scale) and origin placement
 		if ( THE_TPL_CTX->getBoundaries().hasBoundaries() ) 
 			motionMonitor->makeCompleteVisibleMetric(THE_TPL_CTX->getBoundaries());
-		
+
 		serialSpyPanel->clearSerialSpyBeforNextRun();
 		
 		THE_CONTEXT->resetProcessing();
@@ -5297,7 +5376,7 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 	const bool isFileChanged	= lastMonitorPreviewFileName != getCurrentTemplatePathFileName();
 	const bool isModified		= sourceEditor->GetModify() || force;
 	
-	if ( isFileChanged == false && isModified == false)
+	if ( isFileChanged == false && isModified == false )
 		return;
 		
 	// Open ...
@@ -5306,45 +5385,54 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 	// wxString tfn(CncFileNameService::getCncTemplatePreviewFileName(getCurrentTemplateFormat()));
 	// this causes file access errors between this app and the internet explorer
 	// write a temp file instead to have any time a new one
+	
+	// --------------------------------------------------------------
+	// First prepare the file name for the temporary file
 	wxString tfn(CncFileNameService::getTempFileName(getCurrentTemplateFormat()));
 	
 	CncTemplateFormat tf = getCurrentTemplateFormat();
-	switch ( tf ) {
+	switch ( tf )
+	{
 		case TplSvg:		tfn.append(".svg");
 							break;
 							
 		case TplGcode:		tfn.append(".gcode");
 							break;
 							
-		case TplBinary:		if ( BinaryFileParser::extractSourceContentAsFile(getCurrentTemplatePathFileName(), tfn) == true ) {
+		case TplBinary:		if ( BinaryFileParser::extractSourceContentAsFile(getCurrentTemplatePathFileName(), tfn) == true )
+							{
 								openMonitorPreview(tfn);
-								// no further copy necessay
+								// no further copy necessary
 								return;
-								
-							} else {
+							} 
+							else 
+							{
 								std::cerr << CNC_LOG_FUNCT << ": Can't create preview!" << std::endl;
 								return;
-								
 							}
 							
 		default:			// do nothing;
 							break;
 	}
 	
-	if ( tfn.IsEmpty() ) {
-		std::cerr << CNC_LOG_FUNCT << ": Invalid file name!" << std::endl;
+	if ( tfn.IsEmpty() )
+	{
+		std::cerr << CNC_LOG_FUNCT_A(": Invalid file name!\n");
 		return;
 	}
 	
-	// create a copy to avoid a modification of sourceEditor
+	// --------------------------------------------------------------
+	// Then create a copy to avoid a modification of source editor
 	wxTextFile file(tfn);
 	if ( !file.Exists() )
 		file.Create();
 	
-	if ( file.Open() ) {
+	if ( file.Open() ) 
+	{
 		file.Clear();
 		
-		for (long i=0; i<sourceEditor->GetNumberOfLines(); i++) {
+		for (long i=0; i<sourceEditor->GetNumberOfLines(); i++) 
+		{
 			wxString line = sourceEditor->GetLineText(i);
 			file.AddLine(line);
 		}
@@ -5353,9 +5441,36 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 		file.Close();
 		
 		openMonitorPreview(tfn);
-
-	} else {
+	} 
+	else 
+	{
 		std::cerr << "Error creating a temp file: " << tfn.c_str() << std::endl;
+	}
+	
+	// --------------------------------------------------------------
+	// Now check the boundaries. This will be done here because the relevant 
+	// information were evaluated by the openMonitorPreview preview function above 
+	
+	// Only if boundaries exists check if it fits
+	if ( THE_TPL_CTX->hasBoundaries() )
+	{
+		std::stringstream ss;
+		if ( THE_TPL_CTX->fitsIntoCurrentHardwareBoundaries(ss) == false )
+		{
+			const wxString msg(ss.str().c_str());
+			
+			REGISTER_NEXT_LOGGER_ROW
+			
+			if		( msg.StartsWith("Error") )		{ std::cerr << msg; SET_RESULT_FOR_REGISTERED_LOGGER_ROW_ERROR		}
+			else if	( msg.StartsWith("Warning") )	{ cnc::cex1 << msg; SET_RESULT_FOR_REGISTERED_LOGGER_ROW_WARNING	}
+			else									{ std::cout << msg; SET_RESULT_FOR_REGISTERED_LOGGER_ROW_OK			}
+		}
+	}
+	else
+	{
+		REGISTER_NEXT_LOGGER_ROW
+		cnc::cex1 << "Template without boundary information" << std::endl;
+		SET_RESULT_FOR_REGISTERED_LOGGER_ROW_WARNING
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -5586,7 +5701,8 @@ void MainFrame::requestInterrupt(wxCommandEvent& event) {
 void MainFrame::updateFileContentPosition(long x, long y) {
 ///////////////////////////////////////////////////////////////////
 	// try to select current  line as client id
-	if ( motionMonitor != NULL ) {
+	if ( motionMonitor != NULL )
+	{
 		motionMonitor->setCurrentClientId(y);
 		motionMonitor->Refresh();
 	}
@@ -5983,7 +6099,8 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 	selectMainBookSourcePanel();
 	selectMonitorBookTemplatePanel();
 	
-	if ( saveTemplateOnDemand(false) == false ) {
+	if ( saveTemplateOnDemand(false) == false )
+	{
 		prepareAndShowMonitorTemplatePreview();
 		return;
 	}
@@ -6000,12 +6117,14 @@ void MainFrame::openNavigatorFromGamepad() {
 ///////////////////////////////////////////////////////////////////
 	const bool b1 = m_mainViewBook->GetSelection() == MainBookSelection::VAL::MANUEL_PANEL;
 	
-	if ( b1 ) {
+	if ( b1 )
+	{
 		const int max  = m_listbookManallyMotionControl->GetPageCount();
 		const int next = ( m_listbookManallyMotionControl->GetSelection() + 1) % max;
 		m_listbookManallyMotionControl->SetSelection(next);
 	}
-	else {
+	else
+	{
 		selectMainBookManuelPanel();
 	}
 }
@@ -8598,13 +8717,14 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 	const wxString msg("Should the new template opened directly into the editor?");
 	wxMessageDialog dlg(this, msg, headline, wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
 
-	if ( dlg.ShowModal() == wxID_YES ) {
-		
+	if ( dlg.ShowModal() == wxID_YES )
+	{
 		const wxFileName tpl(newFile);
 		m_inputFileName->SetValue(tpl.GetFullName());
 		m_inputFileName->SetHint(tpl.GetFullPath());
 		
-		if ( !openFile() ) {
+		if ( !openFile() ) 
+		{
 			std::cerr << "Error while open file: " << outboundFile << std::endl;
 			return;
 		}
@@ -8616,7 +8736,8 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	BinaryFileParser parser(getCurrentTemplatePathFileName());
-	if ( parser.preface() == false ) {
+	if ( parser.preface() == false )
+	{
 		std::cerr << "MainFrame::extractSourceAsNewTpl(): Error while prefacing file '" 
 				  << getCurrentTemplatePathFileName()
 				  << "'" << std::endl;
@@ -8666,7 +8787,8 @@ void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
 	m_inputFileName->SetValue(x.GetFullName());
 	m_inputFileName->SetHint(x.GetFullPath());
 
-	if ( !openFile() ) {
+	if ( !openFile() ) 
+	{
 		std::cerr << "Error while open file: " << saveFileDialog.GetPath() << std::endl;
 		return;
 	}
@@ -9444,20 +9566,22 @@ void MainFrame::onSvgFormatPretty(wxCommandEvent& event) {
 	}
 	
 	// in case a new file was created, ask to open it
-	if ( outboundFileName.IsSameAs(getCurrentTemplatePathFileName()) == false ) {
+	if ( outboundFileName.IsSameAs(getCurrentTemplatePathFileName()) == false )
+	{
 		wxMessageDialog dlg(this, 
 							outboundFileName,
 							"Open . . .  ", 
 							wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
 							
 		int ret = dlg.ShowModal();
-		if ( ret == wxID_YES ) {
-			
+		if ( ret == wxID_YES )
+		{
 			wxFileName fn(outboundFileName);
 			m_inputFileName->SetValue(fn.GetFullName());
 			m_inputFileName->SetHint(fn.GetFullPath());
 			
-			if ( openFile() == false ) {
+			if ( openFile() == false )
+			{
 				std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" openFile('%s') failed!\n", fn.GetFullPath()));
 				return;
 			}
@@ -9465,10 +9589,10 @@ void MainFrame::onSvgFormatPretty(wxCommandEvent& event) {
 		
 	}
 	// else reload to make the overridden content visible
-	else {
+	else 
+	{
 		reloadTemplate();
 	}
-	
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onLeftDClickTemplateName(wxMouseEvent& event) {

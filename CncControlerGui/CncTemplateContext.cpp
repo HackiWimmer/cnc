@@ -43,6 +43,74 @@ bool CncTemplateContext::isValid() const {
 	return true;
 }
 //////////////////////////////////////////////////////////////
+bool CncTemplateContext::fitsIntoCurrentHardwareBoundaries(std::ostream& o) {
+//////////////////////////////////////////////////////////////
+	if ( boundarySpace == NULL )
+	{
+		o << "Error:\n Invalid pointer!\n";
+		return false;
+	}
+	
+	if ( boundarySpace->isValid() == false )
+	{
+		o << "Error:\n No hardware information available!\n";
+		return false;
+	}
+	
+	if ( getBoundaries().hasBoundaries() == false ) 
+	{
+		o << "Error:\n No template boundary information available!\n";
+		return false;
+	}
+	
+	const CncDoublePosition tplMin = getBoundaries().getMinBound();
+	const CncDoublePosition tplMax = getBoundaries().getMaxBound();
+	const CncDoublePosition hwdMin = boundarySpace->getPhysicallyBoundaries().getMinBound();
+	const CncDoublePosition hwdMax = boundarySpace->getPhysicallyBoundaries().getMaxBound();
+	
+	const CncDoubleBoundaries nrmTplBounds = getBoundaries().normalize();
+	const CncDoubleBoundaries nrmHwdBounds = boundarySpace->getLogicallyBoundaries().normalize();
+	
+	if ( nrmTplBounds.fitsInside(nrmHwdBounds) == false )
+	{
+		o	<< "Error:\n"
+			<< " The current template don't fits into the available hardware space!\n"
+			<< " Issue List [Template vs. Hardware]:\n"
+		;
+		
+		if ( nrmTplBounds.getMaxDistanceX() > nrmHwdBounds.getMaxDistanceX() )
+			o << "  Distance X [mm]: " << nrmTplBounds.getMaxDistanceX() << " < " << nrmHwdBounds.getMaxDistanceX() << std::endl;
+			
+		if ( nrmTplBounds.getMaxDistanceY() > nrmHwdBounds.getMaxDistanceY() )
+			o << "  Distance Y [mm]: " << nrmTplBounds.getMaxDistanceY() << " < " << nrmHwdBounds.getMaxDistanceY() << std::endl;
+			
+		if ( nrmTplBounds.getMaxDistanceZ() > nrmHwdBounds.getMaxDistanceZ() )
+			o << "  Distance Z [mm]: " << nrmTplBounds.getMaxDistanceZ() << " < " << nrmHwdBounds.getMaxDistanceZ() << std::endl;
+		
+		return false;
+	}
+
+	if ( getBoundaries().fitsInside(boundarySpace->getPhysicallyBoundaries()) == false )
+	{
+		o	<< "Error:\n"
+			<< " The current template don't fits regarding the current origin position!\n"
+			<< " Issue List [Template vs. Hardware]:\n"
+		;
+		
+		if ( tplMin.getX() < hwdMin.getX() )	o << "  Xmin [mm]: " << tplMin.getX() << " < " << hwdMin.getX() << std::endl;
+		if ( tplMin.getY() < hwdMin.getY() )	o << "  Ymin [mm]: " << tplMin.getY() << " < " << hwdMin.getY() << std::endl;
+		if ( tplMin.getZ() < hwdMin.getZ() )	o << "  Zmin [mm]: " << tplMin.getZ() << " < " << hwdMin.getZ() << std::endl;
+		if ( tplMax.getX() > hwdMax.getX() )	o << "  Xmax [mm]: " << tplMax.getX() << " > " << hwdMax.getX() << std::endl;
+		if ( tplMax.getY() > hwdMax.getY() )	o << "  Ymax [mm]: " << tplMax.getY() << " > " << hwdMax.getY() << std::endl;
+		if ( tplMax.getZ() > hwdMax.getZ() )	o << "  Zmax [mm]: " << tplMax.getZ() << " > " << hwdMax.getZ() << std::endl;
+		
+		return false;
+	}
+	
+	o << "Info:\n The current template fits . . .\n";
+	return true;
+}
+//////////////////////////////////////////////////////////////
 const wxString CncTemplateContext::getFileName() const {
 //////////////////////////////////////////////////////////////
 	wxString ret(wxFileName(path, name).GetFullPath());

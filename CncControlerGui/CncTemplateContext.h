@@ -33,7 +33,7 @@ class CncTemplateContext : public ContextInterface {
 		
 	public:
 		
-		CncTemplateContext(CncBoundarySpace*);
+		CncTemplateContext(CncBoundarySpace* bs);
 		
 		bool				isValid()						const;
 		void				reset();
@@ -62,6 +62,8 @@ class CncTemplateContext : public ContextInterface {
 		
 		void				updateGui(bool force)			const;
 		void				traceTo(std::ostream& o, unsigned int indent) const;
+		
+		bool				fitsIntoCurrentHardwareBoundaries(std::ostream& o);
 		
 		// context interface
 		virtual void		notifyBeginRun();
