@@ -104,7 +104,7 @@ void CncLruFileViewListCtrl::setBigTheme(bool big) {
 /////////////////////////////////////////////////////////////
 	const int size = big ? bigFontSize : smallFontSize;
 	
-	const wxColour tc = big ? wxColour(32,   32,  32) : wxColour(255, 255, 255);
+	const wxColour tc = big ? wxColour(32,   32,  32) : wxColour(228, 228, 228);
 	const wxColour bc = big ? wxColour(255, 255, 255) : wxColour( 32,  32,  32);
 	const wxColour sc = big ? wxColour(255, 128, 128) : wxColour(255, 242,   0);
 	
@@ -534,7 +534,7 @@ CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
 	setBigTheme(false);
 	
 	SetBackgroundColour(wxColour(32, 32, 32));
-	SetTextColour(wxColour(255, 255, 255));
+	SetTextColour(wxColour(200, 200, 200));
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
