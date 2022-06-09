@@ -9165,12 +9165,11 @@ void MainFrame::simulateHardwareReference(bool defaultBehaviour) {
 		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
 		return;
 	}
-
-	CncSimuHwDimensionSetup dlg(this);
+	
+	CncSimuHwDimensionSetup dlg(this, CncSimuHwDimensionSetup::M_ORIGIN);
 	if ( defaultBehaviour == false )
 	{
 		selectMonitorBookCncPanel();
-		
 		dlg.ShowModal();
 	}
 	else
@@ -9179,10 +9178,25 @@ void MainFrame::simulateHardwareReference(bool defaultBehaviour) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::simulateHardwareDimensions() {
+/////////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
+	CncSimuHwDimensionSetup dlg(this, CncSimuHwDimensionSetup::M_DIMENSION);
+	dlg.ShowModal();
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareReference(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	// using isEmulator() instead of hasHardware() because the Arduino emulator 
+	// has hardware but no end switch detection
 	if ( cnc->isEmulator() == true )
 		return simulateHardwareReference(false);
+	
+	if ( THE_CONTEXT->hasHardware() == false ) {
+		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
+		return;
+	}
 	
 	// evaluate the physical hardware reference
 	wxString msg("Do you really want to evaluate the hardware reference position?\n\n");
@@ -9236,6 +9250,11 @@ void MainFrame::updateHardwareDimensions() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	// using isEmulator() instead of hasHardware() because the Arduino emulator 
+	// has hardware but no end switch detection
+	if ( cnc->isEmulator() == true )
+		return simulateHardwareDimensions();
+		
 	if ( THE_CONTEXT->hasHardware() == false ) {
 		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
 		return;
@@ -9286,6 +9305,16 @@ void MainFrame::onEvaluateHardwareXYPlane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onEvaluateHardwareZAxis(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	// using isEmulator() instead of hasHardware() because the Arduino emulator 
+	// has hardware but no end switch detection
+	if ( cnc->isEmulator() == true )
+		return simulateHardwareDimensions();
+	
+	if ( THE_CONTEXT->hasHardware() == false ) {
+		cnc::trc.logInfoMessage("No hardware support available for the connected port . . . ");
+		return;
+	}
+	
 	wxString msg("Do you really want to evaluate the dimensions of the Z axis?\n");
 	msg.append("Execution Plan:\n\n");
 	msg.append(" 1. Moves Z axis to maximum position\n");
@@ -9298,7 +9327,8 @@ void MainFrame::onEvaluateHardwareZAxis(wxCommandEvent& event) {
 	dlg.SetFooterText("Make sure this path is free . . . ");
 	dlg.SetFooterIcon(wxICON_WARNING);
 
-	if ( dlg.ShowModal() == wxID_YES ) {
+	if ( dlg.ShowModal() == wxID_YES )
+	{
 		CncGampadDeactivator cgd(this);
 
 		selectMonitorBookCncPanel();

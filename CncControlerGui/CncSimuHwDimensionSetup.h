@@ -5,7 +5,10 @@
 class CncSimuHwDimensionSetup : public CncSimuHwDimensionSetupBase
 {
 	public:
-		CncSimuHwDimensionSetup(wxWindow* parent);
+		
+		enum Mode { M_DIMENSION, M_ORIGIN };
+		
+		CncSimuHwDimensionSetup(wxWindow* parent, Mode m);
 		virtual ~CncSimuHwDimensionSetup();
 		
 		void processDefault();
@@ -35,21 +38,22 @@ class CncSimuHwDimensionSetup : public CncSimuHwDimensionSetupBase
 		
 		struct PreviousSetup
 		{
-			double					maxDimX;
-			double					maxDimY;
-			double					maxDimZ;
+			double		maxDimX;
+			double		maxDimY;
+			double		maxDimZ;
 			
-			double					hwoX;
-			double					hwoY;
-			double					hwoZ;
+			double		hwoX;
+			double		hwoY;
+			double		hwoZ;
 		};
 		
-		PreviousSetup previousSetup;
+		PreviousSetup	previousSetup;
+		Mode			mode;
 		
 		double	getValue(wxTextCtrl* ctrl, double dfltValue) const;
 		double	evaluateZLocation();
 		
-		bool isSomethingChanged() const;
+		bool	isSomethingChanged() const;
 		
 		void	cancel();
 		void	apply();

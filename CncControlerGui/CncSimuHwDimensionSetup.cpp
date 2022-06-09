@@ -11,9 +11,10 @@
 #define TOP				2
 
 ///////////////////////////////////////////////////////////////////
-CncSimuHwDimensionSetup::CncSimuHwDimensionSetup(wxWindow* parent)
+CncSimuHwDimensionSetup::CncSimuHwDimensionSetup(wxWindow* parent, Mode m)
 : CncSimuHwDimensionSetupBase	(parent)
 , previousSetup					()
+, mode							(m)
 ///////////////////////////////////////////////////////////////////
 {
 	wxFloatingPointValidator<float> validator(3, NULL, wxNUM_VAL_DEFAULT);
@@ -65,6 +66,11 @@ void CncSimuHwDimensionSetup::onInitDialog(wxInitDialogEvent& event) {
 	previousSetup.hwoY		= THE_BOUNDS->getHardwareOffset().getAsMetricY();
 	previousSetup.hwoZ		= THE_BOUNDS->getHardwareOffset().getAsMetricZ();
 	
+	switch ( mode )
+	{
+		case M_DIMENSION:	m_lbContext->SetSelection(0); break;
+		case M_ORIGIN:		m_lbContext->SetSelection(1); break;
+	}
 }
 ///////////////////////////////////////////////////////////////////
 bool CncSimuHwDimensionSetup::isSomethingChanged() const {
@@ -147,8 +153,8 @@ void CncSimuHwDimensionSetup::cancel() {
 ///////////////////////////////////////////////////////////////////
 	// restore previous values
 	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, previousSetup.hwoX));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, previousSetup.hwoX));
-	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, previousSetup.hwoX));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, previousSetup.hwoY));
+	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, previousSetup.hwoZ));
 
 	m_tcMaxDimX->ChangeValue(wxString::Format(fltFormat, previousSetup.maxDimX));
 	m_tcMaxDimY->ChangeValue(wxString::Format(fltFormat, previousSetup.maxDimY));

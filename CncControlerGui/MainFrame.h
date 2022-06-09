@@ -915,6 +915,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void simulateHardwareReference(bool defaultBehaviour);
 		void updateHardwareDimensions();
 		
+		void simulateHardwareDimensions();
+		
 		bool saveTemplateOnDemand(bool force);
 
 		BinaryFileParser::ViewType getCurrentBinaryViewMode();
