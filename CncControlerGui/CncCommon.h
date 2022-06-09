@@ -37,6 +37,9 @@ namespace cnc
 	#define CNC_RESULT_WARNING_STR			"WARNING"
 	#define CNC_RESULT_ERROR_STR			"ERROR"
 	
+	#define ADD_LOGGER_SEPERATOR \
+		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->addSeparator(); }
+	
 	#define FORCE_LOGGER_UPDATE \
 		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->forceUpdate(); }
 		

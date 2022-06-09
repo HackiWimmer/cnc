@@ -3863,7 +3863,8 @@ bool MainFrame::openFile(int sourcePageToSelect) {
 
 		THE_TPL_CTX->init(getCurrentTemplatePathFileName());
 		
-		std::clog << "\nTemplate: '" << THE_TPL_CTX->getName() << "' successfully loaded" << std::endl;
+		ADD_LOGGER_SEPERATOR
+		std::clog << "Template: '" << THE_TPL_CTX->getName() << "' successfully loaded" << std::endl;
 		SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_OK
 	}
 	

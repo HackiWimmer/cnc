@@ -112,6 +112,8 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		void add(const wxString& text, const wxString& result);
 		void add(const wxString& text, const wxString& result, const wxListItemAttr& lia);
 		
+		void addSeparator();
+		
 		bool writeToFile(const wxFileName& fn, bool allRows=false);
 		bool copyToClipboard(bool allRows=false);
 		bool openAsTextView(bool allRows=false);

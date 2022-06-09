@@ -404,6 +404,22 @@ void CncLoggerListCtrl::add(const wxString& text, const wxString& result, const 
 	updateContent();
 }
 /////////////////////////////////////////////////////////////
+void CncLoggerListCtrl::addSeparator() {
+/////////////////////////////////////////////////////////////
+	static const wxString sep('.', 256);
+	const wxColour bckCol(GetBackgroundColour().ChangeLightness(105));
+	const wxListItemAttr prevAttr(entries.back().listItemAttr);
+	const wxListItemAttr seprAttr(GetTextColour(), bckCol, GetFont());
+	
+	if ( entries.size() == 0 || entries.back().text.Len() != 0 )
+		next();
+		
+	add(sep, ".........", seprAttr);
+	next();
+	
+	entries.back().listItemAttr = prevAttr;
+}
+/////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::tokenAndAdd(const wxString& text, const wxListItemAttr& lia) {
 /////////////////////////////////////////////////////////////
 	wxStringTokenizer lines(text, "\n");
