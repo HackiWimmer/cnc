@@ -263,6 +263,8 @@ bool CncPathListEntryListCtrl::searchReference(const wxString& what) {
 /////////////////////////////////////////////////////////////
 bool CncPathListEntryListCtrl::searchReferenceById(const long id) {
 /////////////////////////////////////////////////////////////
+	SetItemCount(pathLists.size());
+	
 	long item = -1;
 	
 	for ( auto it = pathLists.begin(); it != pathLists.end(); ++it ) {

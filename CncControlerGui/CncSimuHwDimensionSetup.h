@@ -35,7 +35,7 @@ class CncSimuHwDimensionSetup : public CncSimuHwDimensionSetupBase
 	private:
 		
 		const char*	fltFormat	= "%.3lf";
-		const double dftBorder	= -10;
+		const double dftBorder	= 10;
 		
 		struct PreviousSetup
 		{
@@ -51,6 +51,7 @@ class CncSimuHwDimensionSetup : public CncSimuHwDimensionSetupBase
 		PreviousSetup	previousSetup;
 		Mode			mode;
 		
+		double	getBorder() const;
 		double	getValue(wxTextCtrl* ctrl, double dfltValue) const;
 		double	evaluateZLocation();
 		

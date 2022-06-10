@@ -15,7 +15,8 @@ CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
 , runCount				(0)
 , validRunCount			(0)
 , boundarySpace			(bs)
-, boundaries			()
+, templateBounds		()
+, measuredBounds		()
 //////////////////////////////////////////////////////////////
 {
 }
@@ -138,10 +139,56 @@ bool CncTemplateContext::init(const wxString& path, const wxString& name) {
 	return wxFileName::Exists(getFileName());
 }
 //////////////////////////////////////////////////////////////
-void CncTemplateContext::registerBoundaries(const CncDoubleBoundaries& b) {
+void CncTemplateContext::registerBoundaries(const CncDoubleBoundaries& b, BoundType bt) {
 //////////////////////////////////////////////////////////////
-	boundaries = b;
+	if ( bt == BT_TEMPLATE )	templateBounds	= b;
+	else						measuredBounds	= b;
+		
 	updateGui(false);
+}
+//////////////////////////////////////////////////////////////
+const CncDoubleBoundaries& CncTemplateContext::getBoundaries(BoundType bt) const {
+//////////////////////////////////////////////////////////////
+	if ( bt == BT_TEMPLATE )
+		return templateBounds;
+		
+	return measuredBounds; 
+}
+//////////////////////////////////////////////////////////////
+bool CncTemplateContext::hasBoundaries(BoundType bt) const { 
+//////////////////////////////////////////////////////////////
+	if ( bt == BT_TEMPLATE )
+		return templateBounds.hasBoundaries(); 
+		
+	return measuredBounds.hasBoundaries(); 
+}
+//////////////////////////////////////////////////////////////
+const CncDoubleBoundaries& CncTemplateContext::getBoundaries() const {
+//////////////////////////////////////////////////////////////
+	// measured beats template
+	if ( measuredBounds.hasBoundaries() )
+		return measuredBounds; 
+		
+	return templateBounds;
+}
+//////////////////////////////////////////////////////////////
+bool CncTemplateContext::hasBoundaries() const { 
+//////////////////////////////////////////////////////////////
+	// measured beats template
+	if ( measuredBounds.hasBoundaries() )
+		return true;
+		
+	return templateBounds.hasBoundaries(); 
+}
+//////////////////////////////////////////////////////////////
+
+CncTemplateContext::BoundType CncTemplateContext::getBoundLevel() const {
+//////////////////////////////////////////////////////////////
+	// measured beats template
+	if ( measuredBounds.hasBoundaries() )
+		return BT_MEASURED;
+		
+	return BT_TEMPLATE; 
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::updateGui(bool force) const {
@@ -157,26 +204,32 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 //////////////////////////////////////////////////////////////
 	const wxString prefix(' ', indent);
 	
-	auto traceBound = [&](const CncDoubleBoundaries& b) {
-		return wxString::Format("(%.3lf, %.3lf)(%.3lf, %.3lf)(%.3lf, %.3lf)"
+	auto traceBound = [](const CncDoubleBoundaries& b) {
+		return wxString::Format("(%8.3lf, %8.3lf)(%8.3lf, %8.3lf)(%8.3lf, %8.3lf)"
 								, b.xMin, b.xMax
 								, b.yMin, b.yMax
 								, b.zMin, b.zMax
 		);
 	};
 	
+	auto traceBoundLvl = [](BoundType bt) {
+		return ( bt == BT_TEMPLATE ? "Template" : "Measured");
+	};
+	
 	wxFileName fn(getFileName());
 	
-	o	<< prefix << "Name                      : " << fn.GetFullName()				<< std::endl
-		<< prefix << "Path                      : " << fn.GetPath()					<< std::endl
-		<< prefix << "Valid                     : " << (isValid() ? "Yes" : "No" )	<< std::endl
-		<< prefix << "Total run count           : " << runCount						<< std::endl
-		<< prefix << "Valid run count           : " << validRunCount					<< std::endl
-		<< prefix << "Errors                    : " << hasErrors()					<< std::endl
-		<< prefix << "Tool Tot. List            : " << toolTotList					<< std::endl
-		<< prefix << "Tool Sel. List            : " << toolSelList					<< std::endl
-		<< prefix << "Tool Sel Count            : " << getToolSelCount()			<< std::endl
-		<< prefix << "Boundaries (X)(Y)(Z) [mm] : " << traceBound(boundaries)		<< std::endl
+	o	<< prefix << "Name                           : " << fn.GetFullName()				<< std::endl
+		<< prefix << "Path                           : " << fn.GetPath()					<< std::endl
+		<< prefix << "Valid                          : " << (isValid() ? "Yes" : "No" )		<< std::endl
+		<< prefix << "Total run count                : " << runCount						<< std::endl
+		<< prefix << "Valid run count                : " << validRunCount					<< std::endl
+		<< prefix << "Errors                         : " << hasErrors()						<< std::endl
+		<< prefix << "Tool Tot. List                 : " << toolTotList						<< std::endl
+		<< prefix << "Tool Sel. List                 : " << toolSelList						<< std::endl
+		<< prefix << "Tool Sel Count                 : " << getToolSelCount()				<< std::endl
+		<< prefix << "Bound Level                    : " << traceBoundLvl(getBoundLevel())	<< std::endl
+		<< prefix << "Template Bounds (X)(Y)(Z) [mm] : " << traceBound(templateBounds)		<< std::endl
+		<< prefix << "Measured Bounds (X)(Y)(Z) [mm] : " << traceBound(measuredBounds)		<< std::endl
 	;
 	
 	if ( hasErrors() )

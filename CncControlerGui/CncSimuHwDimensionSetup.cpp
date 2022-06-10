@@ -147,10 +147,12 @@ void CncSimuHwDimensionSetup::processDefault() {
 	m_tcMaxDimZ->ChangeValue(wxString::Format(fltFormat, THE_BOUNDS->getMaxDimensionMetricZ()));
 	
 	// It's on purpose tho have the default origin not exact at (0.0, 0.0, ... )
-	const double border = getValue(m_tcDefaultBorder, dftBorder);
-	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, border));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, border));
-	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, +(THE_BOUNDS->getMaxDimensionMetricZ() - (border * -1) )));
+	// It's not much realistic to have the logical XY origin synchronous with the physical one.
+	// That's the idea of border
+	const double border = getBorder();
+	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, -border));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, -border));
+	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, +(THE_BOUNDS->getMaxDimensionMetricZ() - border)));
 	
 	apply();
 }
@@ -205,17 +207,22 @@ void CncSimuHwDimensionSetup::onTakeOverFromConfigMaxDimZ(wxCommandEvent& event)
 	apply();
 }
 ///////////////////////////////////////////////////////////////////
+double CncSimuHwDimensionSetup::getBorder() const {
+///////////////////////////////////////////////////////////////////
+	return getValue(m_tcDefaultBorder, dftBorder);
+}
+///////////////////////////////////////////////////////////////////
 double CncSimuHwDimensionSetup::evaluateZLocation() {
 ///////////////////////////////////////////////////////////////////
-	const double border = getValue(m_tcDefaultBorder, dftBorder);
+	const double border = getBorder();
 	double z = +THE_BOUNDS->getMaxDimensionMetricZ();
 	
 	switch ( m_cbDefaultZ->GetSelection() )
 	{
-		case BOTTOM:	z = border;											break;
+		case BOTTOM:	z = -border;										break;
 		case CENTERED:	z = +THE_BOUNDS->getMaxDimensionMetricZ() / 2.0;	break;
 		case TOP:
-		default:		z = +(THE_BOUNDS->getMaxDimensionMetricZ() - (border * -1));
+		default:		z = +(THE_BOUNDS->getMaxDimensionMetricZ() - border);
 	}
 	
 	return z;
@@ -232,10 +239,10 @@ void CncSimuHwDimensionSetup::onRefCentered(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::onRefSector1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	const double border = getValue(m_tcDefaultBorder, dftBorder);
+	const double border = getBorder();
 	
-	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, border));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, border));
+	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, -border));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, -border));
 	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, evaluateZLocation()));
 	
 	apply();
@@ -243,10 +250,10 @@ void CncSimuHwDimensionSetup::onRefSector1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::onRefSector2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	const double border = getValue(m_tcDefaultBorder, dftBorder);
-
-	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricX()));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, border));
+	const double border = getBorder();
+	
+	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricX() + border));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, -border));
 	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, evaluateZLocation()));
 	
 	apply();
@@ -254,10 +261,10 @@ void CncSimuHwDimensionSetup::onRefSector2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::onRefSector3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	const double border = getValue(m_tcDefaultBorder, dftBorder);
-
-	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, border));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricY()));
+	const double border = getBorder();
+	
+	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, -border));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricY() + border));
 	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, evaluateZLocation()));
 	
 	apply();
@@ -265,8 +272,10 @@ void CncSimuHwDimensionSetup::onRefSector3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::onRefSector4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricX()));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricY()));
+	const double border = getBorder();
+	
+	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricX() + border));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricY() + border));
 	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, evaluateZLocation()));
 	
 	apply();

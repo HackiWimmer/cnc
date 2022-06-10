@@ -158,6 +158,9 @@ bool CncGCodeSequenceListCtrl::searchReference(const wxString& what) {
 /////////////////////////////////////////////////////////////
 bool CncGCodeSequenceListCtrl::searchReferenceById(const long id) {
 /////////////////////////////////////////////////////////////
+	// Update
+	SetItemCount(gcodes.size());
+	
 	long item = -1;
 	
 	for ( auto it = gcodes.begin(); it != gcodes.end(); ++it ) {

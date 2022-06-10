@@ -5135,8 +5135,13 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		CncDoubleBoundaries bounds;
 		bounds.setMinBound(cnc->getMinPositionsMetric());
 		bounds.setMaxBound(cnc->getMaxPositionsMetric());
-		THE_TPL_CTX->registerBoundaries(bounds);
+		THE_TPL_CTX->registerBoundaries(bounds, CncTemplateContext::BT_MEASURED);
 		
+		// if template boundaries available prepare the motion monitor 
+		// to the best size (scale) and origin placement
+		if ( THE_TPL_CTX->getBoundaries().hasBoundaries() ) 
+			motionMonitor->makeCompleteVisibleMetric(THE_TPL_CTX->getBoundaries());
+
 		const wxTimeSpan elapsed = wxDateTime::UNow().Subtract(tsStart);
 		const wxString timeInfo(wxString::Format("total time: %s", elapsed.Format("%H:%M:%S.%l")));
 		
@@ -8035,19 +8040,22 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	if ( isRunning == true )	return;
 	else						isRunning = true;
 	
-	if ( motionMonitor && motionMonitor->IsShownOnScreen() ) {
+	if ( motionMonitor && motionMonitor->IsShownOnScreen() )
+	{
 		if ( tss != ClientIdSelSource::TSS_REPLAY )
-			cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsLongString(tss), firstClientId, lastClientId);
+			cnc::trc.logInfo(wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsLongString(tss), firstClientId, lastClientId));
 	}
 	
-	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {
+	if ( tss != ClientIdSelSource::TSS_POS_SPY )
+	{
 		if ( positionSpy != NULL )
 			positionSpy->searchReferenceById(firstClientId);
 	}
 	
-	if ( tss != ClientIdSelSource::TSS_MONITOR ) {
-		if ( motionMonitor != NULL ) {
-			
+	if ( tss != ClientIdSelSource::TSS_MONITOR )
+	{
+		if ( motionMonitor != NULL )
+		{
 			// replay is a special mode which creates the highlighting by itself
 			if ( tss != ClientIdSelSource::TSS_REPLAY )
 				motionMonitor->highlightClientId(firstClientId, lastClientId);
@@ -8056,24 +8064,29 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 		}
 	}
 	
-	if ( tss != ClientIdSelSource::TSS_PATH_LIST ) {
+	if ( tss != ClientIdSelSource::TSS_PATH_LIST )
+	{
 		if ( cncPreprocessor != NULL )
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_PATH_LIST);
 	}
 	
-	if ( tss != ClientIdSelSource::TSS_MOVE_SEQ_OVW && tss != ClientIdSelSource::TSS_MOVE_SEQ ) {
-		if ( cncPreprocessor != NULL ) {
+	if ( tss != ClientIdSelSource::TSS_MOVE_SEQ_OVW && tss != ClientIdSelSource::TSS_MOVE_SEQ )
+	{
+		if ( cncPreprocessor != NULL )
+		{
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_MOVE_SEQ_OVERVIEW);
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_MOVE_SEQ_CONTENT);
 		}
 	}
 	
-	if ( tss != ClientIdSelSource::TSS_VERTEX_DATA_TRACE) {
+	if ( tss != ClientIdSelSource::TSS_VERTEX_DATA_TRACE)
+	{
 		if ( motionVertexCtrl != NULL )
-				motionVertexCtrl->selectClientId(firstClientId, CncMotionVertexTrace::LT_VERTEX_DATA_TRACE);
+			motionVertexCtrl->selectClientId(firstClientId, CncMotionVertexTrace::LT_VERTEX_DATA_TRACE);
 	}
 	
-	if ( tss != ClientIdSelSource::TSS_VERTEX_INDEX_TRACE) {
+	if ( tss != ClientIdSelSource::TSS_VERTEX_INDEX_TRACE)
+	{
 		if ( motionVertexCtrl != NULL )
 			motionVertexCtrl->selectClientId(firstClientId, CncMotionVertexTrace::LT_VERTEX_INDEX_TRACE);
 	}
@@ -8082,7 +8095,8 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Clie
 	// The editor hast to be the last one, otherwise the selection can be overridden by an 
 	// other control which calls tryToSelectClientId(long clientId, TemplateSelSource tss) only
 	// and the he first line is then selected only
-	if ( tss != ClientIdSelSource::TSS_EDITOR ) {
+	if ( tss != ClientIdSelSource::TSS_EDITOR )
+	{
 		selectSourceControlLineNumbers(firstClientId, lastClientId);
 	}
 	

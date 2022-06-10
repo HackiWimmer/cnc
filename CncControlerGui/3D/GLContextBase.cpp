@@ -1321,28 +1321,27 @@ bool GLContextBase::isBoxVisible(const CncDoubleBoundaries& box) {
 /////////////////////////////////////////////////////////////////
 bool GLContextBase::isVertexVisible(const CncDoublePosition& p) {
 /////////////////////////////////////////////////////////////////
-	return isVertexVisible(p.getX(), p.getY(), p.getZ());
-}
-/////////////////////////////////////////////////////////////////
-bool GLContextBase::isVertexVisible(GLdouble px, GLdouble py, GLdouble pz) {
-/////////////////////////////////////////////////////////////////
-	// box has always already aligned to DispFact*3D
-	if ( viewPort == NULL )
-		return false;
-		
+	// p has always already aligned to DispFact*3D
+	const CncLongPosition pw(evaluateWindowCoordinates(p));
+	
 	if ( associatedCanvas == NULL )
 		return false;
 	
 	const wxSize cs = associatedCanvas->GetClientSize();
 
-	if ( px < 0 || px > cs.GetWidth() )
+	if ( pw.getX() < 0 || pw.getX() > cs.GetWidth() )
 		return false;
 		
-	if ( py < 0 || py > cs.GetHeight() )
+	if ( pw.getY() < 0 || pw.getY() > cs.GetHeight() )
 		return false;
 	
 	return true;
-
+}
+/////////////////////////////////////////////////////////////////
+bool GLContextBase::isVertexVisible(GLdouble px, GLdouble py, GLdouble pz) {
+/////////////////////////////////////////////////////////////////
+	return isVertexVisible(CncDoublePosition(px, py, pz));
+	
 	//Feedback buffer works currently not reliable!
 	//If GL_POINTS is used only one vertex works currently within the feedback buffer 
 	//this is then replicated as often as there are s points.

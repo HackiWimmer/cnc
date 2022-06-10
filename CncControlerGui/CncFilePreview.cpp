@@ -369,7 +369,7 @@ bool CncFilePreview::evaluateMetricBoundaries() const {
 	}
 	
 	// setup the template context with this preview size information
-	THE_TPL_CTX->registerBoundaries(box);
+	THE_TPL_CTX->registerBoundaries(box, CncTemplateContext::BT_TEMPLATE);
 	THE_TPL_CTX->updateGui(true);
 	
 	return box.hasBoundaries();

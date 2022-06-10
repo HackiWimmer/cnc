@@ -221,6 +221,8 @@ bool CncMoveSequenceListCtrl::searchReferenceById(const long id) {
 	if ( moveSequence == NULL )
 		return false;
 		
+	SetItemCount(moveSequence->getCount());
+	
 	for ( auto it=moveSequence->const_begin(); it != moveSequence->const_end(); ++it ) {
 		
 		if ( id >= it->clientID ) {
@@ -245,11 +247,15 @@ void CncMoveSequenceListCtrl::addMoveSequence(const CncMoveSequence* seq) {
 		return;
 		
 	moveSequence = seq;
-	SetItemCount(moveSequence->getCount());
+	
+	// To minimize the performance impact of SetItemCount(...)
+	// for large list content, it will be called ones at onPaint(...).
 }
 //////////////////////////////////////////////////
 void CncMoveSequenceListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
+	SetItemCount(moveSequence->getCount());
+
 	event.Skip();
 
 	const bool show = THE_CONFIG->getPreProcessorAnalyseFlag() == false && active && moveSequence == NULL;
@@ -359,9 +365,12 @@ void CncMoveSequenceOverviewListCtrl::clearAll() {
 //////////////////////////////////////////////////////////////////
 void CncMoveSequenceOverviewListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////////////////////
+	SetItemCount(moveSequences.size());
+	
 	event.Skip();
 	
-	if ( moveSequences.size() > 0 && GetSelectedItemCount() == 0 ) {
+	if ( moveSequences.size() > 0 && GetSelectedItemCount() == 0 ) 
+	{
 		selectItem(0, true);
 	}
 }
@@ -369,7 +378,9 @@ void CncMoveSequenceOverviewListCtrl::onPaint(wxPaintEvent& event) {
 void CncMoveSequenceOverviewListCtrl::addMoveSequence(const CncMoveSequence& seq) {
 /////////////////////////////////////////////////////////////
 	moveSequences.push_back(seq);
-	SetItemCount(moveSequences.size());
+	
+	// To minimize the performance impact of SetItemCount(...)
+	// for large list content, it will be called ones at onPaint(...).
 }
 /////////////////////////////////////////////////////////////
 wxListItemAttr* CncMoveSequenceOverviewListCtrl::OnGetItemAttr(long item) const {
@@ -460,6 +471,8 @@ bool CncMoveSequenceOverviewListCtrl::searchReference(const wxString& what) {
 /////////////////////////////////////////////////////////////
 bool CncMoveSequenceOverviewListCtrl::searchReferenceById(const long id) {
 /////////////////////////////////////////////////////////////
+	SetItemCount(moveSequences.size());
+
 	for ( auto it=moveSequences.begin(); it != moveSequences.end(); ++it ) {
 		
 		if ( id >= it->getFirstClientId() && id <= it->getLastClientId() ) {

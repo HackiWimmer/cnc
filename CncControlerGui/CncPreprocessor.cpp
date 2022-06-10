@@ -299,7 +299,8 @@ void CncPreprocessor::connectOperatingTrace(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::selectClientId(long id, ListType lt) {
 //////////////////////////////////////////////////////////////////
-	switch ( lt ) {
+	switch ( lt )
+	{
 		case LT_PATH_LIST: 			pathListEntries->searchReferenceById(id); 		break;
 		case LT_MOVE_SEQ_OVERVIEW:	moveSequenceOverview->searchReferenceById(id); 	break;
 		case LT_MOVE_SEQ_CONTENT:	moveSequence->searchReferenceById(id); 			break;

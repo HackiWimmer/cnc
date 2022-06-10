@@ -22,7 +22,8 @@ class CncTemplateContext : public ContextInterface {
 		unsigned int				validRunCount;
 		
 		CncBoundarySpace*			boundarySpace;
-		CncDoubleBoundaries			boundaries;
+		CncDoubleBoundaries			templateBounds;
+		CncDoubleBoundaries			measuredBounds;
 		
 	protected:
 		
@@ -32,6 +33,8 @@ class CncTemplateContext : public ContextInterface {
 		CncTemplateContext& operator= (CncTemplateContext&&)		= default;
 		
 	public:
+		
+		enum BoundType { BT_TEMPLATE, BT_MEASURED };
 		
 		CncTemplateContext(CncBoundarySpace* bs);
 		
@@ -48,9 +51,12 @@ class CncTemplateContext : public ContextInterface {
 		unsigned int		getValidRunCount()				const	{ return validRunCount; }
 		unsigned int		getRunCount()					const	{ return runCount; }
 		
-		void				registerBoundaries(const CncDoubleBoundaries& b);
-		const CncDoubleBoundaries& getBoundaries()			const	{ return boundaries; }
-		bool				hasBoundaries()					const	{ return boundaries.hasBoundaries(); }
+		void				registerBoundaries(const CncDoubleBoundaries& b, BoundType bt);
+		const CncDoubleBoundaries& getBoundaries(BoundType bt)	const;
+		const CncDoubleBoundaries& getBoundaries()				const;
+		bool				hasBoundaries(BoundType bt)			const;
+		bool				hasBoundaries()						const;
+		BoundType 			getBoundLevel()						const;
 		
 		const wxString&		getName()						const	{ return name; }
 		const wxString&		getPath()						const	{ return path; }
