@@ -770,4 +770,65 @@ typedef std::stack<CncLongBoundaries>		CncLongBoundariesStack;
 typedef std::stack<CncDoubleBoundaries>		CncDoubleBoundariesStack;
 typedef std::stack<CncFloatBoundaries>		CncFloatBoundariesStack;
 
+// ----------------------------------------------------------------------
+//
+template <class T>
+class CncRectangle
+{
+	private:
+		T X;
+		T Y;
+		T W;
+		T H;
+		
+	public:
+		
+		CncRectangle<T>()
+		: X	(T(0))
+		, Y	(T(0))
+		, W	(T(0))
+		, H	(T(0))
+		{}
+		
+		CncRectangle<T>(T x, T y, T w, T h)
+		: X	(T(x))
+		, Y	(T(y))
+		, W	(T(w))
+		, H	(T(h))
+		{}
+		
+		T getX() const { return X; }
+		T getY() const { return Y; }
+		T getW() const { return W; }
+		T getH() const { return H; }
+		
+		const CncRectangle& reset() { *this = CncRectangle(); return *this;}
+		
+		const CncRectangle& setX(T x) { X = x; return *this;}
+		const CncRectangle& setY(T y) { Y = y; return *this;}
+		const CncRectangle& setW(T w) { W = w; return *this;}
+		const CncRectangle& setH(T h) { H = h; return *this;}
+};
+
+typedef CncRectangle<int16_t>				CncIntRectangle;
+typedef CncRectangle<int32_t>				CncLongRectangle;
+typedef CncRectangle<double>				CncDoubleRectangle;
+typedef CncRectangle<float>					CncFloatRectangle;
+
+typedef std::vector<CncIntRectangle>		CncIntRectanglesVector;
+typedef std::vector<CncLongRectangle>		CncLongRectangleVector;
+typedef std::vector<CncDoubleRectangle>		CncDoubleRectangleVector;
+typedef std::vector<CncFloatRectangle>		CncFloatRectangleVector;
+
+typedef std::list<CncIntRectangle>			CncIntRectangleList;
+typedef std::list<CncLongRectangle>			CncLongRectangleList;
+typedef std::list<CncDoubleRectangle>		CncDoubleRectangleList;
+typedef std::list<CncFloatRectangle>		CncFloatRectangleList;
+
+typedef std::stack<CncIntRectangle>			CncIntRectangleStack;
+typedef std::stack<CncLongRectangle>		CncLongRectangleStack;
+typedef std::stack<CncDoubleRectangle>		CncDoubleRectangleStack;
+typedef std::stack<CncFloatRectangle>		CncFloatRectangleStack;
+
 #endif
+

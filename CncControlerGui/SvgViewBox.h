@@ -21,30 +21,53 @@ class SVGViewbox {
 		double maxY;
 		
 	public:
+	
 		///////////////////////////////////////////////////////////////////
 		explicit SVGViewbox(const wxString& vb) 
-		: viewBoxStr(vb)
-		, x(DBL_MAX)	, y(DBL_MAX)
-		, w(DBL_MAX)	, h(DBL_MAX)
-		, minX(0.0)		, maxX(0.0)
-		, minY(0.0)		, maxY(0.0)
+		: viewBoxStr	(vb)
+		, x				(DBL_MAX)
+		, y				(DBL_MAX)
+		, w				(DBL_MAX)
+		, h				(DBL_MAX)
+		, minX			(0.0)
+		, maxX			(0.0)
+		, minY			(0.0)
+		, maxY			(0.0)
 		{
 			setup(viewBoxStr);
 		}
 		
-		///////////////////////////////////////////////////////////////////
-		~SVGViewbox() {}
+		SVGViewbox(const SVGViewbox& vb) 
+		: viewBoxStr	(vb.getViewBoxStr())
+		, x				(vb.getX())
+		, y				(vb.getY())
+		, w				(vb.getW())
+		, h				(vb.getH())
+		, minX			(vb.getMinX())
+		, maxX			(vb.getMaxX())
+		, minY			(vb.getMinY())
+		, maxY			(vb.getMaxY())
+		{
+		}
 		
 		///////////////////////////////////////////////////////////////////
-		void setup(const wxString& vb) {
+		~SVGViewbox() 
+		{}
+		
+		///////////////////////////////////////////////////////////////////
+		void setup(const wxString& vb) 
+		{
 			viewBoxStr.assign(vb);
 			
 			wxStringTokenizer tokenizer(viewBoxStr, " ,");
 			unsigned int counter = 0;
-			while ( tokenizer.HasMoreTokens() ) {
+			while ( tokenizer.HasMoreTokens() ) 
+			{
 				wxString token = tokenizer.GetNextToken();
-				if ( token.IsEmpty() == false ) {
-					switch ( counter++ ) {
+				if ( token.IsEmpty() == false )
+				{
+					switch ( counter++ )
+					{
 						case 0:		token.ToDouble(&x); break;
 						case 1:		token.ToDouble(&y); break;
 						case 2:		token.ToDouble(&w); break;
@@ -55,7 +78,8 @@ class SVGViewbox {
 			}
 			
 			// calculate further members
-			if ( isValid() ) {
+			if ( isValid() ) 
+			{
 				minX = x;
 				minY = y;
 				maxX = x + w;
@@ -64,7 +88,8 @@ class SVGViewbox {
 		}
 		
 		////////////////////////////////////////////////////////////////
-		friend std::ostream &operator<< (std::ostream &ostr, const SVGViewbox &a) {
+		friend std::ostream &operator<< (std::ostream &ostr, const SVGViewbox &a)
+		{
 			ostr << a.getViewBoxStr() << ": " 	<< a.getX() 	<< ", " 
 												<< a.getY() 	<< ", " 
 												<< a.getW() 	<< ", " 
@@ -120,22 +145,24 @@ class SVGRootNode {
 		SVGRootNode();
 		SVGRootNode(double svgWidth, double svgHeight, Unit unit);
 		SVGRootNode(double svgWidth, double svgHeight, Unit unit, const wxString& vb);
-		explicit SVGRootNode(const SVGRootNode& n); 
+		SVGRootNode(const SVGRootNode& n); 
 		~SVGRootNode() {}
 		
-		const SVGViewbox& getViewbox()		const { return viewBox; }
-		const double getWidth()				const { return width;   }
-		const double getHeight()			const { return height;  }
-		const float getScaleX()				const { return scaleX;  }
-		const float getScaleY()				const { return scaleY;  }
+		const SVGViewbox&	getViewbox()			const { return viewBox; }
+		CncDoublePosition	getViewboxOffset_MM()	const; 
+		const double		getWidth()				const { return width;   }
+		const double		getHeight()				const { return height;  }
+		const float			getScaleX()				const { return scaleX;  }
+		const float			getScaleY()				const { return scaleY;  }
 		
-		const Unit getInputUnit()			const { return unitCalculator.getInputUnit();  }
-		const double getWidth_MM()			const { CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);  return uc.convert(width);  }
-		const double getHeight_MM()			const { CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);  return uc.convert(height); }
+		const Unit			getInputUnit()			const { return unitCalculator.getInputUnit();  }
+		const double		getWidth_MM()			const { CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);  return uc.convert(width);  }
+		const double		getHeight_MM()			const { CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);  return uc.convert(height); }
 		
 		const wxString& getRootTransformation(wxString& ret) const;
 		
-		friend std::ostream &operator<< (std::ostream &ostr, const SVGRootNode &a) {
+		friend std::ostream &operator<< (std::ostream &ostr, const SVGRootNode &a)
+		{
 			typedef CncUnitCalculator<float> UC;
 			wxString rt;
 			

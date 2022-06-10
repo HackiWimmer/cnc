@@ -104,7 +104,7 @@ void CncLruFileViewListCtrl::setBigTheme(bool big) {
 /////////////////////////////////////////////////////////////
 	const int size = big ? bigFontSize : smallFontSize;
 	
-	const wxColour tc = big ? wxColour(32,   32,  32) : wxColour(228, 228, 228);
+	const wxColour tc = big ? wxColour(32,   32,  32) : wxColour(200, 200, 200);
 	const wxColour bc = big ? wxColour(255, 255, 255) : wxColour( 32,  32,  32);
 	const wxColour sc = big ? wxColour(255, 128, 128) : wxColour(255, 242,   0);
 	
@@ -528,7 +528,7 @@ CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::NORMAL);
 	
-	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+	wxFont font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
 	setBigTheme(false);

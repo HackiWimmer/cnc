@@ -120,7 +120,7 @@ class SVGFileParser : public SVGParserBase
 		
 		virtual void displayUserAgentDetailInfo(unsigned int pos)				{ svgUserAgent.displayDetailInfo(pos); }
 		
-		static bool evaluateMetricSize(const wxString& fileName, CncXYDoubleDimension& size);
+		static bool evaluateMetricSize(const wxString& fileName, CncDoubleRectangle& rect);
 		
 };
 

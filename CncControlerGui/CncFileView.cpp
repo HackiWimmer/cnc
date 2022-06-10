@@ -21,14 +21,14 @@ const char* BIN_FILES 		= "*.bct";
 
 /////////////////////////////////////////////////////////////////
 CncFileView::CncFileView(wxWindow* parent, bool sd)
-: CncFileViewBase(parent)
-, wxDirTraverser()
-, defaultPath("")
-, fileList(NULL)
-, filterList()
-, staticDir(sd)
-, avoidSelectListEvent(false)
-, lastSelection()
+: CncFileViewBase		(parent)
+, wxDirTraverser		()
+, defaultPath			("")
+, fileList				(NULL)
+, filterList			()
+, staticDir				(sd)
+, avoidSelectListEvent	(false)
+, lastSelection			()
 /////////////////////////////////////////////////////////////////
 {
 	// File List 

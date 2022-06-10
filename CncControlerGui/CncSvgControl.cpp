@@ -159,6 +159,7 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 		return false;
 		
 	#ifdef WX_SVG_SUPPORT
+	
 		{
 			CncStringLogger tmpLogger;
 			const bool ret = Load(filename);
@@ -173,11 +174,11 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 			}
 			else
 			{
-				CncXYDoubleDimension size;
-				if ( SVGFileParser::evaluateMetricSize(filename, size) )
+				CncDoubleRectangle rect;
+				if ( SVGFileParser::evaluateMetricSize(filename, rect) )
 				{
-					boundaries.setMinBound(CncDoublePosition(0, 0, 0));
-					boundaries.setMaxBound(CncDoublePosition(size.getW(), size.getH(), 0));
+					boundaries.setMinBound(CncDoublePosition(rect.getX(), rect.getY(), 0.0));
+					boundaries.setMaxBound(CncDoublePosition(rect.getW(), rect.getH(), 0.0));
 				}
 				else
 				{
@@ -188,9 +189,13 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 			Refresh();
 			return ret;
 		}
+		
 	#else
+		
+		boundaries.reset();
 		SetToolTip(wxString::Format("wxPanel: Can't display %s", filename));
 		return false;
+		
 	#endif
 }
 //////////////////////////////////////////////////////////////////////////////

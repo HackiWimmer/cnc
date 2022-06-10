@@ -52,7 +52,7 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		static const int miCopyLruListEntry			= 8001;
 		static const int miRemoveLruListEntry		= 8002;
 		
-		static const int smallFontSize				=  8;
+		static const int smallFontSize				=  9;
 		static const int bigFontSize				= 16;
 		
 		static const int COL_IMAGE 					= 0;
@@ -138,7 +138,7 @@ class CncFileViewListCtrl : public CncLargeScaledListCtrl {
 		static const int TOTAL_COL_COUNT	= 2;
 		static const int COL_STRECH			= COL_FILE;
 		
-		static const int smallFontSize		=  8;
+		static const int smallFontSize		=  9;
 		static const int bigFontSize		= 16;
 
 		CncFileViewListCtrl(wxWindow *parent, long style);

@@ -245,55 +245,6 @@ bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) 
 bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const wxString& vb) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
-	/*
-	double width=0, height=0;
-	wxString s, unitW, unitH;
-	int sPos = -1;
-	s = w;
-	for ( int i=0; i<(int)s.Length();i++ )
-	{
-		if ( s[i] == ' ' || s[i] == '\t' )
-			continue;
-		
-		if ( isalpha(s[i]) && sPos < 0 )
-		{
-			sPos = i;
-			s.SubString(0, i - 1).ToDouble(&width);
-			unitW = s.SubString(i, s.Length() -1);
-		}
-	}
-	if ( sPos == -1 )
-	{
-			s.SubString(0, s.Length() - 1).ToDouble(&width);
-			unitW = "px";
-	}
-
-	sPos = -1;
-	s = h;
-	for ( int i=0; i<(int)s.Length();i++ )
-	{
-		if ( s[i] == ' ' || s[i] == '\t' )
-			continue;
-		
-		if ( isalpha(s[i]) && sPos < 0 )
-		{
-			sPos = i;
-			s.SubString(0, i - 1).ToDouble(&height);
-			unitH = s.SubString(i, s.Length() -1);
-		}
-	}
-	if ( sPos == -1 )
-	{
-			s.SubString(0, s.Length() - 1).ToDouble(&height);
-			unitH = "px";
-	}
-	
-	Unit unit;
-	if ( determineUnit(unitW, unitH, unit) == false )
-		return false;
-		
-	SVGRootNode svgRootNode(width, height, unit, vb);
-	*/
 	SVGRootNode svgRootNode = evaluateSVGRootNode(w, h, vb);
 	
 	std::stringstream ss; ss << svgRootNode;
@@ -1023,9 +974,9 @@ void SVGFileParser::initNextPath(const wxString& data) {
 	svgUserAgent.initNextPath(pathHandler->getSvgCncContext(), data);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::evaluateMetricSize(const wxString& fileName, CncXYDoubleDimension& size) {
+bool SVGFileParser::evaluateMetricSize(const wxString& fileName, CncDoubleRectangle& rect) {
 //////////////////////////////////////////////////////////////////
-	size.reset();
+	rect.reset();
 	
 	wxXmlDocument doc;
 	{
@@ -1047,66 +998,58 @@ bool SVGFileParser::evaluateMetricSize(const wxString& fileName, CncXYDoubleDime
 	const wxString h = doc.GetRoot()->GetAttribute("height");
 	const wxString v = doc.GetRoot()->GetAttribute("viewBox");
 	
-	SVGRootNode svgRootNode = evaluateSVGRootNode(w, h, v);
+	const SVGRootNode svgRootNode		= evaluateSVGRootNode(w, h, v);
+	const CncDoublePosition vbOffset_MM	= svgRootNode.getViewboxOffset_MM();
 	
-	const double widthMM  = svgRootNode.getWidth_MM();
-	const double heightMM = svgRootNode.getHeight_MM();
-	
-	if ( cnc::dblCmp::nu(widthMM) && cnc::dblCmp::nu(heightMM) )
+	if ( cnc::dblCmp::nu(svgRootNode.getWidth_MM()) && cnc::dblCmp::nu(svgRootNode.getHeight_MM()) )
 	{
 		std::cerr << CNC_LOG_A(": Invalid SVG Root node evaluation\n");
 		return false;
 	}
 	
-	size.setH(widthMM);
-	size.setW(heightMM);
+	rect.setX(vbOffset_MM.getX());
+	rect.setY(vbOffset_MM.getY());
+	rect.setW(svgRootNode.getWidth_MM());
+	rect.setH(svgRootNode.getHeight_MM());
 	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
 SVGRootNode SVGFileParser::evaluateSVGRootNode(const wxString& w, const wxString& h, const wxString& vb) {
 //////////////////////////////////////////////////////////////////
-	double width=0, height=0;
-	wxString s, unitW, unitH;
-	int sPos = -1;
-	s = w;
-	for ( int i=0; i<(int)s.Length();i++ )
+	// ----------------------------------------------------------
+	auto evaluate = [](const wxString& s, wxString& unit) 
 	{
-		if ( s[i] == ' ' || s[i] == '\t' )
-			continue;
+		int sPos		= -1;
+		double value	= 0;
 		
-		if ( isalpha(s[i]) && sPos < 0 )
+		for ( int i=0; i<(int)s.Length();i++ )
 		{
-			sPos = i;
-			s.SubString(0, i - 1).ToDouble(&width);
-			unitW = s.SubString(i, s.Length() -1);
+			if ( s[i] == ' ' || s[i] == '\t' )
+				continue;
+			
+			if ( isalpha(s[i]) && sPos < 0 )
+			{
+				sPos = i;
+				s.SubString(0, i - 1).ToDouble(&value);
+				unit = s.SubString(i, s.Length() -1);
+			}
 		}
-	}
-	if ( sPos == -1 )
-	{
-			s.SubString(0, s.Length() - 1).ToDouble(&width);
-			unitW = "px";
-	}
-
-	sPos = -1;
-	s = h;
-	for ( int i=0; i<(int)s.Length();i++ )
-	{
-		if ( s[i] == ' ' || s[i] == '\t' )
-			continue;
 		
-		if ( isalpha(s[i]) && sPos < 0 )
+		if ( sPos == -1 )
 		{
-			sPos = i;
-			s.SubString(0, i - 1).ToDouble(&height);
-			unitH = s.SubString(i, s.Length() -1);
+				s.SubString(0, s.Length() - 1).ToDouble(&value);
+				unit = "px";
 		}
-	}
-	if ( sPos == -1 )
-	{
-			s.SubString(0, s.Length() - 1).ToDouble(&height);
-			unitH = "px";
-	}
+		
+		return value;
+	};
+	
+	// ----------------------------------------------------------
+	wxString unitW, unitH;
+	
+	const double width  = evaluate(w, unitW);
+	const double height = evaluate(h, unitH);
 	
 	Unit unit;
 	if ( determineUnit(unitW, unitH, unit) == false )
