@@ -1850,7 +1850,7 @@ CncSimuHwDimensionSetupBase::CncSimuHwDimensionSetupBase(wxWindow* parent,
 
     flexGridSizer299->Add(m_staticLine324, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
-    wxFlexGridSizer* flexGridSizer332 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer332 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer332->SetFlexibleDirection(wxBOTH);
     flexGridSizer332->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
@@ -1920,13 +1920,37 @@ CncSimuHwDimensionSetupBase::CncSimuHwDimensionSetupBase(wxWindow* parent,
     m_cbDefaultZArr.Add(_("centre"));
     m_cbDefaultZArr.Add(_("top"));
     m_cbDefaultZ = new wxComboBox(
-        m_panel272, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), m_cbDefaultZArr, 0);
+        m_panel272, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(80, -1)), m_cbDefaultZArr, 0);
 #if wxVERSION_NUMBER >= 3000
     m_cbDefaultZ->SetHint(wxT(""));
 #endif
     m_cbDefaultZ->SetSelection(2);
 
     flexGridSizer333->Add(m_cbDefaultZ, 0, wxALL, WXC_FROM_DIP(2));
+
+    wxFlexGridSizer* flexGridSizer344 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer344->SetFlexibleDirection(wxBOTH);
+    flexGridSizer344->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer332->Add(flexGridSizer344, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_staticText345 = new wxStaticText(
+        m_panel272, wxID_ANY, _("Border:"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(70, -1)), 0);
+
+    flexGridSizer344->Add(m_staticText345, 0, wxALL, WXC_FROM_DIP(5));
+
+    m_tcDefaultBorder = new wxTextCtrl(
+        m_panel272, wxID_ANY, wxT("-42.000"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(80, -1)), wxTE_RIGHT);
+#if wxVERSION_NUMBER >= 3000
+    m_tcDefaultBorder->SetHint(wxT(""));
+#endif
+
+    flexGridSizer344->Add(m_tcDefaultBorder, 0, wxALL, WXC_FROM_DIP(1));
+
+    m_staticText348 =
+        new wxStaticText(m_panel272, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(m_panel272, wxSize(-1, -1)), 0);
+
+    flexGridSizer344->Add(m_staticText348, 0, wxALL, WXC_FROM_DIP(5));
 
     m_staticLine279 =
         new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxLI_HORIZONTAL);

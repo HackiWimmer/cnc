@@ -892,6 +892,9 @@ protected:
     wxBitmapButton* m_btRefSector3;
     wxStaticText* m_staticText341;
     wxComboBox* m_cbDefaultZ;
+    wxStaticText* m_staticText345;
+    wxTextCtrl* m_tcDefaultBorder;
+    wxStaticText* m_staticText348;
     wxStaticLine* m_staticLine279;
     wxButton* m_btCancel;
     wxButton* m_btOk;
@@ -1090,6 +1093,18 @@ public:
     wxComboBox* GetCbDefaultZ()
     {
 	return m_cbDefaultZ;
+    }
+    wxStaticText* GetStaticText345()
+    {
+	return m_staticText345;
+    }
+    wxTextCtrl* GetTcDefaultBorder()
+    {
+	return m_tcDefaultBorder;
+    }
+    wxStaticText* GetStaticText348()
+    {
+	return m_staticText348;
     }
     wxPanel* GetPanel272()
     {

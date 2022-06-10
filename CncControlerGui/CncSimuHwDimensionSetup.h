@@ -35,6 +35,7 @@ class CncSimuHwDimensionSetup : public CncSimuHwDimensionSetupBase
 	private:
 		
 		const char*	fltFormat	= "%.3lf";
+		const double dftBorder	= -10;
 		
 		struct PreviousSetup
 		{

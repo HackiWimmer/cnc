@@ -32,6 +32,10 @@ CncSimuHwDimensionSetup::CncSimuHwDimensionSetup(wxWindow* parent, Mode m)
 
 	validator.SetRange(-500, 500.0);
 	m_tcRefPosOffsetZ->SetValidator(validator);
+	
+	validator.SetRange(-50.0, 50.0);
+	m_tcDefaultBorder->SetValidator(validator);
+	m_tcDefaultBorder->ChangeValue(wxString::Format(fltFormat, dftBorder));
 }
 ///////////////////////////////////////////////////////////////////
 CncSimuHwDimensionSetup::~CncSimuHwDimensionSetup() {
@@ -142,9 +146,11 @@ void CncSimuHwDimensionSetup::processDefault() {
 	m_tcMaxDimY->ChangeValue(wxString::Format(fltFormat, THE_BOUNDS->getMaxDimensionMetricY()));
 	m_tcMaxDimZ->ChangeValue(wxString::Format(fltFormat, THE_BOUNDS->getMaxDimensionMetricZ()));
 	
-	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, +0.0));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, +0.0));
-	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, +THE_BOUNDS->getMaxDimensionMetricZ()));
+	// It's on purpose tho have the default origin not exact at (0.0, 0.0, ... )
+	const double border = getValue(m_tcDefaultBorder, dftBorder);
+	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, border));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, border));
+	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, +(THE_BOUNDS->getMaxDimensionMetricZ() - (border * -1) )));
 	
 	apply();
 }
@@ -201,14 +207,15 @@ void CncSimuHwDimensionSetup::onTakeOverFromConfigMaxDimZ(wxCommandEvent& event)
 ///////////////////////////////////////////////////////////////////
 double CncSimuHwDimensionSetup::evaluateZLocation() {
 ///////////////////////////////////////////////////////////////////
+	const double border = getValue(m_tcDefaultBorder, dftBorder);
 	double z = +THE_BOUNDS->getMaxDimensionMetricZ();
 	
 	switch ( m_cbDefaultZ->GetSelection() )
 	{
-		case BOTTOM:	z = 0.0;											break;
+		case BOTTOM:	z = border;											break;
 		case CENTERED:	z = +THE_BOUNDS->getMaxDimensionMetricZ() / 2.0;	break;
 		case TOP:
-		default:		z = +THE_BOUNDS->getMaxDimensionMetricZ();
+		default:		z = +(THE_BOUNDS->getMaxDimensionMetricZ() - (border * -1));
 	}
 	
 	return z;
@@ -225,8 +232,10 @@ void CncSimuHwDimensionSetup::onRefCentered(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::onRefSector1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, +0.0));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, +0.0));
+	const double border = getValue(m_tcDefaultBorder, dftBorder);
+	
+	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, border));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, border));
 	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, evaluateZLocation()));
 	
 	apply();
@@ -234,8 +243,10 @@ void CncSimuHwDimensionSetup::onRefSector1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::onRefSector2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	const double border = getValue(m_tcDefaultBorder, dftBorder);
+
 	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricX()));
-	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, +0.0));
+	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, border));
 	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, evaluateZLocation()));
 	
 	apply();
@@ -243,7 +254,9 @@ void CncSimuHwDimensionSetup::onRefSector2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncSimuHwDimensionSetup::onRefSector3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, 0.0));
+	const double border = getValue(m_tcDefaultBorder, dftBorder);
+
+	m_tcRefPosOffsetX->ChangeValue(wxString::Format(fltFormat, border));
 	m_tcRefPosOffsetY->ChangeValue(wxString::Format(fltFormat, -THE_BOUNDS->getMaxDimensionMetricY()));
 	m_tcRefPosOffsetZ->ChangeValue(wxString::Format(fltFormat, evaluateZLocation()));
 	
