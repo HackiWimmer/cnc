@@ -72,12 +72,13 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		// Curve lib callback
 		virtual bool callback(const CncCurveLib::Point& p);
 		
-		virtual bool processLinearMove(bool alreadyRendered) = 0;
-		virtual void processFeedSpeed(CncSpeedMode mode);
 		void processClientId(long id);
 		void processFeedSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN);
 		void processSpindleState(bool state);
 		void processSpindleSpeed(double spindleSpeed_U_MIN);
+		
+		virtual bool processLinearMove(bool alreadyRendered) = 0;
+		virtual void processFeedSpeed(CncSpeedMode mode);
 		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);

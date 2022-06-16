@@ -11,26 +11,27 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		GCodePathHandlerGL(CncGCodePreview* gl);
 		virtual ~GCodePathHandlerGL();
 		
-		virtual const char*		getName() 							const	{ return "GCodePathHandlerGL"; }
+		virtual const char*		getName() 							const					override { return "GCodePathHandlerGL"; }
 		
-		virtual bool			isPathListUsed() 					const	{ return false; }
-		virtual bool			shouldAToolChangeProcessed()				{ return false; }
+		virtual bool			isPathListUsed() 					const					override { return false; }
+		virtual bool			shouldAToolChangeProcessed()								override { return false; }
 		
-		virtual void			switchSpindleState(bool state)				{}
-		virtual void			logMeasurementStart()						{}
-		virtual void			logMeasurementEnd()							{}
+		virtual void			switchSpindleState(bool state)								override {}
+		virtual void			logMeasurementStart()										override {}
+		virtual void			logMeasurementEnd()											override {}
 
 	protected:
 		
 		virtual bool			processLinearMove(bool alreadyRendered);
-		virtual bool			changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value = 0.0);
-		virtual bool			changeCurrentSpindleSpeed(double value = 0.0);
-		virtual bool			initNextPath();
-		virtual bool			prepareWorkImpl();
-		virtual bool			finishWorkImpl();
+		virtual bool			changeCurrentFeedSpeedXYZ(CncSpeedMode sm);
+		virtual bool			changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value)	override;
+		virtual bool			changeCurrentSpindleSpeed(double value = 0.0)				override;
+		virtual bool			initNextPath()												override;
+		virtual bool			prepareWorkImpl()											override;
+		virtual bool			finishWorkImpl()											override;
 		
-		virtual void			resetWorkflow()	{ }
-		virtual bool			spoolWorkflow()	{ return true; }
+		virtual void			resetWorkflow()												override { }
+		virtual bool			spoolWorkflow()												override { return true; }
 		
 	private:
 		

@@ -146,7 +146,8 @@ bool SVGPathHandlerCnc::invertPathArgSweepFlag() const {
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::processFeedSpeed(CncSpeedMode mode) {
 //////////////////////////////////////////////////////////////////
-	switch ( mode ) {
+	switch ( mode ) 
+	{
 		case CncSpeedRapid:	pathListMgr.addEntryAdm(mode, currentCncContext.getCurrentRapidSpeed_MM_MIN());
 							break;
 							
@@ -160,8 +161,7 @@ void SVGPathHandlerCnc::processFeedSpeed(CncSpeedMode mode) {
 bool SVGPathHandlerCnc::activateNextPath(long clientID) {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL(CNC_LOG_FUNCT);
-	
-	CTX_ADD_SEP(wxString::Format("Run next Path:"));
+CTX_ADD_SEP(wxString::Format("Run next Path:"));
 	
 	nextPath = true;
 	if ( currentCncContext.isGuidePath() )
@@ -174,7 +174,14 @@ bool SVGPathHandlerCnc::activateNextPath(long clientID) {
 		pathListMgr.initNextCncPath();
 	}
 	
-	pathListMgr.normalizeLinkedEntry(clientID, CncSpeedWork, currentCncContext.getCurrentWorkSpeed_MM_MIN());
+	CncPathListEntry ple;
+	ple.clientId			= clientID;
+	ple.feedSpeedMode		= CncSpeedWork;
+	ple.feedSpeed_MM_MIN	= currentCncContext.getCurrentWorkSpeed_MM_MIN();
+	ple.spindleState		= currentCncContext.getCurrentSpindleState();
+	ple.spindleSpeed_U_MIN	= currentCncContext.getCurrentSpindleSpeed_U_MIN();
+	
+	pathListMgr.normalizeLinkedEntry(ple);
 	
 	const Trigger::NextPath tr;
 	processTrigger(tr);
@@ -535,7 +542,8 @@ bool SVGPathHandlerCnc::moveZAxisNextStepDown(double zTarget) {
 	}
 	
 	// second, perform the move
-	if ( cnc::dblCompare(curRunPosition.getZ(), curZTarget) == false ) {
+	if ( cnc::dblCompare(curRunPosition.getZ(), curZTarget) == false )
+	{
 		const double zDist	= (-1) * fabs(curRunPosition.getZ() - curZTarget);
 		const long clientID	= currentCncContext.getCurrentClientID(CO::Z_NEXT_STEP_DOWN);
 		

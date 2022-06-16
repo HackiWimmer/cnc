@@ -188,7 +188,8 @@ CncPathListManager::~CncPathListManager() {
 auto CncPathListManager::firstPosEntryIterator() {
 //////////////////////////////////////////////////////////////////
 	auto it = begin();
-	while ( it != end() ) {
+	while ( it != end() )
+	{
 		if ( it->isPositionChange() )
 			break;
 			
@@ -201,7 +202,8 @@ auto CncPathListManager::firstPosEntryIterator() {
 auto CncPathListManager::lastPosEntryIterator() {
 //////////////////////////////////////////////////////////////////
 	auto it = rbegin();
-	while ( it != rend() ) {
+	while ( it != rend() )
+	{
 		if ( it->isPositionChange() )
 			break;
 			
@@ -214,7 +216,8 @@ auto CncPathListManager::lastPosEntryIterator() {
 auto CncPathListManager::cFirstPosEntryIterator() const {
 //////////////////////////////////////////////////////////////////
 	auto it = cbegin();
-	while ( it != cend() ) {
+	while ( it != cend() )
+	{
 		if ( it->isPositionChange() )
 			break;
 			
@@ -229,6 +232,34 @@ auto CncPathListManager::crLastPosEntryIterator() const {
 	auto it = crbegin();
 	while ( it != crend() ) {
 		if ( it->isPositionChange() )
+			break;
+			
+		it++;
+	}
+	
+	return it;
+}
+//////////////////////////////////////////////////////////////////
+auto CncPathListManager::crLastValidEntryWithF() const {
+//////////////////////////////////////////////////////////////////
+	auto it = crbegin();
+	while ( it != crend() ) 
+	{
+		if ( it->hasSpeedValueF() )
+			break;
+			
+		it++;
+	}
+	
+	return it;
+}
+//////////////////////////////////////////////////////////////////
+auto CncPathListManager::crLastValidEntryWithS() const {
+//////////////////////////////////////////////////////////////////
+	auto it = crbegin();
+	while ( it != crend() ) 
+	{
+		if ( it->hasSpeedValueS() )
 			break;
 			
 		it++;
@@ -301,14 +332,31 @@ void CncPathListManager::initNextPath(bool linked) {
 	cpe.entryDistance		= CncPathListEntry::NoDistance;
 	cpe.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 	
+	/*
 	auto itLast = crLastPosEntryIterator();
 	const bool b = (pathType == PT_CNC_PATH && itLast != crend());
-
+	
 	cpe.clientId			= b ? itLast->clientId         : CncPathListEntry::DefaultClientID;
 	cpe.feedSpeedMode		= b ? itLast->feedSpeedMode    : CncPathListEntry::DefaultSpeedMode;
 	cpe.feedSpeed_MM_MIN	= b ? itLast->feedSpeed_MM_MIN : CncPathListEntry::DefaultSpeedValue;
 	cpe.entryTarget			= b ? itLast->entryTarget      : CncPathListEntry::ZeroTarget;
+	*/
+	
+	auto itLast  = clast();
+	auto itLastF = crLastValidEntryWithF();
+	auto itLastS = crLastValidEntryWithF();
 
+	const bool last  = ( pathType == PT_CNC_PATH && itLast  != cend()  );
+	const bool lastF = ( pathType == PT_CNC_PATH && itLastF != crend() );
+	const bool lastS = ( pathType == PT_CNC_PATH && itLastS != crend() );
+	
+	cpe.clientId			= last  ? itLast ->clientId				: CncPathListEntry::DefaultClientID;
+	cpe.feedSpeedMode		= lastF ? itLastF->feedSpeedMode		: CncPathListEntry::DefaultSpeedMode;
+	cpe.feedSpeed_MM_MIN	= lastF ? itLastF->feedSpeed_MM_MIN		: CncPathListEntry::DefaultSpeedValue;
+	cpe.spindleState		= lastS ? itLastS->spindleState			: CncPathListEntry::DefaultSpindleState;
+	cpe.spindleSpeed_U_MIN	= lastS ? itLastS->spindleSpeed_U_MIN	: CncPathListEntry::DefaultSpindleSpeedValue;
+	cpe.entryTarget			= last  ? itLast ->entryTarget			: CncPathListEntry::ZeroTarget;
+	
 	clear();
 	
 	if ( linked == true )
@@ -370,6 +418,14 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(long clientId) {
 
 	// append
 	return appendEntry(cpe), getPathList().back();
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode) {
+//////////////////////////////////////////////////////////////////
+	CncPathListEntry cpe;
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
+	
+	return addEntryAdm(mode, prevEntry.feedSpeed_MM_MIN);
 }
 //////////////////////////////////////////////////////////////////
 const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN) {
@@ -502,7 +558,7 @@ const CncPathListEntry& CncPathListManager::addEntryRel(const CncDoublePosition&
 					  );
 }
 //////////////////////////////////////////////////////////////////
-size_t CncPathListManager::normalizeLinkedEntry(long clientId, CncSpeedMode mode, double feedSpeed_MM_MIN) {
+size_t CncPathListManager::normalizeLinkedEntry(const CncPathListEntry& ref) {
 //////////////////////////////////////////////////////////////////
 	if ( getPathListSize() == 0 )
 		return 0;
@@ -511,12 +567,15 @@ size_t CncPathListManager::normalizeLinkedEntry(long clientId, CncSpeedMode mode
 	if ( firstEntry.isNothingChanged() == false )
 		;//return 0;
 	
-	for ( auto it = begin(); it != end(); ++it ) {
+	for ( auto it = begin(); it != end(); ++it ) 
+	{
 		CncPathListEntry& ple 	 = *it;
 		
-		ple.clientId			 = clientId;
-		ple.feedSpeedMode		 = mode;
-		ple.feedSpeed_MM_MIN	 = feedSpeed_MM_MIN;
+		ple.clientId			= ref.clientId;
+		ple.feedSpeedMode		= ref.feedSpeedMode;
+		ple.feedSpeed_MM_MIN	= ref.feedSpeed_MM_MIN;
+		ple.spindleState		= ref.spindleState;
+		ple.spindleSpeed_U_MIN	= ref.spindleSpeed_U_MIN;
 		
 		if ( std::distance(begin(), it) == 0 )
 			ple.content |= CncPathListEntry::CONT_CLIENTID | CncPathListEntry::CONT_SPEED;
@@ -537,7 +596,7 @@ void CncPathListManager::init(const CncDoublePosition& p) {
 	initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
 	initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 	initialEntry.entryTarget		= p;
-	initialEntry.clientId			= 0;
+	initialEntry.clientId			= CncPathListEntry::DefaultClientID;
 	initialEntry.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
 	initialEntry.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
 	initialEntry.spindleState		= CncPathListEntry::DefaultSpindleState;

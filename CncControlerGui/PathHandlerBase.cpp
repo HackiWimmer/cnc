@@ -129,9 +129,7 @@ void PathHandlerBase::processClientId(long id) {
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::processFeedSpeed(CncSpeedMode mode) {
 //////////////////////////////////////////////////////////////////
-	// do nothing, have to be overridden by classes which
-	// knowing current feed speed values for the given mode
-	std::cerr << CNC_LOG_FUNCT_A(": Invalid call. This method have to be overridden to use\n");
+	pathListMgr.addEntryAdm(mode);
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::processFeedSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN) {

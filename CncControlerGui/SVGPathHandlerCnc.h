@@ -18,7 +18,8 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		typedef CncUnitCalculatorBase::Unit Unit;
 		typedef SvgCncContextBase::CLIENT_ID_OFFSET CO;
 		
-		struct MoveParameter {
+		struct MoveParameter
+		{
 			CncSpeedMode 				mode		= CncSpeedWork;
 			CO							idOffset	= CO::MAIN;
 			bool						zToTop		= true;
@@ -30,8 +31,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		CncDoublePosition		curRunPosition;
 		bool					initialized;
 		bool					debugState;
-
-		// 
+		
 		bool					moveZAxisToLogicalTop(CncSpeedMode m = CncSpeedWork);
 		bool					moveZAxisToSurface();
 		bool					moveZAxisNextStepDown(double zTarget);
@@ -54,27 +54,28 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 	protected:
 	
 		// debug functions
-		virtual void			appendDebugValueDetail(const char* key, wxVariant value);
-		virtual void			appendDebugValueDetail(const CncPathListEntry& cpe);
-		virtual void			appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
+		virtual void			appendDebugValueDetail(const char* key, wxVariant value)		override;
+		virtual void			appendDebugValueDetail(const CncPathListEntry& cpe)				override;
+		virtual void			appendDebugValueDetail(const CncCurveLib::ParameterSet& ps)		override;
 		
-		virtual bool			isInitialized() 			const 	{ return initialized; }
 		virtual bool			performModifications();
 		
-		virtual bool			convertToRightHandCoordSystem() const;
-		virtual bool			invertPathArgSweepFlag() const;
-		virtual void			processFeedSpeed(CncSpeedMode mode);
+		virtual bool			convertToRightHandCoordSystem()			const					override;
+		virtual bool			invertPathArgSweepFlag()				const					override;
+		virtual void			processFeedSpeed(CncSpeedMode mode)								override;
+		
+		virtual bool			isInitialized() 						const					{ return initialized; }
 		
 	public:
 		
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
 		
-		virtual void			deligateTrigger(const Trigger::BeginRun& tr)			{ processTrigger(tr); }
-		virtual void			deligateTrigger(const Trigger::EndRun& tr)				{ processTrigger(tr); }
-		virtual void			changePathListRunnerInterface(const wxString& portName)	{ changePathListRunnerInterfaceImpl(portName); }
+		virtual void			deligateTrigger(const Trigger::BeginRun& tr)			override { processTrigger(tr); }
+		virtual void			deligateTrigger(const Trigger::EndRun& tr)				override { processTrigger(tr); }
+		virtual void			changePathListRunnerInterface(const wxString& portName)	override { changePathListRunnerInterfaceImpl(portName); }
 		
-		virtual const char*		getName()					const	{ return "SVGPathHandlerCnc"; }
+		virtual const char*		getName()					const						override { return "SVGPathHandlerCnc"; }
 			
 		double					getW() 								{ return svgRootNode.getWidth();      }
 		double					getH() 								{ return svgRootNode.getHeight();     }
@@ -83,21 +84,21 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		
 		void					setDebugState(bool state)			{ debugState = state; }
 		
-		virtual void			initNextClientId(long clientId);
-		virtual bool			activateNextPath(long clientId);
+		virtual void			initNextClientId(long clientId)				override;
+		virtual bool			activateNextPath(long clientId)				override;
 		
-		virtual void			setSvgRootNode(const SVGRootNode& srn);
-		virtual void			logMeasurementStart();
-		virtual void			logMeasurementEnd();
+		virtual void			setSvgRootNode(const SVGRootNode& srn)		override;
+		virtual void			logMeasurementStart()						override;
+		virtual void			logMeasurementEnd()							override;
 
 		// path handling
-		virtual bool			prepareWork();
-		virtual bool			finishCurrentPath();
-		virtual bool			runCurrentPath();
-		virtual bool			finishWork();
+		virtual bool			prepareWork()								override;
+		virtual bool			finishCurrentPath()							override;
+		virtual bool			runCurrentPath()							override;
+		virtual bool			finishWork()								override;
 		
-		virtual void			resetWorkflow() { CncPathListRunner::resetWorkflow(); }
-		virtual bool			spoolWorkflow() { return CncPathListRunner::spoolWorkflow(); }
+		virtual void			resetWorkflow()								override { CncPathListRunner::resetWorkflow(); }
+		virtual bool			spoolWorkflow()								override { return CncPathListRunner::spoolWorkflow(); }
 };
 
 #endif

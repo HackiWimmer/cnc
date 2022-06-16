@@ -830,33 +830,39 @@ void SvgCncContext::setCurrentSpindleSpeed(const char type, const wxString& para
 	if ( para.IsEmpty() )
 		return;
 		
-	if ( para.IsSameAs(RESET_Modifyer) ) {
+	if ( para.IsSameAs(RESET_Modifyer) )
+	{
 		currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedDefault();
 		return;
 	}
 	
 	const char mode = (char)para[0];
-	if ( mode != type ) {
+	if ( mode != type )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid mode token: '%s'", para));
 		return;
 	}
 	
 	double speedValue = 0.0;
 	para = para.SubString(1, para.Length() - 1);
-	if ( para.ToDouble(&speedValue) == false ) {
+	if ( para.ToDouble(&speedValue) == false ) 
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid speed token: '%s'", para));
 		return;
 	}
 	
-	if ( speedValue < THE_CONFIG->getSpindleSpeedMin() ) {
+	if ( speedValue < THE_CONFIG->getSpindleSpeedMin() )
+	{
 		currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedMin();
 		CTX_LOG_WAR(wxString::Format("Warning: A Spindle speed of %.lf is to less. It would be adjusted to %.lf.", speedValue, currentSpindleSpeed_U_MIN));
 	}
-	else if ( speedValue > THE_CONFIG->getSpindleSpeedMax() ) {
+	else if ( speedValue > THE_CONFIG->getSpindleSpeedMax() )
+	{
 		currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedMin();
 		CTX_LOG_WAR(wxString::Format("Warning: A Spindle speed of %.lf is to much. It would be adjusted to %.lf.", speedValue, currentSpindleSpeed_U_MIN));
 	}
-	else {
+	else
+	{
 		currentSpindleSpeed_U_MIN = speedValue;
 	}
 }
@@ -873,11 +879,13 @@ void SvgCncContext::reconstructToolList() {
 void SvgCncContext::deleteTool(const wxString& id) {
 //////////////////////////////////////////////////////////////////
 	auto it = toolList.find(id);
-	if ( it != toolList.end() ) {
+	if ( it != toolList.end() )
+	{
 		toolList.erase(it);
 		reconstructToolList();
 	}
-	else {
+	else 
+	{
 		CTX_LOG_ERR(wxString::Format(" Cant find tool with id='%s", id));
 	}
 }

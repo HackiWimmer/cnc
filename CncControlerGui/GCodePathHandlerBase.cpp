@@ -74,10 +74,9 @@ bool GCodePathHandlerBase::processRapidLinearMove(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
-		
-	// change to the maximum configured speed
-	//changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedRapid, THE_CONFIG->getDefaultRapidSpeed_MM_MIN());
-	changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedRapid, gcb.getCurrentFeedSpeed());
+	
+	if ( gcb.hasF() )	changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedRapid, gcb.getCurrentFeedSpeed());
+	else				changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedRapid);
 	
 	// in this case position ins't changed
 	if ( updateCurrentPosition(gcb) == false)
@@ -105,7 +104,8 @@ bool GCodePathHandlerBase::processArcMove(GCodeBlock& gcb, bool sweep) {
 	double ey = gcb.y;
 	char cmd  = 'A';
 	
-	if ( gcb.isAbsolutePositioningXYZ() == false ) {
+	if ( gcb.isAbsolutePositioningXYZ() == false )
+	{
 		cmd = 'a';
 		ex = currentPos.getX() + gcb.x;
 		ey = currentPos.getY() + gcb.y;

@@ -120,7 +120,8 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 	static const wxString fmt(globalStrings.pathListRefFormat);
 	
 	// ------------------------------------------------------
-	auto formatDistance = [](double val) {
+	auto formatDistance = [](double val) 
+	{
 		if ( cnc::dblCmp::nu(val) == false )
 			return wxString::Format("%10.3lf", val);
 			
@@ -128,7 +129,8 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 	};
 	
 	// ------------------------------------------------------
-	auto formatTarget = [](double val) {
+	auto formatTarget = [](double val) 
+	{
 		return wxString::Format("%10.3lf", val);
 	};
 	
@@ -150,7 +152,8 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 	if ( cpe.hasToolChange() )		contStr.append('S');
 	if ( cpe.hasPositionChange() )	contStr.append('P');
 	
-	switch ( column ) {
+	switch ( column ) 
+	{
 		case CncPathListEntryListCtrl::COL_CONT:			return wxString::Format("%s", contStr);
 		
 		case CncPathListEntryListCtrl::COL_REF: 			return displayRef          == true ?	wxString::Format("%lld",		cpe.pathListReference)		: _("");

@@ -197,10 +197,10 @@ class CncMatrix4x4 {
 			return mat; 
 		}
 		
-		bool	hasTranslation()	const { return ( mat[14] != T(0) || mat[24] != T(0) || mat[44] != T(0) ); }
-		const T getTranslationX()	const { return mat[14]; }
-		const T getTranslationY()	const { return mat[24]; }
-		const T getTranslationZ()	const { return mat[34]; }
+		bool	hasTranslation()	const { return ( mat[V14] != T(0) || mat[V24] != T(0) || mat[V44] != T(0) ); }
+		const T getTranslationX()	const { return mat[V14]; }
+		const T getTranslationY()	const { return mat[V24]; }
+		const T getTranslationZ()	const { return mat[V34]; }
 		
 		void transform(T& x, T& y, T& z)
 		{

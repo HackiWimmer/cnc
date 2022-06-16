@@ -80,13 +80,13 @@ bool CncTemplateContext::fitsIntoCurrentHardwareBoundaries(std::ostream& o) {
 		;
 		
 		if ( nrmTplBounds.getMaxDistanceX() > nrmHwdBounds.getMaxDistanceX() )
-			o << "  Distance X [mm]: " << nrmTplBounds.getMaxDistanceX() << " < " << nrmHwdBounds.getMaxDistanceX() << std::endl;
+			o << "  Distance X [mm]: " << nrmTplBounds.getMaxDistanceX() << " > " << nrmHwdBounds.getMaxDistanceX() << std::endl;
 			
 		if ( nrmTplBounds.getMaxDistanceY() > nrmHwdBounds.getMaxDistanceY() )
-			o << "  Distance Y [mm]: " << nrmTplBounds.getMaxDistanceY() << " < " << nrmHwdBounds.getMaxDistanceY() << std::endl;
+			o << "  Distance Y [mm]: " << nrmTplBounds.getMaxDistanceY() << " > " << nrmHwdBounds.getMaxDistanceY() << std::endl;
 			
 		if ( nrmTplBounds.getMaxDistanceZ() > nrmHwdBounds.getMaxDistanceZ() )
-			o << "  Distance Z [mm]: " << nrmTplBounds.getMaxDistanceZ() << " < " << nrmHwdBounds.getMaxDistanceZ() << std::endl;
+			o << "  Distance Z [mm]: " << nrmTplBounds.getMaxDistanceZ() << " > " << nrmHwdBounds.getMaxDistanceZ() << std::endl;
 		
 		return false;
 	}

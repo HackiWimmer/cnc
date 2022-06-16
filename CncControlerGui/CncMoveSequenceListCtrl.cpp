@@ -254,7 +254,7 @@ void CncMoveSequenceListCtrl::addMoveSequence(const CncMoveSequence* seq) {
 //////////////////////////////////////////////////
 void CncMoveSequenceListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
-	SetItemCount(moveSequence->getCount());
+	SetItemCount(moveSequence ? moveSequence->getCount() : 0);
 
 	event.Skip();
 
@@ -370,9 +370,7 @@ void CncMoveSequenceOverviewListCtrl::onPaint(wxPaintEvent& event) {
 	event.Skip();
 	
 	if ( moveSequences.size() > 0 && GetSelectedItemCount() == 0 ) 
-	{
 		selectItem(0, true);
-	}
 }
 /////////////////////////////////////////////////////////////
 void CncMoveSequenceOverviewListCtrl::addMoveSequence(const CncMoveSequence& seq) {

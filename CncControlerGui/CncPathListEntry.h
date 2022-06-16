@@ -105,6 +105,9 @@ struct CncPathListEntry {
 	bool hasSpeedChange()		const	{ return content  & CONT_SPEED;    }
 	bool hasToolChange()		const	{ return content  & CONT_TOOL;     }
 	bool hasPositionChange()	const	{ return content  & CONT_POSITION; }
+	
+	bool hasSpeedValueF()		const	{ return feedSpeed_MM_MIN   != DefaultSpeedValue;        }
+	bool hasSpeedValueS()		const	{ return spindleSpeed_U_MIN != DefaultSpindleSpeedValue; }
 
 	void traceEntry(std::ostream& ostr) const;
 	const wxString& traceEntryToString(wxString& ret) const;

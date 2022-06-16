@@ -44,14 +44,14 @@ class CncPathListManager {
 		
 		bool					adjustZOffset(double offset, bool relative=false);
 			
-		void					initNextPath(bool linked = true);
+		void					initNextPath(bool linked);
 		void					initNextPath(const CncPathListEntry& initialEntry);
 		void					appendEntry(CncPathListEntry& cpe);
 		CncPathList&			getPathListIntern();
 		
 	protected:
 		
-		void	clear();
+		void					clear();
 		
 		void					setReferencePos(const CncDoublePosition& p);
 		
@@ -139,6 +139,9 @@ class CncPathListManager {
 		auto	crLastPosEntryIterator()							const;
 		bool	hasMovement()										const;
 		
+		auto	crLastValidEntryWithF()								const;
+		auto	crLastValidEntryWithS()								const;
+		
 		long	firstClientID()										const;
 		
 		void	init(const CncDoublePosition& p);
@@ -159,7 +162,7 @@ class CncPathListManager {
 		bool	normalizeStartPosDistance(const CncDoublePosition& pos = {0.0, 0.0, 0.0});
 		bool	normalizeStartPos(const CncDoublePosition& pos = {0.0, 0.0, 0.0});
 		bool	normalizeEndPos(const CncDoublePosition& pos = {0.0, 0.0, 0.0});
-		size_t	normalizeLinkedEntry(long clientId, CncSpeedMode mode, double feedSpeed_MM_MIN);
+		size_t	normalizeLinkedEntry(const CncPathListEntry& ple);
 		
 		bool	ensureDirection(CncDirection d);
 		bool	reversePath();
@@ -168,6 +171,7 @@ class CncPathListManager {
 		void	initNextGuidePath(GuideType gt = HELP_PATH);
 		
 		const	CncPathListEntry& addEntryAdm(long clientId);
+		const	CncPathListEntry& addEntryAdm(CncSpeedMode mode);
 		const	CncPathListEntry& addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN);
 		const	CncPathListEntry& addEntrySpl(bool spindleState);
 		const	CncPathListEntry& addEntrySpl(double spindleSpeed_U_MIN);
