@@ -2,12 +2,14 @@
 #include "MainFrame.h"
 #include "CncCommon.h"
 #include "CncTemplateContextSummaryPanel.h"
+#include "CncPathListInterfaceCnc.h"
 #include "CncBoundarySpace.h"
 #include "CncTemplateContext.h"
 
 //////////////////////////////////////////////////////////////
 CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
 : ContextInterface		()
+, modifyFlag			(false)
 , name					("")
 , path					("")
 , toolTotList			("")
@@ -17,6 +19,7 @@ CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
 , boundarySpace			(bs)
 , templateBounds		()
 , measuredBounds		()
+, cncInterface			(NULL)
 //////////////////////////////////////////////////////////////
 {
 }
@@ -34,10 +37,15 @@ bool CncTemplateContext::isValid() const {
 		
 	if ( wxFileName::Exists(getFileName()) == false )
 		return false;
+		
+	if ( modifyFlag == true )
+		return false;
+	
+	if ( cncInterface == NULL )
+		return false;
 	
 	if ( hasErrors() == true )
 		return false;
-		
 		
 	// ....
 	
@@ -181,7 +189,6 @@ bool CncTemplateContext::hasBoundaries() const {
 	return templateBounds.hasBoundaries(); 
 }
 //////////////////////////////////////////////////////////////
-
 CncTemplateContext::BoundType CncTemplateContext::getBoundLevel() const {
 //////////////////////////////////////////////////////////////
 	// measured beats template
@@ -220,7 +227,9 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 	
 	o	<< prefix << "Name                           : " << fn.GetFullName()				<< std::endl
 		<< prefix << "Path                           : " << fn.GetPath()					<< std::endl
-		<< prefix << "Valid                          : " << (isValid() ? "Yes" : "No" )		<< std::endl
+		<< prefix << "Valid                          : " << (isValid()    ? "Yes" : "No" )	<< std::endl
+		<< prefix << "Modified                       : " << (modifyFlag   ? "Yes" : "No" )	<< std::endl
+		<< prefix << "CNC Interface                  : " << (cncInterface ? "Yes" : "No" )	<< std::endl
 		<< prefix << "Total run count                : " << runCount						<< std::endl
 		<< prefix << "Valid run count                : " << validRunCount					<< std::endl
 		<< prefix << "Errors                         : " << hasErrors()						<< std::endl
@@ -232,11 +241,21 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 		<< prefix << "Measured Bounds (X)(Y)(Z) [mm] : " << traceBound(measuredBounds)		<< std::endl
 	;
 	
-	if ( hasErrors() )
+	if ( isValid() == false )
 	{
 		// additional error infos from ContextInterface
 		o << " \n\nAdditional error info:\n";
-		traceErrorInfoTo(o);
+		
+		const bool fileExists  = wxFileName::Exists(getFileName());
+		const bool interfaceOk = hasValidRuns() ? cncInterface != NULL : true;
+		
+		
+		if ( modifyFlag   == true  )	o << " Template is modified\n";
+		if ( interfaceOk  == false )	o << " Invalid CNC interface\n";
+		if ( fileExists   == false )	o << " Invalid file name\n";
+		
+		if ( hasErrors() )
+			traceErrorInfoTo(o);
 	}
 	
 	o << std::endl;
@@ -295,4 +314,20 @@ void CncTemplateContext::notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTup
 	//CNC_CEX2_FUNCT
 	ContextInterface::notifyStepperSpeed(pid, s);
 }
-
+//////////////////////////////////////////////////////////////
+bool CncTemplateContext::registerCncInterface(CncPathListInterfaceCnc* ci) {
+//////////////////////////////////////////////////////////////
+	if ( ci == NULL )
+		return false;
+		
+	cncInterface = ci;
+	return true;
+}
+//////////////////////////////////////////////////////////////
+bool CncTemplateContext::executeCncInterface() {
+//////////////////////////////////////////////////////////////
+	if ( cncInterface == NULL )
+		return false;
+		
+	return cncInterface->spoolInstructions();
+}

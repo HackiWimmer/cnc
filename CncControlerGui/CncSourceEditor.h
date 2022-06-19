@@ -8,12 +8,15 @@ class CncSourceEditor : public CncBaseEditor {
 	public:
 		CncSourceEditor(wxWindow *parent);
 		virtual ~CncSourceEditor();
-		virtual bool Enable(bool enable = true);
-		virtual void decorateParentTabName(bool changed);
+		
+		virtual bool Enable(bool enable = true)				override;
+		virtual void decorateParentTabName(bool changed)	override;
 		
 	protected:
-		virtual void initialize();
-		virtual bool hasEditMode();
+		virtual void initialize()							override;
+		virtual bool hasEditMode()							override;
+		virtual void notifyChange()							override;
+		virtual void notifySave()							override;
 };
 
 #endif

@@ -117,6 +117,7 @@ void CncTemplateContextSummaryPanel::update() {
 	ss.str("");
 	analysisOverall->clearAll();
 	ss << result;
+	
 	if ( ok == false )	analysisOverall->addErrorEntry(ss.str().c_str());
 	else				analysisOverall->addInfoEntry(ss.str().c_str());
 	

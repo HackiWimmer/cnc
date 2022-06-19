@@ -402,7 +402,8 @@ class PreProcessorSelection{
 		enum VAL {
 			OPERATIG_TRACE				= 0,
 			PATH_LIST_ENTRIES			= 1,
-			MOVE_SEQ_ENTRIES			= 2
+			MOVE_SEQ_ENTRIES			= 2,
+			CNC_INSTRUCTIONS			= 3
 		};
 };
 

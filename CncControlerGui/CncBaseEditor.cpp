@@ -88,6 +88,7 @@ wxDEFINE_EVENT(wxEVT_EDITOR_SUGGEST_TIMER,		wxTimerEvent);
 wxBEGIN_EVENT_TABLE(CncBaseEditor, wxStyledTextCtrl)
 	EVT_STC_MARGINCLICK			(wxID_ANY,						CncBaseEditor::onMarginClick)
 	EVT_STC_CHANGE				(wxID_ANY,						CncBaseEditor::onChange)
+	EVT_STC_SAVEPOINTREACHED	(wxID_ANY,						CncBaseEditor::onSave)
 	EVT_KEY_DOWN				(								CncBaseEditor::onKeyDown)
 	EVT_KEY_UP					(								CncBaseEditor::onKeyUp)
 	EVT_LEFT_DOWN				(								CncBaseEditor::onLeftDown)
@@ -218,26 +219,42 @@ void CncBaseEditor::onChange(wxStyledTextEvent& event) {
 	bool isInsert = event.GetModificationType() & wxSTC_MOD_INSERTTEXT;
 	bool isDelete = event.GetModificationType() & wxSTC_MOD_DELETETEXT;
 	
-	if ( isInsert || isDelete) {
+	if ( isInsert || isDelete)
+	{
 		int numlines(event.GetLinesAdded());
 		
-		// ignore this event incase we are in the middle of file reloading
-		if ( fileLoadingActive == false/*GetReloadingFile() == false && GetMarginWidth(EDIT_TRACKER_MARGIN_ID */) /* margin is visible */ {
+		// ignore this event in case we are in the middle of file reloading
+		if ( fileLoadingActive == false/*GetReloadingFile() == false && GetMarginWidth(EDIT_TRACKER_MARGIN_ID */) /* margin is visible */ 
+		{
 			int curline(LineFromPosition(event.GetPosition()));
 			
-			if ( numlines == 0 ) {
+			if ( numlines == 0 ) 
+			{
 				// probably only the current line was modified
 				MarginSetText(curline, wxT(" "));
 				MarginSetStyle(curline, TE_LINE_MODIFIED_STYLE);
-			} else {
-				for ( int i = 0; i <= numlines; i++ ) {
+			}
+			else
+			{
+				for ( int i = 0; i <= numlines; i++ )
+				{
 					MarginSetText(curline + i, wxT(" "));
 					MarginSetStyle(curline + i, TE_LINE_MODIFIED_STYLE);
 				}
 			}
 		}
 	}
+	
+	// propagate
+	notifyChange();
 }
+///////////////////////////////////////////////////////////////////
+void CncBaseEditor::onSave(wxStyledTextEvent& event) {
+///////////////////////////////////////////////////////////////////
+	// propagate
+	notifySave();
+}
+///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
@@ -246,9 +263,9 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 	if ( flags.handleKeyCommands == false )
 		return;
 	
-	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
-	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
-	int c		= event.GetUnicodeKey();
+	const bool shtKey	= CncAsyncKeyboardState::isShiftPressed();
+	const bool ctlKey	= CncAsyncKeyboardState::isControlPressed();
+	const int c			= event.GetUnicodeKey();
 	bool skip	= true;
 	
 	

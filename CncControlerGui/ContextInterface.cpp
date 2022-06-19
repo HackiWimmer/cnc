@@ -148,27 +148,27 @@ std::ostream& ContextInterface::traceErrorInfoTo(std::ostream &ostr) const {
 //////////////////////////////////////////////////////////////
 	if ( hasErrors() == false )
 	{
-		ostr << "No error detected!\n";
+		ostr << " No error detected!\n";
 	}
 	else
 	{
 		if ( errorFlags & ERR_GENERAL )
-			ostr << "Error: General error!\n";
+			ostr << " Error: General error!\n";
 			
 		if ( errorFlags & ERR_INVALID_LIST_SIZE )
-			ostr << "Error: Invalid context list size!\n";
+			ostr << " Error: Invalid context list size!\n";
 			
 		if ( errorFlags & ERR_INVALID_LIST_BEG )
-			ostr << "Error: Invalid context list begin!\n";
+			ostr << " Error: Invalid context list begin!\n";
 			
 		if ( errorFlags & ERR_INVALID_LIST_END )
-			ostr << "Error: Invalid context list end!\n";
+			ostr << " Error: Invalid context list end!\n";
 			
 		if ( errorFlags & ERR_LIMIT )
-			ostr << "Error: One ore more limit switches reached during the run!\n";
+			ostr << " Error: One ore more limit switches reached during the run!\n";
 			
 		if ( errorFlags & ERR_MOVE_WITHOUT_SPINDLE )
-			ostr << "Error: One ore more movements detected as work path performed with Spindle = OFF!\n";
+			ostr << " Error: One ore more movements detected as work path performed with Spindle = OFF!\n";
 			
 		// add more on demand
 	}

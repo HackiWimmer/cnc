@@ -2,6 +2,7 @@
 #define CNCCONTROLERGUI_CNC_MOVE_SEQUENCE_H
 
 #include <vector>
+#include <iostream>
 #include "../Arduino/StepperEnvironment/CncRndr.h"
 #include "OSD/CncTimeFunctions.h"
 #include "CncCommon.h"
@@ -275,9 +276,13 @@ class CncMoveSequenceImage {
 		CncMoveSequenceImage(CncMoveSequence& sequence);
 		~CncMoveSequenceImage();
 		
-		bool									isValid()			const { return valid; }
-		const CncMoveSequence::FlushResult&		getFlushResult()	const { return result; }
-		const CncMoveSequence::PortionIndex&	getPortionIndex()	const { return portionIndex; }
+		bool									reconstruct(CncMoveSequence& ms)	const;
+		bool									isValid()							const { return valid; }
+		const CncMoveSequence::FlushResult&		getFlushResult()					const { return result; }
+		const CncMoveSequence::PortionIndex&	getPortionIndex()					const { return portionIndex; }
+
+		std::ostream& traceTo(std::ostream &ostr) const;
+		friend std::ostream &operator<< (std::ostream &ostr, const CncMoveSequenceImage& msi) { return msi.traceTo(ostr); }
 		
 	private:
 		

@@ -801,6 +801,170 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
 
     flexGridSizer190->Add(m_selectedClientIds, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
+    m_panelCncInstructions = new wxPanel(m_listbookPreProcessor, wxID_ANY, wxDefaultPosition,
+        wxDLG_UNIT(m_listbookPreProcessor, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+    int m_panelCncInstructionsImgIndex;
+    m_panelCncInstructionsImgIndex = m_listbookPreProcessor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("CncPath")));
+    m_listbookPreProcessor->AddPage(
+        m_panelCncInstructions, _("CNC\nInstructions"), false, m_panelCncInstructionsImgIndex);
+
+    wxFlexGridSizer* flexGridSizer413 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer413->SetFlexibleDirection(wxBOTH);
+    flexGridSizer413->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer413->AddGrowableCol(0);
+    flexGridSizer413->AddGrowableRow(0);
+    m_panelCncInstructions->SetSizer(flexGridSizer413);
+
+    m_plCncInstructions = new wxPanel(m_panelCncInstructions, wxID_ANY, wxDefaultPosition,
+        wxDLG_UNIT(m_panelCncInstructions, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+
+    flexGridSizer413->Add(m_plCncInstructions, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    wxFlexGridSizer* flexGridSizer449 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer449->SetFlexibleDirection(wxBOTH);
+    flexGridSizer449->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer449->AddGrowableCol(0);
+    flexGridSizer449->AddGrowableRow(2);
+    m_plCncInstructions->SetSizer(flexGridSizer449);
+
+    wxFlexGridSizer* flexGridSizer7635311 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer7635311->SetFlexibleDirection(wxBOTH);
+    flexGridSizer7635311->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer7635311->AddGrowableCol(1);
+    flexGridSizer7635311->AddGrowableRow(0);
+
+    flexGridSizer449->Add(flexGridSizer7635311, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer30221 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer30221->SetFlexibleDirection(wxBOTH);
+    flexGridSizer30221->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer7635311->Add(flexGridSizer30221, 0, wxALL, WXC_FROM_DIP(0));
+
+    m_bmpButton3043 =
+        new wxBitmapButton(m_plCncInstructions, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("abb-export")),
+            wxDefaultPosition, wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), wxBU_AUTODRAW);
+
+    flexGridSizer30221->Add(m_bmpButton3043, 0, wxALL, WXC_FROM_DIP(1));
+    m_bmpButton3043->SetMinSize(wxSize(26, 26));
+
+    m_staticText6138144 = new wxStaticText(m_plCncInstructions, wxID_ANY, _("CNC Instructions [steps]:"),
+        wxDefaultPosition, wxDLG_UNIT(m_plCncInstructions, wxSize(-1, -1)), 0);
+    wxFont m_staticText6138144Font(
+        12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText6138144->SetFont(m_staticText6138144Font);
+
+    flexGridSizer30221->Add(m_staticText6138144, 0, wxALL, WXC_FROM_DIP(3));
+
+    wxFlexGridSizer* flexGridSizer788915 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer788915->SetFlexibleDirection(wxBOTH);
+    flexGridSizer788915->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer7635311->Add(flexGridSizer788915, 1, wxALL | wxEXPAND | wxALIGN_RIGHT, WXC_FROM_DIP(5));
+
+    m_staticText789126 = new wxStaticText(m_plCncInstructions, wxID_ANY, _("Rows:"), wxDefaultPosition,
+        wxDLG_UNIT(m_plCncInstructions, wxSize(-1, -1)), 0);
+    wxFont m_staticText789126Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText789126->SetFont(m_staticText789126Font);
+
+    flexGridSizer788915->Add(m_staticText789126, 0, wxALL, WXC_FROM_DIP(2));
+
+    m_cncInstructionsRowCount = new wxTextCtrl(m_plCncInstructions, wxID_ANY, wxT("0"), wxDefaultPosition,
+        wxDLG_UNIT(m_plCncInstructions, wxSize(80, -1)), wxTE_RIGHT | wxTE_READONLY | wxBORDER_NONE);
+    wxFont m_cncInstructionsRowCountFont(
+        8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_cncInstructionsRowCount->SetFont(m_cncInstructionsRowCountFont);
+#if wxVERSION_NUMBER >= 3000
+    m_cncInstructionsRowCount->SetHint(wxT(""));
+#endif
+
+    flexGridSizer788915->Add(m_cncInstructionsRowCount, 0, wxALL, WXC_FROM_DIP(2));
+    m_cncInstructionsRowCount->SetMinSize(wxSize(80, -1));
+
+    m_staticLine79018 = new wxStaticLine(m_plCncInstructions, wxID_ANY, wxDefaultPosition,
+        wxDLG_UNIT(m_plCncInstructions, wxSize(-1, -1)), wxLI_VERTICAL);
+
+    flexGridSizer788915->Add(m_staticLine79018, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    wxFlexGridSizer* flexGridSizer7678691 = new wxFlexGridSizer(0, 9, 0, 0);
+    flexGridSizer7678691->SetFlexibleDirection(wxBOTH);
+    flexGridSizer7678691->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer7635311->Add(flexGridSizer7678691, 1, wxALL | wxEXPAND | wxALIGN_RIGHT, WXC_FROM_DIP(0));
+
+    m_btConnectCncInstructions =
+        new wxBitmapToggleButton(m_plCncInstructions, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")),
+            wxDefaultPosition, wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), 0);
+    m_btConnectCncInstructions->SetToolTip(_("Connect"));
+    m_btConnectCncInstructions->SetValue(true);
+
+    flexGridSizer7678691->Add(m_btConnectCncInstructions, 0, wxALL, WXC_FROM_DIP(1));
+    m_btConnectCncInstructions->SetMinSize(wxSize(26, 26));
+
+    m_btClearCncInntructions =
+        new wxBitmapButton(m_plCncInstructions, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")),
+            wxDefaultPosition, wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btClearCncInntructions->SetToolTip(_("Clear"));
+
+    flexGridSizer7678691->Add(m_btClearCncInntructions, 0, wxALL, WXC_FROM_DIP(1));
+    m_btClearCncInntructions->SetMinSize(wxSize(26, 26));
+
+    m_staticLine285412 = new wxStaticLine(m_plCncInstructions, wxID_ANY, wxDefaultPosition,
+        wxDLG_UNIT(m_plCncInstructions, wxSize(-1, -1)), wxLI_VERTICAL);
+
+    flexGridSizer7678691->Add(m_staticLine285412, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_btCncInstructionsFirst = new wxBitmapButton(m_plCncInstructions, wxID_ANY,
+        wxXmlResource::Get()->LoadBitmap(wxT("media-skip-backward-7")), wxDefaultPosition,
+        wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btCncInstructionsFirst->SetToolTip(_("Skip to First Client ID"));
+
+    flexGridSizer7678691->Add(m_btCncInstructionsFirst, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCncInstructionsFirst->SetMinSize(wxSize(26, 26));
+
+    m_btCncInstructionsPrev = new wxBitmapButton(m_plCncInstructions, wxID_ANY,
+        wxXmlResource::Get()->LoadBitmap(wxT("media-seek-backward-7")), wxDefaultPosition,
+        wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btCncInstructionsPrev->SetToolTip(_("Skip to Prev Client ID"));
+
+    flexGridSizer7678691->Add(m_btCncInstructionsPrev, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCncInstructionsPrev->SetMinSize(wxSize(26, 26));
+
+    m_btCncInstructionsNext =
+        new wxBitmapButton(m_plCncInstructions, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-seek-forward-7")),
+            wxDefaultPosition, wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btCncInstructionsNext->SetToolTip(_("Skip to NextClient ID"));
+
+    flexGridSizer7678691->Add(m_btCncInstructionsNext, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCncInstructionsNext->SetMinSize(wxSize(26, 26));
+
+    m_btCncInstructionsLast =
+        new wxBitmapButton(m_plCncInstructions, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-skip-forward-7")),
+            wxDefaultPosition, wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btCncInstructionsLast->SetToolTip(_("Skip to Last Client ID"));
+
+    flexGridSizer7678691->Add(m_btCncInstructionsLast, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCncInstructionsLast->SetMinSize(wxSize(26, 26));
+
+    m_staticLine448 = new wxStaticLine(m_plCncInstructions, wxID_ANY, wxDefaultPosition,
+        wxDLG_UNIT(m_plCncInstructions, wxSize(-1, -1)), wxLI_HORIZONTAL);
+
+    flexGridSizer449->Add(m_staticLine448, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    wxFlexGridSizer* flexGridSizer450 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer450->SetFlexibleDirection(wxBOTH);
+    flexGridSizer450->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer450->AddGrowableCol(0);
+    flexGridSizer450->AddGrowableRow(0);
+
+    flexGridSizer449->Add(flexGridSizer450, 1, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
+    m_cncInstructionsPlaceholder = new wxPanel(m_plCncInstructions, wxID_ANY, wxDefaultPosition,
+        wxDLG_UNIT(m_plCncInstructions, wxSize(-1, -1)), wxTAB_TRAVERSAL);
+    m_cncInstructionsPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
+
+    flexGridSizer450->Add(m_cncInstructionsPlaceholder, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
+
     SetName(wxT("CncPreprocessorBase"));
     SetSize(wxDLG_UNIT(this, wxSize(700, 700)));
     if(GetSizer()) {
@@ -830,6 +994,10 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
     m_btMoveSeqPrev->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryPrev, this);
     m_btMoveSeqNext->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryNext, this);
     m_btMoveSeqLast->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryLast, this);
+    m_bmpButton3043->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onDetachCncInstructionView, this);
+    m_btConnectCncInstructions->Bind(
+        wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectCncInstructions, this);
+    m_btClearCncInntructions->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearCncInstructions, this);
 }
 
 CncPreprocessorBase::~CncPreprocessorBase()
@@ -857,6 +1025,10 @@ CncPreprocessorBase::~CncPreprocessorBase()
     m_btMoveSeqPrev->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryPrev, this);
     m_btMoveSeqNext->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryNext, this);
     m_btMoveSeqLast->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryLast, this);
+    m_bmpButton3043->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onDetachCncInstructionView, this);
+    m_btConnectCncInstructions->Unbind(
+        wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectCncInstructions, this);
+    m_btClearCncInntructions->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearCncInstructions, this);
 }
 
 CncMotionVertexTraceBase::CncMotionVertexTraceBase(wxWindow* parent,

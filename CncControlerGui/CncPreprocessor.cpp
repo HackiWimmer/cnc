@@ -37,14 +37,19 @@ wxEND_EVENT_TABLE()
 CncPreprocessor::CncPreprocessor(wxWindow* parent)
 : CncPreprocessorBase(parent)
 , useOperatingTrace				(true)
+, useCncInstTrace				(true)
 , pathListEntries				(NULL)
 , moveSequenceOverview			(NULL)
 , moveSequence					(NULL)
 , operatingTrace				(NULL)
+, cncInstTrace					(NULL)
 , externalPathListEntriesView	(NULL)
 , externalMoveSequenceView		(NULL)
 , externalParsingSynopsisView	(NULL)
 , externalOperatingTraceView	(NULL)
+, externalCncInstructionView	(NULL)
+, bmpOn							(ImageLib16().Bitmap("BMP_CONNECTED"))
+, bmpOff						(ImageLib16().Bitmap("BMP_DISCONNECTED"))
 //////////////////////////////////////////////////////////////////
 {
 	// path list entries control
@@ -63,12 +68,19 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 	operatingTrace = new CncOperatingTrace(this, wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_operatingTracePlaceholder, operatingTrace);
 	
+	// cnc instructions
+	cncInstTrace = new CncOperatingTrace(this, wxLC_SINGLE_SEL); 
+	GblFunc::replaceControl(m_cncInstructionsPlaceholder, cncInstTrace);
+	
 	externalPathListEntriesView	= new CncExternalViewBox(this);
 	externalMoveSequenceView	= new CncExternalViewBox(this);
 	externalOperatingTraceView	= new CncExternalViewBox(this);
+	externalCncInstructionView	= new CncExternalViewBox(this);
+	
 	externalPathListEntriesView ->setupView(CncExternalViewBox::Default::VIEW1,		m_plPathListView,			"External PathList Entries View. . . ");
 	externalMoveSequenceView	->setupView(CncExternalViewBox::Default::VIEW1,		m_plMoveSequences,			"External Move Sequences View. . . ");
 	externalOperatingTraceView	->setupView(CncExternalViewBox::Default::VIEW1,		m_plOperatingTrace,			"External Move Sequences View. . . ");
+	externalCncInstructionView	->setupView(CncExternalViewBox::Default::VIEW1,		m_plCncInstructions,		"External CNC Instruction View. . . ");
 	
 	const wxFont font = THE_CONTEXT->outboundListBookFont;
 	m_listbookPreProcessor->GetListView()->SetFont(font);
@@ -79,11 +91,13 @@ CncPreprocessor::~CncPreprocessor() {
 	wxDELETE( externalPathListEntriesView );
 	wxDELETE( externalMoveSequenceView );
 	wxDELETE( externalOperatingTraceView );
+	wxDELETE( externalCncInstructionView );
 
 	wxDELETE( pathListEntries );
 	wxDELETE( moveSequenceOverview );
 	wxDELETE( moveSequence );
 	wxDELETE( operatingTrace ); 
+	wxDELETE( cncInstTrace ); 
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearAll() {
@@ -91,6 +105,7 @@ void CncPreprocessor::clearAll() {
 	clearPathListEntries();
 	clearMoveSequences();
 	clearOperatingTrace();
+	clearCncInstructions();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearPathListEntries() {
@@ -102,11 +117,17 @@ void CncPreprocessor::clearMoveSequences() {
 ///////////////////////////////////////////////////////////
 	moveSequenceOverview->clearAll();
 	moveSequence->clearAll();
+	m_contentLabel->SetLabel("Content:");
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearOperatingTrace() {
 //////////////////////////////////////////////////////////////////
 	operatingTrace->clearAll();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::clearCncInstructions() {
+//////////////////////////////////////////////////////////////////
+	cncInstTrace->clearAll();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::select(PreProcessorSelection::VAL page) {
@@ -124,6 +145,7 @@ void CncPreprocessor::popProcessMode() {
 	moveSequenceOverview->freeze();
 	
 	operatingTrace->popProcessMode();
+	cncInstTrace->popProcessMode();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::pushUpdateMode() {
@@ -133,13 +155,11 @@ void CncPreprocessor::pushUpdateMode() {
 	moveSequenceOverview->thaw();
 	
 	operatingTrace->pushUpdateMode();
+	cncInstTrace->pushUpdateMode();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::enablePathListEntries(bool state) {
 //////////////////////////////////////////////////////////////////
-	wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
-	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
-	
 	state == true ? m_btConnectPathListEntries->SetBitmap(bmpOn) 			: m_btConnectPathListEntries->SetBitmap(bmpOff);
 	state == true ? m_btConnectPathListEntries->SetToolTip("Disable List")	: m_btConnectPathListEntries->SetToolTip("Enable List");
 	
@@ -153,9 +173,6 @@ void CncPreprocessor::enablePathListEntries(bool state) {
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::enableMoveSequences(bool state) {
 //////////////////////////////////////////////////////////////////
-	wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
-	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
-	
 	state == true ? m_btConnectMoveSequences->SetBitmap(bmpOn) 				: m_btConnectMoveSequences->SetBitmap(bmpOff);
 	state == true ? m_btConnectMoveSequences->SetToolTip("Disable List")	: m_btConnectMoveSequences->SetToolTip("Enable List");
 	
@@ -172,9 +189,6 @@ void CncPreprocessor::enableMoveSequences(bool state) {
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::enableOperatingTrace(bool state) {
 //////////////////////////////////////////////////////////////////
-	wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
-	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
-	
 	state == true ? m_btConnectOperatingTrace->SetBitmap(bmpOn) 			: m_btConnectOperatingTrace->SetBitmap(bmpOff);
 	state == true ? m_btConnectOperatingTrace->SetToolTip("Disable List")	: m_btConnectOperatingTrace->SetToolTip("Enable List");
 	
@@ -185,6 +199,20 @@ void CncPreprocessor::enableOperatingTrace(bool state) {
 	useOperatingTrace = state;
 	if ( useOperatingTrace == false )
 		clearOperatingTrace();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::enableCncInstTrace(bool state) {
+//////////////////////////////////////////////////////////////////
+	state == true ? m_btConnectCncInstructions->SetBitmap(bmpOn) 			: m_btConnectCncInstructions->SetBitmap(bmpOff);
+	state == true ? m_btConnectCncInstructions->SetToolTip("Disable List")	: m_btConnectCncInstructions->SetToolTip("Enable List");
+	
+	m_btConnectCncInstructions->SetValue(state);
+	m_btConnectCncInstructions->Refresh();
+	m_btConnectCncInstructions->Update();
+
+	useCncInstTrace = state;
+	if ( useCncInstTrace == false )
+		clearCncInstructions();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::addMoveSequence(const CncMoveSequence& seq) {
@@ -343,7 +371,6 @@ void CncPreprocessor::onIndividualCommand(wxCommandEvent& event) {
 											break;
 	}
 }
-
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearOperatingTrace(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
@@ -448,4 +475,27 @@ void CncPreprocessor::onMoveSequenceEntryLast(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(moveSequenceOverview);
 	moveSequenceOverview->skipToLastReference();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addCncInstructionTrace(const wxString& s) {
+//////////////////////////////////////////////////////////////////
+	if ( useCncInstTrace == false )
+		return;
+		
+	cncInstTrace->addDebugEntry(s);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::connectCncInstructions(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	enableCncInstTrace(m_btConnectCncInstructions->GetValue());
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::clearCncInstructions(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	clearCncInstructions();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onDetachCncInstructionView(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	detachView(externalCncInstructionView);
 }

@@ -269,6 +269,22 @@ protected:
     wxStaticText* m_staticText222;
     wxListCtrl* m_moveSequencesPlaceholder;
     wxTextCtrl* m_selectedClientIds;
+    wxPanel* m_panelCncInstructions;
+    wxPanel* m_plCncInstructions;
+    wxBitmapButton* m_bmpButton3043;
+    wxStaticText* m_staticText6138144;
+    wxStaticText* m_staticText789126;
+    wxTextCtrl* m_cncInstructionsRowCount;
+    wxStaticLine* m_staticLine79018;
+    wxBitmapToggleButton* m_btConnectCncInstructions;
+    wxBitmapButton* m_btClearCncInntructions;
+    wxStaticLine* m_staticLine285412;
+    wxBitmapButton* m_btCncInstructionsFirst;
+    wxBitmapButton* m_btCncInstructionsPrev;
+    wxBitmapButton* m_btCncInstructionsNext;
+    wxBitmapButton* m_btCncInstructionsLast;
+    wxStaticLine* m_staticLine448;
+    wxPanel* m_cncInstructionsPlaceholder;
 
 protected:
     virtual void onDetachOperatingTraceView(wxCommandEvent& event)
@@ -348,6 +364,18 @@ protected:
 	event.Skip();
     }
     virtual void onMoveSequenceEntryLast(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onDetachCncInstructionView(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void connectCncInstructions(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void clearCncInstructions(wxCommandEvent& event)
     {
 	event.Skip();
     }
@@ -560,6 +588,70 @@ public:
     wxPanel* GetPanelMoveSequences()
     {
 	return m_panelMoveSequences;
+    }
+    wxBitmapButton* GetBmpButton3043()
+    {
+	return m_bmpButton3043;
+    }
+    wxStaticText* GetStaticText6138144()
+    {
+	return m_staticText6138144;
+    }
+    wxStaticText* GetStaticText789126()
+    {
+	return m_staticText789126;
+    }
+    wxTextCtrl* GetCncInstructionsRowCount()
+    {
+	return m_cncInstructionsRowCount;
+    }
+    wxStaticLine* GetStaticLine79018()
+    {
+	return m_staticLine79018;
+    }
+    wxBitmapToggleButton* GetBtConnectCncInstructions()
+    {
+	return m_btConnectCncInstructions;
+    }
+    wxBitmapButton* GetBtClearCncInntructions()
+    {
+	return m_btClearCncInntructions;
+    }
+    wxStaticLine* GetStaticLine285412()
+    {
+	return m_staticLine285412;
+    }
+    wxBitmapButton* GetBtCncInstructionsFirst()
+    {
+	return m_btCncInstructionsFirst;
+    }
+    wxBitmapButton* GetBtCncInstructionsPrev()
+    {
+	return m_btCncInstructionsPrev;
+    }
+    wxBitmapButton* GetBtCncInstructionsNext()
+    {
+	return m_btCncInstructionsNext;
+    }
+    wxBitmapButton* GetBtCncInstructionsLast()
+    {
+	return m_btCncInstructionsLast;
+    }
+    wxStaticLine* GetStaticLine448()
+    {
+	return m_staticLine448;
+    }
+    wxPanel* GetCncInstructionsPlaceholder()
+    {
+	return m_cncInstructionsPlaceholder;
+    }
+    wxPanel* GetPlCncInstructions()
+    {
+	return m_plCncInstructions;
+    }
+    wxPanel* GetPanelCncInstructions()
+    {
+	return m_panelCncInstructions;
     }
     wxListbook* GetListbookPreProcessor()
     {

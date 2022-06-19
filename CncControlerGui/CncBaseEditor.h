@@ -123,7 +123,8 @@ class CncBaseEditor : public wxStyledTextCtrl {
 			void reset() { *this = AutoCompleteInfo(); }
 		};
 		
-		struct Styles {
+		struct Styles 
+		{
 			// Define used fonts
 			//wxFont defaultFont		= wxFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 			wxFont defaultFont		= wxFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
@@ -144,12 +145,14 @@ class CncBaseEditor : public wxStyledTextCtrl {
 			wxColour clOperator		= wxColour(255, 128, 128);
 		};
 		
-		struct Flags {
+		struct Flags 
+		{
 			bool handleBreakpoints		= true;
 			bool handleKeyCommands		= true;
 		};
 		
-		class SelectEventBlocker {
+		class SelectEventBlocker 
+		{
 			private:
 				CncBaseEditor* editor;
 			public:
@@ -182,6 +185,9 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		virtual void registerClientIdsToSelect(long firstCID, long lastCID);
 		
+		virtual void notifyChange()	{}
+		virtual void notifySave()	{}
+		
 		void setupDefaultStyle();
 		void setupStyle();
 		void setupTextStyle();
@@ -208,6 +214,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		void onUpdateFilePosition(bool publishSelection);
 		
 		virtual void onMarginClick(wxStyledTextEvent& event);
+		virtual void onSave(wxStyledTextEvent& event);
 		virtual void onChange(wxStyledTextEvent& event);
 		virtual void onKeyDown(wxKeyEvent& event);
 		virtual void onKeyUp(wxKeyEvent& event);

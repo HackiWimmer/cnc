@@ -2,6 +2,7 @@
 #include "SvgEditPopup.h"
 #include "MainFrame.h"
 #include "CncTemplateObserver.h"
+#include "CncTemplateContext.h"
 #include "CncSourceEditor.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -56,24 +57,41 @@ void CncSourceEditor::decorateParentTabName(bool changed) {
 	const wxString indicator("*");
 	wxString name(THE_APP->GetTemplateNotebook()->GetPageText(TemplateBookSelection::VAL::SOURCE_PANEL));
 	
-	if ( changed == false ) {
+	if ( changed == false )
+	{
 		if ( name.StartsWith(indicator) == true )	name.Replace(indicator, "");
 		else										return;
-		
-	} else {
-		if ( IsEditable() == true ) {
-			if ( name.StartsWith(indicator) == false ) {
+	}
+	else
+	{
+		if ( IsEditable() == true ) 
+		{
+			if ( name.StartsWith(indicator) == false )
+			{
 				name.Prepend(indicator);
 				
 				THE_APP->clearMotionMonitor();
 				THE_APP->clearPositionSpy();
-			} else {
+			}
+			else
+			{
 				return;
 			}
 		}
 	}
 	
 	THE_APP->GetTemplateNotebook()->SetPageText(TemplateBookSelection::VAL::SOURCE_PANEL, name);
+}
+///////////////////////////////////////////////////////////////////
+void CncSourceEditor::notifyChange() {
+///////////////////////////////////////////////////////////////////
+	if ( THE_TPL_CTX->getModifyFlag() != GetModify() )
+		THE_TPL_CTX->setModifyFlag(GetModify());
+}
+///////////////////////////////////////////////////////////////////
+void CncSourceEditor::notifySave() {
+///////////////////////////////////////////////////////////////////
+	THE_TPL_CTX->setModifyFlag(GetModify());
 }
 
 

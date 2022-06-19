@@ -3,6 +3,7 @@
 #include "CncConfig.h"
 #include "CncMoveSequence.h"
 #include "CncFlowPositionConverter.h"
+#include "CncCommandDecoder.h"
 #include "GlobalStrings.h"
 
 extern GlobalConstStringDatabase globalStrings;
@@ -616,4 +617,27 @@ CncMoveSequenceImage::~CncMoveSequenceImage() {
 	
 	if ( bufferCopy != NULL )
 		delete []bufferCopy;
+}
+///////////////////////////////////////////////////////////////////
+std::ostream& CncMoveSequenceImage::traceTo(std::ostream &ostr) const {
+///////////////////////////////////////////////////////////////////
+	ostr << "Buffer size = " << result.bufferSize;
+	return ostr;
+}
+///////////////////////////////////////////////////////////////////
+bool CncMoveSequenceImage::reconstruct(CncMoveSequence& ms) const {
+///////////////////////////////////////////////////////////////////
+	if ( bufferCopy  == NULL ||  result.bufferSize == 0 ) 
+	{
+		ms.clear();
+		return false;
+	}
+	
+	const bool ret = CncCommandDecoder::decodeMoveSequence(
+		bufferCopy,
+		result.bufferSize,
+		&ms
+	);
+	
+	return ret;
 }

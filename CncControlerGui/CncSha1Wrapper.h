@@ -6,23 +6,32 @@
 #include <wx/file.h>
 #include "sha1.h"
 
+typedef wxString SHA1SessionKey;
+
 struct CncStringSha1  {
 	
-	static const wxString& checksum(const wxString& string, wxString& ret) {
-		
+	static const wxString& checksum(const wxString& underlying, wxString& ret) 
+	{
 		SHA1 cs;
-		cs.update(std::string(string));
+		cs.update(std::string(underlying));
 		ret.assign(cs.final().c_str());
 		
 		return ret;
 	}
+	
+	static const SHA1SessionKey& createSessionKey(const wxString& underlying, SHA1SessionKey& ret) 
+	{
+		return checksum(underlying, ret) ;
+	}
+	
 };
 
 struct CncFileSha1  {
 	
-	static const wxString& checksum(const wxString& fileName, wxString& ret) {
-		
-		if ( wxFile::Exists(fileName) == false ) {
+	static const wxString& checksum(const wxString& fileName, wxString& ret)
+	{
+		if ( wxFile::Exists(fileName) == false )
+		{
 			std::cerr << "CncFileSha1::checksum: Can't open file: '"
 					  << fileName 
 					  << "'" << std::endl;

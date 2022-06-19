@@ -62,7 +62,7 @@ bool CncTestRunConfig::runLoop() {
 		THE_APP->selectMonitorBookCncPanel();
 		
 		{
-			bool ret = THE_APP->processTemplateWrapper( i == 0 );
+			bool ret = THE_APP->processTemplate( i == 0 );
 			duration += THE_CONTEXT->timestamps.getTotalDurationMillis();
 
 			cnc::trc.logInfoMessage(wxString::Format("Loop Counter : % 6d [#]; AVG duration: % 10ld [ms]", 
@@ -70,7 +70,7 @@ bool CncTestRunConfig::runLoop() {
 
 			if ( ret == false )
 			{
-				CNC_CERR_FUNCT_A("Call of processTemplateWrapper() failed")
+				CNC_CERR_FUNCT_A("Call of processTemplate() failed")
 				if ( m_cbBreakOnError->GetValue() == true )
 				{
 					ret = false;
@@ -134,7 +134,7 @@ bool CncTestRunConfig::runDir() {
 				
 				if ( THE_APP->openTemplateFile(fn) )
 				{
-					if ( THE_APP->processTemplateWrapper() == false )
+					if ( THE_APP->processTemplate() == false )
 					{
 						// the errors are already present
 						//CNC_CERR_A("Error while processing '%s'", fn.GetFullPath())

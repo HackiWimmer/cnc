@@ -8,12 +8,15 @@
 #include "CncPosition.h"
 
 class CncBoundarySpace;
+class CncPathListInterfaceCnc;
+
 class CncTemplateContext : public ContextInterface {
 	
 	private:
 		
 		typedef std::vector<wxString> LogInformation;
 		
+		bool						modifyFlag;
 		wxString					name;
 		wxString					path;
 		wxString					toolTotList;
@@ -24,6 +27,8 @@ class CncTemplateContext : public ContextInterface {
 		CncBoundarySpace*			boundarySpace;
 		CncDoubleBoundaries			templateBounds;
 		CncDoubleBoundaries			measuredBounds;
+		
+		CncPathListInterfaceCnc*	cncInterface;
 		
 	protected:
 		
@@ -44,10 +49,14 @@ class CncTemplateContext : public ContextInterface {
 		bool				init(const wxString& pathFileName);
 		bool				init(const wxString& path, const wxString& name);
 		
+		
+		void				setModifyFlag(bool f)					{ modifyFlag = f; }
 		void				registerRun()							{ runCount++; updateGui(false); }
 		void				resetValidRuns()						{ validRunCount = 0; }
 		void				registerValidRun()						{ validRunCount++; updateGui(false); }
+		bool				registerCncInterface(CncPathListInterfaceCnc* ci);
 		bool				hasValidRuns()					const	{ return validRunCount > 0; }
+		bool				getModifyFlag()					const	{ return modifyFlag; }
 		unsigned int		getValidRunCount()				const	{ return validRunCount; }
 		unsigned int		getRunCount()					const	{ return runCount; }
 		
@@ -85,6 +94,9 @@ class CncTemplateContext : public ContextInterface {
 		
 		virtual void		notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTupleValue s);
 		virtual void		notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTupleValue s);
+		
+		
+		bool executeCncInterface();
 };
 
 #endif

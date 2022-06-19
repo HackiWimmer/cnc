@@ -174,6 +174,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		void executeTrigger(const Trigger::SpeedChange& tr);
 		void executeTrigger(const Trigger::GuidePath& tr);
 	
+		bool spoolInstructions(CncInstructionList* ci);
+		
 	public:
 		
 		CncPathListInterfaceCnc(CncControl* cc);
@@ -182,44 +184,45 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual bool spoolInstructions();
 		virtual void resetInstructions();
 		
-		virtual CncLongPosition		getCurrentPositionSteps()  const;
-		virtual CncDoublePosition	getCurrentPositionMetric() const;
-		virtual void				setCurrentPositionMetric(double px, double py, double pz);
-		virtual void				setCurrentPositionMetric(const CncDoublePosition& pos);
+		virtual CncLongPosition		getCurrentPositionSteps()									const	override;
+		virtual CncDoublePosition	getCurrentPositionMetric()									const	override;
+		virtual void				setCurrentPositionMetric(double px, double py, double pz)			override;
+		virtual void				setCurrentPositionMetric(const CncDoublePosition& pos)				override;
 		
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();
 		virtual bool isInterrupted();
 		
-	#define XXXXX
-	#ifdef XXXXX
+	#define CNC_USE_INSTRUCTIONS
+	#ifdef CNC_USE_INSTRUCTIONS
 	
-		virtual bool processGuidePath(const CncPathListManager& plm)					{ cncInstructions.push_back(new CncGuidPathInstruction(plm));				return true; }
-		virtual bool processClientIDChange(long cid)									{ cncInstructions.push_back(new CncClientIDInstruction(cid));				return true; }
-		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ cncInstructions.push_back(new CncFeedSpeedInstruction(value_MM_MIN, m));	return true; }
-		virtual bool processToolChange(double diameter)									{ cncInstructions.push_back(new CncToolChangeInstruction(diameter));		return true; }
-		virtual bool processSpindleStateSwitch(bool on, bool force)						{ cncInstructions.push_back(new CncSpindleStateInstruction(on, force));		return true; }
-		virtual bool processSpindleSpeedChange(double value_U_MIN)						{ cncInstructions.push_back(new CncSpindleSpeedInstruction(value_U_MIN));	return true; }
-		virtual bool processMoveSequence(CncMoveSequence& msq)							{ cncInstructions.push_back(new CncMovSeqInstruction(msq));					return true; }
-		virtual bool processPathListEntry(const CncPathListEntry& ple)					{ cncInstructions.push_back(new CncPathListInstruction(ple));				return true; }
+		virtual bool processGuidePath(const CncPathListManager& plm)					override { cncInstructions.push_back(new CncGuidPathInstruction(plm));				return true; }
+		virtual bool processClientIDChange(long cid)									override { cncInstructions.push_back(new CncClientIDInstruction(cid));				return true; }
+		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		override { cncInstructions.push_back(new CncFeedSpeedInstruction(value_MM_MIN, m));	return true; }
+		virtual bool processToolChange(double diameter)									override { cncInstructions.push_back(new CncToolChangeInstruction(diameter));		return true; }
+		virtual bool processSpindleStateSwitch(bool on, bool force)						override { cncInstructions.push_back(new CncSpindleStateInstruction(on, force));	return true; }
+		virtual bool processSpindleSpeedChange(double value_U_MIN)						override { cncInstructions.push_back(new CncSpindleSpeedInstruction(value_U_MIN));	return true; }
+		virtual bool processMoveSequence(CncMoveSequence& msq)							override { cncInstructions.push_back(new CncMovSeqInstruction(msq));				return true; }
+		virtual bool processPathListEntry(const CncPathListEntry& ple)					override { cncInstructions.push_back(new CncPathListInstruction(ple));				return true; }
 	
 	#else
 	
-		virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)	{ return executeGuidePath(plm, zOffset); }
-		virtual bool processClientIDChange(long cid)									{ return executeClientIDChange( cid); }
-		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ return executeFeedSpeedChange(value_MM_MIN, m); }
-		virtual bool processToolChange(double diameter)									{ return executeToolChange(diameter); }
-		virtual bool processSpindleStateSwitch(bool on, bool force)						{ return executeSpindleStateSwitch(on, force); }
-		virtual bool processSpindleSpeedChange(double value_U_MIN)						{ return executeSpindleSpeedChange(value_U_MIN); }
-		virtual bool processMoveSequence(CncMoveSequence& msq)							{ return executeMoveSequence(msq); }
-		virtual bool processPathListEntry(const CncPathListEntry& ple)					{ return executePathListEntry(ple); }
+		virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)	override { return executeGuidePath(plm, zOffset); }
+		virtual bool processClientIDChange(long cid)									override { return executeClientIDChange( cid); }
+		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		override { return executeFeedSpeedChange(value_MM_MIN, m); }
+		virtual bool processToolChange(double diameter)									override { return executeToolChange(diameter); }
+		virtual bool processSpindleStateSwitch(bool on, bool force)						override { return executeSpindleStateSwitch(on, force); }
+		virtual bool processSpindleSpeedChange(double value_U_MIN)						override { return executeSpindleSpeedChange(value_U_MIN); }
+		virtual bool processMoveSequence(CncMoveSequence& msq)							override { return executeMoveSequence(msq); }
+		virtual bool processPathListEntry(const CncPathListEntry& ple)					override { return executePathListEntry(ple); }
 	
 	#endif
-		virtual void processTrigger(const Trigger::BeginRun& tr)						{ cncInstructions.push_back(new InstructionTriggerBeginRun     (tr)); }
-		virtual void processTrigger(const Trigger::EndRun& tr)							{ cncInstructions.push_back(new InstructionTriggerEndRun       (tr)); }
-		virtual void processTrigger(const Trigger::NextPath& tr)						{ cncInstructions.push_back(new InstructionTriggerNextPath     (tr)); }
-		virtual void processTrigger(const Trigger::SpeedChange& tr)						{ cncInstructions.push_back(new InstructionTriggerSpeedChange  (tr)); }
-		virtual void processTrigger(const Trigger::GuidePath& tr)						{ cncInstructions.push_back(new InstructionTriggerGuidePath    (tr)); }
+	
+		virtual void processTrigger(const Trigger::BeginRun& tr)						override { cncInstructions.push_back(new InstructionTriggerBeginRun     (tr)); }
+		virtual void processTrigger(const Trigger::EndRun& tr)							override;
+		virtual void processTrigger(const Trigger::NextPath& tr)						override { cncInstructions.push_back(new InstructionTriggerNextPath     (tr)); }
+		virtual void processTrigger(const Trigger::SpeedChange& tr)						override { cncInstructions.push_back(new InstructionTriggerSpeedChange  (tr)); }
+		virtual void processTrigger(const Trigger::GuidePath& tr)						override { cncInstructions.push_back(new InstructionTriggerGuidePath    (tr)); }
 };
 
 #endif

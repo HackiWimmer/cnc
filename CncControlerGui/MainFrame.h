@@ -12,6 +12,7 @@
 #include "NotebookInfo.h"
 #include "FileParser.h"
 #include "BinaryFileParser.h"
+#include "CncSha1Wrapper.h"
 #include "CncControl.h"
 #include "CncToolStateControl.h"
 #include "CncPerspective.h"
@@ -513,7 +514,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual bool Show(bool show);
 
 		void initialize(void);
-		bool secureRun() { return processTemplateIntern(); }
 		
 		void handleCncInterruptException(const CncInterruption& ex);
 		void handleUnhandledException(const wxString& context);
@@ -760,6 +760,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncPodiumMgmtMovement;
 		friend class CncSecureManuallyMovePanel;
 		
+		friend class CncPathListInterfaceCnc;
 		friend class CncPathListRunner;
 		
 		friend class CncSimuHwDimensionSetup;
@@ -969,12 +970,15 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void displayPositionSituation(int type, const wxString& msg, const wxString& headLine = "Current Positions:", const wxString& appendix = wxEmptyString);
 		bool checkIfRunCanBeProcessed(bool confirm=true);
 		bool checkReferencePositionState();
-		bool processVirtualTemplate();
-		bool processTemplateIntern();
-		bool processTemplateWrapper(bool confirm=true);
-		bool processBinaryTemplate();
-		bool processSVGTemplate();
-		bool processGCodeTemplate();
+		
+		bool processTemplate(bool confirm=true);
+		bool processTemplate_SelectType(const SHA1SessionKey& sk);
+		bool processTemplate_Execute(const SHA1SessionKey& sk);
+		
+		bool processBinaryTemplate(const SHA1SessionKey& sk);
+		bool processSVGTemplate(const SHA1SessionKey& sk);
+		bool processGCodeTemplate(const SHA1SessionKey& sk);
+		
 		bool processManualTemplate();
 		bool processTestTemplate();
 		bool processTestInterval();

@@ -16,15 +16,21 @@ class CncPreprocessor : public CncPreprocessorBase {
 	
 	private:
 		bool								useOperatingTrace;
+		bool								useCncInstTrace;
 		
 		CncPathListEntryListCtrl* 			pathListEntries;
 		CncMoveSequenceOverviewListCtrl* 	moveSequenceOverview;
 		CncMoveSequenceListCtrl* 			moveSequence;
 		CncOperatingTrace*					operatingTrace;
+		CncOperatingTrace*					cncInstTrace;
 		CncExternalViewBox*					externalPathListEntriesView;
 		CncExternalViewBox*					externalMoveSequenceView;
 		CncExternalViewBox*					externalParsingSynopsisView;
 		CncExternalViewBox*					externalOperatingTraceView;
+		CncExternalViewBox*					externalCncInstructionView;
+		
+		wxBitmap							bmpOn;
+		wxBitmap							bmpOff;
 		
 		void updatePathListContent();
 		void updateMoveSequenceListContent(bool force = false);
@@ -41,9 +47,15 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void popProcessMode();
 		void pushUpdateMode();
 		
+		bool isPathListEntriesActive()		const	{ return m_btConnectPathListEntries->GetValue(); }
+		bool isMoveSequencesActive()		const	{ return m_btConnectMoveSequences->GetValue(); }
+		bool isOperatingTraceActive()		const	{ return m_btConnectOperatingTrace->GetValue(); }
+		bool isCncInstTraceActive()			const	{ return m_btConnectCncInstructions->GetValue(); }
+		
 		void enablePathListEntries		(bool state);
 		void enableMoveSequences		(bool state);
 		void enableOperatingTrace		(bool state);
+		void enableCncInstTrace			(bool state);
 		
 		void clearAll();
 		
@@ -64,12 +76,17 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void addOperatingTraceWarnEntry	(const wxString& s);
 		void addOperatingTraceErrorEntry(const wxString& s);
 		
+		void clearCncInstructions();
+		void addCncInstructionTrace		(const wxString& s);
+		
 		void selectClientId(long id, CncPreprocessor::ListType lt);
 		
 		void updateContent();
 
 	protected:
-		
+		virtual void onDetachCncInstructionView(wxCommandEvent& event);
+		virtual void clearCncInstructions(wxCommandEvent& event);
+		virtual void connectCncInstructions(wxCommandEvent& event);
 		virtual void formatPathListEntries(wxCommandEvent& event);
 		virtual void onDetachOperatingTraceView(wxCommandEvent& event);
 		virtual void onDetachMoveSequenceView(wxCommandEvent& event);

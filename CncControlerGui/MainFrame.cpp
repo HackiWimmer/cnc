@@ -82,7 +82,6 @@
 #include "CncSpeedMonitor.h"
 #include "CncUsbConnectionObserver.h"
 #include "CncConnectProgress.h"
-#include "CncSha1Wrapper.h"
 #include "CncMonitorSplitterWindow.h"
 #include "CncMotionVertexTrace.h"
 #include "CncTemplateObserver.h"
@@ -1652,7 +1651,7 @@ void MainFrame::onStartupTimer(wxTimerEvent& event) {
 				openInitialTemplateFile();
 				
 			defineMinMonitoring();
-			processTemplateWrapper();
+			processTemplate();
 			defineNormalMonitoring();
 		}
 	}
@@ -4254,7 +4253,8 @@ void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 	saveFileAs();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::processVirtualTemplate() {
+// don't call this method directly, instead use processTemplate()
+bool MainFrame::processTemplate_Execute(const SHA1SessionKey& sk) {
 ///////////////////////////////////////////////////////////////////
 	Trigger::ParameterSet ps;
 	ps.SRC.fileName		= getCurrentTemplatePathFileName();
@@ -4318,7 +4318,7 @@ void MainFrame::activateGamepadNotifications(bool state) {
 	decorateGamepadState(gamepadThread->IsRunning());
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::processBinaryTemplate() {
+bool MainFrame::processBinaryTemplate(const SHA1SessionKey& sk) {
 ///////////////////////////////////////////////////////////////////
 	if ( inboundFileParser != NULL )
 		delete inboundFileParser;
@@ -4328,10 +4328,10 @@ bool MainFrame::processBinaryTemplate() {
 	inboundFileParser = new BinaryFileParser(getCurrentTemplatePathFileName().c_str(), new BinaryPathHandlerCnc(cnc));
 	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
 	
-	return processVirtualTemplate();
+	return processTemplate_Execute(sk);
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::processSVGTemplate() {
+bool MainFrame::processSVGTemplate(const SHA1SessionKey& sk) {
 ///////////////////////////////////////////////////////////////////
 	if ( inboundFileParser != NULL )
 		delete inboundFileParser;
@@ -4341,10 +4341,10 @@ bool MainFrame::processSVGTemplate() {
 	inboundFileParser = new SVGFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
 	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
 
-	return processVirtualTemplate();
+	return processTemplate_Execute(sk);
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::processGCodeTemplate() {
+bool MainFrame::processGCodeTemplate(const SHA1SessionKey& sk) {
 ///////////////////////////////////////////////////////////////////
 	if ( inboundFileParser != NULL )
 		delete inboundFileParser;
@@ -4354,7 +4354,7 @@ bool MainFrame::processGCodeTemplate() {
 	inboundFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), new GCodePathHandlerCnc(cnc));
 	inboundFileParser->changePathListRunnerInterface(m_portSelector->GetStringSelection());
 	
-	return processVirtualTemplate();
+	return processTemplate_Execute(sk);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processManualTemplate() {
@@ -5021,13 +5021,19 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 	return (confirm == true ? showConfigSummaryAndConfirmRun() : true);
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::processTemplateWrapper(bool confirm) {
+bool MainFrame::processTemplate(bool confirm) {
 ///////////////////////////////////////////////////////////////////
 	try 
 	{
 		wxASSERT(cnc);
 		
 		wxDateTime tsStart(wxDateTime::UNow());
+		
+		SHA1SessionKey runSessionKey;
+		CncStringSha1::createSessionKey(
+					wxString::Format("%s.%u", tsStart.FormatISOCombined(), tsStart.GetMillisecond()), 
+					runSessionKey
+		); 
 		
 		//-----------------------------------------------------------------
 		// all mandatory checks from here on . . . 
@@ -5109,15 +5115,30 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		// process template . . . 
 		
 			// *********************
-			StreamBufferHighlighter sbh(std::clog);
-			CNC_CLOG_A(wxString::Format("~~~ Processing(probe mode = %s) started ~~~", probeMode))
-			INC_LOGGER_INDENT
-			
 			// This instance starts and stops the speed monitor
 			CncSpeedMonitorRunner smr(speedMonitor);
 			
-			THE_TPL_CTX->registerRun();
-			const bool ret = processTemplateIntern();
+			StreamBufferHighlighter sbh(std::clog);
+			
+			bool ret = false;
+			if ( THE_TPL_CTX->isValid() )
+			{
+				#warning currently only a test
+				
+				CNC_CLOG_A(wxString::Format("~~~ Processing based on existing CNC Instructions started ~~~"))
+				INC_LOGGER_INDENT
+				
+				motionMonitor->clear();
+				ret = THE_TPL_CTX->executeCncInterface();
+			}
+			else
+			{
+				CNC_CLOG_A(wxString::Format("~~~ Processing(probe mode = %s) started ~~~", probeMode))
+				INC_LOGGER_INDENT
+					
+				THE_TPL_CTX->registerRun();
+				ret = processTemplate_SelectType(runSessionKey);
+			}
 			
 			DEC_LOGGER_INDENT
 			// *********************
@@ -5205,8 +5226,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-// don't call this method directly, instead use processTemplateWrapper
-bool MainFrame::processTemplateIntern() {
+// don't call this method directly, instead use processTemplate()
+bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 ///////////////////////////////////////////////////////////////////
 	CncRunAnimationControl rac(this);
 	
@@ -5244,42 +5265,49 @@ bool MainFrame::processTemplateIntern() {
 	switch ( getCurrentTemplateFormat() )
 	{
 		case TplBinary:
+		{
 			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
+				
 			clearMotionMonitor();
-			// measurement handling will be done by the corresponding file parser
-			ret = processBinaryTemplate();
-			break;
 			
+			ret = processBinaryTemplate(sk);
+			break;
+		}
 		case TplSvg:
+		{
 			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
-			clearMotionMonitor();
-			// measurement handling will be done by the corresponding file parser
-			ret = processSVGTemplate();
-			break;
 			
+			clearMotionMonitor();
+			
+			ret = processSVGTemplate(sk);
+			break;
+		}
 		case TplGcode:
+		{
 			if ( saveTemplateOnDemand(forceSave) == false )
 				break;
+				
 			clearMotionMonitor();
-			// measurement handling will be done by the corresponding file parser
-			ret = processGCodeTemplate();
-			break;
 			
+			ret = processGCodeTemplate(sk);
+			break;
+		}
 		case TplManual:
+		{
 			ret = processManualTemplate();
 			break;
-			
+		}
 		case TplTest:
+		{
 			clearMotionMonitor();
 			cnc->startSerialMeasurement();
 			ret = processTestTemplate();
 			cnc->stopSerialMeasurement();
 			break;
-			
-		default:
-			; // do nothing
+		}
+		default: ; // do nothing
 	}
 	
 	// Check positions
@@ -7035,7 +7063,7 @@ void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcDryRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	// do this already here, because this is true a part of processTemplateWrapper(), 
+	// do this already here, because this is true a part of processTemplate(), 
 	// but is makes a clearer work flow if the state is checked before anything is started 
 	if ( checkReferencePositionState() == false )
 		return;
@@ -7056,7 +7084,7 @@ void MainFrame::rcDryRun(wxCommandEvent& event) {
 			CNC_CLOG_A(starMessage)
 			
 			cnc->switchRunMode(CncControl::RunMode::M_DryRun);
-			ret = processTemplateWrapper();
+			ret = processTemplate();
 			cnc->switchRunMode(CncControl::RunMode::M_RealRun);
 			
 			// error handling 
@@ -7221,7 +7249,8 @@ void MainFrame::rcRun() {
 	
 	// process
 	CNC_CLOG_A("")
-	processTemplateWrapper();
+	
+	processTemplate();
 	
 	// restore the interval
 	THE_CONTEXT->setUpdateInterval(interval);
