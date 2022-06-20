@@ -1160,7 +1160,6 @@ bool CncPathListManager::normalizeStartPos(const CncDoublePosition& pos) {
 	const double transY	= pos.getY();
 	const double dist	= sqrt(transX * transX + transY * transY);
 	
-	#warning sign or not sign????
 	it->entryTarget.setXYZ(	pos.getX(),
 							pos.getY(),
 							it->entryTarget.getZ() - pos.getZ()
@@ -1185,7 +1184,6 @@ bool CncPathListManager::normalizeEndPos(const CncDoublePosition& pos) {
 		const double transY	= pos.getY();
 		const double dist	= sqrt(transX * transX + transY * transY);
 		
-		#warning sign or not sign????
 		it->entryTarget.setXYZ(	pos.getX(),
 								pos.getY(),
 								it->entryTarget.getZ() - pos.getZ()

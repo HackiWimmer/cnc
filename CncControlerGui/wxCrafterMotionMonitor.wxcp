@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	451,
+		"m_objCounter":	457,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxC1306InitBitmapResources",
 		"m_bitmapsFile":	"wxCrafterMotionMonitor_bitmaps.cpp",
@@ -2618,7 +2618,7 @@
 																						}, {
 																							"type":	"string",
 																							"m_label":	"Name:",
-																							"m_value":	"m_btClearOperatingTrace10"
+																							"m_value":	"m_btCopyOperatingTrace"
 																						}, {
 																							"type":	"multi-string",
 																							"m_label":	"Tooltip:",
@@ -2699,7 +2699,7 @@
 																						}, {
 																							"type":	"string",
 																							"m_label":	"Name:",
-																							"m_value":	"m_btClearOperatingTrace11"
+																							"m_value":	"m_btSaveOperatingTrace"
 																						}, {
 																							"type":	"multi-string",
 																							"m_label":	"Tooltip:",
@@ -3794,7 +3794,7 @@
 																				}, {
 																					"type":	"string",
 																					"m_label":	"# Columns:",
-																					"m_value":	"9"
+																					"m_value":	"10"
 																				}, {
 																					"type":	"string",
 																					"m_label":	"# Rows:",
@@ -4056,6 +4056,168 @@
 																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																							"m_eventClass":	"wxCommandEvent",
 																							"m_functionNameAndSignature":	"clearPathListEntries(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
+																					"m_children":	[]
+																				}, {
+																					"m_type":	4404,
+																					"proportion":	0,
+																					"border":	1,
+																					"gbSpan":	"1,1",
+																					"gbPosition":	"0,0",
+																					"m_styles":	["wxBU_AUTODRAW"],
+																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+																					"m_properties":	[{
+																							"type":	"winid",
+																							"m_label":	"ID:",
+																							"m_winid":	"wxID_ANY"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Minimum Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Name:",
+																							"m_value":	"m_btCopyPathListEntries"
+																						}, {
+																							"type":	"multi-string",
+																							"m_label":	"Tooltip:",
+																							"m_value":	"Copy"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Bg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Fg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"font",
+																							"m_label":	"Font:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Hidden",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Disabled",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Focused",
+																							"m_value":	false
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Class Name:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Include File:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Style:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bitmapPicker",
+																							"m_label":	"Bitmap File:",
+																							"m_path":	"bitmaps/16-copy.png"
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Default Button",
+																							"m_value":	false
+																						}],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"copyPathListEntries(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
+																					"m_children":	[]
+																				}, {
+																					"m_type":	4404,
+																					"proportion":	0,
+																					"border":	1,
+																					"gbSpan":	"1,1",
+																					"gbPosition":	"0,0",
+																					"m_styles":	["wxBU_AUTODRAW"],
+																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+																					"m_properties":	[{
+																							"type":	"winid",
+																							"m_label":	"ID:",
+																							"m_winid":	"wxID_ANY"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Minimum Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Name:",
+																							"m_value":	"m_btSavePathListEntries"
+																						}, {
+																							"type":	"multi-string",
+																							"m_label":	"Tooltip:",
+																							"m_value":	"Save "
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Bg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Fg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"font",
+																							"m_label":	"Font:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Hidden",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Disabled",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Focused",
+																							"m_value":	false
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Class Name:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Include File:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Style:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bitmapPicker",
+																							"m_label":	"Bitmap File:",
+																							"m_path":	"bitmaps/CodeLite/16-file_save_all.png"
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Default Button",
+																							"m_value":	false
+																						}],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"savePathListEntries(wxCommandEvent& event)",
 																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																							"m_noBody":	false
 																						}],
@@ -5588,6 +5750,168 @@
 																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																							"m_eventClass":	"wxCommandEvent",
 																							"m_functionNameAndSignature":	"clearMoveSequences(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
+																					"m_children":	[]
+																				}, {
+																					"m_type":	4404,
+																					"proportion":	0,
+																					"border":	1,
+																					"gbSpan":	"1,1",
+																					"gbPosition":	"0,0",
+																					"m_styles":	["wxBU_AUTODRAW"],
+																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+																					"m_properties":	[{
+																							"type":	"winid",
+																							"m_label":	"ID:",
+																							"m_winid":	"wxID_ANY"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Minimum Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Name:",
+																							"m_value":	"m_btCopyMoveSequences"
+																						}, {
+																							"type":	"multi-string",
+																							"m_label":	"Tooltip:",
+																							"m_value":	"Copy"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Bg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Fg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"font",
+																							"m_label":	"Font:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Hidden",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Disabled",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Focused",
+																							"m_value":	false
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Class Name:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Include File:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Style:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bitmapPicker",
+																							"m_label":	"Bitmap File:",
+																							"m_path":	"bitmaps/16-copy.png"
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Default Button",
+																							"m_value":	false
+																						}],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"copyMoveSequences(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
+																					"m_children":	[]
+																				}, {
+																					"m_type":	4404,
+																					"proportion":	0,
+																					"border":	1,
+																					"gbSpan":	"1,1",
+																					"gbPosition":	"0,0",
+																					"m_styles":	["wxBU_AUTODRAW"],
+																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+																					"m_properties":	[{
+																							"type":	"winid",
+																							"m_label":	"ID:",
+																							"m_winid":	"wxID_ANY"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Minimum Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Name:",
+																							"m_value":	"m_btSaveMoveSequences"
+																						}, {
+																							"type":	"multi-string",
+																							"m_label":	"Tooltip:",
+																							"m_value":	"Save"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Bg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Fg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"font",
+																							"m_label":	"Font:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Hidden",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Disabled",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Focused",
+																							"m_value":	false
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Class Name:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Include File:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Style:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bitmapPicker",
+																							"m_label":	"Bitmap File:",
+																							"m_path":	"bitmaps/CodeLite/16-file_save_all.png"
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Default Button",
+																							"m_value":	false
+																						}],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"saveMoveSequences(wxCommandEvent& event)",
 																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																							"m_noBody":	false
 																						}],
@@ -8056,6 +8380,168 @@
 																						}],
 																					"m_children":	[]
 																				}, {
+																					"m_type":	4404,
+																					"proportion":	0,
+																					"border":	1,
+																					"gbSpan":	"1,1",
+																					"gbPosition":	"0,0",
+																					"m_styles":	["wxBU_AUTODRAW"],
+																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+																					"m_properties":	[{
+																							"type":	"winid",
+																							"m_label":	"ID:",
+																							"m_winid":	"wxID_ANY"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Minimum Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Name:",
+																							"m_value":	"m_btCopyCncInntructions"
+																						}, {
+																							"type":	"multi-string",
+																							"m_label":	"Tooltip:",
+																							"m_value":	"Copy CNC Instruction"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Bg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Fg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"font",
+																							"m_label":	"Font:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Hidden",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Disabled",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Focused",
+																							"m_value":	false
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Class Name:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Include File:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Style:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bitmapPicker",
+																							"m_label":	"Bitmap File:",
+																							"m_path":	"bitmaps/16-copy.png"
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Default Button",
+																							"m_value":	false
+																						}],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"copyCncInstructions(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
+																					"m_children":	[]
+																				}, {
+																					"m_type":	4404,
+																					"proportion":	0,
+																					"border":	1,
+																					"gbSpan":	"1,1",
+																					"gbPosition":	"0,0",
+																					"m_styles":	["wxBU_AUTODRAW"],
+																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+																					"m_properties":	[{
+																							"type":	"winid",
+																							"m_label":	"ID:",
+																							"m_winid":	"wxID_ANY"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Minimum Size:",
+																							"m_value":	"26,26"
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Name:",
+																							"m_value":	"m_btSaveCncInntructions"
+																						}, {
+																							"type":	"multi-string",
+																							"m_label":	"Tooltip:",
+																							"m_value":	"Save CNC Instruction"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Bg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"colour",
+																							"m_label":	"Fg Colour:",
+																							"colour":	"<Default>"
+																						}, {
+																							"type":	"font",
+																							"m_label":	"Font:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Hidden",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Disabled",
+																							"m_value":	false
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Focused",
+																							"m_value":	false
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Class Name:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Include File:",
+																							"m_value":	""
+																						}, {
+																							"type":	"string",
+																							"m_label":	"Style:",
+																							"m_value":	""
+																						}, {
+																							"type":	"bitmapPicker",
+																							"m_label":	"Bitmap File:",
+																							"m_path":	"bitmaps/CodeLite/16-file_save_all.png"
+																						}, {
+																							"type":	"bool",
+																							"m_label":	"Default Button",
+																							"m_value":	false
+																						}],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"saveCncInstructions(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
+																					"m_children":	[]
+																				}, {
 																					"m_type":	4418,
 																					"proportion":	0,
 																					"border":	1,
@@ -8195,7 +8681,13 @@
 																							"m_label":	"Default Button",
 																							"m_value":	false
 																						}],
-																					"m_events":	[],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"onCncInstFirstClientId(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
 																					"m_children":	[]
 																				}, {
 																					"m_type":	4404,
@@ -8270,7 +8762,13 @@
 																							"m_label":	"Default Button",
 																							"m_value":	false
 																						}],
-																					"m_events":	[],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"onCncInstNextClientId(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
 																					"m_children":	[]
 																				}, {
 																					"m_type":	4404,
@@ -8345,7 +8843,13 @@
 																							"m_label":	"Default Button",
 																							"m_value":	false
 																						}],
-																					"m_events":	[],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"onCncInstPrevClientId(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
 																					"m_children":	[]
 																				}, {
 																					"m_type":	4404,
@@ -8374,7 +8878,7 @@
 																						}, {
 																							"type":	"multi-string",
 																							"m_label":	"Tooltip:",
-																							"m_value":	"Skip to Last Client ID"
+																							"m_value":	"Skip to Last Client ID "
 																						}, {
 																							"type":	"colour",
 																							"m_label":	"Bg Colour:",
@@ -8420,7 +8924,13 @@
 																							"m_label":	"Default Button",
 																							"m_value":	false
 																						}],
-																					"m_events":	[],
+																					"m_events":	[{
+																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
+																							"m_eventClass":	"wxCommandEvent",
+																							"m_functionNameAndSignature":	"onCncInstLastClientId(wxCommandEvent& event)",
+																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+																							"m_noBody":	false
+																						}],
 																					"m_children":	[]
 																				}]
 																		}]

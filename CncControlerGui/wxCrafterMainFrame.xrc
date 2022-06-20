@@ -5709,7 +5709,7 @@ Interval [ms]:</label>
                                                                               <tooltip>
                                                                                 <![CDATA[Total time consumed]]>
                                                                               </tooltip>
-                                                                              <value>00:00:00.123456</value>
+                                                                              <value>00:00:00.000000</value>
                                                                             </object>
                                                                           </object>
                                                                         </object>

@@ -5035,6 +5035,8 @@ bool MainFrame::processTemplate(bool confirm) {
 					runSessionKey
 		); 
 		
+		CncRunAnimationControl rac(this);
+		
 		//-----------------------------------------------------------------
 		// all mandatory checks from here on . . . 
 		
@@ -5057,6 +5059,22 @@ bool MainFrame::processTemplate(bool confirm) {
 			return false;
 		}
 		
+		// select a template page
+		if ( m_mainViewBook->GetSelection() != MainBookSelection::VAL::MANUEL_PANEL && 
+			 m_mainViewBook->GetSelection() != MainBookSelection::VAL::TEST_PANEL && 
+			 m_mainViewBook->GetSelection() != MainBookSelection::VAL::SOURCE_PANEL &&
+			 m_mainViewBook->GetSelection() != MainBookSelection::VAL::SETUP_PANEL)
+		{
+			selectMainBookSourcePanel();
+		}
+		
+		// select the draw pane
+		if ( THE_CONTEXT->secureModeInfo.isActive == false )
+		{
+			showAuiPane("Outbound");
+			selectMonitorBookCncPanel();
+		}
+		
 		//-----------------------------------------------------------------
 		// deactivate all relevant behaviours from here on . . . 
 		
@@ -5077,6 +5095,7 @@ bool MainFrame::processTemplate(bool confirm) {
 		
 		//-----------------------------------------------------------------
 		// prepare all relevant settings from here on . . . 
+		const bool useExistingCncInstructions = THE_TPL_CTX->isValid();
 		
 		// if template boundaries available prepare the motion monitor 
 		// to the best size (scale) and origin placement
@@ -5092,24 +5111,23 @@ bool MainFrame::processTemplate(bool confirm) {
 		cnc->resetSetterMap();
 		cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
 		cnc->enableProbeMode(THE_CONTEXT->isProbeMode());
+		cnc->setStepDelay(THE_CONFIG->getArtificallyStepDelay());
 		
 		decorateOutboundSaveControls(false);
-		cncPreprocessor->clearAll();
-		
-		if ( getCurrentTemplateFormat() == TplManual )
-		{
-			if ( cncManuallyMoveCoordPanel->shouldClearMontionMonitor() )
-				clearMotionMonitor();
-		}
-		else
-		{
-			cncManuallyMoveCoordPanel->resetClearViewState();
-		}
 		
 		const wxString probeMode(THE_CONTEXT->isProbeMode() ? "ON" :"OFF");
 		
 		// restart the trace timer using the previous time-out value
 		m_traceTimer->Start(-1);
+		
+		clearPositionSpy();
+		disableControls();
+		resetMinMaxPositions();
+		notifyConfigUpdate();
+		
+		// Overrides the THE_CONTEXT->timestamps.logTotalTimeStart() CncRunAnimationControl mechanism (ctor)
+		// to be more closer on the real processing start
+		THE_CONTEXT->timestamps.logTotalTimeStart();
 		
 		//-----------------------------------------------------------------
 		// process template . . . 
@@ -5120,11 +5138,11 @@ bool MainFrame::processTemplate(bool confirm) {
 			
 			StreamBufferHighlighter sbh(std::clog);
 			
+			motionMonitor->pushProcessMode();
+			
 			bool ret = false;
-			if ( THE_TPL_CTX->isValid() )
+			if ( useExistingCncInstructions )
 			{
-				#warning currently only a test
-				
 				CNC_CLOG_A(wxString::Format("~~~ Processing based on existing CNC Instructions started ~~~"))
 				INC_LOGGER_INDENT
 				
@@ -5139,6 +5157,17 @@ bool MainFrame::processTemplate(bool confirm) {
 				THE_TPL_CTX->registerRun();
 				ret = processTemplate_SelectType(runSessionKey);
 			}
+			
+			motionMonitor->popProcessMode();
+	
+			if ( ret )
+				cnc->updatePreview3D();
+			
+			// Do this already here to be to be more closer on the real processing start
+			// instead of the dtor of CncRunAnimationControl 
+			logTimeConsumed();
+			statisticsPane->logStatistics();
+			displayReport(1);
 			
 			DEC_LOGGER_INDENT
 			// *********************
@@ -5210,6 +5239,7 @@ bool MainFrame::processTemplate(bool confirm) {
 			}
 		}
 		
+		enableControls();
 		return ret;
 	}
 	catch (const CncInterruption& ex) 
@@ -5229,6 +5259,7 @@ bool MainFrame::processTemplate(bool confirm) {
 // don't call this method directly, instead use processTemplate()
 bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 ///////////////////////////////////////////////////////////////////
+/*
 	CncRunAnimationControl rac(this);
 	
 	clearPositionSpy();
@@ -5258,8 +5289,11 @@ bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 	disableControls();
 	resetMinMaxPositions();
 	notifyConfigUpdate();
-	
+*/
 	const bool forceSave = m_btSvgToggleAutoSaveTplOnProcess->GetValue();
+	
+	if ( getCurrentTemplateFormat() != TplManual )
+		cncManuallyMoveCoordPanel->resetClearViewState();
 	
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() )
@@ -5296,12 +5330,16 @@ bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 		}
 		case TplManual:
 		{
+			if ( cncManuallyMoveCoordPanel->shouldClearMontionMonitor() )
+				clearMotionMonitor();
+
 			ret = processManualTemplate();
 			break;
 		}
 		case TplTest:
 		{
 			clearMotionMonitor();
+			
 			cnc->startSerialMeasurement();
 			ret = processTestTemplate();
 			cnc->stopSerialMeasurement();
@@ -5341,17 +5379,6 @@ bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 			setReferencePosEnforceFlag(true);
 		//}
 	}
-	
-	motionMonitor->popProcessMode();
-	
-	if ( ret )
-		cnc->updatePreview3D();
-		
-	logTimeConsumed();
-	statisticsPane->logStatistics();
-	displayReport(1);
-		
-	enableControls();
 	
 	return ret;
 }
@@ -6687,7 +6714,8 @@ void MainFrame::createAnimationControl() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::startAnimationControl() {
 ///////////////////////////////////////////////////////////////////
-	if ( pngAnimation != NULL ) {
+	if ( pngAnimation != NULL ) 
+	{
 		if ( pngAnimation->IsRunning() )
 			pngAnimation->Stop();
 			
@@ -6707,8 +6735,10 @@ void MainFrame::stopAnimationControl() {
 	m_cmdDuration->SetForegroundColour(*wxBLACK);
 	m_cmdDuration->Refresh();
 	
-	if ( pngAnimation != NULL ) {
-		if ( pngAnimation->IsRunning() ) {
+	if ( pngAnimation != NULL ) 
+	{
+		if ( pngAnimation->IsRunning() ) 
+		{
 			pngAnimation->Stop();
 			pngAnimation->Update();
 
@@ -7661,11 +7691,12 @@ void MainFrame::clearMotionMonitor() {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc )
 		cnc->resetClientId();
-
+	
+	const bool useExistingCncInstructions = THE_TPL_CTX->isValid();
+	
 	motionMonitor->clear();
 	statisticsPane->clear();
-	
-	cncPreprocessor->clearAll();
+	cncPreprocessor->clearAll(useExistingCncInstructions == false);
 	
 	decorateOutboundEditor();
 }
@@ -7707,7 +7738,7 @@ void MainFrame::requestPins(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewControllerMsgHistory(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	getCtrlMsgHistoryList()->openAsTextView(true);
+	getCtrlMsgHistoryList()->openAsTextView("CNC Message History", true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearControllerMsgHistory(wxCommandEvent& event) {

@@ -3871,7 +3871,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     flexGridSizer7243->Add(m_staticText395, 0, wxALL, WXC_FROM_DIP(5));
     m_staticText395->SetMinSize(wxSize(-1, 18));
 
-    m_cmdDuration = new wxTextCtrl(m_3DOutboundStatistics, wxID_ANY, wxT("00:00:00.123456"), wxDefaultPosition,
+    m_cmdDuration = new wxTextCtrl(m_3DOutboundStatistics, wxID_ANY, wxT("00:00:00.000000"), wxDefaultPosition,
         wxDLG_UNIT(m_3DOutboundStatistics, wxSize(96, -1)), wxTE_RIGHT | wxTE_READONLY);
     m_cmdDuration->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     wxFont m_cmdDurationFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));

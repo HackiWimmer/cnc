@@ -343,21 +343,21 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
     flexGridSizer767867->Add(m_btConnectOperatingTrace, 0, wxALL, WXC_FROM_DIP(1));
     m_btConnectOperatingTrace->SetMinSize(wxSize(26, 26));
 
-    m_btClearOperatingTrace10 =
+    m_btCopyOperatingTrace =
         new wxBitmapButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")),
             wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(26, 26)), wxBU_AUTODRAW);
-    m_btClearOperatingTrace10->SetToolTip(_("Copy Operating Trace to Clipboard"));
+    m_btCopyOperatingTrace->SetToolTip(_("Copy Operating Trace to Clipboard"));
 
-    flexGridSizer767867->Add(m_btClearOperatingTrace10, 0, wxALL, WXC_FROM_DIP(1));
-    m_btClearOperatingTrace10->SetMinSize(wxSize(26, 26));
+    flexGridSizer767867->Add(m_btCopyOperatingTrace, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCopyOperatingTrace->SetMinSize(wxSize(26, 26));
 
-    m_btClearOperatingTrace11 =
+    m_btSaveOperatingTrace =
         new wxBitmapButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")),
             wxDefaultPosition, wxDLG_UNIT(m_plOperatingTrace, wxSize(26, 26)), wxBU_AUTODRAW);
-    m_btClearOperatingTrace11->SetToolTip(_("Save Operating Trace to File"));
+    m_btSaveOperatingTrace->SetToolTip(_("Save Operating Trace to File"));
 
-    flexGridSizer767867->Add(m_btClearOperatingTrace11, 0, wxALL, WXC_FROM_DIP(1));
-    m_btClearOperatingTrace11->SetMinSize(wxSize(26, 26));
+    flexGridSizer767867->Add(m_btSaveOperatingTrace, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSaveOperatingTrace->SetMinSize(wxSize(26, 26));
 
     m_btClearOperatingTrace =
         new wxBitmapButton(m_plOperatingTrace, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")),
@@ -462,7 +462,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
 
     flexGridSizer7889->Add(m_staticLine7903, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
 
-    wxFlexGridSizer* flexGridSizer7678 = new wxFlexGridSizer(1, 9, 0, 0);
+    wxFlexGridSizer* flexGridSizer7678 = new wxFlexGridSizer(1, 10, 0, 0);
     flexGridSizer7678->SetFlexibleDirection(wxBOTH);
     flexGridSizer7678->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
@@ -493,6 +493,22 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
 
     flexGridSizer7678->Add(m_btClearPathListEntries, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearPathListEntries->SetMinSize(wxSize(26, 26));
+
+    m_btCopyPathListEntries =
+        new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")),
+            wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btCopyPathListEntries->SetToolTip(_("Copy"));
+
+    flexGridSizer7678->Add(m_btCopyPathListEntries, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCopyPathListEntries->SetMinSize(wxSize(26, 26));
+
+    m_btSavePathListEntries =
+        new wxBitmapButton(m_plPathListView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")),
+            wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btSavePathListEntries->SetToolTip(_("Save"));
+
+    flexGridSizer7678->Add(m_btSavePathListEntries, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSavePathListEntries->SetMinSize(wxSize(26, 26));
 
     m_staticLine285 = new wxStaticLine(
         m_plPathListView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plPathListView, wxSize(-1, -1)), wxLI_VERTICAL);
@@ -649,6 +665,22 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
 
     flexGridSizer76786->Add(m_btClearMoveSequences, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearMoveSequences->SetMinSize(wxSize(26, 26));
+
+    m_btCopyMoveSequences =
+        new wxBitmapButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")),
+            wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btCopyMoveSequences->SetToolTip(_("Copy"));
+
+    flexGridSizer76786->Add(m_btCopyMoveSequences, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCopyMoveSequences->SetMinSize(wxSize(26, 26));
+
+    m_btSaveMoveSequences =
+        new wxBitmapButton(m_plMoveSequences, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")),
+            wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btSaveMoveSequences->SetToolTip(_("Save"));
+
+    flexGridSizer76786->Add(m_btSaveMoveSequences, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSaveMoveSequences->SetMinSize(wxSize(26, 26));
 
     m_staticLine2854 = new wxStaticLine(
         m_plMoveSequences, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_plMoveSequences, wxSize(-1, -1)), wxLI_VERTICAL);
@@ -909,6 +941,22 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
     flexGridSizer7678691->Add(m_btClearCncInntructions, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearCncInntructions->SetMinSize(wxSize(26, 26));
 
+    m_btCopyCncInntructions =
+        new wxBitmapButton(m_plCncInstructions, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")),
+            wxDefaultPosition, wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btCopyCncInntructions->SetToolTip(_("Copy CNC Instruction"));
+
+    flexGridSizer7678691->Add(m_btCopyCncInntructions, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCopyCncInntructions->SetMinSize(wxSize(26, 26));
+
+    m_btSaveCncInntructions =
+        new wxBitmapButton(m_plCncInstructions, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")),
+            wxDefaultPosition, wxDLG_UNIT(m_plCncInstructions, wxSize(26, 26)), wxBU_AUTODRAW);
+    m_btSaveCncInntructions->SetToolTip(_("Save CNC Instruction"));
+
+    flexGridSizer7678691->Add(m_btSaveCncInntructions, 0, wxALL, WXC_FROM_DIP(1));
+    m_btSaveCncInntructions->SetMinSize(wxSize(26, 26));
+
     m_staticLine285412 = new wxStaticLine(m_plCncInstructions, wxID_ANY, wxDefaultPosition,
         wxDLG_UNIT(m_plCncInstructions, wxSize(-1, -1)), wxLI_VERTICAL);
 
@@ -974,14 +1022,16 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
     m_bmpButton304910->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onDetachOperatingTraceView, this);
     m_btConnectOperatingTrace->Bind(
         wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectOperatingTrace, this);
-    m_btClearOperatingTrace10->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyOperatingTrace, this);
-    m_btClearOperatingTrace11->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::saveOperatingTrace, this);
+    m_btCopyOperatingTrace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyOperatingTrace, this);
+    m_btSaveOperatingTrace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::saveOperatingTrace, this);
     m_btClearOperatingTrace->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearOperatingTrace, this);
     m_bmpButton3049->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onDetachPathListEntriesView, this);
     m_btConnectPathListEntries->Bind(
         wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectPathListEntries, this);
     m_btFormatPathList->Bind(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::formatPathListEntries, this);
     m_btClearPathListEntries->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearPathListEntries, this);
+    m_btCopyPathListEntries->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyPathListEntries, this);
+    m_btSavePathListEntries->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::savePathListEntries, this);
     m_btPathListEntryFirst->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onPathListEntryFirst, this);
     m_btPathListEntryPrev->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onPathListEntryPrev, this);
     m_btPathListEntryNext->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onPathListEntryNext, this);
@@ -990,6 +1040,8 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
     m_btConnectMoveSequences->Bind(
         wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectMoveSequences, this);
     m_btClearMoveSequences->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearMoveSequences, this);
+    m_btCopyMoveSequences->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyMoveSequences, this);
+    m_btSaveMoveSequences->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::saveMoveSequences, this);
     m_btMoveSeqFirst->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryFirst, this);
     m_btMoveSeqPrev->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryPrev, this);
     m_btMoveSeqNext->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryNext, this);
@@ -998,6 +1050,12 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent,
     m_btConnectCncInstructions->Bind(
         wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectCncInstructions, this);
     m_btClearCncInntructions->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearCncInstructions, this);
+    m_btCopyCncInntructions->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyCncInstructions, this);
+    m_btSaveCncInntructions->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::saveCncInstructions, this);
+    m_btCncInstructionsFirst->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onCncInstFirstClientId, this);
+    m_btCncInstructionsPrev->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onCncInstNextClientId, this);
+    m_btCncInstructionsNext->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onCncInstPrevClientId, this);
+    m_btCncInstructionsLast->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onCncInstLastClientId, this);
 }
 
 CncPreprocessorBase::~CncPreprocessorBase()
@@ -1005,14 +1063,16 @@ CncPreprocessorBase::~CncPreprocessorBase()
     m_bmpButton304910->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onDetachOperatingTraceView, this);
     m_btConnectOperatingTrace->Unbind(
         wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectOperatingTrace, this);
-    m_btClearOperatingTrace10->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyOperatingTrace, this);
-    m_btClearOperatingTrace11->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::saveOperatingTrace, this);
+    m_btCopyOperatingTrace->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyOperatingTrace, this);
+    m_btSaveOperatingTrace->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::saveOperatingTrace, this);
     m_btClearOperatingTrace->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearOperatingTrace, this);
     m_bmpButton3049->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onDetachPathListEntriesView, this);
     m_btConnectPathListEntries->Unbind(
         wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectPathListEntries, this);
     m_btFormatPathList->Unbind(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::formatPathListEntries, this);
     m_btClearPathListEntries->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearPathListEntries, this);
+    m_btCopyPathListEntries->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyPathListEntries, this);
+    m_btSavePathListEntries->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::savePathListEntries, this);
     m_btPathListEntryFirst->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onPathListEntryFirst, this);
     m_btPathListEntryPrev->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onPathListEntryPrev, this);
     m_btPathListEntryNext->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onPathListEntryNext, this);
@@ -1021,6 +1081,8 @@ CncPreprocessorBase::~CncPreprocessorBase()
     m_btConnectMoveSequences->Unbind(
         wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectMoveSequences, this);
     m_btClearMoveSequences->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearMoveSequences, this);
+    m_btCopyMoveSequences->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyMoveSequences, this);
+    m_btSaveMoveSequences->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::saveMoveSequences, this);
     m_btMoveSeqFirst->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryFirst, this);
     m_btMoveSeqPrev->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryPrev, this);
     m_btMoveSeqNext->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onMoveSequenceEntryNext, this);
@@ -1029,6 +1091,12 @@ CncPreprocessorBase::~CncPreprocessorBase()
     m_btConnectCncInstructions->Unbind(
         wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, &CncPreprocessorBase::connectCncInstructions, this);
     m_btClearCncInntructions->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::clearCncInstructions, this);
+    m_btCopyCncInntructions->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::copyCncInstructions, this);
+    m_btSaveCncInntructions->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::saveCncInstructions, this);
+    m_btCncInstructionsFirst->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onCncInstFirstClientId, this);
+    m_btCncInstructionsPrev->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onCncInstNextClientId, this);
+    m_btCncInstructionsNext->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onCncInstPrevClientId, this);
+    m_btCncInstructionsLast->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncPreprocessorBase::onCncInstLastClientId, this);
 }
 
 CncMotionVertexTraceBase::CncMotionVertexTraceBase(wxWindow* parent,

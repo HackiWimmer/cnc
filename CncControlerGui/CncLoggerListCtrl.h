@@ -114,9 +114,8 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		
 		void addSeparator();
 		
-		bool writeToFile(const wxFileName& fn, bool allRows=false);
-		bool copyToClipboard(bool allRows=false);
-		bool openAsTextView(bool allRows=false);
+		virtual bool writeToFile(const wxFileName& fn, bool allRows=false)		override;
+		virtual bool copyToClipboard(bool allRows=false)						override;
 		
 		void incCurrentIndent();
 		void decCurrentIndent();

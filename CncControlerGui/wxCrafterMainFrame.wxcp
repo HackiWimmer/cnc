@@ -36827,7 +36827,7 @@
 																																																}, {
 																																																	"type":	"string",
 																																																	"m_label":	"Value:",
-																																																	"m_value":	"00:00:00.123456"
+																																																	"m_value":	"00:00:00.000000"
 																																																}, {
 																																																	"type":	"string",
 																																																	"m_label":	"Text Hint",

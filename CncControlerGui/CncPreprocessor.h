@@ -36,11 +36,16 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void updateMoveSequenceListContent(bool force = false);
 		void detachView(CncExternalViewBox* viewbox);
 		
+		void copy(PreProcessorSelection::VAL type);
+		void save(PreProcessorSelection::VAL type);
+		
 	public:
 		enum ListType{ LT_PATH_LIST, LT_MOVE_SEQ_OVERVIEW, LT_MOVE_SEQ_CONTENT};
 
 		CncPreprocessor(wxWindow* parent);
 		virtual ~CncPreprocessor();
+		
+		unsigned long getCncInstructionCount() const;
 		
 		void select(PreProcessorSelection::VAL page);
 		
@@ -57,7 +62,7 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void enableOperatingTrace		(bool state);
 		void enableCncInstTrace			(bool state);
 		
-		void clearAll();
+		void clearAll(bool considerCncInst);
 		
 		void clearPathListEntries();
 		void addPathListEntries(const CncPathListManager& cpm);
@@ -77,6 +82,7 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void addOperatingTraceErrorEntry(const wxString& s);
 		
 		void clearCncInstructions();
+		void addCncInstructionCount		(unsigned long cnt);
 		void addCncInstructionTrace		(const wxString& s);
 		
 		void selectClientId(long id, CncPreprocessor::ListType lt);
@@ -84,6 +90,16 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void updateContent();
 
 	protected:
+		virtual void copyMoveSequences(wxCommandEvent& event);
+		virtual void copyPathListEntries(wxCommandEvent& event);
+		virtual void saveMoveSequences(wxCommandEvent& event);
+		virtual void savePathListEntries(wxCommandEvent& event);
+		virtual void copyCncInstructions(wxCommandEvent& event);
+		virtual void saveCncInstructions(wxCommandEvent& event);
+		virtual void onCncInstPrevClientId(wxCommandEvent& event);
+		virtual void onCncInstFirstClientId(wxCommandEvent& event);
+		virtual void onCncInstLastClientId(wxCommandEvent& event);
+		virtual void onCncInstNextClientId(wxCommandEvent& event);
 		virtual void onDetachCncInstructionView(wxCommandEvent& event);
 		virtual void clearCncInstructions(wxCommandEvent& event);
 		virtual void connectCncInstructions(wxCommandEvent& event);

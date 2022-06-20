@@ -182,7 +182,8 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 		ret = processLinearMove(false);
 		nextPath = false;
 	}
-	else {
+	else 
+	{
 		// Moving the path forward
 		const double moveX = ( c == 'M' ? values[0] - currentPos.getX() : values[0] );
 		const double moveY = ( c == 'M' ? values[1] - currentPos.getY() : values[1] );

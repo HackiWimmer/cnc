@@ -100,12 +100,14 @@ CncPreprocessor::~CncPreprocessor() {
 	wxDELETE( cncInstTrace ); 
 }
 //////////////////////////////////////////////////////////////////
-void CncPreprocessor::clearAll() {
+void CncPreprocessor::clearAll(bool considerCncInst) {
 //////////////////////////////////////////////////////////////////
 	clearPathListEntries();
 	clearMoveSequences();
 	clearOperatingTrace();
-	clearCncInstructions();
+	
+	if ( considerCncInst == true )
+		clearCncInstructions();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearPathListEntries() {
@@ -379,25 +381,12 @@ void CncPreprocessor::clearOperatingTrace(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::copyOperatingTrace(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
-	operatingTrace->copyToClipboard(true);
+	copy(PreProcessorSelection::VAL::OPERATIG_TRACE);
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::saveOperatingTrace(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
-	const wxString& fileName(wxString::Format("%s%s%s%s",	CncFileNameService::getTempDirSession(), 
-															"CncPreprocessorOperatingTrace", 
-															wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S"), 
-															".txt")
-											 );
-	const wxFileName fn(fileName);
-	
-	operatingTrace->writeToFile(fn, true);
-	
-	if ( fn.Exists() ) {
-		wxString tool;
-		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
-		GblFunc::executeExternalProgram(tool, fileName, true);
-	}
+	save(PreProcessorSelection::VAL::OPERATIG_TRACE);
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::detachView(CncExternalViewBox* viewbox) {
@@ -477,12 +466,23 @@ void CncPreprocessor::onMoveSequenceEntryLast(wxCommandEvent& event) {
 	moveSequenceOverview->skipToLastReference();
 }
 //////////////////////////////////////////////////////////////////
+void CncPreprocessor::addCncInstructionCount(unsigned long cnt) {
+//////////////////////////////////////////////////////////////////
+	m_cncInstructionsRowCount->ChangeValue(wxString::Format("%u", cnt));
+}
+//////////////////////////////////////////////////////////////////
 void CncPreprocessor::addCncInstructionTrace(const wxString& s) {
 //////////////////////////////////////////////////////////////////
 	if ( useCncInstTrace == false )
 		return;
 		
-	cncInstTrace->addDebugEntry(s);
+	if ( s.StartsWith("Trigger:") )		cncInstTrace->addErrorEntry(s);
+	else								cncInstTrace->addDebugEntry(s);
+}
+//////////////////////////////////////////////////////////////////
+unsigned long CncPreprocessor::getCncInstructionCount() const {
+//////////////////////////////////////////////////////////////////
+	return cncInstTrace->GetItemCount();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::connectCncInstructions(wxCommandEvent& event) {
@@ -498,4 +498,135 @@ void CncPreprocessor::clearCncInstructions(wxCommandEvent& event) {
 void CncPreprocessor::onDetachCncInstructionView(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 	detachView(externalCncInstructionView);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onCncInstFirstClientId(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	CNC_CERR_FUNCT_A("Implementation missing")
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onCncInstLastClientId(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	CNC_CERR_FUNCT_A("Implementation missing")
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onCncInstNextClientId(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	CNC_CERR_FUNCT_A("Implementation missing")
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onCncInstPrevClientId(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	CNC_CERR_FUNCT_A("Implementation missing")
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::copyCncInstructions(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	copy(PreProcessorSelection::VAL::CNC_INSTRUCTIONS);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::saveCncInstructions(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	save(PreProcessorSelection::VAL::CNC_INSTRUCTIONS);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::copyMoveSequences(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	copy(PreProcessorSelection::VAL::MOVE_SEQ_ENTRIES);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::copyPathListEntries(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	copy(PreProcessorSelection::VAL::PATH_LIST_ENTRIES);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::saveMoveSequences(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	save(PreProcessorSelection::VAL::MOVE_SEQ_ENTRIES);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::savePathListEntries(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	save(PreProcessorSelection::VAL::PATH_LIST_ENTRIES);
+}
+/////////////////////////////////////////////////////////////////
+void CncPreprocessor::copy(PreProcessorSelection::VAL type) {
+//////////////////////////////////////////////////////////////////
+	switch ( type )
+	{
+		case PreProcessorSelection::VAL::OPERATIG_TRACE:
+		{
+			operatingTrace->copyToClipboard(true);
+			break;
+		}
+		case PreProcessorSelection::VAL::PATH_LIST_ENTRIES:
+		{
+			pathListEntries->copyToClipboard(true);
+			break;
+		}
+		case PreProcessorSelection::VAL::MOVE_SEQ_ENTRIES:
+		{
+			moveSequenceOverview->copyToClipboard(true);
+			break;
+		}
+		case PreProcessorSelection::VAL::CNC_INSTRUCTIONS:
+		{
+			cncInstTrace->copyToClipboard(true);
+			break;
+		}
+	}
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::save(PreProcessorSelection::VAL type) {
+//////////////////////////////////////////////////////////////////
+	wxString token("Unknown");
+	CncLargeScaledListCtrl* ctrl = NULL;
+	
+	switch ( type )
+	{
+		case PreProcessorSelection::VAL::OPERATIG_TRACE:
+		{
+			token = "OperatingTrace";
+			ctrl  = operatingTrace;
+			break;
+		}
+		case PreProcessorSelection::VAL::PATH_LIST_ENTRIES:
+		{
+			token = "PathListEntries";
+			ctrl  = pathListEntries;
+			break;
+		}
+		case PreProcessorSelection::VAL::MOVE_SEQ_ENTRIES:
+		{
+			token = "SequenceOverview";
+			ctrl  = moveSequenceOverview;
+			break;
+		}
+		case PreProcessorSelection::VAL::CNC_INSTRUCTIONS:
+		{	
+			token = "CncInstructionsTrace";
+			ctrl  = cncInstTrace;
+			break;
+		}
+	}
+	
+	if ( ctrl == NULL )
+		return;
+	
+	const wxString& fileName(wxString::Format("%s%s-%s%s%s",	CncFileNameService::getTempDirSession(), 
+															"CncPreprocessor", 
+															token, 
+															wxDateTime::Now().Format("%Y-%m-%d.%H-%M-%S"), 
+															".txt")
+											 );
+	const wxFileName fn(fileName);
+	
+	ctrl->writeToFile(fn, true);
+	
+	if ( fn.Exists() ) 
+	{
+		wxString tool;
+		CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+		GblFunc::executeExternalProgram(tool, fileName, true);
+	}
 }

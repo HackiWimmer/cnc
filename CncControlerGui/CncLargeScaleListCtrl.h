@@ -2,6 +2,7 @@
 #define CNC_LARGE_SCALED_LIST_CTRL_H
 
 #include <vector>
+#include <wx/filename.h>
 #include <wx/arrstr.h>
 #include <wx/listctrl.h>
 
@@ -133,6 +134,10 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		
 		bool goForwardUnitlColumnChange(long item, long column);
 		bool goBackwardUnitlColumnChange(long item, long column);
+		
+		virtual bool writeToFile(const wxFileName& fn, bool allRows=false);
+		virtual bool copyToClipboard(bool allRows=false);
+		virtual bool openAsTextView(const wxString& title, bool allRows=false);
 		
 	protected:
 		

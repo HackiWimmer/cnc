@@ -1,6 +1,12 @@
 #include <iostream>
+#include <fstream>
 #include <climits>
+#include <wx/clipbrd.h>
+#include <wx/Filename.h>
+#include "CncCommon.h"
 #include "CncConfig.h"
+#include "CncFileNameService.h"
+#include "CncMessageDialog.h"
 #include "CncLargeScaleListCtrl.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -422,6 +428,103 @@ long CncLargeScaledListCtrl::searchRow(const wxString& what, int searchColumn) {
 	
 	return ret;
 }
-
+///////////////////////////////////////////////////////////////////
+bool CncLargeScaledListCtrl::writeToFile(const wxFileName& fn, bool allRows) {
+///////////////////////////////////////////////////////////////////
+	if ( fn.DirExists() == false ) 
+	{
+		std::cerr <<  CNC_LOG_FUNCT_A(": Invalid file name: ") << fn.GetFullPath() << std::endl;
+		return false;
+	}
+	
+	std::ofstream out(fn.GetFullPath().c_str().AsChar(), std::ofstream::out);
+	if ( !out.good() ) 
+	{
+		std::cerr <<  CNC_LOG_FUNCT_A(": Can't create file: ") << fn.GetFullPath() << std::endl;
+		return false;
+	}
+	
+	if ( GetItemCount() > 0 )
+	{
+		const long firstRow = allRows ? 0                  : GetTopItem();
+		const long lastRow  = allRows ? GetItemCount() - 1 : firstRow + std::min(GetCountPerPage(), GetItemCount() - 1);
+		
+			wxString content;
+			for ( long i = firstRow; i < lastRow; i++ )
+			{
+				for ( long c = 0; c < GetColumnCount(); c++ )
+				{
+					out << wxString::Format("%s\t", GetItemText(i, c));
+				}
+				
+				out << std::endl;
+			}
+	}
+	
+	out.close();
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncLargeScaledListCtrl::openAsTextView(const wxString& title, bool allRows) {
+///////////////////////////////////////////////////////////////////
+	const wxString& fileName(wxString::Format("%s%s%s", CncFileNameService::getTempDirSession(), typeid(this).name(), ".txt"));
+	const wxFileName fn(fileName);
+	
+	if ( writeToFile(fn, allRows) == false )
+		return false;
+	
+	// find the main window
+	wxWindow* parent = this;
+	while ( parent->GetParent() != NULL )
+		parent = parent->GetParent();
+	
+	const wxString headline(wxString::Format("%s List View", title));
+	CncFileContentDialog dlg(parent, fileName, allRows ? "Complete Content" : "Visible Content", headline);
+	dlg.SetSize(800, 900);
+	dlg.CenterOnParent();
+	dlg.setWordWrap(false);
+	dlg.ShowModal();
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncLargeScaledListCtrl::copyToClipboard(bool allRows) {
+///////////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	// Write the content of entries to the clipboard
+	if ( wxTheClipboard->Open() )
+	{
+		if ( GetItemCount() > 0 )
+		{
+			const long firstRow = allRows ? 0                  : GetTopItem();
+			const long lastRow  = allRows ? GetItemCount() - 1 : firstRow + std::min(GetCountPerPage(), GetItemCount() - 1 );
+			
+			wxString content;
+			for ( long i = firstRow; i < lastRow; i++ )
+			{
+				for ( long c = 0; c < GetColumnCount(); c++ )
+				{
+					content.append(wxString::Format("%s\t", GetItemText(i, c)));
+				}
+				
+				content.append("\n");
+			}
+			
+			// This data objects are held by the clipboard,
+			// so do not delete them in the app.
+			ret = wxTheClipboard->SetData( new wxTextDataObject(content) );
+		}
+		else 
+		{
+			ret = true;
+		}
+		
+		wxTheClipboard->Close();
+	}
+	
+	return ret;
+	
+}
 
 

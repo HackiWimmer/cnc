@@ -397,7 +397,7 @@ void CncLoggerView::onView(wxCommandEvent& event) {
 	if ( loggerLists.size() != MaxLoggerCount )
 		return;
 	
-	loggerLists.at(currentLoggerIndex)->openAsTextView();
+	loggerLists.at(currentLoggerIndex)->openAsTextView("CNC Logger");
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::onViewAll(wxCommandEvent& event) {
@@ -405,7 +405,7 @@ void CncLoggerView::onViewAll(wxCommandEvent& event) {
 	if ( loggerLists.size() != MaxLoggerCount )
 		return;
 	
-	loggerLists.at(currentLoggerIndex)->openAsTextView(true);
+	loggerLists.at(currentLoggerIndex)->openAsTextView("CNC Logger", true);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLoggerView::clear(LoggerSelection::VAL id) {

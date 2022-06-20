@@ -222,8 +222,8 @@ protected:
     wxBitmapButton* m_bmpButton304910;
     wxStaticText* m_staticText6138142;
     wxBitmapToggleButton* m_btConnectOperatingTrace;
-    wxBitmapButton* m_btClearOperatingTrace10;
-    wxBitmapButton* m_btClearOperatingTrace11;
+    wxBitmapButton* m_btCopyOperatingTrace;
+    wxBitmapButton* m_btSaveOperatingTrace;
     wxBitmapButton* m_btClearOperatingTrace;
     wxStaticLine* m_staticLine249;
     wxPanel* m_operatingTracePlaceholder;
@@ -237,6 +237,8 @@ protected:
     wxBitmapToggleButton* m_btConnectPathListEntries;
     wxBitmapToggleButton* m_btFormatPathList;
     wxBitmapButton* m_btClearPathListEntries;
+    wxBitmapButton* m_btCopyPathListEntries;
+    wxBitmapButton* m_btSavePathListEntries;
     wxStaticLine* m_staticLine285;
     wxBitmapButton* m_btPathListEntryFirst;
     wxBitmapButton* m_btPathListEntryPrev;
@@ -253,6 +255,8 @@ protected:
     wxStaticLine* m_staticLine7901;
     wxBitmapToggleButton* m_btConnectMoveSequences;
     wxBitmapButton* m_btClearMoveSequences;
+    wxBitmapButton* m_btCopyMoveSequences;
+    wxBitmapButton* m_btSaveMoveSequences;
     wxStaticLine* m_staticLine2854;
     wxBitmapButton* m_btMoveSeqFirst;
     wxBitmapButton* m_btMoveSeqPrev;
@@ -278,6 +282,8 @@ protected:
     wxStaticLine* m_staticLine79018;
     wxBitmapToggleButton* m_btConnectCncInstructions;
     wxBitmapButton* m_btClearCncInntructions;
+    wxBitmapButton* m_btCopyCncInntructions;
+    wxBitmapButton* m_btSaveCncInntructions;
     wxStaticLine* m_staticLine285412;
     wxBitmapButton* m_btCncInstructionsFirst;
     wxBitmapButton* m_btCncInstructionsPrev;
@@ -323,6 +329,14 @@ protected:
     {
 	event.Skip();
     }
+    virtual void copyPathListEntries(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void savePathListEntries(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
     virtual void onPathListEntryFirst(wxCommandEvent& event)
     {
 	event.Skip();
@@ -348,6 +362,14 @@ protected:
 	event.Skip();
     }
     virtual void clearMoveSequences(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void copyMoveSequences(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void saveMoveSequences(wxCommandEvent& event)
     {
 	event.Skip();
     }
@@ -379,6 +401,30 @@ protected:
     {
 	event.Skip();
     }
+    virtual void copyCncInstructions(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void saveCncInstructions(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCncInstFirstClientId(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCncInstNextClientId(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCncInstPrevClientId(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void onCncInstLastClientId(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
 
 public:
     wxBitmapButton* GetBmpButton304910()
@@ -393,13 +439,13 @@ public:
     {
 	return m_btConnectOperatingTrace;
     }
-    wxBitmapButton* GetBtClearOperatingTrace10()
+    wxBitmapButton* GetBtCopyOperatingTrace()
     {
-	return m_btClearOperatingTrace10;
+	return m_btCopyOperatingTrace;
     }
-    wxBitmapButton* GetBtClearOperatingTrace11()
+    wxBitmapButton* GetBtSaveOperatingTrace()
     {
-	return m_btClearOperatingTrace11;
+	return m_btSaveOperatingTrace;
     }
     wxBitmapButton* GetBtClearOperatingTrace()
     {
@@ -452,6 +498,14 @@ public:
     wxBitmapButton* GetBtClearPathListEntries()
     {
 	return m_btClearPathListEntries;
+    }
+    wxBitmapButton* GetBtCopyPathListEntries()
+    {
+	return m_btCopyPathListEntries;
+    }
+    wxBitmapButton* GetBtSavePathListEntries()
+    {
+	return m_btSavePathListEntries;
     }
     wxStaticLine* GetStaticLine285()
     {
@@ -516,6 +570,14 @@ public:
     wxBitmapButton* GetBtClearMoveSequences()
     {
 	return m_btClearMoveSequences;
+    }
+    wxBitmapButton* GetBtCopyMoveSequences()
+    {
+	return m_btCopyMoveSequences;
+    }
+    wxBitmapButton* GetBtSaveMoveSequences()
+    {
+	return m_btSaveMoveSequences;
     }
     wxStaticLine* GetStaticLine2854()
     {
@@ -616,6 +678,14 @@ public:
     wxBitmapButton* GetBtClearCncInntructions()
     {
 	return m_btClearCncInntructions;
+    }
+    wxBitmapButton* GetBtCopyCncInntructions()
+    {
+	return m_btCopyCncInntructions;
+    }
+    wxBitmapButton* GetBtSaveCncInntructions()
+    {
+	return m_btSaveCncInntructions;
     }
     wxStaticLine* GetStaticLine285412()
     {

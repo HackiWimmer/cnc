@@ -12,7 +12,6 @@
 #include "MainFrame.h"
 #include "GlobalFunctions.h"
 #include "CncFileNameService.h"
-#include "CncMessageDialog.h"
 #include "CncLoggerView.h"
 #include "CncLoggerListCtrl.h"
 
@@ -788,26 +787,3 @@ bool CncLoggerListCtrl::copyToClipboard(bool allRows) {
 	
 	return ret;
 }
-//////////////////////////////////////////////////
-bool CncLoggerListCtrl::openAsTextView(bool allRows) {
-//////////////////////////////////////////////////
-	const wxString& fileName(wxString::Format("%s%s", CncFileNameService::getTempDirSession(), "CncLoggerListCtrl.txt"));
-	const wxFileName fn(fileName);
-	
-	if ( writeToFile(fn, allRows) == false )
-		return false;
-	
-	// find the main window
-	wxWindow* parent = this;
-	while ( parent->GetParent() != NULL )
-		parent = parent->GetParent();
-	
-	CncFileContentDialog dlg(parent, fileName, allRows ? "Complete Content" : "Visible Content", "Cnc Logger List View");
-	dlg.SetSize(800, 900);
-	dlg.CenterOnParent();
-	dlg.setWordWrap(false);
-	dlg.ShowModal();
-	
-	return true;
-}
-
