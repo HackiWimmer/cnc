@@ -150,38 +150,48 @@ void CncZView::updateView(double val) {
 	if ( THE_CONTEXT->isOnlineUpdateCoordinates() == false )
 		return;
 	
-	if ( cnc::dblCompare(maxValue, THE_BOUNDS->getMaxDimensionMetricZ() * scale) == false ) {
-		maxValue = THE_BOUNDS->getMaxDimensionMetricZ() * scale;
-		resetWaterMarks();
-		refresh(RT_ALL);
+	if ( THE_CONTEXT->isProcessing() == false )
+	{
+		if ( cnc::dblCompare(maxValue, THE_BOUNDS->getMaxDimensionMetricZ() * scale) == false )
+		{
+			maxValue = THE_BOUNDS->getMaxDimensionMetricZ() * scale;
+			resetWaterMarks();
+			refresh(RT_ALL);
+		}
+		
+		if ( cnc::dblCompare(durationThickness, THE_CONFIG->getMaxDurationThickness()) == false )
+		{
+			durationThickness = THE_CONFIG->getMaxDurationThickness();
+			resetWaterMarks();
+			refresh(RT_ALL);
+		}
+		
+		if ( cnc::dblCompare(workPieceThickness, THE_BOUNDS->getWorkpieceThickness()) == false )
+		{
+			resetWaterMarks();
+			workPieceThickness = THE_BOUNDS->getWorkpieceThickness();
+			refresh(RT_WORKPIECE);
+		}
+		
+		if ( cnc::dblCompare(workPieceOffset, THE_CONFIG->getWorkpieceOffset()) == false ) 
+		{
+			workPieceOffset = THE_CONFIG->getWorkpieceOffset();
+			resetWaterMarks();
+			refresh(RT_WORKPIECE);
+		}
 	}
 	
-	if ( cnc::dblCompare(durationThickness, THE_CONFIG->getMaxDurationThickness()) == false ) {
-		durationThickness = THE_CONFIG->getMaxDurationThickness();
-		resetWaterMarks();
-		refresh(RT_ALL);
-	}
-	
-	if ( cnc::dblCompare(workPieceThickness, THE_BOUNDS->getWorkpieceThickness()) == false ) {
-		resetWaterMarks();
-		workPieceThickness = THE_BOUNDS->getWorkpieceThickness();
-		refresh(RT_WORKPIECE);
-	}
-	
-	if ( cnc::dblCompare(workPieceOffset, THE_CONFIG->getWorkpieceOffset()) == false ) {
-		workPieceOffset = THE_CONFIG->getWorkpieceOffset();
-		resetWaterMarks();
-		refresh(RT_WORKPIECE);
-	}
-	
-	if ( cnc::dblCompare(value, val) == false ) {
+	if ( cnc::dblCompare(value, val) == false ) 
+	{
 		value = val;
-		if ( value == 0.0 || value < lowWaterMark )  	setLowWaterMark(value);
+		if ( value == 0.0 || value < lowWaterMark )		setLowWaterMark(value);
 		if ( value > highWaterMark ) 					setHighWaterMark(value);
 		
 		// adjust visible range
-		while ( convertPosition(value) < 0 ) {
+		while ( convertPosition(value) < 0 ) 
+		{
 			setScale(scale + 0.1, 1.0);
+			
 			if (scale >= 1.0 )
 				break;
 		}

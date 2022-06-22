@@ -96,7 +96,8 @@ void CncPosSpyListCtrl::setPositionType(CncPosSpyListCtrl::PosType pt) {
 /////////////////////////////////////////////////////////////
 	posType = pt;
 	
-	switch( posType ) {
+	switch( posType )
+	{
 		case PT_APP:	SetItemCount(appPositionEntries.size()); break;
 		case PT_CTL:	SetItemCount(ctlPositionEntries.size()); break;
 	}
@@ -110,8 +111,10 @@ void CncPosSpyListCtrl::addAppPosition(unsigned char pid, long id, char speedMod
 /////////////////////////////////////////////////////////////
 	appPositionEntries.push_back(std::move(PositionEntry(pid, id, speedMode, cfgSpeedValue, curSpeedValue, pos)));
 	
-	if ( posType == PT_APP )	SetItemCount(appPositionEntries.size());
-	else						SetItemCount(ctlPositionEntries.size());
+	// To minimize the performance impact of SetItemCount(...)
+	// for large list content, it will be called ones at onPaint(...).
+	//if ( posType == PT_APP )	SetItemCount(appPositionEntries.size());
+	//else						SetItemCount(ctlPositionEntries.size());
 	
 	if ( IsShownOnScreen() == true )
 		if ( displayTimer.IsRunning() == false )
@@ -122,8 +125,10 @@ void CncPosSpyListCtrl::addCtlPosition(unsigned char pid, long id, char speedMod
 /////////////////////////////////////////////////////////////
 	ctlPositionEntries.push_back(std::move(PositionEntry(pid, id, speedMode, cfgSpeedValue, curSpeedValue, pos)));
 	
-	if ( posType == PT_APP )	SetItemCount(appPositionEntries.size());
-	else						SetItemCount(ctlPositionEntries.size());
+	// To minimize the performance impact of SetItemCount(...)
+	// for large list content, it will be called ones at onPaint(...).
+	//if ( posType == PT_APP )	SetItemCount(appPositionEntries.size());
+	//else						SetItemCount(ctlPositionEntries.size());
 	
 	if ( IsShownOnScreen() == true )
 		if ( displayTimer.IsRunning() == false )
@@ -265,6 +270,9 @@ void CncPosSpyListCtrl::onDisplayTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////
 void CncPosSpyListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
+	if ( posType == PT_APP )	SetItemCount(appPositionEntries.size());
+	else						SetItemCount(ctlPositionEntries.size());
+
 	long items = 0;
 	if ( THE_APP->GetBtTogglePosSpy() )
 		items = GetItemCount();

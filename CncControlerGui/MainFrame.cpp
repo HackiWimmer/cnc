@@ -1795,7 +1795,8 @@ void MainFrame::addSetter(unsigned char pid, const cnc::SetterValueList& v) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::addAppPosition(unsigned char pid, long id, char speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
-	if ( m_btTogglePosSpy->GetValue() == true ) {
+	if ( m_btTogglePosSpy->GetValue() == true )
+	{
 		positionSpy->addAppPosition(	pid, 
 										id, 
 										speedMode, 
@@ -1810,7 +1811,8 @@ void MainFrame::addAppPosition(unsigned char pid, long id, char speedMode, doubl
 ///////////////////////////////////////////////////////////////////
 void MainFrame::addCtlPosition(unsigned char pid, long id, char speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
-	if ( m_btTogglePosSpy->GetValue() == true ) {
+	if ( m_btTogglePosSpy->GetValue() == true )
+	{
 		positionSpy->addCtlPosition(	pid, 
 										id, 
 										speedMode, 

@@ -1504,12 +1504,14 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 ///////////////////////////////////////////////////////////////////
 	static CncLongPosition lastAppPos;
 	
-	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) {
+	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) 
+	{
 		// app positions are always from type major
 		// so || pid == PID_XYZ_POS_MAJOR isn't necessary
 		// the comparison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
-		if ( lastAppPos != curAppPos || force == true) {
+		if ( lastAppPos != curAppPos || force == true)
+		{
 			PositionStorage::addPos(PositionStorage::TRIGGER_APP_POS, curAppPos);
 			
 			THE_APP->addAppPosition(	pid, 
@@ -1527,7 +1529,8 @@ void CncControl::postAppPosition(unsigned char pid, bool force) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::postCtlPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->isOnlineUpdateCoordinates() ) {
+	if ( THE_CONTEXT->isOnlineUpdateCoordinates() )
+	{
 		PositionStorage::addPos(PositionStorage::TRIGGER_CTL_POS, curCtlPos);
 		
 		// a position comparison isn't necessary here because the serialControllerCallback(...)
