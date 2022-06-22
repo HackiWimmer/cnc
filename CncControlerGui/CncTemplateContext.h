@@ -55,6 +55,7 @@ class CncTemplateContext : public ContextInterface {
 		void				resetValidRuns()						{ validRunCount = 0; }
 		void				registerValidRun()						{ validRunCount++; updateGui(false); }
 		bool				registerCncInterface(CncPathListInterfaceCnc* ci);
+		void				unregisterCncInterface();
 		bool				hasValidRuns()					const	{ return validRunCount > 0; }
 		bool				getModifyFlag()					const	{ return modifyFlag; }
 		unsigned int		getValidRunCount()				const	{ return validRunCount; }

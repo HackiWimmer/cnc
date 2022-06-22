@@ -315,6 +315,11 @@ void CncTemplateContext::notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTup
 	ContextInterface::notifyStepperSpeed(pid, s);
 }
 //////////////////////////////////////////////////////////////
+void CncTemplateContext::unregisterCncInterface() {
+//////////////////////////////////////////////////////////////
+	cncInterface = NULL;
+}
+//////////////////////////////////////////////////////////////
 bool CncTemplateContext::registerCncInterface(CncPathListInterfaceCnc* ci) {
 //////////////////////////////////////////////////////////////
 	if ( ci == NULL )
@@ -328,6 +333,10 @@ bool CncTemplateContext::executeCncInterface() {
 //////////////////////////////////////////////////////////////
 	if ( cncInterface == NULL )
 		return false;
-		
+	
+	
+	#warning !!! this crashes if the serial was changed
+	
+	
 	return cncInterface->spoolInstructions();
 }

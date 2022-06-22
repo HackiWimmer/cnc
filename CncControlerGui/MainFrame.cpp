@@ -3074,6 +3074,7 @@ bool MainFrame::connectSerialPort() {
 	
 	// this has to be done after enableControls(), otherwise the state can
 	// no be reproduced after the next disableControls()!
+	m_rcDryRun->Enable(cnc->dryRunAvailable());
 	secureCtrlPanel->GetBtDryRunSec()->Enable(cnc->dryRunAvailable());
 	secureCtrlPanel->GetBtTemplateContextSec()->Enable(cnc->dryRunAvailable());
 	
@@ -3101,8 +3102,8 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	serialFileName.clear();
 	cnc = NULL;
 	
-	struct InitialSetup {
-		
+	struct InitialSetup 
+	{
 		wxString serialFileName		= "";
 		wxString description		= "";
 		bool probeMode				= false;
@@ -3218,7 +3219,8 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	}
 	
 	const bool startDisabled = false;
-	if ( startDisabled == true ) {
+	if ( startDisabled == true ) 
+	{
 		cnc::cex1 << "MainFrame::createCncControl(): Flag startDisabled is active!" << std::endl;
 		setup.pathListEntries	= false;
 		setup.moveSequences		= false;
@@ -4945,8 +4947,10 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 			wxString msg(ss.str().c_str());
 			std::clog << "Boundary Failure . . ." << std::endl;
 			
-			if		( msg.StartsWith("Error") )		std::cerr << msg;
-			else if	( msg.StartsWith("Warning") )	cnc::cex1 << msg;
+			REGISTER_NEXT_LOGGER_ROW
+			
+			if		( msg.StartsWith("Error") )		{ SET_RESULT_FOR_REGISTERED_LOGGER_ROW_ERROR;   std::cerr << msg; }
+			else if	( msg.StartsWith("Warning") )	{ SET_RESULT_FOR_REGISTERED_LOGGER_ROW_WARNING; cnc::cex1 << msg; }
 			else									std::cout << msg;
 			
 			// if hardware is available interact with the user in this case
@@ -5417,12 +5421,14 @@ bool MainFrame::saveTemplateOnDemand(bool force) {
 		
 		int ret = force ? wxID_YES : dlg.ShowModal();
 		
-		if ( ret == wxID_YES ) {
+		if ( ret == wxID_YES )
+		{
 			saveFile();
 			selectMonitorBookCncPanel();
 			
 		} 
-		else if ( ret == wxID_CANCEL ) {
+		else if ( ret == wxID_CANCEL ) 
+		{
 			return false;
 		}
 	}

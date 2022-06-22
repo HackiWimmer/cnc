@@ -49,10 +49,18 @@ CncPathListInterfaceCnc::CncPathListInterfaceCnc(CncControl* cc)
 { 
 	wxASSERT ( cnc != NULL ); 
 	cncInstructions.reserve(1024);
+	
+	// This keeps the reference invisible until
+	// registerCncInterface(this) at processTrigger(const Trigger::EndRun& tr)
+	// is called
+	THE_TPL_CTX->unregisterCncInterface();
 }
 ////////////////////////////////////////////////////////////////////
 CncPathListInterfaceCnc::~CncPathListInterfaceCnc() {
 ////////////////////////////////////////////////////////////////////
+	// remove the reference pointer again
+	// because this becomes invalid after this ctor
+	THE_TPL_CTX->unregisterCncInterface();
 }
 
 ////////////////////////////////////////////////////////////////////

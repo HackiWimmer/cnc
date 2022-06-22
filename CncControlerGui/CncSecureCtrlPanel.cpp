@@ -1,3 +1,4 @@
+#include <wx/richmsgdlg.h>
 #include "MainFrame.h"
 #include "wxCrafterImages.h"
 #include "GlobalStrings.h"
@@ -296,6 +297,38 @@ void CncSecureCtrlPanel::onEmergencySec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onRunSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	CncControl* cnc = THE_APP->getCncControl();
+	if ( cnc && cnc->dryRunAvailable() )
+	{
+		if ( THE_TPL_CTX->isValid() == false )
+		{
+			wxString msg("The current Template status is valid!\nChoose what you really want?");
+
+			wxRichMessageDialog dlg(this, msg, _T("Template State . . . "), 
+								wxYES|wxNO|wxCANCEL|wxCENTRE);
+			
+			dlg.SetFooterText("It is strictly recommend to perform a Template Run only based on a Dry Run with a valid state!");
+			dlg.SetFooterIcon(wxICON_WARNING);
+			dlg.SetYesNoCancelLabels("Start a Dry Run", "Start a Run", "Cancel") ;
+			
+			int ret = dlg.ShowModal();
+			
+			if      ( ret == wxID_CANCEL )
+			{ 
+				// still return 
+				return; 
+			}
+			else if ( ret == wxID_YES )
+			{
+				// start a dry run and return
+				THE_APP->rcDryRun(event); 
+				return; 
+			}
+			
+			//... run
+		}
+	}
+	
 	THE_APP->rcRun(event);
 }
 /////////////////////////////////////////////////////////////////////

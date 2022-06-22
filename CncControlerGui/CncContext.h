@@ -52,7 +52,8 @@ struct CncContext {
 		wxFont outboundListBookFont		= wxFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 		
 		// ----------------------------------------------------------------
-		struct SecureModeInfo {
+		struct SecureModeInfo 
+		{
 			bool useIt						= false;
 			bool isActive					= false;
 			bool isActivatedByStartup		= false;

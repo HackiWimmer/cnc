@@ -20,14 +20,16 @@ END_EVENT_TABLE()
 	void CncSvgViewer::Init() {
 	/////////////////////////////////////////////////////////////////////
 		wxSVGCtrl::Init();
+		init();
 	}
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::OnPaint(wxPaintEvent& event) {
 	/////////////////////////////////////////////////////////////////////
 		wxSVGCtrl::OnPaint(event);
 		return;
-		
-		if ( IsShownOnScreen() ) {
+		/*
+		if ( IsShownOnScreen() ) 
+		{
 			// this overrides the default behaviour to get access to adjust the background colour
 			if (!m_doc)				m_buffer = wxBitmap();
 			else if (m_repaint)		RepaintBuffer();
@@ -44,6 +46,7 @@ END_EVENT_TABLE()
 			if (m_buffer.IsOk())
 				dc.DrawBitmap(m_buffer, 0, 0);
 		}
+		*/
 	}
 	/////////////////////////////////////////////////////////////////////
 	void CncSvgViewer::OnResize(wxSizeEvent& event) {
@@ -65,15 +68,19 @@ END_EVENT_TABLE()
 		wxSVGCtrl::RepaintBuffer();
 		return;
 		
-		if ( IsShownOnScreen() ) {
-			
+		/*
+		if ( IsShownOnScreen() ) 
+		{
 			int w = -1, h = -1;
 			if (m_fitToFrame)
 				GetClientSize(&w, &h);
 
-			if (m_repaintRect.width > 0 && m_repaintRect.height > 0
-					&& (m_repaintRect.width < 2 * m_buffer.GetWidth() / 3
-							|| m_repaintRect.height < 2 * m_buffer.GetHeight() / 3)) {
+			if (   m_repaintRect.width > 0 
+				&& m_repaintRect.height > 0
+				&& (m_repaintRect.width < 2 * m_buffer.GetWidth()  / 3
+				|| m_repaintRect.height < 2 * m_buffer.GetHeight() / 3)
+				) 
+			{
 				m_repaintRect.x = wxMax(m_repaintRect.x, 0);
 				m_repaintRect.y = wxMax(m_repaintRect.y, 0);
 				wxSVGRect rect(m_repaintRect.x / GetScaleX(), m_repaintRect.y / GetScaleY(),
@@ -83,7 +90,8 @@ END_EVENT_TABLE()
 				dc.SelectObject(m_buffer);
 				dc.DrawBitmap(bitmap, m_repaintRect.x, m_repaintRect.y);
 			} 
-			else {
+			else 
+			{
 				const wxImage img(m_doc->Render(w, h));
 				
 				if ( img.IsOk() )	m_buffer = wxBitmap(img);
@@ -92,6 +100,7 @@ END_EVENT_TABLE()
 			
 			m_repaintRect = wxRect();
 		}
+		*/
 	}
 	
 	/////////////////////////////////////////////////////////////////////
@@ -116,12 +125,14 @@ void CncSvgViewer::OnMouse(wxMouseEvent& event) {
 	if ( canSize == false )
 		return;
 		
-	if ( event.GetWheelRotation() != 0 ) {
+	if ( event.GetWheelRotation() != 0 ) 
+	{
 		wxSize clientSize = GetClientSize();
 		
 		const int rot = event.GetWheelRotation();
 		
-		if ( rot != 0 ) {
+		if ( rot != 0 ) 
+		{
 			rot < 0 ? clientSize.Scale(0.9, 0.9) : clientSize.Scale(1.1, 1.1);
 			
 			SetClientSize(clientSize);
@@ -162,6 +173,7 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 	
 		{
 			CncStringLogger tmpLogger;
+			
 			const bool ret = Load(filename);
 			if ( ret == false ) {
 				
