@@ -66,9 +66,11 @@ class CncTemplateContext : public ContextInterface
 		bool				hasBoundaries()						const;
 		BoundType 			getBoundLevel()						const;
 		
-		const wxString&		getName()						const	{ return name; }
-		const wxString&		getPath()						const	{ return path; }
-		const wxString		getFileName()					const;
+		const wxString&		getName()							const	{ return name; }
+		const wxString&		getPath()							const	{ return path; }
+		const wxString		getFileName()						const;
+		CncTemplateFormat	getTemplateFormat()					const;
+		bool				isTemplateFormat(CncTemplateFormat)	const;
 		
 		void				registerToolTotList(const wxString& tl)	{ toolTotList.assign(tl); }
 		void				registerToolSelList(const wxString& tl)	{ toolSelList.assign(tl); }

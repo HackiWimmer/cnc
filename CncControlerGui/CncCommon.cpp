@@ -393,7 +393,8 @@ const char* cnc::getTemplateFormatAsString(const CncTemplateFormat tf) {
 //////////////////////////////////////////////////////////////
 const char* cnc::getExtention(const CncTemplateFormat tf) {
 //////////////////////////////////////////////////////////////
-	switch ( tf ) {
+	switch ( tf ) 
+	{
 		case TplUnknown:	return "unknown";
 		case TplText:		return "txt";
 		case TplSvg:		return "svg";
@@ -432,6 +433,30 @@ const CncTemplateFormat cnc::getTemplateFormatFromFileName(const char* fileName)
 	wxString ext(fn.GetExt());
 	
 	return cnc::getTemplateFormatFromExtention(ext);
+}
+//////////////////////////////////////////////////////////////
+bool cnc::isFileTemplate(const CncTemplateFormat tf) {
+//////////////////////////////////////////////////////////////
+	switch ( tf ) 
+	{
+		case TplText:
+		case TplSvg:
+		case TplGcode:
+		case TplBinary:	return true;
+		default: 		;
+	}
+	
+	return false;
+}
+//////////////////////////////////////////////////////////////
+bool cnc::isManuallyTemplate(const CncTemplateFormat tf) {
+//////////////////////////////////////////////////////////////
+	return tf == TplManual; 
+}
+//////////////////////////////////////////////////////////////
+bool cnc::isTestTemplate(const CncTemplateFormat tf) {
+//////////////////////////////////////////////////////////////
+	return tf == TplTest; 
 }
 //////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream& os, const wxPoint& p) {

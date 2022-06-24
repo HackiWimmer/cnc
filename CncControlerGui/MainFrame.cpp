@@ -4157,7 +4157,8 @@ void MainFrame::openTemplateExtern() {
 ///////////////////////////////////////////////////////////////////
 	wxString tool;
 	
-	switch ( getCurrentTemplateFormat() ) {
+	switch ( getCurrentTemplateFormat() ) 
+	{
 		case TplBinary:
 					// binary files are readonly, thereforenow saveFile() necessary here
 					THE_CONFIG->getBINFileViewer(tool);
@@ -5096,7 +5097,7 @@ bool MainFrame::processTemplate(bool confirm) {
 		
 		//-----------------------------------------------------------------
 		// prepare all relevant settings from here on . . . 
-		const bool useExistingCncInstructions = THE_TPL_CTX->isValid();
+		const bool useExistingCncInstructions = THE_TPL_CTX->isValid() && cnc::isFileTemplate(getCurrentTemplateFormat());
 		
 		// if template boundaries available prepare the motion monitor 
 		// to the best size (scale) and origin placement
@@ -5260,37 +5261,6 @@ bool MainFrame::processTemplate(bool confirm) {
 // don't call this method directly, instead use processTemplate()
 bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 ///////////////////////////////////////////////////////////////////
-/*
-	CncRunAnimationControl rac(this);
-	
-	clearPositionSpy();
-	
-	if ( THE_CONTEXT->secureModeInfo.isActive == false )
-	{
-		showAuiPane("Outbound");
-		selectMonitorBookCncPanel();
-		
-		// select draw pane
-		selectMonitorBookCncPanel();
-	}
-	
-	// select template Page
-	if ( m_mainViewBook->GetSelection() != MainBookSelection::VAL::MANUEL_PANEL && 
-	     m_mainViewBook->GetSelection() != MainBookSelection::VAL::TEST_PANEL && 
-	     m_mainViewBook->GetSelection() != MainBookSelection::VAL::SOURCE_PANEL &&
-	     m_mainViewBook->GetSelection() != MainBookSelection::VAL::SETUP_PANEL)
-	{
-		selectMainBookSourcePanel();
-	}
-	
-	THE_CONTEXT->timestamps.logTotalTimeStart();
-	motionMonitor->pushProcessMode();
-	
-	cnc->setStepDelay(THE_CONFIG->getArtificallyStepDelay());
-	disableControls();
-	resetMinMaxPositions();
-	notifyConfigUpdate();
-*/
 	const bool forceSave = m_btSvgToggleAutoSaveTplOnProcess->GetValue();
 	
 	if ( getCurrentTemplateFormat() != TplManual )

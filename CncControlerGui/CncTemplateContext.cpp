@@ -54,6 +54,12 @@ bool CncTemplateContext::isValid() const {
 //////////////////////////////////////////////////////////////
 bool CncTemplateContext::fitsIntoCurrentHardwareBoundaries(std::ostream& o) {
 //////////////////////////////////////////////////////////////
+	//the following check a only meaningful for file templates
+	// in all other cases fit per default
+	if ( getFileName().IsEmpty() || cnc::isFileTemplate(getTemplateFormat()) == false )
+		return true;
+
+	// start checking . . . 
 	if ( boundarySpace == NULL )
 	{
 		o << "Error:\n Invalid pointer!\n";
@@ -127,6 +133,16 @@ const wxString CncTemplateContext::getFileName() const {
 //////////////////////////////////////////////////////////////
 	wxString ret(wxFileName(path, name).GetFullPath());
 	return ret;
+}
+//////////////////////////////////////////////////////////////
+CncTemplateFormat CncTemplateContext::getTemplateFormat() const {
+//////////////////////////////////////////////////////////////
+	return cnc::getTemplateFormatFromFileName(getFileName());
+}
+//////////////////////////////////////////////////////////////
+bool CncTemplateContext::isTemplateFormat(CncTemplateFormat tf) const {
+//////////////////////////////////////////////////////////////
+	return tf == getTemplateFormat();
 }
 //////////////////////////////////////////////////////////////
 bool CncTemplateContext::init(const wxString& pathFileName) {

@@ -256,6 +256,9 @@ namespace cnc
 	int16_t						cvnSpindleSpeed_U_MIN_ToRaw(double value);
 	int32_t						cnvSpidleSpeedRaw_To_U_MIN(int16_t value);
 	
+	bool						isFileTemplate(const CncTemplateFormat tf);
+	bool						isManuallyTemplate(const CncTemplateFormat tf);
+	bool						isTestTemplate(const CncTemplateFormat tf);
 	const CncTemplateFormat		getTemplateFormatFromFileName(const char* fileName);
 	const CncTemplateFormat		getTemplateFormatFromExtention(const char* extention);
 	const char*					getTemplateFormatAsString(const CncTemplateFormat tf);
