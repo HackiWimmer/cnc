@@ -242,7 +242,14 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			wxDynamicCast(prop, CncCfgSliderProperty)->setEditable(false);
 			wxDynamicCast(prop, CncCfgSliderProperty)->setDecimalPlaces(0);
 			registerProperty(CncWork_Ctl_ARTIFICIALLY_STEP_DELAY, prop);
-
+			
+			//...............
+			prop = cCtl->AppendChild( new wxBoolProperty("Use Position Syp", NEXT_PROP_ID, false));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_USE_POSITION_SPY, prop);
+			
 			//...............
 			prop = cCtl->AppendChild( new wxBoolProperty("Avoid sending of duplicate Setter values", NEXT_PROP_ID, true));
 			prop->Enable(true);

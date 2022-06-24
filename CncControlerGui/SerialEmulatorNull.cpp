@@ -33,6 +33,8 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , ignoreLimitViolations					(true)
 , interactiveMove						(false)
 , stepperEnableState					(false)
+, spindlePowerState						(SPINDLE_STATE_OFF)
+, spindleSpeedFact						(0L)
 , interactiveX							(0L)
 , interactiveY							(0L)
 , interactiveZ							(0L)
@@ -711,16 +713,20 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_GETTER);
 	
-	switch ( pid ) {
+	switch ( pid ) 
+	{
 		
-		case PID_QUERY_READY_TO_RUN:	    writerGetterValues(pid, (int32_t)isReadyToRun()); break;
-		case PID_ENABLE_STEPPERS:	    	writerGetterValues(pid, (int32_t)stepperEnableState); break;
+		case PID_QUERY_READY_TO_RUN:		writerGetterValues(pid, (int32_t)isReadyToRun()); break;
+		case PID_ENABLE_STEPPERS:			writerGetterValues(pid, (int32_t)stepperEnableState); break;
 		
-		case PID_X_POS:   					writerGetterValues(pid, curEmulatorPos.getX()); break;
-		case PID_Y_POS:   					writerGetterValues(pid, curEmulatorPos.getY()); break;
-		case PID_Z_POS:  					writerGetterValues(pid, curEmulatorPos.getZ()); break;
-		case PID_XY_POS:  					writerGetterValues(pid, curEmulatorPos.getX(), curEmulatorPos.getY()); break;
-		case PID_XYZ_POS: 					writerGetterValues(pid, curEmulatorPos.getX(), curEmulatorPos.getY(), curEmulatorPos.getZ()); break;
+		case PID_SPINDLE_SWITCH:			writerGetterValues(pid, (int32_t)spindlePowerState); break;
+		case PID_SPINDLE_SPEED:				writerGetterValues(pid, spindleSpeedFact); break;
+		
+		case PID_X_POS:						writerGetterValues(pid, curEmulatorPos.getX()); break;
+		case PID_Y_POS:						writerGetterValues(pid, curEmulatorPos.getY()); break;
+		case PID_Z_POS:						writerGetterValues(pid, curEmulatorPos.getZ()); break;
+		case PID_XY_POS:					writerGetterValues(pid, curEmulatorPos.getX(), curEmulatorPos.getY()); break;
+		case PID_XYZ_POS:					writerGetterValues(pid, curEmulatorPos.getX(), curEmulatorPos.getY(), curEmulatorPos.getZ()); break;
 		
 		case PID_LIMIT:						evaluateLimitStates();
 											writerGetterValues(pid, limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
@@ -788,13 +794,26 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 		setterMap[pid] = values;
 
 		// -------------------------------------------------------------
-		auto setupACM = [&](float AA, float AB, float AC, float DA, float DB, float DC) {
+		auto setupACM = [&](float AA, float AB, float AC, float DA, float DB, float DC) 
+		{
 			Function fA(AA, AB, AC), fD(DA, DB, DC);
 			ArduinoAccelManager::initialize(fA, fD);
 		};
 
 		// special handling for later use
-		switch ( pid ) {
+		switch ( pid ) 
+		{
+			case PID_SPINDLE_SWITCH:
+			{
+				spindlePowerState = (bool)( values.size() > 0 ? values.front() : 0 ); 
+				break;
+			}
+			case PID_SPINDLE_SPEED:
+			{
+				spindleSpeedFact: ( values.size() > 0 ? values.front() : 0L ); 
+				break;
+			}
+		
 			case PID_ENABLE_STEPPERS:
 			{
 				stepperEnableState = (bool)( values.size() > 0 ? values.front() : 0 ); 

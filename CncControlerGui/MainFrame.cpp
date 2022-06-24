@@ -1329,37 +1329,28 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 	cnc::trc.logDebugMessage("Test function 2");
 	THE_CONTEXT->templateContext->traceContextEntriesTo(cnc::cex3);
 }
-#include "CncVector.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	CncDoubleMatrix4x4 m;
-	m.setTranslation(1.0, 1.0, 0.0);
-	m.setRotationAxisZ(90.0);
+	cnc::trc.logDebugMessage("Test function 3");
 	
-	double x = 1.0, y = 0.0, z = 0.0;
-	
-	m.transform(x, y, z);
-	CNC_CEX3_A("%lf, %lf, %lf", x, y, z)
-	
-	
-	//std::cex3 << m << std::endl;
+	cnc->switchSpindleOn();
+	std::cout << "SPS: " << cnc->evaluateSpindlePowerState() << std::endl;
 }
-#include "CncFlowPositionConverter.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
 	
-	CncFlowPositionConverter flowCnv;
+	cnc->switchSpindleOff();
+	std::cout << "SPS: " << cnc->evaluateSpindlePowerState() << std::endl;
+	/*
+	GetterValues gv;
+	cnc->processGetter(PID_SPINDLE_SWITCH, gv);
 	
-	CncDoublePosition pos(0.565, 1.12, -12.45);
-	// add given movements
-	flowCnv.set(pos.getX(), pos.getY(), pos.getZ());
-	
-	// the the converted values
-	const CncLongPosition& p = flowCnv.get();
-	CNC_CLOG_A("%ld, %ld, %ld    -    %ld, %ld, %ld", p.getX(), p.getY(), p.getZ(), (int32_t)round(pos.getX() * THE_CONFIG->getCalculationFactX() ), (int32_t)round(pos.getY() * THE_CONFIG->getCalculationFactY() ), (int32_t)round(pos.getZ() * THE_CONFIG->getCalculationFactZ() ));
+	if ( gv.size() > 0 )
+		std::cout << gv[0] << std::endl;
+	*/
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -2753,7 +2744,7 @@ void MainFrame::initialize(void) {
 	decorateSearchButton();
 	switchMonitorButton(true);
 	determineRunMode();
-	decoratePosSpyConnectButton(false);
+	decoratePosSpyConnectButton(THE_CONFIG->getUsePositionSpyFlag());
 	decorateSecureDlgChoice(true);
 	registerGuiControls();
 	decorateOutboundSaveControls(false);
@@ -4202,6 +4193,8 @@ bool MainFrame::saveFile(bool interactive) {
 	// Deactivate observer
 	CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
 	
+	THE_TPL_CTX->resetValidRuns();
+	
 	wxASSERT(sourceEditor);
 	bool ret = sourceEditor->saveFile();
 	
@@ -5043,6 +5036,11 @@ bool MainFrame::processTemplate(bool confirm) {
 		
 		CncRunAnimationControl rac(this);
 		
+		// deactivate idle requests
+		// do this already here because the checks below already perform 
+		// cnc commands
+		CNC_TRANSACTION_LOCK_RET_ON_ERROR(false)
+
 		//-----------------------------------------------------------------
 		// all mandatory checks from here on . . . 
 		
@@ -5085,9 +5083,6 @@ bool MainFrame::processTemplate(bool confirm) {
 		// deactivate all relevant behaviours from here on . . . 
 		
 		CncRunEventFilter cef;
-		
-		// deactivate idle requests
-		CNC_TRANSACTION_LOCK_RET_ON_ERROR(false)
 		
 		// Deactivate observer
 		CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
@@ -5410,8 +5405,8 @@ void MainFrame::resetMinMaxPositions() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::saveTemplateOnDemand(bool force) {
 ///////////////////////////////////////////////////////////////////
-	if ( sourceEditor->IsModified() == true ) {
-		
+	if ( sourceEditor->IsModified() == true )
+	{
 		const wxString msg(wxString::Format("Save Template?\n\n '%s'", getCurrentTemplatePathFileName()));
 		wxRichMessageDialog dlg(this, msg, _T("File Observer . . . "), 
 		                    wxYES|wxNO|wxCANCEL|wxCENTRE);
@@ -5425,7 +5420,6 @@ bool MainFrame::saveTemplateOnDemand(bool force) {
 		{
 			saveFile();
 			selectMonitorBookCncPanel();
-			
 		} 
 		else if ( ret == wxID_CANCEL ) 
 		{
@@ -9605,12 +9599,16 @@ void MainFrame::detachSetterList(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onSelectTemplatePanel(wxListbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	/*
+	// already done by the onPaint event of 
+	// class CncTemplateContextSummaryPanel
 	if ( (wxWindow*)event.GetEventObject() == m_listbookSource ) {
 		unsigned int sel = event.GetSelection();
 
 		if ( sel == SourceBookSelection::VAL::CONTEXT )
 			THE_TPL_CTX->updateGui(true);
 	}
+	*/
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onSvgExport(wxCommandEvent& event) {

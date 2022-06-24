@@ -91,6 +91,12 @@ int CncArduinoController::SpindleInterface::getRemainingSeconds() const {
 
   return ret;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+int32_t CncArduinoController::SpindleInterface::getSpeedFactor() const { 
+/////////////////////////////////////////////////////////////////////////////////////
+  return ArdoObj::SpindleTuple::encode(speedRange, speedValue);
+}
 /////////////////////////////////////////////////////////////////////////////////////
 void CncArduinoController::SpindleInterface::setSpeedFactor(int32_t ssf) { 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1323,6 +1329,9 @@ byte CncArduinoController::process(const ArduinoCmdDecoderGetter::Result& gt) {
     case PID_LIMIT:                       writeLimitGetter(); break;
 
     case PID_TOUCH_CONTACT_STATE:         writeGetterValue1(PID_TOUCH_CONTACT_STATE,          (int32_t)(AE::digitalRead(PIN_TOUCH_CONTACT) == PL_LOW)); break;
+
+    case PID_SPINDLE_SWITCH:              writeGetterValue1(PID_SPINDLE_SWITCH,               (int32_t)(AE::digitalRead(PIN_ENABLE_SPINDLE))); break;
+    case PID_SPINDLE_SPEED:               writeGetterValue1(PID_SPINDLE_SPEED,                spindleInterface.getSpeedFactor()); break;
     
     default:                              writeGetterValue1(PID_UNKNOWN, 0);
                                       

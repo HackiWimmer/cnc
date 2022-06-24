@@ -90,7 +90,10 @@ CncSetterListCtrl::~CncSetterListCtrl() {
 void CncSetterListCtrl::addSetter(unsigned char pid, const cnc::SetterValueList& v) {
 /////////////////////////////////////////////////////////////
 	setterEntries.push_back(std::move(SetterEntry(pid, v)));
-	SetItemCount(setterEntries.size());
+	
+	// To minimize the performance impact of SetItemCount(...)
+	// for large list content, it will be called ones at onPaint(...).
+	//SetItemCount(setterEntries.size());
 	
 	if ( IsShownOnScreen() == true )
 		if ( displayTimer.IsRunning() == false )
@@ -253,6 +256,8 @@ void CncSetterListCtrl::onDisplayTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////
 void CncSetterListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
+	SetItemCount(setterEntries.size());
+	
 	const long items = GetItemCount();
 	
 	THE_APP->GetSetterListCount()->ChangeValue(CncNumberFormatter::toString(items));

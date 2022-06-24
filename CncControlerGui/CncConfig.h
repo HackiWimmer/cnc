@@ -322,6 +322,7 @@ class CncConfig {
 		const bool getSimulateMillingWithSoundFlag();
 		const bool getCameraSupportFlag();
 		const bool getSpindleSpeedSupportFlag();
+		const bool getUsePositionSpyFlag();
 		
 		const double getMaxSpeedXYZ_MM_MIN();
 		

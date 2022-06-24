@@ -131,6 +131,8 @@ protected:
     wxStaticText* m_staticText352;
     wxSpinCtrl* m_loopCount;
     wxStaticText* m_staticText35;
+    wxCheckBox* m_cbUseCncInstructions;
+    wxStaticText* m_staticText35244;
     wxCheckBox* m_cbBreakOnError;
     wxPanel* m_plDir;
     wxStaticText* m_staticText33;
@@ -161,6 +163,14 @@ public:
     wxStaticText* GetStaticText35()
     {
 	return m_staticText35;
+    }
+    wxCheckBox* GetCbUseCncInstructions()
+    {
+	return m_cbUseCncInstructions;
+    }
+    wxStaticText* GetStaticText35244()
+    {
+	return m_staticText35244;
     }
     wxCheckBox* GetCbBreakOnError()
     {

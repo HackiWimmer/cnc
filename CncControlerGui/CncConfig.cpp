@@ -1128,6 +1128,7 @@ const bool CncConfig::getPreProcessorCntMoveSequneces()				{ PROPERTY(CncWork_Ct
 const bool CncConfig::getSimulateMillingWithSoundFlag()				{ PROPERTY(CncWork_Ctl_SIMULATE_MILLING_WITH_SOUND)			return p->GetValue().GetBool(); }
 const bool CncConfig::getCameraSupportFlag()						{ PROPERTY(CncWork_Ctl_CAMERA_SUPPORT)						return p->GetValue().GetBool(); }
 const bool CncConfig::getSpindleSpeedSupportFlag()					{ PROPERTY(CncWork_Ctl_SPINDLE_SPEED_SUPPORT)				return p->GetValue().GetBool(); }
+const bool CncConfig::getUsePositionSpyFlag()						{ PROPERTY(CncWork_Ctl_USE_POSITION_SPY)					return p->GetValue().GetBool(); }
 
 const unsigned int CncConfig::getStepsX()							{ PROPERTY(CncConfig_STEPS_X) 								return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY()							{ PROPERTY(CncConfig_STEPS_Y) 								return p->GetValue().GetInteger(); }

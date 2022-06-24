@@ -75,6 +75,8 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		bool skipToNextReference();
 		bool skipToLastReference();
 		
+		virtual long getItemCount() const override { return pathLists.size(); }
+		
 		wxDECLARE_NO_COPY_CLASS(CncPathListEntryListCtrl);
 		wxDECLARE_EVENT_TABLE();
 		

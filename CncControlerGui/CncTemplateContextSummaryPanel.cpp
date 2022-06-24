@@ -1,5 +1,6 @@
 #include <iostream>
 #include "GlobalFunctions.h"
+#include "CncCommon.h"
 #include "CncContext.h"
 #include "CncConfig.h"
 #include "CncAutoFreezer.h"
@@ -7,6 +8,10 @@
 #include "CncLoggerListCtrl.h"
 #include "CncTemplateContext.h"
 #include "CncTemplateContextSummaryPanel.h"
+
+wxBEGIN_EVENT_TABLE(CncTemplateContextSummaryPanel, CncTemplateContextSummaryPanelBase)
+	EVT_PAINT(				CncTemplateContextSummaryPanel::onPaint)
+wxEND_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////
 CncTemplateContextSummaryPanel::CncTemplateContextSummaryPanel(wxWindow* parent)
@@ -49,6 +54,8 @@ CncTemplateContextSummaryPanel::CncTemplateContextSummaryPanel(wxWindow* parent)
 	GblFunc::replaceControl(m_parsingSynopsisPlaceholder, parsingSynopsis);
 	loggerRegister.push_back(parsingSynopsis);
 	
+	const wxFont font = THE_CONTEXT->outboundListBookFont;
+	m_loggerBook->GetListView()->SetFont(font);
 }
 ///////////////////////////////////////////////////////////////////
 CncTemplateContextSummaryPanel::~CncTemplateContextSummaryPanel() {
@@ -75,8 +82,43 @@ void CncTemplateContextSummaryPanel::selectPage(CncExtLoggerListCtrl* page) cons
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncTemplateContextSummaryPanel::update() {
+void CncTemplateContextSummaryPanel::flagListItem(CncExtLoggerListCtrl* ctrl, bool flag) {
 ///////////////////////////////////////////////////////////////////
+	if ( ctrl == NULL )
+		return; 
+		
+	const int sel = m_loggerBook->FindPage(ctrl->GetParent());
+	if ( sel < 0 || sel > m_loggerBook->GetListView()->GetItemCount() - 1 )
+		return; 
+		
+	if ( flag == false )	m_loggerBook->GetListView()->SetItemTextColour(sel, *wxRED);
+	else					m_loggerBook->GetListView()->SetItemTextColour(sel, *wxBLACK);
+	
+	const wxString ch("*");
+	
+	wxString text (m_loggerBook->GetListView()->GetItemText(sel));
+	text.Replace(ch, "");
+	
+	if ( flag == false )
+		text.Prepend(ch);
+		
+	m_loggerBook->GetListView()->SetItemText(sel, text);
+}
+///////////////////////////////////////////////////////////////////
+void CncTemplateContextSummaryPanel::resetListFlagging() {
+///////////////////////////////////////////////////////////////////
+	for ( auto it = loggerRegister.begin(); it != loggerRegister.end(); ++it )
+	{
+		CncExtLoggerListCtrl* logger = *it;
+		flagListItem(logger, true);
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncTemplateContextSummaryPanel::update(bool force) {
+///////////////////////////////////////////////////////////////////
+	if ( IsShownOnScreen() == false && force == false )
+		return;
+
 	const bool analized = THE_CONTEXT->templateContext->analized();
 	if ( analized == false )
 	{
@@ -92,6 +134,7 @@ void CncTemplateContextSummaryPanel::update() {
 		THE_CONTEXT->templateContext->traceTo(ss, 0);
 		summary->addInfoEntry(ss.str().c_str());
 		
+		resetListFlagging();
 		return;
 	}
 	
@@ -110,6 +153,8 @@ void CncTemplateContextSummaryPanel::update() {
 	summary->clearAll();
 	THE_CONTEXT->templateContext->traceTo(ss, 0);
 	
+	// --------------------------------------------------------------
+	flagListItem(summary, ok);
 	if ( ok == false )	summary->addErrorEntry(ss.str().c_str());
 	else				summary->addInfoEntry(ss.str().c_str());
 	
@@ -118,6 +163,7 @@ void CncTemplateContextSummaryPanel::update() {
 	analysisOverall->clearAll();
 	ss << result;
 	
+	flagListItem(analysisOverall, ok);
 	if ( ok == false )	analysisOverall->addErrorEntry(ss.str().c_str());
 	else				analysisOverall->addInfoEntry(ss.str().c_str());
 	
@@ -131,13 +177,23 @@ void CncTemplateContextSummaryPanel::update() {
 	ss.str("");
 	analysisLimit->clearAll();
 	THE_CONTEXT->templateContext->filterAllLimitEntries(ss);
-	analysisLimit->add(ss.str().c_str());
+	const wxString analysisLimitStr(ss.str().c_str());
+	analysisLimit->add(analysisLimitStr);
+	flagListItem(analysisLimit, analysisLimitStr.IsEmpty());
 	
 	// movement
 	ss.str("");
 	analysisMovement->clearAll();
 	THE_CONTEXT->templateContext->filterAllMovesWithoutSpindle(ss);
-	analysisMovement->add(ss.str().c_str());
+	const wxString analysisMovementStr(ss.str().c_str());
+	analysisMovement->add(analysisMovementStr);
+	flagListItem(analysisMovement, analysisMovementStr.IsEmpty());
+}
+///////////////////////////////////////////////////////////////////
+void CncTemplateContextSummaryPanel::onPaint(wxPaintEvent& event) {
+///////////////////////////////////////////////////////////////////
+	const bool force = true;
+	update(force);
 }
 ///////////////////////////////////////////////////////////////////
 void CncTemplateContextSummaryPanel::onCopyCurrentList(wxCommandEvent& event) {

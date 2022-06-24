@@ -76,6 +76,8 @@ class CncSetterListCtrl : public CncLargeScaledListCtrl {
 		
 		void updateColumnWidth();
 		
+		virtual long getItemCount() const override { return setterEntries.size(); }
+		
 		wxDECLARE_NO_COPY_CLASS(CncSetterListCtrl);
 		wxDECLARE_EVENT_TABLE();
 };

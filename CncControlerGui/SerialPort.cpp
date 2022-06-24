@@ -2378,7 +2378,7 @@ bool Serial::serializeSetter(SerialFetchInfo& sfi, const unsigned char* buffer, 
 ///////////////////////////////////////////////////////////////////
 	if ( buffer == 0 || nbByte == 0 )
 	{
-		std::cerr << "Serial::serializeSetter(): Invalid buffer" << std::endl;
+		CNC_CERR_FUNCT_A(": Invalid buffer\n")
 		return false;
 	}
 	
@@ -2386,7 +2386,7 @@ bool Serial::serializeSetter(SerialFetchInfo& sfi, const unsigned char* buffer, 
 	
 	if ( writeData((void*)buffer, nbByte) == false )
 	{
-		std::cerr << "Serial::processSetter: Unable to write data" << std::endl;
+		CNC_CERR_FUNCT_A(": Unable to write data\n")
 		return false;
 	}
 	

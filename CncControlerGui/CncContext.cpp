@@ -56,9 +56,6 @@ const char* CncContext::getOSTypeAsString() {
 void CncContext::setProbeMode(bool state) { 
 ////////////////////////////////////////////////////////////////////////
 	probeMode = state;
-	
-	if ( THE_APP )
-		THE_APP->decoratePosSpyConnectButton(probeMode);
 }
 ////////////////////////////////////////////////////////////////////////
 const std::ostream& CncContext::traceVersionInfo(std::ostream& os) const {

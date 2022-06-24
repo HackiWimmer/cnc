@@ -205,7 +205,7 @@ class CncControl {
 		bool isReadyToRun();
 		
 		void setClientId(long id);
-		void resetClientId()			{ setClientId(-1L); }
+		void resetClientId()			{ setClientId(CLIENT_ID.INVALID); }
 		const long getClientId() const 	{ return currentClientId; }
 		
 		bool dryRunAvailable() const { return dryRunSerial != NULL; }
@@ -342,6 +342,7 @@ class CncControl {
 		bool switchSpindleOn();
 		bool switchSpindleOff(bool force = false);
 		
+		CncSpindlePowerState evaluateSpindlePowerState();
 		CncSpindlePowerState getSpindlePowerState() const { return spindlePowerState; }
 		bool isSpindleOn()					const { return spindlePowerState == SPINDLE_STATE_ON; }
 		bool isSpindleOff()					const { return spindlePowerState == SPINDLE_STATE_OFF; }

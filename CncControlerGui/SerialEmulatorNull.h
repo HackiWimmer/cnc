@@ -208,6 +208,9 @@ class SerialEmulatorNULL  : public wxEvtHandler,
 		bool				interactiveMove;
 		bool				stepperEnableState;
 		
+		bool				spindlePowerState;
+		int32_t				spindleSpeedFact;
+		
 		int32_t 			interactiveX;
 		int32_t 			interactiveY;
 		int32_t				interactiveZ;

@@ -631,7 +631,8 @@ bool CncPathListRunner::publishMoveSequence() {
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.hasClientIdChange() == false ) {
+	if ( curr.hasClientIdChange() == false ) 
+	{
 		std::cerr << "CncPathListRunner::onPhysicallyClientIdChange(): Invalid Type!" << std::endl;
 		return false;
 	}
@@ -644,8 +645,9 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 	if ( setup.trace == true )
 		cpp->addOperatingTraceSeparator(wxString::Format("ClientID Change (%ld)", curr.clientId));
 		
-	if ( currentSequence != NULL )	currentSequence->addClientId(curr.clientId);
-	else							currentInterface->processClientIDChange(curr.clientId);
+	const bool b = (currentSequence != NULL && setup.optAnalyse == true );
+	if ( b )	currentSequence->addClientId(curr.clientId);
+	else		currentInterface->processClientIDChange(curr.clientId);
 	
 	return true;
 }
@@ -681,7 +683,8 @@ bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.hasToolChange() == false ) {
+	if ( curr.hasToolChange() == false )
+	{
 		std::cerr << CNC_LOG_FUNCT << ": Invalid Type!" << std::endl;
 		return false;
 	}
@@ -698,12 +701,14 @@ bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) 
 	
 	CHECK_AND_PERFORM_PROCESSING_STATE
 	
-	if ( currentInterface->processSpindleStateSwitch(curr.spindleState) == false ) {
+	if ( currentInterface->processSpindleStateSwitch(curr.spindleState) == false )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": processSpindleStateSwitch() failed!\n");
 		return false;
 	}
 	
-	if ( currentInterface->processSpindleSpeedChange(curr.spindleSpeed_U_MIN) == false ) {
+	if ( currentInterface->processSpindleSpeedChange(curr.spindleSpeed_U_MIN) == false )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": processSpindleSpeedChange() failed!\n");
 		return false;
 	}
@@ -716,7 +721,8 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 	if ( isInterrupted() == true )
 		return false;
 		
-	if ( setup.trace == true ) {
+	if ( setup.trace == true )
+	{
 		std::stringstream ss; 
 		ss 	<< "Distance         : " << cnc::dblFormat(curr.entryDistance)	<< std::endl
 			<< "Already Rendered : " << curr.alreadyRendered				<< std::endl

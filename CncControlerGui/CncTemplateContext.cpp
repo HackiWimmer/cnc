@@ -27,7 +27,7 @@ CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
 void CncTemplateContext::reset() {
 //////////////////////////////////////////////////////////////
 	*this = CncTemplateContext(boundarySpace);
-	updateGui(false);
+	updateGui(true);
 }
 //////////////////////////////////////////////////////////////
 bool CncTemplateContext::isValid() const {
@@ -96,6 +96,7 @@ bool CncTemplateContext::fitsIntoCurrentHardwareBoundaries(std::ostream& o) {
 		if ( nrmTplBounds.getMaxDistanceZ() > nrmHwdBounds.getMaxDistanceZ() )
 			o << "  Distance Z [mm]: " << nrmTplBounds.getMaxDistanceZ() << " > " << nrmHwdBounds.getMaxDistanceZ() << std::endl;
 		
+		updateGui(true);
 		return false;
 	}
 
@@ -113,10 +114,12 @@ bool CncTemplateContext::fitsIntoCurrentHardwareBoundaries(std::ostream& o) {
 		if ( tplMax.getY() > hwdMax.getY() )	o << "  Ymax [mm]: " << tplMax.getY() << " > " << hwdMax.getY() << std::endl;
 		if ( tplMax.getZ() > hwdMax.getZ() )	o << "  Zmax [mm]: " << tplMax.getZ() << " > " << hwdMax.getZ() << std::endl;
 		
+		updateGui(true);
 		return false;
 	}
 	
 	o << "Info:\n The current template fits . . .\n";
+	updateGui(true);
 	return true;
 }
 //////////////////////////////////////////////////////////////
@@ -133,6 +136,7 @@ bool CncTemplateContext::init(const wxString& pathFileName) {
 	wxFileName fn(pathFileName);
 	this->name.assign(fn.GetFullName());
 	this->path.assign(fn.GetPath());
+	updateGui(true);
 	
 	return wxFileName::Exists(getFileName());
 }
@@ -143,6 +147,7 @@ bool CncTemplateContext::init(const wxString& path, const wxString& name) {
 	
 	this->name.assign(name);
 	this->path.assign(path);
+	updateGui(true);
 	
 	return wxFileName::Exists(getFileName());
 }
@@ -152,7 +157,7 @@ void CncTemplateContext::registerBoundaries(const CncDoubleBoundaries& b, BoundT
 	if ( bt == BT_TEMPLATE )	templateBounds	= b;
 	else						measuredBounds	= b;
 		
-	updateGui(false);
+	updateGui(true);
 }
 //////////////////////////////////////////////////////////////
 const CncDoubleBoundaries& CncTemplateContext::getBoundaries(BoundType bt) const {
@@ -203,7 +208,12 @@ void CncTemplateContext::updateGui(bool force) const {
 	if ( CncConfig::available() )
 	{
 		if ( THE_APP->getTemplateContextSummary()->IsShownOnScreen() || force == true )
-			THE_APP->getTemplateContextSummary()->update();
+		{
+			// do not propagate the force flag here because the receiving view 
+			// decides by itself id a force is necessary ore not
+			// only call the update function
+			THE_APP->getTemplateContextSummary()->update(false);
+		}
 	}
 }
 //////////////////////////////////////////////////////////////
@@ -263,61 +273,98 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifyBeginRun() {
 //////////////////////////////////////////////////////////////
-	//CNC_CEX2_FUNCT
-	ContextInterface::notifyBeginRun();
+	CNC_CEX2_FUNCT_A(": %d", hasValidRuns())
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifyBeginRun();
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifyEndRun() {
 //////////////////////////////////////////////////////////////
 	//CNC_CEX2_FUNCT
-	ContextInterface::notifyEndRun();
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifyEndRun();
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifyClientId(long id) {
 //////////////////////////////////////////////////////////////
 	//CNC_CEX2_FUNCT
-	ContextInterface::notifyClientId(id);
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifyClientId(id);
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifyLimit(const CncInterface::ILS::States& s) {
 //////////////////////////////////////////////////////////////
 	//CNC_CEX2_FUNCT
-	ContextInterface::notifyLimit(s);
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifyLimit(s);
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifyMove(unsigned char cmd, int32_t dx, int32_t dy, int32_t dz) {
 //////////////////////////////////////////////////////////////
 	//CNC_CEX2_FUNCT
-	ContextInterface::notifyMove(cmd, dx, dy, dz);
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifyMove(cmd, dx, dy, dz);
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifySpindleOn() {
 //////////////////////////////////////////////////////////////
 	//CNC_CEX2_FUNCT
-	ContextInterface::notifySpindleOn();
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifySpindleOn();
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifySpindleOff() {
 //////////////////////////////////////////////////////////////
 	//CNC_CEX2_FUNCT
-	ContextInterface::notifySpindleOff();
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifySpindleOff();
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifySpindleSpeed(unsigned char pid, ArdoObj::SpindleTupleValue s) {
 //////////////////////////////////////////////////////////////
 	//CNC_CEX2_FUNCT
-	ContextInterface::notifySpindleSpeed(pid, s);
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifySpindleSpeed(pid, s);
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifyStepperSpeed(unsigned char pid, ArdoObj::SpeedTupleValue s) {
 //////////////////////////////////////////////////////////////
 	//CNC_CEX2_FUNCT
-	ContextInterface::notifyStepperSpeed(pid, s);
+	
+	//this notification is only meaningful as long as 
+	//the template was not valid processed.
+	if ( hasValidRuns() == false )
+		ContextInterface::notifyStepperSpeed(pid, s);
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::unregisterCncInterface() {
 //////////////////////////////////////////////////////////////
 	cncInterface = NULL;
+	updateGui(true);
 }
 //////////////////////////////////////////////////////////////
 bool CncTemplateContext::registerCncInterface(CncPathListInterfaceCnc* ci) {
@@ -326,6 +373,8 @@ bool CncTemplateContext::registerCncInterface(CncPathListInterfaceCnc* ci) {
 		return false;
 		
 	cncInterface = ci;
+	updateGui(true);
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////
@@ -333,10 +382,6 @@ bool CncTemplateContext::executeCncInterface() {
 //////////////////////////////////////////////////////////////
 	if ( cncInterface == NULL )
 		return false;
-	
-	
-	#warning !!! this crashes if the serial was changed
-	
 	
 	return cncInterface->spoolInstructions();
 }

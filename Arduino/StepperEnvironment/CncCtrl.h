@@ -46,6 +46,7 @@ class CncArduinoController : public ArduinoCmdDecoderGetter,
 
         void reset();
 
+        int32_t getSpeedFactor() const; 
         void setSpeedFactor(int32_t ssf);
 
         bool isOverloaded() const;

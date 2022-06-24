@@ -220,7 +220,7 @@ CncTestRunConfigBase::CncTestRunConfigBase(wxWindow* parent,
     m_plLoopImgIndex = m_lbTestCase_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("ConConnected")));
     m_lbTestCase->AddPage(m_plLoop, _("Loop\nCurrent Template"), false, m_plLoopImgIndex);
 
-    wxFlexGridSizer* flexGridSizer30 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer30 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer30->SetFlexibleDirection(wxBOTH);
     flexGridSizer30->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer30->AddGrowableCol(0);
@@ -238,8 +238,8 @@ CncTestRunConfigBase::CncTestRunConfigBase(wxWindow* parent,
     wxFont m_staticText352Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText352->SetFont(m_staticText352Font);
 
-    flexGridSizer341->Add(m_staticText352, 0, wxALL, WXC_FROM_DIP(5));
-    m_staticText352->SetMinSize(wxSize(100, -1));
+    flexGridSizer341->Add(m_staticText352, 0, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+    m_staticText352->SetMinSize(wxSize(180, -1));
 
     m_loopCount = new wxSpinCtrl(
         m_plLoop, wxID_ANY, wxT("3"), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), wxSP_ARROW_KEYS);
@@ -254,19 +254,39 @@ CncTestRunConfigBase::CncTestRunConfigBase(wxWindow* parent,
 
     flexGridSizer30->Add(flexGridSizer34, 1, wxALL | wxEXPAND, WXC_FROM_DIP(0));
 
-    m_staticText35 = new wxStaticText(
-        m_plLoop, wxID_ANY, _("Break on Error:"), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), 0);
+    m_staticText35 = new wxStaticText(m_plLoop, wxID_ANY, _("Use existing CncInstruction:"), wxDefaultPosition,
+        wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), 0);
     wxFont m_staticText35Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText35->SetFont(m_staticText35Font);
 
     flexGridSizer34->Add(m_staticText35, 0, wxALL, WXC_FROM_DIP(5));
-    m_staticText35->SetMinSize(wxSize(100, -1));
+    m_staticText35->SetMinSize(wxSize(180, -1));
+
+    m_cbUseCncInstructions =
+        new wxCheckBox(m_plLoop, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), 0);
+    m_cbUseCncInstructions->SetValue(true);
+
+    flexGridSizer34->Add(m_cbUseCncInstructions, 0, wxALL, WXC_FROM_DIP(5));
+
+    wxFlexGridSizer* flexGridSizer341xx = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer341xx->SetFlexibleDirection(wxBOTH);
+    flexGridSizer341xx->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer30->Add(flexGridSizer341xx, 1, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticText35244 = new wxStaticText(
+        m_plLoop, wxID_ANY, _("Break on Error:"), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), 0);
+    wxFont m_staticText35244Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText35244->SetFont(m_staticText35244Font);
+
+    flexGridSizer341xx->Add(m_staticText35244, 0, wxALL, WXC_FROM_DIP(5));
+    m_staticText35244->SetMinSize(wxSize(180, -1));
 
     m_cbBreakOnError =
         new wxCheckBox(m_plLoop, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_plLoop, wxSize(-1, -1)), 0);
     m_cbBreakOnError->SetValue(true);
 
-    flexGridSizer34->Add(m_cbBreakOnError, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer341xx->Add(m_cbBreakOnError, 0, wxALL, WXC_FROM_DIP(5));
 
     m_plDir = new wxPanel(
         m_lbTestCase, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_lbTestCase, wxSize(-1, -1)), wxTAB_TRAVERSAL);

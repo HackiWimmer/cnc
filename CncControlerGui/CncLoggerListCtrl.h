@@ -126,6 +126,8 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 		
 		void forceUpdate();
 		
+		virtual long getItemCount() const override { return entries.size(); }
+		
 		wxDECLARE_NO_COPY_CLASS(CncLoggerListCtrl);
 		wxDECLARE_EVENT_TABLE();
 };

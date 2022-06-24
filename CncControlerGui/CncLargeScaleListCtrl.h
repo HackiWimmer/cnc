@@ -119,8 +119,6 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		bool updateItem(long item, const CncColumContainer& cc);
 		bool updateItem(long item, long column, const wxString& value);
 
-		long getItemCount() { return rows.size(); }
-		
 		const CncColumContainer& getRow(long item);
 		
 		void setListType(CncLargeScaledListCtrl::ListType lt) 	{ listType = lt; }
@@ -138,6 +136,8 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		virtual bool writeToFile(const wxFileName& fn, bool allRows=false);
 		virtual bool copyToClipboard(bool allRows=false);
 		virtual bool openAsTextView(const wxString& title, bool allRows=false);
+		
+		virtual long getItemCount() const { return rows.size(); }
 		
 	protected:
 		

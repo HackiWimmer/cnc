@@ -60,6 +60,8 @@ class CncMoveSequenceListCtrl : public CncLargeScaledListCtrl {
 
 		bool searchReference(const wxString& what);
 		bool searchReferenceById(const long id);
+		
+		virtual long getItemCount() const override { return moveSequence ? moveSequence->getCount() : 0; }
 
 		wxDECLARE_NO_COPY_CLASS(CncMoveSequenceListCtrl);
 		wxDECLARE_EVENT_TABLE();
@@ -112,6 +114,8 @@ class CncMoveSequenceOverviewListCtrl : public CncLargeScaledListCtrl {
 		bool skipToPrevReference();
 		bool skipToNextReference();
 		bool skipToLastReference();
+		
+		virtual long getItemCount() const override { return moveSequences.size(); }
 
 		wxDECLARE_NO_COPY_CLASS(CncMoveSequenceOverviewListCtrl);
 		wxDECLARE_EVENT_TABLE();

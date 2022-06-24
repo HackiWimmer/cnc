@@ -98,6 +98,7 @@
 	#define CncGCode_Parser_PLACEHOLDER						"CncGCode_Parser|CGODE_PLACEHOLDER"
 	
 	#define CncWork_Ctl_ARTIFICIALLY_STEP_DELAY				"#|CncWork_Controller|ARTIFICIALLY_STEP_DELAY"
+	#define CncWork_Ctl_USE_POSITION_SPY					"#|CncWork_Controller|USE_POSITION_SPY"
 	#define CncWork_Ctl_REPLY_THRESHOLD_METRIC				"CncWork_Controller|REPLY_THRESHOLD_METRIC"
 	#define CncWork_Ctl_REPLY_THRESHOLD_STEPS				"CncWork_Controller|REPLY_THRESHOLD_STEPS"
 	#define CncWork_Ctl_AVOID_DUP_SETTER_VALUES				"CncWork_Controller|AVOID_DUP_SETTER_VALUES"

@@ -748,12 +748,23 @@ bool CncControl::isReadyToRun() {
 	// there state isn't correct especially in the case of dry run!!!
 	
 	// query the serial port
-	std::vector<int32_t> list;
+	const CncSpindlePowerState evalSpindlePowerState = evaluateSpindlePowerState();
+	if ( evalSpindlePowerState != spindlePowerState || evalSpindlePowerState == SPINDLE_STATE_ON )
+	{
+		const bool force = true;
+		switchSpindleOff(force);
+		
+		if ( evalSpindlePowerState == SPINDLE_STATE_ON )
+			cnc::cex1 << CNC_LOG_FUNCT_A(": Invalid Spindle state! Switch spindle off before start running\n");
+		// else switch the state silent
+	}
+	
+	GetterValues list;
 	getSerial()->processGetter(PID_QUERY_READY_TO_RUN, list);
 		
 	if ( list.size() != 1 )
 	{
-		CNC_CERR_FUNCT_A("CncControl::isReadyToRun: Unable due to the corresponding state of the serial port:")
+		CNC_CERR_FUNCT_A(": Unable due to the corresponding state of the serial port:")
 		return false;
 	}
 	
@@ -1988,6 +1999,25 @@ bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool al
 	                             alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
+CncSpindlePowerState CncControl::evaluateSpindlePowerState() {
+///////////////////////////////////////////////////////////////////
+	GetterValues gv;
+	
+	if ( processGetter(PID_SPINDLE_SWITCH, gv) == false )
+	{
+		CNC_CERR_FUNCT_A(": Unable to evaluate spindle power state!")
+		return false;
+	}
+	
+	if ( gv.size() == 0 )
+	{
+		CNC_CERR_FUNCT_A(": Unable to read spindle power state!")
+		return false;
+	}
+	
+	return gv[0] != 0;
+}
+///////////////////////////////////////////////////////////////////
 bool CncControl::switchSpindleState(bool on, bool force) {
 ///////////////////////////////////////////////////////////////////
 	return on ? switchSpindleOn() : switchSpindleOff(force);
@@ -2023,7 +2053,7 @@ bool CncControl::switchSpindleOff(bool force) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
 		return false;
-
+	
 	if ( spindlePowerState == SPINDLE_STATE_ON || force == true )
 	{
 		if ( processSetter(PID_SPINDLE_SWITCH, SPINDLE_STATE_OFF) )

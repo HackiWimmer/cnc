@@ -10,11 +10,9 @@
 class CncBoundarySpace;
 class CncPathListInterfaceCnc;
 
-class CncTemplateContext : public ContextInterface {
-	
+class CncTemplateContext : public ContextInterface 
+{
 	private:
-		
-		typedef std::vector<wxString> LogInformation;
 		
 		bool						modifyFlag;
 		wxString					name;
@@ -50,10 +48,10 @@ class CncTemplateContext : public ContextInterface {
 		bool				init(const wxString& path, const wxString& name);
 		
 		
-		void				setModifyFlag(bool f)					{ modifyFlag = f; }
-		void				registerRun()							{ runCount++; updateGui(false); }
-		void				resetValidRuns()						{ validRunCount = 0; }
-		void				registerValidRun()						{ validRunCount++; updateGui(false); }
+		void				setModifyFlag(bool f)					{ modifyFlag = f;		updateGui(true); }
+		void				registerRun()							{ runCount++;			updateGui(true); }
+		void				resetValidRuns()						{ validRunCount = 0; 	updateGui(true); }
+		void				registerValidRun()						{ validRunCount++; 		updateGui(true); }
 		bool				registerCncInterface(CncPathListInterfaceCnc* ci);
 		void				unregisterCncInterface();
 		bool				hasValidRuns()					const	{ return validRunCount > 0; }

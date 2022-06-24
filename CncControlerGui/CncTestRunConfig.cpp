@@ -1,6 +1,7 @@
 #include "MainFrame.h"
 #include "CncConfig.h"
 #include "CncCommon.h"
+#include "CncTemplateContext.h"
 #include "CncTestRunConfig.h"
 
 /////////////////////////////////////////////////////////////
@@ -52,7 +53,10 @@ bool CncTestRunConfig::runLoop() {
 	bool ret		= true;
 	long duration	= 0;
 	
-	for ( long i=0; i < loopCount; i++ )
+	// always do this to get a fresh CncInstruction workflow
+	THE_TPL_CTX->unregisterCncInterface();
+	
+	for ( long i = 0; i < loopCount; i++ )
 	{
 		if ( THE_APP->getCncControl() && THE_APP->getCncControl()->isInterrupted() )
 			break;
@@ -62,6 +66,9 @@ bool CncTestRunConfig::runLoop() {
 		THE_APP->selectMonitorBookCncPanel();
 		
 		{
+			if ( m_cbUseCncInstructions->GetValue() == false && i > 0)
+				THE_TPL_CTX->unregisterCncInterface();
+			
 			bool ret = THE_APP->processTemplate( i == 0 );
 			duration += THE_CONTEXT->timestamps.getTotalDurationMillis();
 
