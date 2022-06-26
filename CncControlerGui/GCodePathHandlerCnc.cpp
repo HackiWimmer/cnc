@@ -32,7 +32,8 @@ bool GCodePathHandlerCnc::prepareWorkImpl() {
 bool GCodePathHandlerCnc::finishWorkImpl() {
 //////////////////////////////////////////////////////////////////
 	// execute the the last movement
-	return initNextPath();
+	const bool ret = initNextPath();
+	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::initNextPath() {
@@ -74,7 +75,7 @@ bool GCodePathHandlerCnc::changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-void GCodePathHandlerCnc::switchSpindleState(bool state) {
+void GCodePathHandlerCnc::switchSpindleState(CncSpindlePowerState state) {
 //////////////////////////////////////////////////////////////////
 	processSpindleState(state);
 }

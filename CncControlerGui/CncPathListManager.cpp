@@ -449,7 +449,7 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, doubl
 	return appendEntry(cpe), getPathList().back();
 }
 //////////////////////////////////////////////////////////////////
-const CncPathListEntry& CncPathListManager::addEntrySpl(bool spindleState) {
+const CncPathListEntry& CncPathListManager::addEntrySpl(CncSpindlePowerState spindleState) {
 //////////////////////////////////////////////////////////////////
 	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
 	return addEntrySpl(spindleState, prevEntry.spindleSpeed_U_MIN);
@@ -461,7 +461,7 @@ const CncPathListEntry& CncPathListManager::addEntrySpl(double spindleSpeed_U_MI
 	return addEntrySpl(prevEntry.spindleState, spindleSpeed_U_MIN);
 }
 //////////////////////////////////////////////////////////////////
-const CncPathListEntry& CncPathListManager::addEntrySpl(bool spindleState, double spindleSpeed_U_MIN) {
+const CncPathListEntry& CncPathListManager::addEntrySpl(CncSpindlePowerState spindleState, double spindleSpeed_U_MIN) {
 //////////////////////////////////////////////////////////////////
 	CncPathListEntry cpe;
 	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;

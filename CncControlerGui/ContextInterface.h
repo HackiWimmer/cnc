@@ -41,16 +41,18 @@ class ContextInterface
 			int32_t						moveDy			= 0;
 			int32_t						moveDz			= 0;
 			
-			void resetMovement()     { moveCmd = CMD_INVALID; moveDx = moveDy = moveDz = 0; }
-			bool hasMovement() const { return ( moveDx != 0 || moveDy || moveDz ); }
+			void resetMovement()			{ moveCmd = CMD_INVALID; moveDx = moveDy = moveDz = 0; }
+			bool hasMovement()		const	{ return ( moveDx != 0 || moveDy || moveDz ); }
+			
+			bool hasLimit()			const	{ return lastType == ProcessEntry::Type::LIMIT; }
+			bool hasWrongMovement()	const	{ return hasMovement() && spindleState == SPINDLE_STATE_OFF && ArdoObj::SpeedTuple::decodeMode(speedTupleVal) != cnc::RAPID_SPEED_CHAR; }
+			
+			static const char* getTypeAsString(Type t);
 			
 			std::ostream& traceTo(std::ostream &ostr) const;
 			friend std::ostream &operator<< (std::ostream &ostr, const ProcessEntry &e) 
-			{
-				return e.traceTo(ostr);
-			}
+				{ return e.traceTo(ostr); }
 			
-			static const char* getTypeAsString(Type t);
 		};
 		
 		typedef std::vector<ProcessEntry> ContextEntries;
@@ -85,11 +87,11 @@ class ContextInterface
 				uint64_t					lenZ = 0;
 			} err;
 			
+			bool save(const wxFileName& fn) const;
+			
 			std::ostream& traceTo(std::ostream &o) const;
 			friend std::ostream &operator<< (std::ostream &o, const ProcessResult &r) 
-			{
-				return r.traceTo(o);
-			}
+				{ return r.traceTo(o); }
 		};
 
 		ContextInterface();
@@ -116,13 +118,15 @@ class ContextInterface
 		
 		bool filterAllLimitEntries(std::ostream& o);
 		bool filterAllMovesWithoutSpindle(std::ostream& o);
-
+		
+		bool hasLimitEntries() const;
+		bool hasMovesWithoutSpindleEntries() const;
+		
 		std::ostream& traceErrorInfoTo(std::ostream &ostr) const;
 		std::ostream& traceContextEntriesTo(std::ostream &ostr) const;
+		
 		friend std::ostream &operator<< (std::ostream &ostr, const ContextInterface &i) 
-		{
-			return i.traceContextEntriesTo(ostr);
-		}
+			{ return i.traceContextEntriesTo(ostr); }
 };
 
 #endif

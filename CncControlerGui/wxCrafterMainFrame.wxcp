@@ -63699,11 +63699,11 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Name:",
-											"m_value":	"m_miUnitTestFramework"
+											"m_value":	"m_miLoopRepeatTest"
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Unit Test Framework . . ."
+											"m_value":	"Run Template Test . . . "
 										}, {
 											"type":	"string",
 											"m_label":	"Shortcut:",
@@ -63729,7 +63729,7 @@
 									"m_events":	[{
 											"m_eventName":	"wxEVT_COMMAND_MENU_SELECTED",
 											"m_eventClass":	"wxCommandEvent",
-											"m_functionNameAndSignature":	"unitTestFramework(wxCommandEvent& event)",
+											"m_functionNameAndSignature":	"loopRepeatTest(wxCommandEvent& event)",
 											"m_description":	"Menu item has been clicked",
 											"m_noBody":	false
 										}],
@@ -63793,11 +63793,11 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Name:",
-											"m_value":	"m_miLoopRepeatTest"
+											"m_value":	"m_miUnitTestFramework"
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Run Template Test"
+											"m_value":	"Unit Test Framework . . . <deprecated>"
 										}, {
 											"type":	"string",
 											"m_label":	"Shortcut:",
@@ -63823,7 +63823,7 @@
 									"m_events":	[{
 											"m_eventName":	"wxEVT_COMMAND_MENU_SELECTED",
 											"m_eventClass":	"wxCommandEvent",
-											"m_functionNameAndSignature":	"loopRepeatTest(wxCommandEvent& event)",
+											"m_functionNameAndSignature":	"unitTestFramework(wxCommandEvent& event)",
 											"m_description":	"Menu item has been clicked",
 											"m_noBody":	false
 										}],
@@ -63891,7 +63891,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Test Function 1"
+											"m_value":	"Test Function 1 <for development only>"
 										}, {
 											"type":	"string",
 											"m_label":	"Shortcut:",
@@ -63941,7 +63941,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Test Function 2"
+											"m_value":	"Test Function 2 <for development only>"
 										}, {
 											"type":	"string",
 											"m_label":	"Shortcut:",
@@ -63991,7 +63991,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Test Function 3"
+											"m_value":	"Test Function 3 <for development only>"
 										}, {
 											"type":	"string",
 											"m_label":	"Shortcut:",
@@ -64041,7 +64041,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Test Function 4"
+											"m_value":	"Test Function 4 <for development only>"
 										}, {
 											"type":	"string",
 											"m_label":	"Shortcut:",

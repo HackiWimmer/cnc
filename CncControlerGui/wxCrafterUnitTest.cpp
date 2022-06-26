@@ -294,24 +294,51 @@ CncTestRunConfigBase::CncTestRunConfigBase(wxWindow* parent,
     m_plDirImgIndex = m_lbTestCase_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("CncFolder")));
     m_lbTestCase->AddPage(m_plDir, _("Process\nDirectory"), false, m_plDirImgIndex);
 
-    wxFlexGridSizer* flexGridSizer31 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer31 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer31->SetFlexibleDirection(wxBOTH);
     flexGridSizer31->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
-    flexGridSizer31->AddGrowableCol(1);
+    flexGridSizer31->AddGrowableCol(0);
     m_plDir->SetSizer(flexGridSizer31);
+
+    wxFlexGridSizer* flexGridSizer50 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer50->SetFlexibleDirection(wxBOTH);
+    flexGridSizer50->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+    flexGridSizer50->AddGrowableCol(1);
+
+    flexGridSizer31->Add(flexGridSizer50, 0, wxALL, WXC_FROM_DIP(5));
 
     m_staticText33 = new wxStaticText(
         m_plDir, wxID_ANY, _("Select a folder:"), wxDefaultPosition, wxDLG_UNIT(m_plDir, wxSize(-1, -1)), 0);
     wxFont m_staticText33Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText33->SetFont(m_staticText33Font);
 
-    flexGridSizer31->Add(m_staticText33, 0, wxALL, WXC_FROM_DIP(5));
-    m_staticText33->SetMinSize(wxSize(100, -1));
+    flexGridSizer50->Add(m_staticText33, 0, wxALL, WXC_FROM_DIP(5));
+    m_staticText33->SetMinSize(wxSize(183, -1));
 
     m_dirSelection = new wxDirPickerCtrl(m_plDir, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition,
         wxDLG_UNIT(m_plDir, wxSize(-1, -1)), wxDIRP_SMALL | wxDIRP_DEFAULT_STYLE);
 
-    flexGridSizer31->Add(m_dirSelection, 0, wxALL | wxEXPAND, WXC_FROM_DIP(2));
+    flexGridSizer50->Add(m_dirSelection, 0, wxALL | wxEXPAND, WXC_FROM_DIP(2));
+
+    wxFlexGridSizer* flexGridSizer47 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer47->SetFlexibleDirection(wxBOTH);
+    flexGridSizer47->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+    flexGridSizer31->Add(flexGridSizer47, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
+
+    m_staticText48 = new wxStaticText(m_plDir, wxID_ANY, _("Skip File with 'Ignore' in Name"), wxDefaultPosition,
+        wxDLG_UNIT(m_plDir, wxSize(-1, -1)), 0);
+    wxFont m_staticText48Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText48->SetFont(m_staticText48Font);
+
+    flexGridSizer47->Add(m_staticText48, 0, wxALL, WXC_FROM_DIP(5));
+    m_staticText48->SetMinSize(wxSize(180, -1));
+
+    m_cbSkipIgnore =
+        new wxCheckBox(m_plDir, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_plDir, wxSize(-1, -1)), 0);
+    m_cbSkipIgnore->SetValue(true);
+
+    flexGridSizer47->Add(m_cbSkipIgnore, 0, wxALL, WXC_FROM_DIP(5));
 
     m_staticLine43 =
         new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxLI_HORIZONTAL);

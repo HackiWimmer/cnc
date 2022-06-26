@@ -700,7 +700,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case 3: 	// GC_M_SpindleOnClockwise
 		{
-			pathHandler->switchSpindleState(true);
+			pathHandler->switchSpindleState(SPINDLE_STATE_ON);
 			return true;
 		}
 		case 4:		// GC_M_SpindleOnCounterClockwise
@@ -709,7 +709,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		}
 		case 5:		// GC_M_SpindleOff
 		{
-			pathHandler->switchSpindleState(false);
+			pathHandler->switchSpindleState(SPINDLE_STATE_OFF);
 			return true;
 		}
 		case 6:		// GC_M_ToolChange

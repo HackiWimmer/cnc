@@ -6873,32 +6873,36 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     m_menuTest = new wxMenu();
     m_menuBar->Append(m_menuTest, _("Test"));
 
-    m_miUnitTestFramework =
-        new wxMenuItem(m_menuTest, wxID_ANY, _("Unit Test Framework . . ."), wxT(""), wxITEM_NORMAL);
-    m_miUnitTestFramework->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")));
-    m_menuTest->Append(m_miUnitTestFramework);
-
-    m_menuTest->AppendSeparator();
-
-    m_miLoopRepeatTest = new wxMenuItem(m_menuTest, wxID_ANY, _("Run Template Test"), wxT(""), wxITEM_NORMAL);
+    m_miLoopRepeatTest = new wxMenuItem(m_menuTest, wxID_ANY, _("Run Template Test . . ."), wxT(""), wxITEM_NORMAL);
     m_miLoopRepeatTest->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")));
     m_menuTest->Append(m_miLoopRepeatTest);
 
     m_menuTest->AppendSeparator();
 
-    m_miTest1 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 1"), wxT(""), wxITEM_NORMAL);
+    m_miUnitTestFramework =
+        new wxMenuItem(m_menuTest, wxID_ANY, _("Unit Test Framework . . . <deprecated>"), wxT(""), wxITEM_NORMAL);
+    m_miUnitTestFramework->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")));
+    m_menuTest->Append(m_miUnitTestFramework);
+
+    m_menuTest->AppendSeparator();
+
+    m_miTest1 =
+        new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 1 <for development only>"), wxT(""), wxITEM_NORMAL);
     m_miTest1->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-inactive (2)")));
     m_menuTest->Append(m_miTest1);
 
-    m_miTest2 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 2"), wxT(""), wxITEM_NORMAL);
+    m_miTest2 =
+        new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 2 <for development only>"), wxT(""), wxITEM_NORMAL);
     m_miTest2->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-inactive (2)")));
     m_menuTest->Append(m_miTest2);
 
-    m_miTest3 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 3"), wxT(""), wxITEM_NORMAL);
+    m_miTest3 =
+        new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 3 <for development only>"), wxT(""), wxITEM_NORMAL);
     m_miTest3->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-inactive (2)")));
     m_menuTest->Append(m_miTest3);
 
-    m_miTest4 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 4"), wxT(""), wxITEM_NORMAL);
+    m_miTest4 =
+        new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 4 <for development only>"), wxT(""), wxITEM_NORMAL);
     m_miTest4->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-inactive (2)")));
     m_menuTest->Append(m_miTest4);
 
@@ -7406,8 +7410,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::openSpeedPlayground, this, m_miSpeedPlayground->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::openPositionStorage, this, m_miPositionStorage->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::traceAllCameraDevices, this, m_miCameraDevices->GetId());
-    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::unitTestFramework, this, m_miUnitTestFramework->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::loopRepeatTest, this, m_miLoopRepeatTest->GetId());
+    this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::unitTestFramework, this, m_miUnitTestFramework->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction1, this, m_miTest1->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction2, this, m_miTest2->GetId());
     this->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction3, this, m_miTest3->GetId());
@@ -7715,9 +7719,9 @@ MainFrameBClass::~MainFrameBClass()
         wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::openPositionStorage, this, m_miPositionStorage->GetId());
     this->Unbind(
         wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::traceAllCameraDevices, this, m_miCameraDevices->GetId());
+    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::loopRepeatTest, this, m_miLoopRepeatTest->GetId());
     this->Unbind(
         wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::unitTestFramework, this, m_miUnitTestFramework->GetId());
-    this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::loopRepeatTest, this, m_miLoopRepeatTest->GetId());
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction1, this, m_miTest1->GetId());
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction2, this, m_miTest2->GetId());
     this->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrameBClass::testFunction3, this, m_miTest3->GetId());

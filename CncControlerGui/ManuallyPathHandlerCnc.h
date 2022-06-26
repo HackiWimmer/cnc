@@ -1,13 +1,14 @@
 #ifndef MANUALLY_PATH_HANDLER_BASE_H
 #define MANUALLY_PATH_HANDLER_BASE_H
 
+//#include "CncArduino.h"
 #include "PathHandlerBase.h"
 #include "CncMoveDefinition.h"
 #include "CncControl.h"
 #include "CncPosition.h"
 
-class ManuallyPathHandlerCnc : public PathHandlerBase {
-	
+class ManuallyPathHandlerCnc : public PathHandlerBase 
+{
 	public:
 		
 		ManuallyPathHandlerCnc(CncControl* cnc);
@@ -18,7 +19,7 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		virtual void 			logMeasurementStart();
 		virtual void			logMeasurementEnd();
 		
-		virtual void			switchSpindleState(bool state);
+		virtual void			switchSpindleState(CncSpindlePowerState state);
 		
 		virtual bool			prepareWork(); 
 		virtual bool			finishWork();
@@ -26,8 +27,8 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		virtual bool			processLinearMove(bool alreadyRendered);
 		bool					processLinearMove(const CncMoveDefinition& md);
 		
-		void					swichtSpindleOn()  { switchSpindleState(true); }
-		void					swichtSpindleOff() { switchSpindleState(false); }
+		void					swichtSpindleOn()  { switchSpindleState(SPINDLE_STATE_ON);  }
+		void					swichtSpindleOff() { switchSpindleState(SPINDLE_STATE_OFF); }
 		
 	private:
 		

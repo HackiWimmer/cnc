@@ -173,9 +173,9 @@ class CncPathListManager {
 		const	CncPathListEntry& addEntryAdm(long clientId);
 		const	CncPathListEntry& addEntryAdm(CncSpeedMode mode);
 		const	CncPathListEntry& addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN);
-		const	CncPathListEntry& addEntrySpl(bool spindleState);
+		const	CncPathListEntry& addEntrySpl(CncSpindlePowerState spindleState);
 		const	CncPathListEntry& addEntrySpl(double spindleSpeed_U_MIN);
-		const	CncPathListEntry& addEntrySpl(bool spindelState, double spindleSpeed_U_MIN);
+		const	CncPathListEntry& addEntrySpl(CncSpindlePowerState spindelState, double spindleSpeed_U_MIN);
 		const	CncPathListEntry& addEntryAbs(const CncDoublePosition& newAbsPos, bool alreadyRendered=false);
 		const	CncPathListEntry& addEntryRel(const CncDoublePosition& distance,  bool alreadyRendered=false);
 		const	CncPathListEntry& addEntryAbs(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered=false);

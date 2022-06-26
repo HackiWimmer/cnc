@@ -10357,8 +10357,8 @@ State</label>
       <object class="wxMenu" name="m_menuTest">
         <label>Test</label>
         <style/>
-        <object class="wxMenuItem" name="m_miUnitTestFramework">
-          <label>Unit Test Framework . . .</label>
+        <object class="wxMenuItem" name="m_miLoopRepeatTest">
+          <label>Run Template Test . . .</label>
           <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -10368,8 +10368,8 @@ State</label>
           </help>
         </object>
         <object class="separator"/>
-        <object class="wxMenuItem" name="m_miLoopRepeatTest">
-          <label>Run Template Test</label>
+        <object class="wxMenuItem" name="m_miUnitTestFramework">
+          <label>Unit Test Framework . . . &lt;deprecated&gt;</label>
           <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -10380,7 +10380,7 @@ State</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miTest1">
-          <label>Test Function 1</label>
+          <label>Test Function 1 &lt;for development only&gt;</label>
           <bitmap>bitmaps/software-update-inactive (2).png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -10390,7 +10390,7 @@ State</label>
           </help>
         </object>
         <object class="wxMenuItem" name="m_miTest2">
-          <label>Test Function 2</label>
+          <label>Test Function 2 &lt;for development only&gt;</label>
           <bitmap>bitmaps/software-update-inactive (2).png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -10400,7 +10400,7 @@ State</label>
           </help>
         </object>
         <object class="wxMenuItem" name="m_miTest3">
-          <label>Test Function 3</label>
+          <label>Test Function 3 &lt;for development only&gt;</label>
           <bitmap>bitmaps/software-update-inactive (2).png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -10410,7 +10410,7 @@ State</label>
           </help>
         </object>
         <object class="wxMenuItem" name="m_miTest4">
-          <label>Test Function 4</label>
+          <label>Test Function 4 &lt;for development only&gt;</label>
           <bitmap>bitmaps/software-update-inactive (2).png</bitmap>
           <accel>
             <![CDATA[]]>

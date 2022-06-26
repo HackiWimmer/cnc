@@ -694,7 +694,7 @@ bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) 
 	
 	if ( setup.trace == true ) {
 		const wxString msg(wxString::Format("Spindle State, Speed Change (%s, %.1lf)", 
-											curr.spindleState ? "ON" : "OFF", curr.spindleSpeed_U_MIN));
+											curr.spindleState == SPINDLE_STATE_ON ? "ON" : "OFF", curr.spindleSpeed_U_MIN));
 											
 		THE_APP->getCncPreProcessor()->addOperatingTraceSeparator(msg);
 	}

@@ -76,8 +76,9 @@ class CncTemplateContext : public ContextInterface
 		void				registerToolSelList(const wxString& tl)	{ toolSelList.assign(tl); }
 		unsigned int		getToolSelCount()				const	{ return toolSelList.Freq(';'); }
 		
-		void				updateGui(bool force)			const;
-		void				traceTo(std::ostream& o, unsigned int indent) const;
+		void				updateGui(bool force)							const;
+		void				traceTo(std::ostream& o, unsigned int indent)	const;
+		bool				save(const wxFileName& fn)						const;
 		
 		bool				fitsIntoCurrentHardwareBoundaries(std::ostream& o);
 		

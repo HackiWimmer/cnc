@@ -1,3 +1,5 @@
+#include <fstream>
+#include <wx/filename.h>
 #include "CncArduino.h"
 #include "CncConfig.h"
 #include "ContextInterface.h"
@@ -54,7 +56,23 @@ std::ostream& ContextInterface::ProcessResult::traceTo(std::ostream &o) const {
 	;
 	
 	return o;
-};
+}
+////////////////////////////////////////////////////////////////////
+bool ContextInterface::ProcessResult::save(const wxFileName& fn) const {
+////////////////////////////////////////////////////////////////////
+	std::fstream fs;
+
+	fs.open(fn.GetFullPath().c_str().AsChar(), std::ios::out | std::ios::trunc);
+	if ( fs.is_open() ) 
+	{
+		traceTo(fs);
+		fs.close();
+		return true;
+	}
+	
+	return false;
+}
+
 
 ////////////////////////////////////////////////////////////////////
 std::ostream& ContextInterface::ProcessEntry::traceTo(std::ostream &ostr) const {
@@ -267,6 +285,30 @@ bool ContextInterface::isEntryListValid() {
 	return true;
 }
 ////////////////////////////////////////////////////////////////////
+bool ContextInterface::hasLimitEntries() const {
+////////////////////////////////////////////////////////////////////
+	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
+	{
+		const ProcessEntry& entry = *it;
+		if ( entry.hasLimit() )
+			return true;
+	}
+	
+	return false;
+}
+////////////////////////////////////////////////////////////////////
+bool ContextInterface::hasMovesWithoutSpindleEntries()const  {
+////////////////////////////////////////////////////////////////////
+	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
+	{
+		const ProcessEntry& entry = *it;
+		if ( entry.hasWrongMovement() )
+			return true;
+	}
+	
+	return false;
+}
+////////////////////////////////////////////////////////////////////
 bool ContextInterface::filterAllLimitEntries(std::ostream& o) {
 ////////////////////////////////////////////////////////////////////
 	if ( isEntryListValid() == false )
@@ -274,12 +316,12 @@ bool ContextInterface::filterAllLimitEntries(std::ostream& o) {
 		o << "The underling list is not valid\n";
 		return false;
 	}
+	
 	// --------------------------------------------------------------
 	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
 	{
-		const ProcessEntry& entry	= *it;
-		
-		if ( entry.lastType == ProcessEntry::Type::LIMIT )
+		const ProcessEntry& entry = *it;
+		if ( entry.hasLimit() )
 			TRACE_ENTRY(o);
 	}
 	
@@ -298,9 +340,7 @@ bool ContextInterface::filterAllMovesWithoutSpindle(std::ostream& o) {
 	for ( auto it = contextInterfaceEntries.begin(); it != contextInterfaceEntries.end(); ++it )
 	{
 		const ProcessEntry& entry = *it;
-		const bool b = entry.hasMovement() && entry.spindleState == SPINDLE_STATE_OFF && ArdoObj::SpeedTuple::decodeMode(entry.speedTupleVal) != 'R';
-		
-		if ( b )
+		if ( entry.hasWrongMovement() )
 			TRACE_ENTRY(o);
 	}
 	
@@ -333,7 +373,7 @@ bool ContextInterface::analizeContextEntries(ProcessResult& result) {
 		}
 		
 		// Limit
-		if ( entry.limitStates.hasLimits() == true )
+		if ( entry.hasLimit() == true )
 		{
 			if ( entry.limitStates.xMin() == true ) result.sum.limitStates.setBit(LimitSwitch::BIT_LS_X_MIN, true);
 			if ( entry.limitStates.xMax() == true ) result.sum.limitStates.setBit(LimitSwitch::BIT_LS_X_MAX, true);
@@ -351,7 +391,7 @@ bool ContextInterface::analizeContextEntries(ProcessResult& result) {
 			result.sum.lenY += abs(entry.moveDy);
 			result.sum.lenZ += abs(entry.moveDz);
 			
-			if ( entry.spindleState == SPINDLE_STATE_OFF && ArdoObj::SpeedTuple::decodeMode(entry.speedTupleVal) != 'R' )
+			if ( entry.hasWrongMovement() )
 			{
 				result.err.lenX += abs(entry.moveDx);
 				result.err.lenY += abs(entry.moveDy);

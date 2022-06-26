@@ -83,10 +83,10 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		// ---------------------------------------------------
 		struct CncSpindleStateInstruction : public CncInstruction
 		{
-			bool on;
+			bool state;
 			bool force;
 			
-			explicit CncSpindleStateInstruction(bool o, bool f) : on (o), force(f) {}
+			explicit CncSpindleStateInstruction(bool s, bool f) : state (s), force(f) {}
 			virtual bool process(CncPathListInterfaceCnc* i);
 			virtual void traceTo(std::ostream& o) const;
 		};
@@ -162,7 +162,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		bool executeClientIDChange(long cid);
 		bool executeFeedSpeedChange(double value_MM_MIN, CncSpeedMode m);
 		bool executeToolChange(double diameter);
-		bool executeSpindleStateSwitch(bool on, bool force=false);
+		bool executeSpindleStateSwitch(CncSpindlePowerState state, bool force=false);
 		bool executeSpindleSpeedChange(double value_U_MIN);
 		bool executeMoveImage(const CncMoveSequenceImage& img);
 		bool executeMoveSequence(CncMoveSequence& seq);
@@ -200,7 +200,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual bool processClientIDChange(long cid)									override { cncInstructions.push_back(new CncClientIDInstruction(cid));				return true; }
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		override { cncInstructions.push_back(new CncFeedSpeedInstruction(value_MM_MIN, m));	return true; }
 		virtual bool processToolChange(double diameter)									override { cncInstructions.push_back(new CncToolChangeInstruction(diameter));		return true; }
-		virtual bool processSpindleStateSwitch(bool on, bool force)						override { cncInstructions.push_back(new CncSpindleStateInstruction(on, force));	return true; }
+		virtual bool processSpindleStateSwitch(CncSpindlePowerState state, bool force)	override { cncInstructions.push_back(new CncSpindleStateInstruction(state, force));	return true; }
 		virtual bool processSpindleSpeedChange(double value_U_MIN)						override { cncInstructions.push_back(new CncSpindleSpeedInstruction(value_U_MIN));	return true; }
 		virtual bool processMoveSequence(CncMoveSequence& msq)							override { cncInstructions.push_back(new CncMovSeqInstruction(msq));				return true; }
 		virtual bool processPathListEntry(const CncPathListEntry& ple)					override { cncInstructions.push_back(new CncPathListInstruction(ple));				return true; }
@@ -211,7 +211,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual bool processClientIDChange(long cid)									override { return executeClientIDChange( cid); }
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		override { return executeFeedSpeedChange(value_MM_MIN, m); }
 		virtual bool processToolChange(double diameter)									override { return executeToolChange(diameter); }
-		virtual bool processSpindleStateSwitch(bool on, bool force)						override { return executeSpindleStateSwitch(on, force); }
+		virtual bool processSpindleStateSwitch(CncSpindlePowerState state, bool force)	override { return executeSpindleStateSwitch(state, force); }
 		virtual bool processSpindleSpeedChange(double value_U_MIN)						override { return executeSpindleSpeedChange(value_U_MIN); }
 		virtual bool processMoveSequence(CncMoveSequence& msq)							override { return executeMoveSequence(msq); }
 		virtual bool processPathListEntry(const CncPathListEntry& ple)					override { return executePathListEntry(ple); }

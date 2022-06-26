@@ -7,18 +7,18 @@
 #include "CncPathListRunner.h"
 
 // -------------------------------------------------------------------------------------
-class CncPathListMonitor : public CncPathListRunner::Interface {
-	
+class CncPathListMonitor : public CncPathListRunner::Interface 
+{
 	protected:
 		
 		struct Current 
 		{
-			CncDoublePosition	monitorPos			= {0.0, 0.0, 0.0};
-			bool				spindleState		= false;
-			double				spindleSpeed		= 0.0;
-			long				clientId			= CLIENT_ID.INVALID;
-			double				speedValue_MM_MIN	= 0.0;
-			CncSpeedMode		speedMode			= CncSpeedUserDefined;
+			CncDoublePosition		monitorPos			= {0.0, 0.0, 0.0};
+			CncSpindlePowerState	spindleState		= SPINDLE_STATE_OFF;
+			double					spindleSpeed		= 0.0;
+			long					clientId			= CLIENT_ID.INVALID;
+			double					speedValue_MM_MIN	= 0.0;
+			CncSpeedMode			speedMode			= CncSpeedUserDefined;
 		};
 		
 		Current				current;

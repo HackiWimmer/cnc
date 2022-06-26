@@ -137,7 +137,7 @@ void PathHandlerBase::processFeedSpeed(CncSpeedMode mode, double feedSpeed_MM_MI
 	pathListMgr.addEntryAdm(mode, feedSpeed_MM_MIN);
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::processSpindleState(bool state) {
+void PathHandlerBase::processSpindleState(CncSpindlePowerState state) {
 //////////////////////////////////////////////////////////////////
 	pathListMgr.addEntrySpl(state);
 }

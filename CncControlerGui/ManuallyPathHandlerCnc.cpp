@@ -39,9 +39,9 @@ bool ManuallyPathHandlerCnc::finishWork() {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-void ManuallyPathHandlerCnc::switchSpindleState(bool state) {
+void ManuallyPathHandlerCnc::switchSpindleState(CncSpindlePowerState state) {
 //////////////////////////////////////////////////////////////////
-	state == true ? cncControl->switchSpindleOn() : cncControl->switchSpindleOff();
+	state == SPINDLE_STATE_ON ? cncControl->switchSpindleOn() : cncControl->switchSpindleOff();
 }
 //////////////////////////////////////////////////////////////////
 bool ManuallyPathHandlerCnc::processLinearMove(const CncMoveDefinition& md) {

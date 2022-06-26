@@ -287,6 +287,21 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 	o << std::endl;
 }
 //////////////////////////////////////////////////////////////
+bool CncTemplateContext::save(const wxFileName& fn) const {
+//////////////////////////////////////////////////////////////
+	std::fstream fs;
+
+	fs.open(fn.GetFullPath().c_str().AsChar(), std::ios::out | std::ios::trunc);
+	if ( fs.is_open() ) 
+	{
+		traceTo(fs, 0);
+		fs.close();
+		return true;
+	}
+	
+	return false;
+}
+//////////////////////////////////////////////////////////////
 void CncTemplateContext::notifyBeginRun() {
 //////////////////////////////////////////////////////////////
 	CNC_CEX2_FUNCT_A(": %d", hasValidRuns())

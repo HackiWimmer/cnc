@@ -338,7 +338,7 @@ class CncControl {
 		bool isLastDuration();
 		
 		// Tool management
-		bool switchSpindleState(bool on, bool force = false);
+		bool switchSpindleState(CncSpindlePowerState state, bool force = false);
 		bool switchSpindleOn();
 		bool switchSpindleOff(bool force = false);
 		

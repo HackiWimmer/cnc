@@ -598,7 +598,10 @@ bool SVGPathHandlerCnc::finishWork() {
 	if ( PathHandlerBase::finishWork() == false )
 		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::finishWork() failed!\n");
 	
+	// Move to end position:
+	// position p defines the end position
 	#warning is p(0.0, 0.0, 0.0) always correct here?
+	
 	CncDoublePosition p(0.0, 0.0, 0.0);
 	MoveParameter mp;
 	mp.idOffset = CO::FINALIZE_TEMPLATE;

@@ -1333,24 +1333,14 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 3");
-	
-	cnc->switchSpindleOn();
-	std::cout << "SPS: " << cnc->evaluateSpindlePowerState() << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
 	
-	cnc->switchSpindleOff();
-	std::cout << "SPS: " << cnc->evaluateSpindlePowerState() << std::endl;
-	/*
-	GetterValues gv;
-	cnc->processGetter(PID_SPINDLE_SWITCH, gv);
-	
-	if ( gv.size() > 0 )
-		std::cout << gv[0] << std::endl;
-	*/
+	wxFileName fileName("c:\\temp\\aaaa.bmp");
+	motionMonitor->saveContentAsBitmap(fileName);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {

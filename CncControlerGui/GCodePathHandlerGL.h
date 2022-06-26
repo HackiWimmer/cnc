@@ -16,7 +16,7 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		virtual bool			isPathListUsed() 					const					override { return false; }
 		virtual bool			shouldAToolChangeProcessed()								override { return false; }
 		
-		virtual void			switchSpindleState(bool state)								override {}
+		virtual void			switchSpindleState(CncSpindlePowerState state)				override {}
 		virtual void			logMeasurementStart()										override {}
 		virtual void			logMeasurementEnd()											override {}
 

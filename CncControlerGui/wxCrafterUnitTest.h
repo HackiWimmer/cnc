@@ -137,6 +137,8 @@ protected:
     wxPanel* m_plDir;
     wxStaticText* m_staticText33;
     wxDirPickerCtrl* m_dirSelection;
+    wxStaticText* m_staticText48;
+    wxCheckBox* m_cbSkipIgnore;
     wxStaticLine* m_staticLine43;
     wxButton* m_btCancel;
     wxButton* m_btRun;
@@ -187,6 +189,14 @@ public:
     wxDirPickerCtrl* GetDirSelection()
     {
 	return m_dirSelection;
+    }
+    wxStaticText* GetStaticText48()
+    {
+	return m_staticText48;
+    }
+    wxCheckBox* GetCbSkipIgnore()
+    {
+	return m_cbSkipIgnore;
     }
     wxPanel* GetPlDir()
     {

@@ -167,7 +167,7 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 		case CncPathListEntryListCtrl::COL_TOTAL_DISTANCE: 	return displayPosition     == true ?	formatDistance(cpe.totalDistance)							: _("");
 		
 		case CncPathListEntryListCtrl::COL_F:				return displayFeedSpeed    == true ?	wxString::Format("%4.1lf %c",	cpe.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(cpe.feedSpeedMode)) : _("");
-		case CncPathListEntryListCtrl::COL_S:				return displaySpindleSpeed == true ?	wxString::Format("%4.1lf %s",	cpe.spindleSpeed_U_MIN, cpe.spindleState ? "ON" : "OFF") : _("");
+		case CncPathListEntryListCtrl::COL_S:				return displaySpindleSpeed == true ?	wxString::Format("%4.1lf %s",	cpe.spindleSpeed_U_MIN, cpe.spindleState == SPINDLE_STATE_ON ? "ON" : "OFF") : _("");
 	}
 
 	return _("");

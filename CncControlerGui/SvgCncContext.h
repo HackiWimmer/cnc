@@ -83,6 +83,7 @@ class SvgCncContextBase {
 		const wxString 	getParameterValue(const wxString& key)								const;
 		
 		bool			convertToBool(const wxString& key)									const;
+		bool			convertToSpindelState(const wxString& key)								const;
 		
 		bool			getParameterAsBool	(const wxString& key, const char* def = NULL)	const	{ return getParameter(key).GetBool(); }
 		char			getParameterAsChar	(const wxString& key, const char* def = NULL)	const	{ return getParameter(key).GetChar(); }
@@ -283,7 +284,7 @@ class SvgCncContext : public SvgCncContextBase {
 		double					getCurrentWorkSpeed_MM_MIN()				const	{ return currentWorkSpeed_MM_MIN; }
 		double					getCurrentSpindleSpeed_U_MIN()				const	{ return currentSpindleSpeed_U_MIN; }
 		
-		bool					getCurrentSpindleState()					const	{ return convertToBool(ID_SPINDLE_STATE); }
+		CncSpindlePowerState	getCurrentSpindleState()					const	{ return convertToSpindelState(ID_SPINDLE_STATE); }
 		
 		char					getCurrentZDepthMode()						const	{ return currentZDepthMode; }
 		double					getCurrentZDepth() 							const	{ return currentZDepth; }

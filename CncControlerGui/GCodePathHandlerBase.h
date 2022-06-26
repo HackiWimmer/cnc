@@ -22,9 +22,9 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		int					getToolLengthOffsetId()										const	{ return toolLengthOffsetId; }
 		void				setToolLengthOffsetId(int tloi)										{ toolLengthOffsetId = tloi; }
 		
-		virtual bool		isPathListUsed()				const	= 0;
-		virtual void		switchSpindleState(bool state)			= 0;
-		virtual bool		initNextPath()							= 0;
+		virtual bool		isPathListUsed()								const	= 0;
+		virtual void		switchSpindleState(CncSpindlePowerState state)			= 0;
+		virtual bool		initNextPath()											= 0;
 		virtual bool		prepareWork(); 
 		virtual bool		finishWork();
 		

@@ -184,6 +184,12 @@ const wxVariant SvgCncContextBase::getParameter(const wxString& key, const char*
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
+CncSpindlePowerState SvgCncContextBase::convertToSpindelState(const wxString& key) const {
+//////////////////////////////////////////////////////////////////
+	const bool b = convertToBool(key);
+	return b ? SPINDLE_STATE_ON : SPINDLE_STATE_OFF;
+}
+//////////////////////////////////////////////////////////////////
 bool SvgCncContextBase::convertToBool(const wxString& key) const {
 //////////////////////////////////////////////////////////////////
 	auto it = parameterMap.find(key);

@@ -790,3 +790,26 @@ void CncMotionMonitor::traceInformation() {
 	md.CenterOnParent();
 	md.ShowModal();
 }
+//////////////////////////////////////////////////
+bool CncMotionMonitor::saveContentAsBitmap(const wxFileName& fileName) {
+//////////////////////////////////////////////////
+	const unsigned int w = GetClientSize().GetWidth();
+	const unsigned int h = GetClientSize().GetHeight();
+
+	wxClientDC cltDC(this);
+	wxMemoryDC memDC;
+	wxBitmap bitmap(w, h);
+	
+	memDC.SelectObject(bitmap);
+	memDC.Blit( 0, 
+				0, 
+				w, 
+				h,
+				&cltDC, 
+				0, 
+				0 
+			);
+	
+	memDC.SelectObject(wxNullBitmap);
+	return bitmap.SaveFile(fileName.GetFullPath(), wxBITMAP_TYPE_BMP);
+}

@@ -67,6 +67,8 @@ class CncMotionMonitor : public CncGlCanvas
 		virtual bool Show(bool show);
 		virtual void update(bool force=false);
 		
+		bool saveContentAsBitmap(const wxFileName& fileName);
+		
 		void synchronizeClientId();
 
 		// is used from global key down hook, that's the reason why it is public

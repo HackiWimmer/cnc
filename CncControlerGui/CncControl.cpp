@@ -2018,9 +2018,9 @@ CncSpindlePowerState CncControl::evaluateSpindlePowerState() {
 	return gv[0] != 0;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::switchSpindleState(bool on, bool force) {
+bool CncControl::switchSpindleState(CncSpindlePowerState state, bool force) {
 ///////////////////////////////////////////////////////////////////
-	return on ? switchSpindleOn() : switchSpindleOff(force);
+	return state == SPINDLE_STATE_ON ? switchSpindleOn() : switchSpindleOff(force);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::switchSpindleOn() {
