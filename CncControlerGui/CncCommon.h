@@ -535,9 +535,7 @@ namespace Trigger
 		
 		std::ostream& traceTo(std::ostream &ostr) const;
 		friend std::ostream &operator<< (std::ostream &ostr, const ParameterSet &p)
-		{
-			return p.traceTo(ostr);
-		}
+			{ return p.traceTo(ostr); }
 	};
 	
 	struct BeginRun 

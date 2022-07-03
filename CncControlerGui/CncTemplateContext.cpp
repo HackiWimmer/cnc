@@ -275,7 +275,6 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 		const bool fileExists  = wxFileName::Exists(getFileName());
 		const bool interfaceOk = hasValidRuns() ? cncInterface != NULL : true;
 		
-		
 		if ( modifyFlag   == true  )	o << " Template is modified\n";
 		if ( interfaceOk  == false )	o << " Invalid CNC interface\n";
 		if ( fileExists   == false )	o << " Invalid file name\n";
@@ -304,7 +303,7 @@ bool CncTemplateContext::save(const wxFileName& fn) const {
 //////////////////////////////////////////////////////////////
 void CncTemplateContext::notifyBeginRun() {
 //////////////////////////////////////////////////////////////
-	CNC_CEX2_FUNCT_A(": %d", hasValidRuns())
+	//CNC_CEX2_FUNCT_A(": %d", hasValidRuns())
 	
 	//this notification is only meaningful as long as 
 	//the template was not valid processed.

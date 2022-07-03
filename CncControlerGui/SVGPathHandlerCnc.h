@@ -97,6 +97,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		virtual bool			runCurrentPath()							override;
 		virtual bool			finishWork()								override;
 		
+		virtual void			traceWorkflow(std::ostream& o)				override { CncPathListRunner::traceWorkflow(o); }
 		virtual void			resetWorkflow()								override { CncPathListRunner::resetWorkflow(); }
 		virtual bool			spoolWorkflow()								override { return CncPathListRunner::spoolWorkflow(); }
 };

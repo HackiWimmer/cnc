@@ -167,7 +167,6 @@ bool CncTestRunConfig::runDir() {
 					if ( THE_APP->processTemplate() == false )
 					{
 						// the errors are already present
-						//CNC_CERR_A("Error while processing '%s'", fn.GetFullPath())
 						cntFailed++;
 						error = true;
 					}
@@ -189,11 +188,12 @@ bool CncTestRunConfig::runDir() {
 				const bool result    = ( error == false && tplCtxErr == false );
 
 				// build a test directory
-				const wxString testCaseDir(wxString::Format("%s@TC%s_%s.%s\\",
+				const wxString testCaseDir(wxString::Format("%s@TC%s_%s.%s%s",
 											testOutputDir,
 											testCaseIndex,
 											fn.GetFullName(),
-											(result ? "OK" : "FAILED")
+											(result ? "OK" : "FAILED"),
+											char(wxFileName::GetPathSeparator())
 										   )
 				);
 				

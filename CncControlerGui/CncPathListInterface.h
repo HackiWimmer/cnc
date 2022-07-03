@@ -53,6 +53,7 @@ class CncPathListMonitor : public CncPathListRunner::Interface
 		virtual bool processSpindleSpeedChange(double value_U_MIN)								override { current.spindleSpeed = value_U_MIN; return true; }
 		virtual bool processMoveSequence(CncMoveSequence& msq)									override;
 		virtual bool processPathListEntry(const CncPathListEntry& ple)							override;
+		virtual bool processCommandEntry(const unsigned char* buffer, int bytes)				override;
 		
 		virtual void processTrigger(const Trigger::BeginRun& tr)								override {}
 		virtual void processTrigger(const Trigger::EndRun& tr)									override {}

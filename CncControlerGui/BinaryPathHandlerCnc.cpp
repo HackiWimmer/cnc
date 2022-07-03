@@ -2,8 +2,9 @@
 
 /////////////////////////////////////////////////////////////
 BinaryPathHandlerCnc::BinaryPathHandlerCnc(CncControl* cnc) 
-: BinaryPathHandlerBase()
-, cncControl(cnc)
+: BinaryPathHandlerBase		()
+, CncPathListRunner			(cnc)
+, cncControl				(cnc)
 /////////////////////////////////////////////////////////////
 {
 }
@@ -14,6 +15,11 @@ BinaryPathHandlerCnc::~BinaryPathHandlerCnc() {
 /////////////////////////////////////////////////////////////
 bool BinaryPathHandlerCnc::processCommand(const unsigned char* buffer, int nbBytes) {
 /////////////////////////////////////////////////////////////
+	const bool usePathListRunner = true;
+	if ( usePathListRunner == true)
+		return CncPathListRunner::processCommand(buffer, nbBytes);
+
+	// ... or direct cnc control communication
 	if ( nbBytes <= 0 || buffer == NULL)
 		return true;
 

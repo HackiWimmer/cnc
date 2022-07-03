@@ -12,6 +12,7 @@ typedef CncPathListInterfaceCnc CPLI;
 bool CPLI::CncMovSeqInstruction				::process(CPLI* i)					{ return i->executeMoveImage(img); }
 bool CPLI::CncPathListInstruction			::process(CPLI* i)					{ return i->executePathListEntry(ple); }
 bool CPLI::CncGuidPathInstruction			::process(CPLI* i)					{ return i->executeGuidePath(plm); }
+bool CPLI::CncCommandInstruction			::process(CPLI* i)					{ return i->executeCommand(buffer, bytes); }
 bool CPLI::CncClientIDInstruction			::process(CPLI* i)					{ return i->executeClientIDChange(cid); }
 bool CPLI::CncFeedSpeedInstruction			::process(CPLI* i)					{ return i->executeFeedSpeedChange(value_MM_MIN, mode); }
 bool CPLI::CncToolChangeInstruction			::process(CPLI* i)					{ return i->executeToolChange(diameter); }
@@ -84,6 +85,8 @@ void CncPathListInterfaceCnc::executeTrigger(const Trigger::GuidePath& tr)						
 
 bool CncPathListInterfaceCnc::executeGuidePath(const CncPathListManager& plm)					{ cnc->addGuidePath(plm); return true; }
 
+bool CncPathListInterfaceCnc::executeCommand(const unsigned char* buffer, int bytes)			{ return cnc->execute(buffer, bytes); }
+
 void CncPathListInterfaceCnc::setCurrentPositionMetric(double px, double py, double pz)			{ currentAddPosition.setXYZ(px, py, pz); }
 void CncPathListInterfaceCnc::setCurrentPositionMetric(const CncDoublePosition& pos)			{ currentAddPosition.set(pos); }
 CncDoublePosition CncPathListInterfaceCnc::getCurrentPositionMetric() const						{ return currentAddPosition; }
@@ -149,10 +152,14 @@ bool CncPathListInterfaceCnc::spoolInstructions() {
 	return spoolInstructions(&cncInstructions);
 }
 ////////////////////////////////////////////////////////////////////
+void CncPathListInterfaceCnc::processTrigger(const Trigger::BeginRun& tr) { 
+////////////////////////////////////////////////////////////////////
+	cncInstructions.push_back(new InstructionTriggerBeginRun(tr)); 
+}
+////////////////////////////////////////////////////////////////////
 void CncPathListInterfaceCnc::processTrigger(const Trigger::EndRun& tr) { 
 ////////////////////////////////////////////////////////////////////
 	cncInstructions.push_back(new InstructionTriggerEndRun(tr)); 
-	
 	THE_TPL_CTX->registerCncInterface(this);
 }
 ////////////////////////////////////////////////////////////////////

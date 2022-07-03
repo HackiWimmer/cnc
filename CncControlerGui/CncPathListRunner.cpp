@@ -24,6 +24,7 @@ bool CncPathListRunner::WorkflowTriggerGuidePtahEntry  ::process(CncPathListRunn
 bool CncPathListRunner::WorkflowSetupRunEntry          ::process(CncPathListRunner* plr)	{ plr->autoSetup(trace);   return true; }
 bool CncPathListRunner::WorkflowCncEntry               ::process(CncPathListRunner* plr)	{ return plr->publishCncPath(plm); }
 bool CncPathListRunner::WorkflowGuideEntry             ::process(CncPathListRunner* plr)	{ return plr->publishGuidePath(plm); }
+bool CncPathListRunner::WorkflowCommandEntry           ::process(CncPathListRunner* plr)	{ return plr->publishCommand(buffer, bytes); }
 
 void CncPathListRunner::WorkflowTriggerBeginRunEntry   ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
 void CncPathListRunner::WorkflowTriggerEndRunEntry     ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
@@ -33,6 +34,8 @@ void CncPathListRunner::WorkflowTriggerGuidePtahEntry  ::traceTo(std::ostream& o
 void CncPathListRunner::WorkflowSetupRunEntry          ::traceTo(std::ostream& o)	const	{ o << "Setup(...)"									<< std::endl; }
 void CncPathListRunner::WorkflowCncEntry               ::traceTo(std::ostream& o)	const	{ o << "CncEntry("	<< plm.firstClientID() << ")"	<< std::endl; }
 void CncPathListRunner::WorkflowGuideEntry             ::traceTo(std::ostream& o)	const	{ o << "GuideEntry("<< plm.firstClientID() << ")"	<< std::endl; }
+void CncPathListRunner::WorkflowCommandEntry           ::traceTo(std::ostream& o)	const	{ o << "CommandEntry(size="<< bytes << ")"			<< std::endl; }
+
 
 ////////////////////////////////////////////////////////////////////
 float CncPathListRunner::Move::maxXYPitchRadians	= CncPathListRunner::Move::degree2Radians(15);
@@ -365,6 +368,13 @@ bool CncPathListRunner::processCncPath(const CncPathListManager& plm) {
 	return true; 
 }
 //////////////////////////////////////////////////////////////////
+bool CncPathListRunner::processCommand(const unsigned char* buffer, int len) {
+//////////////////////////////////////////////////////////////////
+	workflowList.push_back(new WorkflowCommandEntry(buffer, len));
+	
+	return true; 
+}
+//////////////////////////////////////////////////////////////////
 void CncPathListRunner::resetWorkflow() {
 //////////////////////////////////////////////////////////////////
 	for ( auto workflowEntry : workflowList )
@@ -466,6 +476,15 @@ bool CncPathListRunner::spoolWorkflow() {
 	
 	// process all collected cnc instructions
 	return currentInterface->spoolInstructions();
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListRunner::traceWorkflow(std::ostream& o) {
+//////////////////////////////////////////////////////////////////
+	// over all workflow entries
+	for ( auto workflowEntry : workflowList )
+	{
+		workflowEntry->traceTo(o);
+	}
 }
 //////////////////////////////////////////////////////////////////
 void CncPathListRunner::logMeasurementStart() {
@@ -1096,6 +1115,14 @@ bool CncPathListRunner::publishGuidePath(const CncPathListManager& plm) {
 		
 	currentInterface->processGuidePath(plm);
 	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::publishCommand(const unsigned char* buffer, int bytes) {
+//////////////////////////////////////////////////////////////////
+	if ( buffer == NULL || bytes <= 0 )
+		return false;
+	
+	return currentInterface->processCommandEntry(buffer, bytes);
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::checkContent(const CncPathListEntry& curr) {

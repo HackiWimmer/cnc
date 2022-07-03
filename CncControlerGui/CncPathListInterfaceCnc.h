@@ -2,6 +2,7 @@
 #define CNC_PATH_LIST_INTERFACE_CNC
 
 #include "CncCommon.h"
+#include "CncArduino.h"
 #include "CncPosition.h"
 #include "CncMoveSequence.h"
 #include "CncPathListRunner.h"
@@ -50,6 +51,44 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 			virtual void traceTo(std::ostream& o) const;
 		};
 		
+		struct CncCommandInstruction : public CncInstruction
+		{
+			unsigned char*	buffer;
+			int				bytes;
+			
+			CncCommandInstruction(const unsigned char* b, int len)
+			: CncInstruction	()
+			, buffer			(NULL)
+			, bytes				(0)
+			{
+				// creates a deep copy!
+				if ( b != NULL && len > 0 )
+				{
+					bytes = len;
+					buffer = new unsigned char[bytes];
+					memcpy(buffer, b, bytes);
+				}
+			}
+			
+			~CncCommandInstruction()
+			{
+				if ( buffer != NULL )
+					delete [] buffer;
+			}
+			
+			virtual bool process(CncPathListInterfaceCnc* i);
+			virtual void traceTo(std::ostream& o) const
+			{
+				o	<< "  Command:"
+					<< " type = " 
+					<< std::left  << std::setw(30) << std::setfill(' ') << ( bytes > 0 ?  ArduinoCMDs::getCMDLabel(buffer[0]) : "???" ) 
+					<< " size = "
+					<< std::right << std::setw( 3) << std::setfill('0') << bytes
+					<< std::endl
+				; 
+			}
+		};
+
 		struct CncClientIDInstruction : public CncInstruction
 		{
 			long cid;
@@ -167,6 +206,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		bool executeMoveImage(const CncMoveSequenceImage& img);
 		bool executeMoveSequence(CncMoveSequence& seq);
 		bool executePathListEntry(const CncPathListEntry& ple);
+		bool executeCommand(const unsigned char* buffer, int bytes);
 		
 		void executeTrigger(const Trigger::BeginRun& tr);
 		void executeTrigger(const Trigger::EndRun& tr);
@@ -204,6 +244,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual bool processSpindleSpeedChange(double value_U_MIN)						override { cncInstructions.push_back(new CncSpindleSpeedInstruction(value_U_MIN));	return true; }
 		virtual bool processMoveSequence(CncMoveSequence& msq)							override { cncInstructions.push_back(new CncMovSeqInstruction(msq));				return true; }
 		virtual bool processPathListEntry(const CncPathListEntry& ple)					override { cncInstructions.push_back(new CncPathListInstruction(ple));				return true; }
+		virtual bool processCommandEntry(const unsigned char* buffer, int bytes)		override { cncInstructions.push_back(new CncCommandInstruction(buffer, bytes));		return true; }
 	
 	#else
 	
@@ -215,10 +256,11 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		virtual bool processSpindleSpeedChange(double value_U_MIN)						override { return executeSpindleSpeedChange(value_U_MIN); }
 		virtual bool processMoveSequence(CncMoveSequence& msq)							override { return executeMoveSequence(msq); }
 		virtual bool processPathListEntry(const CncPathListEntry& ple)					override { return executePathListEntry(ple); }
+		virtual bool processCommandEntry(const unsigned char* buffer, int bytes)		override { return executeCommandEntry(buffer, bytes); }
 	
 	#endif
 	
-		virtual void processTrigger(const Trigger::BeginRun& tr)						override { cncInstructions.push_back(new InstructionTriggerBeginRun     (tr)); }
+		virtual void processTrigger(const Trigger::BeginRun& tr)						override;
 		virtual void processTrigger(const Trigger::EndRun& tr)							override;
 		virtual void processTrigger(const Trigger::NextPath& tr)						override { cncInstructions.push_back(new InstructionTriggerNextPath     (tr)); }
 		virtual void processTrigger(const Trigger::SpeedChange& tr)						override { cncInstructions.push_back(new InstructionTriggerSpeedChange  (tr)); }

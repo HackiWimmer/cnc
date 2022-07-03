@@ -144,11 +144,12 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		virtual bool runCurrentPath();
 		virtual bool finishWork();
 		
-		virtual void resetWorkflow()			{  CNC_CEX1_FUNCT_A("Implement this within inherited classes") }
-		virtual bool spoolWorkflow()			{  CNC_CEX1_FUNCT_A("Implement this within inherited classes"); return false; }
+		virtual void traceWorkflow(std::ostream& o)	{ CNC_CEX1_FUNCT_A("Implement this within inherited classes"); }
+		virtual void resetWorkflow()				{ CNC_CEX1_FUNCT_A("Implement this within inherited classes") }
+		virtual bool spoolWorkflow()				{ CNC_CEX1_FUNCT_A("Implement this within inherited classes"); return false; }
 		
-		virtual void logMeasurementStart()		{}
-		virtual void logMeasurementEnd() 		{}
+		virtual void logMeasurementStart()			{}
+		virtual void logMeasurementEnd() 			{}
 		
 		virtual void processWait(int64_t microseconds);
 		

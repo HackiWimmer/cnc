@@ -6,10 +6,10 @@
 //------------------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////
 BinaryPathHandlerBase::BinaryPathHandlerBase()
-: PathHandlerBase()
-, lineNumberTranslater()
-, totalLineNumberOffset(0)
-, lineNumberCounter(0)
+: PathHandlerBase			()
+, lineNumberTranslater		()
+, totalLineNumberOffset		(0)
+, lineNumberCounter			(0)
 ////////////////////////////////////////////////////////////
 {
 }
@@ -37,8 +37,8 @@ void BinaryPathHandlerBase::resetLineNumberTranslation() {
 //------------------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////
 BinaryPathHandlerHexView::BinaryPathHandlerHexView(FormatType ft) 
-: BinaryPathHandlerBase()
-, formatType(ft)
+: BinaryPathHandlerBase	()
+, formatType			(ft)
 /////////////////////////////////////////////////////////////
 {
 }
@@ -86,9 +86,9 @@ bool BinaryPathHandlerHexView::processCommand(const unsigned char* buffer, int n
 //------------------------------------------------------------------------------------
 /////////////////////////////////////////////////////////////
 BinaryPathHandlerHumanReadableView::BinaryPathHandlerHumanReadableView(FormatType ft) 
-: BinaryPathHandlerBase()
-, CncCommandDecoder::CallbackInterface()
-, formatType(ft)
+: BinaryPathHandlerBase						()
+, CncCommandDecoder::CallbackInterface		()
+, formatType								(ft)
 /////////////////////////////////////////////////////////////
 {
 }
@@ -197,7 +197,8 @@ bool BinaryPathHandlerHumanReadableView::processCommand(const unsigned char* buf
 	bool ret = false;
 	
 	const unsigned char cmd = buffer[0];
-	switch ( cmd ) {
+	switch ( cmd )
+	{
 		//--------------------------------------------------
 		case CMD_SETTER:
 		{	
@@ -239,7 +240,8 @@ void BinaryPathHandlerHumanReadableView::notifyMove(int32_t dx, int32_t dy, int3
 	const double factY = THE_CONFIG->getDisplayFactY();
 	const double factZ = THE_CONFIG->getDisplayFactZ();
 
-	switch ( formatType ) {
+	switch ( formatType )
+	{
 		case Steps:		readableContent << wxString::Format("    cnc->seq->exec(%+ 10ld, %+ 10ld, %+ 8ld ); // Sequence Move\n", dx, dy, dz);
 						break;
 						

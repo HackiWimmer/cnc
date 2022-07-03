@@ -1418,10 +1418,12 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei) {
 ///////////////////////////////////////////////////////////////////
-	auto checkSetterCount = [](unsigned char pid, size_t count, size_t ref) {
+	auto checkSetterCount = [](unsigned char pid, size_t count, size_t ref)
+	{
 		bool ret = (count == ref);
 		
-		if ( ret == false ) {
+		if ( ret == false )
+		{
 			std::cerr << "CncControl::SerialExecuteControllerCallback(): Invalid Setter(" << ArduinoPIDs::getPIDLabel(pid) << ") value count: " 
 					  << "Given: " << count << ", Reference: " << ref
 					  << std::endl;
@@ -1434,7 +1436,8 @@ bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei
 	if ( dispatchEventQueue() == false )
 		return false;
 	
-	switch ( cei.infoType ) {
+	switch ( cei.infoType )
+	{
 		// --------------------------------------------------------
 		case CEITSetter:
 		{

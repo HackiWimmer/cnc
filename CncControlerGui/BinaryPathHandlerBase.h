@@ -10,8 +10,8 @@
 typedef cnc::LineNumberTranslater LineNumberTranslater;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-class BinaryPathHandlerBase : public PathHandlerBase {
-	
+class BinaryPathHandlerBase : public PathHandlerBase 
+{
 	private:
 		
 		LineNumberTranslater	lineNumberTranslater;
@@ -20,7 +20,9 @@ class BinaryPathHandlerBase : public PathHandlerBase {
 		
 	protected:
 		
-		virtual bool			processLinearMove(bool alreadyRendered) { return true; }
+		virtual bool			processLinearMove(bool alreadyRendered)						override	{ return true; }
+		
+		
 		void					resetLineNumberTranslation();
 		void					translateLineNumber(unsigned long offset);
 		
@@ -28,19 +30,26 @@ class BinaryPathHandlerBase : public PathHandlerBase {
 		BinaryPathHandlerBase();
 		virtual ~BinaryPathHandlerBase();
 		
-		virtual const char*		getName() const { return "BinaryPathHandlerBase"; }
+		virtual const char*		getName() const override 												{ return "BinaryPathHandlerBase"; }
 		
 		// common interface
-		virtual bool			processCommand(const unsigned char* buffer, int nbBytes) { return true; };
+		virtual bool			processCommand(const unsigned char* buffer, int nbBytes)				{ return true; };
+		
+		virtual void			traceWorkflow(std::ostream& o)								override	{ }
+		virtual void			resetWorkflow()												override	{ }
+		virtual bool			spoolWorkflow()												override	{ return true; }
+		
+		virtual void			deligateTrigger(const Trigger::BeginRun& tr)				override	{ /*processTrigger(tr);*/ }
+		virtual void			deligateTrigger(const Trigger::EndRun& tr)					override	{ /*processTrigger(tr);*/ }
 		
 		// view interface
-		virtual const wxString& getViewContent(wxString& content) 		{ return content; }
-		const cnc::LineNumberTranslater& getLineNumberTranslater() 		{ return lineNumberTranslater; }
+		virtual const wxString& getViewContent(wxString& content)										{ return content; }
+		const cnc::LineNumberTranslater& getLineNumberTranslater()										{ return lineNumberTranslater; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-class BinaryPathHandlerHexView : public BinaryPathHandlerBase {
-	
+class BinaryPathHandlerHexView : public BinaryPathHandlerBase 
+{
 	public:
 		enum FormatType {Raw, CStyle};
 	
@@ -53,12 +62,12 @@ class BinaryPathHandlerHexView : public BinaryPathHandlerBase {
 		explicit BinaryPathHandlerHexView(FormatType ft = FormatType::Raw);
 		virtual ~BinaryPathHandlerHexView() {}
 		
-		virtual bool prepareWork(); 
-		virtual bool finishWork();
+		virtual bool prepareWork() override; 
+		virtual bool finishWork() override;
 		
-		virtual bool processCommand(const unsigned char* buffer, int nbBytes);
+		virtual bool processCommand(const unsigned char* buffer, int nbBytes) override;
 		
-		virtual const wxString& getViewContent(wxString& content) { content.assign(hexContent.str()); return content; }
+		virtual const wxString& getViewContent(wxString& content) override { content.assign(hexContent.str()); return content; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -84,18 +93,18 @@ class BinaryPathHandlerHumanReadableView : public BinaryPathHandlerBase
 		explicit BinaryPathHandlerHumanReadableView(FormatType ft);
 		virtual ~BinaryPathHandlerHumanReadableView() {}
 		
-		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz);
+		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz) override;
 
-		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence);
-		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence);
-		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence);
+		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) override;
+		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence) override;
+		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence) override;
 
-		virtual bool prepareWork(); 
-		virtual bool finishWork();
+		virtual bool prepareWork() override; 
+		virtual bool finishWork() override;
 		
-		virtual bool processCommand(const unsigned char* buffer, int nbBytes);
+		virtual bool processCommand(const unsigned char* buffer, int nbBytes) override;
 
-		virtual const wxString& getViewContent(wxString& content) { content.assign(readableContent.str()); return content; }
+		virtual const wxString& getViewContent(wxString& content) override { content.assign(readableContent.str()); return content; }
 };
 
 #endif

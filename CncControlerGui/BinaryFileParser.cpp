@@ -103,7 +103,7 @@ unsigned int BinaryFileParser::readBytes(InputStream& is, unsigned char* buffer,
 //////////////////////////////////////////////////////////////////
 	if ( buffer == NULL ) 
 	{
-		std::cerr << "BinaryFileParser::readBytes(): Invalid buffer" << std::endl;
+		CNC_CERR_FUNCT_A(": Invalid buffer\n");
 		return false;
 	}
 
@@ -111,7 +111,8 @@ unsigned int BinaryFileParser::readBytes(InputStream& is, unsigned char* buffer,
 
 	if ( !is.good() ) 
 	{
-		std::cerr << "BinaryFileParser::readBytes(): Error while reading : Required bytes = "
+		std::cerr << CNC_LOG_FUNCT 
+				  << ": Error while reading : Required bytes = "
 				  << nbBytes 
 				  << ". But only " 
 				  << is.gcount() 
@@ -130,7 +131,7 @@ unsigned int BinaryFileParser::readDataBlock(InputStream& is) {
 	uint32_t len;
 	if ( read_unit32_t(is, len) == false )
 	{
-		std::cerr << "BinaryFileParser::readDataBlock(): Error while reading length information" << std::endl;
+		CNC_CERR_FUNCT_A(": Error while reading length information\n")
 		// more details are already published
 		return -1;
 	}
@@ -162,60 +163,76 @@ bool BinaryFileParser::readDataBody(InputStream& is) {
 	is.seekg(bodyStartPos, is.beg);
 	
 	setCurrentLineNumber(0);
+	
 	// parse body - read to file end, block by block
 	bool ret = true;
-	while ( is.good() ) {
-		
+	while ( is.good() ) 
+	{
 		if ( evaluateDebugState() == false )
 			return false;
 			
 		incCurrentLineNumber();
 		
 		unsigned int datLen = readDataBlock(is);
-		if ( datLen > 0 ) {
+		if ( datLen > 0 ) 
+		{
 			// always is fine
 			remaining -= ( lenBuffSize + datLen);
-		
-		} else {
-			
-			if ( datLen < 0 ) {
-				std::cerr << "Error while reading data body" << std::endl;
+		} 
+		else
+		{
+			if ( datLen < 0 ) 
+			{
+				CNC_CERR_FUNCT_A(": Error while reading data block\n");
 				// more details already published
 				break;
 			}
 		}
 		
 		// check eof
-		if ( remaining == 0 ) {
+		if ( remaining == 0 )
+		{
 			
 			int32_t pos1 = is.tellg();
 			is.seekg (0, is.end);
 			int32_t pos2 = is.tellg();
 			
-			if ( pos1 != pos2 ) {
-				std::cerr << "BinaryFileParser::readDataBody(): Error while reaching end of data body. "
+			if ( pos1 != pos2 )
+			{
+				std::cerr << CNC_LOG_FUNCT
+						  << ": Error while reaching end of data body. "
 						  << "Remaining = "
 						  << remaining << ", "
 						  << "Current file pos = "
 						  << pos1 << ", "
 						  << "End of file = "
 						  << pos2 << std::endl;
+				ret = false;
 			}
-
+			
 			break;
 		}
 
 		// check remaining length buffer + min. 1 byte data buffer
-		if ( remaining < lenBuffSize + 1 ) {
-			std::cerr << "BinaryFileParser::readDataBody(): Error while reading data body. "
+		if ( remaining < lenBuffSize + 1 )
+		{
+			std::cerr << CNC_LOG_FUNCT
+					  << ": Error while reading data body. "
 					  << "Remaining buffer to small. Available size = "
 					  << remaining
 					  << std::endl;
 
+			ret = false;
 			break;
 		}
 	}
-
+	
+	const Trigger::EndRun tr(ret);
+	deligateTrigger(tr);
+	
+	if ( ret == true )
+		ret = pathHandler->spoolWorkflow();
+	
 	return ret;
 }
 //////////////////////////////////////////////////////////////////

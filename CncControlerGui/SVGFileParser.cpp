@@ -540,10 +540,10 @@ bool SVGFileParser::performPathByIds(const SVGUserAgentInfo& uai) {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::performUse(const SVGUserAgentInfo& uai, UseDirective& ud) {
 //////////////////////////////////////////////////////////////////
-	if ( auto it = ud.attributes.find("transform"); it != ud.attributes.end() ) {
+	if ( auto it = ud.attributes.find("transform"); it != ud.attributes.end() )
+	{
 		
-		
-		#warning - the use transformation did not work correctly
+		#warning - the use transformation did not work correctly in all casses
 		
 		
 		// reset the svg matrix

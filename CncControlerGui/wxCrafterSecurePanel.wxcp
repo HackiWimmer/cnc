@@ -15092,7 +15092,7 @@
 										}, {
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
-											"m_path":	"bitmaps/CodeLite/16-copy@2x.png"
+											"m_path":	"bitmaps/CodeLite/16-copy.png"
 										}, {
 											"type":	"bool",
 											"m_label":	"Default Button",
@@ -15173,7 +15173,7 @@
 										}, {
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
-											"m_path":	"bitmaps/CodeLite/16-file_save_all@2x.png"
+											"m_path":	"bitmaps/CodeLite/16-file_save_all.png"
 										}, {
 											"type":	"bool",
 											"m_label":	"Default Button",
@@ -15589,7 +15589,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Template CTX\\nOverall Analysis"
+											"m_value":	"Overall\\nAnalysis"
 										}, {
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
@@ -15790,7 +15790,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Template CTX\\nLimit Analysis"
+											"m_value":	"Limit\\nAnalysis"
 										}, {
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
@@ -15991,7 +15991,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Template CTX\\nMovement Analysis"
+											"m_value":	"Movement\\nAnalysis"
 										}, {
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
@@ -16192,7 +16192,7 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Template\\nParsing Synopsis"
+											"m_value":	"Parsing\\nSynopsis"
 										}, {
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
@@ -16594,11 +16594,11 @@
 										}, {
 											"type":	"string",
 											"m_label":	"Label:",
-											"m_value":	"Template CTX\\nBase List"
+											"m_value":	"Underlying\\nBase-List"
 										}, {
 											"type":	"bitmapPicker",
 											"m_label":	"Bitmap File:",
-											"m_path":	"bitmaps/CodeLite/16-database@2x.png"
+											"m_path":	"bitmaps/CodeLite/16-archive@2x.png"
 										}, {
 											"type":	"bool",
 											"m_label":	"Selected",

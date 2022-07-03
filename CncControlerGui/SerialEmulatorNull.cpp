@@ -810,7 +810,7 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			}
 			case PID_SPINDLE_SPEED:
 			{
-				spindleSpeedFact: ( values.size() > 0 ? values.front() : 0L ); 
+				spindleSpeedFact = ( values.size() > 0 ? values.front() : 0L ); 
 				break;
 			}
 		

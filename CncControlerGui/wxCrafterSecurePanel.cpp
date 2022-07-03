@@ -1847,14 +1847,14 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
 
     flexGridSizer714->Add(10, 0, 1, wxALL | wxEXPAND, WXC_FROM_DIP(5));
 
-    m_btCopy = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy@2x")),
-        wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btCopy = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxDefaultPosition,
+        wxDLG_UNIT(this, wxSize(-1, -1)), wxBU_AUTODRAW);
     m_btCopy->SetToolTip(_("Copy current List"));
 
     flexGridSizer714->Add(m_btCopy, 0, wxALL, WXC_FROM_DIP(1));
     m_btCopy->SetMinSize(wxSize(40, 40));
 
-    m_btSave = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all@2x")),
+    m_btSave = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-file_save_all")),
         wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxBU_AUTODRAW);
     m_btSave->SetToolTip(_("Save and Open current List"));
 
@@ -1898,7 +1898,7 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
     int m_plContextAnalysisOverallImgIndex;
     m_plContextAnalysisOverallImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database@2x")));
     m_loggerBook->AddPage(
-        m_plContextAnalysisOverall, _("Template CTX\nOverall Analysis"), false, m_plContextAnalysisOverallImgIndex);
+        m_plContextAnalysisOverall, _("Overall\nAnalysis"), false, m_plContextAnalysisOverallImgIndex);
 
     wxFlexGridSizer* flexGridSizer6844 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer6844->SetFlexibleDirection(wxBOTH);
@@ -1917,8 +1917,7 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
         m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     int m_plContextAnalysisLimitImgIndex;
     m_plContextAnalysisLimitImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database@2x")));
-    m_loggerBook->AddPage(
-        m_plContextAnalysisLimit, _("Template CTX\nLimit Analysis"), false, m_plContextAnalysisLimitImgIndex);
+    m_loggerBook->AddPage(m_plContextAnalysisLimit, _("Limit\nAnalysis"), false, m_plContextAnalysisLimitImgIndex);
 
     wxFlexGridSizer* flexGridSizer68442 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer68442->SetFlexibleDirection(wxBOTH);
@@ -1938,7 +1937,7 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
     int m_plContextAnalysisMovementImgIndex;
     m_plContextAnalysisMovementImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database@2x")));
     m_loggerBook->AddPage(
-        m_plContextAnalysisMovement, _("Template CTX\nMovement Analysis"), false, m_plContextAnalysisMovementImgIndex);
+        m_plContextAnalysisMovement, _("Movement\nAnalysis"), false, m_plContextAnalysisMovementImgIndex);
 
     wxFlexGridSizer* flexGridSizer684425 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer684425->SetFlexibleDirection(wxBOTH);
@@ -1957,7 +1956,7 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
         m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     int m_plParsingSynopsisImgIndex;
     m_plParsingSynopsisImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-globals@2x")));
-    m_loggerBook->AddPage(m_plParsingSynopsis, _("Template\nParsing Synopsis"), false, m_plParsingSynopsisImgIndex);
+    m_loggerBook->AddPage(m_plParsingSynopsis, _("Parsing\nSynopsis"), false, m_plParsingSynopsisImgIndex);
 
     wxFlexGridSizer* flexGridSizer6844257 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer6844257->SetFlexibleDirection(wxBOTH);
@@ -1994,8 +1993,8 @@ CncTemplateContextSummaryPanelBase::CncTemplateContextSummaryPanelBase(wxWindow*
     m_plContextList = new wxPanel(
         m_loggerBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerBook, wxSize(-1, -1)), wxTAB_TRAVERSAL);
     int m_plContextListImgIndex;
-    m_plContextListImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database@2x")));
-    m_loggerBook->AddPage(m_plContextList, _("Template CTX\nBase List"), false, m_plContextListImgIndex);
+    m_plContextListImgIndex = m_loggerBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-archive@2x")));
+    m_loggerBook->AddPage(m_plContextList, _("Underlying\nBase-List"), false, m_plContextListImgIndex);
 
     wxFlexGridSizer* flexGridSizer684 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer684->SetFlexibleDirection(wxBOTH);

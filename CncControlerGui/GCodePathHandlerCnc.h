@@ -33,6 +33,7 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		virtual bool			prepareWorkImpl()											override;
 		virtual bool			finishWorkImpl()											override;
 		
+		virtual void			traceWorkflow(std::ostream& o)								override { CncPathListRunner::traceWorkflow(o); }
 		virtual void			resetWorkflow()												override { CncPathListRunner::resetWorkflow(); }
 		virtual bool			spoolWorkflow()												override { return CncPathListRunner::spoolWorkflow(); }
 };

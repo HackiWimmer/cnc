@@ -1,6 +1,7 @@
 #ifndef CNC_PATH_LIST_RUNNER_H
 #define CNC_PATH_LIST_RUNNER_H
 
+#include <iostream>
 #include "CncVector.h"
 #include "CncPathListManager.h"
 
@@ -8,8 +9,8 @@ class CncMoveSequence;
 class FileParser;
 
 ///////////////////////////////////////////////////////////////////
-class CncPathListRunner {
-	
+class CncPathListRunner 
+{
 	private:
 		
 		// ---------------------------------------------------
@@ -104,6 +105,37 @@ class CncPathListRunner {
 			virtual void traceTo(std::ostream& o) const;
 		};
 		
+		// ---------------------------------------------------
+		struct WorkflowCommandEntry : public WorkflowEntry
+		{
+			unsigned char*	buffer;
+			int				bytes;
+			
+			WorkflowCommandEntry(const unsigned char* b, int len)
+			: WorkflowEntry	()
+			, buffer		(NULL)
+			, bytes			(0)
+			{
+				// creates a deep copy!
+				if ( b != NULL && len > 0 )
+				{
+					bytes = len;
+					buffer = new unsigned char[bytes];
+					memcpy(buffer, b, bytes);
+				}
+			}
+			
+			~WorkflowCommandEntry()
+			{
+				if ( buffer != NULL )
+					delete [] buffer;
+			}
+			
+			virtual bool process(CncPathListRunner* plr);
+			virtual void traceTo(std::ostream& o) const;
+		};
+		
+
 		typedef std::vector<WorkflowEntry*> WorkFlowList;
 		
 		// ---------------------------------------------------
@@ -199,6 +231,7 @@ class CncPathListRunner {
 				virtual bool processSpindleSpeedChange(double value_U_MIN)								= 0;
 				virtual bool processMoveSequence(CncMoveSequence& msq)									= 0;
 				virtual bool processPathListEntry(const CncPathListEntry& ple)							= 0;
+				virtual bool processCommandEntry(const unsigned char* buffer, int bytes)				= 0;
 				
 				virtual void processTrigger(const Trigger::BeginRun& tr)								= 0;
 				virtual void processTrigger(const Trigger::EndRun& tr)									= 0;
@@ -250,6 +283,7 @@ class CncPathListRunner {
 		void autoSetup(bool trace);
 		bool publishGuidePath(const CncPathListManager& plm);
 		bool publishCncPath(const CncPathListManager&plm);
+		bool publishCommand(const unsigned char* buffer, int bytes);
 		
 		void executeTrigger(const Trigger::BeginRun& tr)	{ currentInterface->processTrigger(tr); }
 		void executeTrigger(const Trigger::EndRun& tr)		{ currentInterface->processTrigger(tr); }
@@ -271,9 +305,12 @@ class CncPathListRunner {
 		
 		bool spoolWorkflow();
 		void resetWorkflow();
+		void traceWorkflow(std::ostream& o);
 		
 		bool processGuidePath(const CncPathListManager& plm, double zOffset=0.0);
 		bool processCncPath(const CncPathListManager& plm);
+		
+		bool processCommand(const unsigned char* buffer, int len);
 		
 		void processTrigger(const Trigger::BeginRun& tr)	{ resetWorkflow(); 
 															  workflowList.push_back(new WorkflowTriggerBeginRunEntry   (tr)); }

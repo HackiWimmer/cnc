@@ -148,16 +148,17 @@ void CncTemplateContextSummaryPanel::update(bool force) {
 	
 	std::stringstream ss;
 	
+	// --------------------------------------------------------------
 	// summary
 	ss.str("");
 	summary->clearAll();
 	THE_CONTEXT->templateContext->traceTo(ss, 0);
 	
-	// --------------------------------------------------------------
 	flagListItem(summary, ok);
 	if ( ok == false )	summary->addErrorEntry(ss.str().c_str());
 	else				summary->addInfoEntry(ss.str().c_str());
 	
+	// ---------------------------------------------------------
 	// overall analysis
 	ss.str("");
 	analysisOverall->clearAll();
@@ -167,26 +168,35 @@ void CncTemplateContextSummaryPanel::update(bool force) {
 	if ( ok == false )	analysisOverall->addErrorEntry(ss.str().c_str());
 	else				analysisOverall->addInfoEntry(ss.str().c_str());
 	
+	// ---------------------------------------------------------
 	// list all entries
 	ss.str("");
 	list->clearAll();
 	THE_CONTEXT->templateContext->traceContextEntriesTo(ss);
-	list->add(ss.str().c_str());
+	list->addInfoEntry(ss.str().c_str());
 	
+	// ---------------------------------------------------------
 	// limit
 	ss.str("");
 	analysisLimit->clearAll();
 	THE_CONTEXT->templateContext->filterAllLimitEntries(ss);
 	const wxString analysisLimitStr(ss.str().c_str());
-	analysisLimit->add(analysisLimitStr);
+	
+	if ( analysisLimitStr.length() > 0 )	analysisLimit->addErrorEntry(analysisLimitStr);
+	else									analysisLimit->addInfoEntry(analysisLimitStr);
+	
 	flagListItem(analysisLimit, analysisLimitStr.IsEmpty());
 	
+	// ---------------------------------------------------------
 	// movement
 	ss.str("");
 	analysisMovement->clearAll();
 	THE_CONTEXT->templateContext->filterAllMovesWithoutSpindle(ss);
 	const wxString analysisMovementStr(ss.str().c_str());
-	analysisMovement->add(analysisMovementStr);
+	
+	if ( analysisMovementStr.length() > 0 )	analysisMovement->addErrorEntry(analysisMovementStr);
+	else									analysisMovement->addInfoEntry(analysisMovementStr);
+	
 	flagListItem(analysisMovement, analysisMovementStr.IsEmpty());
 }
 ///////////////////////////////////////////////////////////////////

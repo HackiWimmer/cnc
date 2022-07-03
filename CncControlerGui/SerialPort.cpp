@@ -1265,13 +1265,15 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 	const unsigned char cmd = buffer[0];
 	bool ret = false;
 	
-	switch ( cmd ) {
+	switch ( cmd )
+	{
 		// --------------------------------------------------------
 		case CMD_SETTER:
 		{
 			// log setter (for gui only)
 			CncCommandDecoder::SetterInfo si;
-			if ( CncCommandDecoder::decodeSetter(buffer, nbByte, si) ) {
+			if ( CncCommandDecoder::decodeSetter(buffer, nbByte, si) )
+			{
 				ContollerExecuteInfo cei;
 				cei.infoType 		= CEITSetter;
 				cei.setterPid		= si.pid;
@@ -1279,12 +1281,35 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 				
 				if ( sendSerialControllerCallback(cei) == false )
 					return false;
+					
+				if ( si.pid == PID_SPINDLE_SWITCH )
+				{
+					if ( contextInterface )
+					{
+						if ( si.values.size() > 0 )
+						{
+							switch ( si.values[0] )
+							{ 
+								case SPINDLE_STATE_ON:	contextInterface->notifySpindleOn();	break;
+								case SPINDLE_STATE_OFF:	contextInterface->notifySpindleOff();	break;
+								default:				CNC_CERR_FUNCT_A(": Invalid setter list value!")
+														contextInterface->notifySpindleOff();
+							}
+						}
+						else
+						{
+							CNC_CERR_FUNCT_A(": Invalid setter list!")
+							contextInterface->notifySpindleOff();
+						}
+					}
+				}
 				
 				// serialize
 				SerialFetchInfo sfi(cmd);
 				ret = serializeSetter(sfi, buffer, nbByte);
 			}
-			else {
+			else 
+			{
 				std::cerr << "Serial::execute(): CncCommandDecoder::decodeSetter() failed!" << std::endl;
 				ret = false;
 			}
