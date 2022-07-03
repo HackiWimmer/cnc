@@ -143,6 +143,7 @@ class SVGRootNode {
 	public:
 		
 		SVGRootNode();
+		explicit SVGRootNode(const wxString& vb);
 		SVGRootNode(double svgWidth, double svgHeight, Unit unit);
 		SVGRootNode(double svgWidth, double svgHeight, Unit unit, const wxString& vb);
 		SVGRootNode(const SVGRootNode& n); 

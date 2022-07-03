@@ -80,9 +80,9 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 			virtual void traceTo(std::ostream& o) const
 			{
 				o	<< "  Command:"
-					<< " type = " 
+					<< " type = '" 
 					<< std::left  << std::setw(30) << std::setfill(' ') << ( bytes > 0 ?  ArduinoCMDs::getCMDLabel(buffer[0]) : "???" ) 
-					<< " size = "
+					<< "' size = "
 					<< std::right << std::setw( 3) << std::setfill('0') << bytes
 					<< std::endl
 				; 

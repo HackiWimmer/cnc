@@ -1046,10 +1046,15 @@ SVGRootNode SVGFileParser::evaluateSVGRootNode(const wxString& w, const wxString
 	};
 	
 	// ----------------------------------------------------------
-	wxString unitW, unitH;
+	// build root node based on viewbox only
+	if ( w.IsEmpty() && h.IsEmpty() )
+		return SVGRootNode(vb);
+		
+	// build root node based on w and h
+	wxString unitW("px"), unitH("px");
 	
-	const double width  = evaluate(w, unitW);
-	const double height = evaluate(h, unitH);
+	const double width  = w.IsEmpty() ? 0.0 : evaluate(w, unitW);
+	const double height = h.IsEmpty() ? 0.0 : evaluate(h, unitH);
 	
 	Unit unit;
 	if ( determineUnit(unitW, unitH, unit) == false )
