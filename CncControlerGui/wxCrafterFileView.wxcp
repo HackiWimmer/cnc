@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	58,
+		"m_objCounter":	60,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxCD0FFInitBitmapResources",
 		"m_bitmapsFile":	"wxCrafterFileView_bitmaps.cpp",
@@ -960,14 +960,8 @@
 							"m_events":	[{
 									"m_eventName":	"wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED",
 									"m_eventClass":	"wxNotebookEvent",
-									"m_functionNameAndSignature":	"previewBookChanged(wxNotebookEvent& event)",
+									"m_functionNameAndSignature":	"onPreviewBookChanged(wxNotebookEvent& event)",
 									"m_description":	"The page selection was changed",
-									"m_noBody":	false
-								}, {
-									"m_eventName":	"wxEVT_PAINT",
-									"m_eventClass":	"wxPaintEvent",
-									"m_functionNameAndSignature":	"previewBookPaint(wxPaintEvent& event)",
-									"m_description":	"Process a wxEVT_PAINT event",
 									"m_noBody":	false
 								}],
 							"m_children":	[{

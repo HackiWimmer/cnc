@@ -905,7 +905,7 @@ Editor</label>
                                                                       <object class="sizeritem" name="flexGridSizer9795">
                                                                         <flag>wxALL</flag>
                                                                         <object class="wxFlexGridSizer">
-                                                                          <cols>1</cols>
+                                                                          <cols>2</cols>
                                                                           <rows>2</rows>
                                                                           <vgap>0</vgap>
                                                                           <hgap>0</hgap>
@@ -931,6 +931,17 @@ Editor</label>
                                                                               <style/>
                                                                               <label>Keep Cnc</label>
                                                                               <checked>1</checked>
+                                                                            </object>
+                                                                          </object>
+                                                                          <object class="sizeritem">
+                                                                            <flag>wxALL</flag>
+                                                                            <object class="wxCheckBox" name="m_chSvgExportKeepFormat">
+                                                                              <tooltip>
+                                                                                <![CDATA[Keep SVG Format attributes]]>
+                                                                              </tooltip>
+                                                                              <style/>
+                                                                              <label>Keep Format</label>
+                                                                              <checked>0</checked>
                                                                             </object>
                                                                           </object>
                                                                         </object>

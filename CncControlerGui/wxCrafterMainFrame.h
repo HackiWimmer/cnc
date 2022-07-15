@@ -146,6 +146,7 @@ protected:
     wxStaticText* m_staticText98027;
     wxCheckBox* m_cbSvgExportCompact;
     wxCheckBox* m_cbSvgExportKeepCncNodes;
+    wxCheckBox* m_chSvgExportKeepFormat;
     wxButton* m_btSvgExport;
     wxPanel* m_panelToolBoxGcode;
     wxPanel* m_panelToolBoxBinary;
@@ -2005,6 +2006,10 @@ public:
     wxCheckBox* GetCbSvgExportKeepCncNodes()
     {
 	return m_cbSvgExportKeepCncNodes;
+    }
+    wxCheckBox* GetChSvgExportKeepFormat()
+    {
+	return m_chSvgExportKeepFormat;
     }
     wxButton* GetBtSvgExport()
     {

@@ -1321,13 +1321,12 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	motionMonitor->makeHardwareSpaceVisible();
+	Refresh();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logDebugMessage("Test function 2");
-	THE_CONTEXT->templateContext->traceContextEntriesTo(cnc::cex3);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -1338,9 +1337,6 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logErrorMessage("Test function 4");
-	
-	wxFileName fileName("c:\\temp\\aaaa.bmp");
-	motionMonitor->saveContentAsBitmap(fileName);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDeactivateSecureRunMode(wxCommandEvent& event) {
@@ -6064,7 +6060,8 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 	if      ( ctrl == mainFilePreview )			m_currentFileMangerPreviewFileName->ChangeValue(fn);
 	else if ( ctrl == monitorFilePreview)		m_currentInboundFilePreviewFileName->ChangeValue(fn);
 	
-	if ( cncExtMainPreview != NULL ) {
+	if ( cncExtMainPreview != NULL ) 
+	{
 		if      ( ctrl == mainFilePreview )		cncExtMainPreview->setStatusTextRight(wxFileName(fn).GetFullName());
 		else if ( ctrl == monitorFilePreview)	cncExtMainPreview->setStatusTextRight(m_inputFileName->GetValue());
 	}
@@ -6072,11 +6069,14 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 	//selectSecurePreviewView();
 	
 	CncTemplateFormat tf = getTemplateFormat(fn);
-	switch ( tf ) {
+	switch ( tf )
+	{
 		case TplSvg:		ctrl->selectPreview(fn);
+							ctrl->Refresh();
 							break;
 							
 		case TplGcode:		ctrl->selectPreview(fn);
+							ctrl->Refresh();
 							break;
 							
 		case TplBinary:		{
@@ -6261,6 +6261,12 @@ void MainFrame::selectMonitorBookCncPanel() {
 	
 	// to release the opengl context switch
 	motionMonitor->Update();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectMonitorBookSetupSummaryPanel() {
+///////////////////////////////////////////////////////////////////
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookTemplatePanel() {
@@ -9584,22 +9590,41 @@ void MainFrame::onSvgExport(wxCommandEvent& event) {
 
 	if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
 		return; 
-		
+	
 	outboundFileName.assign(newFileDialog.GetPath());
 	
-	const SVGFileFormatter::Mode m = m_cbSvgExportCompact->GetValue() ? ( m_cbSvgExportKeepCncNodes ? SVGFileFormatter::Mode::CNV_PRETTY_WITH_CNC 
-																									: SVGFileFormatter::Mode::CNV_PRETTY_WITHOUT_CNC 
-																		) 
-																	  : ( m_cbSvgExportKeepCncNodes ? SVGFileFormatter::Mode::CNV_COMPACT_WITH_CNC
-																									: SVGFileFormatter::Mode::CNV_COMPACT_WITHOUT_CNC
-																		);
+	SVGFileFormatter::Setup s;
+	s.compact		= m_cbSvgExportCompact->GetValue();
+	s.keepCnc		= m_cbSvgExportKeepCncNodes->GetValue();
+	s.keepFormat	= m_chSvgExportKeepFormat->GetValue();
 																		
 	SVGFileFormatter f(getCurrentTemplatePathFileName());
-	if ( f.convert(m, outboundFileName) == false ) {
+	if ( f.convert(s, outboundFileName) == false )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" SVGFileFormatter::convert('%s' -> '%s') failed!\n", 
 														getCurrentTemplatePathFileName(), 
 														outboundFileName
 													 ));
+	}
+	else
+	{
+		//ask to open the exported file
+		wxMessageDialog dlg(this, 
+							outboundFileName,
+							"Open . . .  ", 
+							wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
+							
+		int ret = dlg.ShowModal();
+		if ( ret == wxID_YES )
+		{
+			wxFileName fn(outboundFileName);
+			
+			if ( openTemplateFile(fn) == false )
+			{
+				std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" openFile('%s') failed!\n", fn.GetFullPath()));
+				return;
+			}
+		}
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -9607,7 +9632,7 @@ void MainFrame::onSvgFormatPretty(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxString outboundFileName(getCurrentTemplatePathFileName());
 	
-	// determie a new file name of overriden == false
+	// determine a new file name of overridden == false
 	if ( m_cbSvgFormatPrettyOverride->GetValue() == false ) {
 		const wxString templateName(outboundFileName + ( m_cbSvgFormatPretty->GetValue() ? ".pretty.svg" : ".compact.svg") );
 		
@@ -9624,11 +9649,14 @@ void MainFrame::onSvgFormatPretty(wxCommandEvent& event) {
 		outboundFileName.assign(newFileDialog.GetPath());
 	}
 	
-	// generate new format
-	const SVGFileFormatter::Mode m = m_cbSvgFormatPretty->GetValue() ? SVGFileFormatter::Mode::CNV_PRETTY_WITH_CNC 
-																	 : SVGFileFormatter::Mode::CNV_COMPACT_WITH_CNC; 
+	SVGFileFormatter::Setup s;
+	s.compact		= m_cbSvgFormatPretty->GetValue() == false;
+	s.keepCnc		= true;
+	s.keepFormat	= true;
+
 	SVGFileFormatter f(getCurrentTemplatePathFileName());
-	if ( f.convert(m, outboundFileName) == false ) {
+	if ( f.convert(s, outboundFileName) == false )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" SVGFileFormatter::convert('%s' -> '%s') failed!\n", 
 														getCurrentTemplatePathFileName(), 
 														outboundFileName
@@ -9648,16 +9676,13 @@ void MainFrame::onSvgFormatPretty(wxCommandEvent& event) {
 		if ( ret == wxID_YES )
 		{
 			wxFileName fn(outboundFileName);
-			m_inputFileName->SetValue(fn.GetFullName());
-			m_inputFileName->SetHint(fn.GetFullPath());
 			
-			if ( openFile() == false )
+			if ( openTemplateFile(fn) == false )
 			{
 				std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" openFile('%s') failed!\n", fn.GetFullPath()));
 				return;
 			}
 		}
-		
 	}
 	// else reload to make the overridden content visible
 	else 

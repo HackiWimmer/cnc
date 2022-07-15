@@ -8,10 +8,12 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="include">
+    <File Name="FtMonitor.h"/>
     <File Name="impl.h"/>
     <File Name="main_app.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="src">
+    <File Name="FtMonitor.cpp"/>
     <File Name="impl.cpp"/>
     <File Name="main_app.cpp"/>
   </VirtualDirectory>

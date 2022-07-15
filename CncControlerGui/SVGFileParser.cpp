@@ -30,8 +30,8 @@ SVGFileFormatter::SVGFileFormatter(const wxString& ifn)
 bool SVGFileFormatter::removeCncTags(wxXmlNode* child) {
 //////////////////////////////////////////////////////////////////
 	// -----------------------------------------------------------
-	auto isCncTag = [&](const wxString& name) {
-		
+	auto isCncTag = [&](const wxString& name)
+	{
 		if      ( name.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) )	return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncParameterPrintBlockNodeName) )	return true;
 		else if ( name.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) )		return true;
@@ -44,18 +44,21 @@ bool SVGFileFormatter::removeCncTags(wxXmlNode* child) {
 	};
 	
 	// -----------------------------------------------------------
-	while ( child ) {
-		
+	while ( child )
+	{
+		// recursive child's child
 		if ( removeCncTags(child->GetChildren()) == false )
 			return false;
 			
 		wxXmlNode* next = child->GetNext();
 		
 		const wxString& name = child->GetName();
-		if ( name.StartsWith("Cnc") && isCncTag(name) )  {
+		if ( name.StartsWith("Cnc") && isCncTag(name) )  
+		{
 			const int ln = child->GetLineNumber();
 			
-			if ( child->GetParent()->RemoveChild(child) == false ) {
+			if ( child->GetParent()->RemoveChild(child) == false )
+			{
 				std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": RemoveChild() failed! [%d] [%s]\n", ln, name));
 				return false;
 			}
@@ -67,9 +70,40 @@ bool SVGFileFormatter::removeCncTags(wxXmlNode* child) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::removeSvgFormatAttributs(wxXmlNode* child) {
+//////////////////////////////////////////////////////////////////
+	// -----------------------------------------------------------
+	while ( child )
+	{
+		// recursive child's child
+		if ( removeSvgFormatAttributs(child->GetChildren()) == false )
+			return false;
+		
+		wxXmlNode* next = child->GetNext();
+		
+		//const wxString& name = child->GetName();
+		//std::cout << name << std::endl;
+		
+		// remove known format attributes
+		child->DeleteAttribute("stroke-width");
+		child->DeleteAttribute("stroke");
+		child->DeleteAttribute("fill");
+		child->DeleteAttribute("style");
+		
+		// default style attribute
+		child->AddAttribute("style", "fill:none;stroke:#070707;stroke-width:0.5;stroke-miterlimit:10");
+		
+		//swap
+		child = next;
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
 bool SVGFileFormatter::removeCncTags(wxXmlDocument& doc) {
 //////////////////////////////////////////////////////////////////
-	if ( doc.IsOk() == false ) {
+	if ( doc.IsOk() == false )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": wxXmlDocument::isOk() failed\n"));
 		return false;
 	}
@@ -78,22 +112,59 @@ bool SVGFileFormatter::removeCncTags(wxXmlDocument& doc) {
 	return removeCncTags(child);
 }
 //////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::removeSvgFormatAttributs(wxXmlDocument& doc) {
+//////////////////////////////////////////////////////////////////
+	if ( doc.IsOk() == false )
+	{
+		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": wxXmlDocument::isOk() failed\n"));
+		return false;
+	}
+	
+	wxXmlNode* child = doc.GetRoot()->GetChildren();
+	return removeSvgFormatAttributs(child);
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileFormatter::removeSvgFormatAttributs(const wxString& ofn) {
+//////////////////////////////////////////////////////////////////
+	Setup s;
+	s.compact		= false;
+	s.keepCnc		= true;
+	s.keepFormat	= false;
+	
+	return convert(s, ofn);
+}
+//////////////////////////////////////////////////////////////////
 bool SVGFileFormatter::removeCncTags(const wxString& ofn) {
 //////////////////////////////////////////////////////////////////
-	return convert(CNV_PRETTY_WITHOUT_CNC, ofn);
+	Setup s;
+	s.compact		= false;
+	s.keepCnc		= false;
+	s.keepFormat	= true;
+
+	return convert(s, ofn);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileFormatter::format(const wxString& ofn) {
 //////////////////////////////////////////////////////////////////
-	return convert(CNV_PRETTY_WITH_CNC, ofn);
+	Setup s;
+	s.compact		= false;
+	s.keepCnc		= true;
+	s.keepFormat	= true;
+
+	return convert(s, ofn);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileFormatter::compact(const wxString& ofn, bool rmvCncTags) {
 //////////////////////////////////////////////////////////////////
-	return convert(rmvCncTags ? CNV_COMPACT_WITHOUT_CNC : CNV_PRETTY_WITH_CNC, ofn);
+	Setup s;
+	s.compact		= true;
+	s.keepCnc		= rmvCncTags == false;
+	s.keepFormat	= true;
+
+	return convert(s, ofn);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileFormatter::convert(SVGFileFormatter::Mode m, const wxString& ofn) {
+bool SVGFileFormatter::convert(SVGFileFormatter::Setup s, const wxString& ofn) {
 //////////////////////////////////////////////////////////////////
 	if ( wxFileName(inboundFileName).Exists() == false ) {
 		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": Inbound file '%s' didn't exist!\n", inboundFileName));
@@ -109,36 +180,24 @@ bool SVGFileFormatter::convert(SVGFileFormatter::Mode m, const wxString& ofn) {
 		}
 	}
 	
-	int indent		= 2;
-	bool rmvCncTags	= false;
+	int indent		= s.compact ? wxXML_NO_INDENTATION : 2;
+	bool rmvCncTags	= s.keepCnc == false;
 	
-	switch ( m ) {
-		case CNV_PRETTY_WITHOUT_CNC:
-			rmvCncTags	= true;
-			indent		= 2;
-			break;
-		case CNV_PRETTY_WITH_CNC:
-			rmvCncTags	= false;
-			indent		= 2;
-			break;
-		case CNV_COMPACT_WITHOUT_CNC:
-			rmvCncTags	= true;
-			indent		= wxXML_NO_INDENTATION;
-			break;
-		case CNV_COMPACT_WITH_CNC:
-			rmvCncTags	= false;
-			indent		= wxXML_NO_INDENTATION;
-			break;
-	}
-	
-	if ( rmvCncTags == true ) {
-		if ( removeCncTags(doc) == false ) {
+	if ( s.keepFormat == false )
+		removeSvgFormatAttributs(doc);
+
+	if ( rmvCncTags == true )
+	{
+		if ( removeCncTags(doc) == false )
+		{
 			std::cerr << CNC_LOG_FUNCT_A(wxString::Format(":removeCncTags('%s') failed!\n", inboundFileName));
 			return false;
 		}
 	}
 	
-	if ( doc.Save(ofn, indent) == false ) {
+	
+	if ( doc.Save(ofn, indent) == false )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(": wxXmlDocument::Save('%s') failed!\n", ofn));
 		return false;
 	}

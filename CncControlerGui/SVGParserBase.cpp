@@ -60,24 +60,25 @@ bool SVGParserBase::evaluatePath(const wxString& data) {
 	
 	initNextPath(data);
 	
-	int sPos = -1;
-	wxString token;
-	for (unsigned int i=0; i<data.Length(); i++ )
+	int sPos		= -1;
+	unsigned int i	=  0;
+	
+	for (auto it = data.begin(); it != data.end(); ++it, ++i)
 	{
+		// this ensures an evaluation before each command block within one path data 
+		if ( evaluateProcessingCallback() == false )
+			return false;
 		
-		if ( data[i] == '-' || data[i] == '+' || data[i] == 'e' || data[i] == 'E' ) 
+		if ( *it == '-' || *it == '+' || *it == 'e' || *it == 'E' ) 
 			continue;
 			
-		if ( isalpha(data[i]) && sPos < 0 )
+		if ( isalpha(*it) && sPos < 0 )
 		{
 			sPos = i;
 		}
-		else if ( isalpha(data[i]) )
+		else if ( isalpha(*it) )
 		{
-			token.assign(data.SubString(sPos, i - 1));
-			token.Trim(true).Trim(false);
-			
-			if ( processPathCommand(token) == false )
+			if ( processPathCommand(data.SubString(sPos, i - 1).Trim(true).Trim(false)) == false )
 				return false;
 				
 			sPos = i;
@@ -85,10 +86,7 @@ bool SVGParserBase::evaluatePath(const wxString& data) {
 		
 		if ( i == data.Length() - 1 )
 		{
-			token.assign(data.SubString(sPos, i));
-			token.Trim(true).Trim(false);
-			
-			if ( processPathCommand(token) == false )
+			if ( processPathCommand(data.SubString(sPos, i).Trim(true).Trim(false)) == false )
 				return false;
 		}
 	}
@@ -113,19 +111,28 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 
 	double values[MAX_PARAMETER_VALUES];
 	
-	wxString token;
-	char c						= '\0';
 	unsigned int sPos			=  0;
 	unsigned int valueCounter	=  0;
 	unsigned int commandCounter	=  0;
-	int parameterCount			= -1;
-
-	for (unsigned int i=sPos; i<para.Length(); i++)
+	int          parameterCount	= -1;
+	
+	unsigned int i				= sPos; 
+	char         c				= '\0';
+	
+	for (auto it = para.begin(); it != para.end(); ++it, ++i)
 	{
-		
+		if ( i % 10 == 0 )
+		{
+			// this ensures an evaluation before each tenth parameter block occurrence 
+			if ( evaluateProcessingCallback() == false )
+				return false;
+		}
+
+		// First parameter block character = Type of command
 		if ( i == 0 )
 		{
-			c = para[0].GetValue();
+			// first character of d="";
+			c = *it;
 			sPos++;
 			
 			if ( (parameterCount = getCommandParaCount(c) ) < 0 )
@@ -133,24 +140,24 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 				std::cerr	<< CNC_LOG_FUNCT 
 							<< "Not known command: "
 							<< c << std::endl
-							;
+				;
 				return false;
 			}
 		}
 		else
 		{
+			// one of the following characters
+			
 			// list of possible separators
-			if ( para[i] == ' ' || para[i] == ',' || para[i] == '-' || para[i] == '+' )
+			if ( *it == ' ' || *it == ',' || *it == '-' || *it == '+' )
 			{
-				
 				// handle exponential presentation - i is always > 0
-				if ( (para[i] == '-' || para[i] == '+') && ( para[i-1] == 'e' || para[i-1] == 'E') ) 
+				if ( (*it == '-' || *it == '+') && ( para[i-1] == 'e' || para[i-1] == 'E') ) 
 					continue;
 				
 				if ( i != sPos )
 				{
-					token.assign(para.SubString(sPos, i - 1));
-					token.ToDouble(&values[valueCounter++]);
+					para.SubString(sPos, i - 1).ToDouble(&values[valueCounter++]);
 
 					if ( valueCounter == MAX_PARAMETER_VALUES )
 					{
@@ -163,21 +170,26 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 					}
 				}
 				
-				if ( para[i] == '-'|| para[i] == '+' )	sPos = i;
-				else									sPos = i + 1;
+				if ( *it == '-'|| *it == '+' )	sPos = i;
+				else										sPos = i + 1;
 				
 			}
 			else if ( i == para.Length() - 1 )
 			{
-				token.assign(para.SubString(sPos, i));
-				token.ToDouble(&values[valueCounter++]);
+				para.SubString(sPos, i).ToDouble(&values[valueCounter++]);
 			}
 		}
 		
-		if ( (int)valueCounter ==  parameterCount )
+		if ( (int)valueCounter == parameterCount )
 		{
 			commandCounter++;
-			if ( commandCounter == 2 && ( c == 'm' || c == 'M' ) ) {
+			
+			// switch command on demand 
+			// this occurs only for 'm' or 'M' at the second command position.
+			// the first pos behind 'm' or 'M'
+			// from hear on 'm' --> 'l' and 'M' --> 'L'
+			if ( commandCounter == 2 && ( c == 'm' || c == 'M' ) ) 
+			{
 				// M - 1 = L or m - 1 = l
 				c = c - 1;
 			}
@@ -188,9 +200,6 @@ bool SVGParserBase::processPathCommand(const wxString& para) {
 			
 			valueCounter = 0;
 		} 
-		
-		if ( evaluateProcessingCallback() == false )
-			return false;
 	}
 	
 	const bool ret = (valueCounter == 0);

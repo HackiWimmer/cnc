@@ -12,7 +12,8 @@
 
 //////////////////////////////////////////////////////////////////
 #define ASSERT_PH_PARA_COUNT(c) \
-	if ( count != c ) { \
+	if ( count != c ) \
+	{ \
 		std::cerr	<< CNC_LOG_FUNCT \
 					<< ": Invalid parameter count: " << count \
 					<< std::endl; \
@@ -94,15 +95,19 @@ void PathHandlerBase::tracePositions(const char* userPerspectivePrefix) {
 //////////////////////////////////////////////////////////////////
 	std::cout << "tracePositions(" << userPerspectivePrefix << ")" << std::endl;
 	
-	if ( pathListMgr.getPathListSize() > 0 ) {
+	if ( pathListMgr.getPathListSize() > 0 )
+	{
 		CncPathList::iterator it = pathListMgr.begin();
 		std::cout << " PL.First.Pos  : " << (*it).entryDistance << std::endl;
 		it = pathListMgr.end()-1;
 		std::cout << " PL.Last.Pos   : " << (*it).entryDistance << std::endl;
-	} else {
+	}
+	else
+	{
 		std::cout << " PL.First.Pos  : empty" << std::endl;
 		std::cout << " PL.Last.Pos   : empty" << std::endl;
 	}
+	
 	std::cout << " PL.Start Pos  : " << pathListMgr.getStartPos().getX() << std::endl;
 
 	std::cout << " StartPos      : " << startPos   << std::endl;
@@ -169,7 +174,8 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 	
 	bool ret = false;
 	
-	if ( nextPath == true ) {
+	if ( nextPath == true )
+	{
 		// Move to the path start
 		// first register start pos
 		// the first move is always absolute - see comment above!
@@ -178,20 +184,25 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, const double 
 		// the first move is always absolute - see comment above!
 		currentPos.setXY(startPos.getX(), startPos.getY());
 		
-		// drive to first path
+		// move to start position
 		ret = processLinearMove(false);
+		
+		// switch state
 		nextPath = false;
 	}
 	else 
 	{
-		// Moving the path forward
+		// This only happens if d="" contains more the one 'm' or 'M'
+		// and it is not the first occurrence
+		// --> Sub path handling . . .
 		const double moveX = ( c == 'M' ? values[0] - currentPos.getX() : values[0] );
 		const double moveY = ( c == 'M' ? values[1] - currentPos.getY() : values[1] );
 		
 		currentPos.incXY(moveX, moveY);
 		startPos.setXY(currentPos.getX(), currentPos.getY());
 		
-		// to decouple the sub path the following speed mode switch is important . . . 
+		// to decouple the sub path,
+		// the following speed mode switch is important . . . 
 		processFeedSpeed(CncSpeedRapid);
 		{
 			// . . . now this is a flying (rapid) move 
@@ -209,13 +220,14 @@ bool PathHandlerBase::processClose_2DXY(char c, unsigned int count, const double
 	
 	appendDebugValueDetail("Close",c);
 	
-	switch ( c ) {
+	switch ( c )
+	{
 		case 'z':
-		case 'Z':
-			currentPos.setX(startPos.getX());
-			currentPos.setY(startPos.getY());
-			break;
-		default: ; // Do nothing, already checked before
+		case 'Z':	currentPos.setX(startPos.getX());
+					currentPos.setY(startPos.getY());
+					break;
+					
+		default: 	; // Do nothing, already checked before
 	}
 	
 	return processLinearMove(false);
@@ -227,16 +239,17 @@ bool PathHandlerBase::processLine_2DXY(char c, unsigned int count, const double 
 	
 	appendDebugValueDetail("Line",c);
 	
-	switch ( c ) {
-		case 'l':
-			currentPos.incX(values[0]);
-			currentPos.incY(values[1]);
-			break;
-		case 'L':
-			currentPos.setX(values[0]);
-			currentPos.setY(values[1]);
-			break;
-		default: ; // Do nothing, already checked before
+	switch ( c )
+	{
+		case 'l':	currentPos.incX(values[0]);
+					currentPos.incY(values[1]);
+					break;
+					
+		case 'L':	currentPos.setX(values[0]);
+					currentPos.setY(values[1]);
+					break;
+					
+		default: 	; // Do nothing, already checked before
 	}
 	
 	return processLinearMove(false);
@@ -248,14 +261,15 @@ bool PathHandlerBase::processHLine_2DXY(char c, unsigned int count, const double
 	
 	appendDebugValueDetail("HLine",c);
 	
-	switch ( c ) {
-		case 'h':
-			currentPos.incX(values[0]);
-			break;
-		case 'H':
-			currentPos.setX(values[0]);
-			break;
-		default: ; // Do nothing, already checked before
+	switch ( c ) 
+	{
+		case 'h':	currentPos.incX(values[0]);
+					break;
+					
+		case 'H':	currentPos.setX(values[0]);
+					break;
+					
+		default: 	; // Do nothing, already checked before
 	}
 	
 	return processLinearMove(false);
@@ -267,14 +281,15 @@ bool PathHandlerBase::processVLine_2DXY(char c, unsigned int count, const double
 	
 	appendDebugValueDetail("VLine",c);
 	
-	switch ( c ) {
-		case 'v':
-			currentPos.incY(values[0]);
-			break;
-		case 'V':
-			currentPos.setY(values[0]);
-			break;
-		default: ; // Do nothing, already checked before
+	switch ( c ) 
+	{
+		case 'v':	currentPos.incY(values[0]);
+					break;
+					
+		case 'V':	currentPos.setY(values[0]);
+					break;
+					
+		default: 	; // Do nothing, already checked before
 	}
 	
 	return processLinearMove(false);
@@ -314,7 +329,8 @@ bool PathHandlerBase::processARC_2DXY(char c, unsigned int count, const double v
 	CncCurveLib::ParameterElliptical& ps = ellipticalCurve.getParameterSet();
 	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY());
 	
-	switch ( c ) {
+	switch ( c )
+	{
 		case 'a': 	ps.p1 = transformCurveLibPoint(values[5] + currentPos.getX(), values[6] + currentPos.getY()); 
 					
 					// set current pos and control point without transformation
@@ -379,7 +395,8 @@ bool PathHandlerBase::processQuadraticBezier_2DXY(char c, unsigned int count, co
 	CncCurveLib::Point pCtl;
 	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY()); 
 	
-	switch ( c ) {
+	switch ( c )
+	{
 		case 'q': 	ps.p1 = transformCurveLibPoint(values[0] + currentPos.getX(), values[1] + currentPos.getY()); 
 					ps.p2 = transformCurveLibPoint(values[2] + currentPos.getX(), values[3] + currentPos.getY()); 
 					
@@ -406,7 +423,8 @@ bool PathHandlerBase::processQuadraticBezier_2DXY(char c, unsigned int count, co
 	}
 	
 	const bool ret = processQuadraticBezier_2DXY(ps);
-	if ( ret == true ) {
+	if ( ret == true )
+	{
 		// Store the last control point
 		lastQuadraticControlPoint.setCtrlPointAbs(pCtl);
 	}
@@ -437,7 +455,8 @@ bool PathHandlerBase::processCubicBezier_2DXY(char c, unsigned int count, const 
 	CncCurveLib::Point pCtl;
 	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY());
 	
-	switch ( c ) {
+	switch ( c ) 
+	{
 		case 'c': 	ps.p1 = transformCurveLibPoint(values[0] + currentPos.getX(), values[1] + currentPos.getY()); 
 					ps.p2 = transformCurveLibPoint(values[2] + currentPos.getX(), values[3] + currentPos.getY()); 
 					ps.p3 = transformCurveLibPoint(values[4] + currentPos.getX(), values[5] + currentPos.getY()); 
@@ -466,7 +485,8 @@ bool PathHandlerBase::processCubicBezier_2DXY(char c, unsigned int count, const 
 	}
 	
 	const bool ret = processCubicBezier_2DXY(ps);
-	if ( ret == true ) {
+	if ( ret == true )
+	{
 		// Store the last control point
 		lastCubicControlPoint.setCtrlPointAbs(pCtl);
 	}
@@ -487,7 +507,8 @@ bool PathHandlerBase::processQuadraticBezierSmooth_2DXY(char c, unsigned int cou
 	newValues[3] = values[1];
 	newValues[2] = values[0];
 	
-	switch ( c ) {
+	switch ( c )
+	{
 		case 't':	c = 'q'; 
 					newValues[1] = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).y - currentPos.getY();
 					newValues[0] = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x - currentPos.getX();
@@ -502,7 +523,8 @@ bool PathHandlerBase::processQuadraticBezierSmooth_2DXY(char c, unsigned int cou
 	}
 	
 	// debug only
-	if ( false ) {
+	if ( false )
+	{
 		const float cpX  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).x;
 		const float cpY  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).y;
 		const float cprX = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x;
@@ -531,7 +553,8 @@ bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, 
 	newValues[3] = values[1];
 	newValues[2] = values[0];
 	
-	switch ( c ) {
+	switch ( c ) 
+	{
 		case 's':	c = 'c'; 
 					newValues[1] = lastCubicControlPoint.getLastCtrlPointReflectedAbs(p0).y - currentPos.getY();
 					newValues[0] = lastCubicControlPoint.getLastCtrlPointReflectedAbs(p0).x - currentPos.getX();
@@ -546,7 +569,8 @@ bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, 
 	}
 	
 	// debug only
-	if ( false ) {
+	if ( false )
+	{
 		const float cpX  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).x;
 		const float cpY  = lastQuadraticControlPoint.getLastCtrlPointAbs(p0).y;
 		const float cprX = lastQuadraticControlPoint.getLastCtrlPointReflectedAbs(p0).x;
@@ -562,7 +586,8 @@ bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, 
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, const double values[]) {
 //////////////////////////////////////////////////////////////////
-	if ( isInitialized() == false ) {
+	if ( isInitialized() == false )
+	{
 		std::cerr	<< CNC_LOG_FUNCT 
 					<< ": PathHandlerBase not initialized "
 					<< std::endl;
@@ -585,7 +610,8 @@ bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, const doub
 	*/
 	
 	bool ret = false;
-	switch ( c ) {
+	switch ( c ) 
+	{
 		case 'm':
 		case 'M': 	lastQuadraticControlPoint.reset();
 					lastCubicControlPoint.reset();

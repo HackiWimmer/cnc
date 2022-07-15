@@ -321,8 +321,7 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent,
 	GetSizer()->Fit(this);
     }
     // Connect events
-    m_previewBook->Bind(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, &CncFilePreviewBase::previewBookChanged, this);
-    m_previewBook->Bind(wxEVT_PAINT, &CncFilePreviewBase::previewBookPaint, this);
+    m_previewBook->Bind(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, &CncFilePreviewBase::onPreviewBookChanged, this);
     m_3D_Top->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncFilePreviewBase::showFromTop3D, this);
     m_3D_Bottom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncFilePreviewBase::showFromBottom3D, this);
     m_3D_Front->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncFilePreviewBase::showFromFront3D, this);
@@ -337,8 +336,7 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent,
 
 CncFilePreviewBase::~CncFilePreviewBase()
 {
-    m_previewBook->Unbind(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, &CncFilePreviewBase::previewBookChanged, this);
-    m_previewBook->Unbind(wxEVT_PAINT, &CncFilePreviewBase::previewBookPaint, this);
+    m_previewBook->Unbind(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, &CncFilePreviewBase::onPreviewBookChanged, this);
     m_3D_Top->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncFilePreviewBase::showFromTop3D, this);
     m_3D_Bottom->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncFilePreviewBase::showFromBottom3D, this);
     m_3D_Front->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncFilePreviewBase::showFromFront3D, this);

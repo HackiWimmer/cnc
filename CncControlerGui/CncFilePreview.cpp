@@ -20,16 +20,31 @@ CncFilePreview::CncFilePreview(wxWindow* parent, wxString name)
 , lastFileName			()
 ///////////////////////////////////////////////////////////////////
 {
-	gcodePreview = new CncGCodePreview(this, name);
+	gcodePreview = new CncGCodePreview(m_gcodePreviewPlaceholder->GetParent(), name);
 	GblFunc::replaceControl(m_gcodePreviewPlaceholder, gcodePreview);
 	
-	svgPreview = new CncSvgViewer(this);
+	svgPreview = new CncSvgViewer(m_svgPreviewPlaceholder->GetParent());
 	svgPreview->SetBackgroundColour(*wxBLACK);
 	GblFunc::replaceControl(m_svgPreviewPlaceholder, svgPreview);
+	
+	m_previewBook->SetBackgroundColour(*wxBLACK);
+	svgPreview->GetParent()->Bind(wxEVT_MOUSEWHEEL,			&CncFilePreview::onMouse,	this);
+	svgPreview->GetParent()->Bind(wxEVT_LEFT_DOWN,			&CncFilePreview::onMouse,	this);
+	svgPreview->GetParent()->Bind(wxEVT_LEFT_UP,			&CncFilePreview::onMouse,	this);
+	svgPreview->GetParent()->Bind(wxEVT_LEFT_DCLICK,		&CncFilePreview::onMouse,	this);
+	svgPreview->GetParent()->Bind(wxEVT_MOTION,				&CncFilePreview::onMouse,	this);
 }
 ///////////////////////////////////////////////////////////////////
 CncFilePreview::~CncFilePreview() {
 ///////////////////////////////////////////////////////////////////
+	svgPreview->GetParent()->Unbind(wxEVT_MOUSEWHEEL,		&CncFilePreview::onMouse,	this);
+	svgPreview->GetParent()->Unbind(wxEVT_LEFT_DOWN,		&CncFilePreview::onMouse,	this);
+	svgPreview->GetParent()->Unbind(wxEVT_LEFT_UP,			&CncFilePreview::onMouse,	this);
+	svgPreview->GetParent()->Unbind(wxEVT_LEFT_DCLICK,		&CncFilePreview::onMouse,	this);
+	svgPreview->GetParent()->Unbind(wxEVT_MOTION,			&CncFilePreview::onMouse,	this);
+	
+	delete gcodePreview;
+	delete svgPreview;
 }
 ///////////////////////////////////////////////////////////////////
 void CncFilePreview::normalizeView() {
@@ -118,8 +133,8 @@ bool CncFilePreview::loadFile() {
 	{
 		ret = svgPreview->loadFile(lastFileName.GetFullPath(), "Cnc File Preview:" );
 		
-		if ( ret == true )	svgPreview->update();
-		else				svgPreview->clear();
+		if ( ret == true )	svgPreview->Update();
+		else				svgPreview->Clear();
 	}
 	
 	// always do this, because in case ret == false the boundaries have to be reseted;
@@ -172,14 +187,10 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void CncFilePreview::previewBookChanged(wxNotebookEvent& event) {
+void CncFilePreview::onPreviewBookChanged(wxNotebookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	//std::cout << "X: " << m_previewBook->GetSelection() << ", " << m_previewBook->IsShown() << ", " << m_previewBook->IsShownOnScreen() << std::endl;
-}
-///////////////////////////////////////////////////////////////////
-void CncFilePreview::previewBookPaint(wxPaintEvent& event) {
-///////////////////////////////////////////////////////////////////
-	//std::cout << "Y: " << m_previewBook->GetSelection() << ", " << m_previewBook->IsShown() << ", " << m_previewBook->IsShownOnScreen() << std::endl;
+	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
 void CncFilePreview::activate3DPerspectiveButton(wxButton* bt) {
@@ -373,4 +384,10 @@ bool CncFilePreview::evaluateMetricBoundaries() const {
 	THE_TPL_CTX->updateGui(true);
 	
 	return box.hasBoundaries();
+}
+/////////////////////////////////////////////////////////////////////
+void CncFilePreview::onMouse(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( tplFormat == TplSvg )
+		svgPreview->onMouse(event);
 }

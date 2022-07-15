@@ -38,9 +38,9 @@ class CncFilePreview : public CncFilePreviewBase
 		bool selectSVGPreview();
 		bool selectGCodePreview();
 		bool selectBinaryPreview(const wxString& fileName);
-
-		virtual void previewBookChanged(wxNotebookEvent& event);
-		virtual void previewBookPaint(wxPaintEvent& event);
+		
+		virtual void onMouse(wxMouseEvent& event);
+		virtual void onPreviewBookChanged(wxNotebookEvent& event);
 		
 		virtual void show3D(wxCommandEvent& event);
 		virtual void showFromBottom3D(wxCommandEvent& event);

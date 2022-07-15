@@ -683,7 +683,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 
     flexGridSizer9789->Add(m_staticText98027, 0, wxALL, WXC_FROM_DIP(1));
 
-    wxFlexGridSizer* flexGridSizer9795 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer9795 = new wxFlexGridSizer(2, 2, 0, 0);
     flexGridSizer9795->SetFlexibleDirection(wxBOTH);
     flexGridSizer9795->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
@@ -702,6 +702,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     m_cbSvgExportKeepCncNodes->SetToolTip(_("Keep Cnc parameter nodes"));
 
     flexGridSizer9795->Add(m_cbSvgExportKeepCncNodes, 0, wxALL, WXC_FROM_DIP(0));
+
+    m_chSvgExportKeepFormat = new wxCheckBox(m_panelToolBoxSvg, wxID_ANY, _("Keep Format"), wxDefaultPosition,
+        wxDLG_UNIT(m_panelToolBoxSvg, wxSize(-1, -1)), 0);
+    m_chSvgExportKeepFormat->SetValue(false);
+    m_chSvgExportKeepFormat->SetToolTip(_("Keep SVG Format attributes"));
+
+    flexGridSizer9795->Add(m_chSvgExportKeepFormat, 0, wxALL, WXC_FROM_DIP(0));
 
     m_btSvgExport = new wxButton(
         m_panelToolBoxSvg, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelToolBoxSvg, wxSize(26, 26)), 0);

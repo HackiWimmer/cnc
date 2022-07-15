@@ -27,21 +27,26 @@ class SVGFileFormatter
 		bool removeCncTags(wxXmlNode* child);
 		bool removeCncTags(wxXmlDocument& doc);
 		
+		bool removeSvgFormatAttributs(wxXmlNode* child);
+		bool removeSvgFormatAttributs(wxXmlDocument& doc);
+
 	public:
-		enum Mode {
-			CNV_PRETTY_WITH_CNC, 
-			CNV_PRETTY_WITHOUT_CNC, 
-			CNV_COMPACT_WITH_CNC, 
-			CNV_COMPACT_WITHOUT_CNC 
+		
+		struct Setup
+		{
+			bool compact	= false;
+			bool keepCnc	= true;
+			bool keepFormat	= false;
 		};
 		
 		SVGFileFormatter(const wxString& ifn);
 		
-		bool convert(SVGFileFormatter::Mode m, const wxString& ofn);
+		bool convert(SVGFileFormatter::Setup s, const wxString& ofn);
 		
 		bool format(const wxString& ofn);
 		bool compact(const wxString& ofn, bool rmvCncTags = false);
 		
+		bool removeSvgFormatAttributs(const wxString& ofn);
 		bool removeCncTags(const wxString& ofn);
 };
 

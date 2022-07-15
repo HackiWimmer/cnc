@@ -1,1 +1,1 @@
-Release/main_app.cpp.o Release/impl.cpp.o   
+Release/main_app.cpp.o Release/impl.cpp.o Release/FtMonitor.cpp.o   

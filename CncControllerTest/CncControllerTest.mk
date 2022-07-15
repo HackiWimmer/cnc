@@ -14,7 +14,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=30/04/2022
+Date                   :=15/07/2022
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/msys64/mingw64/bin/g++.exe
 SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
@@ -64,7 +64,7 @@ AS       := C:/msys64/mingw64/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files\CodeLite
-Objects0=$(IntermediateDirectory)/main_app.cpp$(ObjectSuffix) $(IntermediateDirectory)/impl.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main_app.cpp$(ObjectSuffix) $(IntermediateDirectory)/impl.cpp$(ObjectSuffix) $(IntermediateDirectory)/FtMonitor.cpp$(ObjectSuffix) 
 
 
 
@@ -106,6 +106,12 @@ $(IntermediateDirectory)/impl.cpp$(ObjectSuffix): impl.cpp
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControllerTest/impl.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/impl.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/impl.cpp$(PreprocessSuffix): impl.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/impl.cpp$(PreprocessSuffix) impl.cpp
+
+$(IntermediateDirectory)/FtMonitor.cpp$(ObjectSuffix): FtMonitor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/FtMonitor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/FtMonitor.cpp$(DependSuffix) -MM FtMonitor.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControllerTest/FtMonitor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/FtMonitor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/FtMonitor.cpp$(PreprocessSuffix): FtMonitor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/FtMonitor.cpp$(PreprocessSuffix) FtMonitor.cpp
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

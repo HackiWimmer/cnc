@@ -15,7 +15,8 @@ SVGNodeParser::~SVGNodeParser() {
 //////////////////////////////////////////////////////////////////
 bool SVGNodeParser::addPathElement(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
-	if ( pathHandler == NULL ) {
+	if ( pathHandler == NULL )
+	{
 		std::cerr << CNC_LOG_FUNCT << ": Failed: Member pathHandler is NULL " << std::endl;
 		return false;
 	}
@@ -37,15 +38,16 @@ bool SVGNodeParser::processSvgNode(const wxString& node) {
 	path.clear();
 	
 	SvgNodeAttributeMap aMap;
-	if ( SVGElementConverter::convertNodeToPathData(node, path, aMap) ) {
-
+	if ( SVGElementConverter::convertNodeToPathData(node, path, aMap) )
+	{
 		// reset transform
 		SVGTransformMatrix& tm = pathHandler->getSvgTransformMatrix();
 		tm.unchanged();
 		
 		// perform transform
 		SvgNodeAttributeMap::iterator it = aMap.find("transform");
-		if ( it != aMap.end() ) {
+		if ( it != aMap.end() )
+		{
 			if ( tm.performTransformAsStringList(it->second) == false )
 				return false;
 		}

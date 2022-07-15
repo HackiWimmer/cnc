@@ -101,11 +101,7 @@ protected:
     wxButton* m_3D_Perspective4;
 
 protected:
-    virtual void previewBookChanged(wxNotebookEvent& event)
-    {
-	event.Skip();
-    }
-    virtual void previewBookPaint(wxPaintEvent& event)
+    virtual void onPreviewBookChanged(wxNotebookEvent& event)
     {
 	event.Skip();
     }

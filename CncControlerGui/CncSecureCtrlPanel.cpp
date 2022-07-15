@@ -297,21 +297,29 @@ void CncSecureCtrlPanel::onEmergencySec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSecureCtrlPanel::onRunSec(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	// first some questionnaires . . . 
 	CncControl* cnc = THE_APP->getCncControl();
 	if ( cnc && cnc->dryRunAvailable() )
 	{
 		if ( THE_TPL_CTX->isValid() == false )
 		{
-			wxString msg("The current Template status is valid!\nChoose what you really want?");
-
+			wxString msg(wxString::Format(	"The current Template status is not valid!\n" \
+											" - The count of (dry)runs is %u\n" \
+											" - The count of valid (dry)runs is %u\n\n" \
+											"Choose what you really want?",
+											THE_TPL_CTX->getRunCount(),
+											THE_TPL_CTX->getValidRunCount()
+										  )
+			);
+			
 			wxRichMessageDialog dlg(this, msg, _T("Template State . . . "), 
 								wxYES|wxNO|wxCANCEL|wxCENTRE);
 			
 			dlg.SetFooterText("It is strictly recommend to perform a Template Run only based on a Dry Run with a valid state!");
 			dlg.SetFooterIcon(wxICON_WARNING);
-			dlg.SetYesNoCancelLabels("Start a Dry Run", "Start a Run", "Cancel") ;
+			dlg.SetYesNoCancelLabels("Start a Dry Run", "Start a Run", "Cancel");
 			
-			int ret = dlg.ShowModal();
+			const int ret = dlg.ShowModal();
 			
 			if      ( ret == wxID_CANCEL )
 			{ 
@@ -324,11 +332,32 @@ void CncSecureCtrlPanel::onRunSec(wxCommandEvent& event) {
 				THE_APP->rcDryRun(event); 
 				return; 
 			}
+			// else
+			// ... starting run
+		}
+		else
+		{
+			wxString msg("The current Template is ready to run.");
 			
-			//... run
+			wxRichMessageDialog dlg(this, msg, _T("Template State . . . "), 
+								wxOK|wxCANCEL|wxCENTRE);
+								
+			dlg.SetFooterText("The final starting shot . . .");
+			dlg.SetFooterIcon(wxICON_QUESTION);
+			dlg.SetOKCancelLabels("Start Run", "Cancel");
+			const int ret = dlg.ShowModal();
+			
+			if ( ret == wxID_CANCEL )
+			{
+				CNC_CLOG_A("The run was cancelled by user")
+				return;
+			}
+			// else
+			// ... starting run
 		}
 	}
 	
+	// then starting run . . . 
 	THE_APP->rcRun(event);
 }
 /////////////////////////////////////////////////////////////////////

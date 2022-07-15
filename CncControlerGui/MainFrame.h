@@ -192,11 +192,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void onKeepFrontModeCentred(wxCommandEvent& event);
-    virtual void onKeepFrontModeInFrame(wxCommandEvent& event);
-    virtual void onKeepFrontModeOff(wxCommandEvent& event);
-    virtual void onSelectHardwareSpace(wxCommandEvent& event);
-    virtual void onSelectWorkingSpace(wxCommandEvent& event);
+		virtual void onKeepFrontModeCentred(wxCommandEvent& event);
+		virtual void onKeepFrontModeInFrame(wxCommandEvent& event);
+		virtual void onKeepFrontModeOff(wxCommandEvent& event);
+		virtual void onSelectHardwareSpace(wxCommandEvent& event);
+		virtual void onSelectWorkingSpace(wxCommandEvent& event);
 		virtual void rcDryRun(wxCommandEvent& event);
 		virtual void onPodiumManagement(wxCommandEvent& event);
 		virtual void onResetView(wxCommandEvent& event);
@@ -535,13 +535,12 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void selectMonitorBookCncPanel();
 		void selectMonitorBookTemplatePanel();
+		void selectMonitorBookSetupSummaryPanel();
 		
 		void selectParsingSynopsisTrace();
-		
-		void setControllerPowerStateBmp(bool state);
-		
 		void selectSecureMonitorView();
 		
+		void setControllerPowerStateBmp(bool state);
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
 		void installCustControls();
