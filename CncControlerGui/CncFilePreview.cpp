@@ -114,10 +114,14 @@ bool CncFilePreview::loadFile() {
 	bool ret = false;
 	if ( m_previewBook->GetSelection() == (int)GCODE_TAB_PAGE )
 	{
-		//if ( IsShownOnScreen() ) {
+		const unsigned long fileSizeInBytes	= lastFileName.GetSize().ToULong();
+		const unsigned long waterMark		= 1000 * 1014; //1 MB
+		
+		if ( IsShownOnScreen() || fileSizeInBytes > waterMark )  
+		{
 			CncAutoProgressDialog progressDlg(this, "Loading File");
 			progressDlg.Show();
-		//}
+		}
 		
 		gcodePreview->clear();
 		gcodePreview->Refresh();
@@ -127,7 +131,6 @@ bool CncFilePreview::loadFile() {
 		ret = gfp.processRelease();
 		
 		gcodePreview->Refresh();
-		
 	}
 	else if ( m_previewBook->GetSelection() == (int)SVG_TAB_PAGE )
 	{

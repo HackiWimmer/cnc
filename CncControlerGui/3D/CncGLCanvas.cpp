@@ -43,17 +43,20 @@ bool CncGlCanvas::activateContext(GLContextBase* context, const wxGLCanvas &win,
 //////////////////////////////////////////////////
 	lastSetCurrent = false;
 
-	if ( context == NULL ) {
+	if ( context == NULL )
+	{
 		wxASSERT ( context != NULL );
 		return lastSetCurrent;
 	} 
 	
-	if ( THE_CONTEXT->isWinOS() == true ) {
+	if ( THE_CONTEXT->isWinOS() == true ) 
+	{
 		lastSetCurrent = context->SetCurrent(win);
 		return lastSetCurrent;
 	} 
 	
-	if ( win.IsShown() ) {
+	if ( win.IsShown() ) 
+	{
 		lastSetCurrent = context->SetCurrent(win);
 		return lastSetCurrent;
 	}

@@ -396,7 +396,10 @@ void GLOpenGLPathBuffer::display(DisplayType dt, int vertices) {
 	
 	glBindVertexArray(vertexArrayID);
 	
-		if ( GL_COMMON_CHECK_ERROR > 0 ) {
+		if ( GL_COMMON_CHECK_ERROR > 0 ) 
+		{
+			//GblFunc::stacktrace(std::cout);
+			
 			traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT);
 			traceParameters(std::cerr);
 			return;

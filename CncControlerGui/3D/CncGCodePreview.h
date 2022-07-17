@@ -42,6 +42,7 @@ class CncGCodePreview : public CncGlCanvas {
 		
 	protected:
 		
+		bool					makeCompleteVisible;
 		wxString				previewName;
 		GLContextGCodePreview*	preview;
 		double					maxDimension;

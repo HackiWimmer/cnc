@@ -1136,7 +1136,8 @@ bool CncControl::dispatchEventQueue() {
 	static       CncMilliTimestamp tsLastDispatch   = 0;
 	static       CncMilliTimestamp tsLastUpdate     = 0;
 	
-	if ( isInterrupted() ) {
+	if ( isInterrupted() )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(": Interrupt detected\n");
 		return false;
 	}

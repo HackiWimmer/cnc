@@ -21,10 +21,11 @@ wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////
 CncGCodePreview::CncGCodePreview(wxWindow *parent, wxString name, int *attribList) 
-: CncGlCanvas		(parent, attribList)
-, previewName		(name)
-, preview			(new GLContextGCodePreview(this, name))
-, maxDimension		(400.0)
+: CncGlCanvas			(parent, attribList)
+, makeCompleteVisible	(true)
+, previewName			(name)
+, preview				(new GLContextGCodePreview(this, name))
+, maxDimension			(400.0)
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
@@ -68,7 +69,15 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 	if ( alreadyPainted )	preview->reshape();
 	else 					preview->reshapeViewMode();
 	
-	preview->display();
+	if ( makeCompleteVisible == true )
+	{
+		preview->reshapeCompleteVisible();
+		makeCompleteVisible = false;
+	}
+	else
+	{
+		preview->display();
+	}
 	
 	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
 	// later this should not appear to support custom origin positions
@@ -81,6 +90,7 @@ void CncGCodePreview::onSize(wxSizeEvent& event) {
 //////////////////////////////////////////////////
 	// noting to do, 
 	// in this case the onPaint() event is also fired
+	event.Skip(true);
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::onEraseBackground(wxEraseEvent& event) {
@@ -127,6 +137,8 @@ void CncGCodePreview::clear() {
 //////////////////////////////////////////////////
 	if ( activateContext(preview) == true ) 
 		preview->clearPathData();
+		
+	makeCompleteVisible = true;
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::setMaxDimension(double maxDim) {
@@ -147,7 +159,8 @@ void CncGCodePreview::popProcessMode() {
 //////////////////////////////////////////////////
 	preview->getOptions().showPosMarker = false;
 
-	preview->reshapeCompleteVisible();
+	if ( activateContext(preview) == true ) 
+		preview->reshapeCompleteVisible();
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {

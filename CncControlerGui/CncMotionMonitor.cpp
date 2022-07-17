@@ -408,8 +408,10 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 	static bool displayCoords = false;
 
-	auto clearCoords = [&]() {
-		if ( displayCoords == true ) {
+	auto clearCoords = [&]() 
+	{
+		if ( displayCoords == true ) 
+		{
 			SetToolTip("");
 			THE_APP->GetMouseCoordX()->ChangeValue("");
 			THE_APP->GetMouseCoordY()->ChangeValue("");
@@ -419,15 +421,18 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 	
 	clearCoords();
 	
-	if ( event.ControlDown() == true ) {
-		if ( context->logWinCoordsToVertex(event.GetX(), event.GetY()) )  {
+	if ( event.ControlDown() == true )
+	{
+		if ( context->logWinCoordsToVertex(event.GetX(), event.GetY()) )
+		{
 			// the refresh() (not update()) is necessary here to get the coordinates well
 			Refresh();
 			performMouseCoordAndToolTip();
 			displayCoords = true;
 		}
-	
-	} else {
+	} 
+	else 
+	{
 		context->delWinCoordsToVertex();
 		update();
 		clearCoords();
@@ -540,7 +545,8 @@ void CncMotionMonitor::cameraRotationTimerHandler(CncMotionMonitor::CameraMode c
 	}
 	
 	typedef CncMotionMonitor::CameraMode Mode;
-	switch ( cm ) {
+	switch ( cm )
+	{
 		case Mode::CM_OFF:					return;
 		case Mode::CM_CLOCKWISE:			cameraRotationStepWidth = +1; break;
 		case Mode::CM_COUNTER_CLOCKWISE:	cameraRotationStepWidth = -1; break;
@@ -682,7 +688,10 @@ bool CncMotionMonitor::makeCompleteVisible(const CncDoubleBoundaries& box) {
 	if ( box.hasBoundaries() == false )
 		return false;
 		
-	const bool ret = monitor->makeCompleteVisible(box); 
+	bool ret = false;
+	if ( activateContext(monitor) == true )
+		ret = monitor->makeCompleteVisible(box); 
+		
 	onPaint();
 	
 	return ret;
