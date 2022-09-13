@@ -106,6 +106,7 @@
 	cd <opencvDir>/mingwbuild
 	cmake .
 
+	#Update codelite compiler include path setup
 
 # --------------------------------------------------------------------------------
 # msys2: building wxsvg
@@ -127,7 +128,7 @@
 	make
 	make install
 	
-	# provide enhanced veriosn infomation by the following file: 
+	# provide enhanced version information by the following file: 
 	<wxSVGDir>/include/CncWxSvgVersionInfo.h
 	
 	Content:{
@@ -136,5 +137,20 @@
 			#define CNC_WX_SVG_VERSIONFO "?.?.??"
 		#endif
 	}
+	
+	#Update codelite compiler include path setup
 
+# --------------------------------------------------------------------------------
+# windows: installing boost
+# --------------------------------------------------------------------------------
+	#first find out the highest msys2 version
+	#download this version boost_????.zip
+	
+	extract/copy
+	
+	#Update codelite compiler include path setup
  
+# --------------------------------------------------------------------------------
+# msys2: building wxsvg
+	pacman -sQ boost
+	pacman -sS <version name>

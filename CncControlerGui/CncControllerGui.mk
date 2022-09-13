@@ -14,7 +14,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=17/07/2022
+Date                   :=13/09/2022
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/msys64/mingw64/bin/g++.exe
 SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
@@ -40,12 +40,12 @@ MakeDirCommand         :=makedir
 RcCmpOptions           := $(shell wx-config --rcflags ) -D NDEBUG 
 RcCompilerName         :=C:/msys64/mingw64/bin/windres.exe
 LinkOptions            :=  $(shell wx-config --libs) -mwindows
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/@Development/boost_1_79_0 $(IncludeSwitch)C:/msys64/mingw64/include $(IncludeSwitch)C:/@Development/wxsvg-1.5.23/include $(IncludeSwitch)C:/@Development/opencv/build/include $(IncludeSwitch)C:/@Development/openvg 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/@Development/boost_1_79_0 $(IncludeSwitch)C:/msys64/mingw64/include $(IncludeSwitch)C:/@Development/wxsvg-1.5.24/include $(IncludeSwitch)C:/@Development/opencv/build/include $(IncludeSwitch)C:/@Development/openvg 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)wxmsw31u_stc $(LibrarySwitch)wxmsw31u_webview $(LibrarySwitch)wxmsw31u_propgrid $(LibrarySwitch)wxmsw31u_adv $(LibrarySwitch)wxmsw31u_gl $(LibrarySwitch)wxmsw31u_aui $(LibrarySwitch)wxsvg $(LibrarySwitch)cairo $(LibrarySwitch)avutil $(LibrarySwitch)avformat $(LibrarySwitch)avcodec $(LibrarySwitch)xvidcore $(LibrarySwitch)expat $(LibrarySwitch)exif $(LibrarySwitch)swscale $(LibrarySwitch)backtrace $(LibrarySwitch)dl $(LibrarySwitch)dbgeng $(LibrarySwitch)opengl32 $(LibrarySwitch)strmiids $(LibrarySwitch)glu32 $(LibrarySwitch)glew32 $(LibrarySwitch)ole32 $(LibrarySwitch)oleaut32 $(LibrarySwitch)freeglut $(LibrarySwitch)Xinput9_1_0 $(LibrarySwitch)opencv_core451 $(LibrarySwitch)opencv_video451 $(LibrarySwitch)opencv_videoio451 $(LibrarySwitch)opencv_highgui451 
-ArLibs                 :=  "libwxmsw31u_stc" "libwxmsw31u_webview" "libwxmsw31u_propgrid" "libwxmsw31u_adv" "libwxmsw31u_gl" "libwxmsw31u_aui" "libwxsvg" "libcairo" "libavutil" "libavformat" "libavcodec" "libxvidcore" "libexpat" "libexif" "libswscale" "backtrace" "libdl" "dbgeng" "opengl32" "strmiids" "glu32" "glew32" "ole32" "oleaut32" "freeglut" "Xinput9_1_0" "libopencv_core451" "libopencv_video451" "libopencv_videoio451" "libopencv_highgui451" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/@Development/wxWidgets-3.1.6/lib/gcc_dll $(LibraryPathSwitch)C:/msys64/mingw64/lib $(LibraryPathSwitch)C:/@Development/opencv/mingwbuild/lib 
+Libs                   := $(LibrarySwitch)wxmsw32u_stc $(LibrarySwitch)wxmsw32u_webview $(LibrarySwitch)wxmsw32u_propgrid $(LibrarySwitch)wxmsw32u_adv $(LibrarySwitch)wxmsw32u_gl $(LibrarySwitch)wxmsw32u_aui $(LibrarySwitch)wxsvg $(LibrarySwitch)cairo $(LibrarySwitch)avutil $(LibrarySwitch)avformat $(LibrarySwitch)avcodec $(LibrarySwitch)xvidcore $(LibrarySwitch)expat $(LibrarySwitch)exif $(LibrarySwitch)swscale $(LibrarySwitch)backtrace $(LibrarySwitch)dl $(LibrarySwitch)dbgeng $(LibrarySwitch)opengl32 $(LibrarySwitch)strmiids $(LibrarySwitch)glu32 $(LibrarySwitch)glew32 $(LibrarySwitch)ole32 $(LibrarySwitch)oleaut32 $(LibrarySwitch)freeglut $(LibrarySwitch)Xinput9_1_0 $(LibrarySwitch)opencv_core451 $(LibrarySwitch)opencv_video451 $(LibrarySwitch)opencv_videoio451 $(LibrarySwitch)opencv_highgui451 
+ArLibs                 :=  "libwxmsw32u_stc" "libwxmsw32u_webview" "libwxmsw32u_propgrid" "libwxmsw32u_adv" "libwxmsw32u_gl" "libwxmsw32u_aui" "libwxsvg" "libcairo" "libavutil" "libavformat" "libavcodec" "libxvidcore" "libexpat" "libexif" "libswscale" "backtrace" "libdl" "dbgeng" "opengl32" "strmiids" "glu32" "glew32" "ole32" "oleaut32" "freeglut" "Xinput9_1_0" "libopencv_core451" "libopencv_video451" "libopencv_videoio451" "libopencv_highgui451" 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/@Development/wxWidgets-3.2.1/lib/gcc_dll $(LibraryPathSwitch)C:/msys64/mingw64/lib $(LibraryPathSwitch)C:/@Development/opencv/mingwbuild/lib 
 
 ##
 ## Common variables
@@ -138,10 +138,10 @@ $(IntermediateDirectory)/.d:
 PreBuild:
 	@echo Executing Pre Build commands ...
 	g++ -v
-	echo C:\@Development\wxWidgets-3.1.6
+	echo C:\@Development\wxWidgets-3.2.1
 	where g++
 	g++ -v
-	echo C:\@Development\wxWidgets-3.1.6
+	echo C:\@Development\wxWidgets-3.2.1
 	where g++
 	@echo Done
 

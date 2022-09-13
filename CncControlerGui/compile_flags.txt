@@ -1,11 +1,11 @@
 -IC:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui
 -IC:\@Development\boost_1_79_0
 -IC:\msys64\mingw64\include
--IC:\@Development\wxsvg-1.5.23\include
+-IC:\@Development\wxsvg-1.5.24\include
 -IC:\@Development\opencv\build\include
 -IC:\@Development\openvg
--IC:\@Development\wxWidgets-3.1.6\lib\gcc_dll\mswu
--IC:\@Development\wxWidgets-3.1.6\include
+-IC:\@Development\wxWidgets-3.2.1\lib\gcc_dll\mswu
+-IC:\@Development\wxWidgets-3.2.1\include
 -IC:\msys64\mingw64\include\c++\9.2.0
 -IC:\msys64\mingw64\include\c++\9.2.0\x86_64-w64-mingw32
 -IC:\msys64\mingw64\include\c++\9.2.0\backward
