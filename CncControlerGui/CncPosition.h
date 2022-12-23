@@ -201,16 +201,19 @@ class CncPosition
 		////////////////////////////////////////////////////////////////
 		const CncPosition<T>& operator= (const CncPosition<T>& cp) 
 		{
-			xMin = cp.getXMin();
-			xMax = cp.getXMax();
-			yMin = cp.getYMin();
-			yMax = cp.getYMax();
-			zMin = cp.getZMin();
-			zMax = cp.getZMax();
-			xPos = cp.getX();
-			yPos = cp.getY();
-			zPos = cp.getZ();
-			
+			// self-assignment check
+			if ( this != &cp ) 
+			{
+				xMin = cp.getXMin();
+				xMax = cp.getXMax();
+				yMin = cp.getYMin();
+				yMax = cp.getYMax();
+				zMin = cp.getZMin();
+				zMax = cp.getZMax();
+				xPos = cp.getX();
+				yPos = cp.getY();
+				zPos = cp.getZ();
+			}
 			return *this;
 		}
 		

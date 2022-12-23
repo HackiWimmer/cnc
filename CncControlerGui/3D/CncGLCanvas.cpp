@@ -128,7 +128,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	if ( event.RightDown() )
 	{
 		if ( context->isViewMode2D() )
-			CNC_PRINT_FUNCT
+			;//CNC_PRINT_FUNCT
 	}
 
 	// wheel - rotate and scale

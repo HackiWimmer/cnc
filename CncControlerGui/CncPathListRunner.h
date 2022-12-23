@@ -74,11 +74,11 @@ class CncPathListRunner
 			virtual void traceTo(std::ostream& o) const;
 		};
 		// ---------------------------------------------------
-		struct WorkflowTriggerGuidePtahEntry : public WorkflowEntry
+		struct WorkflowTriggerGuidePathEntry : public WorkflowEntry
 		{
 			Trigger::GuidePath tr;
 			
-			explicit WorkflowTriggerGuidePtahEntry(const Trigger::GuidePath& t) : tr (t) {}
+			explicit WorkflowTriggerGuidePathEntry(const Trigger::GuidePath& t) : tr (t) {}
 			virtual bool process(CncPathListRunner* plr);
 			virtual void traceTo(std::ostream& o) const;
 		};
@@ -226,7 +226,7 @@ class CncPathListRunner
 				virtual bool processGuidePath(const CncPathListManager& plm)							= 0;
 				virtual bool processClientIDChange(long cid)											= 0;
 				virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)				= 0;
-				virtual bool processToolChange(double diameter)											= 0;
+				virtual bool processToolChange(int id)													= 0;
 				virtual bool processSpindleStateSwitch(bool on, bool force=false)						= 0;
 				virtual bool processSpindleSpeedChange(double value_U_MIN)								= 0;
 				virtual bool processMoveSequence(CncMoveSequence& msq)									= 0;
@@ -261,6 +261,7 @@ class CncPathListRunner
 		
 		bool onPhysicallyClientIdChange(const CncPathListEntry& curr);
 		bool onPhysicallyFeedSpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next);
+		bool onPhysicallyToolChange(const CncPathListEntry& curr);
 		bool onPhysicallySpindleChange(const CncPathListEntry& curr);
 		bool onPhysicallyMoveRaw(const CncPathListEntry& curr);
 		bool onPhysicallyMoveAnalysed(CncPathList::const_iterator& it, const CncPathList::const_iterator& end);
@@ -317,7 +318,7 @@ class CncPathListRunner
 		void processTrigger(const Trigger::EndRun& tr)		{ workflowList.push_back(new WorkflowTriggerEndRunEntry     (tr)); }
 		void processTrigger(const Trigger::NextPath& tr)	{ workflowList.push_back(new WorkflowTriggerNextPathEntry   (tr)); }
 		void processTrigger(const Trigger::SpeedChange& tr)	{ workflowList.push_back(new WorkflowTriggerSpeedChangeEntry(tr)); }
-		void processTrigger(const Trigger::GuidePath& tr)	{ workflowList.push_back(new WorkflowTriggerGuidePtahEntry  (tr)); }
+		void processTrigger(const Trigger::GuidePath& tr)	{ workflowList.push_back(new WorkflowTriggerGuidePathEntry  (tr)); }
 		
 		static bool test() { return Move::test(); }
 };

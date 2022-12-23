@@ -70,13 +70,15 @@ class CncFileHousekeeping : public wxDirTraverser {
 		{}
 		
 		// -------------------------------------------------------------------
-		virtual wxDirTraverseResult OnFile(const wxString& filename) {
+		virtual wxDirTraverseResult OnFile(const wxString& filename) 
+		{
 			cntTotalFiles++;
 			return wxDIR_CONTINUE;
 		}
 		
 		// -------------------------------------------------------------------
-		virtual wxDirTraverseResult OnDir(const wxString& dirname) {
+		virtual wxDirTraverseResult OnDir(const wxString& dirname) 
+		{
 			cntTotalDirs++;
 			
 			// ensure name ends with the separator
@@ -230,7 +232,8 @@ void CncFileNameService::trace(std::ostream& os) {
 	os << "Stack Trace Filename              : " << CncFileNameService::getStackTraceFileName() 					<< std::endl;
 	
 	os << "Search Path Entries               : " << ""											 					<< std::endl;
-	for ( size_t i=0; i< _pathList.GetCount(); i++ ) {
+	for ( size_t i=0; i< _pathList.GetCount(); i++ )
+	{
 		os << wxString::Format(" - Path(%00ld): ", (long)i) << _pathList.Item(i)				 					<< std::endl;
 	}
 }
@@ -239,7 +242,8 @@ bool CncFileNameService::ensureEndWithPathSep(wxString& str) {
 ///////////////////////////////////////////////////////////////////
 	str.Trim();
 	
-	if ( str.EndsWith(wxFileName::GetPathSeparator()) == false) {
+	if ( str.EndsWith(wxFileName::GetPathSeparator()) == false)
+	{
 		str.append(wxFileName::GetPathSeparator());
 		return true;
 	}
@@ -265,7 +269,8 @@ wxString CncFileNameService::getTempFileName(const wxString& extention) {
 ///////////////////////////////////////////////////////////////////
 wxString CncFileNameService::getTempFileName(CncTemplateFormat f) {
 ///////////////////////////////////////////////////////////////////
-	switch ( f ) {
+	switch ( f )
+	{
 		case TplBinary:		return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "BIN")); 
 		case TplSvg:		return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "SVG"));
 		case TplGcode:		return wxString(wxFileName::CreateTempFileName(_tempDirectorySession + "GCODE"));
@@ -279,5 +284,23 @@ wxString CncFileNameService::getCncTemplatePreviewFileName(CncTemplateFormat f) 
 ///////////////////////////////////////////////////////////////////
 	return wxEmptyString;
 }
-
+///////////////////////////////////////////////////////////////////
+bool CncFileNameService::isAsNoSerialFile(const wxString& fileName) {
+///////////////////////////////////////////////////////////////////
+	wxFileName refFile(fileName);
+	refFile.MakeAbsolute();
+	
+	wxFileName f1(getNoSerialPreviewAvailableFile());
+	wxFileName f2(getNoSerialContentAvailableFile());
+	wxFileName f3(getNoSerialPreviewRegisteredFile());
+	f1.MakeAbsolute();
+	f2.MakeAbsolute();
+	f3.MakeAbsolute();
+	
+	if      ( refFile == f1 ) return true;
+	else if ( refFile == f2 ) return true;
+	else if ( refFile == f3 ) return true;
+	
+	return false;
+}
 

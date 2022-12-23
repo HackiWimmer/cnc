@@ -27,20 +27,25 @@ struct PGFuncPtrStore {
 	PropertyCommandFunc		propertyCommandButton	= NULL;
 };
 
-typedef std::map<wxPGProperty*, PGFuncPtrStore>		ConfigPGEventMap;
-typedef std::map<const wxString, wxPGProperty*> 	ConfigCategoryMap;
-typedef std::map<const wxString, wxPGProperty*> 	ConfigPropertyMap;
-
 wxDECLARE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 
 //////////////////////////////////////////////////////////////////////////////
 class MainFrame;
 class CncContext;
 
-typedef std::map<wxWindow*, wxWindow*> RegisteredWindows;
+namespace
+{
+	typedef std::map<wxPGProperty*, PGFuncPtrStore>		ConfigPGEventMap;
+	typedef std::map<const wxString, wxPGProperty*> 	ConfigCategoryMap;
+	typedef std::map<const wxString, wxPGProperty*> 	ConfigPropertyMap;
+	typedef std::map<wxWindow*, wxWindow*>				RegisteredWindows;
 
-static const int TOOL_MAGAZINE_MIN_ID = -1;
-static const int TOOL_MAGAZINE_MAX_ID = 999;
+	static const int			TOOL_MAGAZINE_MIN_ID		= -1;
+	static const int			TOOL_MAGAZINE_MAX_ID		= 99999;
+	static const wxString		CTX_ACT_NOTIFY				= "Activate Configuration Notification";
+	static const wxString		CTX_DISP_UNIT				= "Display Unit";
+	static const wxString		CTX_LOAD_CONFIG				= "Load Configuration";
+}
 
 class CncConfig {
 	
@@ -50,28 +55,68 @@ class CncConfig {
 		std::stringstream obsoleteTrace;
 	
 	public:
-		typedef CncUnitCalculatorBase::Unit Unit;
 		
-		struct ToolMagazineEntry {
-		
-			double diameter 	= 0.0;
-			double length		= 0.0;
-			double offset		= 0.0;
-			wxString type 		= "PEN";
-			wxString comment 	= "";
+		struct ToolMagazineEntry
+		{
+			double diameter				= 0.0;
+			double length				= 0.0;
+			double offset				= 0.0;
+			wxString type				= "PEN";
+			wxString comment			= "";
 			
 			const wxString& serialize(wxString& ret );
 			bool deserialize(const wxString& input);
 		};
 		
-		struct ToolMagazineParameter {
+		struct ToolMagazineParameter
+		{
 			bool useDefaultTool			= true;
-			wxString defaultMappedTo	= "-1";
+			wxString defaultMappedTo	= wxString::Format("%s", INBUILT_TOOL_ID);
+			
+			static const int cnvToolId(const wxString& toolId)
+			{ 
+				long id;
+				if ( toolId.ToLong(&id) == true )
+				{
+					if ( id < INT_MAX )
+						return id;
+				}
+				
+				return INVALID_TOOL_ID;
+			}
+
+			
 		};
 		
 		typedef std::map<int, ToolMagazineEntry> ToolMagazine;
 		
-		struct ContainerMemoryAllocation {
+		bool toolExists(int toolId) const;
+		bool toolExists(const wxString& toolId) const;
+		int translateToolId(int toolId);
+		
+		const int getDefaultToolId() const;
+		const wxString getDefaultToolIdAsStr() const;
+		
+		const double getToolDiameter(int toolId);
+		const double getToolLength(int toolId);
+		const double getToolOffset(int toolId);
+		const wxString& getToolType(wxString& ret, int toolId);
+			
+		const wxString getCurrentToolParamAsInfoStr();
+		const wxString getDefaultToolParamAsInfoStr();
+		const wxString getToolParamAsShortInfoStr(int id);
+		const wxString getToolParamAsInfoStr(int id);
+		
+		const wxString getShortToolListAsStr();
+		const wxString getLongToolListAsStr();
+		
+	public:
+	
+		typedef CncUnitCalculatorBase::Unit		Unit;
+		typedef std::map<wxString, wxVariant>	ChangeMap;
+		
+		struct ContainerMemoryAllocation 
+		{
 			private:
 				unsigned int portion 	= 1024;
 				size_t capacity			=    1;
@@ -90,8 +135,14 @@ class CncConfig {
 		};
 		
 	private:
-		bool 						changed;
+		
+		ChangeMap					changeMap;
 		bool 						notificationActivated;
+		bool						pendingNotificationDedected;
+		
+		bool						modifyFlag;
+		
+
 		CncOSDConfigList 			osdConfigList;
 		CncUnit 					currentUnit;
 		MainFrame* 					theApp;
@@ -105,18 +156,9 @@ class CncConfig {
 		double						calcFactX, calcFactY, calcFactZ, calcFactH;
 		float						dispFactX3D, dispFactY3D, dispFactZ3D;
 		
-		unsigned int replyThreshold;
-		
-		int currentToolId;
-		
-		static const unsigned int maxDurations = 32;
-		unsigned int durationCount;
-		double durationSteps[maxDurations];
-		double workpieceOffset;
-		double currentZDepth;
-		double maxZDistance;
-		
-		float renderResolutionMM;
+		unsigned int				replyThreshold;
+		double						workpieceOffset;
+		float						renderResolutionMM;
 		
 		const wxString defaultConfigValue = "";
 		static unsigned int globalPropertyCounter;
@@ -150,7 +192,7 @@ class CncConfig {
 		
 		void updateCalculatedFactors();
 		
-		void broadcastConfigUpdateNotification();
+		void broadcastConfigUpdateNotification(const wxString& context);
 		
 		bool loadNonGuiConfig(const wxString& groupName, const wxString& entryName, const wxString& value);
 		void saveNonGuiConfig(wxConfigBase& config);
@@ -158,14 +200,15 @@ class CncConfig {
 		void calculateFactors();
 		void calculateSpeedValues();
 		bool setPropertyValueFromConfig(const wxString& groupName, const wxString& entryName, const wxString& value);
+		void releaseChangedCallback(const wxString& context);
 		void releaseChangedCallback(wxPGProperty* prop);
 		void initZAxisValues();
 		
 		unsigned int calculateThreshold(double pitch, unsigned int steps);
 		void calculateThresholds();
 		
-		void sc();
-		void rc();
+		void deactivateConfigNotification();
+		void activateConfigNotification(bool notifyOnActivation);
 		
 	public:
 		
@@ -174,10 +217,16 @@ class CncConfig {
 		
 		void init();
 		
+		void setModificationFlag();
+		void resetModificationFlag();
+		bool isModified() const;
+		
+		const ChangeMap& getModificationMap() const { return changeMap; }
+		
 		MainFrame* getTheApp() { wxASSERT(theApp); return theApp; }
 		CncContext* getContext() { wxASSERT(context); return context; }
 		
-		// global config pointer - don't use this directly
+		// global configuration pointer - don't use this directly use THE_CONFIG instead
 		static CncConfig* globalCncConfig;
 		
 		void updateLoadTrace(wxTextCtrl* lTrace, wxTextCtrl* oTrace);
@@ -201,10 +250,9 @@ class CncConfig {
 		
 		// notifications
 		void registerWindowForConfigNotification(wxWindow* wnd);
-		void deactivateConfigNotification();
-		void activateConfigNotification(bool notify=true);
 		
-		class NotificationDeactivator {
+		class NotificationDeactivator
+		{
 			private:
 				bool notifyOnEnd;
 				
@@ -225,21 +273,11 @@ class CncConfig {
 		
 		// user events
 		void loadConfiguration(wxConfigBase& config);
-		void saveConfiguration(wxConfigBase& config);
+		void saveConfiguration(wxConfigBase& config, bool ask);
 		void setupGridChanged(wxPropertyGridEvent& event);
 		void setupGridChanging(wxPropertyGridEvent& event);
 		void setupGridCommandButton(wxCommandEvent& event);
 		void setupGridSelected(wxPropertyGridEvent& event);
-		
-		int getCurrentToolId() { return currentToolId; }
-		void setCurrentToolId(int id) { currentToolId = id; }
-		const wxString getCurrentToolParamAsString();
-		const wxString getToolParamAsString(int id);
-		const wxString getDefaultToolParamAsString();
-		
-		// modification flag
-		const bool isModified() 		{ return changed; }
-		void discardModifications() 	{ changed = false; }
 		
 		double convertX(CncUnit oldUnit, CncUnit newUnit, double value);
 		double convertY(CncUnit oldUnit, CncUnit newUnit, double value);
@@ -277,13 +315,6 @@ class CncConfig {
 		double connvert_STP_SEC_TO_MM_MIN_X(int32_t speed)	{ return connvert_STP_SEC_TO_MM_MIN(speed, getStepsX(), getPitchX()); }
 		double connvert_STP_SEC_TO_MM_MIN_Y(int32_t speed)	{ return connvert_STP_SEC_TO_MM_MIN(speed, getStepsY(), getPitchY()); }
 		double connvert_STP_SEC_TO_MM_MIN_Z(int32_t speed)	{ return connvert_STP_SEC_TO_MM_MIN(speed, getStepsZ(), getPitchZ()); }
-		
-		bool checkToolExists(int toolId=-1);
-		int translateToolId(int toolId=-1);
-		const double getToolDiameter(int toolId=-1);
-		const double getToolLength(int toolId=-1);
-		const double getToolOffset(int toolId=-1);
-		const wxString& getToolType(wxString& ret, int toolId=-1);
 		
 		const unsigned int getReplyThresholdSteps() { return replyThreshold; }
 		
@@ -360,8 +391,6 @@ class CncConfig {
 		const unsigned int getHighPulsWidthZ();
 		const unsigned int getHighPulsWidthH();
 		const unsigned int getSpindleSpeedStepRange();
-		const unsigned int getMaxDurations() 					{ return maxDurations; }
-		const unsigned int getDurationCount() 					{ return durationCount; }
 		
 		const double getMaxDimension();
 		const double getMaxDimensionX();
@@ -402,12 +431,7 @@ class CncConfig {
 		const double getDispFactZ3D()							{ return dispFactZ3D; }
 		
 		const double getWorkpieceOffset()						{ return workpieceOffset; }
-
-// to remove
-const double getCurrentZDepth()							{ return currentZDepth; }
-const double getMaxZDistance()							{ return maxZDistance; }
-const double getCurZDistance() 							{ return 0.0 /*getWorkpieceThickness()*/ + workpieceOffset; }
-
+	
 		const wxString& getFileBrowser(wxString& ret);
 		const wxString& getSVGFileViewer(wxString& ret);
 		const wxString& getBINFileViewer(wxString& ret);

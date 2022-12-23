@@ -69,6 +69,13 @@ class CncPathListManager {
 		
 	public:
 		
+		struct TFS
+		{
+			CncPathList::const_reverse_iterator itT;
+			CncPathList::const_reverse_iterator itF;
+			CncPathList::const_reverse_iterator itS;
+		};
+		
 		CncPathListManager();
 		explicit CncPathListManager(const CncPathListEntry& initialEntry);
 		
@@ -139,8 +146,10 @@ class CncPathListManager {
 		auto	crLastPosEntryIterator()							const;
 		bool	hasMovement()										const;
 		
+		auto	crLastValidEntryWithT()								const;
 		auto	crLastValidEntryWithF()								const;
 		auto	crLastValidEntryWithS()								const;
+		TFS		crLastValidEntryWithTFS()							const;
 		
 		long	firstClientID()										const;
 		
@@ -173,6 +182,7 @@ class CncPathListManager {
 		const	CncPathListEntry& addEntryAdm(long clientId);
 		const	CncPathListEntry& addEntryAdm(CncSpeedMode mode);
 		const	CncPathListEntry& addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN);
+		const	CncPathListEntry& addEntryToC(int toolId);
 		const	CncPathListEntry& addEntrySpl(CncSpindlePowerState spindleState);
 		const	CncPathListEntry& addEntrySpl(double spindleSpeed_U_MIN);
 		const	CncPathListEntry& addEntrySpl(CncSpindlePowerState spindelState, double spindleSpeed_U_MIN);

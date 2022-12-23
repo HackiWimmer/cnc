@@ -24,9 +24,9 @@ class SVGPathHandlerBase : public PathHandlerBase {
 		
 	protected:
 		
-		SVGRootNode				svgRootNode;
 		SVGTransformMatrix 		currentSvgTransformMatrix;
 		SvgCncContext			currentCncContext;
+		SVGRootNode				svgRootNode;
 		
 		virtual void 			transform(double& xAbs, double& yAbs);
 		virtual bool 			callback(const CncCurveLib::Point& p);

@@ -20,7 +20,7 @@ bool CncPathListRunner::WorkflowTriggerBeginRunEntry   ::process(CncPathListRunn
 bool CncPathListRunner::WorkflowTriggerEndRunEntry     ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
 bool CncPathListRunner::WorkflowTriggerNextPathEntry   ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
 bool CncPathListRunner::WorkflowTriggerSpeedChangeEntry::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
-bool CncPathListRunner::WorkflowTriggerGuidePtahEntry  ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
+bool CncPathListRunner::WorkflowTriggerGuidePathEntry  ::process(CncPathListRunner* plr)	{ plr->executeTrigger(tr); return true; }
 bool CncPathListRunner::WorkflowSetupRunEntry          ::process(CncPathListRunner* plr)	{ plr->autoSetup(trace);   return true; }
 bool CncPathListRunner::WorkflowCncEntry               ::process(CncPathListRunner* plr)	{ return plr->publishCncPath(plm); }
 bool CncPathListRunner::WorkflowGuideEntry             ::process(CncPathListRunner* plr)	{ return plr->publishGuidePath(plm); }
@@ -30,7 +30,7 @@ void CncPathListRunner::WorkflowTriggerBeginRunEntry   ::traceTo(std::ostream& o
 void CncPathListRunner::WorkflowTriggerEndRunEntry     ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
 void CncPathListRunner::WorkflowTriggerNextPathEntry   ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
 void CncPathListRunner::WorkflowTriggerSpeedChangeEntry::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
-void CncPathListRunner::WorkflowTriggerGuidePtahEntry  ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
+void CncPathListRunner::WorkflowTriggerGuidePathEntry  ::traceTo(std::ostream& o)	const	{ o << tr 			<< std::endl; }
 void CncPathListRunner::WorkflowSetupRunEntry          ::traceTo(std::ostream& o)	const	{ o << "Setup(...)"									<< std::endl; }
 void CncPathListRunner::WorkflowCncEntry               ::traceTo(std::ostream& o)	const	{ o << "CncEntry("	<< plm.firstClientID() << ")"	<< std::endl; }
 void CncPathListRunner::WorkflowGuideEntry             ::traceTo(std::ostream& o)	const	{ o << "GuideEntry("<< plm.firstClientID() << ")"	<< std::endl; }
@@ -608,7 +608,7 @@ bool CncPathListRunner::publishMoveSequence() {
 
 	if ( currentSequence == NULL )
 	{
-		std::cerr << "CncPathListRunner::publishMoveSequence(): Invalid Sequence!" << std::endl;
+		CNC_CERR_FUNCT_A(": Invalid Sequence!")
 		return false;
 	}
 	
@@ -652,7 +652,7 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 //////////////////////////////////////////////////////////////////
 	if ( curr.hasClientIdChange() == false ) 
 	{
-		std::cerr << "CncPathListRunner::onPhysicallyClientIdChange(): Invalid Type!" << std::endl;
+		CNC_CERR_FUNCT_A(": Invalid Type!")
 		return false;
 	}
 	
@@ -673,15 +673,17 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.hasSpeedChange() == false ) {
-		std::cerr << CNC_LOG_FUNCT << ": Invalid Type!" << std::endl;
+	if ( curr.hasSpeedChange() == false ) 
+	{
+		CNC_CERR_FUNCT_A(": Invalid Type!")
 		return false;
 	}
 	
 	if ( isInterrupted() == true )
 		return false;
 	
-	if ( setup.trace == true ) {
+	if ( setup.trace == true )
+	{
 		const wxString msg(wxString::Format("Feed Speed Change (%c - %5.1lf)", 
 											cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), curr.feedSpeed_MM_MIN));
 											
@@ -690,8 +692,9 @@ bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr
 		
 	const long nextClientID = next ? next->clientId : CLIENT_ID.INVALID;
 	
-	if ( initializeNextMoveSequence(curr.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), nextClientID) == false ) {
-		std::cerr << CNC_LOG_FUNCT << ": initNextMoveSequence failed!" << std::endl;
+	if ( initializeNextMoveSequence(curr.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode), nextClientID) == false )
+	{
+		CNC_CERR_FUNCT_A(": initNextMoveSequence failed!")
 		return false;
 	}
 	
@@ -700,18 +703,47 @@ bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr
 	return currentInterface->processFeedSpeedChange(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) {
+bool CncPathListRunner::onPhysicallyToolChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
 	if ( curr.hasToolChange() == false )
 	{
-		std::cerr << CNC_LOG_FUNCT << ": Invalid Type!" << std::endl;
+		CNC_CERR_FUNCT_A(": Invalid Type!")
+		return false;
+	}
+	
+	if ( isInterrupted() == true )
+		return false;
+
+	if ( setup.trace == true ) 
+	{
+		const wxString msg(wxString::Format("Tool Change to id = %d", curr.toolId));
+		THE_APP->getCncPreProcessor()->addOperatingTraceSeparator(msg);
+	}
+	
+	CHECK_AND_PERFORM_PROCESSING_STATE
+	
+	if ( currentInterface->processToolChange(curr.toolId) == false )
+	{
+		CNC_CERR_FUNCT_A(": processToolChange() failed!\n")
+		return false;
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) {
+//////////////////////////////////////////////////////////////////
+	if ( curr.hasSpindleChange() == false )
+	{
+		CNC_CERR_FUNCT_A(": Invalid Type!")
 		return false;
 	}
 	
 	if ( isInterrupted() == true )
 		return false;
 	
-	if ( setup.trace == true ) {
+	if ( setup.trace == true ) 
+	{
 		const wxString msg(wxString::Format("Spindle State, Speed Change (%s, %.1lf)", 
 											curr.spindleState == SPINDLE_STATE_ON ? "ON" : "OFF", curr.spindleSpeed_U_MIN));
 											
@@ -722,13 +754,13 @@ bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) 
 	
 	if ( currentInterface->processSpindleStateSwitch(curr.spindleState) == false )
 	{
-		std::cerr << CNC_LOG_FUNCT_A(": processSpindleStateSwitch() failed!\n");
+		CNC_CERR_FUNCT_A(": processSpindleStateSwitch() failed!\n")
 		return false;
 	}
 	
 	if ( currentInterface->processSpindleSpeedChange(curr.spindleSpeed_U_MIN) == false )
 	{
-		std::cerr << CNC_LOG_FUNCT_A(": processSpindleSpeedChange() failed!\n");
+		CNC_CERR_FUNCT_A(": processSpindleSpeedChange() failed!\n")
 		return false;
 	}
 	
@@ -777,11 +809,11 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	auto getNextEntry    = [&](const CncPathList::const_iterator& it) { return it + 1 != itEnd ? &(*(it + 1)) : NULL; };
 	
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	auto getNextPosEntry = [&](const CncPathList::const_iterator& it, const CncPathListEntry* defaultRet=NULL) { 
-		
+	auto getNextPosEntry = [&](const CncPathList::const_iterator& it, const CncPathListEntry* defaultRet=NULL) 
+	{
 		uint32_t index = 1;
-		while ( it + index != itEnd ) {
-			
+		while ( it + index != itEnd ) 
+		{
 			if ( (it + index)->isPositionChange() )
 				return &(*(it + index));
 				
@@ -792,7 +824,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	};
 	
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	auto isEmptyMove = [&](double dx, double dy, double dz) {
+	auto isEmptyMove = [&](double dx, double dy, double dz) 
+	{
 		return (cnc::dblCompareNull(dx) == true &&	cnc::dblCompareNull(dy) == true &&	cnc::dblCompareNull(dz) == true);
 	};
 	
@@ -815,8 +848,10 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	
 	// -----------------------------------------------------------
 	// check if current is a empty move
-	if ( setup.optSkipEmptyMoves == true ) {
-		if ( isEmptyMove(curr->entryDistance.getX(), curr->entryDistance.getY(), curr->entryDistance.getZ()) ) {
+	if ( setup.optSkipEmptyMoves == true )
+	{
+		if ( isEmptyMove(curr->entryDistance.getX(), curr->entryDistance.getY(), curr->entryDistance.getZ()) )
+		{
 			// skip
 			return true;
 		}
@@ -824,7 +859,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	
 	// -----------------------------------------------------------
 	// check if nothing more than curr available
-	if ( next == NULL ) {
+	if ( next == NULL ) 
+	{
 		addSequenceEntryFromEntry(curr);
 		return true;
 	}
@@ -850,8 +886,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	const CncPathListEntry* n = next;
 	
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	auto skipToNextEntry = [&]() { 
-		
+	auto skipToNextEntry = [&]()
+	{ 
 		++itCurr; 
 		c = n; 
 		n = getNextEntry(itCurr); 
@@ -862,25 +898,25 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		return (c != NULL && n != NULL);
 	};
 	
-	while ( c != NULL && n != NULL ) {
-		
+	while ( c != NULL && n != NULL )
+	{
 		// check common break conditions
 		if ( isInterrupted()   == true  )	return false;
 		if ( checkDebugState() == false )	return false;
 		
 		nextClientID = n->clientId;
 		
-		if ( checkContent(*c) == false ) {
+		if ( checkContent(*c) == false )
 			return false;
-		}
 		
 		// check type: Register new client id
-		if ( c->hasClientIdChange() == true ) {
-			
+		if ( c != curr && c->hasClientIdChange() == true )
+		{
 			if ( onPhysicallyClientIdChange(*c) == false )
 				return false;
 			
-			if ( c->isClientIdChange() ) {
+			if ( c->isClientIdChange() )
+			{
 				if ( skipToNextEntry() == false )
 					break;
 					
@@ -888,12 +924,29 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 			}
 		}
 		
+		// check type: process tool change
+		if ( c != curr && c->hasToolChange() == true ) 
+		{
+			if ( onPhysicallyToolChange(*c) == false )
+				return false;
+				
+			if ( c->isToolChange() == true )
+			{
+				if ( skipToNextEntry() == false )
+					break;
+				
+				continue;
+			}
+		}
+
 		// check type: process spindle update
-		if ( c->hasToolChange() == true ) {
+		if ( c != curr && c->hasSpindleChange() == true ) 
+		{
 			if ( onPhysicallySpindleChange(*c) == false )
 				return false;
 				
-			if ( c->isToolChange() == true ) {
+			if ( c->isSpindleChange() == true )
+			{
 				if ( skipToNextEntry() == false )
 					break;
 				
@@ -902,13 +955,16 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		}
 		
 		// check type: Don't combine entries over a speed change
-		if ( c->hasSpeedChange() == true )  {
+		if ( c != curr && c->hasSpeedChange() == true )
+		{
 			finalizeCurrentSequence = true;
 			
-			if ( c->isSpeedChange() ) {
+			if ( c->isSpeedChange() )
+			{
 				break;
 			}
-			else {
+			else 
+			{
 				// this has already been checked by if ( checkContent(*c) == false ) above, but
 				std::cerr << CNC_LOG_FUNCT_A(": Don't combine entries over a speed change\n");
 			}
@@ -917,8 +973,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		// check content: Skip this entry if it's an empty move
 		// this also handle c->isNothingChanged()
 		const bool empty = isEmptyMove(c->entryDistance.getX(), c->entryDistance.getY(), c->entryDistance.getZ());
-		if ( setup.optSkipEmptyMoves == true && empty ) {
-			
+		if ( setup.optSkipEmptyMoves == true && empty )
+		{
 			if ( skipToNextEntry() == false )
 				break;
 				
@@ -930,7 +986,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		const Move mNext(getNextPosEntry(itCurr, n));
 		
 		// check pitch: Stop here if the pitch to nect step is to strong 
-		if ( mCurr.isXYPitchDiffTooStrong(mNext) == true ) {
+		if ( mCurr.isXYPitchDiffTooStrong(mNext) == true )
+		{
 			cpp->addOperatingTrace(wxString::Format("--> XY: An entanglement of %.1f degree between X and Y is too strong to keep also the next entry together\n", mCurr.getXYPitchDiffenceAsDegree(mNext)));
 			
 			wxString x;
@@ -942,7 +999,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		}
 		
 		// check pitch: Stop here if the pitch to nect step is to strong 
-		if ( mCurr.isZPitchDiffTooStrong(mNext) == true ) {
+		if ( mCurr.isZPitchDiffTooStrong(mNext) == true )
+		{
 			cpp->addOperatingTrace(wxString::Format("--> Z: An entanglement of %.1f degree between Z and the XY Pane is too strong to keep also the next entry together\n", mCurr.getZPitchDiffenceAsDegree(mNext)));
 			
 			wxString x;
@@ -1041,7 +1099,8 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		CHECK_AND_PERFORM_PROCESSING_STATE
 		
 		// ----------------------------------------------------------
-		if ( curr.isNothingChanged() == true ) {
+		if ( curr.isNothingChanged() == true )
+		{
 			continue;
 		}
 		
@@ -1050,7 +1109,8 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		
 		// ----------------------------------------------------------
 		// client id change
-		if ( curr.hasClientIdChange() == true ) {
+		if ( curr.hasClientIdChange() == true )
+		{
 			if ( onPhysicallyClientIdChange(curr) == false )
 				return false;
 		
@@ -1059,8 +1119,20 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		}
 		
 		// ----------------------------------------------------------
+		// tool change
+		if ( curr.hasToolChange() == true ) 
+		{
+			if ( onPhysicallyToolChange(curr) == false )
+				return false;
+			
+			if ( curr.isToolChange() == true )
+				continue;
+		}
+		
+		// ----------------------------------------------------------
 		// feed speed change
-		if ( curr.hasSpeedChange() == true ) {
+		if ( curr.hasSpeedChange() == true )
+		{
 			if ( onPhysicallyFeedSpeedChange(curr, next) == false )
 				return false;
 			
@@ -1070,18 +1142,19 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		
 		// ----------------------------------------------------------
 		// spindle speed change
-		if ( curr.hasToolChange() == true ) {
+		if ( curr.hasSpindleChange() == true )
+		{
 			if ( onPhysicallySpindleChange(curr) == false )
 				return false;
 			
-			if ( curr.isToolChange() == true )
+			if ( curr.isSpindleChange() == true )
 				continue;
 		}
 		
 		// ----------------------------------------------------------
 		// position change
-		if ( curr.hasPositionChange() == true ) {
-			
+		if ( curr.hasPositionChange() == true )
+		{
 			if ( setup.optAnalyse == false ) 
 			{
 				if ( onPhysicallyMoveRaw(curr) == false )

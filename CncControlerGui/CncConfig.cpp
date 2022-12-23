@@ -1,6 +1,7 @@
 #include <sstream>
 #include <iomanip>
 #include <wx/msgdlg.h>
+#include <wx/richmsgdlg.h>
 #include "MainFrame.h"
 #include "GlobalStrings.h"
 #include "GlobalFunctions.h"
@@ -26,8 +27,10 @@ unsigned int CncConfig::globalPropertyCounter	= 0;
 CncConfig*   CncConfig::globalCncConfig			= NULL;
 
 ////////////////////////////////////////////////////////////////////////
-namespace Cnc {
-	namespace Config {
+namespace Cnc 
+{
+	namespace Config 
+	{
 		
 		// global variables - uses in dedicated pages
 		wxPropertyGridManager*	globlSetupGrid			= NULL;
@@ -151,8 +154,10 @@ CncConfig::CncConfig(MainFrame* app)
 : loadTrace						()
 , saveTrace						()
 , obsoleteTrace					()
-, changed						(true)
+, changeMap						()
 , notificationActivated			(true)
+, pendingNotificationDedected	(false)
+, modifyFlag					(false)
 , osdConfigList					()
 , currentUnit					(CncSteps)
 , theApp						(app)
@@ -172,14 +177,13 @@ CncConfig::CncConfig(MainFrame* app)
 , dispFactY3D					(1.0)
 , dispFactZ3D					(1.0)
 , replyThreshold				(1)
-, currentToolId					(-1)
-, currentZDepth					(0.0)
-, maxZDistance					(50.0)
 , renderResolutionMM			(0.1)
 ////////////////////////////////////////////////////////////////////////
 {
 	registerWindowForConfigNotification(app);
 	APPEND_LOCATION_TO_STACK_TRACE_FILE
+	
+	resetModificationFlag();
 }
 ////////////////////////////////////////////////////////////////////////
 CncConfig::~CncConfig() {
@@ -204,19 +208,20 @@ void CncConfig::init() {
 	THE_BOUNDS->setMaxDimensionMetricZ(getMaxDimensionZ());
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::sc() { 
-//sc = set changed
+bool CncConfig::isModified() const {
 ////////////////////////////////////////////////////////////////////////
-	changed = true; 
-	
-	if ( notificationActivated == true )
-		broadcastConfigUpdateNotification();
+	return modifyFlag == true;
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::rc() { 
-//rc = reset changed
+void CncConfig::setModificationFlag() { 
 ////////////////////////////////////////////////////////////////////////
-	changed = false; 
+	modifyFlag = true; 
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::resetModificationFlag() { 
+////////////////////////////////////////////////////////////////////////
+	modifyFlag = false;
+	changeMap.clear();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::deactivateConfigNotification() {
@@ -224,13 +229,15 @@ void CncConfig::deactivateConfigNotification() {
 	notificationActivated = false;
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::activateConfigNotification(bool notify) {
+void CncConfig::activateConfigNotification(bool notifyOnActivation) {
 ////////////////////////////////////////////////////////////////////////
 	notificationActivated = true;
-
-	if ( notify == true ) {
-		// release always a notification after the (re)activation
-		broadcastConfigUpdateNotification();
+	
+	// release always a notification after the (re)activation
+	if ( notifyOnActivation == true && pendingNotificationDedected == true )
+	{
+		broadcastConfigUpdateNotification(CTX_ACT_NOTIFY);
+		pendingNotificationDedected = false;
 	}
 }
 ////////////////////////////////////////////////////////////////////////
@@ -243,16 +250,22 @@ void CncConfig::registerWindowForConfigNotification(wxWindow* wnd) {
 	registeredWindows[wnd] = wnd;
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::broadcastConfigUpdateNotification() {
+void CncConfig::broadcastConfigUpdateNotification(const wxString& context) {
 ////////////////////////////////////////////////////////////////////////
-	wxCommandEvent evt(wxEVT_CONFIG_UPDATE_NOTIFICATION);
+	if ( notificationActivated == false )
+	{
+		pendingNotificationDedected = true;
+		return;
+	}
 	
-	THE_APP->GetLastConfigNotification()->ChangeValue(wxDateTime::UNow().Format("%H:%M:%S"));
-	for ( auto it = registeredWindows.begin(); it != registeredWindows.end(); ++it ) {
+	wxCommandEvent evt(wxEVT_CONFIG_UPDATE_NOTIFICATION);
+	evt.SetString(context);
+	
+	for ( auto it = registeredWindows.begin(); it != registeredWindows.end(); ++it )
+	{
 		wxWindow* wnd = it->first;
-		if ( wnd != NULL ) {
+		if ( wnd != NULL )
 			wxPostEvent(wnd, evt);
-		}
 	}
 }
 ////////////////////////////////////////////////////////////////////////
@@ -397,49 +410,8 @@ double CncConfig::convertZ(CncUnit oldUnit, CncUnit newUnit, double value) {
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::initZAxisValues() {
-	// example:
-	// workpieceOffset		= 1.0;
-	// maxDurationThickness	= 2.0;
-	// currentZDepth		= 6.4;
 ////////////////////////////////////////////////////////////////////////
 	workpieceOffset = 1.5;
-		
-	for (unsigned int i=0; i<maxDurations; i++ ) {
-		durationSteps[i] = 0.0;
-	}
-
-	durationCount = 0;
-	if ( getMaxDurationThickness() > 0 ) {
-		durationCount = currentZDepth/ getMaxDurationThickness();						// --> 3
-		if ( durationCount >= 1 ) {
-			double rest = currentZDepth - (durationCount *  getMaxDurationThickness());	//--> 0.4
-			
-			if ( durationCount < maxDurations ) {
-				for (unsigned int i=0; i<maxDurations; i++ ) {
-					if ( i < durationCount )
-						durationSteps[i] =  getMaxDurationThickness();
-					else
-						durationSteps[i] = 0.0;
-				}
-
-				if ( rest > 0 ) {
-					durationSteps[durationCount] = rest;							// --> add 0.4
-					durationCount++;												// --> 3 + 1 = 4 durations (3 * 2mm + 1 * 0.4mm )
-				}
-			} else {
-				std::cerr << "CncConfig: maxDurations reached: " << durationCount << std::endl;
-			}
-		} else {
-			// currentZDepth/maxDurationThickness < 1
-			durationCount = 1;
-			
-			wxASSERT(currentZDepth <  getMaxDurationThickness());
-			if ( currentZDepth >= 0.0 )	durationSteps[0] = currentZDepth;
-			else 						durationSteps[0] = 0.0;
-		}
-	} else {
-		std::cerr << "CncConfig: Invalid maxDurationThickness: " <<  getMaxDurationThickness() << std::endl;
-	}
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::collapse(wxPGProperty* prop) {
@@ -640,7 +612,8 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 	if ( prop == NULL )
 		return loadNonGuiConfig(groupName, entryName, value);
 		
-	if ( entryName.StartsWith(CncOSDConfigList::getOSDPrefix()) == true ) {
+	if ( entryName.StartsWith(CncOSDConfigList::getOSDPrefix()) == true )
+	{
 		// add the ODS list string
 		osdConfigList.add(groupName, entryName, val);
 		// get the correct OSD value
@@ -669,38 +642,44 @@ bool CncConfig::loadNonGuiConfig(const wxString& groupName, const wxString& entr
 ////////////////////////////////////////////////////////////////////////
 	bool entryIsKnown = false;
 	
-	// "Perspectives"
-	if ( groupName == CncPerspective::getConfigGroupName() ) {
+	if ( groupName == CncPerspective::getConfigGroupName() )
+	{
+		// "Perspectives"
 		entryIsKnown = true;
 	}
-	// tool magazine
-	else if ( groupName == CncToolMagazine_SECTION_NAME ) {
+	else if ( groupName == CncToolMagazine_SECTION_NAME ) 
+	{
+		// tool magazine
 		long toolId;
 		entryName.ToLong(&toolId);
 		
 		CncConfig::ToolMagazineEntry tme;
 		tme.deserialize(value);
 
-		if ( toolId >= TOOL_MAGAZINE_MIN_ID && toolId <= TOOL_MAGAZINE_MAX_ID ) {
+		if ( toolId >= TOOL_MAGAZINE_MIN_ID && toolId <= TOOL_MAGAZINE_MAX_ID )
+		{
 			toolMagazine[toolId] = tme;
 			entryIsKnown = true;
 		}
 	}
-	// tool magazine parameter
-	else if ( groupName == CncToolMagazineParam_SECTION_NAME ) {
+	else if ( groupName == CncToolMagazineParam_SECTION_NAME ) 
+	{
+		// tool magazine parameter
 		if      ( entryName == CncToolMagazineParam_USE_DEF_TOOL)		{ entryIsKnown = true; toolMagazineParameter.useDefaultTool  = ( value == "0" ? false : true ); }
 		else if ( entryName == CncToolMagazineParam_MAP_DEF_TOOL_TO)	{ entryIsKnown = true; toolMagazineParameter.defaultMappedTo =  value; }
 	}
 	
 	const wxString propKName(wxString::Format("%s.%s", groupName, entryName));
 	
-	if ( entryIsKnown == false ) {
+	if ( entryIsKnown == false )
+	{
 		obsoleteTrace	<< propKName << ":"
 						<< std::setw(60 - propKName.length()) << " "
 						<< "Property isn't used currently."
 						<< std::endl;
 	}
-	else {
+	else
+	{
 		loadTrace		<< propKName << ":"
 						<< std::setw(59 - propKName.length()) << " "
 						<< "[*], [NonGui] Property is loaded."
@@ -753,34 +732,45 @@ void CncConfig::loadConfiguration(wxConfigBase& config) {
 	// reset the file configuration to the root path(group)
 	config.SetPath("/");
 	
-	// perform the change flag
-	sc();
+	releaseChangedCallback(CTX_LOAD_CONFIG);
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::saveConfiguration(wxConfigBase& config) {
+void CncConfig::saveConfiguration(wxConfigBase& config, bool ask) {
 ////////////////////////////////////////////////////////////////////////
 	if ( Cnc::Config::globlSetupGrid == NULL )
 		return;
 		
-	wxMessageDialog dlg(NULL,	_T("Do you realy save the current configuration?"), 
-								_T("Save Configuration  . . . "), 
-								wxYES|wxNO|wxCENTRE|wxICON_QUESTION
-						);
-						
-	if ( dlg.ShowModal() != wxID_YES )
-		return;
+	if ( ask == true )
+	{
+		wxRichMessageDialog dlg(NULL,	_T("Do you really want to save the current configuration?"), 
+										_T("Save Configuration  . . . "), 
+										wxYES|wxNO|wxCENTRE
+		);
 		
+		wxString footerText("Change history:\n");
+		for ( auto it=changeMap.begin(); it != changeMap.end(); ++it)
+			footerText.append(wxString::Format("%s = %s\n", it->first, it->second.MakeString()));
+		
+		dlg.SetFooterText(footerText);
+		dlg.SetFooterIcon(wxICON_QUESTION);
+							
+		if ( dlg.ShowModal() != wxID_YES )
+			return;
+	}
+	
 	saveTrace.str() = "";
 	
-	for ( wxPGVIterator it = Cnc::Config::globlSetupGrid->GetVIterator(wxPG_ITERATE_ALL); !it.AtEnd(); it.Next() ) {
+	for ( wxPGVIterator it = Cnc::Config::globlSetupGrid->GetVIterator(wxPG_ITERATE_ALL); !it.AtEnd(); it.Next() ) 
+	{
 		wxPGProperty* p = it.GetProperty();
 		
-		if ( p != NULL && p->IsCategory() == false ) {
-			
+		if ( p != NULL && p->IsCategory() == false )
+		{
 			const wxString shortName(Cnc::Config::getPropertyShortName(*p));
 			const wxString sectionName(Cnc::Config::getPropertySectionName(*p));
 			
-			if ( sectionName.StartsWith("#") == false ) {
+			if ( sectionName.StartsWith("#") == false )
+			{
 				
 				const wxString className(p->GetClassInfo()->GetClassName());
 				const wxString savePath(wxString::Format("/%s/%s", sectionName, shortName));
@@ -795,8 +785,8 @@ void CncConfig::saveConfiguration(wxConfigBase& config) {
 				
 				wxString val(p->GetValueAsString(wxPG_FULL_VALUE));
 				
-				if ( shortName.StartsWith(CncOSDConfigList::getOSDPrefix()) == true ) {
-					
+				if ( shortName.StartsWith(CncOSDConfigList::getOSDPrefix()) == true ) 
+				{
 					const wxString osdId(CncOSDConfigList::makeId(sectionName, shortName));
 					// add the ODS value string
 					osdConfigList.update(osdId, val);
@@ -811,7 +801,6 @@ void CncConfig::saveConfiguration(wxConfigBase& config) {
 	}
 	
 	saveNonGuiConfig(config);
-	
 	config.Flush();
 }
 ////////////////////////////////////////////////////////////////////////
@@ -822,13 +811,14 @@ void CncConfig::saveNonGuiConfig(wxConfigBase& config) {
 	// tool magazine
 	section.assign(CncToolMagazine_SECTION_NAME);
 	config.DeleteGroup(section);
-	for ( auto it = toolMagazine.begin(); it != toolMagazine.end(); ++it) {
+	for ( auto it = toolMagazine.begin(); it != toolMagazine.end(); ++it)
+	{
 		int id = it->first;
 		
 		if ( id < TOOL_MAGAZINE_MIN_ID || id > TOOL_MAGAZINE_MAX_ID)
 			continue;
 			
-		wxString entry(wxString::Format("%d", id));
+		const wxString entry(wxString::Format("%d", id));
 		wxString value;
 		config.Write(wxString::Format("/%s/%s", section, entry), it->second.serialize(value));
 	}
@@ -838,8 +828,6 @@ void CncConfig::saveNonGuiConfig(wxConfigBase& config) {
 	config.DeleteGroup(section);
 	config.Write(wxString::Format("/%s/%s", section, CncToolMagazineParam_USE_DEF_TOOL), 	toolMagazineParameter.useDefaultTool);
 	config.Write(wxString::Format("/%s/%s", section, CncToolMagazineParam_MAP_DEF_TOOL_TO), toolMagazineParameter.defaultMappedTo);
-	
-	
 	//...
 }
 ////////////////////////////////////////////////////////////////////////
@@ -858,6 +846,18 @@ void CncConfig::updateSaveTrace(wxTextCtrl* sTrace) {
 		sTrace->ChangeValue(saveTrace.str().c_str());
 }
 ////////////////////////////////////////////////////////////////////////
+void CncConfig::releaseChangedCallback(const wxString& context) {
+////////////////////////////////////////////////////////////////////////
+	if ( context.IsEmpty())
+		return;
+	
+	wxPropertyGridEvent event;
+	event.SetProperty(NULL);
+	event.SetString(context);
+	
+	setupGridChanged(event);
+}
+////////////////////////////////////////////////////////////////////////
 void CncConfig::releaseChangedCallback(wxPGProperty* prop) {
 ////////////////////////////////////////////////////////////////////////
 	if ( prop == NULL )
@@ -873,19 +873,32 @@ void CncConfig::releaseChangedCallback(wxPGProperty* prop) {
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setupGridChanged(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
-	// perform the change flag
-	sc();
-	
 	wxPGProperty* p = event.GetProperty();
-	if ( p == NULL )
-		return;
+	wxString key, val;
 	
-	auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
-	if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertyChanged != NULL)
-		(*(it->second.propertyChanged))(event);
+	if ( p == NULL )
+	{
+		key.assign(event.GetString());
 		
-	wxASSERT( theApp != NULL );
-	theApp->notifyConfigUpdate();
+		if      ( key.IsSameAs(CTX_DISP_UNIT) )		val.assign(cnc::getCncUnitAsStr(getDisplayUnit()));
+		else if ( key.IsSameAs(CTX_ACT_NOTIFY) )	val.assign("");
+		else if ( key.IsSameAs(CTX_LOAD_CONFIG) )	val.assign("");
+		else										val.assign("n.a.");
+	}
+	else
+	{
+		// notify the page containing the property
+		auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
+		if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertyChanged != NULL)
+			(*(it->second.propertyChanged))(event);
+			
+		key.assign(p->GetName());
+		val.assign(p->GetValue());
+	}
+	
+	changeMap[key] = val;
+	setModificationFlag();
+	broadcastConfigUpdateNotification(key);
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setupGridChanging(wxPropertyGridEvent& event) {
@@ -894,13 +907,16 @@ void CncConfig::setupGridChanging(wxPropertyGridEvent& event) {
 	if ( p == NULL )
 		return;
 		
-	if ( p->GetAttribute(Attribute_READONLY).IsNull() == false ) {
+	if ( p->GetAttribute(Attribute_READONLY).IsNull() == false )
+	{
 		// veto this event
 		event.Veto();
-		// Hack to do nothing and rstore the old value
+		// Hack to do nothing and restore the old value
 		event.SetValidationFailureBehavior(wxPG_VFB_SHOW_MESSAGE_ON_STATUSBAR);
-	} else {
-		// process the event
+	}
+	else
+	{
+		// notify the page containing the property
 		auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
 		if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertyChanging != NULL )
 			(*(it->second.propertyChanging))(event);
@@ -913,6 +929,7 @@ void CncConfig::setupGridCommandButton(wxCommandEvent& event) {
 	if ( p == NULL )
 		return;
 	
+	// notify the page containing the property
 	auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
 	if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertyCommandButton != NULL )
 		(*(it->second.propertyCommandButton))(event);
@@ -924,74 +941,137 @@ void CncConfig::setupGridSelected(wxPropertyGridEvent& event) {
 	if ( p == NULL )
 		return;
 	
+	// notify the page containing the property
 	auto it = Cnc::Config::globalPGEventMap.find(CncConfig::getPageRoot(p));
 	if ( it != Cnc::Config::globalPGEventMap.end() && it->second.propertySelected != NULL )
 		(*(it->second.propertySelected))(event);
 }
+
+
+
+
 ////////////////////////////////////////////////////////////////////////
-bool CncConfig::checkToolExists(int toolId) {
+const wxString CncConfig::getShortToolListAsStr() {
 ////////////////////////////////////////////////////////////////////////
-	auto it = toolMagazine.find(toolId);
-	if ( it != toolMagazine.end() )
-		return true;
+	wxString ret;
+	for ( auto it = toolMagazine.begin(); it != toolMagazine.end(); ++it)
+	{
+		const int					id    = it->first;
+		const ToolMagazineEntry&	entry = it->second;
 		
-	// tool id did not exist
-	return false;
+		ret.append(wxString::Format("T_%d=[%.3lf];", id, entry.diameter));
+	}
+	
+	return ret;
 }
 ////////////////////////////////////////////////////////////////////////
-const wxString CncConfig::getToolParamAsString(int id) {
+const wxString CncConfig::getLongToolListAsStr() {
+////////////////////////////////////////////////////////////////////////
+	wxString ret;
+	for ( auto it = toolMagazine.begin(); it != toolMagazine.end(); ++it)
+	{
+		const int					id    = it->first;
+		const ToolMagazineEntry&	entry = it->second;
+		
+		ret.append(wxString::Format("T_%d=[%s,%.3lf,%.3lf,%.3lf,%s];", 
+						id, 
+						entry.type, 
+						entry.diameter,
+						entry.length,
+						entry.offset,
+						entry.comment
+					)
+		);
+	}
+	
+	return ret;
+}
+////////////////////////////////////////////////////////////////////////
+const wxString CncConfig::getToolParamAsShortInfoStr(int id) {
 ////////////////////////////////////////////////////////////////////////
 	wxString ret;
 	auto it = toolMagazine.find(id);
-	if ( it == toolMagazine.end() ) {
+	if ( it == toolMagazine.end() )
 		return wxString::Format("Unknown tool id: %d", id);
-	}
 	
 	ToolMagazineEntry tme = it->second;
-	ret = wxString::Format( "ID=%d; T=%s; D=%4.3lf; L=%4.3lf; O=%4.3lf",
+	ret = wxString::Format( "T_%d=[%.3lf]",
+							id,
+							tme.diameter
+	);
+	return ret;
+
+}
+////////////////////////////////////////////////////////////////////////
+const wxString CncConfig::getToolParamAsInfoStr(int id) {
+////////////////////////////////////////////////////////////////////////
+	wxString ret;
+	auto it = toolMagazine.find(id);
+	if ( it == toolMagazine.end() )
+		return wxString::Format("Unknown tool id: %d", id);
+	
+	ToolMagazineEntry tme = it->second;
+	ret = wxString::Format( "ID=%d; T=%s; D=%.3lf; L=%.3lf; O=%.3lf",
 							id,
 							tme.type,
 							tme.diameter,
 							tme.length,
-							tme.offset);
+							tme.offset
+	);
 	return ret;
 }
 ////////////////////////////////////////////////////////////////////////
-const wxString CncConfig::getDefaultToolParamAsString() {
+const wxString CncConfig::getDefaultToolParamAsInfoStr() {
 ////////////////////////////////////////
-	return getToolParamAsString(translateToolId(-1));
+	return getToolParamAsInfoStr(getDefaultToolId());
 }
 ////////////////////////////////////////////////////////////////////////
-const wxString CncConfig::getCurrentToolParamAsString() {
+const wxString CncConfig::getCurrentToolParamAsInfoStr() {
 ///////////////////////////////////////////////////////////////////////
-	return getToolParamAsString(translateToolId(getCurrentToolId()));
+	return getToolParamAsInfoStr(translateToolId(THE_CONTEXT->getCurrentToolId()));
+}
+////////////////////////////////////////////////////////////////////////
+const int CncConfig::getDefaultToolId() const {
+////////////////////////////////////////////////////////////////////////
+	if ( toolMagazineParameter.useDefaultTool == true )
+		return ToolMagazineParameter::cnvToolId(toolMagazineParameter.defaultMappedTo);
+	
+	return INVALID_TOOL_ID;
+}
+////////////////////////////////////////////////////////////////////////
+const wxString CncConfig::getDefaultToolIdAsStr() const {
+////////////////////////////////////////////////////////////////////////
+	const int id = getDefaultToolId();
+	
+	if ( id == INVALID_TOOL_ID )
+		return _("T_???");
+	
+	wxString ret(wxString::Format("T_%d", id));
+	return ret;
+}
+////////////////////////////////////////////////////////////////////////
+bool CncConfig::toolExists(int toolId) const {
+////////////////////////////////////////////////////////////////////////
+	auto it = toolMagazine.find(toolId);
+	return it != toolMagazine.end();
+}
+////////////////////////////////////////////////////////////////////////
+bool CncConfig::toolExists(const wxString& toolId) const {
+////////////////////////////////////////////////////////////////////////
+	return toolExists(ToolMagazineParameter::cnvToolId(toolId));
 }
 ////////////////////////////////////////////////////////////////////////
 int CncConfig::translateToolId(int toolId) {
 ////////////////////////////////////////////////////////////////////////
-	if ( toolId >= 0 ) {
-		// try to find
+	if ( toolId > INVALID_TOOL_ID )
+	{
 		auto it = toolMagazine.find(toolId);
+		
 		if ( it != toolMagazine.end() )
 			return toolId;
 	}
 	
-	// tool id did not exist
-	if ( toolMagazineParameter.useDefaultTool == false )
-		return toolId;
-		
-	// evaluate tool mapping
-	long id = -1;
-	if ( toolMagazineParameter.defaultMappedTo.ToLong(&id) == false )
-		return toolId;
-		
-	// search mapped tool
-	auto it = toolMagazine.find(id);
-	if ( it != toolMagazine.end() )
-		return id;
-		
-	// mapped tool id did already not exist
-	return toolId;
+	return getDefaultToolId();
 }
 ////////////////////////////////////////////////////////////////////////
 const double CncConfig::getToolDiameter(int toolId) {
@@ -1203,11 +1283,11 @@ const wxString& CncConfig::getDefaultTplFile(wxString& ret)			{ PROPERTY(CncAppl
 const wxString& CncConfig::getRunConfirmationMode(wxString& ret)	{ PROPERTY(CncApplication_CONFIRMATION_MODE)			ret.assign(p->GetValue().GetString()); return ret; }
 
 ////////////////////////////////////////////////////////////////////////
-// config setters
-CncConfig& CncConfig::setDisplayUnit(CncUnit unit) 					{ currentUnit = unit; sc(); return *this; }
-CncConfig& CncConfig::setMaxDimensionX(const double val) 			{ PROPERTY(CncConfig_MAX_DIMENSION_X) 					p->SetValue(val); releaseChangedCallback(p); return *this; }
-CncConfig& CncConfig::setMaxDimensionY(const double val) 			{ PROPERTY(CncConfig_MAX_DIMENSION_Y) 					p->SetValue(val); releaseChangedCallback(p); return *this; }
-CncConfig& CncConfig::setMaxDimensionZ(const double val) 			{ PROPERTY(CncConfig_MAX_DIMENSION_Z) 					p->SetValue(val); releaseChangedCallback(p); return *this; }
+// configuration setters
+CncConfig& CncConfig::setDisplayUnit(CncUnit unit)					{ currentUnit = unit;									releaseChangedCallback(CTX_DISP_UNIT);		 return *this; }
+CncConfig& CncConfig::setMaxDimensionX(const double val)			{ PROPERTY(CncConfig_MAX_DIMENSION_X)					p->SetValue(val); releaseChangedCallback(p); return *this; }
+CncConfig& CncConfig::setMaxDimensionY(const double val)			{ PROPERTY(CncConfig_MAX_DIMENSION_Y)					p->SetValue(val); releaseChangedCallback(p); return *this; }
+CncConfig& CncConfig::setMaxDimensionZ(const double val)			{ PROPERTY(CncConfig_MAX_DIMENSION_Z)					p->SetValue(val); releaseChangedCallback(p); return *this; }
 
 #undef PROPERTY
 

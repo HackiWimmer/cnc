@@ -1281,6 +1281,10 @@ protected:
     {
 	event.Skip();
     }
+    virtual void onLeftDclickLastConfigTime(wxMouseEvent& event)
+    {
+	event.Skip();
+    }
     virtual void selectUnit(wxCommandEvent& event)
     {
 	event.Skip();

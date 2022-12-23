@@ -135,45 +135,54 @@ class CncLoggerListCtrl : public CncLargeScaledListCtrl {
 class CncExtLoggerListCtrl : public CncLoggerListCtrl {
 	
 	protected:
-		bool bInfoEntries;
-		bool bDebugEntries;
-		bool bWarnEntries;
-		bool bErrorEntries;
-	
+		
+		typedef std::vector<wxString> LoggedEntries;
+		
+		LoggedEntries	loggedInfoEntries;
+		LoggedEntries	loggedDebugEntries;
+		LoggedEntries	loggedWarnEntries;
+		LoggedEntries	loggedErrorEntries;
+		
 	public:
 		
 		CncExtLoggerListCtrl(wxWindow *parent, long style)
 		: CncLoggerListCtrl(parent, style)
-		, bInfoEntries		(false)
-		, bDebugEntries		(false)
-		, bWarnEntries		(false)
-		, bErrorEntries		(false)
+		, loggedInfoEntries		()
+		, loggedDebugEntries	()
+		, loggedWarnEntries		()
+		, loggedErrorEntries	()
 		{}
 		
 		virtual ~CncExtLoggerListCtrl()
 		{}
 		
-		bool hasInfoEntries()		const	{ return bInfoEntries; }
-		bool hasNonInfoEntries()	const	{ return bDebugEntries == true || bWarnEntries == true || bErrorEntries == true; }
-		bool hasDebugEntries()		const	{ return bDebugEntries; }
-		bool hasWarnEntries()		const	{ return bWarnEntries;  }
-		bool hasErrorEntries()		const 	{ return bErrorEntries; }
+		bool hasInfoEntries()		const	{ return loggedInfoEntries.size() > 0; }
+		bool hasNonInfoEntries()	const	{ return hasDebugEntries() == true || hasWarnEntries() == true || hasErrorEntries() == true; }
+		bool hasDebugEntries()		const	{ return loggedDebugEntries.size() > 0; }
+		bool hasWarnEntries()		const	{ return loggedWarnEntries.size() > 0;  }
+		bool hasErrorEntries()		const 	{ return loggedErrorEntries.size() > 0; }
+		
+		void traceInfoEntries(std::ostream& ostr);
+		void traceDebugEntries(std::ostream& ostr);
+		void traceWarnEntries(std::ostream& ostr);
+		void traceErrorEntries(std::ostream& ostr);
 		
 		virtual void clearAll()
 		{
-			bInfoEntries	= false;
-			bDebugEntries	= false;
-			bWarnEntries	= false;
-			bErrorEntries	= false;
+			loggedInfoEntries.clear();
+			loggedDebugEntries.clear();
+			loggedWarnEntries.clear();
+			loggedErrorEntries.clear();
+
 			CncLoggerListCtrl::clearAll();
 		}
 		
 		typedef wxListItemAttr LIA;
 		void addSeparator	(const wxString& s) { const LIA lia(wxColour(255, 255, 255), wxColour(185, 122,  87),	GetFont()); tokenAndAdd(s, lia); }
-		void addInfoEntry	(const wxString& s) { const LIA lia(GetTextColour(),         GetBackgroundColour(),		GetFont()); add(s, lia); bInfoEntries  = true; }
-		void addDebugEntry	(const wxString& s) { const LIA lia(wxColour(128, 128,   0), GetBackgroundColour(),		GetFont()); add(s, lia); bDebugEntries = true; }
-		void addWarnEntry	(const wxString& s) { const LIA lia(wxColour(255, 201,  14), GetBackgroundColour(),		GetFont()); add(s, lia); bWarnEntries  = true; }
-		void addErrorEntry	(const wxString& s) { const LIA lia(wxColour(255, 128, 128), GetBackgroundColour(),		GetFont()); add(s, lia); bErrorEntries = true; }
+		void addInfoEntry	(const wxString& s) { const LIA lia(GetTextColour(),         GetBackgroundColour(),		GetFont()); add(s, lia); loggedInfoEntries.push_back(s); }
+		void addDebugEntry	(const wxString& s) { const LIA lia(wxColour(128, 128,   0), GetBackgroundColour(),		GetFont()); add(s, lia); loggedDebugEntries.push_back(s); }
+		void addWarnEntry	(const wxString& s) { const LIA lia(wxColour(255, 201,  14), GetBackgroundColour(),		GetFont()); add(s, lia); loggedWarnEntries.push_back(s); }
+		void addErrorEntry	(const wxString& s) { const LIA lia(wxColour(255, 128, 128), GetBackgroundColour(),		GetFont()); add(s, lia); loggedErrorEntries.push_back(s); }
 };
 
 #endif

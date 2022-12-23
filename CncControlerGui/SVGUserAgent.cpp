@@ -5,7 +5,6 @@
 SVGUserAgent::SVGUserAgent() 
 : nodeName						()
 , elementId						()
-, defaultUserAgent				()
 , userAgent						()
 , collectedAttributes			()
 , collectedIds					()
@@ -49,15 +48,8 @@ SVGUserAgentInfo& SVGUserAgent::getCurentUserAgent() {
 /////////////////////////////////////////////////////////
 SVGUserAgentInfo& SVGUserAgent::getUserAgent(unsigned int pos) {
 /////////////////////////////////////////////////////////
-	if ( pos < userAgent.size() )
-		return userAgent.at(pos);
-	
-	std::cerr	<< CNC_LOG_FUNCT << ": invalid index: "
-				<< pos 
-				<< std::endl
-				;
-	
-	return defaultUserAgent;
+	wxASSERT_MSG(pos < userAgent.size(), wxString::Format("%s: invalid index: %u", CNC_LOG_FUNCT, pos))
+	return userAgent.at(pos);
 }
 /////////////////////////////////////////////////////////
 void SVGUserAgent::displayUseDirective() {
@@ -82,9 +74,7 @@ void SVGUserAgent::displayUseDirective() {
 	}
 	
 	for ( auto it = rows.begin(); it != rows.end(); ++it )
-	{
 		oCtl.useDirectiveList->AppendItem(*it);
-	}
 }
 /////////////////////////////////////////////////////////
 void SVGUserAgent::setOutputControls(SvgUserAgentOutputControls& oc) {
@@ -108,15 +98,13 @@ void SVGUserAgent::initalize() {
 		oCtl.useDirectiveList->DeleteAllItems();
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgent::initNextPath(SvgCncContext& cwp, const wxString& origPath) {
+bool SVGUserAgent::initNextPath(SvgCncContext& ssc, const wxString& origPath) {
 /////////////////////////////////////////////////////////
-	SVGUserAgentInfo sua;
-	sua.lineNumber 			= cwp.getCurrentClientID();
+	SVGUserAgentInfo sua(ssc);
 	sua.nodeName 			= nodeName;
 	sua.elementId			= ( elementId.IsEmpty() == false ? elementId : "");
 	sua.nodeType			= SVGUserAgentInfo::NT_PATH;
 	sua.originalPath		= origPath;
-	sua.cncParameters 		= cwp;
 	
 	// move the following list
 	sua.attributes.swap(collectedAttributes);
@@ -130,93 +118,82 @@ bool SVGUserAgent::initNextPath(SvgCncContext& cwp, const wxString& origPath) {
 	return true;
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgent::initNextCncParameterNode(const SvgCncContext& cwp) {
+bool SVGUserAgent::initNextCncParameterNode(const SvgCncContext& ssc) {
 /////////////////////////////////////////////////////////
-	SVGUserAgentInfo sua;
-	sua.lineNumber 			= cwp.getCurrentLineNumber();
+	SVGUserAgentInfo sua(ssc);
 	sua.nodeName 			= nodeName;
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_PARAM;
 	sua.originalPath		= "";
-	sua.cncParameters		= cwp;
 	
 	// copy the following lists - why ????
-	sua.styleList		= collectedStyles;
+	sua.styleList			= collectedStyles;
 	
 	userAgent.push_back(std::move(sua));
 	return true;
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgent::initNextCncVaribalesNode(const SvgCncContext& cwp) {
+bool SVGUserAgent::initNextCncVaribalesNode(const SvgCncContext& ssc) {
 /////////////////////////////////////////////////////////
-	SVGUserAgentInfo sua;
-	sua.lineNumber 			= cwp.getCurrentLineNumber();
+	SVGUserAgentInfo sua(ssc);
 	sua.nodeName 			= nodeName;
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_VAR;
 	sua.originalPath		= "";
-	sua.cncParameters		= cwp;
 	
 	// copy the following lists - why ????
-	sua.styleList		= collectedStyles;
+	sua.styleList			= collectedStyles;
 	
 	userAgent.push_back(std::move(sua));
 	return true;
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgent::initNextCncMacroNode(const SvgCncContextMacro& cwm) {
+bool SVGUserAgent::initNextCncMacroNode(const SvgCncContextMacro& sccm) {
 /////////////////////////////////////////////////////////
-	SVGUserAgentInfo sua;
-	sua.lineNumber 			= cwm.getCurrentLineNumber();
+	SVGUserAgentInfo sua(sccm);
 	sua.nodeName 			= nodeName;
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_MACRO;
 	sua.originalPath		= "";
-	sua.cncMacro			= cwm;
 	
-	bool ret = false;
+	// copy the following list - why ????
+	sua.styleList			= collectedStyles;
 	
 	// collect this macro;
-	if ( cwm.hasParameter(cwm.MACRO_IDENTIFIER) == true ) 
+	bool ret = false;
+	if ( sccm.hasParameter(sccm.MACRO_IDENTIFIER) == true ) 
 	{
-		const wxString& id(cwm.getParameterAsString(cwm.MACRO_IDENTIFIER, ""));
+		const wxString& id(sccm.getParameterAsString(sccm.MACRO_IDENTIFIER, ""));
 		if ( id.IsEmpty() == false ) 
 		{
-			collectedMacros[id] = cwm;
+			collectedMacros[id] = sccm;
 			ret = true;
 		}
 	}
-	
-	// copy the following list - why ????
-	sua.styleList		= collectedStyles;
 	
 	userAgent.push_back(std::move(sua));
 	return ret;
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgent::initNextCncBreakNode(const SvgCncBreak& scb) {
+bool SVGUserAgent::initNextCncBreakNode(const SvgCncBreak& sccb) {
 /////////////////////////////////////////////////////////
-	SVGUserAgentInfo sua;
-	sua.lineNumber 			= scb.getCurrentLineNumber();
+	SVGUserAgentInfo sua(sccb);
 	sua.nodeName 			= nodeName;
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_BREAK;
 	sua.originalPath		= "";
-	sua.cncBreak			= scb;
 	
 	userAgent.push_back(std::move(sua));
 	return true;
 }
 /////////////////////////////////////////////////////////
-bool SVGUserAgent::initNextCncPauseNode(const SvgCncPause& scp) {
+bool SVGUserAgent::initNextCncPauseNode(const SvgCncPause& sccp) {
 /////////////////////////////////////////////////////////
-	SVGUserAgentInfo sua;
-	sua.lineNumber 			= scp.getCurrentLineNumber();
+	SVGUserAgentInfo sua(sccp);
 	sua.nodeName 			= nodeName;
 	sua.elementId			= "";
 	sua.nodeType			= SVGUserAgentInfo::NT_CNC_PAUSE;
 	sua.originalPath		= "";
-	sua.cncPause			= scp;
 	
 	userAgent.push_back(std::move(sua));
 	return true;
@@ -230,7 +207,8 @@ bool SVGUserAgent::setNodeType(const wxString& t) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::addID(const wxString& id, const char* nodeName) {
 /////////////////////////////////////////////////////////
-	if ( id.IsEmpty() == false ) {
+	if ( id.IsEmpty() == false )
+	{
 		collectedIds[id] = nodeName;
 		return true;
 	}
@@ -239,7 +217,8 @@ bool SVGUserAgent::addID(const wxString& id, const char* nodeName) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::addTransform(const wxString& cmd) {
 /////////////////////////////////////////////////////////
-	if ( cmd.IsEmpty() == false ) {
+	if ( cmd.IsEmpty() == false )
+	{
 		collectedTransforms.push_back(cmd);
 		return true;
 	}
@@ -249,7 +228,8 @@ bool SVGUserAgent::addTransform(const wxString& cmd) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::addStyle(const wxString& s) {
 /////////////////////////////////////////////////////////
-	if ( s.IsEmpty() == false ) {
+	if ( s.IsEmpty() == false )
+	{
 		collectedStyles.push_back(s);
 		return true;
 	}
@@ -258,7 +238,8 @@ bool SVGUserAgent::addStyle(const wxString& s) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::removeId(const wxString& id) {
 /////////////////////////////////////////////////////////
-	if ( auto it = collectedIds.find(id); it != collectedIds.end() ) {
+	if ( auto it = collectedIds.find(id); it != collectedIds.end() )
+	{
 		collectedIds.erase(it);
 		return true;
 	}
@@ -267,7 +248,8 @@ bool SVGUserAgent::removeId(const wxString& id) {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::removeLastTransform() {
 /////////////////////////////////////////////////////////
-	if ( collectedTransforms.size() > 0 ) {
+	if ( collectedTransforms.size() > 0 )
+	{
 		collectedTransforms.pop_back();
 		return true;
 	}
@@ -276,7 +258,8 @@ bool SVGUserAgent::removeLastTransform() {
 /////////////////////////////////////////////////////////
 bool SVGUserAgent::removeLastStyle() {
 /////////////////////////////////////////////////////////
-	if ( collectedStyles.size() > 0 ) {
+	if ( collectedStyles.size() > 0 )
+	{
 		collectedStyles.pop_back();
 		return true;
 	}
@@ -288,14 +271,15 @@ bool SVGUserAgent::addXMLAttributes(wxXmlAttribute *attribute) {
 	if ( attribute == NULL )
 		return true;
 		
-	if ( attribute->GetName() == "id" ) {
+	if ( attribute->GetName().IsSameAs("id") )
+	{
 		addID(attribute->GetValue(), "#elem");
 		elementId = attribute->GetValue();
 	}
 	
 	collectedAttributes[attribute->GetName()] = attribute->GetValue();
 	
-	// recursion call to get the compelete depth
+	// recursion call to get the complete depth
 	return addXMLAttributes(attribute->GetNext());
 }
 /////////////////////////////////////////////////////////
@@ -306,7 +290,8 @@ bool SVGUserAgent::hasCurrentAttribute(const wxString& key) {
 	if ( auto it = collAttrMap.find(key); it != collAttrMap.end() )
 		return true;
 		
-	if ( userAgent.size() > 0 ) {
+	if ( userAgent.size() > 0 )
+	{
 		// second try to find it here
 		const DoubleStringMap& attrMap = getCurentUserAgent().attributes;
 		if ( auto it = attrMap.find(key); it != attrMap.end() )
@@ -323,7 +308,8 @@ const wxString& SVGUserAgent::getCurrentAttribute(const wxString& key, const wxS
 	if ( auto it = collAttrMap.find(key); it != collAttrMap.end() )
 		return it->second;
 		
-	if ( userAgent.size() > 0 ) {
+	if ( userAgent.size() > 0 )
+	{
 		// second try to find it here
 		const DoubleStringMap& attrMap = getCurentUserAgent().attributes;
 		if ( auto it = attrMap.find(key); it != attrMap.end() )
@@ -438,7 +424,8 @@ void SVGUserAgent::clearControls() {
 void SVGUserAgent::evaluateTraceInfo(wxXmlNode* tr) {
 /////////////////////////////////////////////////////////
 	// over all stored pathes
-	for ( auto itUav = userAgent.begin(); itUav != userAgent.end(); ++itUav ) {
+	for ( auto itUav = userAgent.begin(); itUav != userAgent.end(); ++itUav )
+	{
 		SVGUserAgentInfo& uai	= *itUav;
 		wxXmlNode*			n 	= new wxXmlNode();
 		
@@ -450,7 +437,8 @@ void SVGUserAgent::evaluateTraceInfo(wxXmlNode* tr) {
 		tr->AddChild(n);
 	}
 	
-	for ( auto it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 ) {
+	for ( auto it1 = useInfo.begin(); it1 != useInfo.end(); ++it1 )
+	{
 		UseDirective&  ud	= *it1;
 		wxXmlNode*		n	= new wxXmlNode();
 		

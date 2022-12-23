@@ -29,6 +29,17 @@ std::ostream& Trigger::GuidePath::traceTo(std::ostream &ostr) const {
 	return ostr;
 }
 //////////////////////////////////////////////////////////////
+const char* cnc::getCncUnitAsStr(CncUnit u) {
+//////////////////////////////////////////////////////////////
+	switch( u )
+	{
+		case CncSteps:		return "steps";
+		case CncMetric:		return "metric";
+	}
+	
+	return "Unknown";
+}
+//////////////////////////////////////////////////////////////
 int16_t cnc::cvnSpindleSpeed_U_MIN_ToRaw(double value) {
 //////////////////////////////////////////////////////////////
 	const double		min = std::min(THE_CONFIG->getSpindleSpeedMin(), THE_CONFIG->getSpindleSpeedMax());

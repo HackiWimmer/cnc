@@ -36,7 +36,7 @@
 				}, {
 					"type":	"multi-string",
 					"m_label":	"Tooltip:",
-					"m_value":	""
+					"m_value":	"sdfsfds"
 				}, {
 					"type":	"colour",
 					"m_label":	"Bg Colour:",
@@ -35430,11 +35430,11 @@
 																																																}, {
 																																																	"type":	"string",
 																																																	"m_label":	"Size:",
-																																																	"m_value":	"12,-1"
+																																																	"m_value":	"24,-1"
 																																																}, {
 																																																	"type":	"string",
 																																																	"m_label":	"Minimum Size:",
-																																																	"m_value":	"12,-1"
+																																																	"m_value":	"24,-1"
 																																																}, {
 																																																	"type":	"string",
 																																																	"m_label":	"Name:",
@@ -44335,7 +44335,13 @@
 															"m_label":	"Auto Complete Files:",
 															"m_value":	false
 														}],
-													"m_events":	[],
+													"m_events":	[{
+															"m_eventName":	"wxEVT_LEFT_DCLICK",
+															"m_eventClass":	"wxMouseEvent",
+															"m_functionNameAndSignature":	"onLeftDclickLastConfigTime(wxMouseEvent& event)",
+															"m_description":	"Process a wxEVT_LEFT_DCLICK event.",
+															"m_noBody":	false
+														}],
 													"m_children":	[]
 												}]
 										}, {

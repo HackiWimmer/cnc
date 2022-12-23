@@ -67,16 +67,16 @@ class SVGFileParser : public SVGParserBase
 		
 		bool setSVGRootNode(const wxString& w, const wxString& h, const wxString& vb);
 		
-		virtual bool preprocess();
-		virtual bool postprocess();
-		virtual void initNextRunPhase(CncProcessingInfo::RunPhase p);
-		virtual void initNextPath(const wxString& data);
-		virtual bool evaluateProcessingCallback();
-		virtual bool addPathElement(char c, unsigned int count, double values[]);
-		virtual void initNextClientId(long id);
+		virtual bool preprocess() override;
+		virtual bool postprocess() override;
+		virtual void initNextRunPhase(CncProcessingInfo::RunPhase p) override;
+		virtual void initNextPath(const wxString& data) override;
+		virtual bool evaluateProcessingCallback() override;
+		virtual bool addPathElement(char c, unsigned int count, double values[]) override;
+		virtual void initNextClientId(long id) override;
 		
-		virtual void logMeasurementStart();
-		virtual void logMeasurementEnd();
+		virtual void logMeasurementStart() override;
+		virtual void logMeasurementEnd() override;
 		
 		bool processXMLNode(wxXmlNode* node);
 		bool processCncParameter(wxXmlNode* node);
@@ -94,7 +94,7 @@ class SVGFileParser : public SVGParserBase
 		inline bool performUse(const SVGUserAgentInfo& uai, UseDirective& ud);
 		inline bool spoolPath(const SVGUserAgentInfo& uai, const wxString& transform = "");
 		
-		virtual bool shouldAToolChangeProcessed()								{ return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
+		virtual bool shouldAToolChangeProcessed() override { return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
 
 		static bool determineUnit(const wxString& uw, const wxString& uh, Unit& u);
 		static SVGRootNode evaluateSVGRootNode(const wxString& w, const wxString& h, const wxString& vb);

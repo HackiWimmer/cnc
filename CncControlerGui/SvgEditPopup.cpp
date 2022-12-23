@@ -11,8 +11,8 @@ wxString SvgNodeTemplates::_ret									= _T("");
 const char* SvgNodeTemplates::CncParameterResetBlockNodeName	= "CncParameterReset";
 const char* SvgNodeTemplates::CncParameterPrintBlockNodeName	= "CncParameterPrint";
 const char* SvgNodeTemplates::CncParameterBlockNodeName			= "CncParameterBlock";
-const char* SvgNodeTemplates::CncVariablesBlockNodeName			= "CncVaribalesBock";
-const char* SvgNodeTemplates::CncMacroBlockNodeName				= "CncMacroBock";
+const char* SvgNodeTemplates::CncVariablesBlockNodeName			= "CncVaribalesBlock";
+const char* SvgNodeTemplates::CncMacroBlockNodeName				= "CncMacroBlock";
 const char* SvgNodeTemplates::CncBreakBlockNodeName				= "CncBreak";
 const char* SvgNodeTemplates::CncPauseBlockNodeName				= "CncPause";
 
@@ -70,7 +70,7 @@ SvgCncContext::provideUsage(std::cout);
 							 "ToolSelect=\"T_000\" " \
 							 "ZDept=\"Z-0.00\" " \
 							 "UseColourScheme=\"Yes|No\" " \
-							 "PathModification=\"Center|Inner|Outer|Pocket\" " \
+							 "PathModification=\"Centre|Inner|Outer|Pocket\" " \
 							 "PathRule=\"EnsureClockwise|EnsureCounterClockwise|ReversePath\" " \
 							 "/>\n", 
 							 SvgNodeTemplates::CncParameterBlockNodeName);

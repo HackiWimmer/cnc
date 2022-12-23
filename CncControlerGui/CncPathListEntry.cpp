@@ -1,13 +1,17 @@
 #include "CncArduino.h"
 #include "CncPathListEntry.h"
 
-const int					CncPathListEntry::ContentCFSP				= CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_TOOL | CncPathListEntry::CONT_POSITION;
-const int					CncPathListEntry::ContentCFS				= CONT_CLIENTID | CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_TOOL;
-const int					CncPathListEntry::ContentFS					=                 CncPathListEntry::CONT_SPEED | CncPathListEntry::CONT_TOOL;
+const int					CncPathListEntry::ContentCFSP				= CONT_CLIENTID | CONT_SPEED | CONT_SPINDLE             | CONT_POSITION;
+const int					CncPathListEntry::ContentCFS				= CONT_CLIENTID | CONT_SPEED | CONT_SPINDLE;
+const int					CncPathListEntry::ContentFS					=                 CONT_SPEED | CONT_SPINDLE;
+const int					CncPathListEntry::ContentCFSTP				= CONT_CLIENTID | CONT_SPEED | CONT_SPINDLE | CONT_TOOL | CONT_POSITION;
+const int					CncPathListEntry::ContentCFST				= CONT_CLIENTID | CONT_SPEED | CONT_SPINDLE | CONT_TOOL;
+const int					CncPathListEntry::ContentFST				=                 CONT_SPEED | CONT_SPINDLE | CONT_TOOL;
 
 const bool 					CncPathListEntry::DefaultAlreadyRendered	= false;
 const long 					CncPathListEntry::DefaultClientID   		= CLIENT_ID.INVALID;
-const CncSpeedMode 			CncPathListEntry::DefaultSpeedMode  		=  CncSpeedUserDefined;
+const int					CncPathListEntry::DefaultToolID				= INVALID_TOOL_ID;
+const CncSpeedMode 			CncPathListEntry::DefaultSpeedMode  		= CncSpeedUserDefined;
 const double				CncPathListEntry::DefaultSpeedValue 		= -1.0;
 const CncSpindlePowerState	CncPathListEntry::DefaultSpindleState		= SPINDLE_STATE_OFF;
 const double				CncPathListEntry::DefaultSpindleSpeedValue	= -1.0;
@@ -41,6 +45,8 @@ std::ostream& CncPathListEntry::outputOperator(std::ostream &ostr) const {
 	ostr << "  FeedSpeed Mode      : "	<< feedSpeedMode			<< std::endl;
 	ostr << "  FeedSpeed Value     : "	<< feedSpeed_MM_MIN			<< std::endl;
 
+	ostr << "  Tool ID             : "	<< toolId		 			<< std::endl;
+
 	ostr << "  Spindle State       : "	<< printSps(spindleState)	<< std::endl;
 	ostr << "  Spindle Speed Value : "	<< spindleSpeed_U_MIN		<< std::endl;
 
@@ -55,7 +61,8 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 	content.append( isNothingChanged()		? 'L' : '-' );
 	content.append( hasClientIdChange()		? 'C' : '-' );
 	content.append( hasSpeedChange()		? 'F' : '-' );
-	content.append( hasToolChange()			? 'S' : '-' );
+	content.append( hasSpindleChange()		? 'S' : '-' );
+	content.append( hasToolChange()			? 'T' : '-' );
 	content.append( hasPositionChange()		? 'P' : '-' );
 	
 	ostr << traceIndent
@@ -73,6 +80,10 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 		 << "("													<< " "
 		 << cnc::dblFormat1(feedSpeed_MM_MIN)					<< " "
 		 << cnc::getCncSpeedTypeAsCharacter(feedSpeedMode)
+		 << ")"													<< ", "
+		 
+		 << "("
+		 << wxString::Format("% 5ld", toolId)					<< " " 
 		 << ")"													<< ", "
 		 
 		 << "("

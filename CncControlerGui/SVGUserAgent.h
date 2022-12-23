@@ -27,7 +27,6 @@ class SVGUserAgent{
 		wxString					nodeName;
 		wxString					elementId;
 		
-		SVGUserAgentInfo			defaultUserAgent;
 		UserAgentVector				userAgent;
 		
 		DoubleStringMap				collectedAttributes;

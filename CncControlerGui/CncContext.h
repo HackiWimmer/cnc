@@ -11,6 +11,7 @@
 #include "CncTsTplProcessing.h"
 #include "CncPositionStorage.h"
 #include "CncPosition.h"
+#include "CncCommon.h"
 #include "CncAverage.h"
 
 // -----------------------------------------------------------
@@ -44,8 +45,7 @@ struct CncContext {
 		bool	cncTransactionState			= false;
 		
 		int		updateInterval				= 100;
-		
-		double	currentToolDiameter			= 0.0;
+		int		currentToolId				= INVALID_TOOL_ID;
 		
 	public:
 	
@@ -85,8 +85,10 @@ struct CncContext {
 		void unregisterCncTransaction()									{ cncTransactionState = false; }
 		bool isCncTransactionActive()							const	{ return cncTransactionState; }
 		
-		void setCurrentToolDiameter(double d )							{ currentToolDiameter = fabs(d); }
-		double getCurrentToolDiameter()							const	{ return currentToolDiameter; }
+		
+		void setCurrentToolId(int id);
+		int getCurrentToolId()									const	{ return currentToolId; }
+		double getCurrentToolDiameter()							const;
 		
 		void setProbeMode(bool state); 
 		bool isProbeMode() 										const	{ return probeMode; }

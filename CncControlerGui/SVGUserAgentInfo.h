@@ -13,7 +13,8 @@
 typedef std::map<wxString, wxString>			DoubleStringMap;
 
 // ------------------------------------------------------------
-struct PathInfo {
+struct PathInfo 
+{
 	
 	char			cmd;
 	unsigned int	cnt;
@@ -32,7 +33,8 @@ typedef std::vector<PathInfo> 					PathInfoVector;
 typedef std::map<wxString, DoubleStringMap>		UseDirectiveMap;
 
 // ------------------------------------------------------------
-struct UseDirective {
+struct UseDirective
+{
 	wxString 		id;
 	DoubleStringMap	attributes;
 };
@@ -42,9 +44,9 @@ typedef std::vector<wxString>					TransformVector;
 typedef std::vector<wxString>					StyleVector;
 
 ////////////////////////////////////////////////////////////////
-struct SVGUserAgentInfo {
+struct SVGUserAgentInfo
 ////////////////////////////////////////////////////////////////
-	
+{
 	private:
 		bool isMemberOf(const wxString& id, const char* type)	const;
 		
@@ -57,10 +59,10 @@ struct SVGUserAgentInfo {
 		wxString				elementId;
 		wxString				originalPath;
 		
-		SvgCncBreak				cncBreak;
-		SvgCncPause				cncPause;
-		SvgCncContext			cncParameters;
-		SvgCncContextMacro		cncMacro;
+		SvgCncBreak*			cncBreak;
+		SvgCncPause*			cncPause;
+		SvgCncContextMacro*		cncMacro;
+		SvgCncContext*			cncParameters;
 		
 		DoubleStringMap			attributes;
 		DoubleStringMap			ids;
@@ -68,8 +70,14 @@ struct SVGUserAgentInfo {
 		TransformVector			transformList;
 		StyleVector				styleList;
 		
-		SVGUserAgentInfo();
+		explicit SVGUserAgentInfo(const SvgCncContext& ssc);
+		explicit SVGUserAgentInfo(const SvgCncContextMacro& sccm);
+		explicit SVGUserAgentInfo(const SvgCncBreak& scb);
+		explicit SVGUserAgentInfo(const SvgCncPause& scp);
+		explicit SVGUserAgentInfo(const SVGUserAgentInfo& uai);
 		~SVGUserAgentInfo();
+		
+		SVGUserAgentInfo& operator= (const SVGUserAgentInfo&);
 		
 		bool isMemberOfSymbol(const wxString& id = "")			const;
 		bool isMemberOfGroup(const wxString& id = "")			const;

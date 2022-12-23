@@ -29,6 +29,7 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		virtual bool			changeCurrentFeedSpeedXYZ(CncSpeedMode s)					override;
 		virtual bool			changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value)		override;
 		virtual bool			changeCurrentSpindleSpeed(double value = 0.0)				override;
+		virtual bool			initToolChange(int id)										override;
 		virtual bool			initNextPath()												override;
 		virtual bool			prepareWorkImpl()											override;
 		virtual bool			finishWorkImpl()											override;

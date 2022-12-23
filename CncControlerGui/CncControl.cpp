@@ -183,35 +183,35 @@ const CncDoublePosition CncControl::getCurCtlPosMetric() {
 //////////////////////////////////////////////////////////////////
 const CncLongPosition CncControl::getMinPositions() {
 //////////////////////////////////////////////////////////////////
-	const CncLongPosition retValue(	curAppPos.getXMin(), 
-									curAppPos.getYMin(), 
-									curAppPos.getZMin()
+	const CncLongPosition retValue(	curCtlPos.getXMin(), 
+									curCtlPos.getYMin(), 
+									curCtlPos.getZMin()
 	);
 	return retValue;
 }//////////////////////////////////////////////////////////////////
 const CncLongPosition CncControl::getMaxPositions() {
 //////////////////////////////////////////////////////////////////
-	const CncLongPosition retValue( curAppPos.getXMax(), 
-									curAppPos.getYMax(),
-									curAppPos.getZMax()
+	const CncLongPosition retValue( curCtlPos.getXMax(), 
+									curCtlPos.getYMax(),
+									curCtlPos.getZMax()
 	);
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getMinPositionsMetric() {
 //////////////////////////////////////////////////////////////////
-	const CncDoublePosition retValue(curAppPos.getXMin() * THE_CONFIG->getDisplayFactX(),
-									 curAppPos.getYMin() * THE_CONFIG->getDisplayFactY(),
-									 curAppPos.getZMin() * THE_CONFIG->getDisplayFactZ()
+	const CncDoublePosition retValue(curCtlPos.getXMin() * THE_CONFIG->getDisplayFactX(),
+									 curCtlPos.getYMin() * THE_CONFIG->getDisplayFactY(),
+									 curCtlPos.getZMin() * THE_CONFIG->getDisplayFactZ()
 	);
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getMaxPositionsMetric() {
 //////////////////////////////////////////////////////////////////
-	const CncDoublePosition retValue(curAppPos.getXMax() * THE_CONFIG->getDisplayFactX(),
-									 curAppPos.getYMax() * THE_CONFIG->getDisplayFactY(),
-									 curAppPos.getZMax() * THE_CONFIG->getDisplayFactZ()
+	const CncDoublePosition retValue(curCtlPos.getXMax() * THE_CONFIG->getDisplayFactX(),
+									 curCtlPos.getYMax() * THE_CONFIG->getDisplayFactY(),
+									 curCtlPos.getZMax() * THE_CONFIG->getDisplayFactZ()
 	);
 	return retValue;
 }
@@ -839,10 +839,11 @@ bool CncControl::reset() {
 	
 	return true;
 }
+
 ///////////////////////////////////////////////////////////////////
 unsigned int CncControl::getDurationCount() {
 ///////////////////////////////////////////////////////////////////
-	return THE_CONFIG->getDurationCount();
+	return durationCounter ;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::hasNextDuration() {
@@ -876,6 +877,7 @@ bool CncControl::isLastDuration() {
 ///////////////////////////////////////////////////////////////////
 	return (durationCounter == getDurationCount());
 }
+
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToBottom() {
 ///////////////////////////////////////////////////////////////////
@@ -902,7 +904,7 @@ bool CncControl::moveZToBottom() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToTop() {
 ///////////////////////////////////////////////////////////////////
-	double topZPos = THE_CONFIG->getCurZDistance(); //THE_CONFIG->getMaxZDistance();
+	double topZPos = 0.0 + THE_CONFIG->getWorkpieceOffset();
 	double curZPos = curAppPos.getZ() * THE_CONFIG->getDisplayFactZ(); // we need it as mm
 	double moveZ   = topZPos - curZPos;
 	
@@ -1609,8 +1611,6 @@ bool CncControl::simpleMoveZToZeroPos() {
 	return ret;
 }
 
-
-
 /*
 
 #define CNC_ROUND round
@@ -2171,11 +2171,6 @@ bool CncControl::validateAppAgainstCtlPosition() {
 	return ( curAppPos == ctlPos );
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::notifyConfigUpdate() {
-///////////////////////////////////////////////////////////////////
-	// currently nothing to do
-}
-///////////////////////////////////////////////////////////////////
 bool CncControl::enableStepperMotors(bool s) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
@@ -2638,67 +2633,6 @@ bool CncControl::convertPositionToHardwareCoordinate(const CncDoublePosition& po
 	
 	return b;
 }
-
-/*
-///////////////////////////////////////////////////////////////////
-bool CncControl::simulateHardwareReference(float offsetFact) {
-///////////////////////////////////////////////////////////////////
-	offsetFact = std::min(0.99999f, offsetFact);
-	offsetFact = std::max(0.00001f, offsetFact);
-	
-	CncLongPosition fakedHwRefPos(curCtlPos);
-	fakedHwRefPos.setX( (-1) * wxRound(THE_BOUNDS->getMaxDimensionStepsX() *       offsetFact ));
-	fakedHwRefPos.setY( (-1) * wxRound(THE_BOUNDS->getMaxDimensionStepsY() *       offsetFact ));
-	fakedHwRefPos.setZ( (+1) * wxRound(THE_BOUNDS->getMaxDimensionStepsZ() * ( 1 - offsetFact )));
-	
-	const bool ret = fakedHwRefPos != curCtlPos;
-	if ( ret )
-	{
-		THE_BOUNDS->setHardwareOffset(fakedHwRefPos);
-		THE_BOUNDS->setHardwareOffsetValid(true); 
-	}
-	else
-	{
-		CNC_CERR_FUNCT_A("Error while simulate hardware reference")
-	}
-	
-	return ret;
-}
-*/
-/*
-///////////////////////////////////////////////////////////////////
-bool CncControl::simulateHardwareReference(const CncDoubleOffset& offset) {
-///////////////////////////////////////////////////////////////////
-	const CncLongOffset o
-	(
-		THE_CONFIG->convertMetricToStepsX(offset.getX()),
-		THE_CONFIG->convertMetricToStepsY(offset.getY()),
-		THE_CONFIG->convertMetricToStepsZ(offset.getZ())
-	);
-	
-	return simulateHardwareReference(o);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::simulateHardwareReference(const CncLongOffset& offset) {
-///////////////////////////////////////////////////////////////////
-	CncLongPosition fakedHwRefPos(curCtlPos);
-	fakedHwRefPos.setX(offset.getX());
-	fakedHwRefPos.setY(offset.getY());
-	fakedHwRefPos.setZ(offset.getZ());
-	
-	const bool ret = fakedHwRefPos != curCtlPos;
-	if ( ret )
-	{
-		THE_BOUNDS->setHardwareOffset(fakedHwRefPos);
-		THE_BOUNDS->setHardwareOffsetValid(true); 
-	}
-	
-	return ret;
-}
-*/
-
-
-
 ///////////////////////////////////////////////////////////////////
 bool CncControl::evaluateHardwareReference() {
 ///////////////////////////////////////////////////////////////////
@@ -3114,3 +3048,5 @@ double CncControl::getPodiumDistanceMetric() {
 	const int32_t dist = list.at(0);
 	return THE_CONFIG->convertStepsToMetricH(dist);
 }
+
+

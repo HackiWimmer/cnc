@@ -347,9 +347,6 @@ class CncControl {
 		bool isSpindleOn()					const { return spindlePowerState == SPINDLE_STATE_ON; }
 		bool isSpindleOff()					const { return spindlePowerState == SPINDLE_STATE_OFF; }
 		
-		// Updates the configure trace control
-		void notifyConfigUpdate();
-		
 		CncLongPosition& 					getCurAppPosAsReference()			{ return curAppPos;   }
 		const CncLongPosition 				getCurAppPos()				const	{ return curAppPos;   }
 		const CncLongPosition 				getCurCtlPos() 				const	{ return curCtlPos;   }

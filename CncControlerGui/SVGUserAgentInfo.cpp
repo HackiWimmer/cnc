@@ -2,15 +2,16 @@
 #include "SVGUserAgentInfo.h"
 
 /////////////////////////////////////////////////////////
-SVGUserAgentInfo::SVGUserAgentInfo() 
-: lineNumber				(UNDEFINED_LINE_NUMBER)
+SVGUserAgentInfo::SVGUserAgentInfo(const SvgCncContext& ssc)
+: lineNumber				(ssc.getCurrentLineNumber())
 , nodeType					(NT_UNDEFINED)
 , nodeName					()
 , elementId					()
 , originalPath				()
-, cncBreak					()
-, cncPause					()
-, cncParameters				()
+, cncBreak					(NULL)
+, cncPause					(NULL)
+, cncMacro					(NULL)
+, cncParameters				(new SvgCncContext(ssc))
 , attributes				()
 , ids						()
 , pathInfoList				()
@@ -22,26 +23,127 @@ SVGUserAgentInfo::SVGUserAgentInfo()
 	pathInfoList.reserve(THE_CONFIG->getConstReserveCapacity());
 }
 /////////////////////////////////////////////////////////
+SVGUserAgentInfo::SVGUserAgentInfo(const SvgCncContextMacro& sscm)
+: lineNumber				(sscm.getCurrentLineNumber())
+, nodeType					(NT_UNDEFINED)
+, nodeName					()
+, elementId					()
+, originalPath				()
+, cncBreak					(NULL)
+, cncPause					(NULL)
+, cncMacro					(new SvgCncContextMacro(sscm))
+, cncParameters				(NULL)
+, attributes				()
+, ids						()
+, pathInfoList				()
+, transformList				()
+, styleList					()
+/////////////////////////////////////////////////////////
+{
+	//preallocate space
+	pathInfoList.reserve(THE_CONFIG->getConstReserveCapacity());
+}
+/////////////////////////////////////////////////////////
+SVGUserAgentInfo::SVGUserAgentInfo(const SvgCncBreak& scb)
+: lineNumber				(scb.getCurrentLineNumber())
+, nodeType					(NT_UNDEFINED)
+, nodeName					()
+, elementId					()
+, originalPath				()
+, cncBreak					(new SvgCncBreak(scb))
+, cncPause					(NULL)
+, cncMacro					(NULL)
+, cncParameters				(NULL)
+, attributes				()
+, ids						()
+, pathInfoList				()
+, transformList				()
+, styleList					()
+/////////////////////////////////////////////////////////
+{
+	//preallocate space
+	pathInfoList.reserve(THE_CONFIG->getConstReserveCapacity());
+}
+/////////////////////////////////////////////////////////
+SVGUserAgentInfo::SVGUserAgentInfo(const SvgCncPause& scp)
+: lineNumber				(scp.getCurrentLineNumber())
+, nodeType					(NT_UNDEFINED)
+, nodeName					()
+, elementId					()
+, originalPath				()
+, cncBreak					(NULL)
+, cncPause					(new SvgCncPause(scp))
+, cncMacro					(NULL)
+, cncParameters				(NULL)
+, attributes				()
+, ids						()
+, pathInfoList				()
+, transformList				()
+, styleList					()
+/////////////////////////////////////////////////////////
+{
+	//preallocate space
+	pathInfoList.reserve(THE_CONFIG->getConstReserveCapacity());
+}
+/////////////////////////////////////////////////////////
+SVGUserAgentInfo::SVGUserAgentInfo(const SVGUserAgentInfo& uai)
+: lineNumber				(uai.lineNumber)
+, nodeType					(uai.nodeType)
+, nodeName					(uai.nodeName)
+, elementId					(uai.elementId)
+, originalPath				(uai.originalPath)
+, cncBreak					(uai.cncBreak      ? new SvgCncBreak(*uai.cncBreak)        : NULL)
+, cncPause					(uai.cncPause      ? new SvgCncPause(*uai.cncPause)        : NULL)
+, cncMacro					(uai.cncMacro      ? new SvgCncContextMacro(*uai.cncMacro) : NULL)
+, cncParameters				(uai.cncParameters ? new SvgCncContext(*uai.cncParameters) : NULL)
+, attributes				(uai.attributes)
+, ids						(uai.ids)
+, pathInfoList				(uai.pathInfoList)
+, transformList				(uai.transformList)
+, styleList					(uai.styleList)
+/////////////////////////////////////////////////////////
+{
+	//preallocate space
+	pathInfoList.reserve(THE_CONFIG->getConstReserveCapacity());
+}
+//////////////////////////////////////////////////////////////////
+SVGUserAgentInfo& SVGUserAgentInfo::operator= (const SVGUserAgentInfo& uai) {
+//////////////////////////////////////////////////////////////////
+	// self-assignment check
+	if ( this != &uai ) 
+		*this = SVGUserAgentInfo(uai);
+		
+	return *this;
+}
+/////////////////////////////////////////////////////////
 SVGUserAgentInfo::~SVGUserAgentInfo() {
 /////////////////////////////////////////////////////////
 	attributes.clear();
 	ids.clear();
 	pathInfoList.clear();
+	
+	delete cncBreak;
+	delete cncPause;
+	delete cncMacro;
+	delete cncParameters;
 }
 /////////////////////////////////////////////////////////
 bool SVGUserAgentInfo::isMemberOf(const wxString& id, const char* type) const {
 /////////////////////////////////////////////////////////
-	if ( id.length() > 0 ) {
+	if ( id.length() > 0 )
+	{
 		
 		auto it = ids.find(id);
-		if ( it != ids.end() ) {
+		if ( it != ids.end() )
+		{
 			if ( it->second == type )
 				return true;
 		}
 	} 
-	else {
-		
-		for (auto it=ids.begin(); it!=ids.end(); ++it) {
+	else 
+	{
+		for (auto it=ids.begin(); it!=ids.end(); ++it)
+		{
 			if ( it->second == type )
 				return true;
 		}
@@ -72,7 +174,8 @@ bool SVGUserAgentInfo::hasStyle() const {
 /////////////////////////////////////////////////////////
 void SVGUserAgentInfo::debug(const DoubleStringMap& dsm, std::ostream& out) const {
 /////////////////////////////////////////////////////////
-	for (auto it=dsm.begin(); it!=dsm.end(); ++it) {
+	for (auto it=dsm.begin(); it!=dsm.end(); ++it)
+	{
 		out << it->first;
 		out << "=";
 		out << it->second;
@@ -83,9 +186,8 @@ void SVGUserAgentInfo::debug(const DoubleStringMap& dsm, std::ostream& out) cons
 void SVGUserAgentInfo::debug(const PathInfo& pi, std::ostream& out) const {
 /////////////////////////////////////////////////////////
 	out << "Command: " << pi.cmd << ", Count: " << pi.cnt << std::endl;
-	for (unsigned int i=0; i< pi.cnt; i++) {
+	for (unsigned int i=0; i< pi.cnt; i++)
 		out << "Value( " << i << "): " << pi.values[i] << std::endl;
-	}
 }
 /////////////////////////////////////////////////////////
 void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
@@ -95,9 +197,11 @@ void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
 	// --------------------------------------------------
 	auto addCncStr = [&](const char* str) {
 		
-		if ( str != NULL ) {
+		if ( str != NULL )
+		{
 			wxStringTokenizer lines(str, "\n" );
-			while ( lines.HasMoreTokens() ) {
+			while ( lines.HasMoreTokens() )
+			{
 				wxString token(lines.GetNextToken());
 				wxString key(token.BeforeFirst('=').Trim().Trim(false));
 				wxString val(token.AfterFirst ('=').Trim().Trim(false));
@@ -111,20 +215,23 @@ void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
 		
 		case NT_PATH:
 		{
-			cncParameters.getParameterList(rows);
+			wxASSERT(cncParameters);
+			cncParameters->getParameterList(rows);
 			
 			value.clear();
-			for (auto it=attributes.begin(); it!=attributes.end(); ++it) {
+			for (auto it=attributes.begin(); it!=attributes.end(); ++it)
+			{
 				value += it->first;
 				value += "=";
 				value += it->second;
 				value += " ";
 			}
 			DataControlModel::addKeyValueRow(rows, "Attributes", value);
-
+			
 			value.clear();
 			DataControlModel::addKeyValueRow(rows, "IDs", (int)ids.size());
-			for (auto it=ids.begin(); it!=ids.end(); ++it) {
+			for (auto it=ids.begin(); it!=ids.end(); ++it)
+			{
 				value  = it->second;
 				value += "(";
 				value += it->first;
@@ -133,44 +240,52 @@ void SVGUserAgentInfo::getBaseDetails(DcmItemList& rows) const {
 			}
 			
 			DataControlModel::addKeyValueRow(rows, "transform", (int)transformList.size());
-			for (auto it=transformList.begin(); it!=transformList.end(); ++it) {
+			for (auto it=transformList.begin(); it!=transformList.end(); ++it)
 				DataControlModel::addKeyValueRow(rows, "  cmd", *it);
-			}
 			
 			DataControlModel::addKeyValueRow(rows, "style", (int)styleList.size());
-			for (auto it=styleList.begin(); it!=styleList.end(); ++it) {
+			for (auto it=styleList.begin(); it!=styleList.end(); ++it)
 				DataControlModel::addKeyValueRow(rows, "  style", *it);
-			}
 			
 			break;
 		}
 		case NT_CNC_VAR:
 		{
-			std::stringstream ss; cncParameters.traceVariablesOnlyTo(ss);
+			wxASSERT(cncParameters);
+			std::stringstream ss; 
+			cncParameters->traceVariablesOnlyTo(ss);
 			addCncStr(ss.str().c_str());
 			break;
 		}
 		case NT_CNC_PARAM:
 		{
-			std::stringstream ss; cncParameters.traceTo(ss);
+			wxASSERT(cncParameters);
+			std::stringstream ss; 
+			cncParameters->traceTo(ss);
 			addCncStr(ss.str().c_str());
 			break;
 		}
 		case NT_CNC_MACRO:
 		{
-			std::stringstream ss; cncMacro.traceTo(ss);
+			wxASSERT(cncMacro);
+			std::stringstream ss; 
+			cncMacro->traceTo(ss);
 			addCncStr(ss.str().c_str());
 			break;
 		}
 		case NT_CNC_BREAK:
 		{
-			std::stringstream ss; cncBreak.traceTo(ss);
+			wxASSERT(cncBreak);
+			std::stringstream ss; 
+			cncBreak->traceTo(ss);
 			addCncStr(ss.str().c_str());
 			break;
 		}
 		case NT_CNC_PAUSE:
 		{
-			std::stringstream ss; cncPause.traceTo(ss);
+			wxASSERT(cncPause);
+			std::stringstream ss; 
+			cncPause->traceTo(ss);
 			addCncStr(ss.str().c_str());
 			break;
 		}
@@ -200,7 +315,8 @@ const char* SVGUserAgentInfo::getStyleInfoAsString() const {
 /////////////////////////////////////////////////////////
 bool SVGUserAgentInfo::shouldProceed() const {
 /////////////////////////////////////////////////////////
-	switch ( nodeType ) {
+	switch ( nodeType ) 
+	{
 		case NT_CNC_VAR:
 		case NT_CNC_MACRO:
 		case NT_CNC_PARAM:
@@ -225,15 +341,15 @@ void SVGUserAgentInfo::getPathDetails(DcmItemList& rows) const {
 		return;
 		
 	DataControlModel::addKeyValueRow(rows, "Path", originalPath);
-	for ( auto it=pathInfoList.begin(); it!=pathInfoList.end(); ++it ) {
+	for ( auto it=pathInfoList.begin(); it!=pathInfoList.end(); ++it )
+	{
 		
 		const PathInfo& pi = *it;
 		const wxString command(wxString::Format("%c, Count=&u", pi.cmd, pi.cnt));
 		DataControlModel::addKeyValueRow(rows, "  Command", command);
 		
-		for ( unsigned int i=0; i<pi.cnt; i++ ) {
+		for ( unsigned int i=0; i<pi.cnt; i++ )
 			DataControlModel::addKeyValueRow(rows, wxString::Format(wxT("    Token(%d)"), i+1), pi.values[i]);
-		}
 	}
 }
 /////////////////////////////////////////////////////////

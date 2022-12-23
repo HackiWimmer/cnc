@@ -1,53 +1,101 @@
 #include "CncConfig.h"
+#include "CncCommon.h"
+#include "SvgTransformMatrix.h"
 #include "SvgViewBox.h"
 
-#define FORMAT_VIEWBOX_STRING \
- wxString::Format("0 0 %lf %lf", width, height)
+namespace ViewBox
+{
+	typedef CncUnitCalculatorBase::Unit Unit;
+	wxString generate(double w, double h, Unit u)
+	{
+		CncUnitCalculator<float> uc(Unit::px, u);
+		const float width  = uc.convert(w);
+		const float height = uc.convert(h);
+		return wxString::Format("%lf %lf %lf %lf", 0.0, 0.0, width, height);
+	}
+};
+
+//////////////////////////////////////////////////////////////////
+void SVGViewbox::setup(const wxString& vb) {
+//////////////////////////////////////////////////////////////////
+	viewBoxStr.assign(vb);
+	
+	wxStringTokenizer tokenizer(viewBoxStr, " ,");
+	unsigned int counter = 0;
+	while ( tokenizer.HasMoreTokens() ) 
+	{
+		wxString token = tokenizer.GetNextToken();
+		if ( token.IsEmpty() == false )
+		{
+			switch ( counter++ )
+			{
+				case 0:		token.ToDouble(&x); break;
+				case 1:		token.ToDouble(&y); break;
+				case 2:		token.ToDouble(&w); break;
+				case 3:		token.ToDouble(&h); break;
+				default:	CNC_CERR_FUNCT_A(" Invalid token count: %u", counter);
+			}
+		}
+	}
+	
+	// calculate further members
+	if ( isValid() ) 
+	{
+		minX = x;
+		minY = y;
+		maxX = x + w;
+		maxY = y + h;
+	}
+}
 
 //////////////////////////////////////////////////////////////////
 SVGRootNode::SVGRootNode() 
-: width			(1000)
-, height		(1000)
-, viewBox		(FORMAT_VIEWBOX_STRING)
-, scaleX		(1.0f)
-, scaleY		(1.0f)
-, unitCalculator(Unit::px, Unit::mm)
+: width					(1000.0)
+, height				(1000.0)
+, viewBox				(ViewBox::generate(width, height, Unit::px))
+, scaleX				(1.0f)
+, scaleY				(1.0f)
+, rootTransformation	()
+, unitCalculator		(Unit::px, Unit::mm)
 //////////////////////////////////////////////////////////////////
 {
 	setup();
 }
 //////////////////////////////////////////////////////////////////
 SVGRootNode::SVGRootNode(double svgWidth, double svgHeight, Unit unit) 
-: width			(svgWidth)
-, height		(svgHeight)
-, viewBox		(FORMAT_VIEWBOX_STRING)
-, scaleX		(1.0f)
-, scaleY		(1.0f)
-, unitCalculator(unit, unit)
+: width					(svgWidth)
+, height				(svgHeight)
+, viewBox				(ViewBox::generate(width, height, unit))
+, scaleX				(1.0f)
+, scaleY				(1.0f)
+, rootTransformation	()
+, unitCalculator		(unit, unit)
 //////////////////////////////////////////////////////////////////
 {
 	setup();
 }
 //////////////////////////////////////////////////////////////////
 SVGRootNode::SVGRootNode(double svgWidth, double svgHeight, Unit unit, const wxString& vb) 
-: width			(svgWidth)
-, height		(svgHeight)
-, viewBox		(vb.IsEmpty() ? FORMAT_VIEWBOX_STRING : vb)
-, scaleX		(1.0f)
-, scaleY		(1.0f)
-, unitCalculator(unit, unit)
+: width					(svgWidth)
+, height				(svgHeight)
+, viewBox				(vb.IsEmpty() ? ViewBox::generate(width, height, unit) : vb)
+, scaleX				(1.0f)
+, scaleY				(1.0f)
+, rootTransformation	()
+, unitCalculator		(unit, unit)
 //////////////////////////////////////////////////////////////////
 {
 	setup();
 }
 //////////////////////////////////////////////////////////////////
 SVGRootNode::SVGRootNode(const SVGRootNode& n) 
-: width			(n.getWidth())
-, height		(n.getHeight())
-, viewBox		(getViewbox().getViewBoxStr())
-, scaleX		(n.getScaleX())
-, scaleY		(n.getScaleY())
-, unitCalculator(n.getInputUnit(), Unit::mm)
+: width					(n.getWidth())
+, height				(n.getHeight())
+, viewBox				(getViewbox().getViewBoxStr())
+, scaleX				(n.getScaleX())
+, scaleY				(n.getScaleY())
+, rootTransformation	(n.getRootTransformation())
+, unitCalculator		(n.getInputUnit(), Unit::mm)
 //////////////////////////////////////////////////////////////////
 {
 	// already done by the given node
@@ -56,12 +104,13 @@ SVGRootNode::SVGRootNode(const SVGRootNode& n)
 //////////////////////////////////////////////////////////////////
 SVGRootNode::SVGRootNode(const wxString& vb)
 //////////////////////////////////////////////////////////////////
-: width			(0)
-, height		(0)
-, viewBox		(vb)
-, scaleX		(1.0f)
-, scaleY		(1.0f)
-, unitCalculator(Unit::px, Unit::px)
+: width					(0.0f)
+, height				(0.0f)
+, viewBox				(vb)
+, scaleX				(1.0f)
+, scaleY				(1.0f)
+, rootTransformation	()
+, unitCalculator		(Unit::px, Unit::px)
 {
 	width  = viewBox.getW();
 	height = viewBox.getH();
@@ -71,50 +120,60 @@ SVGRootNode::SVGRootNode(const wxString& vb)
 //////////////////////////////////////////////////////////////////
 void SVGRootNode::setup() {
 //////////////////////////////////////////////////////////////////
-	// determine scaling
+	// determine viewBox scaling
+	scaleX = 1.0;
+	scaleY = 1.0;
+	
 	if ( THE_CONFIG->getSvgConsiderViewboxFlag() )
 	{
 		if ( viewBox.isValid() )
 		{
-			scaleX = getWidth()  / ( viewBox.getW() ? viewBox.getW() : getWidth() );
-			scaleY = getHeight() / ( viewBox.getH() ? viewBox.getH() : getHeight() );
+			if ( cnc::dblCmp::nu(viewBox.getW()) == false && cnc::dblCmp::nu(width) == false )
+				scaleX = viewBox.getW() / width;
+				
+				
+			if ( cnc::dblCmp::nu(viewBox.getH()) == false && cnc::dblCmp::nu(height) == false )
+				scaleY = viewBox.getH() / height;
 		}
-		else
-		{
-			scaleX = 1.0;
-			scaleY = 1.0;
-		}
+	}
+	
+	// initialize root transformation
+	rootTransformation.clear();
+	
+	// determine right hand transformation
+	if ( THE_CONFIG->getSvgConvertToRightHandFlag() )
+	{
+		// The target display area (Cnc App) is always a right hand coordinate system.
+		// Therefore, the Y axis for an svg always must be mirrored! 
+		scaleY *= (-1);
+		
+		rootTransformation.append(wxString::Format(" scale(%lf,%lf)", scaleX, scaleY));
 	}
 	
 	if ( THE_CONFIG->getSvgConsiderViewboxFlag() )
 	{
-		width  *= scaleX;
-		height *= scaleY;
+		if ( viewBox.isValid() )
+		{
+			const double dx = -viewBox.getX();
+			const double dy = -viewBox.getY();
+			
+			// consider viewBox offset
+			rootTransformation.append(wxString::Format(" translate(%lf,%lf) ", dx, dy));
+			
+			if ( THE_CONFIG->getSvgConvertToRightHandFlag() )
+				rootTransformation.append(wxString::Format(" translate(%lf,%lf) ", 0.0, -height));
+		}
 	}
 }
 //////////////////////////////////////////////////////////////////
-const wxString& SVGRootNode::getRootTransformation(wxString& ret) const {
+CncDoublePosition SVGRootNode::getViewboxOffset() const {
 //////////////////////////////////////////////////////////////////
-	ret.clear();
+	const CncDoublePosition ret(
+				getViewbox().getX(), 
+				getViewbox().getY(), 
+				0.0
+	);
 	
-	double h  = 0.0;
-	double sx = scaleX;
-	double sy = scaleY;
-	
-	if ( THE_CONFIG->getSvgConvertToRightHandFlag() )
-	{
-		// The scene has to be moved in the special case the svg should 
-		// be converted to a right hand coord system 
-		h  = getHeight();
-
-		// The target display area (Cnc App) is always a right hand coord system.
-		// Therefore, the Y axis for an svg always must be reversed! 
-		sx = scaleX;
-		sy = scaleY * (-1);
-	}
-	
-	ret.append(wxString::Format("translate(%lf,%lf) ",	0.0, h));
-	ret.append(wxString::Format("scale(%lf,%lf)",		sx, sy));
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
@@ -123,8 +182,8 @@ CncDoublePosition SVGRootNode::getViewboxOffset_MM() const {
 	CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);
 	
 	const CncDoublePosition ret(
-				uc.convert(getViewbox().getX() * (THE_CONFIG->getSvgConsiderViewboxFlag() ? scaleX : 1.0)), 
-				uc.convert(getViewbox().getX() * (THE_CONFIG->getSvgConsiderViewboxFlag() ? scaleY : 1.0)), 
+				uc.convert(getViewbox().getX()), 
+				uc.convert(getViewbox().getY()), 
 				0.0
 	);
 	

@@ -48,7 +48,7 @@ class CncPathListMonitor : public CncPathListRunner::Interface
 		virtual bool processGuidePath(const CncPathListManager& plm);
 		virtual bool processClientIDChange(long cid)											override;
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)				override;
-		virtual bool processToolChange(double diameter)											override { return true; }
+		virtual bool processToolChange(int id)													override { return true; }
 		virtual bool processSpindleStateSwitch(bool on, bool force=false)						override { current.spindleState = on; return true; }
 		virtual bool processSpindleSpeedChange(double value_U_MIN)								override { current.spindleSpeed = value_U_MIN; return true; }
 		virtual bool processMoveSequence(CncMoveSequence& msq)									override;

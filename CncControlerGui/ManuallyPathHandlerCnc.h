@@ -14,18 +14,19 @@ class ManuallyPathHandlerCnc : public PathHandlerBase
 		ManuallyPathHandlerCnc(CncControl* cnc);
 		virtual ~ManuallyPathHandlerCnc();
 		
-		virtual const char*		getName() const { return "ManuallyPathHandlerCnc"; }
+		virtual const char*		getName() const override { return "ManuallyPathHandlerCnc"; }
 		
-		virtual void 			logMeasurementStart();
-		virtual void			logMeasurementEnd();
+		virtual void 			logMeasurementStart()										override;
+		virtual void			logMeasurementEnd()											override;
 		
-		virtual void			switchSpindleState(CncSpindlePowerState state);
+		virtual bool			prepareWork()												override;
+		virtual bool			initToolChange(int id)										override;
+		virtual bool			finishWork()												override;
 		
-		virtual bool			prepareWork(); 
-		virtual bool			finishWork();
-		
-		virtual bool			processLinearMove(bool alreadyRendered);
+		virtual bool			processLinearMove(bool alreadyRendered)						override;
 		bool					processLinearMove(const CncMoveDefinition& md);
+		
+		void					switchSpindleState(CncSpindlePowerState state);
 		
 		void					swichtSpindleOn()  { switchSpindleState(SPINDLE_STATE_ON);  }
 		void					swichtSpindleOff() { switchSpindleState(SPINDLE_STATE_OFF); }

@@ -15,7 +15,7 @@ bool CPLI::CncGuidPathInstruction			::process(CPLI* i)					{ return i->executeGu
 bool CPLI::CncCommandInstruction			::process(CPLI* i)					{ return i->executeCommand(buffer, bytes); }
 bool CPLI::CncClientIDInstruction			::process(CPLI* i)					{ return i->executeClientIDChange(cid); }
 bool CPLI::CncFeedSpeedInstruction			::process(CPLI* i)					{ return i->executeFeedSpeedChange(value_MM_MIN, mode); }
-bool CPLI::CncToolChangeInstruction			::process(CPLI* i)					{ return i->executeToolChange(diameter); }
+bool CPLI::CncToolChangeInstruction			::process(CPLI* i)					{ return i->executeToolChange(toolId); }
 bool CPLI::CncSpindleStateInstruction		::process(CPLI* i)					{ return i->executeSpindleStateSwitch(state, force); }
 bool CPLI::CncSpindleSpeedInstruction		::process(CPLI* i)					{ return i->executeSpindleSpeedChange(value_U_MIN); }
 bool CPLI::InstructionTriggerBeginRun		::process(CPLI* i)					{ i->executeTrigger(tr); return true; }
@@ -24,19 +24,19 @@ bool CPLI::InstructionTriggerNextPath		::process(CPLI* i)					{ i->executeTrigge
 bool CPLI::InstructionTriggerSpeedChange	::process(CPLI* i)					{ i->executeTrigger(tr); return true; }
 bool CPLI::InstructionTriggerGuidePath		::process(CPLI* i)					{ i->executeTrigger(tr); return true; }
 
-void CPLI::CncClientIDInstruction			::traceTo(std::ostream& o) const	{ o << " Next Id: "			<< cid 								<< std::endl; }
-void CPLI::CncMovSeqInstruction				::traceTo(std::ostream& o) const	{ o << "  MoveSequence: ";	img.traceTo(o); o					<< std::endl; } 
-void CPLI::CncPathListInstruction			::traceTo(std::ostream& o) const	{ o << "  PathEntry: ";		ple.traceEntry(o); o				<< std::endl; }
-void CPLI::CncGuidPathInstruction			::traceTo(std::ostream& o) const	{ o << "  Guide Path:" 		<< plm								<< std::endl; }
-void CPLI::CncFeedSpeedInstruction			::traceTo(std::ostream& o) const	{ o << "  Speed: F("		<< value_MM_MIN << ")"				<< std::endl; }
-void CPLI::CncToolChangeInstruction			::traceTo(std::ostream& o) const	{ o << "  Tool Change("		<< diameter << ")"					<< std::endl; }
-void CPLI::CncSpindleStateInstruction		::traceTo(std::ostream& o) const	{ o << "  Spindle Motor: ("	<< (state ? "ON" : "OFF") << ")"	<< std::endl; }
-void CPLI::CncSpindleSpeedInstruction		::traceTo(std::ostream& o) const	{ o << "  Spindle Speed: S("<< value_U_MIN << ")"				<< std::endl; }
-void CPLI::InstructionTriggerBeginRun		::traceTo(std::ostream& o) const	{ o << tr 														<< std::endl; }
-void CPLI::InstructionTriggerEndRun			::traceTo(std::ostream& o) const	{ o << tr 														<< std::endl; }
-void CPLI::InstructionTriggerNextPath		::traceTo(std::ostream& o) const	{ o << tr 														<< std::endl; }
-void CPLI::InstructionTriggerSpeedChange	::traceTo(std::ostream& o) const	{ o << tr 														<< std::endl; }
-void CPLI::InstructionTriggerGuidePath		::traceTo(std::ostream& o) const	{ o << tr 														<< std::endl; }
+void CPLI::CncClientIDInstruction			::traceTo(std::ostream& o) const	{ o << " Next Id: "				<< cid 								<< std::endl; }
+void CPLI::CncMovSeqInstruction				::traceTo(std::ostream& o) const	{ o << "  Move Sequence: ";		img.traceTo(o); o					<< std::endl; } 
+void CPLI::CncPathListInstruction			::traceTo(std::ostream& o) const	{ o << "  Path Entry: ";		ple.traceEntry(o); o				<< std::endl; }
+void CPLI::CncGuidPathInstruction			::traceTo(std::ostream& o) const	{ o << "  Guide Path: entries="	<< plm.getPathListSize()			<< std::endl; }
+void CPLI::CncFeedSpeedInstruction			::traceTo(std::ostream& o) const	{ o << "  Speed: F("			<< value_MM_MIN << ")"				<< std::endl; }
+void CPLI::CncToolChangeInstruction			::traceTo(std::ostream& o) const	{ o << "  Tool Change("			<< toolId << ")"					<< std::endl; }
+void CPLI::CncSpindleStateInstruction		::traceTo(std::ostream& o) const	{ o << "  Spindle Motor: ("		<< (state ? "ON" : "OFF") << ")"	<< std::endl; }
+void CPLI::CncSpindleSpeedInstruction		::traceTo(std::ostream& o) const	{ o << "  Spindle Speed: S("	<< value_U_MIN << ")"				<< std::endl; }
+void CPLI::InstructionTriggerBeginRun		::traceTo(std::ostream& o) const	{ o << tr 															<< std::endl; }
+void CPLI::InstructionTriggerEndRun			::traceTo(std::ostream& o) const	{ o << tr 															<< std::endl; }
+void CPLI::InstructionTriggerNextPath		::traceTo(std::ostream& o) const	{ o << tr 															<< std::endl; }
+void CPLI::InstructionTriggerSpeedChange	::traceTo(std::ostream& o) const	{ o << tr 															<< std::endl; }
+void CPLI::InstructionTriggerGuidePath		::traceTo(std::ostream& o) const	{ o << tr 															<< std::endl; }
 
 ////////////////////////////////////////////////////////////////////
 
@@ -70,7 +70,7 @@ void CncPathListInterfaceCnc::logMeasurementStart()												{ cnc->startSeria
 void CncPathListInterfaceCnc::logMeasurementEnd()												{ cnc->stopSerialMeasurement(); }
 bool CncPathListInterfaceCnc::isInterrupted()													{ return cnc->isInterrupted(); }
 bool CncPathListInterfaceCnc::executeClientIDChange(long cid)									{ cnc->setClientId(cid); return true; }
-bool CncPathListInterfaceCnc::executeToolChange(double diameter)								{ return true; }
+bool CncPathListInterfaceCnc::executeToolChange(int id)											{ CNC_CLOG_FUNCT_A(" tool change to %d", id); return true; }
 bool CncPathListInterfaceCnc::executeSpindleStateSwitch(CncSpindlePowerState state, bool force)	{ return cnc->switchSpindleState(state, force); }
 bool CncPathListInterfaceCnc::executeSpindleSpeedChange(double value_U_MIN)						{ return cnc->changeCurrentSpindleSpeed_U_MIN(value_U_MIN); }
 bool CncPathListInterfaceCnc::executeFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ return cnc->changeCurrentFeedSpeedXYZ_MM_MIN(value_MM_MIN, m); }

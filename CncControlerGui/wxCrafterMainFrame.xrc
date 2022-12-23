@@ -7,6 +7,9 @@
     <centered>1</centered>
     <style>wxDEFAULT_FRAME_STYLE</style>
     <size>1600,1000</size>
+    <tooltip>
+      <![CDATA[sdfsfds]]>
+    </tooltip>
     <object class="wxAuiManager">
       <style>wxAUI_MGR_LIVE_RESIZE|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_ALLOW_ACTIVE_PANE|wxAUI_MGR_ALLOW_FLOATING</style>
       <sashsize>3</sashsize>
@@ -5414,10 +5417,10 @@ Interval [ms]:</label>
                                                                           </object>
                                                                           <object class="sizeritem">
                                                                             <flag>wxALL</flag>
-                                                                            <minsize>12,-1</minsize>
+                                                                            <minsize>24,-1</minsize>
                                                                             <object class="wxTextCtrl" name="m_toolId">
                                                                               <style>wxTE_READONLY|wxBORDER_NONE</style>
-                                                                              <size>12,-1</size>
+                                                                              <size>24,-1</size>
                                                                               <font>
                                                                                 <size>7</size>
                                                                                 <style>normal</style>

@@ -9,8 +9,8 @@
 class CncMutexLocker {
 	
 	private:
-		 wxMutex&	m_mutex;
-		 bool 		m_ok;
+		wxMutex&	m_mutex;
+		bool 		m_ok;
 		
 		CncMutexLocker(const wxMutexLocker&);
 		CncMutexLocker& operator=(const wxMutexLocker&);

@@ -25,6 +25,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 	wxC9ED9InitBitmapResources();
 	bBitmapLoaded = true;
     }
+    this->SetToolTip(_("sdfsfds"));
 
     m_auimgrMain = new wxAuiManager;
     m_auimgrMain->SetManagedWindow(this);
@@ -3708,7 +3709,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     flexGridSizer4584->Add(0, 7, 1, wxALL, WXC_FROM_DIP(0));
 
     m_toolId = new wxTextCtrl(m_3DOutboundStatistics, wxID_ANY, wxT("-1"), wxDefaultPosition,
-        wxDLG_UNIT(m_3DOutboundStatistics, wxSize(12, -1)), wxTE_READONLY | wxBORDER_NONE);
+        wxDLG_UNIT(m_3DOutboundStatistics, wxSize(24, -1)), wxTE_READONLY | wxBORDER_NONE);
     wxFont m_toolIdFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_toolId->SetFont(m_toolIdFont);
     m_toolId->SetToolTip(_("Last Tool ID"));
@@ -3717,7 +3718,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 #endif
 
     flexGridSizer4584->Add(m_toolId, 0, wxALL, WXC_FROM_DIP(0));
-    m_toolId->SetMinSize(wxSize(12, -1));
+    m_toolId->SetMinSize(wxSize(24, -1));
 
     m_staticLine5005 = new wxStaticLine(m_3DOutboundStatistics, wxID_ANY, wxDefaultPosition,
         wxDLG_UNIT(m_3DOutboundStatistics, wxSize(-1, -1)), wxLI_VERTICAL);
@@ -7288,6 +7289,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     m_bmpButton9297->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onReloadMonitorPreview, this);
     m_externFileManagerPreview->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &MainFrameBClass::onChangePreviewMode, this);
     m_inputFileName->Bind(wxEVT_LEFT_DCLICK, &MainFrameBClass::onLeftDClickTemplateName, this);
+    m_lastConfigNotification->Bind(wxEVT_LEFT_DCLICK, &MainFrameBClass::onLeftDclickLastConfigTime, this);
     m_unit->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &MainFrameBClass::selectUnit, this);
     m_heartbeatState->Bind(wxEVT_LEFT_DCLICK, &MainFrameBClass::dclickHeartbeatState, this);
     m_cbUCUnitFrom->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &MainFrameBClass::selectUCUnitFrom, this);
@@ -7590,6 +7592,7 @@ MainFrameBClass::~MainFrameBClass()
     m_bmpButton9297->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::onReloadMonitorPreview, this);
     m_externFileManagerPreview->Unbind(wxEVT_COMMAND_CHECKBOX_CLICKED, &MainFrameBClass::onChangePreviewMode, this);
     m_inputFileName->Unbind(wxEVT_LEFT_DCLICK, &MainFrameBClass::onLeftDClickTemplateName, this);
+    m_lastConfigNotification->Unbind(wxEVT_LEFT_DCLICK, &MainFrameBClass::onLeftDclickLastConfigTime, this);
     m_unit->Unbind(wxEVT_COMMAND_COMBOBOX_SELECTED, &MainFrameBClass::selectUnit, this);
     m_heartbeatState->Unbind(wxEVT_LEFT_DCLICK, &MainFrameBClass::dclickHeartbeatState, this);
     m_cbUCUnitFrom->Unbind(wxEVT_COMMAND_COMBOBOX_SELECTED, &MainFrameBClass::selectUCUnitFrom, this);

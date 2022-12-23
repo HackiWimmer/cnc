@@ -226,6 +226,10 @@ bool GCodeFileParser::spool() {
 		
 		programEnd  = false;
 		
+		// important to reset the current tool id,
+		// otherwise the first change will not be detected
+		THE_CONTEXT->setCurrentToolId(INVALID_TOOL_ID);
+		
 		CncAutoProgressDialog progressDlg(THE_APP->getMotionMonitor(), "Preprocessing GCode");
 		progressDlg.Show();
 		
@@ -488,10 +492,6 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	
 	initNextClientId(gcb.clientID);
 	
-	// first detect tool changes
-	if ( THE_CONFIG->getCurrentToolId() != int(gcb.t) )
-		setNextToolID(gcb.t);
-	
 	// then setup these parameters
 	bool ret = false;
 	if ( ( ret = pathHandler->processParameterEFS(gcb) ) == true )
@@ -714,8 +714,15 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		}
 		case 6:		// GC_M_ToolChange
 		{
-			// a tool change isn't yet supported
-			// a corresponding message will be display by setNextToolID(....)
+			if ( gcb.hasT() )
+			{
+				pathHandler->initToolChange(gcb.t);
+			}
+			else
+			{
+				CNC_CERR_A("[Line: %d] Tool change: M6 without a value of T!", getCurrentLineNumber())
+				return false;
+			}
 			return true;
 		}
 		case 7:		// GC_M_MistCoolantOn

@@ -108,13 +108,20 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent,
 
     flexGridSizer6519->Add(flexGridSizer6530, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
 
-    wxFlexGridSizer* flexGridSizer6525 = new wxFlexGridSizer(1, 6, 0, 0);
+    wxFlexGridSizer* flexGridSizer6525 = new wxFlexGridSizer(1, 7, 0, 0);
     flexGridSizer6525->SetFlexibleDirection(wxBOTH);
     flexGridSizer6525->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer6525->AddGrowableCol(3);
     flexGridSizer6525->AddGrowableRow(0);
 
     flexGridSizer6530->Add(flexGridSizer6525, 1, wxALL | wxEXPAND | wxALIGN_RIGHT, WXC_FROM_DIP(1));
+
+    m_btOpenSourceExtern =
+        new wxBitmapButton(this, wxID_ANY, wxArtProvider::GetBitmap(wxART_FILE_OPEN, wxART_BUTTON, wxDefaultSize),
+            wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxBU_AUTODRAW);
+    m_btOpenSourceExtern->SetToolTip(_("Open Source extern with configured tool"));
+
+    flexGridSizer6525->Add(m_btOpenSourceExtern, 0, wxALL, WXC_FROM_DIP(1));
 
     m_btOpenExtern = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")),
         wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1, -1)), wxBU_AUTODRAW);
@@ -226,6 +233,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent,
     }
     // Connect events
     m_observationMode->Bind(wxEVT_COMMAND_CHECKBOX_CLICKED, &CncTemplateObserverBase::changeObservationMode, this);
+    m_btOpenSourceExtern->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTemplateObserverBase::openTemplateSourceExtern, this);
     m_btOpenExtern->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTemplateObserverBase::openTemplateExtern, this);
     m_button6532->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTemplateObserverBase::clearTrace, this);
     m_observeTimer->Bind(wxEVT_TIMER, &CncTemplateObserverBase::observe, this);
@@ -234,6 +242,8 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent,
 CncTemplateObserverBase::~CncTemplateObserverBase()
 {
     m_observationMode->Unbind(wxEVT_COMMAND_CHECKBOX_CLICKED, &CncTemplateObserverBase::changeObservationMode, this);
+    m_btOpenSourceExtern->Unbind(
+        wxEVT_COMMAND_BUTTON_CLICKED, &CncTemplateObserverBase::openTemplateSourceExtern, this);
     m_btOpenExtern->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTemplateObserverBase::openTemplateExtern, this);
     m_button6532->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &CncTemplateObserverBase::clearTrace, this);
     m_observeTimer->Unbind(wxEVT_TIMER, &CncTemplateObserverBase::observe, this);

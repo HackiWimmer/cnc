@@ -6,6 +6,7 @@
 #include "CncTemplateContext.h"
 #include "CncBoundarySpace.h"
 #include "CncProcessingInfo.h"
+#include "CncConfig.h"
 #include "CncContext.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -31,7 +32,6 @@ CncContext::CncContext()
 ////////////////////////////////////////////////////////////////////////
 CncContext::~CncContext() {
 ////////////////////////////////////////////////////////////////////////
-	
 	wxDELETE( processingInfo );
 	wxDELETE( boundarySpace );
 	wxDELETE( anchorMap );
@@ -51,6 +51,14 @@ const char* CncContext::getOSTypeAsString() {
 	}
 	
 	return "Unknown";
+}
+////////////////////////////////////////////////////////////////////////
+double CncContext::getCurrentToolDiameter() const { 
+////////////////////////////////////////////////////////////////////////
+	if ( THE_CONFIG )
+		return THE_CONFIG->getToolDiameter(currentToolId);
+	
+	return 0.0; 
 }
 ////////////////////////////////////////////////////////////////////////
 void CncContext::setProbeMode(bool state) { 
@@ -112,6 +120,19 @@ void CncContext::initPreparationPhase() {
 void CncContext::resetProcessing() {
 ////////////////////////////////////////////////////////////////////////
 	processingInfo->reset();
+}
+////////////////////////////////////////////////////////////////////////
+void CncContext::setCurrentToolId(int id) { 
+////////////////////////////////////////////////////////////////////////
+	currentToolId = id; 
+	THE_TPL_CTX->addToolIdToSelList(id);
+	
+	wxTextCtrl* toolIdCtrl = THE_APP->GetToolId();
+	if ( toolIdCtrl != NULL )
+	{
+		toolIdCtrl->SetValue(wxString::Format("%d", currentToolId));
+		toolIdCtrl->SetToolTip(wxString::Format("Current Tool: %s", THE_CONFIG->getToolParamAsInfoStr(currentToolId)));
+	}
 }
 ////////////////////////////////////////////////////////////////////////
 void CncContext::addParsingSynopisSeparator	(const wxString& m) const { THE_APP->getParserSynopsisProxy()->addSeparator(m); }

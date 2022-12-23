@@ -614,7 +614,7 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 	
 	const wxString rawLine(entries.at(selectedItem).text);
 	wxString line(rawLine);
-	line.Trim(false);
+	line.Trim(wxLeft);
 	line.MakeUpper();
 	
 	// ---------------------------------------------------
@@ -622,6 +622,12 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 	{
 		line.assign(line.BeforeFirst(']'));
 		line.assign(line.AfterFirst('['));
+		
+		if ( line.Contains(":") )
+		{
+			line.assign(line.AfterFirst(':'));
+			line.Trim(wxLeft);
+		}
 	} 
 	// ---------------------------------------------------
 	else if ( line.Contains("LINE") == true )
@@ -629,8 +635,8 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 		int p = line.Find("LINE");
 		bool start = false;
 		wxString ln;
-		for (unsigned int i=p; i<line.length(); i++ ) {
-			
+		for (unsigned int i=p; i<line.length(); i++ ) 
+		{
 			if ( start == false && isdigit((char)line[i]) != 0 )
 				start = true;
 			
@@ -642,22 +648,24 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 		}
 		
 		line.assign(ln);
-		
 	}
 	// ---------------------------------------------------
 	else if ( line.Contains("FILE:") == true ) 
 	{
 		wxStringTokenizer words(rawLine, " \t");
-		while ( words.HasMoreTokens() ) {
+		while ( words.HasMoreTokens() ) 
+		{
 			const wxString token = words.GetNextToken();
 			const wxFileName fn(token);
 			
-			if ( fn.Exists() ) {
+			if ( fn.Exists() ) 
+			{
 				wxString tool;
 				THE_CONFIG->getEditorTool(tool);
 				GblFunc::executeExternalProgram(tool, token, true);
 			}
 		}
+		return;
 	}
 	// ---------------------------------------------------
 	else if ( line.Contains("PARSING SYNOPSIS TRACE") == true )
@@ -666,11 +674,21 @@ void CncLoggerListCtrl::onLeftDClick(wxMouseEvent& event) {
 		return;
 	}
 	
+	
+	// ----------------------------------------------------
 	// try to select the evaluated line number - on demand
-	if ( lineNumber > 0 && line.ToLong(&lineNumber) == true )
+	if ( line.ToLong(&lineNumber) == true )
 	{
-		if ( CNC_READY )
-			THE_APP->selectSourceControlLineNumber(lineNumber - 1);
+		if ( lineNumber > 0 && CNC_READY ) 
+		{
+			const long ln = (lineNumber - 1) * CLIENT_ID.TPL_FACTOR;
+			THE_APP->selectSourceControlLineNumber(ln);
+			cnc::trc.logInfo(wxString::Format("Select template line %ld", lineNumber));
+		}
+	}
+	else
+	{
+		cnc::trc.logWarning(wxString::Format("Cannot decode the following line information: '%s'", line));
 	}
 }
 
@@ -786,4 +804,43 @@ bool CncLoggerListCtrl::copyToClipboard(bool allRows) {
 	}
 	
 	return ret;
+}
+
+
+
+//////////////////////////////////////////////////////////////
+void CncExtLoggerListCtrl::traceInfoEntries(std::ostream& ostr) {
+//////////////////////////////////////////////////////////////
+	for (auto it = loggedInfoEntries.begin(); it != loggedInfoEntries.end(); ++it)
+	{
+		const wxString & line = *it;
+		ostr << line << ( line.Last() != '\n' ? '\n' : '\0');
+	}
+}
+//////////////////////////////////////////////////////////////
+void CncExtLoggerListCtrl::traceDebugEntries(std::ostream& ostr) {
+//////////////////////////////////////////////////////////////
+	for (auto it = loggedDebugEntries.begin(); it != loggedDebugEntries.end(); ++it)
+	{
+		const wxString & line = *it;
+		ostr << line << ( line.Last() != '\n' ? '\n' : '\0');
+	}
+}
+//////////////////////////////////////////////////////////////
+void CncExtLoggerListCtrl::traceWarnEntries(std::ostream& ostr) {
+//////////////////////////////////////////////////////////////
+	for (auto it = loggedWarnEntries.begin(); it != loggedWarnEntries.end(); ++it)
+	{
+		const wxString & line = *it;
+		ostr << line << ( line.Last() != '\n' ? '\n' : '\0');
+	}
+}
+//////////////////////////////////////////////////////////////
+void CncExtLoggerListCtrl::traceErrorEntries(std::ostream& ostr) {
+//////////////////////////////////////////////////////////////
+	for (auto it = loggedErrorEntries.begin(); it != loggedErrorEntries.end(); ++it)
+	{
+		const wxString & line = *it;
+		ostr << line << ( line.Last() != '\n' ? '\n' : '\0');
+	}
 }

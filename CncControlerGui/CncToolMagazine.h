@@ -4,8 +4,8 @@
 #include "CncConfig.h"
 #include "wxCrafterToolMagazine.h"
 
-class CncToolMagazine : public CncToolMagazineBase {
-	
+class CncToolMagazine : public CncToolMagazineBase 
+{
 	public:
 		CncToolMagazine(wxWindow* parent);
 		virtual ~CncToolMagazine();
@@ -26,8 +26,9 @@ class CncToolMagazine : public CncToolMagazineBase {
 		wxDECLARE_EVENT_TABLE();
 		
 	private:
-		long lastSelectedItem;
-		bool insertState;
+		long		lastSelectedItem;
+		bool		insertState;
+		wxString	inbuiltToolId;
 		
 		void enableInputFields();
 		void completeTool(unsigned int index);

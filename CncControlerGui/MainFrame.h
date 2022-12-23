@@ -192,6 +192,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onLeftDclickLastConfigTime(wxMouseEvent& event);
 		virtual void onKeepFrontModeCentred(wxCommandEvent& event);
 		virtual void onKeepFrontModeInFrame(wxCommandEvent& event);
 		virtual void onKeepFrontModeOff(wxCommandEvent& event);
@@ -548,7 +549,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		//////////////////////////////////////////////////////////////////////////////////
 		// svg edit popup callbacks
 		void openCurrentTemplateInBrowser();
-		void openTemplateExtern();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void displayNotification(const Notification& notification);
@@ -559,7 +559,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		/////////////////////////////////////////////////////////////////////////////////
 		// configuration callbacks
 		void releaseControllerSetupFromConfig();
-		void notifyConfigUpdate();
 		void changeCrossingThickness();
 		void decorateSpindleState(CncSpindlePowerState state, bool force = false);
 		
@@ -917,7 +916,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void simulateHardwareDimensions();
 		
-		bool saveTemplateOnDemand(bool force);
+		bool saveTemplateOnDemand();
+		void setAutoSaveMode(bool as);
 
 		BinaryFileParser::ViewType getCurrentBinaryViewMode();
 		

@@ -22,15 +22,18 @@ class CncMillingTrackCreator {
 			
 			void reset() { *this = Data(); }
 			
-			const Data& operator= (const Data& v) {
-				pnt = v.pnt;
-				dir = v.dir;
-				rd1 = v.rd1;
-				rd2 = v.rd2;
-				
+			const Data& operator= (const Data& v) 
+			{
+				// self-assignment check
+				if ( this != &v ) 
+				{
+					pnt = v.pnt;
+					dir = v.dir;
+					rd1 = v.rd1;
+					rd2 = v.rd2;
+				}
 				return *this;
 			}
-
 		};
 		
 		State					state;

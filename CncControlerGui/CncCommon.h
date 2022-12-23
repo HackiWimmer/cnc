@@ -171,9 +171,13 @@ namespace cnc
 
 // -------------------------------------------------------------------
 // define globally const values
-	static const float 	PI 									=  3.14159265;
-	static const int 	MAX_PARAMETER_VALUES 				=  10;
-	static const int 	UNDEFINED_LINE_NUMBER 				= -1;
+	static const float	PI									=  3.14159265;
+	static const int	MAX_PARAMETER_VALUES				=  10;
+	static const int	UNDEFINED_LINE_NUMBER				= -1;
+	
+	static const int	INVALID_TOOL_ID						= -1;
+	static const int	INBUILT_TOOL_ID 					=  0;
+	
 
 // -------------------------------------------------------------------
 static struct ClientIds {
@@ -252,6 +256,8 @@ namespace cnc
 	int							getSpeedStepSensitivityIndex(float amplitude);
 	const std::vector<float>&	getSpeedStepSensitivityFactors(std::vector<float>& ret);
 	bool						isCncSpeedType(char m);
+	
+	const char*					getCncUnitAsStr(CncUnit u);
 	
 	int16_t						cvnSpindleSpeed_U_MIN_ToRaw(double value);
 	int32_t						cnvSpidleSpeedRaw_To_U_MIN(int16_t value);

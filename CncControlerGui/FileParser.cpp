@@ -141,76 +141,35 @@ FileParser::FileParser(const wxString& fn)
 , debugControls			()
 , inboundSourceControl	(NULL)
 , currentLineNumber		(UNDEFINED_LINE_NUMBER)
-, toolIds				()
 {
 ////////////////////////////////////////////////////////////////////////////
-	displayToolId(-1);
 }
 ////////////////////////////////////////////////////////////////////////////
 FileParser::~FileParser() {
 ////////////////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
-void FileParser::displayToolId(int id) {
-//////////////////////////////////////////////////////////////////
-	displayToolId(wxString::Format("%d", id));
-}
-//////////////////////////////////////////////////////////////////
-void FileParser::displayToolId(const wxString& id) {
-//////////////////////////////////////////////////////////////////
-	wxTextCtrl* toolIdCtrl = CncConfig::getGlobalCncConfig()->getTheApp()->GetToolId();
-	if ( toolIdCtrl == NULL )
-		return;
-		
-	long toolId = 0;
-	id.ToLong(&toolId);
-	
-	toolIdCtrl->SetValue(id);
-	toolIdCtrl->SetToolTip(wxString::Format("Last Tool: %s", THE_CONFIG->getToolParamAsString(toolId)));
-}
-//////////////////////////////////////////////////////////////////
 bool FileParser::setNextToolID(unsigned int id) {
 //////////////////////////////////////////////////////////////////
 	if ( shouldAToolChangeProcessed() == false )
+	{
+		// A log message is not sufficient because the 
+		// e.g. gcode preview always display this
+		
+		//CNC_CEX1_A("Tool change suppressed. Tool id = %d", id)
 		return true;
-	
-	int toolId = THE_CONFIG->translateToolId(id);
-	
-	// Check for tool change
-	if ( toolIds.size() > 0 ) {
-		if ( *toolIds.begin() != toolId ) {
-			std::cerr << "A tool change isn't supported yet: Current id: " << toolIds[toolIds.size() - 1] 
-			          << "; New id: " << toolId << " [" << id << "]" << std::endl;
-			std::cerr << "The current tool stays unchanged! - this is may be an error!" << std::endl;
-			return false;
-		}
 	}
 	
-	if ( THE_CONFIG->checkToolExists(toolId) == false ) {
-		std::cerr << "Tool id didn't exists: " << toolId << " [" << id << "]" << std::endl;
-		std::cerr << "The current tool stays unchanged! - this is may be an error!" << std::endl;
-		displayToolId("-");
+	const bool toolExists = THE_CONFIG->toolExists(id);
+	if ( toolExists == false )
+	{
+		CNC_CERR_A("[LINE: %ld] Tool id = %d didn't exists.", currentLineNumber, id);
+		CNC_CERR_A("The current tool stays unchanged! - this is may be an error!")
 		return false;
 	}
 	
-	THE_CONFIG->setCurrentToolId(toolId);
-	displayToolId(toolId);
-	toolIds.push_back(toolId);
-	
+	THE_CONTEXT->setCurrentToolId(id);
 	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool FileParser::isAToolAvailable() {
-//////////////////////////////////////////////////////////////////
-	return ( toolIds.size() > 0 ); 
-}
-//////////////////////////////////////////////////////////////////
-int FileParser::getCurrentToolId() {
-//////////////////////////////////////////////////////////////////
-	if ( isAToolAvailable() == false )
-		return -9;
-		
-	return toolIds[toolIds.size() - 1];
 }
 //////////////////////////////////////////////////////////////////
 void FileParser::installDebugConfigPage(wxPropertyGridManager* pgm) {
@@ -355,7 +314,6 @@ bool FileParser::processDebug() {
 bool FileParser::process() {
 //////////////////////////////////////////////////////////////////
 	clearControls();
-	toolIds.clear();
 	
 	// first: preprocessing
 	initNextRunPhase(CncProcessingInfo::RP_Preprocesser);

@@ -5,6 +5,7 @@
 #include <wx/filename.h>
 #include <wx/dcmemory.h>
 #include "CncStringLogger.h"
+#include "CncFileNameService.h"
 #include "SVGFileParser.h"
 #include "CncSvgControl.h"
 
@@ -150,15 +151,15 @@ bool CncSvgViewer::loadFile(const wxString& filename, const char* contextInfo) {
 	}
 	else
 	{
-		CncDoubleRectangle rect;
-		if ( SVGFileParser::evaluateMetricSize(filename, rect) )
+		boundaries.reset();
+		if ( CncFileNameService::isAsNoSerialFile(filename) == false )
 		{
-			boundaries.setMinBound(CncDoublePosition(rect.getX(), rect.getY(), 0.0));
-			boundaries.setMaxBound(CncDoublePosition(rect.getW(), rect.getH(), 0.0));
-		}
-		else
-		{
-			boundaries.reset();
+			CncDoubleRectangle rect;
+			if ( SVGFileParser::evaluateMetricSize(filename, rect) )
+			{
+				boundaries.setMinBound(CncDoublePosition(rect.getX(), rect.getY(), 0.0));
+				boundaries.setMaxBound(CncDoublePosition(rect.getW(), rect.getH(), 0.0));
+			}
 		}
 	}
 	

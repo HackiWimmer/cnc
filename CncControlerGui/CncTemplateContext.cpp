@@ -1,6 +1,7 @@
 #include <wx/filename.h>
 #include "MainFrame.h"
 #include "CncCommon.h"
+#include "CncConfig.h"
 #include "CncTemplateContextSummaryPanel.h"
 #include "CncPathListInterfaceCnc.h"
 #include "CncBoundarySpace.h"
@@ -10,10 +11,10 @@
 CncTemplateContext::CncTemplateContext(CncBoundarySpace* bs)
 : ContextInterface		()
 , modifyFlag			(false)
+, autoSave				(false)
 , name					("")
 , path					("")
-, toolTotList			("")
-, toolSelList			("")
+, toolSelList			()
 , runCount				(0)
 , validRunCount			(0)
 , boundarySpace			(bs)
@@ -38,21 +39,44 @@ bool CncTemplateContext::isValid() const {
 	if ( wxFileName::Exists(getFileName()) == false )
 		return false;
 		
-	if ( modifyFlag == true )
-		return false;
-	
 	if ( cncInterface == NULL )
+		return false;
+		
+	if ( modifyFlag == true )
 		return false;
 	
 	if ( hasErrors() == true )
 		return false;
 		
+	if ( validRunCount == 0 )
+		return false;
+		
 	// ....
-	
 	return true;
 }
 //////////////////////////////////////////////////////////////
-bool CncTemplateContext::fitsIntoCurrentHardwareBoundaries(std::ostream& o) {
+void CncTemplateContext::registerToolSelList(const wxString& tl) { 
+//////////////////////////////////////////////////////////////
+	wxStringTokenizer tokenizer(tl, ";");
+	
+	while ( tokenizer.HasMoreTokens() ) 
+	{
+		wxString token = tokenizer.GetNextToken();
+		token.assign(token.BeforeFirst('='));
+		token.assign(token.AfterFirst('_'));
+		
+		long id;
+		if ( token.ToLong(&id) && id < INT_MAX )
+			toolSelList.insert(int(id));
+	}
+}
+//////////////////////////////////////////////////////////////
+void CncTemplateContext::addToolIdToSelList(int id) {
+//////////////////////////////////////////////////////////////
+	toolSelList.insert(id);
+}
+//////////////////////////////////////////////////////////////
+bool CncTemplateContext::fitsIntoCurrentHardwareBoundaries(BoundType bt, std::ostream& o) {
 //////////////////////////////////////////////////////////////
 	//the following check a only meaningful for file templates
 	// in all other cases fit per default
@@ -106,22 +130,28 @@ bool CncTemplateContext::fitsIntoCurrentHardwareBoundaries(std::ostream& o) {
 		return false;
 	}
 
-	if ( getBoundaries().fitsInside(boundarySpace->getPhysicallyBoundaries()) == false )
+	if ( bt == BT_MEASURED )
 	{
-		o	<< "Error:\n"
-			<< " The current template don't fits regarding the current origin position!\n"
-			<< " Issue List [Template vs. Hardware]:\n"
-		;
+		// For BT_TEMPLATE only width and height available, 
+		// therefore the following check did not make sense.
 		
-		if ( tplMin.getX() < hwdMin.getX() )	o << "  Xmin [mm]: " << tplMin.getX() << " < " << hwdMin.getX() << std::endl;
-		if ( tplMin.getY() < hwdMin.getY() )	o << "  Ymin [mm]: " << tplMin.getY() << " < " << hwdMin.getY() << std::endl;
-		if ( tplMin.getZ() < hwdMin.getZ() )	o << "  Zmin [mm]: " << tplMin.getZ() << " < " << hwdMin.getZ() << std::endl;
-		if ( tplMax.getX() > hwdMax.getX() )	o << "  Xmax [mm]: " << tplMax.getX() << " > " << hwdMax.getX() << std::endl;
-		if ( tplMax.getY() > hwdMax.getY() )	o << "  Ymax [mm]: " << tplMax.getY() << " > " << hwdMax.getY() << std::endl;
-		if ( tplMax.getZ() > hwdMax.getZ() )	o << "  Zmax [mm]: " << tplMax.getZ() << " > " << hwdMax.getZ() << std::endl;
-		
-		updateGui(true);
-		return false;
+		if ( getBoundaries().fitsInside(boundarySpace->getPhysicallyBoundaries()) == false )
+		{
+			o	<< "Error:\n"
+				<< " The current template don't fits regarding the current origin position!\n"
+				<< " Issue List [Template vs. Hardware]:\n"
+			;
+			
+			if ( tplMin.getX() < hwdMin.getX() )	o << "  Xmin [mm]: " << tplMin.getX() << " < " << hwdMin.getX() << std::endl;
+			if ( tplMin.getY() < hwdMin.getY() )	o << "  Ymin [mm]: " << tplMin.getY() << " < " << hwdMin.getY() << std::endl;
+			if ( tplMin.getZ() < hwdMin.getZ() )	o << "  Zmin [mm]: " << tplMin.getZ() << " < " << hwdMin.getZ() << std::endl;
+			if ( tplMax.getX() > hwdMax.getX() )	o << "  Xmax [mm]: " << tplMax.getX() << " > " << hwdMax.getX() << std::endl;
+			if ( tplMax.getY() > hwdMax.getY() )	o << "  Ymax [mm]: " << tplMax.getY() << " > " << hwdMax.getY() << std::endl;
+			if ( tplMax.getZ() > hwdMax.getZ() )	o << "  Zmax [mm]: " << tplMax.getZ() << " > " << hwdMax.getZ() << std::endl;
+			
+			updateGui(true);
+			return false;
+		}
 	}
 	
 	o << "Info:\n The current template fits . . .\n";
@@ -237,7 +267,9 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 //////////////////////////////////////////////////////////////
 	const wxString prefix(' ', indent);
 	
-	auto traceBound = [](const CncDoubleBoundaries& b) {
+	//--------------------------------------------------------
+	auto traceBound = [](const CncDoubleBoundaries& b) 
+	{
 		return wxString::Format("(%8.3lf, %8.3lf)(%8.3lf, %8.3lf)(%8.3lf, %8.3lf)"
 								, b.xMin, b.xMax
 								, b.yMin, b.yMax
@@ -245,26 +277,40 @@ void CncTemplateContext::traceTo(std::ostream& o, unsigned int indent) const {
 		);
 	};
 	
-	auto traceBoundLvl = [](BoundType bt) {
+	//--------------------------------------------------------
+	auto traceBoundLvl = [](BoundType bt) 
+	{
 		return ( bt == BT_TEMPLATE ? "Template" : "Measured");
+	};
+	
+	//--------------------------------------------------------
+	auto displayToolList = [](const ToolIds& tids)
+	{
+		wxString ret;
+		for( auto it=tids.begin(); it != tids.end(); ++it)
+		{
+			const int& id = *it;
+			ret.append(wxString::Format("{%s};", THE_CONFIG->getToolParamAsShortInfoStr(id)));
+		}
+
+		return ret;
 	};
 	
 	wxFileName fn(getFileName());
 	
-	o	<< prefix << "Name                           : " << fn.GetFullName()				<< std::endl
-		<< prefix << "Path                           : " << fn.GetPath()					<< std::endl
-		<< prefix << "Valid                          : " << (isValid()    ? "Yes" : "No" )	<< std::endl
-		<< prefix << "Modified                       : " << (modifyFlag   ? "Yes" : "No" )	<< std::endl
-		<< prefix << "CNC Interface                  : " << (cncInterface ? "Yes" : "No" )	<< std::endl
-		<< prefix << "Total run count                : " << runCount						<< std::endl
-		<< prefix << "Valid run count                : " << validRunCount					<< std::endl
-		<< prefix << "Errors                         : " << hasErrors()						<< std::endl
-		<< prefix << "Tool Tot. List                 : " << toolTotList						<< std::endl
-		<< prefix << "Tool Sel. List                 : " << toolSelList						<< std::endl
-		<< prefix << "Tool Sel Count                 : " << getToolSelCount()				<< std::endl
-		<< prefix << "Bound Level                    : " << traceBoundLvl(getBoundLevel())	<< std::endl
-		<< prefix << "Template Bounds (X)(Y)(Z) [mm] : " << traceBound(templateBounds)		<< std::endl
-		<< prefix << "Measured Bounds (X)(Y)(Z) [mm] : " << traceBound(measuredBounds)		<< std::endl
+	o	<< prefix << "Name                           : " << fn.GetFullName()					<< std::endl
+		<< prefix << "Path                           : " << fn.GetPath()						<< std::endl
+		<< prefix << "Valid                          : " << (isValid()       ? "Yes" : "No" )	<< std::endl
+		<< prefix << "Modified                       : " << (modifyFlag      ? "Yes" : "No" )	<< std::endl
+		<< prefix << "CNC Interface                  : " << (cncInterface    ? "Yes" : "No" )	<< std::endl
+		<< prefix << "Total run count                : " << runCount							<< std::endl
+		<< prefix << "Valid run count                : " << validRunCount						<< std::endl
+		<< prefix << "Errors                         : " << hasErrors()							<< std::endl
+		<< prefix << "Tool Sel. List                 : " << displayToolList(toolSelList)		<< std::endl
+		<< prefix << "Tool Sel Count                 : " << getToolSelCount()					<< std::endl
+		<< prefix << "Bound Level                    : " << traceBoundLvl(getBoundLevel())		<< std::endl
+		<< prefix << "Template Bounds (X)(Y)(Z) [mm] : " << traceBound(templateBounds)			<< std::endl
+		<< prefix << "Measured Bounds (X)(Y)(Z) [mm] : " << traceBound(measuredBounds)			<< std::endl
 	;
 	
 	if ( isValid() == false )

@@ -206,10 +206,10 @@ bool SVGFileFormatter::convert(SVGFileFormatter::Setup s, const wxString& ofn) {
 }
 
 //////////////////////////////////////////////////////////////////
-#define SFP_ADD_SEP(msg)	THE_CONTEXT->addParsingSynopisSeparator(wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define SFP_LOG_INF(msg)	THE_CONTEXT->addParsingSynopisInfo     (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define SFP_LOG_WAR(msg)	THE_CONTEXT->addParsingSynopisWarning  (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define SFP_LOG_ERR(msg)	THE_CONTEXT->addParsingSynopisError    (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_ADD_SEP(msg)	THE_CONTEXT->addParsingSynopisSeparator(wxString::Format("[LINE: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_INF(msg)	THE_CONTEXT->addParsingSynopisInfo     (wxString::Format("[LINE: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_WAR(msg)	THE_CONTEXT->addParsingSynopisWarning  (wxString::Format("[LINE: %8ld]: %s", getCurrentLineNumber(), msg));
+#define SFP_LOG_ERR(msg)	THE_CONTEXT->addParsingSynopisError    (wxString::Format("[LINE: %8ld]: %s", getCurrentLineNumber(), msg));
 
 //////////////////////////////////////////////////////////////////
 class svgUserAgent;
@@ -259,7 +259,8 @@ bool SVGFileParser::evaluateProcessingCallback() {
 void SVGFileParser::selectSourceControl(unsigned long pos) {
 //////////////////////////////////////////////////////////////////
 	// default handling
-	if ( inboundSourceControl == NULL ) {
+	if ( inboundSourceControl == NULL )
+	{
 		FileParser::selectSourceControl(pos);
 		return;
 	}
@@ -271,12 +272,14 @@ void SVGFileParser::enableUserAgentControls(bool state) {
 ////////////////////////////////////////////////////////////////////////////
 	SvgUserAgentOutputControls soc;
 	
-	if ( state == true ) {
+	if ( state == true )
+	{
 		soc.detailInfo 			= APP_PROXY::GetDvListCtrlSvgUADetailInfo();
 		soc.inboundPathList		= APP_PROXY::GetDvListCtrlSvgUAInboundPathList();
 		soc.useDirectiveList	= APP_PROXY::GetDvListCtrlSvgUAUseDirective();
 	} 
-	else {
+	else
+	{
 		soc.detailInfo 			= NULL;
 		soc.inboundPathList		= NULL;
 		soc.useDirectiveList	= NULL;
@@ -304,7 +307,7 @@ bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) 
 bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const wxString& vb) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
-	SVGRootNode svgRootNode = evaluateSVGRootNode(w, h, vb);
+	SVGRootNode svgRootNode(evaluateSVGRootNode(w, h, vb));
 	
 	std::stringstream ss; ss << svgRootNode;
 	APP_PROXY::GetSvgRootNode()->ChangeValue(ss.str());
@@ -314,18 +317,17 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 	SFP_ADD_SEP("RootNode:\n");
 	SFP_LOG_INF(wxString::Format("Translated RootNode: %s\n",      ss.str()));
 	SFP_LOG_INF(wxString::Format(" Input Unit        : %s\n",      UC::getUnitAsStr(svgRootNode.getInputUnit())));
-	SFP_LOG_INF(wxString::Format(" Width        [px] : %12.3lf\n", svgRootNode.getWidth()));
-	SFP_LOG_INF(wxString::Format(" Heigth       [px] : %12.3lf\n", svgRootNode.getHeight()));
+	SFP_LOG_INF(wxString::Format(" Width             : %12.3lf\n", svgRootNode.getWidth()));
+	SFP_LOG_INF(wxString::Format(" Height            : %12.3lf\n", svgRootNode.getHeight()));
 	SFP_LOG_INF(wxString::Format(" Width        [mm] : %12.3lf\n", svgRootNode.getWidth_MM()));
-	SFP_LOG_INF(wxString::Format(" Heigth       [mm] : %12.3lf\n", svgRootNode.getHeight_MM()));
+	SFP_LOG_INF(wxString::Format(" Height       [mm] : %12.3lf\n", svgRootNode.getHeight_MM()));
 	SFP_LOG_INF(wxString::Format(" Scale X           : %12.3lf\n", svgRootNode.getScaleX()));
 	SFP_LOG_INF(wxString::Format(" Scale Y           : %12.3lf\n", svgRootNode.getScaleY()));
 	
 	pathHandler->setSvgRootNode(svgRootNode);
 	
-	wxString ret;
 	svgUserAgent.initalize();
-	svgUserAgent.addTransform(svgRootNode.getRootTransformation(ret));
+	svgUserAgent.addTransform(svgRootNode.getRootTransformation());
 	
 	return true;
 }
@@ -359,7 +361,8 @@ void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 	csc.setCurrentLineNumber(getCurrentLineNumber());
 	
 	// ----------------------------------------------------------
-	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true ) {
+	if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true )
+	{
 		wxString content;
 		debugXMLAttribute(attr, content);
 		appendDebugValueBase("Attributes", content);
@@ -431,46 +434,60 @@ bool SVGFileParser::spool() {
 	
 	if ( pathHandler->prepareWork() == false )
 	{
-		CNC_CERR_FUNCT_A("pathHandler->prepareWork() failed");
+		CNC_CERR_FUNCT_A(" pathHandler->prepareWork() failed")
 		return triggerEnd(false);
 	}
 	
 	SvgCncContextSummary sumCtx;
 	const UserAgentVector& uav = svgUserAgent.getList();
-
-	// over all stored paths
+	
 	CNC_CEX2_A("Start spooling parsed svg paths (entries=%zu)", uav.size())
+	
+	// over all stored paths
 	for ( auto itUav = uav.begin(); itUav != uav.end(); ++itUav )
 	{
 		const SVGUserAgentInfo& uai = *itUav;
 		
 		// ----------------------------------------------------------------------
-		if ( uai.nodeName == SvgNodeTemplates::CncBreakBlockNodeName ) {
-			std::cout << " CncBreak at line " << ( uai.lineNumber / CLIENT_ID.TPL_FACTOR )<< " detected. Processing will stop here." << std::endl;
+		if ( uai.nodeName == SvgNodeTemplates::CncBreakBlockNodeName )
+		{
+			std::cout	<< " CncBreak at line " << ( uai.lineNumber / CLIENT_ID.TPL_FACTOR ) 
+						<< " detected. Processing will stop here." 
+						<< std::endl
+			;
 			break;
 		}
 		
 		// ----------------------------------------------------------------------
-		if ( uai.nodeName == SvgNodeTemplates::CncPauseBlockNodeName ) {
-			pathHandler->processWait(uai.cncPause.getMicroSeconds());
+		if ( uai.nodeName == SvgNodeTemplates::CncPauseBlockNodeName )
+		{
+			pathHandler->processWait(uai.cncPause->getMicroSeconds());
 		}
 		
 		// ----------------------------------------------------------------------
-		if ( uai.nodeName == SvgNodeTemplates::CncMacroBlockNodeName ) {
+		if ( uai.nodeName == SvgNodeTemplates::CncMacroBlockNodeName )
+		{
 			// is already processed to the current cnc parameter
 			continue;
 		}
 		
-		// ----------------------------------------------------------------------
-		if ( uai.nodeName == SvgNodeTemplates::CncParameterBlockNodeName ) {
-			sumCtx.add(uai.cncParameters);
-		}
-		
-		pathHandler->setSvgCncContext(uai.cncParameters);
-		
-		// important! the current node name has to be set before setCurrentLineNumer() 
+		// important! the current node name has to be set before setCurrentLineNumber() 
 		// to get a correct result in this overloaded function
 		currentNodeName.assign(uai.nodeName);
+		
+		if ( uai.cncParameters != NULL )
+		{
+			// ----------------------------------------------------------------------
+			if ( uai.nodeName == SvgNodeTemplates::CncParameterBlockNodeName )
+			{
+				#warning
+					//CNC_CERR_FUNCT_A("xa ctxti %d", THE_CONTEXT->getCurrentToolId())
+					sumCtx.add(*uai.cncParameters);
+					//CNC_CERR_FUNCT_A("xb txti %d", THE_CONTEXT->getCurrentToolId())
+			}
+			
+			pathHandler->setSvgCncContext(*uai.cncParameters);
+		}
 		
 		if ( THE_CONTEXT->processingInfo->getCurrentDebugState() == true )
 		{
@@ -504,7 +521,6 @@ bool SVGFileParser::spool() {
 			return triggerEnd(false);
 	}
 	
-	THE_TPL_CTX->registerToolTotList(sumCtx.getToolTotList());
 	THE_TPL_CTX->registerToolSelList(sumCtx.getToolSelList());
 	
 	if ( pathHandler->finishWork() == false )
@@ -635,7 +651,7 @@ bool SVGFileParser::spoolPath(const SVGUserAgentInfo& uai, const wxString& trans
 	if ( uai.shouldProceed() == false )
 		return true;
 		
-	if ( pathHandler->activateNextPath(uai.lineNumber) == false )
+	if ( pathHandler->activateNextPath(uai.lineNumber * CLIENT_ID.TPL_FACTOR) == false )
 		return false;
 	
 	const PathInfoVector& pil = uai.getPathInfoList();
@@ -718,55 +734,6 @@ bool SVGFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
-	if ( cncControl == NULL )
-		return true;
-	
-	const SVGRootNode& rn = getPathHandler()->getSvgRootNode();
-	CncUnitCalculator<float> to_mm(rn.getInputUnit(), Unit::mm);
-	
-	const CncDoublePosition min(cncControl->getMinPositionsMetric());
-	const CncDoublePosition max(cncControl->getMaxPositionsMetric());
-	
-	const double cncDistX 	= max.getX() - min.getX();
-	const double cncDistY 	= max.getY() - min.getY();
-	const double svgDistX 	= rn.getWidth_MM()  * rn.getScaleX();
-	const double svgDistY 	= rn.getHeight_MM() * rn.getScaleY();
-	
-	const double cncMinX	= min.getX();
-	const double cncMaxX	= max.getX();
-
-	// if the Y axis will be reversed svg is also a right hand coord system
-	const bool   cnv		= CncConfig::getGlobalCncConfig()->getSvgConvertToRightHandFlag();
-	const double cncMinY	= min.getY() * (cnv ? +1 : -1);
-	const double cncMaxY	= max.getY() * (cnv ? +1 : -1);
-	
-	const double svgMinX	= to_mm.convert(rn.getViewbox().getMinX());
-	const double svgMaxX	= to_mm.convert(rn.getViewbox().getMaxX());
-	const double svgMinY	= to_mm.convert(rn.getViewbox().getMinY());
-	const double svgMaxY	= to_mm.convert(rn.getViewbox().getMaxY());
-	
-	// --------------------------------------------------------
-	auto check_1_Less_2 = [&](double d1, double d2, const char* msg)
-	{
-		if ( d1 > d2 ) 
-			SFP_LOG_WAR(wxString::Format("%s %12.3lf > %12.3lf\n", msg, d1, d2));
-	};
-	
-	SFP_ADD_SEP("Boundings:\n");
-	SFP_LOG_INF(wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf\n", cncDistX, cncDistY));
-	SFP_LOG_INF(wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf\n", svgDistX, svgDistY));
-	SFP_LOG_INF(wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf\n", cncMinX,  cncMinY));
-	SFP_LOG_INF(wxString::Format(" SVG min      x, y  [mm]: %12.3lf, %12.3lf\n", svgMinX,  svgMinY));
-	SFP_LOG_INF(wxString::Format(" CNC max      x, y  [mm]: %12.3lf, %12.3lf\n", cncMaxX,  cncMaxY));
-	SFP_LOG_INF(wxString::Format(" SVG max      x, y  [mm]: %12.3lf, %12.3lf\n", svgMaxX,  svgMaxY));
-
-	check_1_Less_2(cncDistX, svgDistX, " CNC distance X out of range:  ");
-	check_1_Less_2(cncDistY, svgDistY, " CNC distance Y out of range:  ");
-	check_1_Less_2(svgMinX,  cncMinX,  " CNC min bound X out of range: ");
-	check_1_Less_2(svgMinY,  cncMinY,  " CNC min bound Y out of range: ");
-	check_1_Less_2(cncMaxX,  svgMaxX,  " CNC max bound X out of range: ");
-	check_1_Less_2(cncMaxY,  svgMaxY,  " CNC max bound Y out of range: ");
-	
 	const bool ret = THE_CONTEXT->parsingSynopsisHasErrorEntries() == false;
 	return ret;
 }
@@ -789,6 +756,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		if ( child->HasAttribute(attrName) ) \
 			svgUserAgent.addTransform(child->GetAttribute(attrName)); \
 	}
+	
 	// -----------------------------------------------------------
 	#define ADD_ATTR_STYLE \
 	{ \
@@ -796,7 +764,23 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		if ( child->HasAttribute(attrName) )  \
 			svgUserAgent.addStyle(child->GetAttribute(attrName)); \
 	}
-
+	
+	// -----------------------------------------------------------
+	#define ADD_ATTR_SHAPER \
+	{ \
+		wxXmlAttribute* pAttr = child->GetAttributes(); \
+		SvgCncContext& cwp    = pathHandler->getSvgCncContext(); \
+		while ( pAttr != NULL ) \
+		{ \
+			if ( pAttr->GetName().StartsWith(cwp.ID_SHAPER_PREFIX) ) \
+			{ \
+				if ( cwp.provide(pAttr) == false ) \
+					; \
+			} \
+			pAttr = pAttr->GetNext(); \
+		} \
+	}
+	
 	// -----------------------------------------------------------
 	#define ADD_BASIC_SHAPE(function) \
 	{ \
@@ -815,7 +799,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 				return false; \
 		} \
 	}
-	
 	
 	// -----------------------------------------------------------
 	// entry point
@@ -836,11 +819,12 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			registerMovementNode();
 			registerNextDebugNode(currentNodeName);
 			
-			ADD_ATTR_TRANSFORM
-			
 			const wxString data(child->GetAttribute("d", ""));
 			if ( evaluatePath(data)  == false )
 				return false;
+				
+			ADD_ATTR_TRANSFORM
+			ADD_ATTR_SHAPER
 		}
 		// ----------------------------------------------------------
 		else if ( currentNodeName.IsSameAs("SYMBOL", false) )
@@ -938,20 +922,23 @@ bool SVGFileParser::processCncParameter(wxXmlNode* node) {
 	SvgCncContext& cwp = pathHandler->getSvgCncContext();
 	
 	// ------------------------------------------------------
-	if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) ) {
+	if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterResetBlockNodeName) )
+	{
 		cwp.reset();
 		
 		registerNextDebugNode(currentNodeName);
 		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
-	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) ) {
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncParameterBlockNodeName) )
+	{
 		registerNextDebugNode(currentNodeName);
 		
 		// replace cnc macros on demand
 		const wxString macroKey(SvgCncContextMacro().MACRO_IDENTIFIER);
 		wxString macroId;
-		if ( node->GetAttribute(macroKey, &macroId) ) {
+		if ( node->GetAttribute(macroKey, &macroId) )
+		{
 			node->DeleteAttribute(macroKey);
 			
 			const SvgCncContextMacro* macro = svgUserAgent.getMarcoWithId(macroId);
@@ -960,12 +947,14 @@ bool SVGFileParser::processCncParameter(wxXmlNode* node) {
 		}
 		
 		if ( cwp.provide(node) == false )
+		if ( cwp.provide(node) == false )
 			return false;
 			
 		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
-	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncVariablesBlockNodeName) ) {
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncVariablesBlockNodeName) )
+	{
 		registerNextDebugNode(currentNodeName);
 		
 		if ( cwp.provideVariables(node) == false )
@@ -974,7 +963,8 @@ bool SVGFileParser::processCncParameter(wxXmlNode* node) {
 		svgUserAgent.initNextCncVaribalesNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
-	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncMacroBlockNodeName) ) {
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncMacroBlockNodeName) )
+	{
 		registerNextDebugNode(currentNodeName);
 	
 		SvgCncContextMacro scm; 
@@ -985,7 +975,8 @@ bool SVGFileParser::processCncParameter(wxXmlNode* node) {
 		svgUserAgent.initNextCncMacroNode(scm);
 	}
 	// ------------------------------------------------------
-	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) ) {
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncPauseBlockNodeName) )
+	{
 		registerNextDebugNode(currentNodeName);
 	
 		SvgCncPause scp; 
@@ -996,7 +987,8 @@ bool SVGFileParser::processCncParameter(wxXmlNode* node) {
 		svgUserAgent.initNextCncPauseNode(scp);
 	}
 	// ------------------------------------------------------
-	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) ) {
+	else if ( currentNodeName.IsSameAs(SvgNodeTemplates::CncBreakBlockNodeName) )
+	{
 		registerNextDebugNode(currentNodeName);
 		
 		SvgCncBreak scb; 
@@ -1012,8 +1004,14 @@ bool SVGFileParser::processCncParameter(wxXmlNode* node) {
 		svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncContext());
 	}
 	// ------------------------------------------------------
-	else if ( currentNodeName.IsSameAs("CNC", false) ) {
-		cnc::cex1 << "Obsolete Node. <CNC> isn't longer supported. Line number: " << node->GetLineNumber() << std::endl;
+	else if ( currentNodeName.IsSameAs("CNC", false) )
+	{
+		CNC_CEX1_A("[LINE: %d] Obsolete Node. <CNC> isn't longer supported.", node->GetLineNumber())
+	}
+	// ------------------------------------------------------
+	else
+	{
+		CNC_CEX1_A("[LINE: %d] Unknown Cnc Node =%s", node->GetLineNumber(), currentNodeName)
 	}
 	
 	return true;
@@ -1048,7 +1046,8 @@ bool SVGFileParser::evaluateMetricSize(const wxString& fileName, CncDoubleRectan
 	}
 	
 	// Start processing the XML file.
-	if ( doc.GetRoot()->GetName().Upper() != "SVG") {
+	if ( doc.GetRoot()->GetName().Upper() != "SVG")
+	{
 		std::cerr << CNC_LOG_FUNCT << ": Can't evaluate svg tag\n";
 		return false;
 	}

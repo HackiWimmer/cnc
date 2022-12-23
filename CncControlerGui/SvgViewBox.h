@@ -47,45 +47,10 @@ class SVGViewbox {
 		, maxX			(vb.getMaxX())
 		, minY			(vb.getMinY())
 		, maxY			(vb.getMaxY())
-		{
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		~SVGViewbox() 
 		{}
 		
-		///////////////////////////////////////////////////////////////////
-		void setup(const wxString& vb) 
-		{
-			viewBoxStr.assign(vb);
-			
-			wxStringTokenizer tokenizer(viewBoxStr, " ,");
-			unsigned int counter = 0;
-			while ( tokenizer.HasMoreTokens() ) 
-			{
-				wxString token = tokenizer.GetNextToken();
-				if ( token.IsEmpty() == false )
-				{
-					switch ( counter++ )
-					{
-						case 0:		token.ToDouble(&x); break;
-						case 1:		token.ToDouble(&y); break;
-						case 2:		token.ToDouble(&w); break;
-						case 3:		token.ToDouble(&h); break;
-						default:	std::cerr << "SvgViewBox::SvgViewBox: Invalid token count: "<< counter << std::endl;;
-					}
-				}
-			}
-			
-			// calculate further members
-			if ( isValid() ) 
-			{
-				minX = x;
-				minY = y;
-				maxX = x + w;
-				maxY = y + h;
-			}
-		}
+		~SVGViewbox() {}
+		void setup(const wxString& vb);
 		
 		////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const SVGViewbox &a)
@@ -128,13 +93,15 @@ class SVGRootNode {
 	private:
 		typedef CncUnitCalculatorBase::Unit Unit;
 		
-		double 		width;
-		double 		height;
+		double				width;
+		double				height;
 		
-		SVGViewbox 	viewBox;
+		SVGViewbox			viewBox;
 		
-		float 		scaleX;
-		float 		scaleY;
+		float				scaleX;
+		float				scaleY;
+		
+		wxString			rootTransformation;
 		
 		CncUnitCalculator<float> unitCalculator;
 		
@@ -150,9 +117,11 @@ class SVGRootNode {
 		~SVGRootNode() {}
 		
 		const SVGViewbox&	getViewbox()			const { return viewBox; }
+		CncDoublePosition	getViewboxOffset()		const; 
 		CncDoublePosition	getViewboxOffset_MM()	const; 
 		const double		getWidth()				const { return width;   }
 		const double		getHeight()				const { return height;  }
+		
 		const float			getScaleX()				const { return scaleX;  }
 		const float			getScaleY()				const { return scaleY;  }
 		
@@ -160,18 +129,17 @@ class SVGRootNode {
 		const double		getWidth_MM()			const { CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);  return uc.convert(width);  }
 		const double		getHeight_MM()			const { CncUnitCalculator<float> uc(getInputUnit(), Unit::mm);  return uc.convert(height); }
 		
-		const wxString& getRootTransformation(wxString& ret) const;
+		const wxString& getRootTransformation()		const { return rootTransformation; }
 		
 		friend std::ostream &operator<< (std::ostream &ostr, const SVGRootNode &a)
 		{
 			typedef CncUnitCalculator<float> UC;
-			wxString rt;
 			
 			ostr	<< " <svg"
 					<< " width=\""		<< a.getWidth_MM()	<< UC::getUnitAsStr(Unit::mm)	<< "\""
 					<< " height=\""		<< a.getHeight_MM()	<< UC::getUnitAsStr(Unit::mm)	<< "\""
 					<< " viewBox=\""	<< a.getViewbox().getViewBoxStr()					<< "\""
-					<< " transform=\""	<< a.getRootTransformation(rt)						<< "\""
+					<< " transform=\""	<< a.getRootTransformation()						<< "\""
 					<< "/>"
 			;
 			

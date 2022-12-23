@@ -28,15 +28,15 @@ class ManuallyParser : public FileParser {
 	protected:
 		ManuallyPathHandlerCnc* pathHandler;
 		
-		virtual void initNextClientId(long id);
-		virtual bool preprocess();
-		virtual bool spool();
-		virtual bool postprocess();
+		virtual void initNextClientId(long id) override;
+		virtual bool preprocess() override;
+		virtual bool spool() override;
+		virtual bool postprocess() override;
 		
-		virtual void logMeasurementStart();
-		virtual void logMeasurementEnd();
+		virtual void logMeasurementStart() override;
+		virtual void logMeasurementEnd() override;
 		
-		virtual bool shouldAToolChangeProcessed() { return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
+		virtual bool shouldAToolChangeProcessed() override { return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
 		
 	private:
 		typedef std::vector<CncMoveDefinition> Moves;

@@ -77,6 +77,12 @@ class CncFileNameService {
 		static bool     ensureFileAccessible	(const wxString& file)	{ return _pathList.EnsureFileAccessible(file); }
 		static wxString findAbsoluteValidPath	(const wxString& file)	{ return _pathList.FindAbsoluteValidPath(file); }
 		static wxString findValidPath			(const wxString& file)	{ return _pathList.FindValidPath(file); }
+		
+		static wxString getNoSerialPreviewAvailableFile()				{ return wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"); }
+		static wxString getNoSerialContentAvailableFile()				{ return wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialContentAvailable.svg"); }
+		static wxString getNoSerialPreviewRegisteredFile()				{ return wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewRegistered.svg"); }
+		static bool isAsNoSerialFile(const wxString& fileName);
 };
+
 
 #endif

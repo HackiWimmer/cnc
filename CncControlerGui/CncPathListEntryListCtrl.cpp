@@ -27,12 +27,12 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 , initialItemAttr			()
 , clientIdItemAttr			()
 , speedItemAttr				()
-, toolItemAttr				()
+, spindleItemAttr			()
 , defaultItemAttrSelected	()
 , initialItemAttrSelected	()
 , clientIdItemAttrSelected	()
 , speedItemAttrSelected		()
-, toolItemAttrSelected		()
+, spindleItemAttrSelected	()
 , pathLists					()
 , showAllFlag				(false)
 /////////////////////////////////////////////////////////////
@@ -41,6 +41,7 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	AppendColumn("Content",	 		wxLIST_FORMAT_LEFT, 	64);
 	AppendColumn("PathList ID",		wxLIST_FORMAT_LEFT, 	120);
 	AppendColumn("Client ID", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("Tool ID", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("F [mm/min]",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("S [U/min]",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	
@@ -79,14 +80,19 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	speedItemAttr.SetFont(font.Bold());
 	speedItemAttr.SetTextColour(wxColour(125, 133, 221));
 	
+	spindleItemAttr.SetBackgroundColour(GetBackgroundColour());
+	spindleItemAttr.SetFont(font.Bold());
+	spindleItemAttr.SetTextColour(wxColour( 64, 128, 128));
+
 	toolItemAttr.SetBackgroundColour(GetBackgroundColour());
 	toolItemAttr.SetFont(font.Bold());
-	toolItemAttr.SetTextColour(wxColour( 64, 128, 128));
+	toolItemAttr.SetTextColour(wxColour(128, 128, 128));
 
 	defaultItemAttrSelected		= defaultItemAttr;
 	initialItemAttrSelected		= initialItemAttr;
 	clientIdItemAttrSelected	= clientIdItemAttr;
 	speedItemAttrSelected		= speedItemAttr;
+	spindleItemAttrSelected		= spindleItemAttr;
 	toolItemAttrSelected		= toolItemAttr;
 	
 	defaultItemAttrSelected.SetTextColour(*wxYELLOW);
@@ -100,6 +106,9 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	
 	speedItemAttrSelected.SetTextColour(*wxYELLOW);
 	speedItemAttrSelected.SetFont(speedItemAttrSelected.GetFont().Bold());
+	
+	spindleItemAttrSelected.SetTextColour(*wxYELLOW);
+	spindleItemAttrSelected.SetFont(spindleItemAttrSelected.GetFont().Bold());
 	
 	toolItemAttrSelected.SetTextColour(*wxYELLOW);
 	toolItemAttrSelected.SetFont(toolItemAttrSelected.GetFont().Bold());
@@ -142,15 +151,17 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 	const bool displayRef			= showAllFlag ? true : ( cpe.pathListReference   >= 0    );
 	const bool displayClientID		= showAllFlag ? true : ( cpe.hasClientIdChange() == true );
 	const bool displayFeedSpeed		= showAllFlag ? true : ( cpe.hasSpeedChange()    == true );
-	const bool displaySpindleSpeed	= showAllFlag ? true : ( cpe.hasToolChange()     == true );
+	const bool displaySpindleSpeed	= showAllFlag ? true : ( cpe.hasSpindleChange()  == true );
 	const bool displayPosition		= showAllFlag ? true : ( cpe.hasPositionChange() == true );
+	const bool displayToolChange	= showAllFlag ? true : ( cpe.hasToolChange()     == true );
 	
 	wxString contStr;
 	if ( cpe.isNothingChanged() )	contStr.append('L');
 	if ( cpe.hasClientIdChange() )	contStr.append('C');
 	if ( cpe.hasSpeedChange() )		contStr.append('F');
-	if ( cpe.hasToolChange() )		contStr.append('S');
+	if ( cpe.hasSpindleChange() )	contStr.append('S');
 	if ( cpe.hasPositionChange() )	contStr.append('P');
+	if ( cpe.hasToolChange() )		contStr.append('T');
 	
 	switch ( column ) 
 	{
@@ -158,6 +169,7 @@ wxString CncPathListEntryListCtrl::OnGetItemText(long item, long column) const {
 		
 		case CncPathListEntryListCtrl::COL_REF: 			return displayRef          == true ?	wxString::Format("%lld",		cpe.pathListReference)		: _("");
 		case CncPathListEntryListCtrl::COL_CLD_ID:			return displayClientID     == true ?	wxString::Format(fmt,			cpe.clientId) 				: _("");
+		case CncPathListEntryListCtrl::COL_TOOL_ID:			return displayToolChange   == true ?	wxString::Format("%d",			cpe.toolId) 				: _("");
 		case CncPathListEntryListCtrl::COL_DISTANCE_X:		return displayPosition     == true ?	formatDistance(cpe.entryDistance.getX())					: _("");
 		case CncPathListEntryListCtrl::COL_DISTANCE_Y: 		return displayPosition     == true ?	formatDistance(cpe.entryDistance.getY())					: _("");
 		case CncPathListEntryListCtrl::COL_DISTANCE_Z: 		return displayPosition     == true ?	formatDistance(cpe.entryDistance.getZ())					: _("");
@@ -195,6 +207,7 @@ wxListItemAttr* CncPathListEntryListCtrl::OnGetItemAttr(long item) const {
 	if      ( cpe.hasPositionChange() )		return (wxListItemAttr*)( b ? (&defaultItemAttrSelected)  : (&defaultItemAttr) );
 	else if	( cpe.hasClientIdChange() )		return (wxListItemAttr*)( b ? (&clientIdItemAttrSelected) : (&clientIdItemAttr) );
 	else if ( cpe.hasSpeedChange() )		return (wxListItemAttr*)( b ? (&speedItemAttrSelected)    : (&speedItemAttr) );
+	else if ( cpe.hasSpindleChange() )		return (wxListItemAttr*)( b ? (&spindleItemAttrSelected)  : (&spindleItemAttr) );
 	else if ( cpe.hasToolChange() )			return (wxListItemAttr*)( b ? (&toolItemAttrSelected)     : (&toolItemAttr) );
 	
 	return (wxListItemAttr*)( b ? (&initialItemAttrSelected)  : (&initialItemAttr) );

@@ -5,9 +5,9 @@
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerBase::SVGPathHandlerBase()
 : PathHandlerBase				()
-, svgRootNode					()
 , currentSvgTransformMatrix		()
 , currentCncContext				()
+, svgRootNode					()
 //////////////////////////////////////////////////////////////////
 {
 	unitCalculator.changeInputUnit(Unit::px);

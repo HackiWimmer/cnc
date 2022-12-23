@@ -28,15 +28,17 @@ void CncConfig::pgChangedWorkingCfgPage(wxPropertyGridEvent& event) {
 	if ( p == NULL )
 		return;
 		
+	THE_CONFIG;
+		
 	if ( Cnc::Config::compare(*p, CncWork_Ctl_REPLY_THRESHOLD_METRIC) ) {
 		
-		CncConfig::getGlobalCncConfig()->calculateThresholds();
+		THE_CONFIG->calculateThresholds();
 		APP_PROXY::releaseControllerSetupFromConfig();
 		
 	} 
 	else if ( Cnc::Config::compare(*p, CncSvg_Parser_MAX_THICKNESS_CROSS) ) {
 		
-		CncConfig::getGlobalCncConfig()->initZAxisValues();
+		THE_CONFIG->initZAxisValues();
 		APP_PROXY::changeCrossingThickness();
 		
 	}

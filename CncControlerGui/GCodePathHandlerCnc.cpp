@@ -1,5 +1,6 @@
 #include "CncControl.h"
 #include "CncPosition.h"
+#include "CncContext.h"
 #include "GCodePathHandlerCnc.h"
 
 //////////////////////////////////////////////////////////////////
@@ -36,6 +37,18 @@ bool GCodePathHandlerCnc::finishWorkImpl() {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
+bool GCodePathHandlerCnc::initToolChange(int id) {
+//////////////////////////////////////////////////////////////////
+	if ( PathHandlerBase::initToolChange(id) == false )
+	{
+		// id didn't changed
+		return false;
+	}
+	
+	pathListMgr.addEntryToC(id);
+	return true;
+}
+//////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::initNextPath() {
 //////////////////////////////////////////////////////////////////
 	// execute already existing path list
@@ -45,7 +58,7 @@ bool GCodePathHandlerCnc::initNextPath() {
 	// default processing
 	if ( PathHandlerBase::initNextPath() == false )
 		return false;
-
+	
 	const Trigger::NextPath tr;
 	processTrigger(tr);
 	

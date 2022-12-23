@@ -164,15 +164,15 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 							return selectBinaryPreview(fn);
 							
 		case TplText:		selectEmptyPreviewIntern();
-							fn.assign(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
+							fn.assign(wxString::Format("%s", CncFileNameService::getNoSerialPreviewAvailableFile()));
 							break;
 							
 		case TplUnknown:	selectEmptyPreviewIntern();
-							fn.assign(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
+							fn.assign(wxString::Format("%s", CncFileNameService::getNoSerialPreviewAvailableFile()));
 							break;
 							
 		default:			selectEmptyPreviewIntern();
-							fn.assign(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
+							fn.assign(wxString::Format("%s", CncFileNameService::getNoSerialPreviewAvailableFile()));
 							
 							std::cerr << "CncFilePreview::selectPreview(): No preview registered for: " 
 									  << cnc::getTemplateFormatAsString(tplFormat)

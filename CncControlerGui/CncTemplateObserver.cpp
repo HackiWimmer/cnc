@@ -63,14 +63,20 @@ void CncTemplateObserver::activateSourecEditor(bool state) {
 	THE_APP->sourceEditor->Enable(state);
 }
 //////////////////////////////////////////////////////////////
+void CncTemplateObserver::openTemplateSourceExtern(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////
+	THE_APP->openTemplateSourceExtern(event);
+}
+//////////////////////////////////////////////////////////////
 void CncTemplateObserver::openTemplateExtern(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////
-	THE_APP->openTemplateExtern();
+	THE_APP->openTemplateExtern(event);
 }
 //////////////////////////////////////////////////////////////
 void CncTemplateObserver::changeObservationMode(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////
 	observationActive = m_observationMode->GetValue();
+	m_btOpenSourceExtern->Enable(observationActive);
 	m_btOpenExtern->Enable(observationActive);
 	
 	activateSourecEditor(!observationActive);
@@ -79,13 +85,16 @@ void CncTemplateObserver::changeObservationMode(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////
 void CncTemplateObserver::enableObservationTimer(bool state) {
 //////////////////////////////////////////////////////////////
-	if ( state == true ) {
+	if ( state == true ) 
+	{
 		if ( m_observeTimer->IsRunning() == true )
 			return;
 			
 		m_observeTimer->Start(1000, false);
 		
-	} else {
+	}
+	else
+	{
 		if ( m_observeTimer->IsRunning() == false )
 			return;
 			
@@ -155,7 +164,8 @@ void CncTemplateObserver::logTemplateModificationTimeStamp() {
 	const wxString fn(THE_APP->getCurrentTemplatePathFileName());
 	wxFileName tplFile(fn);
 	
-	if ( tplFile.Exists() == false ) {
+	if ( tplFile.Exists() == false )
+	{
 		lastTemplateModification = wxDateTime::UNow();
 		return;
 	}
@@ -168,7 +178,8 @@ bool CncTemplateObserver::isCurrentTemplateChanged() {
 	wxString fn(THE_APP->getCurrentTemplatePathFileName());
 	wxFileName tplFile(fn);
 	
-	if ( tplFile.Exists() == false ) {
+	if ( tplFile.Exists() == false )
+	{
 		logWarning("The template file did not exists!\n");
 		return false;
 	}
@@ -176,7 +187,8 @@ bool CncTemplateObserver::isCurrentTemplateChanged() {
 	wxDateTime dt = tplFile.GetModificationTime();
 	
 	bool ret = false;
-	if ( dt != lastTemplateModification ) {
+	if ( dt != lastTemplateModification )
+	{
 		logInformation("An externally template change was detected . . .\n", styles.taDetected);
 		logFileName();
 		

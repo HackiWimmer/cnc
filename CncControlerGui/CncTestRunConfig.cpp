@@ -188,7 +188,7 @@ bool CncTestRunConfig::runDir() {
 				const bool result    = ( error == false && tplCtxErr == false );
 
 				// build a test directory
-				const wxString testCaseDir(wxString::Format("%s@TC%s_%s.%s%s",
+				const wxString testCaseDir(wxString::Format("%s@TC%s_%s.%s%c",
 											testOutputDir,
 											testCaseIndex,
 											fn.GetFullName(),

@@ -77,8 +77,8 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		
 		virtual const char*		getName()					const						override { return "SVGPathHandlerCnc"; }
 			
-		double					getW() 								{ return svgRootNode.getWidth();      }
-		double					getH() 								{ return svgRootNode.getHeight();     }
+		double					getW() 								{ return svgRootNode.getWidth();  }
+		double					getH() 								{ return svgRootNode.getHeight(); }
 		const char*				getViewBox() 						{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
 		const SVGRootNode&		getSvgRootNode()					{ return svgRootNode; }
 		
@@ -93,6 +93,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 
 		// path handling
 		virtual bool			prepareWork()								override;
+		virtual bool			initToolChange(int id)						override;
 		virtual bool			finishCurrentPath()							override;
 		virtual bool			runCurrentPath()							override;
 		virtual bool			finishWork()								override;

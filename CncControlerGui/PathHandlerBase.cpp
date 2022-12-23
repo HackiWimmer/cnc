@@ -132,6 +132,11 @@ void PathHandlerBase::processClientId(long id) {
 	pathListMgr.addEntryAdm(id);
 }
 //////////////////////////////////////////////////////////////////
+void PathHandlerBase::processToolChange(int id) {
+//////////////////////////////////////////////////////////////////
+	pathListMgr.addEntryToC(id);
+}
+//////////////////////////////////////////////////////////////////
 void PathHandlerBase::processFeedSpeed(CncSpeedMode mode) {
 //////////////////////////////////////////////////////////////////
 	pathListMgr.addEntryAdm(mode);
@@ -665,8 +670,22 @@ bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, const doub
 bool PathHandlerBase::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	pathListMgr.init(currentPos);
-	totalLength = 0.0;
+	totalLength   = 0.0;
 	
+	// important to reset the current tool id,
+	// otherwise the first change will not be detected
+	THE_CONTEXT->setCurrentToolId(INVALID_TOOL_ID);
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool PathHandlerBase::initToolChange(int id) {
+//////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->getCurrentToolId() == id )
+		return false;
+		
+	//CNC_PRINT_FUNCT_A("given id=%d    context id=%d", id, THE_CONTEXT->getCurrentToolId()  )
+	THE_CONTEXT->setCurrentToolId(id);
 	return true;
 }
 //////////////////////////////////////////////////////////////////

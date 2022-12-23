@@ -4,6 +4,7 @@
 #include "CncTextCtrl.h"
 
 class CncLoggerListCtrl;
+class CncExtLoggerListCtrl;
 
 // --------------------------------------------------------------
 class CncLoggerProxy : public CncTextCtrl {

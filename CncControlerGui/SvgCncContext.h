@@ -112,7 +112,8 @@ class SvgCncBreak : public SvgCncContextBase {
 		virtual ~SvgCncBreak()
 		{}
 		
-		SvgCncBreak& operator= (const SvgCncBreak& scb) { 
+		SvgCncBreak& operator= (const SvgCncBreak& scb) 
+		{ 
 			SvgCncContextBase::operator= (scb);
 			
 			return *this;
@@ -137,12 +138,14 @@ class SvgCncPause : public SvgCncContextBase {
 		virtual ~SvgCncPause()
 		{}
 		
-		SvgCncPause& operator= (const SvgCncPause& scp) {
+		SvgCncPause& operator= (const SvgCncPause& scp) 
+		{
 			SvgCncContextBase::operator= (scp);
 			return *this;
 		}
 		
-		virtual void traceTo(std::ostream& o, unsigned int indent=0) const {
+		virtual void traceTo(std::ostream& o, unsigned int indent=0) const 
+		{
 			SvgCncContextBase::traceTo(o, indent);
 		}
 		
@@ -165,12 +168,14 @@ class SvgCncContextMacro : public SvgCncContextBase {
 		virtual ~SvgCncContextMacro()
 		{}
 		
-		SvgCncContextMacro& operator= (const SvgCncContextMacro& scm) {
+		SvgCncContextMacro& operator= (const SvgCncContextMacro& scm) 
+		{
 			SvgCncContextBase::operator= (scm);
 			return *this;
 		}
 		
-		virtual void traceTo(std::ostream& o, unsigned int indent=0) const {
+		virtual void traceTo(std::ostream& o, unsigned int indent=0) const 
+		{
 			SvgCncContextBase::traceTo(o, indent);
 		}
 };
@@ -201,6 +206,8 @@ class SvgCncContext : public SvgCncContextBase {
 		double					currentWorkSpeed_MM_MIN; 
 		double		 			currentSpindleSpeed_U_MIN;
 		
+		int						currentToolId;
+		
 		ToolList				toolList;
 		CncPathModificationType	pathModification;
 		CncPathRuleType			pathRule;
@@ -222,9 +229,27 @@ class SvgCncContext : public SvgCncContextBase {
 		virtual void			reconstruct();
 		virtual void			manageParameter(const Mode mode, const wxString& name, const wxString& value);
 		
+		wxString				cnvDepth_ShaperToCnc(const wxString& d);
+		wxString				cnvPathMode_ShaperToCnc(const wxString& pm);
+		
 	public:
 		
-		const char * 			ID_DEFAULT_TOOL_ID	= "T_000";
+		const double			DEF_TOOL_DIM		= 0.9; //mm
+		const double			MIN_TOOL_DIM		= 1.0; //mm
+		
+		const char * 			KEY_PM_CENTRE		= "Centre";
+		const char * 			KEY_PM_INNER		= "Inner";
+		const char * 			KEY_PM_OUTER		= "Outer";
+		const char * 			KEY_PM_POCKET		= "Pocket";
+		const char * 			KEY_PM_GUIDE		= "Guide";
+		const char * 			KEY_PM_ZEROREF		= "ZeroRef";
+		const char * 			KEY_PM_NONE			= "None";
+		
+		const char * 			KEY_SPAPER_CENTRE	= "online";
+		const char * 			KEY_SPAPER_INNER	= "inside";
+		const char * 			KEY_SPAPER_OUTER	= "outside";
+		const char * 			KEY_SPAPER_POCKET	= "pocket";
+		const char * 			KEY_SPAPER_GUIDE	= "guide";
 		
 		const char * 			ID_COLOUR_SCHEME	= "UseColourScheme";
 		
@@ -247,6 +272,10 @@ class SvgCncContext : public SvgCncContextBase {
 		const char * 			ID_MAX_FEED_STEP	= "ZMaxFeedStep";
 		
 		const char *			ID_ARG_SWEEP_FLAG	= "InvertPathArgSweepFlag";
+		
+		const char *			ID_SHAPER_PREFIX	= "shaper:";
+		const char *			ID_SHAPER_CUT_TYPE	= "shaper:cutType";
+		const char *			ID_SHAPER_CUT_DEPTH	= "shaper:cutDepth";
 
 		SvgCncContext();
 		explicit SvgCncContext(const SvgCncContext& scc);
@@ -255,8 +284,6 @@ class SvgCncContext : public SvgCncContextBase {
 		
 		SvgCncContext& operator= (const SvgCncContext&);
 		
-		const ToolList&			getToolList()								const	{ return toolList; }
-		
 		CncPathModificationType	getPathModificationType()					const	{ return pathModification; }
 		const char* 			getPathModificationTypeAsStr()				const;
 		void					setPathModification(CncPathModificationType pm)		{ pathModification = pm; }
@@ -264,9 +291,12 @@ class SvgCncContext : public SvgCncContextBase {
 		CncPathRuleType			getPathRuleType()							const	{ return pathRule; }
 		const char* 			getPathRuleTypeAsStr()						const;
 		
+		const ToolList&			getToolList()								const	{ return toolList; }
 		double					getToolDiameter(const wxString& id)			const;
-		double					getCurrentToolDiameter()					const	{ return getToolDiameter(getParameterAsString(ID_TOOL_SEL)); }
-		wxString				getCurrentToolId()							const	{ return getParameterAsString(ID_TOOL_SEL); }
+		double					getCurrentToolDiameter()					const;
+		wxString				getCurrentToolIdAsStr()						const;
+		int						getCurrentToolId()							const	{ return currentToolId; }
+		bool					setCurrentToolId(const wxString& s);
 		
 		bool					useColourScheme()							const	{ return isUseColouScheme; }
 		bool					hasPathModifications()						const;
@@ -315,7 +345,7 @@ class SvgCncContextSummary  : public SvgCncContext {
 		
 		unsigned int			participants;
 		unsigned int			toolSelections;
-		wxString				curToolId;
+		wxString				curToolIdStr;
 		wxString				toolSelectionList;
 		double					curZDept;
 		double					minZDept;

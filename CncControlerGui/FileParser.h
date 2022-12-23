@@ -17,8 +17,6 @@ class wxPropertyGridPage;
 class wxPropertyCategory;
 class wxPGProperty;
 
-typedef std::vector<int> ToolIds;
-
 class FileParser {
 
 	public:
@@ -132,13 +130,6 @@ class FileParser {
 	private:
 		
 		long currentLineNumber;
-		ToolIds	toolIds;
-		
-		void displayToolId(const wxString& id);
-		void displayToolId(int id);
-		
-		bool isAToolAvailable();
-		int getCurrentToolId();
 };
 
 #endif

@@ -26,8 +26,12 @@ class CncAverage {
 		~CncAverage()
 		{}
 		
-		CncAverage& operator= (const CncAverage& a) { 
-			list.push_back(a.getAvg());
+		CncAverage& operator= (const CncAverage& a) 
+		{ 
+			// self-assignment check
+			if ( this != &a ) 
+				list.push_back(a.getAvg());
+				
 			return *this; 
 		}  
 		

@@ -810,8 +810,16 @@ void MainFrame::stopSerialTimer(bool notify) {
 ////////////////////////////////////////////////////////////////////////////
 void MainFrame::onConfigurationUpdated(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////////
-	// currently nothing to do
-	//std::clog << "MainFrame::configurationUpdated(wxCommandEvent& event)" << std::endl;
+	GetLastConfigNotification()->ChangeValue(wxDateTime::UNow().Format("%H:%M:%S"));
+
+	// log the change is related to
+	//CNC_PRINT_FUNCT_A(" %s", event.GetString())
+	
+	if ( drawPane3D && drawPane3D->GetZView() )
+		drawPane3D->GetInfoToolDiameter()->SetLabel(wxString::Format("%.3lf", THE_CONTEXT->getCurrentToolDiameter()));
+	
+	if ( drawPane3D && drawPane3D->GetInfoToolDiameter() )
+		drawPane3D->GetZView()->updateView(cnc->requestControllerPos().getZ() * THE_CONFIG->getDisplayFactZ(THE_CONFIG->getDisplayUnit()));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::disableGuiControls() {
@@ -2062,7 +2070,7 @@ bool MainFrame::readSerialThreadData(AE::TransferData& td) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( saveTemplateOnDemand(false) == false )
+	if ( saveTemplateOnDemand() == false )
 		return;
 		
 	if ( canClose == false) {
@@ -2778,7 +2786,6 @@ void MainFrame::initialize(void) {
 	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
 	
-	notifyConfigUpdate();
 	updateUnit();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3024,7 +3031,6 @@ bool MainFrame::connectSerialPort() {
 		{
 			setReferencePosEnforceFlag(cnc->isEmulator() == false);
 			
-			notifyConfigUpdate();
 			decorateSpindleState(cnc->getSpindlePowerState());
 			
 			m_connect->SetBitmap(bmpC);
@@ -3536,23 +3542,10 @@ void MainFrame::updateReferencePosition(RefPosResult* parameter) {
 	motionMonitor->Refresh();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::notifyConfigUpdate() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	cnc->notifyConfigUpdate();
-	
-	if ( drawPane3D && drawPane3D->GetZView() )
-		drawPane3D->GetInfoToolDiameter()->SetLabel(wxString::Format("%.3lf", THE_CONFIG->getToolDiameter(THE_CONFIG->getCurrentToolId())));
-	
-	if ( drawPane3D && drawPane3D->GetInfoToolDiameter() )
-		drawPane3D->GetZView()->updateView(cnc->requestControllerPos().getZ() * THE_CONFIG->getDisplayFactZ(THE_CONFIG->getDisplayUnit()));
-	
-	collectSummary();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::changeCrossingThickness() {
 ///////////////////////////////////////////////////////////////////
-	m_crossings->ChangeValue(wxString() << CncConfig::getGlobalCncConfig()->getDurationCount());
+	if ( cnc != NULL )
+		m_crossings->ChangeValue(wxString::Format("%d", cnc->getDurationCount()));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::defineMinMonitoring(wxCommandEvent& event) {
@@ -3807,6 +3800,8 @@ bool MainFrame::openFile(int sourcePageToSelect) {
 	lastTemplateFileName.Assign(getCurrentTemplatePathFileName());
 	
 	THE_TPL_CTX->reset();
+	setAutoSaveMode(THE_TPL_CTX->isAutoSaveMode());
+
 	decorateDryRunState(cncUnknown);
 	
 	bool ret = false;
@@ -3885,8 +3880,9 @@ void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::newTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( saveTemplateOnDemand(false) == false )
+	if ( saveTemplateOnDemand() == false )
 		return;
+		
 		
 	wxString defaultTplDir;
 	THE_CONFIG->getDefaultTplDir(defaultTplDir);
@@ -4135,11 +4131,6 @@ void MainFrame::openTemplateSourceExtern(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplateExtern(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	openTemplateExtern();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::openTemplateExtern() {
 ///////////////////////////////////////////////////////////////////
 	wxString tool;
 	
@@ -4738,18 +4729,7 @@ void MainFrame::cancelRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::collectSvgSpecificSummary() {
 ///////////////////////////////////////////////////////////////////
-	typedef CncSummaryListCtrl::ParameterType PT;
-	CncConfig* cc = CncConfig::getGlobalCncConfig();
-	
 	cncSummaryListCtrl->addHeadline(CncSummaryListCtrl::ParameterType::PT_HEADLINE, "SVG specific Settings");
-
-	cncSummaryListCtrl->addParameter(PT::PT_SVG, "Z axis values:", "", "");
-	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Max durations", 				wxString::Format("%u",		cc->getMaxDurations()),							"#");
-	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Workpiece offset", 				wxString::Format("%4.3f",	cc->getWorkpieceOffset()),						"mm");
-	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Max duration thickness", 		wxString::Format("%4.3f",	cc->getMaxDurationThickness()),					"mm");
-	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Calculated durations", 			wxString::Format("%u",		cc->getDurationCount()),						"#");
-	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Current Z distance", 			wxString::Format("%4.3f",	cc->getCurZDistance()),							"mm");
-	//cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Wpt is included", 				wxString::Format("%d",		cc->getReferenceIncludesWpt()),					"-");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::collectGCodeSpecificSummary() {
@@ -4758,7 +4738,7 @@ void MainFrame::collectGCodeSpecificSummary() {
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	
 	cncSummaryListCtrl->addHeadline(CncSummaryListCtrl::ParameterType::PT_HEADLINE, "GCode specific Settings");
-	cncSummaryListCtrl->addParameter(PT::PT_GCODE, "Sample . . . .", 					wxString::Format("%4.3f",	cc->getReplyThresholdMetric()),						"xx");
+	cncSummaryListCtrl->addParameter(PT::PT_GCODE, "Sample . . . .", wxString::Format("%4.3f",	cc->getReplyThresholdMetric()),						"xx");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::collectSummary() {
@@ -4770,12 +4750,12 @@ void MainFrame::collectSummary() {
 		
 	cncSummaryListCtrl->clear();
 	cncSummaryListCtrl->addHeadline(PT::PT_HEADLINE, "Common Settings");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Tool", 					THE_CONFIG->getDefaultToolParamAsString(),												"-");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Workpiece thickness", 				wxString::Format("%4.3f", 	THE_BOUNDS->getWorkpieceThickness()),						"mm");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Tool",					THE_CONFIG->getDefaultToolParamAsInfoStr(),												"-");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Workpiece thickness",				wxString::Format("%4.3f", 	THE_BOUNDS->getWorkpieceThickness()),						"mm");
 	//cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Curve lib resolution", 			wxString::Format("%0.3f", 	THE_CONFIG->getRenderResolution()),							"-");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Papid speed", 				wxString::Format("%4.3f", 	THE_CONFIG->getDefaultRapidSpeed_MM_MIN()),					"mm/min");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Work speed", 				wxString::Format("%4.3f", 	THE_CONFIG->getDefaultWorkSpeed_MM_MIN()),					"mm/min");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Reply Threshold", 					wxString::Format("%4.3f",	THE_CONFIG->getReplyThresholdMetric()),						"mm");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Rapid speed",				wxString::Format("%4.3f", 	THE_CONFIG->getDefaultRapidSpeed_MM_MIN()),					"mm/min");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Work speed",				wxString::Format("%4.3f", 	THE_CONFIG->getDefaultWorkSpeed_MM_MIN()),					"mm/min");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Reply Threshold",					wxString::Format("%4.3f",	THE_CONFIG->getReplyThresholdMetric()),						"mm");
 
 	// type specific . . .
 	switch ( getCurrentTemplateFormat() ) {
@@ -4922,7 +4902,7 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 	{
 		// check if template fits with the current hardware information
 		std::stringstream ss;
-		if ( THE_TPL_CTX->fitsIntoCurrentHardwareBoundaries(ss) == false ) 
+		if ( THE_TPL_CTX->fitsIntoCurrentHardwareBoundaries(CncTemplateContext::BT_TEMPLATE, ss) == false ) 
 		{
 			wxString msg(ss.str().c_str());
 			std::clog << "Boundary Failure . . ." << std::endl;
@@ -5075,7 +5055,7 @@ bool MainFrame::processTemplate(bool confirm) {
 		CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
 		
 		// it's very import to deactivate the notifications during a run
-		// because instead every config change (sc()) will release a notification
+		// because instead every configure change will release a notification
 		// this will be the case for example if the SVG path handler changes
 		// the z -axis values . . .
 		// as a result the processing slows down significantly.
@@ -5083,7 +5063,10 @@ bool MainFrame::processTemplate(bool confirm) {
 		
 		//-----------------------------------------------------------------
 		// prepare all relevant settings from here on . . . 
-		const bool useExistingCncInstructions = THE_TPL_CTX->isValid() && cnc::isFileTemplate(getCurrentTemplateFormat());
+		const bool useExistingCncInstructions	 = THE_CONFIG->isModified() == false 
+												&& THE_TPL_CTX->isValid() 
+												&& cnc::isFileTemplate(getCurrentTemplateFormat())
+		;
 		
 		// if template boundaries available prepare the motion monitor 
 		// to the best size (scale) and origin placement
@@ -5111,7 +5094,7 @@ bool MainFrame::processTemplate(bool confirm) {
 		clearPositionSpy();
 		disableControls();
 		resetMinMaxPositions();
-		notifyConfigUpdate();
+		getTemplateContextSummary()->getParsingSynopsis()->clearAll();
 		
 		// Overrides the THE_CONTEXT->timestamps.logTotalTimeStart() CncRunAnimationControl mechanism (ctor)
 		// to be more closer on the real processing start
@@ -5142,8 +5125,20 @@ bool MainFrame::processTemplate(bool confirm) {
 				CNC_CLOG_A(wxString::Format("~~~ Processing(probe mode = %s) started ~~~", probeMode))
 				INC_LOGGER_INDENT
 					
+				if ( THE_TPL_CTX->getRunCount() > 0 )
+				{
+					wxString msg("Cant use existing Cnc Instructions because: ");
+					if ( THE_CONFIG->isModified() == true  ) msg.append(" Configuration is modified");
+					if ( THE_TPL_CTX->isValid()   == false ) msg.append(" Template context isn't valid");
+					
+					CNC_CEX3_A(msg)
+				}
 				THE_TPL_CTX->registerRun();
 				ret = processTemplate_SelectType(runSessionKey);
+				
+				#warning
+				if ( ret )
+					THE_CONFIG->resetModificationFlag();
 			}
 			
 			motionMonitor->popProcessMode();
@@ -5178,8 +5173,23 @@ bool MainFrame::processTemplate(bool confirm) {
 		// if template boundaries available prepare the motion monitor 
 		// to the best size (scale) and origin placement
 		if ( THE_TPL_CTX->getBoundaries().hasBoundaries() ) 
+		{
+			std::stringstream ss;
 			motionMonitor->makeCompleteVisibleMetric(THE_TPL_CTX->getBoundaries());
-
+			if ( THE_TPL_CTX->fitsIntoCurrentHardwareBoundaries(CncTemplateContext::BT_MEASURED, ss) == false )
+			{
+				const wxString msg(ss.str().c_str());
+				
+				REGISTER_NEXT_LOGGER_ROW
+				
+				if		( msg.StartsWith("Error") )		{ std::cerr << msg; SET_RESULT_FOR_REGISTERED_LOGGER_ROW_ERROR		}
+				else if	( msg.StartsWith("Warning") )	{ cnc::cex1 << msg; SET_RESULT_FOR_REGISTERED_LOGGER_ROW_WARNING	}
+				else									{ std::cout << msg; SET_RESULT_FOR_REGISTERED_LOGGER_ROW_OK			}
+				
+				ret = false;
+			}
+		}
+		
 		const wxTimeSpan elapsed = wxDateTime::UNow().Subtract(tsStart);
 		const wxString timeInfo(wxString::Format("total time: %s", elapsed.Format("%H:%M:%S.%l")));
 		
@@ -5189,7 +5199,11 @@ bool MainFrame::processTemplate(bool confirm) {
 		if ( ret == false || THE_CONTEXT->parsingSynopsisHasErrorEntries() )
 		{
 			if ( THE_CONTEXT->parsingSynopsisHasErrorEntries() )
-				CNC_CERR_A("Error(s) detected. For more details please visit the parsing synopsis trace")
+			{
+				CNC_CERR_A("Parsing Error(s) detected")
+				getTemplateContextSummary()->getParsingSynopsis()->traceErrorEntries(std::cerr);
+				CNC_CERR_A("For more details please visit the parsing synopsis trace")
+			}
 			
 			StreamBufferHighlighter sbh(std::cerr);
 			
@@ -5205,7 +5219,11 @@ bool MainFrame::processTemplate(bool confirm) {
 		{
 			if ( THE_CONTEXT->parsingSynopsisHasNonInfoEntries() )
 			{
-				CNC_CEX1_A("Warnings(s) detected. For more details please visit the parsing synopsis trace")
+				CNC_CEX1_A("Parsing Warnings(s) detected")
+				getTemplateContextSummary()->getParsingSynopsis()->traceWarnEntries(cnc::cex1);
+				CNC_CEX1_A("Parsing Error(s) detected")
+				getTemplateContextSummary()->getParsingSynopsis()->traceErrorEntries(std::cerr);
+				CNC_CEX1_A("For more details please visit the parsing synopsis trace")
 				
 				StreamBufferHighlighter sbh(cnc::cex1);
 				
@@ -5247,8 +5265,6 @@ bool MainFrame::processTemplate(bool confirm) {
 // don't call this method directly, instead use processTemplate()
 bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 ///////////////////////////////////////////////////////////////////
-	const bool forceSave = m_btSvgToggleAutoSaveTplOnProcess->GetValue();
-	
 	if ( getCurrentTemplateFormat() != TplManual )
 		cncManuallyMoveCoordPanel->resetClearViewState();
 	
@@ -5257,7 +5273,7 @@ bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 	{
 		case TplBinary:
 		{
-			if ( saveTemplateOnDemand(forceSave) == false )
+			if ( saveTemplateOnDemand() == false )
 				break;
 				
 			clearMotionMonitor();
@@ -5267,7 +5283,7 @@ bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 		}
 		case TplSvg:
 		{
-			if ( saveTemplateOnDemand(forceSave) == false )
+			if ( saveTemplateOnDemand() == false )
 				break;
 			
 			clearMotionMonitor();
@@ -5277,7 +5293,7 @@ bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 		}
 		case TplGcode:
 		{
-			if ( saveTemplateOnDemand(forceSave) == false )
+			if ( saveTemplateOnDemand() == false )
 				break;
 				
 			clearMotionMonitor();
@@ -5359,7 +5375,16 @@ void MainFrame::resetMinMaxPositions() {
 	cnc->resetWatermarks();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::saveTemplateOnDemand(bool force) {
+void MainFrame::setAutoSaveMode(bool as) {
+///////////////////////////////////////////////////////////////////
+	THE_TPL_CTX->setAutoSaveMode(as);
+	
+	const bool b = THE_TPL_CTX->isAutoSaveMode();
+	m_btSvgToggleAutoSaveTplOnProcess->SetToolTip(b ? "Switch AutoSave off" : "Switch AutoSave on" );
+	m_btSvgToggleAutoSaveTplOnProcess->SetValue(b);
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::saveTemplateOnDemand() {
 ///////////////////////////////////////////////////////////////////
 	if ( sourceEditor->IsModified() == true )
 	{
@@ -5367,10 +5392,12 @@ bool MainFrame::saveTemplateOnDemand(bool force) {
 		wxRichMessageDialog dlg(this, msg, _T("File Observer . . . "), 
 		                    wxYES|wxNO|wxCANCEL|wxCENTRE);
 		
+		dlg.ShowCheckBox("Don not ask again for the current template", THE_TPL_CTX->isAutoSaveMode());
 		dlg.SetFooterText("The current template was modified.");
 		dlg.SetFooterIcon(wxICON_WARNING);
 		
-		int ret = force ? wxID_YES : dlg.ShowModal();
+		const int ret = THE_TPL_CTX->isAutoSaveMode() ? wxID_YES : dlg.ShowModal();
+		setAutoSaveMode(dlg.IsCheckBoxChecked());
 		
 		if ( ret == wxID_YES )
 		{
@@ -5474,7 +5501,7 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 	if ( THE_TPL_CTX->hasBoundaries() )
 	{
 		std::stringstream ss;
-		if ( THE_TPL_CTX->fitsIntoCurrentHardwareBoundaries(ss) == false )
+		if ( THE_TPL_CTX->fitsIntoCurrentHardwareBoundaries(CncTemplateContext::BT_TEMPLATE, ss) == false )
 		{
 			const wxString msg(ss.str().c_str());
 			
@@ -6122,7 +6149,7 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 	selectMainBookSourcePanel();
 	selectMonitorBookTemplatePanel();
 	
-	if ( saveTemplateOnDemand(false) == false )
+	if ( saveTemplateOnDemand() == false )
 	{
 		prepareAndShowMonitorTemplatePreview();
 		return;
@@ -6976,6 +7003,7 @@ void MainFrame::toggleTemplateWordWrapMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleAutoSaveTplOnProcess(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	setAutoSaveMode(m_btSvgToggleAutoSaveTplOnProcess->GetValue());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleTryToSelectClientIdFromEditor(wxCommandEvent& event) {
@@ -7952,31 +7980,28 @@ void MainFrame::releaseControllerSetupFromConfig() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setupGridChanged(wxPropertyGridEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->setupGridChanged(event);
+	THE_CONFIG->setupGridChanged(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setupGridChanging(wxPropertyGridEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->setupGridChanging(event);
+	THE_CONFIG->setupGridChanging(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setupGridCommandButton(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->setupGridCommandButton(event);
+	THE_CONFIG->setupGridCommandButton(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setupGridSelected(wxPropertyGridEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->setupGridSelected(event);
+	THE_CONFIG->setupGridSelected(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::saveConfiguration(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	THE_CONFIG->saveConfiguration(*config);
+	const bool ask = true;
+	THE_CONFIG->saveConfiguration(*config, ask);
 	THE_CONFIG->updateSaveTrace(m_cfgSaveTrace);
 }
 /////////////////////////////////////////////////////////////////////
@@ -9416,7 +9441,10 @@ void MainFrame::onTakeoverHardwareDimensions(wxCommandEvent& event) {
 	}
 	
 	if ( somethingChanged == true )
-		THE_CONFIG->saveConfiguration(*config);
+	{
+		const bool ask = true;
+		THE_CONFIG->saveConfiguration(*config, ask);
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::requestResolveLimitStates(wxCommandEvent& event) {
@@ -9895,6 +9923,32 @@ bool MainFrame::evaluateAndPerformProcessingState() {
 	}
 	
 	return true;
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onLeftDclickLastConfigTime(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	const CncConfig::ChangeMap& cm = THE_CONFIG->getModificationMap();
+	
+	if ( cm.size() == 0 )
+		return;
+		
+	ADD_LOGGER_SEPERATOR
+	cnc::cex2 << "Collected Configuration Changes: [key: value changed to]" << std::endl;
+	
+	for ( auto it = cm.begin(); it != cm.end(); )
+	{
+		std::cout 	<< "  "
+					<< std::left << std::setw(64) << std::setfill(' ') 
+					<< it->first 
+					<< ": "
+					<< it->second.MakeString()
+		;
+		
+		if ( ++it != cm.end() ) 
+			std::cout << std::endl;
+	}
+	
+	ADD_LOGGER_SEPERATOR
 }
 
 

@@ -46,6 +46,7 @@ protected:
     wxCheckBox* m_observationMode;
     wxStaticText* m_staticText6553;
     wxRadioBox* m_actionSelection;
+    wxBitmapButton* m_btOpenSourceExtern;
     wxBitmapButton* m_btOpenExtern;
     wxStaticLine* m_staticLine28;
     wxStaticText* m_staticText7386;
@@ -60,6 +61,10 @@ protected:
 
 protected:
     virtual void changeObservationMode(wxCommandEvent& event)
+    {
+	event.Skip();
+    }
+    virtual void openTemplateSourceExtern(wxCommandEvent& event)
     {
 	event.Skip();
     }
@@ -88,6 +93,10 @@ public:
     wxRadioBox* GetActionSelection()
     {
 	return m_actionSelection;
+    }
+    wxBitmapButton* GetBtOpenSourceExtern()
+    {
+	return m_btOpenSourceExtern;
     }
     wxBitmapButton* GetBtOpenExtern()
     {

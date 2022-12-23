@@ -2,6 +2,7 @@
 #define CNC_TEMPLATE_CONTEXT_H
 
 #include <vector>
+#include <set>
 #include <iostream>
 #include <wx/string.h>
 #include "ContextInterface.h"
@@ -14,11 +15,13 @@ class CncTemplateContext : public ContextInterface
 {
 	private:
 		
+		typedef std::set<int> ToolIds;
+		
 		bool						modifyFlag;
+		bool						autoSave;
 		wxString					name;
 		wxString					path;
-		wxString					toolTotList;
-		wxString					toolSelList;
+		ToolIds						toolSelList;
 		unsigned int				runCount;
 		unsigned int				validRunCount;
 		
@@ -47,6 +50,8 @@ class CncTemplateContext : public ContextInterface
 		bool				init(const wxString& pathFileName);
 		bool				init(const wxString& path, const wxString& name);
 		
+		void				setAutoSaveMode(bool as)				{ autoSave = as; }
+		bool				isAutoSaveMode()				const	{ return autoSave; }
 		
 		void				setModifyFlag(bool f)					{ modifyFlag = f;		updateGui(true); }
 		void				registerRun()							{ runCount++;			updateGui(true); }
@@ -72,15 +77,15 @@ class CncTemplateContext : public ContextInterface
 		CncTemplateFormat	getTemplateFormat()					const;
 		bool				isTemplateFormat(CncTemplateFormat)	const;
 		
-		void				registerToolTotList(const wxString& tl)	{ toolTotList.assign(tl); }
-		void				registerToolSelList(const wxString& tl)	{ toolSelList.assign(tl); }
-		unsigned int		getToolSelCount()				const	{ return toolSelList.Freq(';'); }
+		void				registerToolSelList(const wxString& tl);
+		void				addToolIdToSelList(int id);
+		unsigned int		getToolSelCount() 					const	{ return toolSelList.size(); }
 		
 		void				updateGui(bool force)							const;
 		void				traceTo(std::ostream& o, unsigned int indent)	const;
 		bool				save(const wxFileName& fn)						const;
 		
-		bool				fitsIntoCurrentHardwareBoundaries(std::ostream& o);
+		bool				fitsIntoCurrentHardwareBoundaries(BoundType bt, std::ostream& o);
 		
 		// context interface
 		virtual void		notifyBeginRun();

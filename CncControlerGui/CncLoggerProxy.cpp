@@ -78,7 +78,6 @@ void CncLoggerProxy::AppendText(const wxString &text) {
 	lc->add(text);
 }
 
-
 //////////////////////////////////////////////////////////////
 CncLoggerListCtrl* CncStartupLoggerProxy::getListCtrl()		const { return THE_APP->getLoggerView()->getLoggerListCtrl(LoggerSelection::VAL::STARTUP); }
 CncLoggerListCtrl* CncStandardLoggerProxy::getListCtrl()	const { return THE_APP->getLoggerView()->getLoggerListCtrl(LoggerSelection::VAL::CNC); }
@@ -106,14 +105,28 @@ void CncParserSynopsisProxy::pushUpdateMode() {
 //////////////////////////////////////////////////////////////////
 void CncParserSynopsisProxy::addEntry(const char type, const wxString& entry) { 
 //////////////////////////////////////////////////////////////////
-	CncExtLoggerListCtrl* logger = THE_APP->getTemplateContextSummary()->getParsingSynopsis();
-	switch ( type )
+	if ( THE_APP && THE_APP->getTemplateContextSummary() )
 	{
-		case 'W':	logger->addWarnEntry(entry);	break;
-		case 'D':	logger->addDebugEntry(entry);	break;
-		case 'E':	logger->addErrorEntry(entry);	break;
-		case 'S':	logger->addSeparator(entry);	break;
-		default:	logger->addInfoEntry(entry);
+		CncExtLoggerListCtrl* logger = THE_APP->getTemplateContextSummary()->getParsingSynopsis();
+		switch ( type )
+		{
+			case 'W':	logger->addWarnEntry(entry);	break;
+			case 'D':	logger->addDebugEntry(entry);	break;
+			case 'E':	logger->addErrorEntry(entry);	break;
+			case 'S':	logger->addSeparator(entry);	break;
+			default:	logger->addInfoEntry(entry);
+		}
+	}
+	else
+	{
+		switch ( type )
+		{
+			case 'W':	cnc::cex1 << entry;	break;
+			case 'D':	cnc::cex2 << entry;	break;
+			case 'E':	std::cerr << entry;	break;
+			case 'S':	std::cout << entry;	break;
+			default:	std::cout << entry;
+		}
 	}
 }
 

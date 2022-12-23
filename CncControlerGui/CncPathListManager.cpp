@@ -10,7 +10,8 @@ CncPathListManager* CncPathListManager::clone(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
 ClipperLib::JoinType CncPathListManager::transform(JoinType jt) {
 //////////////////////////////////////////////////////////////////
-	switch ( jt ) {
+	switch ( jt )
+	{
 		case jtSquare:	return ClipperLib::jtSquare;
 		case jtRound:	return ClipperLib::jtRound;
 		case jtMiter:	return ClipperLib::jtMiter;
@@ -21,7 +22,8 @@ ClipperLib::JoinType CncPathListManager::transform(JoinType jt) {
 //////////////////////////////////////////////////////////////////
 ClipperLib::EndType CncPathListManager::transform(EndType et) {
 //////////////////////////////////////////////////////////////////
-	switch ( et ) {
+	switch ( et )
+	{
 		case etClosedPolygon:	return ClipperLib::etClosedPolygon;
 		case etClosedLine:		return ClipperLib::etClosedLine;
 		case etOpenButt:		return ClipperLib::etOpenButt;
@@ -34,7 +36,8 @@ ClipperLib::EndType CncPathListManager::transform(EndType et) {
 //////////////////////////////////////////////////////////////////
 CncPathListManager::JoinType CncPathListManager::transform(ClipperLib::JoinType jt) {
 //////////////////////////////////////////////////////////////////
-	switch ( jt ) {
+	switch ( jt ) 
+	{
 		case ClipperLib::jtSquare:	return jtSquare;
 		case ClipperLib::jtRound:	return jtRound;
 		case ClipperLib::jtMiter:	return jtMiter;
@@ -46,7 +49,8 @@ CncPathListManager::JoinType CncPathListManager::transform(ClipperLib::JoinType 
 //////////////////////////////////////////////////////////////////
 CncPathListManager::EndType CncPathListManager::transform(ClipperLib::EndType et) {
 //////////////////////////////////////////////////////////////////
-	switch ( et ) {
+	switch ( et )
+	{
 		case ClipperLib::etClosedPolygon:	return etClosedPolygon;
 		case ClipperLib::etClosedLine:		return etClosedLine;
 		case ClipperLib::etOpenButt:		return etOpenButt;
@@ -55,7 +59,6 @@ CncPathListManager::EndType CncPathListManager::transform(ClipperLib::EndType et
 	}
 	
 	return etClosedPolygon;
-
 }
 
 //////////////////////////////////////////////////////////////
@@ -77,7 +80,7 @@ CncPathListManager::CncPathListManager()
 , totalDistance				(0.0)
 //////////////////////////////////////////////////////////////////
 {
-	// reservate memory
+	// reserve memory
 	pathList .reserve(THE_CONFIG->getConstReserveCapacity());
 	guideList.reserve(THE_CONFIG->getConstReserveCapacity());
 	
@@ -103,7 +106,7 @@ CncPathListManager::CncPathListManager(const CncPathListEntry& initialEntry)
 , totalDistance				(0.0)
 //////////////////////////////////////////////////////////////////
 {
-	// reservate memory
+	// reserve memory
 	pathList .reserve(THE_CONFIG->getConstReserveCapacity());
 	guideList.reserve(THE_CONFIG->getConstReserveCapacity());
 	
@@ -230,8 +233,60 @@ auto CncPathListManager::cFirstPosEntryIterator() const {
 auto CncPathListManager::crLastPosEntryIterator() const {
 //////////////////////////////////////////////////////////////////
 	auto it = crbegin();
-	while ( it != crend() ) {
+	while ( it != crend() ) 
+	{
 		if ( it->isPositionChange() )
+			break;
+			
+		it++;
+	}
+	
+	return it;
+}
+//////////////////////////////////////////////////////////////////
+CncPathListManager::TFS CncPathListManager::crLastValidEntryWithTFS() const {
+//////////////////////////////////////////////////////////////////
+	CncPathListManager::TFS tfs;
+	auto it = crbegin();
+	
+	tfs.itT = tfs.itF = tfs.itS = crend();
+	bool t = false, f = false,  s = false;
+	
+	while ( it != crend() ) 
+	{
+		if ( t == false && it->hasToolChange() )
+		{
+			tfs.itT = it;
+			t = true;
+		}
+	
+		if ( f == false && it->hasSpeedValueF() )
+		{
+			tfs.itF = it;
+			f = true;
+		}
+		
+		if ( s == false && it->hasSpeedValueS() )
+		{
+			tfs.itS = it;
+			s = true;
+		}
+		
+		if ( t & f && s )
+			break;
+		
+		it++;
+	}
+	
+	return tfs;
+}
+//////////////////////////////////////////////////////////////////
+auto CncPathListManager::crLastValidEntryWithT() const {
+//////////////////////////////////////////////////////////////////
+	auto it = crbegin();
+	while ( it != crend() ) 
+	{
+		if ( it->hasToolChange() )
 			break;
 			
 		it++;
@@ -275,7 +330,8 @@ bool CncPathListManager::hasMovement() const {
 //////////////////////////////////////////////////////////////////
 const char* CncPathListManager::getPathTypeAsStr() const {
 //////////////////////////////////////////////////////////////////
-	switch ( pathType ) {
+	switch ( pathType ) 
+	{
 		case PT_CNC_PATH: 		return "CNC Path";
 		case PT_GUIDE_PATH: 	return "GUIDE Path";
 	}
@@ -324,39 +380,33 @@ void CncPathListManager::initNextPath(const CncPathListEntry& initialEntry) {
 //////////////////////////////////////////////////////////////////
 void CncPathListManager::initNextPath(bool linked) {
 //////////////////////////////////////////////////////////////////
-	totalDistance			= 0.0;
-	
 	CncPathListEntry cpe;
-	cpe.setNothingChanged();
+	
+	if ( linked == true )
+	{
+		cpe.setNothingChanged();
 
-	cpe.entryDistance		= CncPathListEntry::NoDistance;
-	cpe.pathListReference	= CncTimeFunctions::getNanoTimestamp();
+		cpe.entryDistance		= CncPathListEntry::NoDistance;
+		cpe.pathListReference	= CncTimeFunctions::getNanoTimestamp();
+		
+		auto itLast  = clast();
+		CncPathListManager::TFS tfs = crLastValidEntryWithTFS();
+		
+		const bool last  = ( pathType == PT_CNC_PATH && itLast  != cend()  );
+		const bool lastT = ( pathType == PT_CNC_PATH && tfs.itT != crend() );
+		const bool lastF = ( pathType == PT_CNC_PATH && tfs.itF != crend() );
+		const bool lastS = ( pathType == PT_CNC_PATH && tfs.itS != crend() );
+		
+		cpe.clientId			= last  ? itLast ->clientId				: CncPathListEntry::DefaultClientID;
+		cpe.toolId				= lastT ? tfs.itT->toolId				: CncPathListEntry::DefaultToolID;
+		cpe.feedSpeedMode		= lastF ? tfs.itF->feedSpeedMode		: CncPathListEntry::DefaultSpeedMode;
+		cpe.feedSpeed_MM_MIN	= lastF ? tfs.itF->feedSpeed_MM_MIN		: CncPathListEntry::DefaultSpeedValue;
+		cpe.spindleState		= lastS ? tfs.itS->spindleState			: CncPathListEntry::DefaultSpindleState;
+		cpe.spindleSpeed_U_MIN	= lastS ? tfs.itS->spindleSpeed_U_MIN	: CncPathListEntry::DefaultSpindleSpeedValue;
+		cpe.entryTarget			= last  ? itLast ->entryTarget			: CncPathListEntry::ZeroTarget;
+	}
 	
-	/*
-	auto itLast = crLastPosEntryIterator();
-	const bool b = (pathType == PT_CNC_PATH && itLast != crend());
-	
-	cpe.clientId			= b ? itLast->clientId         : CncPathListEntry::DefaultClientID;
-	cpe.feedSpeedMode		= b ? itLast->feedSpeedMode    : CncPathListEntry::DefaultSpeedMode;
-	cpe.feedSpeed_MM_MIN	= b ? itLast->feedSpeed_MM_MIN : CncPathListEntry::DefaultSpeedValue;
-	cpe.entryTarget			= b ? itLast->entryTarget      : CncPathListEntry::ZeroTarget;
-	*/
-	
-	auto itLast  = clast();
-	auto itLastF = crLastValidEntryWithF();
-	auto itLastS = crLastValidEntryWithF();
-
-	const bool last  = ( pathType == PT_CNC_PATH && itLast  != cend()  );
-	const bool lastF = ( pathType == PT_CNC_PATH && itLastF != crend() );
-	const bool lastS = ( pathType == PT_CNC_PATH && itLastS != crend() );
-	
-	cpe.clientId			= last  ? itLast ->clientId				: CncPathListEntry::DefaultClientID;
-	cpe.feedSpeedMode		= lastF ? itLastF->feedSpeedMode		: CncPathListEntry::DefaultSpeedMode;
-	cpe.feedSpeed_MM_MIN	= lastF ? itLastF->feedSpeed_MM_MIN		: CncPathListEntry::DefaultSpeedValue;
-	cpe.spindleState		= lastS ? itLastS->spindleState			: CncPathListEntry::DefaultSpindleState;
-	cpe.spindleSpeed_U_MIN	= lastS ? itLastS->spindleSpeed_U_MIN	: CncPathListEntry::DefaultSpindleSpeedValue;
-	cpe.entryTarget			= last  ? itLast ->entryTarget			: CncPathListEntry::ZeroTarget;
-	
+	totalDistance = 0.0;
 	clear();
 	
 	if ( linked == true )
@@ -408,6 +458,7 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(long clientId) {
 	cpe.entryDistance			= CncPathListEntry::NoDistance;
 	cpe.clientId				= clientId;
 	
+	cpe.toolId					= prevEntry.toolId;
 	cpe.pathListReference		= prevEntry.pathListReference;
 	cpe.alreadyRendered			= prevEntry.alreadyRendered;
 	cpe.entryTarget				= prevEntry.entryTarget;
@@ -438,6 +489,29 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, doubl
 	cpe.feedSpeedMode			= mode;
 	cpe.feedSpeed_MM_MIN		= feedSpeed_MM_MIN;
 	
+	cpe.toolId					= prevEntry.toolId;
+	cpe.pathListReference		= prevEntry.pathListReference;
+	cpe.clientId				= prevEntry.clientId;
+	cpe.alreadyRendered			= prevEntry.alreadyRendered;
+	cpe.entryTarget				= prevEntry.entryTarget;
+	cpe.spindleState			= prevEntry.spindleState;
+	cpe.spindleSpeed_U_MIN		= prevEntry.spindleSpeed_U_MIN;
+	
+	// append
+	return appendEntry(cpe), getPathList().back();
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntryToC(int toolId) {
+//////////////////////////////////////////////////////////////////
+	CncPathListEntry cpe;
+	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
+	
+	cpe.setToolChange();
+	cpe.entryDistance			= CncPathListEntry::NoDistance;
+	cpe.toolId					= toolId;
+	
+	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
+	cpe.feedSpeed_MM_MIN		= prevEntry.feedSpeed_MM_MIN;
 	cpe.pathListReference		= prevEntry.pathListReference;
 	cpe.clientId				= prevEntry.clientId;
 	cpe.alreadyRendered			= prevEntry.alreadyRendered;
@@ -466,11 +540,12 @@ const CncPathListEntry& CncPathListManager::addEntrySpl(CncSpindlePowerState spi
 	CncPathListEntry cpe;
 	CncPathListEntry& prevEntry	= getPathListSize() ? getPathListIntern().back() : defaultEntry;
 	
-	cpe.setToolChange();
+	cpe.setSpindleChange();
 	cpe.entryDistance			= CncPathListEntry::NoDistance;
 	cpe.spindleState			= spindleState;
 	cpe.spindleSpeed_U_MIN		= spindleSpeed_U_MIN;
 	
+	cpe.toolId					= prevEntry.toolId;
 	cpe.pathListReference		= prevEntry.pathListReference;
 	cpe.clientId				= prevEntry.clientId;
 	cpe.alreadyRendered			= prevEntry.alreadyRendered;
@@ -499,6 +574,7 @@ const CncPathListEntry& CncPathListManager::addEntryAbs(double newAbsPosX, doubl
 	cpe.entryTarget				= { newAbsPosX, newAbsPosY, newAbsPosZ };
 	cpe.entryDistance			= { distanceX,  distanceY,  distanceZ  };
 	
+	cpe.toolId					= prevEntry.toolId;
 	cpe.pathListReference		= prevEntry.pathListReference;
 	cpe.clientId				= prevEntry.clientId;
 	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
@@ -529,6 +605,7 @@ const CncPathListEntry& CncPathListManager::addEntryRel(double deltaX, double de
 	cpe.entryDistance			= { deltaX,  deltaY,  deltaZ  };
 	cpe.entryTarget				= { targetX, targetY, targetZ };
 	
+	cpe.toolId					= prevEntry.toolId;
 	cpe.pathListReference		= prevEntry.pathListReference;
 	cpe.clientId				= prevEntry.clientId;
 	cpe.feedSpeedMode			= prevEntry.feedSpeedMode;
@@ -563,13 +640,13 @@ size_t CncPathListManager::normalizeLinkedEntry(const CncPathListEntry& ref) {
 	if ( getPathListSize() == 0 )
 		return 0;
 		
-	CncPathListEntry& firstEntry = *(getPathListIntern().begin());
-	if ( firstEntry.isNothingChanged() == false )
-		;//return 0;
+	//CncPathListEntry& firstEntry = *(getPathListIntern().begin());
+	//if ( firstEntry.isNothingChanged() == false )
+	//	return 0;
 	
 	for ( auto it = begin(); it != end(); ++it ) 
 	{
-		CncPathListEntry& ple 	 = *it;
+		CncPathListEntry& ple = *it;
 		
 		ple.clientId			= ref.clientId;
 		ple.feedSpeedMode		= ref.feedSpeedMode;
@@ -578,7 +655,10 @@ size_t CncPathListManager::normalizeLinkedEntry(const CncPathListEntry& ref) {
 		ple.spindleSpeed_U_MIN	= ref.spindleSpeed_U_MIN;
 		
 		if ( std::distance(begin(), it) == 0 )
-			ple.content |= CncPathListEntry::CONT_CLIENTID | CncPathListEntry::CONT_SPEED;
+		{
+			ple.content	|= CncPathListEntry::CONT_CLIENTID 
+						|  CncPathListEntry::CONT_SPEED;
+		}
 	}
 	
 	return getPathListSize();
@@ -597,6 +677,7 @@ void CncPathListManager::init(const CncDoublePosition& p) {
 	initialEntry.entryDistance		= CncPathListEntry::NoDistance;
 	initialEntry.entryTarget		= p;
 	initialEntry.clientId			= CncPathListEntry::DefaultClientID;
+	initialEntry.toolId				= CncPathListEntry::DefaultToolID;
 	initialEntry.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
 	initialEntry.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
 	initialEntry.spindleState		= CncPathListEntry::DefaultSpindleState;
@@ -799,15 +880,18 @@ bool CncPathListManager::adjustZOffset(double offset, bool relative) {
 	minPosZ			= 0.0;
 	maxPosZ			= 0.0;
 	
-	for ( auto it = begin(); it != end(); ++it) {
+	for ( auto it = begin(); it != end(); ++it)
+	{
 		CncPathListEntry& pe1 = *it;
 		
-		if ( pe1.hasPositionChange() == true ) {
-			
-			if ( relative == true ) {
+		if ( pe1.hasPositionChange() == true ) 
+		{
+			if ( relative == true ) 
+			{
 				pe1.entryTarget.incZ(offset);
 			}
-			else {
+			else 
+			{
 				// optimization
 				if ( pe1.entryTarget.getZ() == offset )
 					continue;
@@ -825,16 +909,17 @@ bool CncPathListManager::adjustZOffset(double offset, bool relative) {
 //////////////////////////////////////////////////////////////////
 bool CncPathListManager::processXYHelix(double zBegDepth, double zTotDepth, double zFeed360) {
 //////////////////////////////////////////////////////////////////
-	if ( cnc::dblCmp::le(zFeed360, 0.0) ) {
+	if ( cnc::dblCmp::le(zFeed360, 0.0) )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Invalid z feed parameter: %.3lf", zFeed360));
 		return false;
 	}
 	
 	// ----------------------------------------------------------
-	auto getPositionCount = [&]() {
-		if ( true ) {
+	auto getPositionCount = [&]() 
+	{
+		if ( true )
 			return getPathListSize();
-		}
 		
 		unsigned int c = 0;
 		for ( auto it = begin(); it != end(); ++it) {
@@ -862,36 +947,41 @@ bool CncPathListManager::processXYHelix(double zBegDepth, double zTotDepth, doub
 		double zCurStop = std::max(zBegDepth - (zFeed360 * duration), zTotDepth );
 		
 		// modify the exiting path to go the first helix step down
-		if ( duration == 1 ) {
-			
-			for ( auto it = begin(); it != end(); ++it) {
+		if ( duration == 1 )
+		{
+			for ( auto it = begin(); it != end(); ++it) 
+			{
 				CncPathListEntry& pe = *it;
 				
-				if ( pe.hasPositionChange() == true ) {
+				if ( pe.hasPositionChange() == true ) 
+				{
 					zCurDepth += stepSize;
 					
-					if ( cnc::dblCmp::lt(zCurDepth, zCurStop) ) {
+					if ( cnc::dblCmp::lt(zCurDepth, zCurStop) ) 
+					{
 						pe.entryDistance.setZ(stepSize - abs(zCurStop - zCurDepth) );
 						pe.entryTarget.setZ(zCurStop);
 					}
-					else {
+					else 
+					{
 						pe.entryDistance.setZ(stepSize);
 						pe.entryTarget.setZ(zCurDepth);
 					}
 				}
 			}
 		}
-		// append further helix steps down to reach the final depth
-		else {
-			
-			for ( auto it = source.begin() + 1; it != source.end(); ++it) {
+		else 
+		{
+			// append further helix steps down to reach the final depth
+			for ( auto it = source.begin() + 1; it != source.end(); ++it) 
+			{
 				const CncPathListEntry& pe = *it;
 				
 				if ( cnc::dblCmp::nu(pe.entryDistance.getX()) && cnc::dblCmp::nu(pe.entryDistance.getY()) )
 					continue;
 				
-				if ( pe.hasPositionChange() == true ) {
-					
+				if ( pe.hasPositionChange() == true )
+				{
 					zCurDepth += stepSize;
 					
 					if ( cnc::dblCmp::lt(zCurDepth, zCurStop) )	addEntryAbs(pe.entryTarget.getX(), pe.entryTarget.getY(), zCurStop);
@@ -907,7 +997,8 @@ bool CncPathListManager::processXYHelix(double zBegDepth, double zTotDepth, doub
 	// last try to step minimal to a inner radius before finalize 
 	// and moving up again (outside this method)
 	source.processXYOffset(-0.5);
-	if ( source.getPathListSize() > 1 ) {
+	if ( source.getPathListSize() > 1 ) 
+	{
 		const CncPathListEntry& pe = *(source.begin() + 1);
 		addEntryAbs(pe.entryTarget.getX(), pe.entryTarget.getY(), zTotDepth);
 	}
@@ -983,17 +1074,16 @@ bool CncPathListManager::processXYOffset(double offset, JoinType jt, EndType et)
 	
 	size_t points = 0;
 	
-	for (auto it=result.begin(); it != result.end(); ++it) {
-		
+	for (auto it=result.begin(); it != result.end(); ++it) 
+	{
 		ClipperLib::Path& path = *it;
 		closePath(path);
 		ensureDirection(finalDirection, path);
 		
 		points += path.size();
 		
-		for (auto itP=path.begin(); itP != path.end(); ++itP) {
+		for (auto itP=path.begin(); itP != path.end(); ++itP) 
 			addEntryAbs(ClipperLib::asCncDoublePosition(*itP), false);
-		}
 	}
 	
 	if ( points == 0 ) {

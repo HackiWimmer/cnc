@@ -5,10 +5,10 @@
 
 
 //////////////////////////////////////////////////////////////////
-#define CTX_ADD_SEP(msg)	THE_CONTEXT->addParsingSynopisSeparator(wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define CTX_LOG_INF(msg)	THE_CONTEXT->addParsingSynopisInfo     (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define CTX_LOG_WAR(msg)	THE_CONTEXT->addParsingSynopisWarning  (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
-#define CTX_LOG_ERR(msg)	THE_CONTEXT->addParsingSynopisError    (wxString::Format("[LN: %8ld]: %s", getCurrentLineNumber(), msg));
+#define CTX_ADD_SEP(msg)	THE_CONTEXT->addParsingSynopisSeparator(wxString::Format("[LINE: %8ld]: %s", getCurrentLineNumber(), msg));
+#define CTX_LOG_INF(msg)	THE_CONTEXT->addParsingSynopisInfo     (wxString::Format("[LINE: %8ld]: %s", getCurrentLineNumber(), msg));
+#define CTX_LOG_WAR(msg)	THE_CONTEXT->addParsingSynopisWarning  (wxString::Format("[LINE: %8ld]: %s", getCurrentLineNumber(), msg));
+#define CTX_LOG_ERR(msg)	THE_CONTEXT->addParsingSynopisError    (wxString::Format("[LINE: %8ld]: %s", getCurrentLineNumber(), msg));
 
 //////////////////////////////////////////////////////////////////
 SvgCncContextBase::SvgCncContextBase()
@@ -81,7 +81,13 @@ void SvgCncContextBase::traceTo(std::ostream& o, unsigned int indent) const {
 	const wxString prefix(' ', (int)indent);
 	
 	for ( auto it = parameterMap.begin(); it != parameterMap.end(); ++it )
-		o << wxString::Format("%s%s%s = %s\n", prefix, it->first, wxString(' ', 25 - it->first.length()), it->second);
+	{
+		o << wxString::Format("%s%s%s = %s\n", 
+								prefix, 
+								it->first, 
+								wxString(' ', 29 - it->first.length()), it->second)
+		;
+	}
 }
 //////////////////////////////////////////////////////////////////
 bool SvgCncContextBase::deleteParameter(const wxString& key) {
@@ -100,18 +106,21 @@ bool SvgCncContextBase::provide(const wxString& name, const wxString& value) {
 	
 	if ( n.IsEmpty() )
 		return false;
-	
+		
 	bool ret = true;
 	
-	if ( value.IsSameAs(DEL_Modifyer) ) {
-		deleteParameter(n);
+	if ( value.IsSameAs(DEL_Modifyer) )
+	{
+		ret = deleteParameter(n);
 		manageParameter(Delete, n, value);
 	}
-	else {
+	else
+	{
 		wxString v;
 		ret = replaceVariables(value, v);
 		// always do this
 		parameterMap[n] = v;
+		
 		manageParameter(Update, n, v);
 	}
 	
@@ -132,7 +141,8 @@ bool SvgCncContextBase::provide(const wxXmlNode* node) {
 		return false;
 		
 	wxXmlAttribute* a = node->GetAttributes();
-	while ( a != NULL ) {
+	while ( a != NULL )
+	{
 		if ( provide(a) == false )
 			std::cerr << CNC_LOG_FUNCT_A(" Invalid attribute name ='%s', storage failed\n", a->GetName());
 			
@@ -162,7 +172,8 @@ bool SvgCncContextBase::provideVariables(const wxXmlNode *node) {
 		return false;
 		
 	wxXmlAttribute* a = node->GetAttributes();
-	while ( a != NULL ) {
+	while ( a != NULL )
+	{
 		if ( provideVariables(a) == false )
 			std::cerr << CNC_LOG_FUNCT_A(" Invalid variables name, storage failed\n");
 			
@@ -174,7 +185,8 @@ bool SvgCncContextBase::provideVariables(const wxXmlNode *node) {
 //////////////////////////////////////////////////////////////////
 const wxVariant SvgCncContextBase::getParameter(const wxString& key, const char* def) const {
 //////////////////////////////////////////////////////////////////
-	if ( def != NULL ) {
+	if ( def != NULL )
+	{
 		auto it = parameterMap.find(key);
 		const wxVariant ret( it != parameterMap.end() ? it->second : wxString(def));
 		return ret;
@@ -216,7 +228,8 @@ const wxString SvgCncContextBase::getParameterValue(const wxString& key) const {
 //////////////////////////////////////////////////////////////////
 	auto it = parameterMap.find(key);
 	
-	if ( it == parameterMap.end() ) {
+	if ( it == parameterMap.end() )
+	{
 		std::cerr << CNC_LOG_FUNCT_A(wxString::Format(" Can't find key = '%s'\n", key));
 		return "";
 	}
@@ -270,6 +283,7 @@ SvgCncContext::SvgCncContext()
 , currentRapidSpeed_MM_MIN	(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , currentWorkSpeed_MM_MIN	(THE_CONFIG->getDefaultWorkSpeed_MM_MIN())
 , currentSpindleSpeed_U_MIN	(THE_CONFIG->getSpindleSpeedDefault())
+, currentToolId				()
 , toolList					()
 , pathModification			(CncPM_None)
 , pathRule					(CncPR_None)
@@ -278,14 +292,18 @@ SvgCncContext::SvgCncContext()
 //////////////////////////////////////////////////////////////////
 {
 	// defaults
-	provide(ID_COLOUR_SCHEME,	THE_CONFIG->getSvgUseColourScheme() ? "YES" : "NO" );
-	provide(ID_TOOL_LIST,		wxString::Format("%s=[0.00]",	ID_DEFAULT_TOOL_ID));
-	provide(ID_TOOL_SEL,		wxString::Format("%s",			ID_DEFAULT_TOOL_ID));
-	provide(ID_DEPT,			"Z-0.0");
-	provide(ID_MAX_FEED_STEP,	wxString::Format("Z%+.1lf",		THE_CONFIG->getMaxDurationThickness()));
+	const int    id  = THE_CONFIG->getDefaultToolId();
+	const double tdm = THE_CONFIG->getToolDiameter(id);
+	const double fst = tdm / 2.0;
+	
+	provide(ID_TOOL_LIST,		wxString::Format("%s",			THE_CONFIG->getShortToolListAsStr()));
+	provide(ID_TOOL_SEL,		wxString::Format("%s",			THE_CONFIG->getDefaultToolIdAsStr()));
+	provide(ID_MAX_FEED_STEP,	wxString::Format("Z%+.3lf",		fst));
 	provide(ID_RAPID_SPEED,		wxString::Format("R%+.1lf",		currentRapidSpeed_MM_MIN));
 	provide(ID_WORK_SPEED,		wxString::Format("W%+.1lf",		currentWorkSpeed_MM_MIN));
 	provide(ID_SPINDLE_SPEED,	wxString::Format("S%+.1lf",		currentSpindleSpeed_U_MIN));
+	provide(ID_COLOUR_SCHEME,	THE_CONFIG->getSvgUseColourScheme() ? "YES" : "NO" );
+	provide(ID_DEPT,			"Z-0.0");
 	provide(ID_ARG_SWEEP_FLAG,	"No");
 }
 //////////////////////////////////////////////////////////////////
@@ -299,21 +317,27 @@ SvgCncContext::SvgCncContext(const SvgCncContext& scc)
 //////////////////////////////////////////////////////////////////
 SvgCncContext& SvgCncContext::operator= (const SvgCncContext& scc) {
 //////////////////////////////////////////////////////////////////
-	SvgCncContextBase::operator= (scc);
-	
-	reconstruct();
-
-	isUseColouScheme			= scc.useColourScheme();
-	currentZMaxFeedStep			= scc.getCurrentZMaxFeedStep();
-	currentZDepth				= scc.getCurrentZDepth();
-	currentZDepthMode			= scc.getCurrentZDepthMode();
-	currentRapidSpeed_MM_MIN	= scc.getCurrentRapidSpeed_MM_MIN();
-	currentWorkSpeed_MM_MIN		= scc.getCurrentWorkSpeed_MM_MIN();
-	toolList					= scc.toolList;
-	pathModification			= scc.pathModification;
-	pathRule					= scc.pathRule;
-	fillColourDecoder			= scc.fillColourDecoder;
-	strokeColourDecoder			= scc.strokeColourDecoder;
+	// self-assignment check
+	if ( this != &scc ) 
+	{
+		SvgCncContextBase::operator= (scc);
+		
+		// reconstruct() was replace here to reduce the error messages
+		//reconstruct();
+		
+		isUseColouScheme			= scc.useColourScheme();
+		currentZMaxFeedStep			= scc.getCurrentZMaxFeedStep();
+		currentZDepth				= scc.getCurrentZDepth();
+		currentZDepthMode			= scc.getCurrentZDepthMode();
+		currentRapidSpeed_MM_MIN	= scc.getCurrentRapidSpeed_MM_MIN();
+		currentWorkSpeed_MM_MIN		= scc.getCurrentWorkSpeed_MM_MIN();
+		currentToolId				= scc.getCurrentToolId();
+		toolList					= scc.toolList;
+		pathModification			= scc.pathModification;
+		pathRule					= scc.pathRule;
+		fillColourDecoder			= scc.fillColourDecoder;
+		strokeColourDecoder			= scc.strokeColourDecoder;
+	}
 	
 	return *this;
 }
@@ -329,8 +353,17 @@ void SvgCncContext::reconstruct() {
 //////////////////////////////////////////////////////////////////
 void SvgCncContext::traceTo(std::ostream& o, unsigned int indent) const {
 //////////////////////////////////////////////////////////////////
-	const wxString prefix(' ', (int)indent);
+	// ------------------------------------------------------
+	auto fillUp = [](const wxString& name)
+	{
+		const unsigned int length = 25;
+		const unsigned int rest = length >= name.length() ? length - name.length() : 0;
+		
+		return wxString(' ', rest);
+	};
 	
+	// ------------------------------------------------------
+	const wxString prefix(' ', (int)indent);
 	o	<< prefix
 		<< "Current Cnc Parameter, line: " 
 		<< ClientIds::lineNumber(getCurrentClientID())
@@ -342,35 +375,43 @@ void SvgCncContext::traceTo(std::ostream& o, unsigned int indent) const {
 		
 		SvgCncContextBase::traceTo(o, indent + 2);
 		
-		const unsigned int fillTo = 21;
 		wxString name;
 		
 		name.assign("Is Guide Path");
-		o	 << wxString::Format("%s  --> %s%s = %s\n", prefix, name, wxString(' ', fillTo - name.length()), (isGuidePath() ? "Yes" : "No"));
+		o	 << wxString::Format("%s  --> %s%s = %s\n",					prefix, name, fillUp(name), (isGuidePath() ? "Yes" : "No"));
 		
 		name.assign("Is Zero Ref Path");
-		o	 << wxString::Format("%s  --> %s%s = %s\n", prefix, name, wxString(' ', fillTo - name.length()), (isZeroPosPath() ? "Yes" : "No"));
+		o	 << wxString::Format("%s  --> %s%s = %s\n",					prefix, name, fillUp(name), (isZeroPosPath() ? "Yes" : "No"));
 		
 		name.assign("Use Colour Scheme");
-		o	 << wxString::Format("%s  --> %s%s = %s\n", prefix, name, wxString(' ', fillTo - name.length()), (isUseColouScheme ? "Yes" : "No"));
+		o	 << wxString::Format("%s  --> %s%s = %s\n",					prefix, name, fillUp(name), (isUseColouScheme ? "Yes" : "No"));
+		
+		name.assign("Path Modification Type");
+		o	 << wxString::Format("%s  --> %s%s = %s\n",					prefix, name, fillUp(name), getPathModificationTypeAsStr());
+		
+		name.assign("Path Rule Type");
+		o	 << wxString::Format("%s  --> %s%s = %s\n",					prefix, name, fillUp(name), getPathRuleTypeAsStr());
+		
+		name.assign("Tool ID");
+		o	 << wxString::Format("%s  --> %s%s = %d\n",					prefix, name, fillUp(name), getCurrentToolId());
 		
 		name.assign("Tool Diameter");
-		o	 << wxString::Format("%s  --> %s%s = %.3lf\n", prefix, name, wxString(' ', fillTo - name.length()), getCurrentToolDiameter());
+		o	 << wxString::Format("%s  --> %s%s = %.3lf [mm]\n",			prefix, name, fillUp(name), getCurrentToolDiameter());
 		
 		name.assign("ZDepth");
-		o	 << wxString::Format("%s  --> %s%s = %s [mm]\n", prefix, name, wxString(' ', fillTo - name.length()), getCurrentZDeptAsStr());
+		o	 << wxString::Format("%s  --> %s%s = %s [mm]\n",			prefix, name, fillUp(name), getCurrentZDeptAsStr());
 		
 		name.assign("ZMAxFeedStep");
-		o	 << wxString::Format("%s  --> %s%s = %.3lf [mm]\n", prefix, name, wxString(' ', fillTo - name.length()), getCurrentZMaxFeedStep());
+		o	 << wxString::Format("%s  --> %s%s = %.3lf [mm]\n",			prefix, name, fillUp(name), getCurrentZMaxFeedStep());
 		
 		name.assign("Speed Rapid");
-		o	 << wxString::Format("%s  --> %s%s = %+.1lf [mm/min]\n", prefix, name, wxString(' ', fillTo - name.length()), currentRapidSpeed_MM_MIN);
+		o	 << wxString::Format("%s  --> %s%s = %+.1lf [mm/min]\n",	prefix, name, fillUp(name), currentRapidSpeed_MM_MIN);
 		
 		name.assign("Speed Work");
-		o	 << wxString::Format("%s  --> %s%s = %+.1lf [mm/min]\n", prefix, name, wxString(' ', fillTo - name.length()), currentWorkSpeed_MM_MIN);
+		o	 << wxString::Format("%s  --> %s%s = %+.1lf [mm/min]\n",	prefix, name, fillUp(name), currentWorkSpeed_MM_MIN);
 		
 		name.assign("Speed Spindle");
-		o	 << wxString::Format("%s  --> %s%s = %+.1lf [U/min]\n", prefix, name, wxString(' ', fillTo - name.length()), currentSpindleSpeed_U_MIN);
+		o	 << wxString::Format("%s  --> %s%s = %+.1lf [U/min]\n",		prefix, name, fillUp(name), currentSpindleSpeed_U_MIN);
 		// ...
 	
 	o	<< prefix
@@ -393,10 +434,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 	bool commandExists = false;
 	
 	// ----------------------------------------------------------
-	if ( name.IsSameAs(ID_DEPT) ) {
+	if ( name.IsSameAs(ID_DEPT) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				currentZDepth		= 0.0;
@@ -412,10 +455,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_MAX_FEED_STEP) ) {
+	else if ( name.IsSameAs(ID_MAX_FEED_STEP) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				setCurrentZFeedStep(wxString::Format("Z+%lf", THE_CONFIG->getMaxDurationThickness()));
@@ -429,27 +474,37 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_TOOL_LIST) ) {
+	else if ( name.IsSameAs(ID_TOOL_LIST) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
-				toolList.clear();
+				manageParameter(Mode::Update, name, THE_CONFIG->getShortToolListAsStr());
 				break;
 			}
 			case Update:
 			{
 				setToolList(value);
+				
+				/*
+				const wxString n(ID_TOOL_SEL);
+				if ( hasParameter(n) == false )
+					manageParameter(Mode::Update, n, THE_CONFIG->getDefaultToolIdAsStr());
+				*/
 				break;
 			}
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_TOOL_ADD) ) {
+	else if ( name.IsSameAs(ID_TOOL_ADD) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				break;
@@ -464,10 +519,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		deleteParameter(name);
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_TOOL_DEL) ) {
+	else if ( name.IsSameAs(ID_TOOL_DEL) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				break;
@@ -482,32 +539,38 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		deleteParameter(name);
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_TOOL_SEL) ) {
+	else if ( name.IsSameAs(ID_TOOL_SEL) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				break;
 			}
 			case Update:
 			{
-				if ( checkToolExists(value) == false ) {
+				if ( checkToolExists(value) == false )
+				{
 					CTX_LOG_ERR(wxString::Format(" A tool with id = '%s' didn't exist within the tool list.\n", value));
 				}
-				else {
-					THE_CONTEXT->setCurrentToolDiameter(getCurrentToolDiameter());
+				
+				if ( setCurrentToolId(value) == false )
+				{
+					CTX_LOG_ERR(wxString::Format(" setCurrentToolId(%s) failed.\n", value));
 				}
-					
 				break;
 			}
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_PATH_MODE) ) {
+	else if ( name.IsSameAs(ID_PATH_MODE) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				pathModification = CncPM_None;
@@ -515,21 +578,23 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 			}
 			case Update:
 			{
-				if      ( value.IsSameAs("Center", false) )		pathModification = CncPM_Center;
-				else if ( value.IsSameAs("Inner",  false) )		pathModification = CncPM_Inner;
-				else if ( value.IsSameAs("Outer",  false) )		pathModification = CncPM_Outer;
-				else if ( value.IsSameAs("Pocket", false) )		pathModification = CncPM_Pocket;
-				else 											pathModification = CncPM_None;
+				if      ( value.IsSameAs(KEY_PM_CENTRE, false) )		pathModification = CncPM_Center;
+				else if ( value.IsSameAs(KEY_PM_INNER,  false) )		pathModification = CncPM_Inner;
+				else if ( value.IsSameAs(KEY_PM_OUTER,  false) )		pathModification = CncPM_Outer;
+				else if ( value.IsSameAs(KEY_PM_POCKET, false) )		pathModification = CncPM_Pocket;
+				else 													pathModification = CncPM_None;
 				
 				break;
 			}
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_PATH_RULE) ) {
+	else if ( name.IsSameAs(ID_PATH_RULE) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				pathRule = CncPR_None;
@@ -547,10 +612,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_COLOUR_SCHEME) ) {
+	else if ( name.IsSameAs(ID_COLOUR_SCHEME) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				isUseColouScheme = convertToBool(name);
@@ -566,10 +633,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_RAPID_SPEED) ) {
+	else if ( name.IsSameAs(ID_RAPID_SPEED) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				currentRapidSpeed_MM_MIN = THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
@@ -583,10 +652,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_WORK_SPEED) ) {
+	else if ( name.IsSameAs(ID_WORK_SPEED) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				currentWorkSpeed_MM_MIN = THE_CONFIG->getDefaultWorkSpeed_MM_MIN();
@@ -599,10 +670,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_SPINDLE_SPEED) ) {
+	else if ( name.IsSameAs(ID_SPINDLE_SPEED) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			{
 				currentSpindleSpeed_U_MIN = THE_CONFIG->getSpindleSpeedDefault();
@@ -615,10 +688,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_SPINDLE_STATE) ) {
+	else if ( name.IsSameAs(ID_SPINDLE_STATE) ) 
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			case Update:
 			{
@@ -628,10 +703,12 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 	}
 	// ----------------------------------------------------------
-	else if ( name.IsSameAs(ID_ARG_SWEEP_FLAG) ) {
+	else if ( name.IsSameAs(ID_ARG_SWEEP_FLAG) )
+	{
 		commandExists = true;
 		
-		switch ( mode ) {
+		switch ( mode ) 
+		{
 			case Delete:
 			case Update:
 			{
@@ -641,13 +718,72 @@ void SvgCncContext::manageParameter(const Mode mode, const wxString& name, const
 		}
 		
 	}
+	// ----------------------------------------------------------
+	else if ( name.StartsWith(ID_SHAPER_PREFIX) ) 
+	{
+		commandExists = true;
 		
+		if ( name.IsSameAs(ID_SHAPER_CUT_TYPE) )
+		{
+			// recursive call to map to cnc format
+			const wxString n(ID_PATH_MODE);
+			manageParameter(mode, n, cnvPathMode_ShaperToCnc(value));
+		}
+		else if ( name.IsSameAs(ID_SHAPER_CUT_DEPTH) )
+		{
+			// recursive call to map to cnc format
+			const wxString n(ID_DEPT);
+			manageParameter(mode, n, cnvDepth_ShaperToCnc(value));
+		}
+		else
+		{
+			CNC_CERR_FUNCT_A(" Unknown shaper parameter name: %s = %s", name, value);
+		}
+	}
+	
 	// ----------------------------------------------------------
 	// final checks
 	if ( commandExists == false ) {
 		if ( name.StartsWith("{") == false )
 			CTX_LOG_WAR(wxString::Format(" Unknown CncParameter '%s' = '%s'\n", name, value));
 	}
+}
+//////////////////////////////////////////////////////////////////
+wxString SvgCncContext::cnvPathMode_ShaperToCnc(const wxString& pm) {
+//////////////////////////////////////////////////////////////////
+	if 		( pm.IsSameAs(KEY_SPAPER_CENTRE) )	return KEY_PM_CENTRE;
+	else if	( pm.IsSameAs(KEY_SPAPER_INNER) )	return KEY_PM_INNER;
+	else if	( pm.IsSameAs(KEY_SPAPER_OUTER) )	return KEY_PM_OUTER;
+	else if	( pm.IsSameAs(KEY_SPAPER_POCKET) )	return KEY_PM_POCKET;
+	else if	( pm.IsSameAs(KEY_SPAPER_GUIDE) )	return KEY_PM_GUIDE;
+	
+	CNC_PRINT_FUNCT_A(" Unknown shaper cut type: '%s'", pm)
+	return KEY_PM_NONE;
+}
+//////////////////////////////////////////////////////////////////
+wxString SvgCncContext::cnvDepth_ShaperToCnc(const wxString& d) {
+//////////////////////////////////////////////////////////////////
+	double depth = 0.0;
+	wxString v(d);
+	
+	if ( d.EndsWith("mm") )
+	{
+		v.Replace("mm", "", true);
+		v.ToDouble(&depth);
+	}
+	else if ( d.EndsWith("in") )
+	{
+		v.Replace("in", "", true);
+		v.ToDouble(&depth);
+		depth *= 25.4;
+	}
+	else
+	{
+		CNC_CERR_FUNCT_A(" Not known shaper unit! Value = %s", d);
+		return wxString::Format("Z-%lf", 0.0);
+	}
+	
+	return wxString::Format("Z-%lf", depth);
 }
 //////////////////////////////////////////////////////////////////
 bool SvgCncContext::isCurrentZFeedStepToStrong() const {
@@ -658,25 +794,28 @@ bool SvgCncContext::isCurrentZFeedStepToStrong() const {
 	const double val = std::min(fabs(getCurrentZDepth()), fabs(getCurrentZMaxFeedStep()));
 	
 	// only if something in Z direction has to be done
-	if ( cnc::dblCmp::nu(dpt) == false ) {
-		
+	if ( cnc::dblCmp::nu(dpt) == false )
+	{
 		// only if the tool diameter is well known
-		if ( ctd > 0.0 ) {
-			if ( val > ctd / 2.0 ) {
-				std::cerr << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is to strong for tool diameter %.2lf. The Processing stops here!\n", nfs, ctd));
+		// less the 1.0 mm 
+		if ( ctd >= MIN_TOOL_DIM ) 
+		{
+			if ( val > ctd / 2.0 )
+			{
+				std::cerr << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.3lf [mm] is to strong for tool diameter %.3lf. The Processing stops here!\n", nfs, ctd));
 				return true;
 			}
 			
 			// generate a warning 
 			if ( val * 0.8 > ctd / 2.0 ) 
-				cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is may be to strong for tool diameter %.2lf.\n", nfs, ctd));
+				cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.3lf [mm] is may be to strong for tool diameter %.3lf.\n", nfs, ctd));
 		}
-		else {
-			
+		else
+		{
 			// generate a warning 
 			const double ctdStatic = 4.0;
 			if ( val > ctdStatic ) 
-				cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.2lf [mm] is may be to strong for tool diameter %.2lf.\n", nfs, ctdStatic));
+				cnc::cex1 << CNC_LOG_FUNCT_A(wxString::Format("The current feed step of %.3lf [mm] is may be to strong for tool diameter %.3lf.\n", nfs, ctdStatic));
 		}
 	}
 	
@@ -716,10 +855,12 @@ bool SvgCncContext::hasPathRules() const {
 void SvgCncContext::setCurrentZDepth(const wxString& parameter) {
 //////////////////////////////////////////////////////////////////
 	//ZDepth="z-1.0" || zDepth="Z5.0"
+	
 	wxString para(parameter);
 	para.Trim(true).Trim(false);
 	
-	if ( para.IsSameAs(RESET_Modifyer) ) {
+	if ( para.IsSameAs(RESET_Modifyer) )
+	{
 		currentZDepth		= 0.0;
 		currentZDepthMode	= 'Z';
 		return;
@@ -729,14 +870,16 @@ void SvgCncContext::setCurrentZDepth(const wxString& parameter) {
 		return;
 		
 	const char mode = (char)para[0];
-	if ( mode != 'z' && mode != 'Z' ) {
+	if ( mode != 'z' && mode != 'Z' )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid mode token: '%s'", para));
 		return;
 	}
 	
 	double depthValue	= 0.0;
 	para = para.SubString(1, para.Length() - 1);
-	if ( para.ToDouble(&depthValue) == false ) {
+	if ( para.ToDouble(&depthValue) == false )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid depth token: '%s'", para));
 		return;
 	}
@@ -751,7 +894,8 @@ void SvgCncContext::setCurrentZFeedStep(const wxString& parameter) {
 	wxString para(parameter);
 	para.Trim(true).Trim(false);
 	
-	if ( para.IsSameAs(RESET_Modifyer) ) {
+	if ( para.IsSameAs(RESET_Modifyer) ) 
+	{
 		currentZMaxFeedStep = 0.0;
 		return;
 	}
@@ -760,14 +904,16 @@ void SvgCncContext::setCurrentZFeedStep(const wxString& parameter) {
 		return;
 		
 	const char mode = (char)para[0];
-	if ( mode != 'Z' ) {
+	if ( mode != 'Z' )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid mode token: '%s'", para));
 		return;
 	}
 	
 	double maxValue	= 0.0;
 	para = para.SubString(1, para.Length() - 1);
-	if ( para.ToDouble(&maxValue) == false ) {
+	if ( para.ToDouble(&maxValue) == false )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid max feed step token: '%s'", para));
 		return;
 	}
@@ -784,21 +930,24 @@ void SvgCncContext::setCurrentSpeed(const char type, const wxString& parameter) 
 	if ( para.IsEmpty() )
 		return;
 		
-	if ( para.IsSameAs(RESET_Modifyer) ) {
+	if ( para.IsSameAs(RESET_Modifyer) )
+	{
 		if      ( type == 'R')	currentRapidSpeed_MM_MIN = THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
 		else if ( type == 'W')	currentWorkSpeed_MM_MIN  = THE_CONFIG->getDefaultWorkSpeed_MM_MIN();
 		return;
 	}
 	
 	const char mode = (char)para[0];
-	if ( mode != type ) {
+	if ( mode != type )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid mode token: '%s'", para));
 		return;
 	}
 	
 	double speedValue	= 0.0;
 	para = para.SubString(1, para.Length() - 1);
-	if ( para.ToDouble(&speedValue) == false ) {
+	if ( para.ToDouble(&speedValue) == false )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid speed token: '%s'", para));
 		return;
 	}
@@ -814,13 +963,15 @@ void SvgCncContext::setCurrentSpeed(const char type, const wxString& parameter) 
 		CTX_LOG_WAR(wxString::Format("Warning: High work speed value: %.lf.", currentWorkSpeed_MM_MIN));
 	
 	// errors
-	if ( currentRapidSpeed_MM_MIN > THE_CONFIG->getMaxSpeedXYZ_MM_MIN() ) {
+	if ( currentRapidSpeed_MM_MIN > THE_CONFIG->getMaxSpeedXYZ_MM_MIN() )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid rapid speed value: %.lf is greater the max speed %.lf. Value will be reset to its default value.",
 									  currentRapidSpeed_MM_MIN, THE_CONFIG->getMaxSpeedXYZ_MM_MIN()));
 		currentRapidSpeed_MM_MIN = THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
 	}
 	
-	if ( currentWorkSpeed_MM_MIN > THE_CONFIG->getMaxSpeedXYZ_MM_MIN() ) {
+	if ( currentWorkSpeed_MM_MIN > THE_CONFIG->getMaxSpeedXYZ_MM_MIN() )
+	{
 		CTX_LOG_ERR(wxString::Format("Invalid work speed value: %.lf is greater the max speed %.lf. Value will be reset to its default value.",
 									  currentWorkSpeed_MM_MIN, THE_CONFIG->getMaxSpeedXYZ_MM_MIN()));
 		currentWorkSpeed_MM_MIN  = THE_CONFIG->getDefaultWorkSpeed_MM_MIN();
@@ -892,7 +1043,7 @@ void SvgCncContext::deleteTool(const wxString& id) {
 	}
 	else 
 	{
-		CTX_LOG_ERR(wxString::Format(" Cant find tool with id='%s", id));
+		CTX_LOG_ERR(wxString::Format(" Can't find tool with id='%s", id));
 	}
 }
 //////////////////////////////////////////////////////////////////
@@ -915,10 +1066,12 @@ void SvgCncContext::addTool(const wxString& toolString) {
 	Tool t;
 	unsigned int counter = 0;
 	wxStringTokenizer tool(val, ",");
-	while ( tool.HasMoreTokens() ) {
+	while ( tool.HasMoreTokens() )
+	{
 		const wxString& para = tool.GetNextToken();
 		
-		switch ( counter ) {
+		switch ( counter ) 
+		{
 			case 0:
 			{
 				para.ToDouble(&t.diameter);
@@ -940,13 +1093,12 @@ void SvgCncContext::setToolList(const wxString& list) {
 	
 	// over all tools
 	wxStringTokenizer tools(list, ";");
-	while ( tools.HasMoreTokens() ) {
+	while ( tools.HasMoreTokens() )
+	{
 		const wxString& token = tools.GetNextToken();
-		addTool(token);
+		if ( token.IsEmpty() == false )
+			addTool(token);
 	}
-	
-	if ( checkToolExists(ID_DEFAULT_TOOL_ID) == false )
-		addTool(wxString::Format("%s=[0.00]",	ID_DEFAULT_TOOL_ID));
 }
 //////////////////////////////////////////////////////////////////
 bool SvgCncContext::checkToolExists(const wxString& id) const {
@@ -963,20 +1115,56 @@ double SvgCncContext::getToolDiameter(const wxString& id) const {
 	return it->second.diameter;
 }
 //////////////////////////////////////////////////////////////////
+double SvgCncContext::getCurrentToolDiameter() const { 
+//////////////////////////////////////////////////////////////////
+	if ( hasParameter(ID_TOOL_SEL) )
+		return getToolDiameter(getParameterAsString(ID_TOOL_SEL)); 
+		
+	return 0.0;
+}
+//////////////////////////////////////////////////////////////////
+wxString SvgCncContext::getCurrentToolIdAsStr() const { 
+//////////////////////////////////////////////////////////////////
+	if ( hasParameter(ID_TOOL_SEL) )
+		return getParameterAsString(ID_TOOL_SEL); 
+		
+	return "";
+}
+//////////////////////////////////////////////////////////////////
+bool SvgCncContext::setCurrentToolId(const wxString& s) { 
+//////////////////////////////////////////////////////////////////
+	wxString n;
+	for ( unsigned int i=0; i< s.length(); i++)
+	{ 
+		const char c = (char)s[i];
+		if ( isdigit(c) != 0 )
+			n.append(c);
+	}
+	
+	long id;
+	n.ToLong(&id);
+	
+	if ( id < 0 || id >= INT_MAX )
+		return false;
+	
+	currentToolId = id;
+	return true;
+}
+//////////////////////////////////////////////////////////////////
 const char* SvgCncContext::getPathModificationTypeAsStr() const {
 //////////////////////////////////////////////////////////////////
 	switch ( pathModification )
 	{
-		case CncPM_Pocket:				return "Pocket";
-		case CncPM_Center:				return "Center";
-		case CncPM_Inner:				return "Inner";
-		case CncPM_Outer:				return "Outer";
-		case CncPM_ZeroRef:				return "ZeroRef";
-		case CncPM_Guide:				return "Guide";
-		case CncPM_None:				return "None";
+		case CncPM_Pocket:				return KEY_PM_POCKET;
+		case CncPM_Center:				return KEY_PM_CENTRE;
+		case CncPM_Inner:				return KEY_PM_INNER;
+		case CncPM_Outer:				return KEY_PM_OUTER;
+		case CncPM_ZeroRef:				return KEY_PM_ZEROREF;
+		case CncPM_Guide:				return KEY_PM_GUIDE;
+		case CncPM_None:				return KEY_PM_NONE;
 	}
 	
-	return wxString::Format("%s: unkown", CNC_LOG_FUNCT);
+	return wxString::Format("%s: unknown", CNC_LOG_FUNCT);
 }
 //////////////////////////////////////////////////////////////////
 const char* SvgCncContext::getPathRuleTypeAsStr() const {
@@ -989,7 +1177,7 @@ const char* SvgCncContext::getPathRuleTypeAsStr() const {
 		case CncPR_None:					return "None";
 	}
 	
-	return wxString::Format("%s: unkown", CNC_LOG_FUNCT);
+	return wxString::Format("%s: unknown", CNC_LOG_FUNCT);
 }
 //////////////////////////////////////////////////////////////////
 double SvgCncContext::getCurrentSpeed_MM_MIN(CncSpeedMode m) const {
@@ -1011,7 +1199,7 @@ const char* SvgCncContext::getCurrentZDeptAsStr() const {
 //////////////////////////////////////////////////////////////////
 void SvgCncContext::getParameterList(DcmItemList& rows) const {
 //////////////////////////////////////////////////////////////////
-	DataControlModel::addKeyValueRow(rows, "SVG CNC-Parameters", 	"");
+	DataControlModel::addKeyValueRow(rows, "SVG CNC-Parameters", "");
 	for ( auto it = parameterMap.begin(); it != parameterMap.end(); ++it ) 
 		DataControlModel::addKeyValueRow(rows, wxString::Format("  %s", it->first), it->second);
 }
@@ -1162,7 +1350,7 @@ SvgCncContextSummary::SvgCncContextSummary()
 : SvgCncContext			()
 , participants			(0)
 , toolSelections		(0)
-, curToolId				("")
+, curToolIdStr			("")
 , toolSelectionList		("")
 , curZDept				(0.0)
 , minZDept				(0.0)
@@ -1180,16 +1368,17 @@ void SvgCncContextSummary::add(const SvgCncContext& c) {
 	for ( auto it = tl.cbegin(); it != tl.cend(); ++it)
 		toolList[it->first] = it->second;
 		
-	if ( c.hasParameter(c.ID_TOOL_SEL) ) {
-		const wxString newTooId(c.getParameterAsString(c.ID_TOOL_SEL));
+	#warning ....
+	if ( c.hasParameter(c.ID_TOOL_SEL) )
+	{
+		const wxString newToolId(c.getParameterAsString(c.ID_TOOL_SEL));
 		
 		// if not current and not default
-		if ( newTooId.IsSameAs(curToolId) == false ) {
-			if ( newTooId.IsSameAs(c.ID_DEFAULT_TOOL_ID) == false ) {
-				toolSelections++; 
-				curToolId.assign(newTooId);
-				toolSelectionList.append(wxString::Format("%s;", newTooId));
-			}
+		if ( newToolId.IsSameAs(curToolIdStr) == false ) 
+		{
+			toolSelections++; 
+			curToolIdStr.assign(newToolId);
+			toolSelectionList.append(wxString::Format("%s;", newToolId));
 		}
 	}
 	
@@ -1198,7 +1387,8 @@ void SvgCncContextSummary::add(const SvgCncContext& c) {
 	const char		m = c.getCurrentZDepthMode();
 	const double	z = c.getCurrentZDepth();
 	
-	switch ( m ) {
+	switch ( m )
+	{
 		case 'z':	curZDept -= z;
 		case 'Z':	curZDept  = z;
 	}

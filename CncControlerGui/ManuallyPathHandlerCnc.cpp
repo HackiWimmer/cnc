@@ -1,3 +1,4 @@
+#include "CncContext.h"
 #include "ManuallyPathHandlerCnc.h"
 
 /////////////////////////////////////////////////////////////
@@ -31,6 +32,23 @@ bool ManuallyPathHandlerCnc::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT( cncControl != NULL );
 	cncControl->resetDurationCounter();
+	
+	// important to reset the current tool id,
+	// otherwise the first change will not be detected
+	THE_CONTEXT->setCurrentToolId(INVALID_TOOL_ID);
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool ManuallyPathHandlerCnc::initToolChange(int id) {
+//////////////////////////////////////////////////////////////////
+	if ( PathHandlerBase::initToolChange(id) == false )
+	{
+		// id didn't changed
+		return false;
+	}
+	
+	pathListMgr.addEntryToC(id);
 	return true;
 }
 //////////////////////////////////////////////////////////////////
