@@ -5,12 +5,12 @@
 #include "CncCommon.h"
 #include "CncPosition.h"
 
-class CncBoundarySpace {
-	
+class CncBoundarySpace
+{
 	public:
 		
-		class HardwareOriginOffset {
-			
+		class HardwareOriginOffset
+		{
 			private:
 				bool valid = false;
 				

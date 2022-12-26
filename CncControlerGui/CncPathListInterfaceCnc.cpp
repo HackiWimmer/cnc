@@ -1,5 +1,5 @@
 #include "CncControl.h"
-#include "CncControl.h"
+#include "CncConfig.h"
 #include "MainFrame.h"
 #include "CncTemplateContext.h"
 #include "CncPreprocessor.h"
@@ -70,7 +70,7 @@ void CncPathListInterfaceCnc::logMeasurementStart()												{ cnc->startSeria
 void CncPathListInterfaceCnc::logMeasurementEnd()												{ cnc->stopSerialMeasurement(); }
 bool CncPathListInterfaceCnc::isInterrupted()													{ return cnc->isInterrupted(); }
 bool CncPathListInterfaceCnc::executeClientIDChange(long cid)									{ cnc->setClientId(cid); return true; }
-bool CncPathListInterfaceCnc::executeToolChange(int id)											{ CNC_CLOG_FUNCT_A(" tool change to %d", id); return true; }
+bool CncPathListInterfaceCnc::executeToolChange(int id)											{ return interactToolChange(id); }
 bool CncPathListInterfaceCnc::executeSpindleStateSwitch(CncSpindlePowerState state, bool force)	{ return cnc->switchSpindleState(state, force); }
 bool CncPathListInterfaceCnc::executeSpindleSpeedChange(double value_U_MIN)						{ return cnc->changeCurrentSpindleSpeed_U_MIN(value_U_MIN); }
 bool CncPathListInterfaceCnc::executeFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		{ return cnc->changeCurrentFeedSpeedXYZ_MM_MIN(value_MM_MIN, m); }
@@ -136,7 +136,7 @@ bool CncPathListInterfaceCnc::spoolInstructions(CncInstructionList* ci) {
 		if ( instruction->process(this) == false )
 		{
 			std::stringstream ss; instruction->traceTo(ss);
-			CNC_CERR_FUNCT_A("Error while processing: %s", ss.str().c_str())
+			CNC_CERR_FUNCT_A("Error while processing:\n%s", ss.str().c_str())
 			return safeReturn(false);
 		}
 		
@@ -178,4 +178,15 @@ bool CncPathListInterfaceCnc::executePathListEntry(const CncPathListEntry& ple) 
 										ple.entryTarget.getZ(),
 										ple.alreadyRendered
 	); 
+}
+////////////////////////////////////////////////////////////////////
+bool CncPathListInterfaceCnc::interactToolChange(int id) {
+////////////////////////////////////////////////////////////////////
+	if ( cnc == NULL )
+	{
+		CNC_CERR_FUNCT_A(" Invalid cnc pointer")
+		return false;
+	}
+	
+	return cnc->interactToolChange(id);
 }

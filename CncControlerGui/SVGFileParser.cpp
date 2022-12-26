@@ -479,12 +479,7 @@ bool SVGFileParser::spool() {
 		{
 			// ----------------------------------------------------------------------
 			if ( uai.nodeName == SvgNodeTemplates::CncParameterBlockNodeName )
-			{
-				#warning
-					//CNC_CERR_FUNCT_A("xa ctxti %d", THE_CONTEXT->getCurrentToolId())
-					sumCtx.add(*uai.cncParameters);
-					//CNC_CERR_FUNCT_A("xb txti %d", THE_CONTEXT->getCurrentToolId())
-			}
+				sumCtx.add(*uai.cncParameters);
 			
 			pathHandler->setSvgCncContext(*uai.cncParameters);
 		}

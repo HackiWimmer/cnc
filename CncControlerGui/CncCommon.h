@@ -82,6 +82,12 @@ namespace cnc
 	#define SET_RESULT_FOR_LAST_FILLED_LOGGER_ROW_ERROR \
 		{ cnc::loggerProxyRedirectStack.top()->getListCtrl()->changeResultForLastFilledPosition(CNC_RESULT_ERROR_STR); }
 		
+	struct TmpLoggerIndent
+	{
+		TmpLoggerIndent()	{ INC_LOGGER_INDENT }
+		~TmpLoggerIndent()	{ DEC_LOGGER_INDENT }
+	};
+
 // -------------------------------------------------------------------
 // global strings
 	#define _maxSpeedLabel				"<MAX>"
@@ -217,6 +223,17 @@ static struct ClientIds {
 	enum CncDimensions				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
 	enum CncRefPositionMode			{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6, CncRM_Touchblock = 7, CncRM_Camera = 8 };
 	
+	enum CncMoveOrder
+	{
+		X,
+		Y,
+		Z,
+		XY,
+		XYZ,
+		XY_Z, Z_XY,
+		X_Y_Z, Z_X_Y, Y_X_Z
+	};
+
 // -------------------------------------------------------------------
 // global typedefs
 typedef bool CncSpindlePowerState;

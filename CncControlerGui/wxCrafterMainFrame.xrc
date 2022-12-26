@@ -2873,7 +2873,7 @@ Summary</label>
                               <object class="wxListbook" name="m_listbookManallyMotionControl">
                                 <style>wxBK_BOTTOM|wxBK_DEFAULT</style>
                                 <object class="listbookpage">
-                                  <label>Predefined
+                                  <label>Hardware
 Positions</label>
                                   <bitmap>bitmaps/flag-blue-2.png</bitmap>
                                   <selected>0</selected>
@@ -2912,7 +2912,7 @@ Positions</label>
                                                   <flag>wxALL|wxEXPAND</flag>
                                                   <border>1</border>
                                                   <object class="wxStaticText" name="m_staticText1171">
-                                                    <label>Home:</label>
+                                                    <label>Home  (Physically):</label>
                                                     <style/>
                                                     <fg>wxSYS_COLOUR_ACTIVECAPTION</fg>
                                                     <font>
@@ -3201,7 +3201,7 @@ Positions</label>
                                                   <flag>wxALL|wxEXPAND</flag>
                                                   <border>1</border>
                                                   <object class="wxStaticText" name="m_staticText1177233">
-                                                    <label>XY Axis:</label>
+                                                    <label>XY Axis (Physically):</label>
                                                     <style/>
                                                     <fg>wxSYS_COLOUR_ACTIVECAPTION</fg>
                                                     <font>
@@ -3397,26 +3397,11 @@ Positions</label>
                                               <border>1</border>
                                               <object class="wxFlexGridSizer">
                                                 <cols>1</cols>
-                                                <rows>2</rows>
+                                                <rows>1</rows>
                                                 <vgap>0</vgap>
                                                 <hgap>0</hgap>
                                                 <growablecols>0</growablecols>
-                                                <growablerows>1</growablerows>
-                                                <object class="sizeritem">
-                                                  <flag>wxALL|wxEXPAND</flag>
-                                                  <border>1</border>
-                                                  <object class="wxStaticText" name="m_staticText1175">
-                                                    <label>Z Axis:</label>
-                                                    <style/>
-                                                    <fg>wxSYS_COLOUR_ACTIVECAPTION</fg>
-                                                    <font>
-                                                      <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                                                      <style>normal</style>
-                                                      <weight>bold</weight>
-                                                      <underlined>0</underlined>
-                                                    </font>
-                                                  </object>
-                                                </object>
+                                                <growablerows>0</growablerows>
                                                 <object class="sizeritem" name="flexGridSizer8678">
                                                   <flag>wxALL|wxEXPAND|wxALIGN_LEFT</flag>
                                                   <object class="wxFlexGridSizer">
@@ -3430,11 +3415,26 @@ Positions</label>
                                                       <flag>wxALL|wxEXPAND|wxALIGN_LEFT</flag>
                                                       <object class="wxFlexGridSizer">
                                                         <cols>1</cols>
-                                                        <rows>3</rows>
+                                                        <rows>4</rows>
                                                         <vgap>0</vgap>
                                                         <hgap>0</hgap>
                                                         <growablecols>0</growablecols>
-                                                        <growablerows>0,1,2</growablerows>
+                                                        <growablerows>1,2,3</growablerows>
+                                                        <object class="sizeritem">
+                                                          <flag>wxALL|wxEXPAND</flag>
+                                                          <border>1</border>
+                                                          <object class="wxStaticText" name="m_staticText1175">
+                                                            <label>Z Axis  (Physically):</label>
+                                                            <style/>
+                                                            <fg>wxSYS_COLOUR_ACTIVECAPTION</fg>
+                                                            <font>
+                                                              <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                                              <style>normal</style>
+                                                              <weight>bold</weight>
+                                                              <underlined>0</underlined>
+                                                            </font>
+                                                          </object>
+                                                        </object>
                                                         <object class="sizeritem">
                                                           <flag>wxALL|wxEXPAND</flag>
                                                           <border>3</border>
@@ -3514,7 +3514,22 @@ Positions</label>
                                                         <vgap>0</vgap>
                                                         <hgap>0</hgap>
                                                         <growablecols>0</growablecols>
-                                                        <growablerows>0,1</growablerows>
+                                                        <growablerows>1</growablerows>
+                                                        <object class="sizeritem">
+                                                          <flag>wxALL|wxEXPAND</flag>
+                                                          <border>1</border>
+                                                          <object class="wxStaticText" name="m_staticText11751">
+                                                            <label>Z Axis  (Logically):</label>
+                                                            <style/>
+                                                            <fg>wxSYS_COLOUR_ACTIVECAPTION</fg>
+                                                            <font>
+                                                              <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                                              <style>normal</style>
+                                                              <weight>bold</weight>
+                                                              <underlined>0</underlined>
+                                                            </font>
+                                                          </object>
+                                                        </object>
                                                         <object class="sizeritem">
                                                           <flag>wxALL|wxEXPAND</flag>
                                                           <border>3</border>
@@ -3533,29 +3548,6 @@ Positions</label>
                                                             </font>
                                                             <tooltip>
                                                               <![CDATA[Moves the Z axis to the logical MAX position.\nDepending on the current setup.]]>
-                                                            </tooltip>
-                                                            <bitmapposition>wxLEFT</bitmapposition>
-                                                            <default>0</default>
-                                                          </object>
-                                                        </object>
-                                                        <object class="sizeritem">
-                                                          <flag>wxALL|wxEXPAND</flag>
-                                                          <border>3</border>
-                                                          <object class="wxButton" name="m_zToBottom">
-                                                            <label>Move Z Axis to Bottom</label>
-                                                            <style/>
-                                                            <bg>wxSYS_COLOUR_BTNSHADOW</bg>
-                                                            <fg>wxSYS_COLOUR_BTNTEXT</fg>
-                                                            <font>
-                                                              <size>9</size>
-                                                              <style>normal</style>
-                                                              <weight>bold</weight>
-                                                              <family>swiss</family>
-                                                              <underlined>0</underlined>
-                                                              <face>Segoe UI</face>
-                                                            </font>
-                                                            <tooltip>
-                                                              <![CDATA[Moves the Z axis to the logical MIN position.\nDepending on the current setup.]]>
                                                             </tooltip>
                                                             <bitmapposition>wxLEFT</bitmapposition>
                                                             <default>0</default>

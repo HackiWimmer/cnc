@@ -1,5 +1,5 @@
 
-[Anchor_ZTouch_1]
+[Anchor_ZTouch]
 D=1
 C=1
 T=XYZ
@@ -7,10 +7,10 @@ X=10.0
 Y=10.0
 Z=0.0
 
-[Anchor_ZTouch_2]
-D=0
+[Anchor_ToolChange]
+D=1
 C=1
 T=XYZ
-X=0.21
-Y=0.22
-Z=0.32
+X=100.0
+Y=100.0
+Z=10.0

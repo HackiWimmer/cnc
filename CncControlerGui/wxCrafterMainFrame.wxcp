@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	10089,
+		"m_objCounter":	10091,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxC9ED9InitBitmapResources",
 		"m_bitmapsFile":	"wxCrafterMainFrame_bitmaps.cpp",
@@ -20031,7 +20031,7 @@
 																								}, {
 																									"type":	"string",
 																									"m_label":	"Label:",
-																									"m_value":	"Predefined\\nPositions"
+																									"m_value":	"Hardware\\nPositions"
 																								}, {
 																									"type":	"bitmapPicker",
 																									"m_label":	"Bitmap File:",
@@ -20337,7 +20337,7 @@
 																																		}, {
 																																			"type":	"multi-string",
 																																			"m_label":	"Label:",
-																																			"m_value":	"Home:"
+																																			"m_value":	"Home  (Physically):"
 																																		}, {
 																																			"type":	"string",
 																																			"m_label":	"Wrap:",
@@ -21667,7 +21667,7 @@
 																																		}, {
 																																			"type":	"multi-string",
 																																			"m_label":	"Label:",
-																																			"m_value":	"XY Axis:"
+																																			"m_value":	"XY Axis (Physically):"
 																																		}, {
 																																			"type":	"string",
 																																			"m_label":	"Wrap:",
@@ -22491,7 +22491,7 @@
 																																}, {
 																																	"type":	"string",
 																																	"m_label":	"# Rows:",
-																																	"m_value":	"2"
+																																	"m_value":	"1"
 																																}, {
 																																	"type":	"string",
 																																	"m_label":	"Growable columns:",
@@ -22499,7 +22499,7 @@
 																																}, {
 																																	"type":	"string",
 																																	"m_label":	"Growable rows:",
-																																	"m_value":	"1"
+																																	"m_value":	"0"
 																																}, {
 																																	"type":	"string",
 																																	"m_label":	"Horizontal gap:",
@@ -22511,81 +22511,6 @@
 																																}],
 																															"m_events":	[],
 																															"m_children":	[{
-																																	"m_type":	4405,
-																																	"proportion":	0,
-																																	"border":	1,
-																																	"gbSpan":	"1,1",
-																																	"gbPosition":	"0,0",
-																																	"m_styles":	[],
-																																	"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
-																																	"m_properties":	[{
-																																			"type":	"winid",
-																																			"m_label":	"ID:",
-																																			"m_winid":	"wxID_ANY"
-																																		}, {
-																																			"type":	"string",
-																																			"m_label":	"Size:",
-																																			"m_value":	"-1,-1"
-																																		}, {
-																																			"type":	"string",
-																																			"m_label":	"Minimum Size:",
-																																			"m_value":	"-1,-1"
-																																		}, {
-																																			"type":	"string",
-																																			"m_label":	"Name:",
-																																			"m_value":	"m_staticText1175"
-																																		}, {
-																																			"type":	"multi-string",
-																																			"m_label":	"Tooltip:",
-																																			"m_value":	""
-																																		}, {
-																																			"type":	"colour",
-																																			"m_label":	"Bg Colour:",
-																																			"colour":	"<Default>"
-																																		}, {
-																																			"type":	"colour",
-																																			"m_label":	"Fg Colour:",
-																																			"colour":	"ActiveCaption"
-																																		}, {
-																																			"type":	"font",
-																																			"m_label":	"Font:",
-																																			"m_value":	"wxSYS_DEFAULT_GUI_FONT,normal,bold,normal"
-																																		}, {
-																																			"type":	"bool",
-																																			"m_label":	"Hidden",
-																																			"m_value":	false
-																																		}, {
-																																			"type":	"bool",
-																																			"m_label":	"Disabled",
-																																			"m_value":	false
-																																		}, {
-																																			"type":	"bool",
-																																			"m_label":	"Focused",
-																																			"m_value":	false
-																																		}, {
-																																			"type":	"string",
-																																			"m_label":	"Class Name:",
-																																			"m_value":	""
-																																		}, {
-																																			"type":	"string",
-																																			"m_label":	"Include File:",
-																																			"m_value":	""
-																																		}, {
-																																			"type":	"string",
-																																			"m_label":	"Style:",
-																																			"m_value":	""
-																																		}, {
-																																			"type":	"multi-string",
-																																			"m_label":	"Label:",
-																																			"m_value":	"Z Axis:"
-																																		}, {
-																																			"type":	"string",
-																																			"m_label":	"Wrap:",
-																																			"m_value":	"-1"
-																																		}],
-																																	"m_events":	[],
-																																	"m_children":	[]
-																																}, {
 																																	"m_type":	4403,
 																																	"proportion":	0,
 																																	"border":	0,
@@ -22666,7 +22591,7 @@
 																																				}, {
 																																					"type":	"string",
 																																					"m_label":	"# Rows:",
-																																					"m_value":	"3"
+																																					"m_value":	"4"
 																																				}, {
 																																					"type":	"string",
 																																					"m_label":	"Growable columns:",
@@ -22674,7 +22599,7 @@
 																																				}, {
 																																					"type":	"string",
 																																					"m_label":	"Growable rows:",
-																																					"m_value":	"0,1,2"
+																																					"m_value":	"1,2,3"
 																																				}, {
 																																					"type":	"string",
 																																					"m_label":	"Horizontal gap:",
@@ -22686,6 +22611,81 @@
 																																				}],
 																																			"m_events":	[],
 																																			"m_children":	[{
+																																					"m_type":	4405,
+																																					"proportion":	0,
+																																					"border":	1,
+																																					"gbSpan":	"1,1",
+																																					"gbPosition":	"0,0",
+																																					"m_styles":	[],
+																																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+																																					"m_properties":	[{
+																																							"type":	"winid",
+																																							"m_label":	"ID:",
+																																							"m_winid":	"wxID_ANY"
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Size:",
+																																							"m_value":	"-1,-1"
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Minimum Size:",
+																																							"m_value":	"-1,-1"
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Name:",
+																																							"m_value":	"m_staticText1175"
+																																						}, {
+																																							"type":	"multi-string",
+																																							"m_label":	"Tooltip:",
+																																							"m_value":	""
+																																						}, {
+																																							"type":	"colour",
+																																							"m_label":	"Bg Colour:",
+																																							"colour":	"<Default>"
+																																						}, {
+																																							"type":	"colour",
+																																							"m_label":	"Fg Colour:",
+																																							"colour":	"ActiveCaption"
+																																						}, {
+																																							"type":	"font",
+																																							"m_label":	"Font:",
+																																							"m_value":	"wxSYS_DEFAULT_GUI_FONT,normal,bold,normal"
+																																						}, {
+																																							"type":	"bool",
+																																							"m_label":	"Hidden",
+																																							"m_value":	false
+																																						}, {
+																																							"type":	"bool",
+																																							"m_label":	"Disabled",
+																																							"m_value":	false
+																																						}, {
+																																							"type":	"bool",
+																																							"m_label":	"Focused",
+																																							"m_value":	false
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Class Name:",
+																																							"m_value":	""
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Include File:",
+																																							"m_value":	""
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Style:",
+																																							"m_value":	""
+																																						}, {
+																																							"type":	"multi-string",
+																																							"m_label":	"Label:",
+																																							"m_value":	"Z Axis  (Physically):"
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Wrap:",
+																																							"m_value":	"-1"
+																																						}],
+																																					"m_events":	[],
+																																					"m_children":	[]
+																																				}, {
 																																					"m_type":	4400,
 																																					"proportion":	0,
 																																					"border":	3,
@@ -23007,7 +23007,7 @@
 																																				}, {
 																																					"type":	"string",
 																																					"m_label":	"Growable rows:",
-																																					"m_value":	"0,1"
+																																					"m_value":	"1"
 																																				}, {
 																																					"type":	"string",
 																																					"m_label":	"Horizontal gap:",
@@ -23019,6 +23019,81 @@
 																																				}],
 																																			"m_events":	[],
 																																			"m_children":	[{
+																																					"m_type":	4405,
+																																					"proportion":	0,
+																																					"border":	1,
+																																					"gbSpan":	"1,1",
+																																					"gbPosition":	"0,0",
+																																					"m_styles":	[],
+																																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+																																					"m_properties":	[{
+																																							"type":	"winid",
+																																							"m_label":	"ID:",
+																																							"m_winid":	"wxID_ANY"
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Size:",
+																																							"m_value":	"-1,-1"
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Minimum Size:",
+																																							"m_value":	"-1,-1"
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Name:",
+																																							"m_value":	"m_staticText11751"
+																																						}, {
+																																							"type":	"multi-string",
+																																							"m_label":	"Tooltip:",
+																																							"m_value":	""
+																																						}, {
+																																							"type":	"colour",
+																																							"m_label":	"Bg Colour:",
+																																							"colour":	"<Default>"
+																																						}, {
+																																							"type":	"colour",
+																																							"m_label":	"Fg Colour:",
+																																							"colour":	"ActiveCaption"
+																																						}, {
+																																							"type":	"font",
+																																							"m_label":	"Font:",
+																																							"m_value":	"wxSYS_DEFAULT_GUI_FONT,normal,bold,normal"
+																																						}, {
+																																							"type":	"bool",
+																																							"m_label":	"Hidden",
+																																							"m_value":	false
+																																						}, {
+																																							"type":	"bool",
+																																							"m_label":	"Disabled",
+																																							"m_value":	false
+																																						}, {
+																																							"type":	"bool",
+																																							"m_label":	"Focused",
+																																							"m_value":	false
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Class Name:",
+																																							"m_value":	""
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Include File:",
+																																							"m_value":	""
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Style:",
+																																							"m_value":	""
+																																						}, {
+																																							"type":	"multi-string",
+																																							"m_label":	"Label:",
+																																							"m_value":	"Z Axis  (Logically):"
+																																						}, {
+																																							"type":	"string",
+																																							"m_label":	"Wrap:",
+																																							"m_value":	"-1"
+																																						}],
+																																					"m_events":	[],
+																																					"m_children":	[]
+																																				}, {
 																																					"m_type":	4400,
 																																					"proportion":	0,
 																																					"border":	3,
@@ -23108,100 +23183,6 @@
 																																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
 																																							"m_eventClass":	"wxCommandEvent",
 																																							"m_functionNameAndSignature":	"moveZToTop(wxCommandEvent& event)",
-																																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
-																																							"m_noBody":	false
-																																						}],
-																																					"m_children":	[]
-																																				}, {
-																																					"m_type":	4400,
-																																					"proportion":	0,
-																																					"border":	3,
-																																					"gbSpan":	"1,1",
-																																					"gbPosition":	"0,0",
-																																					"m_styles":	[],
-																																					"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
-																																					"m_properties":	[{
-																																							"type":	"winid",
-																																							"m_label":	"ID:",
-																																							"m_winid":	"wxID_ANY"
-																																						}, {
-																																							"type":	"string",
-																																							"m_label":	"Size:",
-																																							"m_value":	"-1,-1"
-																																						}, {
-																																							"type":	"string",
-																																							"m_label":	"Minimum Size:",
-																																							"m_value":	"-1,-1"
-																																						}, {
-																																							"type":	"string",
-																																							"m_label":	"Name:",
-																																							"m_value":	"m_zToBottom"
-																																						}, {
-																																							"type":	"multi-string",
-																																							"m_label":	"Tooltip:",
-																																							"m_value":	"Moves the Z axis to the logical MIN position.\\nDepending on the current setup."
-																																						}, {
-																																							"type":	"colour",
-																																							"m_label":	"Bg Colour:",
-																																							"colour":	"ButtonShadow"
-																																						}, {
-																																							"type":	"colour",
-																																							"m_label":	"Fg Colour:",
-																																							"colour":	"ButtonText"
-																																						}, {
-																																							"type":	"font",
-																																							"m_label":	"Font:",
-																																							"m_value":	"9,normal, bold, swiss, 0, Segoe UI"
-																																						}, {
-																																							"type":	"bool",
-																																							"m_label":	"Hidden",
-																																							"m_value":	false
-																																						}, {
-																																							"type":	"bool",
-																																							"m_label":	"Disabled",
-																																							"m_value":	false
-																																						}, {
-																																							"type":	"bool",
-																																							"m_label":	"Focused",
-																																							"m_value":	false
-																																						}, {
-																																							"type":	"string",
-																																							"m_label":	"Class Name:",
-																																							"m_value":	""
-																																						}, {
-																																							"type":	"string",
-																																							"m_label":	"Include File:",
-																																							"m_value":	""
-																																						}, {
-																																							"type":	"string",
-																																							"m_label":	"Style:",
-																																							"m_value":	""
-																																						}, {
-																																							"type":	"string",
-																																							"m_label":	"Label:",
-																																							"m_value":	"Move Z Axis to Bottom"
-																																						}, {
-																																							"type":	"bool",
-																																							"m_label":	"Default Button",
-																																							"m_value":	false
-																																						}, {
-																																							"type":	"bitmapPicker",
-																																							"m_label":	"Bitmap File:",
-																																							"m_path":	""
-																																						}, {
-																																							"type":	"choice",
-																																							"m_label":	"Direction",
-																																							"m_selection":	0,
-																																							"m_options":	["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
-																																						}, {
-																																							"type":	"string",
-																																							"m_label":	"Margins:",
-																																							"m_value":	"2,2"
-																																						}],
-																																					"m_events":	[{
-																																							"m_eventName":	"wxEVT_COMMAND_BUTTON_CLICKED",
-																																							"m_eventClass":	"wxCommandEvent",
-																																							"m_functionNameAndSignature":	"moveZToBottom(wxCommandEvent& event)",
 																																							"m_description":	"Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
 																																							"m_noBody":	false
 																																						}],

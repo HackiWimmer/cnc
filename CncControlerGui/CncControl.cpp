@@ -8,6 +8,7 @@
 #include <wx/dataview.h>
 #include <wx/propgrid/manager.h>
 #include <wx/evtloop.h>
+#include <wx/richmsgdlg.h>
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/SerialOSD.h"
 #include "GlobalFunctions.h"
@@ -877,54 +878,6 @@ bool CncControl::isLastDuration() {
 ///////////////////////////////////////////////////////////////////
 	return (durationCounter == getDurationCount());
 }
-
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveZToBottom() {
-///////////////////////////////////////////////////////////////////
-	double curZPos = curAppPos.getZ() * THE_CONFIG->getDisplayFactZ(); // we need it as mm
-	double moveZ   = curZPos * (-1);
-	
-	bool ret = true;
-	if ( prepareSimpleMove() == true )
-	{
-		if ( moveRelMetricZ(moveZ) == false )
-		{
-			CNC_CERR_FUNCT_A("CncControl: Move Z to bottom error")
-			ret = false;
-		}
-	}
-	else 
-	{
-		ret = false;
-	}
-	
-	reconfigureSimpleMove(false);
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveZToTop() {
-///////////////////////////////////////////////////////////////////
-	double topZPos = 0.0 + THE_CONFIG->getWorkpieceOffset();
-	double curZPos = curAppPos.getZ() * THE_CONFIG->getDisplayFactZ(); // we need it as mm
-	double moveZ   = topZPos - curZPos;
-	
-	bool ret = true;
-	if ( prepareSimpleMove() == true )
-	{
-		if ( moveRelMetricZ(moveZ) == false )
-		{
-			CNC_CERR_FUNCT_A("CncControl: Move Z to top error")
-			ret = false;
-		}
-	}
-	else
-	{
-		ret = false;
-	}
-	
-	reconfigureSimpleMove(false);
-	return ret;
-}
 ///////////////////////////////////////////////////////////////////
 bool CncControl::changeCurrentSpindleSpeed_U_MIN(double value) {
 ///////////////////////////////////////////////////////////////////
@@ -1583,233 +1536,21 @@ bool CncControl::processMoveSequence(CncMoveSequence& moveSequence) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::simpleMoveXYToZeroPos(CncDimensions dim) {
 ///////////////////////////////////////////////////////////////////
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
-		ret = moveXYToZeroPos(dim);
-	
-	reconfigureSimpleMove(ret);
-	return ret;
+	InitializeMove im(this);
+	return moveXYToZeroPos(dim);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::simpleMoveXYZToZeroPos(CncDimensions dim) {
 ///////////////////////////////////////////////////////////////////
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
-		ret = moveXYZToZeroPos(dim);
-	
-	reconfigureSimpleMove(ret);
-	return ret;
+	InitializeMove im(this);
+	return moveXYZToZeroPos(dim);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::simpleMoveZToZeroPos() {
 ///////////////////////////////////////////////////////////////////
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
-		ret = moveZToZeroPos();
-	
-	reconfigureSimpleMove(ret);
-	return ret;
+	InitializeMove im(this);
+	return moveZToZeroPos();
 }
-
-/*
-
-#define CNC_ROUND round
-
-
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveXYToZeroPos(CncDimensions dim) {
-///////////////////////////////////////////////////////////////////
-	bool ret = true;
-	if ( curAppPos != zeroAppPos )
-	{
-		const int32_t moveX = zeroAppPos.getX() - curAppPos.getX(); 
-		const int32_t moveY = zeroAppPos.getY() - curAppPos.getY();
-		
-		if ( dim == CncDimension2D )
-		{
-			ret = moveRelLinearStepsXY(moveX, moveY, false);
-		}
-		else
-		{
-			if ( moveRelLinearStepsXY(moveX, 0, false) == false ) 
-				return false;
-				
-			if ( moveRelLinearStepsXY(0, moveY, false) == false )
-				return false;
-		}
-	}
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveXYZToZeroPos(CncDimensions dim) {
-///////////////////////////////////////////////////////////////////
-	bool ret = true;
-	if ( curAppPos != zeroAppPos )
-	{
-		const int32_t moveX = zeroAppPos.getX() - curAppPos.getX(); 
-		const int32_t moveY = zeroAppPos.getY() - curAppPos.getY();
-		const int32_t moveZ = zeroAppPos.getZ() - curAppPos.getZ();
-		
-		if ( dim == CncDimension3D )
-		{
-			ret = moveRelLinearStepsXYZ(moveX, moveY, moveZ, false);
-			
-		}
-		else if ( dim == CncDimension2D )
-		{
-			if ( moveRelLinearStepsXYZ(0, 0, moveZ, false) == false ) 
-				return false;
-				
-			if ( moveRelLinearStepsXYZ(moveX, moveY, 0, false) == false ) 
-				return false;
-			
-		}
-		else
-		{
-			if ( moveRelLinearStepsXYZ(moveX, 0, 0, false) == false ) 
-				return false;
-				
-			if ( moveRelLinearStepsXYZ(0, moveY, 0, false) == false ) 
-				return false;
-				
-			if ( moveRelLinearStepsXYZ(0, 0, moveZ, false) == false ) 
-				return false;
-		}
-	}
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveZToZeroPos() {
-///////////////////////////////////////////////////////////////////
-	bool ret = true;
-	if ( curAppPos != zeroAppPos ) 
-	{
-		const int32_t moveZ = zeroAppPos.getZ() - curAppPos.getZ();
-		ret = moveRelLinearStepsXYZ(0, 0, moveZ, false);
-	}
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveXYToStartPos() {
-///////////////////////////////////////////////////////////////////
-	const CncLongPosition pos(startAppPos.getX(), startAppPos.getY(), curAppPos.getZ());
-	return moveToPos(pos);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveToStartPos() {
-///////////////////////////////////////////////////////////////////
-	return moveToPos(startAppPos);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveToPos(const CncLongPosition& pos) {
-///////////////////////////////////////////////////////////////////
-	bool ret = true;
-	if ( curAppPos != pos )
-	{
-		const int32_t moveX = pos.getX() - curAppPos.getX(); 
-		const int32_t moveY = pos.getY() - curAppPos.getY();
-		const int32_t moveZ = pos.getZ() - curAppPos.getZ();
-		moveRelLinearStepsXYZ(moveX, moveY, moveZ, false);
-	}
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveRelStepsZ(int32_t z) {
-///////////////////////////////////////////////////////////////////
-	if ( z == 0 )
-		return true;
-	// z moves are always linear, as a consequence alreadyRendered can be true
-	// but to see the detail positions use false
-	return serialPort->processMoveZ(z, false);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered) {
-///////////////////////////////////////////////////////////////////
-	//avoid empty steps
-	if ( x1 == 0 && y1 == 0 )
-		return true;
-	
-	return serialPort->processMoveXY(x1, y1, alreadyRendered);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
-///////////////////////////////////////////////////////////////////
-	//avoid empty steps
-	if ( x1 == 0 && y1 == 0 && z1 == 0 )
-		return true;
-	
-	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveAbsLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
-///////////////////////////////////////////////////////////////////
-	return moveRelLinearStepsXYZ(x1 - curCtlPos.getX(),
-	                             y1 - curCtlPos.getY(),
-	                             z1 - curCtlPos.getZ(),
-	                             alreadyRendered);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveRelMetricZ(double z) {
-///////////////////////////////////////////////////////////////////
-	const double sZ = z * THE_CONFIG->getCalculationFactZ();
-	
-	return moveRelStepsZ((int32_t)round(sZ));
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveRelLinearMetricXY(double x1, double y1, bool alreadyRendered) {
-///////////////////////////////////////////////////////////////////
-	const double sX1 = x1 * THE_CONFIG->getCalculationFactX();
-	const double sY1 = y1 * THE_CONFIG->getCalculationFactY();
-	
-	return moveRelLinearStepsXY((int32_t)round(sX1), 
-	                            (int32_t)round(sY1),
-	                            alreadyRendered);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveRelLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
-///////////////////////////////////////////////////////////////////
-	const double sX1 = x1 * THE_CONFIG->getCalculationFactX();
-	const double sY1 = y1 * THE_CONFIG->getCalculationFactY();
-	const double sZ1 = z1 * THE_CONFIG->getCalculationFactZ();
-	
-	return moveRelLinearStepsXYZ((int32_t)round(sX1), 
-	                             (int32_t)round(sY1),
-	                             (int32_t)round(sZ1),
-	                             alreadyRendered);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveAbsMetricZ(double z) {
-///////////////////////////////////////////////////////////////////
-	const double sZ = z * THE_CONFIG->getCalculationFactZ();
-	
-	return moveRelStepsZ( (int32_t)round(sZ) - curAppPos.getZ() );
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendered) {
-///////////////////////////////////////////////////////////////////
-	const double sX1 = x1 * THE_CONFIG->getCalculationFactX();
-	const double sY1 = y1 * THE_CONFIG->getCalculationFactY();
-	
-	return moveRelLinearStepsXY((int32_t)round(sX1) - curAppPos.getX(), 
-	                            (int32_t)round(sY1) - curAppPos.getY(),
-	                            alreadyRendered);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
-///////////////////////////////////////////////////////////////////
-	const double sX1 = x1 * THE_CONFIG->getCalculationFactX();
-	const double sY1 = y1 * THE_CONFIG->getCalculationFactY();
-	const double sZ1 = z1 * THE_CONFIG->getCalculationFactZ();
-	
-	return moveRelLinearStepsXYZ((int32_t)round(sX1) - curAppPos.getX(),
-	                             (int32_t)round(sY1) - curAppPos.getY(),
-	                             (int32_t)round(sZ1) - curAppPos.getZ(),
-	                             alreadyRendered);
-}
-
-
-*/
-
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXYToZeroPos(CncDimensions dim) {
 ///////////////////////////////////////////////////////////////////
@@ -1909,14 +1650,40 @@ bool CncControl::moveToPos(const CncLongPosition& pos) {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::moveRelStepsZ(int32_t z) {
+bool CncControl::moveRelStepsX(int32_t distance) {
 ///////////////////////////////////////////////////////////////////
-	if ( z == 0 )
+	if ( distance == 0 )
 		return true;
-	
-	// z moves are always linear, as a consequence alreadyRendered can be true
+		
+	// one axis moves are always linear, 
+	// as a consequence alreadyRendered can be true
 	// but to see the detail positions use false
-	return serialPort->processMoveZ(z, false);
+	const bool alreadyRendered = false;
+	return serialPort->processMoveX(distance, alreadyRendered);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveRelStepsY(int32_t distance) {
+///////////////////////////////////////////////////////////////////
+	if ( distance == 0 )
+		return true;
+		
+	// one axis moves are always linear, 
+	// as a consequence alreadyRendered can be true
+	// but to see the detail positions use false
+	const bool alreadyRendered = false;
+	return serialPort->processMoveY(distance, alreadyRendered);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveRelStepsZ(int32_t distance) {
+///////////////////////////////////////////////////////////////////
+	if ( distance == 0 )
+		return true;
+		
+	// one axis moves are always linear, 
+	// as a consequence alreadyRendered can be true
+	// but to see the detail positions use false
+	const bool alreadyRendered = false;
+	return serialPort->processMoveZ(distance, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelMetricZ(double z) {
@@ -2323,162 +2090,615 @@ void CncControl::displayHealtyStates() {
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMinLimit() {
-// This function move the max distance and will be latest stopped by the end switch
-// However, the PC and controller positions are not equal at the end!
-// the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
 	
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
+	if ( b1 && b2 )
 	{
-		ret = moveRelLinearMetricXY(distance, 0.0, true);
-		
-		if ( ret == false && limitStates.hasLimit() )
-			ret = resolveLimits(true, false, false);
+		// find min by using the physically boundary information
+		const CncDoublePosition tPhy = { 0.0, 0.0, 0.0 };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getX() - getCurCtlPosMetricX();
 	}
-	reconfigureSimpleMove(ret);
+	else
+	{
+		// try to find min by touching the end stops
+		distance = -THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelLinearMetricXY(distance, 0.0, true);
+	
+	if ( ret == false && limitStates.hasLimit() )
+		ret = resolveLimits(true, false, false);
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMaxLimit() {
-// This function move the max distance and will be latest stopped by the end switch
-// However, the PC and controller positions are not equal at the end!
-// the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
 	
-	bool ret = false;
-	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXY(distance, 0.0, true);
-		if ( ret == false && limitStates.hasLimit() )
-			ret = resolveLimits(true, false, false);
+	if ( b1 && b2 )
+	{
+		// find max by using the physically boundary information
+		const CncDoublePosition tPhy = { THE_BOUNDS->getMaxDimensionMetricX(), 0.0, 0.0 };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getX() - getCurCtlPosMetricX();
 	}
-	reconfigureSimpleMove(ret);
+	else
+	{
+		// try to find max by touching the end stops
+		distance = +THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelLinearMetricXY(distance, 0.0, true);
+	if ( ret == false && limitStates.hasLimit() )
+		ret = resolveLimits(true, false, false);
+
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveYToMinLimit() {
-// This function move the max distance and will be latest stopped by the end switch
-// However, the PC and controller positions are not equal at the end!
-// the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
 	
-	bool ret = false;
-	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXY(0.0, distance, true);
-		if ( ret == false && limitStates.hasLimit() )
-			ret = resolveLimits(false, true, false);
+	if ( b1 && b2 )
+	{
+		// find min by using the physically boundary information
+		const CncDoublePosition tPhy = { 0.0, 0.0, 0.0 };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getY() - getCurCtlPosMetricY();
 	}
-	reconfigureSimpleMove(ret);
+	else
+	{
+		// try to find min by touching the end stops
+		distance = -THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelLinearMetricXY(0.0, distance, true);
+	if ( ret == false && limitStates.hasLimit() )
+		ret = resolveLimits(false, true, false);
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveYToMaxLimit() {
-// This function move the max distance and will be latest stopped by the end switch
-// However, the PC and controller positions are not equal at the end!
-// the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
 	
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
+	if ( b1 && b2 )
 	{
-		ret = moveRelLinearMetricXY(0.0, distance, true);
-		
-		if ( ret == false && limitStates.hasLimit() )
-			ret = resolveLimits(false, true, false);
+		// find max by using the physically boundary information
+		const CncDoublePosition tPhy = { 0.0, THE_BOUNDS->getMaxDimensionMetricY(), 0.0 };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getY() - getCurCtlPosMetricY();
 	}
-	reconfigureSimpleMove(ret);
+	else
+	{
+		// try to find max by touching the end stops
+		distance = +THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelLinearMetricXY(0.0, distance, true);
+	if ( ret == false && limitStates.hasLimit() )
+		ret = resolveLimits(false, true, false);
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToMinLimit() {
-// This function move the max distance and will be latest stopped by the end switch
-// However, the PC and controller positions are not equal at the end!
-// the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
 	
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
+	if ( b1 && b2 )
 	{
-		ret = moveRelMetricZ(distance);
-		
-		if ( ret == false && limitStates.hasLimit() )
-			ret = resolveLimits(false, false, true);
+		// find min by using the physically boundary information
+		const CncDoublePosition tPhy = { 0.0, 0.0, -THE_BOUNDS->getMaxDimensionMetricZ() };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getZ() - getCurCtlPosMetricZ();
 	}
-	reconfigureSimpleMove(ret);
+	else
+	{
+		// try to find min by touching the end stops
+		distance = -THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelMetricZ(distance);
+	
+	if ( ret == false && limitStates.hasLimit() )
+		ret = resolveLimits(false, false, true);
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToMaxLimit() {
-// This function move the max distance and will be latest stopped by the end switch
-// However, the PC and controller positions are not equal at the end!
-// the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
 	
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
+	if ( b1 && b2 )
 	{
-		ret = moveRelMetricZ(distance);
-		
-		if ( ret == false && limitStates.hasLimit() ) {
-			ret = resolveLimits(false, false, true);
-		}
+		// find max by using the physically boundary information
+		const CncDoublePosition tPhy = { 0.0, 0.0, 0.0 };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getZ() - getCurCtlPosMetricZ();
 	}
-	reconfigureSimpleMove(ret);
+	else
+	{
+		// try to find max by touching the end stops
+		distance = +THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelMetricZ(distance);
+	if ( ret == false && limitStates.hasLimit() )
+		ret = resolveLimits(false, false, true);
+		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
 	
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
+	if ( b1 && b2 )
 	{
-		ret = moveRelLinearMetricXY(distance, 0.0, true);
-		
-		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(-THE_BOUNDS->getMaxDimensionMetricX() / 2, 0.0, true);
+		// find mid by using the physically boundary information
+		const CncDoublePosition tPhy = { THE_BOUNDS->getMaxDimensionMetricX() / 2.0, 0.0, 0.0 };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getX() - getCurCtlPosMetricX();
 	}
-	reconfigureSimpleMove(ret);
+	else
+	{
+		// try to find mid by touching the end stops
+		distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricX() - getCurCtlPosMetricX();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelLinearMetricXY(distance, 0.0, true);
+	if ( ret == false && limitStates.hasLimit() )
+		ret = moveRelLinearMetricXY(-THE_BOUNDS->getMaxDimensionMetricX() / 2, 0.0, true);
+		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveYToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
 	
-	bool ret = false;
-	if ( prepareSimpleMove() == true )
+	if ( b1 && b2 )
 	{
-		ret = moveRelLinearMetricXY(0.0, distance, true);
-		
-		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(0.0, -THE_BOUNDS->getMaxDimensionMetricY() / 2, true);
+		// find mid by using the physically boundary information
+		const CncDoublePosition tPhy = { 0.0, THE_BOUNDS->getMaxDimensionMetricY() / 2.0, 0.0 };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getY() - getCurCtlPosMetricY();
 	}
-	reconfigureSimpleMove(ret);
+	else
+	{
+		// try to find mid by touching the end stops
+		distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricY() - getCurCtlPosMetricY();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelLinearMetricXY(0.0, distance, true);
+	if ( ret == false && limitStates.hasLimit() )
+		ret = moveRelLinearMetricXY(0.0, -THE_BOUNDS->getMaxDimensionMetricY() / 2, true);
+		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
+	const bool b1	= THE_BOUNDS->isValid();
+	const bool b2	= THE_BOUNDS->getHardwareOffset().isValid();
+	double distance	= 0.0;
+	bool ret		= false;
+	
+	if ( b1 && b2 )
+	{
+		// find mid by using the physically boundary information
+		const CncDoublePosition tPhy = { 0.0, 0.0, -THE_BOUNDS->getMaxDimensionMetricZ() / 2.0 };
+		const CncDoublePosition tLog = THE_BOUNDS->getHardwareOffset().transPhy2Log(tPhy);
+		distance = tLog.getZ() - getCurCtlPosMetricZ();
+	}
+	else
+	{
+		// try to find mid by touching the end stops
+		distance = 5.0 + THE_BOUNDS->getMaxDimensionMetricZ() - getCurCtlPosMetricZ();
+	}
+	
+	InitializeMove im(this);
+	ret = moveRelMetricZ(distance);
+	if ( ret == false && limitStates.hasLimit() )
+		ret = moveRelMetricZ(-THE_BOUNDS->getMaxDimensionMetricZ() / 2);
+		
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveZToTop() {
+///////////////////////////////////////////////////////////////////
+	const double topZPos = 0.0 + THE_CONFIG->getWorkpieceOffset();
+	const double curZPos = getCurAppPosMetricZ();
+	const double moveZ   = topZPos - curZPos;
+	bool ret = false;
+	
+	InitializeMove im(this, false);
+	if ( (ret = moveRelMetricZ(moveZ)) == false )
+		CNC_CERR_FUNCT_A("CncControl: Move Z to top error")
+		
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveToZeroZAxisAnchor() {
+///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() )
+		return false;
+		
+	const CncLongPosition	p1(getCurCtlPos());
+	const float				s1 = getConfiguredFeedSpeed_MM_MIN();
+	const CncSpeedMode		sm = getConfiguredSpeedMode();
+	
+	// TODO: Get tool change anchor from the anchor pos dialogue
+	const CncDoublePosition tPhy = {30.0, THE_BOUNDS->getMaxDimensionMetricY() - 30, -1.0 };
+	
+	if ( moveToPhysicalPos(tPhy, Z) == false )
+	{
+		CNC_CERR_FUNCT_A(" moveToPhysicalPos(Z) failed")
+		return false;
+	}
+	
+	// switch spindle off
+	switchSpindleOff(true);
+	if ( evaluateSpindlePowerState() != SPINDLE_STATE_OFF )
+	{
+		CNC_CERR_FUNCT_A(" Can't switch of the spindle! Abort!")
+		return false;
+	}
+	
+	if ( moveToPhysicalPos(tPhy, XY) == false )
+	{
+		CNC_CERR_FUNCT_A(" moveToPhysicalPos(Z) failed")
+		return false;
+	}
+
+	// interactive = true only for a real serial port 
+	// with physically Z touch functionality
+	const bool interactive = THE_CONTEXT->hasHardware() == true && serialPort->isEmulator() == false;
+	const float st         = 500.0;
+	
+	// reduce feed speed for levelling the z axis
+	if ( changeCurrentFeedSpeedXYZ_MM_MIN(st, CncSpeedRapid) == false )
+	{
+		CNC_CERR_FUNCT_A(" changeCurrentFeedSpeedXYZ_MM_MIN(%f) failed!", st)
+		return false;
+	}
+	
+	if ( interactive == true  )
+	{
+		// For all real physical serial ports
+		
+		
+		// warning TODO: Move Z axis down until it touches the switch
+		
+	}
+	else
+	{
+		// For all emulators - also the arduino emulator too
+		// simulate z touch by moving again to the current Z zero position
+		if ( moveAbsMetricZ(0.0) == false )
+		{
+			CNC_CERR_FUNCT_A("CncControl: Move Z to top error")
+			return false;
+		}
+		
+		// change speed back to the initial values
+		if ( changeCurrentFeedSpeedXYZ_MM_MIN(s1, sm) == false )
+		{
+			CNC_CERR_FUNCT_A(" changeCurrentFeedSpeedXYZ_MM_MIN(%f) failed!", s1)
+			return false;
+		}
+			
+		// move Z axis back to logged start position
+		if ( moveToLogicalPos(p1, Z) == false )
+		{
+			CNC_CERR_FUNCT_A(" finally moveToLogicalPos(Z) failed!", s1)
+			return false;
+		}
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveToToolChangeAnchor() {
+///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() )
+		return false;
+		
+	// TODO: Get tool change anchor from the anchor pos dialogue
+	const CncDoublePosition tPhy = { THE_BOUNDS->getMaxDimensionMetricX() / 2.0 , 1.0, -1.0 };
+	return moveToPhysicalPos(tPhy, Z_XY);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::interactToolChange(int toolId) {
+///////////////////////////////////////////////////////////////////
+	CNC_CEX1_A("Processing manually tool change . . .")
+	TmpLoggerIndent tli;
+	
+	const bool interactive = THE_CONTEXT->hasHardware() == true;
+	if ( interactive == true )
+	{
+		const wxString msg(wxString::Format("Manually Tool change to %d\n%s\n\n"
+											" Click Yes if the tool change should happen.\n" 
+											" Click No if the current tool should continue exists\n"
+											" Click Cancel if the curren t run should be aborted"
+											, toolId, THE_CONFIG->getToolParamAsInfoStr(toolId)));
+		
+		wxRichMessageDialog dlg(THE_APP, msg, _T("Manually Tool Change"), 
+							wxYES|wxNO|wxCANCEL|wxCENTRE|wxICON_INFORMATION);
+		
+		dlg.SetFooterText("Decide what will happen . . .");
+		dlg.SetFooterIcon(wxICON_WARNING);
+		
+		const int ret = dlg.ShowModal();
+		
+		switch ( ret )
+		{
+			case wxID_YES:		CNC_CEX1_A("Manually tool change was finalized, template runs further with new tool setup.")
+								break;
+								
+			case wxID_NO:		CNC_CEX1_A("Manually tool change was ignored, template runs further with previous tool setup.")
+								return true;
+								
+			case wxID_CANCEL:	CNC_CEX1_A("Manually tool change was aborted, template run will be also aborted")
+								return false;
+								
+			default:			CNC_CERR_FUNCT_A(" Unhandelt return value!")
+								return false;
+		}
+	}
+	
+	const wxString msg(wxString::Format("Initialize tool change to tool id: %d\n%s", toolId, THE_CONFIG->getToolParamAsInfoStr(toolId)));
+	CNC_CEX1_A(msg);
+	
+	// ------------------------------------------------------------------
+	// tool change procedure starts from here
+
+	// first log the current position, speed ans spindle state
+	const CncLongPosition	p1(getCurCtlPos());
+	const float				s1 = getConfiguredFeedSpeed_MM_MIN();
+	const CncSpeedMode		sm = getConfiguredSpeedMode();
+	CncSpindlePowerState	sp = getSpindlePowerState();
+	
+	// setup a fast movement speed to navigate to the tool change position 
+	const float st = 5500.0;
+	if ( changeCurrentFeedSpeedXYZ_MM_MIN(st, CncSpeedRapid) == false )
+	{
+		CNC_CERR_FUNCT_A(" changeCurrentFeedSpeedXYZ_MM_MIN(%f) failed!", st)
+		return false;
+	}
+	
+	// move to the predefined tool change anchor to have a good position 
+	// to procedure  the manually tool change 
+	if ( moveToToolChangeAnchor() == false )
+	{
+		CNC_CERR_FUNCT_A(" moveToToolChangeAnchor() failed!")
+		return false;
+	}
+	
+	// switch spindle off
+	switchSpindleOff(true);
+	if ( evaluateSpindlePowerState() != SPINDLE_STATE_OFF )
+	{
+		CNC_CERR_FUNCT_A(" Can't switch of the spindle! Abort!")
+		return false;
+	}
+	
+	// ask for finalisation
+	if ( interactive == true )
+	{
+		const wxString msg(wxString::Format("Now manually replace the current tool to tool id: %d\n\n%s\n\nand click OK", 
+											toolId, THE_CONFIG->getToolParamAsInfoStr(toolId)));
+											
+		wxRichMessageDialog dlg(THE_APP, msg, _T("Manually Tool Change"), 
+							wxOK|wxCANCEL|wxCENTRE|wxICON_INFORMATION);
+		
+		dlg.SetFooterText("Waiting for completion . . .");
+		dlg.SetFooterIcon(wxICON_WARNING);
+		
+		if ( dlg.ShowModal() == wxID_CANCEL )
+		{
+			CNC_COUT_A("Manually tool change was aborted, template run will be also aborted")
+			return false;
+		}
+	}
+	
+	CNC_CEX1_A(wxString::Format("Manually tool change finalized to tool id: %d\n%s", toolId, THE_CONFIG->getToolParamAsInfoStr(toolId)));
+	
+	// now level the z axis again
+	if ( moveToZeroZAxisAnchor() == false )
+	{
+		CNC_CERR_FUNCT_A(" moveToZeroZAxisAnchor() failed!")
+		return false;
+	}
+	
+	// move back to logged start position
+	if ( moveToLogicalPos(p1, XY) == false )
+	{
+		CNC_CERR_FUNCT_A(" moveToLogicalPos(XY) failed!")
+		return false;
+	}
+	
+	switchSpindleState(sp, true);
+
+	// move back to logged start position
+	if ( moveToLogicalPos(p1, Z) == false )
+	{
+		CNC_CERR_FUNCT_A(" moveToLogicalPos(Z) failed!")
+		return false;
+	}
+	
+	// and reconfigure the speed
+	if ( changeCurrentFeedSpeedXYZ_MM_MIN(s1, sm) == false )
+	{
+		CNC_CERR_FUNCT_A(" changeCurrentFeedSpeedXYZ_MM_MIN(%f) failed!", s1)
+		return false;
+	}
+
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveToPhysicalPos(const CncDoublePosition& pPhy, CncMoveOrder mo) {
+///////////////////////////////////////////////////////////////////
+	const bool b1 = THE_BOUNDS->isValid();
+	const bool b2 = THE_BOUNDS->getHardwareOffset().isValid();
+	
+	if ( !b1 || !b2 )
+	{
+		CNC_CERR_FUNCT_A(" Boundaries are invalid!")
+		return false;
+	}
+	
+	CncDoublePosition pLog(THE_BOUNDS->getHardwareOffset().transPhy2Log(pPhy));
+	return moveToLogicalPos(pLog, mo);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveToLogicalPos(const CncLongPosition& pLog, CncMoveOrder mo) {
+///////////////////////////////////////////////////////////////////
+	InitializeMove im(this);
+	
+	#define PCERR	CNC_CERR_FUNCT_A
 	
 	bool ret = false;
-	if ( prepareSimpleMove() == true )
+	const int32_t dx = pLog.getX() - getCurCtlPos().getX();
+	const int32_t dy = pLog.getY() - getCurCtlPos().getY();
+	const int32_t dz = pLog.getZ() - getCurCtlPos().getZ();
+	
+	switch ( mo )
 	{
-		ret = moveRelMetricZ(distance);
-		
-		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelMetricZ(-THE_BOUNDS->getMaxDimensionMetricZ() / 2);
+		case XYZ:
+		{
+			if ( ( ret = moveAbsLinearStepsXYZ(pLog.getX(), pLog.getY(), pLog.getZ(), true) ) == false )
+				PCERR(" moveAbsLinearStepsXYZ() failed!"); 
+			break;
+		}
+		case XY:
+		{
+			if ( ( ret = moveRelLinearStepsXY(dx, dy, true) ) == false )
+				PCERR(" moveAbsLinearStepsXY() failed!"); 
+			break;
+		}
+		case X:
+		{
+			if ( ( ret = moveRelStepsX(dx) ) == false ) 
+				PCERR(" moveRelStepsX() failed!");
+			break;
+		}
+		case Y:
+		{
+			if ( ( ret = moveRelStepsY(dy) ) == false ) 
+				PCERR(" moveRelStepsY() failed!");
+			break;
+		}
+		case Z:
+		{
+			if ( ( ret = moveRelStepsZ(dz) ) == false ) 
+				PCERR(" moveRelStepsZ() failed!");
+			break;
+		}
+		case X_Y_Z:
+		{
+			if ( ( ret = moveRelStepsX(dx) ) == false ) { PCERR(" moveRelStepsX() failed!"); break; }
+			if ( ( ret = moveRelStepsY(dy) ) == false ) { PCERR(" moveRelStepsY() failed!"); break; }
+			if ( ( ret = moveRelStepsZ(dz) ) == false ) { PCERR(" moveRelStepsZ() failed!"); break; }
+			break;
+		}
+		case Z_X_Y:
+		{
+			if ( ( ret = moveRelStepsZ(dz) ) == false ) { PCERR(" moveRelStepsZ() failed!"); break; }
+			if ( ( ret = moveRelStepsX(dx) ) == false ) { PCERR(" moveRelStepsX() failed!"); break; }
+			if ( ( ret = moveRelStepsY(dy) ) == false ) { PCERR(" moveRelStepsY() failed!"); break; }
+			break;
+		}
+		case Y_X_Z:
+		{
+			if ( ( ret = moveRelStepsY(dy) ) == false ) { PCERR(" moveRelStepsY() failed!"); break; }
+			if ( ( ret = moveRelStepsX(dx) ) == false ) { PCERR(" moveRelStepsX() failed!"); break; }
+			if ( ( ret = moveRelStepsZ(dz) ) == false ) { PCERR(" moveRelStepsZ() failed!"); break; }
+			break;
+		}
+		case XY_Z:
+		{
+			if ( ( ret = moveRelLinearStepsXY(dx, dy, true) ) == false )
+				{ PCERR(" moveAbsLinearStepsXYZ() failed!"); break; }
+				
+			if ( ( ret = moveRelStepsZ(dz) ) == false ) 
+				{ PCERR(" moveRelStepsZ() failed!"); break; }
+				
+			break;
+		}
+		case Z_XY:
+		{
+			if ( ( ret = moveRelStepsZ(dz) ) == false ) 
+				{ PCERR(" moveRelStepsZ() failed!"); break; }
+				
+			if ( ( ret = moveRelLinearStepsXY(dx, dy, true) ) == false )
+				{ PCERR(" moveAbsLinearStepsXY() failed!"); break; }
+				
+			break;
+		}
 	}
-	reconfigureSimpleMove(ret);
+	
+	#undef PCERR
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveToLogicalPos(const CncDoublePosition& p, CncMoveOrder mo) {
+///////////////////////////////////////////////////////////////////
+	CncLongPosition pLong;
+	return moveToLogicalPos(THE_CONFIG->convertMetricToSteps(pLong, p), mo);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveToPhysicalPos(const CncLongPosition& pPhy, CncMoveOrder mo) {
+///////////////////////////////////////////////////////////////////
+	const bool b1 = THE_BOUNDS->isValid();
+	const bool b2 = THE_BOUNDS->getHardwareOffset().isValid();
+	
+	if ( !b1 || !b2 )
+	{
+		CNC_CERR_FUNCT_A(" Boundaries are invalid!")
+		return false;
+	}
+	
+	CncLongPosition pLog(THE_BOUNDS->getHardwareOffset().transPhy2Log(pPhy));
+	return moveToLogicalPos(pLog, mo);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::previewConfiguredFeedSpeed_MM_MIN(CncSpeedMode m, float v) {
@@ -2636,8 +2856,8 @@ bool CncControl::convertPositionToHardwareCoordinate(const CncDoublePosition& po
 ///////////////////////////////////////////////////////////////////
 bool CncControl::evaluateHardwareReference() {
 ///////////////////////////////////////////////////////////////////
-	float 			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
-	CncLongPosition	prevCtlPos	= curCtlPos;
+	const float				prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
+	const CncLongPosition	prevCtlPos	= curCtlPos;
 	
 	// ------------------------------------------------------------
 	auto returnFalse = [&](const wxString& msg)
@@ -2682,8 +2902,8 @@ bool CncControl::evaluateHardwareReference() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::evaluateHardwareDimensionsZAxis(DimensionZAxis& result) {
 ///////////////////////////////////////////////////////////////////
-	float			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
-	CncLongPosition	prevCtlPos	= curCtlPos;
+	const float				prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
+	const CncLongPosition	prevCtlPos	= curCtlPos;
 	
 	// ------------------------------------------------------------
 	auto returnFalse = [&](const wxString& msg)
@@ -2727,8 +2947,8 @@ bool CncControl::evaluateHardwareDimensionsZAxis(DimensionZAxis& result) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::evaluateHardwareDimensionsXYPlane(DimensionXYPlane& result) {
 ///////////////////////////////////////////////////////////////////
-	float 			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
-	CncLongPosition	prevCtlPos	= curCtlPos;
+	const float 			prevSpeed 	= getConfiguredFeedSpeed_MM_MIN();
+	const CncLongPosition	prevCtlPos	= curCtlPos;
 	
 	// ------------------------------------------------------------
 	auto returnFalse = [&](const wxString& msg)
@@ -2941,9 +3161,8 @@ void CncControl::reconfigureSimpleMove(bool correctPositions) {
 	resetDurationCounter();
 	evaluateLimitState();
 	
-	if ( validateAppAgainstCtlPosition() == false && correctPositions == true ) {
+	if ( validateAppAgainstCtlPosition() == false && correctPositions == true ) 
 		curAppPos = requestControllerPos();
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::clearControllerConfigControl() {

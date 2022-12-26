@@ -5,8 +5,8 @@
 #include <wx/string.h>
 #include "CncPosition.h"
 
-struct CncAnchorInfo {
-	
+struct CncAnchorInfo 
+{
 	bool				show		= true; 
 	bool				fixed		= false;
 	bool				absolute	= false;
@@ -19,8 +19,8 @@ struct CncAnchorInfo {
 	bool hasZ() const { return type.Contains("Z"); }
 };
 
-class CncAnchorMap : public std::map<wxString, CncAnchorInfo> {
-	
+class CncAnchorMap : public std::map<wxString, CncAnchorInfo> 
+{
 	public:
 		CncAnchorMap()
 		//: std::map()

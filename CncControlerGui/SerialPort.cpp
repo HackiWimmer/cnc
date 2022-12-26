@@ -1413,11 +1413,33 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMoveZ(int32_t z1, bool alreadyRendered) {
+bool Serial::processMoveX(int32_t x, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	const unsigned int size = 1;
 	static int32_t values[3];
-	values[0] = z1;
+	values[0] = x;
+	values[1] = 0;
+	values[2] = 0;
+
+	return processMove(size, values, alreadyRendered);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::processMoveY(int32_t y, bool alreadyRendered) {
+///////////////////////////////////////////////////////////////////
+	const unsigned int size = 1;
+	static int32_t values[3];
+	values[0] = 0;
+	values[1] = y;
+	values[2] = 0;
+
+	return processMove(size, values, alreadyRendered);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::processMoveZ(int32_t z, bool alreadyRendered) {
+///////////////////////////////////////////////////////////////////
+	const unsigned int size = 1;
+	static int32_t values[3];
+	values[0] = z;
 	values[1] = 0;
 	values[2] = 0;
 

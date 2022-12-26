@@ -410,7 +410,9 @@ class Serial {
 		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered);
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered);
-		bool processMoveZ(int32_t z1, bool alreadyRendered);
+		bool processMoveX(int32_t x, bool alreadyRendered);
+		bool processMoveY(int32_t y, bool alreadyRendered);
+		bool processMoveZ(int32_t z, bool alreadyRendered);
 		
 		bool execute(const unsigned char* buffer, unsigned int nbByte);
 		

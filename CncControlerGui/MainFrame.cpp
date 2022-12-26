@@ -1158,7 +1158,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_anchorPosition);
 	registerGuiControl(m_zToTop);
 	registerGuiControl(m_zToTop);
-	registerGuiControl(m_zToBottom);
 	registerGuiControl(m_xToMin);
 	registerGuiControl(m_yToMin);
 	registerGuiControl(m_zToMin);
@@ -3444,7 +3443,7 @@ bool MainFrame::applyPodiumDistance() {
 	// log the current position before the correction operation below applies
 	const CncLongPosition prevPos = cnc->requestControllerPos();
 	
-	// correct the z position by the .podium movement
+	// correct the z position by the podium movement
 	cnc->setZeroPosZ(prevPos.getZ() + THE_CONFIG->convertMetricToStepsZ(dbl) );
 	
 	// align the hardware offset with the new logical software origin
@@ -5136,7 +5135,7 @@ bool MainFrame::processTemplate(bool confirm) {
 				THE_TPL_CTX->registerRun();
 				ret = processTemplate_SelectType(runSessionKey);
 				
-				#warning
+				#warning rethink the reset procedure
 				if ( ret )
 					THE_CONFIG->resetModificationFlag();
 			}
@@ -5392,7 +5391,7 @@ bool MainFrame::saveTemplateOnDemand() {
 		wxRichMessageDialog dlg(this, msg, _T("File Observer . . . "), 
 		                    wxYES|wxNO|wxCANCEL|wxCENTRE);
 		
-		dlg.ShowCheckBox("Don not ask again for the current template", THE_TPL_CTX->isAutoSaveMode());
+		dlg.ShowCheckBox("Don't not ask again for the current template", THE_TPL_CTX->isAutoSaveMode());
 		dlg.SetFooterText("The current template was modified.");
 		dlg.SetFooterIcon(wxICON_WARNING);
 		
@@ -5763,233 +5762,233 @@ void MainFrame::requestEnableStepperMotors(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveHome(wxCommandEvent& event) {
-/*
-a) X(min), Y(min), Z(Top)
-b) X(max), Y(max), Z(Top)
-c) X(mid), Y(mid), Z(Top)
-d) X(mid), Y(mid), Z(mid)
-*/
+//
+//	a) X(min), Y(min), Z(Top)
+//	b) X(max), Y(max), Z(Top)
+//	c) X(mid), Y(mid), Z(Top)
+//	d) X(mid), Y(mid), Z(mid)
+//
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-	
-	const bool refPosValid = isReferenceStateValid();
-	if ( refPosValid == false ) {
-		cnc::trc.logError("The current reference position isn't valid. Therefore, can't move home");
-		return;
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		#define PCERR	CNC_CERR_FUNCT_A
+		
+		const wxString sel = m_homeDefintion->GetStringSelection();
+		const char c = sel[0];
+		switch (c) 
+		{
+			case 'a':	if ( cnc->moveZToMaxLimit() == false ) { PCERR("a: moveZToMaxLimit() failed"); break; } 
+						if ( cnc->moveXToMinLimit() == false ) { PCERR("a: moveXToMaxLimit() failed"); break; } 
+						if ( cnc->moveYToMinLimit() == false ) { PCERR("a: moveYToMaxLimit() failed"); break; } 
+						break;
+						
+			case 'b':	if ( cnc->moveZToMaxLimit() == false ) { PCERR("b: moveZToMaxLimit() failed"); break; } 
+						if ( cnc->moveXToMaxLimit() == false ) { PCERR("b: moveXToMaxLimit() failed"); break; } 
+						if ( cnc->moveYToMaxLimit() == false ) { PCERR("b: moveYToMaxLimit() failed"); break; } 
+						break;
+						
+			case 'c':	if ( cnc->moveZToMaxLimit() == false ) { PCERR("c: moveZToMaxLimit() failed"); break; } 
+						if ( cnc->moveXToMid()      == false ) { PCERR("c: moveXToMid() failed"); break; } 
+						if ( cnc->moveYToMid()      == false ) { PCERR("c: moveYToMid() failed"); break; } 
+						break;
+						
+			case 'd':	if ( cnc->moveZToMid()      == false ) { PCERR("d: moveZToMid() failed"); break; } 
+						if ( cnc->moveXToMid()      == false ) { PCERR("d: moveXToMid() failed"); break; } 
+						if ( cnc->moveYToMid()      == false ) { PCERR("d: moveYToMid() failed"); break; }
+						break;
+						
+			default:	CNC_CERR_FUNCT_A(" invalid selection!")
+		}
 	}
 	
-	disableControls();
-	selectMonitorBookCncPanel();
-
-	wxString sel = m_homeDefintion->GetStringSelection();
-	const char c = sel[0];
-	switch (c) {
-		case 'a':	cnc->moveZToMaxLimit();
-					cnc->moveXToMinLimit();
-					cnc->moveYToMinLimit();
-					break;
-		case 'b':	cnc->moveZToMaxLimit();
-					cnc->moveXToMaxLimit();
-					cnc->moveYToMaxLimit();
-					break;
-		case 'c':	cnc->moveZToMaxLimit();
-					cnc->moveXToMid();
-					cnc->moveYToMid();
-					break;
-		case 'd':	cnc->moveZToMid();
-					cnc->moveXToMid();
-					cnc->moveYToMid();
-					break;
-		default:	std::cerr << "MainFrame::moveHome: invalid selection!" << std::endl;
-	}
-	
-	enableControls();
+	#undef PCERR
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveXToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveXToMid();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveXToMid();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveYToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-	
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveYToMid();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveYToMid();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-	
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveZToMid();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveZToMid();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroXY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
 	
-	wxString sel = m_zeroMoveModeXY->GetStringSelection();
-	char mode = sel[0];
-
-	CncDimensions dim = CncDimension1D;
-	switch ( mode ) {
-		case '2':	dim = CncDimension2D; break;
+		const wxString sel      = m_zeroMoveModeXY->GetStringSelection();
+		const char mode         = sel[0];
+		const CncDimensions dim = mode == 2 ? CncDimension2D : CncDimension1D;
+		cnc->simpleMoveXYToZeroPos(dim);
 	}
-
-	disableControls();
-	cnc->simpleMoveXYToZeroPos(dim);
-	enableControls();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroXYZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
 	
-	wxString sel = m_zeroMoveModeXYZ->GetStringSelection();
-	char mode = sel[0];
+		const wxString sel = m_zeroMoveModeXYZ->GetStringSelection();
+		const char mode    = sel[0];
 
-	CncDimensions dim = CncDimension1D;
-	switch ( mode ) {
-		case '2':	dim = CncDimension2D; break;
-		case '3':	dim = CncDimension3D; break;
+		CncDimensions dim = CncDimension1D;
+		switch ( mode ) 
+		{
+			case '2':	dim = CncDimension2D; break;
+			case '3':	dim = CncDimension3D; break;
+		}
+
+		cnc->simpleMoveXYZToZeroPos(dim);
 	}
-
-	disableControls();
-	cnc->simpleMoveXYZToZeroPos(dim);
-	enableControls();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
 	
-	disableControls();
-	cnc->simpleMoveZToZeroPos();
-	enableControls();
+		cnc->simpleMoveZToZeroPos();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveXToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveXToMinLimit();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveXToMinLimit();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveXToMax(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveXToMaxLimit();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveXToMaxLimit();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveYToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveYToMinLimit();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveYToMinLimit();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveYToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveYToMaxLimit();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveYToMaxLimit();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveZToMinLimit();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveZToMinLimit();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-	
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveZToMaxLimit();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveZToMaxLimit();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToTop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveZToTop();
-	enableControls();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::moveZToBottom(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc );
-	CNC_TRANSACTION_LOCK
-
-	selectMonitorBookCncPanel();
-	
-	disableControls();
-	cnc->moveZToBottom();
-	enableControls();
+	if ( cnc && cnc->isReadyToRun() )
+	{
+		selectMonitorBookCncPanel();
+		CNC_TRANSACTION_LOCK
+		const CncRunAnimationControl rac(this);
+		const CncGuiDisabler cgd(this);
+		
+		cnc->moveZToTop();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openConfigurationFile(wxCommandEvent& event) {

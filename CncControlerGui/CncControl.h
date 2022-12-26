@@ -23,8 +23,8 @@
 class CncTouchBlockDetector;
 
 ///////////////////////////////////////////////////////////////////
-class CncControl {
-	
+class CncControl 
+{
 	public:
 		enum DimensionMode			{ DM_2D, DM_3D };
 		enum CtrlPowerState			{ CPS_ON = POWER_STATE_ON, CPS_OFF = POWER_STATE_OFF, CPS_NOT_INITIALIZED = -1, CPS_UNKNOWN = -2  };
@@ -48,7 +48,8 @@ class CncControl {
 		struct CncSpeedMemory : public std::map<CncSpeedMode, float> 
 		{
 			public:
-				CncSpeedMemory() {
+				CncSpeedMemory()
+				{
 					(*this)[CncSpeedRapid]			= THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
 					(*this)[CncSpeedWork]			= THE_CONFIG->getDefaultWorkSpeed_MM_MIN();
 					(*this)[CncSpeedMax]			= THE_CONFIG->getDefaultRapidSpeed_MM_MIN();
@@ -285,6 +286,8 @@ class CncControl {
 		// Start positioning
 		void setStartPos();
 		// Move from current position
+		bool moveRelStepsX(int32_t z);
+		bool moveRelStepsY(int32_t z);
 		bool moveRelStepsZ(int32_t z);
 		bool moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered);
 		bool moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
@@ -374,29 +377,45 @@ class CncControl {
 		bool								convertPositionToHardwareCoordinate(const CncDoublePosition& pos, CncDoublePosition& ret);
 		
 		// query the current controller position
-		const CncLongPosition requestControllerPos();
+		const CncLongPosition				requestControllerPos();
+		
 		// query the current controller limit state
-		const CncLongPosition requestControllerLimitState();
-		const CncLimitStates& getLimitState() { return limitStates; }
+		const CncLongPosition				requestControllerLimitState();
+		const CncLimitStates&				getLimitState() { return limitStates; }
+		
 		// validates pc and controller positions
-		bool validateAppAgainstCtlPosition();
+		bool 								validateAppAgainstCtlPosition();
+		
 		// execute
-		bool execute(const unsigned char* buffer, unsigned int nbByte);
-		//
-		bool popSerial(bool dispatchUserEvents=true);
+		bool 								execute(const unsigned char* buffer, unsigned int nbByte);
+		bool 								popSerial(bool dispatchUserEvents=true);
+		
 		// processing the given setter values
-		bool processSetter(unsigned char pid, int32_t value);
-		bool processSetter(unsigned char pid, const cnc::SetterValueList& values);
-		bool processSetterList(const Setters& setup);
+		bool								processSetter(unsigned char pid, int32_t value);
+		bool								processSetter(unsigned char pid, const cnc::SetterValueList& values);
+		bool								processSetterList(const Setters& setup);
+		
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
-		void activatePositionCheck(bool a) { positionCheck = a; }
+		void								activatePositionCheck(bool a) { positionCheck = a; }
+		
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
-		bool enableStepperMotors(bool s);
-		bool enableProbeMode(bool s);
+		bool								enableStepperMotors(bool s);
+		bool								enableProbeMode(bool s);
+		
 		//Limit management
-		wxString& getLimitInfoString(wxString& ret);
-		void evaluateLimitState();
-		bool isALimitSwitchActive() { return limitStates.hasLimit(); }
+		wxString& 							getLimitInfoString(wxString& ret);
+		void								evaluateLimitState();
+		bool								isALimitSwitchActive() { return limitStates.hasLimit(); }
+		
+		bool moveToLogicalPos(const CncDoublePosition& p, CncMoveOrder mo);
+		bool moveToLogicalPos(const CncLongPosition& p, CncMoveOrder mo);
+		
+		bool moveToPhysicalPos(const CncDoublePosition& p, CncMoveOrder mo);
+		bool moveToPhysicalPos(const CncLongPosition& p, CncMoveOrder mo);
+		
+		bool moveToZeroZAxisAnchor();
+		bool moveToToolChangeAnchor();
+		bool interactToolChange(int toolId);
 		
 		bool moveXToMinLimit();
 		bool moveXToMaxLimit();
@@ -424,7 +443,6 @@ class CncControl {
 		bool moveXYZToZeroPos(CncDimensions dim = CncDimension1D);
 		bool moveZToZeroPos();
 		bool moveZToTop();
-		bool moveZToBottom();
 		
 		// Moves curPos to startPos
 		bool moveXYToStartPos();
@@ -489,9 +507,28 @@ class CncControl {
 		void				processTrigger(const Trigger::SpeedChange& tr)				{ getSerial()->processTrigger(tr); }
 		void				processTrigger(const Trigger::GuidePath& tr)				{ getSerial()->processTrigger(tr); }
 		
-		
 		friend class CncTouchBlockDetector;
 		
+		// -------------------------------------------------------------------------------------------------------------
+		class InitializeMove
+		{
+			CncControl* cnc;
+			bool correctPositions;
+			
+			public:
+				explicit InitializeMove(CncControl* c, bool cp = true, bool ee = true)
+				: cnc				(c)
+				, correctPositions	(cp)
+				{
+					wxASSERT(cnc);
+					cnc->prepareSimpleMove(ee);
+				}
+				
+				~InitializeMove()
+				{
+					cnc->reconfigureSimpleMove(true);
+				}
+		};
 };
 
 #endif

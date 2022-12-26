@@ -391,7 +391,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void moveYToMin(wxCommandEvent& event);
 		virtual void moveZToMax(wxCommandEvent& event);
 		virtual void moveZToMin(wxCommandEvent& event);
-		virtual void moveZToBottom(wxCommandEvent& event);
 		virtual void moveZToTop(wxCommandEvent& event);
 		virtual void openConfigurationFile(wxCommandEvent& event);
 		virtual void openExternalEditor(wxCommandEvent& event);
@@ -734,6 +733,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncMsgHistoryLoggerProxy;
 		friend class CncLoggerListCtrl;
 		friend class CncPerspective;
+		friend class CncGuiDisabler;
 
 		friend class CncBaseEditor;
 		friend class CncSourceEditor;
@@ -1179,6 +1179,23 @@ class CncRunAnimationControl {
 		
 		~CncRunAnimationControl()
 		{ if ( parent ) parent->stopAnimationControl(); }
+};
+
+////////////////////////////////////////////////////////////////////
+class CncGuiDisabler {
+	
+	private:
+		
+		MainFrame*	parent;
+		
+	public:
+	
+		explicit CncGuiDisabler(MainFrame* p)
+		: parent(p)
+		{ if ( parent ) parent->disableControls(); }
+		
+		~CncGuiDisabler()
+		{ if ( parent ) parent->enableControls(); }
 };
 
 #endif // MAINFRAME_H

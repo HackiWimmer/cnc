@@ -9,8 +9,8 @@
 
 // -------------------------------------------------------------------------------------
 class CncControl;
-class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
-	
+class CncPathListInterfaceCnc : public CncPathListRunner::Interface 
+{
 	private:
 		
 		// ---------------------------------------------------
@@ -215,6 +215,7 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface {
 		void executeTrigger(const Trigger::GuidePath& tr);
 	
 		bool spoolInstructions(CncInstructionList* ci);
+		bool interactToolChange(int id);
 		
 	public:
 		

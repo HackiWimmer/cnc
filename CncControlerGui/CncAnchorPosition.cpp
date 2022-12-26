@@ -67,14 +67,15 @@ void CncAnchorPosition::load() {
 	long			anchorIndex;
 	
 	bool bAnchor = db.GetFirstGroup(anchorName, anchorIndex);
-	while ( bAnchor ) {
+	while ( bAnchor ) 
+	{
 		anchorNames.Add(anchorName);
 		bAnchor = db.GetNextGroup(anchorName, anchorIndex);
 	}
 	
 	// over all anchors
-	for ( unsigned int i=0; i<anchorNames.GetCount(); i++ ) {
-		
+	for ( unsigned int i=0; i<anchorNames.GetCount(); i++ ) 
+	{
 		anchorName.assign(anchorNames.Item(i));
 		db.SetPath(wxString::Format("/%s", anchorName));
 		
@@ -100,7 +101,8 @@ void CncAnchorPosition::provide() {
 	CncAnchorMap& cam = *THE_CONTEXT->anchorMap;
 	const CncAnchorPosListCtrl::AnchorMap& am = anchorList->getAnchorMap();
 
-	for (auto it = am.begin(); it != am.end(); ++it ) {
+	for (auto it = am.begin(); it != am.end(); ++it ) 
+	{
 		const CncAnchorPosListCtrl::AnchorInfo& sai = it->second;
 		CncAnchorInfo nai;
 		
@@ -228,7 +230,8 @@ void CncAnchorPosition::processType() {
 ///////////////////////////////////////////////////////////////////
 	const wxString& t = m_valT->GetValue();
 	
-	auto enableXYZ = [&](bool x, bool y, bool z) {
+	auto enableXYZ = [&](bool x, bool y, bool z) 
+	{
 		m_valX->Enable(x);
 		m_valY->Enable(y);
 		m_valZ->Enable(z);

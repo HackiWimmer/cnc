@@ -781,11 +781,12 @@ void GLContextCncPathBase::drawAnchorPoints() {
 	
 	glLineStipple(2, 0x00FF);
 	
-	for ( auto it = THE_CONTEXT->anchorMap->cbegin(); it != THE_CONTEXT->anchorMap->cend(); ++it ) {
+	for ( auto it = THE_CONTEXT->anchorMap->cbegin(); it != THE_CONTEXT->anchorMap->cend(); ++it )
+	{
 		const CncAnchorInfo& ai = it->second;
 		
-		if ( ai.show == true ) {
-			
+		if ( ai.show == true ) 
+		{
 			// abs position can't shown i this case
 			if ( ai.absolute && THE_BOUNDS->getHardwareOffset().isValid() == false )
 				continue;

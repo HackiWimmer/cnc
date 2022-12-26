@@ -295,8 +295,8 @@ protected:
     wxButton* m_zToMax;
     wxButton* m_zToMid;
     wxButton* m_zToMin;
+    wxStaticText* m_staticText11751;
     wxButton* m_zToTop;
-    wxButton* m_zToBottom;
     wxPanel* m_manuallyPanel;
     wxScrolledWindow* m_scrollWin8689;
     wxPanel* m_manuallyMoveCoordPlaceholder;
@@ -1126,10 +1126,6 @@ protected:
 	event.Skip();
     }
     virtual void moveZToTop(wxCommandEvent& event)
-    {
-	event.Skip();
-    }
-    virtual void moveZToBottom(wxCommandEvent& event)
     {
 	event.Skip();
     }
@@ -2619,13 +2615,13 @@ public:
     {
 	return m_zToMin;
     }
+    wxStaticText* GetStaticText11751()
+    {
+	return m_staticText11751;
+    }
     wxButton* GetZToTop()
     {
 	return m_zToTop;
-    }
-    wxButton* GetZToBottom()
-    {
-	return m_zToBottom;
     }
     wxScrolledWindow* GetScrollWinPredefinedPositions()
     {

@@ -2074,7 +2074,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     int m_preposPanelImgIndex;
     m_preposPanelImgIndex =
         m_listbookManallyMotionControl_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("flag-blue-2")));
-    m_listbookManallyMotionControl->AddPage(m_preposPanel, _("Predefined\nPositions"), false, m_preposPanelImgIndex);
+    m_listbookManallyMotionControl->AddPage(m_preposPanel, _("Hardware\nPositions"), false, m_preposPanelImgIndex);
 
     wxFlexGridSizer* flexGridSizer1152 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer1152->SetFlexibleDirection(wxBOTH);
@@ -2106,8 +2106,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 
     flexGridSizer1165->Add(flexGridSizerPDP_Home, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
-    m_staticText1171 = new wxStaticText(m_scrollWinPredefinedPositions, wxID_ANY, _("Home:"), wxDefaultPosition,
-        wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
+    m_staticText1171 = new wxStaticText(m_scrollWinPredefinedPositions, wxID_ANY, _("Home  (Physically):"),
+        wxDefaultPosition, wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
     m_staticText1171->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     wxFont m_staticText1171Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1171Font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -2261,8 +2261,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 
     flexGridSizer1165->Add(flexGridSizerPDP_XY, 0, wxALL | wxEXPAND | wxALIGN_LEFT, WXC_FROM_DIP(0));
 
-    m_staticText1177233 = new wxStaticText(m_scrollWinPredefinedPositions, wxID_ANY, _("XY Axis:"), wxDefaultPosition,
-        wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
+    m_staticText1177233 = new wxStaticText(m_scrollWinPredefinedPositions, wxID_ANY, _("XY Axis (Physically):"),
+        wxDefaultPosition, wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
     m_staticText1177233->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     wxFont m_staticText1177233Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1177233Font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -2364,22 +2364,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 
     flexGridSizer1165->Add(m_staticLine2197, 0, wxALL | wxEXPAND, WXC_FROM_DIP(6));
 
-    wxFlexGridSizer* flexGridSizerPDP_Z = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizerPDP_Z = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizerPDP_Z->SetFlexibleDirection(wxBOTH);
     flexGridSizerPDP_Z->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizerPDP_Z->AddGrowableCol(0);
-    flexGridSizerPDP_Z->AddGrowableRow(1);
+    flexGridSizerPDP_Z->AddGrowableRow(0);
 
     flexGridSizer1165->Add(flexGridSizerPDP_Z, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
-
-    m_staticText1175 = new wxStaticText(m_scrollWinPredefinedPositions, wxID_ANY, _("Z Axis:"), wxDefaultPosition,
-        wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
-    m_staticText1175->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    wxFont m_staticText1175Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_staticText1175Font.SetWeight(wxFONTWEIGHT_BOLD);
-    m_staticText1175->SetFont(m_staticText1175Font);
-
-    flexGridSizerPDP_Z->Add(m_staticText1175, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
     wxFlexGridSizer* flexGridSizer8678 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer8678->SetFlexibleDirection(wxBOTH);
@@ -2390,15 +2381,24 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
 
     flexGridSizerPDP_Z->Add(flexGridSizer8678, 0, wxALL | wxEXPAND | wxALIGN_LEFT, WXC_FROM_DIP(0));
 
-    wxFlexGridSizer* flexGridSizer2434 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2434 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer2434->SetFlexibleDirection(wxBOTH);
     flexGridSizer2434->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer2434->AddGrowableCol(0);
-    flexGridSizer2434->AddGrowableRow(0);
     flexGridSizer2434->AddGrowableRow(1);
     flexGridSizer2434->AddGrowableRow(2);
+    flexGridSizer2434->AddGrowableRow(3);
 
     flexGridSizer8678->Add(flexGridSizer2434, 0, wxALL | wxEXPAND | wxALIGN_LEFT, WXC_FROM_DIP(0));
+
+    m_staticText1175 = new wxStaticText(m_scrollWinPredefinedPositions, wxID_ANY, _("Z Axis  (Physically):"),
+        wxDefaultPosition, wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
+    m_staticText1175->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    wxFont m_staticText1175Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_staticText1175Font.SetWeight(wxFONTWEIGHT_BOLD);
+    m_staticText1175->SetFont(m_staticText1175Font);
+
+    flexGridSizer2434->Add(m_staticText1175, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
     m_zToMax = new wxButton(m_scrollWinPredefinedPositions, wxID_ANY, _("Move Z Axis to Max"), wxDefaultPosition,
         wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
@@ -2434,10 +2434,18 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     flexGridSizer2435->SetFlexibleDirection(wxBOTH);
     flexGridSizer2435->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
     flexGridSizer2435->AddGrowableCol(0);
-    flexGridSizer2435->AddGrowableRow(0);
     flexGridSizer2435->AddGrowableRow(1);
 
     flexGridSizer8678->Add(flexGridSizer2435, 0, wxALL | wxEXPAND, WXC_FROM_DIP(0));
+
+    m_staticText11751 = new wxStaticText(m_scrollWinPredefinedPositions, wxID_ANY, _("Z Axis  (Logically):"),
+        wxDefaultPosition, wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
+    m_staticText11751->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    wxFont m_staticText11751Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_staticText11751Font.SetWeight(wxFONTWEIGHT_BOLD);
+    m_staticText11751->SetFont(m_staticText11751Font);
+
+    flexGridSizer2435->Add(m_staticText11751, 0, wxALL | wxEXPAND, WXC_FROM_DIP(1));
 
     m_zToTop = new wxButton(m_scrollWinPredefinedPositions, wxID_ANY, _("Move Z Axis to Top"), wxDefaultPosition,
         wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
@@ -2448,16 +2456,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     m_zToTop->SetToolTip(_("Moves the Z axis to the logical MAX position.\nDepending on the current setup."));
 
     flexGridSizer2435->Add(m_zToTop, 0, wxALL | wxEXPAND, WXC_FROM_DIP(3));
-
-    m_zToBottom = new wxButton(m_scrollWinPredefinedPositions, wxID_ANY, _("Move Z Axis to Bottom"), wxDefaultPosition,
-        wxDLG_UNIT(m_scrollWinPredefinedPositions, wxSize(-1, -1)), 0);
-    m_zToBottom->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNSHADOW));
-    m_zToBottom->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    wxFont m_zToBottomFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_zToBottom->SetFont(m_zToBottomFont);
-    m_zToBottom->SetToolTip(_("Moves the Z axis to the logical MIN position.\nDepending on the current setup."));
-
-    flexGridSizer2435->Add(m_zToBottom, 0, wxALL | wxEXPAND, WXC_FROM_DIP(3));
 
     m_manuallyPanel = new wxPanel(m_listbookManallyMotionControl, wxID_ANY, wxDefaultPosition,
         wxDLG_UNIT(m_listbookManallyMotionControl, wxSize(-1, -1)), wxTAB_TRAVERSAL);
@@ -7242,7 +7240,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent,
     m_zToMid->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::moveZToMid, this);
     m_zToMin->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::moveZToMin, this);
     m_zToTop->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::moveZToTop, this);
-    m_zToBottom->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::moveZToBottom, this);
     m_rbStepSensitivity->Bind(wxEVT_COMMAND_RADIOBOX_SELECTED, &MainFrameBClass::onSelectStepSensitivity, this);
     m_rbStepMode->Bind(wxEVT_COMMAND_RADIOBOX_SELECTED, &MainFrameBClass::onSelectStepMode, this);
     m_testCaseBook->Bind(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, &MainFrameBClass::testCaseBookChanged, this);
@@ -7543,7 +7540,6 @@ MainFrameBClass::~MainFrameBClass()
     m_zToMid->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::moveZToMid, this);
     m_zToMin->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::moveZToMin, this);
     m_zToTop->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::moveZToTop, this);
-    m_zToBottom->Unbind(wxEVT_COMMAND_BUTTON_CLICKED, &MainFrameBClass::moveZToBottom, this);
     m_rbStepSensitivity->Unbind(wxEVT_COMMAND_RADIOBOX_SELECTED, &MainFrameBClass::onSelectStepSensitivity, this);
     m_rbStepMode->Unbind(wxEVT_COMMAND_RADIOBOX_SELECTED, &MainFrameBClass::onSelectStepMode, this);
     m_testCaseBook->Unbind(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, &MainFrameBClass::testCaseBookChanged, this);
