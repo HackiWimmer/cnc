@@ -34,12 +34,14 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		void onSelectListItem(wxListEvent& event);
 		void onActivateListItem(wxListEvent& event);
 		
-		virtual bool isItemValid(long item) const;
+		virtual bool isItemValid(long item) const override;
 		
-		virtual wxString OnGetItemText(long item, long column) const;
-		virtual int OnGetItemColumnImage(long item, long column) const;
-		virtual wxListItemAttr* OnGetItemAttr(long item) const;
+		virtual wxString OnGetItemText(long item, long column) const override;
+		virtual int OnGetItemColumnImage(long item, long column) const override;
+		virtual wxListItemAttr* OnGetItemAttr(long item) const override;
 		
+		virtual wxString getFormatedItemText(long item, int col = 0) const override;
+
 	public:
 
 		static const int COL_CONT 			=  0;
@@ -55,8 +57,7 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		static const int COL_TARGET_Y		= 10;
 		static const int COL_TARGET_Z		= 11;
 		static const int COL_TOTAL_DISTANCE = 12;
-		static const int COL_STRECH 		= 13;
-		
+		static const int COL_STRECH 		= 12;
 		static const int TOTAL_COL_COUNT	= 13;
 		
 		static const int COL_SEARCH			= COL_CLD_ID;

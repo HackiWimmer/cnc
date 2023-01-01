@@ -47,7 +47,7 @@ CncLongPosition CncPathListMonitor::getCurrentPositionSteps() const {
 	return THE_CONFIG->convertMetricToSteps(ret, current.monitorPos);
 }
 ////////////////////////////////////////////////////////////////////
-void CncPathListMonitor::setCurrentPositionMetric(double px, double py, double pz) {
+void CncPathListMonitor::logCurrentPositionMetric(double px, double py, double pz) {
 ////////////////////////////////////////////////////////////////////
 	current.monitorPos.setXYZ(px, py, pz);
 	
@@ -60,7 +60,7 @@ void CncPathListMonitor::setCurrentPositionMetric(double px, double py, double p
 	dispatchEventQueue();
 }
 ////////////////////////////////////////////////////////////////////
-void CncPathListMonitor::setCurrentPositionMetric(const CncDoublePosition& pos) {
+void CncPathListMonitor::logCurrentPositionMetric(const CncDoublePosition& pos) {
 ////////////////////////////////////////////////////////////////////
 	current.monitorPos.set(pos);
 	
@@ -100,7 +100,7 @@ bool CncPathListMonitor::processFeedSpeedChange(double value_MM_MIN, CncSpeedMod
 bool CncPathListMonitor::processMoveSequence(CncMoveSequence& msq) {
 ////////////////////////////////////////////////////////////////////
 	// Nothing to do here, because position management is already done by
-	// setCurrentPositionMetric(...)
+	// logCurrentPositionMetric(...)
 	//
 	//	CncLongPosition ps;
 	//	THE_CONFIG->convertMetricToSteps(ps, current.monitorPos);
@@ -120,10 +120,18 @@ bool CncPathListMonitor::processMoveSequence(CncMoveSequence& msq) {
 	return true;
 }
 ////////////////////////////////////////////////////////////////////
-bool CncPathListMonitor::processPathListEntry(const CncPathListEntry& ple) {
+bool CncPathListMonitor::processInitialEntry(const CncDoublePosition& p) {
+////////////////////////////////////////////////////////////////////
+	CNC_PRINT_FUNCT_A(" p = %s", p.asStr())
+	
+	#warning further impl. for the initial entry is missing
+	return processPathListEntry(p);
+}
+////////////////////////////////////////////////////////////////////
+bool CncPathListMonitor::processPathListEntry(const CncDoublePosition& p) {
 ////////////////////////////////////////////////////////////////////
 	// Nothing to do here, because position management is already done by
-	// setCurrentPositionMetric(...)
+	// logCurrentPositionMetric(...)
 	//
 	//	current.monitorPos = ple.entryTarget;
 	//	
@@ -136,7 +144,6 @@ bool CncPathListMonitor::processPathListEntry(const CncPathListEntry& ple) {
 ////////////////////////////////////////////////////////////////////
 bool CncPathListMonitor::processCommandEntry(const unsigned char* buffer, int bytes) {
 ////////////////////////////////////////////////////////////////////
-	
 	return true;
 }
 

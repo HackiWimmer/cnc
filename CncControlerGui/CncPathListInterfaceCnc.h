@@ -24,33 +24,46 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 		};
 		
 		// ---------------------------------------------------
+		struct CncInitialInstruction : public CncInstruction
+		{
+			CncDoublePosition pos;
+			
+			explicit CncInitialInstruction(const CncDoublePosition& p) : pos (p) {}
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
+		};
+		
+		// ---------------------------------------------------
 		struct CncMovSeqInstruction : public CncInstruction
 		{
 			CncMoveSequenceImage img;
 			
 			explicit CncMovSeqInstruction(CncMoveSequence& s) : img (s) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
-		};
-	
-		struct CncPathListInstruction : public CncInstruction
-		{
-			CncPathListEntry ple;
-			
-			explicit CncPathListInstruction(const CncPathListEntry& e) : ple (e) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
+		// ---------------------------------------------------
+		struct CncPathListInstruction : public CncInstruction
+		{
+			CncDoublePosition pos;
+			
+			explicit CncPathListInstruction(const CncDoublePosition& p) : pos (p) {}
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
+		};
+		
+		// ---------------------------------------------------
 		struct CncGuidPathInstruction : public CncInstruction
 		{
 			CncPathListManager	plm;
 			
 			explicit CncGuidPathInstruction(const CncPathListManager& m) : plm (m) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
+		// ---------------------------------------------------
 		struct CncCommandInstruction : public CncInstruction
 		{
 			unsigned char*	buffer;
@@ -76,26 +89,18 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 					delete [] buffer;
 			}
 			
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const
-			{
-				o	<< "  Command:"
-					<< " type = '" 
-					<< std::left  << std::setw(30) << std::setfill(' ') << ( bytes > 0 ?  ArduinoCMDs::getCMDLabel(buffer[0]) : "???" ) 
-					<< "' size = "
-					<< std::right << std::setw( 3) << std::setfill('0') << bytes
-					<< std::endl
-				; 
-			}
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 
+		// ---------------------------------------------------
 		struct CncClientIDInstruction : public CncInstruction
 		{
 			long cid;
 			
 			explicit CncClientIDInstruction(long id) : cid (id) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -105,8 +110,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			CncSpeedMode	mode;
 			
 			explicit CncFeedSpeedInstruction(double v, CncSpeedMode m) : value_MM_MIN (v), mode(m) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -115,8 +120,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			int toolId;
 			
 			explicit CncToolChangeInstruction(int id) : toolId (id) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -126,8 +131,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			bool force;
 			
 			explicit CncSpindleStateInstruction(bool s, bool f) : state (s), force(f) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -136,8 +141,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			double value_U_MIN;
 			
 			explicit CncSpindleSpeedInstruction(double v) : value_U_MIN (v) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -146,8 +151,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			Trigger::BeginRun tr;
 			
 			explicit InstructionTriggerBeginRun(const Trigger::BeginRun& t) : tr (t) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -156,8 +161,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			Trigger::EndRun tr;
 			
 			explicit InstructionTriggerEndRun(const Trigger::EndRun& t) : tr (t) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		// ---------------------------------------------------
 		struct InstructionTriggerNextPath : public CncInstruction
@@ -165,8 +170,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			Trigger::NextPath tr;
 			
 			explicit InstructionTriggerNextPath(const Trigger::NextPath& t) : tr (t) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		///////////////////////////////////////////////////////////////////
@@ -175,8 +180,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			Trigger::SpeedChange tr;
 			
 			explicit InstructionTriggerSpeedChange(const Trigger::SpeedChange& t) : tr (t) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -185,8 +190,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 			Trigger::GuidePath tr;
 			
 			explicit InstructionTriggerGuidePath(const Trigger::GuidePath& t) : tr (t) {}
-			virtual bool process(CncPathListInterfaceCnc* i);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListInterfaceCnc* i) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		typedef std::vector<CncInstruction*> CncInstructionList;
@@ -205,7 +210,8 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 		bool executeSpindleSpeedChange(double value_U_MIN);
 		bool executeMoveImage(const CncMoveSequenceImage& img);
 		bool executeMoveSequence(CncMoveSequence& seq);
-		bool executePathListEntry(const CncPathListEntry& ple);
+		bool executeInitialEntry(const CncDoublePosition& p);
+		bool executePathListEntry(const CncDoublePosition& p);
 		bool executeCommand(const unsigned char* buffer, int bytes);
 		
 		void executeTrigger(const Trigger::BeginRun& tr);
@@ -227,16 +233,13 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 		
 		virtual CncLongPosition		getCurrentPositionSteps()									const	override;
 		virtual CncDoublePosition	getCurrentPositionMetric()									const	override;
-		virtual void				setCurrentPositionMetric(double px, double py, double pz)			override;
-		virtual void				setCurrentPositionMetric(const CncDoublePosition& pos)				override;
+		virtual void				logCurrentPositionMetric(double px, double py, double pz)			override;
+		virtual void				logCurrentPositionMetric(const CncDoublePosition& pos)				override;
 		
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();
 		virtual bool isInterrupted();
 		
-	#define CNC_USE_INSTRUCTIONS
-	#ifdef CNC_USE_INSTRUCTIONS
-	
 		virtual bool processGuidePath(const CncPathListManager& plm)					override { cncInstructions.push_back(new CncGuidPathInstruction(plm));				return true; }
 		virtual bool processClientIDChange(long cid)									override { cncInstructions.push_back(new CncClientIDInstruction(cid));				return true; }
 		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		override { cncInstructions.push_back(new CncFeedSpeedInstruction(value_MM_MIN, m));	return true; }
@@ -244,22 +247,9 @@ class CncPathListInterfaceCnc : public CncPathListRunner::Interface
 		virtual bool processSpindleStateSwitch(CncSpindlePowerState state, bool force)	override { cncInstructions.push_back(new CncSpindleStateInstruction(state, force));	return true; }
 		virtual bool processSpindleSpeedChange(double value_U_MIN)						override { cncInstructions.push_back(new CncSpindleSpeedInstruction(value_U_MIN));	return true; }
 		virtual bool processMoveSequence(CncMoveSequence& msq)							override { cncInstructions.push_back(new CncMovSeqInstruction(msq));				return true; }
-		virtual bool processPathListEntry(const CncPathListEntry& ple)					override { cncInstructions.push_back(new CncPathListInstruction(ple));				return true; }
+		virtual bool processInitialEntry(const CncDoublePosition& p)					override { cncInstructions.push_back(new CncInitialInstruction(p));					return true; }
+		virtual bool processPathListEntry(const CncDoublePosition& p)					override { cncInstructions.push_back(new CncPathListInstruction(p));				return true; }
 		virtual bool processCommandEntry(const unsigned char* buffer, int bytes)		override { cncInstructions.push_back(new CncCommandInstruction(buffer, bytes));		return true; }
-	
-	#else
-	
-		virtual bool processGuidePath(const CncPathListManager& plm, double zOffset)	override { return executeGuidePath(plm, zOffset); }
-		virtual bool processClientIDChange(long cid)									override { return executeClientIDChange( cid); }
-		virtual bool processFeedSpeedChange(double value_MM_MIN, CncSpeedMode m)		override { return executeFeedSpeedChange(value_MM_MIN, m); }
-		virtual bool processToolChange(int id)											override { return executeToolChange(id); }
-		virtual bool processSpindleStateSwitch(CncSpindlePowerState state, bool force)	override { return executeSpindleStateSwitch(state, force); }
-		virtual bool processSpindleSpeedChange(double value_U_MIN)						override { return executeSpindleSpeedChange(value_U_MIN); }
-		virtual bool processMoveSequence(CncMoveSequence& msq)							override { return executeMoveSequence(msq); }
-		virtual bool processPathListEntry(const CncPathListEntry& ple)					override { return executePathListEntry(ple); }
-		virtual bool processCommandEntry(const unsigned char* buffer, int bytes)		override { return executeCommandEntry(buffer, bytes); }
-	
-	#endif
 	
 		virtual void processTrigger(const Trigger::BeginRun& tr)						override;
 		virtual void processTrigger(const Trigger::EndRun& tr)							override;

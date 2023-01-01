@@ -3,16 +3,16 @@
   <WorkspaceParserMacros/>
   <WorkspaceParserPaths/>
   <Project Name="CncControllerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
-  <Project Name="CncControllerTest" Path="CncControllerTest/CncControllerTest.project" Active="No"/>
   <Project Name="EnvSetupTest" Path="EnvSetupTest/EnvSetupTest.project" Active="No"/>
+  <Project Name="CNCUnitTests" Path="CNCUnitTests/CNCUnitTests.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
+    <WorkspaceConfiguration Name="Release">
       <Environment/>
       <Project Name="CncControllerGui" ConfigName="Release"/>
-      <Project Name="CncControllerTest" ConfigName="Release"/>
       <Project Name="EnvSetupTest" ConfigName="Release"/>
+      <Project Name="CNCUnitTests" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug">
       <Environment/>
       <Project Name="CncControllerGui" ConfigName="Debug"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Debug"/>
@@ -20,14 +20,14 @@
       <Project Name="GameController" ConfigName="Debug"/>
       <Project Name="NavigatorPanel" ConfigName="Debug"/>
       <Project Name="wxWidgetsTest" ConfigName="Debug"/>
-      <Project Name="CncControllerTest" ConfigName="Debug"/>
       <Project Name="EnvSetupTest" ConfigName="Debug"/>
+      <Project Name="CNCUnitTests" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Gprof" Selected="yes">
+    <WorkspaceConfiguration Name="Gprof">
       <Environment/>
       <Project Name="CncControllerGui" ConfigName="Release"/>
-      <Project Name="CncControllerTest" ConfigName="Debug"/>
       <Project Name="EnvSetupTest" ConfigName="Debug"/>
+      <Project Name="CNCUnitTests" ConfigName="Debug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

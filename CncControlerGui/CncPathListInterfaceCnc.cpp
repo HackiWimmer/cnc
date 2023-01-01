@@ -9,8 +9,9 @@
 
 typedef CncPathListInterfaceCnc CPLI;
 
+bool CPLI::CncInitialInstruction			::process(CPLI* i)					{ return i->executeInitialEntry(pos); }
 bool CPLI::CncMovSeqInstruction				::process(CPLI* i)					{ return i->executeMoveImage(img); }
-bool CPLI::CncPathListInstruction			::process(CPLI* i)					{ return i->executePathListEntry(ple); }
+bool CPLI::CncPathListInstruction			::process(CPLI* i)					{ return i->executePathListEntry(pos); }
 bool CPLI::CncGuidPathInstruction			::process(CPLI* i)					{ return i->executeGuidePath(plm); }
 bool CPLI::CncCommandInstruction			::process(CPLI* i)					{ return i->executeCommand(buffer, bytes); }
 bool CPLI::CncClientIDInstruction			::process(CPLI* i)					{ return i->executeClientIDChange(cid); }
@@ -25,8 +26,9 @@ bool CPLI::InstructionTriggerSpeedChange	::process(CPLI* i)					{ i->executeTrig
 bool CPLI::InstructionTriggerGuidePath		::process(CPLI* i)					{ i->executeTrigger(tr); return true; }
 
 void CPLI::CncClientIDInstruction			::traceTo(std::ostream& o) const	{ o << " Next Id: "				<< cid 								<< std::endl; }
+void CPLI::CncInitialInstruction			::traceTo(std::ostream& o) const	{ o << "  Initial Entry: "		<< pos.asStr()						<< std::endl; }
 void CPLI::CncMovSeqInstruction				::traceTo(std::ostream& o) const	{ o << "  Move Sequence: ";		img.traceTo(o); o					<< std::endl; } 
-void CPLI::CncPathListInstruction			::traceTo(std::ostream& o) const	{ o << "  Path Entry: ";		ple.traceEntry(o); o				<< std::endl; }
+void CPLI::CncPathListInstruction			::traceTo(std::ostream& o) const	{ o << "  Path Entry: "			<< pos.asStr()						<< std::endl; }
 void CPLI::CncGuidPathInstruction			::traceTo(std::ostream& o) const	{ o << "  Guide Path: entries="	<< plm.getPathListSize()			<< std::endl; }
 void CPLI::CncFeedSpeedInstruction			::traceTo(std::ostream& o) const	{ o << "  Speed: F("			<< value_MM_MIN << ")"				<< std::endl; }
 void CPLI::CncToolChangeInstruction			::traceTo(std::ostream& o) const	{ o << "  Tool Change("			<< toolId << ")"					<< std::endl; }
@@ -39,6 +41,16 @@ void CPLI::InstructionTriggerSpeedChange	::traceTo(std::ostream& o) const	{ o <<
 void CPLI::InstructionTriggerGuidePath		::traceTo(std::ostream& o) const	{ o << tr 															<< std::endl; }
 
 ////////////////////////////////////////////////////////////////////
+void CPLI::CncCommandInstruction::traceTo(std::ostream& o) const {
+////////////////////////////////////////////////////////////////////
+	o	<< "  Command:"
+		<< " type = '" 
+		<< std::left  << std::setw(30) << std::setfill(' ') << ( bytes > 0 ?  ArduinoCMDs::getCMDLabel(buffer[0]) : "???" ) 
+		<< "' size = "
+		<< std::right << std::setw( 3) << std::setfill('0') << bytes
+		<< std::endl
+	; 
+}  
 
 ////////////////////////////////////////////////////////////////////
 CncPathListInterfaceCnc::CncPathListInterfaceCnc(CncControl* cc)
@@ -87,8 +99,8 @@ bool CncPathListInterfaceCnc::executeGuidePath(const CncPathListManager& plm)			
 
 bool CncPathListInterfaceCnc::executeCommand(const unsigned char* buffer, int bytes)			{ return cnc->execute(buffer, bytes); }
 
-void CncPathListInterfaceCnc::setCurrentPositionMetric(double px, double py, double pz)			{ currentAddPosition.setXYZ(px, py, pz); }
-void CncPathListInterfaceCnc::setCurrentPositionMetric(const CncDoublePosition& pos)			{ currentAddPosition.set(pos); }
+void CncPathListInterfaceCnc::logCurrentPositionMetric(double px, double py, double pz)			{ currentAddPosition.setXYZ(px, py, pz); }
+void CncPathListInterfaceCnc::logCurrentPositionMetric(const CncDoublePosition& pos)			{ currentAddPosition.set(pos); }
 CncDoublePosition CncPathListInterfaceCnc::getCurrentPositionMetric() const						{ return currentAddPosition; }
 CncLongPosition CncPathListInterfaceCnc::getCurrentPositionSteps() const						{ CncLongPosition ret; return THE_CONFIG->convertMetricToSteps(ret, currentAddPosition); }
 
@@ -121,7 +133,7 @@ bool CncPathListInterfaceCnc::spoolInstructions(CncInstructionList* ci) {
 		
 		return ret;
 	};
-		
+	
 	// -------------------------------------------------------------
 	// loop
 	for ( auto instruction : *ci )
@@ -171,22 +183,36 @@ void CncPathListInterfaceCnc::resetInstructions() {
 	cncInstructions.clear();
 }
 ////////////////////////////////////////////////////////////////////
-bool CncPathListInterfaceCnc::executePathListEntry(const CncPathListEntry& ple) { 
+bool CncPathListInterfaceCnc::executeInitialEntry(const CncDoublePosition& p) { 
 ////////////////////////////////////////////////////////////////////
-	return cnc->moveAbsLinearMetricXYZ(	ple.entryTarget.getX(),
-										ple.entryTarget.getY(),
-										ple.entryTarget.getZ(),
-										ple.alreadyRendered
+	if ( false)
+	{
+		// only for logging
+		CncDoubleDistance dist = p - cnc->getCurCtlPosMetric();
+		CNC_PRINT_FUNCT_A("\n p = %s, c = %s --> d = %s", 
+								p.asStr(), 
+								cnc->getCurCtlPosMetric().asStr(), 
+								dist.asStr() 
+		)
+	}
+	
+	return cnc->moveAbsLinearMetricXYZ(	p.getX(),
+										p.getY(),
+										p.getZ(),
+										false
+	); 
+}
+////////////////////////////////////////////////////////////////////
+bool CncPathListInterfaceCnc::executePathListEntry(const CncDoublePosition& p) { 
+////////////////////////////////////////////////////////////////////
+	return cnc->moveAbsLinearMetricXYZ(	p.getX(),
+										p.getY(),
+										p.getZ(),
+										false
 	); 
 }
 ////////////////////////////////////////////////////////////////////
 bool CncPathListInterfaceCnc::interactToolChange(int id) {
 ////////////////////////////////////////////////////////////////////
-	if ( cnc == NULL )
-	{
-		CNC_CERR_FUNCT_A(" Invalid cnc pointer")
-		return false;
-	}
-	
 	return cnc->interactToolChange(id);
 }

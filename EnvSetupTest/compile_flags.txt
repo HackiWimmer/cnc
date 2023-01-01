@@ -1,6 +1,6 @@
 -IC:\@Development\@Projekte\c++\CNCGuiController\EnvSetupTest
 -IC:\@Development\boost_1_77_0
--IC:\@Development\wxsvg-1.5.22\include
+-IC:\@Development\wxsvg-1.5.24\include
 -IC:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui
 -IC:\@Development\wxWidgets-3.2.1\lib\gcc_dll\mswu
 -IC:\@Development\wxWidgets-3.2.1\include

@@ -13,9 +13,6 @@
   <object class="wxBitmap" name="aui-minimize@2x">bitmaps\aui-minimize@2x.png</object>
   <object class="wxBitmap" name="byeye">bitmaps\byeye.png</object>
   <object class="wxBitmap" name="camera">bitmaps\camera.png</object>
-  <object class="wxBitmap" name="chart-line-error (2)">bitmaps\chart-line-error (2).png</object>
-  <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
-  <object class="wxBitmap" name="dialog-ok">bitmaps\dialog-ok.png</object>
   <object class="wxBitmap" name="mode1">bitmaps\ReferencePosition\mode1.png</object>
   <object class="wxBitmap" name="mode2">bitmaps\ReferencePosition\mode2.png</object>
   <object class="wxBitmap" name="mode3">bitmaps\ReferencePosition\mode3.png</object>
@@ -27,6 +24,5 @@
   <object class="wxBitmap" name="snap-intersection">bitmaps\snap-intersection.png</object>
   <object class="wxBitmap" name="snap-orto">bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="table-border-outline">bitmaps\table-border-outline.png</object>
-  <object class="wxBitmap" name="target-200">bitmaps\target-200.png</object>
   <object class="wxBitmap" name="touchblock">bitmaps\touchblock.png</object>
 </resource>

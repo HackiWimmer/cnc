@@ -23,7 +23,6 @@ CncAnchorPosListCtrl::CncAnchorPosListCtrl(wxWindow *parent, long style)
 	AppendColumn(" ",		wxLIST_FORMAT_LEFT, 	 20);
 	AppendColumn("Name:",	wxLIST_FORMAT_LEFT, 	160);
 	AppendColumn("*",		wxLIST_FORMAT_CENTRE, 	 40);
-	AppendColumn("Coord",	wxLIST_FORMAT_RIGHT,	 80);
 	AppendColumn("Type",	wxLIST_FORMAT_RIGHT,	 80);
 	AppendColumn("X",		wxLIST_FORMAT_RIGHT,	 80);
 	AppendColumn("Y",		wxLIST_FORMAT_RIGHT,	 80);
@@ -87,15 +86,15 @@ wxString CncAnchorPosListCtrl::OnGetItemText(long item, long column) const {
 		
 	const AnchorInfo ai = anchorMap.at(anchorIdx.at(item));
 	
-	switch ( column ) {
-		case COL_MODE:	return _(ai.fixed		? "*"   : " ");
+	switch ( column )
+	{
 		case COL_NAME:	return _(ai.name);
-		case COL_SHOW:	return _(ai.show  		? "Y"   : "N");
-		case COL_COORD:	return _(ai.absolute	? "Abs" : "Rel");
-		case COL_TYPE:	return _(ai.type);
-		case COL_X:		return _(ai.hasX() ? wxString::Format("%.3lf", ai.pos.getX()) : "");
-		case COL_Y:		return _(ai.hasY() ? wxString::Format("%.3lf", ai.pos.getY()) : "");
-		case COL_Z:		return _(ai.hasZ() ? wxString::Format("%.3lf", ai.pos.getZ()) : "");
+		case COL_MODE:	return _(ai.fixed			? "*"          : " ");
+		case COL_SHOW:	return _(ai.show 			? "Y"          : "N");
+		case COL_TYPE:	return _(ai.isPhysically()	? "Physically" : "Logically");
+		case COL_X:		return wxString::Format("%.3lf", ai.pos.getX());
+		case COL_Y:		return wxString::Format("%.3lf", ai.pos.getY());
+		case COL_Z:		return wxString::Format("%.3lf", ai.pos.getZ());
 	}
 	
 	return _("");
@@ -175,12 +174,13 @@ void CncAnchorPosListCtrl::delAnchor(const wxString& name) {
 /////////////////////////////////////////////////////////////////////
 void CncAnchorPosListCtrl::selAnchor(const wxString& name) {
 /////////////////////////////////////////////////////////////////////
-	if ( name.IsEmpty() == true ) {
+	if ( name.IsEmpty() == true ) 
+	{
 		selectItem(0, true);
 		return;
 	}
 	
-	auto it = anchorMap.find (name);
+	auto it = anchorMap.find(name);
 	if ( it == anchorMap.end() )
 		return;
 	
@@ -190,7 +190,8 @@ void CncAnchorPosListCtrl::selAnchor(const wxString& name) {
 void CncAnchorPosListCtrl::updateIndex() {
 /////////////////////////////////////////////////////////////////////
 	anchorIdx.clear();
-	for ( auto it = anchorMap.begin(); it != anchorMap.end(); ++it ) {
+	for ( auto it = anchorMap.begin(); it != anchorMap.end(); ++it )
+	{
 		it->second.index = anchorIdx.size();
 		anchorIdx.push_back(it->first);
 	}

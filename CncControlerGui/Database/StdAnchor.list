@@ -1,16 +1,30 @@
 
+[Anchor_HardwareReference]
+D=1
+T=P
+X=0.0
+Y=0.0
+Z=$Z_MaxDist_MM
+
+[Anchor_Parking]
+D=1
+T=P
+X=$X_MaxDist_MM / 4.0
+Y=+1.0
+Z=-1.0
+
 [Anchor_ZTouch]
 D=1
-C=1
-T=XYZ
-X=10.0
-Y=10.0
-Z=0.0
+T=P
+X=+30.0
+Y=+$Y_MaxDist_MM - 30.0
+Z=-1.0
 
 [Anchor_ToolChange]
 D=1
-C=1
-T=XYZ
-X=100.0
-Y=100.0
-Z=10.0
+T=P
+X=$X_MaxDist_MM / 2.0
+Y=+1.0
+Z=-1.0
+
+

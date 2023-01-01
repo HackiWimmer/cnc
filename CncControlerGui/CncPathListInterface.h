@@ -38,8 +38,8 @@ class CncPathListMonitor : public CncPathListRunner::Interface
 		
 		virtual CncLongPosition		getCurrentPositionSteps()  const							override ;
 		virtual CncDoublePosition	getCurrentPositionMetric() const							override  { return current.monitorPos; }
-		virtual void				setCurrentPositionMetric(double px, double py, double pz)	override;
-		virtual void				setCurrentPositionMetric(const CncDoublePosition& pos)		override;
+		virtual void				logCurrentPositionMetric(double px, double py, double pz)	override;
+		virtual void				logCurrentPositionMetric(const CncDoublePosition& pos)		override;
 		
 		virtual void logMeasurementStart()														override { tsMeasurementStart = CncTimeFunctions::getNanoTimestamp(); }
 		virtual void logMeasurementEnd()														override { tsMeasurementLast  = CncTimeFunctions::getNanoTimestamp(); }
@@ -52,7 +52,8 @@ class CncPathListMonitor : public CncPathListRunner::Interface
 		virtual bool processSpindleStateSwitch(bool on, bool force=false)						override { current.spindleState = on; return true; }
 		virtual bool processSpindleSpeedChange(double value_U_MIN)								override { current.spindleSpeed = value_U_MIN; return true; }
 		virtual bool processMoveSequence(CncMoveSequence& msq)									override;
-		virtual bool processPathListEntry(const CncPathListEntry& ple)							override;
+		virtual bool processInitialEntry(const CncDoublePosition& p)							override;
+		virtual bool processPathListEntry(const CncDoublePosition& p)							override;
 		virtual bool processCommandEntry(const unsigned char* buffer, int bytes)				override;
 		
 		virtual void processTrigger(const Trigger::BeginRun& tr)								override {}

@@ -1,6 +1,7 @@
 #ifndef CNCANCHORPOSITION_H
 #define CNCANCHORPOSITION_H
 
+#include <wx/fileconf.h>
 #include "CncAnchorPosListCtrl.h"
 #include "wxCrafterReferencePosition.h"
 
@@ -22,6 +23,10 @@ class CncAnchorPosition : public CncAnchorPositionBase
 		void provide();
 		
 		void processType();
+		
+		double readX(wxFileConfig& db);
+		double readY(wxFileConfig& db);
+		double readZ(wxFileConfig& db);
 		
 	public:
 		CncAnchorPosition(wxWindow* parent);

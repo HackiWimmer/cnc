@@ -583,6 +583,9 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 			gcb.plane = GCodeBlock::GC_YZ_PLANE;
 			return true;
 		} //....................................................
+		case 27: 	// GC_G: Park tool head
+		{			return pathHandler->moveToParkPosition();
+		}//....................................................
 		case 28: 	// GC_G: Move To Origin:
 		{
 			return pathHandler->moveToOrigin(gcb);
@@ -692,6 +695,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		case  0:		// GC_M_StopOrUnconditionalStop
 		case  1:		// GC_M_SleepOrConditionalStop
 		case  2:		// GC_M_ProgramEnd
+		case 30:		
 		{
 			programEnd = true; 
 			return true;
@@ -744,6 +748,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 			return true;
 		} //....................................................
 		
+		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case 117:	// Marlin: Set LCD Message
 		{
 			const CncProcessingInfo::RunPhase curRunPhase = THE_CONTEXT->processingInfo->getCurrentRunPhase();
@@ -756,6 +761,12 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 			}
 			
 			return true;
+		}
+		
+		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
+		case 125:	// Park Head
+		{
+			pathHandler->moveToParkPosition();
 		}
 		
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::

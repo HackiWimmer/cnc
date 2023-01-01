@@ -44,7 +44,9 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		CncPathListManager 				pathListMgr;
 
 		FileParser*						fileParser;
+		
 		bool 							nextPath;
+		uint32_t						pathCounter;
 
 		CncDoublePosition				startPos;
 		CncDoublePosition				currentPos;

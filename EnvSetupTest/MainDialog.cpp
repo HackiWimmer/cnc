@@ -102,7 +102,8 @@ void MainDialog::onScanCOM(wxCommandEvent& event) {
 	CncArduinoRegisteryScanner::RegResult result;
 	ars.scan(result);
 	
-	for ( auto it = result.begin(); it != result.end(); ++it ) {
+	for ( auto it = result.begin(); it != result.end(); ++it )
+	{
 		std::stringstream ss;
 		//ss << (*it) << std::endl;
 		
@@ -115,7 +116,5 @@ void MainDialog::onScanCOM(wxCommandEvent& event) {
 		m_comScanOutput->AppendText(wxString::Format("%s\n",ss.str().c_str()));
 	}
 	
-
 	//RegCloseKey(hKey);
-
 }

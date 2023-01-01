@@ -597,9 +597,9 @@ const CncPathListEntry& CncPathListManager::addEntryRel(double deltaX, double de
 	
 	const long clipperIndex	= (long)clipperPath.size();
 	clipperPath.push_back(std::move(ClipperLib::transform(targetX, targetY, targetZ)));
-
+	
 	cpe.setPositionChange();
-
+	
 	cpe.clipperIndex			= clipperIndex;
 	cpe.alreadyRendered			= alreadyRendered;
 	cpe.entryDistance			= { deltaX,  deltaY,  deltaZ  };
@@ -734,8 +734,8 @@ bool CncPathListManager::isPathClosed() const {
 	
 	const CncDoublePosition& p1 = itFirst->entryTarget;
 	const CncDoublePosition& p2 = itLast->entryTarget;
-	
-	return p1.isFloatingEqual(p2, 0.001);
+
+	return p1.isEqual(p2, CncDoublePosition::CMP_BASE, 0.001);
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListManager::getTargetPos(CncDoublePosition& ret) const {

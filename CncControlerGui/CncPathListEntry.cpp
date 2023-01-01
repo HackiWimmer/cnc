@@ -83,6 +83,7 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 		 << ")"													<< ", "
 		 
 		 << "("
+		 << std::fixed << std::setw(4) << std::setfill(' ') << std::right
 		 << wxString::Format("% 5ld", toolId)					<< " " 
 		 << ")"													<< ", "
 		 
@@ -91,8 +92,10 @@ void CncPathListEntry::traceEntry(std::ostream& ostr) const {
 		 << cnc::dblFormat1(spindleSpeed_U_MIN)
 		 << ")"													<< ", "
 		 
-		 << cnc::dblFormat(entryDistance)						<< " --> "
-		 << cnc::dblFormat(entryTarget)							<< " | "
+		 << "+D("
+		 << cnc::dblFormat(entryDistance)						<< ") = T("
+		 << cnc::dblFormat(entryTarget)							<< ") | "
+		 
 		 << "td = " << cnc::dblFormat1(totalDistance)			<< " | "
 		 << "ar = " << alreadyRendered
 		 

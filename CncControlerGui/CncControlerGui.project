@@ -6,8 +6,6 @@
     </Plugin>
   </Plugins>
   <VirtualDirectory Name="src">
-    <File Name="CncUnitTests.h"/>
-    <File Name="CncUnitTests.cpp"/>
     <File Name="PathGeneratorFrame.cpp"/>
     <File Name="PathGeneratorFrame.h"/>
   </VirtualDirectory>
@@ -288,6 +286,9 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncSimpleCalculator.cpp"/>
+      <File Name="CncSimpleCalculator.h"/>
+      <File Name="CncAnchorInfo.cpp"/>
       <File Name="CncTestRunConfig.cpp"/>
       <File Name="CncTestRunConfig.h"/>
       <File Name="CncSimuHwDimensionSetup.h"/>
@@ -382,8 +383,6 @@
       <File Name="CncMotionVertexTrace.h"/>
       <File Name="CncMotionVertexTrace.cpp"/>
       <File Name="CncExceptions.h"/>
-      <File Name="CncStartPositionResolver.h"/>
-      <File Name="CncStartPositionResolver.cpp"/>
       <File Name="CncPreprocessor.h"/>
       <File Name="CncPreprocessor.cpp"/>
       <File Name="CncMoveSequence.h"/>
@@ -468,6 +467,9 @@
       <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Debug;release2;Gprof;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterUnitTest_bitmaps.cpp"/>
+      <File Name="wxCrafterUnitTest.h"/>
+      <File Name="wxCrafterUnitTest.cpp"/>
       <File Name="wxCrafterPodiumManagement_bitmaps.cpp"/>
       <File Name="wxCrafterPodiumManagement.h"/>
       <File Name="wxCrafterPodiumManagement.cpp"/>
@@ -504,9 +506,6 @@
       <File Name="wxCrafterSpeedMonitor_bitmaps.cpp"/>
       <File Name="wxCrafterSpeedMonitor.h"/>
       <File Name="wxCrafterSpeedMonitor.cpp"/>
-      <File Name="wxCrafterUnitTest_bitmaps.cpp"/>
-      <File Name="wxCrafterUnitTest.h"/>
-      <File Name="wxCrafterUnitTest.cpp"/>
       <File Name="wxCrafterTemplateObserver_bitmaps.cpp"/>
       <File Name="wxCrafterTemplateObserver.h"/>
       <File Name="wxCrafterTemplateObserver.cpp"/>
@@ -693,6 +692,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
+    <File Name="wxCrafterUnitTest.wxcp"/>
     <File Name="wxCrafterPodiumManagement.wxcp"/>
     <File Name="wxCrafterSecurePanel.wxcp"/>
     <File Name="wxCrafterSerialSpy.wxcp"/>
@@ -705,7 +705,6 @@
     <File Name="wxCrafterBaseDialogs.wxcp"/>
     <File Name="wxCrafterReferencePosition.wxcp"/>
     <File Name="wxCrafterSpeedMonitor.wxcp"/>
-    <File Name="wxCrafterUnitTest.wxcp"/>
     <File Name="wxCrafterTemplateObserver.wxcp"/>
     <File Name="wxCrafterPathGenerator.wxcp"/>
     <File Name="wxCrafterMessageDialog.wxcp"/>
@@ -892,7 +891,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="MinGW 64bit ( MSYS2 64bit )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g1;-fpic;-O3;-std=c++2a;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g1;-fpic;-O3;-std=c++2a;-Wall;-pipe;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:/@Development/boost_1_79_0"/>
         <IncludePath Value="C:/msys64/mingw64/include"/>

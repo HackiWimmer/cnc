@@ -490,9 +490,10 @@ int Serial::traceReadBuffer(std::ostream& ostr) const {
 	ostr << "******************" << std::endl;
 	ostr << "Serial: ReadBuffer Size: " << readBuffer.size() << std::endl;
 	
-		for ( auto it = readBuffer.cbegin(); it != readBuffer.cend(); ++it ) {
+		for ( auto it = readBuffer.cbegin(); it != readBuffer.cend(); ++it ) 
+		{
 			const unsigned char c = *it;
-			ostr << wxString::Format("%02d, 0x%02X\n", (int)c, (int)c);
+			ostr << wxString::Format("%03d, 0x%02X\n", (int)c, (int)c);
 		}
 	
 	ostr << "******************" << std::endl;
@@ -507,9 +508,8 @@ int Serial::peekAndTraceReadBuffer(std::ostream& ostr) {
 	int bytesRead		= 0;
 	int totBytesRead	= 0;
 	
-	while ( (bytesRead = peekData(buffer, size)) > 0 ) {
+	while ( (bytesRead = peekData(buffer, size)) > 0 ) 
 		totBytesRead += bytesRead;
-	}
 	
 	return traceReadBuffer(ostr);
 }
@@ -519,8 +519,10 @@ bool Serial::dataAvailable() {
 	unsigned char buffer[1];
 	const bool ret = peekData(buffer, 1) > 0;
 	
-	if ( false ) {
-		if ( ret == true ) {
+	if ( false ) 
+	{
+		if ( ret == true ) 
+		{
 			traceReadBuffer(std::cout);
 		}
 	}
@@ -2200,7 +2202,8 @@ bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 		return false;
 	}
 	
-	if ( sfi.Lc.bytes%4 != 0 ) {
+	if ( sfi.Lc.bytes%4 != 0 )
+	{
 		std::cerr << "ERROR while reading limit values. Result can't broken down to int32_t values. Byte count: " << sfi.Lc.bytes << std::endl;
 		return false;
 	}
@@ -2231,7 +2234,8 @@ bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 ///////////////////////////////////////////////////////////////////
 	// first reading heartbeat value
-	if ( (sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, LONG_BUF_SIZE)) < (int)LONG_BUF_SIZE ) {
+	if ( (sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, LONG_BUF_SIZE)) < (int)LONG_BUF_SIZE )
+	{
 		std::cerr << "ERROR while reading heartbeat counter value. Nothing available" << std::endl;
 		return false;
 	}
@@ -2249,15 +2253,18 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 	sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, remainingBytes);
 	sfi.Sc.p 	 = sfi.Sc.result;
 	
-	if ( sfi.Sc.bytes != remainingBytes ) {
+	if ( sfi.Sc.bytes != remainingBytes )
+	{
 		std::cerr << "WARNING while reading furter heartbeat bytes. Expected byte count: " << remainingBytes;
 		std::cerr << " received: " << sfi.Sc.bytes << std::endl;
 	}
 	
-	for (int b=0; b<sfi.Sc.bytes; b++) {
+	for (int b=0; b<sfi.Sc.bytes; b++)
+	{
 		memcpy(&sfi.Sc.value, sfi.Sc.p, 1);
 		
-		switch ( b ) {
+		switch ( b )
+		{
 			case 0:		ci.limitState	= true; ci.limitStateValue		= sfi.Sc.value; break;
 			case 1:		ci.supportState	= true; ci.supportStateValue	= sfi.Sc.value; break;
 			case 2:		ci.healtyState	= true; ci.healtyStateValue		= sfi.Sc.value; break;

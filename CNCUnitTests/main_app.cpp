@@ -1,5 +1,3 @@
-#include <iostream>
-#include "impl.h"
 #include "main_app.h"
 
 IMPLEMENT_APP_CONSOLE(MainApp)
@@ -23,9 +21,6 @@ bool MainApp::OnInit()
     if ( !DoParseCommandLine(parser) ) {
         return false;
     }
-	
-	Implementation impl;
-	impl.run();
     
     // place your initialization code here
     return true;

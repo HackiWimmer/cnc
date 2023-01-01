@@ -67,16 +67,18 @@ int CncStartPositionResolver::resolve() {
 int CncStartPositionResolver::resolve(const wxString& cmd) {
 ///////////////////////////////////////////////////////////////////
 	wxStringTokenizer tokenizer(cmd, "-> ");
-	while ( tokenizer.HasMoreTokens() ) {
-		wxString token = tokenizer.GetNextToken();
+	while ( tokenizer.HasMoreTokens() ) 
+	{
+		const wxString token = tokenizer.GetNextToken();
 		
-		if ( token.IsEmpty() == false ) {
+		if ( token.IsEmpty() == false ) 
+		{
 			//std::cout << token << std::endl;
 			
 			CncControl* cnc = APP_PROXY::getCncControl();
 			const double dx = -distance.getX();
 			const double dy = -distance.getY();
-			const double dz = -distance.getZ();
+			const double dz = -distance.getZ();// + THE_CONFIG->getWorkpieceOffset();
 			
 			APP_PROXY::getMotionMonitor()->pushInteractiveProcessMode();
 			
@@ -90,10 +92,21 @@ int CncStartPositionResolver::resolve(const wxString& cmd) {
 			else if ( token == UnchgStr )	{ ret = true; }
 			else							{ ret = false; }
 			
-			APP_PROXY::getMotionMonitor()->pushInteractiveProcessMode();
+			APP_PROXY::getMotionMonitor()->popInteractiveProcessMode();
 			
-			if ( ret == false ) {
-				std::cerr << "CncStartPositionResolver::resolve(): Error while resolve '" << token << "'" << std::endl;
+			if ( ret == false )
+			{
+				CNC_CERR_FUNCT_A("\nError while resolve '%s'\n"
+								 " distance = %.3lf, %.3lf, %.3lf; dx = %.3lf, dy = %.3lf, dz = %.3lf", 
+									token, 
+									distance.getX(),
+									distance.getY(),
+									distance.getZ(),
+									dx, 
+									dy, 
+									dz
+				)
+				
 				return wxID_ABORT;
 			}
 		}

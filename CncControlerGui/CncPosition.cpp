@@ -1,15 +1,380 @@
 #include <iomanip>
-
 #include "CncCommon.h"
 #include "CncPosition.h"
 
 ///////////////////////////////////////////////////////////////////////
-void test() { 
-	CncIntPosition 		p1;
-	CncLongPosition 	p2;
-	CncDoublePosition 	p3;
-	CncFloatPosition 	p4;
+template <> bool CncPosition<int16_t>::compare(int16_t v1, int16_t v2, double fpe) const { return v1 == v2; }
+template <> bool CncPosition<int32_t>::compare(int32_t v1, int32_t v2, double fpe) const { return v1 == v2; }
+template <> bool CncPosition<float>  ::compare(float   v1, float   v2, double fpe) const { return std::fabs(v1 - v2) <= fpe; }
+template <> bool CncPosition<double> ::compare(double  v1, double  v2, double fpe) const { return std::fabs(v1 - v2) <= fpe; }
+
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::resetTransformation() { 
+///////////////////////////////////////////////////////////////////////
+	transformationMatrix.reset();
+	return setXYZ(xOrg, yOrg, zOrg); 
 }
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::operator= (const CncPosition<T>& cp) {
+///////////////////////////////////////////////////////////////////////
+	// self-assignment check
+	if ( this != &cp ) 
+	{
+		transformationMatrix = cp.getTransformationMatrix();
+		floatingPointEpsilon = cp.getFloatingPointPrecision();
+		
+		xOrg = cp.xOrg;
+		yOrg = cp.yOrg;
+		zOrg = cp.zOrg;
+		
+		xPos = cp.xPos;
+		yPos = cp.yPos;
+		zPos = cp.zPos;
+		
+		xMin = cp.xMin;
+		xMax = cp.xMax;
+		yMin = cp.yMin;
+		yMax = cp.yMax;
+		zMin = cp.zMin;
+		zMax = cp.zMax;
+	}
+	
+	return *this;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+bool CncPosition<T>::operator== (const CncPosition<T> &a) const {
+///////////////////////////////////////////////////////////////////////
+	return ( memcmp(this, &a, sizeof(CncPosition<T>)) == 0 );
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+bool CncPosition<T>::operator!= (const CncPosition<T> &a) const {
+///////////////////////////////////////////////////////////////////////
+	return (!operator== (a));
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+bool CncPosition<T>::isEqual(const CncPosition<T> &a, CompareFlags cf, double fpe) const {
+///////////////////////////////////////////////////////////////////////
+	if ( fpe < 0 )
+		fpe = DefaultfloatingPointEpsilon;
+
+	if ( cf & CMP_POS )
+	{
+		if ( compare(a.xPos, xPos, fpe) == false ) return false;
+		if ( compare(a.yPos, yPos, fpe) == false ) return false;
+		if ( compare(a.zPos, zPos, fpe) == false ) return false;
+	}
+	if ( cf & CMP_ORG )
+	{
+		if ( compare(a.xOrg, xOrg, fpe) == false ) return false;
+		if ( compare(a.yOrg, yOrg, fpe) == false ) return false;
+		if ( compare(a.zOrg, zOrg, fpe) == false ) return false;
+	}
+	if ( cf & CMP_WMS )
+	{
+		if ( compare(a.xMin, xMin, fpe) == false ) return false;
+		if ( compare(a.yMin, yMin, fpe) == false ) return false;
+		if ( compare(a.zMin, zMin, fpe) == false ) return false;
+		if ( compare(a.xMax, xMax, fpe) == false ) return false;
+		if ( compare(a.yMax, yMax, fpe) == false ) return false;
+		if ( compare(a.zMax, zMax, fpe) == false ) return false;
+	}
+	if ( cf & CMP_FPE )
+	{
+		if ( compare(a.floatingPointEpsilon, floatingPointEpsilon) == false ) 
+			return false;
+	}
+	if ( cf & CMP_MTX )
+	{
+		if ( a.transformationMatrix != transformationMatrix)
+			return false;
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::set(const CncPosition<T>& p) {
+///////////////////////////////////////////////////////////////////////
+	*this = p;
+	return *this;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::setXYZ(T x, T y, T z) {
+///////////////////////////////////////////////////////////////////////
+	xOrg = x;
+	yOrg = y;
+	zOrg = z;
+	
+	xPos = xOrg;
+	yPos = yOrg;
+	zPos = zOrg;
+	
+	if ( hasTransformation() )
+		transformationMatrix.transform(xPos, yPos, zPos);
+		
+	evaluateWatermarks();
+	return *this;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::inc(T x, T y, T z) {
+///////////////////////////////////////////////////////////////////////
+	return setXYZ(xOrg + x, yOrg + y, zOrg + z);
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::dec(T x, T y, T z) {
+///////////////////////////////////////////////////////////////////////
+	return setXYZ(xOrg - x, yOrg - y, zOrg - z);
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+CncPosition<T> CncPosition<T>::operator+ (const CncPosition<T> &a) const {
+///////////////////////////////////////////////////////////////////////
+	CncPosition<T> c(a);
+	c.setXYZ(xOrg + a.xOrg, 
+			 yOrg + a.yOrg, 
+			 zOrg + a.zOrg
+	);
+	return c;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+CncPosition<T> CncPosition<T>::operator- (const CncPosition<T> &a) const {
+///////////////////////////////////////////////////////////////////////
+	CncPosition<T> c(a);
+	c.setXYZ(xOrg - a.xOrg, 
+			 yOrg - a.yOrg, 
+			 zOrg - a.zOrg
+	);
+	return c;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::operator+= (const CncPosition &a) {
+///////////////////////////////////////////////////////////////////////
+	return setXYZ(xOrg + a.getX(), yOrg + a.getY(), zOrg + a.getZ());
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::operator-= (const CncPosition &a) {
+///////////////////////////////////////////////////////////////////////
+	return setXYZ(xOrg - a.getX(), yOrg - a.getY(), zOrg - a.getZ());
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::operator++ () {
+///////////////////////////////////////////////////////////////////////
+	return setXYZ(xOrg + 1, yOrg + 1, zOrg + 1);
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+const CncPosition<T>& CncPosition<T>::operator-- () {
+///////////////////////////////////////////////////////////////////////
+	return setXYZ(xOrg - 1, yOrg - 1, zOrg - 1);
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+CncPosition<T> CncPosition<T>::operator++ (int size) {
+///////////////////////////////////////////////////////////////////////
+	CncPosition<T> temp = *this;
+	++*this;
+   return temp;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+CncPosition<T> CncPosition<T>::operator-- (int size) {
+///////////////////////////////////////////////////////////////////////
+	CncPosition<T> temp = *this;
+	--*this;
+   return temp;
+}
+
+///////////////////////////////////////////////////////////////////////
+template <>
+wxString CncPosition<int16_t>::asStr() const {
+///////////////////////////////////////////////////////////////////////
+	wxString ret(wxString::Format("%d, %d, %d", xPos, yPos, zPos));
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////
+template <>
+wxString CncPosition<int32_t>::asStr() const {
+///////////////////////////////////////////////////////////////////////
+	wxString ret(wxString::Format("%ld, %ld, %ld", xPos, yPos, zPos));
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////
+template <>
+wxString CncPosition<float>::asStr() const {
+///////////////////////////////////////////////////////////////////////
+	wxString ret(wxString::Format("%.3f, %.3f, %.3f", xPos, yPos, zPos));
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////
+template <>
+wxString CncPosition<double>::asStr() const {
+///////////////////////////////////////////////////////////////////////
+	wxString ret(wxString::Format("%.3lf, %.3lf, %.3lf", xPos, yPos, zPos));
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////
+template <>
+wxString CncPosition<int16_t>::asFullStr() const {
+///////////////////////////////////////////////////////////////////////
+	wxString ret(wxString::Format(	"Pos(%d, %d, %d) " 
+									"Org(%d, %d, %d) "
+									"Wms(%d/%d, %d/%d, %d/%d)",
+									xPos, yPos, zPos,
+									xOrg, yOrg, zOrg,
+									xMin, xMax, yMin, yMax, zMin, zMax
+				)
+	);
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////
+template <>
+wxString CncPosition<int32_t>::asFullStr() const {
+///////////////////////////////////////////////////////////////////////
+	wxString ret(wxString::Format(	"Pos(%ld, %ld, %ld) " 
+									"Org(%ld, %ld, %ld) "
+									"Wms(%ld/%d, %ld/%ld, %ld/%ld)",
+									xPos, yPos, zPos,
+									xOrg, yOrg, zOrg,
+									xMin, xMax, yMin, yMax, zMin, zMax
+				)
+	);
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////
+template <>
+wxString CncPosition<float>::asFullStr() const {
+///////////////////////////////////////////////////////////////////////
+	wxString ret(wxString::Format(	"Pos(%.3f, %.3f, %.3f) " 
+									"Org(%.3f, %.3f, %.3f) "
+									"Wms(%.3f/%.3f, %.3f/%.3f, %.3f/%.3f)",
+									xPos, yPos, zPos,
+									xOrg, yOrg, zOrg,
+									xMin, xMax, yMin, yMax, zMin, zMax
+				)
+	);
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////
+template <>
+wxString CncPosition<double>::asFullStr() const {
+///////////////////////////////////////////////////////////////////////
+	wxString ret(wxString::Format(	"Pos(%.3lf, %.3lf, %.3lf) " 
+									"Org(%.3lf, %.3lf, %.3lf) "
+									"Wms(%.3lf/%.3lf, %.3lf/%.3lf, %.3lf/%.3lf)",
+									xPos, yPos, zPos,
+									xOrg, yOrg, zOrg,
+									xMin, xMax, yMin, yMax, zMin, zMax
+				)
+	);
+	return ret;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+std::ostream& CncPosition<T>::trace(std::ostream &ostr) const {
+///////////////////////////////////////////////////////////////////////
+	const unsigned int	p = ostr.precision();
+	const unsigned int	w = ostr.width();
+	const char			f = ostr.fill();
+	
+	ostr	<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< getX() << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< getY() << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< getZ()
+	;
+		return ostr;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+std::ostream& CncPosition<T>::traceAll(std::ostream &ostr, bool matrix) const {
+///////////////////////////////////////////////////////////////////////
+	const unsigned int	p = ostr.precision();
+	const unsigned int	w = ostr.width();
+	const char			f = ostr.fill();
+	
+	ostr	<< "Pos("
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< getX() << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< getY() << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< getZ()
+			<< ") "
+	;
+	
+	ostr	<< "Org("
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< xOrg << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< yOrg << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< zOrg
+			<< ") "
+	;
+	
+	ostr	<< "Fpe(" 
+			<< floatingPointEpsilon 
+			<< ") "
+	;
+	
+	traceWatermarks(ostr);
+	
+	if ( matrix )
+	{
+		ostr << std::endl; 
+		traceMatrix(ostr);
+	}
+	
+	return ostr;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+std::ostream& CncPosition<T>::traceMatrix(std::ostream &ostr) const {
+///////////////////////////////////////////////////////////////////////
+	ostr << transformationMatrix;
+	return ostr;
+}
+///////////////////////////////////////////////////////////////////////
+template <class T>
+std::ostream& CncPosition<T>::traceWatermarks(std::ostream &ostr) const {
+///////////////////////////////////////////////////////////////////////
+	const unsigned int	p = ostr.precision();
+	const unsigned int	w = ostr.width();
+	const char			f = ostr.fill();
+	
+	ostr	<< "Wms("
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< xMin << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< yMin << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< zMin << " | "
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< xMax << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< yMax << ", " 
+			<< std::showpos << std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+			<< zMax
+			<< ")"
+	;
+	
+	return ostr;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////
 template <class T>
@@ -637,6 +1002,11 @@ CncBoundaries<T> CncBoundaries<T>::normalize() const {
 }
 
 // Explicit template instantiation
+template class CncPosition<int16_t>;
+template class CncPosition<int32_t>;
+template class CncPosition<double>;
+template class CncPosition<float>;
+
 template class CncBoundaries<int16_t>;
 template class CncBoundaries<int32_t>;
 template class CncBoundaries<double>;

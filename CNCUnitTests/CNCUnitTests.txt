@@ -1,0 +1,1 @@
+Release/Test_CncSimpleCalculator.cpp.o Release/up_CncControlerGui_CncSimpleCalculator.cpp.o Release/up_CncControlerGui_CncPosition.cpp.o Release/up_CncControlerGui_CncVector.cpp.o Release/main.cpp.o Release/Test_CncPosition.cpp.o   

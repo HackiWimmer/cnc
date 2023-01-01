@@ -1,1 +1,1 @@
-Release/win_resources.rc.o Release/MainDialog.cpp.o Release/wxcrafter_bitmaps.cpp.o Release/wxcrafter.cpp.o Release/main.cpp.o   
+Release/win_resources.rc.o Release/main.cpp.o Release/wxcrafter.cpp.o Release/wxcrafter_bitmaps.cpp.o Release/MainDialog.cpp.o   

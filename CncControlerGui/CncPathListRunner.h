@@ -30,8 +30,8 @@ class CncPathListRunner
 		{
 			bool trace;
 			explicit WorkflowSetupRunEntry(bool t) : trace (t) {}
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -40,8 +40,8 @@ class CncPathListRunner
 			Trigger::BeginRun tr;
 			
 			explicit WorkflowTriggerBeginRunEntry(const Trigger::BeginRun& t) : tr (t) {}
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -50,8 +50,8 @@ class CncPathListRunner
 			Trigger::EndRun tr;
 			
 			explicit WorkflowTriggerEndRunEntry(const Trigger::EndRun& t) : tr (t) {}
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
 			virtual bool isEndRunTrigger() const { return true; }
 		};
 		// ---------------------------------------------------
@@ -60,8 +60,8 @@ class CncPathListRunner
 			Trigger::NextPath tr;
 			
 			explicit WorkflowTriggerNextPathEntry(const Trigger::NextPath& t) : tr (t) {}
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		///////////////////////////////////////////////////////////////////
@@ -70,8 +70,8 @@ class CncPathListRunner
 			Trigger::SpeedChange tr;
 			
 			explicit WorkflowTriggerSpeedChangeEntry(const Trigger::SpeedChange& t) : tr (t) {}
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		// ---------------------------------------------------
 		struct WorkflowTriggerGuidePathEntry : public WorkflowEntry
@@ -79,8 +79,8 @@ class CncPathListRunner
 			Trigger::GuidePath tr;
 			
 			explicit WorkflowTriggerGuidePathEntry(const Trigger::GuidePath& t) : tr (t) {}
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -89,10 +89,11 @@ class CncPathListRunner
 			CncPathListManager plm;
 			
 			explicit WorkflowCncEntry(const CncPathListManager& p) : plm (p) {}
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
 			
-			virtual CncPathListManager* getPLM()			{ return &plm; }
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
+			
+			virtual CncPathListManager* getPLM() { return &plm; }
 		};
 		
 		// ---------------------------------------------------
@@ -101,8 +102,8 @@ class CncPathListRunner
 			CncPathListManager plm;
 			
 			explicit WorkflowGuideEntry(const CncPathListManager& p) : plm (p) {}
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 		// ---------------------------------------------------
@@ -131,8 +132,8 @@ class CncPathListRunner
 					delete [] buffer;
 			}
 			
-			virtual bool process(CncPathListRunner* plr);
-			virtual void traceTo(std::ostream& o) const;
+			virtual bool process(CncPathListRunner* plr) override;
+			virtual void traceTo(std::ostream& o) const override;
 		};
 		
 
@@ -213,8 +214,8 @@ class CncPathListRunner
 				
 				virtual CncLongPosition		getCurrentPositionSteps()  const							= 0;
 				virtual CncDoublePosition	getCurrentPositionMetric() const							= 0;
-				virtual void				setCurrentPositionMetric(double px, double py, double pz)	= 0;
-				virtual void				setCurrentPositionMetric(const CncDoublePosition& pos)		= 0;
+				virtual void				logCurrentPositionMetric(double px, double py, double pz)	= 0;
+				virtual void				logCurrentPositionMetric(const CncDoublePosition& pos)		= 0;
 
 				virtual bool spoolInstructions()														= 0;
 				virtual void resetInstructions()														= 0;
@@ -230,7 +231,8 @@ class CncPathListRunner
 				virtual bool processSpindleStateSwitch(bool on, bool force=false)						= 0;
 				virtual bool processSpindleSpeedChange(double value_U_MIN)								= 0;
 				virtual bool processMoveSequence(CncMoveSequence& msq)									= 0;
-				virtual bool processPathListEntry(const CncPathListEntry& ple)							= 0;
+				virtual bool processInitialEntry(const CncDoublePosition& p)							= 0;
+				virtual bool processPathListEntry(const CncDoublePosition& p)							= 0;
 				virtual bool processCommandEntry(const unsigned char* buffer, int bytes)				= 0;
 				
 				virtual void processTrigger(const Trigger::BeginRun& tr)								= 0;
@@ -252,6 +254,8 @@ class CncPathListRunner
 		CncMoveSequence*	currentSequence;
 		Interface*			currentInterface;
 		Setup				setup;
+		bool				initialMovementPerformed;
+
 		
 		bool isInterrupted();
 		bool checkAndPerfromProcessingState();
@@ -259,12 +263,13 @@ class CncPathListRunner
 		
 		void traceSetup();
 		
-		bool onPhysicallyClientIdChange(const CncPathListEntry& curr);
-		bool onPhysicallyFeedSpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next);
-		bool onPhysicallyToolChange(const CncPathListEntry& curr);
-		bool onPhysicallySpindleChange(const CncPathListEntry& curr);
-		bool onPhysicallyMoveRaw(const CncPathListEntry& curr);
-		bool onPhysicallyMoveAnalysed(CncPathList::const_iterator& it, const CncPathList::const_iterator& end);
+		bool onPerfromClientIdChange(const CncPathListEntry& curr);
+		bool onPerfromFeedSpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next);
+		bool onPerfromToolChange(const CncPathListEntry& curr);
+		bool onPerfromSpindleChange(const CncPathListEntry& curr);
+		bool onPerfromInitialMove(const CncPathListEntry& curr);
+		bool onPerfromRawMove(const CncPathListEntry& curr);
+		bool onPerfromAnalysedMove(CncPathList::const_iterator& it, const CncPathList::const_iterator& end);
 		
 		bool initializeNextMoveSequence(long nextClientId);
 		bool initializeNextMoveSequence(double value_MM_MIN, char mode, long nextClientId);

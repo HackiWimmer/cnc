@@ -141,7 +141,7 @@ class CncConfig {
 		bool						pendingNotificationDedected;
 		
 		bool						modifyFlag;
-		
+		bool						modificationsConsidered;
 
 		CncOSDConfigList 			osdConfigList;
 		CncUnit 					currentUnit;
@@ -219,6 +219,8 @@ class CncConfig {
 		
 		void setModificationFlag();
 		void resetModificationFlag();
+		void setModificationsAsConsidered();
+		bool hasNotConsideredModifications() const;
 		bool isModified() const;
 		
 		const ChangeMap& getModificationMap() const { return changeMap; }

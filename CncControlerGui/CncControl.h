@@ -8,6 +8,7 @@
 #include <wx/geometry.h>
 #include <wx/menuitem.h>
 #include <wx/checkbox.h>
+#include <wx/checkbox.h>
 #include <wx/dragimag.h>
 #include <wx/panel.h>
 #include <wx/dcclient.h>
@@ -26,6 +27,7 @@ class CncTouchBlockDetector;
 class CncControl 
 {
 	public:
+		
 		enum DimensionMode			{ DM_2D, DM_3D };
 		enum CtrlPowerState			{ CPS_ON = POWER_STATE_ON, CPS_OFF = POWER_STATE_OFF, CPS_NOT_INITIALIZED = -1, CPS_UNKNOWN = -2  };
 		
@@ -91,36 +93,28 @@ class CncControl
 		};
 		typedef std::vector<SetterTuple> Setters;
 		
-		long	 					currentClientId;
-		InteractiveMoveInfo			currentInteractiveMoveInfo;
-		SetterMap 					setterMap;
+		long	 				currentClientId;
+		InteractiveMoveInfo		currentInteractiveMoveInfo;
+		SetterMap 				setterMap;
 		
 		void appendToSetterMap(unsigned char pid, const cnc::SetterValueList& values);
 		bool dispatchEventQueue();
 		
 	protected:
-		//
+	
 		RunMode					runMode;
-		// internal port object
 		Serial* 				serialPort;
-		// internal try run port object
 		Serial*					realRunSerial;
-		// internal try run port object
 		Serial*					dryRunSerial;
-		// Defines the absolute zero pos as a reference pos 
+		
 		CncLongPosition 		zeroAppPos;
-		// Defines the start postion of an object in relation to zeroPos 
 		CncLongPosition 		startAppPos;
-		// Defines the current pos
 		CncLongPosition 		curAppPos;
-		// Stores the lateset requested control positions
 		CncLongPosition 		curCtlPos;
-		// actual rte (measured) speed value
+		
 		float 					realtimeFeedSpeed_MM_MIN;
-		// default values for work and rapid
 		float 					defaultFeedSpeedRapid_MM_MIN;
 		float 					defaultFeedSpeedWork_MM_MIN;
-		// actual configured speed type and value
 		CncSpeedMemory			speedMemory_MM_MIN;
 		CncSpeedMode			configuredSpeedMode;
 		float					configuredFeedSpeed_MM_MIN;
@@ -128,30 +122,20 @@ class CncControl
 		
 		double 					configuredSpindleSpeed;
 		
-		// Duration counter
 		unsigned int			durationCounter;
-		// Interrupt state
 		bool					interruptState;
-		// position flf
 		bool					positionOutOfRangeFlag;
-		// ctrl power state
+		bool					positionCheck;
+		
 		CtrlPowerState			ctrlPowerState;
-		// tool power state
 		CncSpindlePowerState	spindlePowerState;
-		// Artificially Step Delay
 		unsigned int			stepDelay;
-		// heartbeat value
 		int32_t					lastCncHeartbeatValue;
 		
+		CncLimitStates			limitStates;
+		
+		
 		Serial* getSerial() const { wxASSERT(serialPort); return serialPort; }
-		
-		CncLimitStates		limitStates;
-		
-		
-		//measurements variables
-		//struct timeb endTime, startTime;
-		// Flag to indicatate if a positions check aplies
-		bool positionCheck;
 		
 		// Limit management
 		void displayLimitState(wxWindow* ctl, bool value);
@@ -161,14 +145,11 @@ class CncControl
 		void displaySupportStates(const CncInterface::ISP::States& sp);
 		void displayHealtyStates();
 		
-		// simple move
 		bool prepareSimpleMove(bool enaleEventHandling = true);
 		void reconfigureSimpleMove(bool correctPositions);
 		
-		// secial convesion to transfer a double as long
 		long convertDoubleToCtrlLong(unsigned char 	id, float d);
 		
-		// display the given pos in the open gl view
 		void monitorPosition(const CncLongPosition& pos);
 		
 		inline void postAppPosition(unsigned char pid, bool force = false);
@@ -191,10 +172,12 @@ class CncControl
 			} Details;
 		};
 		
-		struct DimensionZAxis {
+		struct DimensionZAxis 
+		{
 			double dimensionZ;
 			
-			struct {
+			struct 
+			{
 				CncLongPosition pMin;
 				CncLongPosition pMax;
 			} Details;
@@ -212,17 +195,13 @@ class CncControl
 		bool dryRunAvailable() const { return dryRunSerial != NULL; }
 		void switchRunMode(RunMode m);
 		
-		// Connection to portName
 		bool connect(const char * portName);
-		// Disconnection the serial connection
 		bool disconnect();
-		// Check the connection
 		bool isConnected();
 		
 		void resetPositionOutOfRangeFlag() { positionOutOfRangeFlag = false; }
 		bool getPositionOutOfRangeFlag() { return positionOutOfRangeFlag; }
 		
-		// validating given pos due to the given reference coordinates
 		bool isPositionOutOfRange(const CncLongPosition& pos, bool trace=true);
 		
 		void onPeriodicallyAppEvent();
@@ -316,37 +295,38 @@ class CncControl
 		
 		// Callback from Serial
 		bool SerialCallback();
+		
 		// Callback from Serial with controller content
 		bool SerialControllerCallback(const ContollerInfo& ci);
 		bool SerialExecuteControllerCallback(const ContollerExecuteInfo& cei);
 		
-		// Callback fromS Serial with a controller message
+		// Callback from Serial with a controller message
 		bool SerialMessageCallback(const ControllerMsgInfo& cmi);
-		//interrupt the processing
+
 		void interrupt(const char* why = NULL);
 		void resetInterrupt();
 		bool isInterrupted();
 		bool reset();
+
 		bool resetWatermarks();
-		// Setup the cnc control
 		void resetSetterMap();
 		bool setup(bool reset = true);
-		// Duration management
-		unsigned int getDurationCount();
-		unsigned int getDurationCounter();
-		void resetDurationCounter();
-		void initNextDuration();
-		bool hasNextDuration();
-		bool isFirstDuration();
-		bool isLastDuration();
 		
-		// Tool management
-		bool switchSpindleState(CncSpindlePowerState state, bool force = false);
-		bool switchSpindleOn();
-		bool switchSpindleOff(bool force = false);
+		unsigned int	getDurationCount();
+		unsigned int	getDurationCounter();
+		void			resetDurationCounter();
+		void			initNextDuration();
+		bool			hasNextDuration();
+		bool			isFirstDuration();
+		bool			isLastDuration();
 		
-		CncSpindlePowerState evaluateSpindlePowerState();
-		CncSpindlePowerState getSpindlePowerState() const { return spindlePowerState; }
+		// Spindle management
+		bool								switchSpindleState(CncSpindlePowerState state, bool force = false);
+		bool								switchSpindleOn();
+		bool								switchSpindleOff(bool force = false);
+		
+		CncSpindlePowerState				evaluateSpindlePowerState();
+		CncSpindlePowerState				getSpindlePowerState() const { return spindlePowerState; }
 		bool isSpindleOn()					const { return spindlePowerState == SPINDLE_STATE_ON; }
 		bool isSpindleOff()					const { return spindlePowerState == SPINDLE_STATE_OFF; }
 		

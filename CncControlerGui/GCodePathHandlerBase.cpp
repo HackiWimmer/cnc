@@ -33,8 +33,14 @@ bool GCodePathHandlerBase::finishWork() {
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerBase::moveToOrigin(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
+	const CncDoublePosition prev(currentPos);
 	currentPos.setXYZ(0.0, 0.0, 0.0);
-	return processLinearMove(false);
+	
+	const bool ret = processLinearMove(false);
+	if ( ret == false )
+		currentPos.set(prev);
+		
+	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerBase::updateCurrentPosition(GCodeBlock& gcb) {
@@ -45,7 +51,7 @@ bool GCodePathHandlerBase::updateCurrentPosition(GCodeBlock& gcb) {
 	if ( gcb.hasY() ) currentPos.setY(gcb.getYMoveAbsolute(currentPos));
 	if ( gcb.hasZ() ) currentPos.setZ(gcb.getZMoveAbsolute(currentPos));
 	
-	return ref.isFloatingEqual(currentPos) == false;
+	return ref.isEqual(currentPos) == false;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerBase::processParameterEFS(GCodeBlock& gcb) {

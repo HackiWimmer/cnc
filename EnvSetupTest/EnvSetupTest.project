@@ -1,24 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="EnvSetupTest" Version="11000" InternalType="GUI">
-  <VirtualDirectory Name="wxcrafter">
-    <VirtualDirectory Name="base">
-      <File Name="../CncControlerGui/wxCrafterSecurePanel.cpp"/>
-      <File Name="../CncControlerGui/wxCrafterSecurePanel.h"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="resources">
-      <File Name="../CncControlerGui/wxCrafterSecurePanel_bitmaps.cpp"/>
-    </VirtualDirectory>
-    <File Name="../CncControlerGui/wxCrafterSecurePanel.wxcp"/>
-  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="../CncControlerGui/CncTemplateContextSummaryPanel.cpp"/>
-    <File Name="../CncControlerGui/CncTemplateContextSummaryPanel.h"/>
-    <File Name="../CncControlerGui/CncSecureCtrlPanel.cpp"/>
-    <File Name="../CncControlerGui/CncSecureCtrlPanel.h"/>
-    <File Name="../CncControlerGui/test.cpp"/>
-    <File Name="../CncControlerGui/test.h"/>
     <File Name="main.cpp"/>
     <File Name="wxcrafter.cpp"/>
     <File Name="wxcrafter_bitmaps.cpp"/>
@@ -87,8 +71,8 @@
       <Compiler Options="-O2;-Wall;$(shell wx-config --cflags)" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="1">
         <IncludePath Value="."/>
         <IncludePath Value="C:/@Development/boost_1_77_0"/>
-        <IncludePath Value="C:/@Development/wxsvg-1.5.22/include"/>
-        <IncludePath Value="C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.24/include"/>
+        <IncludePath Value="C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">

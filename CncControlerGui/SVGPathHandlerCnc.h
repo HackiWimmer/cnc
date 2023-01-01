@@ -22,8 +22,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		{
 			CncSpeedMode 				mode		= CncSpeedWork;
 			CO							idOffset	= CO::MAIN;
-			bool						zToTop		= true;
-			const CncDoublePosition*	pos			= NULL;
+			CncDoublePosition			pos			= {0.0, 0.0, 0.0};
 		};
 		
 		CncControl* 			cncControl;
@@ -32,11 +31,13 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		bool					initialized;
 		bool					debugState;
 		
+		bool					moveZAxisToLogicalPos(const MoveParameter& mp);
 		bool					moveZAxisToLogicalTop(CncSpeedMode m = CncSpeedWork);
 		bool					moveZAxisToSurface();
 		bool					moveZAxisNextStepDown(double zTarget);
 		bool					moveXYToStartPos(CncSpeedMode m);
 		bool					moveXYToPos(const MoveParameter& mp);
+		bool					moveXYZToPos(const MoveParameter& mp);
 		
 		bool					hasMoreDurations(double zTarget) const;
 		

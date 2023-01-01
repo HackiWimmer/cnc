@@ -5,18 +5,23 @@
 #include <wx/string.h>
 #include "CncPosition.h"
 
+struct CncAnchorName
+{
+	static const wxString ANCHOR_TOOL_CHANGE;
+	static const wxString ANCHOR_ZTOUCH;
+	static const wxString ANCHOR_PARKING;
+};
+
 struct CncAnchorInfo 
 {
 	bool				show		= true; 
-	bool				fixed		= false;
-	bool				absolute	= false;
+	bool				fixed		= true;
 	wxString			name		= "";
-	wxString			type		= "XYZ";
+	wxString			type		= "P";
 	CncDoublePosition	pos			= { 0.0, 0.0, 0.0 };
 	
-	bool hasX() const { return type.Contains("X"); }
-	bool hasY() const { return type.Contains("Y"); }
-	bool hasZ() const { return type.Contains("Z"); }
+	bool isPhysically() const { return type.IsSameAs("P") == true;  }
+	bool isLogically()  const { return type.IsSameAs("P") == false; }
 };
 
 class CncAnchorMap : public std::map<wxString, CncAnchorInfo> 
@@ -28,6 +33,14 @@ class CncAnchorMap : public std::map<wxString, CncAnchorInfo>
 		
 		~CncAnchorMap()
 		{}
+		
+		CncDoublePosition getLogicalAnchorToolChange() const;
+		CncDoublePosition getLogicalAnchorZTouch() const;
+		CncDoublePosition getLogicalAnchorParking() const;
+		
+		CncDoublePosition getPhysicalAnchorToolChange() const;
+		CncDoublePosition getPhysicalAnchorZTouch() const;
+		CncDoublePosition getPhysicalAnchorParking() const;
 };
 
 #endif

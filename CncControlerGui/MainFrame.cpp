@@ -65,7 +65,6 @@
 #include "CncAnchorPosition.h"
 #include "CncPatternDefinitions.h"
 #include "CncUnitCalculator.h"
-#include "CncStartPositionResolver.h"
 #include "CncFileNameService.h"
 #include "CncFilePreviewWnd.h"
 #include "CncSpeedPlayground.h"
@@ -200,20 +199,19 @@ CncTransactionLockBase::~CncTransactionLockBase() {
 bool CncTransactionLockBase::waitUntilCncIsAvailable() {
 ////////////////////////////////////////////////////////////////////
 	bool ret = false;
-	
-	if ( parent->cnc ) {
-		
+	if ( parent->cnc )
+	{
 		unsigned counter = 0;
-		while ( parent->cnc->isCommandActive() ) {
-			
+		while ( parent->cnc->isCommandActive() )
+		{
 			parent->dispatchAll();
 			parent->waitActive(10);
 			
-			if ( counter++ > 15 ) {
-				
+			if ( counter++ > 15 )
+			{
 				//  this should not appear
 				const unsigned char lcmd = SerialCommandLocker::getLockedCommand();
-				std::cerr << CNC_LOG_FUNCT_A(": Command '%s' still active!", ArduinoCMDs::getCMDLabel(lcmd));
+				CNC_CERR_FUNCT_A(" Command '%s' still active!", ArduinoCMDs::getCMDLabel(lcmd))
 				
 				break;
 			}
@@ -223,8 +221,34 @@ bool CncTransactionLockBase::waitUntilCncIsAvailable() {
 		
 		if ( parent->cnc->isConnected() )
 		{
+			// trace available data
 			if ( parent->cnc->serialDataAvailable() == true )
-				parent->cnc->peekAndTraceReadBuffer(std::cout);
+			{
+				CNC_CEX1_FUNCT_A("\nUnexpected serial data available:\n cnc->isCommandActive() = %d, ret = %d", 
+									parent->cnc->isCommandActive(), ret)
+									
+				parent->cnc->peekAndTraceReadBuffer(cnc::cex1);
+			
+				// Self repairing, try to purge it ...
+				if ( parent->cnc->isCommandActive() == false )
+				{
+					// ... if no command is active
+					parent->cnc->popSerial();
+					
+					// check again
+					if ( parent->cnc->serialDataAvailable() == true )
+					{
+						CNC_CERR_FUNCT_A("\nUnexpected serial data still available:\n") 
+						parent->cnc->peekAndTraceReadBuffer(std::cerr);
+						
+						ret = false;
+					}
+					else
+					{
+						CNC_CLOG_A(" Serial data was purged, (may be) repeat last action\n") 
+					}
+				}
+			}
 		}
 	}
 	
@@ -238,20 +262,18 @@ CncTransactionLock::CncTransactionLock(MainFrame* p)
 {
 	state = waitUntilCncIsAvailable();
 	
-	if ( isOk() ) {
-		
-		if ( parent->cnc != NULL ) {
-			
+	if ( isOk() ) 
+	{
+		if ( parent->cnc != NULL ) 
+		{
 			if ( parent->cnc->isSpyOutputOn() )
 				cnc::spy.addMarker("Transaction initiated . . . ");
 		
 			if ( parent->cnc->isConnected() )
 				parent->cnc->processCommand(CMD_PUSH_TRANSACTION, std::cerr);
-				
 		}
 		
 		THE_CONTEXT->registerCncTransaction();
-		
 		parent->cncTransactionLockCallback(this);
 	}
 	else 
@@ -267,8 +289,8 @@ CncTransactionLock::~CncTransactionLock() {
 		if ( waitUntilCncIsAvailable() )
 			parent->cncTransactionReleaseCallback(this);
 			
-		if ( parent->cnc != NULL ) {
-			
+		if ( parent->cnc != NULL ) 
+		{
 			if ( parent->cnc->isConnected() )
 				parent->cnc->processCommand(CMD_POP_TRANSACTION, std::cerr);
 			
@@ -4623,7 +4645,16 @@ void MainFrame::displayPositionSituation(int type, const wxString& m, const wxSt
 							cnc->getCurCtlPosMetricZ()
 		);
 	}
-		
+	
+	if ( true )
+	{
+		std::stringstream ss;
+		ss << "Controller Pos <requested>      : "; ctrlPos.traceAll(ss);				ss << std::endl;
+		ss << "Controller Pos <locally stored> : "; cnc->getCurCtlPos().traceAll(ss);	ss << std::endl;
+		ss << "Application Pos                 : "; cnc->getCurAppPos().traceAll(ss);	ss << std::endl;
+		CNC_CEX1_FUNCT_A("\n%s", ss.str().c_str())
+	}
+	
 	if ( appendix.IsEmpty() == false )
 		msg	<< "\n\n" << appendix;
 	
@@ -4818,7 +4849,7 @@ bool MainFrame::checkReferencePositionState() {
 	if ( tf == TplManual || tf == TplTest )
 		return true;
 		
-	const CncDoublePosition refPos(CncStartPositionResolver::getReferencePosition());
+	const CncDoublePosition refPos(0.0, 0.0, 0.0);
 	const bool refPosValid	= isReferenceStateValid();
 	const bool zero			= ( cnc->getCurAppPosMetric() != refPos );
 	
@@ -4832,39 +4863,6 @@ bool MainFrame::checkReferencePositionState() {
 			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
 			
 			// Safety: Always return false in this case because this will
-			// stop the currently started run. 
-			return false;
-		}
-	}
-	
-	if ( zero )
-	{
-		wxASSERT( cnc != NULL );
-		
-		bool openDlg = false;
-		switch ( THE_CONFIG->getRunConfirmationModeAsChar() )
-		{
-			// Always
-			case 'A':	openDlg = true; break;
-			// Serial Port only
-			case 'S': 	openDlg = !cnc->isEmulator(); break;
-			// Never
-			default:	openDlg = false;
-		}
-		
-		CncStartPositionResolver dlg(this);
-		int ret = wxID_OK;
-		
-		if ( openDlg == true ) 	ret = dlg.ShowModal();
-		else 					ret = dlg.resolve("M[xyz]");
-
-		if ( ret == wxID_OK )
-		{
-			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
-		}
-		else
-		{
-			// Always return false in this case because this will
 			// stop the currently started run. 
 			return false;
 		}
@@ -4957,7 +4955,7 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 	{
 		displayPositionSituation(	wxICON_ERROR,
 									"Validate positions failed\n", 
-									"CNC Position check . . . ", 
+									"Initial CNC Position check . . . ", 
 									"The run command will be aborted!"
 		);
 		
@@ -4967,7 +4965,7 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 		return false;
 	}
 	
-	// ask controlwer for readiness
+	// ask controller for readiness
 	if ( cnc->isReadyToRun() == false ) 
 	{
 		CNC_CERR_FUNCT_A("Controller isn't ready to run: Run was rejected!")
@@ -5062,7 +5060,7 @@ bool MainFrame::processTemplate(bool confirm) {
 		
 		//-----------------------------------------------------------------
 		// prepare all relevant settings from here on . . . 
-		const bool useExistingCncInstructions	 = THE_CONFIG->isModified() == false 
+		const bool useExistingCncInstructions	 = THE_CONFIG->hasNotConsideredModifications() == false 
 												&& THE_TPL_CTX->isValid() 
 												&& cnc::isFileTemplate(getCurrentTemplateFormat())
 		;
@@ -5127,17 +5125,16 @@ bool MainFrame::processTemplate(bool confirm) {
 				if ( THE_TPL_CTX->getRunCount() > 0 )
 				{
 					wxString msg("Cant use existing Cnc Instructions because: ");
-					if ( THE_CONFIG->isModified() == true  ) msg.append(" Configuration is modified");
-					if ( THE_TPL_CTX->isValid()   == false ) msg.append(" Template context isn't valid");
+					if ( THE_CONFIG->hasNotConsideredModifications() == true  ) msg.append(" Configuration is modified");
+					if ( THE_TPL_CTX->isValid()                       == false ) msg.append(" Template context isn't valid");
 					
 					CNC_CEX3_A(msg)
 				}
 				THE_TPL_CTX->registerRun();
 				ret = processTemplate_SelectType(runSessionKey);
 				
-				#warning rethink the reset procedure
 				if ( ret )
-					THE_CONFIG->resetModificationFlag();
+					THE_CONFIG->setModificationsAsConsidered();
 			}
 			
 			motionMonitor->popProcessMode();
@@ -5327,7 +5324,7 @@ bool MainFrame::processTemplate_SelectType(const SHA1SessionKey& sk) {
 		{
 			displayPositionSituation(	wxICON_ERROR * (-1),
 										"Validate positions failed\n", 
-										"CNC Position check . . . ", 
+										"Final CNC Position check . . . ", 
 										"The run command will be aborted!"
 			);
 			

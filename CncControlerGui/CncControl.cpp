@@ -26,6 +26,7 @@
 #include "CncContext.h"
 #include "CncTemplateContext.h"
 #include "CncBoundarySpace.h"
+#include "CncAnchorInfo.h"
 #include "CncGamePad.h"
 #include "CncFileNameService.h"
 #include "CncLoggerView.h"
@@ -40,16 +41,17 @@
 
 ///////////////////////////////////////////////////////////////////
 CncControl::CncControl(CncPortType pt) 
-: currentClientId					(-1)
+: currentClientId					(CLIENT_ID.INVALID)
 , currentInteractiveMoveInfo		()
 , setterMap							()
 , runMode							(M_RealRun)
 , serialPort						(NULL)
 , realRunSerial						(NULL)
 , dryRunSerial						(NULL)
-, zeroAppPos						(0,0,0)
-, startAppPos						(0,0,0)
-, curAppPos							(0,0,0)
+, zeroAppPos						(0, 0, 0)
+, startAppPos						(0, 0, 0)
+, curAppPos							(0, 0, 0)
+, curCtlPos							(0, 0, 0)
 , realtimeFeedSpeed_MM_MIN			(0.0)
 , defaultFeedSpeedRapid_MM_MIN		(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , defaultFeedSpeedWork_MM_MIN		(THE_CONFIG->getDefaultRapidSpeed_MM_MIN())
@@ -61,11 +63,11 @@ CncControl::CncControl(CncPortType pt)
 , durationCounter					(0)
 , interruptState					(false)
 , positionOutOfRangeFlag			(false)
+, positionCheck						(true)
 , ctrlPowerState					(CPS_NOT_INITIALIZED)
 , spindlePowerState					(SPINDLE_STATE_OFF)
 , stepDelay							(0)
 , lastCncHeartbeatValue				(0)
-, positionCheck						(true)
 {
 //////////////////////////////////////////////////////////////////
 	// Serial factory
@@ -795,10 +797,10 @@ void CncControl::resetInterrupt() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::resetWatermarks() {
 ///////////////////////////////////////////////////////////////////
-	zeroAppPos.resetWatermarks();
+	zeroAppPos .resetWatermarks();
 	startAppPos.resetWatermarks();
-	curAppPos.resetWatermarks();
-	curCtlPos.resetWatermarks();
+	curAppPos  .resetWatermarks();
+	curCtlPos  .resetWatermarks();
 	
 	return true;
 }
@@ -1171,7 +1173,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			if ( false )
 				std::cout << "handshake: " << ArduinoCMDs::getCMDLabel(ci.command) << " = " << ArduinoPIDs::getPIDLabel(ci.handshake) << std::endl;
 				
-			if ( ci.handshake == RET_QUIT ) {
+			if ( ci.handshake == RET_QUIT ) 
+			{
 				// adjust the pc position
 				curAppPos = curCtlPos;
 				postCtlPosition(PID_XYZ_POS_MAJOR);
@@ -1935,7 +1938,10 @@ const CncLongPosition CncControl::requestControllerLimitState() {
 bool CncControl::validateAppAgainstCtlPosition() {
 ///////////////////////////////////////////////////////////////////
 	CncLongPosition ctlPos = requestControllerPos();
-	return ( curAppPos == ctlPos );
+	return ( curAppPos.isEqual(ctlPos, CncLongPosition::CMP_BASE) );
+	
+	#warning watermaks not in all cases identically
+	//return ( curAppPos == ctlPos );
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::enableStepperMotors(bool s) {
@@ -2363,11 +2369,9 @@ bool CncControl::moveToZeroZAxisAnchor() {
 		return false;
 		
 	const CncLongPosition	p1(getCurCtlPos());
-	const float				s1 = getConfiguredFeedSpeed_MM_MIN();
-	const CncSpeedMode		sm = getConfiguredSpeedMode();
-	
-	// TODO: Get tool change anchor from the anchor pos dialogue
-	const CncDoublePosition tPhy = {30.0, THE_BOUNDS->getMaxDimensionMetricY() - 30, -1.0 };
+	const float				s1   = getConfiguredFeedSpeed_MM_MIN();
+	const CncSpeedMode		sm   = getConfiguredSpeedMode();
+	const CncDoublePosition tPhy = THE_CONTEXT->anchorMap->getPhysicalAnchorZTouch();
 	
 	if ( moveToPhysicalPos(tPhy, Z) == false )
 	{
@@ -2442,8 +2446,7 @@ bool CncControl::moveToToolChangeAnchor() {
 	if ( isInterrupted() )
 		return false;
 		
-	// TODO: Get tool change anchor from the anchor pos dialogue
-	const CncDoublePosition tPhy = { THE_BOUNDS->getMaxDimensionMetricX() / 2.0 , 1.0, -1.0 };
+	const CncDoublePosition tPhy = THE_CONTEXT->anchorMap->getPhysicalAnchorToolChange();
 	return moveToPhysicalPos(tPhy, Z_XY);
 }
 ///////////////////////////////////////////////////////////////////
@@ -2451,6 +2454,21 @@ bool CncControl::interactToolChange(int toolId) {
 ///////////////////////////////////////////////////////////////////
 	CNC_CEX1_A("Processing manually tool change . . .")
 	TmpLoggerIndent tli;
+	
+	// first log the current position, speed ans spindle state
+	const CncLongPosition	p1(getCurCtlPos());
+	const float				s1 = getConfiguredFeedSpeed_MM_MIN();
+	const CncSpeedMode		sm = getConfiguredSpeedMode();
+	CncSpindlePowerState	sp = getSpindlePowerState();
+	
+	// move Z axis up to work piece offset to be out of the work piece 
+	// while asking for the tool change options below
+	const CncDoublePosition pwo(0.0, 0.0, THE_CONFIG->getWorkpieceOffset() );
+	if ( moveToLogicalPos(pwo, Z) == false )
+	{
+		CNC_CERR_FUNCT_A(" moveToLogicalPos(Z) to work piece offset failed!")
+		return false;
+	}
 	
 	const bool interactive = THE_CONTEXT->hasHardware() == true;
 	if ( interactive == true )
@@ -2475,7 +2493,7 @@ bool CncControl::interactToolChange(int toolId) {
 								break;
 								
 			case wxID_NO:		CNC_CEX1_A("Manually tool change was ignored, template runs further with previous tool setup.")
-								return true;
+								return moveToLogicalPos(p1, Z);
 								
 			case wxID_CANCEL:	CNC_CEX1_A("Manually tool change was aborted, template run will be also aborted")
 								return false;
@@ -2485,17 +2503,11 @@ bool CncControl::interactToolChange(int toolId) {
 		}
 	}
 	
-	const wxString msg(wxString::Format("Initialize tool change to tool id: %d\n%s", toolId, THE_CONFIG->getToolParamAsInfoStr(toolId)));
+	const wxString msg(wxString::Format("Initialize tool change to tool id: %d\n %s", toolId, THE_CONFIG->getToolParamAsInfoStr(toolId)));
 	CNC_CEX1_A(msg);
 	
 	// ------------------------------------------------------------------
 	// tool change procedure starts from here
-
-	// first log the current position, speed ans spindle state
-	const CncLongPosition	p1(getCurCtlPos());
-	const float				s1 = getConfiguredFeedSpeed_MM_MIN();
-	const CncSpeedMode		sm = getConfiguredSpeedMode();
-	CncSpindlePowerState	sp = getSpindlePowerState();
 	
 	// setup a fast movement speed to navigate to the tool change position 
 	const float st = 5500.0;
@@ -2540,7 +2552,7 @@ bool CncControl::interactToolChange(int toolId) {
 		}
 	}
 	
-	CNC_CEX1_A(wxString::Format("Manually tool change finalized to tool id: %d\n%s", toolId, THE_CONFIG->getToolParamAsInfoStr(toolId)));
+	CNC_CEX1_A(wxString::Format("Manually tool change finalized to tool id: %d", toolId));
 	
 	// now level the z axis again
 	if ( moveToZeroZAxisAnchor() == false )
@@ -3264,8 +3276,7 @@ double CncControl::getPodiumDistanceMetric() {
 		return 0.0;
 	}
 	
+	
 	const int32_t dist = list.at(0);
 	return THE_CONFIG->convertStepsToMetricH(dist);
 }
-
-

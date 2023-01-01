@@ -137,6 +137,7 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		virtual bool copyToClipboard(bool allRows=false);
 		virtual bool openAsTextView(const wxString& title, bool allRows=false);
 		
+		virtual wxString getFormatedItemText(long item, int col = 0) const;
 		virtual long getItemCount() const { return rows.size(); }
 		
 	protected:

@@ -55,6 +55,7 @@ class CommandStoreInitializer {
 			registerCommand(GCodeField("M107"),		I, ig,	false, "Marlin: Fan Off");
 			registerCommand(GCodeField("M109"),		I, ig,	false, "Marlin: Wait for Hotend Temperature");
 			registerCommand(GCodeField("M117"),		S, ig,	false, "Marlin: Set LCD Message");
+			registerCommand(GCodeField("M125"),		S, ig,	false, "Marlin: Move to Park Position");
 			registerCommand(GCodeField("M140"),		I, ig,	false, "Marlin: Set Bed Temperature");
 			registerCommand(GCodeField("M190"),		I, ig,	false, "Marlin: Wait for Bed Temperature");
 		}
@@ -77,6 +78,7 @@ class CommandStoreInitializer {
 			
 			registerCommand(GCodeField("G20"),		C, 6,		false, "Set Units To Inches");
 			registerCommand(GCodeField("G21"),		C, 6,		false, "Set Units To Millimeters");
+			registerCommand(GCodeField("G27"),		C, 0,		false, "Move To Park Position");
 			registerCommand(GCodeField("G28"),		C, 0,		false, "Move To Origin");
 			
 			registerCommand(GCodeField("G30"),		C, 0,		false, "Zero Return");

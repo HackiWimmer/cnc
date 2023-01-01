@@ -7,6 +7,7 @@
 #include "CncControl.h"
 #include "CncContext.h"
 #include "CncBoundarySpace.h"
+#include "CncAnchorInfo.h"
 #include "CncPathListRunner.h"
 #include "GlobalFunctions.h"
 #include "MainFrame.h"
@@ -161,9 +162,12 @@ void SVGPathHandlerCnc::processFeedSpeed(CncSpeedMode mode) {
 bool SVGPathHandlerCnc::activateNextPath(long clientID) {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL(CNC_LOG_FUNCT);
-	CTX_ADD_SEP(wxString::Format("Run next Path:"));
 	
 	nextPath = true;
+	pathCounter++;
+	
+	CTX_ADD_SEP(wxString::Format("Run next Path(%u): ", pathCounter));
+	
 	if ( currentCncContext.isGuidePath() )
 	{
 		if ( currentCncContext.isZeroPosPath() )	pathListMgr.initNextGuidePath(CncPathListManager::GuideType::REFPOS_PATH);
@@ -393,11 +397,14 @@ bool SVGPathHandlerCnc::repeatCurrentPath(double zTarget) {
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveXYToStartPos(CncSpeedMode m) {
 ///////////////////////////////////////////////////////////////////
+	// first move to top if not already done - on demand
+	if ( moveZAxisToLogicalTop(m) == false )
+		return false;
+
 	MoveParameter mp;
 	mp.idOffset = CO::START_POS;
 	mp.mode		= m;
-	mp.zToTop	= true;
-	mp.pos		= &pathListMgr.getStartPos();
+	mp.pos		= pathListMgr.getStartPos();
 	
 	const bool ret = moveXYToPos(mp);
 	pathListMgr.normalizeStartPosDistance();
@@ -407,24 +414,11 @@ bool SVGPathHandlerCnc::moveXYToStartPos(CncSpeedMode m) {
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveXYToPos(const MoveParameter& mp) {
 ///////////////////////////////////////////////////////////////////
-	if ( mp.pos == NULL )
-	{
-		std::cerr << CNC_LOG_FUNCT_A(": Invalid position!\n");
-		return false;
-	}
-	
-	const CncDoublePosition& pos = *mp.pos;
+	const CncDoublePosition& pos = mp.pos;
 	
 	// nothing to do in this case
 	if ( isXYEqual(curRunPosition, pos) )
 		return true;
-	
-	// first move to top if not already done - on demand
-	if ( mp.zToTop == true )
-	{
-		if ( moveZAxisToLogicalTop(mp.mode) == false )
-			return false;
-	}
 	
 	const long clientId	= currentCncContext.getCurrentClientID(mp.idOffset);
 	const bool tc       = initToolChange(currentCncContext.getCurrentToolId());
@@ -452,17 +446,57 @@ bool SVGPathHandlerCnc::moveXYToPos(const MoveParameter& mp) {
 	return processCncPath(plm);
 }
 ///////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::moveZAxisToLogicalTop(CncSpeedMode m) {
+bool SVGPathHandlerCnc::moveXYZToPos(const MoveParameter& mp) {
 ///////////////////////////////////////////////////////////////////
-	const double zTopRefValue = THE_BOUNDS->getSurfaceOffset() + THE_CONFIG->getSurefaceOffset();
-	
-	if ( cnc::dblCompare(curRunPosition.getZ(), zTopRefValue) == false )
+	const CncDoublePosition& pos = mp.pos;
+
+	if ( moveZAxisToLogicalPos(mp) == false ) 
 	{
-		const long clientId	= currentCncContext.getCurrentClientID(CO::Z_TO_LOGICAL_TOP);
+		CNC_CERR_FUNCT_A(": moveZAxisToLogicalPos() failed!\n")
+		return false;
+	}
+	
+	// nothing to do in this case
+	if ( isXYEqual(curRunPosition, pos) )
+		return true;
+	
+	const long clientId	= currentCncContext.getCurrentClientID(mp.idOffset);
+	const bool tc       = initToolChange(currentCncContext.getCurrentToolId());
+	const int content   = tc ? CncPathListEntry::ContentCFST : CncPathListEntry::ContentCFS;
+	
+	const double dx		= pos.getX() - curRunPosition.getX();
+	const double dy 	= pos.getY() - curRunPosition.getY();
+	
+	CncPathListEntry initialEntry;
+	initialEntry.content			= content;
+	initialEntry.pathListReference	= CncTimeFunctions::getNanoTimestamp();
+	initialEntry.entryDistance		= CncPathListEntry::NoDistance;
+	initialEntry.entryTarget		= curRunPosition;
+	initialEntry.clientId			= clientId;
+	initialEntry.toolId				= currentCncContext.getCurrentToolId();
+	initialEntry.feedSpeedMode		= mp.mode;
+	initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentSpeed_MM_MIN(mp.mode);
+	initialEntry.spindleState		= currentCncContext.getCurrentSpindleState();
+	initialEntry.spindleSpeed_U_MIN	= currentCncContext.getCurrentSpindleSpeed_U_MIN();
+	
+	CncPathListManager plm(initialEntry);
+	plm.addEntryRel(dx, dy, 0.0);
+	
+	curRunPosition += {dx, dy, 0.0};
+	return processCncPath(plm);
+}
+///////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::moveZAxisToLogicalPos(const MoveParameter& mp) {
+///////////////////////////////////////////////////////////////////
+	const double zPos = mp.pos.getZ();
+	
+	if ( cnc::dblCompare(curRunPosition.getZ(), zPos) == false )
+	{
+		const long clientId	= currentCncContext.getCurrentClientID(mp.idOffset);
 		const bool tc       = initToolChange(currentCncContext.getCurrentToolId());
 		const int content   = tc ? CncPathListEntry::ContentCFST : CncPathListEntry::ContentCFS;
 		
-		const double zDist	= zTopRefValue - curRunPosition.getZ();
+		const double zDist	= zPos - curRunPosition.getZ();
 		
 		CncPathListEntry initialEntry;
 		initialEntry.content			= content;
@@ -471,8 +505,8 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop(CncSpeedMode m) {
 		initialEntry.entryTarget		= curRunPosition;
 		initialEntry.clientId			= clientId;
 		initialEntry.toolId				= currentCncContext.getCurrentToolId();
-		initialEntry.feedSpeedMode		= m;
-		initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentSpeed_MM_MIN(m);
+		initialEntry.feedSpeedMode		= mp.mode;
+		initialEntry.feedSpeed_MM_MIN	= currentCncContext.getCurrentSpeed_MM_MIN(mp.mode);
 		initialEntry.spindleState		= currentCncContext.getCurrentSpindleState();
 		initialEntry.spindleSpeed_U_MIN	= currentCncContext.getCurrentSpindleSpeed_U_MIN();
 		
@@ -484,6 +518,18 @@ bool SVGPathHandlerCnc::moveZAxisToLogicalTop(CncSpeedMode m) {
 	}
 	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::moveZAxisToLogicalTop(CncSpeedMode m) {
+///////////////////////////////////////////////////////////////////
+	const double zTopRefValue = THE_BOUNDS->getSurfaceOffset() + THE_CONFIG->getSurefaceOffset();
+	
+	MoveParameter mp;
+	mp.idOffset = CO::Z_TO_LOGICAL_TOP;
+	mp.mode		= m;
+	mp.pos		= { curRunPosition.getX(), curRunPosition.getY(), zTopRefValue};
+	
+	return moveZAxisToLogicalPos(mp);
 }
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveZAxisToSurface() {
@@ -603,7 +649,10 @@ bool SVGPathHandlerCnc::prepareWork() {
 	startPos.resetWatermarks();
 	
 	// align again
-	curRunPosition.set(cncControl->getCurCtlPosMetric());
+	#warning align yes or no
+	//curRunPosition.set(cncControl->getCurCtlPosMetric());
+	curRunPosition.zeroXYZ();
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -617,6 +666,8 @@ bool SVGPathHandlerCnc::initToolChange(int id) {
 		return false;
 	}
 	
+	// not necessary to do this because the tool change was already included
+	// be an other pathListMgr entry
 	//pathListMgr.addEntryToC(id);
 	return true;
 }
@@ -629,25 +680,13 @@ bool SVGPathHandlerCnc::finishWork() {
 		std::cerr << CNC_LOG_FUNCT_A(": PathHandlerBase::finishWork() failed!\n");
 	
 	// Move to end position:
-	// position p defines the end position
-	#warning is p(0.0, 0.0, 0.0) always correct here?
-	
-	CncDoublePosition p(0.0, 0.0, 0.0);
 	MoveParameter mp;
 	mp.idOffset = CO::FINALIZE_TEMPLATE;
 	mp.mode		= CncSpeedRapid;
-	mp.zToTop	= true;
-	mp.pos		= &p;
+	mp.pos		= THE_CONTEXT->anchorMap->getLogicalAnchorParking();
 	
-	const bool ret = moveXYToPos(mp);
-	
-	//svg output handling only
-	if ( ret == true )
-	{
-		CncDoublePosition::Watermarks xyMax;
-		xyMax = cncControl->getWaterMarksMetric();
-	}
-	
+	// move to parking position
+	const bool ret = moveXYZToPos(mp);
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////

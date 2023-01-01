@@ -21,6 +21,7 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase
 		virtual bool			isPathListUsed()				const						override { return true; }
 		virtual void			initNextClientId(long id)									override;
 		virtual void			switchSpindleState(CncSpindlePowerState state)				override;
+		virtual bool			moveToParkPosition()										override;
 		
 	protected:
 		

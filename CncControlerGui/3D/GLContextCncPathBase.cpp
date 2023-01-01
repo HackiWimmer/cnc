@@ -787,62 +787,40 @@ void GLContextCncPathBase::drawAnchorPoints() {
 		
 		if ( ai.show == true ) 
 		{
-			// abs position can't shown i this case
-			if ( ai.absolute && THE_BOUNDS->getHardwareOffset().isValid() == false )
+			// position can't shown in this case
+			if ( ai.isPhysically() && THE_BOUNDS->getHardwareOffset().isValid() == false )
 				continue;
 				
-			const CncDoublePosition pos(ai.absolute ? THE_BOUNDS->getHardwareOffset().transPhy2Log(ai.pos) : ai.pos);
+			const CncDoublePosition pos(ai.isPhysically() ? THE_BOUNDS->getHardwareOffset().transPhy2Log(ai.pos) : ai.pos);
 			
 			const float x = pos.getX() * factorX;
 			const float y = pos.getY() * factorY;
 			const float z = pos.getZ() * factorZ;
 			
-			const bool  bx = ai.hasX();
-			const bool  by = ai.hasY();
-			const bool  bz = ai.hasZ();
-			
-			const float ox = bx ? offset : 10.0;
-			const float oy = by ? offset : 10.0;
-			const float oz = bz ? offset : 10.0;
+			const float ox = offset;
+			const float oy = offset;
+			const float oz = offset;
 			
 			{
-				if ( bx == false ) 
-					glEnable(GL_LINE_STIPPLE);
-				
-				glColor4ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue(), alpha * (bx ? 1.0 : 0.5) );
+				glColor4ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue(), alpha * (1.0) );
 				glBegin(GL_LINES);
 					glVertex3f(x - ox, y, z);
 					glVertex3f(x + ox, y, z);
 				glEnd();
-					
-				if ( bx == false ) 
-					glDisable(GL_LINE_STIPPLE);
 			}
 			{
-				if ( by == false ) 
-					glEnable(GL_LINE_STIPPLE);
-					
-				glColor4ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue(), alpha * (by ? 1.0 : 0.5) );
+				glColor4ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue(), alpha * (1.0) );
 				glBegin(GL_LINES);
 					glVertex3f(x, y - oy, z);
 					glVertex3f(x, y + oy, z);
 				glEnd();
-				
-				if ( by == false ) 
-					glDisable(GL_LINE_STIPPLE);
 			}
 			{
-				if ( bz == false ) 
-					glEnable(GL_LINE_STIPPLE);
-					
-				glColor4ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue(), alpha * (bz ? 1.0 : 0.5) );
+				glColor4ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue(), alpha * (1.0) );
 				glBegin(GL_LINES);
 					glVertex3f(x, y, z - oz);
 					glVertex3f(x, y, z + oz);
 				glEnd();
-				
-				if ( bz == false ) 
-					glDisable(GL_LINE_STIPPLE);
 			}
 		}
 	}

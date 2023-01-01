@@ -2,9 +2,25 @@
 #include "GlobalFunctions.h"
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "CncCommon.h"
+#include "CncBoundarySpace.h"
+#include "CncSimpleCalculator.h"
 #include "CncFloatingPointValidator.h"
 #include "CncFilenameService.h"
 #include "CncAnchorPosition.h"
+
+#define EVALUATE_VALUE \
+	double result = 0.0; \
+	if ( expression.Contains("$") == false ) \
+	{ \
+		if ( calc.calculate(expression, result) == false ) \
+			CNC_CERR_FUNCT_A(" Error while calculate expression") \
+	} \
+	else \
+	{ \
+		CNC_CERR_FUNCT_A(" Unparsed variable(s) in expression: %s", expression) \
+	}
+
 
 ///////////////////////////////////////////////////////////////////
 CncAnchorPosition::CncAnchorPosition(wxWindow* parent)
@@ -44,79 +60,6 @@ CncAnchorPosition::~CncAnchorPosition() {
 	wxDELETE( anchorList );
 }
 ///////////////////////////////////////////////////////////////////
-void CncAnchorPosition::load() {
-///////////////////////////////////////////////////////////////////
-	wxString dbName(CncFileNameService::getDatabaseDir());
-	CncFileNameService::ensureEndWithPathSep(dbName);
-	dbName.append("StdAnchor.list");
-	
-	wxFileName fn(dbName);
-	if ( fn.Exists() == false )
-		return;
-	
-	wxFileConfig db(wxT("StdAnchor"), 
-					wxEmptyString, 
-					dbName, 
-					dbName, 
-					wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS
-	);
-	
-	// store all anchors  ...
-	wxArrayString	anchorNames;
-	wxString		anchorName;
-	long			anchorIndex;
-	
-	bool bAnchor = db.GetFirstGroup(anchorName, anchorIndex);
-	while ( bAnchor ) 
-	{
-		anchorNames.Add(anchorName);
-		bAnchor = db.GetNextGroup(anchorName, anchorIndex);
-	}
-	
-	// over all anchors
-	for ( unsigned int i=0; i<anchorNames.GetCount(); i++ ) 
-	{
-		anchorName.assign(anchorNames.Item(i));
-		db.SetPath(wxString::Format("/%s", anchorName));
-		
-		CncAnchorPosListCtrl::AnchorInfo ai;
-		ai.name		= wxString::Format("*%s", anchorNames.Item(i));
-		ai.type		= db.Read("T", "XYZ");
-		ai.fixed	= true;
-		ai.absolute	= db.ReadBool("C", false);
-		ai.show		= db.ReadBool("D", true);
-		ai.pos		= { db.ReadDouble("X", 0.0), db.ReadDouble("Y", 0.0), db.ReadDouble("Z", 0.0) };
-		anchorList->addAnchor(ai);
-	}
-	
-	update();
-	provide();
-}
-///////////////////////////////////////////////////////////////////
-void CncAnchorPosition::provide() {
-///////////////////////////////////////////////////////////////////
-	if ( THE_CONTEXT->anchorMap == NULL )
-		return;
-		
-	CncAnchorMap& cam = *THE_CONTEXT->anchorMap;
-	const CncAnchorPosListCtrl::AnchorMap& am = anchorList->getAnchorMap();
-
-	for (auto it = am.begin(); it != am.end(); ++it ) 
-	{
-		const CncAnchorPosListCtrl::AnchorInfo& sai = it->second;
-		CncAnchorInfo nai;
-		
-		nai.show		= sai.show; 
-		nai.fixed		= sai.fixed;
-		nai.absolute	= sai.absolute;
-		nai.name		= sai.name;
-		nai.type		= sai.type;
-		nai.pos			= sai.pos;
-		
-		cam[nai.name] = nai;
-	}
-}
-///////////////////////////////////////////////////////////////////
 void CncAnchorPosition::onInitDialog(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	event.Skip();
@@ -138,12 +81,11 @@ void CncAnchorPosition::onUpdateName(wxCommandEvent& event) {
 void CncAnchorPosition::notifySelection(const CncAnchorPosListCtrl::AnchorInfo& ai) {
 ///////////////////////////////////////////////////////////////////
 	m_valN->ChangeValue(ai.name);
-	m_valT->SetValue(ai.type);
 	m_valS->SetValue(ai.show);
-	m_valC->SetValue(ai.absolute ? "Absolute" : "Relative");
 	m_valX->ChangeValue(wxString::Format("%.3lf", ai.pos.getX()));
 	m_valY->ChangeValue(wxString::Format("%.3lf", ai.pos.getY()));
 	m_valZ->ChangeValue(wxString::Format("%.3lf", ai.pos.getZ()));
+	m_valT->SetSelection(ai.isLogically() ? 0 : 1);
 	
 	canAdd = false;
 	canMod = (ai.fixed == false);
@@ -155,24 +97,6 @@ void CncAnchorPosition::notifySelection(const CncAnchorPosListCtrl::AnchorInfo& 
 void CncAnchorPosition::notifyActivation(const CncAnchorPosListCtrl::AnchorInfo& ai) {
 ///////////////////////////////////////////////////////////////////
 	// nothing to do
-}
-///////////////////////////////////////////////////////////////////
-void CncAnchorPosition::update() {
-///////////////////////////////////////////////////////////////////
-	m_btAdd->Enable(canAdd);
-	m_btMod->Enable(canMod);
-	m_btDel->Enable(canDel);
-	
-	// let m_valN enabled to provide the add path
-	m_valT->Enable(canMod);
-	m_valS->Enable(canMod);
-	m_valC->Enable(canMod);
-	m_valX->Enable(canMod);
-	m_valY->Enable(canMod);
-	m_valZ->Enable(canMod);
-	
-	if ( canMod == true )
-		processType();
 }
 ///////////////////////////////////////////////////////////////////
 void CncAnchorPosition::onAdd(wxCommandEvent& event) {
@@ -190,9 +114,7 @@ void CncAnchorPosition::onMod(wxCommandEvent& event) {
 	ai.name		= m_valN->GetValue();
 	ai.pos		= { x, y, z };
 	ai.show 	= m_valS->GetValue();
-	ai.type		= m_valT->GetValue();
-	ai.absolute	= m_valC->GetValue().StartsWith("Abs") ? true: false;
-	
+	ai.type		= m_valT->GetSelection() == 0 ? "L" : "P";
 	ai.name.Replace("*", "");
 	
 	anchorList->modAnchor(ai);
@@ -230,24 +152,119 @@ void CncAnchorPosition::processType() {
 ///////////////////////////////////////////////////////////////////
 	const wxString& t = m_valT->GetValue();
 	
-	auto enableXYZ = [&](bool x, bool y, bool z) 
-	{
-		m_valX->Enable(x);
-		m_valY->Enable(y);
-		m_valZ->Enable(z);
-		
-		if ( x == false )	m_valX->ChangeValue("");
-		if ( y == false )	m_valY->ChangeValue("");
-		if ( z == false )	m_valZ->ChangeValue("");
-	};
-	
-	if      ( t.IsSameAs("XYZ") )	{ enableXYZ(true,  true,  true ); }
-	else if ( t.IsSameAs("XY")  )	{ enableXYZ(true,  true,  false); }
-	else if ( t.IsSameAs("XZ")  )	{ enableXYZ(true,  false, true ); }
-	else if ( t.IsSameAs("YZ")  )	{ enableXYZ(false, true,  true ); }
-	else if ( t.IsSameAs("X")   )	{ enableXYZ(true,  false, false); }
-	else if ( t.IsSameAs("Y")   )	{ enableXYZ(false, true,  false); }
-	else if ( t.IsSameAs("Z")   )	{ enableXYZ(false, false, true ); }
-	else							{ enableXYZ(false, false, false); }
 }
+///////////////////////////////////////////////////////////////////
+void CncAnchorPosition::update() {
+///////////////////////////////////////////////////////////////////
+	m_btAdd->Enable(canAdd);
+	m_btMod->Enable(canMod);
+	m_btDel->Enable(canDel);
+	
+	// let m_valN enabled to provide the add path
+	m_valS->Enable(canMod);
+	m_valT->Enable(canMod);
+	m_valX->Enable(canMod);
+	m_valY->Enable(canMod);
+	m_valZ->Enable(canMod);
+	
+	if ( canMod == true )
+		processType();
+}
+///////////////////////////////////////////////////////////////////
+void CncAnchorPosition::provide() {
+///////////////////////////////////////////////////////////////////
+	if ( THE_CONTEXT->anchorMap == NULL )
+		return;
+		
+	CncAnchorMap& cam = *THE_CONTEXT->anchorMap;
+	const CncAnchorPosListCtrl::AnchorMap& am = anchorList->getAnchorMap();
 
+	for (auto it = am.begin(); it != am.end(); ++it ) 
+	{
+		const CncAnchorPosListCtrl::AnchorInfo& sai = it->second;
+		CncAnchorInfo nai;
+		
+		nai.show		= sai.show; 
+		nai.name		= sai.name;
+		nai.type		= sai.type;
+		nai.pos			= sai.pos;
+		
+		cam[nai.name] = nai;
+	}
+}
+///////////////////////////////////////////////////////////////////
+double CncAnchorPosition::readX(wxFileConfig& db) {
+///////////////////////////////////////////////////////////////////
+	CncSimpleCalculator calc;
+	wxString expression(db.Read("X", "0.0"));
+	expression.Replace("$X_MaxDist_MM", wxString::Format("%lf", THE_BOUNDS->getMaxDimensionMetricX()), true);
+	
+	EVALUATE_VALUE
+	return result;
+}
+///////////////////////////////////////////////////////////////////
+double CncAnchorPosition::readY(wxFileConfig& db) {
+///////////////////////////////////////////////////////////////////
+	CncSimpleCalculator calc;
+	wxString expression(db.Read("Y", "0.0"));
+	expression.Replace("$Y_MaxDist_MM", wxString::Format("%lf", THE_BOUNDS->getMaxDimensionMetricX()), true);
+	
+	EVALUATE_VALUE
+	return result;
+}
+///////////////////////////////////////////////////////////////////
+double CncAnchorPosition::readZ(wxFileConfig& db) {
+///////////////////////////////////////////////////////////////////
+	CncSimpleCalculator calc;
+	wxString expression(db.Read("Z", "0.0"));
+	expression.Replace("$Z_MaxDist_MM", wxString::Format("%lf", THE_BOUNDS->getMaxDimensionMetricX()), true);
+
+	EVALUATE_VALUE
+	return result;
+}
+///////////////////////////////////////////////////////////////////
+void CncAnchorPosition::load() {
+///////////////////////////////////////////////////////////////////
+	wxString dbName(CncFileNameService::getDatabaseDir());
+	CncFileNameService::ensureEndWithPathSep(dbName);
+	dbName.append("StdAnchor.list");
+	
+	wxFileName fn(dbName);
+	if ( fn.Exists() == false )
+		return;
+	
+	wxFileConfig db(wxT("StdAnchor"), 
+					wxEmptyString, 
+					dbName, 
+					dbName, 
+					wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS
+	);
+	
+	// store all anchors  ...
+	wxArrayString	anchorNames;
+	wxString		anchorName;
+	long			anchorIndex;
+	
+	// collect all groups
+	while ( db.GetNextGroup(anchorName, anchorIndex) ) 
+		anchorNames.Add(anchorName);
+	
+	// over all groups/anchors
+	for ( unsigned int i=0; i<anchorNames.GetCount(); i++ ) 
+	{
+		anchorName.assign(anchorNames.Item(i));
+		db.SetPath(wxString::Format("/%s", anchorName));
+		
+		CncAnchorPosListCtrl::AnchorInfo ai;
+		
+		ai.name		= wxString::Format("*%s", anchorNames.Item(i));
+		ai.type		= db.Read("T", "P");
+		ai.show		= db.ReadBool("D", true);
+		ai.fixed	= true;
+		ai.pos		= { readX(db), readY(db), readZ(db) };
+		anchorList->addAnchor(ai);
+	}
+	
+	update();
+	provide();
+}

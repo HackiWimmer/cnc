@@ -9,6 +9,9 @@
 #include <list>
 #include <stack>
 
+#include <wx/string.h>
+#include "CncVector.h"
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> 
 class CncXYDimension 
@@ -110,7 +113,20 @@ template <class T>
 class CncPosition 
 {
 	public:
-	
+		
+		static constexpr double DefaultfloatingPointEpsilon = 0.000001;
+		
+		enum CompareFlags
+		{
+			CMP_POS		=  1,
+			CMP_ORG		=  2,
+			CMP_WMS		=  4,
+			CMP_FPE		=  8,
+			CMP_MTX		= 16,
+			CMP_BASE	= CMP_POS | CMP_ORG,
+			CMP_ALL		= CMP_POS | CMP_ORG | CMP_WMS | CMP_FPE | CMP_MTX
+		};
+		
 		////////////////////////////////////////////////////////////////////////////////////////////
 		struct Watermarks 
 		{
@@ -125,17 +141,44 @@ class CncPosition
 					yMin = yMax = 0;
 					zMin = zMax = 0;
 				}
+				
+				friend std::ostream& operator<< (std::ostream &ostr, const Watermarks& o) 
+				{ 
+					const unsigned int	p = ostr.precision();
+					const unsigned int	w = ostr.width();
+					const char			f = ostr.fill();
+					
+					ostr	<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+							<< o.xMin << ", " 
+							<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+							<< o.yMin << ", " 
+							<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+							<< o.zMin << " | "
+							<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+							<< o.xMax << ", " 
+							<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+							<< o.yMax << ", " 
+							<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
+							<< o.zMax
+					;
+					
+					return ostr;
+				}
 		};
 		
 	protected:
 		
+		T xOrg, yOrg, zOrg;
+		T xPos, yPos, zPos;
+		
 		T xMin, xMax;
 		T yMin, yMax;
 		T zMin, zMax;
+
+		double			floatingPointEpsilon;
+		CncMatrix4x4<T>	transformationMatrix;
 		
-		T xPos, yPos, zPos;
-		
-		double floatingPointEpsilon;
+		bool compare(T v1, T v2, double fpe = DefaultfloatingPointEpsilon) const;
 		
 		////////////////////////////////////////////////////////////////
 		inline void evaluateWatermarks()
@@ -167,67 +210,65 @@ class CncPosition
 		
 		////////////////////////////////////////////////////////////////
 		CncPosition<T>()
-		: xMin(0), xMax(0)
-		, yMin(0), yMax(0)
-		, zMin(0), zMax(0)
-		, xPos(0), yPos(0)
-		, zPos(0)
-		, floatingPointEpsilon	(0.000001)
+		: xOrg(0)
+		, yOrg(0)
+		, zOrg(0)
+		, xPos(xOrg)
+		, yPos(yOrg)
+		, zPos(zOrg)
+		, xMin(xOrg), xMax(xOrg)
+		, yMin(yOrg), yMax(yOrg)
+		, zMin(zOrg), zMax(zOrg)
+		, floatingPointEpsilon	(DefaultfloatingPointEpsilon)
+		, transformationMatrix	()
 		{}
 		
 		////////////////////////////////////////////////////////////////
 		CncPosition<T>(T x, T y, T z)
-		: xMin(x), xMax(x)
+		: xOrg(x)
+		, yOrg(y)
+		, zOrg(z)
+		, xPos(x)
+		, yPos(y)
+		, zPos(z)
+		, xMin(x), xMax(x)
 		, yMin(y), yMax(y)
 		, zMin(z), zMax(z)
-		, xPos(x), yPos(y)
-		, zPos(z)
-		, floatingPointEpsilon	(0.000001)
+		, floatingPointEpsilon	(DefaultfloatingPointEpsilon)
+		, transformationMatrix	()
 		{}
 		
 		////////////////////////////////////////////////////////////////
 		/*explicit*/ CncPosition<T>(const CncPosition<T>& cp)
-		: xMin(cp.getXMin()),   xMax(cp.getXMax())
-		, yMin(cp.getYMin()),   yMax(cp.getYMax())
-		, zMin(cp.getZMin()),   zMax(cp.getZMax())
-		, xPos(cp.getX()),      yPos(cp.getY())
-		, zPos(cp.getZ())
-		, floatingPointEpsilon	(0.000001)
+		: xOrg(cp.xOrg) 
+		, yOrg(cp.yOrg) 
+		, zOrg(cp.zOrg) 
+		, xPos(cp.xPos)
+		, yPos(cp.yPos)
+		, zPos(cp.zPos)
+		, xMin(cp.xMin), xMax(cp.xMax)
+		, yMin(cp.yMin), yMax(cp.yMax)
+		, zMin(cp.zMin), zMax(cp.zMax)
+		, floatingPointEpsilon	(cp.floatingPointEpsilon)
+		, transformationMatrix	(cp.transformationMatrix)
 		{}
 		
-		////////////////////////////////////////////////////////////////
 		virtual ~CncPosition<T>() {}
 		
 		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& operator= (const CncPosition<T>& cp) 
-		{
-			// self-assignment check
-			if ( this != &cp ) 
-			{
-				xMin = cp.getXMin();
-				xMax = cp.getXMax();
-				yMin = cp.getYMin();
-				yMax = cp.getYMax();
-				zMin = cp.getZMin();
-				zMax = cp.getZMax();
-				xPos = cp.getX();
-				yPos = cp.getY();
-				zPos = cp.getZ();
-			}
-			return *this;
-		}
+		const CncPosition<T>& setTranslation(T x, T y, T z)			{ transformationMatrix.setTranslation(x, y, z );	return *this; }
+		const CncPosition<T>& setRotationAxisX(double aDegree)		{ transformationMatrix.setRotationAxisX(aDegree);	return *this; }
+		const CncPosition<T>& setRotationAxisY(double aDegree)		{ transformationMatrix.setRotationAxisY(aDegree);	return *this; }
+		const CncPosition<T>& setRotationAxisZ(double aDegree)		{ transformationMatrix.setRotationAxisZ(aDegree);	return *this; }
+		const CncPosition<T>& setScaling(double factor)				{ transformationMatrix.setScaling(factor);			return *this; }
+		const CncPosition<T>& resetTransformation();
+		
+		const CncMatrix4x4<T>& getTransformationMatrix() const		{ return transformationMatrix; }
+		bool hasTransformation()                         const		{ return transformationMatrix.hasTransformation(); }
 		
 		////////////////////////////////////////////////////////////////
-		double getFloatingPointPrecision() 
-		{
-			return floatingPointEpsilon;
-		}
-		
-		double setFloatingPointPrecision(double eps) 
-		{
-			floatingPointEpsilon = std::fabs(eps);
-			return floatingPointEpsilon;
-		}
+		double getFloatingPointPrecision()               const		{ return floatingPointEpsilon; }
+		const CncPosition<T>& setFloatingPointPrecision(double eps)	{ floatingPointEpsilon = std::fabs(eps); return *this; }
 		
 		////////////////////////////////////////////////////////////////
 		const Watermarks& getWatermarks(Watermarks& wm) const 
@@ -258,18 +299,12 @@ class CncPosition
 		T getXMin() const { return xMin; }
 		T getYMin() const { return yMin; } 
 		T getZMin() const { return zMin; }
+		void getMinWatermarks(CncPosition& min) { min.setXYZ(xMin, yMin, zMin); }
 		
-		////////////////////////////////////////////////////////////////
-		void getMinWatermarks(CncPosition& min) 
-		{
-			min.setXYZ(xMin, yMin, zMin);
-		}
 		////////////////////////////////////////////////////////////////
 		T getXMax() const { return xMax; }
 		T getYMax() const { return yMax; } 
 		T getZMax() const { return zMax; }
-		
-		////////////////////////////////////////////////////////////////
 		void getMaxWatermarks(CncPosition& max) { max.setXYZ(xMax, yMax, zMax); }
 		
 		////////////////////////////////////////////////////////////////
@@ -278,270 +313,64 @@ class CncPosition
 		T getZ() const { return zPos; }
 		
 		////////////////////////////////////////////////////////////////
-		T setX(T x) { xPos = x; evaluateWatermarks(); return xPos; }
-		T setY(T y) { yPos = y; evaluateWatermarks(); return yPos; }
-		T setZ(T z) { zPos = z; evaluateWatermarks(); return zPos; }
+		const CncPosition<T>& setX(T x)						{ return setXYZ(       x,     yOrg,     zOrg); }
+		const CncPosition<T>& setY(T y)						{ return setXYZ(    xOrg,        y,     zOrg); }
+		const CncPosition<T>& setZ(T z)						{ return setXYZ(    xOrg,     yOrg,        z); }
+		const CncPosition<T>& setXY(T x, T y)				{ return setXYZ(       x,        y,     zOrg); } 
+		const CncPosition<T>& set(const CncPosition<T>& p);
+		const CncPosition<T>& setXYZ(T x, T y, T z); 
 		
 		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& setXYZ(T x, T y, T z) 
-		{
-			xPos = x;
-			yPos = y;
-			zPos = z;
-			evaluateWatermarks();
-			return *this;
-		} 
+		const CncPosition<T>& zeorX()						{ return setXYZ(   0, yOrg, zOrg); }
+		const CncPosition<T>& zeorY()						{ return setXYZ(xOrg,    0, zOrg); }
+		const CncPosition<T>& zeorZ()						{ return setXYZ(xOrg, yOrg,    0); }
+		const CncPosition<T>& zeroXYZ()						{ return setXYZ(   0,    0,    0); }
 		
 		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& setXY(T x, T y) {
-			xPos = x;
-			yPos = y;
-			evaluateWatermarks();
-			return *this;
-		} 
+		const CncPosition<T>& incX(T x)						{ return inc(x, 0, 0); }
+		const CncPosition<T>& incY(T y)						{ return inc(0, y, 0); }
+		const CncPosition<T>& incZ(T z)						{ return inc(0, 0, z); }
+		const CncPosition<T>& incXY(T x, T y)				{ return inc(x, y, 0); }
+		const CncPosition<T>& shift(T x, T y, T z)			{ return inc(x, y, z); }
+		const CncPosition<T>& inc(T x, T y, T z);
 		
 		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& set(const CncPosition<T>& p) 
-		{
-			xPos = p.getX();
-			yPos = p.getY();
-			zPos = p.getZ();
-			evaluateWatermarks();
-			return *this;
-		} 
+		const CncPosition<T>& decX(T x)						{ return dec(x, 0, 0); }
+		const CncPosition<T>& decY(T y)						{ return dec(0, y, 0); }
+		const CncPosition<T>& decZ(T z) 					{ return dec(0, 0, z); }
+		const CncPosition<T>& decXY(T x, T y)				{ return dec(x, y, 0); }
+		const CncPosition<T>& dec(T x, T y, T z);
 		
 		////////////////////////////////////////////////////////////////
-		T zeorX() { xPos = 0; evaluateWatermarks(); return xPos; }
-		T zeroY() { yPos = 0; evaluateWatermarks(); return yPos; }
-		T zeroZ() { zPos = 0; evaluateWatermarks(); return zPos; }
-		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& zeroXYZ() 
-		{
-			xPos = 0;
-			yPos = 0;
-			zPos = 0;
-			evaluateWatermarks();
-			return *this;
-		}
+		const CncPosition<T>& invertX()						{ xPos *= -1; evaluateWatermarks(); return *this; }
+		const CncPosition<T>& invertY()						{ yPos *= -1; evaluateWatermarks(); return *this; }
+		const CncPosition<T>& invertZ()						{ zPos *= -1; evaluateWatermarks(); return *this; }
+		const CncPosition<T>& invert()						{ invertX(); invertY(); invertZ();  return *this; }
 		
 		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& incX(T x) { xPos = xPos + x; evaluateWatermarks(); return *this; }
-		const CncPosition<T>& incY(T y) { yPos = yPos + y; evaluateWatermarks(); return *this; }
-		const CncPosition<T>& incZ(T z) { zPos = zPos + z; evaluateWatermarks(); return *this; }
-		
-		const CncPosition<T>& incXY(T x, T y) 
-		{
-			xPos = xPos + x;
-			yPos = yPos + y;
-			evaluateWatermarks(); 
-			return *this; 
-		}
-		
-		const CncPosition<T>& shift(T x, T y, T z) { return inc(x, y, z); }
-		const CncPosition<T>& inc(T x, T y, T z) 
-		{
-			xPos = xPos + x;
-			yPos = yPos + y;
-			zPos = zPos + z;
-			evaluateWatermarks(); 
-			return *this; 
-		}
+		bool isEqual(const CncPosition<T> &a, CompareFlags = CMP_BASE, double fpe = DefaultfloatingPointEpsilon) const;
 		
 		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& decX(T x) { xPos = xPos - x; evaluateWatermarks(); return *this; }
-		const CncPosition<T>& decY(T y) { yPos = yPos - y; evaluateWatermarks(); return *this; }
-		const CncPosition<T>& decZ(T z) { zPos = zPos - z; evaluateWatermarks(); return *this; }
-		
-		const CncPosition<T>& decXY(T x, T y) 
-		{
-			xPos = xPos - x;
-			yPos = yPos - y;
-			evaluateWatermarks(); 
-			return *this; 
-		}
-
-		const CncPosition<T>& dec(T x, T y, T z) 
-		{
-			xPos = xPos - x;
-			yPos = yPos - y;
-			zPos = zPos - z;
-			evaluateWatermarks(); 
-			return *this; 
-		}
+		bool operator== (const CncPosition<T> &a) const;
+		bool operator!= (const CncPosition<T> &a) const;
+		const CncPosition<T>& operator=  (const CncPosition<T>& cp);
+		const CncPosition<T>& operator+= (const CncPosition &a);
+		const CncPosition<T>& operator-= (const CncPosition &a);
+		const CncPosition<T>& operator++ ();
+		const CncPosition<T>& operator-- ();
+		CncPosition<T> operator++ (int size);
+		CncPosition<T> operator-- (int size);
+		CncPosition<T> operator+ (const CncPosition<T> &a) const;
+		CncPosition<T> operator- (const CncPosition<T> &a) const;
 		
 		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& invertX() { xPos *= -1; evaluateWatermarks(); return *this; }
-		const CncPosition<T>& invertY() { yPos *= -1; evaluateWatermarks(); return *this; }
-		const CncPosition<T>& invertZ() { zPos *= -1; evaluateWatermarks(); return *this; }
-		const CncPosition<T>& invert()  { invertX(); invertY(); invertZ();  return *this; }
-		
-		////////////////////////////////////////////////////////////////
-		friend std::ostream &operator<< (std::ostream &ostr, const CncPosition<T> &a) 
-		{
-			const unsigned int	p = ostr.precision();
-			const unsigned int	w = ostr.width();
-			const char			f = ostr.fill();
-			
-			ostr	<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.getX() << ", " 
-					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.getY() << ", " 
-					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.getZ()
-			;
-			
-			return ostr;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		friend std::ostream &operator<< (std::ostream &ostr, const Watermarks &a) 
-		{
-			const unsigned int	p = ostr.precision();
-			const unsigned int	w = ostr.width();
-			const char			f = ostr.fill();
-			
-			ostr	<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.xMin << ", " 
-					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.yMin << ", " 
-					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.zMin << " | "
-					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.xMax << ", " 
-					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.yMax << ", " 
-					<< std::fixed << std::setw(w) << std::setprecision(p) << std::setfill(f)
-					<< a.zMax;
-			return ostr;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		bool isEqual(const CncPosition<T> &a) const 
-		{
-			return (    (a.getX() == getX())
-					 && (a.getY() == getY())
-					 && (a.getZ() == getZ())
-					);
-		}
-		
-		////////////////////////////////////////////////////////////////
-		bool isFloatingEqual(const CncPosition<double> &a, const double epsilon = -1.0) const 
-		{
-			const bool xc = std::fabs(a.getX() - getX()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
-			const bool yc = std::fabs(a.getY() - getY()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
-			const bool zc = std::fabs(a.getZ() - getZ()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
-			
-			return ( xc && yc && zc ); 
-		}
-		
-		////////////////////////////////////////////////////////////////
-		bool isFloatingEqual(const CncPosition<float> &a, const float epsilon = -1.0) const 
-		{
-			const bool xc = std::fabs(a.getX() - getX()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
-			const bool yc = std::fabs(a.getY() - getY()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
-			const bool zc = std::fabs(a.getZ() - getZ()) <= ( epsilon > 0.0 ? epsilon : floatingPointEpsilon );
-			
-			return ( xc && yc && zc ); 
-		}
-
-		////////////////////////////////////////////////////////////////
-		bool operator== (const CncPosition<T> &a) const 
-		{
-			return (    (a.getX() == getX())
-					 && (a.getY() == getY())
-					 && (a.getZ() == getZ())
-					);
-		}
-		
-		////////////////////////////////////////////////////////////////
-		bool operator!= (const CncPosition<T> &a) const 
-		{
-			return (!operator== (a));
-		}
-		
-		////////////////////////////////////////////////////////////////
-		CncPosition<T> operator+ (const CncPosition<T> &a) const 
-		{
-			CncPosition<T> c(a);
-
-			c.setX(c.getX() + getX());
-			c.setY(c.getY() + getY());
-			c.setZ(c.getZ() + getZ());
-			
-			return c;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		CncPosition<T> operator- (const CncPosition<T> &a) const 
-		{
-			CncPosition<T> c(a);
-
-			c.setX(c.getX() - getX());
-			c.setY(c.getY() - getY());
-			c.setZ(c.getZ() - getZ());
-			
-			return c;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& operator+= (const CncPosition &a) 
-		{
-			xPos = xPos + a.getX();
-			yPos = yPos + a.getY();
-			zPos = zPos + a.getZ();
-			evaluateWatermarks(); 
-			return *this;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& operator-= (const CncPosition &a) 
-		{
-			xPos = xPos - a.getX();
-			yPos = yPos - a.getY();
-			zPos = zPos - a.getZ();
-			evaluateWatermarks(); 
-			return *this;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& operator++ () 
-		{
-			xPos = xPos + 1;
-			yPos = yPos + 1;
-			zPos = zPos + 1;
-			evaluateWatermarks(); 
-			return *this;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& operator-- () 
-		{
-			xPos = xPos - 1;
-			yPos = yPos - 1;
-			zPos = zPos - 1;
-			evaluateWatermarks(); 
-			return *this;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& operator++ (int size) 
-		{
-			xPos = xPos + size;
-			yPos = yPos + size;
-			zPos = zPos + size;
-			evaluateWatermarks(); 
-			return *this;
-		}
-		
-		////////////////////////////////////////////////////////////////
-		const CncPosition<T>& operator-- (int size) 
-		{
-			xPos = xPos - size;
-			yPos = yPos - size;
-			zPos = zPos - size;
-			evaluateWatermarks(); 
-			return *this;
-		}
+		wxString asStr() const;
+		wxString asFullStr() const;
+		std::ostream& trace(std::ostream &ostr) const;
+		std::ostream& traceAll(std::ostream &ostr, bool matrix=false) const;
+		std::ostream& traceMatrix(std::ostream &ostr) const;
+		std::ostream& traceWatermarks(std::ostream &ostr) const;
+		friend std::ostream& operator<< (std::ostream &ostr, const CncPosition<T> &a) { return a.trace(ostr); }
 };
 
 // ----------------------------------------------------------------------

@@ -25,8 +25,9 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		virtual bool		isPathListUsed()								const	= 0;
 		virtual void		switchSpindleState(CncSpindlePowerState state)			= 0;
 		virtual bool		initNextPath()											= 0;
-		virtual bool		prepareWork(); 
-		virtual bool		finishWork();
+		virtual bool		moveToParkPosition()									= 0;
+		virtual bool		prepareWork() override; 
+		virtual bool		finishWork() override; 
 		
 		bool				processRapidLinearMove(GCodeBlock& gcb);
 		bool				processLinearMove(GCodeBlock& gcb);

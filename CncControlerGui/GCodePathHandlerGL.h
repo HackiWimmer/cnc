@@ -30,6 +30,7 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		virtual bool			prepareWorkImpl()											override;
 		virtual bool			finishWorkImpl()											override;
 		
+		virtual bool			moveToParkPosition()										override { }
 		virtual void			traceWorkflow(std::ostream& o)								override { }
 		virtual void			resetWorkflow()												override { }
 		virtual bool			spoolWorkflow()												override { return true; }

@@ -1,6 +1,7 @@
 #include "CncControl.h"
 #include "CncPosition.h"
 #include "CncContext.h"
+#include "CncAnchorInfo.h"
 #include "GCodePathHandlerCnc.h"
 
 //////////////////////////////////////////////////////////////////
@@ -105,4 +106,17 @@ bool GCodePathHandlerCnc::processLinearMove(bool alreadyRendered) {
 	logNextPathListEntry(cpe);
 	
 	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool GCodePathHandlerCnc::moveToParkPosition() {
+//////////////////////////////////////////////////////////////////
+	const CncDoublePosition pos(THE_CONTEXT->anchorMap->getLogicalAnchorParking());
+	const CncDoublePosition prev(currentPos);
+	
+	currentPos.set(pos);
+	const bool ret = processLinearMove(false);
+	if ( ret == false )
+		currentPos.set(prev);
+		
+	return ret;
 }

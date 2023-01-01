@@ -26,6 +26,7 @@ PathHandlerBase::PathHandlerBase()
 , pathListMgr				()
 , fileParser				(NULL)
 , nextPath					(false)
+, pathCounter				(0)
 , startPos					({0.0, 0.0, 0.0})
 , currentPos				({0.0, 0.0, 0.0})
 , totalLength				(0.0)
@@ -670,7 +671,9 @@ bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, const doub
 bool PathHandlerBase::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	pathListMgr.init(currentPos);
-	totalLength   = 0.0;
+	totalLength		= 0.0;
+	pathCounter		= 0;
+	nextPath		= false;
 	
 	// important to reset the current tool id,
 	// otherwise the first change will not be detected

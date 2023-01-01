@@ -421,13 +421,17 @@ void CncLoggerListCtrl::addSeparator() {
 /////////////////////////////////////////////////////////////
 void CncLoggerListCtrl::tokenAndAdd(const wxString& text, const wxListItemAttr& lia) {
 /////////////////////////////////////////////////////////////
-	wxStringTokenizer lines(text, "\n");
+	const char* search = "\n";
+	const bool b =  text.Contains(search);
 	
+	wxStringTokenizer lines(text, search);
 	while ( lines.HasMoreTokens() )
 	{
 		const wxString& token = lines.GetNextToken();
 		entries.push_back(std::move(LoggerEntry(token, "", lia)));
-		next();
+		
+		if ( b )
+			next();
 	}
 }
 /////////////////////////////////////////////////////////////

@@ -434,5 +434,33 @@ void CncPathListEntryListCtrl::addPathListEntries(const CncPathListManager& cpm)
 		addPathListEntry(cpe);
 	}
 }
+///////////////////////////////////////////////////////////////////
+wxString CncPathListEntryListCtrl::getFormatedItemText(long item, int col) const {
+///////////////////////////////////////////////////////////////////
+	if ( isItemValid(item) == false )
+		return _("");
+
+	const CncPathListEntry& cpe = pathLists.at(item);
+	
+	wxString ret;
+	switch (col)
+	{
+		case COL_CONT:				ret.assign(wxString::Format("%5s",		GetItemText(item, col)));	return ret;
+		case COL_REF:				ret.assign(wxString::Format("%ld",		cpe.pathListReference));	return ret;
+		case COL_CLD_ID:			ret.assign(wxString::Format("%+7ld",	cpe.clientId));				return ret;
+		case COL_TOOL_ID:			ret.assign(wxString::Format("%+5d",		cpe.toolId));				return ret;
+		case COL_F:					ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+		case COL_S:					ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+		case COL_DISTANCE_X:		ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+		case COL_DISTANCE_Y:		ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+		case COL_DISTANCE_Z:		ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+		case COL_TARGET_X:			ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+		case COL_TARGET_Y:			ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+		case COL_TARGET_Z:			ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+		case COL_TOTAL_DISTANCE:	ret.assign(wxString::Format("%14s",		GetItemText(item, col)));	return ret;
+	}
+	
+	return GetItemText(item, col);
+}
 
 

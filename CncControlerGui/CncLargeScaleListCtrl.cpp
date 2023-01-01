@@ -429,6 +429,11 @@ long CncLargeScaledListCtrl::searchRow(const wxString& what, int searchColumn) {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+wxString CncLargeScaledListCtrl::getFormatedItemText(long item, int col) const {
+///////////////////////////////////////////////////////////////////
+	return GetItemText(item, col);
+}
+///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::writeToFile(const wxFileName& fn, bool allRows) {
 ///////////////////////////////////////////////////////////////////
 	if ( fn.DirExists() == false ) 
@@ -449,16 +454,16 @@ bool CncLargeScaledListCtrl::writeToFile(const wxFileName& fn, bool allRows) {
 		const long firstRow = allRows ? 0                  : GetTopItem();
 		const long lastRow  = allRows ? GetItemCount() - 1 : firstRow + std::min(GetCountPerPage(), GetItemCount() - 1);
 		
-			wxString content;
-			for ( long i = firstRow; i < lastRow; i++ )
+		wxString content;
+		for ( long i = firstRow; i < lastRow; i++ )
+		{
+			for ( long c = 0; c < GetColumnCount(); c++ )
 			{
-				for ( long c = 0; c < GetColumnCount(); c++ )
-				{
-					out << wxString::Format("%s\t", GetItemText(i, c));
-				}
-				
-				out << std::endl;
+				out << wxString::Format("%s\t", getFormatedItemText(i, c));
 			}
+			
+			out << std::endl;
+		}
 	}
 	
 	out.close();

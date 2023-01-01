@@ -233,6 +233,17 @@ bool CncPathListRunner::Move::test() {
 
 //////////////////////////////////////////////////////////////////
 
+#define CHECK_INTERRUPTED \
+	if ( isInterrupted() == true ) \
+		return false;
+		
+#define CHECK_TYPE(b) \
+	if ( b == false ) \
+	{ \
+		CNC_CERR_FUNCT_A(": Invalid Type!") \
+		return false; \
+	}
+
 #define CHECK_AND_PERFORM_PROCESSING_STATE \
 	if ( checkAndPerfromProcessingState() == false ) \
 	{ \
@@ -243,11 +254,12 @@ bool CncPathListRunner::Move::test() {
 
 //////////////////////////////////////////////////////////////////
 CncPathListRunner::CncPathListRunner(CncControl* cnc) 
-: workflowList			()
-, transformationMatrix	()
-, currentSequence		(NULL)
-, currentInterface		(new CncPathListInterfaceCnc(cnc))
-, setup					()
+: workflowList				()
+, transformationMatrix		()
+, currentSequence			(NULL)
+, currentInterface			(new CncPathListInterfaceCnc(cnc))
+, setup						()
+, initialMovementPerformed	()
 //////////////////////////////////////////////////////////////////
 {
 	autoSetup(false);
@@ -371,7 +383,6 @@ bool CncPathListRunner::processCncPath(const CncPathListManager& plm) {
 bool CncPathListRunner::processCommand(const unsigned char* buffer, int len) {
 //////////////////////////////////////////////////////////////////
 	workflowList.push_back(new WorkflowCommandEntry(buffer, len));
-	
 	return true; 
 }
 //////////////////////////////////////////////////////////////////
@@ -381,6 +392,7 @@ void CncPathListRunner::resetWorkflow() {
 		delete workflowEntry;
 	
 	workflowList.clear();
+	initialMovementPerformed = false;
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::spoolWorkflow() {
@@ -388,7 +400,7 @@ bool CncPathListRunner::spoolWorkflow() {
 	CNC_CEX2_A("Start analyzing path list workflow (entries=%zu)", workflowList.size())
 	FORCE_LOGGER_UPDATE
 	
-	// normalize start and end position regarding a translation
+	// normalize start position regarding a translation
 	if ( transformationMatrix.hasTranslation() )
 	{
 		// find first entry with path information
@@ -403,24 +415,6 @@ bool CncPathListRunner::spoolWorkflow() {
 				if ( workflowEntry->getPLM()->normalizeStartPos(p) )
 				{
 					//cnc::cex3 << *(workflowEntry->getPLM()) << std::endl;
-					break;
-				}
-			}
-		}
-		
-		// find last entry with path information
-		for ( auto it = workflowList.rbegin(); it != workflowList.rend(); ++it )
-		{
-			WorkflowEntry* workflowEntry = *it;
-			if ( workflowEntry->getPLM() != NULL )
-			{
-				const double transX	= transformationMatrix.getTranslationX();
-				const double transY	= transformationMatrix.getTranslationY();
-				const CncDoublePosition p(transX, transY, 0.0);
-				
-				if ( workflowEntry->getPLM()->normalizeEndPos(p) )
-				{
-					//cnc::cex2 << *(workflowEntry->getPLM()) << std::endl;
 					break;
 				}
 			}
@@ -576,11 +570,11 @@ bool CncPathListRunner::addSequenceEntryFromAbsValues(double px, double py, doub
 	const double dy = py - currentInterface->getCurrentPositionMetric().getY();
 	const double dz = pz - currentInterface->getCurrentPositionMetric().getZ();
 	
-	// update sequence
+	// update sequence (relative)
 	currentSequence->addMetricRelXYZ(dx, dy, dz);
 	
-	// update position
-	currentInterface->setCurrentPositionMetric(px, py, pz);
+	// update position (absolute)
+	currentInterface->logCurrentPositionMetric(px, py, pz);
 	
 	return true;
 }
@@ -591,7 +585,8 @@ bool CncPathListRunner::destroyMoveSequence() {
 //////////////////////////////////////////////////////////////////
 	bool ret = true;
 	
-	if ( currentSequence != NULL && currentSequence->getCount() > 0 ) {
+	if ( currentSequence != NULL && currentSequence->getCount() > 0 )
+	{
 		ret = publishMoveSequence();
 		wxDELETE ( currentSequence );
 	}
@@ -648,21 +643,16 @@ bool CncPathListRunner::publishMoveSequence() {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr) {
+bool CncPathListRunner::onPerfromClientIdChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.hasClientIdChange() == false ) 
-	{
-		CNC_CERR_FUNCT_A(": Invalid Type!")
-		return false;
-	}
-	
-	if ( isInterrupted() == true )
-		return false;
-		
-	CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
+	CHECK_INTERRUPTED
+	CHECK_TYPE(curr.hasClientIdChange())
 	
 	if ( setup.trace == true )
+	{
+		CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 		cpp->addOperatingTraceSeparator(wxString::Format("ClientID Change (%ld)", curr.clientId));
+	}
 		
 	const bool b = (currentSequence != NULL && setup.optAnalyse == true );
 	if ( b )	currentSequence->addClientId(curr.clientId);
@@ -671,16 +661,10 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next) {
+bool CncPathListRunner::onPerfromFeedSpeedChange(const CncPathListEntry& curr, const CncPathListEntry* next) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.hasSpeedChange() == false ) 
-	{
-		CNC_CERR_FUNCT_A(": Invalid Type!")
-		return false;
-	}
-	
-	if ( isInterrupted() == true )
-		return false;
+	CHECK_INTERRUPTED
+	CHECK_TYPE(curr.hasSpeedChange())
 	
 	if ( setup.trace == true )
 	{
@@ -703,17 +687,11 @@ bool CncPathListRunner::onPhysicallyFeedSpeedChange(const CncPathListEntry& curr
 	return currentInterface->processFeedSpeedChange(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyToolChange(const CncPathListEntry& curr) {
+bool CncPathListRunner::onPerfromToolChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.hasToolChange() == false )
-	{
-		CNC_CERR_FUNCT_A(": Invalid Type!")
-		return false;
-	}
+	CHECK_INTERRUPTED
+	CHECK_TYPE(curr.hasToolChange())
 	
-	if ( isInterrupted() == true )
-		return false;
-
 	if ( setup.trace == true ) 
 	{
 		const wxString msg(wxString::Format("Tool Change to id = %d", curr.toolId));
@@ -731,16 +709,10 @@ bool CncPathListRunner::onPhysicallyToolChange(const CncPathListEntry& curr) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) {
+bool CncPathListRunner::onPerfromSpindleChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( curr.hasSpindleChange() == false )
-	{
-		CNC_CERR_FUNCT_A(": Invalid Type!")
-		return false;
-	}
-	
-	if ( isInterrupted() == true )
-		return false;
+	CHECK_INTERRUPTED
+	CHECK_TYPE(curr.hasSpindleChange())
 	
 	if ( setup.trace == true ) 
 	{
@@ -767,22 +739,23 @@ bool CncPathListRunner::onPhysicallySpindleChange(const CncPathListEntry& curr) 
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
+bool CncPathListRunner::onPerfromInitialMove(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	if ( isInterrupted() == true )
-		return false;
-		
+	CHECK_INTERRUPTED
+	CHECK_TYPE(curr.hasPositionChange())
+	
 	if ( setup.trace == true )
 	{
 		std::stringstream ss; 
 		ss 	<< "Distance         : " << cnc::dblFormat(curr.entryDistance)	<< std::endl
+			<< "Target           : " << cnc::dblFormat(curr.entryTarget)	<< std::endl
 			<< "Already Rendered : " << curr.alreadyRendered				<< std::endl
 		;
 		
 		CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
 		wxASSERT( cpp != NULL );
 		
-		cpp->addOperatingTraceMovSeqSep("Next PhysicallyMoveRaw");
+		cpp->addOperatingTraceMovSeqSep("Next Perform Initial Move");
 		cpp->addOperatingTrace(ss);
 	}
 	
@@ -794,13 +767,49 @@ bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 	double pz = curr.entryTarget.getZ();
 	transformationMatrix.transform(px, py, pz);
 	
+	CncDoublePosition p(px, py, pz);
 	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, px, py, pz);
-	currentInterface->setCurrentPositionMetric(px, py, pz);
+	currentInterface->logCurrentPositionMetric(px, py, pz);
 	
-	return currentInterface->processPathListEntry(curr);
+	return currentInterface->processInitialEntry(p);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& itCurr, const CncPathList::const_iterator& itEnd) {
+bool CncPathListRunner::onPerfromRawMove(const CncPathListEntry& curr) {
+//////////////////////////////////////////////////////////////////
+	CHECK_INTERRUPTED
+	CHECK_TYPE(curr.hasPositionChange())
+		
+	if ( setup.trace == true )
+	{
+		std::stringstream ss; 
+		ss 	<< "Distance         : " << cnc::dblFormat(curr.entryDistance)	<< std::endl
+			<< "Target           : " << cnc::dblFormat(curr.entryTarget)	<< std::endl
+			<< "Already Rendered : " << curr.alreadyRendered				<< std::endl
+		;
+		
+		CncPreprocessor* cpp = THE_APP->getCncPreProcessor();
+		wxASSERT( cpp != NULL );
+		
+		cpp->addOperatingTraceMovSeqSep("Next Perform Raw Move");
+		cpp->addOperatingTrace(ss);
+	}
+	
+	CHECK_AND_PERFORM_PROCESSING_STATE
+	
+	// Important: Move absolute to avoid a error propagation
+	double px = curr.entryTarget.getX();
+	double py = curr.entryTarget.getY();
+	double pz = curr.entryTarget.getZ();
+	transformationMatrix.transform(px, py, pz);
+	
+	CncDoublePosition p(px, py, pz);
+	PositionStorage::addPos(PositionStorage::TRIGGER_PH_LST_RUN, px, py, pz);
+	currentInterface->logCurrentPositionMetric(px, py, pz);
+	
+	return currentInterface->processPathListEntry(p);
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::onPerfromAnalysedMove(CncPathList::const_iterator& itCurr, const CncPathList::const_iterator& itEnd) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(currentSequence != NULL);
 
@@ -912,7 +921,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		// check type: Register new client id
 		if ( c != curr && c->hasClientIdChange() == true )
 		{
-			if ( onPhysicallyClientIdChange(*c) == false )
+			if ( onPerfromClientIdChange(*c) == false )
 				return false;
 			
 			if ( c->isClientIdChange() )
@@ -927,7 +936,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		// check type: process tool change
 		if ( c != curr && c->hasToolChange() == true ) 
 		{
-			if ( onPhysicallyToolChange(*c) == false )
+			if ( onPerfromToolChange(*c) == false )
 				return false;
 				
 			if ( c->isToolChange() == true )
@@ -942,7 +951,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		// check type: process spindle update
 		if ( c != curr && c->hasSpindleChange() == true ) 
 		{
-			if ( onPhysicallySpindleChange(*c) == false )
+			if ( onPerfromSpindleChange(*c) == false )
 				return false;
 				
 			if ( c->isSpindleChange() == true )
@@ -1085,8 +1094,9 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 	CncAutoFreezer caf(cpp->IsShownOnScreen() ? cpp : NULL);
 	
 	// Main loop over all path list manager cnc entries
-	auto beg = plm.cbegin();
-	auto end = plm.cend();
+	auto beg						= plm.cbegin();
+	auto end						= plm.cend();
+	
 	for ( auto it = beg; it != end; ++it)
 	{
 		const CncPathListEntry& curr = *it;
@@ -1100,9 +1110,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		
 		// ----------------------------------------------------------
 		if ( curr.isNothingChanged() == true )
-		{
 			continue;
-		}
 		
 		if ( checkContent(curr) == false )
 			return false;
@@ -1111,7 +1119,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		// client id change
 		if ( curr.hasClientIdChange() == true )
 		{
-			if ( onPhysicallyClientIdChange(curr) == false )
+			if ( onPerfromClientIdChange(curr) == false )
 				return false;
 		
 			if ( curr.isClientIdChange() )
@@ -1122,7 +1130,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		// tool change
 		if ( curr.hasToolChange() == true ) 
 		{
-			if ( onPhysicallyToolChange(curr) == false )
+			if ( onPerfromToolChange(curr) == false )
 				return false;
 			
 			if ( curr.isToolChange() == true )
@@ -1133,7 +1141,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		// feed speed change
 		if ( curr.hasSpeedChange() == true )
 		{
-			if ( onPhysicallyFeedSpeedChange(curr, next) == false )
+			if ( onPerfromFeedSpeedChange(curr, next) == false )
 				return false;
 			
 			if ( curr.isSpeedChange() == true )
@@ -1144,7 +1152,7 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		// spindle speed change
 		if ( curr.hasSpindleChange() == true )
 		{
-			if ( onPhysicallySpindleChange(curr) == false )
+			if ( onPerfromSpindleChange(curr) == false )
 				return false;
 			
 			if ( curr.isSpindleChange() == true )
@@ -1155,16 +1163,32 @@ bool CncPathListRunner::publishCncPath(const CncPathListManager& plm) {
 		// position change
 		if ( curr.hasPositionChange() == true )
 		{
-			if ( setup.optAnalyse == false ) 
+			if ( initialMovementPerformed == false )
 			{
-				if ( onPhysicallyMoveRaw(curr) == false )
+				// Initial Movement, never optimize it 
+				// because it has to be converted later to 
+				// a relative Movement depending on the 
+				// cnc position at the time the cnc execute it
+				if ( onPerfromInitialMove(curr) == false )
 					return false;
+				
+				// only do this once
+				initialMovementPerformed = true;
 			}
-			else 
+			else
 			{
-				// Note: this call may be increments (it)
-				if ( onPhysicallyMoveAnalysed(it, plm.cend()) == false ) {
-					return false;
+				// secondary movements
+				if ( setup.optAnalyse == false ) 
+				{
+					if ( onPerfromRawMove(curr) == false )
+						return false;
+				}
+				else 
+				{
+					// Note: this call may be increments (it)
+					if ( onPerfromAnalysedMove(it, plm.cend()) == false ) {
+						return false;
+					}
 				}
 			}
 			
